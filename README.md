@@ -1,22 +1,16 @@
-# create-svelte
+# Drips App V2
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This repo contains the in-development Drips App V2, which will allow users to create and manage streams on the Radicle Drips protocol, as well as provide developers with an interface for inspecting streams.
 
-## Creating a project
+## Development
 
-If you're seeing this, you've probably already done this step. Congrats!
+Setup:
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+npm install
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+To run a development server:
 
 ```bash
 npm run dev
@@ -35,4 +29,12 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Tests
+
+Tests are setup with `vitest` as a runner, and `playwright` as the E2E test environment. Components can be unit-tested using `jsdom` (check `$lib/components/example/example.test.ts` for an example).
+
+Run all tests:
+
+```bash
+npm run test
+```
