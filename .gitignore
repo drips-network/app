@@ -6,5 +6,7 @@ node_modules
 .env
 .env.*
 !.env.example
-static/fonts
-static/twemoji
+static/fonts/*
+!static/fonts/.gitkeep
+static/twemoji/*
+!static/twemoji/.gitkeep
