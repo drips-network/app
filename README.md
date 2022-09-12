@@ -1,4 +1,4 @@
-# Drips App V2
+banana# Drips App V2
 
 This repo contains the in-development Drips App V2, which will allow users to create and manage streams on the Radicle Drips protocol, as well as provide developers with an interface for inspecting streams.
 
