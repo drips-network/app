@@ -1,0 +1,19 @@
+name: pull-request
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install E2E test browsers
+        run: npx playwright install-deps
+
+      - name: Run tests
+        run: npm run test
