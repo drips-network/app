@@ -1,6 +1,8 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
+  import walletStore from '$lib/stores/wallet';
 
+  // Global CSS imports
   import '../app.css';
   import 'radicle-design-system/static/reset.css';
   import 'radicle-design-system/static/global.css';
@@ -18,6 +20,8 @@
       prefersDarkMode = event.matches;
     });
   });
+
+  onMount(() => walletStore.initialize());
 </script>
 
 <div class="main" data-theme={prefersDarkMode ? 'dark' : 'light'}>

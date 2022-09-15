@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import test from './example';
+import test from './example.store';
 
 it('increments', () => {
   test.increment(1);
