@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import walletStore from '$lib/stores/wallet';
 
   // Global CSS imports
   import '../app.css';
@@ -9,11 +10,28 @@
   import 'radicle-design-system/static/elevation.css';
   import 'radicle-design-system/static/typography.css';
 
-  import walletStore from '$lib/stores/wallet';
+  let prefersDarkMode = false;
+
+  onMount(() => {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    prefersDarkMode = darkModeQuery.matches;
+
+    darkModeQuery.addEventListener('change', (event) => {
+      prefersDarkMode = event.matches;
+    });
+  });
 
   onMount(() => walletStore.initialize());
 </script>
 
-<div data-theme="light">
+<div class="main" data-theme={prefersDarkMode ? 'dark' : 'light'}>
   <slot />
 </div>
+
+<style>
+  .main {
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: var(--color-background);
+  }
+</style>
