@@ -9,6 +9,9 @@ const config = defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.ts'],
     setupFiles: ['./setup-test.js'],
+    deps: {
+      inline: ['@ethersproject/signing-key', '@ethersproject/basex'],
+    },
   },
 });
 

@@ -19,6 +19,7 @@
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@playwright/test": "^1.25.0",
+    "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
     "@testing-library/jest-dom": "^5.16.5",
