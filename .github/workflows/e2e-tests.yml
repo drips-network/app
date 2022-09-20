@@ -1,6 +1,6 @@
-name: Run tests
+name: Run e2e tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
@@ -15,5 +15,8 @@ jobs:
       - name: Install E2E test browsers
         run: npx playwright install-deps
 
-      - name: Run tests
-        run: npm run test
+      - name: Build app
+        run: npm run build
+
+      - name: Run e2e tests
+        run: npm run test:e2e

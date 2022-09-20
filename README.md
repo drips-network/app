@@ -31,10 +31,17 @@ You can preview the production build with `npm run preview`.
 
 ## Tests
 
-Tests are setup with `vitest` as a runner, and `playwright` as the E2E test environment. Components can be unit-tested using `jsdom` (check `$lib/components/example/example.test.ts` for an example).
+Tests are setup with `vitest` as a runner, and `playwright` as the E2E test environment. Components can be unit-tested using `jsdom` (check `$lib/components/example/example.test.ts` for an example). Ensure unit tests follow the name format `*.unit.test.ts`, while E2E tests should be named like `*.e2e.test.ts`.
 
-Run all tests:
+Run tests:
 
 ```bash
+# All tests (run npm build first to produce a production build for E2E)
 npm run test
+
+# Only E2E (run npm build first to produce a production build for E2E)
+npm run test:e2e
+
+# Only unit
+npm run test:unit
 ```
