@@ -3,9 +3,13 @@ import type { Network } from '@ethersproject/networks';
 import Web3Modal from 'web3modal';
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { Utils } from 'radicle-drips';
 
 // https://github.com/vitejs/vite/issues/7257#issuecomment-1079579892
 import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
+
+const { SUPPORTED_CHAINS } = Utils.Network;
+const DEFAULT_CHAIN = 5;
 
 const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
 
@@ -44,11 +48,7 @@ export default (() => {
     });
 
     if (web3Modal.cachedProvider) {
-      const instance = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(instance);
-
-      _attachListeners(instance);
-      await _setConnectedState(provider);
+      await connect();
     }
   }
 
@@ -59,8 +59,13 @@ export default (() => {
     if (!browser) throw new Error('Can only connect client-side');
 
     const instance = await web3Modal.connect();
-
     const provider = new ethers.providers.Web3Provider(instance);
+
+    if (!_isNetworkSupported(await provider.getNetwork())) {
+      await provider.send('wallet_switchEthereumChain', [
+        { chainId: `0x${DEFAULT_CHAIN.toString(16)}` },
+      ]);
+    }
 
     _attachListeners(instance);
     await _setConnectedState(provider);
@@ -72,6 +77,10 @@ export default (() => {
    */
   function disconnect(): void {
     _clear();
+  }
+
+  function _isNetworkSupported(network: Network): boolean {
+    return SUPPORTED_CHAINS.includes(network.chainId);
   }
 
   async function _setConnectedState(provider: ethers.providers.Web3Provider): Promise<void> {
