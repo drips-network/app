@@ -2,6 +2,7 @@
   import Button from 'radicle-design-system/Button.svelte';
   import wallet from '$lib/stores/wallet';
   import ens from '$lib/stores/ens';
+  import drips from '$lib/stores/drips';
 
   async function connect() {
     await wallet.connect();
@@ -14,12 +15,14 @@
 
       // Connect all stores to wallet
       ens.connect(provider);
+      drips.connect(provider);
 
       // Lookup own name
       ens.lookup(address);
     } else {
       // Disconnect all stores from wallet
       ens.disconnect();
+      drips.disconnect();
     }
   }
 </script>
