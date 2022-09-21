@@ -1,12 +1,9 @@
 <script lang="ts">
-  import Button from 'radicle-design-system/Button.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import wallet from '$lib/stores/wallet';
   import ens from '$lib/stores/ens';
   import drips from '$lib/stores/drips';
-
-  async function connect() {
-    await wallet.connect();
-  }
 
   $: {
     if ($wallet?.connected) {
@@ -27,8 +24,6 @@
   }
 </script>
 
-{#if $wallet?.connected}
-  <Button on:click={wallet.disconnect}>Disconnect wallet</Button>
-{:else}
-  <Button on:click={connect}>Connect wallet</Button>
-{/if}
+<Button icon={WalletIcon} on:click={$wallet?.connected ? wallet.disconnect : wallet.connect}
+  >{$wallet?.connected ? 'Disconnect wallet' : 'Connect wallet'}</Button
+>
