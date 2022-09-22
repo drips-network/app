@@ -1,5 +1,6 @@
 import SlotTestComponent from '$lib/utils/test/slot-test-component.svelte';
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { render, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
 import ThumbsUpIcon from 'radicle-design-system/icons/ThumbsUp.svelte';
 import Button from './button.svelte';
 
@@ -27,33 +28,30 @@ describe('button.svelte', async () => {
     expect(icon).toBeInTheDocument();
   });
 
-  it('fires click handler on click', () => {
+  it('fires click handler on click', async () => {
     const handleClick = vi.fn();
 
-    render(Button, {
-      props: {
-        onClick: handleClick,
-      },
-    });
+    const { component } = render(Button);
+
+    component.$on('click', handleClick);
 
     const button = screen.getByRole('button');
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(handleClick).toHaveBeenCalled();
   });
 
-  it('cannot be clicked when disabled', () => {
+  it('cannot be clicked when disabled', async () => {
     const handleClick = vi.fn();
 
     render(Button, {
       props: {
-        onClick: handleClick,
         disabled: true,
       },
     });
 
     const button = screen.getByRole('button');
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(handleClick).toBeCalledTimes(0);
   });

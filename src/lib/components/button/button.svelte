@@ -4,15 +4,9 @@
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
-  export let onClick: (() => void) | undefined = undefined;
 </script>
 
-<button
-  aria-label={ariaLabel}
-  class:with-icon={Boolean(icon)}
-  {disabled}
-  on:click={!disabled ? onClick : undefined}
->
+<button aria-label={ariaLabel} class:with-icon={Boolean(icon)} {disabled} on:click|stopPropagation>
   {#if icon}
     <svelte:component this={icon} style="fill: var(--color-foreground-level-6)" />
   {/if}
