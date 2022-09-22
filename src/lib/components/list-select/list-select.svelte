@@ -2,6 +2,7 @@
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import EyeClosedIcon from 'radicle-design-system/icons/EyeClosed.svelte';
   import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
+  import CircleIcon from 'radicle-design-system/icons/Circle.svelte';
   import type { Items } from './list-select.types';
   import { onMount } from 'svelte';
 
@@ -133,10 +134,16 @@
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
-      <div class:hidden={!multiselect || !selected.includes(slug)} class="check-icon">
-        <CheckIcon style="fill: var(--color-primary)" />
-      </div>
-      <div class:hidden={multiselect && selected.includes(slug)} class="image">
+      {#if multiselect && item.type === 'selectable'}
+        <div class="check-icon">
+          {#if selected.includes(slug)}
+            <CheckIcon style="fill: var(--color-primary)" />
+          {:else}
+            <CircleIcon />
+          {/if}
+        </div>
+      {/if}
+      <div class="image">
         {#if typeof item.image === 'string'}
           <img src={item.image} alt="List item" />
         {:else if item.image}
