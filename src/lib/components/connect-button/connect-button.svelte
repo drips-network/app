@@ -24,6 +24,6 @@
   }
 </script>
 
-<Button icon={WalletIcon} on:click={$wallet?.connected ? wallet.disconnect : wallet.connect}
+<Button icon={WalletIcon} onClick={$wallet?.connected ? wallet.disconnect : wallet.connect}
   >{$wallet?.connected ? 'Disconnect wallet' : 'Connect wallet'}</Button
 >
