@@ -3,6 +3,7 @@
   import EyeClosedIcon from 'radicle-design-system/icons/EyeClosed.svelte';
   import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
   import type { Items } from './list-select.types';
+  import { onMount } from 'svelte';
 
   export let items: Items;
 
@@ -52,13 +53,67 @@
     if (e.key !== 'Enter') return;
     selectItem(slug);
   };
+
+  let searchBarElem: HTMLDivElement;
+  let itemElements: { [slug: string]: HTMLDivElement } = {};
+
+  function handleArrowKeys(e: KeyboardEvent) {
+    const focussedElem = document.activeElement;
+
+    const visibleEls = Object.values(itemElements).filter(
+      (itemElement) => !itemElement.classList.contains('hidden'),
+    );
+
+    const itemElemInFocus = visibleEls.find((elem) => document.activeElement === elem);
+
+    if (!(searchBarElem === focussedElem || itemElemInFocus)) return;
+    if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
+
+    switch (e.key) {
+      case 'ArrowDown': {
+        if (!itemElemInFocus) {
+          visibleEls[0].focus();
+          break;
+        }
+
+        visibleEls[visibleEls.indexOf(itemElemInFocus) + 1]?.focus();
+        break;
+      }
+      case 'ArrowUp': {
+        if (!itemElemInFocus) break;
+
+        const previousElem = visibleEls[visibleEls.indexOf(itemElemInFocus) - 1];
+
+        if (previousElem) {
+          previousElem.focus();
+        } else {
+          searchBarElem.focus();
+        }
+
+        break;
+      }
+    }
+
+    e.preventDefault();
+  }
+
+  onMount(() => {
+    window.addEventListener('keydown', handleArrowKeys);
+
+    return () => window.removeEventListener('keydown', handleArrowKeys);
+  });
 </script>
 
 <div class="list">
   {#if searchable}
     <div class="search-bar">
       <SearchIcon />
-      <input class="typo-text" bind:value={searchString} placeholder="Search…" />
+      <input
+        class="typo-text"
+        bind:this={searchBarElem}
+        bind:value={searchString}
+        placeholder="Search…"
+      />
     </div>
   {/if}
   {#if listIsEmpty}
@@ -76,6 +131,7 @@
       on:keydown={(e) => handleKeypress(e, slug)}
       tabindex="0"
       data-testid={`item-${slug}`}
+      bind:this={itemElements[slug]}
     >
       <div class:hidden={!multiselect || !selected.includes(slug)} class="check-icon">
         <CheckIcon style="fill: var(--color-primary)" />

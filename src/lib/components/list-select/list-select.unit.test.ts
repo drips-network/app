@@ -87,10 +87,11 @@ describe('list-select.svelte', async () => {
     expect(otherItem).not.toHaveClass('selected');
   });
 
-  it('allows selecting an item via keyboard', async () => {
+  it('allows selecting (multiple) items via keyboard', async () => {
     render(ListSelect, {
       props: {
         items: testItems,
+        multiselect: true,
       },
     });
 
@@ -104,13 +105,23 @@ describe('list-select.svelte', async () => {
     const item1 = screen.getByTestId('item-test-item-1');
     expect(item1).toHaveFocus();
 
-    await userEvent.tab();
+    await userEvent.keyboard('{ArrowDown}');
 
     const item2 = screen.getByTestId('item-test-item-2');
     expect(item2).toHaveFocus();
 
     await userEvent.keyboard('{enter}');
     expect(item2).toHaveClass('selected');
+
+    await userEvent.keyboard('{ArrowUp}');
+    expect(item1).toHaveFocus();
+
+    await userEvent.keyboard('{enter}');
+    expect(item1).toHaveClass('selected');
+    expect(item2).toHaveClass('selected');
+
+    await userEvent.keyboard('{ArrowUp}');
+    expect(searchBar).toHaveFocus();
   });
 
   it('fires action handlers', async () => {
