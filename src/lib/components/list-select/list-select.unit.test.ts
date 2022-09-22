@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import ListSelect from './list-select.svelte';
+import type { Items } from './list-select.types';
 
-const testItems = {
+const testItems: Items = {
   'test-item-1': {
     type: 'selectable',
     label: 'test-item-1-label',
