@@ -112,4 +112,25 @@ describe('list-select.svelte', async () => {
     await userEvent.keyboard('{enter}');
     expect(item2).toHaveClass('selected');
   });
+
+  it('fires action handlers', async () => {
+    const spy = vi.fn();
+
+    render(ListSelect, {
+      props: {
+        items: {
+          action: {
+            type: 'action',
+            label: 'action',
+            handler: spy,
+          },
+        },
+      },
+    });
+
+    const item1 = screen.getByTestId('item-action');
+    await userEvent.click(item1);
+
+    expect(spy).toHaveBeenCalled();
+  });
 });
