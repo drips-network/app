@@ -5,7 +5,7 @@ beforeEach(() => {
   render(Counter);
 });
 
-describe('Test Counter.svelte', async () => {
+describe.skip('Test Counter.svelte', async () => {
   it('Initially shows zero', async () => {
     expect(screen.getByText('0')).toBeInTheDocument();
   });
