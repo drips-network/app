@@ -1,5 +1,6 @@
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+import { tick } from 'svelte';
 import flyoutTestWrapperComponentSvelte from './flyout-test-wrapper-component.svelte';
 
 describe('flyout.svelte', () => {
@@ -23,10 +24,9 @@ describe('flyout.svelte', () => {
     const content = screen.getByText('Content');
 
     await userEvent.unhover(trigger);
+    await tick();
 
-    await waitForElementToBeRemoved(content, {
-      timeout: 2000,
-    });
+    await waitForElementToBeRemoved(content, { timeout: 5000 });
   });
 
   it('responds to keyboard focus too', async () => {
@@ -39,9 +39,8 @@ describe('flyout.svelte', () => {
     const content = screen.getByText('Content');
 
     await userEvent.tab();
+    await tick();
 
-    await waitForElementToBeRemoved(content, {
-      timeout: 2000,
-    });
+    await waitForElementToBeRemoved(content, { timeout: 5000 });
   });
 });
