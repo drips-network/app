@@ -17,15 +17,16 @@ const store = writable<ScrollStore>({
 
 const html = browser && document.querySelector('html');
 
-let initialized = false;
-
 /**
  * Initializes the store by attaching required listeners to `window`.
  */
 function attach(): void {
-  if (!initialized) {
+  if (!get(store).initialized) {
     window.addEventListener('scroll', () => _update());
-    initialized = true;
+    store.update((s) => ({
+      ...s,
+      initialized: true,
+    }));
   }
 }
 
@@ -34,7 +35,10 @@ function attach(): void {
  */
 function detach() {
   window.removeEventListener('scroll', () => _update());
-  initialized = false;
+  store.update((s) => ({
+    ...s,
+    initialized: false,
+  }));
 }
 
 /**
