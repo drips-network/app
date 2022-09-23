@@ -8,12 +8,14 @@ interface ScrollStore {
   direction: 'up' | 'down' | undefined;
 }
 
-const store = writable<ScrollStore>({
+const INITIAL_STATE = {
   initialized: false,
   pos: 0,
   direction: undefined,
   scrolling: false,
-});
+};
+
+const store = writable<ScrollStore>(INITIAL_STATE);
 
 const html = browser && document.querySelector('html');
 
@@ -35,10 +37,7 @@ function attach(): void {
  */
 function detach() {
   window.removeEventListener('scroll', () => _update());
-  store.update((s) => ({
-    ...s,
-    initialized: false,
-  }));
+  store.set(INITIAL_STATE);
 }
 
 /**
@@ -58,16 +57,28 @@ function unlock() {
 }
 
 function _update() {
-  const pos = Math.max(window.scrollY, 0);
-  const direction = pos > get(store).pos ? 'down' : 'up';
-  const scrolling = pos !== get(store).pos;
+  let newValues = {};
 
-  store.set({
-    initialized: true,
-    pos,
-    direction,
+  const pos = Math.max(window.scrollY, 0);
+  const scrolling = pos !== get(store).pos;
+  newValues = {
     scrolling,
-  });
+    pos,
+  };
+
+  if (scrolling) {
+    const direction = pos > get(store).pos ? 'down' : 'up';
+
+    newValues = {
+      ...newValues,
+      direction,
+    };
+  }
+
+  store.update((s) => ({
+    ...s,
+    ...newValues,
+  }));
 }
 
 export default {
