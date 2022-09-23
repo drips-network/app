@@ -1,9 +1,13 @@
 <script lang="ts">
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
+  import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
+  import User from 'radicle-design-system/icons/User.svelte';
+  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
 
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items as ListItems } from '$lib/components/list-select/list-select.types';
   import Button from '$lib/components/button/button.svelte';
+  import SectionHeader from '$lib/components/section-header/section-header.svelte';
 
   // Button
   let disabled = false;
@@ -42,37 +46,67 @@
 
 <h1>Component showcase</h1>
 
-<h2>Button</h2>
-<div>
-  <input id="button-disabled-checkbox" type="checkbox" bind:checked={disabled} />
-  <label for="button-disabled-checkbox">Disabled</label>
+<div class="showcase-item">
+  <h2>Button</h2>
+  <div>
+    <input id="button-disabled-checkbox" type="checkbox" bind:checked={disabled} />
+    <label for="button-disabled-checkbox">Disabled</label>
+  </div>
+  <Button {disabled} icon={PlusIcon}>Example button</Button>
 </div>
-<Button {disabled} icon={PlusIcon}>Example button</Button>
 
-<h2>List Select</h2>
-<div>
-  <input id="searchable-checkbox" type="checkbox" bind:checked={searchable} />
-  <label for="searchable-checkbox">Searchable</label>
+<div class="showcase-item">
+  <h2>List Select</h2>
+  <div>
+    <input id="searchable-checkbox" type="checkbox" bind:checked={searchable} />
+    <label for="searchable-checkbox">Searchable</label>
+  </div>
+  <div>
+    <input id="multiselect-checkbox" type="checkbox" bind:checked={multiselect} />
+    <label for="multiselect-checkbox">Multi-select</label>
+  </div>
+  <p>
+    Selected tokens: {selectedTokens}
+  </p>
+  <div class="list-container">
+    <ListSelect
+      items={exampleListItems}
+      bind:selected={selectedTokens}
+      {searchable}
+      {multiselect}
+    />
+  </div>
 </div>
-<div>
-  <input id="multiselect-checkbox" type="checkbox" bind:checked={multiselect} />
-  <label for="multiselect-checkbox">Multi-select</label>
-</div>
-<p>
-  Selected tokens: {selectedTokens}
-</p>
-<div class="list-container">
-  <ListSelect items={exampleListItems} bind:selected={selectedTokens} {searchable} {multiselect} />
+
+<div class="showcase-item">
+  <h2>Section header</h2>
+  <SectionHeader
+    label="Hello"
+    icon={ThumbsUp}
+    actions={[
+      {
+        label: 'Trigger existential crisis',
+        icon: User,
+        handler: () => undefined,
+      },
+      {
+        label: 'Witness',
+        icon: EyeOpen,
+        handler: () => undefined,
+      },
+    ]}
+  />
 </div>
 
 <style>
   h1 {
     color: var(--color-primary);
+    margin-bottom: 2rem;
   }
 
   h2 {
     color: var(--color-primary);
-    margin-top: 2rem;
+    margin-bottom: 0.5rem;
   }
 
   p,
@@ -81,11 +115,15 @@
   }
 
   .list-container {
-    margin: 3rem;
+    margin-top: 1rem;
     width: 32rem;
     height: 32rem;
     overflow: scroll;
     border: 0.125rem solid var(--color-foreground-level-2);
     border-radius: 0.5rem;
+  }
+
+  .showcase-item {
+    margin-bottom: 3rem;
   }
 </style>
