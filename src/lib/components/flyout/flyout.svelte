@@ -1,23 +1,37 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
   export let direction: 'left' | 'right' = 'left';
 
   let visible = false;
+  let triggerElem: HTMLDivElement;
 
   function handleHover(hovering: boolean) {
     visible = hovering;
   }
+
+  function handleFocusChange(e: FocusEvent) {
+    if (e.target === triggerElem) return (visible = true);
+    if (triggerElem.contains(e.target as HTMLDivElement)) return;
+
+    visible = false;
+  }
+
+  onMount(() => {
+    document.addEventListener('focusin', handleFocusChange);
+
+    return () => document.removeEventListener('focusin', handleFocusChange);
+  });
 </script>
 
 <div class="flyout">
   <div
     class="trigger"
     tabindex="0"
+    bind:this={triggerElem}
     on:mouseenter={() => handleHover(true)}
-    on:focus={() => handleHover(true)}
     on:mouseleave={() => handleHover(false)}
-    on:blur={() => handleHover(false)}
   >
     <div class="trigger-content">
       <slot name="trigger" />
