@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import walletStore from '$lib/stores/wallet';
+  import Header from '$lib/components/header/header.svelte';
+  import scroll from '$lib/stores/scroll';
 
   // Global CSS imports
-  import '../app.css';
+  import '../styles/app.css';
   import 'radicle-design-system/static/reset.css';
   import 'radicle-design-system/static/global.css';
   import 'radicle-design-system/static/colors.css';
@@ -22,10 +24,15 @@
   });
 
   onMount(() => walletStore.initialize());
+
+  onMount(() => scroll.attach());
 </script>
 
 <div class="main" data-theme={prefersDarkMode ? 'dark' : 'light'}>
-  <slot />
+  <Header />
+  <div class="page">
+    <slot />
+  </div>
 </div>
 
 <style>
@@ -33,5 +40,11 @@
     min-height: 100vh;
     min-width: 100vw;
     background-color: var(--color-background);
+  }
+
+  .page {
+    max-width: 64rem;
+    padding: 6rem 1rem 1rem 1rem;
+    margin: 0 auto;
   }
 </style>
