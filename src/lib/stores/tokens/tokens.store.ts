@@ -3,6 +3,7 @@ import type { TokenInfo } from '@uniswap/token-lists';
 import { get, writable } from 'svelte/store';
 import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
+import { Utils } from 'radicle-drips';
 
 interface DefaultTokenInfoWrapper {
   info: TokenInfo;
@@ -64,6 +65,23 @@ export default (() => {
       const chainIdMatch = t.info.chainId === chain;
 
       return symbolMatch && chainIdMatch;
+    });
+  }
+
+  function getByDripsAssetId(
+    dripsAssetId: string | bigint,
+    chain = chainId,
+  ): TokenInfoWrapper | undefined {
+    const tokens = get(tokenList);
+    assert(tokens, 'Store must be connected first');
+
+    return tokens.find((t) => {
+      const assetAddress = Utils.Asset.getAddressFromId(dripsAssetId);
+
+      const addressMatch = t.info.address.toLowerCase() === assetAddress.toLowerCase();
+      const chainIdMatch = t.info.chainId === chain;
+
+      return addressMatch && chainIdMatch;
     });
   }
 
@@ -133,6 +151,7 @@ export default (() => {
     disconnect,
     getByAddress,
     getBySymbol,
+    getByDripsAssetId,
     addCustomToken,
     removeCustomToken,
     setCustomTokenBanStatus,

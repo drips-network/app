@@ -1,4 +1,5 @@
 import uniswapTokenList from '@uniswap/default-token-list';
+import { Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import tokens from '.';
 
@@ -33,7 +34,7 @@ describe('tokens store', () => {
     );
   });
 
-  it('finds tokens by address or symbol', () => {
+  it('finds tokens by address, symbol or drips asset ID', () => {
     tokens.connect(1);
     expect(tokens.getBySymbol('RAD')?.info.address).toBe(
       '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -41,6 +42,11 @@ describe('tokens store', () => {
     expect(tokens.getByAddress('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3')?.info.symbol).toBe(
       'RAD',
     );
+    expect(
+      tokens.getByDripsAssetId(
+        Utils.Asset.getIdFromAddress('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3'),
+      )?.info.address,
+    ).toBe('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3');
   });
 
   it('adds and removes custom tokens', () => {
