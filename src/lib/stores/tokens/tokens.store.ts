@@ -22,6 +22,11 @@ export default (() => {
   let chainId: number | undefined;
   const tokenList = writable<TokenInfoWrapper[] | undefined>();
 
+  /**
+   * Connect the store to a chain, which is required before any other
+   * functionality can be used.
+   * @param toChainId The ID of the chain to serve tokens for.
+   */
   function connect(toChainId: number) {
     chainId = toChainId;
 
@@ -39,11 +44,22 @@ export default (() => {
     tokenList.set([...defaultTokens, ...customTokens]);
   }
 
+  /**
+   * Disconnect the store from the connected chain, and clear it completely. Any custom
+   * tokens persisted in localstorage will be restored on next call to `connect`.
+   */
   function disconnect() {
     chainId = undefined;
     tokenList.set(undefined);
   }
 
+  /**
+   * Retrieve token information for a given token by its address.
+   * @param address The contract address of the token to retrieve information for.
+   * @param chain The chain ID to retrieve the token information for. Defaults to the
+   * chain the store is connected to.
+   * @returns Token information, or undefined if not found.
+   */
   function getByAddress(address: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
     assert(tokens, 'Store must be connected first');
@@ -56,6 +72,13 @@ export default (() => {
     });
   }
 
+  /**
+   * Retrieve token information for a given token by its symbol.
+   * @param symbol The symbol of the token to retrieve information for.
+   * @param chain The chain ID to retrieve the token information for. Defaults to the
+   * chain the store is connected to.
+   * @returns Token information, or undefined if not found.
+   */
   function getBySymbol(symbol: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
     assert(tokens, 'Store must be connected first');
@@ -68,6 +91,14 @@ export default (() => {
     });
   }
 
+  /**
+   * Retrieve token information for a given token by its Drips `asset ID` (which is a
+   * hexadecimal representation of its address).
+   * @param dripsAssetId The drips asset ID of the token to retrieve information for.
+   * @param chain The chain ID to retrieve the token information for. Defaults to the
+   * chain the store is connected to.
+   * @returns Token information, or undefined if not found.
+   */
   function getByDripsAssetId(
     dripsAssetId: string | bigint,
     chain = chainId,
@@ -85,6 +116,13 @@ export default (() => {
     });
   }
 
+  /**
+   * Add a new custom token if said token is not part of the default list. Custom tokens
+   * are persisted in localstorage. Once called, the custom token will be included in the
+   * store state, provided it matches the current chainId.
+   * @param tokenInfo An object containing all of the required metadata for persisting the
+   * custom token.
+   */
   function addCustomToken(tokenInfo: TokenInfo) {
     const tokens = get(tokenList);
     assert(tokens && chainId, 'Store must be connected first');
@@ -108,6 +146,12 @@ export default (() => {
     ]);
   }
 
+  /**
+   * Removes a previously-created custom token from the persisted custom token list. Once
+   * called, the token disappears from the store state and is erased from localstorage.
+   * @param address The address of the custom token to remove.
+   * @param chainId The chain ID of the custom token to remove.
+   */
   function removeCustomToken(address: string, chainId: number) {
     const tokens = get(tokenList);
     assert(tokens && chainId, 'Store must be connected first');
@@ -124,6 +168,14 @@ export default (() => {
     tokenList.set(tokens);
   }
 
+  /**
+   * Ban or un-ban a custom token. Banning a custom token adds a `banned = true` field to its
+   * token info, which is intended to denote that said token should generally be hidden across
+   * the application.
+   * @param address The address of the token to ban / un-ban.
+   * @param chainId The chain ID of the token to ban / un-ban.
+   * @param banned True if the token should be banned, false if un-banned.
+   */
   function setCustomTokenBanStatus(address: string, chainId: number, banned: boolean) {
     const tokens = get(tokenList);
     assert(tokens && chainId, 'Store must be connected first');
