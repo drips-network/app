@@ -1,5 +1,7 @@
 <script lang="ts">
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
+  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import Dropdown from 'radicle-design-system/Dropdown.svelte';
   import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
   import User from 'radicle-design-system/icons/User.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
@@ -8,6 +10,7 @@
   import type { Items as ListItems } from '$lib/components/list-select/list-select.types';
   import Button from '$lib/components/button/button.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
+  import Amount from '$lib/components/amount/amount.svelte';
 
   // Button
   let disabled = false;
@@ -42,6 +45,11 @@
       handler: () => undefined,
     },
   };
+
+  // Amount
+  let amount = '1000000000000000000';
+  let tokenAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
+  let delta: 'positive' | 'negative' | 'none' = 'none';
 </script>
 
 <h1>Component showcase</h1>
@@ -96,6 +104,34 @@
       },
     ]}
   />
+</div>
+
+<div class="showcase-item">
+  <h2>Amount</h2>
+  <p>Amount</p>
+  <TextInput bind:value={amount} />
+  <p>Token Address</p>
+  <TextInput bind:value={tokenAddress} />
+  <p>Delta</p>
+  <Dropdown
+    bind:value={delta}
+    options={[
+      {
+        value: 'positive',
+        title: 'Positive',
+      },
+      {
+        value: 'negative',
+        title: 'Negative',
+      },
+      {
+        value: 'none',
+        title: 'None',
+      },
+    ]}
+  />
+  <p>Output:</p>
+  <Amount amount={BigInt(amount)} {tokenAddress} delta={delta === 'none' ? undefined : delta} />
 </div>
 
 <style>
