@@ -7,15 +7,17 @@
   import Flyout from '../flyout/flyout.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenu from '../account-menu/account-menu.svelte';
+  import tokens from '$lib/stores/tokens';
 
   $: {
     if ($wallet?.connected) {
-      const { provider, address } = $wallet ?? {};
+      const { provider, address, network } = $wallet ?? {};
       if (!provider || !address) throw new Error('No provider after connection');
 
       // Connect all stores to wallet
       ens.connect(provider);
       drips.connect(provider);
+      tokens.connect(network.chainId);
 
       // Lookup own name
       ens.lookup(address);
@@ -23,6 +25,7 @@
       // Disconnect all stores from wallet
       ens.disconnect();
       drips.disconnect();
+      tokens.disconnect();
     }
   }
 </script>
