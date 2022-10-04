@@ -51,8 +51,11 @@
   const handleItemClick = selectItem;
 
   const handleKeypress = (e: KeyboardEvent, slug: string) => {
-    if (e.key !== 'Enter') return;
+    const selectKeys = ['Enter', ' '];
+    if (!selectKeys.includes(e.key)) return;
+
     selectItem(slug);
+    e.preventDefault();
   };
 
   let searchBarElem: HTMLDivElement;
