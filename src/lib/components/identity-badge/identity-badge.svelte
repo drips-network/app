@@ -4,6 +4,7 @@
   import ensStore from '$lib/stores/ens';
   import { createIcon } from 'radicle-design-system/lib/blockies';
   import Avatar from '$lib/components/avatar/avatar.svelte';
+  import { browser } from '$app/environment';
 
   export let address: string;
   export let showIdentity = true;
@@ -11,11 +12,14 @@
   $: ensStore.lookup(address);
   $: ens = $ensStore[address];
 
-  $: blockyUrl = createIcon({
-    seed: address.toLowerCase(),
-    size: 8,
-    scale: 16,
-  }).toDataURL();
+  $: blockyUrl =
+    (browser &&
+      createIcon({
+        seed: address.toLowerCase(),
+        size: 8,
+        scale: 16,
+      }).toDataURL()) ||
+    undefined;
 
   function formatAddress(address: string) {
     const unpadded = address.replace('0x', '');
