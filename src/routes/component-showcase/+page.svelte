@@ -11,6 +11,7 @@
   import Button from '$lib/components/button/button.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Amount from '$lib/components/amount/amount.svelte';
+  import ExampleTable from './examples/example-table.svelte';
 
   // Button
   let disabled = false;
@@ -132,6 +133,11 @@
   />
   <p>Output:</p>
   <Amount amount={BigInt(amount)} {tokenAddress} delta={delta === 'none' ? undefined : delta} />
+</div>
+
+<div class="showcase-item">
+  <h2>Table</h2>
+  <ExampleTable />
 </div>
 
 <style>
