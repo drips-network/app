@@ -117,7 +117,7 @@ describe('list-select.svelte', async () => {
     await userEvent.keyboard('{ArrowUp}');
     expect(item1).toHaveFocus();
 
-    await userEvent.keyboard('{enter}');
+    await userEvent.keyboard(' ');
     expect(item1).toHaveClass('selected');
     expect(item2).toHaveClass('selected');
 
