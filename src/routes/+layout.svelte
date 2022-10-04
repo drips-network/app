@@ -44,7 +44,7 @@
 
   .page {
     max-width: 64rem;
-    padding: 6rem 1rem 1rem 1rem;
+    padding: 6rem 1rem 4rem 1rem;
     margin: 0 auto;
   }
 </style>
