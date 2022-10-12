@@ -12,29 +12,21 @@ vi.mock('@rsksmart/mock-web3-provider', () => ({
 const provider = new MockProvider();
 
 afterEach(() => {
-  ens.disconnect();
+  ens.clear();
 });
 
 describe('ens store', () => {
-  it("quietly doesn't resolve without a provider", async () => {
-    const result = await ens.lookup('0x1234');
-
-    expect(result).toBe(undefined);
-    expect(get(ens)['0x1234']?.name).toBe(undefined);
-  });
-
   it('resolves records', async () => {
     ens.connect(provider);
 
-    const result = await ens.lookup('0x1234');
+    await ens.lookup('0x1234');
 
     const expectedResult = {
       name: 'test.ens',
       avatarUrl: 'foo.com/bar',
     };
 
-    expect(result).toStrictEqual(expectedResult);
-    expect(get(ens)['0x1234']).toStrictEqual(result);
+    expect(get(ens)['0x1234']).toStrictEqual(expectedResult);
   });
 
   it('deduplicates requests', async () => {
@@ -42,8 +34,10 @@ describe('ens store', () => {
 
     ens.lookup('0x1234');
     ens.lookup('0x1234');
+    ens.lookup('0x1234');
+    ens.lookup('0x1234');
 
-    expect(provider.lookupAddress).toHaveBeenCalledTimes(1);
-    expect(provider.getAvatar).toHaveBeenCalledTimes(1);
+    expect(provider.lookupAddress).toHaveBeenCalledTimes(2);
+    expect(provider.getAvatar).toHaveBeenCalledTimes(2);
   });
 });
