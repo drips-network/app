@@ -9,7 +9,10 @@ import { Utils } from 'radicle-drips';
 import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
-const DEFAULT_CHAIN = 5;
+const DEFAULT_NETWORK: Network = {
+  chainId: 5,
+  name: 'Görli',
+};
 
 const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
 
@@ -22,16 +25,41 @@ const WEB_3_MODAL_PROVIDER_OPTIONS = {
   },
 };
 
-type WalletStoreState = {
+interface ConnectedWalletStoreState {
   connected: true;
   address: string;
   provider: ethers.providers.Web3Provider;
   signer: ethers.Signer;
   network: Network;
+}
+
+interface DisconnectedWalletStoreState {
+  connected: false;
+  network: Network;
+  provider: ethers.providers.Web3Provider | ethers.providers.InfuraProvider;
+  address?: undefined;
+  signer?: undefined;
+}
+
+type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState;
+
+const windowProvider =
+  browser && window.ethereum && new ethers.providers.Web3Provider(window.ethereum);
+
+const selectedNetwork =
+  windowProvider && new ethers.providers.Web3Provider(window.ethereum).network;
+
+const INITIAL_STATE: DisconnectedWalletStoreState = {
+  connected: false,
+  network:
+    selectedNetwork && SUPPORTED_CHAINS.includes(selectedNetwork.chainId)
+      ? selectedNetwork
+      : DEFAULT_NETWORK,
+  provider: new ethers.providers.InfuraProvider(),
 };
 
 export default (() => {
-  const state = writable<WalletStoreState | undefined>(undefined);
+  const state = writable<WalletStoreState>(INITIAL_STATE);
 
   let web3Modal: Web3Modal;
 
@@ -63,7 +91,7 @@ export default (() => {
 
     if (!_isNetworkSupported(await provider.getNetwork())) {
       await provider.send('wallet_switchEthereumChain', [
-        { chainId: `0x${DEFAULT_CHAIN.toString(16)}` },
+        { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
       ]);
     }
 
@@ -97,12 +125,12 @@ export default (() => {
   }
 
   function _clear() {
-    web3Modal.clearCachedProvider();
+    web3Modal?.clearCachedProvider();
 
     localStorage.removeItem('walletconnect');
     localStorage.removeItem('WALLETCONNECT_DEEPLINK_CHOICE');
 
-    state.set(undefined);
+    state.set(INITIAL_STATE);
   }
 
   function _attachListeners(provider: ethers.providers.Web3Provider): void {
@@ -113,7 +141,7 @@ export default (() => {
       }
 
       state.update((s) => {
-        if (!s) throw new Error('Accounts changed, but no wallet is connected');
+        if (!s.connected) throw new Error('Accounts changed, but no wallet is connected');
 
         return {
           ...s,
