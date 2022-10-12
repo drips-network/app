@@ -52,13 +52,15 @@
     "vitest": "^0.23.2"
   },
   "dependencies": {
+    "@pinata/sdk": "^1.1.26",
     "@uniswap/default-token-list": "^4.1.0",
     "@uniswap/token-lists": "^1.0.0-beta.30",
     "@tanstack/svelte-table": "^8.5.15",
     "@walletconnect/web3-provider": "^1.8.0",
+    "dotenv": "^16.0.3",
     "ethers": "^5.7.0",
     "radicle-design-system": "https://github.com/radicle-dev/radicle-design-system",
-    "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/v2",
+    "radicle-drips": "github:radicle-dev/drips-js-sdk#v2",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"
   },
