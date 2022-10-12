@@ -34,7 +34,7 @@ describe('amount.svelte', () => {
       },
     });
 
-    expect(screen.getByText('1.0000')).toBeInTheDocument();
+    expect(screen.getByText('1.000000')).toBeInTheDocument();
     expect(screen.getByText('RAD')).toBeInTheDocument();
 
     cleanup();
@@ -46,34 +46,8 @@ describe('amount.svelte', () => {
       },
     });
 
-    screen.getByText('1.0000');
+    screen.getByText('1.000000');
     screen.getByText('RLC');
-  });
-
-  it('renders positive delta', () => {
-    render(Amount, {
-      props: {
-        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-        amount: BigInt('10000000000000000'),
-        delta: 'positive',
-      },
-    });
-
-    expect(screen.getByText('+ 0.0100')).toBeInTheDocument();
-    expect(screen.getByText('RAD')).toBeInTheDocument();
-  });
-
-  it('renders negative delta', () => {
-    render(Amount, {
-      props: {
-        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-        amount: BigInt('10000000000000000'),
-        delta: 'negative',
-      },
-    });
-
-    expect(screen.getByText('- 0.0100')).toBeInTheDocument();
-    expect(screen.getByText('RAD')).toBeInTheDocument();
   });
 });
 

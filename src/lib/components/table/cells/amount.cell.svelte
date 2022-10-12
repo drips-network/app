@@ -1,8 +1,9 @@
 <script lang="ts" context="module">
   export interface AmountCellData {
-    amount: bigint;
+    amount?: bigint;
     tokenAddress: string;
-    delta?: 'positive' | 'negative';
+    showSymbol?: boolean;
+    amountPerSecond?: bigint;
   }
 </script>
 
@@ -13,26 +14,21 @@
 
   export let context: CellContext<unknown, unknown>;
 
-  let amount: bigint;
-  let tokenAddress: string;
-  let delta: 'positive' | 'negative' | undefined;
+  let props: AmountCellData;
   $: {
     const value = context.getValue();
 
     const valueSchema = z.object({
-      amount: z.bigint(),
+      amount: z.bigint().optional(),
       tokenAddress: z.string(),
-      delta: z.union([z.literal('positive'), z.literal('negative'), z.undefined()]),
+      showSymbol: z.boolean().optional(),
+      amountPerSecond: z.bigint().optional(),
     });
 
-    const parsed = valueSchema.parse(value);
-
-    amount = parsed.amount;
-    tokenAddress = parsed.tokenAddress;
-    delta = parsed.delta;
+    props = valueSchema.parse(value);
   }
 </script>
 
-{#if amount && tokenAddress}
-  <Amount {amount} {tokenAddress} {delta} />
+{#if props}
+  <Amount {...props} />
 {/if}
