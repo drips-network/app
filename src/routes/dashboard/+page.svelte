@@ -3,6 +3,11 @@
   import Streams from './sections/streams.section.svelte';
 </script>
 
+<svelte:head>
+  <title>Drips — Dashboard</title>
+  <meta name="description" value="Radicle Drips Dashboard" />
+</svelte:head>
+
 <div class="dashboard">
   <h1>Dashboard</h1>
   <Balances />
