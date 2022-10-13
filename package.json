@@ -53,9 +53,9 @@
   },
   "dependencies": {
     "@pinata/sdk": "^1.1.26",
+    "@tanstack/svelte-table": "^8.5.15",
     "@uniswap/default-token-list": "^4.1.0",
     "@uniswap/token-lists": "^1.0.0-beta.30",
-    "@tanstack/svelte-table": "^8.5.15",
     "@walletconnect/web3-provider": "^1.8.0",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.0",

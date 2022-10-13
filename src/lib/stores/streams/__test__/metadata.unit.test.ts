@@ -185,7 +185,7 @@ describe('metadata.ts', () => {
       expect(account.user.userId).toBe(MOCK_ACCOUNT_DATA.describes.userId);
       expect(account.user.driver).toBe(MOCK_ACCOUNT_DATA.describes.driver);
       // TODO: This is a mocked value ATM since the Drips SDK doesn't yet support converting the user ID to an address.
-      expect(account.user.address).toBe('0x00');
+      expect(account.user.address).toBe('0x99505B669C6064BA2B2f26f2E4fffa5e8d906299');
 
       expect(account.lastUpdated?.getTime()).toBe(
         new Date(MOCK_ACCOUNT_DATA.timestamp * 1000).getTime(),

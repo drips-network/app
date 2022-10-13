@@ -1,4 +1,4 @@
-import { Utils, type DripsSetEvent } from 'radicle-drips';
+import { AddressDriverClient, Utils, type DripsSetEvent } from 'radicle-drips';
 import type { z } from 'zod';
 import type { accountMetadataSchema } from '../metadata';
 import type { AssetConfig, AssetConfigHistoryItem, DripsConfig } from '../types';
@@ -120,13 +120,11 @@ export default function buildAssetConfigs(
         sender: {
           driver: 'address',
           userId: accountMetadata.describes.userId,
-          // TODO: Derive this from the user ID once the right util is available in Drips SDK.
-          address: '0x00',
+          address: AddressDriverClient.getUserAddress(BigInt(accountMetadata.describes.userId)),
         },
         receiver: {
           ...streamMetadata.receiver,
-          // TODO: Derive this from the user ID once the right util is available in Drips SDK.
-          address: '0x00',
+          address: AddressDriverClient.getUserAddress(BigInt(streamMetadata.receiver.userId)),
         },
         dripsConfig: {
           raw: BigInt(streamMetadata.initialDripsConfig.raw),

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { DripsSubgraphClient } from 'radicle-drips';
+import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import { get } from 'svelte/store';
 import { z } from 'zod';
 import wallet from '../wallet';
@@ -196,8 +196,7 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
     user: {
       userId,
       driver: 'address',
-      // TODO: Derive this from the user ID once the right util is available in Drips SDK.
-      address: '0x00',
+      address: AddressDriverClient.getUserAddress(BigInt(userId)),
     },
     name: data?.name,
     description: data?.description,
