@@ -20,8 +20,21 @@
     }
   }
 
+  function countDecimals(num: number) {
+    if (isNaN(+num)) return 0;
+    const decimals = (num + '').split('.')[1];
+    if (decimals) return decimals.length;
+    return 0;
+  }
+
   function format(amount: bigint, decimals: number) {
-    return `${Math.abs(parseFloat(utils.formatUnits(amount, decimals))).toFixed(6)}`;
+    const MAX_DECIMALS = 8;
+    const MIN_DECIMALS = 2;
+
+    const parsed = Math.abs(parseFloat(utils.formatUnits(amount, decimals)));
+    const decimalCount = countDecimals(parsed);
+
+    return `${parsed.toFixed(Math.max(Math.min(MAX_DECIMALS, decimalCount), MIN_DECIMALS))}`;
   }
 </script>
 

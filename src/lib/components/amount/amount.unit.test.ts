@@ -34,7 +34,7 @@ describe('amount.svelte', () => {
       },
     });
 
-    expect(screen.getByText('1.000000')).toBeInTheDocument();
+    expect(screen.getByText('1.00')).toBeInTheDocument();
     expect(screen.getByText('RAD')).toBeInTheDocument();
 
     cleanup();
@@ -46,8 +46,40 @@ describe('amount.svelte', () => {
       },
     });
 
-    screen.getByText('1.000000');
+    screen.getByText('1.00');
     screen.getByText('RLC');
+  });
+
+  it('trims decimals', () => {
+    render(Amount, {
+      props: {
+        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
+        amount: BigInt('1100000000000000000'),
+      },
+    });
+
+    // Should display at least 2 decimal places
+    screen.getByText('1.10');
+
+    render(Amount, {
+      props: {
+        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
+        amount: BigInt('1123400000000000000'),
+      },
+    });
+
+    // Should not display excessive zeroes
+    screen.getByText('1.1234');
+
+    render(Amount, {
+      props: {
+        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
+        amount: BigInt('1123456789000000000'),
+      },
+    });
+
+    // Should display at most 8 decimal places
+    screen.getByText('1.12345679');
   });
 });
 
