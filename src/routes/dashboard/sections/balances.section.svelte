@@ -10,6 +10,9 @@
   import balances from '$lib/stores/balances/balances.store';
   import Amount from '$lib/components/table/cells/amount.cell.svelte';
   import wallet from '$lib/stores/wallet';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
+  import streams from '$lib/stores/streams';
+  import { get } from 'svelte/store';
 
   interface TokenTableRow {
     token: string;
@@ -37,8 +40,32 @@
   $: accountEstimate =
     $wallet.connected && $balances.accounts['875267609686611184008791658115888920329297355417'];
 
-  function getReceivableForToken(address: string): bigint {
-    return $balances.receivable.find((b) => b.tokenAddress === address)?.amount ?? BigInt(0);
+  function getIncomingTotalsForToken(address: string): {
+    totalEarned: bigint;
+    amountPerSecond: bigint;
+  } {
+    const streamsState = get(streams);
+    const estimates = get(balances);
+
+    if (!streamsState.ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
+
+    const incomingStreamsForToken = streamsState.ownStreams.incoming.filter(
+      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
+    );
+
+    return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
+      (acc, stream) => {
+        const estimate = estimates.accounts[stream.sender.userId]?.[address]?.streams[stream.id];
+
+        if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
+
+        return {
+          totalEarned: acc.totalEarned + estimate.totalStreamed.amount,
+          amountPerSecond: acc.amountPerSecond + estimate.amountPerSecond.amount,
+        };
+      },
+      { totalEarned: 0n, amountPerSecond: 0n },
+    );
   }
 
   function updateTable() {
@@ -47,25 +74,29 @@
       return;
     }
 
-    tableData = Object.entries(accountEstimate).map(([tokenAddress, estimate]) => ({
-      token: tokenAddress,
-      earnings: {
-        amount: getReceivableForToken(tokenAddress),
-        tokenAddress: tokenAddress,
-        showSymbol: false,
-        amountPerSecond: BigInt(0),
-      },
-      streaming: {
-        ...estimate.totals.remainingBalance,
-        amountPerSecond: -estimate.totals.amountPerSecond.amount,
-        showSymbol: false,
-      },
-      netRate: {
-        amountPerSecond: -estimate.totals.amountPerSecond.amount,
-        tokenAddress: tokenAddress,
-        showSymbol: false,
-      },
-    }));
+    tableData = Object.entries(accountEstimate).map(([tokenAddress, estimate]) => {
+      const incomingTotals = getIncomingTotalsForToken(tokenAddress);
+
+      return {
+        token: tokenAddress,
+        earnings: {
+          amount: incomingTotals.totalEarned,
+          tokenAddress: tokenAddress,
+          showSymbol: false,
+          amountPerSecond: incomingTotals.amountPerSecond,
+        },
+        streaming: {
+          ...estimate.totals.remainingBalance,
+          amountPerSecond: -estimate.totals.amountPerSecond.amount,
+          showSymbol: false,
+        },
+        netRate: {
+          amountPerSecond: incomingTotals.amountPerSecond - estimate.totals.amountPerSecond.amount,
+          tokenAddress: tokenAddress,
+          showSymbol: false,
+        },
+      };
+    });
   }
 
   $: {
@@ -126,10 +157,16 @@
       },
     ]}
   />
-  <div class="table-container">
-    {#if tableData.length > 0}
+  <div class="content">
+    <SectionSkeleton
+      emptyStateHeadline="No tokens"
+      emptyStateEmoji="🫗"
+      emptyStateText="This is where any tokens balances you stream or earned show up."
+      loaded={Boolean(accountEstimate)}
+      empty={tableData.length === 0}
+    >
       <Table {options} />
-    {/if}
+    </SectionSkeleton>
   </div>
 </div>
 
@@ -140,13 +177,13 @@
     gap: 2rem;
   }
 
-  .table-container {
+  .content {
     margin: 0 -1rem 0 -1rem;
     overflow-y: scroll;
   }
 
   @media (max-width: 1024px) {
-    .table-container {
+    .content {
       padding: 0 1rem 0 1rem;
     }
   }

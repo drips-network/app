@@ -9,6 +9,7 @@
   import streams from '$lib/stores/streams/streams.store';
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
 
   interface OutgoingStreamTableRow {
     name: string;
@@ -38,6 +39,19 @@
           ]?.streams[stream.id].totalStreamed.amount ?? BigInt(100),
       },
     }));
+
+    incomingTableData = ($streams.ownStreams?.incoming ?? []).map((stream) => ({
+      name: stream.name ?? 'Unnamed stream',
+      fromAddress: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
+      amount: {
+        amountPerSecond: stream.paused ? 0n : stream.dripsConfig.amountPerSecond.amount,
+        tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
+        amount:
+          $balancesStore.accounts[stream.sender.userId]?.[
+            stream.dripsConfig.amountPerSecond.tokenAddress
+          ]?.streams[stream.id].totalStreamed.amount ?? BigInt(100),
+      },
+    }));
   }
 
   $: {
@@ -51,6 +65,7 @@
       accessorKey: 'name',
       header: 'Name',
       cell: (info) => info.getValue(),
+      enableSorting: false,
     },
     {
       accessorKey: 'toAddress',
@@ -71,16 +86,17 @@
       accessorKey: 'name',
       header: 'Name',
       cell: (info) => info.getValue(),
+      enableSorting: false,
     },
     {
       accessorKey: 'fromAddress',
-      header: 'To',
+      header: 'From',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
     },
     {
-      accessorKey: 'amountPerSecond',
-      header: 'Amount',
+      accessorKey: 'amount',
+      header: 'Amount earned',
       cell: () => Amount,
       enableSorting: false,
     },
@@ -115,18 +131,29 @@
       },
     ]}
   />
-  {#if outgoingTableData.length > 0}
-    <h4>Outgoing</h4>
-    <div class="table-container">
-      <Table options={optionsOutgoing} />
-    </div>
-  {/if}
-  <!-- {#if optionsIncoming.data.length > 0}
-    <h4>Incoming</h4>
-    <div class="table-container">
-        <Table options={optionsIncoming} />
-    </div>
-  {/if} -->
+  <div class="content">
+    <SectionSkeleton
+      emptyStateEmoji="🫙"
+      emptyStateHeadline="No streams"
+      emptyStateText="This is where incoming and outgoing streams for your account will appear."
+      loaded={$streams.ownStreams !== undefined && Object.keys($balancesStore.accounts).length > 0}
+      empty={$streams.ownStreams?.incoming.length === 0 &&
+        $streams.ownStreams?.outgoing.length === 0}
+    >
+      {#if optionsOutgoing.data.length > 0}
+        <div class="table-container">
+          <h4 class="table-group-header">↑ Outgoing</h4>
+          <Table options={optionsOutgoing} />
+        </div>
+      {/if}
+      {#if optionsIncoming.data.length > 0}
+        <div class="table-container">
+          <h4 class="table-group-header">↓ Incoming</h4>
+          <Table options={optionsIncoming} />
+        </div>
+      {/if}
+    </SectionSkeleton>
+  </div>
 </div>
 
 <style>
@@ -136,14 +163,33 @@
     gap: 2rem;
   }
 
-  .table-container {
+  .content {
     margin: 0 -1rem 0 -1rem;
     overflow-y: scroll;
   }
 
+  .table-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .table-container:first-child:not(:last-child) {
+    margin-bottom: 2rem;
+  }
+
+  .table-group-header {
+    color: var(--color-foreground-level-6);
+    margin-left: calc(0.75rem + 2px);
+  }
+
   @media (max-width: 1024px) {
-    .table-container {
+    .content {
       padding: 0 1rem 0 1rem;
+    }
+
+    .table-group-header {
+      margin-left: none;
     }
   }
 </style>
