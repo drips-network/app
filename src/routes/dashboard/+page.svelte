@@ -1,6 +1,15 @@
 <script lang="ts">
   import Balances from './sections/balances.section.svelte';
   import Streams from './sections/streams.section.svelte';
+
+  import { goto } from '$app/navigation';
+  import wallet from '$lib/stores/wallet';
+
+  $: {
+    if (!$wallet.connected) {
+      goto('/');
+    }
+  }
 </script>
 
 <svelte:head>
