@@ -46,7 +46,10 @@ export interface Stream {
 export interface AssetConfigHistoryItem {
   timestamp: Date;
   balance: Amount;
-  /** Undefined if there are no streams, or the balance is zero. */
+  /**
+   * Undefined if there are no streams, the balance is zero, or all streams end before
+   * the balance is depleted.
+   */
   runsOutOfFunds?: Date;
   streams: {
     streamId: string;

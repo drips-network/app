@@ -77,9 +77,9 @@ export default function buildAssetConfigs(
       }
 
       /*
-        If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
-        dripsSet event, we can assume it is paused.
-        */
+      If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
+      dripsSet event, we can assume it is paused.
+      */
       for (const remainingStreamId of remainingStreamIds) {
         assetConfigHistoryItemStreams.push({
           streamId: remainingStreamId,
@@ -90,14 +90,14 @@ export default function buildAssetConfigs(
       }
 
       let runsOutOfFunds: Date | undefined;
-      if (assetConfigHistoryItemStreams.length > 0 && dripsSetEvent.balance > 0n) {
-        if (dripsSetEvent.maxEnd === 0n) {
-          throw new Error('maxEnd is 0n even though we have a balance and receivers');
-        }
 
-        runsOutOfFunds = new Date(Number(dripsSetEvent.maxEnd) * 1000);
-      } else {
+      // If maxEnd is the largest possible timestamp, all current streams end before balance is depleted.
+      if (dripsSetEvent.maxEnd === 2n ** 32n - 1n) {
         runsOutOfFunds = undefined;
+      } else if (dripsSetEvent.maxEnd === 0n) {
+        runsOutOfFunds = undefined;
+      } else {
+        runsOutOfFunds = new Date(Number(dripsSetEvent.maxEnd) * 1000);
       }
 
       assetConfigHistoryItems.push({
