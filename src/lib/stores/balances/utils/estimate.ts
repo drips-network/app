@@ -1,5 +1,4 @@
 import type { Account, AssetConfig } from '$lib/stores/streams/types';
-import { bigIntMin } from '$lib/utils/big-int-min-max';
 
 interface Amount {
   amount: bigint;
@@ -8,6 +7,7 @@ interface Amount {
 
 export interface StreamEstimation {
   totalStreamed: Amount;
+  amountPerSecond: Amount;
 }
 
 export interface AssetConfigEstimation {
@@ -38,13 +38,14 @@ export function estimateAccount(account: Account): AccountEstimation {
 }
 
 export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstimation {
-  let totalRemaining = BigInt(0);
-  let delta = BigInt(0);
+  const streamEstimates: { [streamId: string]: StreamEstimation } = {};
 
-  const { streams: configuredStreams } = assetConfig;
-  const streamEstimates: { [streamId: string]: bigint } = {};
+  const remainingBalance: Amount = {
+    tokenAddress: assetConfig.tokenAddress,
+    amount: 0n,
+  };
 
-  const totalStreamed = assetConfig.history.reduce<bigint>((acc, historyItem) => {
+  for (const historyItem of assetConfig.history) {
     const { timestamp } = historyItem;
     const nextEvent = assetConfig.history[assetConfig.history.indexOf(historyItem) + 1];
 
@@ -54,115 +55,133 @@ export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstima
     */
     const nextTimestamp = nextEvent?.timestamp ?? new Date();
 
-    const streamedDuringEvent = bigIntMin(
-      historyItem.streams.reduce<bigint>((acc, historyItemStream) => {
-        // If DripsConfig is undefined, the stream was paused, so nothing was streamed.
-        if (!historyItemStream.dripsConfig) {
-          return acc;
-        }
+    const streamedDuringEvent: { [streamId: string]: StreamEstimation } = {};
 
-        // If runsOutOfFunds is undefined, there are either no receivers, or balance is zero.
-        if (!historyItem.runsOutOfFunds) {
-          return acc;
-        }
+    for (const stream of historyItem.streams) {
+      /*
+      If DripsConfig is undefined, the stream was paused, so nothing was streamed. We keep the total
+      streamed value whatever it was before, update the current amountPerSecond to zero, and move on
+      to the next stream.
+      */
+      if (!stream.dripsConfig) {
+        streamedDuringEvent[stream.streamId] = {
+          totalStreamed: {
+            tokenAddress: assetConfig.tokenAddress,
+            amount: streamedDuringEvent[stream.streamId]?.totalStreamed.amount ?? 0n,
+          },
+          amountPerSecond: {
+            tokenAddress: assetConfig.tokenAddress,
+            amount: 0n,
+          },
+        };
 
-        /*
-        If the startDate of the stream is before the history item's block timestamp, we use the history
-        item's timestamp as the valid start date of this particular udpate event. 
-        */
-        const receiverValidFrom = new Date(
-          Math.max(historyItemStream.dripsConfig.startDate?.getTime() || timestamp.getTime()),
-        );
+        break;
+      }
 
-        let receiverValidUntil: Date;
+      /*
+      If the startDate of the stream is before the history item's block timestamp, we use the history
+      item's timestamp as the valid start date of this particular udpate event. 
+      */
+      const streamingFrom = new Date(
+        Math.max(stream.dripsConfig.startDate?.getTime() || timestamp.getTime()),
+      );
 
-        if (historyItemStream.dripsConfig.durationSeconds) {
-          receiverValidUntil = new Date(
-            Math.min(
-              historyItem.runsOutOfFunds.getTime(),
-              nextTimestamp.getTime(),
-              historyItem.timestamp.getTime() +
-                historyItemStream.dripsConfig.durationSeconds * 1000,
-            ),
-          );
-        } else {
-          receiverValidUntil = new Date(
-            Math.min(historyItem.runsOutOfFunds.getTime(), nextTimestamp.getTime()),
-          );
-        }
+      /*
+      If a duration has been set for the current receiver, calculate the timestamp of when it is set
+      to stop. If there is no duration, we use the next event timestamp, because that's the maximum
+      of how long the current receiver may be valid for.
+      */
+      const durationEndDate = stream.dripsConfig.durationSeconds
+        ? new Date(streamingFrom.getTime() + stream.dripsConfig.durationSeconds * 1000)
+        : nextTimestamp;
 
-        /*
-        Calculcate how many milliseconds the current update has been valid for — either from the beginning
-        of its validity to the next update's timestmap, or until the current time if there is none. 
-        */
-        const historyItemValidForMillis = Math.max(
-          receiverValidUntil.getTime() - receiverValidFrom.getTime(),
-          0,
-        );
+      /*
+      This runsOutOfFunds date is the time at which the current balance will deplete. It may be undefined if
+      all streams have a duration that causes them all to cease before the balance is depleted, or the balance
+      is zero. If there is no runsOutOfFunds date, we use the next event timestamp, because that's the maximum
+      of how long the current receiver may be valid for.
+      */
+      const runsOutOfFunds = historyItem.runsOutOfFunds ?? nextTimestamp;
 
-        const streamedForReceiver =
-          (BigInt(historyItemValidForMillis) *
-            (historyItemStream.dripsConfig?.amountPerSecond.amount ?? 0n)) /
-          1000n;
+      /*
+      This receivers streams until either the end of its duration, when it runs out of funds, or when the next
+      update item becomes valid, or until maximum the current timestamp.
+      */
+      const streamingUntil = new Date(
+        Math.min(durationEndDate.getTime(), runsOutOfFunds.getTime(), nextTimestamp.getTime()),
+      );
 
-        const stream = configuredStreams.find((stream) => stream.id === historyItemStream.streamId);
+      const historyItemValidForMillis = streamingUntil.getTime() - streamingFrom.getTime();
+      const streamedByReceiverDuringEvent =
+        (BigInt(historyItemValidForMillis) * stream.dripsConfig.amountPerSecond.amount) / 1000n;
 
-        /*
-        Write an additional per-stream estimate, so we can break down the total streamed per
-        stream, in addition to assetConfig level.
-        */
-        if (stream) {
-          streamEstimates[stream.id] =
-            (streamEstimates[stream.id] ?? BigInt(0)) + streamedForReceiver;
-        }
+      /*
+      If streamingUntil matches the nextTimestamp, we can infer that the stream was ongoing at the end of this
+      event's validity (either until the next event occured, or the current time).
+      */
+      const wasStreamingAtTheEndOfEvent = streamingUntil.getTime() === nextTimestamp.getTime();
 
-        return acc + streamedForReceiver;
-      }, BigInt(0)),
-      historyItem.balance.amount,
-    );
-
-    /*
-    If there is no next event, calculate the remaining balance of the current asset.
-    */
-    if (!nextEvent) {
-      totalRemaining = historyItem.balance.amount - streamedDuringEvent;
-      delta =
-        totalRemaining > 0
-          ? historyItem.streams.reduce<bigint>(
-              (acc, receiver) => acc + (receiver.dripsConfig?.amountPerSecond.amount ?? 0n),
-              0n,
-            )
-          : 0n;
+      streamedDuringEvent[stream.streamId] = {
+        totalStreamed: {
+          tokenAddress: assetConfig.tokenAddress,
+          amount:
+            (streamEstimates[stream.streamId]?.totalStreamed.amount ?? 0n) +
+            streamedByReceiverDuringEvent,
+        },
+        amountPerSecond: {
+          tokenAddress: assetConfig.tokenAddress,
+          amount: wasStreamingAtTheEndOfEvent ? stream.dripsConfig.amountPerSecond.amount : 0n,
+        },
+      };
     }
 
-    return acc + streamedDuringEvent;
-  }, BigInt(0));
+    // Summarize all stream estimates from within this assetConfig history event.
+    for (const [streamId, eventStreamEstimate] of Object.entries(streamedDuringEvent)) {
+      streamEstimates[streamId] = {
+        totalStreamed: {
+          tokenAddress: assetConfig.tokenAddress,
+          amount:
+            (streamEstimates[streamId]?.totalStreamed.amount ?? BigInt(0)) +
+            eventStreamEstimate.totalStreamed.amount,
+        },
+        amountPerSecond: eventStreamEstimate.amountPerSecond,
+      };
+    }
+
+    const totalStreamedDuringHistoryEvent = Object.values(streamedDuringEvent).reduce<bigint>(
+      (acc, estimate) => acc + estimate.totalStreamed.amount,
+      0n,
+    );
+
+    if (assetConfig.history.indexOf(historyItem) === assetConfig.history.length - 1) {
+      remainingBalance.amount = historyItem.balance.amount - totalStreamedDuringHistoryEvent;
+    }
+  }
+
+  // Calculate the totals for the asset config estimation based on stream-level estimates.
+  const totalStreamed = Object.values(streamEstimates).reduce<Amount>(
+    (acc, streamEstimate) => ({
+      ...acc,
+      amount: acc.amount + streamEstimate.totalStreamed.amount,
+    }),
+    { tokenAddress: assetConfig.tokenAddress, amount: 0n },
+  );
+
+  // Calculate the current total amountPerSecond based on stream-level estimates.
+  const amountPerSecond = Object.values(streamEstimates).reduce<Amount>(
+    (acc, streamEstimate) => ({
+      ...acc,
+      amount: acc.amount + streamEstimate.amountPerSecond.amount,
+    }),
+    { tokenAddress: assetConfig.tokenAddress, amount: 0n },
+  );
 
   return {
     totals: {
-      totalStreamed: {
-        tokenAddress: assetConfig.tokenAddress,
-        amount: totalStreamed,
-      },
-      remainingBalance: {
-        tokenAddress: assetConfig.tokenAddress,
-        amount: totalRemaining,
-      },
-      amountPerSecond: {
-        amount: delta,
-        tokenAddress: assetConfig.tokenAddress,
-      },
+      totalStreamed,
+      remainingBalance,
+      amountPerSecond,
     },
-    streams: Object.fromEntries(
-      configuredStreams.map((stream) => [
-        stream.id,
-        {
-          totalStreamed: {
-            tokenAddress: assetConfig.tokenAddress,
-            amount: streamEstimates[stream.id] ?? BigInt(0),
-          },
-        },
-      ]),
-    ),
+    streams: streamEstimates,
   };
 }

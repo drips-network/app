@@ -51,7 +51,7 @@ const mockAssetConfigHistoryItem = ({
   balance,
 }: {
   timestamp: number;
-  runsOutOfFundsTimestamp: number;
+  runsOutOfFundsTimestamp?: number;
   balance: bigint;
   streams: ReturnType<typeof mockStream>[];
 }) => ({
@@ -65,7 +65,7 @@ const mockAssetConfigHistoryItem = ({
     dripsConfig: stream.paused ? undefined : stream.dripsConfig,
     managed: stream.managed,
   })),
-  runsOutOfFunds: new Date(runsOutOfFundsTimestamp * 1000),
+  runsOutOfFunds: runsOutOfFundsTimestamp ? new Date(runsOutOfFundsTimestamp * 1000) : undefined,
 });
 
 const mockAssetConfig = (
@@ -191,6 +191,72 @@ describe('estimate.ts', () => {
       expect(result.totals.remainingBalance.amount).toBe(0n);
 
       expect(result.streams['foo'].totalStreamed.amount).toBe(250n);
+    });
+
+    it('handles start dates', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(10 * 1000);
+
+      const streamWithStartDate = mockStream({
+        id: 'foo',
+        paused: false,
+        amountPerSecond: 100n,
+        durationSeconds: 0,
+        startTimestamp: 5,
+      });
+
+      const result = estimateAssetConfig(
+        mockAssetConfig(
+          [streamWithStartDate],
+          [
+            mockAssetConfigHistoryItem({
+              timestamp: 0,
+              streams: [streamWithStartDate],
+              balance: 1000n,
+              runsOutOfFundsTimestamp: 15,
+            }),
+          ],
+        ),
+      );
+
+      expect(result.totals.amountPerSecond.amount).toBe(100n);
+      expect(result.totals.totalStreamed.amount).toBe(500n);
+      expect(result.totals.remainingBalance.amount).toBe(500n);
+
+      expect(result.streams['foo'].totalStreamed.amount).toBe(500n);
+    });
+
+    it('handles start durations', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(20 * 1000);
+
+      const streamWithDurationAndStartDate = mockStream({
+        id: 'foo',
+        paused: false,
+        amountPerSecond: 100n,
+        durationSeconds: 5,
+        startTimestamp: 5,
+      });
+
+      const result = estimateAssetConfig(
+        mockAssetConfig(
+          [streamWithDurationAndStartDate],
+          [
+            mockAssetConfigHistoryItem({
+              timestamp: 0,
+              streams: [streamWithDurationAndStartDate],
+              balance: 1000n,
+              runsOutOfFundsTimestamp: 0,
+            }),
+          ],
+        ),
+      );
+
+      expect(result.totals.amountPerSecond.amount).toBe(0n);
+      expect(result.totals.totalStreamed.amount).toBe(500n);
+      expect(result.totals.remainingBalance.amount).toBe(500n);
+
+      expect(result.streams['foo'].totalStreamed.amount).toBe(500n);
     });
   });
 });
