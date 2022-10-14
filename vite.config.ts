@@ -13,6 +13,14 @@ const config = defineConfig({
       inline: ['@ethersproject/signing-key', '@ethersproject/basex'],
     },
   },
+  build: {
+    target: 'es2020',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2020',
+    },
+  },
 });
 
 export default config;
