@@ -12,5 +12,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Svelte Kit Sync
+        run: npx svelte-kit sync
+
       - name: Run tests
         run: npm run test:unit
