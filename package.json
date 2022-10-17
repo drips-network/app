@@ -60,7 +60,7 @@
     "dotenv": "^16.0.3",
     "ethers": "^5.7.0",
     "radicle-design-system": "https://github.com/radicle-dev/radicle-design-system",
-    "radicle-drips": "github:radicle-dev/drips-js-sdk#v2",
+    "radicle-drips": "github:radicle-dev/drips-js-sdk#nft-and-immutable-splits-drivers",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"
   },
