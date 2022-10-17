@@ -11,6 +11,11 @@
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Amount from '$lib/components/amount/amount.svelte';
   import ExampleTable from './examples/example-table.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { makeStep } from '$lib/components/stepper/types';
+  import Step_1 from './examples/example-stepper-steps/step-1.svelte';
+  import Step_2 from './examples/example-stepper-steps/step-2.svelte';
+  import SuccessStep from './examples/example-stepper-steps/success-step.svelte';
 
   // Button
   let disabled = false;
@@ -106,6 +111,30 @@
 </div>
 
 <div class="showcase-item">
+  <h2>Stepper</h2>
+  <div class="stepper-wrapper">
+    <Stepper
+      steps={[
+        makeStep({
+          component: Step_1,
+          props: {
+            testProp: 'test prop value',
+          },
+        }),
+        makeStep({
+          component: Step_2,
+          props: undefined,
+        }),
+        makeStep({
+          component: SuccessStep,
+          props: undefined,
+        }),
+      ]}
+    />
+  </div>
+</div>
+
+<div class="showcase-item">
   <h2>Amount</h2>
   <p>Amount</p>
   <TextInput bind:value={amount} />
@@ -147,5 +176,10 @@
 
   .showcase-item {
     margin-bottom: 3rem;
+  }
+
+  .stepper-wrapper {
+    border: 0.125rem solid var(--color-foreground-level-2);
+    border-radius: 0.5rem;
   }
 </style>
