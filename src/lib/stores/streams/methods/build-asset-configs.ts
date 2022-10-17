@@ -1,4 +1,4 @@
-import { AddressDriverClient, Utils, type DripsSetEvent } from 'radicle-drips';
+import { AddressDriverClient, Utils, type DripsSubgraphTypes } from 'radicle-drips';
 import type { z } from 'zod';
 import type { accountMetadataSchema } from '../metadata';
 import type { AssetConfig, AssetConfigHistoryItem, DripsConfig } from '../types';
@@ -19,7 +19,7 @@ import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
  */
 export default function buildAssetConfigs(
   accountMetadata: z.infer<typeof accountMetadataSchema>,
-  dripsSetEvents: { [tokenAddress: string]: DripsSetEvent[] },
+  dripsSetEvents: { [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[] },
 ) {
   return accountMetadata.assetConfigs.reduce<AssetConfig[]>((acc, assetConfigMetadata) => {
     const { tokenAddress } = assetConfigMetadata;
@@ -40,7 +40,11 @@ export default function buildAssetConfigs(
       }[] = [];
 
       const remainingStreamIds = assetConfigMetadata.streams.map((stream) =>
-        makeStreamId(stream.receiver.userId, stream.initialDripsConfig.raw),
+        makeStreamId(
+          accountMetadata.describes.userId,
+          tokenAddress,
+          stream.initialDripsConfig.dripId,
+        ),
       );
 
       for (const dripsReceiverSeenEvent of dripsSetEvent.dripsReceiverSeenEvents) {
@@ -54,8 +58,9 @@ export default function buildAssetConfigs(
         );
 
         const streamId = makeStreamId(
-          matchingStream?.receiver.userId || dripsReceiverSeenEvent.receiverUserId.toString(),
-          matchingStream?.initialDripsConfig.raw || dripsReceiverSeenEvent.config.toString(),
+          accountMetadata.describes.userId,
+          tokenAddress,
+          eventConfig.dripId.toString(),
         );
 
         assetConfigHistoryItemStreams.push({
@@ -68,6 +73,7 @@ export default function buildAssetConfigs(
               amount: eventConfig.amountPerSec,
               tokenAddress: tokenAddress,
             },
+            dripId: eventConfig.dripId.toString(),
             durationSeconds: eventConfig.duration > 0n ? Number(eventConfig.duration) : undefined,
           },
           managed: Boolean(matchingStream),
@@ -115,47 +121,48 @@ export default function buildAssetConfigs(
 
     acc.push({
       tokenAddress: assetConfigMetadata.tokenAddress,
-      streams: assetConfigMetadata.streams.map((streamMetadata) => ({
-        id: makeStreamId(streamMetadata.receiver.userId, streamMetadata.initialDripsConfig.raw),
-        sender: {
-          driver: 'address',
-          userId: accountMetadata.describes.userId,
-          address: AddressDriverClient.getUserAddress(BigInt(accountMetadata.describes.userId)),
-        },
-        receiver: {
-          ...streamMetadata.receiver,
-          address: AddressDriverClient.getUserAddress(BigInt(streamMetadata.receiver.userId)),
-        },
-        dripsConfig: {
-          raw: BigInt(streamMetadata.initialDripsConfig.raw),
-          amountPerSecond: {
-            tokenAddress: assetConfigMetadata.tokenAddress,
-            amount: streamMetadata.initialDripsConfig.amountPerSecond,
+      streams: assetConfigMetadata.streams.map((streamMetadata) => {
+        const streamId = makeStreamId(
+          accountMetadata.describes.userId,
+          assetConfigMetadata.tokenAddress,
+          streamMetadata.initialDripsConfig.raw,
+        );
+
+        return {
+          id: streamId,
+          sender: {
+            driver: 'address',
+            userId: accountMetadata.describes.userId,
+            address: AddressDriverClient.getUserAddress(BigInt(accountMetadata.describes.userId)),
           },
-          startDate: streamMetadata.initialDripsConfig.startTimestamp
-            ? new Date(streamMetadata.initialDripsConfig.startTimestamp * 1000)
-            : undefined,
-          durationSeconds:
-            streamMetadata.initialDripsConfig.durationSeconds > 0
-              ? streamMetadata.initialDripsConfig.durationSeconds
+          receiver: {
+            ...streamMetadata.receiver,
+            address: AddressDriverClient.getUserAddress(BigInt(streamMetadata.receiver.userId)),
+          },
+          dripsConfig: {
+            raw: BigInt(streamMetadata.initialDripsConfig.raw),
+            amountPerSecond: {
+              tokenAddress: assetConfigMetadata.tokenAddress,
+              amount: streamMetadata.initialDripsConfig.amountPerSecond,
+            },
+            startDate: streamMetadata.initialDripsConfig.startTimestamp
+              ? new Date(streamMetadata.initialDripsConfig.startTimestamp * 1000)
               : undefined,
-        },
-        paused:
-          currentStreams.find(
-            (stream) =>
-              stream.streamId ===
-              makeStreamId(streamMetadata.receiver.userId, streamMetadata.initialDripsConfig.raw),
-          )?.dripsConfig === undefined,
-        managed:
-          currentStreams.find(
-            (stream) =>
-              stream.streamId ===
-              makeStreamId(streamMetadata.receiver.userId, streamMetadata.initialDripsConfig.raw),
-          )?.managed ?? true,
-        name: streamMetadata.name,
-        description: streamMetadata.description,
-        archived: streamMetadata.archived,
-      })),
+            durationSeconds:
+              streamMetadata.initialDripsConfig.durationSeconds > 0
+                ? streamMetadata.initialDripsConfig.durationSeconds
+                : undefined,
+            dripId: streamMetadata.initialDripsConfig.dripId,
+          },
+          paused:
+            currentStreams.find((stream) => stream.streamId === streamId)?.dripsConfig ===
+            undefined,
+          managed: currentStreams.find((stream) => stream.streamId === streamId)?.managed ?? true,
+          name: streamMetadata.name,
+          description: streamMetadata.description,
+          archived: streamMetadata.archived,
+        };
+      }),
       history: assetConfigHistoryItems,
     });
 

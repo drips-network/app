@@ -18,8 +18,7 @@ interface Amount {
 export interface DripsConfig {
   /** The raw on-chain config value. */
   raw: bigint;
-  /** The drips receiver ID. */
-  id: string;
+  dripId: string;
   amountPerSecond: Amount;
   /** If undefined, stream starts at the block timestamp its receiver was created on. */
   startDate?: Date;
