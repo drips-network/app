@@ -76,6 +76,7 @@
   $: {
     currentStep;
     awaitError;
+    awaiting;
     updateContainerHeight();
   }
 </script>
@@ -109,11 +110,17 @@
 <style>
   .container {
     overflow: hidden;
-    padding: 16px;
+    padding: 1rem;
     position: relative;
   }
 
   .step-container {
     position: absolute;
+    width: calc(100% - 2rem);
+    height: calc(100% - 2rem);
+  }
+
+  .step {
+    width: 100%;
   }
 </style>

@@ -42,5 +42,21 @@
 
 <div class="await-step">
   <Spinner />
-  {message}
+  <p>{message}</p>
 </div>
+
+<style>
+  .await-step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    height: 100%;
+    padding: 4rem 0;
+  }
+
+  p {
+    color: var(--color-foreground-level-5);
+  }
+</style>
