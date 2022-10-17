@@ -35,7 +35,7 @@
       x = direction === 'forward' ? -64 : 64;
     }
 
-    return { x };
+    return { x, duration: 300, easing: cubicInOut };
   }
 
   let containerHeight = tweened(0);
