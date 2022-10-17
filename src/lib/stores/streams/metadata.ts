@@ -28,6 +28,7 @@ export const userSchema = addressDriverUserSchema;
 
 export const dripsConfigSchema = z.object({
   raw: z.string(),
+  id: z.string(),
   amountPerSecond: bigintSchema,
   /** If zero, the stream runs indefinitely. */
   durationSeconds: z.number(),
@@ -63,16 +64,10 @@ export const accountMetadataSchema = z.object({
   writtenByAddress: addressSchema,
 });
 
-export async function fetchAccountMetadataHash(userId: UserId) {
-  // TODO: Real implementation
-  switch (userId) {
-    case '875267609686611184008791658115888920329297355417': {
-      return 'QmTyoyw5u3rf9pvSdNK5wXmxmEsqWdtk6K5tjrHUxFtDsh';
-    }
-    default: {
-      throw new Error('Unmocked AccountMetadataHash');
-    }
-  }
+export async function fetchAccountMetadataHash(userId: UserId): Promise<string | undefined> {
+  // TODO: Real implementation once SDK adds function for getting emitUserData events
+  userId;
+  return undefined;
 }
 
 async function fetchIpfs(hash: string) {
@@ -92,6 +87,7 @@ async function fetchAccountMetadata(
   userId: UserId,
 ): Promise<{ hash: string; data: z.infer<typeof accountMetadataSchema> } | undefined> {
   const metadataHash = await fetchAccountMetadataHash(userId);
+  if (!metadataHash) return undefined;
 
   let accountMetadataRes: Awaited<ReturnType<typeof fetchIpfs>>;
 
@@ -128,6 +124,7 @@ export function generateMetadata(
       streams: assetConfig.streams.map((stream) => ({
         id: stream.id,
         initialDripsConfig: {
+          id: stream.dripsConfig.id,
           raw: stream.dripsConfig.raw.toString(),
           startTimestamp: (stream.dripsConfig.startDate?.getTime() || 0) / 1000,
           durationSeconds: stream.dripsConfig.durationSeconds || 0,
