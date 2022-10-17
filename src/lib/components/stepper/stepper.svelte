@@ -38,16 +38,20 @@
     return { x };
   }
 
-  let containerHeight = tweened(0, {
-    duration: 300,
-    easing: cubicInOut,
-  });
+  let containerHeight = tweened(0);
 
+  let firstHeightUpdate = true;
   async function updateContainerHeight() {
     await tick();
 
     const stepHeight = stepElement.getBoundingClientRect().height;
-    containerHeight.set(stepHeight + 32);
+
+    containerHeight.set(stepHeight + 32, {
+      duration: firstHeightUpdate ? 0 : 300,
+      easing: cubicInOut,
+    });
+
+    firstHeightUpdate = false;
   }
 
   let awaiting: AwaitPendingPayload | undefined;
@@ -84,8 +88,8 @@
 <div class="container" style:height={`${$containerHeight}px`}>
   {#key `${awaiting}${awaitError}${currentStepIndex}`}
     <div
-      in:fly={(() => getTransition('in'))()}
-      out:fly={(() => getTransition('out'))()}
+      in:fly|local={(() => getTransition('in'))()}
+      out:fly|local={(() => getTransition('out'))()}
       class="step-container"
     >
       <div class="step" bind:this={stepElement}>
