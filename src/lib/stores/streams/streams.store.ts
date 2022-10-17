@@ -1,3 +1,4 @@
+import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import { derived, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
@@ -48,10 +49,13 @@ export default (() => {
 
     await fetchAccount(toUserId);
 
-    // TODO: Really fetch these
-    const accountsSendingToCurrentUser: UserId[] = [];
+    const subgraphClient = getSubgraphClient();
+    const accountsSendingToCurrentUser =
+      await subgraphClient.getDripsReceiverSeenEventsByReceiverId(toUserId);
 
-    await Promise.all(accountsSendingToCurrentUser.map((a) => fetchAccount(a)));
+    await Promise.all(
+      accountsSendingToCurrentUser.map((a) => fetchAccount(a.receiverUserId.toString())),
+    );
   }
 
   async function disconnect() {
