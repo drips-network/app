@@ -6,8 +6,20 @@ import wallet from '../wallet';
 import type { Account, UserId } from './types';
 import seperateDripsSetEvents from './methods/separate-drips-set-events';
 import buildAssetConfigs from './methods/build-asset-configs';
+import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 
 const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
+
+/*
+A randomly-generated uint256 that we use as the `key` value for calls to `emitUserData` on the
+drips contracts. This essentially acts as a "namespace", aiming to ensure that this apps reads only the
+emitUserData events that it created itself.
+
+If you're an app developer looking at this for reference, make sure to generate your own random uint256
+value to use as a `key` value for `emitUserData`, in order to avoid metadata collisions with other apps.
+*/
+const USER_DATA_KEY =
+  65932473927847481224664369441494644980717748729109625944182088338412766444512n;
 
 const addressSchema = z.preprocess((v) => {
   if (typeof v !== 'string' || !ethers.utils.isAddress(v)) {
@@ -166,7 +178,7 @@ export async function updateAccountMetadata(
 
   const newHash = await pinAccountMetadata(newData);
 
-  // TODO: Call `emitUserData` with new hash
+  await (await getAddressDriverClient()).emitUserMetadata(USER_DATA_KEY, newHash);
 
   return newHash;
 }
