@@ -1,4 +1,4 @@
-import { Utils, type DripsSetEvent } from 'radicle-drips';
+import { Utils, type DripsSubgraphTypes } from 'radicle-drips';
 
 /**
  * Take an array of dripsSetEvents, and group them by their asset's token address.
@@ -6,10 +6,12 @@ import { Utils, type DripsSetEvent } from 'radicle-drips';
  * @returns An object with keys corresponding to token addresses, and values being
  * relevant dripsSetEvents.
  */
-export default function seperateDripsSetEvents(dripsSetEvents: DripsSetEvent[]): {
-  [tokenAddress: string]: DripsSetEvent[];
+export default function seperateDripsSetEvents(
+  dripsSetEvents: DripsSubgraphTypes.DripsSetEvent[],
+): {
+  [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[];
 } {
-  return dripsSetEvents.reduce<{ [tokenAddress: string]: DripsSetEvent[] }>(
+  return dripsSetEvents.reduce<{ [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[] }>(
     (acc, dripsSetEvent) => {
       const { assetId } = dripsSetEvent;
       const tokenAddress = Utils.Asset.getAddressFromId(assetId);

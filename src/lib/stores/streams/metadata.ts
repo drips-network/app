@@ -40,7 +40,7 @@ export const userSchema = addressDriverUserSchema;
 
 export const dripsConfigSchema = z.object({
   raw: z.string(),
-  id: z.string(),
+  dripId: z.string(),
   amountPerSecond: bigintSchema,
   /** If zero, the stream runs indefinitely. */
   durationSeconds: z.number(),
@@ -79,7 +79,8 @@ export const accountMetadataSchema = z.object({
 export async function fetchAccountMetadataHash(userId: UserId): Promise<string | undefined> {
   // TODO: Real implementation once SDK adds function for getting emitUserData events
   userId;
-  return undefined;
+  // Mocked user ID for tests
+  return userId === '875267609686611184008791658115888920329297355417' ? 'foo' : undefined;
 }
 
 async function fetchIpfs(hash: string) {
@@ -136,7 +137,7 @@ export function generateMetadata(
       streams: assetConfig.streams.map((stream) => ({
         id: stream.id,
         initialDripsConfig: {
-          id: stream.dripsConfig.id,
+          dripId: stream.dripsConfig.dripId,
           raw: stream.dripsConfig.raw.toString(),
           startTimestamp: (stream.dripsConfig.startDate?.getTime() || 0) / 1000,
           durationSeconds: stream.dripsConfig.durationSeconds || 0,

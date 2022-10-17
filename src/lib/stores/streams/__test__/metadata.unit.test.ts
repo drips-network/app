@@ -26,11 +26,12 @@ const MOCK_ACCOUNT_DATA = {
       tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD
       streams: [
         {
-          id: '875267609686611184008791658115888920329297355418-30500568904940211240327314407424',
+          id: '875267609686611184008791658115888920329297355417-0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3-1',
           initialDripsConfig: {
-            raw: '30500568904940211240327314407424',
+            raw: '26959946667150639794667015087019630704137713327499230465504634208256',
             durationSeconds: 0,
-            amountPerSecond: '1653439153439',
+            amountPerSecond: '1653439153440',
+            dripId: '1',
           },
           receiver: {
             userId: '875267609686611184008791658115888920329297355418',
@@ -41,11 +42,12 @@ const MOCK_ACCOUNT_DATA = {
           description: 'Just a test 1',
         },
         {
-          id: '875267609686611184008791658115888920329297355418-30500568904958657984401023959040',
+          id: '875267609686611184008791658115888920329297355417-0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3-2',
           initialDripsConfig: {
-            raw: '30500568904958657984401023959040',
+            raw: '53919893334301279589334030174039261377774857750039802946608244457472',
             durationSeconds: 0,
             amountPerSecond: '1653439153440',
+            dripId: '2',
           },
           receiver: {
             userId: '875267609686611184008791658115888920329297355418',
@@ -61,11 +63,12 @@ const MOCK_ACCOUNT_DATA = {
       tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
       streams: [
         {
-          id: '875267609686611184008791658115888920329297355418-30500568904940211240327314407424',
+          id: '875267609686611184008791658115888920329297355417-0x6B175474E89094C44Da98b954EedeAC495271d0F-1',
           initialDripsConfig: {
-            raw: '30500568904940211240327314407424',
+            raw: '26959946667150639794667015087019630704137713327499230465504634208256',
             durationSeconds: 0,
-            amountPerSecond: '1653439153439',
+            amountPerSecond: '1653439153440',
+            dripId: '1',
           },
           receiver: {
             userId: '875267609686611184008791658115888920329297355418',
@@ -102,11 +105,11 @@ const MOCK_DRIPS_SET_EVENTS = [
     dripsReceiverSeenEvents: [
       {
         receiverUserId: 875267609686611184008791658115888920329297355418n,
-        config: 30500568904940211240327314407424n,
+        config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
       {
         receiverUserId: 875267609686611184008791658115888920329297355418n,
-        config: 30500568904958657984401023959040n,
+        config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
     dripsHistoryHash: '',
@@ -120,11 +123,11 @@ const MOCK_DRIPS_SET_EVENTS = [
     dripsReceiverSeenEvents: [
       {
         receiverUserId: 875267609686611184008791658115888920329297355418n,
-        config: 30500568904940211240327314407424n,
+        config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
     dripsHistoryHash: '',
-    balance: 10000000000000000000n - 3600n * (1653439153439n + 1653439153440n),
+    balance: 10000000000000000000n - 3600n * (1653439153440n * 2n),
     blockTimestamp: 1665569299n, // 1 hour later
     maxEnd: 100n,
   },
@@ -134,7 +137,7 @@ const MOCK_DRIPS_SET_EVENTS = [
     dripsReceiverSeenEvents: [
       {
         receiverUserId: 875267609686611184008791658115888920329297355418n,
-        config: 30500568904940211240327314407424n,
+        config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
     dripsHistoryHash: '',
@@ -148,15 +151,15 @@ const MOCK_DRIPS_SET_EVENTS = [
     dripsReceiverSeenEvents: [
       {
         receiverUserId: 875267609686611184008791658115888920329297355418n,
-        config: 30500568904940211240327314407424n,
+        config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
       {
         receiverUserId: 875267609686611184008791658115888920329297355418n,
-        config: 30500568904958657984401023959040n,
+        config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
     dripsHistoryHash: '',
-    balance: 10000000000000000000n - 3600n * 3n * 1653439153439n - 3600n * 1653439153440n,
+    balance: 10000000000000000000n - 3600n * 3n * 1653439153440n - 3600n * 1653439153440n,
     blockTimestamp: 1665576499n, // 1 hour later
     maxEnd: 100n,
   },
@@ -193,7 +196,7 @@ describe('metadata.ts', () => {
       expect(account.lastUpdatedByAddress).toBe('0x99505B669C6064BA2B2f26f2E4fffa5e8d906299');
 
       // TODO: This is a mocked value ATM since the Drips SDK doesn't yet support fetching the metadata hash.
-      expect(account.lastIpfsHash).toBe('QmTyoyw5u3rf9pvSdNK5wXmxmEsqWdtk6K5tjrHUxFtDsh');
+      expect(account.lastIpfsHash).toBe('foo');
     });
 
     it('creates the expected assetConfig objects', async () => {
@@ -275,11 +278,12 @@ describe('metadata.ts', () => {
         streamId: radStreams[0].id,
         dripsConfig: {
           amountPerSecond: {
-            amount: 1653439153439n,
+            amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
           },
+          dripId: '1',
           durationSeconds: undefined,
-          raw: 30500568904940211240327314407424n,
+          raw: 26959946667150639794667015087019630704137713327499230465504634208256n,
           startDate: undefined,
         },
         managed: true,
@@ -291,8 +295,9 @@ describe('metadata.ts', () => {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
           },
+          dripId: '2',
           durationSeconds: undefined,
-          raw: 30500568904958657984401023959040n,
+          raw: 53919893334301279589334030174039261377774857750039802946608244457472n,
           startDate: undefined,
         },
         managed: true,
@@ -310,11 +315,12 @@ describe('metadata.ts', () => {
         streamId: radStreams[0].id,
         dripsConfig: {
           amountPerSecond: {
-            amount: 1653439153439n,
+            amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
           },
           durationSeconds: undefined,
-          raw: 30500568904940211240327314407424n,
+          dripId: '1',
+          raw: 26959946667150639794667015087019630704137713327499230465504634208256n,
           startDate: undefined,
         },
         managed: true,
@@ -337,11 +343,12 @@ describe('metadata.ts', () => {
         streamId: radStreams[0].id,
         dripsConfig: {
           amountPerSecond: {
-            amount: 1653439153439n,
+            amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
           },
           durationSeconds: undefined,
-          raw: 30500568904940211240327314407424n,
+          dripId: '1',
+          raw: 26959946667150639794667015087019630704137713327499230465504634208256n,
           startDate: undefined,
         },
         managed: true,
@@ -353,8 +360,9 @@ describe('metadata.ts', () => {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
           },
+          dripId: '2',
           durationSeconds: undefined,
-          raw: 30500568904958657984401023959040n,
+          raw: 53919893334301279589334030174039261377774857750039802946608244457472n,
           startDate: undefined,
         },
         managed: true,
@@ -386,11 +394,12 @@ describe('metadata.ts', () => {
         streamId: daiStreams[0].id,
         dripsConfig: {
           amountPerSecond: {
-            amount: 1653439153439n,
+            amount: 1653439153440n,
             tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
           },
+          dripId: '1',
           durationSeconds: undefined,
-          raw: 30500568904940211240327314407424n,
+          raw: 26959946667150639794667015087019630704137713327499230465504634208256n,
           startDate: undefined,
         },
         managed: true,

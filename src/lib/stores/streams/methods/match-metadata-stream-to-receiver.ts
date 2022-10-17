@@ -17,7 +17,7 @@ export default function matchMetadataStreamToReceiver(
 ): z.infer<typeof streamMetadataSchema> | undefined {
   const results = metadataStreams.filter(
     (stream) =>
-      stream.receiver.userId ===
+      stream.initialDripsConfig.dripId ===
       Utils.DripsReceiverConfiguration.fromUint256(receiverSeenEvent.config).dripId.toString(),
   );
 
