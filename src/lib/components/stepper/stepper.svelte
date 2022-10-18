@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { tick } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
   import type { AwaitPendingPayload, Steps } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
@@ -43,6 +43,8 @@
   let firstHeightUpdate = true;
   async function updateContainerHeight(disableTransition = false) {
     await tick();
+
+    if (!stepElement) return;
 
     const stepHeight = stepElement.getBoundingClientRect().height;
 
@@ -93,6 +95,8 @@
     updateContainerHeight();
     updateMutationObserver();
   }
+
+  onDestroy(() => mutationObserver.disconnect());
 </script>
 
 <div class="container" style:height={`${$containerHeight}px`}>
