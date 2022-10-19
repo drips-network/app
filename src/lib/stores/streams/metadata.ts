@@ -200,7 +200,7 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
   const { data, hash } = (await fetchAccountMetadata(userId)) ?? {};
 
   const dripsSetEvents = seperateDripsSetEvents(
-    await subgraphClient.getDripsSetEventsByUserId(BigInt(userId)),
+    await subgraphClient.getDripsSetEventsByUserId(userId),
   );
 
   const assetConfigs = data ? buildAssetConfigs(data, dripsSetEvents) : [];
@@ -209,7 +209,7 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
     user: {
       userId,
       driver: 'address',
-      address: AddressDriverClient.getUserAddress(BigInt(userId)),
+      address: AddressDriverClient.getUserAddress(userId),
     },
     name: data?.name,
     description: data?.description,

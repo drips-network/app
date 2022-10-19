@@ -66,7 +66,7 @@ export default (() => {
   async function updateReceivable() {
     assert(addressDriverClient && userId, 'Store must be connected first');
 
-    const allBalancesRes = await addressDriverClient.dripsHub.getBalancesForUser(BigInt(userId));
+    const allBalancesRes = await addressDriverClient.dripsHub.getBalancesForUser(userId);
 
     state.update((s) => ({
       ...s,
