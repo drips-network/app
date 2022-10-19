@@ -66,7 +66,8 @@ export default (() => {
   async function updateReceivable() {
     assert(addressDriverClient && userId, 'Store must be connected first');
 
-    const allBalancesRes = await addressDriverClient.dripsHub.getBalancesForUser(userId);
+    // TODO: Remove explicit maxCycles once SDK no longer has overflow bug with the default value
+    const allBalancesRes = await addressDriverClient.dripsHub.getBalancesForUser(userId, 10000);
 
     state.update((s) => ({
       ...s,
