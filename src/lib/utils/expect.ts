@@ -24,7 +24,7 @@ export default async function expect<T extends (() => any) | (() => Promise<any>
   within = 5000,
   checkingEvery = 1000,
 ): Promise<ReturnType<T> | FailedExpectation> {
-  const numberOfChecks = within / checkingEvery;
+  const numberOfChecks = Math.floor(within / checkingEvery);
 
   const checks = Array.from(Array(numberOfChecks).keys()).map(() => func);
 

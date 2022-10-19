@@ -6,6 +6,10 @@ import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
 import TriggerAwaitEvent from './test-steps/trigger-await-event.svelte';
 
+vi.mock('$app/environment', () => ({
+  browser: true,
+}));
+
 const wait = (millis: number) => new Promise((resolve) => setTimeout(resolve, millis));
 
 describe('stepper.svelte', () => {

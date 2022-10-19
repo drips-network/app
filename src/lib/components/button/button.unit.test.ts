@@ -1,4 +1,4 @@
-import SlotTestComponent from '$lib/utils/test/slot-test-component.svelte';
+import SlotTestComponent from '$lib/utils/test-utils/slot-test-component.svelte';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import ThumbsUpIcon from 'radicle-design-system/icons/ThumbsUp.svelte';
