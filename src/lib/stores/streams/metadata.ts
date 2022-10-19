@@ -197,10 +197,10 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
   const { data, hash } = (await fetchAccountMetadata(userId)) ?? {};
 
   const dripsSetEvents = seperateDripsSetEvents(
-    await subgraphClient.getDripsSetEventsByUserId(BigInt(userId)),
+    (await subgraphClient.getDripsSetEventsByUserId(BigInt(userId))).reverse(),
   );
 
-  const assetConfigs = data ? buildAssetConfigs(data, dripsSetEvents) : [];
+  const assetConfigs = buildAssetConfigs(userId, data, dripsSetEvents);
 
   return {
     user: {

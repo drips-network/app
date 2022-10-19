@@ -9,10 +9,23 @@
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
   import Amount from '$lib/components/table/cells/amount.cell.svelte';
-  import wallet from '$lib/stores/wallet';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import streams from '$lib/stores/streams';
   import { get } from 'svelte/store';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { makeStep } from '$lib/components/stepper/types';
+  import SelectTokenStep from './top-up-flow/select-token.svelte';
+  import topUpFlowState from './top-up-flow/top-up-flow-state';
+  import EnterAmountStep from './top-up-flow/enter-amount.svelte';
+  import Approve from './top-up-flow/approve.svelte';
+  import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
+  import SuccessStep from '$lib/components/success-step/success-step.svelte';
+  import { ethers } from 'ethers';
+  import tokens from '$lib/stores/tokens';
+  import assert from '$lib/utils/assert';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { onMount } from 'svelte';
 
   interface TokenTableRow {
     token: string;
@@ -35,10 +48,14 @@
     };
   }
 
-  let tableData: TokenTableRow[] = [];
+  let currentUserId: string;
+  $: accountEstimate = currentUserId ? $balances.accounts[currentUserId] : undefined;
 
-  $: accountEstimate =
-    $wallet.connected && $balances.accounts['875267609686611184008791658115888920329297355417'];
+  onMount(async () => {
+    currentUserId = (await (await getAddressDriverClient()).getUserId()).toString();
+  });
+
+  let tableData: TokenTableRow[] = [];
 
   function getIncomingTotalsForToken(address: string): {
     totalEarned: bigint;
@@ -138,6 +155,21 @@
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
   };
+
+  function getTopUpSuccessMessage() {
+    const { tokenAddress, amountToTopUp } = $topUpFlowState;
+    assert(tokenAddress && amountToTopUp, 'Missing context to construct getTopUpSuccessMessage');
+
+    const tokenInfo = tokens.getByAddress(tokenAddress)?.info;
+
+    const formattedAmount =
+      tokenInfo && ethers.utils.formatUnits(amountToTopUp, tokenInfo.decimals);
+
+    return `
+      You've successfully topped up ${formattedAmount} ${tokenInfo?.name}.
+      It may take some time for your balance to update on your dashboard.
+    `;
+  }
 </script>
 
 <div class="section">
@@ -146,7 +178,35 @@
     label="Balances"
     actions={[
       {
-        handler: () => undefined,
+        handler: () => {
+          modal.show(Stepper, undefined, {
+            context: topUpFlowState,
+            steps: [
+              makeStep({
+                component: SelectTokenStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: EnterAmountStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: Approve,
+                props: undefined,
+              }),
+              makeStep({
+                component: TriggerTopUpTransaction,
+                props: undefined,
+              }),
+              makeStep({
+                component: SuccessStep,
+                props: {
+                  message: () => getTopUpSuccessMessage(),
+                },
+              }),
+            ],
+          });
+        },
         icon: TopUpIcon,
         label: 'Top up',
       },

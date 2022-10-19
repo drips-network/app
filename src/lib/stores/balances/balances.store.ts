@@ -38,7 +38,7 @@ export default (() => {
     addressDriverClient = toAddressDriverClient;
     userId = (await addressDriverClient.getUserId()).toString();
 
-    await updateReceivable();
+    await updateBalances();
   }
 
   /**
@@ -63,10 +63,13 @@ export default (() => {
   }
 
   /** Update the current receivable balances for the currently connected user. */
-  async function updateReceivable() {
+  async function updateBalances() {
     assert(addressDriverClient && userId, 'Store must be connected first');
 
-    const allBalancesRes = await addressDriverClient.dripsHub.getBalancesForUser(BigInt(userId));
+    const allBalancesRes = await addressDriverClient.dripsHub.getBalancesForUser(
+      BigInt(userId),
+      100,
+    );
 
     state.update((s) => ({
       ...s,
@@ -96,6 +99,6 @@ export default (() => {
     setAccounts,
     connect,
     disconnect,
-    updateReceivable,
+    updateBalances,
   };
 })();

@@ -4,14 +4,24 @@ export interface SelectableItem {
   type: 'selectable';
   label: string;
   text: string;
-  image?: typeof SvelteComponent | string;
+  image?:
+    | string
+    | {
+        component: typeof SvelteComponent;
+        props: { [propName: string]: unknown };
+      };
 }
 
 export interface ActionItem {
   type: 'action';
   label: string;
   handler: () => void;
-  image?: typeof SvelteComponent | string;
+  image?:
+    | string
+    | {
+        component: typeof SvelteComponent;
+        props: { [propName: string]: unknown };
+      };
 }
 
 export type ListItem = SelectableItem | ActionItem;

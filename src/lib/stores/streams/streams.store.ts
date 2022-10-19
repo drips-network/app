@@ -1,7 +1,8 @@
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
+import assert from '$lib/utils/assert';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -62,15 +63,28 @@ export default (() => {
     userId.set(undefined);
   }
 
-  async function fetchAccount(userId: UserId) {
+  async function fetchAccount(userId: UserId): Promise<Account> {
     const account = await metadata.fetchAccount(userId);
 
     accounts.update((s) => ({ ...s, [userId]: account }));
+
+    return account;
+  }
+
+  async function refreshUserAccount(): Promise<Account> {
+    const currentUserId = get(userId);
+    assert(currentUserId, 'Store needs to be connected first.');
+
+    const account = await fetchAccount(currentUserId);
+
+    return account;
   }
 
   return {
     subscribe: state.subscribe,
     connect,
     disconnect,
+    refreshUserAccount,
+    fetchAccount,
   };
 })();

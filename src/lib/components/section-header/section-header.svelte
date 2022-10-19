@@ -4,7 +4,11 @@
 
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let label: string;
-  export let actions: { handler: () => void; label?: string; icon?: typeof SvelteComponent }[] = [];
+  export let actions: {
+    handler: (event: MouseEvent) => void;
+    label?: string;
+    icon?: typeof SvelteComponent;
+  }[] = [];
 </script>
 
 <div class="section-header">

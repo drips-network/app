@@ -1,11 +1,15 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import modal from '$lib/stores/modal';
   import CrossCircle from 'radicle-design-system/icons/CrossCircle.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
 
   export let message: string;
 
   const dispatch = createEventDispatcher<{ retry: never }>();
+
+  onMount(() => modal.setHideable(true));
 </script>
 
 <div class="await-error-step">
@@ -35,6 +39,8 @@
     width: 100%;
     max-width: 32rem;
     background-color: var(--color-foreground-level-2);
+    text-align: left;
+    overflow: scroll;
   }
 
   p {

@@ -122,6 +122,14 @@
     border-bottom: var(--border);
   }
 
+  tbody > tr:only-child > td:first-child {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  tbody > tr:only-child > td:last-child {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
   td {
     padding: 0.75rem;
     vertical-align: middle;

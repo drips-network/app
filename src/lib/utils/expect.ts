@@ -1,10 +1,10 @@
-export interface FailedExpectation {
+interface FailedExpectation {
   failed: true;
 }
 
 /**
- * Function `func` will be called every `checkingEvery` milliseconds, up to `within`
- * milliseconds total. Every time, its returned value is compared with `toMatchCondition`.
+ * Function `func` will be called roughly every `checkingEvery` milliseconds, up to roughly
+ * `within` milliseconds total. Every time, its returned value is compared with `toMatchCondition`.
  * If it's a match, returns the return value of `func`. If after all tries are exceeded
  * the condition still doesn't match, a `FailedExpectation` is returned.
  * @param func The function to execute every `checkingEvery` for `within` millis total.

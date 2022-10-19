@@ -46,7 +46,10 @@
     'test-action': {
       type: 'action',
       label: 'Add a custom token',
-      image: PlusIcon,
+      image: {
+        component: PlusIcon,
+        props: {},
+      },
       handler: () => undefined,
     },
   };

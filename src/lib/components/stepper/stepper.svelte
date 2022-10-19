@@ -1,13 +1,15 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { onDestroy, tick } from 'svelte';
-  import type { AwaitPendingPayload, Steps } from './types';
+  import { onDestroy, onMount, tick } from 'svelte';
+  import type { AwaitPendingPayload, Steps, MovePayload } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
   import AwaitErrorStep from './components/await-error-step.svelte';
+  import type { Writable } from 'svelte/store';
 
   export let steps: Steps;
+  export let context: Writable<unknown> | undefined = undefined;
 
   let stepElement: HTMLDivElement;
 
@@ -46,7 +48,7 @@
 
     if (!stepElement) return;
 
-    const stepHeight = stepElement.getBoundingClientRect().height;
+    const stepHeight = stepElement.offsetHeight;
 
     containerHeight.set(stepHeight + 32, {
       duration: firstHeightUpdate || disableTransition ? 0 : 300,
@@ -62,11 +64,18 @@
     await tick();
 
     mutationObserver.disconnect();
-    mutationObserver.observe(stepElement, { childList: true, attributes: true, subtree: true });
+
+    if (stepElement instanceof HTMLDivElement) {
+      mutationObserver.observe(stepElement, { childList: true, attributes: true, subtree: true });
+    }
   }
 
   let awaiting: AwaitPendingPayload | undefined;
   let awaitError: Error | undefined;
+
+  function handleGoForward(event: CustomEvent<MovePayload>) {
+    move(event.detail?.by ?? 1);
+  }
 
   function handleAwait(event: CustomEvent<AwaitPendingPayload>) {
     direction = 'forward';
@@ -96,6 +105,13 @@
     updateMutationObserver();
   }
 
+  onMount(() => {
+    const windowResizeListener = () => updateContainerHeight(true);
+    window.addEventListener('resize', windowResizeListener);
+
+    return () => window.removeEventListener('resize', windowResizeListener);
+  });
+
   onDestroy(() => mutationObserver.disconnect());
 </script>
 
@@ -115,9 +131,10 @@
           <svelte:component
             this={currentStep.component}
             on:await={handleAwait}
-            on:goForward={() => move(1)}
+            on:goForward={handleGoForward}
             on:goBackward={() => move(-1)}
             {...currentStep.props}
+            {context}
           />
         {/if}
       </div>

@@ -11,7 +11,9 @@ export default function seperateDripsSetEvents(
 ): {
   [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[];
 } {
-  return dripsSetEvents.reduce<{ [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[] }>(
+  const sorted = dripsSetEvents.sort((a, b) => (a.blockTimestamp > b.blockTimestamp ? 1 : -1));
+
+  return sorted.reduce<{ [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[] }>(
     (acc, dripsSetEvent) => {
       const { assetId } = dripsSetEvent;
       const tokenAddress = Utils.Asset.getAddressFromId(assetId);
