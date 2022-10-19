@@ -1,5 +1,6 @@
 import { derived, get, writable } from 'svelte/store';
 import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
+import scroll from '../scroll';
 
 type OnHide = () => void;
 
@@ -26,6 +27,8 @@ const doNothing = (): void => {
  * Hide the currently-displayed modal.
  */
 export const hide = (): void => {
+  scroll.unlock();
+
   const canHide = get(hideable);
 
   if (!canHide) {
@@ -68,5 +71,6 @@ export const show = <T extends SvelteComponent>(
   onHide: OnHide = doNothing,
   modalComponentProps: Props<T>,
 ): void => {
+  scroll.lock();
   overlayStore.set({ modalComponent, onHide, modalComponentProps });
 };

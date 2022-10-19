@@ -55,7 +55,8 @@
   }
 
   .overlay {
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: var(--color-background);
+    opacity: 0.75;
     height: 100%;
     width: 100%;
     position: fixed;
