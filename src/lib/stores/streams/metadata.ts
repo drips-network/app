@@ -6,7 +6,7 @@ import wallet from '../wallet';
 import type { Account, UserId } from './types';
 import seperateDripsSetEvents from './methods/separate-drips-set-events';
 import buildAssetConfigs from './methods/build-asset-configs';
-import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
 
 const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
 
@@ -77,10 +77,13 @@ export const accountMetadataSchema = z.object({
 });
 
 export async function fetchAccountMetadataHash(userId: UserId): Promise<string | undefined> {
-  // TODO: Real implementation once SDK adds function for getting emitUserData events
-  userId;
-  // Mocked user ID for tests
-  return userId === '875267609686611184008791658115888920329297355417' ? 'foo' : undefined;
+  /*
+  TODO: Query by both `userId` and `key` to decrease the chance of accidentally getting metadata
+  written by another app.
+  */
+  const response = await getSubgraphClient().getUserMetadataByUserId(userId);
+
+  return response?.value;
 }
 
 async function fetchIpfs(hash: string) {
@@ -197,7 +200,7 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
   const { data, hash } = (await fetchAccountMetadata(userId)) ?? {};
 
   const dripsSetEvents = seperateDripsSetEvents(
-    (await subgraphClient.getDripsSetEventsByUserId(BigInt(userId))).reverse(),
+    (await subgraphClient.getDripsSetEventsByUserId(userId)).reverse(),
   );
 
   const assetConfigs = buildAssetConfigs(userId, data, dripsSetEvents);
@@ -206,7 +209,7 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
     user: {
       userId,
       driver: 'address',
-      address: AddressDriverClient.getUserAddress(BigInt(userId)),
+      address: AddressDriverClient.getUserAddress(userId),
     },
     name: data?.name,
     description: data?.description,

@@ -131,11 +131,11 @@ export default function buildAssetConfigs(
               sender: {
                 driver: 'address',
                 userId,
-                address: AddressDriverClient.getUserAddress(BigInt(userId)),
+                address: AddressDriverClient.getUserAddress(userId),
               },
               receiver: {
                 ...streamMetadata.receiver,
-                address: AddressDriverClient.getUserAddress(BigInt(streamMetadata.receiver.userId)),
+                address: AddressDriverClient.getUserAddress(streamMetadata.receiver.userId),
               },
               dripsConfig: {
                 raw: BigInt(streamMetadata.initialDripsConfig.raw),

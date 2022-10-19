@@ -12,7 +12,7 @@ import type { streamMetadataSchema } from '../metadata';
  * that should never happen.
  */
 export default function matchMetadataStreamToReceiver(
-  receiverSeenEvent: { receiverUserId: bigint; config: bigint },
+  receiverSeenEvent: { receiverUserId: string; config: bigint },
   metadataStreams: z.infer<typeof streamMetadataSchema>[],
 ): z.infer<typeof streamMetadataSchema> | undefined {
   const results = metadataStreams.filter(
