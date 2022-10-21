@@ -1,10 +1,11 @@
-import { AddressDriverClient, constants, Utils, type DripsSubgraphTypes } from 'radicle-drips';
+import { AddressDriverClient, constants, Utils } from 'radicle-drips';
 import type { z } from 'zod';
 import type { accountMetadataSchema } from '../metadata';
 import type { AssetConfig, AssetConfigHistoryItem, DripsConfig, User } from '../types';
 import makeStreamId from './make-stream-id';
 import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
+import type { DripsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
 
 /**
  * Given accountMetadata and on-chain dripsSetEvents, construct an object describing
@@ -21,7 +22,7 @@ import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
 export default function buildAssetConfigs(
   userId: string,
   accountMetadata: z.infer<typeof accountMetadataSchema> | undefined,
-  dripsSetEvents: { [tokenAddress: string]: DripsSubgraphTypes.DripsSetEvent[] },
+  dripsSetEvents: { [tokenAddress: string]: DripsSetEventWithFullReceivers[] },
 ) {
   return Object.entries(dripsSetEvents).reduce<AssetConfig[]>(
     (acc, [tokenAddress, assetConfigDripsSetEvents]) => {
@@ -49,7 +50,7 @@ export default function buildAssetConfigs(
             makeStreamId(userId, tokenAddress, stream.initialDripsConfig.dripId),
           ) ?? [];
 
-        for (const dripsReceiverSeenEvent of dripsSetEvent.dripsReceiverSeenEvents) {
+        for (const dripsReceiverSeenEvent of dripsSetEvent.currentReceivers) {
           const matchingStream = matchMetadataStreamToReceiver(
             dripsReceiverSeenEvent,
             assetConfigMetadata?.streams ?? [],

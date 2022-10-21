@@ -112,7 +112,7 @@ const MOCK_DRIPS_SET_EVENTS = [
         config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
-    dripsHistoryHash: '',
+    receiversHash: '0x00',
     balance: 10000000000000000000n,
     blockTimestamp: 1665565699n,
     maxEnd: 100n,
@@ -126,7 +126,7 @@ const MOCK_DRIPS_SET_EVENTS = [
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
-    dripsHistoryHash: '',
+    receiversHash: '0x01',
     balance: 10000000000000000000n - 3600n * (1653439153440n * 2n),
     blockTimestamp: 1665569299n, // 1 hour later
     maxEnd: 100n,
@@ -140,7 +140,7 @@ const MOCK_DRIPS_SET_EVENTS = [
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
-    dripsHistoryHash: '',
+    receiversHash: '0x02',
     balance: 10000000000000000000n,
     blockTimestamp: 1665572899n, // 1 hour later
     maxEnd: 100n,
@@ -158,7 +158,7 @@ const MOCK_DRIPS_SET_EVENTS = [
         config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
-    dripsHistoryHash: '',
+    receiversHash: '0x00',
     balance: 10000000000000000000n - 3600n * 3n * 1653439153440n - 3600n * 1653439153440n,
     blockTimestamp: 1665576499n, // 1 hour later
     maxEnd: 100n,
@@ -170,7 +170,7 @@ vi.mock('radicle-drips', async () => ({
   DripsSubgraphClient: {
     create: () => ({
       getDripsSetEventsByUserId: () => MOCK_DRIPS_SET_EVENTS,
-      getUserMetadataByUserId: () => ({ value: 'foo' }),
+      getUserMetadataByUserId: () => ({ value: '0x666f6f' }), // 0x666f6f = Hex speak for 'foo'
     }),
   },
 }));

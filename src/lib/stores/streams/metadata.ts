@@ -7,6 +7,9 @@ import type { Account, UserId } from './types';
 import seperateDripsSetEvents from './methods/separate-drips-set-events';
 import buildAssetConfigs from './methods/build-asset-configs';
 import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
+import { toUtf8String } from 'ethers/lib/utils';
+import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { reconcileDripsSetReceivers } from './methods/reconcile-drips-set-receivers';
 
 const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
 
@@ -83,7 +86,13 @@ export async function fetchAccountMetadataHash(userId: UserId): Promise<string |
   */
   const response = await getSubgraphClient().getUserMetadataByUserId(userId);
 
-  return response?.value;
+  if (!response) return undefined;
+
+  try {
+    return toUtf8String(response.value);
+  } catch {
+    return undefined;
+  }
 }
 
 async function fetchIpfs(hash: string) {
@@ -93,7 +102,9 @@ async function fetchIpfs(hash: string) {
 async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
   const res = await fetch('/api/ipfs/pin', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    ),
   });
 
   return res.text();
@@ -122,6 +133,7 @@ async function fetchAccountMetadata(
 /**
  * Generate a metadata object (to be stored on IPFS) for a given account.
  * @param forAccount The account object to convert into the IPFS metadata format.
+ * @param address The address of the account owner.
  * @returns The converted metadata object matching `accountMetadataSchema`.
  */
 export function generateMetadata(
@@ -133,24 +145,28 @@ export function generateMetadata(
     name: forAccount.name,
     description: forAccount.description,
     emoji: forAccount.emoji,
-    timestamp: new Date().getTime() / 1000,
+    timestamp: Math.floor(new Date().getTime() / 1000),
     writtenByAddress: address,
-    assetConfigs: forAccount.assetConfigs.map((assetConfig) => ({
+    assetConfigs: mapFilterUndefined(forAccount.assetConfigs, (assetConfig) => ({
       tokenAddress: assetConfig.tokenAddress,
-      streams: assetConfig.streams.map((stream) => ({
-        id: stream.id,
-        initialDripsConfig: {
-          dripId: stream.dripsConfig.dripId,
-          raw: stream.dripsConfig.raw.toString(),
-          startTimestamp: (stream.dripsConfig.startDate?.getTime() || 0) / 1000,
-          durationSeconds: stream.dripsConfig.durationSeconds || 0,
-          amountPerSecond: stream.dripsConfig.amountPerSecond.amount,
-        },
-        receiver: stream.receiver,
-        archived: stream.archived ?? false,
-        name: stream.name,
-        description: stream.description,
-      })),
+      streams: mapFilterUndefined(assetConfig.streams, (stream) => {
+        if (stream.managed === false) return undefined;
+
+        return {
+          id: stream.id,
+          initialDripsConfig: {
+            dripId: stream.dripsConfig.dripId,
+            raw: stream.dripsConfig.raw.toString(),
+            startTimestamp: Math.floor((stream.dripsConfig.startDate?.getTime() || 0) / 1000),
+            durationSeconds: stream.dripsConfig.durationSeconds || 0,
+            amountPerSecond: stream.dripsConfig.amountPerSecond.amount,
+          },
+          receiver: stream.receiver,
+          archived: stream.archived ?? false,
+          name: stream.name,
+          description: stream.description,
+        };
+      }),
     })),
   };
 }
@@ -168,7 +184,7 @@ export function generateMetadata(
  */
 export async function updateAccountMetadata(
   newData: z.infer<typeof accountMetadataSchema>,
-  lastKnownHash: string,
+  lastKnownHash: string | undefined,
 ): Promise<string> {
   const { userId } = newData.describes;
   const currentOnChainHash = await fetchAccountMetadataHash(userId);
@@ -181,8 +197,13 @@ export async function updateAccountMetadata(
   }
 
   const newHash = await pinAccountMetadata(newData);
+  const client = await getAddressDriverClient();
+  const tx = await client.emitUserMetadata(
+    USER_DATA_KEY,
+    ethers.utils.hexlify(ethers.utils.toUtf8Bytes(newHash)),
+  );
 
-  await (await getAddressDriverClient()).emitUserMetadata(USER_DATA_KEY, newHash);
+  await tx.wait();
 
   return newHash;
 }
@@ -199,11 +220,11 @@ export async function fetchAccount(userId: UserId): Promise<Account> {
 
   const { data, hash } = (await fetchAccountMetadata(userId)) ?? {};
 
-  const dripsSetEvents = seperateDripsSetEvents(
-    (await subgraphClient.getDripsSetEventsByUserId(userId)).reverse(),
-  );
+  const dripsSetEvents = await subgraphClient.getDripsSetEventsByUserId(userId);
+  const dripsSetEventsWithFullReceivers = reconcileDripsSetReceivers(dripsSetEvents);
+  const dripsSetEventsByTokenAddress = seperateDripsSetEvents(dripsSetEventsWithFullReceivers);
 
-  const assetConfigs = buildAssetConfigs(userId, data, dripsSetEvents);
+  const assetConfigs = buildAssetConfigs(userId, data, dripsSetEventsByTokenAddress);
 
   return {
     user: {
