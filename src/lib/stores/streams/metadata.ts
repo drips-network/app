@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, type ContractTransaction } from 'ethers';
 import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import { get } from 'svelte/store';
 import { z } from 'zod';
@@ -80,16 +80,15 @@ export const accountMetadataSchema = z.object({
 });
 
 export async function fetchAccountMetadataHash(userId: UserId): Promise<string | undefined> {
-  /*
-  TODO: Query by both `userId` and `key` to decrease the chance of accidentally getting metadata
-  written by another app.
-  */
-  const response = await getSubgraphClient().getUserMetadataByUserId(userId);
+  const getLatestUserMetadata = await getSubgraphClient().getLatestUserMetadata(
+    userId,
+    USER_DATA_KEY,
+  );
 
-  if (!response) return undefined;
+  if (!getLatestUserMetadata) return undefined;
 
   try {
-    return toUtf8String(response.value);
+    return toUtf8String(getLatestUserMetadata.value);
   } catch {
     return undefined;
   }
@@ -185,7 +184,10 @@ export function generateMetadata(
 export async function updateAccountMetadata(
   newData: z.infer<typeof accountMetadataSchema>,
   lastKnownHash: string | undefined,
-): Promise<string> {
+): Promise<{
+  newHash: string;
+  tx: ContractTransaction;
+}> {
   const { userId } = newData.describes;
   const currentOnChainHash = await fetchAccountMetadataHash(userId);
 
@@ -203,9 +205,10 @@ export async function updateAccountMetadata(
     ethers.utils.hexlify(ethers.utils.toUtf8Bytes(newHash)),
   );
 
-  await tx.wait();
-
-  return newHash;
+  return {
+    newHash,
+    tx,
+  };
 }
 
 /**

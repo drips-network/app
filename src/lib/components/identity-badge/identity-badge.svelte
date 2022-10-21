@@ -8,6 +8,10 @@
 
   export let address: string;
   export let showIdentity = true;
+  export let showAvatar = true;
+  export let size: 'normal' | 'big' | 'huge' = 'normal';
+
+  export let avatarImgElem: HTMLImageElement | undefined = undefined;
 
   $: ensStore.lookup(address);
   $: ens = $ensStore[address];
@@ -27,16 +31,38 @@
   }
 
   $: toDisplay = ens?.name ?? formatAddress(address);
+
+  const sizes = {
+    normal: 24,
+    big: 48,
+    huge: 64,
+  };
+  $: currentSize = sizes[size];
+
+  const fontClasses = {
+    normal: 'typo-text-bold',
+    big: 'typo-header-4',
+    huge: 'typo-header-3',
+  };
+  $: currentFontClass = fontClasses[size];
 </script>
 
-<div class="identity-badge">
-  <Avatar src={ens?.avatarUrl} placeholderSrc={blockyUrl} />
+<div class="identity-badge" style:height={showAvatar ? `${currentSize}px` : ''}>
+  {#if showAvatar}
+    <Avatar
+      size={currentSize}
+      bind:imgElem={avatarImgElem}
+      src={ens?.avatarUrl}
+      placeholderSrc={blockyUrl}
+    />
+  {/if}
   {#if showIdentity}
     {#key toDisplay}
       <p
         transition:fade|local={{ duration: 300 }}
-        class:typo-text-mono-bold={!ens?.name}
-        class="typo-text-bold identity"
+        class:mono={!ens?.name}
+        class={`${currentFontClass} identity`}
+        style:left={showAvatar ? '2rem' : '0rem'}
       >
         {toDisplay}
       </p>
@@ -51,17 +77,30 @@
   .identity-badge {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
     color: var(--color-foreground-level-6);
     position: relative;
+    text-align: left;
+    width: 100%;
+  }
+
+  .mono {
+    font-family: var(--typeface-mono-bold);
+    white-space: nowrap;
   }
 
   .identity {
     position: absolute;
-    left: 2rem;
     width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .identity-placeholder {
     opacity: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 </style>

@@ -16,7 +16,6 @@
     width: 70vw;
     max-width: 40rem;
     text-align: center;
-    overflow: hidden;
   }
 
   @media only screen and (max-width: 54rem) {
