@@ -8,7 +8,7 @@
   import TokenCell from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
-  import Amount from '$lib/components/table/cells/amount.cell.svelte';
+  import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import streams from '$lib/stores/streams';
   import { get } from 'svelte/store';
@@ -29,23 +29,9 @@
 
   interface TokenTableRow {
     token: string;
-    earnings: {
-      amount: bigint;
-      amountPerSecond: bigint;
-      tokenAddress: string;
-      showSymbol: false;
-    };
-    streaming: {
-      amount: bigint;
-      amountPerSecond: bigint;
-      tokenAddress: string;
-      showSymbol: false;
-    };
-    netRate: {
-      amountPerSecond: bigint;
-      tokenAddress: string;
-      showSymbol: false;
-    };
+    earnings: AmountCellData;
+    streaming: AmountCellData;
+    netRate: AmountCellData;
   }
 
   let currentUserId: string;
@@ -62,7 +48,6 @@
     amountPerSecond: bigint;
   } {
     const streamsState = get(streams);
-    const estimates = get(balances);
 
     if (!streamsState.ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
 
@@ -72,13 +57,13 @@
 
     return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
       (acc, stream) => {
-        const estimate = estimates.accounts[stream.sender.userId]?.[address]?.streams[stream.id];
+        const estimate = balances.getEstimateByStreamId(stream.id);
 
         if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
 
         return {
-          totalEarned: acc.totalEarned + estimate.totalStreamed.amount,
-          amountPerSecond: acc.amountPerSecond + estimate.amountPerSecond.amount,
+          totalEarned: acc.totalEarned + estimate.totalStreamed,
+          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
         };
       },
       { totalEarned: 0n, amountPerSecond: 0n },
@@ -97,19 +82,32 @@
       return {
         token: tokenAddress,
         earnings: {
-          amount: incomingTotals.totalEarned,
-          tokenAddress: tokenAddress,
+          amount: {
+            amount: incomingTotals.totalEarned,
+            tokenAddress,
+          },
+          amountPerSecond: {
+            amount: incomingTotals.amountPerSecond,
+            tokenAddress,
+          },
           showSymbol: false,
-          amountPerSecond: incomingTotals.amountPerSecond,
         },
         streaming: {
-          ...estimate.totals.remainingBalance,
-          amountPerSecond: -estimate.totals.amountPerSecond.amount,
+          amount: {
+            tokenAddress,
+            amount: estimate.totals.remainingBalance,
+          },
+          amountPerSecond: {
+            tokenAddress,
+            amount: -estimate.totals.totalAmountPerSecond,
+          },
           showSymbol: false,
         },
         netRate: {
-          amountPerSecond: incomingTotals.amountPerSecond - estimate.totals.amountPerSecond.amount,
-          tokenAddress: tokenAddress,
+          amountPerSecond: {
+            amount: incomingTotals.amountPerSecond - estimate.totals.totalAmountPerSecond,
+            tokenAddress,
+          },
           showSymbol: false,
         },
       };
@@ -176,6 +174,7 @@
   <SectionHeader
     icon={TokensIcon}
     label="Balances"
+    actionsDisabled={!accountEstimate}
     actions={[
       {
         handler: () => {

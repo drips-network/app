@@ -1,7 +1,7 @@
-import { AddressDriverClient, Utils, type DripsSubgraphTypes } from 'radicle-drips';
+import { AddressDriverClient, constants, Utils, type DripsSubgraphTypes } from 'radicle-drips';
 import type { z } from 'zod';
 import type { accountMetadataSchema } from '../metadata';
-import type { AssetConfig, AssetConfigHistoryItem, DripsConfig } from '../types';
+import type { AssetConfig, AssetConfigHistoryItem, DripsConfig, User } from '../types';
 import makeStreamId from './make-stream-id';
 import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
@@ -41,6 +41,7 @@ export default function buildAssetConfigs(
           streamId: string;
           dripsConfig?: DripsConfig;
           managed: boolean;
+          receiver: User;
         }[] = [];
 
         const remainingStreamIds =
@@ -68,27 +69,41 @@ export default function buildAssetConfigs(
                 eventConfig.start > 0n ? new Date(Number(eventConfig.start) * 1000) : undefined,
               amountPerSecond: {
                 amount: eventConfig.amountPerSec,
-                tokenAddress: tokenAddress,
+                tokenAddress,
               },
               dripId: eventConfig.dripId.toString(),
               durationSeconds: eventConfig.duration > 0n ? Number(eventConfig.duration) : undefined,
             },
             managed: Boolean(matchingStream),
+            receiver: {
+              address: AddressDriverClient.getUserAddress(dripsReceiverSeenEvent.receiverUserId),
+              driver: 'address',
+              userId: String(dripsReceiverSeenEvent.receiverUserId),
+            },
           });
 
           remainingStreamIds.splice(remainingStreamIds.indexOf(streamId), 1);
         }
 
         /*
-      If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
-      dripsSet event, we can assume it is paused.
-      */
+        If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
+        dripsSet event, we can assume it is paused.
+        */
         for (const remainingStreamId of remainingStreamIds) {
+          const stream = assetConfigMetadata?.streams.find(
+            (stream) => stream.id === remainingStreamId,
+          );
+          if (!stream) break;
+
           assetConfigHistoryItemStreams.push({
             streamId: remainingStreamId,
             // Undefined dripsConfig == stream was paused
             dripsConfig: undefined,
             managed: true,
+            receiver: {
+              ...stream.receiver,
+              address: AddressDriverClient.getUserAddress(stream.receiver.userId),
+            },
           });
         }
 
@@ -99,6 +114,8 @@ export default function buildAssetConfigs(
           runsOutOfFunds = undefined;
         } else if (dripsSetEvent.maxEnd === 0n) {
           runsOutOfFunds = undefined;
+        } else if (dripsSetEvent.maxEnd === dripsSetEvent.blockTimestamp) {
+          runsOutOfFunds = undefined;
         } else {
           runsOutOfFunds = new Date(Number(dripsSetEvent.maxEnd) * 1000);
         }
@@ -107,7 +124,7 @@ export default function buildAssetConfigs(
           timestamp: new Date(Number(dripsSetEvent.blockTimestamp) * 1000),
           balance: {
             tokenAddress: tokenAddress,
-            amount: dripsSetEvent.balance,
+            amount: dripsSetEvent.balance * BigInt(constants.AMT_PER_SEC_MULTIPLIER),
           },
           runsOutOfFunds,
           streams: assetConfigHistoryItemStreams,
@@ -119,47 +136,50 @@ export default function buildAssetConfigs(
       acc.push({
         tokenAddress: tokenAddress,
         streams:
-          assetConfigMetadata?.streams.map((streamMetadata) => {
-            const streamId = makeStreamId(
-              userId,
-              assetConfigMetadata.tokenAddress,
-              streamMetadata.initialDripsConfig.raw,
+          currentStreams.map((stream) => {
+            const streamMetadata = assetConfigMetadata?.streams.find(
+              (streamMetadata) => streamMetadata.id === stream.streamId,
+            );
+            const initialDripsConfig = streamMetadata?.initialDripsConfig;
+
+            const dripsConfig: DripsConfig | undefined =
+              stream.dripsConfig ||
+              (initialDripsConfig && {
+                dripId: initialDripsConfig.dripId,
+                raw: BigInt(initialDripsConfig.raw),
+                amountPerSecond: {
+                  amount: initialDripsConfig.amountPerSecond,
+                  tokenAddress,
+                },
+                startDate:
+                  initialDripsConfig.startTimestamp && initialDripsConfig.startTimestamp > 0
+                    ? new Date(initialDripsConfig.startTimestamp)
+                    : undefined,
+                durationSeconds:
+                  initialDripsConfig.durationSeconds !== 0
+                    ? initialDripsConfig.durationSeconds
+                    : undefined,
+              });
+
+            assert(
+              dripsConfig,
+              'Both stream metadata and on-chain data cannot have an undefined dripsConfig',
             );
 
             return {
-              id: streamId,
+              id: stream.streamId,
               sender: {
                 driver: 'address',
                 userId,
                 address: AddressDriverClient.getUserAddress(userId),
               },
-              receiver: {
-                ...streamMetadata.receiver,
-                address: AddressDriverClient.getUserAddress(streamMetadata.receiver.userId),
-              },
-              dripsConfig: {
-                raw: BigInt(streamMetadata.initialDripsConfig.raw),
-                amountPerSecond: {
-                  tokenAddress: assetConfigMetadata.tokenAddress,
-                  amount: streamMetadata.initialDripsConfig.amountPerSecond,
-                },
-                startDate: streamMetadata.initialDripsConfig.startTimestamp
-                  ? new Date(streamMetadata.initialDripsConfig.startTimestamp * 1000)
-                  : undefined,
-                durationSeconds:
-                  streamMetadata.initialDripsConfig.durationSeconds > 0
-                    ? streamMetadata.initialDripsConfig.durationSeconds
-                    : undefined,
-                dripId: streamMetadata.initialDripsConfig.dripId,
-              },
-              paused:
-                currentStreams.find((stream) => stream.streamId === streamId)?.dripsConfig ===
-                undefined,
-              managed:
-                currentStreams.find((stream) => stream.streamId === streamId)?.managed ?? true,
-              name: streamMetadata.name,
-              description: streamMetadata.description,
-              archived: streamMetadata.archived,
+              receiver: stream.receiver,
+              dripsConfig,
+              paused: !stream.dripsConfig,
+              managed: Boolean(streamMetadata),
+              name: streamMetadata?.name,
+              description: streamMetadata?.description,
+              archived: streamMetadata?.archived ?? false,
             };
           }) ?? [],
         history: assetConfigHistoryItems,

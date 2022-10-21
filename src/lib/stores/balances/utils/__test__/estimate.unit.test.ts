@@ -66,6 +66,7 @@ const mockAssetConfigHistoryItem = ({
     streamId: stream.id,
     dripsConfig: stream.paused ? undefined : stream.dripsConfig,
     managed: stream.managed,
+    receiver: stream.receiver,
   })),
   runsOutOfFunds: runsOutOfFundsTimestamp ? new Date(runsOutOfFundsTimestamp * 1000) : undefined,
 });
@@ -111,11 +112,13 @@ describe('estimate.ts', () => {
         ),
       );
 
-      expect(result.totals.amountPerSecond.amount).toBe(100n);
-      expect(result.totals.totalStreamed.amount).toBe(1000n);
-      expect(result.totals.remainingBalance.amount).toBe(9000n);
+      expect(result.totals.totalAmountPerSecond).toBe(100n);
+      expect(result.totals.totalStreamed).toBe(1000n);
+      expect(result.totals.remainingBalance).toBe(9000n);
 
-      expect(result.streams[`${MOCK_USER.userId}-0x00-1`].totalStreamed.amount).toBe(1000n);
+      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
+        1000n,
+      );
     });
 
     it('handles a stream being paused and unpaused', () => {
@@ -155,11 +158,13 @@ describe('estimate.ts', () => {
         ),
       );
 
-      expect(result.totals.amountPerSecond.amount).toBe(0n);
-      expect(result.totals.totalStreamed.amount).toBe(500n);
-      expect(result.totals.remainingBalance.amount).toBe(9500n);
+      expect(result.totals.totalAmountPerSecond).toBe(0n);
+      expect(result.totals.totalStreamed).toBe(500n);
+      expect(result.totals.remainingBalance).toBe(9500n);
 
-      expect(result.streams[`${MOCK_USER.userId}-0x00-1`].totalStreamed.amount).toBe(500n);
+      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
+        500n,
+      );
     });
 
     it('handles streams running out of funds', () => {
@@ -188,11 +193,13 @@ describe('estimate.ts', () => {
         ),
       );
 
-      expect(result.totals.amountPerSecond.amount).toBe(0n);
-      expect(result.totals.totalStreamed.amount).toBe(250n);
-      expect(result.totals.remainingBalance.amount).toBe(0n);
+      expect(result.totals.totalAmountPerSecond).toBe(0n);
+      expect(result.totals.totalStreamed).toBe(250n);
+      expect(result.totals.remainingBalance).toBe(0n);
 
-      expect(result.streams[`${MOCK_USER.userId}-0x00-1`].totalStreamed.amount).toBe(250n);
+      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
+        250n,
+      );
     });
 
     it('handles start dates', () => {
@@ -221,14 +228,16 @@ describe('estimate.ts', () => {
         ),
       );
 
-      expect(result.totals.amountPerSecond.amount).toBe(100n);
-      expect(result.totals.totalStreamed.amount).toBe(500n);
-      expect(result.totals.remainingBalance.amount).toBe(500n);
+      expect(result.totals.totalAmountPerSecond).toBe(100n);
+      expect(result.totals.totalStreamed).toBe(500n);
+      expect(result.totals.remainingBalance).toBe(500n);
 
-      expect(result.streams[`${MOCK_USER.userId}-0x00-1`].totalStreamed.amount).toBe(500n);
+      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
+        500n,
+      );
     });
 
-    it('handles start durations', () => {
+    it('handles durations', () => {
       vi.useFakeTimers();
       vi.setSystemTime(20 * 1000);
 
@@ -254,11 +263,13 @@ describe('estimate.ts', () => {
         ),
       );
 
-      expect(result.totals.amountPerSecond.amount).toBe(0n);
-      expect(result.totals.totalStreamed.amount).toBe(500n);
-      expect(result.totals.remainingBalance.amount).toBe(500n);
+      expect(result.totals.totalAmountPerSecond).toBe(0n);
+      expect(result.totals.totalStreamed).toBe(500n);
+      expect(result.totals.remainingBalance).toBe(500n);
 
-      expect(result.streams[`${MOCK_USER.userId}-0x00-1`].totalStreamed.amount).toBe(500n);
+      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
+        500n,
+      );
     });
   });
 });

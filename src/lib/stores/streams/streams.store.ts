@@ -15,7 +15,6 @@ interface State {
 export default (() => {
   const userId = writable<string | undefined>(undefined);
   const accounts = writable<{ [accountId: UserId]: Account }>({});
-
   const state = derived<[typeof accounts, typeof userId], State>(
     [accounts, userId],
     ([accounts, userId]) => {
@@ -51,12 +50,17 @@ export default (() => {
     await fetchAccount(toUserId);
 
     const subgraphClient = getSubgraphClient();
-    const accountsSendingToCurrentUser =
+    const dripsReceiverSeenEventForUser =
       await subgraphClient.getDripsReceiverSeenEventsByReceiverId(toUserId);
-
-    await Promise.all(
-      accountsSendingToCurrentUser.map((a) => fetchAccount(a.receiverUserId.toString())),
+    const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
+      (acc, event) => {
+        const senderUserId = event.senderUserId.toString();
+        return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;
+      },
+      [],
     );
+
+    await Promise.all(accountsSendingToCurrentUser.map((a) => fetchAccount(a)));
   }
 
   async function disconnect() {

@@ -59,6 +59,7 @@
     "@walletconnect/web3-provider": "^1.8.0",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.0",
+    "multiformats": "^10.0.2",
     "radicle-design-system": "https://github.com/radicle-dev/radicle-design-system",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#v2",
     "web3modal": "^1.9.9",
