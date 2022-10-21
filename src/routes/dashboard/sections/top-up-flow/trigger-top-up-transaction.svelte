@@ -18,6 +18,8 @@
   async function topUp() {
     modal.setHideable(false);
 
+    const client = await getAddressDriverClient();
+
     const { tokenAddress, amountToTopUp } = $context;
     const { address, provider } = $wallet;
 
@@ -27,9 +29,23 @@
       'TriggerTopUpTransaction step is missing required context',
     );
 
-    const tx = await (
-      await getAddressDriverClient()
-    ).setDrips(tokenAddress, [], [], address, amountToTopUp);
+    const ownUserId = (await client.getUserId()).toString();
+    const ownAccount = $streams.accounts[ownUserId];
+    const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+    assert(assetConfig, "App hasn't yet fetched the right asset config");
+
+    const currentReceivers = assetConfig.streams.map((stream) => ({
+      userId: stream.receiver.userId,
+      config: stream.dripsConfig.raw,
+    }));
+
+    const tx = await client.setDrips(
+      tokenAddress,
+      currentReceivers,
+      currentReceivers,
+      address,
+      amountToTopUp,
+    );
 
     const receipt = await tx.wait();
     const block = await provider.getBlock(receipt.blockNumber);
