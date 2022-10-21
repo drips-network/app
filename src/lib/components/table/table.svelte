@@ -8,75 +8,73 @@
   $: table = createSvelteTable(options);
 </script>
 
-<div class="p-2">
-  <table>
-    <thead>
-      {#each $table.getHeaderGroups() as headerGroup}
-        <tr>
-          {#each headerGroup.headers as header}
-            <th
-              on:click={header.column.getToggleSortingHandler()}
-              class:sortable={header.column.getCanSort()}
-            >
-              {#if !header.isPlaceholder}
-                <div>
-                  <span class="typo-all-caps">
-                    {(typeof header.column.columnDef.header === 'string' &&
-                      header.column.columnDef.header) ||
-                      ''}
-                  </span>
-                  {#if header.column.getIsSorted() === 'asc'}
-                    <ChevronDown />
-                  {:else if header.column.getIsSorted() === 'desc'}
-                    <ChevronUp />
-                  {/if}
-                </div>
-              {/if}
-            </th>
-          {/each}
-        </tr>
-      {/each}
-    </thead>
-    <tbody>
-      {#each $table.getRowModel().rows as row}
-        <tr>
-          {#each row.getVisibleCells() as cell}
-            <td
-              class:typo-text-bold={cell.column.getIsSorted()}
-              class:sorted={cell.column.getIsSorted()}
-            >
+<table>
+  <thead>
+    {#each $table.getHeaderGroups() as headerGroup}
+      <tr>
+        {#each headerGroup.headers as header}
+          <th
+            on:click={header.column.getToggleSortingHandler()}
+            class:sortable={header.column.getCanSort()}
+          >
+            {#if !header.isPlaceholder}
               <div>
-                <svelte:component
-                  this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  context={cell.getContext()}
-                />
+                <span class="typo-all-caps">
+                  {(typeof header.column.columnDef.header === 'string' &&
+                    header.column.columnDef.header) ||
+                    ''}
+                </span>
+                {#if header.column.getIsSorted() === 'asc'}
+                  <ChevronDown />
+                {:else if header.column.getIsSorted() === 'desc'}
+                  <ChevronUp />
+                {/if}
               </div>
-            </td>
-          {/each}
-        </tr>
-      {/each}
-    </tbody>
-    <tfoot>
-      {#each $table.getFooterGroups() as footerGroup}
-        <tr>
-          {#each footerGroup.headers as header}
-            <th>
-              {#if !header.isPlaceholder}
-                <svelte:component
-                  this={flexRender(header.column.columnDef.footer, header.getContext())}
-                />
-              {/if}
-            </th>
-          {/each}
-        </tr>
-      {/each}
-    </tfoot>
-  </table>
-  <div class="h-4" />
-</div>
+            {/if}
+          </th>
+        {/each}
+      </tr>
+    {/each}
+  </thead>
+  <tbody>
+    {#each $table.getRowModel().rows as row}
+      <tr>
+        {#each row.getVisibleCells() as cell}
+          <td
+            class:typo-text-bold={cell.column.getIsSorted()}
+            class:sorted={cell.column.getIsSorted()}
+          >
+            <div>
+              <svelte:component
+                this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+                context={cell.getContext()}
+              />
+            </div>
+          </td>
+        {/each}
+      </tr>
+    {/each}
+  </tbody>
+  <tfoot>
+    {#each $table.getFooterGroups() as footerGroup}
+      <tr>
+        {#each footerGroup.headers as header}
+          <th>
+            {#if !header.isPlaceholder}
+              <svelte:component
+                this={flexRender(header.column.columnDef.footer, header.getContext())}
+              />
+            {/if}
+          </th>
+        {/each}
+      </tr>
+    {/each}
+  </tfoot>
+</table>
 
 <style>
   table {
+    padding: none;
     border-collapse: separate;
     border-spacing: 0;
     box-sizing: border-box;
@@ -86,6 +84,10 @@
 
   tfoot {
     color: gray;
+  }
+
+  tbody {
+    width: 100%;
   }
 
   tbody > tr:first-child > td:first-child {
@@ -131,7 +133,6 @@
   }
 
   td > div {
-    height: 1.5rem;
     display: flex;
     align-items: center;
     white-space: nowrap;

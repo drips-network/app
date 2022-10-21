@@ -1,4 +1,5 @@
-import type { Web3Provider } from '@ethersproject/providers';
+import type { BaseProvider } from '@ethersproject/providers';
+import { ethers } from 'ethers';
 import { get, writable } from 'svelte/store';
 
 interface ResolvedRecord {
@@ -12,35 +13,25 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
-  let provider: Web3Provider | undefined;
+  let provider = ethers.getDefaultProvider();
 
   /**
    * Connect the store to a provider, which is needed in order to resolve ENS
    * records.
    * @param toProvider The provider to connect to.
    */
-  function connect(toProvider: Web3Provider) {
+  function connect(toProvider: BaseProvider) {
     provider = toProvider;
-  }
-
-  /**
-   * Disconnect the store from a previously-connected provider. After calling this,
-   * all subsequent lookups will silently fail.
-   */
-  function disconnect() {
-    provider = undefined;
   }
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
    * store state. Looks up ENS name & avatar URL.
    * @param address The address to attempt resolving.
-   * @returns A promise resolving to the fetched ENS record, or undefined if
-   * unknown.
    */
-  async function lookup(address: string): Promise<ResolvedRecord | undefined> {
+  async function lookup(address: string): Promise<void> {
     const saved = get(state)[address];
-    if (saved?.name) return saved;
+    if (saved) return;
 
     // Initially write an empty object to prevent multiple in-flight requests
     // for the same name
@@ -60,15 +51,17 @@ export default (() => {
         ...s,
         [address]: resolvedRecord,
       }));
-
-      return resolvedRecord;
     }
+  }
+
+  function clear() {
+    state.set({});
   }
 
   return {
     subscribe: state.subscribe,
     connect,
-    disconnect,
     lookup,
+    clear,
   };
 })();

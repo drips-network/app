@@ -15,6 +15,9 @@ jobs:
       - name: Install E2E test browsers
         run: npx playwright install-deps
 
+      - name: Svelte Kit Sync
+        run: npx svelte-kit sync
+
       - name: Build app
         run: npm run build
 

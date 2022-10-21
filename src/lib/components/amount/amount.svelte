@@ -2,47 +2,96 @@
   import tokens from '$lib/stores/tokens';
   import { utils } from 'ethers';
 
-  export let amount: bigint;
+  export let amount: bigint | undefined = undefined;
   export let tokenAddress: string;
-
-  export let delta: 'positive' | 'negative' | undefined = undefined;
+  export let amountPerSecond: bigint | undefined = undefined;
+  export let showSymbol = true;
 
   $: tokenInfo = $tokens ? tokens.getByAddress(tokenAddress) : undefined;
 
+  let amountPerSecondPolarity: '' | '+' | '-';
+  $: {
+    if (!amountPerSecond || amountPerSecond === 0n) {
+      amountPerSecondPolarity = '';
+    } else if (amountPerSecond > 0) {
+      amountPerSecondPolarity = '+';
+    } else {
+      amountPerSecondPolarity = '-';
+    }
+  }
+
+  function countDecimals(num: number) {
+    if (isNaN(+num)) return 0;
+    const decimals = (num + '').split('.')[1];
+    if (decimals) return decimals.length;
+    return 0;
+  }
+
   function format(amount: bigint, decimals: number) {
-    return `${parseFloat(utils.formatUnits(amount, decimals)).toFixed(4)}`;
+    const MAX_DECIMALS = 8;
+    const MIN_DECIMALS = 2;
+
+    const parsed = Math.abs(parseFloat(utils.formatUnits(amount, decimals)));
+    const decimalCount = countDecimals(parsed);
+
+    return `${parsed.toFixed(Math.max(Math.min(MAX_DECIMALS, decimalCount), MIN_DECIMALS))}`;
   }
 </script>
 
 {#if tokenInfo}
-  <span
-    class="amount-wrapper typo-text-mono-bold"
-    class:positive={delta === 'positive'}
-    class:negative={delta === 'negative'}
-  >
-    <span class="amount">
-      {delta === 'positive' ? '+' : ''}
-      {delta === 'negative' ? '-' : ''}
-      {format(amount, tokenInfo.info.decimals)}
-    </span>
-    <span class="symbol">
-      {tokenInfo.info.symbol}
-    </span>
-  </span>
+  <div class="wrapper">
+    {#if amount !== undefined}
+      <div class="amount">
+        <span class="amount-wrapper typo-text-mono-bold">
+          <span class="amount">
+            {format(amount, tokenInfo.info.decimals)}
+          </span>
+          {#if showSymbol}
+            <span class="symbol">
+              {tokenInfo.info.symbol}
+            </span>
+          {/if}
+        </span>
+      </div>
+    {/if}
+    {#if amountPerSecond !== undefined}
+      <div class="amount-per-second typo-text-small">
+        <span
+          class="amount typo-text-small-mono"
+          class:positive={amountPerSecondPolarity === '+'}
+          class:negative={amountPerSecondPolarity === '-'}
+          >{amountPerSecondPolarity}{format(
+            amountPerSecond,
+            tokenInfo.info.decimals,
+          )}{#if showSymbol}
+            {' ' + tokenInfo.info.symbol}
+          {/if}</span
+        > / sec
+      </div>
+    {/if}
+  </div>
 {:else}
   Unknown token
 {/if}
 
 <style>
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+  }
   .amount-wrapper {
     color: var(--color-foreground-level-6);
   }
 
-  .amount-wrapper.negative {
+  .negative {
     color: var(--color-negative);
   }
 
-  .amount-wrapper.positive {
+  .positive {
     color: var(--color-positive);
+  }
+
+  .amount-per-second {
+    color: var(--color-foreground-level-5);
   }
 </style>

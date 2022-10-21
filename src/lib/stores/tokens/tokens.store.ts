@@ -4,6 +4,7 @@ import { get, writable } from 'svelte/store';
 import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
 import { Utils } from 'radicle-drips';
+import { browser } from '$app/environment';
 
 interface DefaultTokenInfoWrapper {
   info: TokenInfo;
@@ -30,9 +31,9 @@ export default (() => {
   function connect(toChainId: number) {
     chainId = toChainId;
 
-    const customTokens = storedTokens
-      .readCustomTokensList()
-      .filter((t) => t.info.chainId === chainId);
+    const customTokens = browser
+      ? storedTokens.readCustomTokensList().filter((t) => t.info.chainId === chainId)
+      : [];
 
     const defaultTokens: TokenInfoWrapper[] = uniswapTokenList.tokens
       .filter((t) => t.chainId === chainId)
@@ -99,15 +100,12 @@ export default (() => {
    * chain the store is connected to.
    * @returns Token information, or undefined if not found.
    */
-  function getByDripsAssetId(
-    dripsAssetId: string | bigint,
-    chain = chainId,
-  ): TokenInfoWrapper | undefined {
+  function getByDripsAssetId(dripsAssetId: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
     assert(tokens, 'Store must be connected first');
 
     return tokens.find((t) => {
-      const assetAddress = Utils.Asset.getAddressFromId(dripsAssetId);
+      const assetAddress = Utils.Asset.getAddressFromId(BigInt(dripsAssetId));
 
       const addressMatch = t.info.address.toLowerCase() === assetAddress.toLowerCase();
       const chainIdMatch = t.info.chainId === chain;
