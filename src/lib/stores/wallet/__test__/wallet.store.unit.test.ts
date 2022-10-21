@@ -32,13 +32,13 @@ afterEach(() => {
 
 describe('wallet store', () => {
   it('is not connected to anything after being created', () => {
-    expect(get(wallet)).toBe(undefined);
+    expect(get(wallet).connected).toBe(false);
   });
 
-  it('is still undefined after being initialized with no cached provider', async () => {
+  it('is still disconnected after being initialized with no cached provider', async () => {
     await wallet.initialize();
 
-    expect(get(wallet)).toBe(undefined);
+    expect(get(wallet).connected).toBe(false);
   });
 
   it('connects to wallet', async () => {
@@ -60,6 +60,7 @@ describe('wallet store', () => {
 
   it('clears on disconnect', () => {
     // disconnect is called in afterEach
-    expect(get(wallet)).toBe(undefined);
+    expect(get(wallet).address).toBe(undefined);
+    expect(get(wallet).connected).toBe(false);
   });
 });

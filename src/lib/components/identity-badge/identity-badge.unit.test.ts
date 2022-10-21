@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import IdentityBadge from './identity-badge.svelte';
 
+vi.mock('$app/environment', () => ({
+  browser: true,
+}));
+
 vi.mock('$lib/stores/ens/ens.store.ts');
 
 vi.mock('radicle-design-system/lib/blockies', () => ({

@@ -3,6 +3,10 @@ import { Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import tokens from '.';
 
+vi.mock('$app/environment', () => ({
+  browser: true,
+}));
+
 afterEach(() => {
   tokens.disconnect();
   window.localStorage.clear();
@@ -44,7 +48,7 @@ describe('tokens store', () => {
     );
     expect(
       tokens.getByDripsAssetId(
-        Utils.Asset.getIdFromAddress('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3'),
+        Utils.Asset.getIdFromAddress('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3').toString(),
       )?.info.address,
     ).toBe('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3');
   });
