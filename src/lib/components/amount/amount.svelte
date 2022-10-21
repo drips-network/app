@@ -1,8 +1,8 @@
 <script lang="ts">
   import tokens from '$lib/stores/tokens';
-  import { utils } from 'ethers';
   import assert from '$lib/utils/assert';
   import { constants } from 'radicle-drips';
+  import formatTokenAmount from '$lib/utils/format-token-amount';
 
   interface Amount {
     amount: bigint;
@@ -18,28 +18,11 @@
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
-  function countDecimals(num: number) {
-    if (isNaN(+num)) return 0;
-    const decimals = (num + '').split('.')[1];
-    if (decimals) return decimals.length;
-    return 0;
-  }
-
   function format(amount: Amount) {
-    const MAX_DECIMAL_ZEROES = 8;
-    const MIN_DECIMAL_ZEROES = 2;
-
     const tokenDecimals = tokens.getByAddress(amount.tokenAddress)?.info.decimals;
     assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
 
-    const parsed = Math.abs(
-      parseFloat(utils.formatUnits(amount.amount / multiplier, tokenDecimals)),
-    );
-    const decimalCount = countDecimals(parsed);
-
-    return `${parsed.toFixed(
-      Math.max(Math.min(MAX_DECIMAL_ZEROES, decimalCount), MIN_DECIMAL_ZEROES),
-    )}`;
+    return formatTokenAmount(amount, tokenDecimals, multiplier);
   }
 
   function getPolarity(amount: bigint): '+' | '-' | undefined {

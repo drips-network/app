@@ -1,8 +1,22 @@
 import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
 
+export interface UpdateAwaitStepParams {
+  message?: string;
+  link?: {
+    url: string;
+    label: string;
+  };
+  icon?: {
+    component: typeof SvelteComponent;
+    props: Record<string, unknown>;
+  };
+}
+
+export type UpdateAwaitStepFn = (params: UpdateAwaitStepParams) => void;
+
 export interface AwaitPendingPayload {
   message: string;
-  promise: () => Promise<void>;
+  promise: (updateFn: UpdateAwaitStepFn) => Promise<void>;
 }
 
 export interface MovePayload {
