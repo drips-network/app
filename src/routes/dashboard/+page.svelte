@@ -1,6 +1,7 @@
 <script lang="ts">
   import Balances from './sections/balances.section.svelte';
   import Streams from './sections/streams.section.svelte';
+  import Splits from './sections/splits.section.svelte';
 
   import { goto } from '$app/navigation';
   import wallet from '$lib/stores/wallet';
@@ -21,6 +22,7 @@
   <h1>Dashboard</h1>
   <Balances />
   <Streams />
+  <Splits />
 </div>
 
 <style>
