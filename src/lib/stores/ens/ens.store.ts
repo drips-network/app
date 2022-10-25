@@ -54,6 +54,24 @@ export default (() => {
     }
   }
 
+  /**
+   * Look up an address by providing an ens name. The result is appended
+   * to the store state.
+   * @param name The name to reverse-lookup.
+   * @returns A promise that resolves to `void` when the lookup has concluded.
+   * If it was successful, you can find a resolved record which matches the provided
+   * name in the store state.
+   */
+  async function reverseLookup(name: string): Promise<void> {
+    const saved = Object.values(get(state)).find((record) => record.name === name);
+
+    if (saved) return;
+
+    const address = await provider.resolveName(name);
+
+    if (address) await lookup(address);
+  }
+
   function clear() {
     state.set({});
   }
@@ -62,6 +80,7 @@ export default (() => {
     subscribe: state.subscribe,
     connect,
     lookup,
+    reverseLookup,
     clear,
   };
 })();

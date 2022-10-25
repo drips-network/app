@@ -8,44 +8,46 @@
   import TokenCell from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
-  import Amount from '$lib/components/table/cells/amount.cell.svelte';
-  import wallet from '$lib/stores/wallet';
+  import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import streams from '$lib/stores/streams';
   import { get } from 'svelte/store';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { makeStep } from '$lib/components/stepper/types';
+  import SelectTokenStep from './top-up-flow/select-token.svelte';
+  import topUpFlowState from './top-up-flow/top-up-flow-state';
+  import EnterAmountStep from './top-up-flow/enter-amount.svelte';
+  import Approve from './top-up-flow/approve.svelte';
+  import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
+  import SuccessStep from '$lib/components/success-step/success-step.svelte';
+  import { ethers } from 'ethers';
+  import tokens from '$lib/stores/tokens';
+  import assert from '$lib/utils/assert';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { onMount } from 'svelte';
 
   interface TokenTableRow {
     token: string;
-    earnings: {
-      amount: bigint;
-      amountPerSecond: bigint;
-      tokenAddress: string;
-      showSymbol: false;
-    };
-    streaming: {
-      amount: bigint;
-      amountPerSecond: bigint;
-      tokenAddress: string;
-      showSymbol: false;
-    };
-    netRate: {
-      amountPerSecond: bigint;
-      tokenAddress: string;
-      showSymbol: false;
-    };
+    earnings: AmountCellData;
+    streaming: AmountCellData;
+    netRate: AmountCellData;
   }
 
-  let tableData: TokenTableRow[] = [];
+  let currentUserId: string;
+  $: accountEstimate = currentUserId ? $balances.accounts[currentUserId] : undefined;
 
-  $: accountEstimate =
-    $wallet.connected && $balances.accounts['875267609686611184008791658115888920329297355417'];
+  onMount(async () => {
+    currentUserId = (await (await getAddressDriverClient()).getUserId()).toString();
+  });
+
+  let tableData: TokenTableRow[] = [];
 
   function getIncomingTotalsForToken(address: string): {
     totalEarned: bigint;
     amountPerSecond: bigint;
   } {
     const streamsState = get(streams);
-    const estimates = get(balances);
 
     if (!streamsState.ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
 
@@ -55,13 +57,13 @@
 
     return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
       (acc, stream) => {
-        const estimate = estimates.accounts[stream.sender.userId]?.[address]?.streams[stream.id];
+        const estimate = balances.getEstimateByStreamId(stream.id);
 
         if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
 
         return {
-          totalEarned: acc.totalEarned + estimate.totalStreamed.amount,
-          amountPerSecond: acc.amountPerSecond + estimate.amountPerSecond.amount,
+          totalEarned: acc.totalEarned + estimate.totalStreamed,
+          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
         };
       },
       { totalEarned: 0n, amountPerSecond: 0n },
@@ -80,19 +82,32 @@
       return {
         token: tokenAddress,
         earnings: {
-          amount: incomingTotals.totalEarned,
-          tokenAddress: tokenAddress,
+          amount: {
+            amount: incomingTotals.totalEarned,
+            tokenAddress,
+          },
+          amountPerSecond: {
+            amount: incomingTotals.amountPerSecond,
+            tokenAddress,
+          },
           showSymbol: false,
-          amountPerSecond: incomingTotals.amountPerSecond,
         },
         streaming: {
-          ...estimate.totals.remainingBalance,
-          amountPerSecond: -estimate.totals.amountPerSecond.amount,
+          amount: {
+            tokenAddress,
+            amount: estimate.totals.remainingBalance,
+          },
+          amountPerSecond: {
+            tokenAddress,
+            amount: -estimate.totals.totalAmountPerSecond,
+          },
           showSymbol: false,
         },
         netRate: {
-          amountPerSecond: incomingTotals.amountPerSecond - estimate.totals.amountPerSecond.amount,
-          tokenAddress: tokenAddress,
+          amountPerSecond: {
+            amount: incomingTotals.amountPerSecond - estimate.totals.totalAmountPerSecond,
+            tokenAddress,
+          },
           showSymbol: false,
         },
       };
@@ -138,15 +153,59 @@
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
   };
+
+  function getTopUpSuccessMessage() {
+    const { tokenAddress, amountToTopUp } = $topUpFlowState;
+    assert(tokenAddress && amountToTopUp, 'Missing context to construct getTopUpSuccessMessage');
+
+    const tokenInfo = tokens.getByAddress(tokenAddress)?.info;
+
+    const formattedAmount =
+      tokenInfo && ethers.utils.formatUnits(amountToTopUp, tokenInfo.decimals);
+
+    return `
+      You've successfully topped up ${formattedAmount} ${tokenInfo?.name}.
+      It may take some time for your balance to update on your dashboard.
+    `;
+  }
 </script>
 
 <div class="section">
   <SectionHeader
     icon={TokensIcon}
     label="Balances"
+    actionsDisabled={!accountEstimate}
     actions={[
       {
-        handler: () => undefined,
+        handler: () => {
+          modal.show(Stepper, undefined, {
+            context: topUpFlowState,
+            steps: [
+              makeStep({
+                component: SelectTokenStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: EnterAmountStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: Approve,
+                props: undefined,
+              }),
+              makeStep({
+                component: TriggerTopUpTransaction,
+                props: undefined,
+              }),
+              makeStep({
+                component: SuccessStep,
+                props: {
+                  message: () => getTopUpSuccessMessage(),
+                },
+              }),
+            ],
+          });
+        },
         icon: TopUpIcon,
         label: 'Top up',
       },

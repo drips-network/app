@@ -3,6 +3,8 @@
   import QuestionIcon from 'radicle-design-system/icons/Info.svelte';
 
   export let address: string;
+  export let hideName = false;
+  export let small = false;
 
   $: tokenInfo = $tokens ? tokens.getByAddress(address)?.info : undefined;
 
@@ -10,7 +12,7 @@
 </script>
 
 <div class="token">
-  <div class="logo">
+  <div class="logo" style={small ? 'height: 1.5rem; width: 1.5rem' : undefined}>
     {#if tokenInfo?.logoURI && !imageFailed}
       <img
         src={tokenInfo.logoURI}
@@ -21,9 +23,11 @@
       <QuestionIcon />
     {/if}
   </div>
-  <div class="name typo-text-bold" class:unknown={tokenInfo === undefined}>
-    {tokenInfo?.name ?? 'Unknown token'}
-  </div>
+  {#if !hideName}
+    <div class="name typo-text-bold" class:unknown={tokenInfo === undefined}>
+      {tokenInfo?.name ?? 'Unknown token'}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -41,6 +45,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   }
 
   .unknown {
