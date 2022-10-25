@@ -19,6 +19,7 @@
   import streams from '$lib/stores/streams/streams.store';
   import { derived } from 'svelte/store';
   import tick from '$lib/stores/tick/tick.store';
+  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
 
   let prefersDarkMode = false;
 
@@ -135,6 +136,7 @@
 
 {#if loaded && !fatalError}
   <div class="main" data-theme={prefersDarkMode ? 'dark' : 'light'}>
+    <ModalLayout />
     <Header />
     <div class="page">
       <slot />

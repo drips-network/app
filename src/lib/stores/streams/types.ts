@@ -1,4 +1,4 @@
-/** \<receiver-user-id\>-\<receiver-config\> */
+/** \<senderUserId\>-\<tokenAddress\>-\<dripId\> */
 export type StreamId = string;
 export type UserId = string;
 
@@ -19,6 +19,11 @@ export interface DripsConfig {
   /** The raw on-chain config value. */
   raw: bigint;
   dripId: string;
+  /**
+   * The amount per second in the smallest possible unit of the respective token, plus
+   * extra decimal precision provided by DripsHub. To get an amount in the token decimal
+   * unit, divide by 10 ^ 18.
+   */
   amountPerSecond: Amount;
   /** If undefined, stream starts at the block timestamp its receiver was created on. */
   startDate?: Date;
@@ -44,6 +49,18 @@ export interface Stream {
   managed: boolean;
 }
 
+export interface Receiver {
+  streamId: string;
+  /** If undefined, stream is paused. */
+  dripsConfig?: DripsConfig;
+  /**
+   * If true, the stream was created through the Drips App. If false, it was created
+   * by an unknown third party application.
+   */
+  managed: boolean;
+  receiver: User;
+}
+
 export interface AssetConfigHistoryItem {
   timestamp: Date;
   balance: Amount;
@@ -52,16 +69,7 @@ export interface AssetConfigHistoryItem {
    * the balance is depleted.
    */
   runsOutOfFunds?: Date;
-  streams: {
-    streamId: string;
-    /** If undefined, stream is paused. */
-    dripsConfig?: DripsConfig;
-    /**
-     * If true, the stream was created through the Drips App. If false, it was created
-     * by an unknown third party application.
-     */
-    managed: boolean;
-  }[];
+  streams: Receiver[];
 }
 
 export interface AssetConfig {

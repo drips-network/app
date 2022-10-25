@@ -1,7 +1,8 @@
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
+import assert from '$lib/utils/assert';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -14,7 +15,6 @@ interface State {
 export default (() => {
   const userId = writable<string | undefined>(undefined);
   const accounts = writable<{ [accountId: UserId]: Account }>({});
-
   const state = derived<[typeof accounts, typeof userId], State>(
     [accounts, userId],
     ([accounts, userId]) => {
@@ -50,27 +50,45 @@ export default (() => {
     await fetchAccount(toUserId);
 
     const subgraphClient = getSubgraphClient();
-    const accountsSendingToCurrentUser =
+    const dripsReceiverSeenEventForUser =
       await subgraphClient.getDripsReceiverSeenEventsByReceiverId(toUserId);
-
-    await Promise.all(
-      accountsSendingToCurrentUser.map((a) => fetchAccount(a.receiverUserId.toString())),
+    const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
+      (acc, event) => {
+        const senderUserId = event.senderUserId.toString();
+        return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;
+      },
+      [],
     );
+
+    await Promise.all(accountsSendingToCurrentUser.map((a) => fetchAccount(a)));
   }
 
   async function disconnect() {
     userId.set(undefined);
   }
 
-  async function fetchAccount(userId: UserId) {
+  async function fetchAccount(userId: UserId): Promise<Account> {
     const account = await metadata.fetchAccount(userId);
 
     accounts.update((s) => ({ ...s, [userId]: account }));
+
+    return account;
+  }
+
+  async function refreshUserAccount(): Promise<Account> {
+    const currentUserId = get(userId);
+    assert(currentUserId, 'Store needs to be connected first.');
+
+    const account = await fetchAccount(currentUserId);
+
+    return account;
   }
 
   return {
     subscribe: state.subscribe,
     connect,
     disconnect,
+    refreshUserAccount,
+    fetchAccount,
   };
 })();

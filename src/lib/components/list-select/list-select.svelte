@@ -150,7 +150,7 @@
         {#if typeof item.image === 'string'}
           <img src={item.image} alt="List item" />
         {:else if item.image}
-          <svelte:component this={item.image} />
+          <svelte:component this={item.image.component} {...item.image.props} />
         {/if}
       </div>
       <div class="content" class:action={item.type === 'action'}>

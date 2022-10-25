@@ -18,8 +18,10 @@ describe('amount.svelte', () => {
   it('displays unknown token if the token address is unknown', () => {
     render(Amount, {
       props: {
-        tokenAddress: '0000',
-        amount: BigInt('1000000000000000000'),
+        amount: {
+          tokenAddress: '0000',
+          amount: BigInt('1000000000000000000'),
+        },
       },
     });
 
@@ -28,12 +30,13 @@ describe('amount.svelte', () => {
 
   it('displays the correct amount for tokens of different decimals', () => {
     render(Amount, {
-      props: {
+      amount: {
         tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-        amount: BigInt('1000000000000000000'),
+        amount: BigInt('1000000000000000000000000000'),
       },
     });
 
+    // By default, the component should apply extra 9 decimals of precision to the value
     expect(screen.getByText('1.00')).toBeInTheDocument();
     expect(screen.getByText('RAD')).toBeInTheDocument();
 
@@ -41,20 +44,25 @@ describe('amount.svelte', () => {
 
     render(Amount, {
       props: {
-        tokenAddress: '0x607F4C5BB672230e8672085532f7e901544a7375', // RLC, 9 decimals
-        amount: BigInt('1000000000'),
+        amount: {
+          tokenAddress: '0x607F4C5BB672230e8672085532f7e901544a7375', // RLC, 9 decimals
+          amount: BigInt('1000000000000000000000000000'),
+        },
       },
     });
 
-    screen.getByText('1.00');
+    screen.getByText('1000000000.00');
     screen.getByText('RLC');
   });
 
   it('trims decimals', () => {
     render(Amount, {
       props: {
-        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-        amount: BigInt('1100000000000000000'),
+        amount: {
+          tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
+          amount: BigInt('1100000000000000000'),
+        },
+        multiplier: 1n,
       },
     });
 
@@ -63,8 +71,11 @@ describe('amount.svelte', () => {
 
     render(Amount, {
       props: {
-        tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-        amount: BigInt('1123400000000000000'),
+        amount: {
+          tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
+          amount: BigInt('1123400000000000000'),
+        },
+        multiplier: 1n,
       },
     });
 
@@ -72,10 +83,11 @@ describe('amount.svelte', () => {
     screen.getByText('1.1234');
 
     render(Amount, {
-      props: {
+      amount: {
         tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
         amount: BigInt('1123456789000000000'),
       },
+      multiplier: 1n,
     });
 
     // Should display at most 8 decimal places

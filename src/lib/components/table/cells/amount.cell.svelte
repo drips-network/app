@@ -1,10 +1,5 @@
 <script lang="ts" context="module">
-  export interface AmountCellData {
-    amount?: bigint;
-    tokenAddress: string;
-    showSymbol?: boolean;
-    amountPerSecond?: bigint;
-  }
+  export type AmountCellData = Amount['$$prop_def'];
 </script>
 
 <script lang="ts">
@@ -18,11 +13,16 @@
   $: {
     const value = context.getValue();
 
-    const valueSchema = z.object({
-      amount: z.bigint().optional(),
+    const amountSchema = z.object({
+      amount: z.bigint(),
+      multiplier: z.bigint().optional(),
       tokenAddress: z.string(),
+    });
+
+    const valueSchema = z.object({
+      amount: amountSchema.optional(),
+      amountPerSecond: amountSchema.optional(),
       showSymbol: z.boolean().optional(),
-      amountPerSecond: z.bigint().optional(),
     });
 
     props = valueSchema.parse(value);

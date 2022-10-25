@@ -10,6 +10,7 @@
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
+  import balances from '$lib/stores/balances';
 
   interface OutgoingStreamTableRow {
     name: string;
@@ -31,12 +32,11 @@
       name: stream.name ?? 'Unnamed stream',
       toAddress: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
       amount: {
-        amountPerSecond: stream.paused ? 0n : stream.dripsConfig.amountPerSecond.amount,
-        tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
-        amount:
-          $balancesStore.accounts[stream.sender.userId]?.[
-            stream.dripsConfig.amountPerSecond.tokenAddress
-          ]?.streams[stream.id].totalStreamed.amount ?? BigInt(100),
+        amount: {
+          amount: balances.getEstimateByStreamId(stream.id)?.totalStreamed ?? 0n,
+          tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
+        },
+        amountPerSecond: stream.dripsConfig.amountPerSecond,
       },
     }));
 
@@ -44,12 +44,11 @@
       name: stream.name ?? 'Unnamed stream',
       fromAddress: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
       amount: {
-        amountPerSecond: stream.paused ? 0n : stream.dripsConfig.amountPerSecond.amount,
-        tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
-        amount:
-          $balancesStore.accounts[stream.sender.userId]?.[
-            stream.dripsConfig.amountPerSecond.tokenAddress
-          ]?.streams[stream.id].totalStreamed.amount ?? BigInt(100),
+        amountPerSecond: stream.dripsConfig.amountPerSecond,
+        amount: {
+          amount: balances.getEstimateByStreamId(stream.id)?.totalStreamed ?? 0n,
+          tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
+        },
       },
     }));
   }
