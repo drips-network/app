@@ -152,10 +152,20 @@
         type: 'unvalidated',
       };
     } else if (streamEndDateValue.match(validationRegex)) {
-      streamEndDateValidationState = {
-        type: 'valid',
-      };
-      streamEndDate = new Date(streamEndDateValue);
+      const parsed = new Date(streamEndDateValue);
+      const isInFuture = new Date().getTime() < parsed.getTime();
+
+      if (isInFuture) {
+        streamEndDateValidationState = {
+          type: 'valid',
+        };
+        streamEndDate = new Date(streamEndDateValue);
+      } else {
+        streamEndDateValidationState = {
+          type: 'invalid',
+          message: 'The end date must be a valid date in the future.',
+        };
+      }
     } else {
       streamEndDateValidationState = {
         type: 'invalid',
@@ -196,7 +206,7 @@
       }));
 
       const duration = streamEndDate
-        ? BigInt((streamEndDate.getTime() - new Date().getTime()) / 1000)
+        ? BigInt(Math.floor((streamEndDate.getTime() - new Date().getTime()) / 1000))
         : 0n;
 
       const dripId = ethers.BigNumber.from(ethers.utils.randomBytes(4)).toBigInt();
