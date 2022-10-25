@@ -63,7 +63,8 @@
   .content {
     position: absolute;
     left: 0;
-    width: 256px;
+    width: 24rem;
+    max-width: calc(100vw - 2rem);
   }
 
   .content.left {
