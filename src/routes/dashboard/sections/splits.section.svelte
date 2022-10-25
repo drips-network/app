@@ -1,30 +1,56 @@
 <script lang="ts">
-  import type { Split } from '$lib/components/splits-table/splits-table.types';
+  import type { SplitsEntry } from '$lib/stores/splits/types';
+  import type { UserId } from '$lib/stores/streams/types';
   import MergeIcon from 'radicle-design-system/icons/Merge.svelte';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
-
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
+  import { onMount } from 'svelte';
+  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
+  import { prettySplitPercent } from '$lib/stores/splits/methods/pretty-split-percent';
 
-  let splitsData: Split[] = [
-    {
-      receiver: '0x1b358b965bdeadf16ddb76888243ec9ba0c41448',
-      amount: '1000',
-    },
-    {
-      receiver: '0x1a42cacb0f5b93f2569091fe9eecb627bfa34061',
-      amount: '2000',
-    },
-    {
-      receiver: '0x4adfede77b9fa48fd6ff427eeac8b61c32dd0cd4',
-      amount: '3000',
-    },
-    {
-      receiver: '0x0016c0d0343e8f2c3a7b6a51606b84b1545ec606',
-      amount: '4000',
-    },
-  ];
+  export let userId: string;
+
+  let splitsData: SplitsEntry[] | void;
+  let error = false;
+
+  onMount(() => getSplits(userId));
+
+  $: {
+    getSplits(userId);
+  }
+
+  $: splitsTableData = formatSplitsTable(splitsData || []);
+
+  async function getSplits(userId: UserId) {
+    splitsData = undefined;
+    error = false;
+
+    try {
+      const subgraphClient = getSubgraphClient();
+      splitsData = await subgraphClient.getSplitsConfigByUserId(userId);
+    } catch (e) {
+      error = true;
+    }
+  }
+
+  function formatSplitsTable(splits: SplitsEntry[] = []) {
+    const totalSplitsWeight: bigint = splits.reduce(
+      (acc: bigint, cur: { weight: bigint }) => acc + cur.weight,
+      BigInt(0),
+    );
+
+    return {
+      splits: splits?.map((s: SplitsEntry) => ({
+        text: s.userId,
+        percent: prettySplitPercent(s.weight),
+      })),
+      splitsTotalPercent: prettySplitPercent(totalSplitsWeight),
+      remainderPercent: prettySplitPercent(BigInt('1000000') - totalSplitsWeight),
+      remainderReceiver: 'You',
+    };
+  }
 </script>
 
 <div class="section">
@@ -40,15 +66,18 @@
     ]}
   />
   <div class="content pl-0.5">
-    <SectionSkeleton
-      emptyStateHeadline="No splits"
-      emptyStateEmoji="🫗"
-      emptyStateText="Anyone you split incoming funds with will appear here."
-      loaded={true}
-      empty={splitsData.length === 0}
-    >
-      <SplitsTable splits={splitsData} />
-    </SectionSkeleton>
+    {#key userId}
+      <SectionSkeleton
+        emptyStateHeadline="No splits"
+        emptyStateEmoji="🫧"
+        emptyStateText="Anyone you split incoming funds with will appear here."
+        loaded={splitsData !== undefined}
+        empty={splitsData !== undefined && splitsData.length === 0}
+        {error}
+      >
+        <SplitsTable data={splitsTableData} />
+      </SectionSkeleton>
+    {/key}
   </div>
 </div>
 

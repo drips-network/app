@@ -5,11 +5,24 @@
 
   import { goto } from '$app/navigation';
   import wallet from '$lib/stores/wallet';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+
+  let userId: string;
+
+  let loading = getMyUserId();
+
+  async function getMyUserId() {
+    userId = (await (await getAddressDriverClient()).getUserId()).toString();
+  }
 
   $: {
     if (!$wallet.connected) {
       goto('/');
     }
+  }
+
+  $: {
+    $wallet.address, getMyUserId();
   }
 </script>
 
@@ -20,9 +33,13 @@
 
 <div class="dashboard">
   <h1>Dashboard</h1>
-  <Balances />
-  <Streams />
-  <Splits />
+  {#await loading}
+    loading...
+  {:then}
+    <Balances />
+    <Streams />
+    <Splits {userId} />
+  {/await}
 </div>
 
 <style>

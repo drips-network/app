@@ -2,22 +2,29 @@
   import SplitsTableSplitLozenge from './splits-table-split-lozenge.svelte';
   import SplitsTableSplit from './splits-table-split.svelte';
   import SplitsTableVerticalLine from './splits-table-vertical-line.svelte';
-  import type { Split } from './splits-table.types';
+  import type { SplitsTable } from './types';
 
-  export let splits: Split[] = [];
+  export let data: SplitsTable = {
+    splits: [],
+    splitsTotalPercent: '...',
+    remainderPercent: '...',
+    remainderReceiver: '...',
+  };
 </script>
 
 <section class="splits-table">
   <!-- head line -->
   <header class="ml-7">
     <SplitsTableVerticalLine classes="h-2.5 block -mb-px" />
-    <SplitsTableSplit text={`${splits.length} accounts`} />
+    <SplitsTableSplit
+      split={{ text: `${data.splits.length} accounts`, percent: data.splitsTotalPercent }}
+    />
   </header>
   <div class="relative ml-7 -mt-1 pt-1 -mb-1">
     <ul class="pl-[39px]">
       <!-- each -->
-      {#each splits as split, index}
-        <SplitsTableSplit {split} verticalLine={index < splits.length - 1} />
+      {#each data.splits as split, index}
+        <SplitsTableSplit {split} verticalLine={index < data.splits.length - 1} />
       {/each}
     </ul>
     <SplitsTableVerticalLine classes="absolute h-full left-0 top-0" />
@@ -25,7 +32,7 @@
   <div class="pl-7 relative">
     <!-- remainder lozenge -->
     <div class="absolute z-10 top-0 left-0 w-14 flex justify-center pt-px">
-      <SplitsTableSplitLozenge text=">99%" />
+      <SplitsTableSplitLozenge text={data.remainderPercent} />
     </div>
     <!-- down arrow -->
     <svg
@@ -43,5 +50,5 @@
     </svg>
     <!-- remainder receiver -->
   </div>
-  <div class="pl-3.5 typo-text-bold">You</div>
+  <div class="mt-1.5 pl-3.5 typo-text-bold">{data.remainderReceiver}</div>
 </section>

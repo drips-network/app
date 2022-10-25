@@ -1,13 +1,10 @@
 <script lang="ts">
   import SplitsTableSplitLozenge from './splits-table-split-lozenge.svelte';
   import SplitsTableVerticalLine from './splits-table-vertical-line.svelte';
-  import type { Split } from './splits-table.types';
+  import type { SplitsTableRow } from './types';
 
-  export let split: Split | void = undefined;
-  export let text: string | void = undefined;
+  export let split: SplitsTableRow;
   export let verticalLine = true;
-
-  $: percent = '<1%';
 </script>
 
 <div class="splits-table-split flex items-center -mb-px">
@@ -34,7 +31,7 @@
     <!-- lozenge area as overlay -->
     <div class="absolute overlay flex items-center justify-center">
       <!-- lozenge -->
-      <SplitsTableSplitLozenge text={percent} />
+      <SplitsTableSplitLozenge text={split.percent} />
     </div>
   </div>
 
@@ -43,11 +40,7 @@
     <!-- avatar? -->
     <!-- text -->
     <div class="typo-text-bold" style="color: var(--color-foreground-level-6)">
-      {#if text}
-        {text}
-      {:else if split && split.receiver}
-        {split.receiver}
-      {/if}
+      {split.text}
     </div>
   </div>
 </div>
