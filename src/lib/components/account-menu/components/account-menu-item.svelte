@@ -4,16 +4,10 @@
 
   export let disabled = false;
   export let icon: typeof SvelteComponent | undefined = undefined;
-  export let onClick: (() => void) | undefined = undefined;
+  export let href: string | undefined = undefined;
 </script>
 
-<div
-  class:disabled
-  class:clickable={onClick}
-  class="account-menu-item-wrapper"
-  on:click={() => !disabled && onClick && onClick()}
-  tabindex={onClick ? 0 : undefined}
->
+<a {href} class:disabled class:clickable={href} class="account-menu-item-wrapper">
   <slot name="left">
     <div class="icon-wrapper">
       {#if icon}<svelte:component this={icon} style="fill: var(--color-primary)" />{/if}
@@ -25,7 +19,7 @@
   <slot name="right">
     <ChevronRight />
   </slot>
-</div>
+</a>
 
 <style>
   .account-menu-item-wrapper {

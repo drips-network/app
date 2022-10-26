@@ -5,7 +5,6 @@
   import Button from '../button/button.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenuItem from './components/account-menu-item.svelte';
-  import { goto } from '$app/navigation';
   import Divider from '../divider/divider.svelte';
 </script>
 
@@ -27,7 +26,7 @@
       >
     </AccountMenuItem>
     <Divider />
-    <AccountMenuItem icon={SettingsIcon} onClick={() => goto('/settings')}>
+    <AccountMenuItem icon={SettingsIcon} href="/settings">
       <svelte:fragment slot="title">Settings</svelte:fragment>
     </AccountMenuItem>
   {/if}
