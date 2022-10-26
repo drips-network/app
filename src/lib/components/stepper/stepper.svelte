@@ -42,23 +42,8 @@
 
   let containerHeight = tweened(0);
 
-  let firstHeightUpdate = true;
-  async function updateContainerHeight(disableTransition = false) {
-    await tick();
-
-    if (!stepElement) return;
-
-    const stepHeight = stepElement.offsetHeight;
-
-    containerHeight.set(stepHeight + 32, {
-      duration: firstHeightUpdate || disableTransition ? 0 : 300,
-      easing: cubicInOut,
-    });
-
-    firstHeightUpdate = false;
-  }
-
   let mutationObserver = new MutationObserver(() => updateContainerHeight(true));
+  let observedElement: HTMLDivElement | undefined;
 
   async function updateMutationObserver() {
     await tick();
@@ -66,8 +51,26 @@
     mutationObserver.disconnect();
 
     if (stepElement instanceof HTMLDivElement) {
+      observedElement = stepElement;
       mutationObserver.observe(stepElement, { childList: true, attributes: true, subtree: true });
+      updateContainerHeight();
     }
+  }
+
+  let firstHeightUpdate = true;
+  async function updateContainerHeight(disableTransition = false) {
+    await tick();
+
+    if (!observedElement) return;
+
+    const stepHeight = observedElement.offsetHeight;
+
+    containerHeight.set(stepHeight + 32, {
+      duration: firstHeightUpdate || disableTransition ? 0 : 300,
+      easing: cubicInOut,
+    });
+
+    firstHeightUpdate = false;
   }
 
   let awaiting: AwaitPendingPayload | undefined;
@@ -101,7 +104,6 @@
     currentStep;
     awaitError;
     awaiting;
-    updateContainerHeight();
     updateMutationObserver();
   }
 
