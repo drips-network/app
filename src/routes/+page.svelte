@@ -38,7 +38,7 @@
     <div class="columns-row">
       <div class="columns-item">
         <img src="/assets/gas-optimized.svg" alt="Step 4" />
-        <h2><em>Gas-optimized for one or thousands of senders</em></h2>
+        <h2><em>Gas-optimized for one or<br />thousands of senders</em></h2>
         <p>
           While many streaming protocols focus exclusively on 1:1 streaming, Drips is optimized for
           many-to-one as well, to support low gas costs for use cases where large numbers of
@@ -165,6 +165,12 @@
     font-family: var(--font-serif);
   }
 
+  em:hover {
+    animation-name: glitch;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+  }
+
   h1 {
     font-size: var(--font-size-xl);
     text-align: center;
@@ -209,5 +215,26 @@
   .columns-item img {
     height: 200px;
     margin-bottom: var(--spacing-s);
+  }
+
+  @keyframes glitch {
+    0% {
+      font-family: 'Redaction 10';
+    }
+    20% {
+      font-family: 'Redaction 20';
+    }
+    40% {
+      font-family: 'Redaction 35';
+    }
+    60% {
+      font-family: 'Redaction 50';
+    }
+    80% {
+      font-family: 'Redaction 70';
+    }
+    100% {
+      font-family: 'Redaction 100';
+    }
   }
 </style>
