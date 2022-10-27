@@ -15,7 +15,7 @@
   let splitsData: SplitsEntry[] | void;
   let error = false;
 
-  onMount(() => getSplits(userId));
+  onMount(() => userId && getSplits(userId));
 
   $: {
     getSplits(userId);

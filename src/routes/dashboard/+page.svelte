@@ -9,20 +9,20 @@
 
   let userId: string;
 
-  let loading = getMyUserId();
-
   async function getMyUserId() {
     userId = (await (await getAddressDriverClient()).getUserId()).toString();
+  }
+
+  getMyUserId();
+
+  $: {
+    $wallet.address, getMyUserId();
   }
 
   $: {
     if (!$wallet.connected) {
       goto('/');
     }
-  }
-
-  $: {
-    $wallet.address, getMyUserId();
   }
 </script>
 
@@ -33,13 +33,9 @@
 
 <div class="dashboard">
   <h1>Dashboard</h1>
-  {#await loading}
-    loading...
-  {:then}
-    <Balances />
-    <Streams />
-    <Splits {userId} />
-  {/await}
+  <Balances />
+  <Streams />
+  <Splits {userId} />
 </div>
 
 <style>
