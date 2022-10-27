@@ -12,6 +12,13 @@ export default function makeStreamId(senderUserId: string, tokenAddress: string,
   return `${senderUserId}-${tokenAddress}-${dripId}`;
 }
 
+/**
+ * Given a stream ID created with `makeStreamId`, decode it into its three parts; the sender's user ID, the token
+ * address and the dripId of the on-chain receiver.
+ * @param streamId The stream ID to decode.
+ * @returns An object including the stream's sender user ID, the token address of the token the stream is streaming,
+ * and the on-chain dripId.
+ */
 export function decodeStreamId(streamId: string) {
   const parts = streamId.split('-');
 
