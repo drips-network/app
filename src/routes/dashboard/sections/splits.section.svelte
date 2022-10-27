@@ -6,22 +6,17 @@
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
-  import { onMount } from 'svelte';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { prettySplitPercent } from '$lib/stores/splits/methods/pretty-split-percent';
 
-  export let userId: string;
+  export let userId: string | undefined;
 
-  let splitsData: SplitsEntry[] | void;
+  let splitsData: SplitsEntry[] | undefined;
   let error = false;
 
-  onMount(() => userId && getSplits(userId));
+  $: userId && getSplits(userId);
 
-  $: {
-    getSplits(userId);
-  }
-
-  $: splitsTableData = formatSplitsTable(splitsData || []);
+  $: splitsTableData = formatSplitsTable(splitsData ?? []);
 
   async function getSplits(userId: UserId) {
     splitsData = undefined;
@@ -66,18 +61,16 @@
     ]}
   />
   <div class="content pl-0.5">
-    {#key userId}
-      <SectionSkeleton
-        emptyStateHeadline="No splits"
-        emptyStateEmoji="🫧"
-        emptyStateText="Anyone you split incoming funds with will appear here."
-        loaded={splitsData !== undefined}
-        empty={splitsData !== undefined && splitsData.length === 0}
-        {error}
-      >
-        <SplitsTable data={splitsTableData} />
-      </SectionSkeleton>
-    {/key}
+    <SectionSkeleton
+      emptyStateHeadline="No splits"
+      emptyStateEmoji="🫧"
+      emptyStateText="Anyone you split incoming funds with will appear here."
+      loaded={splitsData !== undefined}
+      empty={splitsData !== undefined && splitsData.length === 0}
+      {error}
+    >
+      <SplitsTable data={splitsTableData} />
+    </SectionSkeleton>
   </div>
 </div>
 
