@@ -9,6 +9,7 @@
     label?: string;
     icon?: typeof SvelteComponent;
   }[] = [];
+  export let actionsDisabled = false;
 </script>
 
 <div class="section-header">
@@ -22,7 +23,9 @@
   </div>
   <div class="actions">
     {#each actions as action}
-      <Button icon={action.icon} on:click={action.handler}>{action.label}</Button>
+      <Button disabled={actionsDisabled} icon={action.icon} on:click={action.handler}
+        >{action.label}</Button
+      >
     {/each}
   </div>
 </div>

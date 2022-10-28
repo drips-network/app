@@ -26,7 +26,7 @@
     box-sizing: border-box;
     border: 2px solid rgba(0, 0, 0, 0);
     user-select: none;
-    transition: background-color 0.3s, color 0.3s, transform 0.1s, border 0.3s;
+    transition: background-color 0.3s, color 0.3s, transform 0.1s, border 0.3s, opacity 0.3s;
   }
 
   button.with-icon {

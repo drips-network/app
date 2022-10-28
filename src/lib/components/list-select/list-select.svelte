@@ -10,6 +10,7 @@
 
   export let searchable = true;
   export let multiselect = false;
+  export let emptyStateText = 'Nothing to see here';
 
   let searchString = '';
 
@@ -23,6 +24,7 @@
     }),
   );
 
+  $: noItems = Object.keys(items).length === 0;
   $: listIsEmpty =
     Object.values(filteredItems).filter((item) => item.type !== 'action').length === 0;
 
@@ -123,7 +125,11 @@
   {#if listIsEmpty}
     <div class="empty-state">
       <EyeClosedIcon />
-      <p class="typo-text-bold">No matches</p>
+      {#if noItems}
+        <p class="typo-text-bold">{emptyStateText}</p>
+      {:else}
+        <p class="typo-text-bold">No matches</p>
+      {/if}
     </div>
   {/if}
   {#each Object.entries(items) as [slug, item]}
@@ -186,7 +192,7 @@
   }
 
   .empty-state {
-    padding: 2rem 0;
+    padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

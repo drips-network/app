@@ -137,10 +137,10 @@
 {#if loaded && !fatalError}
   <div class="main" data-theme={prefersDarkMode ? 'dark' : 'light'}>
     <ModalLayout />
-    <Header />
     <div class="page">
       <slot />
     </div>
+    <Header />
   </div>
 {/if}
 

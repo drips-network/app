@@ -144,7 +144,12 @@
   <p>Token Address</p>
   <TextInput bind:value={tokenAddress} />
   <p>Output:</p>
-  <Amount amount={BigInt(amount)} {tokenAddress} />
+  <Amount
+    amount={{
+      amount: BigInt(amount),
+      tokenAddress,
+    }}
+  />
 </div>
 
 <div class="showcase-item">

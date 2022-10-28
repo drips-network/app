@@ -63,9 +63,9 @@
 
     if (!observedElement) return;
 
-    const stepHeight = observedElement.offsetHeight;
+    const stepHeight = stepElement.clientHeight;
 
-    containerHeight.set(stepHeight + 32, {
+    containerHeight.set(stepHeight, {
       duration: firstHeightUpdate || disableTransition ? 0 : 300,
       easing: cubicInOut,
     });
@@ -146,15 +146,13 @@
 
 <style>
   .container {
-    overflow: hidden;
-    padding: 1rem;
     position: relative;
   }
 
   .step-container {
     position: absolute;
-    width: calc(100% - 2rem);
-    height: calc(100% - 2rem);
+    width: 100%;
+    height: 100%;
   }
 
   .step {
