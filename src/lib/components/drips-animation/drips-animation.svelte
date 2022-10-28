@@ -72,7 +72,7 @@
   } {
     const HORIZON_DISTANCE = 20;
     const LAYER_DISTANCE = 10;
-    const FOREGROUND_LAYER_SPEED = 2;
+    const FOREGROUND_LAYER_SPEED = 1;
 
     return {
       blur: Math.abs((layer + 0.5 - 1) * 8),
