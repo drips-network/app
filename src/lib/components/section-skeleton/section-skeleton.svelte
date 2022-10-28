@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
-  import { tick } from 'svelte';
+  import { tick, onDestroy } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
 
   export let loaded = false;
@@ -33,6 +33,7 @@
     observer = new MutationObserver(() => updateContainerHeight());
     observer.observe(contentContainerElem, { childList: true });
   }
+  onDestroy(() => observer?.disconnect());
 
   $: {
     contentContainerElem;
