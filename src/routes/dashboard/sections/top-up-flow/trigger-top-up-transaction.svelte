@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
@@ -10,12 +10,14 @@
   import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
   import expect from '$lib/utils/expect';
+  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import etherscanLink from '$lib/utils/etherscan-link';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<TopUpFlowState>;
 
-  async function topUp() {
+  async function topUp(updateAwaitStep: UpdateAwaitStepFn) {
     modal.setHideable(false);
 
     const client = await getAddressDriverClient();
@@ -32,12 +34,23 @@
     const ownUserId = (await client.getUserId()).toString();
     const ownAccount = $streams.accounts[ownUserId];
     const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
-    assert(assetConfig, "App hasn't yet fetched the right asset config");
 
-    const currentReceivers = assetConfig.streams.map((stream) => ({
-      userId: stream.receiver.userId,
-      config: stream.dripsConfig.raw,
-    }));
+    const currentReceivers =
+      assetConfig?.streams.map((stream) => ({
+        userId: stream.receiver.userId,
+        config: stream.dripsConfig.raw,
+      })) ?? [];
+
+    updateAwaitStep({
+      icon: {
+        component: Emoji,
+        props: {
+          emoji: '👛',
+          size: 'huge',
+        },
+      },
+      message: 'Waiting for you to confirm the top-up transaction in your wallet',
+    });
 
     const tx = await client.setDrips(
       tokenAddress,
@@ -47,7 +60,20 @@
       amountToTopUp,
     );
 
+    updateAwaitStep({
+      message: 'Waiting for your top-up transaction to be confirmed…',
+      link: {
+        label: 'View on Etherscan',
+        url: etherscanLink($wallet.network.name, tx.hash),
+      },
+    });
+
     const receipt = await tx.wait();
+
+    updateAwaitStep({
+      message: 'Wrapping up…',
+    });
+
     const block = await provider.getBlock(receipt.blockNumber);
     const { timestamp: blockTimestamp } = block;
 
@@ -75,7 +101,7 @@
   onMount(() => {
     dispatch('await', {
       promise: topUp,
-      message: 'Waiting for your transaction to be confirmed…',
+      message: 'Preparing to top up…',
     });
   });
 </script>

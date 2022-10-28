@@ -10,7 +10,13 @@
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { makeStep } from '$lib/components/stepper/types';
+  import InputDetails from './create-stream-flow/input-details.svelte';
   import balances from '$lib/stores/balances';
+  import SuccessStep from '$lib/components/success-step/success-step.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   interface OutgoingStreamTableRow {
     name: string;
@@ -28,29 +34,49 @@
   let incomingTableData: IncomingStreamTableRow[] = [];
 
   function updateTable() {
-    outgoingTableData = ($streams.ownStreams?.outgoing ?? []).map((stream) => ({
-      name: stream.name ?? 'Unnamed stream',
-      toAddress: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
-      amount: {
-        amount: {
-          amount: balances.getEstimateByStreamId(stream.id)?.totalStreamed ?? 0n,
-          tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
-        },
-        amountPerSecond: stream.dripsConfig.amountPerSecond,
-      },
-    }));
+    outgoingTableData = mapFilterUndefined($streams.ownStreams?.outgoing ?? [], (stream) => {
+      const estimate = balances.getEstimateByStreamId(stream.id);
+      if (!estimate) return undefined;
 
-    incomingTableData = ($streams.ownStreams?.incoming ?? []).map((stream) => ({
-      name: stream.name ?? 'Unnamed stream',
-      fromAddress: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
-      amount: {
-        amountPerSecond: stream.dripsConfig.amountPerSecond,
+      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+
+      return {
+        name: stream.name ?? 'Unnamed stream',
+        toAddress: stream.receiver.address,
         amount: {
-          amount: balances.getEstimateByStreamId(stream.id)?.totalStreamed ?? 0n,
-          tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
+          amount: {
+            amount: estimate.totalStreamed,
+            tokenAddress,
+          },
+          amountPerSecond: {
+            amount: estimate.currentAmountPerSecond,
+            tokenAddress,
+          },
         },
-      },
-    }));
+      };
+    });
+
+    incomingTableData = mapFilterUndefined($streams.ownStreams?.incoming ?? [], (stream) => {
+      const estimate = balances.getEstimateByStreamId(stream.id);
+      if (!estimate) return undefined;
+
+      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+
+      return {
+        name: stream.name ?? 'Unnamed stream',
+        fromAddress: stream.sender.address,
+        amount: {
+          amountPerSecond: {
+            amount: estimate.currentAmountPerSecond,
+            tokenAddress,
+          },
+          amount: {
+            amount: estimate.totalStreamed,
+            tokenAddress,
+          },
+        },
+      };
+    });
   }
 
   $: {
@@ -116,15 +142,35 @@
     columns: incomingTableColumns,
     getCoreRowModel: getCoreRowModel(),
   };
+
+  $: loaded = $streams.ownStreams !== undefined && Object.keys($balancesStore.accounts).length > 0;
 </script>
 
 <div class="section">
   <SectionHeader
     icon={TokenStreamIcon}
     label="Streams"
+    actionsDisabled={!loaded}
     actions={[
       {
-        handler: () => undefined,
+        handler: () => {
+          modal.show(Stepper, undefined, {
+            steps: [
+              makeStep({
+                component: InputDetails,
+                props: undefined,
+              }),
+              makeStep({
+                component: SuccessStep,
+                props: {
+                  message:
+                    'Your stream has been successfully created. ' +
+                    'Please note that it may take a while for your dashboard to update.',
+                },
+              }),
+            ],
+          });
+        },
         icon: PlusIcon,
         label: 'Create stream',
       },
@@ -135,7 +181,7 @@
       emptyStateEmoji="🫙"
       emptyStateHeadline="No streams"
       emptyStateText="This is where incoming and outgoing streams for your account will appear."
-      loaded={$streams.ownStreams !== undefined && Object.keys($balancesStore.accounts).length > 0}
+      {loaded}
       empty={$streams.ownStreams?.incoming.length === 0 &&
         $streams.ownStreams?.outgoing.length === 0}
     >
