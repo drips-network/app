@@ -25,6 +25,20 @@
 
   let contentContainerElem: HTMLDivElement;
 
+  let observer: MutationObserver;
+  function observeContentChanges() {
+    observer?.disconnect();
+    if (!contentContainerElem) return;
+
+    observer = new MutationObserver(() => updateContainerHeight());
+    observer.observe(contentContainerElem, { childList: true });
+  }
+
+  $: {
+    contentContainerElem;
+    observeContentChanges();
+  }
+
   $: {
     if (loaded && !empty) {
       updateContainerHeight();
@@ -37,7 +51,7 @@
   async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
-    newHeight = newHeight ?? contentContainerElem.getBoundingClientRect().height;
+    newHeight = newHeight ?? contentContainerElem.offsetHeight;
     containerHeight.set(newHeight);
   }
 </script>
