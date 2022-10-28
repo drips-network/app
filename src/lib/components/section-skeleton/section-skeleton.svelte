@@ -14,7 +14,9 @@
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
 
-  let containerHeight = tweened(256, {
+  const initHeight = 256;
+
+  let containerHeight = tweened(initHeight, {
     duration: 300,
     easing: cubicInOut,
   });
@@ -27,12 +29,15 @@
     if (loaded && !empty) {
       updateContainerHeight();
     }
+    if (!loaded) {
+      updateContainerHeight(initHeight);
+    }
   }
 
-  async function updateContainerHeight() {
+  async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
-    const newHeight = contentContainerElem.getBoundingClientRect().height;
+    newHeight = newHeight ?? contentContainerElem.getBoundingClientRect().height;
     containerHeight.set(newHeight);
   }
 </script>
