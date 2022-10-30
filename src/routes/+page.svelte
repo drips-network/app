@@ -15,21 +15,21 @@
     <h1>An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds</h1>
   </section>
 
-  <section id="columns">
+  <section class="columns">
     <h1><em>How it works</em></h1>
     <div class="columns-row">
       <div class="columns-item">
-        <img src="/assets/multi-token.svg" alt="Step 1" />
+        <img class="illustration" src="/assets/multi-token.svg" alt="Step 1" />
         <h2><em>Multi-Token</em></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
       </div>
       <div class="columns-item">
-        <img src="/assets/no-wrapped-tokens.svg" alt="Step 2" />
+        <img class="illustration" src="/assets/no-wrapped-tokens.svg" alt="Step 2" />
         <h2><em>No need to wrap tokens</em></h2>
         <p>No “wrapping” tokens or trust any third-party with your funds</p>
       </div>
       <div class="columns-item">
-        <img src="/assets/multichain.svg" alt="Step 3" />
+        <img class="illustration" src="/assets/multichain.svg" alt="Step 3" />
         <h2><em>Multi-Chain</em></h2>
         <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism</p>
       </div>
@@ -37,7 +37,7 @@
     <!-- closes columns row -->
     <div class="columns-row">
       <div class="columns-item">
-        <img src="/assets/gas-optimized.svg" alt="Step 4" />
+        <img class="illustration" src="/assets/gas-optimized.svg" alt="Step 4" />
         <h2><em>Gas-optimized for one or<br />thousands of senders</em></h2>
         <p>
           While many streaming protocols focus exclusively on 1:1 streaming, Drips is optimized for
@@ -46,7 +46,7 @@
         </p>
       </div>
       <div class="columns-item">
-        <img src="/assets/one-balance.svg" alt="Step 5" />
+        <img class="illustration" src="/assets/one-balance.svg" alt="Step 5" />
         <h2><em>One balance for all your streams</em></h2>
         <p>
           Fund and top-up multiple streams using a single account balance and a single transaction.
@@ -68,6 +68,49 @@
     <h1>Drips <em>in use</em></h1>
     <p>Some cool projects built on the Drips protocol.</p>
   </section>
+
+  <section class="columned-layout">
+    <div class="columns-row">
+      <div class="columns-item card">
+        <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
+        <h2><em>Crowdfunding</em></h2>
+        <p>
+          <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
+        </p>
+        <a href="http://rad.lol">rad.lol</a>
+      </div>
+      <div class="columns-item card">
+        <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
+        <h2><em>DAO payments</em></h2>
+        <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
+        <a href="http://wonderverse.xyz">wonderverse.xyz</a>
+      </div>
+      <div class="columns-item card">
+        <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
+        <h2><em>Grant Splitting</em></h2>
+        <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
+        <a href="http://gitcoin.co">gitcoin.co</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h1>Get in touch</h1>
+    <div class="three-drip" />
+    <div>
+      <a href="#">Drips at ETHCC Paris</a>
+      <a href="#">Twitter</a>
+      <a href="#">New Profiles in Drips App</a>
+      <a href="#">Twitch</a>
+      <a href="#">Drips JS-SDK ready for use!</a>
+      <a href="#">Version 0.2 released! View the Docs</a>
+    </div>
+  </section>
+
+  <div>
+    make by <img src="/assets/radicle.png" alt="radicle logo" />
+    <div id="sticer" />
+  </div>
 </div>
 
 <!-- closes home -->
@@ -128,6 +171,7 @@
     height: 32px;
     margin: var(--spacing-s);
     background: url('/assets/three-drip.svg');
+    background-repeat: no-repeat;
     align-self: end;
   }
 
@@ -137,6 +181,7 @@
     align-items: center;
     justify-content: center;
     margin: var(--spacing-l) 0;
+    margin-top: 0;
     font-size: var(--font-size-xl);
     font-family: var(--font-serif);
     border: var(--border-width) solid var(--color-foreground);
@@ -182,12 +227,12 @@
     margin: var(--spacing-m) 0 var(--spacing-s);
   }
 
-  section#columns {
+  section.columns {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
-    gap: var(--spacing-l);
+    /* gap: var(--spacing-l); */
   }
 
   .columns-row {
@@ -196,6 +241,7 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--spacing-l);
+    margin-bottom: var(--spacing-l);
   }
 
   .columns-item {
@@ -212,9 +258,17 @@
     padding: var(--spacing-m);
   }
 
-  .columns-item img {
+  .columns-item.card {
+    height: auto;
+  }
+
+  .columns-item img.illustration {
     height: 200px;
     margin-bottom: var(--spacing-s);
+  }
+
+  .columns-item img.image {
+    border-radius: 1rem 0 1rem 1rem;
   }
 
   @keyframes glitch {
