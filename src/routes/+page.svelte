@@ -72,7 +72,7 @@
 
 <!-- closes home -->
 <style>
-  :root {
+  #home {
     --spacing-s: 1rem;
     --spacing-m: 1.5rem;
     --spacing-l: 3rem;
