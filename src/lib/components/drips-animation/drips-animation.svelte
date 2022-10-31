@@ -72,7 +72,7 @@
   } {
     const HORIZON_DISTANCE = 20;
     const LAYER_DISTANCE = 10;
-    const FOREGROUND_LAYER_SPEED = 10;
+    const FOREGROUND_LAYER_SPEED = 1;
 
     return {
       blur: Math.abs((layer + 0.5 - 1) * 8),
@@ -82,8 +82,13 @@
     };
   }
 
+  let lastDraw = new Date().getTime();
+
   function draw() {
     if (!canvasElem) return;
+
+    const currentMillis = new Date().getTime();
+    const millisecondsSinceLastDraw = currentMillis - lastDraw;
 
     ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
 
@@ -102,7 +107,7 @@
 
       ctx.drawImage(dripImg, drip.pos.x, drip.pos.y, rr(size), rr(size));
 
-      drip.pos.x = drip.pos.x + realSpeed;
+      drip.pos.x = drip.pos.x + millisecondsSinceLastDraw * realSpeed;
 
       if (drip.pos.x > canvasElem.width) {
         drips.splice(drips.indexOf(drip), 1, generateDrip());
@@ -110,6 +115,7 @@
       }
     }
 
+    lastDraw = currentMillis;
     requestAnimationFrame(draw);
   }
 </script>

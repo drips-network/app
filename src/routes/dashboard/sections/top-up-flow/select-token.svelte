@@ -8,10 +8,13 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Token from '$lib/components/token/token.svelte';
   import tokens from '$lib/stores/tokens';
+  import wallet from '$lib/stores/wallet';
+  import fetchErc20Balance from '$lib/utils/fetch-erc20-balance';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { TopUpFlowState } from './top-up-flow-state';
+  import assert from '$lib/utils/assert';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -43,12 +46,17 @@
   async function updateContext() {
     const tokenAddress = selected[0];
 
+    const { address, provider } = $wallet;
+    assert(address);
+
     const allowance = await (await getAddressDriverClient()).getAllowance(tokenAddress);
+    const balance = await fetchErc20Balance(tokenAddress, address, provider);
 
     context.update((c) => ({
       ...c,
       tokenAddress,
       tokenAllowance: allowance,
+      tokenBalance: balance,
     }));
   }
 

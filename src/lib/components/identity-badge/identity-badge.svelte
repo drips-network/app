@@ -81,7 +81,6 @@
     color: var(--color-foreground-level-6);
     position: relative;
     text-align: left;
-    width: 100%;
   }
 
   .mono {

@@ -152,10 +152,20 @@
         type: 'unvalidated',
       };
     } else if (streamEndDateValue.match(validationRegex)) {
-      streamEndDateValidationState = {
-        type: 'valid',
-      };
-      streamEndDate = new Date(streamEndDateValue);
+      const parsed = new Date(streamEndDateValue);
+      const isInFuture = new Date().getTime() < parsed.getTime();
+
+      if (isInFuture) {
+        streamEndDateValidationState = {
+          type: 'valid',
+        };
+        streamEndDate = new Date(streamEndDateValue);
+      } else {
+        streamEndDateValidationState = {
+          type: 'invalid',
+          message: 'The end date must be a valid date in the future.',
+        };
+      }
     } else {
       streamEndDateValidationState = {
         type: 'invalid',
@@ -172,10 +182,6 @@
 
   function submit() {
     const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
-      updateAwaitStep({
-        message: 'Preparing…',
-      });
-
       modal.setHideable(false);
       const client = await getAddressDriverClient();
       const ownUserId = (await client.getUserId()).toString();
@@ -187,6 +193,8 @@
 
       const { address: tokenAddress } = selectedToken.info;
       const ownAccount = $streams.accounts[ownUserId];
+      assert(ownAccount, "App hasn't yet fetched user's own account");
+
       const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
       assert(assetConfig, "App hasn't yet fetched the right asset config");
 
@@ -198,7 +206,7 @@
       }));
 
       const duration = streamEndDate
-        ? BigInt((streamEndDate.getTime() - new Date().getTime()) / 1000)
+        ? BigInt(Math.floor((streamEndDate.getTime() - new Date().getTime()) / 1000))
         : 0n;
 
       const dripId = ethers.BigNumber.from(ethers.utils.randomBytes(4)).toBigInt();
@@ -323,7 +331,7 @@
     };
 
     dispatch('await', {
-      message: 'Waiting for your transaction to be confirmed...',
+      message: 'Preparing to create the stream...',
       promise,
     });
   }
@@ -352,15 +360,9 @@
         bind:selected={selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
+        emptyStateText={'No tokens available to stream. Top up a token first by clicking "Top up" on your Dashboard.'}
       />
     </div>
-    <!-- <Dropdown
-      bind:value={selectedTokenAddress}
-      options={$balances.streamable.map((balance) => ({
-        value: balance.tokenAddress,
-        title: tokens.getByAddress(balance.tokenAddress)?.info.name ?? 'Unknown token',
-      }))}
-    /> -->
   </FormField>
   <div class="form-row">
     <FormField title="Stream rate*">

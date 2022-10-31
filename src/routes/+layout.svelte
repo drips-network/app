@@ -20,17 +20,7 @@
   import { derived } from 'svelte/store';
   import tick from '$lib/stores/tick/tick.store';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
-
-  let prefersDarkMode = false;
-
-  onMount(() => {
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    prefersDarkMode = darkModeQuery.matches;
-
-    darkModeQuery.addEventListener('change', (event) => {
-      prefersDarkMode = event.matches;
-    });
-  });
+  import themeStore from '$lib/stores/theme/theme.store';
 
   let walletConnected = false;
   let loaded = false;
@@ -135,7 +125,7 @@
 {/if}
 
 {#if loaded && !fatalError}
-  <div class="main" data-theme={prefersDarkMode ? 'dark' : 'light'}>
+  <div class="main" data-theme={$themeStore.currentTheme}>
     <ModalLayout />
     <div class="page">
       <slot />
@@ -187,6 +177,8 @@
   }
 
   .page {
+    position: relative;
+    min-height: 100vh;
     max-width: 64rem;
     width: 100vw;
     padding: 6rem 1rem 4rem 1rem;

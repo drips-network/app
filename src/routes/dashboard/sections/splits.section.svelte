@@ -7,12 +7,7 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-  import { getSplitPercent } from '$lib/stores/splits/methods/get-split-percent';
-  import { makeStep } from '$lib/components/stepper/types';
-  import EditSplitsInputs from './edit-splits-flow/edit-splits-inputs.svelte';
-  import SuccessStep from '$lib/components/success-step/success-step.svelte';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import modal from '$lib/stores/modal';
+  import { prettySplitPercent } from '$lib/stores/splits/methods/pretty-split-percent';
 
   export let userId: string | undefined;
 
@@ -44,10 +39,10 @@
     return {
       splits: splits?.map((s: SplitsEntry) => ({
         text: s.userId,
-        percent: getSplitPercent(s.weight, 'pretty'),
+        percent: prettySplitPercent(s.weight),
       })),
-      splitsTotalPercent: getSplitPercent(totalSplitsWeight, 'pretty'),
-      remainderPercent: getSplitPercent(BigInt('1000000') - totalSplitsWeight, 'pretty'),
+      splitsTotalPercent: prettySplitPercent(totalSplitsWeight),
+      remainderPercent: prettySplitPercent(BigInt('1000000') - totalSplitsWeight),
       remainderReceiver: 'You',
     };
   }
@@ -57,27 +52,9 @@
   <SectionHeader
     icon={MergeIcon}
     label="Splits"
-    actionsDisabled={splitsData === undefined}
     actions={[
       {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            steps: [
-              makeStep({
-                component: EditSplitsInputs,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message:
-                    'Your stream has been successfully created. ' +
-                    'Please note that it may take a while for your dashboard to update.',
-                },
-              }),
-            ],
-          });
-        },
+        handler: () => undefined,
         icon: PenIcon,
         label: 'Edit',
       },

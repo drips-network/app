@@ -18,10 +18,6 @@
   export let context: Writable<TopUpFlowState>;
 
   async function topUp(updateAwaitStep: UpdateAwaitStepFn) {
-    updateAwaitStep({
-      message: 'Preparing…',
-    });
-
     modal.setHideable(false);
 
     const client = await getAddressDriverClient();
@@ -53,7 +49,7 @@
           size: 'huge',
         },
       },
-      message: 'Waiting for you to confirm the transaction in your wallet',
+      message: 'Waiting for you to confirm the top-up transaction in your wallet',
     });
 
     const tx = await client.setDrips(
@@ -65,7 +61,7 @@
     );
 
     updateAwaitStep({
-      message: 'Waiting for your transaction to be confirmed…',
+      message: 'Waiting for your top-up transaction to be confirmed…',
       link: {
         label: 'View on Etherscan',
         url: etherscanLink($wallet.network.name, tx.hash),
@@ -105,7 +101,7 @@
   onMount(() => {
     dispatch('await', {
       promise: topUp,
-      message: 'Waiting for your transaction to be confirmed…',
+      message: 'Preparing to top up…',
     });
   });
 </script>
