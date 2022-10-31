@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
-  import { tick } from 'svelte';
+  import { tick, onDestroy } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
 
   export let loaded = false;
@@ -25,6 +25,21 @@
 
   let contentContainerElem: HTMLDivElement;
 
+  let observer: MutationObserver;
+  function observeContentChanges() {
+    observer?.disconnect();
+    if (!contentContainerElem) return;
+
+    observer = new MutationObserver(() => updateContainerHeight());
+    observer.observe(contentContainerElem, { childList: true });
+  }
+  onDestroy(() => observer?.disconnect());
+
+  $: {
+    contentContainerElem;
+    observeContentChanges();
+  }
+
   $: {
     if (loaded && !empty) {
       updateContainerHeight();
@@ -37,7 +52,7 @@
   async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
-    newHeight = newHeight ?? contentContainerElem.getBoundingClientRect().height;
+    newHeight = newHeight ?? contentContainerElem.offsetHeight;
     containerHeight.set(newHeight);
   }
 </script>
