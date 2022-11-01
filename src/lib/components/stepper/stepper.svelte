@@ -52,7 +52,7 @@
 
     if (stepElement instanceof HTMLDivElement) {
       observedElement = stepElement;
-      mutationObserver.observe(stepElement, { childList: true, attributes: true, subtree: true });
+      mutationObserver.observe(stepElement, { childList: true, subtree: true });
       updateContainerHeight();
     }
   }
