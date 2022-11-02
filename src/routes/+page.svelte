@@ -8,6 +8,7 @@
   import GasOptimized from './components/gas-optimized.svelte';
   import OneBalance from './components/one-balance.svelte';
   import DotsStarsBox from './components/dots-stars-box.svelte';
+  import HeroSection from './components/HeroSection.svelte';
 </script>
 
 <div id="home">
@@ -28,9 +29,7 @@
     <ThreeDrip />
   </div>
 
-  <section class="part dots-stars">
-    <h1>An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds</h1>
-  </section>
+  <HeroSection />
 
   <section class="columns">
     <h1><em>How it works</em></h1>
@@ -148,7 +147,7 @@
     --font-size-l: 2rem;
     --font-size-xl: 3rem;
 
-    --font-serif: 'Redaction 35';
+    --font-serif: 'Redaction 50';
     --font-regular: 'Inter';
 
     --border-radius: 0.5rem;
