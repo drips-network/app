@@ -10,3 +10,4 @@ static/fonts/*
 !static/fonts/.gitkeep
 static/twemoji/*
 !static/twemoji/.gitkeep
+/coverage
