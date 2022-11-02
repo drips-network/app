@@ -3,15 +3,22 @@
   import Star from './star.svelte';
 </script>
 
-<div class="dots-stars-box">
-  <div class="assets">
-    <Dot />
-    <Dot />
-    <Star />
-    <Star />
+<section class="part dots-stars">
+  <div class="dots-stars-box">
+    <Dot class="bottom-right" />
+    <Star class="bottom-left" />
+    <slot />
+    <Star class="top-right" />
+    <Dot class="top-left" />
   </div>
-  <slot />
-</div>
+</section>
 
 <style>
+  .dots-stars-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-s);
+    margin-bottom: var(--spacing-m);
+  }
 </style>

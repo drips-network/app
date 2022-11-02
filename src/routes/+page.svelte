@@ -7,6 +7,7 @@
   import Multichain from './components/multichain.svelte';
   import GasOptimized from './components/gas-optimized.svelte';
   import OneBalance from './components/one-balance.svelte';
+  import DotsStarsBox from './components/dots-stars-box.svelte';
 </script>
 
 <div id="home">
@@ -82,10 +83,10 @@
     <a class="cta" href="/app">Try the app↗</a>
   </section>
 
-  <section class="part dots-stars">
+  <DotsStarsBox>
     <h1>Drips <em>in use</em></h1>
     <p>Some cool projects built on the Drips protocol.</p>
-  </section>
+  </DotsStarsBox>
 
   <section class="columned-layout">
     <div class="columns-row">
@@ -372,6 +373,7 @@
     justify-content: space-between;
     flex-direction: column;
     gap: var(--spacing-s);
+    margin-top: var(--spacing-m);
   }
 
   #credit svg {
