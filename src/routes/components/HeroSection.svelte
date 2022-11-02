@@ -1,8 +1,37 @@
+<script>
+  import Dot from './dot.svelte';
+  import Star from './star.svelte';
+</script>
+
 <section class="part dots-stars">
   <h1>An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds</h1>
+  <div class="top-left"><Dot /></div>
+  <div class="bottom-left"><Star /></div>
+  <div class="top-right"><Star /></div>
+  <div class="bottom-right"><Dot /></div>
 </section>
 
 <style>
+  .top-right {
+    position: absolute;
+    top: var(--spacing-m);
+    right: var(--spacing-m);
+  }
+  .bottom-left {
+    position: absolute;
+    bottom: var(--spacing-m);
+    left: var(--spacing-m);
+  }
+  .bottom-right {
+    position: absolute;
+    bottom: var(--spacing-m);
+    right: var(--spacing-m);
+  }
+  .top-left {
+    position: absolute;
+    top: var(--spacing-m);
+    left: var(--spacing-m);
+  }
   .part {
     display: flex;
     position: relative;

@@ -298,4 +298,8 @@
   .stroke-foreground {
     stroke: var(--color-foreground);
   }
+
+  svg {
+    max-width: 100%;
+  }
 </style>

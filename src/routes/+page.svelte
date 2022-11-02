@@ -40,26 +40,32 @@
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
       </div>
       <div class="columns-item">
-        <NoWrappedTokens />
-        <h2><em>No need to wrap tokens</em></h2>
-        <p>No “wrapping” tokens or trust any third-party with your funds</p>
+        <GasOptimized />
+        <h2><em>Gas-optimized for thousands of senders</em></h2>
+        <p>
+          Most streaming protocols focus on 1:1 streaming. Drips is instead optimized for thousands
+          of senders, like many followers streaming to one creator.
+        </p>
       </div>
       <div class="columns-item">
-        <Multichain />
-        <h2><em>Multi-Chain</em></h2>
-        <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism</p>
+        <GasOptimized />
+        <h2><em>One graph, one contract</em></h2>
+        <p>A social graph of drippers.</p>
       </div>
     </div>
     <!-- closes columns row -->
     <div class="columns-row">
       <div class="columns-item">
-        <GasOptimized />
-        <h2><em>Gas-optimized for one or<br />thousands of senders</em></h2>
+        <NoWrappedTokens />
+        <h2><em>No need to wrap tokens</em></h2>
         <p>
-          While many streaming protocols focus exclusively on 1:1 streaming, Drips is optimized for
-          many-to-one as well, to support low gas costs for use cases where large numbers of
-          followers are streaming funds to a developer or creator.
+          Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your tokens.
         </p>
+      </div>
+      <div class="columns-item">
+        <Multichain />
+        <h2><em>Multi-Chain</em></h2>
+        <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism</p>
       </div>
       <div class="columns-item">
         <OneBalance />
@@ -76,10 +82,8 @@
   <section class="part">
     <ThreeDrip />
     <h1>Built for <em>developers</em></h1>
-    <p>
-      Integrating Drips into your app is extremely easy with the <a href="#">Javascript-SDK</a>.
-    </p>
-    <a class="cta" href="/app">Try the app↗</a>
+    <p>Integrating Drips into your app is extremely easy with the Javascript-SDK.</p>
+    <a class="cta" href="/app">Check out the SDK↗</a>
   </section>
 
   <DotsStarsBox>
@@ -301,6 +305,7 @@
   }
 
   .columns-item {
+    width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -330,7 +335,7 @@
     margin-bottom: var(--spacing-s);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     .columns-item img.illustration {
       height: auto;
     }
@@ -353,7 +358,7 @@
     padding: var(--spacing-s);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     #sticker {
       bottom: -35px;
       right: -22px;
@@ -373,10 +378,6 @@
     flex-direction: column;
     gap: var(--spacing-s);
     margin-top: var(--spacing-m);
-  }
-
-  #credit svg {
-    fill: green;
   }
 
   @keyframes glitch {
