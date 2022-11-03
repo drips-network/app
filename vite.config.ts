@@ -10,7 +10,7 @@ const config = defineConfig({
     include: ['src/**/*.{test,spec}.ts'],
     setupFiles: ['./setup-test.js'],
     deps: {
-      inline: ['@ethersproject/signing-key', '@ethersproject/basex'],
+      inline: ['@ethersproject/signing-key', '@ethersproject/basex', '@depay/solana-web3.js'],
     },
   },
   build: {

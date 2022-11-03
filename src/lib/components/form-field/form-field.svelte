@@ -2,15 +2,15 @@
   export let title: string;
 </script>
 
-<div class="form-field">
-  <label class="typo-text-bold" for="control">{title}</label>
-  <div id="control">
-    <slot />
-  </div>
-</div>
+<label class="typo-text-bold">
+  {title}
+  <div class="content"><slot /></div>
+</label>
 
 <style>
-  .form-field {
+  label {
+    color: var(--color-foreground-level-5);
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -18,12 +18,9 @@
     align-items: flex-start;
   }
 
-  #control {
+  .content {
+    color: var(--color-foreground);
+    font-weight: normal;
     width: 100%;
-    height: 100%;
-  }
-
-  label {
-    color: var(--color-foreground-level-5);
   }
 </style>

@@ -11,7 +11,7 @@ import erc20Abi from './erc20.abi.json';
 export default async function (
   tokenAddress: string,
   address: string,
-  provider: ethers.providers.Web3Provider,
+  provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider,
 ): Promise<bigint> {
   const contract = new ethers.Contract(tokenAddress, erc20Abi, provider);
 

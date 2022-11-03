@@ -15,12 +15,12 @@
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
   import balances from '$lib/stores/balances/balances.store';
-  import { AddressDriverClient } from 'radicle-drips';
   import streams from '$lib/stores/streams/streams.store';
   import { derived } from 'svelte/store';
   import tick from '$lib/stores/tick/tick.store';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import themeStore from '$lib/stores/theme/theme.store';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
 
@@ -43,6 +43,7 @@
 
   async function initializeStores() {
     await wallet.initialize();
+
     loaded = true;
 
     const { connected, network, provider, address } = $wallet;
@@ -53,7 +54,7 @@
     walletConnected = connected;
 
     if (connected) {
-      const addressDriverClient = await AddressDriverClient.create(provider);
+      const addressDriverClient = await getAddressDriverClient();
 
       ens.lookup(address);
       balances.connect(addressDriverClient);

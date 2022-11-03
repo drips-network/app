@@ -11,3 +11,5 @@ static/fonts/*
 static/twemoji/*
 !static/twemoji/.gitkeep
 /coverage
+/src/e2e-tests/.tmp/*
+!/src/e2e-tests/.tmp/.gitkeep
