@@ -1,7 +1,6 @@
 <script lang="ts">
   import RadicleLogo from './components/radicle-logo.svelte';
   import ThreeDrip from './components/ThreeDrip.svelte';
-  import DripsLogo from './components/DripsLogo.svelte';
   import MultiToken from './components/multi-token.svelte';
   import NoWrappedTokens from './components/no-wrapped-tokens.svelte';
   import Multichain from './components/multichain.svelte';
@@ -9,6 +8,8 @@
   import OneBalance from './components/one-balance.svelte';
   import DotsStarsLine from './components/DotsStarsLine.svelte';
   import HeroSection from './components/HeroSection.svelte';
+  import DripsSticker from './components/DripsSticker.svelte';
+  import DripsLogo from './components/DripsLogo.svelte';
 </script>
 
 <div id="home">
@@ -92,11 +93,13 @@
   </section>
 
   <DotsStarsLine>
-    <h1>Drips <em>in use</em></h1>
-    <p>Some cool projects built on the Drips protocol.</p>
+    <div class="in-use">
+      <h1>Drips <em>in use</em></h1>
+      <p>Some cool projects built on the Drips protocol.</p>
+    </div>
   </DotsStarsLine>
 
-  <section class="columned-layout in-use">
+  <section class="columned-layout">
     <div class="columns-row">
       <div class="columns-item card">
         <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
@@ -137,7 +140,7 @@
       <RadicleLogo />
     </div>
     <div id="sticker">
-      <img src="/assets/drips-sticker.svg" alt="sticker" />
+      <DripsSticker />
     </div>
   </section>
 </div>
@@ -157,7 +160,6 @@
     --font-size-xl: 3rem;
 
     --font-serif: 'Redaction 50';
-    --font-regular: 'Inter';
 
     --border-radius: 0.5rem;
     --border-radius-full: 100rem;
@@ -208,7 +210,7 @@
     background-color: var(--color-primary);
     padding: var(--spacing-xs) var(--spacing-s);
     border-radius: var(--border-radius-pointy);
-    font-family: var(--font-regular);
+    font-family: var(--typeface-regular);
     font-size: var(--font-size-s);
   }
 
@@ -246,13 +248,19 @@
     width: 100%;
     padding: var(--spacing-l);
     border-radius: var(--border-radius-pointy);
-    background-color: #00000050;
+    background-color: var(--color-foreground-level-1);
+  }
+
+  .in-use {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
   }
 
   .part .links a {
     border: 1px solid var(--color-foreground);
     padding: var(--spacing-s) var(--spacing-l);
-    font-family: var(--font-regular);
+    font-family: var(--typeface-regular);
     font-size: var(--font-size-s);
     border-radius: var(--border-radius-pointy);
     white-space: nowrap;
@@ -364,33 +372,8 @@
     border-radius: 1rem 0 1rem 1rem;
   }
 
-  #sticker {
-    background: var(--color-primary);
-    width: 240px;
-    height: 240px;
-    border-radius: 100%;
-    transform: rotate(15deg);
-    position: absolute;
-    position: absolute;
-    bottom: -16px;
-    right: 80px;
-    padding: var(--spacing-s);
-  }
-
-  @media (max-width: 900px) {
-    #sticker {
-      bottom: -35px;
-      right: -22px;
-    }
-  }
-
-  #sticker img {
-    width: 100%;
-    height: 100%;
-  }
-
   #credit {
-    font-family: var(--font-regular);
+    font-family: var(--typeface-regular);
     font-size: var(--font-size-s);
     display: flex;
     justify-content: space-between;

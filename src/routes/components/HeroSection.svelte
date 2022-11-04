@@ -1,10 +1,12 @@
 <script>
   import Dot from './dot.svelte';
   import Star from './star.svelte';
+  import AppScreenshot from './AppScreenshot.svelte';
 </script>
 
 <section class="part dots-stars">
   <h1>An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds</h1>
+  <AppScreenshot />
   <div class="top-left"><Dot /></div>
   <div class="bottom-left"><Star /></div>
   <div class="top-right"><Star /></div>
