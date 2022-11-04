@@ -18,7 +18,6 @@
       <DripsLogo />
     </a>
     <ul>
-      <li><a href="https://discord.gg/vhGXkazpNc">Support</a></li>
       <li><a href="https://github.com/radicle-dev">Code</a></li>
       <li><a href="https://docs.radicle.xyz">Docs</a></li>
       <li><a class="cta" href="/app">App↗</a></li>
@@ -125,15 +124,17 @@
   </section>
 
   <section class="part">
-    <h1>Stay <em>up to date</em></h1>
+    <h1>What’s <em>new</em></h1>
     <ThreeDrip />
     <div class="links">
-      <a href="#">Drips at ETHCC Paris</a>
-      <a href="#">Twitter</a>
-      <a href="#">New Profiles in Drips App</a>
-      <a href="#">Twitch</a>
+      <a href="#">The Drips team presented at DevCon 22</a>
+      <a href="https://twitter.com/dripsnetwork">Twitter</a>
       <a href="#">Drips JS-SDK ready for use!</a>
-      <a href="#">Version 0.2 released! View the Docs</a>
+      <a href="https://discord.gg/vhGXkazpNc">Discord</a>
+      <a href="#">Version 0.2 released</a>
+      <a href="#">Drips get-together at EthCC</a>
+      <a href="#">The alpha version of our SDK is released</a>
+      <a href="#">Protocol v2 now on Goerli Testnet</a>
     </div>
     <div id="credit">
       made by
@@ -143,6 +144,14 @@
       <DripsSticker />
     </div>
   </section>
+
+  <DotsStarsLine>
+    <h1>Stay <em>up to date</em></h1>
+    <div class="links">
+      <a href="https://twitter.com/dripsnetwork">Twitter</a>
+      <a href="https://discord.gg/vhGXkazpNc">Discord</a>
+    </div>
+  </DotsStarsLine>
 </div>
 
 <!-- closes home -->
@@ -257,7 +266,14 @@
     gap: var(--spacing-s);
   }
 
-  .part .links a {
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-s);
+  }
+
+  .links a {
     border: 1px solid var(--color-foreground);
     padding: var(--spacing-s) var(--spacing-l);
     font-family: var(--typeface-regular);
@@ -266,7 +282,7 @@
     white-space: nowrap;
   }
 
-  .part .links a:hover {
+  .links a:hover {
     background-color: var(--color-primary);
   }
 
@@ -355,6 +371,11 @@
 
   .columns-item.card {
     height: auto;
+  }
+
+  .columns-item a {
+    border-bottom: 1px solid var(--color-foreground);
+    padding-top: var(--spacing-s);
   }
 
   .columns-item img.illustration {
