@@ -7,7 +7,7 @@
   import Multichain from './components/multichain.svelte';
   import GasOptimized from './components/gas-optimized.svelte';
   import OneBalance from './components/one-balance.svelte';
-  import DotsStarsBox from './components/dots-stars-box.svelte';
+  import DotsStarsLine from './components/DotsStarsLine.svelte';
   import HeroSection from './components/HeroSection.svelte';
 </script>
 
@@ -79,19 +79,24 @@
   </section>
   <!-- closes how it works columns section -->
 
-  <section class="part">
-    <ThreeDrip />
-    <h1>Built for <em>developers</em></h1>
-    <p>Integrating Drips into your app is extremely easy with the Javascript-SDK.</p>
-    <a class="cta" href="/app">Check out the SDK↗</a>
+  <section class="part developers">
+    <div class="left">
+      <ThreeDrip />
+      <h1>Built for <em>developers</em></h1>
+      <p>Integrating Drips into your app is extremely easy with the Javascript-SDK.</p>
+      <a class="cta" href="/app">Check out the SDK↗</a>
+    </div>
+    <div class="right">
+      <img src="/assets/code-snippet.svg" alt="Code snippet" />
+    </div>
   </section>
 
-  <DotsStarsBox>
+  <DotsStarsLine>
     <h1>Drips <em>in use</em></h1>
     <p>Some cool projects built on the Drips protocol.</p>
-  </DotsStarsBox>
+  </DotsStarsLine>
 
-  <section class="columned-layout">
+  <section class="columned-layout in-use">
     <div class="columns-row">
       <div class="columns-item card">
         <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
@@ -229,6 +234,21 @@
     border-radius: var(--border-radius-pointy);
   }
 
+  .part .left {
+    /* width: 100%; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-m);
+  }
+
+  .part .right {
+    width: 100%;
+    padding: var(--spacing-l);
+    border-radius: var(--border-radius-pointy);
+    background-color: #00000050;
+  }
+
   .part .links a {
     border: 1px solid var(--color-foreground);
     padding: var(--spacing-s) var(--spacing-l);
@@ -293,7 +313,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     gap: var(--spacing-l);
     margin-bottom: var(--spacing-l);
   }
@@ -309,12 +329,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
     flex-grow: 1;
     flex-basis: 0;
     border: var(--border-width) solid var(--color-foreground);
-    height: 500px;
+    height: 400px;
     border-radius: var(--border-radius-pointy);
     padding: var(--spacing-m);
   }
