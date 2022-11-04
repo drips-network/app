@@ -32,7 +32,7 @@
   <HeroSection />
 
   <section class="columns">
-    <h1><em>How it works</em></h1>
+    <h1><em>How</em> it works</h1>
     <div class="columns-row">
       <div class="columns-item">
         <MultiToken />
@@ -137,7 +137,7 @@
       <a href="#">Protocol v2 now on Goerli Testnet</a>
     </div>
     <div id="credit">
-      made by
+      <p>made by</p>
       <RadicleLogo />
     </div>
     <div id="sticker">
@@ -182,6 +182,17 @@
     gap: var(--spacing-s);
     max-width: 1600px;
     margin: 0 auto;
+  }
+
+  *::selection {
+    background: var(--color-primary);
+    color: var(--color-foreground);
+  }
+
+  p,
+  h1,
+  h2 {
+    cursor: default;
   }
 
   @media (max-width: 768px) {

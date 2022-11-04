@@ -81,4 +81,8 @@
       font-family: 'Redaction 100';
     }
   }
+
+  h1 {
+    cursor: default;
+  }
 </style>
