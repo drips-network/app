@@ -1,7 +1,7 @@
 <script>
   import Dot from './dot.svelte';
   import Star from './star.svelte';
-  import AppScreenshot from './AppScreenshot.svelte';
+  import AppScreenshot from './app-screenshot.svelte';
 </script>
 
 <section class="part dots-stars">
@@ -14,6 +14,11 @@
 </section>
 
 <style>
+  *::selection {
+    background: var(--color-primary);
+    color: var(--color-foreground);
+  }
+
   .top-right {
     position: absolute;
     top: var(--spacing-m);

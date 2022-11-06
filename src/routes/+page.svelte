@@ -1,15 +1,15 @@
 <script lang="ts">
   import RadicleLogo from './components/radicle-logo.svelte';
-  import ThreeDrip from './components/ThreeDrip.svelte';
+  import ThreeDrip from './components/three-drip.svelte';
   import MultiToken from './components/multi-token.svelte';
   import NoWrappedTokens from './components/no-wrapped-tokens.svelte';
   import Multichain from './components/multichain.svelte';
   import GasOptimized from './components/gas-optimized.svelte';
   import OneBalance from './components/one-balance.svelte';
-  import DotsStarsLine from './components/DotsStarsLine.svelte';
-  import HeroSection from './components/HeroSection.svelte';
-  import DripsSticker from './components/DripsSticker.svelte';
-  import DripsLogo from './components/DripsLogo.svelte';
+  import DotsStarsLine from './components/dots-stars-line.svelte';
+  import HeroSection from './components/hero-section.svelte';
+  import DripsSticker from './components/drips-sticker.svelte';
+  import DripsLogo from '$lib/components/header/drips-logo.svelte';
 </script>
 
 <div id="home">

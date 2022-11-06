@@ -1,6 +1,7 @@
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
-  import DripsLogo from 'src/routes/components/DripsLogo.svelte';
+  import ConnectButton from '../connect-button/connect-button.svelte';
+  import DripsLogo from '././drips-logo.svelte';
 
   $: elevated = $scroll.pos > 16;
 </script>
