@@ -128,9 +128,7 @@
     <ThreeDrip />
     <div class="links">
       <a href="#">The Drips team presented at DevCon 22</a>
-      <a href="https://twitter.com/dripsnetwork">Twitter</a>
       <a href="#">Drips JS-SDK ready for use!</a>
-      <a href="https://discord.gg/vhGXkazpNc">Discord</a>
       <a href="#">Version 0.2 released</a>
       <a href="#">Drips get-together at EthCC</a>
       <a href="#">The alpha version of our SDK is released</a>
