@@ -66,7 +66,7 @@
             props: {
               hideName: true,
               address: token.info.address,
-              small: true,
+              size: 'small',
             },
           },
         },
