@@ -83,7 +83,7 @@
     <div class="left">
       <ThreeDrip />
       <h1>Built for <em>developers</em></h1>
-      <p>Integrating Drips into your app is extremely easy with the Javascript-SDK.</p>
+      <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
       <a class="cta" href="/app">Check out the SDK↗</a>
     </div>
     <div class="right">
