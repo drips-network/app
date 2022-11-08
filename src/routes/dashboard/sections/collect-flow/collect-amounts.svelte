@@ -18,7 +18,7 @@
   import assert from '$lib/utils/assert';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
-  import { prettySplitPercent } from '$lib/stores/splits/methods/pretty-split-percent';
+  import { getSplitPercent } from '$lib/utils/get-split-percent';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -157,7 +157,7 @@
             disabled: balances.splittable === 0n,
           },
           {
-            title: `Splitting ${prettySplitPercent(1000000n - ownSplitsWeight)}`,
+            title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight)}`,
             value: formatTokenAmount(
               makeAmount(collectableAfterSplit - splittableAfterReceive),
               selectedToken.decimals,
