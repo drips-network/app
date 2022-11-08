@@ -6,6 +6,13 @@
   import { createEventDispatcher } from 'svelte';
 
   export let value: string;
+  export let exclude: {
+    addresses: string[];
+    msg: string;
+  } = {
+    addresses: [],
+    msg: 'You cannot use this address.',
+  };
 
   const dispatch = createEventDispatcher();
 
@@ -44,11 +51,21 @@
         };
       }
     } else if (input && ethers.utils.isAddress(input)) {
-      // is already valid address
+      // is address
       addressValue = input;
-      addressValidationState = {
-        type: 'valid',
-      };
+
+      if (exclude.addresses.includes(input)) {
+        // is excluded!
+        addressValidationState = {
+          type: 'invalid',
+          message: exclude.msg,
+        };
+      } else {
+        // valid
+        addressValidationState = {
+          type: 'valid',
+        };
+      }
     } else {
       // invalid
       addressValue = undefined;
