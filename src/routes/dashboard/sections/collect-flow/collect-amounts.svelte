@@ -4,7 +4,6 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import { prettySplitPercent } from '$lib/stores/splits/methods/pretty-split-percent';
   import tokens from '$lib/stores/tokens';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
@@ -19,6 +18,7 @@
   import assert from '$lib/utils/assert';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
+  import { prettySplitPercent } from '$lib/stores/splits/methods/pretty-split-percent';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
