@@ -3,7 +3,7 @@
   import QuestionIcon from 'radicle-design-system/icons/Info.svelte';
 
   export let address: string;
-  export let hideName = false;
+  export let show: 'name' | 'symbol' | 'none' = 'name';
   export let small = false;
 
   $: tokenInfo = $tokens ? tokens.getByAddress(address)?.info : undefined;
@@ -23,9 +23,9 @@
       <QuestionIcon />
     {/if}
   </div>
-  {#if !hideName}
+  {#if show !== 'none'}
     <div class="name typo-text-bold" class:unknown={tokenInfo === undefined}>
-      {tokenInfo?.name ?? 'Unknown token'}
+      {(show === 'name' ? tokenInfo?.name : tokenInfo?.symbol) ?? 'Unknown token'}
     </div>
   {/if}
 </div>
