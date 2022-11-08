@@ -2,7 +2,7 @@ import type { BaseProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { get, writable } from 'svelte/store';
 
-interface ResolvedRecord {
+export interface ResolvedRecord {
   name?: string;
   avatarUrl?: string;
 }
