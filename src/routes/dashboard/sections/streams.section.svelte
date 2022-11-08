@@ -17,7 +17,11 @@
   import balances from '$lib/stores/balances';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { Stream } from '$lib/stores/streams/types';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
+
+  export let userId: string | undefined;
+  export let disableActions = true;
 
   interface OutgoingStreamTableRow {
     name: string;
@@ -36,8 +40,33 @@
   let outgoingTableData: OutgoingStreamTableRow[] = [];
   let incomingTableData: IncomingStreamTableRow[] = [];
 
+  function getStreamsForUserId(userId: string) {
+    return {
+      outgoing:
+        $streams.accounts[userId]?.assetConfigs.reduce<Stream[]>(
+          (acc, assetConfig) => [...acc, ...assetConfig.streams],
+          [],
+        ) ?? [],
+      incoming: Object.values($streams.accounts).reduce<Stream[]>(
+        (acc, account) => [
+          ...acc,
+          ...account.assetConfigs.reduce<Stream[]>(
+            (acc, assetConfig) => [
+              ...acc,
+              ...assetConfig.streams.filter((stream) => stream.receiver.userId === userId),
+            ],
+            [],
+          ),
+        ],
+        [],
+      ),
+    };
+  }
+
   function updateTable() {
-    outgoingTableData = mapFilterUndefined($streams.ownStreams?.outgoing ?? [], (stream) => {
+    const streams = userId ? getStreamsForUserId(userId) : { outgoing: [], incoming: [] };
+
+    outgoingTableData = mapFilterUndefined(streams.outgoing, (stream) => {
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
@@ -65,7 +94,7 @@
       };
     });
 
-    incomingTableData = mapFilterUndefined($streams.ownStreams?.incoming ?? [], (stream) => {
+    incomingTableData = mapFilterUndefined(streams.incoming ?? [], (stream) => {
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
@@ -186,30 +215,32 @@
     icon={TokenStreamIcon}
     label="Streams"
     actionsDisabled={!loaded}
-    actions={[
-      {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            steps: [
-              makeStep({
-                component: InputDetails,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message:
-                    'Your stream has been successfully created. ' +
-                    'Please note that it may take a while for your dashboard to update.',
-                },
-              }),
-            ],
-          });
-        },
-        icon: PlusIcon,
-        label: 'Create stream',
-      },
-    ]}
+    actions={disableActions
+      ? []
+      : [
+          {
+            handler: () => {
+              modal.show(Stepper, undefined, {
+                steps: [
+                  makeStep({
+                    component: InputDetails,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: SuccessStep,
+                    props: {
+                      message:
+                        'Your stream has been successfully created. ' +
+                        'Please note that it may take a while for your dashboard to update.',
+                    },
+                  }),
+                ],
+              });
+            },
+            icon: PlusIcon,
+            label: 'Create stream',
+          },
+        ]}
   />
   <div class="content">
     <SectionSkeleton

@@ -24,8 +24,6 @@
   import { ethers } from 'ethers';
   import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-  import { onMount } from 'svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -34,12 +32,10 @@
     netRate: AmountCellData;
   }
 
-  let currentUserId: string;
-  $: accountEstimate = currentUserId ? $balances.accounts[currentUserId] : undefined;
+  export let userId: string | undefined;
+  export let disableActions = true;
 
-  onMount(async () => {
-    currentUserId = (await (await getAddressDriverClient()).getUserId()).toString();
-  });
+  $: accountEstimate = userId ? $balances.accounts[userId] : undefined;
 
   let tableData: TokenTableRow[] = [];
 
@@ -181,46 +177,48 @@
     icon={TokensIcon}
     label="Balances"
     actionsDisabled={!accountEstimate}
-    actions={[
-      {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            context: topUpFlowState,
-            steps: [
-              makeStep({
-                component: SelectTokenStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: EnterAmountStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: Approve,
-                props: undefined,
-              }),
-              makeStep({
-                component: TriggerTopUpTransaction,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message: () => getTopUpSuccessMessage(),
-                },
-              }),
-            ],
-          });
-        },
-        icon: TopUpIcon,
-        label: 'Top up',
-      },
-      {
-        handler: () => undefined,
-        icon: CollectIcon,
-        label: 'Collect',
-      },
-    ]}
+    actions={disableActions
+      ? []
+      : [
+          {
+            handler: () => {
+              modal.show(Stepper, undefined, {
+                context: topUpFlowState,
+                steps: [
+                  makeStep({
+                    component: SelectTokenStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: EnterAmountStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: Approve,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: TriggerTopUpTransaction,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: SuccessStep,
+                    props: {
+                      message: () => getTopUpSuccessMessage(),
+                    },
+                  }),
+                ],
+              });
+            },
+            icon: TopUpIcon,
+            label: 'Top up',
+          },
+          {
+            handler: () => undefined,
+            icon: CollectIcon,
+            label: 'Collect',
+          },
+        ]}
   />
   <div class="content">
     <SectionSkeleton

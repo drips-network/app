@@ -33,9 +33,9 @@
 
 <div class="dashboard">
   <h1>Dashboard</h1>
-  <Balances />
-  <Streams />
-  <Splits {userId} />
+  <Balances {userId} disableActions={false} />
+  <Streams {userId} disableActions={false} />
+  <Splits {userId} disableActions={false} />
 </div>
 
 <style>

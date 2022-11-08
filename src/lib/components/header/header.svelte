@@ -6,7 +6,7 @@
 </script>
 
 <header class:elevated>
-  <a sveltekit:prefetch href="/">
+  <a sveltekit:prefetch href="/dashboard">
     <img class="logo" src="/assets/logo.svg" alt="Radicle Drips logo" />
   </a>
   <div class="wallet">

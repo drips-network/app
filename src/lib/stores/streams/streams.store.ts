@@ -44,14 +44,34 @@ export default (() => {
     },
   );
 
+  /**
+   * Connect the store to a user, and fetch the currently-connected user's account
+   * and all incoming streams.
+   * @param toUserId The user ID to connect to.
+   */
   async function connect(toUserId: string) {
     userId.set(toUserId);
 
     await fetchAccount(toUserId);
+  }
+
+  /**
+   * Disconnect the store from the current user's account.
+   */
+  async function disconnect() {
+    userId.set(undefined);
+  }
+
+  /**
+   * Fetches an account, and all accounts streaming to it.
+   * @param userId The user ID to fetch.
+   */
+  async function fetchAccount(userId: UserId): Promise<Account> {
+    const account = await _fetchAccount(userId);
 
     const subgraphClient = getSubgraphClient();
     const dripsReceiverSeenEventForUser =
-      await subgraphClient.getDripsReceiverSeenEventsByReceiverId(toUserId);
+      await subgraphClient.getDripsReceiverSeenEventsByReceiverId(userId);
     const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
       (acc, event) => {
         const senderUserId = event.senderUserId.toString();
@@ -60,21 +80,14 @@ export default (() => {
       [],
     );
 
-    await Promise.all(accountsSendingToCurrentUser.map((a) => fetchAccount(a)));
-  }
-
-  async function disconnect() {
-    userId.set(undefined);
-  }
-
-  async function fetchAccount(userId: UserId): Promise<Account> {
-    const account = await metadata.fetchAccount(userId);
-
-    accounts.update((s) => ({ ...s, [userId]: account }));
+    await Promise.all(accountsSendingToCurrentUser.map((a) => _fetchAccount(a)));
 
     return account;
   }
 
+  /**
+   * Refreshes the currently-connected user's account information.
+   */
   async function refreshUserAccount(): Promise<Account> {
     const currentUserId = get(userId);
     assert(currentUserId, 'Store needs to be connected first.');
@@ -84,11 +97,20 @@ export default (() => {
     return account;
   }
 
+  /** @private */
+  async function _fetchAccount(userId: UserId): Promise<Account> {
+    const account = await metadata.fetchAccount(userId);
+
+    accounts.update((s) => ({ ...s, [userId]: account }));
+
+    return account;
+  }
+
   return {
     subscribe: state.subscribe,
     connect,
     disconnect,
-    refreshUserAccount,
     fetchAccount,
+    refreshUserAccount,
   };
 })();

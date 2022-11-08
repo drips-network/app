@@ -9,7 +9,7 @@
   export let address: string;
   export let showIdentity = true;
   export let showAvatar = true;
-  export let size: 'normal' | 'big' | 'huge' = 'normal';
+  export let size: 'normal' | 'big' | 'huge' | 'gigantic' = 'normal';
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
 
@@ -36,6 +36,7 @@
     normal: 24,
     big: 48,
     huge: 64,
+    gigantic: 128,
   };
   $: currentSize = sizes[size];
 
@@ -43,6 +44,7 @@
     normal: 'typo-text-bold',
     big: 'typo-header-4',
     huge: 'typo-header-3',
+    gigantic: 'typo-header-1',
   };
   $: currentFontClass = fontClasses[size];
 </script>
@@ -61,8 +63,9 @@
       <p
         transition:fade|local={{ duration: 300 }}
         class:mono={!ens?.name}
+        class:foreground={size === 'gigantic'}
         class={`${currentFontClass} identity`}
-        style:left={showAvatar ? '2rem' : '0rem'}
+        style:left={showAvatar ? `${currentSize + 16}px` : '0'}
       >
         {toDisplay}
       </p>
@@ -86,6 +89,10 @@
   .mono {
     font-family: var(--typeface-mono-bold);
     white-space: nowrap;
+  }
+
+  .foreground {
+    color: var(--color-foreground);
   }
 
   .identity {
