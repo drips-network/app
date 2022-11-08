@@ -11,6 +11,8 @@
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   // TODO: Get current balance of ERC-20, validate input accordingly
 
@@ -19,7 +21,7 @@
   export let context: Writable<TopUpFlowState>;
 
   $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) : undefined;
+  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
 
   let amountValue = '0';
   let validationState: TextInputValidationState = {
@@ -76,8 +78,8 @@
 </script>
 
 <StepLayout>
+  <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
   <StepHeader
-    emoji="💸"
     headline={`Top up ${tokenInfo?.info.name ?? ''}`}
     description="Add funds to your Drips account in order to start streaming."
   />
