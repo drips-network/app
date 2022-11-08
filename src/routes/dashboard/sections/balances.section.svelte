@@ -76,7 +76,7 @@
       return;
     }
 
-    const tokensToShow: string[] = [];
+    let tokensToShow: string[] = [];
 
     tokensToShow.push(...Object.keys(accountEstimate));
     tokensToShow.push(
@@ -84,6 +84,7 @@
         (stream) => stream.dripsConfig.amountPerSecond.tokenAddress,
       ) ?? []),
     );
+    tokensToShow = [...new Set(tokensToShow)];
 
     tableData = tokensToShow.map((tokenAddress) => {
       const estimate = accountEstimate?.[tokenAddress];
