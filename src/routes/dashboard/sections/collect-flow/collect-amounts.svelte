@@ -126,7 +126,7 @@
   <StepHeader
     headline={`Collect ${selectedToken.symbol}`}
     description={splittableAfterReceive === 0n
-      ? `You currently don't have any ${selectedToken.symbol} to collect.`
+      ? `You currently don't have any ${selectedToken.symbol} to collect this cycle.`
       : `${selectedToken.symbol} earnings can be collected from your account.`}
   />
   <FormField
@@ -140,16 +140,19 @@
         [
           {
             title: `Receivable ${selectedToken.symbol}`,
-            subtitle: 'from inbound streams',
+            subtitle: 'from incoming streams',
             value:
-              '+' + formatTokenAmount(makeAmount(balances.receivable), selectedToken.decimals, 1n),
+              (balances.receivable > 0 ? '+' : '') +
+              formatTokenAmount(makeAmount(balances.receivable), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
+            disabled: balances.receivable === 0n,
           },
           {
             title: `Splittable ${selectedToken.symbol}`,
             subtitle: 'from already-received streams or incoming splits & gives',
             value:
-              '+' + formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
+              (balances.splittable > 0 ? '+' : '') +
+              formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: balances.splittable === 0n,
           },
@@ -167,7 +170,7 @@
             ? {
                 title: `Previously-split funds`,
                 value:
-                  '+' +
+                  (balances.collectable > 0 ? '+' : '') +
                   formatTokenAmount(makeAmount(balances.collectable), selectedToken.decimals, 1n),
                 symbol: selectedToken.symbol,
               }
@@ -175,8 +178,11 @@
           {
             title: 'You collect',
             subtitle: 'These funds will be sent to your wallet.',
-            value: formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
+            value:
+              (collectableAfterSplit > 0 ? '+' : '') +
+              formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
+            disabled: collectableAfterSplit === 0n,
             highlight: true,
           },
         ],

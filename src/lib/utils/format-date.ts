@@ -3,7 +3,8 @@ export default function (
   options: Intl.DateTimeFormatOptions = {
     month: 'long',
     day: 'numeric',
-    hour: '2-digit',
+    hour: 'numeric',
+    minute: '2-digit',
   },
 ): string {
   return Intl.DateTimeFormat('en-US', options).format(date);
