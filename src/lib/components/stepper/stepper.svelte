@@ -52,7 +52,7 @@
 
     if (stepElement instanceof HTMLDivElement) {
       observedElement = stepElement;
-      mutationObserver.observe(stepElement, { childList: true, attributes: true, subtree: true });
+      mutationObserver.observe(stepElement, { childList: true, subtree: true });
       updateContainerHeight();
     }
   }
@@ -63,7 +63,7 @@
 
     if (!observedElement) return;
 
-    const stepHeight = stepElement.clientHeight;
+    const stepHeight = observedElement.clientHeight;
 
     containerHeight.set(stepHeight, {
       duration: firstHeightUpdate || disableTransition ? 0 : 300,

@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import assert from '$lib/utils/assert';
 
-  const RESOLUTION_RATIO = window?.devicePixelRatio ?? 2;
+  const RESOLUTION_RATIO = window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
 
   export let speedMultiplier = 1;
 
@@ -18,14 +18,15 @@
   }
 
   let drips: Drip[] = [];
+  let maxDripsOnScreen: number;
 
   function generateDrip(maxX = 0): Drip {
     const maxY = containerSize[1] + 64;
 
     return {
       pos: {
-        y: Math.random() * maxY,
-        x: Math.random() * rr(maxX) - 48,
+        y: Math.floor(Math.random() * maxY),
+        x: Math.floor(Math.random() * rr(maxX) - 48),
       },
       layer: Math.random(),
     };
@@ -40,6 +41,10 @@
       containerSize = [containerBounds.width, containerBounds.height];
       canvasElem.width = containerSize[0] * RESOLUTION_RATIO;
       canvasElem.height = containerSize[1] * RESOLUTION_RATIO;
+
+      maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
+
+      drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
     }
     updateContainerSize();
 
@@ -49,8 +54,6 @@
     assert(context, 'Unable to create Canvas element');
 
     ctx = context;
-
-    drips = [...Array(10).keys()].map(() => generateDrip(containerSize[0]));
 
     return () => window.removeEventListener('resize', updateContainerSize);
   });
@@ -107,7 +110,7 @@
 
       ctx.drawImage(dripImg, drip.pos.x, drip.pos.y, rr(size), rr(size));
 
-      drip.pos.x = drip.pos.x + millisecondsSinceLastDraw * realSpeed;
+      drip.pos.x = Math.floor(drip.pos.x + millisecondsSinceLastDraw * realSpeed);
 
       if (drip.pos.x > canvasElem.width) {
         drips.splice(drips.indexOf(drip), 1, generateDrip());
