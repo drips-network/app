@@ -6,7 +6,7 @@
   import { tweened } from 'svelte/motion';
 
   export let address: string;
-  export let hideName = false;
+  export let show: 'name' | 'symbol' | 'none' = 'name';
   export let size: 'small' | 'normal' | 'huge' = 'normal';
   export let animateOnMount = false;
 
@@ -78,9 +78,9 @@
       ✨
     </div>
   </div>
-  {#if !hideName}
+  {#if show !== 'none'}
     <div class="name typo-text-bold" class:unknown={tokenInfo === undefined}>
-      {tokenInfo?.name ?? 'Unknown token'}
+      {(show === 'name' ? tokenInfo?.name : tokenInfo?.symbol) ?? 'Unknown token'}
     </div>
   {/if}
 </div>

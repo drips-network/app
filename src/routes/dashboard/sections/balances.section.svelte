@@ -5,7 +5,7 @@
 
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Table from '$lib/components/table/table.svelte';
-  import TokenCell from '$lib/components/table/cells/token.cell.svelte';
+  import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
   import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
@@ -33,7 +33,7 @@
   import Success from './collect-flow/success.svelte';
 
   interface TokenTableRow {
-    token: string;
+    token: TokenCellData;
     earnings: AmountCellData;
     streaming: AmountCellData;
     netRate: AmountCellData;
@@ -85,7 +85,9 @@
       const incomingTotals = getIncomingTotalsForToken(tokenAddress);
 
       return {
-        token: tokenAddress,
+        token: {
+          address: tokenAddress,
+        },
         earnings: {
           amount: {
             amount: incomingTotals.totalEarned,
@@ -130,24 +132,28 @@
       header: 'Token',
       cell: () => TokenCell,
       enableSorting: false,
+      size: (100 / 24) * 8,
     },
     {
       accessorKey: 'earnings',
       header: 'Earnings',
       cell: () => Amount,
       enableSorting: false,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'streaming',
       header: 'Streaming',
       cell: () => Amount,
       enableSorting: false,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'netRate',
       header: 'Net rate',
       cell: () => Amount,
       enableSorting: false,
+      size: (100 / 24) * 2,
     },
   ];
 
