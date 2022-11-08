@@ -10,12 +10,7 @@
 <div class="illustration">
   <div class="emoji"><Emoji size="huge" {emoji} /></div>
   <div class="token-logo">
-    <Token
-      animateOnMount={animateTokenOnMount}
-      size="huge"
-      address={tokenAddress}
-      hideName={true}
-    />
+    <Token animateOnMount={animateTokenOnMount} size="huge" address={tokenAddress} show="none" />
   </div>
 </div>
 
