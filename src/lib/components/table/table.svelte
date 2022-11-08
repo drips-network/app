@@ -16,6 +16,7 @@
           <th
             on:click={header.column.getToggleSortingHandler()}
             class:sortable={header.column.getCanSort()}
+            style={`width: ${header.column.getSize()}%`}
           >
             {#if !header.isPlaceholder}
               <div>
@@ -160,7 +161,6 @@
   thead th div {
     display: flex;
     align-items: center;
-    height: 1rem;
   }
 
   thead th.sortable {

@@ -31,7 +31,7 @@
         image: {
           component: Token,
           props: {
-            hideName: true,
+            show: 'none',
             address: token.info.address,
             small: true,
           },
