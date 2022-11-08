@@ -1,0 +1,39 @@
+<script lang="ts">
+  import Emoji from 'radicle-design-system/Emoji.svelte';
+
+  export let emoji: string;
+  export let headline: string;
+  export let description: string;
+</script>
+
+<div class="large-empty-state">
+  <Emoji size="huge" {emoji} />
+  <div class="content">
+    <h1>{headline}</h1>
+    <p>{description}</p>
+    <p />
+  </div>
+</div>
+
+<style>
+  .large-empty-state {
+    height: 100%;
+    padding: 30vh 0;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .content {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  p {
+    color: var(--color-foreground-level-6);
+  }
+</style>

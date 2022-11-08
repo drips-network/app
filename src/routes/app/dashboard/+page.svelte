@@ -3,9 +3,9 @@
   import Streams from './sections/streams.section.svelte';
   import Splits from './sections/splits.section.svelte';
 
-  import { goto } from '$app/navigation';
   import wallet from '$lib/stores/wallet';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import guardConnected from '$lib/utils/guard-connected';
 
   let userId: string;
 
@@ -20,9 +20,8 @@
   }
 
   $: {
-    if (!$wallet.connected) {
-      goto('/');
-    }
+    $wallet.connected;
+    guardConnected();
   }
 </script>
 
@@ -33,9 +32,9 @@
 
 <div class="dashboard">
   <h1>Dashboard</h1>
-  <Balances />
-  <Streams />
-  <Splits {userId} />
+  <Balances {userId} disableActions={false} />
+  <Streams {userId} disableActions={false} />
+  <Splits {userId} disableActions={false} />
 </div>
 
 <style>

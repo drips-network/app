@@ -33,6 +33,8 @@ export default (() => {
   let tickRegistration: number | undefined;
   const state = writable<State>(INITIAL_STATE);
 
+  if (!tickRegistration) tickRegistration = tickStore.register(_updateAllBalances);
+
   /**
    * Connect the store to a given AddressDriverClient and fetch balances.
    */
@@ -41,8 +43,6 @@ export default (() => {
     dripsHubClient = await getDripsHubClient();
 
     userId = (await addressDriverClient.getUserId()).toString();
-
-    if (!tickRegistration) tickRegistration = tickStore.register(_updateAllBalances);
 
     await updateBalances();
   }

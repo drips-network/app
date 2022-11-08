@@ -1,5 +1,6 @@
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
+  import wallet from '$lib/stores/wallet';
   import ConnectButton from '../connect-button/connect-button.svelte';
   import DripsLogo from '././drips-logo.svelte';
 
@@ -7,7 +8,7 @@
 </script>
 
 <header class:elevated>
-  <a sveltekit:prefetch href="/">
+  <a sveltekit:prefetch href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
   </a>
   <div class="wallet">

@@ -12,6 +12,8 @@ interface State {
   };
 }
 
+type AccountFetchStatus = 'fetching' | 'error' | 'fetched';
+
 export default (() => {
   const userId = writable<string | undefined>(undefined);
   const accounts = writable<{ [accountId: UserId]: Account }>({});
@@ -23,58 +25,92 @@ export default (() => {
       };
 
       if (userId) {
-        const allStreams = Object.values(accounts).reduce<Stream[]>(
-          (streams, account) => [
-            ...streams,
-            ...account.assetConfigs.reduce<Stream[]>(
-              (acc, assetConfig) => [...acc, ...assetConfig.streams],
-              [],
-            ),
-          ],
-          [],
-        );
-
-        newState.ownStreams = {
-          incoming: allStreams.filter((s) => s.receiver.userId === userId),
-          outgoing: allStreams.filter((s) => s.sender.userId === userId),
-        };
+        newState.ownStreams = getStreamsForUser(userId);
       }
 
       return newState;
     },
   );
 
+  /**
+   * A store that includes drips user IDs and their current AccountFetchStatus. Only
+   * includes accounts explicitly fetched via `fetchAccount`, not any secondary accounts
+   * merely fetched as dependencies to top-level accounts.
+   */
+  const fetchStatuses = writable<{ [key: UserId]: AccountFetchStatus }>({});
+
+  /**
+   * Connect the store to a user, and fetch the currently-connected user's account
+   * and all incoming streams.
+   * @param toUserId The user ID to connect to.
+   */
   async function connect(toUserId: string) {
     userId.set(toUserId);
 
     await fetchAccount(toUserId);
-
-    const subgraphClient = getSubgraphClient();
-    const dripsReceiverSeenEventForUser =
-      await subgraphClient.getDripsReceiverSeenEventsByReceiverId(toUserId);
-    const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
-      (acc, event) => {
-        const senderUserId = event.senderUserId.toString();
-        return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;
-      },
-      [],
-    );
-
-    await Promise.all(accountsSendingToCurrentUser.map((a) => fetchAccount(a)));
   }
 
+  /**
+   * Disconnect the store from the current user's account.
+   */
   async function disconnect() {
     userId.set(undefined);
   }
 
+  /**
+   * Fetches an account, and all accounts streaming to it.
+   * @param userId The user ID to fetch.
+   */
   async function fetchAccount(userId: UserId): Promise<Account> {
-    const account = await metadata.fetchAccount(userId);
+    fetchStatuses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
 
-    accounts.update((s) => ({ ...s, [userId]: account }));
+    try {
+      const account = await _fetchAccount(userId);
 
-    return account;
+      const subgraphClient = getSubgraphClient();
+      const dripsReceiverSeenEventForUser =
+        await subgraphClient.getDripsReceiverSeenEventsByReceiverId(userId);
+      const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
+        (acc, event) => {
+          const senderUserId = event.senderUserId.toString();
+          return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;
+        },
+        [],
+      );
+
+      await Promise.all(accountsSendingToCurrentUser.map((a) => _fetchAccount(a)));
+
+      fetchStatuses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
+      return account;
+    } catch (e) {
+      fetchStatuses.update((fs) => ({ ...fs, [userId]: 'error' }));
+      throw e;
+    }
   }
 
+  function getStreamsForUser(userId: string) {
+    const accountsValue = get(accounts);
+
+    const allStreams = Object.values(accountsValue).reduce<Stream[]>(
+      (streams, account) => [
+        ...streams,
+        ...account.assetConfigs.reduce<Stream[]>(
+          (acc, assetConfig) => [...acc, ...assetConfig.streams],
+          [],
+        ),
+      ],
+      [],
+    );
+
+    return {
+      incoming: allStreams.filter((s) => s.receiver.userId === userId),
+      outgoing: allStreams.filter((s) => s.sender.userId === userId),
+    };
+  }
+
+  /**
+   * Refreshes the currently-connected user's account information.
+   */
   async function refreshUserAccount(): Promise<Account> {
     const currentUserId = get(userId);
     assert(currentUserId, 'Store needs to be connected first.');
@@ -84,11 +120,22 @@ export default (() => {
     return account;
   }
 
+  /** @private */
+  async function _fetchAccount(userId: UserId): Promise<Account> {
+    const account = await metadata.fetchAccount(userId);
+
+    accounts.update((s) => ({ ...s, [userId]: account }));
+
+    return account;
+  }
+
   return {
     subscribe: state.subscribe,
+    fetchStatuses: { subscribe: fetchStatuses.subscribe },
     connect,
     disconnect,
-    refreshUserAccount,
+    getStreamsForUser,
     fetchAccount,
+    refreshUserAccount,
   };
 })();

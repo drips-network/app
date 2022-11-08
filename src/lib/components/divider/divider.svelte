@@ -1,4 +1,8 @@
-<div class="divider" />
+<script lang="ts">
+  export let sideMargin = 0;
+</script>
+
+<div class="divider" style={`margin: 0.25rem ${sideMargin}rem`} />
 
 <style>
   .divider {

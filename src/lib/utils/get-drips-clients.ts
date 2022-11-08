@@ -26,10 +26,13 @@ export function getSubgraphClient() {
  * @returns An initialized Address Driver client.
  */
 export function getAddressDriverClient() {
-  const { provider, connected } = get(wallet);
-  assert(connected, 'Wallet must be connected to create an AddressDriverClient');
+  const { provider, connected, signer } = get(wallet);
 
-  return AddressDriverClient.create(provider, getNetworkConfig().CONTRACT_ADDRESS_DRIVER);
+  const addressDriverAddress = getNetworkConfig().CONTRACT_ADDRESS_DRIVER;
+
+  return connected
+    ? AddressDriverClient.create(signer, addressDriverAddress)
+    : AddressDriverClient.createReadonly(provider, addressDriverAddress);
 }
 
 /**
@@ -37,10 +40,13 @@ export function getAddressDriverClient() {
  * @returns An initialized Drips Hub client.
  */
 export function getDripsHubClient() {
-  const { provider, connected } = get(wallet);
-  assert(connected, 'Wallet must be connected to create a DripsHubClient');
+  const { provider, connected, signer } = get(wallet);
 
-  return DripsHubClient.create(provider, getNetworkConfig().CONTRACT_DRIPS_HUB);
+  const dripsHubAddress = getNetworkConfig().CONTRACT_DRIPS_HUB;
+
+  return connected
+    ? DripsHubClient.create(signer, dripsHubAddress)
+    : DripsHubClient.createReadonly(provider, dripsHubAddress);
 }
 
 /**
