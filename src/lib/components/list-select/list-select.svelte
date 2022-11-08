@@ -136,10 +136,11 @@
     <div
       class="item"
       class:selected={selected.includes(slug)}
+      class:disabled={item.disabled}
       class:hidden={!Object.values(filteredItems).includes(item)}
-      on:click={() => handleItemClick(slug)}
-      on:keydown={(e) => handleKeypress(e, slug)}
-      tabindex="0"
+      on:click={item.disabled ? undefined : () => handleItemClick(slug)}
+      on:keydown={item.disabled ? undefined : (e) => handleKeypress(e, slug)}
+      tabindex={item.disabled ? undefined : 0}
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
@@ -161,7 +162,8 @@
       </div>
       <div class="content" class:action={item.type === 'action'}>
         <span class="label typo-text-bold">{item.label}</span>
-        {#if item.type === 'selectable'}<span class="text typo-text-mono-bold">{item.text}</span
+        {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono-bold"
+            >{item.text}</span
           >{/if}
       </div>
     </div>
@@ -209,7 +211,6 @@
   .item {
     padding: 0.75rem 1rem;
     user-select: none;
-    cursor: pointer;
     transition: background-color 0.3s;
   }
 
@@ -221,8 +222,16 @@
     background-color: var(--color-primary-level-1);
   }
 
-  .item:hover,
-  .item:focus {
+  .item:not(.disabled) {
+    cursor: pointer;
+  }
+
+  .item.disabled {
+    opacity: 0.5;
+  }
+
+  .item:not(.disabled):hover,
+  .item:not(.disabled):focus {
     background-color: var(--color-foreground-level-1);
     outline: none;
   }

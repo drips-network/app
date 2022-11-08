@@ -9,8 +9,7 @@ import { toUtf8String } from 'ethers/lib/utils';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { reconcileDripsSetReceivers } from './methods/reconcile-drips-set-receivers';
 import isTest from '$lib/utils/is-test';
-
-const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
+import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
 /*
 A randomly-generated uint256 that we use as the `key` value for calls to `emitUserData` on the
@@ -99,7 +98,7 @@ async function fetchIpfs(hash: string) {
     return val;
   }
 
-  return await (await fetch(`https://${IPFS_GATEWAY_DOMAIN}/ipfs/${hash}`)).json();
+  return await (await ipfsFetch(hash)).json();
 }
 
 async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
