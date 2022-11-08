@@ -72,7 +72,18 @@
       return;
     }
 
-    tableData = Object.entries(accountEstimate).map(([tokenAddress, estimate]) => {
+    let tokensToShow: string[] = [];
+
+    tokensToShow.push(...Object.keys(accountEstimate));
+    tokensToShow.push(
+      ...($streams.ownStreams?.incoming.map(
+        (stream) => stream.dripsConfig.amountPerSecond.tokenAddress,
+      ) ?? []),
+    );
+    tokensToShow = [...new Set(tokensToShow)];
+
+    tableData = tokensToShow.map((tokenAddress) => {
+      const estimate = accountEstimate?.[tokenAddress];
       const incomingTotals = getIncomingTotalsForToken(tokenAddress);
 
       return {
@@ -93,17 +104,17 @@
         streaming: {
           amount: {
             tokenAddress,
-            amount: estimate.totals.remainingBalance,
+            amount: estimate?.totals.remainingBalance ?? 0n,
           },
           amountPerSecond: {
             tokenAddress,
-            amount: -estimate.totals.totalAmountPerSecond,
+            amount: -(estimate?.totals.totalAmountPerSecond ?? 0n),
           },
           showSymbol: false,
         },
         netRate: {
           amountPerSecond: {
-            amount: incomingTotals.amountPerSecond - estimate.totals.totalAmountPerSecond,
+            amount: incomingTotals.amountPerSecond - (estimate?.totals.totalAmountPerSecond ?? 0n),
             tokenAddress,
           },
           showSymbol: false,
