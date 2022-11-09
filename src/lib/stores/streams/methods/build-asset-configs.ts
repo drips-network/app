@@ -115,8 +115,6 @@ export default function buildAssetConfigs(
           runsOutOfFunds = undefined;
         } else if (dripsSetEvent.maxEnd === 0n) {
           runsOutOfFunds = undefined;
-        } else if (dripsSetEvent.maxEnd === dripsSetEvent.blockTimestamp) {
-          runsOutOfFunds = undefined;
         } else {
           runsOutOfFunds = new Date(Number(dripsSetEvent.maxEnd) * 1000);
         }
