@@ -17,7 +17,7 @@
     const propSchema = z.object({
       address: z.string(),
       show: z.union([z.literal('none'), z.literal('name'), z.literal('symbol')]).optional(),
-      small: z.boolean().optional(),
+      size: z.union([z.literal('small'), z.literal('normal'), z.literal('huge')]).optional(),
     });
 
     props = propSchema.parse(value);
