@@ -12,7 +12,11 @@
   import type { CollectFlowState } from './collect-flow-state';
   import type { Writable } from 'svelte/store';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
+  import {
+    getAddressDriverClient,
+    getDripsHubClient,
+    getSubgraphClient,
+  } from '$lib/utils/get-drips-clients';
   import tuple from '$lib/utils/tuple';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -49,14 +53,15 @@
     assert(selectedToken);
     const { address } = selectedToken.info;
 
+    const dripsHubClient = await getDripsHubClient();
     const driverClient = await getAddressDriverClient();
     const subgraphClient = getSubgraphClient();
     const userId = await driverClient.getUserId();
 
     const calls = tuple(
-      await driverClient.dripsHub.getReceivableBalanceForUser(userId, address, 100),
-      driverClient.dripsHub.getSplittableBalanceForUser(userId, address),
-      driverClient.dripsHub.getCollectableBalanceForUser(userId, address),
+      await dripsHubClient.getReceivableBalanceForUser(userId, address, 100),
+      dripsHubClient.getSplittableBalanceForUser(userId, address),
+      dripsHubClient.getCollectableBalanceForUser(userId, address),
       subgraphClient.getSplitsConfigByUserId(userId),
     );
 

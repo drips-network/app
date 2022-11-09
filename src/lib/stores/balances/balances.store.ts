@@ -1,10 +1,11 @@
-import type { AddressDriverClient } from 'radicle-drips';
+import type { AddressDriverClient, DripsHubClient } from 'radicle-drips';
 import { get, readable, writable, type Readable } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import { estimateAccount, type AssetConfigEstimate, type StreamEstimate } from './utils/estimate';
 import tickStore from '../tick/tick.store';
 import type { Account, StreamId, UserId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
+import { getAddressDriverClient, getDripsHubClient } from '$lib/utils/get-drips-clients';
 
 interface Amount {
   amount: bigint;
@@ -25,6 +26,8 @@ const INITIAL_STATE = {
 
 export default (() => {
   let addressDriverClient: AddressDriverClient | undefined;
+  let dripsHubClient: DripsHubClient | undefined;
+
   let userId: string | undefined;
   let accounts: Readable<{ [accountId: UserId]: Account }> = readable({});
   let tickRegistration: number | undefined;
@@ -34,10 +37,10 @@ export default (() => {
    * Connect the store to a given AddressDriverClient and fetch balances.
    * @param toAddressDriverClient The AddressDriverClient to connect to.
    */
-  async function connect(toAddressDriverClient: AddressDriverClient) {
-    if (addressDriverClient) return;
+  async function connect() {
+    addressDriverClient = await getAddressDriverClient();
+    dripsHubClient = await getDripsHubClient();
 
-    addressDriverClient = toAddressDriverClient;
     userId = (await addressDriverClient.getUserId()).toString();
 
     if (!tickRegistration) tickRegistration = tickStore.register(_updateAllBalances);
@@ -70,13 +73,10 @@ export default (() => {
 
   /** Update the current receivable balances for the currently connected user. */
   async function updateBalances() {
-    assert(addressDriverClient && userId, 'Store must be connected first');
+    assert(dripsHubClient && userId, 'Store must be connected first');
 
     // TODO: Remove explicit maxCycles once SDK no longer has overflow bug with the default value
-    const allBalancesRes = await addressDriverClient.dripsHub.getAllReceivableBalancesForUser(
-      userId,
-      10000,
-    );
+    const allBalancesRes = await dripsHubClient.getAllReceivableBalancesForUser(userId, 10000);
 
     state.update((s) => ({
       ...s,

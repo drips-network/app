@@ -177,7 +177,8 @@
       });
 
       const recipientUserId = await client.getUserIdByAddress(recipientAddressValue);
-      const { signerAddress } = client;
+      const { address } = $wallet;
+      assert(address);
 
       const waitingWalletIcon = {
         component: Emoji,
@@ -202,7 +203,7 @@
             userId: recipientUserId,
           },
         ],
-        signerAddress,
+        address,
       );
 
       updateAwaitStep({
@@ -232,7 +233,7 @@
         name: streamNameValue,
       };
 
-      const accountMetadata = generateMetadata(ownAccount, client.signerAddress);
+      const accountMetadata = generateMetadata(ownAccount, address);
       const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
         (ac) => ac.tokenAddress === tokenAddress,
       );

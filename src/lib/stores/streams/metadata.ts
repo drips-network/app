@@ -214,10 +214,7 @@ export async function updateAccountMetadata(
 
   const newHash = await pinAccountMetadata(newData);
   const client = await getAddressDriverClient();
-  const tx = await client.emitUserMetadata(
-    USER_DATA_KEY,
-    ethers.utils.hexlify(ethers.utils.toUtf8Bytes(newHash)),
-  );
+  const tx = await client.emitUserMetadata(USER_DATA_KEY, newHash);
 
   return {
     newHash,

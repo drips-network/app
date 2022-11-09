@@ -57,7 +57,7 @@
       const addressDriverClient = await getAddressDriverClient();
 
       ens.lookup(address);
-      balances.connect(addressDriverClient);
+      balances.connect();
 
       try {
         await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
