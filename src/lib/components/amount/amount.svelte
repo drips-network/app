@@ -24,15 +24,6 @@
 
     return formatTokenAmount(amount, tokenDecimals, multiplier);
   }
-
-  function getPolarity(amount: bigint): '+' | '-' | undefined {
-    if (amount > 0) {
-      return '+';
-    }
-    if (amount < 0) {
-      return '-';
-    }
-  }
 </script>
 
 <div class="wrapper">
@@ -61,7 +52,7 @@
           class="amount typo-text-small-mono"
           class:positive={amountPerSecond.amount > 0}
           class:negative={amountPerSecond.amount < 0}
-          >{getPolarity(amountPerSecond.amount) ?? ''}{format(amountPerSecond)}{#if showSymbol}
+          >{format(amountPerSecond)}{#if showSymbol}
             {' ' + amountPerSecondTokenInfo.info.symbol}
           {/if}</span
         > / sec
