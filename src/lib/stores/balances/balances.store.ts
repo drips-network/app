@@ -35,7 +35,6 @@ export default (() => {
 
   /**
    * Connect the store to a given AddressDriverClient and fetch balances.
-   * @param toAddressDriverClient The AddressDriverClient to connect to.
    */
   async function connect() {
     addressDriverClient = await getAddressDriverClient();
