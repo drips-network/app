@@ -8,7 +8,7 @@ import type { Browser, Page } from 'playwright';
 import { expect } from '@playwright/test';
 import fetch from 'node-fetch';
 
-describe('top up, create stream and select', async () => {
+describe('top up, create stream', async () => {
   let server: PreviewServer;
   let browser: Browser;
   let page: Page;
@@ -49,7 +49,7 @@ describe('top up, create stream and select', async () => {
 
   describe('top-up flow', () => {
     it('connects', async () => {
-      await page.goto('http://localhost:3000/dashboard');
+      await page.goto('http://localhost:3000/app/dashboard');
 
       const dashboardHeadline = page.locator('text=Dashboard');
       await expect(dashboardHeadline).toHaveCount(1);
