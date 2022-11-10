@@ -32,7 +32,7 @@
   <HeroSection />
 
   <section class="columns">
-    <h1><em>How</em> it works</h1>
+    <h1 class="headline"><em>How</em> it works</h1>
     <div class="columns-row">
       <div class="columns-item">
         <MultiToken />
@@ -82,7 +82,7 @@
   <section class="part developers">
     <div class="left">
       <ThreeDrip />
-      <h1>Built for <em>developers</em></h1>
+      <h1 class="headline">Built for <em>developers</em></h1>
       <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
       <a class="cta" href="/app">Check out the SDK↗</a>
     </div>
@@ -93,7 +93,7 @@
 
   <DotsStarsLine>
     <div class="in-use">
-      <h1>Drips <em>in use</em></h1>
+      <h1 class="headline">Drips <em>in use</em></h1>
       <p>Some cool projects built on the Drips protocol.</p>
     </div>
   </DotsStarsLine>
@@ -124,7 +124,7 @@
   </section>
 
   <section class="part">
-    <h1>What’s <em>new</em></h1>
+    <h1 class="headline">What’s <em>new</em></h1>
     <ThreeDrip />
     <div class="links">
       <a href="#">The Drips team presented at DevCon 22</a>
@@ -144,7 +144,7 @@
   </section>
 
   <DotsStarsLine>
-    <h1>Stay <em>up to date</em></h1>
+    <h1 class="headline">Stay <em>up to date</em></h1>
     <div class="links">
       <a href="https://twitter.com/dripsnetwork">Twitter</a>
       <a href="https://discord.gg/vhGXkazpNc">Discord</a>
@@ -187,10 +187,8 @@
     color: var(--color-foreground);
   }
 
-  p,
-  h1,
-  h2 {
-    cursor: default;
+  .headline {
+    font-weight: normal;
   }
 
   @media (max-width: 768px) {
@@ -206,11 +204,6 @@
     border: var(--border-width) solid var(--color-foreground);
     padding: var(--spacing-s) 12px var(--spacing-s) var(--spacing-m);
     border-radius: var(--border-radius-pointy);
-  }
-
-  #header a#logo svg {
-    height: var(--spacing-m);
-    fill: var(--color-primary);
   }
 
   #header ul {
@@ -300,16 +293,6 @@
     justify-content: flex-end;
   }
 
-  .dots-stars {
-    background: url('/assets/dot.svg'), url('/assets/star.svg'), url('/assets/dot.svg'),
-      url('/assets/star.svg');
-    background-position: var(--spacing-m) var(--spacing-m),
-      calc(100% - var(--spacing-m)) var(--spacing-m),
-      calc(100% - var(--spacing-m)) calc(100% - var(--spacing-m)),
-      var(--spacing-m) calc(100% - var(--spacing-m));
-    background-repeat: no-repeat;
-  }
-
   em {
     font-family: var(--font-serif);
   }
@@ -385,17 +368,6 @@
   .columns-item a {
     border-bottom: 1px solid var(--color-foreground);
     padding-top: var(--spacing-s);
-  }
-
-  .columns-item img.illustration {
-    height: 200px;
-    margin-bottom: var(--spacing-s);
-  }
-
-  @media (max-width: 900px) {
-    .columns-item img.illustration {
-      height: auto;
-    }
   }
 
   .columns-item img.image {

@@ -5,7 +5,9 @@
 </script>
 
 <section class="part dots-stars">
-  <h1>An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds</h1>
+  <h1 class="headline">
+    An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds
+  </h1>
   <AppScreenshot />
   <div class="top-left"><Dot /></div>
   <div class="bottom-left"><Star /></div>
@@ -17,6 +19,11 @@
   *::selection {
     background: var(--color-primary);
     color: var(--color-foreground);
+  }
+
+  .headline {
+    font-weight: normal;
+    font-size: 100%;
   }
 
   .top-right {
