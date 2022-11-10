@@ -732,10 +732,6 @@
     stroke: var(--color-foreground);
   }
 
-  .fill-primary-dark {
-    fill: var(--color-primary-level-6);
-  }
-
   .fill-primary {
     fill: var(--color-primary);
   }

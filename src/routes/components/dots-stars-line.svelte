@@ -5,11 +5,11 @@
 
 <section class="part dots-stars">
   <div class="dots-stars-box">
-    <Dot class="bottom-right" />
-    <Star class="bottom-left" />
+    <Dot />
+    <Star />
     <slot />
-    <Star class="top-right" />
-    <Dot class="top-left" />
+    <Star />
+    <Dot />
   </div>
 </section>
 

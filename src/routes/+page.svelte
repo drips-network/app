@@ -127,12 +127,12 @@
     <h1 class="headline">What’s <em>new</em></h1>
     <ThreeDrip />
     <div class="links">
-      <a href="#">The Drips team presented at DevCon 22</a>
-      <a href="#">Drips JS-SDK ready for use!</a>
-      <a href="#">Version 0.2 released</a>
-      <a href="#">Drips get-together at EthCC</a>
-      <a href="#">The alpha version of our SDK is released</a>
-      <a href="#">Protocol v2 now on Goerli Testnet</a>
+      <a href="/">The Drips team presented at DevCon 22</a>
+      <a href="/">Drips JS-SDK ready for use!</a>
+      <a href="/">Version 0.2 released</a>
+      <a href="/">Drips get-together at EthCC</a>
+      <a href="/">The alpha version of our SDK is released</a>
+      <a href="/">Protocol v2 now on Goerli Testnet</a>
     </div>
     <div id="credit">
       <p>made by</p>

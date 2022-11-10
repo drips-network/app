@@ -126,10 +126,6 @@
     fill: var(--color-background);
   }
 
-  .fill-foreground {
-    fill: var(--color-foreground);
-  }
-
   .stroke-foreground {
     stroke: var(--color-foreground);
   }
