@@ -11,47 +11,54 @@ import {
 import { get } from 'svelte/store';
 import isTest from './is-test';
 
+/**
+ * Get an initialized Drips Subgraph client.
+ * @returns An initialized Drips Subgraph client.
+ */
 export function getSubgraphClient() {
   const { network } = get(wallet);
 
-  return isTest()
-    ? DripsSubgraphClient.create(
-        network.chainId,
-        'http://localhost:8000/subgraphs/name/drips-subgraph-mainnet-v2',
-      )
-    : DripsSubgraphClient.create(network.chainId);
+  return DripsSubgraphClient.create(network.chainId, getNetworkConfig().SUBGRAPH_URL);
 }
 
+/**
+ * Get an initialized Address Driver client.
+ * @returns An initialized Address Driver client.
+ */
 export function getAddressDriverClient() {
   const { provider, connected } = get(wallet);
-
   assert(connected, 'Wallet must be connected to create an AddressDriverClient');
 
-  return isTest()
-    ? AddressDriverClient.create(provider, '0x0165878A594ca255338adfa4d48449f69242Eb8F')
-    : AddressDriverClient.create(provider);
+  return AddressDriverClient.create(provider, getNetworkConfig().CONTRACT_ADDRESS_DRIVER);
 }
 
+/**
+ * Get an initialized Drips Hub client.
+ * @returns An initialized Drips Hub client.
+ */
 export function getDripsHubClient() {
   const { provider, connected } = get(wallet);
+  assert(connected, 'Wallet must be connected to create a DripsHubClient');
 
-  assert(connected, 'Wallet must be connected to create an AddressDriverClient');
-
-  return isTest()
-    ? DripsHubClient.create(provider, '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9')
-    : DripsHubClient.create(provider);
+  return DripsHubClient.create(provider, getNetworkConfig().CONTRACT_DRIPS_HUB);
 }
 
+/**
+ * Get an initialized Caller client.
+ * @returns An initialized Caller client.
+ */
 export function getCallerClient() {
   const { provider, connected } = get(wallet);
-
   assert(connected, 'Wallet must be connected to create a CallerClient');
 
-  return isTest()
-    ? CallerClient.create(provider, '0x5FbDB2315678afecb367f032d93F642f64180aa3')
-    : CallerClient.create(provider);
+  return CallerClient.create(provider, getNetworkConfig().CONTRACT_CALLER);
 }
 
+/**
+ * NetworkConfig object that is aware of being ran in an E2E-test environment, so that
+ * clients are initialized with addresses matching local testnet deployments. See `README`'s
+ * E2E test section.
+ */
 export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
   ? {
       5: {
@@ -76,6 +83,10 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
       ...Utils.Network.configs,
     };
 
+/**
+ * Get the networkConfig for the current network.
+ * @returns The networkConfig for the current network.
+ */
 export function getNetworkConfig() {
   const { network } = get(wallet);
 

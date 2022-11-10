@@ -6,7 +6,11 @@
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import tokens from '$lib/stores/tokens';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { getAddressDriverClient, getDripsHubClient } from '$lib/utils/get-drips-clients';
+  import {
+    getAddressDriverClient,
+    getCallerClient,
+    getNetworkConfig,
+  } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import unreachable from '$lib/utils/unreachable';
   import Emoji from 'radicle-design-system/Emoji.svelte';
@@ -19,6 +23,8 @@
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import { AddressDriverPresets } from 'radicle-drips';
+  import etherscanLink from '$lib/utils/etherscan-link';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -46,78 +52,62 @@
     };
   }
 
-  const waitingWalletIcon = {
-    component: Emoji,
-    props: {
-      emoji: '👛',
-      size: 'huge',
-    },
-  };
-
   async function receiveSplitCollect(updateAwaitStep: UpdateAwaitStepFn) {
-    // TODO: Replace with batched call once SDK supports batching.
-
-    const dripsHubClient = await getDripsHubClient();
+    const callerClient = await getCallerClient();
     const addressDriverClient = await getAddressDriverClient();
     const userId = await addressDriverClient.getUserId();
 
-    if (balances.receivable > 0) {
-      updateAwaitStep({
-        message: 'Please confirm the receiveDrips transaction in your wallet',
-        icon: waitingWalletIcon,
-      });
+    const { address: userAddress, network } = $wallet;
+    assert(userAddress);
 
-      const receiveTx = await dripsHubClient.receiveDrips(userId, tokenAddress, 100000);
+    const { CONTRACT_DRIPS_HUB, CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
-      updateAwaitStep({
-        message: 'Waiting for the receiveDrips transaction to be confirmed…',
-      });
-
-      await receiveTx.wait();
-    }
-
-    if (splittableAfterReceive > 0) {
-      updateAwaitStep({
-        message: 'Please confirm the split transaction in your wallet',
-        icon: waitingWalletIcon,
-      });
-
-      const splitTx = await dripsHubClient.split(userId, tokenAddress, splitsConfig);
-
-      updateAwaitStep({
-        message: 'Waiting for the split transaction to be confirmed…',
-      });
-
-      await splitTx.wait();
-    }
+    const batch = AddressDriverPresets.Presets.createCollectFlow({
+      driverAddress: CONTRACT_ADDRESS_DRIVER,
+      dripsHubAddress: CONTRACT_DRIPS_HUB,
+      userId,
+      tokenAddress,
+      // TODO: Replace with dynamic maxCycles
+      maxCycles: 1000,
+      currentReceivers: splitsConfig,
+      transferToAddress: userAddress,
+    });
 
     updateAwaitStep({
       message: 'Please confirm the collect transaction in your wallet',
-      icon: waitingWalletIcon,
+      icon: {
+        component: Emoji,
+        props: {
+          emoji: '👛',
+          size: 'huge',
+        },
+      },
     });
 
-    const { address: userAddress } = $wallet;
-    assert(userAddress);
-
-    const collectTx = await addressDriverClient.collect(tokenAddress, userAddress);
+    const tx = await callerClient.callBatched(batch);
 
     updateAwaitStep({
-      message: 'Waiting for the collect transaction to be confirmed…',
+      message: 'Waiting for your transaction to be confirmed…',
+      link: {
+        url: etherscanLink(network.name, tx.hash),
+        label: 'View on Etherscan',
+      },
     });
 
-    await collectTx.wait();
+    await tx.wait();
 
     context.update((c) => ({
       ...c,
-      amountCollected: 1000000000000n,
+      // TODO: Display the real value from the `Collected` event emitted during the batch call,
+      // once this is added to the subgraph client.
+      amountCollected: collectableAfterSplit,
     }));
   }
 
   function startCollect() {
     dispatch('await', {
       promise: receiveSplitCollect,
-      message: 'Please confirm the receiveDrips transaction in your wallet',
-      icon: waitingWalletIcon,
+      message: 'Getting ready to collect...',
     });
   }
 </script>
