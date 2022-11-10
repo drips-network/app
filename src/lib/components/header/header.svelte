@@ -1,13 +1,14 @@
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
   import ConnectButton from '../connect-button/connect-button.svelte';
+  import DripsLogo from '././drips-logo.svelte';
 
   $: elevated = $scroll.pos > 16;
 </script>
 
 <header class:elevated>
   <a sveltekit:prefetch href="/">
-    <img class="logo" src="/assets/logo.svg" alt="Radicle Drips logo" />
+    <DripsLogo />
   </a>
   <div class="wallet">
     <ConnectButton />
