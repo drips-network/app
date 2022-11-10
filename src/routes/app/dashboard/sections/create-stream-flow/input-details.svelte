@@ -10,18 +10,22 @@
   import { ethers } from 'ethers';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import Button from '$lib/components/button/button.svelte';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import {
+    getAddressDriverClient,
+    getCallerClient,
+    getNetworkConfig,
+  } from '$lib/utils/get-drips-clients';
   import streams from '$lib/stores/streams';
   import assert from '$lib/utils/assert';
-  import { constants, Utils } from 'radicle-drips';
+  import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import modal from '$lib/stores/modal';
   import expect from '$lib/utils/expect';
   import {
     generateMetadata,
+    pinAccountMetadata,
     streamMetadataSchema,
-    updateAccountMetadata,
   } from '$lib/stores/streams/metadata';
   import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
   import type { z } from 'zod';
@@ -141,8 +145,10 @@
   function submit() {
     const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
       modal.setHideable(false);
-      const client = await getAddressDriverClient();
-      const ownUserId = (await client.getUserId()).toString();
+
+      const callerClient = await getCallerClient();
+      const addressDriverClient = await getAddressDriverClient();
+      const ownUserId = (await addressDriverClient.getUserId()).toString();
 
       assert(
         selectedToken && amountPerSecond && recipientAddressValue && streamNameValue,
@@ -176,45 +182,9 @@
         amountPerSec: amountPerSecond,
       });
 
-      const recipientUserId = await client.getUserIdByAddress(recipientAddressValue);
+      const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddressValue);
       const { address } = $wallet;
       assert(address);
-
-      const waitingWalletIcon = {
-        component: Emoji,
-        props: {
-          emoji: '👛',
-          size: 'huge',
-        },
-      };
-
-      updateAwaitStep({
-        icon: waitingWalletIcon,
-        message: 'Waiting for you to confirm transaction 1/2 in your wallet',
-      });
-
-      const setDripsTx = await client.setDrips(
-        tokenAddress,
-        currentReceivers,
-        [
-          ...currentReceivers,
-          {
-            config: dripConfig,
-            userId: recipientUserId,
-          },
-        ],
-        address,
-      );
-
-      updateAwaitStep({
-        message: 'Waiting for transaction 1/2 to be confirmed…',
-        link: {
-          label: 'View on Etherscan',
-          url: etherscanLink($wallet.network.name, setDripsTx.hash),
-        },
-      });
-
-      await setDripsTx.wait();
 
       const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
         id: makeStreamId(ownUserId, tokenAddress, dripId.toString()),
@@ -251,25 +221,51 @@
         };
       }
 
-      updateAwaitStep({
-        icon: waitingWalletIcon,
-        message: 'Waiting for you to confirm transaction 2/2 in your wallet',
+      const newHash = await pinAccountMetadata(accountMetadata);
+
+      const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+
+      const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
+        key: 65932473927847481224664369441494644980717748729109625944182088338412766444512n,
+        driverAddress: CONTRACT_ADDRESS_DRIVER,
+        tokenAddress,
+        currentReceivers,
+        newReceivers: [
+          ...currentReceivers,
+          {
+            config: dripConfig,
+            userId: recipientUserId,
+          },
+        ],
+        value: newHash,
+        balanceDelta: 0,
+        transferToAddress: address,
       });
 
-      const { newHash, tx: updateMetadataTx } = await updateAccountMetadata(
-        accountMetadata,
-        ownAccount.lastIpfsHash,
-      );
+      const waitingWalletIcon = {
+        component: Emoji,
+        props: {
+          emoji: '👛',
+          size: 'huge',
+        },
+      };
 
       updateAwaitStep({
-        message: 'Waiting for transaction 2/2 to be confirmed…',
+        icon: waitingWalletIcon,
+        message: 'Waiting for you to confirm the transaction in your wallet...',
+      });
+
+      const tx = await callerClient.callBatched(createStreamBatchPreset);
+
+      updateAwaitStep({
+        message: 'Waiting for your transaction to be confirmed…',
         link: {
           label: 'View on Etherscan',
-          url: etherscanLink($wallet.network.name, updateMetadataTx.hash),
+          url: etherscanLink($wallet.network.name, tx.hash),
         },
       });
 
-      await updateMetadataTx.wait();
+      await tx.wait();
 
       updateAwaitStep({
         message: 'Wrapping up…',
