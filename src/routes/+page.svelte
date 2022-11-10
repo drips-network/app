@@ -5,6 +5,7 @@
   import NoWrappedTokens from './components/no-wrapped-tokens.svelte';
   import Multichain from './components/multichain.svelte';
   import GasOptimized from './components/gas-optimized.svelte';
+  import OneContract from './components/one-contract.svelte';
   import OneBalance from './components/one-balance.svelte';
   import DotsStarsLine from './components/dots-stars-line.svelte';
   import HeroSection from './components/hero-section.svelte';
@@ -37,20 +38,23 @@
       <div class="columns-item">
         <MultiToken />
         <h2 class="headline"><em>Multi-Token</em></h2>
-        <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
+        <p>Stream or split any ERC-20 like WETH, DAI or USDC.</p>
       </div>
       <div class="columns-item">
         <GasOptimized />
-        <h2 class="headline"><em>Gas-optimized for thousands of senders</em></h2>
+        <h2 class="headline"><em>Optimized for <br />1000s of senders</em></h2>
         <p>
-          Most streaming protocols focus on 1:1 streaming. Drips is instead optimized for thousands
-          of senders, like many followers streaming to one creator.
+          Most protocols focus on 1:1 streaming. Drips optimizes for thousands of senders, like many
+          followers → one creator.
         </p>
       </div>
       <div class="columns-item">
-        <GasOptimized />
-        <h2 class="headline"><em>One graph, one contract</em></h2>
-        <p>A social graph of drippers.</p>
+        <OneContract />
+        <h2 class="headline"><em>One Contract.<br />One Payment Graph.</em></h2>
+        <p>
+          Drips uses one smart contract for streaming and splitting, enabling effortless and
+          flexible token routing.
+        </p>
       </div>
     </div>
     <!-- closes columns row -->
@@ -65,14 +69,12 @@
       <div class="columns-item">
         <Multichain />
         <h2 class="headline"><em>Multi-Chain</em></h2>
-        <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism</p>
+        <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
       </div>
       <div class="columns-item">
         <OneBalance />
-        <h2 class="headline"><em>One balance for all your streams</em></h2>
-        <p>
-          Fund and top-up multiple streams using a single account balance and a single transaction.
-        </p>
+        <h2 class="headline"><em>One balance for<br />all your streams</em></h2>
+        <p>Fund multiple streams using one account balance in a single transaction.</p>
       </div>
     </div>
     <!-- closes columns row -->
