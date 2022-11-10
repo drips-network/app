@@ -65,7 +65,7 @@
         class:mono={!ens?.name}
         class:foreground={size === 'gigantic'}
         class={`${currentFontClass} identity`}
-        style:left={showAvatar ? `${currentSize + 16}px` : '0'}
+        style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
       >
         {toDisplay}
       </p>
