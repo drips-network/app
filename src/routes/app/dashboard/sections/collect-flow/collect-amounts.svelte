@@ -6,7 +6,7 @@
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import tokens from '$lib/stores/tokens';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { getAddressDriverClient, getDripsHubClient } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import unreachable from '$lib/utils/unreachable';
   import Emoji from 'radicle-design-system/Emoji.svelte';
@@ -57,8 +57,9 @@
   async function receiveSplitCollect(updateAwaitStep: UpdateAwaitStepFn) {
     // TODO: Replace with batched call once SDK supports batching.
 
-    const client = await getAddressDriverClient();
-    const userId = await client.getUserId();
+    const dripsHubClient = await getDripsHubClient();
+    const addressDriverClient = await getAddressDriverClient();
+    const userId = await addressDriverClient.getUserId();
 
     if (balances.receivable > 0) {
       updateAwaitStep({
@@ -66,7 +67,7 @@
         icon: waitingWalletIcon,
       });
 
-      const receiveTx = await client.dripsHub.receiveDrips(userId, tokenAddress, 100000);
+      const receiveTx = await dripsHubClient.receiveDrips(userId, tokenAddress, 100000);
 
       updateAwaitStep({
         message: 'Waiting for the receiveDrips transaction to be confirmed…',
@@ -81,7 +82,7 @@
         icon: waitingWalletIcon,
       });
 
-      const splitTx = await client.dripsHub.split(userId, tokenAddress, splitsConfig);
+      const splitTx = await dripsHubClient.split(userId, tokenAddress, splitsConfig);
 
       updateAwaitStep({
         message: 'Waiting for the split transaction to be confirmed…',
@@ -98,7 +99,7 @@
     const { address: userAddress } = $wallet;
     assert(userAddress);
 
-    const collectTx = await client.collect(tokenAddress, userAddress);
+    const collectTx = await addressDriverClient.collect(tokenAddress, userAddress);
 
     updateAwaitStep({
       message: 'Waiting for the collect transaction to be confirmed…',

@@ -7,6 +7,8 @@ import { Utils } from 'radicle-drips';
 
 // https://github.com/vitejs/vite/issues/7257#issuecomment-1079579892
 import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
+import testnetMockProvider from './__test__/local-testnet-mock-provider';
+import isTest from '$lib/utils/is-test';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
 const DEFAULT_NETWORK: Network = {
@@ -25,10 +27,10 @@ const WEB_3_MODAL_PROVIDER_OPTIONS = {
   },
 };
 
-interface ConnectedWalletStoreState {
+export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
-  provider: ethers.providers.Web3Provider;
+  provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
   signer: ethers.Signer;
   network: Network;
 }
@@ -58,7 +60,7 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
   provider: new ethers.providers.InfuraProvider(),
 };
 
-export default (() => {
+const walletStore = () => {
   const state = writable<WalletStoreState>(INITIAL_STATE);
 
   let web3Modal: Web3Modal;
@@ -165,4 +167,28 @@ export default (() => {
     connect,
     disconnect,
   };
-})();
+};
+
+const mockWalletStore = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const address = (window as any).playwrightAddress ?? '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
+  const provider = testnetMockProvider(address);
+
+  const state = writable<ConnectedWalletStoreState>({
+    connected: true,
+    address,
+    provider,
+    signer: provider.getSigner(),
+    network: provider.network,
+  });
+
+  return {
+    subscribe: state.subscribe,
+    initialize: () => undefined,
+    connect: () => undefined,
+    disconnect: () => undefined,
+  };
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default isTest() ? mockWalletStore() : walletStore();
