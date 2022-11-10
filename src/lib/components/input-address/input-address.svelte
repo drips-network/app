@@ -5,7 +5,9 @@
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import { createEventDispatcher } from 'svelte';
 
-  export let value: string;
+  export let value: string | undefined = undefined;
+  export let validatedValue: string | undefined = undefined;
+
   export let exclude: {
     addresses: string[];
     msg: string;
@@ -16,13 +18,12 @@
 
   const dispatch = createEventDispatcher();
 
-  let addressValue: string | undefined;
   let addressValidationState: TextInputValidationState = { type: 'unvalidated' };
 
   async function validateAddress(input: string | undefined) {
     if (!input) {
       addressValidationState = { type: 'unvalidated' };
-      addressValue = undefined;
+      validatedValue = undefined;
       return;
     }
 
@@ -37,14 +38,14 @@
 
       if (result) {
         const [address] = result;
-        addressValue = address;
+        validatedValue = address;
         value = address;
 
         addressValidationState = {
           type: 'valid',
         };
       } else {
-        addressValue = undefined;
+        validatedValue = undefined;
         addressValidationState = {
           type: 'invalid',
           message: 'Unable to resolve ENS name',
@@ -52,7 +53,7 @@
       }
     } else if (input && ethers.utils.isAddress(input)) {
       // is address
-      addressValue = input;
+      validatedValue = input;
 
       if (exclude.addresses.includes(input)) {
         // is excluded!
@@ -68,7 +69,7 @@
       }
     } else {
       // invalid
-      addressValue = undefined;
+      validatedValue = undefined;
       addressValidationState = {
         type: 'invalid',
         message: 'Enter either an ENS name or valid Ethereum address',
