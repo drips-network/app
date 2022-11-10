@@ -26,7 +26,7 @@
       >
     </AccountMenuItem>
     <Divider />
-    <AccountMenuItem icon={SettingsIcon} href="/app/settings">
+    <AccountMenuItem icon={SettingsIcon} href="/settings">
       <svelte:fragment slot="title">Settings</svelte:fragment>
     </AccountMenuItem>
   {/if}

@@ -5,7 +5,7 @@
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Table from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
-  import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
+  import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
@@ -16,46 +16,82 @@
   import InputDetails from './create-stream-flow/input-details.svelte';
   import balances from '$lib/stores/balances';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
 
   interface OutgoingStreamTableRow {
     name: string;
     toAddress: string;
     amount: AmountCellData;
+    token: TokenCellData;
   }
 
   interface IncomingStreamTableRow {
     name: string;
     fromAddress: string;
     amount: AmountCellData;
+    token: TokenCellData;
   }
 
   let outgoingTableData: OutgoingStreamTableRow[] = [];
   let incomingTableData: IncomingStreamTableRow[] = [];
 
   function updateTable() {
-    outgoingTableData = ($streams.ownStreams?.outgoing ?? []).map((stream) => ({
-      name: stream.name ?? 'Unnamed stream',
-      toAddress: stream.receiver.address,
-      amount: {
-        amount: {
-          amount: balances.getEstimateByStreamId(stream.id)?.totalStreamed ?? 0n,
-          tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
-        },
-        amountPerSecond: stream.dripsConfig.amountPerSecond,
-      },
-    }));
+    outgoingTableData = mapFilterUndefined($streams.ownStreams?.outgoing ?? [], (stream) => {
+      const estimate = balances.getEstimateByStreamId(stream.id);
+      if (!estimate) return undefined;
 
-    incomingTableData = ($streams.ownStreams?.incoming ?? []).map((stream) => ({
-      name: stream.name ?? 'Unnamed stream',
-      fromAddress: stream.sender.address,
-      amount: {
-        amountPerSecond: stream.dripsConfig.amountPerSecond,
+      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+
+      return {
+        name: stream.name ?? 'Unnamed stream',
+        toAddress: stream.receiver.address,
         amount: {
-          amount: balances.getEstimateByStreamId(stream.id)?.totalStreamed ?? 0n,
-          tokenAddress: stream.dripsConfig.amountPerSecond.tokenAddress,
+          amount: {
+            amount: estimate.totalStreamed,
+            tokenAddress,
+          },
+          amountPerSecond: {
+            amount: estimate.currentAmountPerSecond,
+            tokenAddress,
+          },
+          showSymbol: false,
         },
-      },
-    }));
+        token: {
+          address: tokenAddress,
+          small: true,
+          show: 'symbol',
+        },
+      };
+    });
+
+    incomingTableData = mapFilterUndefined($streams.ownStreams?.incoming ?? [], (stream) => {
+      const estimate = balances.getEstimateByStreamId(stream.id);
+      if (!estimate) return undefined;
+
+      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+
+      return {
+        name: stream.name ?? 'Unnamed stream',
+        fromAddress: stream.sender.address,
+        amount: {
+          amountPerSecond: {
+            amount: estimate.currentAmountPerSecond,
+            tokenAddress,
+          },
+          amount: {
+            amount: estimate.totalStreamed,
+            tokenAddress,
+          },
+          showSymbol: false,
+        },
+        token: {
+          address: tokenAddress,
+          small: true,
+          show: 'symbol',
+        },
+      };
+    });
   }
 
   $: {
@@ -70,18 +106,28 @@
       header: 'Name',
       cell: (info) => info.getValue(),
       enableSorting: false,
+      size: (100 / 24) * 8,
     },
     {
       accessorKey: 'toAddress',
       header: 'To',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'amount',
-      header: 'Amount streamed',
-      cell: () => Amount,
+      header: 'Total streamed',
+      cell: () => AmountCell,
       enableSorting: false,
+      size: (100 / 24) * 6,
+    },
+    {
+      accessorKey: 'token',
+      header: 'Token',
+      cell: () => TokenCell,
+      enableSorting: false,
+      size: (100 / 24) * 3,
     },
   ];
 
@@ -91,18 +137,28 @@
       header: 'Name',
       cell: (info) => info.getValue(),
       enableSorting: false,
+      size: (100 / 24) * 8,
     },
     {
       accessorKey: 'fromAddress',
       header: 'From',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'amount',
       header: 'Amount earned',
-      cell: () => Amount,
+      cell: () => AmountCell,
       enableSorting: false,
+      size: (100 / 24) * 6,
+    },
+    {
+      accessorKey: 'token',
+      header: 'Token',
+      cell: () => TokenCell,
+      enableSorting: false,
+      size: (100 / 24) * 3,
     },
   ];
 

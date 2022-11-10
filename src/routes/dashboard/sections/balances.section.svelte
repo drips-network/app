@@ -5,7 +5,7 @@
 
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Table from '$lib/components/table/table.svelte';
-  import TokenCell from '$lib/components/table/cells/token.cell.svelte';
+  import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
   import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
@@ -18,7 +18,8 @@
   import SelectTokenStep from './top-up-flow/select-token.svelte';
   import topUpFlowState from './top-up-flow/top-up-flow-state';
   import EnterAmountStep from './top-up-flow/enter-amount.svelte';
-  import Approve from './top-up-flow/approve.svelte';
+  import ApproveStep from './top-up-flow/approve.svelte';
+  import SelectCollectTokenStep from './collect-flow/select-token.svelte';
   import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import { ethers } from 'ethers';
@@ -26,9 +27,13 @@
   import assert from '$lib/utils/assert';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { onMount } from 'svelte';
+  import CollectAmountsStep from './collect-flow/collect-amounts.svelte';
+  import collectFlowState from './collect-flow/collect-flow-state';
+  import FetchDripsCycleStep from './collect-flow/fetch-drips-cycle.svelte';
+  import Success from './collect-flow/success.svelte';
 
   interface TokenTableRow {
-    token: string;
+    token: TokenCellData;
     earnings: AmountCellData;
     streaming: AmountCellData;
     netRate: AmountCellData;
@@ -76,11 +81,24 @@
       return;
     }
 
-    tableData = Object.entries(accountEstimate).map(([tokenAddress, estimate]) => {
+    let tokensToShow: string[] = [];
+
+    tokensToShow.push(...Object.keys(accountEstimate));
+    tokensToShow.push(
+      ...($streams.ownStreams?.incoming.map(
+        (stream) => stream.dripsConfig.amountPerSecond.tokenAddress,
+      ) ?? []),
+    );
+    tokensToShow = [...new Set(tokensToShow)];
+
+    tableData = tokensToShow.map((tokenAddress) => {
+      const estimate = accountEstimate?.[tokenAddress];
       const incomingTotals = getIncomingTotalsForToken(tokenAddress);
 
       return {
-        token: tokenAddress,
+        token: {
+          address: tokenAddress,
+        },
         earnings: {
           amount: {
             amount: incomingTotals.totalEarned,
@@ -95,17 +113,17 @@
         streaming: {
           amount: {
             tokenAddress,
-            amount: estimate.totals.remainingBalance,
+            amount: estimate?.totals.remainingBalance ?? 0n,
           },
           amountPerSecond: {
             tokenAddress,
-            amount: -estimate.totals.totalAmountPerSecond,
+            amount: -(estimate?.totals.totalAmountPerSecond ?? 0n),
           },
           showSymbol: false,
         },
         netRate: {
           amountPerSecond: {
-            amount: incomingTotals.amountPerSecond - estimate.totals.totalAmountPerSecond,
+            amount: incomingTotals.amountPerSecond - (estimate?.totals.totalAmountPerSecond ?? 0n),
             tokenAddress,
           },
           showSymbol: false,
@@ -125,24 +143,28 @@
       header: 'Token',
       cell: () => TokenCell,
       enableSorting: false,
+      size: (100 / 24) * 8,
     },
     {
       accessorKey: 'earnings',
       header: 'Earnings',
       cell: () => Amount,
       enableSorting: false,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'streaming',
       header: 'Streaming',
       cell: () => Amount,
       enableSorting: false,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'netRate',
       header: 'Net rate',
       cell: () => Amount,
       enableSorting: false,
+      size: (100 / 24) * 2,
     },
   ];
 
@@ -190,7 +212,7 @@
                 props: undefined,
               }),
               makeStep({
-                component: Approve,
+                component: ApproveStep,
                 props: undefined,
               }),
               makeStep({
@@ -210,7 +232,29 @@
         label: 'Top up',
       },
       {
-        handler: () => undefined,
+        handler: () => {
+          modal.show(Stepper, undefined, {
+            context: collectFlowState,
+            steps: [
+              makeStep({
+                component: SelectCollectTokenStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: FetchDripsCycleStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: CollectAmountsStep,
+                props: undefined,
+              }),
+              makeStep({
+                component: Success,
+                props: undefined,
+              }),
+            ],
+          });
+        },
         icon: CollectIcon,
         label: 'Collect',
       },

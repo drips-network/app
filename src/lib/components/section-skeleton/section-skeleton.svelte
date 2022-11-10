@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
-  import { tick } from 'svelte';
+  import { tick, onDestroy } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
 
   export let loaded = false;
@@ -14,7 +14,9 @@
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
 
-  let containerHeight = tweened(256, {
+  const initHeight = 256;
+
+  let containerHeight = tweened(initHeight, {
     duration: 300,
     easing: cubicInOut,
   });
@@ -23,16 +25,34 @@
 
   let contentContainerElem: HTMLDivElement;
 
+  let observer: MutationObserver;
+  function observeContentChanges() {
+    observer?.disconnect();
+    if (!contentContainerElem) return;
+
+    observer = new MutationObserver(() => updateContainerHeight());
+    observer.observe(contentContainerElem, { childList: true });
+  }
+  onDestroy(() => observer?.disconnect());
+
+  $: {
+    contentContainerElem;
+    observeContentChanges();
+  }
+
   $: {
     if (loaded && !empty) {
       updateContainerHeight();
     }
+    if (!loaded) {
+      updateContainerHeight(initHeight);
+    }
   }
 
-  async function updateContainerHeight() {
+  async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
-    const newHeight = contentContainerElem.getBoundingClientRect().height;
+    newHeight = newHeight ?? contentContainerElem.offsetHeight;
     containerHeight.set(newHeight);
   }
 </script>

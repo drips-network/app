@@ -29,6 +29,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
+    "@vitest/coverage-c8": "^0.24.5",
     "autoprefixer": "^10.4.9",
     "eslint": "^8.23.1",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -59,7 +60,7 @@
     "@walletconnect/web3-provider": "^1.8.0",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.0",
-    "radicle-design-system": "https://github.com/radicle-dev/radicle-design-system",
+    "radicle-design-system": "github:radicle-dev/radicle-design-system",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#v2",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"

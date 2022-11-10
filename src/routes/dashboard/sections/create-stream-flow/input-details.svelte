@@ -9,7 +9,6 @@
   import tokens from '$lib/stores/tokens';
   import { ethers } from 'ethers';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import ens from '$lib/stores/ens';
   import Button from '$lib/components/button/button.svelte';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import streams from '$lib/stores/streams';
@@ -33,6 +32,7 @@
   import Token from '$lib/components/token/token.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import formatTokenAmount from '$lib/utils/format-token-amount';
+  import InputAddress from '$lib/components/input-address/input-address.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -40,54 +40,12 @@
 
   // Recipient Address
 
-  let recipientAddressValue: string;
-  let recipientAddress: string | undefined;
+  let recipientAddressValue = '';
   let recipientAddressValidationState: TextInputValidationState = { type: 'unvalidated' };
 
-  async function updateReceipientAddress(value: string | undefined) {
-    if (!value) {
-      recipientAddressValidationState = { type: 'unvalidated' };
-      recipientAddress = undefined;
-      return;
-    }
-
-    if (value.endsWith('.eth')) {
-      recipientAddressValidationState = {
-        type: 'pending',
-      };
-
-      await ens.reverseLookup(value);
-      const result = Object.entries($ens).find((item) => item[1].name === value);
-
-      if (result) {
-        const [address] = result;
-        recipientAddress = address;
-        recipientAddressValue = address;
-
-        recipientAddressValidationState = {
-          type: 'valid',
-        };
-      } else {
-        recipientAddress = undefined;
-        recipientAddressValidationState = {
-          type: 'invalid',
-          message: 'Unable to resolve ENS name',
-        };
-      }
-    } else if (value && ethers.utils.isAddress(value)) {
-      recipientAddress = value;
-      recipientAddressValidationState = {
-        type: 'valid',
-      };
-    } else {
-      recipientAddress = undefined;
-      recipientAddressValidationState = {
-        type: 'invalid',
-        message: 'Enter either an ENS name or valid Ethereum address',
-      };
-    }
+  function onAddressValidationChange(event: CustomEvent) {
+    recipientAddressValidationState = event.detail ?? { type: 'unvalidated' };
   }
-  $: updateReceipientAddress(recipientAddressValue);
 
   // Token dropdown
 
@@ -106,9 +64,9 @@
           image: {
             component: Token,
             props: {
-              hideName: true,
+              show: 'none',
               address: token.info.address,
-              small: true,
+              size: 'small',
             },
           },
         },
@@ -152,10 +110,20 @@
         type: 'unvalidated',
       };
     } else if (streamEndDateValue.match(validationRegex)) {
-      streamEndDateValidationState = {
-        type: 'valid',
-      };
-      streamEndDate = new Date(streamEndDateValue);
+      const parsed = new Date(streamEndDateValue);
+      const isInFuture = new Date().getTime() < parsed.getTime();
+
+      if (isInFuture) {
+        streamEndDateValidationState = {
+          type: 'valid',
+        };
+        streamEndDate = new Date(streamEndDateValue);
+      } else {
+        streamEndDateValidationState = {
+          type: 'invalid',
+          message: 'The end date must be a valid date in the future.',
+        };
+      }
     } else {
       streamEndDateValidationState = {
         type: 'invalid',
@@ -177,7 +145,7 @@
       const ownUserId = (await client.getUserId()).toString();
 
       assert(
-        selectedToken && amountPerSecond && recipientAddress && streamNameValue,
+        selectedToken && amountPerSecond && recipientAddressValue && streamNameValue,
         "Form isn't valid",
       );
 
@@ -196,7 +164,7 @@
       }));
 
       const duration = streamEndDate
-        ? BigInt((streamEndDate.getTime() - new Date().getTime()) / 1000)
+        ? BigInt(Math.floor((streamEndDate.getTime() - new Date().getTime()) / 1000))
         : 0n;
 
       const dripId = ethers.BigNumber.from(ethers.utils.randomBytes(4)).toBigInt();
@@ -208,7 +176,7 @@
         amountPerSec: amountPerSecond,
       });
 
-      const recipientUserId = await client.getUserIdByAddress(recipientAddress);
+      const recipientUserId = await client.getUserIdByAddress(recipientAddressValue);
       const { signerAddress } = client;
 
       const waitingWalletIcon = {
@@ -328,7 +296,7 @@
 </script>
 
 <StepLayout>
-  <StreamVisual fromAddress={$wallet.address} toAddress={recipientAddress} {amountPerSecond} />
+  <StreamVisual fromAddress={$wallet.address} toAddress={recipientAddressValue} {amountPerSecond} />
   <StepHeader
     headline="Create stream"
     description="Stream any ERC-20 token to anyone with an Ethereum address."
@@ -337,11 +305,9 @@
     <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
   </FormField>
   <FormField title="Stream to*">
-    <TextInput
-      showSuccessCheck
-      validationState={recipientAddressValidationState}
+    <InputAddress
       bind:value={recipientAddressValue}
-      placeholder="ENS name or ETH address"
+      on:validationChange={onAddressValidationChange}
     />
   </FormField>
   <FormField title="Token*">

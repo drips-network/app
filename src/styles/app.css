@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.overlay {
+  @apply top-0 left-0 w-full h-full;
+}
+
+/* hide input[number] arrows */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
 @font-face {
   font-family: 'Redaction 35';
   font-weight: 400;

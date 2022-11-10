@@ -12,6 +12,11 @@
   import { derived } from 'svelte/store';
   import tick from '$lib/stores/tick/tick.store';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
+  import themeStore from '$lib/stores/theme/theme.store';
+  import PageTransition from '$lib/components/page-transition/page-transition.svelte';
+  import { navigating } from '$app/stores';
+
+  export let data: { pathname: string };
 
   let walletConnected = false;
   let loaded = false;
@@ -123,9 +128,14 @@
 {/if}
 
 {#if loaded && !fatalError}
-  <ModalLayout />
-  <div class="page">
-    <slot />
+  <div class="main" data-theme={$themeStore.currentTheme}>
+    <ModalLayout />
+    <div class="page" class:loading={$navigating}>
+      <PageTransition pathname={data.pathname}>
+        <slot />
+      </PageTransition>
+    </div>
+    <Header />
   </div>
   <Header />
 {/if}
@@ -167,9 +177,16 @@
   }
 
   .page {
+    position: relative;
+    min-height: 100vh;
     max-width: 64rem;
     width: 100vw;
     padding: 6rem 1rem 4rem 1rem;
     margin: 0 auto;
+    transition: opacity 0.3s;
+  }
+
+  .loading {
+    opacity: 0.5s;
   }
 </style>

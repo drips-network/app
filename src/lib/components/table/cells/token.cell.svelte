@@ -1,22 +1,27 @@
+<script lang="ts" context="module">
+  export type TokenCellData = Token['$$prop_def'];
+</script>
+
 <script lang="ts">
   import type { CellContext } from '@tanstack/svelte-table';
-  import { utils } from 'ethers';
   import Token from '$lib/components/token/token.svelte';
+  import { z } from 'zod';
 
   export let context: CellContext<unknown, unknown>;
 
-  let address: string;
+  let props: Token['$$prop_def'];
+
   $: {
     const value = context.getValue();
 
-    if (!(typeof value === 'string' && utils.isAddress(value))) {
-      throw new Error('Token Cell received a non-address value');
-    }
+    const propSchema = z.object({
+      address: z.string(),
+      show: z.union([z.literal('none'), z.literal('name'), z.literal('symbol')]).optional(),
+      small: z.boolean().optional(),
+    });
 
-    address = value;
+    props = propSchema.parse(value);
   }
 </script>
 
-{#if address}
-  <Token {address} />
-{/if}
+<Token {...props} />

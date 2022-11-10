@@ -10,6 +10,9 @@
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
+  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   // TODO: Get current balance of ERC-20, validate input accordingly
 
@@ -18,9 +21,12 @@
   export let context: Writable<TopUpFlowState>;
 
   $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) : undefined;
+  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
 
   let amountValue = '0';
+  let validationState: TextInputValidationState = {
+    type: 'unvalidated',
+  };
 
   let amount: bigint | undefined = undefined;
   $: {
@@ -31,6 +37,24 @@
     amount = amountValue
       ? ethers.utils.parseUnits(amountValue, tokenInfo.info.decimals).toBigInt()
       : undefined;
+
+    const { tokenBalance } = $context;
+
+    if (amount) {
+      if (tokenBalance && amount < tokenBalance) {
+        validationState = { type: 'valid' };
+      } else {
+        validationState = {
+          type: 'invalid',
+          message: `You only have ${ethers.utils.formatUnits(
+            tokenBalance ?? 0n,
+            tokenInfo.info.decimals,
+          )} ${tokenInfo.info.symbol} in your wallet.`,
+        };
+      }
+    } else {
+      validationState = { type: 'unvalidated' };
+    }
   }
 
   function submit() {
@@ -54,20 +78,21 @@
 </script>
 
 <StepLayout>
+  <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
   <StepHeader
-    emoji="💸"
     headline={`Top up ${tokenInfo?.info.name ?? ''}`}
     description="Add funds to your Drips account in order to start streaming."
   />
   <FormField title="Amount">
     <TextInput
       bind:value={amountValue}
+      {validationState}
       variant={{ type: 'number', min: 0 }}
       suffix={tokenInfo?.info.symbol}
     />
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={submit} disabled={!amount}
+    <Button on:click={submit} disabled={validationState.type !== 'valid'}
       >Top up {amountValue} {tokenInfo?.info.symbol ?? ''}</Button
     >
   </svelte:fragment>
