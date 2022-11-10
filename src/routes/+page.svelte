@@ -49,8 +49,12 @@
       </div>
       <div class="columns-item">
         <GasOptimized />
-        <h2 class="headline"><em>One graph, one contract</em></h2>
-        <p>A social graph of drippers.</p>
+        <h2 class="headline"><em>One Contract. One Payment Graph.</em></h2>
+        <p>
+          Drips utilizes only one smart contract behind the scenes, for both streaming and splitting
+          funds. This allows users to effortlessly route funds between accounts in a very flexible
+          way.
+        </p>
       </div>
     </div>
     <!-- closes columns row -->
