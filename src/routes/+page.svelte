@@ -36,12 +36,12 @@
     <div class="columns-row">
       <div class="columns-item">
         <MultiToken />
-        <h2><em>Multi-Token</em></h2>
+        <h2 class="headline"><em>Multi-Token</em></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
       </div>
       <div class="columns-item">
         <GasOptimized />
-        <h2><em>Gas-optimized for thousands of senders</em></h2>
+        <h2 class="headline"><em>Gas-optimized for thousands of senders</em></h2>
         <p>
           Most streaming protocols focus on 1:1 streaming. Drips is instead optimized for thousands
           of senders, like many followers streaming to one creator.
@@ -49,7 +49,7 @@
       </div>
       <div class="columns-item">
         <GasOptimized />
-        <h2><em>One graph, one contract</em></h2>
+        <h2 class="headline"><em>One graph, one contract</em></h2>
         <p>A social graph of drippers.</p>
       </div>
     </div>
@@ -57,19 +57,19 @@
     <div class="columns-row">
       <div class="columns-item">
         <NoWrappedTokens />
-        <h2><em>No need to wrap tokens</em></h2>
+        <h2 class="headline"><em>No need to wrap tokens</em></h2>
         <p>
           Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your tokens.
         </p>
       </div>
       <div class="columns-item">
         <Multichain />
-        <h2><em>Multi-Chain</em></h2>
+        <h2 class="headline"><em>Multi-Chain</em></h2>
         <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism</p>
       </div>
       <div class="columns-item">
         <OneBalance />
-        <h2><em>One balance for all your streams</em></h2>
+        <h2 class="headline"><em>One balance for all your streams</em></h2>
         <p>
           Fund and top-up multiple streams using a single account balance and a single transaction.
         </p>
@@ -102,7 +102,7 @@
     <div class="columns-row">
       <div class="columns-item card">
         <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
-        <h2><em>Crowdfunding</em></h2>
+        <h2 class="headline"><em>Crowdfunding</em></h2>
         <p>
           <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
         </p>
@@ -110,13 +110,13 @@
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
-        <h2><em>DAO payments</em></h2>
+        <h2 class="headline"><em>DAO payments</em></h2>
         <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
         <a href="http://wonderverse.xyz">wonderverse.xyz</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
-        <h2><em>Grant Splitting</em></h2>
+        <h2 class="headline"><em>Grant Splitting</em></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
         <a href="http://gitcoin.co">gitcoin.co</a>
       </div>
