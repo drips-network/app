@@ -30,9 +30,7 @@ export default function formatTokenAmount(
   tokenDecimals: number,
   precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
 ) {
-  const parsed = Math.abs(
-    parseFloat(utils.formatUnits(amount.amount / precisionMultiplier, tokenDecimals)),
-  );
+  const parsed = parseFloat(utils.formatUnits(amount.amount / precisionMultiplier, tokenDecimals));
   const decimalCount = countDecimals(parsed);
 
   return `${parsed.toFixed(

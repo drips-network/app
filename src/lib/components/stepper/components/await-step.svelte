@@ -23,7 +23,7 @@
   export let icon:
     | { component: typeof SvelteComponent; props: Record<string, unknown> }
     | undefined = undefined;
-  export let promise: (updateFn: UpdateAwaitStepFn) => Promise<void>;
+  export let promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
 
   const updateFn: UpdateAwaitStepFn = (params) => {
     message = params.message ?? message;

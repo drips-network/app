@@ -33,7 +33,7 @@
           props: {
             show: 'none',
             address: token.info.address,
-            small: true,
+            size: 'small',
           },
         },
       },

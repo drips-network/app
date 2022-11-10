@@ -10,8 +10,7 @@ import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-
 import { toUtf8String } from 'ethers/lib/utils';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { reconcileDripsSetReceivers } from './methods/reconcile-drips-set-receivers';
-
-const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
+import { fetchIpfs } from '$lib/utils/ipfs';
 
 /*
 A randomly-generated uint256 that we use as the `key` value for calls to `emitUserData` on the
@@ -94,10 +93,6 @@ export async function fetchAccountMetadataHash(userId: UserId): Promise<string |
   }
 }
 
-async function fetchIpfs(hash: string) {
-  return await (await fetch(`https://${IPFS_GATEWAY_DOMAIN}/ipfs/${hash}`)).json();
-}
-
 async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
   const res = await fetch('/api/ipfs/pin', {
     method: 'POST',
@@ -118,7 +113,7 @@ async function fetchAccountMetadata(
   let accountMetadataRes: Awaited<ReturnType<typeof fetchIpfs>>;
 
   try {
-    accountMetadataRes = await fetchIpfs(metadataHash);
+    accountMetadataRes = await (await fetchIpfs(metadataHash)).json();
   } catch (e) {
     return undefined;
   }

@@ -16,7 +16,7 @@ export type UpdateAwaitStepFn = (params: UpdateAwaitStepParams) => void;
 
 export interface AwaitPendingPayload extends UpdateAwaitStepParams {
   message: string;
-  promise: (updateFn: UpdateAwaitStepFn) => Promise<void>;
+  promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
 }
 
 export interface MovePayload {

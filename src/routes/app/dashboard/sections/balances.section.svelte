@@ -18,12 +18,17 @@
   import SelectTokenStep from './top-up-flow/select-token.svelte';
   import topUpFlowState from './top-up-flow/top-up-flow-state';
   import EnterAmountStep from './top-up-flow/enter-amount.svelte';
-  import Approve from './top-up-flow/approve.svelte';
+  import ApproveStep from './top-up-flow/approve.svelte';
+  import SelectCollectTokenStep from './collect-flow/select-token.svelte';
   import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import { ethers } from 'ethers';
   import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
+  import CollectAmountsStep from './collect-flow/collect-amounts.svelte';
+  import collectFlowState from './collect-flow/collect-flow-state';
+  import FetchDripsCycleStep from './collect-flow/fetch-drips-cycle.svelte';
+  import Success from './collect-flow/success.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -205,7 +210,7 @@
                     props: undefined,
                   }),
                   makeStep({
-                    component: Approve,
+                    component: ApproveStep,
                     props: undefined,
                   }),
                   makeStep({
@@ -225,7 +230,29 @@
             label: 'Top up',
           },
           {
-            handler: () => undefined,
+            handler: () => {
+              modal.show(Stepper, undefined, {
+                context: collectFlowState,
+                steps: [
+                  makeStep({
+                    component: SelectCollectTokenStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: FetchDripsCycleStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: CollectAmountsStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: Success,
+                    props: undefined,
+                  }),
+                ],
+              });
+            },
             icon: CollectIcon,
             label: 'Collect',
           },
