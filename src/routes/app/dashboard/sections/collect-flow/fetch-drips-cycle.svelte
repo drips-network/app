@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { getDripsHubClient } from '$lib/utils/get-drips-clients';
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { CollectFlowState } from './collect-flow-state';
@@ -11,9 +11,9 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   async function fetchDripsCycle() {
-    const client = await getAddressDriverClient();
+    const client = await getDripsHubClient();
 
-    const cycleDurationMillis = (await client.dripsHub.cycleSecs()) * 1000;
+    const cycleDurationMillis = (await client.cycleSecs()) * 1000;
     const currentCycleMillis = new Date().getTime() % cycleDurationMillis;
     const currentCycleStart = new Date().getTime() - currentCycleMillis;
 

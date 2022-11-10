@@ -177,7 +177,8 @@
       });
 
       const recipientUserId = await client.getUserIdByAddress(recipientAddressValue);
-      const { signerAddress } = client;
+      const { address } = $wallet;
+      assert(address);
 
       const waitingWalletIcon = {
         component: Emoji,
@@ -202,7 +203,7 @@
             userId: recipientUserId,
           },
         ],
-        signerAddress,
+        address,
       );
 
       updateAwaitStep({
@@ -232,7 +233,7 @@
         name: streamNameValue,
       };
 
-      const accountMetadata = generateMetadata(ownAccount, client.signerAddress);
+      const accountMetadata = generateMetadata(ownAccount, address);
       const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
         (ac) => ac.tokenAddress === tokenAddress,
       );
@@ -322,47 +323,43 @@
   </FormField>
   <div class="form-row">
     <FormField title="Stream rate*">
-      <div class="form-row">
-        <div>
-          <TextInput
-            suffix={selectedToken?.info.symbol}
-            bind:value={amountValue}
-            variant={{ type: 'number', min: 0 }}
-            placeholder="Amount"
-          />
-        </div>
-        <div>
-          <Dropdown
-            bind:value={selectedMultiplier}
-            options={[
-              {
-                value: '1',
-                title: '/ second',
-              },
-              {
-                value: '3600',
-                title: '/ hour',
-              },
-              {
-                value: '86400',
-                title: '/ day',
-              },
-              {
-                value: '604800',
-                title: '/ week',
-              },
-              {
-                value: '2592000',
-                title: '/ 30 days',
-              },
-              {
-                value: '31536000',
-                title: '/ year',
-              },
-            ]}
-          />
-        </div>
-      </div>
+      <TextInput
+        suffix={selectedToken?.info.symbol}
+        bind:value={amountValue}
+        variant={{ type: 'number', min: 0 }}
+        placeholder="Amount"
+      />
+    </FormField>
+    <FormField title="Amount per*">
+      <Dropdown
+        bind:value={selectedMultiplier}
+        options={[
+          {
+            value: '1',
+            title: '/ second',
+          },
+          {
+            value: '3600',
+            title: '/ hour',
+          },
+          {
+            value: '86400',
+            title: '/ day',
+          },
+          {
+            value: '604800',
+            title: '/ week',
+          },
+          {
+            value: '2592000',
+            title: '/ 30 days',
+          },
+          {
+            value: '31536000',
+            title: '/ year',
+          },
+        ]}
+      />
     </FormField>
   </div>
   <FormField title="Stream end date">
@@ -381,10 +378,6 @@
   .form-row {
     display: flex;
     gap: 1rem;
-  }
-
-  .form-row * {
-    flex: 1;
   }
 
   .list-container {

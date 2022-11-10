@@ -7,7 +7,6 @@
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
   import balances from '$lib/stores/balances/balances.store';
-  import { AddressDriverClient } from 'radicle-drips';
   import streams from '$lib/stores/streams/streams.store';
   import { derived } from 'svelte/store';
   import tick from '$lib/stores/tick/tick.store';
@@ -15,6 +14,7 @@
   import themeStore from '$lib/stores/theme/theme.store';
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 
   export let data: { pathname: string };
 
@@ -45,10 +45,10 @@
     walletConnected = connected;
 
     if (connected) {
-      const addressDriverClient = await AddressDriverClient.create(provider);
+      const addressDriverClient = await getAddressDriverClient();
 
       ens.lookup(address);
-      balances.connect(addressDriverClient);
+      balances.connect();
 
       try {
         await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
