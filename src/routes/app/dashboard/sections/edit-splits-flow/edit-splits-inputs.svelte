@@ -33,7 +33,6 @@
   let userId: string;
   let splitsInputs: SplitInput[] = [emptyRow(), emptyRow()];
   let currentSplits: SplitsEntry[] | undefined;
-  let loadingError = false;
   let validationError: string;
 
   const init = async () => {
@@ -44,28 +43,22 @@
 
   async function getCurrentSplits(userId: UserId) {
     currentSplits = undefined;
-    loadingError = false;
 
-    try {
-      const subgraphClient = getSubgraphClient();
-      currentSplits = await subgraphClient.getSplitsConfigByUserId(userId);
+    const subgraphClient = getSubgraphClient();
+    currentSplits = await subgraphClient.getSplitsConfigByUserId(userId);
 
-      if (currentSplits.length) {
-        splitsInputs = [];
-        // format each split as input row...
-        currentSplits.forEach(async (s) => {
-          const row = emptyRow();
-          row.receiver.value = AddressDriverClient.getUserAddress(s.userId);
-          row.receiver.type = 'valid';
-          row.amount = Number(Number(getSplitPercent(s.weight)).toFixed(2));
-          splitsInputs = [...splitsInputs, row];
-        });
+    if (currentSplits.length) {
+      splitsInputs = [];
+      // format each split as input row...
+      currentSplits.forEach(async (s) => {
+        const row = emptyRow();
+        row.receiver.value = AddressDriverClient.getUserAddress(s.userId);
+        row.receiver.type = 'valid';
+        row.amount = Number(Number(getSplitPercent(s.weight)).toFixed(2));
+        splitsInputs = [...splitsInputs, row];
+      });
 
-        isValidAddresses = true;
-      }
-      return true;
-    } catch (e) {
-      loadingError = true;
+      isValidAddresses = true;
     }
   }
 
@@ -74,7 +67,8 @@
     // TODO focus into input
   }
   function removeRow(index = 0) {
-    splitsInputs = splitsInputs.filter((s, i) => i !== index);
+    splitsInputs.splice(index, 1);
+    splitsInputs = splitsInputs;
   }
 
   $: totalPercent = splitsInputs.reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
@@ -165,7 +159,7 @@
                 splitInput.receiver.type = e.detail.type;
               }}
               exclude={{
-                addresses: allAddresses.filter((r, i) => i !== index),
+                addresses: allAddresses.filter((_, i) => i !== index),
                 msg: 'Duplicate recipient.',
               }}
             />
