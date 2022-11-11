@@ -1,0 +1,16 @@
+name: Run svelte-check
+
+on: [pull_request]
+
+jobs:
+  svelte-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run svelte-check
+        run: npm run check -- --fail-on-warnings --fail-on-hints
