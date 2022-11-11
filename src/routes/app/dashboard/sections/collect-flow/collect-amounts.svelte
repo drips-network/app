@@ -62,7 +62,7 @@
 
     const { CONTRACT_DRIPS_HUB, CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
-    const batch = AddressDriverPresets.Presets.createCollectFlow({
+    const collectFlow = AddressDriverPresets.Presets.createCollectFlow({
       driverAddress: CONTRACT_ADDRESS_DRIVER,
       dripsHubAddress: CONTRACT_DRIPS_HUB,
       userId,
@@ -84,7 +84,7 @@
       },
     });
 
-    const tx = await callerClient.callBatched(batch);
+    const tx = await callerClient.callBatched(collectFlow);
 
     updateAwaitStep({
       message: 'Waiting for your transaction to be confirmed…',
