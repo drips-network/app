@@ -10,18 +10,22 @@
   import { ethers } from 'ethers';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import Button from '$lib/components/button/button.svelte';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import {
+    getAddressDriverClient,
+    getCallerClient,
+    getNetworkConfig,
+  } from '$lib/utils/get-drips-clients';
   import streams from '$lib/stores/streams';
   import assert from '$lib/utils/assert';
-  import { constants, Utils } from 'radicle-drips';
+  import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import modal from '$lib/stores/modal';
   import expect from '$lib/utils/expect';
   import {
     generateMetadata,
+    pinAccountMetadata,
     streamMetadataSchema,
-    updateAccountMetadata,
   } from '$lib/stores/streams/metadata';
   import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
   import type { z } from 'zod';
@@ -141,8 +145,10 @@
   function submit() {
     const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
       modal.setHideable(false);
-      const client = await getAddressDriverClient();
-      const ownUserId = (await client.getUserId()).toString();
+
+      const callerClient = await getCallerClient();
+      const addressDriverClient = await getAddressDriverClient();
+      const ownUserId = (await addressDriverClient.getUserId()).toString();
 
       assert(
         selectedToken && amountPerSecond && recipientAddressValue && streamNameValue,
@@ -176,44 +182,9 @@
         amountPerSec: amountPerSecond,
       });
 
-      const recipientUserId = await client.getUserIdByAddress(recipientAddressValue);
-      const { signerAddress } = client;
-
-      const waitingWalletIcon = {
-        component: Emoji,
-        props: {
-          emoji: '👛',
-          size: 'huge',
-        },
-      };
-
-      updateAwaitStep({
-        icon: waitingWalletIcon,
-        message: 'Waiting for you to confirm transaction 1/2 in your wallet',
-      });
-
-      const setDripsTx = await client.setDrips(
-        tokenAddress,
-        currentReceivers,
-        [
-          ...currentReceivers,
-          {
-            config: dripConfig,
-            userId: recipientUserId,
-          },
-        ],
-        signerAddress,
-      );
-
-      updateAwaitStep({
-        message: 'Waiting for transaction 1/2 to be confirmed…',
-        link: {
-          label: 'View on Etherscan',
-          url: etherscanLink($wallet.network.name, setDripsTx.hash),
-        },
-      });
-
-      await setDripsTx.wait();
+      const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddressValue);
+      const { address } = $wallet;
+      assert(address);
 
       const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
         id: makeStreamId(ownUserId, tokenAddress, dripId.toString()),
@@ -232,7 +203,7 @@
         name: streamNameValue,
       };
 
-      const accountMetadata = generateMetadata(ownAccount, client.signerAddress);
+      const accountMetadata = generateMetadata(ownAccount, address);
       const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
         (ac) => ac.tokenAddress === tokenAddress,
       );
@@ -250,25 +221,51 @@
         };
       }
 
-      updateAwaitStep({
-        icon: waitingWalletIcon,
-        message: 'Waiting for you to confirm transaction 2/2 in your wallet',
+      const newHash = await pinAccountMetadata(accountMetadata);
+
+      const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+
+      const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
+        key: 65932473927847481224664369441494644980717748729109625944182088338412766444512n,
+        driverAddress: CONTRACT_ADDRESS_DRIVER,
+        tokenAddress,
+        currentReceivers,
+        newReceivers: [
+          ...currentReceivers,
+          {
+            config: dripConfig,
+            userId: recipientUserId,
+          },
+        ],
+        value: newHash,
+        balanceDelta: 0,
+        transferToAddress: address,
       });
 
-      const { newHash, tx: updateMetadataTx } = await updateAccountMetadata(
-        accountMetadata,
-        ownAccount.lastIpfsHash,
-      );
+      const waitingWalletIcon = {
+        component: Emoji,
+        props: {
+          emoji: '👛',
+          size: 'huge',
+        },
+      };
 
       updateAwaitStep({
-        message: 'Waiting for transaction 2/2 to be confirmed…',
+        icon: waitingWalletIcon,
+        message: 'Waiting for you to confirm the transaction in your wallet...',
+      });
+
+      const tx = await callerClient.callBatched(createStreamBatchPreset);
+
+      updateAwaitStep({
+        message: 'Waiting for your transaction to be confirmed…',
         link: {
           label: 'View on Etherscan',
-          url: etherscanLink($wallet.network.name, updateMetadataTx.hash),
+          url: etherscanLink($wallet.network.name, tx.hash),
         },
       });
 
-      await updateMetadataTx.wait();
+      await tx.wait();
 
       updateAwaitStep({
         message: 'Wrapping up…',
@@ -322,47 +319,43 @@
   </FormField>
   <div class="form-row">
     <FormField title="Stream rate*">
-      <div class="form-row">
-        <div>
-          <TextInput
-            suffix={selectedToken?.info.symbol}
-            bind:value={amountValue}
-            variant={{ type: 'number', min: 0 }}
-            placeholder="Amount"
-          />
-        </div>
-        <div>
-          <Dropdown
-            bind:value={selectedMultiplier}
-            options={[
-              {
-                value: '1',
-                title: '/ second',
-              },
-              {
-                value: '3600',
-                title: '/ hour',
-              },
-              {
-                value: '86400',
-                title: '/ day',
-              },
-              {
-                value: '604800',
-                title: '/ week',
-              },
-              {
-                value: '2592000',
-                title: '/ 30 days',
-              },
-              {
-                value: '31536000',
-                title: '/ year',
-              },
-            ]}
-          />
-        </div>
-      </div>
+      <TextInput
+        suffix={selectedToken?.info.symbol}
+        bind:value={amountValue}
+        variant={{ type: 'number', min: 0 }}
+        placeholder="Amount"
+      />
+    </FormField>
+    <FormField title="Amount per*">
+      <Dropdown
+        bind:value={selectedMultiplier}
+        options={[
+          {
+            value: '1',
+            title: '/ second',
+          },
+          {
+            value: '3600',
+            title: '/ hour',
+          },
+          {
+            value: '86400',
+            title: '/ day',
+          },
+          {
+            value: '604800',
+            title: '/ week',
+          },
+          {
+            value: '2592000',
+            title: '/ 30 days',
+          },
+          {
+            value: '31536000',
+            title: '/ year',
+          },
+        ]}
+      />
     </FormField>
   </div>
   <FormField title="Stream end date">
@@ -381,10 +374,6 @@
   .form-row {
     display: flex;
     gap: 1rem;
-  }
-
-  .form-row * {
-    flex: 1;
   }
 
   .list-container {

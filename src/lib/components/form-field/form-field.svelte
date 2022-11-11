@@ -3,16 +3,16 @@
   export let description: string | undefined = undefined;
 </script>
 
-<div class="form-field">
-  <label class="typo-text-bold" for="control"><h4>{title}</h4></label>
+<label class="typo-text-bold">
+  {title}
   {#if description}<p>{description}</p>{/if}
-  <div id="control">
-    <slot />
-  </div>
-</div>
+  <div class="content"><slot /></div>
+</label>
 
 <style>
-  .form-field {
+  label {
+    color: var(--color-foreground-level-5);
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -21,13 +21,11 @@
     text-align: left;
   }
 
-  #control {
+  .content {
+    color: var(--color-foreground);
+    font-weight: normal;
     width: 100%;
     height: 100%;
-  }
-
-  h4 {
-    color: var(--color-foreground-level-6);
   }
 
   p {

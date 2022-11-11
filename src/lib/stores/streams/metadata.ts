@@ -1,8 +1,6 @@
 import { ethers, type ContractTransaction } from 'ethers';
-import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
-import { get } from 'svelte/store';
+import { AddressDriverClient } from 'radicle-drips';
 import { z } from 'zod';
-import wallet from '../wallet';
 import type { Account, UserId } from './types';
 import seperateDripsSetEvents from './methods/separate-drips-set-events';
 import buildAssetConfigs from './methods/build-asset-configs';
@@ -10,7 +8,8 @@ import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-
 import { toUtf8String } from 'ethers/lib/utils';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { reconcileDripsSetReceivers } from './methods/reconcile-drips-set-receivers';
-import { fetchIpfs } from '$lib/utils/ipfs';
+import isTest from '$lib/utils/is-test';
+import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
 /*
 A randomly-generated uint256 that we use as the `key` value for calls to `emitUserData` on the
@@ -93,7 +92,27 @@ export async function fetchAccountMetadataHash(userId: UserId): Promise<string |
   }
 }
 
-async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
+async function fetchIpfs(hash: string) {
+  if (isTest()) {
+    const val = JSON.parse(localStorage.getItem(`mock_ipfs_${hash}`) ?? '');
+    return val;
+  }
+
+  return await (await ipfsFetch(hash)).json();
+}
+
+export async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
+  if (isTest()) {
+    const mockHash = (Math.random() + 1).toString(36).substring(7);
+    const mockData = JSON.stringify(data, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    );
+
+    localStorage.setItem(`mock_ipfs_${mockHash}`, mockData);
+
+    return mockHash;
+  }
+
   const res = await fetch('/api/ipfs/pin', {
     method: 'POST',
     body: JSON.stringify(data, (_, value) =>
@@ -113,7 +132,7 @@ async function fetchAccountMetadata(
   let accountMetadataRes: Awaited<ReturnType<typeof fetchIpfs>>;
 
   try {
-    accountMetadataRes = await (await fetchIpfs(metadataHash)).json();
+    accountMetadataRes = await fetchIpfs(metadataHash);
   } catch (e) {
     return undefined;
   }
@@ -195,10 +214,7 @@ export async function updateAccountMetadata(
 
   const newHash = await pinAccountMetadata(newData);
   const client = await getAddressDriverClient();
-  const tx = await client.emitUserMetadata(
-    USER_DATA_KEY,
-    ethers.utils.hexlify(ethers.utils.toUtf8Bytes(newHash)),
-  );
+  const tx = await client.emitUserMetadata(USER_DATA_KEY, newHash);
 
   return {
     newHash,
@@ -213,8 +229,7 @@ export async function updateAccountMetadata(
  * @returns The account information.
  */
 export async function fetchAccount(userId: UserId): Promise<Account> {
-  const { network } = get(wallet);
-  const subgraphClient = DripsSubgraphClient.create(network.chainId);
+  const subgraphClient = getSubgraphClient();
 
   const { data, hash } = (await fetchAccountMetadata(userId)) ?? {};
 
