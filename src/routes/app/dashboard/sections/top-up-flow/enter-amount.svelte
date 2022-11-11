@@ -41,7 +41,7 @@
     const { tokenBalance } = $context;
 
     if (amount) {
-      if (tokenBalance && amount < tokenBalance) {
+      if (tokenBalance && amount <= tokenBalance) {
         validationState = { type: 'valid' };
       } else {
         validationState = {

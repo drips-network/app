@@ -2,11 +2,15 @@ import type * as radicleDrips from 'radicle-drips';
 import { readable } from 'svelte/store';
 import * as metadata from '../metadata';
 
+vi.mock('$app/environment', () => ({
+  browser: true,
+}));
+
 vi.mock('$lib/stores/wallet', () => ({
   default: readable({
     network: {
-      chainId: 1,
-      name: 'homestead',
+      chainId: 5,
+      name: 'goerli',
     },
   }),
 }));
