@@ -59,7 +59,7 @@
         },
         token: {
           address: tokenAddress,
-          small: true,
+          size: 'small',
           show: 'symbol',
         },
       };
@@ -87,7 +87,7 @@
         },
         token: {
           address: tokenAddress,
-          small: true,
+          size: 'small',
           show: 'symbol',
         },
       };
