@@ -101,7 +101,7 @@ async function fetchIpfs(hash: string) {
   return await (await ipfsFetch(hash)).json();
 }
 
-async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
+export async function pinAccountMetadata(data: z.infer<typeof accountMetadataSchema>) {
   if (isTest()) {
     const mockHash = (Math.random() + 1).toString(36).substring(7);
     const mockData = JSON.stringify(data, (_, value) =>
