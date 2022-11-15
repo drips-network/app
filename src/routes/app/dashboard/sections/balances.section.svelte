@@ -11,7 +11,6 @@
   import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import streams from '$lib/stores/streams';
-  import { get } from 'svelte/store';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { makeStep } from '$lib/components/stepper/types';
@@ -25,8 +24,6 @@
   import { ethers } from 'ethers';
   import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-  import { onMount } from 'svelte';
   import CollectAmountsStep from './collect-flow/collect-amounts.svelte';
   import collectFlowState from './collect-flow/collect-flow-state';
   import FetchDripsCycleStep from './collect-flow/fetch-drips-cycle.svelte';
@@ -39,24 +36,25 @@
     netRate: AmountCellData;
   }
 
-  let currentUserId: string;
-  $: accountEstimate = currentUserId ? $balances.accounts[currentUserId] : undefined;
+  export let userId: string | undefined;
+  export let disableActions = true;
 
-  onMount(async () => {
-    currentUserId = (await (await getAddressDriverClient()).getUserId()).toString();
-  });
+  $: accountEstimate = userId ? $balances.accounts[userId] : undefined;
 
   let tableData: TokenTableRow[] = [];
 
-  function getIncomingTotalsForToken(address: string): {
+  function getIncomingTotalsForToken(
+    userId: string,
+    address: string,
+  ): {
     totalEarned: bigint;
     amountPerSecond: bigint;
   } {
-    const streamsState = get(streams);
+    const ownStreams = streams.getStreamsForUser(userId);
 
-    if (!streamsState.ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
+    if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
 
-    const incomingStreamsForToken = streamsState.ownStreams.incoming.filter(
+    const incomingStreamsForToken = ownStreams.incoming.filter(
       (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
     );
 
@@ -76,24 +74,27 @@
   }
 
   function updateTable() {
-    if (!$balances || !accountEstimate) {
+    if (!$balances || !accountEstimate || !userId) {
       tableData = [];
       return;
     }
+
+    const ownStreams = streams.getStreamsForUser(userId);
 
     let tokensToShow: string[] = [];
 
     tokensToShow.push(...Object.keys(accountEstimate));
     tokensToShow.push(
-      ...($streams.ownStreams?.incoming.map(
-        (stream) => stream.dripsConfig.amountPerSecond.tokenAddress,
-      ) ?? []),
+      ...(ownStreams.incoming.map((stream) => stream.dripsConfig.amountPerSecond.tokenAddress) ??
+        []),
     );
     tokensToShow = [...new Set(tokensToShow)];
 
     tableData = tokensToShow.map((tokenAddress) => {
+      assert(userId);
+
       const estimate = accountEstimate?.[tokenAddress];
-      const incomingTotals = getIncomingTotalsForToken(tokenAddress);
+      const incomingTotals = getIncomingTotalsForToken(userId, tokenAddress);
 
       return {
         token: {
@@ -134,7 +135,7 @@
 
   $: {
     $balances;
-    updateTable();
+    if (userId) updateTable();
   }
 
   const tableColumns: ColumnDef<TokenTableRow>[] = [
@@ -190,6 +191,10 @@
       It may take some time for your balance to update on your dashboard.
     `;
   }
+
+  const { fetchStatuses } = streams;
+  $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
+  $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
 </script>
 
 <div class="section">
@@ -197,75 +202,78 @@
     icon={TokensIcon}
     label="Balances"
     actionsDisabled={!accountEstimate}
-    actions={[
-      {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            context: topUpFlowState,
-            steps: [
-              makeStep({
-                component: SelectTokenStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: EnterAmountStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: ApproveStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: TriggerTopUpTransaction,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message: () => getTopUpSuccessMessage(),
-                },
-              }),
-            ],
-          });
-        },
-        icon: TopUpIcon,
-        label: 'Top up',
-      },
-      {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            context: collectFlowState,
-            steps: [
-              makeStep({
-                component: SelectCollectTokenStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: FetchDripsCycleStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: CollectAmountsStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: Success,
-                props: undefined,
-              }),
-            ],
-          });
-        },
-        icon: CollectIcon,
-        label: 'Collect',
-      },
-    ]}
+    actions={disableActions
+      ? []
+      : [
+          {
+            handler: () => {
+              modal.show(Stepper, undefined, {
+                context: topUpFlowState,
+                steps: [
+                  makeStep({
+                    component: SelectTokenStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: EnterAmountStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: ApproveStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: TriggerTopUpTransaction,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: SuccessStep,
+                    props: {
+                      message: () => getTopUpSuccessMessage(),
+                    },
+                  }),
+                ],
+              });
+            },
+            icon: TopUpIcon,
+            label: 'Top up',
+          },
+          {
+            handler: () => {
+              modal.show(Stepper, undefined, {
+                context: collectFlowState,
+                steps: [
+                  makeStep({
+                    component: SelectCollectTokenStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: FetchDripsCycleStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: CollectAmountsStep,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: Success,
+                    props: undefined,
+                  }),
+                ],
+              });
+            },
+            icon: CollectIcon,
+            label: 'Collect',
+          },
+        ]}
   />
   <div class="content">
     <SectionSkeleton
       emptyStateHeadline="No tokens"
       emptyStateEmoji="🫗"
       emptyStateText="This is where any tokens balances you stream or earned show up."
-      loaded={Boolean(accountEstimate)}
+      {loaded}
+      {error}
       empty={tableData.length === 0}
     >
       <Table {options} />

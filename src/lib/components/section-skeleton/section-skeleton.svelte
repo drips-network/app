@@ -7,8 +7,9 @@
   import Spinner from '../spinner/spinner.svelte';
 
   export let loaded = false;
-  export let empty = true;
+  export let empty = false;
   export let error = false;
+  export let placeholderOutline = true;
 
   export let emptyStateEmoji = '👻';
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
@@ -25,13 +26,13 @@
 
   let contentContainerElem: HTMLDivElement;
 
-  let observer: MutationObserver;
+  let observer: ResizeObserver;
   function observeContentChanges() {
     observer?.disconnect();
     if (!contentContainerElem) return;
 
-    observer = new MutationObserver(() => updateContainerHeight());
-    observer.observe(contentContainerElem, { childList: true });
+    observer = new ResizeObserver(() => updateContainerHeight());
+    observer.observe(contentContainerElem);
   }
   onDestroy(() => observer?.disconnect());
 
@@ -59,12 +60,35 @@
 
 <div class="section-skeleton" style:height={`${$containerHeight}px`}>
   {#if loaded}
-    {#if empty}
+    {#if error}
       <div
         in:fade={{ duration: 250 }}
         class="placeholder-container"
         style:height={`${$containerHeight}px`}
         style:position={placeholderContainerPosition}
+        style:border={placeholderOutline ? '2px solid var(--color-foreground-level-1)' : ''}
+      >
+        <div class="empty-state">
+          <Emoji emoji="⚠️" size="large" />
+          <div class="text-group">
+            <p class="typo-text-small-bold">Oops, something went wrong.</p>
+            <p class="typo-text-small">
+              Sorry, we weren't able to load this. There may be more information in the developer
+              console.
+            </p>
+            <a class="typo-link typo-text-small" href="https://discord.gg/vhGXkazpNc"
+              >Ask for help</a
+            >
+          </div>
+        </div>
+      </div>
+    {:else if empty}
+      <div
+        in:fade={{ duration: 250 }}
+        class="placeholder-container"
+        style:height={`${$containerHeight}px`}
+        style:position={placeholderContainerPosition}
+        style:border={placeholderOutline ? '2px solid var(--color-foreground-level-1)' : ''}
       >
         <div class="empty-state">
           <Emoji emoji={emptyStateEmoji} size="large" />
@@ -72,18 +96,6 @@
             {#if emptyStateHeadline}<p class="typo-text-small-bold">{emptyStateHeadline}</p>{/if}
             {#if emptyStateText}<p class="typo-text-small">{emptyStateText}</p>{/if}
           </div>
-        </div>
-      </div>
-    {:else if error}
-      <div class="empty-state">
-        <Emoji emoji="⚠️" size="large" />
-        <div class="text-group">
-          <p class="typo-text-small-bold">Oops, something went wrong.</p>
-          <p class="typo-text-small">
-            Sorry, we weren't able to load this. There may be more information in the developer
-            console.
-          </p>
-          <a class="typo-text-small" href="wikipedia.com">Ask for help</a>
         </div>
       </div>
     {:else}
@@ -97,6 +109,7 @@
       style:position={placeholderContainerPosition}
       class="placeholder-container"
       style:height={`${$containerHeight}px`}
+      style:border={placeholderOutline ? '2px solid var(--color-foreground-level-1)' : ''}
     >
       <Spinner />
     </div>
@@ -110,7 +123,6 @@
 
   .placeholder-container {
     width: 100%;
-    border: 2px solid var(--color-foreground-level-1);
     border-radius: 0.5rem;
     display: flex;
     justify-content: center;

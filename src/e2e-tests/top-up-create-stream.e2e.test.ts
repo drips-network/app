@@ -7,6 +7,8 @@ import { chromium } from 'playwright';
 import type { Browser, Page } from 'playwright';
 import { expect } from '@playwright/test';
 import fetch from 'node-fetch';
+import configureAppForTest from './helpers/configure-app-for-test';
+import changeAddress from './helpers/change-address';
 
 describe('top up, create stream', async () => {
   let server: PreviewServer;
@@ -20,24 +22,7 @@ describe('top up, create stream', async () => {
     browser = await chromium.launch();
     page = await browser.newPage();
 
-    await page.addInitScript(`
-      window.isPlaywrightTest = true;
-      window.playwrightAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
-
-      localStorage.setItem('custom-tokens', JSON.stringify([
-        {
-          "source": "custom",
-          "banned": false,
-          "info": {
-            "chainId": 5,
-            "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-            "name": "Testcoin",
-            "decimals": 18,
-            "symbol": "TEST"
-          }
-        }
-      ]));
-    `);
+    await configureAppForTest(page);
   });
 
   afterAll(async () => {
@@ -93,7 +78,6 @@ describe('top up, create stream', async () => {
 
     it('shows the topped-up amount on the dashboard', async () => {
       await expect(page.locator('text=100.00')).toHaveCount(1);
-      // await page.screenshot({ fullPage: true, path: 'shot.png' });
       await page.locator('text=Close').click();
     });
   });
@@ -125,26 +109,53 @@ describe('top up, create stream', async () => {
     });
 
     it('switches to another user', async () => {
-      await page.addInitScript(`
-        window.playwrightAddress = '0x70997970c51812dc3a010c7d01b50e0d17dc79c8';
-      `);
+      await changeAddress(page, '0x70997970c51812dc3a010c7d01b50e0d17dc79c8');
 
       await page.reload();
 
-      await page.waitForTimeout(1000);
-      await page.screenshot({ path: 'shot.png', fullPage: true });
-
-      expect(page.locator('text=Dashboard')).toBeDefined();
-      expect(page.locator('text=7099—79c8')).toBeDefined();
+      await expect(page.locator('text=Dashboard')).toHaveCount(1);
     });
 
     it('displays the incoming stream', async () => {
-      expect(page.locator('text=Incoming')).toBeDefined();
-      expect(page.locator('text=E2E Test Stream')).toBeDefined();
+      await expect(page.locator('text=↓ Incoming')).toHaveCount(1);
+      await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
     });
 
     it('displays the incoming balance', async () => {
-      expect(page.locator('text=Testcoin')).toBeDefined();
+      await expect(page.locator('text=Testcoin')).toHaveCount(1);
+    });
+  });
+
+  describe('profile view', () => {
+    it('displays the original users outgoing stream on their profile', async () => {
+      await page.goto('http://localhost:3000/app/0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266');
+
+      await expect(page.locator('text=↑ Outgoing')).toHaveCount(1);
+      await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
+    });
+
+    it('displays the outgoing balance', async () => {
+      await expect(page.locator('text=Testcoin')).toHaveCount(1);
+    });
+
+    it('switches to another user', async () => {
+      await changeAddress(page, '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266');
+      await page.goto('http://localhost:3000/app/dashboard');
+
+      await page.reload();
+
+      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+    });
+
+    it('displays the recipient users incoming stream on their profile', async () => {
+      await page.goto('http://localhost:3000/app/0x70997970c51812dc3a010c7d01b50e0d17dc79c8');
+
+      await expect(page.locator('text=↓ Incoming')).toHaveCount(1);
+      await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
+    });
+
+    it('displays the incoming balance', async () => {
+      await expect(page.locator('text=Testcoin')).toHaveCount(1);
     });
   });
 });

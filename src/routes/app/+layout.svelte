@@ -44,6 +44,8 @@
 
     walletConnected = connected;
 
+    balances.setAccounts(derived([streams], ([streams]) => streams.accounts));
+
     if (connected) {
       const addressDriverClient = await getAddressDriverClient();
 
@@ -52,7 +54,6 @@
 
       try {
         await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
-        balances.setAccounts(derived([streams], ([streams]) => streams.accounts));
       } catch (e) {
         if (e instanceof Error) {
           fatalError = {

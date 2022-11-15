@@ -1,6 +1,7 @@
 import type { BaseProvider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
+import type { ethers } from 'ethers';
 import { get, writable } from 'svelte/store';
+import assert from '$lib/utils/assert';
 
 export interface ResolvedRecord {
   name?: string;
@@ -13,7 +14,7 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
-  let provider = ethers.getDefaultProvider();
+  let provider: ethers.providers.BaseProvider | undefined;
 
   /**
    * Connect the store to a provider, which is needed in order to resolve ENS
@@ -29,7 +30,7 @@ export default (() => {
    * store state. Looks up ENS name & avatar URL.
    * @param address The address to attempt resolving.
    */
-  async function lookup(address: string): Promise<void> {
+  async function lookup(address: string): Promise<ResolvedRecord | undefined> {
     const saved = get(state)[address];
     if (saved) return;
 
@@ -51,6 +52,8 @@ export default (() => {
         ...s,
         [address]: resolvedRecord,
       }));
+
+      return resolvedRecord;
     }
   }
 
@@ -62,14 +65,21 @@ export default (() => {
    * If it was successful, you can find a resolved record which matches the provided
    * name in the store state.
    */
-  async function reverseLookup(name: string): Promise<void> {
-    const saved = Object.values(get(state)).find((record) => record.name === name);
+  async function reverseLookup(name: string): Promise<string | undefined> {
+    assert(
+      provider,
+      'You need to `connect` the store to a provider before being able to reverse lookup',
+    );
 
-    if (saved) return;
+    const saved = Object.entries(get(state)).find((entry) => entry[1].name === name);
+
+    if (saved) return saved[0];
 
     const address = await provider.resolveName(name);
 
-    if (address) await lookup(address);
+    if (address) lookup(address);
+
+    return address ?? undefined;
   }
 
   function clear() {

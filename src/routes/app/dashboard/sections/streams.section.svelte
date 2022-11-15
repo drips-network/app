@@ -8,7 +8,6 @@
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
-  import balancesStore from '$lib/stores/balances/balances.store';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
@@ -18,6 +17,10 @@
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
+  import { onMount } from 'svelte';
+
+  export let userId: string | undefined;
+  export let disableActions = true;
 
   interface OutgoingStreamTableRow {
     name: string;
@@ -36,8 +39,12 @@
   let outgoingTableData: OutgoingStreamTableRow[] = [];
   let incomingTableData: IncomingStreamTableRow[] = [];
 
+  let ownStreams: ReturnType<typeof streams.getStreamsForUser> = { outgoing: [], incoming: [] };
+
   function updateTable() {
-    outgoingTableData = mapFilterUndefined($streams.ownStreams?.outgoing ?? [], (stream) => {
+    ownStreams = userId ? streams.getStreamsForUser(userId) : { outgoing: [], incoming: [] };
+
+    outgoingTableData = mapFilterUndefined(ownStreams.outgoing, (stream) => {
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
@@ -65,7 +72,7 @@
       };
     });
 
-    incomingTableData = mapFilterUndefined($streams.ownStreams?.incoming ?? [], (stream) => {
+    incomingTableData = mapFilterUndefined(ownStreams.incoming ?? [], (stream) => {
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
@@ -94,11 +101,15 @@
     });
   }
 
+  const { fetchStatuses } = streams;
+
   $: {
-    $streams.ownStreams;
-    $balancesStore;
+    userId;
+    $balances;
     updateTable();
   }
+
+  onMount(updateTable);
 
   const outgoingTableColumns: ColumnDef<OutgoingStreamTableRow>[] = [
     {
@@ -178,7 +189,9 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  $: loaded = $streams.ownStreams !== undefined && Object.keys($balancesStore.accounts).length > 0;
+  $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
+  $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
+  $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
 </script>
 
 <div class="section">
@@ -186,30 +199,32 @@
     icon={TokenStreamIcon}
     label="Streams"
     actionsDisabled={!loaded}
-    actions={[
-      {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            steps: [
-              makeStep({
-                component: InputDetails,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message:
-                    'Your stream has been successfully created. ' +
-                    'Please note that it may take a while for your dashboard to update.',
-                },
-              }),
-            ],
-          });
-        },
-        icon: PlusIcon,
-        label: 'Create stream',
-      },
-    ]}
+    actions={disableActions
+      ? []
+      : [
+          {
+            handler: () => {
+              modal.show(Stepper, undefined, {
+                steps: [
+                  makeStep({
+                    component: InputDetails,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: SuccessStep,
+                    props: {
+                      message:
+                        'Your stream has been successfully created. ' +
+                        'Please note that it may take a while for your dashboard to update.',
+                    },
+                  }),
+                ],
+              });
+            },
+            icon: PlusIcon,
+            label: 'Create stream',
+          },
+        ]}
   />
   <div class="content">
     <SectionSkeleton
@@ -217,8 +232,8 @@
       emptyStateHeadline="No streams"
       emptyStateText="This is where incoming and outgoing streams for your account will appear."
       {loaded}
-      empty={$streams.ownStreams?.incoming.length === 0 &&
-        $streams.ownStreams?.outgoing.length === 0}
+      {error}
+      {empty}
     >
       {#if optionsOutgoing.data.length > 0}
         <div class="table-container">
