@@ -7,7 +7,7 @@
   import type { UserId } from '$lib/stores/streams/types';
   import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
   import TextInput from 'radicle-design-system/TextInput.svelte';
-  import { AddressDriverClient, type AddressDriver } from 'radicle-drips';
+  import { AddressDriverClient, type SplitsReceiverStruct } from 'radicle-drips';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
@@ -91,7 +91,7 @@
       const client = await getAddressDriverClient();
 
       // format splits for submission
-      const splits: AddressDriver.SplitsReceiverStruct[] = await Promise.all(
+      const splits: SplitsReceiverStruct[] = await Promise.all(
         splitsInputs
           .filter((s) => s.receiver && s.amount)
           .map(async (s) => ({

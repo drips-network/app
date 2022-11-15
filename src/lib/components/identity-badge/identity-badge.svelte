@@ -5,11 +5,14 @@
   import { createIcon } from 'radicle-design-system/lib/blockies';
   import Avatar from '$lib/components/avatar/avatar.svelte';
   import { browser } from '$app/environment';
+  import wallet from '$lib/stores/wallet';
+  import formatAddress from '$lib/utils/format-address';
 
   export let address: string;
   export let showIdentity = true;
   export let showAvatar = true;
-  export let size: 'normal' | 'big' | 'huge' = 'normal';
+  export let disableLink = false;
+  export let size: 'normal' | 'big' | 'huge' | 'gigantic' = 'normal';
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
 
@@ -25,9 +28,11 @@
       }).toDataURL()) ||
     undefined;
 
-  function formatAddress(address: string) {
-    const unpadded = address.replace('0x', '');
-    return `${unpadded.substring(0, 4)}—${unpadded.slice(-4)}`;
+  function getLink() {
+    if (disableLink) return undefined;
+    if (address === $wallet.address) return '/app/dashboard';
+
+    return `/app/${ens?.name ?? address}`;
   }
 
   $: toDisplay = ens?.name ?? formatAddress(address);
@@ -36,6 +41,7 @@
     normal: 24,
     big: 48,
     huge: 64,
+    gigantic: 128,
   };
   $: currentSize = sizes[size];
 
@@ -43,11 +49,12 @@
     normal: 'typo-text-bold',
     big: 'typo-header-4',
     huge: 'typo-header-3',
+    gigantic: 'typo-header-1',
   };
   $: currentFontClass = fontClasses[size];
 </script>
 
-<div class="identity-badge" style:height={showAvatar ? `${currentSize}px` : ''}>
+<a href={getLink()} class="identity-badge" style:height={showAvatar ? `${currentSize}px` : ''}>
   {#if showAvatar}
     <Avatar
       size={currentSize}
@@ -61,8 +68,9 @@
       <p
         transition:fade|local={{ duration: 300 }}
         class:mono={!ens?.name}
+        class:foreground={size === 'gigantic'}
         class={`${currentFontClass} identity`}
-        style:left={showAvatar ? '2rem' : '0rem'}
+        style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
       >
         {toDisplay}
       </p>
@@ -71,7 +79,7 @@
       {toDisplay}
     </p>
   {/if}
-</div>
+</a>
 
 <style>
   .identity-badge {
@@ -86,6 +94,10 @@
   .mono {
     font-family: var(--typeface-mono-bold);
     white-space: nowrap;
+  }
+
+  .foreground {
+    color: var(--color-foreground);
   }
 
   .identity {

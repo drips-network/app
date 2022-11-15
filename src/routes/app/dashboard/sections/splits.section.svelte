@@ -26,6 +26,8 @@
     ens: ResolvedRecord;
   }
 
+  export let disableActions = true;
+
   let splitsRaw: SplitsEntry[] | undefined;
   let splits: SplitsRow[] | undefined;
   let error = false;
@@ -121,35 +123,37 @@
     icon={MergeIcon}
     label="Splits"
     actionsDisabled={splits === undefined}
-    actions={[
-      {
-        handler: () => {
-          modal.setHideable(true);
-          modal.show(Stepper, undefined, {
-            steps: [
-              makeStep({
-                component: EditSplitsInputs,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message: () => {
-                    getSplitsUpdate();
-                    return (
-                      'Your splits have been updated. ' +
-                      'It may take some time to see changes in your dashboard.'
-                    );
-                  },
-                },
-              }),
-            ],
-          });
-        },
-        icon: PenIcon,
-        label: 'Edit',
-      },
-    ]}
+    actions={disableActions
+      ? []
+      : [
+          {
+            handler: () => {
+              modal.setHideable(true);
+              modal.show(Stepper, undefined, {
+                steps: [
+                  makeStep({
+                    component: EditSplitsInputs,
+                    props: undefined,
+                  }),
+                  makeStep({
+                    component: SuccessStep,
+                    props: {
+                      message: () => {
+                        getSplitsUpdate();
+                        return (
+                          'Your splits have been updated. ' +
+                          'It may take some time to see changes in your dashboard.'
+                        );
+                      },
+                    },
+                  }),
+                ],
+              });
+            },
+            icon: PenIcon,
+            label: 'Edit',
+          },
+        ]}
   />
   <div class="content pl-0.5">
     <SectionSkeleton

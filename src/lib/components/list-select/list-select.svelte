@@ -200,6 +200,7 @@
     gap: 0.5rem;
     align-items: center;
     color: var(--color-foreground-level-5);
+    text-align: center;
   }
 
   .list {

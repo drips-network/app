@@ -26,8 +26,8 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
+    padding: 0.5rem;
+    border-radius: 4rem;
     transition: background-color 0.3s;
   }
 

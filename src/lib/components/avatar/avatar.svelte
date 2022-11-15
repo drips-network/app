@@ -29,6 +29,7 @@
     height: 100%;
     width: 100%;
     border-radius: calc(100% / 2);
+    object-fit: cover;
   }
 
   .placeholder {

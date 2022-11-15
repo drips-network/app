@@ -25,7 +25,7 @@ export default (() => {
     connected: true,
     address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
     provider,
-    signer,
+    signer: signer as unknown as ethers.providers.JsonRpcSigner,
     network: NETWORK,
   });
 

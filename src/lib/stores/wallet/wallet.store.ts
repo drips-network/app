@@ -13,7 +13,7 @@ import isTest from '$lib/utils/is-test';
 const { SUPPORTED_CHAINS } = Utils.Network;
 const DEFAULT_NETWORK: Network = {
   chainId: 5,
-  name: 'Görli',
+  name: 'goerli',
 };
 
 const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
@@ -31,7 +31,7 @@ export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
   provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
-  signer: ethers.Signer;
+  signer: ethers.providers.JsonRpcSigner;
   network: Network;
 }
 
@@ -51,13 +51,15 @@ const windowProvider =
 const selectedNetwork =
   windowProvider && new ethers.providers.Web3Provider(window.ethereum).network;
 
+const initNetwork =
+  selectedNetwork && SUPPORTED_CHAINS.includes(selectedNetwork.chainId)
+    ? selectedNetwork
+    : DEFAULT_NETWORK;
+
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
-  network:
-    selectedNetwork && SUPPORTED_CHAINS.includes(selectedNetwork.chainId)
-      ? selectedNetwork
-      : DEFAULT_NETWORK,
-  provider: new ethers.providers.InfuraProvider(),
+  network: initNetwork,
+  provider: new ethers.providers.InfuraProvider(initNetwork),
 };
 
 const walletStore = () => {
