@@ -3,7 +3,12 @@ import type { SvelteComponent } from 'svelte';
 export interface SelectableItem {
   type: 'selectable';
   label: string;
-  text?: string;
+  text?:
+    | string
+    | {
+        component: typeof SvelteComponent;
+        props: { [propName: string]: unknown };
+      };
   disabled?: boolean;
   image?:
     | string

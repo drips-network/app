@@ -75,7 +75,7 @@
     description="Add funds to your Drips account in order to start streaming."
   />
   <FormField title="Select token">
-    <div class="list-container">
+    <div class="token-list-container">
       <ListSelect bind:selected items={tokenList} />
     </div>
   </FormField>
@@ -85,12 +85,3 @@
     >
   </svelte:fragment>
 </StepLayout>
-
-<style>
-  .list-container {
-    height: 24rem;
-    border: 2px solid var(--color-foreground-level-1);
-    border-radius: 0.5rem;
-    overflow: scroll;
-  }
-</style>

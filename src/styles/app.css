@@ -8,6 +8,14 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
+/* token-selector */
+.token-list-container {
+  height: 24rem;
+  border: 2px solid var(--color-foreground-level-1);
+  border-radius: 0.5rem;
+  overflow: scroll;
+}
+
 @font-face {
   font-family: 'Redaction 35';
   font-weight: 400;

@@ -1,6 +1,5 @@
 <script lang="ts">
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
-  import TopUpIcon from 'radicle-design-system/icons/Topup.svelte';
   import CollectIcon from 'radicle-design-system/icons/ArrowUp.svelte';
 
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
@@ -15,12 +14,8 @@
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { makeStep } from '$lib/components/stepper/types';
-  import SelectTokenStep from './top-up-flow/select-token.svelte';
   import topUpFlowState from './top-up-flow/top-up-flow-state';
-  import EnterAmountStep from './top-up-flow/enter-amount.svelte';
-  import ApproveStep from './top-up-flow/approve.svelte';
   import SelectCollectTokenStep from './collect-flow/select-token.svelte';
-  import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import { ethers } from 'ethers';
   import tokens from '$lib/stores/tokens';
@@ -30,7 +25,10 @@
   import CollectAmountsStep from './collect-flow/collect-amounts.svelte';
   import collectFlowState from './collect-flow/collect-flow-state';
   import FetchDripsCycleStep from './collect-flow/fetch-drips-cycle.svelte';
-  import Success from './collect-flow/success.svelte';
+  import CollectSuccess from './collect-flow/success.svelte';
+  import ManageTokenBalance from './manage-token-balance-flow/manage-token-balance.svelte';
+  import manageTokenBalanceFlowState from './manage-token-balance-flow/manage-token-balance-flow-state';
+  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -92,7 +90,7 @@
     tokensToShow = [...new Set(tokensToShow)];
 
     tableData = tokensToShow.map((tokenAddress) => {
-      const estimate = accountEstimate?.[tokenAddress];
+      const outgoingEstimate = accountEstimate?.[tokenAddress];
       const incomingTotals = getIncomingTotalsForToken(tokenAddress);
 
       return {
@@ -113,17 +111,19 @@
         streaming: {
           amount: {
             tokenAddress,
-            amount: estimate?.totals.remainingBalance ?? 0n,
+            amount: outgoingEstimate?.totals.remainingBalance ?? 0n,
           },
           amountPerSecond: {
             tokenAddress,
-            amount: -(estimate?.totals.totalAmountPerSecond ?? 0n),
+            amount: -(outgoingEstimate?.totals.totalAmountPerSecond ?? 0n),
           },
           showSymbol: false,
         },
         netRate: {
           amountPerSecond: {
-            amount: incomingTotals.amountPerSecond - (estimate?.totals.totalAmountPerSecond ?? 0n),
+            amount:
+              incomingTotals.amountPerSecond -
+              (outgoingEstimate?.totals.totalAmountPerSecond ?? 0n),
             tokenAddress,
           },
           showSymbol: false,
@@ -199,43 +199,12 @@
     actionsDisabled={!accountEstimate}
     actions={[
       {
+        label: 'Collect earnings',
+        icon: CollectIcon,
         handler: () => {
           modal.show(Stepper, undefined, {
-            context: topUpFlowState,
-            steps: [
-              makeStep({
-                component: SelectTokenStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: EnterAmountStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: ApproveStep,
-                props: undefined,
-              }),
-              makeStep({
-                component: TriggerTopUpTransaction,
-                props: undefined,
-              }),
-              makeStep({
-                component: SuccessStep,
-                props: {
-                  message: () => getTopUpSuccessMessage(),
-                },
-              }),
-            ],
-          });
-        },
-        icon: TopUpIcon,
-        label: 'Top up',
-      },
-      {
-        handler: () => {
-          modal.show(Stepper, undefined, {
-            context: collectFlowState,
-            steps: [
+            initialContext: collectFlowState,
+            initialSteps: [
               makeStep({
                 component: SelectCollectTokenStep,
                 props: undefined,
@@ -249,14 +218,35 @@
                 props: undefined,
               }),
               makeStep({
-                component: Success,
+                component: CollectSuccess,
                 props: undefined,
               }),
             ],
           });
         },
-        icon: CollectIcon,
-        label: 'Collect',
+      },
+      {
+        label: 'Manage token balances',
+        icon: WalletIcon,
+        handler: () => {
+          modal.show(Stepper, undefined, {
+            initialContext: manageTokenBalanceFlowState,
+            initialSteps: [
+              makeStep({
+                component: ManageTokenBalance,
+                props: {
+                  userId: currentUserId,
+                },
+              }),
+              makeStep({
+                component: SuccessStep,
+                props: {
+                  message: () => getTopUpSuccessMessage(),
+                },
+              }),
+            ],
+          });
+        },
       },
     ]}
   />

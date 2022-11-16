@@ -12,6 +12,7 @@
   export let amount: Amount | undefined = undefined;
   export let amountPerSecond: Amount | undefined = undefined;
   export let showSymbol = true;
+  export let showAmountPerSecond = true;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
   $: amountTokenInfo = $tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined;
@@ -45,7 +46,7 @@
       Unknown token
     {/if}
   {/if}
-  {#if amountPerSecond !== undefined}
+  {#if amountPerSecond !== undefined && showAmountPerSecond}
     {#if amountPerSecondTokenInfo}
       <div class="amount-per-second typo-text-small">
         <span

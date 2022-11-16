@@ -162,9 +162,14 @@
       </div>
       <div class="content" class:action={item.type === 'action'}>
         <span class="label typo-text-bold">{item.label}</span>
-        {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono-bold"
-            >{item.text}</span
-          >{/if}
+        {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono-bold">
+            {#if typeof item.text === 'string'}
+              {item.text}
+            {:else if item.text}
+              <svelte:component this={item.text.component} {...item.text.props} />
+            {/if}
+          </span>
+        {/if}
       </div>
     </div>
   {/each}

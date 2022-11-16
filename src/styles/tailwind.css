@@ -5,3 +5,8 @@
 .overlay {
   @apply top-0 left-0 w-full h-full;
 }
+
+[class*='border'] {
+  /* compensate for radicle reset */
+  border-style: solid;
+}

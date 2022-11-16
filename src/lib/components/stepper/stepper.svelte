@@ -1,16 +1,18 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
   import { onDestroy, onMount, tick } from 'svelte';
-  import type { AwaitPendingPayload, Steps, MovePayload } from './types';
+  import type { AwaitPendingPayload, Steps, MovePayload, SetStepsPayload } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
   import AwaitErrorStep from './components/await-error-step.svelte';
   import type { Writable } from 'svelte/store';
 
-  export let steps: Steps;
-  export let context: Writable<unknown> | undefined = undefined;
+  export let initialSteps: Steps;
+  export let initialContext: Writable<unknown> | undefined = undefined;
 
+  let context: Writable<unknown> | undefined = initialContext;
+  let steps: Steps = initialSteps;
   let stepElement: HTMLDivElement;
 
   $: resolvedSteps = steps.map((someStep) => someStep((i) => i));
@@ -100,6 +102,11 @@
     awaitError = undefined;
   }
 
+  function handleSetSteps(event: CustomEvent<SetStepsPayload>) {
+    currentStepIndex = 0;
+    steps = event.detail.steps;
+  }
+
   $: {
     currentStep;
     awaitError;
@@ -135,6 +142,7 @@
             on:await={handleAwait}
             on:goForward={handleGoForward}
             on:goBackward={() => move(-1)}
+            on:setSteps={handleSetSteps}
             {...currentStep.props}
             {context}
           />

@@ -1,4 +1,5 @@
 import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
+import type { Writable } from 'svelte/store';
 
 export interface UpdateAwaitStepParams {
   message?: string;
@@ -16,11 +17,16 @@ export type UpdateAwaitStepFn = (params: UpdateAwaitStepParams) => void;
 
 export interface AwaitPendingPayload extends UpdateAwaitStepParams {
   message: string;
-  promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+  promise: (updateFn: UpdateAwaitStepFn) => Promise<void>;
 }
 
 export interface MovePayload {
   by?: number;
+}
+
+export interface SetStepsPayload {
+  context?: Writable<unknown>;
+  steps: Steps;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +36,7 @@ export type StepComponentEvents = {
   goForward: MovePayload;
   goBackward: MovePayload;
   await: AwaitPendingPayload;
+  setSteps: SetStepsPayload;
 };
 
 type OmitContext<T> = Omit<T, 'context'>;
