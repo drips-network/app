@@ -28,6 +28,8 @@
   import collectFlowState from './collect-flow/collect-flow-state';
   import FetchDripsCycleStep from './collect-flow/fetch-drips-cycle.svelte';
   import Success from './collect-flow/success.svelte';
+  import wallet from '$lib/stores/wallet';
+  import { goto } from '$app/navigation';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -195,6 +197,12 @@
   const { fetchStatuses } = streams;
   $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
+
+  function onRowClick(event: CustomEvent) {
+    // go to token page by address
+    const tokenAddress = tableData[event.detail].token.address;
+    goto(`/app/tokens/${$wallet.network.name}/${tokenAddress}`);
+  }
 </script>
 
 <div class="section">
@@ -276,7 +284,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} />
+      <Table {options} isRowClickable={true} on:rowclick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>
