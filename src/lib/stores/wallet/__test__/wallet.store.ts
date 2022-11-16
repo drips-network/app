@@ -23,9 +23,10 @@ const signer = new ethers.Wallet(
 export default (() => {
   const state = readable<ConnectedWalletStoreState>({
     connected: true,
-    address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+    address: '0x8B2f7Be6a9d145276AF5D71BD5674E10c2e6937f',
     provider,
     signer: signer as unknown as ethers.providers.JsonRpcSigner,
+    dripsUserId: '794608645470684755422591474294308388755542020991',
     network: NETWORK,
   });
 

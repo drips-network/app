@@ -2,6 +2,7 @@
   import scroll from '$lib/stores/scroll';
   import wallet from '$lib/stores/wallet';
   import ConnectButton from '../connect-button/connect-button.svelte';
+  import SearchBar from '../search-bar/search-bar.svelte';
   import DripsLogo from '././drips-logo.svelte';
 
   $: elevated = $scroll.pos > 16;
@@ -11,6 +12,7 @@
   <a sveltekit:prefetch href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
   </a>
+  <SearchBar />
   <div class="wallet">
     <ConnectButton />
   </div>
