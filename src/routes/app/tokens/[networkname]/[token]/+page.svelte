@@ -13,6 +13,9 @@
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
   import Streams from '../../../dashboard/sections/streams.section.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import collectFlowSteps from '../../../dashboard/sections/collect-flow/collect-flow-steps';
+  import modal from '$lib/stores/modal';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -40,6 +43,10 @@
     userId && tokenAddress && $balances
       ? streams.getIncomingTokenAmountsByUser(userId, tokenAddress) ?? null
       : undefined;
+
+  function openCollectModal() {
+    modal.show(Stepper, undefined, collectFlowSteps(tokenAddress));
+  }
 </script>
 
 <article class="flex flex-col gap-16">
@@ -87,7 +94,7 @@
 
       <svelte:fragment slot="actions">
         <div class="flex gap-3">
-          <Button icon={ArrowUp}>Collect</Button>
+          <Button icon={ArrowUp} on:click={openCollectModal}>Collect</Button>
         </div>
       </svelte:fragment>
     </TokenStat>
