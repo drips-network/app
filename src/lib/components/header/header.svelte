@@ -8,7 +8,7 @@
 </script>
 
 <header class:elevated>
-  <a sveltekit:prefetch href={$wallet.connected ? '/app/dashboard' : '/'}>
+  <a href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
   </a>
   <div class="wallet">
