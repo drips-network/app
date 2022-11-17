@@ -13,6 +13,14 @@
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
 </script>
 
+<svelte:head>
+  <title>Radicle Drips</title>
+  <meta
+    name="description"
+    value="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+  />
+</svelte:head>
+
 <div id="home">
   <div id="header">
     <a id="logo" href="/">
