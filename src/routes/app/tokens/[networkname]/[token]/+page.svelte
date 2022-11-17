@@ -75,7 +75,9 @@
           <span class="animate-pulse">...</span>
         {:else}
           {@const amount = incomingTotals.totalEarned ?? 0n}
-          <Amount amount={{ tokenAddress, amount }} showSymbol={false} />
+          <span class:text-foreground-level-4={amount === 0n}>
+            <Amount amount={{ tokenAddress, amount }} showSymbol={false} amountClasses="" />
+          </span>
         {/if}
       </svelte:fragment>
 
@@ -104,7 +106,7 @@
           <span class="animate-pulse">...</span>
         {:else}
           {@const amount = outgoingEstimate ? outgoingEstimate.totals.remainingBalance : 0n}
-          <Amount amount={{ tokenAddress, amount }} showSymbol={false} />
+          <Amount amount={{ tokenAddress, amount }} showSymbol={false} amountClasses="" />
         {/if}
       </svelte:fragment>
 

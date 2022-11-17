@@ -14,12 +14,12 @@
   </header>
 
   <!-- amount -->
-  <div class="mt-6 text-right typo-header-1">
+  <div class="mt-10 text-right text-typo-header-1 font-mono font-bold">
     <slot name="value" />
   </div>
 
   <!-- actions -->
-  <footer class="flex justify-end mt-3 -mr-1">
+  <footer class="flex justify-end mt-5 -mr-1">
     <slot name="actions" />
   </footer>
 </section>
