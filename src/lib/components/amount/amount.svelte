@@ -18,7 +18,7 @@
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
-  function format(amount: Amount) {
+  export function format(amount: Amount) {
     const tokenDecimals = tokens.getByAddress(amount.tokenAddress)?.info.decimals;
     assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
 
@@ -52,7 +52,7 @@
           class="amount typo-text-small-mono"
           class:positive={amountPerSecond.amount > 0}
           class:negative={amountPerSecond.amount < 0}
-          >{format(amountPerSecond)}{#if showSymbol}
+          >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond)}{#if showSymbol}
             {' ' + amountPerSecondTokenInfo.info.symbol}
           {/if}</span
         > / sec

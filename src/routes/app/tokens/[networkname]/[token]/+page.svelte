@@ -7,6 +7,11 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Minus from 'radicle-design-system/icons/Minus.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import balances from '$lib/stores/balances';
+  import streams from '$lib/stores/streams';
+  import Amount from '$lib/components/amount/amount.svelte';
+  import TokenStat from '$lib/components/token-stat/token-stat.svelte';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -17,6 +22,23 @@
   );
 
   $: tokenAddress = token?.info.address ?? urlParamToken;
+
+  // user id
+  let userId: string | undefined;
+
+  async function getMyUserId() {
+    userId = (await (await getAddressDriverClient()).getUserId()).toString();
+  }
+  getMyUserId();
+
+  $: outgoingEstimate =
+    userId && $balances.accounts[userId]
+      ? $balances.accounts[userId][tokenAddress] ?? null
+      : undefined;
+  $: incomingTotals =
+    userId && tokenAddress && $balances
+      ? streams.getIncomingTokenAmountsByUser(userId, tokenAddress) ?? null
+      : undefined;
 </script>
 
 <article class="flex flex-col gap-12">
@@ -24,7 +46,7 @@
     <div class="mb-5 flex">
       <a
         href="/app/dashboard"
-        class="pl-2 py-1 pr-4 -ml-10 rounded-full flex items-center typo-header-4 text-foreground-level-5 btn-theme-transparent"
+        class="pl-2 py-1 pr-4 -ml-9 rounded-full flex items-center typo-header-4 text-foreground-level-5 btn-theme-transparent"
       >
         <div class="w-8 h-8 flex items-center">
           <ArrowLeft />
@@ -38,47 +60,60 @@
   </header>
 
   <section class="grid sm:grid-cols-2 gap-3">
-    <section
-      class="border-2 rounded-xl py-3 px-4"
-      style="border-color:var(--color-foreground-level-1)"
-    >
-      <header class="flex flex-wrap justify-between">
-        <h3 class="typo-text-bold">Incoming</h3>
-        <div class="typo-text-mono-bold" style="color:var(--color-positive)">0.00/sec</div>
-      </header>
+    <TokenStat title="Incoming">
+      <svelte:fragment slot="detail">
+        {#if incomingTotals}
+          <Amount
+            amountPerSecond={{ tokenAddress, amount: incomingTotals.amountPerSecond }}
+            showSymbol={false}
+          />
+        {/if}
+      </svelte:fragment>
 
-      <!-- amount -->
-      <div class="mt-6 text-right typo-header-1">0.00</div>
+      <svelte:fragment slot="value">
+        {#if incomingTotals === undefined}
+          <span class="animate-pulse">...</span>
+        {:else}
+          {@const amount = incomingTotals.totalEarned ?? 0n}
+          <Amount amount={{ tokenAddress, amount }} showSymbol={false} />
+        {/if}
+      </svelte:fragment>
 
-      <!-- actions -->
-      <footer class="flex justify-end mt-3">
-        <!-- <div>Collectable: XXXX</div> -->
+      <svelte:fragment slot="actions">
         <div class="flex gap-3">
           <Button icon={ArrowUp}>Collect</Button>
         </div>
-      </footer>
-    </section>
+      </svelte:fragment>
+    </TokenStat>
 
-    <section
-      class="border-2 rounded-xl py-3 px-4"
-      style="border-color:var(--color-foreground-level-1)"
-    >
-      <header class="flex flex-wrap justify-between">
-        <h3 class="typo-text-bold">Outgoing</h3>
-        <div class="typo-text-mono-bold" style="color:var(--color-negative)">0.00/sec</div>
-      </header>
+    <TokenStat title="Outgoing">
+      <svelte:fragment slot="detail">
+        {#if outgoingEstimate}
+          <Amount
+            amountPerSecond={{
+              tokenAddress,
+              amount: outgoingEstimate.totals.totalAmountPerSecond,
+            }}
+            showSymbol={false}
+          />
+        {/if}
+      </svelte:fragment>
 
-      <!-- amount -->
-      <div class="mt-6 text-right typo-header-1">0.00</div>
+      <svelte:fragment slot="value">
+        {#if outgoingEstimate === undefined}
+          <span class="animate-pulse">...</span>
+        {:else}
+          {@const amount = outgoingEstimate ? outgoingEstimate.totals.remainingBalance : 0n}
+          <Amount amount={{ tokenAddress, amount }} showSymbol={false} />
+        {/if}
+      </svelte:fragment>
 
-      <!-- actions -->
-      <footer class="flex justify-end mt-3">
-        <div />
+      <svelte:fragment slot="actions">
         <div class="flex gap-1">
           <Button icon={Plus}>Add</Button>
           <Button icon={Minus}>Withdraw</Button>
         </div>
-      </footer>
-    </section>
+      </svelte:fragment>
+    </TokenStat>
   </section>
 </article>

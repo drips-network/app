@@ -45,36 +45,6 @@
 
   let tableData: TokenTableRow[] = [];
 
-  function getIncomingTotalsForToken(
-    userId: string,
-    address: string,
-  ): {
-    totalEarned: bigint;
-    amountPerSecond: bigint;
-  } {
-    const ownStreams = streams.getStreamsForUser(userId);
-
-    if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
-
-    const incomingStreamsForToken = ownStreams.incoming.filter(
-      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
-    );
-
-    return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
-      (acc, stream) => {
-        const estimate = balances.getEstimateByStreamId(stream.id);
-
-        if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
-
-        return {
-          totalEarned: acc.totalEarned + estimate.totalStreamed,
-          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
-        };
-      },
-      { totalEarned: 0n, amountPerSecond: 0n },
-    );
-  }
-
   function updateTable() {
     if (!$balances || !accountEstimate || !userId) {
       tableData = [];
@@ -96,7 +66,7 @@
       assert(userId);
 
       const estimate = accountEstimate?.[tokenAddress];
-      const incomingTotals = getIncomingTotalsForToken(userId, tokenAddress);
+      const incomingTotals = streams.getIncomingTokenAmountsByUser(userId, tokenAddress);
 
       return {
         token: {

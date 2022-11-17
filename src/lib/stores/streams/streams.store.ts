@@ -3,6 +3,7 @@ import { derived, get, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
 import assert from '$lib/utils/assert';
+import balances from '$lib/stores/balances';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -108,6 +109,36 @@ export default (() => {
     };
   }
 
+  function getIncomingTokenAmountsByUser(
+    userId: string,
+    address: string,
+  ): {
+    totalEarned: bigint;
+    amountPerSecond: bigint;
+  } {
+    const ownStreams = getStreamsForUser(userId);
+
+    if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
+
+    const incomingStreamsForToken = ownStreams.incoming.filter(
+      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
+    );
+
+    return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
+      (acc, stream) => {
+        const estimate = balances.getEstimateByStreamId(stream.id);
+
+        if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
+
+        return {
+          totalEarned: acc.totalEarned + estimate.totalStreamed,
+          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
+        };
+      },
+      { totalEarned: 0n, amountPerSecond: 0n },
+    );
+  }
+
   /**
    * Refreshes the currently-connected user's account information.
    */
@@ -135,6 +166,7 @@ export default (() => {
     connect,
     disconnect,
     getStreamsForUser,
+    getIncomingTokenAmountsByUser,
     fetchAccount,
     refreshUserAccount,
   };
