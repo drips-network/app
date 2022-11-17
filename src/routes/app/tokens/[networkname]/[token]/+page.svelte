@@ -12,6 +12,7 @@
   import streams from '$lib/stores/streams';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
+  import Streams from '../../../dashboard/sections/streams.section.svelte';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -41,12 +42,12 @@
       : undefined;
 </script>
 
-<article class="flex flex-col gap-12">
+<article class="flex flex-col gap-16">
   <header>
     <div class="mb-5 flex">
       <a
         href="/app/dashboard"
-        class="pl-2 py-1 pr-4 -ml-9 rounded-full flex items-center typo-header-4 text-foreground-level-5 btn-theme-transparent"
+        class="pl-2 py-1 pr-4 -ml-2 lg:-ml-9 rounded-full flex items-center typo-header-4 text-foreground-level-5 btn-theme-transparent"
       >
         <div class="w-8 h-8 flex items-center">
           <ArrowLeft />
@@ -59,10 +60,13 @@
     </h1>
   </header>
 
-  <section class="grid sm:grid-cols-2 gap-3">
+  <!-- balances -->
+  <section class="grid sm:grid-cols-2 gap-3 lg:-mx-4">
+    <h2 class="sr-only">Your Balances</h2>
+
     <TokenStat title="Incoming">
       <svelte:fragment slot="detail">
-        {#if incomingTotals}
+        {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
           <Amount
             amountPerSecond={{ tokenAddress, amount: incomingTotals.amountPerSecond }}
             showSymbol={false}
@@ -106,7 +110,9 @@
           <span class="animate-pulse">...</span>
         {:else}
           {@const amount = outgoingEstimate ? outgoingEstimate.totals.remainingBalance : 0n}
-          <Amount amount={{ tokenAddress, amount }} showSymbol={false} amountClasses="" />
+          <span class:text-foreground-level-4={amount === 0n}>
+            <Amount amount={{ tokenAddress, amount }} showSymbol={false} amountClasses="" />
+          </span>
         {/if}
       </svelte:fragment>
 
@@ -118,4 +124,6 @@
       </svelte:fragment>
     </TokenStat>
   </section>
+
+  <Streams {userId} disableActions={false} {tokenAddress} />
 </article>

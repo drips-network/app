@@ -18,9 +18,11 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
+  import type { Stream } from '$lib/stores/streams/types';
 
   export let userId: string | undefined;
   export let disableActions = true;
+  export let tokenAddress: string | undefined = undefined;
 
   interface OutgoingStreamTableRow {
     name: string;
@@ -43,6 +45,17 @@
 
   function updateTable() {
     ownStreams = userId ? streams.getStreamsForUser(userId) : { outgoing: [], incoming: [] };
+
+    // filter by tokenAddress ?
+    if (tokenAddress) {
+      const byToken = (stream: Stream) =>
+        stream.dripsConfig.amountPerSecond.tokenAddress.toLowerCase() ===
+        tokenAddress?.toLowerCase();
+      ownStreams = {
+        outgoing: ownStreams.outgoing.filter(byToken),
+        incoming: ownStreams.incoming.filter(byToken),
+      };
+    }
 
     outgoingTableData = mapFilterUndefined(ownStreams.outgoing, (stream) => {
       const estimate = balances.getEstimateByStreamId(stream.id);
