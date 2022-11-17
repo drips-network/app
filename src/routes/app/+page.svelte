@@ -11,6 +11,11 @@
   }
 </script>
 
+<svelte:head>
+  <title>Radicle Drips - Welcome</title>
+  <meta name="description" value="Radicle Drips" />
+</svelte:head>
+
 <LargeEmptyState
   emoji="🌐"
   headline="Connect to Drips"
