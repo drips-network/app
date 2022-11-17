@@ -19,6 +19,7 @@
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
   import type { Stream } from '$lib/stores/streams/types';
+  import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
 
   export let userId: string | undefined;
   export let disableActions = true;
@@ -137,21 +138,28 @@
       header: 'To',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'amount',
       header: 'Total streamed',
       cell: () => AmountCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'token',
       header: 'Token',
       cell: () => TokenCell,
       enableSorting: false,
-      size: (100 / 24) * 3,
+      size: (100 / 24) * 2,
+    },
+    {
+      accessorKey: 'chevron',
+      header: '',
+      cell: () => ChevronRightCell,
+      enableSorting: false,
+      size: (100 / 24) * 2,
     },
   ];
 
@@ -168,21 +176,28 @@
       header: 'From',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'amount',
-      header: 'Amount earned',
+      header: 'Received',
       cell: () => AmountCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'token',
       header: 'Token',
       cell: () => TokenCell,
       enableSorting: false,
-      size: (100 / 24) * 3,
+      size: (100 / 24) * 2,
+    },
+    {
+      accessorKey: 'chevron',
+      header: '',
+      cell: () => ChevronRightCell,
+      enableSorting: false,
+      size: (100 / 24) * 2,
     },
   ];
 

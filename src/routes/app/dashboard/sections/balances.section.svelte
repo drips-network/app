@@ -26,6 +26,7 @@
   import wallet from '$lib/stores/wallet';
   import { goto } from '$app/navigation';
   import getCollectFlowSteps from './collect-flow/collect-flow-steps';
+  import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -116,22 +117,29 @@
     },
     {
       accessorKey: 'earnings',
-      header: 'Earnings',
+      header: 'Incoming',
       cell: () => Amount,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'streaming',
-      header: 'Streaming',
+      header: 'Outgoing',
       cell: () => Amount,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'netRate',
       header: 'Net rate',
       cell: () => Amount,
+      enableSorting: false,
+      size: (100 / 24) * 2,
+    },
+    {
+      accessorKey: 'netRate',
+      header: '',
+      cell: () => ChevronRightCell,
       enableSorting: false,
       size: (100 / 24) * 2,
     },
