@@ -25,22 +25,20 @@ export default function getCollectFlowSteps(tokenAddress: string | undefined = u
         !tokenAddress
           ? makeStep({
               component: SelectCollectTokenStep,
-              props: {
-                tokenAddress,
-              },
+              props: undefined,
             })
           : undefined,
         makeStep({
           component: FetchCollectableAmounts,
-          props: {},
+          props: undefined,
         }),
         makeStep({
           component: CollectAmountsStep,
-          props: {},
+          props: undefined,
         }),
         makeStep({
           component: Success,
-          props: {},
+          props: undefined,
         }),
       ],
       (v) => v,

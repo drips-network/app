@@ -103,13 +103,13 @@ export default (() => {
 
   /**
    * Get and calculate a user's total incoming amount and total incoming amounts-per-second
-   * @param id The user's ID
-   * @param address The Token's address
+   * @param userId The desired user's ID
+   * @param tokenAddress The desired token's address
    * @returns The total income earned and total incoming rate
    */
   function getIncomingTokenAmountsByUser(
     userId: string,
-    address: string,
+    tokenAddress: string,
   ): {
     totalEarned: bigint;
     amountPerSecond: bigint;
@@ -119,7 +119,7 @@ export default (() => {
     if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
 
     const incomingStreamsForToken = ownStreams.incoming.filter(
-      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
+      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === tokenAddress,
     );
 
     return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
