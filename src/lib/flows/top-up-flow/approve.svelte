@@ -64,7 +64,7 @@
   <StepHeader
     emoji="🔐"
     headline="Approve token spend"
-    description={`Please grant your Radicle Drips account access to your ${
+    description={`Please grant your Drips account access to your ${
       tokenInfo?.info.name ?? ''
     } funds by executing this transaction.`}
   />

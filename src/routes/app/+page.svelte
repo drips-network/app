@@ -12,8 +12,11 @@
 </script>
 
 <svelte:head>
-  <title>Radicle Drips - Welcome</title>
-  <meta name="description" value="Radicle Drips" />
+  <title>Drips • Stream and Split Funds on Ethereum</title>
+  <meta
+    name="description"
+    value="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+  />
 </svelte:head>
 
 <LargeEmptyState

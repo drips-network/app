@@ -10,8 +10,8 @@
 </script>
 
 <svelte:head>
-  <title>Drips — Settings</title>
-  <meta name="description" value="Radicle Drips Settings Page" />
+  <title>Settings | Drips</title>
+  <meta name="description" value="Drips Settings Page" />
 </svelte:head>
 
 <div class="settings">

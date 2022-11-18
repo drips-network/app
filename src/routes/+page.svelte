@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-  <title>Radicle Drips</title>
+  <title>Drips • Stream and Split Funds on Ethereum</title>
   <meta
     name="description"
     value="An Ethereum protocol for streaming and splitting funds, built by Radicle."
