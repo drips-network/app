@@ -7,6 +7,8 @@
   import Token from '$lib/components/token/token.svelte';
   import StreamIcon from 'radicle-design-system/icons/TokenStreams.svelte';
   import { type Item, SearchItemType } from '../search';
+  import wallet from '$lib/stores/wallet';
+  import unreachable from '$lib/utils/unreachable';
 
   export let item: Item;
   export let highlighted: string;
@@ -15,7 +17,11 @@
 </script>
 
 {#if item.type === SearchItemType.STREAM}
-  <AccountMenuItem on:click icon={StreamIcon} href={`/app/streams/${item.item.id}`}>
+  <AccountMenuItem
+    on:click
+    icon={StreamIcon}
+    href={`/app/${item.item.sender.address}/tokens/${item.item.dripsConfig.amountPerSecond.tokenAddress}/streams/${item.item.dripsConfig.dripId}`}
+  >
     <div class="icon" slot="title">
       <div class="highlighted">
         <span style="color: var(--color-foreground-level-5)">
@@ -30,7 +36,10 @@
     </div>
   </AccountMenuItem>
 {:else if item.type === SearchItemType.TOKEN}
-  <AccountMenuItem on:click href={`/app/tokens/${item.item.info.address}`}>
+  <AccountMenuItem
+    on:click
+    href={`/app/${$wallet.address ?? unreachable()}/tokens/${item.item.info.address}`}
+  >
     <div class="icon" slot="left">
       <Token show="none" size="huge" address={item.item.info.address} />
       <div class="badge"><TokensIcon style="height: 1rem" /></div>
