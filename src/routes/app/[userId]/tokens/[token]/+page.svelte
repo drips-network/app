@@ -9,7 +9,6 @@
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import balances from '$lib/stores/balances';
-  import streams from '$lib/stores/streams';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
   import Streams from '../../../dashboard/sections/streams.section.svelte';
@@ -41,7 +40,7 @@
       : undefined;
   $: incomingTotals =
     userId && tokenAddress && $balances
-      ? streams.getIncomingTokenAmountsByUser(userId, tokenAddress) ?? null
+      ? balances.getIncomingTokenAmountsByUser(userId, tokenAddress) ?? null
       : undefined;
 
   function openCollectModal() {

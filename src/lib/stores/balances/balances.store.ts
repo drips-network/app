@@ -6,6 +6,7 @@ import tickStore from '../tick/tick.store';
 import type { Account, StreamId, UserId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
 import { getAddressDriverClient, getDripsHubClient } from '$lib/utils/get-drips-clients';
+import streams from '$lib/stores/streams';
 
 interface Amount {
   amount: bigint;
@@ -100,6 +101,42 @@ export default (() => {
     return get(state).accounts[senderUserId]?.[tokenAddress]?.streams.find((s) => s.id === id);
   }
 
+  /**
+   * Get and calculate a user's total incoming amount and total incoming amounts-per-second
+   * @param id The user's ID
+   * @param address The Token's address
+   * @returns The total income earned and total incoming rate
+   */
+  function getIncomingTokenAmountsByUser(
+    userId: string,
+    address: string,
+  ): {
+    totalEarned: bigint;
+    amountPerSecond: bigint;
+  } {
+    const ownStreams = streams.getStreamsForUser(userId);
+
+    if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
+
+    const incomingStreamsForToken = ownStreams.incoming.filter(
+      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
+    );
+
+    return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
+      (acc, stream) => {
+        const estimate = getEstimateByStreamId(stream.id);
+
+        if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
+
+        return {
+          totalEarned: acc.totalEarned + estimate.totalStreamed,
+          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
+        };
+      },
+      { totalEarned: 0n, amountPerSecond: 0n },
+    );
+  }
+
   /** @private */
   function _updateAccountBalances() {
     state.update((s) => ({
@@ -139,6 +176,7 @@ export default (() => {
     subscribe: state.subscribe,
     setAccounts,
     getEstimateByStreamId,
+    getIncomingTokenAmountsByUser,
     connect,
     disconnect,
     updateBalances,

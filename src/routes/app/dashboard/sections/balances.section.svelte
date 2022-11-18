@@ -64,7 +64,7 @@
       assert(userId);
 
       const estimate = accountEstimate?.[tokenAddress];
-      const incomingTotals = streams.getIncomingTokenAmountsByUser(userId, tokenAddress);
+      const incomingTotals = balances.getIncomingTokenAmountsByUser(userId, tokenAddress);
 
       return {
         token: {
