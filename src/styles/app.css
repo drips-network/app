@@ -8,6 +8,12 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
+.search-highlight {
+  background-color: var(--color-foreground-level-2);
+  display: inline;
+  border-radius: 0.25rem;
+}
+
 @font-face {
   font-family: 'Redaction 35';
   font-weight: 400;

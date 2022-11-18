@@ -138,7 +138,6 @@
     </div>
     <Header />
   </div>
-  <Header />
 {/if}
 
 <style>

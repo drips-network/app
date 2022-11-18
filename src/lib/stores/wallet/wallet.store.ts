@@ -3,12 +3,13 @@ import type { Network } from '@ethersproject/networks';
 import Web3Modal from 'web3modal';
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { Utils } from 'radicle-drips';
+import { AddressDriverClient, Utils } from 'radicle-drips';
 
 // https://github.com/vitejs/vite/issues/7257#issuecomment-1079579892
 import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 import testnetMockProvider from './__test__/local-testnet-mock-provider';
 import isTest from '$lib/utils/is-test';
+import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
 const DEFAULT_NETWORK: Network = {
@@ -30,6 +31,7 @@ const WEB_3_MODAL_PROVIDER_OPTIONS = {
 export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
+  dripsUserId: string;
   provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
   signer: ethers.providers.JsonRpcSigner;
   network: Network;
@@ -38,7 +40,11 @@ export interface ConnectedWalletStoreState {
 interface DisconnectedWalletStoreState {
   connected: false;
   network: Network;
-  provider: ethers.providers.Web3Provider | ethers.providers.InfuraProvider;
+  provider:
+    | ethers.providers.Web3Provider
+    | ethers.providers.InfuraProvider
+    | ethers.providers.JsonRpcProvider;
+  dripsUserId?: undefined;
   address?: undefined;
   signer?: undefined;
 }
@@ -122,6 +128,7 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0],
+      dripsUserId: await (await AddressDriverClient.create(signer)).getUserId(),
       provider,
       signer,
       network: await provider.getNetwork(),
@@ -176,17 +183,29 @@ const mockWalletStore = () => {
   const address = (window as any).playwrightAddress ?? '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
   const provider = testnetMockProvider(address);
 
-  const state = writable<ConnectedWalletStoreState>({
-    connected: true,
-    address,
-    provider,
-    signer: provider.getSigner(),
+  const state = writable<WalletStoreState>({
+    connected: false,
     network: provider.network,
+    provider,
   });
+
+  async function initialize() {
+    const signer = provider.getSigner();
+    const userId = await (await getAddressDriverClient(signer)).getUserId();
+
+    state.set({
+      connected: true,
+      address,
+      provider,
+      signer,
+      network: provider.network,
+      dripsUserId: userId,
+    });
+  }
 
   return {
     subscribe: state.subscribe,
-    initialize: () => undefined,
+    initialize,
     connect: () => undefined,
     disconnect: () => undefined,
   };

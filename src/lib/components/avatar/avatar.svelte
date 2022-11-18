@@ -30,6 +30,8 @@
     width: 100%;
     border-radius: calc(100% / 2);
     object-fit: cover;
+    box-sizing: border-box;
+    border: 2px solid var(--color-foreground-level-2);
   }
 
   .placeholder {

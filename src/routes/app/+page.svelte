@@ -14,5 +14,5 @@
 <LargeEmptyState
   emoji="🌐"
   headline="Connect to Drips"
-  description="Connect your wallet to view your Dashboard."
+  description="Connect your wallet to view your Dashboard, or search to find profiles by ENS or address."
 />
