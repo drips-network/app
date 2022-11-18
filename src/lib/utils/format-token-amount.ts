@@ -26,14 +26,18 @@ function countDecimals(num: number) {
  * @returns The formatted value as a string.
  */
 export default function formatTokenAmount(
-  amount: Amount,
+  amount: Amount | bigint,
   tokenDecimals: number,
   precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
 ) {
-  const parsed = parseFloat(utils.formatUnits(amount.amount / precisionMultiplier, tokenDecimals));
+  const toParse = typeof amount === 'bigint' ? amount : amount.amount;
+  const parsed = parseFloat(utils.formatUnits(toParse / precisionMultiplier, tokenDecimals));
   const decimalCount = countDecimals(parsed);
+  const amountDecimals = Math.max(Math.min(MAX_DECIMAL_ZEROES, decimalCount), MIN_DECIMAL_ZEROES);
 
-  return `${parsed.toFixed(
-    Math.max(Math.min(MAX_DECIMAL_ZEROES, decimalCount), MIN_DECIMAL_ZEROES),
-  )}`;
+  const formatted = `${parsed.toFixed(amountDecimals)}`;
+
+  const isTiny = formatted === '0.00' && amount > 0n;
+
+  return isTiny ? '<0.00000001' : formatted;
 }

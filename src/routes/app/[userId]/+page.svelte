@@ -5,9 +5,6 @@
   import ens from '$lib/stores/ens';
   import streams from '$lib/stores/streams';
   import wallet from '$lib/stores/wallet';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-  import { isAddress } from 'ethers/lib/utils';
-  import { AddressDriverClient } from 'radicle-drips';
   import { onMount } from 'svelte';
   import Balances from '../dashboard/sections/balances.section.svelte';
   import Splits from '../dashboard/sections/splits.section.svelte';
@@ -16,6 +13,7 @@
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade } from 'svelte/transition';
+  import decodeUserId from './utils/decode-user-id';
 
   $: userId = $page.params.userId;
 
@@ -65,23 +63,13 @@
   }
 
   onMount(async () => {
-    if (isAddress(userId)) {
-      address = userId;
-      dripsUserId = await (await getAddressDriverClient()).getUserIdByAddress(userId);
-    } else if (/^\d+$/.test(userId)) {
-      // User ID param has only numbers and is probably a drips user ID
-      dripsUserId = userId;
-      address = AddressDriverClient.getUserAddress(userId);
-    } else if (userId.endsWith('.eth')) {
-      const lookup = await ens.reverseLookup(userId);
-      if (lookup) {
-        dripsUserId = await (await getAddressDriverClient()).getUserIdByAddress(lookup);
-        address = lookup;
-      } else {
-        error = new Error('Not found');
-      }
-    } else {
-      error = new Error('Not found.');
+    try {
+      const decodedUserId = await decodeUserId(userId);
+
+      address = decodedUserId.address;
+      dripsUserId = decodedUserId.dripsUserId;
+    } catch (e) {
+      error = e instanceof Error ? e : new Error();
     }
   });
 

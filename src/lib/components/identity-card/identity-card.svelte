@@ -32,7 +32,7 @@
     border-radius: 0.5rem;
     background-color: var(--color-foreground-level-1);
     user-select: none;
-    width: 9rem;
+    width: 12rem;
   }
 
   .identity-card > * {

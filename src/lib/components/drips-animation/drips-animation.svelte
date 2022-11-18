@@ -86,6 +86,24 @@
   }
 
   let lastDraw = new Date().getTime();
+  let paused = false;
+
+  onMount(() => {
+    const handleBlur = () => (paused = true);
+    const handleFocus = () => {
+      lastDraw = new Date().getTime();
+      paused = false;
+      draw();
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  });
 
   function draw() {
     if (!canvasElem) return;
@@ -119,7 +137,7 @@
     }
 
     lastDraw = currentMillis;
-    requestAnimationFrame(draw);
+    if (!paused) requestAnimationFrame(draw);
   }
 </script>
 
