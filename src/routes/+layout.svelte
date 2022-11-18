@@ -9,7 +9,25 @@
   import '../styles/app.css';
 
   import themeStore from '$lib/stores/theme/theme.store';
+  import { page } from '$app/stores';
 </script>
+
+<svelte:head>
+  <meta property="og:title" content="Radicle Drips" />
+  <meta property="og:image" content={`https://${$page.url.host}/assets/social-share.png`} />
+  <meta
+    property="og:description"
+    content="An Ethereum protocol for streaming and splitting funds."
+  />
+  <meta name="twitter:title" content="Radicle Drips" />
+  <meta
+    name="twitter:description"
+    content="An Ethereum protocol for streaming and splitting funds."
+  />
+  <meta name="twitter:image" content={`https://${$page.url.host}/assets/social-share.png`} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@radicle" />
+</svelte:head>
 
 <div class="main" data-theme={$themeStore.currentTheme}>
   <div class="page">
