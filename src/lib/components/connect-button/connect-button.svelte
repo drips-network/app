@@ -10,7 +10,7 @@
 {#if $wallet.connected}
   <Flyout>
     <div slot="trigger">
-      <IdentityBadge address={$wallet.address} />
+      <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
     </div>
     <div slot="content">
       <AccountMenu />

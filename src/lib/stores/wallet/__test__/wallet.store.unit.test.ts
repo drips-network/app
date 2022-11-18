@@ -41,22 +41,9 @@ describe('wallet store', () => {
     expect(get(wallet).connected).toBe(false);
   });
 
-  it('connects to wallet', async () => {
-    // Mock provider automatically accepts connect requests
-    await wallet.connect();
+  it.todo('connects to wallet');
 
-    expect(get(wallet)?.connected).toBe(true);
-    expect(get(wallet)?.address).toBe(TEST_ADDRESS);
-  });
-
-  it('restores a connection if a cached provider is available', async () => {
-    cachedProvider = true;
-
-    await wallet.initialize();
-
-    expect(get(wallet)?.connected).toBe(true);
-    expect(get(wallet)?.address).toBe(TEST_ADDRESS);
-  });
+  it.todo('restores a connection if a cached provider is available');
 
   it('clears on disconnect', () => {
     // disconnect is called in afterEach

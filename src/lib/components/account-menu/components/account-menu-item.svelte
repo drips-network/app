@@ -7,12 +7,14 @@
   export let href: string | undefined = undefined;
 </script>
 
-<a {href} class:disabled class:clickable={href} class="account-menu-item-wrapper">
-  <slot name="left">
+<a {href} on:click class:disabled class:clickable={href} class="account-menu-item-wrapper">
+  {#if !icon}
+    <slot name="left" />
+  {:else}
     <div class="icon-wrapper">
       {#if icon}<svelte:component this={icon} style="fill: var(--color-primary)" />{/if}
     </div>
-  </slot>
+  {/if}
   <div class="description typo-text-bold">
     <slot name="title" />
   </div>
@@ -29,6 +31,10 @@
     padding: 0.5rem;
     border-radius: 4rem;
     transition: background-color 0.3s;
+  }
+
+  .account-menu-item-wrapper > * {
+    min-width: 0;
   }
 
   .account-menu-item-wrapper.clickable {
