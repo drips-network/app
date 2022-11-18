@@ -27,6 +27,7 @@
   import { goto } from '$app/navigation';
   import getCollectFlowSteps from './collect-flow/collect-flow-steps';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -175,7 +176,7 @@
   function onRowClick(event: CustomEvent) {
     // go to token page by address
     const tokenAddress = tableData[event.detail].token.address;
-    goto(`/app/tokens/${$wallet.network.name}/${tokenAddress}`);
+    goto(`/app/${$wallet.address ?? unreachable()}/tokens/${tokenAddress}`);
   }
 </script>
 
