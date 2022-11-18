@@ -119,11 +119,7 @@
 </svelte:head>
 
 <div class="wrapper">
-  {#if loading}
-    <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
-      <Spinner />
-    </div>
-  {:else if error === 'invalid-id'}
+  {#if error === 'invalid-id'}
     <LargeEmptyState
       emoji="💀"
       headline="Invalid stream ID"
@@ -135,6 +131,10 @@
       headline="Stream not found"
       description="We weren't able to find a stream with this ID."
     />
+  {:else if loading}
+    <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
+      <Spinner />
+    </div>
   {:else if stream}
     <div class="stream-page" in:fly={{ duration: 300, y: 16 }}>
       <div class="hero">
