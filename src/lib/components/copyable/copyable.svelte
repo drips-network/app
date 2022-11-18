@@ -3,6 +3,7 @@
   import SuccessIcon from 'radicle-design-system/icons/CheckCircle.svelte';
 
   export let value: string;
+  export let alwaysVisible = false;
 
   let success = false;
   let visible = false;
@@ -21,7 +22,11 @@
   on:mouseleave={() => (visible = false)}
 >
   <slot />
-  <div class="copy-icon" class:visible={visible || success}>
+  <div
+    class="copy-icon"
+    class:visible={visible || success || alwaysVisible}
+    class:animate={!alwaysVisible}
+  >
     {#if success}
       <SuccessIcon style="fill: var(--color-positive)" />
     {:else}<CopyIcon />{/if}
@@ -36,9 +41,12 @@
   }
 
   .copy-icon {
+    width: 0px;
+  }
+
+  .copy-icon.animate {
     transform: translateX(-24px);
     opacity: 0;
-    width: 0px;
     transition: transform 0.3s, opacity 0.3s, width 0.3s;
   }
 

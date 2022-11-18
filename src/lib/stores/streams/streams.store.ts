@@ -88,10 +88,14 @@ export default (() => {
     }
   }
 
-  function getStreamsForUser(userId: string) {
+  function getAssetConfig(userId: string, tokenAddress: string) {
+    return get(state).accounts[userId].assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+  }
+
+  function getAllStreams() {
     const accountsValue = get(accounts);
 
-    const allStreams = Object.values(accountsValue).reduce<Stream[]>(
+    return Object.values(accountsValue).reduce<Stream[]>(
       (streams, account) => [
         ...streams,
         ...account.assetConfigs.reduce<Stream[]>(
@@ -101,11 +105,19 @@ export default (() => {
       ],
       [],
     );
+  }
+
+  function getStreamsForUser(userId: string) {
+    const allStreams = getAllStreams();
 
     return {
       incoming: allStreams.filter((s) => s.receiver.userId === userId),
       outgoing: allStreams.filter((s) => s.sender.userId === userId),
     };
+  }
+
+  function getStreamById(streamId: string) {
+    return getAllStreams().find((stream) => stream.id === streamId);
   }
 
   /**
@@ -134,6 +146,9 @@ export default (() => {
     fetchStatuses: { subscribe: fetchStatuses.subscribe },
     connect,
     disconnect,
+    getAllStreams,
+    getStreamById,
+    getAssetConfig,
     getStreamsForUser,
     fetchAccount,
     refreshUserAccount,

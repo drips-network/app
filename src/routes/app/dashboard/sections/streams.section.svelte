@@ -6,6 +6,7 @@
   import Table from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
+  import LinkCell, { type LinkCellData } from '$lib/components/table/cells/link.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -23,14 +24,14 @@
   export let disableActions = true;
 
   interface OutgoingStreamTableRow {
-    name: string;
+    name: LinkCellData;
     toAddress: string;
     amount: AmountCellData;
     token: TokenCellData;
   }
 
   interface IncomingStreamTableRow {
-    name: string;
+    name: LinkCellData;
     fromAddress: string;
     amount: AmountCellData;
     token: TokenCellData;
@@ -51,7 +52,10 @@
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
       return {
-        name: stream.name ?? 'Unnamed stream',
+        name: {
+          label: stream.name ?? 'Unnamed stream',
+          href: `/app/${userId}/tokens/${tokenAddress}/streams/${stream.dripsConfig.dripId}`,
+        },
         toAddress: stream.receiver.address,
         amount: {
           amount: {
@@ -79,7 +83,10 @@
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
       return {
-        name: stream.name ?? 'Unnamed stream',
+        name: {
+          label: stream.name ?? 'Unnamed stream',
+          href: `/app/${stream.sender.userId}/tokens/${tokenAddress}/streams/${stream.dripsConfig.dripId}`,
+        },
         fromAddress: stream.sender.address,
         amount: {
           amountPerSecond: {
@@ -115,7 +122,7 @@
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: (info) => info.getValue(),
+      cell: () => LinkCell,
       enableSorting: false,
       size: (100 / 24) * 8,
     },
@@ -146,7 +153,7 @@
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: (info) => info.getValue(),
+      cell: () => LinkCell,
       enableSorting: false,
       size: (100 / 24) * 8,
     },
