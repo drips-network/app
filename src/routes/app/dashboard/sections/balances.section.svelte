@@ -23,11 +23,12 @@
   import { ethers } from 'ethers';
   import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
-  import wallet from '$lib/stores/wallet';
   import { goto } from '$app/navigation';
   import getCollectFlowSteps from './collect-flow/collect-flow-steps';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
+  import { AddressDriverClient } from 'radicle-drips';
+  import wallet from '$lib/stores/wallet';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -108,43 +109,47 @@
     if (userId) updateTable();
   }
 
-  const tableColumns: ColumnDef<TokenTableRow>[] = [
-    {
-      accessorKey: 'token',
-      header: 'Token',
-      cell: () => TokenCell,
-      enableSorting: false,
-      size: (100 / 24) * 8,
-    },
-    {
-      accessorKey: 'earnings',
-      header: 'Incoming',
-      cell: () => Amount,
-      enableSorting: false,
-      size: (100 / 24) * 5,
-    },
-    {
-      accessorKey: 'streaming',
-      header: 'Outgoing',
-      cell: () => Amount,
-      enableSorting: false,
-      size: (100 / 24) * 5,
-    },
-    {
-      accessorKey: 'netRate',
-      header: 'Net rate',
-      cell: () => Amount,
-      enableSorting: false,
-      size: (100 / 24) * 2,
-    },
-    {
-      accessorKey: 'netRate',
-      header: '',
-      cell: () => ChevronRightCell,
-      enableSorting: false,
-      size: (100 / 24) * 2,
-    },
-  ];
+  function buildTableColumns(isClickable = false): ColumnDef<TokenTableRow>[] {
+    return [
+      {
+        accessorKey: 'token',
+        header: 'Token',
+        cell: () => TokenCell,
+        enableSorting: false,
+        size: (100 / 24) * 8,
+      },
+      {
+        accessorKey: 'earnings',
+        header: 'Incoming',
+        cell: () => Amount,
+        enableSorting: false,
+        size: (100 / 24) * 5,
+      },
+      {
+        accessorKey: 'streaming',
+        header: 'Outgoing',
+        cell: () => Amount,
+        enableSorting: false,
+        size: (100 / 24) * 5,
+      },
+      {
+        accessorKey: 'netRate',
+        header: 'Net rate',
+        cell: () => Amount,
+        enableSorting: false,
+        size: (100 / 24) * 2,
+      },
+      {
+        accessorKey: 'chevron',
+        header: '',
+        cell: isClickable ? () => ChevronRightCell : undefined,
+        enableSorting: false,
+        size: (100 / 24) * 2,
+      },
+    ];
+  }
+  $: isMyBalances = userId === $wallet.dripsUserId;
+  $: tableColumns = buildTableColumns(isMyBalances);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let options: TableOptions<any>;
@@ -176,7 +181,9 @@
   function onRowClick(event: CustomEvent) {
     // go to token page by address
     const tokenAddress = tableData[event.detail].token.address;
-    goto(`/app/${$wallet.address ?? unreachable()}/tokens/${tokenAddress}`);
+    assert(userId);
+    const address = AddressDriverClient.getUserAddress(userId);
+    goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
   }
 </script>
 
@@ -239,7 +246,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} isRowClickable={true} on:rowclick={onRowClick} />
+      <Table {options} isRowClickable={isMyBalances} on:rowclick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>

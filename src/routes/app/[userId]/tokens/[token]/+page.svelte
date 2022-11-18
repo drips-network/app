@@ -7,7 +7,6 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Minus from 'radicle-design-system/icons/Minus.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import balances from '$lib/stores/balances';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
@@ -15,6 +14,8 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import collectFlowSteps from '../../../dashboard/sections/collect-flow/collect-flow-steps';
   import modal from '$lib/stores/modal';
+  import wallet from '$lib/stores/wallet';
+  import guardConnected from '$lib/utils/guard-connected';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -26,18 +27,13 @@
 
   $: tokenAddress = token?.info.address ?? urlParamToken;
 
-  // user id
-  let userId: string | undefined;
-
-  async function getMyUserId() {
-    userId = (await (await getAddressDriverClient()).getUserId()).toString();
-  }
-  getMyUserId();
+  $: userId = $wallet.dripsUserId;
 
   $: outgoingEstimate =
     userId && $balances.accounts[userId]
       ? $balances.accounts[userId][tokenAddress] ?? null
       : undefined;
+
   $: incomingTotals =
     userId && tokenAddress && $balances
       ? balances.getIncomingTokenAmountsByUser(userId, tokenAddress) ?? null
@@ -45,6 +41,12 @@
 
   function openCollectModal() {
     modal.show(Stepper, undefined, collectFlowSteps(tokenAddress));
+  }
+
+  // redirect to connect page if disconnects
+  $: {
+    $wallet.connected;
+    guardConnected();
   }
 </script>
 
@@ -104,7 +106,7 @@
           <Amount
             amountPerSecond={{
               tokenAddress,
-              amount: outgoingEstimate.totals.totalAmountPerSecond,
+              amount: -outgoingEstimate.totals.totalAmountPerSecond,
             }}
             showSymbol={false}
           />
