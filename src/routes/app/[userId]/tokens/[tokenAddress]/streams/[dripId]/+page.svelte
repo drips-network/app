@@ -13,7 +13,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
   import balances from '$lib/stores/balances';
-  import decodeUserId from '../../utils/decode-user-id';
+  import decodeUserId from '$lib/utils/decode-user-id';
   import Button from '$lib/components/button/button.svelte';
   import unreachable from '$lib/utils/unreachable';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';

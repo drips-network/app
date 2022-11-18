@@ -54,7 +54,7 @@
       return {
         name: {
           label: stream.name ?? 'Unnamed stream',
-          href: `/app/${userId}/${tokenAddress}/${stream.dripsConfig.dripId}`,
+          href: `/app/${userId}/tokens/${tokenAddress}/streams/${stream.dripsConfig.dripId}`,
         },
         toAddress: stream.receiver.address,
         amount: {
@@ -85,7 +85,7 @@
       return {
         name: {
           label: stream.name ?? 'Unnamed stream',
-          href: `/app/${userId}/${tokenAddress}/${stream.dripsConfig.dripId}`,
+          href: `/app/${userId}/tokens/${tokenAddress}/streams/${stream.dripsConfig.dripId}`,
         },
         fromAddress: stream.sender.address,
         amount: {

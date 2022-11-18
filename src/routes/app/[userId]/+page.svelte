@@ -13,7 +13,7 @@
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade } from 'svelte/transition';
-  import decodeUserId from './utils/decode-user-id';
+  import decodeUserId from '$lib/utils/decode-user-id';
 
   $: userId = $page.params.userId;
 
