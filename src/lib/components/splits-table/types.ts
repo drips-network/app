@@ -1,5 +1,12 @@
+import type { SvelteComponent } from 'svelte';
+
 export interface SplitsTableRow {
-  text: string;
+  subject:
+    | string
+    | {
+        component: typeof SvelteComponent;
+        props: { [propName: string]: unknown };
+      };
   percent: string;
 }
 
