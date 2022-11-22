@@ -2,10 +2,20 @@
   import { createSvelteTable, flexRender, type TableOptions } from '@tanstack/svelte-table';
   import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
   import ChevronUp from 'radicle-design-system/icons/ChevronUp.svelte';
+  import { createEventDispatcher } from 'svelte';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let options: TableOptions<any>;
   $: table = createSvelteTable(options);
+
+  export let isRowClickable = false;
+  const dispatch = createEventDispatcher();
+
+  function onRowClick(index: number) {
+    if (isRowClickable) {
+      dispatch('rowclick', index);
+    }
+  }
 </script>
 
 <table>
@@ -38,8 +48,8 @@
     {/each}
   </thead>
   <tbody>
-    {#each $table.getRowModel().rows as row}
-      <tr>
+    {#each $table.getRowModel().rows as row, index}
+      <tr on:click={() => onRowClick(index)} class:cursor-pointer={isRowClickable}>
         {#each row.getVisibleCells() as cell}
           <td
             class:typo-text-bold={cell.column.getIsSorted()}
@@ -169,5 +179,10 @@
 
   tfoot th {
     font-weight: normal;
+  }
+
+  tr.cursor-pointer:hover {
+    background-color: var(--color-foreground-level-1);
+    transition: background-color 300ms;
   }
 </style>
