@@ -16,6 +16,7 @@
   export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
+  export let isReverse = false;
 
   $: ensStore.lookup(address);
   $: ens = $ensStore[address];
@@ -59,7 +60,13 @@
   $: currentFontClass = fontClasses[size];
 </script>
 
-<a href={getLink()} class="identity-badge" style:height={showAvatar ? `${currentSize}px` : ''}>
+<a
+  href={getLink()}
+  class="identity-badge flex items-center relative text-left text-foreground-level-6"
+  class:flex-row-reverse={isReverse}
+  style:height={showAvatar ? `${currentSize}px` : ''}
+  style:gap={showAvatar && showIdentity ? `${currentSize / 2.5}px` : ''}
+>
   {#if showAvatar}
     <Avatar
       size={currentSize}
@@ -69,38 +76,31 @@
     />
   {/if}
   {#if showIdentity}
-    {#key toDisplay}
-      <p
-        transition:fade|local={{ duration: 300 }}
-        class:mono={!ens?.name}
-        class:foreground={size === 'gigantic'}
-        class={`${currentFontClass} identity`}
-        style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+    <div class="relative flex-1">
+      {#key toDisplay}
+        <div
+          transition:fade|local={{ duration: 300 }}
+          class:mono={!ens?.name}
+          class:foreground={size === 'gigantic'}
+          class={`${currentFontClass} identity-ellipsis absolute overlay`}
+          data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+          class:hideOnMobile={hideAvatarOnMobile}
+        >
+          {toDisplay}
+        </div>
+      {/key}
+      <div
+        class:typo-text-mono-bold={!ens?.name}
+        class={`${currentFontClass} identity-ellipsis opacity-0`}
         class:hideOnMobile={hideAvatarOnMobile}
       >
         {toDisplay}
-      </p>
-    {/key}
-    <p
-      class:typo-text-mono-bold={!ens?.name}
-      class={`${currentFontClass} identity-placeholder`}
-      style:margin-left={`${currentSize / 3}px`}
-      class:hideOnMobile={hideAvatarOnMobile}
-    >
-      {toDisplay}
-    </p>
+      </div>
+    </div>
   {/if}
 </a>
 
 <style>
-  .identity-badge {
-    display: flex;
-    align-items: center;
-    color: var(--color-foreground-level-6);
-    position: relative;
-    text-align: left;
-  }
-
   .mono {
     font-family: var(--typeface-mono-bold);
     white-space: nowrap;
@@ -110,16 +110,7 @@
     color: var(--color-foreground);
   }
 
-  .identity {
-    position: absolute;
-    width: 100%;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .identity-placeholder {
-    opacity: 0;
+  .identity-ellipsis {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

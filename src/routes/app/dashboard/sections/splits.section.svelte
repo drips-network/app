@@ -5,7 +5,7 @@
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
+  // import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { makeStep } from '$lib/components/stepper/types';
@@ -15,6 +15,8 @@
   import modal from '$lib/stores/modal';
   import { AddressDriverClient, type SplitsEntry } from 'radicle-drips';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import SplitsTableFull from '$lib/components/splits-table/splits-table-full.svelte';
+  import wallet from '$lib/stores/wallet';
 
   export let userId: UserId | undefined;
 
@@ -76,15 +78,31 @@
     );
 
     return {
-      splits: splits?.map((s: SplitsRow) => {
-        return {
-          subject: { component: IdentityBadge, props: { address: s.address } },
-          percent: getSplitPercent(s.weight, 'pretty'),
-        };
-      }),
-      splitsTotalPercent: getSplitPercent(totalSplitsWeight, 'pretty'),
-      remainderPercent: getSplitPercent(BigInt('1000000') - totalSplitsWeight, 'pretty'),
-      remainderReceiver: 'You',
+      user: !userId
+        ? '...'
+        : userId === $wallet.dripsUserId
+        ? 'You'
+        : AddressDriverClient.getUserAddress(userId),
+      incoming: {
+        // TEMP
+        splits: splits?.map((s: SplitsRow) => {
+          return {
+            subject: { component: IdentityBadge, props: { address: s.address, isReverse: true } },
+            percent: getSplitPercent(s.weight, 'pretty'),
+          };
+        }),
+      },
+      outgoing: {
+        splits: splits?.map((s: SplitsRow) => {
+          return {
+            subject: { component: IdentityBadge, props: { address: s.address } },
+            percent: getSplitPercent(s.weight, 'pretty'),
+          };
+        }),
+        splitsTotalPercent: getSplitPercent(totalSplitsWeight, 'pretty'),
+        // remainderPercent: getSplitPercent(BigInt('1000000') - totalSplitsWeight, 'pretty'),
+        // remainderReceiver: 'You',
+      },
     };
   }
 
@@ -153,7 +171,7 @@
       empty={splits !== undefined && splits.length === 0}
       {error}
     >
-      <SplitsTable data={splitsTableData} />
+      <SplitsTableFull data={splitsTableData} />
     </SectionSkeleton>
   </div>
 </div>

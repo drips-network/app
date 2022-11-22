@@ -16,3 +16,14 @@ export interface SplitsTable {
   remainderPercent: string;
   remainderReceiver: string;
 }
+
+export interface SplitsTableFull {
+  user: string;
+  incoming: {
+    splits: SplitsTableRow[];
+  };
+  outgoing: {
+    splits: SplitsTableRow[];
+    splitsTotalPercent: string;
+  };
+}
