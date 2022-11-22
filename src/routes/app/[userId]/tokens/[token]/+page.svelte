@@ -21,7 +21,7 @@
 
   $: token = $tokens?.find(
     (token) =>
-      token.info.address.toLocaleLowerCase() === urlParamToken ||
+      token.info.address.toLowerCase() === urlParamToken ||
       token.info.symbol.toLowerCase() === urlParamToken,
   );
 

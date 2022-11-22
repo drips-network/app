@@ -21,7 +21,7 @@
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
-  export function format(amount: Amount) {
+  function format(amount: Amount) {
     const tokenDecimals = tokens.getByAddress(amount.tokenAddress)?.info.decimals;
     assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
 
