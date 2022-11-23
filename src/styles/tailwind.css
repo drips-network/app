@@ -5,3 +5,12 @@
 .overlay {
   @apply top-0 left-0 w-full h-full;
 }
+
+[class*='border'],
+.border-solid {
+  border-style: solid;
+}
+
+.btn-theme-transparent {
+  @apply mouse:hover:bg-foreground-level-1 focus:bg-foreground-level-1 focus:ring-2 focus-visible:outline-none focus-visible:text-foreground focus:ring-foreground-level-4 transition duration-300;
+}

@@ -12,12 +12,6 @@
   import type { CollectFlowState } from './collect-flow-state';
   import type { Writable } from 'svelte/store';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import {
-    getAddressDriverClient,
-    getDripsHubClient,
-    getSubgraphClient,
-  } from '$lib/utils/get-drips-clients';
-  import tuple from '$lib/utils/tuple';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -49,59 +43,19 @@
     }) ?? [],
   );
 
-  async function fetchBalancesAndSplits() {
-    assert(selectedToken);
-    const { address } = selectedToken.info;
-
-    const dripsHubClient = await getDripsHubClient();
-    const driverClient = await getAddressDriverClient();
-    const subgraphClient = getSubgraphClient();
-    const userId = await driverClient.getUserId();
-
-    const calls = tuple(
-      await dripsHubClient.getReceivableBalanceForUser(userId, address, 100),
-      dripsHubClient.getSplittableBalanceForUser(userId, address),
-      dripsHubClient.getCollectableBalanceForUser(userId, address),
-      subgraphClient.getSplitsConfigByUserId(userId),
-    );
-
-    const [receivable, splittable, collectable, splitsData] = await Promise.all(calls);
-
-    return {
-      splittable,
-      collectable,
-      receivable,
-      ownSplitsWeight: 1000000n - splitsData.reduce<bigint>((acc, cur) => acc + cur.weight, 0n),
-      splitsConfig: splitsData,
-    };
-  }
-
   async function updateContext() {
     assert(selectedToken);
     const { info } = selectedToken;
 
-    const { splittable, collectable, receivable, ownSplitsWeight, splitsConfig } =
-      await fetchBalancesAndSplits();
-
     context.update((c) => ({
       ...c,
       tokenAddress: info.address,
-      balances: {
-        splittable: splittable.splittableAmount,
-        collectable: collectable.collectableAmount,
-        receivable: receivable.receivableAmount,
-      },
-      ownSplitsWeight,
-      splitsConfig,
     }));
   }
 
   function submit() {
     updateContext();
-    dispatch('await', {
-      promise: updateContext,
-      message: 'Fetching collectable balances…',
-    });
+    dispatch('goForward');
   }
 </script>
 

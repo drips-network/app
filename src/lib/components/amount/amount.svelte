@@ -14,6 +14,9 @@
   export let showSymbol = true;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
+  export let amountClasses = 'typo-text-mono-bold';
+  export let amountPerSecClasses = 'typo-text-small-mono text-foreground-level-4';
+
   $: amountTokenInfo = $tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined;
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
@@ -30,7 +33,7 @@
   {#if amount !== undefined}
     {#if amountTokenInfo}
       <div class="amount">
-        <span class="amount-wrapper typo-text-mono-bold">
+        <span class="amount-wrapper {amountClasses}">
           <span class="amount">
             {format(amount)}
           </span>
@@ -47,15 +50,15 @@
   {/if}
   {#if amountPerSecond !== undefined}
     {#if amountPerSecondTokenInfo}
-      <div class="amount-per-second typo-text-small">
+      <div class="amount-per-second {amountPerSecClasses}">
         <span
-          class="amount typo-text-small-mono"
-          class:positive={amountPerSecond.amount > 0}
-          class:negative={amountPerSecond.amount < 0}
-          >{format(amountPerSecond)}{#if showSymbol}
+          class="amount"
+          class:text-positive={amountPerSecond.amount > 0}
+          class:text-negative={amountPerSecond.amount < 0}
+          >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond)}{#if showSymbol}
             {' ' + amountPerSecondTokenInfo.info.symbol}
           {/if}</span
-        > / sec
+        >/sec
       </div>
     {/if}
   {/if}
@@ -65,20 +68,5 @@
   .wrapper {
     display: flex;
     flex-direction: column;
-  }
-  .amount-wrapper {
-    color: var(--color-foreground-level-6);
-  }
-
-  .negative {
-    color: var(--color-negative);
-  }
-
-  .positive {
-    color: var(--color-positive);
-  }
-
-  .amount-per-second {
-    color: var(--color-foreground-level-5);
   }
 </style>

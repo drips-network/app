@@ -82,7 +82,17 @@
     return socialLinks.includes(input as typeof socialLinks[number]);
   }
 
-  $: dripsUserId && streams.fetchAccount(dripsUserId);
+  async function fetchRequestedAccount(userId: string) {
+    try {
+      await streams.fetchAccount(userId);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      error = e instanceof Error ? e : new Error('Unable to fetch account');
+    }
+  }
+
+  $: dripsUserId && fetchRequestedAccount(dripsUserId);
 </script>
 
 <svelte:head>
