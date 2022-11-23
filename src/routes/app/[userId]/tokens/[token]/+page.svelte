@@ -17,6 +17,7 @@
   import guardConnected from '$lib/utils/guard-connected';
   import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
+  import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -46,6 +47,10 @@
 
   function openAddFundsModal() {
     modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
+  }
+
+  function openWithdrawModal() {
+    modal.show(Stepper, undefined, getWithdrawSteps(tokenAddress));
   }
 
   // redirect to connect page if disconnects
@@ -132,7 +137,7 @@
       <svelte:fragment slot="actions">
         <div class="flex gap-1">
           <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
-          <Button icon={Minus}>Withdraw</Button>
+          <Button icon={Minus} on:click={openWithdrawModal}>Withdraw</Button>
         </div>
       </svelte:fragment>
     </TokenStat>
