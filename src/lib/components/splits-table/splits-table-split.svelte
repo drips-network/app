@@ -35,12 +35,14 @@
     </div>
   </div>
 
-  <!-- text -->
+  <!-- subject -->
   <div class="flex-1 pl-2.5">
-    <!-- avatar? -->
-    <!-- text -->
-    <div class="typo-text-bold" style="color: var(--color-foreground-level-6)">
-      {split.text}
-    </div>
+    {#if typeof split.subject === 'string'}
+      <div class="typo-text-bold" style="color: var(--color-foreground-level-6)">
+        {split.subject}
+      </div>
+    {:else if split.subject}
+      <svelte:component this={split.subject.component} {...split.subject.props} />
+    {/if}
   </div>
 </div>

@@ -17,7 +17,7 @@
   <header class="ml-7">
     <SplitsTableVerticalLine classes="h-2.5 block -mb-px" />
     <SplitsTableSplit
-      split={{ text: `${data.splits.length} accounts`, percent: data.splitsTotalPercent }}
+      split={{ subject: `${data.splits.length} accounts`, percent: data.splitsTotalPercent }}
     />
   </header>
   <div class="relative ml-7 -mt-1 pt-1 -mb-1">
