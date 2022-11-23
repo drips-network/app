@@ -12,6 +12,7 @@
 
   let tooltipPos = {
     left: 0,
+    right: 0,
     top: 0,
   };
 
@@ -24,12 +25,15 @@
 
   let direction: 'up' | 'down' = 'up';
 
+  const MAX_WIDTH = 512;
+
   function updatePos() {
     const triggerPos = tooltipElem.getBoundingClientRect();
     const contentPos = contentElem.getBoundingClientRect();
 
     let newLeft: number;
     let newTop: number;
+    let newRight: number;
 
     if (triggerPos.top > contentPos.height + TOOLTIP_MARGIN * 2) {
       newTop = triggerPos.top - contentPos.height - TOOLTIP_MARGIN;
@@ -40,10 +44,12 @@
     }
 
     const triggerCenter = triggerPos.left + triggerPos.width / 2;
-    newLeft = Math.max(triggerCenter - contentPos.width / 2, 0);
+    newLeft = Math.max(triggerCenter - MAX_WIDTH / 2, 0);
+    newRight = Math.max(Math.abs(triggerCenter - window.innerWidth) - MAX_WIDTH / 2, 0);
 
     tooltipPos = {
       left: newLeft,
+      right: newRight,
       top: newTop,
     };
   }
@@ -71,6 +77,7 @@
     class="expanded-tooltip"
     class:visible={expanded}
     style:left={`${tooltipPos.left}px`}
+    style:right={`${tooltipPos.right}px`}
     style:top={`${tooltipPos.top}px`}
   >
     <div class="target-buffer" />
@@ -106,9 +113,7 @@
     background-color: var(--color-background);
     border-radius: 1rem;
     padding: 0.5rem 0.75rem;
-    width: 512px;
-    max-width: calc(100vw - 16px);
-    /* max-width: 500px; */
+    max-width: 512px;
     color: var(--color-foreground-level-6);
     text-align: left;
   }
