@@ -1,3 +1,9 @@
+<script context="module" lang="ts">
+  export interface RowClickEventPayload {
+    rowIndex: number;
+  }
+</script>
+
 <script lang="ts">
   import { createSvelteTable, flexRender, type TableOptions } from '@tanstack/svelte-table';
   import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
@@ -9,11 +15,16 @@
   $: table = createSvelteTable(options);
 
   export let isRowClickable = false;
-  const dispatch = createEventDispatcher();
+
+  type Events = {
+    rowClick: RowClickEventPayload;
+  };
+
+  const dispatch = createEventDispatcher<Events>();
 
   function onRowClick(index: number) {
     if (isRowClickable) {
-      dispatch('rowclick', index);
+      dispatch('rowClick', { rowIndex: index });
     }
   }
 </script>
@@ -181,8 +192,11 @@
     font-weight: normal;
   }
 
+  tr {
+    transition: background-color 300ms;
+  }
+
   tr.cursor-pointer:hover {
     background-color: var(--color-foreground-level-1);
-    transition: background-color 300ms;
   }
 </style>

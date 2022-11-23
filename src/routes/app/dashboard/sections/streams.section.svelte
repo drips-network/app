@@ -3,10 +3,9 @@
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
 
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Table from '$lib/components/table/table.svelte';
+  import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
-  import LinkCell, { type LinkCellData } from '$lib/components/table/cells/link.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
   import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -21,20 +20,24 @@
   import { onMount } from 'svelte';
   import type { Stream } from '$lib/stores/streams/types';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
+  import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
+  import { goto } from '$app/navigation';
 
   export let userId: string | undefined;
   export let disableActions = true;
   export let tokenAddress: string | undefined = undefined;
 
   interface OutgoingStreamTableRow {
-    name: LinkCellData;
+    streamId: string;
+    name: string;
     toAddress: string;
     amount: AmountCellData;
     token: TokenCellData;
   }
 
   interface IncomingStreamTableRow {
-    name: LinkCellData;
+    streamId: string;
+    name: string;
     fromAddress: string;
     amount: AmountCellData;
     token: TokenCellData;
@@ -66,10 +69,8 @@
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
       return {
-        name: {
-          label: stream.name ?? 'Unnamed stream',
-          href: `/app/${userId}/tokens/${tokenAddress}/streams/${stream.dripsConfig.dripId}`,
-        },
+        streamId: stream.id,
+        name: stream.name ?? 'Unnamed stream',
         toAddress: stream.receiver.address,
         amount: {
           amount: {
@@ -97,10 +98,8 @@
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
       return {
-        name: {
-          label: stream.name ?? 'Unnamed stream',
-          href: `/app/${stream.sender.userId}/tokens/${tokenAddress}/streams/${stream.dripsConfig.dripId}`,
-        },
+        streamId: stream.id,
+        name: stream.name ?? 'Unnamed stream',
         fromAddress: stream.sender.address,
         amount: {
           amountPerSecond: {
@@ -136,7 +135,7 @@
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: () => LinkCell,
+      cell: (info) => info.getValue(),
       enableSorting: false,
       size: (100 / 24) * 8,
     },
@@ -174,7 +173,7 @@
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: () => LinkCell,
+      cell: (info) => info.getValue(),
       enableSorting: false,
       size: (100 / 24) * 8,
     },
@@ -227,6 +226,19 @@
   $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
   $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
+
+  function onRowClick(
+    tableData: OutgoingStreamTableRow[] | IncomingStreamTableRow[],
+    event: CustomEvent<RowClickEventPayload>,
+  ) {
+    // go to token page by address
+    const streamId = tableData[event.detail.rowIndex].streamId;
+    const parsedId = decodeStreamId(streamId);
+
+    goto(
+      `/app/${parsedId.senderUserId}/tokens/${parsedId.tokenAddress}/streams/${parsedId.dripId}`,
+    );
+  }
 </script>
 
 <div class="section">
@@ -273,13 +285,21 @@
       {#if optionsOutgoing.data.length > 0}
         <div class="table-container">
           <h4 class="table-group-header">↑ Outgoing</h4>
-          <Table options={optionsOutgoing} />
+          <Table
+            options={optionsOutgoing}
+            isRowClickable
+            on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+          />
         </div>
       {/if}
       {#if optionsIncoming.data.length > 0}
         <div class="table-container">
           <h4 class="table-group-header">↓ Incoming</h4>
-          <Table options={optionsIncoming} />
+          <Table
+            options={optionsIncoming}
+            isRowClickable
+            on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+          />
         </div>
       {/if}
     </SectionSkeleton>
