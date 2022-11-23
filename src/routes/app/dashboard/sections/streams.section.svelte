@@ -12,7 +12,7 @@
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { makeStep } from '$lib/components/stepper/types';
-  import InputDetails from './create-stream-flow/input-details.svelte';
+  import InputDetails from '../../../../lib/flows/create-stream-flow/input-details.svelte';
   import balances from '$lib/stores/balances';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';

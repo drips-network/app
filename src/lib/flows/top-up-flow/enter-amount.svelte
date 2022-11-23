@@ -80,7 +80,7 @@
 <StepLayout>
   <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
   <StepHeader
-    headline={`Top up ${tokenInfo?.info.name ?? ''}`}
+    headline={`Add ${tokenInfo?.info.name ?? ''} funds`}
     description="Add funds to your Drips account in order to start streaming."
   />
   <FormField title="Amount">
@@ -93,7 +93,7 @@
   </FormField>
   <svelte:fragment slot="actions">
     <Button on:click={submit} disabled={validationState.type !== 'valid'}
-      >Top up {amountValue} {tokenInfo?.info.symbol ?? ''}</Button
+      >Add {amountValue} {tokenInfo?.info.symbol ?? ''}</Button
     >
   </svelte:fragment>
 </StepLayout>

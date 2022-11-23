@@ -12,10 +12,11 @@
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
   import Streams from '../../../dashboard/sections/streams.section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import collectFlowSteps from '../../../dashboard/sections/collect-flow/collect-flow-steps';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet';
   import guardConnected from '$lib/utils/guard-connected';
+  import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
+  import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -41,6 +42,10 @@
 
   function openCollectModal() {
     modal.show(Stepper, undefined, collectFlowSteps(tokenAddress));
+  }
+
+  function openAddFundsModal() {
+    modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
   }
 
   // redirect to connect page if disconnects
@@ -126,7 +131,7 @@
 
       <svelte:fragment slot="actions">
         <div class="flex gap-1">
-          <Button icon={Plus}>Add</Button>
+          <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
           <Button icon={Minus}>Withdraw</Button>
         </div>
       </svelte:fragment>
