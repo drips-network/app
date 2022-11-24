@@ -174,7 +174,7 @@
           <div class="key-value align-right">
             <h5 class="key">Scheduled end</h5>
             {#if streamEndDate}<h1 class="value">{formatDate(streamEndDate, 'verbose')}</h1>{:else}
-              <h1 class="value greyed-out">Open-ended</h1>{/if}
+              <h1 class="value greyed-out">∞</h1>{/if}
           </div>
         </div>
         <div class="key-value-row">
@@ -252,7 +252,7 @@
     gap: 1rem;
   }
 
-  .hero > .title-and-state {
+  .title-and-state {
     display: flex;
     gap: 1rem;
     align-items: center;
@@ -306,5 +306,25 @@
 
   .align-right {
     text-align: right;
+  }
+
+  @media (max-width: 768px) {
+    .title-and-state {
+      flex-direction: column;
+      align-items: left;
+    }
+
+    .key-value-row {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .align-right {
+      text-align: left;
+    }
+
+    .align-right .with-info-icon {
+      justify-content: flex-start;
+    }
   }
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { tweened } from 'svelte/motion';
   import DripsAnimation from '../drips-animation/drips-animation.svelte';
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
@@ -18,11 +19,18 @@
   $: {
     animationSpeed.set(toAddress && amountPerSecond && !halted ? 1 : 0);
   }
+
+  let windowWidth = (browser && window.innerWidth) || 0;
+  $: verticalAnimation = windowWidth <= 768;
 </script>
+
+<svelte:window bind:innerWidth={windowWidth} />
 
 <div class="stream-visual">
   <div class="no-shrink"><IdentityCard address={fromAddress} title="From" /></div>
-  <div class="animation"><DripsAnimation speedMultiplier={$animationSpeed} /></div>
+  <div class="animation">
+    <DripsAnimation vertical={verticalAnimation} speedMultiplier={$animationSpeed} />
+  </div>
   <div class="no-shrink"><IdentityCard address={toAddress} title="To" /></div>
   {#if tokenInfo}<div class="amt-per-sec typo-text-mono-bold">
       <FormattedAmount decimals={tokenInfo.decimals} amount={amountPerSecond} />
@@ -61,5 +69,27 @@
 
   .muted {
     color: var(--color-foreground-level-5);
+  }
+
+  @media (max-width: 768px) {
+    .stream-visual {
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 128rem;
+    }
+
+    .animation {
+      height: 8rem;
+      width: 100%;
+      flex: initial;
+    }
+
+    .amt-per-sec {
+      left: unset;
+      right: unset;
+      transform: unset;
+      transform: translateY(-50%);
+    }
   }
 </style>
