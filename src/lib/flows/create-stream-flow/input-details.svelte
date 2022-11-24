@@ -162,8 +162,6 @@
       const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
       assert(assetConfig, "App hasn't yet fetched the right asset config");
 
-      // TODO: Use a batched call here for receivers & metadata update once SDK supports it
-
       const currentReceivers = assetConfig.streams.map((stream) => ({
         userId: stream.receiver.userId,
         config: stream.dripsConfig.raw,

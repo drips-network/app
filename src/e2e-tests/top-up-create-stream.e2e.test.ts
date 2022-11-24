@@ -53,7 +53,7 @@ describe('top up, create stream, view profile, search', async () => {
       await topUpButton.click();
 
       const topUpFlowDescription = page.locator(
-        'text=Add funds to your Drips account in order to start streaming.',
+        "text=Add funds to your Drips account's outgoing balance.",
       );
       await expect(topUpFlowDescription).toHaveCount(1);
     });

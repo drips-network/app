@@ -13,6 +13,9 @@
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import unreachable from '$lib/utils/unreachable';
+  import ListSelect from '$lib/components/list-select/list-select.svelte';
+  import formatTokenAmount from '$lib/utils/format-token-amount';
+  import Token from '$lib/components/token/token.svelte';
 
   // TODO: Get current balance of ERC-20, validate input accordingly
 
@@ -80,9 +83,39 @@
 <StepLayout>
   <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
   <StepHeader
-    headline={`Top up ${tokenInfo?.info.name ?? ''}`}
-    description="Add funds to your Drips account in order to start streaming."
+    headline={`Add ${tokenInfo?.info.symbol ?? ''} funds`}
+    description="Add funds to your Drips account's outgoing balance."
   />
+  <FormField title="Wallet Balance">
+    <div class="balance">
+      <ListSelect
+        blockInteraction
+        searchable={false}
+        items={{
+          '': {
+            type: 'selectable',
+            label: tokenInfo.info.name ?? 'Unknown token',
+            text: `${formatTokenAmount(
+              {
+                tokenAddress: tokenAddress ?? unreachable(),
+                amount: $context.tokenBalance ?? unreachable(),
+              },
+              tokenInfo.info.decimals,
+              1n,
+            )} ${tokenInfo.info.symbol}`,
+            image: {
+              component: Token,
+              props: {
+                address: tokenAddress,
+                show: 'none',
+                size: 'small',
+              },
+            },
+          },
+        }}
+      />
+    </div>
+  </FormField>
   <FormField title="Amount">
     <TextInput
       bind:value={amountValue}
@@ -93,7 +126,14 @@
   </FormField>
   <svelte:fragment slot="actions">
     <Button on:click={submit} disabled={validationState.type !== 'valid'}
-      >Top up {amountValue} {tokenInfo?.info.symbol ?? ''}</Button
+      >Add {tokenInfo?.info.symbol ?? ''}</Button
     >
   </svelte:fragment>
 </StepLayout>
+
+<style>
+  .balance {
+    border: 2px solid var(--color-foreground-level-2);
+    border-radius: 0.5rem;
+  }
+</style>

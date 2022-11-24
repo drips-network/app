@@ -12,13 +12,15 @@
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
   import Streams from '../../../dashboard/sections/streams.section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import collectFlowSteps from '../../../dashboard/sections/collect-flow/collect-flow-steps';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet';
   import guardConnected from '$lib/utils/guard-connected';
   import checkIsUser from '$lib/utils/check-is-user';
-  import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import decodeUserId from '$lib/utils/decode-user-id';
+  import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
+  import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
+  import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
+  import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -46,6 +48,14 @@
     modal.show(Stepper, undefined, collectFlowSteps(tokenAddress));
   }
 
+  function openAddFundsModal() {
+    modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
+  }
+
+  function openWithdrawModal() {
+    modal.show(Stepper, undefined, getWithdrawSteps(tokenAddress));
+  }
+
   let error: 'connected-to-wrong-user' | undefined;
 
   async function checkUrlUserId() {
@@ -60,6 +70,8 @@
     $wallet.connected;
     if (guardConnected()) checkUrlUserId();
   }
+
+  $: actionsDisabled = !(outgoingEstimate && incomingTotals);
 </script>
 
 {#if error}
@@ -145,8 +157,10 @@
 
         <svelte:fragment slot="actions">
           <div class="flex gap-1">
-            <Button icon={Plus}>Add</Button>
-            <Button icon={Minus}>Withdraw</Button>
+            <Button disabled={actionsDisabled} icon={Plus} on:click={openAddFundsModal}>Add</Button>
+            <Button disabled={actionsDisabled} icon={Minus} on:click={openWithdrawModal}
+              >Withdraw</Button
+            >
           </div>
         </svelte:fragment>
       </TokenStat>

@@ -9,7 +9,7 @@
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { makeStep } from '$lib/components/stepper/types';
-  import EditSplitsInputs from './edit-splits-flow/edit-splits-inputs.svelte';
+  import EditSplitsInputs from '../../../../lib/flows/edit-splits-flow/edit-splits-inputs.svelte';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
