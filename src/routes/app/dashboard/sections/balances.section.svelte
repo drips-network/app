@@ -4,7 +4,7 @@
   import CollectIcon from 'radicle-design-system/icons/ArrowUp.svelte';
 
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Table from '$lib/components/table/table.svelte';
+  import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
@@ -178,9 +178,9 @@
   $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
 
-  function onRowClick(event: CustomEvent) {
+  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     // go to token page by address
-    const tokenAddress = tableData[event.detail].token.address;
+    const tokenAddress = tableData[event.detail.rowIndex].token.address;
     assert(userId);
     const address = AddressDriverClient.getUserAddress(userId);
     goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
@@ -246,7 +246,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} isRowClickable={isMyBalances} on:rowclick={onRowClick} />
+      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>
