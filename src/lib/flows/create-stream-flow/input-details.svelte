@@ -37,6 +37,7 @@
   import type { Items } from '$lib/components/list-select/list-select.types';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -162,10 +163,14 @@
       const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
       assert(assetConfig, "App hasn't yet fetched the right asset config");
 
-      const currentReceivers = assetConfig.streams.map((stream) => ({
-        userId: stream.receiver.userId,
-        config: stream.dripsConfig.raw,
-      }));
+      const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
+        stream.paused
+          ? undefined
+          : {
+              userId: stream.receiver.userId,
+              config: stream.dripsConfig.raw,
+            },
+      );
 
       const duration = streamEndDate
         ? BigInt(Math.floor((streamEndDate.getTime() - new Date().getTime()) / 1000))

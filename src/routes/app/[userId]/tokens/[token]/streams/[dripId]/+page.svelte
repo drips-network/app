@@ -21,6 +21,13 @@
   import { fly } from 'svelte/transition';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircleIcon from 'radicle-design-system/icons/InfoCircle.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import PauseIcon from 'radicle-design-system/icons/Pause.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import checkIsUser from '$lib/utils/check-is-user';
+  import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
+  import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
@@ -30,6 +37,11 @@
   let loading = true;
   let stream: Stream | undefined;
   let token: TokenInfoWrapper | undefined;
+
+  $: {
+    $streams;
+    if (streamId) stream = streams.getStreamById(streamId);
+  }
 
   $: estimate = streamId ? $balances && balances.getEstimateByStreamId(streamId) : undefined;
   $: streamScheduledStart = stream?.dripsConfig.startDate;
@@ -44,14 +56,16 @@
 
   let streamState: StreamState | undefined;
   $: {
-    if (stream?.paused) {
-      streamState = 'paused';
-    } else if (stream && streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
-      streamState = 'ended';
-    } else if (stream && (estimate?.currentAmountPerSecond ?? unreachable()) === 0n) {
-      streamState = 'out-of-funds';
-    } else if (stream && (estimate?.currentAmountPerSecond ?? unreachable()) > 0n) {
-      streamState = 'active';
+    if (estimate && stream) {
+      if (stream?.paused) {
+        streamState = 'paused';
+      } else if (stream && streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
+        streamState = 'ended';
+      } else if (stream && estimate.currentAmountPerSecond === 0n) {
+        streamState = 'out-of-funds';
+      } else if (stream && estimate.currentAmountPerSecond > 0n) {
+        streamState = 'active';
+      }
     }
   }
 
@@ -62,7 +76,7 @@
     assert(assetConfigHistory, 'Unable to find asset config history');
 
     return assetConfigHistory.reduce<
-      { timestamp: Date; runsOutFunds?: Date; receiverConfig: Receiver }[]
+      { timestamp: Date; runsOutOfFunds?: Date; receiverConfig: Receiver }[]
     >((acc, hi) => {
       const matchingReceiver = hi.streams.find((receiver) => receiver.streamId === streamId);
 
@@ -71,13 +85,15 @@
             ...acc,
             {
               timestamp: hi.timestamp,
-              runsOutFunds: hi.runsOutOfFunds,
+              runsOutOfFunds: hi.runsOutOfFunds,
               receiverConfig: matchingReceiver,
             },
           ]
         : acc;
     }, []);
   }
+
+  $: streamRunsOutOfFunds = streamHistory?.[streamHistory?.length - 1].runsOutOfFunds;
 
   onMount(async () => {
     try {
@@ -93,7 +109,6 @@
       stream = streams.getStreamById(streamId);
       if (stream) {
         streamHistory = getStreamHistory(dripsUserId, tokenAddress, streamId);
-        loading = false;
       }
 
       stream?.dripsConfig.durationSeconds;
@@ -101,13 +116,18 @@
       await streams.fetchAccount(dripsUserId);
       stream = streams.getStreamById(streamId);
       assert(stream);
-      streamHistory = getStreamHistory(dripsUserId, tokenAddress, streamId);
-
-      loading = false;
     } catch {
       error = 'not-found';
     }
   });
+
+  $: loading = !(stream && estimate);
+
+  $: {
+    if (stream && streamId && dripsUserId) {
+      streamHistory = getStreamHistory(dripsUserId, tokenAddress, streamId);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -139,11 +159,28 @@
           <h1>{stream.name ?? 'Unnamed stream'}</h1>
           <StreamStateBadge state={streamState ?? unreachable()} />
         </div>
-        <!-- <div class="actions">
-          <Button icon={EditIcon}>Edit</Button>
-          <Button icon={PauseIcon}>Pause</Button>
-          <Button icon={DeleteIcon}>Delete</Button>
-        </div> -->
+        {#if checkIsUser(stream.sender.userId)}
+          <div class="actions">
+            <!-- <Button icon={EditIcon}>Edit</Button> -->
+
+            {#if stream && !stream.paused}<Button
+                icon={PauseIcon}
+                on:click={() =>
+                  modal.show(Stepper, undefined, {
+                    steps: pauseFlowSteps(stream ?? unreachable()),
+                  })}>Pause</Button
+              >{/if}
+            <!-- TODO: Use a "Play" icon -->
+            {#if stream && stream.paused}<Button
+                icon={PauseIcon}
+                on:click={() =>
+                  modal.show(Stepper, undefined, {
+                    steps: unpauseFlowSteps(stream ?? unreachable()),
+                  })}>Unpause</Button
+              >{/if}
+            <!-- <Button icon={DeleteIcon}>Delete</Button> -->
+          </div>
+        {/if}
       </div>
       <StreamVisual
         fromAddress={stream.sender.address}
@@ -207,12 +244,11 @@
                 <InfoCircleIcon style="height: 1.25rem" />
               </Tooltip>
             </div>
-            <h1 class="value">
-              {formatDate(
-                streamHistory?.[streamHistory?.length - 1].runsOutFunds ?? unreachable(),
-                'verbose',
-              )}
-            </h1>
+            {#if streamRunsOutOfFunds}
+              <h1 class="value">{formatDate(streamRunsOutOfFunds, 'verbose')}</h1>
+            {:else}
+              <h1 class="value greyed-out">∞</h1>
+            {/if}
           </div>
         </div>
         <div class="key-value-row">
