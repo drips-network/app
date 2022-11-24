@@ -71,7 +71,7 @@
 <StepLayout>
   <StepHeader
     emoji="💸"
-    headline="Add funds"
+    headline="Add token"
     description="Add any ERC-20 token to your Drips account in order to start streaming."
   />
   <FormField title="Select token">
