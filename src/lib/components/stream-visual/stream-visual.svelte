@@ -7,6 +7,7 @@
 
   export let fromAddress: string | undefined = undefined;
   export let toAddress: string | undefined = undefined;
+  export let disableLinks = false;
   export let amountPerSecond: bigint | undefined = undefined;
   export let halted = false;
 
@@ -27,11 +28,15 @@
 <svelte:window bind:innerWidth={windowWidth} />
 
 <div class="stream-visual">
-  <div class="no-shrink"><IdentityCard address={fromAddress} title="From" /></div>
+  <div class="no-shrink">
+    <IdentityCard disableLink={disableLinks} address={fromAddress} title="From" />
+  </div>
   <div class="animation">
     <DripsAnimation vertical={verticalAnimation} speedMultiplier={$animationSpeed} />
   </div>
-  <div class="no-shrink"><IdentityCard address={toAddress} title="To" /></div>
+  <div class="no-shrink">
+    <IdentityCard disableLink={disableLinks} address={toAddress} title="To" />
+  </div>
   {#if tokenInfo}<div class="amt-per-sec typo-text-mono-bold">
       <FormattedAmount decimals={tokenInfo.decimals} amount={amountPerSecond} />
       {tokenInfo.symbol} <span class="muted">/sec</span>
