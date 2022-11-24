@@ -75,6 +75,7 @@ export interface StreamEstimate {
   id: StreamId;
   totalStreamed: bigint;
   currentAmountPerSecond: bigint;
+  runsOutOfFunds?: Date;
 }
 
 function estimateHistoryItem(

@@ -1,25 +1,33 @@
 <script lang="ts">
+  import wallet from '$lib/stores/wallet';
   import { fade } from 'svelte/transition';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
 
   export let address: string | undefined = undefined;
   export let title: string | undefined = undefined;
+  export let disableLink = false;
 
   let avatarImgElem: HTMLImageElement | undefined;
+
+  function getLink() {
+    if (address === $wallet.address) return '/app/dashboard';
+
+    return `/app/${address}`;
+  }
 </script>
 
-<div class="identity-card">
+<a href={disableLink ? undefined : getLink()} class="identity-card">
   {#if title}<p class="title typo-all-caps">{title}</p>{/if}
   {#if address}
     <div in:fade>
-      <IdentityBadge size="huge" bind:avatarImgElem {address} showIdentity={false} />
+      <IdentityBadge disableLink size="huge" bind:avatarImgElem {address} showIdentity={false} />
     </div>
-    <div in:fade><IdentityBadge size="huge" {address} showAvatar={false} /></div>
+    <div in:fade><IdentityBadge disableLink size="huge" {address} showAvatar={false} /></div>
   {:else}
     <div class="avatar-placeholder" />
     <h3 class="name-placeholder">TBD</h3>
   {/if}
-</div>
+</a>
 
 <style>
   .identity-card {
@@ -32,7 +40,7 @@
     border-radius: 0.5rem;
     background-color: var(--color-foreground-level-1);
     user-select: none;
-    width: 9rem;
+    width: 12rem;
   }
 
   .identity-card > * {

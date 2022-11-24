@@ -291,7 +291,12 @@
 </script>
 
 <StepLayout>
-  <StreamVisual fromAddress={$wallet.address} toAddress={recipientAddressValue} {amountPerSecond} />
+  <StreamVisual
+    disableLinks
+    fromAddress={$wallet.address}
+    toAddress={recipientAddressValue}
+    {amountPerSecond}
+  />
   <StepHeader
     headline="Create stream"
     description="Stream any ERC-20 token to anyone with an Ethereum address."
