@@ -58,6 +58,8 @@
     $wallet.connected;
     guardConnected();
   }
+
+  $: actionsDisabled = !(outgoingEstimate && incomingTotals);
 </script>
 
 <article class="flex flex-col gap-16">
@@ -136,8 +138,10 @@
 
       <svelte:fragment slot="actions">
         <div class="flex gap-1">
-          <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
-          <Button icon={Minus} on:click={openWithdrawModal}>Withdraw</Button>
+          <Button disabled={actionsDisabled} icon={Plus} on:click={openAddFundsModal}>Add</Button>
+          <Button disabled={actionsDisabled} icon={Minus} on:click={openWithdrawModal}
+            >Withdraw</Button
+          >
         </div>
       </svelte:fragment>
     </TokenStat>
