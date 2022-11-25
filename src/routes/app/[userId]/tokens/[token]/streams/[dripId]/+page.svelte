@@ -93,7 +93,11 @@
     }, []);
   }
 
-  $: streamRunsOutOfFunds = streamHistory?.[streamHistory?.length - 1].runsOutOfFunds;
+  $: lastHistoryItem = streamHistory?.[streamHistory?.length - 1];
+  $: streamRunsOutOfFunds =
+    lastHistoryItem?.runsOutOfFunds?.getTime() === lastHistoryItem?.timestamp.getTime()
+      ? undefined
+      : lastHistoryItem?.runsOutOfFunds;
 
   onMount(async () => {
     try {
