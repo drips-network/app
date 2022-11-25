@@ -144,7 +144,8 @@ function streamedByStream(
   const validForMillis = minMax('max', streamingUntil - streamingFrom, 0);
 
   const streamed = (BigInt(validForMillis) * amountPerSecond.amount) / 1000n;
-  const currentAmountPerSecond = streamingUntil >= nextTimestamp ? amountPerSecond.amount : 0n;
+  const currentAmountPerSecond =
+    streamingUntil >= nextTimestamp && streamingFrom < nextTimestamp ? amountPerSecond.amount : 0n;
 
   return {
     streamed,
