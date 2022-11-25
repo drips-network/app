@@ -113,6 +113,10 @@
         cell: () => Amount,
         enableSorting: false,
         size: (100 / 24) * 5,
+        meta: {
+          tooltipMessage:
+            'Your incoming balance is the cumulative total earned from any incoming streams for this token.',
+        },
       },
       {
         accessorKey: 'streaming',
@@ -120,6 +124,10 @@
         cell: () => Amount,
         enableSorting: false,
         size: (100 / 24) * 5,
+        meta: {
+          tooltipMessage:
+            'Your outbound balance is the remaining balance you can stream to others for this token.',
+        },
       },
       {
         accessorKey: 'netRate',
