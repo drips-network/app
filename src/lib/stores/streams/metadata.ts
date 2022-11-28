@@ -20,7 +20,7 @@ If you're an app developer looking at this for reference, make sure to generate 
 value to use as a `key` value for `emitUserData`, in order to avoid metadata collisions with other apps.
 */
 const USER_DATA_KEY =
-  65932473927847481224664369441494644980717748729109625944182088338412766444512n;
+  '65932473927847481224664369441494644980717748729109625944182088338412766444512';
 
 const addressSchema = z.preprocess((v) => {
   if (typeof v !== 'string' || !ethers.utils.isAddress(v)) {
@@ -214,7 +214,12 @@ export async function updateAccountMetadata(
 
   const newHash = await pinAccountMetadata(newData);
   const client = await getAddressDriverClient();
-  const tx = await client.emitUserMetadata(USER_DATA_KEY, newHash);
+  const tx = await client.emitUserMetadata([
+    {
+      key: USER_DATA_KEY,
+      value: newHash,
+    },
+  ]);
 
   return {
     newHash,
