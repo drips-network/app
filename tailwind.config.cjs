@@ -47,6 +47,9 @@ module.exports = {
       'typo-text': '16px',
       'typo-text-small': '14px',
       // 'typo-all-caps': 13px;
+    },
+    borderRadius: {
+      'xl': '1.5rem 0 1.5rem 1.5rem',
     }
   },
   plugins: [],

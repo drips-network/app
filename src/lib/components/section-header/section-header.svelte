@@ -16,7 +16,7 @@
   <div class="title">
     {#if icon}
       <div data-testid="section-icon" class="icon-wrapper">
-        <svelte:component this={icon} style="fill: var(--color-primary)" />
+        <svelte:component this={icon} style="fill: var(--color-background)" />
       </div>
     {/if}
     <h3>{label}</h3>
@@ -39,7 +39,7 @@
   }
 
   .icon-wrapper {
-    background-color: var(--color-primary-level-1);
+    background-color: var(--color-foreground);
     height: 2rem;
     width: 2rem;
     display: flex;

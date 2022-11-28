@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
 
   export let emoji: string;
   export let headline: string;

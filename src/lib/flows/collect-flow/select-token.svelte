@@ -80,7 +80,8 @@
 <style>
   .list-container {
     height: 24rem;
-    border: 2px solid var(--color-foreground-level-1);
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
     border-radius: 0.5rem;
     overflow: scroll;
   }

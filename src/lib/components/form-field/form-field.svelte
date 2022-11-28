@@ -11,7 +11,7 @@
 
 <style>
   label {
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -30,6 +30,6 @@
 
   p {
     margin-top: -0.5rem;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
   }
 </style>

@@ -15,7 +15,7 @@
   on:click|stopPropagation|preventDefault
 >
   {#if icon}
-    <svelte:component this={icon} style="fill: var(--color-foreground-level-6)" />
+    <svelte:component this={icon} style="fill: var(--color-foreground)" />
   {/if}
   <slot />
 </button>
@@ -23,18 +23,16 @@
 <style>
   button {
     height: 2rem;
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
     min-width: 2rem;
-    border-radius: 1rem;
-    background-color: var(--color-foreground-level-2);
-    color: var(--color-foreground-level-6);
+    border-radius: 1rem 0 1rem 1rem;
+    color: var(--color-foreground);
     display: flex;
     gap: 4px;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
-    border: 2px solid rgba(0, 0, 0, 0);
     user-select: none;
-    transition: background-color 0.3s, color 0.3s, transform 0.1s, border 0.3s, opacity 0.3s;
+    transition: background-color 0.3s, color 0.3s, transform 0.1s, box-shadow 0.3s, opacity 0.3s;
     white-space: nowrap;
   }
 
@@ -48,12 +46,12 @@
 
   button:enabled:hover,
   button:enabled:active {
-    background-color: var(--color-foreground-level-3);
+    background-color: var(--color-foreground-level-2);
   }
 
   button:focus {
-    border: 2px solid var(--color-foreground-level-4);
-    outline: none;
+    background-color: var(--color-foreground-level-1);
+    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
   }
 
   button:enabled:active {

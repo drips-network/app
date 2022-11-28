@@ -29,7 +29,7 @@
         <Modal>
           {#if store.hideable}
             <div class="close-button" on:click={modal.hide}>
-              <Cross />
+              <Cross style="fill: var(--color-foreground)" />
             </div>
           {/if}
           <svelte:component
@@ -68,17 +68,22 @@
 
   .close-button {
     position: absolute;
-    right: 0.5rem;
-    top: 0.5rem;
-    background-color: var(--color-foreground-level-2);
-    height: 2rem;
-    width: 2rem;
-    border-radius: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    right: 0;
+    top: 0;
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 0 0 0 1.25rem;
     z-index: 10;
+    padding-left: 0.4rem;
+    padding-top: 0.3rem;
     cursor: pointer;
+    border: 1px solid var(--color-foreground);
+    border-right: none;
+    border-top: none;
+  }
+
+  .close-button:hover {
+    background-color: var(--color-foreground-level-1);
   }
 
   .content {

@@ -21,7 +21,7 @@
   import assert from '$lib/utils/assert';
   import type { WithdrawFlowState } from './withdraw-flow-state';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
   import expect from '$lib/utils/expect';
   import { createEventDispatcher } from 'svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
@@ -190,7 +190,7 @@
 
 <style>
   .balance {
-    border: 2px solid var(--color-foreground-level-2);
-    border-radius: 0.5rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 </style>

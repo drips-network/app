@@ -96,7 +96,7 @@
   .identity-badge {
     display: flex;
     align-items: center;
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
     position: relative;
     text-align: left;
   }

@@ -125,7 +125,7 @@
 
 <div class="search-bar desktop" class:focus>
   <div class="search-bar-input-wrapper">
-    <SearchIcon />
+    <SearchIcon style="fill: var(--color-foreground)" />
     <input
       type="text"
       data-testid="searchbar"
@@ -186,7 +186,8 @@
   }
 
   .search-bar.focus {
-    border: 2px solid var(--color-foreground-level-3);
+    background-color: var(--color-foreground-level-1);
+    box-shadow: var(--elevation-medium);
   }
 
   input {
@@ -206,14 +207,14 @@
     display: flex;
     align-items: center;
     height: 3rem;
-    border-radius: 1.5rem;
-    background-color: var(--color-foreground-level-1);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     max-width: 32rem;
     width: 100%;
-    border: 2px solid transparent;
+    border: 1px solid var(--color-foreground);
     transition: border 0.3s;
     z-index: 2;
     position: relative;
+    transition: border 0.3s, background-color 0.3s, box-shadow 0.3s;
   }
 
   .search-bar-input-wrapper {
@@ -257,7 +258,7 @@
     justify-content: center;
     align-items: center;
     background-color: var(--color-foreground-level-1);
-    border-radius: 1rem;
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
   .mobile input {
@@ -266,7 +267,7 @@
 
   .results {
     position: absolute;
-    top: 3.5rem;
+    top: 4rem;
     right: -2px;
     left: -2px;
     display: flex;
@@ -275,9 +276,10 @@
     max-height: calc(100vh - 5rem);
     overflow: scroll;
     background-color: var(--color-background);
-    border: 2px solid var(--color-foreground-level-1);
-    border-radius: 2.5rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     padding: 0.5rem;
+    box-shadow: var(--elevation-medium);
   }
 
   @media (max-width: 768px) {
@@ -311,6 +313,15 @@
     .results {
       border: none;
       padding: 0;
+    }
+
+    .search-bar {
+      border: none;
+    }
+
+    .results {
+      box-shadow: none;
+      border: none;
     }
   }
 </style>
