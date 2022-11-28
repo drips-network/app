@@ -19,8 +19,7 @@ emitUserData events that it created itself.
 If you're an app developer looking at this for reference, make sure to generate your own random uint256
 value to use as a `key` value for `emitUserData`, in order to avoid metadata collisions with other apps.
 */
-const USER_DATA_KEY =
-  '65932473927847481224664369441494644980717748729109625944182088338412766444512';
+export const USER_DATA_KEY = '1234';
 
 const addressSchema = z.preprocess((v) => {
   if (typeof v !== 'string' || !ethers.utils.isAddress(v)) {

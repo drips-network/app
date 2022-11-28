@@ -15,6 +15,7 @@ import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
 import {
   generateMetadata,
   pinAccountMetadata,
+  USER_DATA_KEY,
   type streamMetadataSchema,
 } from '$lib/stores/streams/metadata';
 import type { z } from 'zod';
@@ -23,6 +24,7 @@ import etherscanLink from '$lib/utils/etherscan-link';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
 
 export default async (
   updateAwaitStep: UpdateAwaitStepFn,
@@ -113,7 +115,6 @@ export default async (
   const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
   const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-    key: 65932473927847481224664369441494644980717748729109625944182088338412766444512n,
     driverAddress: CONTRACT_ADDRESS_DRIVER,
     tokenAddress,
     currentReceivers,
@@ -124,7 +125,12 @@ export default async (
         userId: recipientUserId,
       },
     ],
-    value: newHash,
+    userMetadata: [
+      {
+        key: formatBytes32String(USER_DATA_KEY),
+        value: toUtf8Bytes(newHash),
+      },
+    ],
     balanceDelta: 0,
     transferToAddress: address,
   });
