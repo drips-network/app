@@ -189,7 +189,7 @@
           <h1>{stream.name ?? 'Unnamed stream'}</h1>
           <StreamStateBadge state={streamState ?? unreachable()} />
         </div>
-        {#if checkIsUser(stream.sender.userId)}
+        {#if checkIsUser(stream.sender.userId) && stream.managed}
           <div class="actions">
             <!-- <Button icon={EditIcon}>Edit</Button> -->
 
