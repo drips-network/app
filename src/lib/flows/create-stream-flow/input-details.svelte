@@ -26,6 +26,7 @@
     generateMetadata,
     pinAccountMetadata,
     streamMetadataSchema,
+    USER_DATA_KEY,
   } from '$lib/stores/streams/metadata';
   import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
   import type { z } from 'zod';
@@ -37,6 +38,7 @@
   import type { Items } from '$lib/components/list-select/list-select.types';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
+  import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -224,7 +226,6 @@
       const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
       const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-        key: 65932473927847481224664369441494644980717748729109625944182088338412766444512n,
         driverAddress: CONTRACT_ADDRESS_DRIVER,
         tokenAddress,
         currentReceivers,
@@ -235,9 +236,14 @@
             userId: recipientUserId,
           },
         ],
-        value: newHash,
         balanceDelta: 0,
         transferToAddress: address,
+        userMetadata: [
+          {
+            key: formatBytes32String(USER_DATA_KEY),
+            value: toUtf8Bytes(newHash),
+          },
+        ],
       });
 
       const waitingWalletIcon = {
