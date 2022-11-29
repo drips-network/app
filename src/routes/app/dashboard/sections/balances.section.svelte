@@ -126,7 +126,7 @@
         size: (100 / 24) * 5,
         meta: {
           tooltipMessage:
-            'Your outbound balance is the remaining balance you can stream to others for this token.',
+            'Your outgoing balance is the remaining balance you can stream to others for this token.',
         },
       },
       {
