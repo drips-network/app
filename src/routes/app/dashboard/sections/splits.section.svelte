@@ -28,29 +28,34 @@
 
   export let disableActions = true;
 
-  let splitsRaw: SplitsEntry[] | undefined;
-  let splits: SplitsRow[] | undefined;
+  let outgoingSplitsRaw: SplitsEntry[] | undefined;
+  let outgoingSplits: SplitsRow[] | undefined;
+  let incomingSplits: SplitsRow[] | undefined;
   let error = false;
   const subgraphClient = getSubgraphClient();
 
-  $: getSplits(userId);
+  $: {
+    getOutgoingSplits(userId);
+    fetchIncomingSplits(userId);
+  }
 
-  $: splitsTableData = buildSplitsTable(splits ?? []);
+  $: splitsTableData = buildSplitsTable(incomingSplits, outgoingSplits);
 
-  async function getSplits(userId: UserId | undefined, set = true) {
+  $: isEmptySection = !outgoingSplits?.length && !incomingSplits?.length;
+
+  async function getOutgoingSplits(userId: UserId | undefined, set = true) {
     try {
       if (!userId) throw new Error('userId not defined');
 
-      splits = undefined;
+      outgoingSplits = undefined;
       error = false;
 
       const data = await subgraphClient.getSplitsConfigByUserId(userId);
-
       data.sort((a, b) => Number(b.weight - a.weight));
 
       if (set) {
-        splitsRaw = data;
-        setSplits(data);
+        outgoingSplitsRaw = data;
+        outgoingSplits = buildSplitsRows(data);
       }
 
       return data;
@@ -59,20 +64,40 @@
     }
   }
 
-  function setSplits(rawData: SplitsEntry[] = []) {
-    // add address
-    const data = rawData.map(
-      (row): SplitsRow => ({
-        ...row,
-        address: AddressDriverClient.getUserAddress(row.userId),
-      }),
-    );
+  async function fetchIncomingSplits(userId: UserId | undefined) {
+    try {
+      if (!userId) throw new Error('userId not defined');
 
-    splits = data;
+      incomingSplits = undefined;
+      error = false;
+
+      const data = await subgraphClient.getSplitEntriesByReceiverUserId(userId);
+
+      data.sort((a, b) => Number(b.weight - a.weight));
+
+      incomingSplits = buildSplitsRows(data, 'incoming');
+
+      return data;
+    } catch (e) {
+      error = true;
+    }
   }
 
-  function buildSplitsTable(splits: SplitsRow[] = []) {
-    const totalSplitsWeight: bigint = splits.reduce(
+  function buildSplitsRows(rawData: SplitsEntry[] = [], direction = 'outgoing') {
+    // get address from sender or receiver userId
+    return rawData.map(
+      (row): SplitsRow => ({
+        ...row,
+        address: AddressDriverClient.getUserAddress(
+          direction === 'incoming' ? row.senderId : row.userId,
+        ),
+      }),
+    );
+  }
+
+  // build splits table component data
+  function buildSplitsTable(incoming: SplitsRow[] = [], outgoing: SplitsRow[] = []) {
+    const totalOutgoingWeight: bigint = outgoing.reduce(
       (acc: bigint, cur: { weight: bigint }) => acc + cur.weight,
       BigInt(0),
     );
@@ -84,8 +109,7 @@
         ? 'You'
         : AddressDriverClient.getUserAddress(userId),
       incoming: {
-        // TEMP
-        splits: splits?.map((s: SplitsRow) => {
+        splits: incoming.map((s: SplitsRow) => {
           return {
             subject: { component: IdentityBadge, props: { address: s.address, isReverse: true } },
             percent: getSplitPercent(s.weight, 'pretty'),
@@ -93,35 +117,35 @@
         }),
       },
       outgoing: {
-        splits: splits?.map((s: SplitsRow) => {
+        splits: outgoing.map((s: SplitsRow) => {
           return {
             subject: { component: IdentityBadge, props: { address: s.address } },
             percent: getSplitPercent(s.weight, 'pretty'),
           };
         }),
-        splitsTotalPercent: getSplitPercent(totalSplitsWeight, 'pretty'),
+        splitsTotalPercent: getSplitPercent(totalOutgoingWeight, 'pretty'),
         // remainderPercent: getSplitPercent(BigInt('1000000') - totalSplitsWeight, 'pretty'),
         // remainderReceiver: 'You',
       },
     };
   }
 
-  async function getSplitsUpdate(): Promise<void> {
+  async function getOutgoingSplitsUpdate(): Promise<void> {
     const stringify = (data: any) =>
       JSON.stringify(data.map((d: SplitsRow) => ({ ...d, weight: d.weight.toString() })));
 
-    const newData = await getSplits(userId ?? '', false);
+    const newData = await getOutgoingSplits(userId ?? '', false);
 
     // updated?
-    if (stringify(splitsRaw) !== stringify(newData)) {
-      splitsRaw = newData;
-      setSplits(splitsRaw);
+    if (stringify(outgoingSplitsRaw) !== stringify(newData)) {
+      outgoingSplitsRaw = newData;
+      outgoingSplits = buildSplitsRows(outgoingSplitsRaw);
       return;
     }
 
     // else, refetch after...
     await new Promise((r) => setTimeout(r, 500));
-    return getSplitsUpdate();
+    return getOutgoingSplitsUpdate();
   }
 </script>
 
@@ -129,7 +153,7 @@
   <SectionHeader
     icon={MergeIcon}
     label="Splits"
-    actionsDisabled={splits === undefined}
+    actionsDisabled={outgoingSplits === undefined}
     actions={disableActions
       ? []
       : [
@@ -146,7 +170,7 @@
                     component: SuccessStep,
                     props: {
                       message: () => {
-                        getSplitsUpdate();
+                        getOutgoingSplitsUpdate();
                         return (
                           'Your splits have been updated. ' +
                           'It may take some time to see changes in your dashboard.'
@@ -167,8 +191,8 @@
       emptyStateHeadline="No splits"
       emptyStateEmoji="🫧"
       emptyStateText="Anyone you split incoming funds with will appear here."
-      loaded={splits !== undefined}
-      empty={splits !== undefined && splits.length === 0}
+      loaded={outgoingSplits !== undefined || incomingSplits !== undefined}
+      empty={isEmptySection}
       {error}
     >
       <SplitsTableFull data={splitsTableData} />

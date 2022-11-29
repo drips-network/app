@@ -5,23 +5,23 @@
 
   export let split: SplitsTableRow;
   export let verticalLine = true;
-  export let isOutgoing = false;
+  export let isIncoming = false;
 </script>
 
 <div
-  class="splits-table-split flex items-center -mb-px gap-2.5 {isOutgoing ? 'flex-row-reverse' : ''}"
+  class="splits-table-split flex items-center -mb-px gap-2.5 {isIncoming ? 'flex-row-reverse' : ''}"
 >
   <!-- vector group -->
-  <div class="relative h-8 {isOutgoing ? 'flex items-end justify-end' : ''}">
+  <div class="relative h-8 {isIncoming ? 'flex items-end justify-end' : ''}">
     <!-- (vertical line) -->
     {#if verticalLine}
       <SplitsTableVerticalLine
-        classes="absolute h-full top-0 {isOutgoing ? 'right-0' : 'left-0'}"
+        classes="absolute h-full top-0 {isIncoming ? 'right-0' : 'left-0'}"
       />
     {/if}
 
     <!-- arrow graphic/s -->
-    {#if isOutgoing}
+    {#if isIncoming}
       <!-- curved line -->
       <svg
         width="79"
@@ -53,14 +53,14 @@
     {/if}
 
     <!-- lozenge area as overlay -->
-    <div class="absolute overlay flex items-center justify-center">
+    <div class="absolute overlay flex items-center justify-center {isIncoming ? 'pr-1' : 'pr-2px'}">
       <!-- lozenge centered-->
       <SplitsTableSplitLozenge text={split.percent} />
     </div>
   </div>
 
   <!-- subject -->
-  <div class="flex-1 flex" class:justify-end={isOutgoing}>
+  <div class="flex-1 flex" class:justify-end={isIncoming}>
     {#if typeof split.subject === 'string'}
       <div class="typo-text-bold" style="color: var(--color-foreground-level-6)">
         {split.subject}
