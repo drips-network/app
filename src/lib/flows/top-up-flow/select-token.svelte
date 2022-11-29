@@ -71,8 +71,8 @@
 <StepLayout>
   <StepHeader
     emoji="💸"
-    headline="Top up"
-    description="Add funds to your Drips account in order to start streaming."
+    headline="Add token"
+    description="Add any ERC-20 token to your Drips account in order to start streaming."
   />
   <FormField title="Select token">
     <div class="list-container">
@@ -81,7 +81,7 @@
   </FormField>
   <svelte:fragment slot="actions">
     <Button disabled={selected.length !== 1} on:click={submit}
-      >Top up {selectedToken?.info.name ?? ''}</Button
+      >Add {selectedToken?.info.name ?? ''}</Button
     >
   </svelte:fragment>
 </StepLayout>

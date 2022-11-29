@@ -1,4 +1,7 @@
 import assert from '$lib/utils/assert';
+import { isAddress } from 'ethers/lib/utils';
+
+const numericTest = /^\d+$/;
 
 /**
  * Create a globally unique Stream ID string, including the stream's sender user ID and the associated receiver's
@@ -9,6 +12,10 @@ import assert from '$lib/utils/assert';
  * @returns The stream ID string.
  */
 export default function makeStreamId(senderUserId: string, tokenAddress: string, dripId: string) {
+  if (!(numericTest.test(senderUserId) && numericTest.test(dripId) && isAddress(tokenAddress))) {
+    throw new Error('Invalid values');
+  }
+
   return `${senderUserId}-${tokenAddress}-${dripId}`;
 }
 
@@ -24,9 +31,21 @@ export function decodeStreamId(streamId: string) {
 
   assert(parts.length === 3, 'Invalid stream ID');
 
-  return {
+  const values = {
     senderUserId: parts[0],
     tokenAddress: parts[1],
     dripId: parts[2],
   };
+
+  if (
+    !(
+      numericTest.test(values.senderUserId) &&
+      numericTest.test(values.dripId) &&
+      isAddress(values.tokenAddress)
+    )
+  ) {
+    throw new Error('Invalid stream ID');
+  }
+
+  return values;
 }

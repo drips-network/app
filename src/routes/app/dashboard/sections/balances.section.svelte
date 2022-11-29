@@ -1,10 +1,7 @@
 <script lang="ts">
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
-  import TopUpIcon from 'radicle-design-system/icons/Topup.svelte';
-  import CollectIcon from 'radicle-design-system/icons/ArrowUp.svelte';
-
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Table from '$lib/components/table/table.svelte';
+  import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
@@ -12,23 +9,15 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { makeStep } from '$lib/components/stepper/types';
-  import SelectTokenStep from './top-up-flow/select-token.svelte';
-  import topUpFlowState from './top-up-flow/top-up-flow-state';
-  import EnterAmountStep from './top-up-flow/enter-amount.svelte';
-  import ApproveStep from './top-up-flow/approve.svelte';
-  import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
-  import SuccessStep from '$lib/components/success-step/success-step.svelte';
-  import { ethers } from 'ethers';
-  import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
   import { goto } from '$app/navigation';
-  import getCollectFlowSteps from './collect-flow/collect-flow-steps';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
   import { AddressDriverClient } from 'radicle-drips';
   import wallet from '$lib/stores/wallet';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
+  import Plus from 'radicle-design-system/icons/Plus.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -159,28 +148,13 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  function getTopUpSuccessMessage() {
-    const { tokenAddress, amountToTopUp } = $topUpFlowState;
-    assert(tokenAddress && amountToTopUp, 'Missing context to construct getTopUpSuccessMessage');
-
-    const tokenInfo = tokens.getByAddress(tokenAddress)?.info;
-
-    const formattedAmount =
-      tokenInfo && ethers.utils.formatUnits(amountToTopUp, tokenInfo.decimals);
-
-    return `
-      You've successfully topped up ${formattedAmount} ${tokenInfo?.name}.
-      It may take some time for your balance to update on your dashboard.
-    `;
-  }
-
   const { fetchStatuses } = streams;
   $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
 
-  function onRowClick(event: CustomEvent) {
+  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     // go to token page by address
-    const tokenAddress = tableData[event.detail].token.address;
+    const tokenAddress = tableData[event.detail.rowIndex].token.address;
     assert(userId);
     const address = AddressDriverClient.getUserAddress(userId);
     goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
@@ -196,44 +170,9 @@
       ? []
       : [
           {
-            handler: () => {
-              modal.show(Stepper, undefined, {
-                context: topUpFlowState,
-                steps: [
-                  makeStep({
-                    component: SelectTokenStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: EnterAmountStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: ApproveStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: TriggerTopUpTransaction,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: SuccessStep,
-                    props: {
-                      message: () => getTopUpSuccessMessage(),
-                    },
-                  }),
-                ],
-              });
-            },
-            icon: TopUpIcon,
-            label: 'Top up',
-          },
-          {
-            label: 'Collect',
-            icon: CollectIcon,
-            handler: () => {
-              modal.show(Stepper, undefined, getCollectFlowSteps());
-            },
+            handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
+            icon: Plus,
+            label: 'Add token',
           },
         ]}
   />
@@ -246,7 +185,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} isRowClickable={isMyBalances} on:rowclick={onRowClick} />
+      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>

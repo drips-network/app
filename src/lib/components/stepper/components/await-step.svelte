@@ -62,7 +62,7 @@
   {/if}
   <p>{message}</p>
   {#if link}
-    <a class="typo-link" href={link.url}>{link.label}</a>
+    <a class="typo-link" href={link.url} target="_blank">{link.label}</a>
   {/if}
 </div>
 

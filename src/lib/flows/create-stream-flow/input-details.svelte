@@ -26,6 +26,7 @@
     generateMetadata,
     pinAccountMetadata,
     streamMetadataSchema,
+    USER_DATA_KEY,
   } from '$lib/stores/streams/metadata';
   import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
   import type { z } from 'zod';
@@ -37,6 +38,7 @@
   import type { Items } from '$lib/components/list-select/list-select.types';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
+  import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -162,8 +164,6 @@
       const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
       assert(assetConfig, "App hasn't yet fetched the right asset config");
 
-      // TODO: Use a batched call here for receivers & metadata update once SDK supports it
-
       const currentReceivers = assetConfig.streams.map((stream) => ({
         userId: stream.receiver.userId,
         config: stream.dripsConfig.raw,
@@ -226,7 +226,6 @@
       const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
       const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-        key: 65932473927847481224664369441494644980717748729109625944182088338412766444512n,
         driverAddress: CONTRACT_ADDRESS_DRIVER,
         tokenAddress,
         currentReceivers,
@@ -237,9 +236,14 @@
             userId: recipientUserId,
           },
         ],
-        value: newHash,
         balanceDelta: 0,
         transferToAddress: address,
+        userMetadata: [
+          {
+            key: formatBytes32String(USER_DATA_KEY),
+            value: toUtf8Bytes(newHash),
+          },
+        ],
       });
 
       const waitingWalletIcon = {
@@ -293,7 +297,12 @@
 </script>
 
 <StepLayout>
-  <StreamVisual fromAddress={$wallet.address} toAddress={recipientAddressValue} {amountPerSecond} />
+  <StreamVisual
+    disableLinks
+    fromAddress={$wallet.address}
+    toAddress={recipientAddressValue}
+    {amountPerSecond}
+  />
   <StepHeader
     headline="Create stream"
     description="Stream any ERC-20 token to anyone with an Ethereum address."

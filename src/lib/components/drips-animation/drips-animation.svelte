@@ -5,6 +5,8 @@
   const RESOLUTION_RATIO = window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
 
   export let speedMultiplier = 1;
+  export let vertical = false;
+  $: vertical && canvasElem && alignCanvas();
 
   let canvasElem: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -21,11 +23,11 @@
   let maxDripsOnScreen: number;
 
   function generateDrip(maxX = 0): Drip {
-    const maxY = containerSize[1] + 64;
+    const maxOffset = containerSize[1] + 64;
 
     return {
       pos: {
-        y: Math.floor(Math.random() * maxY),
+        y: Math.floor(Math.random() * maxOffset),
         x: Math.floor(Math.random() * rr(maxX) - 48),
       },
       layer: Math.random(),
@@ -86,6 +88,34 @@
   }
 
   let lastDraw = new Date().getTime();
+  let paused = false;
+
+  function alignCanvas() {
+    if (vertical) {
+      ctx.resetTransform();
+      ctx.translate(canvasElem.width / 2 + canvasElem.height / 2, 0);
+      ctx.rotate(Math.PI / 2);
+    }
+  }
+
+  onMount(() => {
+    alignCanvas();
+
+    const handleBlur = () => (paused = true);
+    const handleFocus = () => {
+      lastDraw = new Date().getTime();
+      paused = false;
+      draw();
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  });
 
   function draw() {
     if (!canvasElem) return;
@@ -119,7 +149,7 @@
     }
 
     lastDraw = currentMillis;
-    requestAnimationFrame(draw);
+    if (!paused) requestAnimationFrame(draw);
   }
 </script>
 
