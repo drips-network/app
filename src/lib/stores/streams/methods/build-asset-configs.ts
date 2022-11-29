@@ -62,6 +62,9 @@ export default function buildAssetConfigs(
 
           const streamId = makeStreamId(userId, tokenAddress, eventConfig.dripId.toString());
 
+          /** If the receiver is not included in remaining streams, it was deleted by the user. */
+          if (!remainingStreamIds.includes(streamId)) break;
+
           assetConfigHistoryItemStreams.push({
             streamId,
             dripsConfig: {

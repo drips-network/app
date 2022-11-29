@@ -139,12 +139,13 @@ function streamedByStream(
   const start: Millis = startDate ? startDate.getTime() : timestamp;
 
   const streamingFrom = minMax('max', timestamp, start);
-  const scheduledToEndAt = calcScheduledEnd(streamingFrom, duration);
+  const scheduledToEndAt = calcScheduledEnd(streamingFrom, start, duration);
   const streamingUntil = minMax('min', runsOutOfFunds, scheduledToEndAt, nextTimestamp);
   const validForMillis = minMax('max', streamingUntil - streamingFrom, 0);
 
   const streamed = (BigInt(validForMillis) * amountPerSecond.amount) / 1000n;
-  const currentAmountPerSecond = streamingUntil >= nextTimestamp ? amountPerSecond.amount : 0n;
+  const currentAmountPerSecond =
+    streamingUntil >= nextTimestamp && streamingFrom < nextTimestamp ? amountPerSecond.amount : 0n;
 
   return {
     streamed,
@@ -156,11 +157,19 @@ function sumEstimates(
   mode: 'totalStreamed' | 'currentAmountPerSecond',
   streamEstimates: StreamEstimate[],
 ): bigint {
-  return streamEstimates.reduce<bigint>((acc, streamEstimate) => acc + streamEstimate[mode], 0n);
+  const res = streamEstimates.reduce<bigint>(
+    (acc, streamEstimate) => acc + streamEstimate[mode],
+    0n,
+  );
+  return res;
 }
 
-function calcScheduledEnd(timestamp: Millis, duration?: Millis): Millis | undefined {
-  return duration ? timestamp + duration : undefined;
+function calcScheduledEnd(
+  timestamp: Millis,
+  start?: Millis,
+  duration?: Millis,
+): Millis | undefined {
+  return duration ? (start ?? timestamp) + duration : undefined;
 }
 
 function minMax(mode: 'min' | 'max', ...args: (number | undefined)[]) {

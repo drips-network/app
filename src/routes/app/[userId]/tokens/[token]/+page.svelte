@@ -71,7 +71,7 @@
     if (guardConnected()) checkUrlUserId();
   }
 
-  $: actionsDisabled = !(outgoingEstimate && incomingTotals);
+  $: withdrawDisabled = !outgoingEstimate;
 </script>
 
 {#if error}
@@ -163,8 +163,8 @@
 
         <svelte:fragment slot="actions">
           <div class="flex gap-1">
-            <Button disabled={actionsDisabled} icon={Plus} on:click={openAddFundsModal}>Add</Button>
-            <Button disabled={actionsDisabled} icon={Minus} on:click={openWithdrawModal}
+            <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
+            <Button disabled={withdrawDisabled} icon={Minus} on:click={openWithdrawModal}
               >Withdraw</Button
             >
           </div>

@@ -42,17 +42,17 @@
 
   let containerHeight = tweened(0);
 
-  let mutationObserver = new MutationObserver(() => updateContainerHeight(true));
+  let resizeObserver = new ResizeObserver(() => updateContainerHeight(true));
   let observedElement: HTMLDivElement | undefined;
 
   async function updateMutationObserver() {
     await tick();
 
-    mutationObserver.disconnect();
+    resizeObserver.disconnect();
 
     if (stepElement instanceof HTMLDivElement) {
       observedElement = stepElement;
-      mutationObserver.observe(stepElement, { childList: true, subtree: true });
+      resizeObserver.observe(stepElement);
       updateContainerHeight();
     }
   }
@@ -114,7 +114,7 @@
     return () => window.removeEventListener('resize', windowResizeListener);
   });
 
-  onDestroy(() => mutationObserver.disconnect());
+  onDestroy(() => resizeObserver.disconnect());
 </script>
 
 <div class="container" style:height={`${$containerHeight}px`}>
