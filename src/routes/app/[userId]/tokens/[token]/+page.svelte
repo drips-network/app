@@ -103,7 +103,10 @@
     <section class="grid sm:grid-cols-2 gap-3 lg:-mx-4">
       <h2 class="sr-only">Your Balances</h2>
 
-      <TokenStat title="Incoming">
+      <TokenStat
+        title="Incoming"
+        tooltip="Your incoming balance is the cumulative total earned from any incoming streams for this token."
+      >
         <svelte:fragment slot="detail">
           {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
             <Amount
@@ -131,7 +134,10 @@
         </svelte:fragment>
       </TokenStat>
 
-      <TokenStat title="Outgoing">
+      <TokenStat
+        title="Outgoing"
+        tooltip="Your outgoing balance is the remaining balance you can stream to others for this token."
+      >
         <svelte:fragment slot="detail">
           {#if outgoingEstimate}
             <Amount
