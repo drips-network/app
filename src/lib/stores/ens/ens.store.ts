@@ -61,7 +61,7 @@ export default (() => {
    * Look up an address by providing an ens name. The result is appended
    * to the store state.
    * @param name The name to reverse-lookup.
-   * @returns A promise that resolves to `void` when the lookup has concluded.
+   * @returns The resolved name's Ethereum address.
    * If it was successful, you can find a resolved record which matches the provided
    * name in the store state.
    */
