@@ -5,22 +5,14 @@ import type { Account, UserId } from './types';
 import seperateDripsSetEvents from './methods/separate-drips-set-events';
 import buildAssetConfigs from './methods/build-asset-configs';
 import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
-import { toUtf8String } from 'ethers/lib/utils';
+import { formatBytes32String, toUtf8Bytes, toUtf8String } from 'ethers/lib/utils';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { reconcileDripsSetReceivers } from './methods/reconcile-drips-set-receivers';
 import isTest from '$lib/utils/is-test';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
-/*
-A randomly-generated uint256 that we use as the `key` value for calls to `emitUserData` on the
-drips contracts. This essentially acts as a "namespace", aiming to ensure that this apps reads only the
-emitUserData events that it created itself.
-
-If you're an app developer looking at this for reference, make sure to generate your own random uint256
-value to use as a `key` value for `emitUserData`, in order to avoid metadata collisions with other apps.
-*/
-const USER_DATA_KEY =
-  65932473927847481224664369441494644980717748729109625944182088338412766444512n;
+// TODO: Set to 'ipfs' once SDK supports non-numeric strings as metadata keys.
+export const USER_DATA_KEY = '1234';
 
 const addressSchema = z.preprocess((v) => {
   if (typeof v !== 'string' || !ethers.utils.isAddress(v)) {
@@ -214,7 +206,12 @@ export async function updateAccountMetadata(
 
   const newHash = await pinAccountMetadata(newData);
   const client = await getAddressDriverClient();
-  const tx = await client.emitUserMetadata(USER_DATA_KEY, newHash);
+  const tx = await client.emitUserMetadata([
+    {
+      key: formatBytes32String(USER_DATA_KEY),
+      value: toUtf8Bytes(newHash),
+    },
+  ]);
 
   return {
     newHash,
