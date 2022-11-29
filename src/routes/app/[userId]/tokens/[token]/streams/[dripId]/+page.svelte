@@ -61,6 +61,11 @@
         streamState = 'paused';
       } else if (stream && streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
         streamState = 'ended';
+      } else if (
+        stream?.dripsConfig.startDate &&
+        stream.dripsConfig.startDate.getTime() > new Date().getTime()
+      ) {
+        streamState = 'scheduled';
       } else if (stream && estimate.currentAmountPerSecond === 0n) {
         streamState = 'out-of-funds';
       } else if (stream && estimate.currentAmountPerSecond > 0n) {
@@ -93,11 +98,32 @@
     }, []);
   }
 
-  $: lastHistoryItem = streamHistory?.[streamHistory?.length - 1];
-  $: streamRunsOutOfFunds =
-    lastHistoryItem?.runsOutOfFunds?.getTime() === lastHistoryItem?.timestamp.getTime()
-      ? undefined
-      : lastHistoryItem?.runsOutOfFunds;
+  /**
+   * The date at which the particular token ran out of funds, even if its associated asset
+   * config was changed later.
+   */
+  let outOfFundsDate: Date | undefined;
+  $: {
+    if (streamHistory) {
+      const latestStreamHistoryItem = streamHistory[streamHistory.length - 1];
+
+      if (
+        latestStreamHistoryItem.runsOutOfFunds?.getTime() ===
+          latestStreamHistoryItem.timestamp.getTime() &&
+        streamState === 'out-of-funds'
+      ) {
+        const reverseHistory = streamHistory;
+        reverseHistory.reverse();
+
+        // Find the latest history item which wasn't already out-of-funds when it was created.
+        outOfFundsDate = reverseHistory.find(
+          (hi) => hi.runsOutOfFunds && hi.runsOutOfFunds.getTime() !== hi.timestamp.getTime(),
+        )?.runsOutOfFunds;
+      } else {
+        outOfFundsDate = latestStreamHistoryItem.runsOutOfFunds;
+      }
+    }
+  }
 
   onMount(async () => {
     try {
@@ -163,12 +189,13 @@
           <h1>{stream.name ?? 'Unnamed stream'}</h1>
           <StreamStateBadge state={streamState ?? unreachable()} />
         </div>
-        {#if checkIsUser(stream.sender.userId)}
+        {#if checkIsUser(stream.sender.userId) && stream.managed}
           <div class="actions">
             <!-- <Button icon={EditIcon}>Edit</Button> -->
 
             {#if stream && !stream.paused}<Button
                 icon={PauseIcon}
+                disabled={streamState !== 'active'}
                 on:click={() =>
                   modal.show(Stepper, undefined, {
                     steps: pauseFlowSteps(stream ?? unreachable()),
@@ -248,8 +275,8 @@
                 <InfoCircleIcon style="height: 1.25rem" />
               </Tooltip>
             </div>
-            {#if streamRunsOutOfFunds}
-              <h1 class="value">{formatDate(streamRunsOutOfFunds, 'verbose')}</h1>
+            {#if outOfFundsDate}
+              <h1 class="value">{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</h1>
             {:else}
               <h1 class="value greyed-out">∞</h1>
             {/if}
@@ -290,6 +317,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    text-align: center;
   }
 
   .title-and-state {

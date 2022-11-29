@@ -12,7 +12,22 @@ vi.mock('$app/environment', () => ({
 
 const wait = (millis: number) => new Promise((resolve) => setTimeout(resolve, millis));
 
+class ResizeObserver {
+  observe() {
+    return undefined;
+  }
+  unobserve() {
+    return undefined;
+  }
+  disconnect() {
+    return undefined;
+  }
+}
+
 describe('stepper.svelte', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window.ResizeObserver as any) = ResizeObserver;
+
   it('renders a step', () => {
     render(Stepper, {
       props: {
