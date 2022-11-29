@@ -81,7 +81,7 @@
     style:top={`${tooltipPos.top}px`}
   >
     <div class="target-buffer" />
-    <div transition:fly={{ y: 5, duration: 300 }} class="tooltip-content typo-text">
+    <div transition:fly|local={{ y: 5, duration: 300 }} class="tooltip-content typo-text">
       {#if copyable}
         <Copyable alwaysVisible value={text}><span class="content">{text}</span></Copyable>
       {:else}
