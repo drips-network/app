@@ -9,13 +9,12 @@
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { makeStep } from '$lib/components/stepper/types';
-  import EditSplitsInputs from './edit-splits-flow/edit-splits-inputs.svelte';
+  import EditSplitsInputs from '../../../../lib/flows/edit-splits-flow/edit-splits-inputs.svelte';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import { AddressDriverClient, type SplitsEntry } from 'radicle-drips';
-  import ens from '$lib/stores/ens';
-  import type { ResolvedRecord } from '$lib/stores/ens/ens.store';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let userId: UserId | undefined;
 
@@ -23,7 +22,6 @@
     userId: UserId;
     weight: bigint;
     address: string;
-    ens: ResolvedRecord;
   }
 
   export let disableActions = true;
@@ -65,19 +63,10 @@
       (row): SplitsRow => ({
         ...row,
         address: AddressDriverClient.getUserAddress(row.userId),
-        ens: {},
       }),
     );
 
     splits = data;
-    data.forEach(lookupRecipientENS);
-  }
-
-  async function lookupRecipientENS(row: SplitsRow, index: number) {
-    const myRows = splits ?? [];
-    await ens.lookup(row.address);
-    myRows[index].ens = $ens[row.address];
-    splits = myRows;
   }
 
   function buildSplitsTable(splits: SplitsRow[] = []) {
@@ -89,7 +78,7 @@
     return {
       splits: splits?.map((s: SplitsRow) => {
         return {
-          text: s.ens.name ?? s.address ?? s.userId,
+          subject: { component: IdentityBadge, props: { address: s.address } },
           percent: getSplitPercent(s.weight, 'pretty'),
         };
       }),

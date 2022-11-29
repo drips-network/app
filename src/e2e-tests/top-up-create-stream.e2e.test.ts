@@ -10,7 +10,7 @@ import fetch from 'node-fetch';
 import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
 
-describe('top up, create stream', async () => {
+describe('top up, create stream, view profile, search', async () => {
   let server: PreviewServer;
   let browser: Browser;
   let page: Page;
@@ -53,7 +53,7 @@ describe('top up, create stream', async () => {
       await topUpButton.click();
 
       const topUpFlowDescription = page.locator(
-        'text=Add funds to your Drips account in order to start streaming.',
+        "text=Add funds to your Drips account's outgoing balance.",
       );
       await expect(topUpFlowDescription).toHaveCount(1);
     });
@@ -156,6 +156,45 @@ describe('top up, create stream', async () => {
 
     it('displays the incoming balance', async () => {
       await expect(page.locator('text=Testcoin')).toHaveCount(1);
+    });
+  });
+
+  describe('search', () => {
+    it('opens opens the searchbar', async () => {
+      const searchbar = page.locator('data-testid=searchbar');
+
+      await searchbar.click();
+    });
+
+    it('finds streams', async () => {
+      await page.keyboard.type('E2E');
+      await expect(
+        page.locator('.account-menu-item-wrapper', { hasText: 'E2E Test Stream' }),
+      ).toHaveCount(1);
+    });
+
+    it('finds tokens', async () => {
+      const searchbar = page.locator('data-testid=searchbar');
+
+      await searchbar.fill('Test');
+
+      await expect(page.locator('.account-menu-item-wrapper', { hasText: 'Testcoin' })).toHaveCount(
+        1,
+      );
+    });
+
+    it('jumps to profiles', async () => {
+      const searchbar = page.locator('data-testid=searchbar');
+      await searchbar.fill('0x');
+
+      await page
+        .locator('.account-menu-item-wrapper', {
+          hasText: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+        })
+        .click();
+      expect(page.url().toLowerCase()).toBe(
+        'http://localhost:3000/app/0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+      );
     });
   });
 });

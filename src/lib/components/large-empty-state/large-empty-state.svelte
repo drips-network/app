@@ -17,6 +17,7 @@
 
 <style>
   .large-empty-state {
+    user-select: none;
     height: 100%;
     padding: 30vh 0;
     display: flex;
@@ -28,7 +29,9 @@
 
   .content {
     display: flex;
-    gap: 0.5rem;
+    text-align: center;
+    max-width: 32rem;
+    gap: 1rem;
     align-items: center;
     flex-direction: column;
   }

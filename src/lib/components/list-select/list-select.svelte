@@ -10,6 +10,7 @@
 
   export let searchable = true;
   export let multiselect = false;
+  export let blockInteraction = false;
   export let emptyStateText = 'Nothing to see here';
 
   let searchString = '';
@@ -110,7 +111,7 @@
   });
 </script>
 
-<div class="list">
+<div class="list" style:pointer-events={blockInteraction ? 'none' : 'all'}>
   {#if searchable}
     <div class="search-bar">
       <SearchIcon />

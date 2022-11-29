@@ -1,10 +1,7 @@
 <script lang="ts">
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
-  import TopUpIcon from 'radicle-design-system/icons/Topup.svelte';
-  import CollectIcon from 'radicle-design-system/icons/ArrowUp.svelte';
-
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Table from '$lib/components/table/table.svelte';
+  import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
@@ -12,22 +9,15 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { makeStep } from '$lib/components/stepper/types';
-  import SelectTokenStep from './top-up-flow/select-token.svelte';
-  import topUpFlowState from './top-up-flow/top-up-flow-state';
-  import EnterAmountStep from './top-up-flow/enter-amount.svelte';
-  import ApproveStep from './top-up-flow/approve.svelte';
-  import SelectCollectTokenStep from './collect-flow/select-token.svelte';
-  import TriggerTopUpTransaction from './top-up-flow/trigger-top-up-transaction.svelte';
-  import SuccessStep from '$lib/components/success-step/success-step.svelte';
-  import { ethers } from 'ethers';
-  import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
-  import CollectAmountsStep from './collect-flow/collect-amounts.svelte';
-  import collectFlowState from './collect-flow/collect-flow-state';
-  import FetchDripsCycleStep from './collect-flow/fetch-drips-cycle.svelte';
-  import Success from './collect-flow/success.svelte';
+  import { goto } from '$app/navigation';
+  import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
+  import unreachable from '$lib/utils/unreachable';
+  import { AddressDriverClient } from 'radicle-drips';
+  import wallet from '$lib/stores/wallet';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
+  import Plus from 'radicle-design-system/icons/Plus.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -42,36 +32,6 @@
   $: accountEstimate = userId ? $balances.accounts[userId] : undefined;
 
   let tableData: TokenTableRow[] = [];
-
-  function getIncomingTotalsForToken(
-    userId: string,
-    address: string,
-  ): {
-    totalEarned: bigint;
-    amountPerSecond: bigint;
-  } {
-    const ownStreams = streams.getStreamsForUser(userId);
-
-    if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
-
-    const incomingStreamsForToken = ownStreams.incoming.filter(
-      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === address,
-    );
-
-    return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
-      (acc, stream) => {
-        const estimate = balances.getEstimateByStreamId(stream.id);
-
-        if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
-
-        return {
-          totalEarned: acc.totalEarned + estimate.totalStreamed,
-          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
-        };
-      },
-      { totalEarned: 0n, amountPerSecond: 0n },
-    );
-  }
 
   function updateTable() {
     if (!$balances || !accountEstimate || !userId) {
@@ -94,7 +54,7 @@
       assert(userId);
 
       const estimate = accountEstimate?.[tokenAddress];
-      const incomingTotals = getIncomingTotalsForToken(userId, tokenAddress);
+      const incomingTotals = balances.getIncomingTokenAmountsByUser(userId, tokenAddress);
 
       return {
         token: {
@@ -138,36 +98,47 @@
     if (userId) updateTable();
   }
 
-  const tableColumns: ColumnDef<TokenTableRow>[] = [
-    {
-      accessorKey: 'token',
-      header: 'Token',
-      cell: () => TokenCell,
-      enableSorting: false,
-      size: (100 / 24) * 8,
-    },
-    {
-      accessorKey: 'earnings',
-      header: 'Earnings',
-      cell: () => Amount,
-      enableSorting: false,
-      size: (100 / 24) * 6,
-    },
-    {
-      accessorKey: 'streaming',
-      header: 'Streaming',
-      cell: () => Amount,
-      enableSorting: false,
-      size: (100 / 24) * 6,
-    },
-    {
-      accessorKey: 'netRate',
-      header: 'Net rate',
-      cell: () => Amount,
-      enableSorting: false,
-      size: (100 / 24) * 2,
-    },
-  ];
+  function buildTableColumns(isClickable = false): ColumnDef<TokenTableRow>[] {
+    return [
+      {
+        accessorKey: 'token',
+        header: 'Token',
+        cell: () => TokenCell,
+        enableSorting: false,
+        size: (100 / 24) * 8,
+      },
+      {
+        accessorKey: 'earnings',
+        header: 'Incoming',
+        cell: () => Amount,
+        enableSorting: false,
+        size: (100 / 24) * 5,
+      },
+      {
+        accessorKey: 'streaming',
+        header: 'Outgoing',
+        cell: () => Amount,
+        enableSorting: false,
+        size: (100 / 24) * 5,
+      },
+      {
+        accessorKey: 'netRate',
+        header: 'Net rate',
+        cell: () => Amount,
+        enableSorting: false,
+        size: (100 / 24) * 2,
+      },
+      {
+        accessorKey: 'chevron',
+        header: '',
+        cell: isClickable ? () => ChevronRightCell : undefined,
+        enableSorting: false,
+        size: (100 / 24) * 2,
+      },
+    ];
+  }
+  $: isMyBalances = userId === $wallet.dripsUserId;
+  $: tableColumns = buildTableColumns(isMyBalances);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let options: TableOptions<any>;
@@ -177,24 +148,17 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  function getTopUpSuccessMessage() {
-    const { tokenAddress, amountToTopUp } = $topUpFlowState;
-    assert(tokenAddress && amountToTopUp, 'Missing context to construct getTopUpSuccessMessage');
-
-    const tokenInfo = tokens.getByAddress(tokenAddress)?.info;
-
-    const formattedAmount =
-      tokenInfo && ethers.utils.formatUnits(amountToTopUp, tokenInfo.decimals);
-
-    return `
-      You've successfully topped up ${formattedAmount} ${tokenInfo?.name}.
-      It may take some time for your balance to update on your dashboard.
-    `;
-  }
-
   const { fetchStatuses } = streams;
   $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
+
+  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
+    // go to token page by address
+    const tokenAddress = tableData[event.detail.rowIndex].token.address;
+    assert(userId);
+    const address = AddressDriverClient.getUserAddress(userId);
+    goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
+  }
 </script>
 
 <div class="section">
@@ -206,64 +170,9 @@
       ? []
       : [
           {
-            handler: () => {
-              modal.show(Stepper, undefined, {
-                context: topUpFlowState,
-                steps: [
-                  makeStep({
-                    component: SelectTokenStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: EnterAmountStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: ApproveStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: TriggerTopUpTransaction,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: SuccessStep,
-                    props: {
-                      message: () => getTopUpSuccessMessage(),
-                    },
-                  }),
-                ],
-              });
-            },
-            icon: TopUpIcon,
-            label: 'Top up',
-          },
-          {
-            handler: () => {
-              modal.show(Stepper, undefined, {
-                context: collectFlowState,
-                steps: [
-                  makeStep({
-                    component: SelectCollectTokenStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: FetchDripsCycleStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: CollectAmountsStep,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: Success,
-                    props: undefined,
-                  }),
-                ],
-              });
-            },
-            icon: CollectIcon,
-            label: 'Collect',
+            handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
+            icon: Plus,
+            label: 'Add token',
           },
         ]}
   />
@@ -276,7 +185,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} />
+      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>

@@ -8,6 +8,7 @@
   export let address: string;
   export let show: 'name' | 'symbol' | 'none' = 'name';
   export let size: 'small' | 'normal' | 'huge' = 'normal';
+  export let fontSize = 'typo-text-bold';
   export let animateOnMount = false;
 
   const sizes = {
@@ -43,7 +44,7 @@
   let loaded = false;
 </script>
 
-<div class="token">
+<div class="token size-{size}">
   <div
     class="logo"
     style={`height: ${sizes[size]}px; width: ${sizes[size]}px`}
@@ -79,7 +80,7 @@
     </div>
   </div>
   {#if show !== 'none'}
-    <div class="name typo-text-bold" class:unknown={tokenInfo === undefined}>
+    <div class="name {fontSize}" class:unknown={tokenInfo === undefined}>
       {(show === 'name' ? tokenInfo?.name : tokenInfo?.symbol) ?? 'Unknown token'}
     </div>
   {/if}
@@ -91,6 +92,10 @@
     align-items: center;
     gap: 0.5rem;
     user-select: none;
+  }
+
+  .token.size-huge {
+    gap: 1.2rem;
   }
 
   .logo {

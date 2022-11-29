@@ -4,20 +4,9 @@
   import Splits from './sections/splits.section.svelte';
 
   import wallet from '$lib/stores/wallet';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import guardConnected from '$lib/utils/guard-connected';
 
-  let userId: string;
-
-  async function getMyUserId() {
-    userId = (await (await getAddressDriverClient()).getUserId()).toString();
-  }
-
-  getMyUserId();
-
-  $: {
-    $wallet.address, getMyUserId();
-  }
+  $: userId = $wallet.dripsUserId;
 
   $: {
     $wallet.connected;

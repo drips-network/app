@@ -30,6 +30,7 @@
     width: 100%;
     border-radius: calc(100% / 2);
     object-fit: cover;
+    box-sizing: border-box;
   }
 
   .placeholder {

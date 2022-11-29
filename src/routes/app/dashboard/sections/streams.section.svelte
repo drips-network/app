@@ -3,7 +3,7 @@
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
 
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Table from '$lib/components/table/table.svelte';
+  import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
@@ -12,17 +12,23 @@
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { makeStep } from '$lib/components/stepper/types';
-  import InputDetails from './create-stream-flow/input-details.svelte';
+  import InputDetails from '../../../../lib/flows/create-stream-flow/input-details.svelte';
   import balances from '$lib/stores/balances';
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
+  import type { Stream } from '$lib/stores/streams/types';
+  import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
+  import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
+  import { goto } from '$app/navigation';
 
   export let userId: string | undefined;
   export let disableActions = true;
+  export let tokenAddress: string | undefined = undefined;
 
   interface OutgoingStreamTableRow {
+    streamId: string;
     name: string;
     toAddress: string;
     amount: AmountCellData;
@@ -30,6 +36,7 @@
   }
 
   interface IncomingStreamTableRow {
+    streamId: string;
     name: string;
     fromAddress: string;
     amount: AmountCellData;
@@ -44,6 +51,17 @@
   function updateTable() {
     ownStreams = userId ? streams.getStreamsForUser(userId) : { outgoing: [], incoming: [] };
 
+    // filter by tokenAddress ?
+    if (tokenAddress) {
+      const byToken = (stream: Stream) =>
+        stream.dripsConfig.amountPerSecond.tokenAddress.toLowerCase() ===
+        tokenAddress?.toLowerCase();
+      ownStreams = {
+        outgoing: ownStreams.outgoing.filter(byToken),
+        incoming: ownStreams.incoming.filter(byToken),
+      };
+    }
+
     outgoingTableData = mapFilterUndefined(ownStreams.outgoing, (stream) => {
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
@@ -51,6 +69,7 @@
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
       return {
+        streamId: stream.id,
         name: stream.name ?? 'Unnamed stream',
         toAddress: stream.receiver.address,
         amount: {
@@ -79,6 +98,7 @@
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
       return {
+        streamId: stream.id,
         name: stream.name ?? 'Unnamed stream',
         fromAddress: stream.sender.address,
         amount: {
@@ -124,21 +144,28 @@
       header: 'To',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'amount',
       header: 'Total streamed',
       cell: () => AmountCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'token',
       header: 'Token',
       cell: () => TokenCell,
       enableSorting: false,
-      size: (100 / 24) * 3,
+      size: (100 / 24) * 2,
+    },
+    {
+      accessorKey: 'chevron',
+      header: '',
+      cell: () => ChevronRightCell,
+      enableSorting: false,
+      size: (100 / 24) * 2,
     },
   ];
 
@@ -155,21 +182,28 @@
       header: 'From',
       cell: () => IdentityBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'amount',
-      header: 'Amount earned',
+      header: 'Received',
       cell: () => AmountCell,
       enableSorting: false,
-      size: (100 / 24) * 6,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'token',
       header: 'Token',
       cell: () => TokenCell,
       enableSorting: false,
-      size: (100 / 24) * 3,
+      size: (100 / 24) * 2,
+    },
+    {
+      accessorKey: 'chevron',
+      header: '',
+      cell: () => ChevronRightCell,
+      enableSorting: false,
+      size: (100 / 24) * 2,
     },
   ];
 
@@ -192,6 +226,19 @@
   $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
   $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
+
+  function onRowClick(
+    tableData: OutgoingStreamTableRow[] | IncomingStreamTableRow[],
+    event: CustomEvent<RowClickEventPayload>,
+  ) {
+    // go to token page by address
+    const streamId = tableData[event.detail.rowIndex].streamId;
+    const parsedId = decodeStreamId(streamId);
+
+    goto(
+      `/app/${parsedId.senderUserId}/tokens/${parsedId.tokenAddress}/streams/${parsedId.dripId}`,
+    );
+  }
 </script>
 
 <div class="section">
@@ -238,13 +285,21 @@
       {#if optionsOutgoing.data.length > 0}
         <div class="table-container">
           <h4 class="table-group-header">↑ Outgoing</h4>
-          <Table options={optionsOutgoing} />
+          <Table
+            options={optionsOutgoing}
+            isRowClickable
+            on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+          />
         </div>
       {/if}
       {#if optionsIncoming.data.length > 0}
         <div class="table-container">
           <h4 class="table-group-header">↓ Incoming</h4>
-          <Table options={optionsIncoming} />
+          <Table
+            options={optionsIncoming}
+            isRowClickable
+            on:rowClick={(e) => onRowClick(incomingTableData, e)}
+          />
         </div>
       {/if}
     </SectionSkeleton>

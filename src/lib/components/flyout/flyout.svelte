@@ -33,7 +33,7 @@
     on:mouseenter={() => handleHover(true)}
     on:mouseleave={() => handleHover(false)}
   >
-    <div class="trigger-content">
+    <div class="trigger-content" on:click|stopPropagation={() => handleHover(true)}>
       <slot name="trigger" />
     </div>
     {#if visible}
@@ -62,6 +62,7 @@
 
   .content {
     position: absolute;
+    z-index: 3;
     left: 0;
     width: 24rem;
     max-width: calc(100vw - 2rem);
@@ -75,8 +76,8 @@
   .container {
     background-color: var(--color-background);
     box-shadow: var(--elevation-medium);
-    border-radius: 0.5rem;
-    padding: 1rem;
+    border-radius: 2.5rem;
+    padding: 0.5rem;
     margin-top: 0.5rem;
   }
 
