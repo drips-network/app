@@ -34,30 +34,44 @@
     };
   }
 
+  function updateContainerSize() {
+    const containerBounds = container.getBoundingClientRect();
+    containerSize = [containerBounds.width, containerBounds.height];
+    canvasElem.width = containerSize[0] * RESOLUTION_RATIO;
+    canvasElem.height = containerSize[1] * RESOLUTION_RATIO;
+
+    maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
+
+    drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
+  }
+
   onMount(() => {
     const containerBounds = container.getBoundingClientRect();
     containerSize = [containerBounds.width, containerBounds.height];
 
-    function updateContainerSize() {
-      const containerBounds = container.getBoundingClientRect();
-      containerSize = [containerBounds.width, containerBounds.height];
-      canvasElem.width = containerSize[0] * RESOLUTION_RATIO;
-      canvasElem.height = containerSize[1] * RESOLUTION_RATIO;
-
-      maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
-
-      drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
-    }
     updateContainerSize();
-
-    window.addEventListener('resize', updateContainerSize);
 
     const context = canvasElem.getContext('2d');
     assert(context, 'Unable to create Canvas element');
 
     ctx = context;
+  });
 
-    return () => window.removeEventListener('resize', updateContainerSize);
+  onMount(() => {
+    let resizeTimeout: number;
+
+    const resizeHandler = () => {
+      if (resizeTimeout) window.clearTimeout(resizeTimeout);
+
+      resizeTimeout = window.setTimeout(() => {
+        alignCanvas();
+        updateContainerSize();
+      }, 50);
+    };
+
+    window.addEventListener('resize', resizeHandler);
+
+    return () => window.removeEventListener('resize', resizeHandler);
   });
 
   interface Drip {
