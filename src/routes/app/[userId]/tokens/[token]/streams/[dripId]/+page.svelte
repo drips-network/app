@@ -23,6 +23,7 @@
   import InfoCircleIcon from 'radicle-design-system/icons/InfoCircle.svelte';
   import Button from '$lib/components/button/button.svelte';
   import PauseIcon from 'radicle-design-system/icons/Pause.svelte';
+  import PlayIcon from 'radicle-design-system/icons/Play.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
@@ -191,8 +192,6 @@
         </div>
         {#if checkIsUser(stream.sender.userId) && stream.managed}
           <div class="actions">
-            <!-- <Button icon={EditIcon}>Edit</Button> -->
-
             {#if stream && !stream.paused}<Button
                 icon={PauseIcon}
                 disabled={streamState !== 'active'}
@@ -201,15 +200,13 @@
                     steps: pauseFlowSteps(stream ?? unreachable()),
                   })}>Pause</Button
               >{/if}
-            <!-- TODO: Use a "Play" icon -->
             {#if stream && stream.paused}<Button
-                icon={PauseIcon}
+                icon={PlayIcon}
                 on:click={() =>
                   modal.show(Stepper, undefined, {
                     steps: unpauseFlowSteps(stream ?? unreachable()),
                   })}>Unpause</Button
               >{/if}
-            <!-- <Button icon={DeleteIcon}>Delete</Button> -->
           </div>
         {/if}
       </div>
