@@ -33,11 +33,9 @@
         type: 'pending',
       };
 
-      await ens.reverseLookup(input);
-      const result = Object.entries($ens).find((item) => item[1].name === input);
+      const address = await ens.reverseLookup(input);
 
-      if (result) {
-        const [address] = result;
+      if (address) {
         validatedValue = address;
         value = address;
 
