@@ -20,9 +20,9 @@
   {#if title}<p class="title typo-all-caps">{title}</p>{/if}
   {#if address}
     <div in:fade>
-      <IdentityBadge disableLink size="huge" bind:avatarImgElem {address} showIdentity={false} />
+      <IdentityBadge size="huge" bind:avatarImgElem {address} showIdentity={false} />
     </div>
-    <div in:fade><IdentityBadge disableLink size="huge" {address} showAvatar={false} /></div>
+    <div in:fade><IdentityBadge size="huge" {address} showAvatar={false} /></div>
   {:else}
     <div class="avatar-placeholder" />
     <h3 class="name-placeholder">TBD</h3>
