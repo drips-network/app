@@ -5,7 +5,6 @@
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  // import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { makeStep } from '$lib/components/stepper/types';
@@ -124,8 +123,6 @@
           };
         }),
         splitsTotalPercent: getSplitPercent(totalOutgoingWeight, 'pretty'),
-        // remainderPercent: getSplitPercent(BigInt('1000000') - totalSplitsWeight, 'pretty'),
-        // remainderReceiver: 'You',
       },
     };
   }
