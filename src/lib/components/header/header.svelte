@@ -9,7 +9,7 @@
 </script>
 
 <header class:elevated>
-  <a sveltekit:prefetch href={$wallet.connected ? '/app/dashboard' : '/'}>
+  <a href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
   </a>
   <SearchBar />
@@ -23,8 +23,6 @@
     height: 4rem;
     width: 100%;
     background-color: var(--color-background);
-    position: fixed;
-    top: 0;
     transition: box-shadow 0.3s;
     display: flex;
     gap: 1rem;
