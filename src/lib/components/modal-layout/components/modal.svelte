@@ -8,7 +8,6 @@
 
 <style>
   .modal {
-    padding: 2.5rem;
     margin: 2rem 0;
     background: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
@@ -21,7 +20,6 @@
   @media only screen and (max-width: 54rem) {
     .modal {
       width: 95vw;
-      padding: 1rem;
     }
   }
 </style>
