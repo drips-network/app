@@ -32,25 +32,25 @@ module.exports = {
         'foreground-level-5': 'var(--color-foreground-level-5)',
         'foreground-level-6': 'var(--color-foreground-level-6)',
         'background': 'var(--color-background)',
+      },
+      fontFamily: {
+        mono: 'var(--typeface-mono-regular), monospace',
+      },
+      fontSize: {
+        // radicle-design-system - typography.css
+        'typo-header-1': '36px',
+        'typo-header-2': '24px',
+        'typo-header-3': '20px',
+        'typo-header-4': '16px',
+        'typo-header-5': '13px',
+        'typo-text': '16px',
+        'typo-text-small': '14px',
+        // 'typo-all-caps': 13px;
+      },
+      borderRadius: {
+        'xl': '1.5rem 0 1.5rem 1.5rem',
       }
     },
-    fontFamily: {
-      mono: 'var(--typeface-mono-regular), monospace',
-    },
-    fontSize: {
-      // radicle-design-system - typography.css
-      'typo-header-1': '36px',
-      'typo-header-2': '24px',
-      'typo-header-3': '20px',
-      'typo-header-4': '16px',
-      'typo-header-5': '13px',
-      'typo-text': '16px',
-      'typo-text-small': '14px',
-      // 'typo-all-caps': 13px;
-    },
-    borderRadius: {
-      'xl': '1.5rem 0 1.5rem 1.5rem',
-    }
   },
   plugins: [],
 };
