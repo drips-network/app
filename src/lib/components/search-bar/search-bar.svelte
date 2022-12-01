@@ -190,7 +190,7 @@
   }
 
   input {
-    height: 100%;
+    height: 3rem;
     width: 100%;
   }
 
