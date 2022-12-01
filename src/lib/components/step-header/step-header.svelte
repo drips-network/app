@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
 
   export let emoji: string | undefined = undefined;
   export let headline: string;
@@ -20,6 +20,6 @@
   }
 
   p {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 </style>

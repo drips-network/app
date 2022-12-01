@@ -24,7 +24,7 @@
   >
     <div class="icon" slot="title">
       <div class="highlighted">
-        <span style="color: var(--color-foreground-level-5)">
+        <span style="color: var(--color-foreground)">
           {#if highlightPlainText !== item.item.name}
             Stream ID:
           {/if}
@@ -42,7 +42,7 @@
   >
     <div class="icon" slot="left">
       <Token show="none" size="huge" address={item.item.info.address} />
-      <div class="badge"><TokensIcon style="height: 1rem" /></div>
+      <div class="badge"><TokensIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
     </div>
     <svelte:fragment slot="title">
       <div class="highlighted">{@html highlighted}</div>
@@ -64,11 +64,11 @@
           address={item.item.address}
           showIdentity={false}
         />{/if}
-      <div class="badge"><UserIcon style="height: 1rem" /></div>
+      <div class="badge"><UserIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
     </div>
     <svelte:fragment slot="title">
       <div class="highlighted">
-        <span style="color: var(--color-foreground-level-5)">
+        <span style="color: var(--color-foreground)">
           {#if !item.item.name && !item.item.address && item.item.dripsUserId}
             Jump to user ID:
           {/if}

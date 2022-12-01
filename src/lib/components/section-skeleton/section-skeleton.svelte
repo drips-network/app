@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
   import { fade } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
@@ -66,10 +66,10 @@
         class="placeholder-container"
         style:height={`${$containerHeight}px`}
         style:position={placeholderContainerPosition}
-        style:border={placeholderOutline ? '2px solid var(--color-foreground-level-1)' : ''}
+        style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
       >
         <div class="empty-state">
-          <Emoji emoji="⚠️" size="large" />
+          <Emoji emoji="⚠️" size="huge" />
           <div class="text-group">
             <p class="typo-text-small-bold">Oops, something went wrong.</p>
             <p class="typo-text-small">
@@ -88,10 +88,10 @@
         class="placeholder-container"
         style:height={`${$containerHeight}px`}
         style:position={placeholderContainerPosition}
-        style:border={placeholderOutline ? '2px solid var(--color-foreground-level-1)' : ''}
+        style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
       >
         <div class="empty-state">
-          <Emoji emoji={emptyStateEmoji} size="large" />
+          <Emoji emoji={emptyStateEmoji} size="huge" />
           <div class="text-group">
             {#if emptyStateHeadline}<p class="typo-text-small-bold">{emptyStateHeadline}</p>{/if}
             {#if emptyStateText}<p class="typo-text-small">{emptyStateText}</p>{/if}
@@ -109,7 +109,7 @@
       style:position={placeholderContainerPosition}
       class="placeholder-container"
       style:height={`${$containerHeight}px`}
-      style:border={placeholderOutline ? '2px solid var(--color-foreground-level-1)' : ''}
+      style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
     >
       <Spinner />
     </div>
@@ -123,11 +123,11 @@
 
   .placeholder-container {
     width: 100%;
-    border-radius: 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--color-foreground-level-4);
+    color: var(--color-foreground);
   }
 
   .empty-state {

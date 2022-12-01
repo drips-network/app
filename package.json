@@ -65,7 +65,7 @@
     "dotenv": "^16.0.3",
     "ethers": "^5.7.0",
     "fuzzysort": "^2.0.3",
-    "radicle-design-system": "https://github.com/radicle-dev/radicle-design-system",
+    "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"

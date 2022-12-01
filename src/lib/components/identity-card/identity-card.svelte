@@ -35,12 +35,12 @@
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
-    border: 1px solid var(--color-foreground-level-2);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background-color: var(--color-foreground-level-1);
+    border: 1px solid var(--color-foreground);
+    padding: 0.75rem;
+    border-radius: 1rem 0 1rem 1rem;
     user-select: none;
     width: 12rem;
+    box-shadow: var(--elevation-medium);
   }
 
   .identity-card > * {
@@ -51,7 +51,7 @@
   .title {
     margin-bottom: 0.5rem;
     line-height: 16px;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
   }
 
   .avatar-placeholder {

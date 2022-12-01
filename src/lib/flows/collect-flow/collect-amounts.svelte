@@ -13,7 +13,7 @@
   } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import unreachable from '$lib/utils/unreachable';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import type { CollectFlowState } from './collect-flow-state';

@@ -25,10 +25,6 @@
     gap: 0.25rem;
   }
 
-  p {
-    color: var(--color-foreground-level-6);
-  }
-
   @media (max-width: 1024px) {
     .setting {
       flex-direction: column;

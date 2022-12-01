@@ -76,9 +76,9 @@
   .container {
     background-color: var(--color-background);
     box-shadow: var(--elevation-medium);
-    border-radius: 2.5rem;
+    border-radius: 1.25rem 0 1.25rem 1.25rem;
     padding: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
   }
 
   .margin {

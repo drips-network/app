@@ -99,14 +99,6 @@
     gap: 1rem;
   }
 
-  p {
-    color: var(--color-foreground-level-6);
-  }
-
-  h4 {
-    color: var(--color-foreground-level-5);
-  }
-
   .section {
     display: flex;
     flex-direction: column;
