@@ -65,6 +65,6 @@
   }
 
   .toggle.toggled {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 </style>
