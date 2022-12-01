@@ -15,23 +15,15 @@
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import globalAdvisoryStore from '$lib/stores/global-advisory/global-advisory.store';
+  import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
+  import { fly } from 'svelte/transition';
 
   export let data: { pathname: string };
 
   let walletConnected = false;
   let loaded = false;
-
-  /**
-   * If a fatal error occurs during store initialization that may result in
-   * incorrect estimation values or balances, this boolean will cause a global
-   * error state to be rendered instead of app content.
-   */
-  let fatalError:
-    | false
-    | {
-        error: unknown;
-        message?: string;
-      } = false;
 
   async function initializeStores() {
     await wallet.initialize();
@@ -56,14 +48,16 @@
         await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
       } catch (e) {
         if (e instanceof Error) {
-          fatalError = {
-            error: e,
-            message: e.message,
-          };
+          globalAdvisoryStore.add({
+            fatal: true,
+            headline: 'A fatal error occured',
+            description: e.message,
+          });
         } else {
-          fatalError = {
-            error: e,
-          };
+          globalAdvisoryStore.add({
+            fatal: true,
+            headline: 'A fatal error occured',
+          });
         }
       }
     } else {
@@ -85,15 +79,6 @@
   });
 
   onMount(() => {
-    const listener = () => {
-      if (fatalError) window.location.reload();
-    };
-
-    window.addEventListener('keydown', listener);
-    return () => window.removeEventListener('keydown', listener);
-  });
-
-  onMount(() => {
     scroll.attach();
     return scroll.detach;
   });
@@ -104,78 +89,33 @@
   });
 </script>
 
-{#if fatalError}
-  <div class="bsod">
-    <h1><span class="white-background">Fatal Error</span></h1>
-    <div class="description">
-      {#if fatalError.message}
-        <p>A fatal exception has occurred.</p>
-        <p><i>{fatalError.message}</i></p>
-      {:else}
-        <p>An unknown fatal exception has occured.</p>
-      {/if}
-      <ul>
-        <li><p>*&#8195&#8195 Press any key to reload this application.</p></li>
-        <li><p>*&#8195&#8195 Ensure your browser is up-to-date.</p></li>
-        <li><p>*&#8195&#8195 Try turning it on & off again.</p></li>
-        <li>
-          *&#8195&#8195<a href="https://discord.gg/vhGXkazpNc" target="_blank"
-            >Get help on our Discord</a
-          >
-        </li>
-      </ul>
-    </div>
-  </div>
-{/if}
+<GlobalAdvisory />
 
-{#if loaded && !fatalError}
-  <div class="main" data-theme={$themeStore.currentTheme}>
+{#if loaded}
+  <div class="main" data-theme={$themeStore.currentTheme} in:fly={{ duration: 300, y: 16 }}>
     <ModalLayout />
     <div class="page" class:loading={$navigating}>
       <PageTransition pathname={data.pathname}>
         <slot />
       </PageTransition>
     </div>
+  </div>
+  <div data-theme={$themeStore.currentTheme} class="header" in:fly={{ duration: 300, y: 16 }}>
     <Header />
+  </div>
+{:else}
+  <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
+    <Spinner />
   </div>
 {/if}
 
 <style>
-  .bsod {
-    height: 100vh;
-    width: 100vw;
-    background-color: #0033bb;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 1rem;
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
   }
-
-  .bsod h1,
-  p,
-  a {
-    font-family: monospace;
-    font-size: 1rem;
-    max-width: 640px;
-  }
-
-  .bsod a {
-    text-decoration: underline;
-  }
-
-  .bsod .white-background {
-    background-color: #fff;
-    color: #0033bb;
-  }
-
-  .bsod .description {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .page {
     position: relative;
     min-height: 100vh;
@@ -188,5 +128,15 @@
 
   .loading {
     opacity: 0.5s;
+  }
+
+  .loading-state {
+    display: fixed;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--color-background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>
