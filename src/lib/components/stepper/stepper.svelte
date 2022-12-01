@@ -40,9 +40,10 @@
     return { x, duration: 300, easing: cubicInOut };
   }
 
+  let transitioning = false;
   let containerHeight = tweened(0);
 
-  let resizeObserver = new ResizeObserver(() => updateContainerHeight(true));
+  let resizeObserver = new ResizeObserver(() => updateContainerHeight());
   let observedElement: HTMLDivElement | undefined;
 
   async function updateMutationObserver() {
@@ -58,15 +59,13 @@
   }
 
   let firstHeightUpdate = true;
-  async function updateContainerHeight(disableTransition = false) {
-    await tick();
-
+  async function updateContainerHeight() {
     if (!observedElement) return;
 
-    const stepHeight = observedElement.clientHeight;
+    const stepHeight = observedElement.offsetHeight;
 
     containerHeight.set(stepHeight, {
-      duration: firstHeightUpdate || disableTransition ? 0 : 300,
+      duration: firstHeightUpdate || !transitioning ? 0 : 300,
       easing: cubicInOut,
     });
 
@@ -108,7 +107,7 @@
   }
 
   onMount(() => {
-    const windowResizeListener = () => updateContainerHeight(true);
+    const windowResizeListener = () => updateContainerHeight();
     window.addEventListener('resize', windowResizeListener);
 
     return () => window.removeEventListener('resize', windowResizeListener);
@@ -117,11 +116,17 @@
   onDestroy(() => resizeObserver.disconnect());
 </script>
 
-<div class="container" style:height={`${$containerHeight}px`}>
+<div
+  class="container"
+  style:height={`${$containerHeight}px`}
+  style:overflow={transitioning ? 'hidden' : 'visible'}
+>
   {#key `${awaiting}${awaitError}${currentStepIndex}`}
     <div
       in:fly|local={(() => getTransition('in'))()}
       out:fly|local={(() => getTransition('out'))()}
+      on:outrostart={() => (transitioning = true)}
+      on:introend={() => (transitioning = false)}
       class="step-container"
     >
       <div class="step" bind:this={stepElement}>
@@ -152,10 +157,16 @@
   .step-container {
     position: absolute;
     width: 100%;
-    height: 100%;
   }
 
   .step {
+    padding: 2.5rem;
     width: 100%;
+  }
+
+  @media only screen and (max-width: 54rem) {
+    .step {
+      padding: 1rem;
+    }
   }
 </style>
