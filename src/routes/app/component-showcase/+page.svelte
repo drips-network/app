@@ -168,17 +168,13 @@
     margin-bottom: 0.5rem;
   }
 
-  p,
-  label {
-    color: var(--color-foreground-level-6);
-  }
-
   .list-container {
     margin-top: 1rem;
     width: 32rem;
     height: 32rem;
     overflow: scroll;
-    border: 0.125rem solid var(--color-foreground-level-2);
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
     border-radius: 0.5rem;
   }
 
@@ -187,7 +183,7 @@
   }
 
   .stepper-wrapper {
-    border: 0.125rem solid var(--color-foreground-level-2);
+    border: 1px solid var(--color-foreground);
     border-radius: 0.5rem;
   }
 </style>

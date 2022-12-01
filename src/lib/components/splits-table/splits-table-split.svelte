@@ -38,7 +38,7 @@
   <!-- subject -->
   <div class="flex-1 pl-2.5">
     {#if typeof split.subject === 'string'}
-      <div class="typo-text-bold" style="color: var(--color-foreground-level-6)">
+      <div class="typo-text-bold" style="color: var(--color-foreground)">
         {split.subject}
       </div>
     {:else if split.subject}

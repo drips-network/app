@@ -13,23 +13,23 @@
 </script>
 
 <svelte:head>
-  <meta property="og:title" content="Radicle Drips" />
+  <meta property="og:title" content="Drips" />
   <meta property="og:image" content={`https://${$page.url.host}/assets/social-share.png`} />
   <meta
     property="og:description"
-    content="An Ethereum protocol for streaming and splitting funds."
+    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
   />
-  <meta name="twitter:title" content="Radicle Drips" />
+  <meta name="twitter:title" content="Drips" />
   <meta
     name="twitter:description"
-    content="An Ethereum protocol for streaming and splitting funds."
+    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
   />
   <meta name="twitter:image" content={`https://${$page.url.host}/assets/social-share.png`} />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@radicle" />
+  <meta name="twitter:site" content="@dripsnetwork" />
 </svelte:head>
 
-<div class="main" data-theme={$themeStore.currentTheme}>
+<div class="main" data-theme={$themeStore.currentTheme} data-sveltekit-prefetch>
   <div class="page">
     <slot />
   </div>

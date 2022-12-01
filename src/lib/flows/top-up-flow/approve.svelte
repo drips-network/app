@@ -10,7 +10,7 @@
   import { ethers } from 'ethers';
   import Button from '$lib/components/button/button.svelte';
   import modal from '$lib/stores/modal';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import wallet from '$lib/stores/wallet';
 
@@ -64,7 +64,7 @@
   <StepHeader
     emoji="🔐"
     headline="Approve token spend"
-    description={`Please grant your Radicle Drips account access to your ${
+    description={`Please grant your Drips account access to your ${
       tokenInfo?.info.name ?? ''
     } funds by executing this transaction.`}
   />

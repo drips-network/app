@@ -75,8 +75,4 @@
     gap: 1rem;
     min-height: 16rem;
   }
-
-  p {
-    color: var(--color-foreground-level-5);
-  }
 </style>

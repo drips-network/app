@@ -206,13 +206,6 @@
   }
 
   .content {
-    margin: 0 -1rem 0 -1rem;
     overflow-y: scroll;
-  }
-
-  @media (max-width: 1024px) {
-    .content {
-      padding: 0 1rem 0 1rem;
-    }
   }
 </style>

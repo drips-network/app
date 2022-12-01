@@ -34,9 +34,4 @@
     justify-content: center;
     align-items: center;
   }
-
-  p {
-    color: var(--color-foreground-level-6);
-    margin-bottom: 1rem;
-  }
 </style>

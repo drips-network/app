@@ -37,8 +37,8 @@
     width: 2.5rem;
     border-radius: 1rem;
     position: relative;
-    outline: 1px solid var(--color-foreground-level-3);
-    transition: background-color 0.3s, outline 0.2s;
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    transition: background-color 0.3s, box-shadow 0.2s;
   }
 
   .slider.checked {
@@ -50,7 +50,7 @@
   }
 
   .slider.focus {
-    outline: 2px solid var(--color-foreground-level-3);
+    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
   }
 
   .slider .head {
