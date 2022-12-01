@@ -99,6 +99,8 @@
         <slot />
       </PageTransition>
     </div>
+  </div>
+  <div data-theme={$themeStore.currentTheme} class="header" in:fly={{ duration: 300, y: 16 }}>
     <Header />
   </div>
 {:else}
@@ -108,6 +110,12 @@
 {/if}
 
 <style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
   .page {
     position: relative;
     min-height: 100vh;
