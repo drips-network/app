@@ -16,6 +16,7 @@
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import Token from '$lib/components/token/token.svelte';
+  import parseTokenAmount from '$lib/utils/parse-token-amount';
 
   // TODO: Get current balance of ERC-20, validate input accordingly
 
@@ -37,9 +38,7 @@
       throw new Error('Unable to get token info');
     }
 
-    amount = amountValue
-      ? ethers.utils.parseUnits(amountValue, tokenInfo.info.decimals).toBigInt()
-      : undefined;
+    amount = amountValue ? parseTokenAmount(amountValue, tokenInfo.info.decimals) : undefined;
 
     const { tokenBalance } = $context;
 
@@ -55,6 +54,8 @@
           )} ${tokenInfo.info.symbol} in your wallet.`,
         };
       }
+    } else if (amountValue && amount === undefined) {
+      validationState = { type: 'invalid', message: 'Invalid value.' };
     } else {
       validationState = { type: 'unvalidated' };
     }

@@ -13,7 +13,6 @@
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import unreachable from '$lib/utils/unreachable';
-  import { parseUnits } from 'ethers/lib/utils';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import { constants } from 'radicle-drips';
@@ -26,6 +25,7 @@
   import { createEventDispatcher } from 'svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import parseTokenAmount from '$lib/utils/parse-token-amount';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -36,10 +36,9 @@
     $balances.streamable.find((amount) => amount.tokenAddress === $context.tokenAddress) ??
     unreachable();
 
-  let amount: number;
-  $: amountWei = amount
-    ? parseUnits(String(amount), tokenInfo.info.decimals).toBigInt()
-    : undefined;
+  let amount: string | undefined;
+  let amountWei: bigint | undefined;
+  $: if (amount) amountWei = parseTokenAmount(amount, tokenInfo.info.decimals);
 
   let validationState: TextInputValidationState;
   $: {
@@ -52,6 +51,8 @@
           message: 'You can only withdraw less than your current remaining streamable balance.',
         };
       }
+    } else if (amount && amountWei === undefined) {
+      validationState = { type: 'invalid', message: 'Invalid amount.' };
     } else {
       validationState = { type: 'unvalidated' };
     }
