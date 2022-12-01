@@ -10,6 +10,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.m
 import testnetMockProvider from './__test__/local-testnet-mock-provider';
 import isTest from '$lib/utils/is-test';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
 const DEFAULT_NETWORK: Network = {
@@ -99,13 +100,23 @@ const walletStore = () => {
     const instance = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(instance);
 
+    _attachListeners(instance);
+
     if (!_isNetworkSupported(await provider.getNetwork())) {
+      const clearAdvisory = globalAdvisoryStore.add({
+        fatal: false,
+        headline: 'Unsupported network',
+        description: 'Please switch your connected wallet to Ethereum Mainnet or Goerli.',
+        emoji: '🔌',
+      });
+
       await provider.send('wallet_switchEthereumChain', [
         { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
       ]);
+
+      clearAdvisory();
     }
 
-    _attachListeners(instance);
     await _setConnectedState(provider);
   }
 
