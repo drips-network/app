@@ -6,7 +6,6 @@
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import balances from '$lib/stores/balances';
   import tokens from '$lib/stores/tokens';
-  import { ethers } from 'ethers';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import Button from '$lib/components/button/button.svelte';
   import streams from '$lib/stores/streams';
@@ -29,6 +28,7 @@
   import parseDate from './methods/parse-date';
   import parseTime from './methods/parse-time';
   import combineDateAndTime from './methods/combine-date-and-time';
+  import parseTokenAmount from '$lib/utils/parse-token-amount';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -77,6 +77,10 @@
   // Amount input
 
   let amountValue: string | undefined;
+  $: amountValueParsed =
+    amountValue && selectedToken
+      ? parseTokenAmount(amountValue, selectedToken?.info.decimals)
+      : undefined;
 
   // Multiplier dropdown
 
@@ -85,10 +89,8 @@
   // Amount per second
 
   $: amountPerSecond =
-    amountValue && selectedMultiplier && selectedToken
-      ? (ethers.utils.parseUnits(amountValue, selectedToken.info.decimals).toBigInt() *
-          BigInt(constants.AMT_PER_SEC_MULTIPLIER)) /
-        BigInt(selectedMultiplier)
+    amountValueParsed && selectedMultiplier && selectedToken
+      ? (amountValueParsed * BigInt(constants.AMT_PER_SEC_MULTIPLIER)) / BigInt(selectedMultiplier)
       : undefined;
 
   let setStartAndEndDate = false;
