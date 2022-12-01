@@ -123,8 +123,6 @@
           };
         }),
         splitsTotalPercent: getSplitPercent(totalOutgoingWeight, 'pretty'),
-        // remainderPercent: getSplitPercent(BigInt('1000000') - totalSplitsWeight, 'pretty'),
-        // remainderReceiver: 'You',
       },
     };
   }
