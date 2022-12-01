@@ -62,7 +62,7 @@
 
 <a
   href={getLink()}
-  class="identity-badge flex items-center relative text-left text-foreground-level-6"
+  class="identity-badge flex items-center relative text-left text-foreground"
   class:flex-row-reverse={isReverse}
   style:height={showAvatar ? `${currentSize}px` : ''}
   style:gap={showAvatar && showIdentity ? `${currentSize / 2.5}px` : ''}
