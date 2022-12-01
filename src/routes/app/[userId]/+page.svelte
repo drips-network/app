@@ -96,8 +96,8 @@
 </script>
 
 <svelte:head>
-  <title>Profile - {(address && $ens[address]?.name) ?? address ?? userId}</title>
-  <meta name="description" value="Radicle Drips Dashboard" />
+  <title>{(address && $ens[address]?.name) ?? address ?? userId} | Drips</title>
+  <meta name="description" value="Drips User Profile" />
 </svelte:head>
 
 {#if error}

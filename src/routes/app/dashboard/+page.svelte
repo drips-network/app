@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-  <title>Drips — Dashboard</title>
+  <title>Dashboard | Drips</title>
   <meta name="description" value="Radicle Drips Dashboard" />
 </svelte:head>
 
