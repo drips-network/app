@@ -148,7 +148,7 @@
             disabled: balances.splittable === 0n,
           },
           {
-            title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight)}`,
+            title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
             value: formatTokenAmount(
               makeAmount(collectableAfterSplit - splittableAfterReceive),
               selectedToken.decimals,
