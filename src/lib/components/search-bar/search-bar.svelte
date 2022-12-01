@@ -2,7 +2,7 @@
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import CloseIcon from 'radicle-design-system/icons/CrossSmall.svelte';
 
-  import { onMount, tick } from 'svelte';
+  import { tick } from 'svelte';
   import { sineIn, sineInOut, sineOut } from 'svelte/easing';
   import { fade, fly } from 'svelte/transition';
   import search, { updateSearchItems } from './search';
@@ -17,7 +17,7 @@
 
   $: focus ? scroll.lock() : scroll.unlock();
 
-  let searchTerm: string;
+  let searchTerm: string | undefined;
 
   let desktopSearchElem: HTMLDivElement;
   let mobileSearchElem: HTMLDivElement;
@@ -28,18 +28,12 @@
       : desktopSearchElem;
   }
 
-  async function triggerMobileSearch() {
+  async function triggerSearch() {
     mobileSearchActive = true;
     focus = true;
     await tick();
 
     getActiveSearchElem().focus();
-  }
-
-  function handleEscape(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      closeSearch();
-    }
   }
 
   function closeSearch() {
@@ -75,25 +69,32 @@
   }
 
   let resultElems: HTMLDivElement[] = [];
+  $: accountMenuItemElems = resultElems.map((e) => e?.firstChild);
 
   function handleKeyboard(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      closeSearch();
+      return;
+    }
+
     if (e.metaKey === true && e.key === 'k') {
       getActiveSearchElem().focus();
       e.preventDefault();
       return;
     }
 
+    if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
+
     const focussedElem = document.activeElement;
-    const accountMenuItemElems = resultElems.map((e) => e?.firstChild);
 
     if (!focussedElem) return;
-    if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
     if (
       !(
         focussedElem === getActiveSearchElem() ||
         accountMenuItemElems.includes(focussedElem as HTMLDivElement)
       )
     ) {
+      focus = false;
       return;
     }
 
@@ -110,18 +111,21 @@
     e.preventDefault();
   }
 
-  onMount(() => {
-    window.addEventListener('keydown', handleKeyboard);
+  function handleSearchBlur(e: FocusEvent) {
+    const focussedElem = e.relatedTarget as HTMLElement;
 
-    return () => window.removeEventListener('keydown', handleKeyboard);
-  });
+    if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== desktopSearchElem) {
+      searchTerm = undefined;
+      focus = false;
+    }
+  }
 </script>
 
-<svelte:window on:keydown={handleEscape} />
+<svelte:window on:keydown={handleKeyboard} />
 
 <div class="search-bar desktop" class:focus>
   <div class="search-bar-input-wrapper">
-    <SearchIcon />
+    <SearchIcon style="fill: var(--color-foreground)" />
     <input
       type="text"
       data-testid="searchbar"
@@ -129,6 +133,7 @@
       bind:this={desktopSearchElem}
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
+      on:focusout={handleSearchBlur}
     />
     {#if focus}<CloseIcon style="cursor: pointer;" on:click={closeSearch} />{/if}
   </div>
@@ -137,6 +142,7 @@
       in:fly={{ duration: 200, y: 8, easing: sineOut }}
       out:fly={{ duration: 200, y: 8, easing: sineIn }}
       class="results"
+      on:focusout={handleSearchBlur}
     >
       <Results bind:resultElems {results} {loading} on:click={closeSearch} />
     </div>
@@ -164,7 +170,7 @@
     </div>
   {/if}
   <div class="mobile-search-button">
-    <SearchIcon on:click={triggerMobileSearch} />
+    <SearchIcon on:click={triggerSearch} />
   </div>
 </div>
 
@@ -180,11 +186,12 @@
   }
 
   .search-bar.focus {
-    border: 2px solid var(--color-foreground-level-3);
+    background-color: var(--color-foreground-level-1);
+    box-shadow: var(--elevation-medium);
   }
 
   input {
-    height: 100%;
+    height: 3rem;
     width: 100%;
   }
 
@@ -200,14 +207,14 @@
     display: flex;
     align-items: center;
     height: 3rem;
-    border-radius: 1.5rem;
-    background-color: var(--color-foreground-level-1);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     max-width: 32rem;
     width: 100%;
-    border: 2px solid transparent;
+    border: 1px solid var(--color-foreground);
     transition: border 0.3s;
     z-index: 2;
     position: relative;
+    transition: border 0.3s, background-color 0.3s, box-shadow 0.3s;
   }
 
   .search-bar-input-wrapper {
@@ -251,7 +258,7 @@
     justify-content: center;
     align-items: center;
     background-color: var(--color-foreground-level-1);
-    border-radius: 1rem;
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
   .mobile input {
@@ -260,7 +267,7 @@
 
   .results {
     position: absolute;
-    top: 3.5rem;
+    top: 4rem;
     right: -2px;
     left: -2px;
     display: flex;
@@ -269,9 +276,10 @@
     max-height: calc(100vh - 5rem);
     overflow: scroll;
     background-color: var(--color-background);
-    border: 2px solid var(--color-foreground-level-1);
-    border-radius: 2.5rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     padding: 0.5rem;
+    box-shadow: var(--elevation-medium);
   }
 
   @media (max-width: 768px) {
@@ -305,6 +313,15 @@
     .results {
       border: none;
       padding: 0;
+    }
+
+    .search-bar {
+      border: none;
+    }
+
+    .results {
+      box-shadow: none;
+      border: none;
     }
   }
 </style>

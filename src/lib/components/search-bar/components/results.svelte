@@ -54,7 +54,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
     flex-direction: column;
   }
 </style>

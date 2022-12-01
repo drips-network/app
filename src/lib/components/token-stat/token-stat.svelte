@@ -7,8 +7,8 @@
 </script>
 
 <section
-  class="token-stat border-2 rounded-xl pt-3 px-4 pb-4"
-  style="border-color:var(--color-foreground-level-1)"
+  class="token-stat border rounded-xl pt-3 px-4 pb-3"
+  style="border-color:var(--color-foreground)"
 >
   <header class="flex flex-wrap justify-between items-end">
     <div class="title">

@@ -147,7 +147,7 @@
   <div class="content pl-0.5">
     <SectionSkeleton
       emptyStateHeadline="No splits"
-      emptyStateEmoji="🫧"
+      emptyStateEmoji="💀"
       emptyStateText="Anyone you split incoming funds with will appear here."
       loaded={splits !== undefined}
       empty={splits !== undefined && splits.length === 0}
@@ -166,13 +166,6 @@
   }
 
   .content {
-    margin: 0 -1rem 0 -1rem;
     overflow-y: scroll;
-  }
-
-  @media (max-width: 1024px) {
-    .content {
-      padding: 0 1rem 0 1rem;
-    }
   }
 </style>

@@ -96,8 +96,8 @@
 </script>
 
 <svelte:head>
-  <title>Profile - {(address && $ens[address]?.name) ?? address ?? userId}</title>
-  <meta name="description" value="Radicle Drips Dashboard" />
+  <title>{(address && $ens[address]?.name) ?? address ?? userId} | Drips</title>
+  <meta name="description" value="Drips User Profile" />
 </svelte:head>
 
 {#if error}
@@ -155,7 +155,6 @@
   .social-links {
     display: flex;
     gap: 0.5rem;
-    color: var(--color-foreground-level-4);
     flex-wrap: wrap;
   }
 
@@ -169,7 +168,6 @@
 
   .description {
     max-width: 40rem;
-    color: var(--color-foreground-level-6);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;

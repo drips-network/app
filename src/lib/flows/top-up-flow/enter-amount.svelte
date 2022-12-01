@@ -134,7 +134,7 @@
 
 <style>
   .balance {
-    border: 2px solid var(--color-foreground-level-2);
-    border-radius: 0.5rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 2rem 0 2rem 2rem;
   }
 </style>
