@@ -25,6 +25,7 @@
   import expect from '$lib/utils/expect';
   import { createEventDispatcher } from 'svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -77,10 +78,14 @@
     );
     assert(assetConfig, "App hasn't yet fetched the right asset config");
 
-    const currentReceivers = assetConfig.streams.map((stream) => ({
-      userId: stream.receiver.userId,
-      config: stream.dripsConfig.raw,
-    }));
+    const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
+      stream.paused
+        ? undefined
+        : {
+            userId: stream.receiver.userId,
+            config: stream.dripsConfig.raw,
+          },
+    );
 
     updateAwaitStepFn({
       icon: {

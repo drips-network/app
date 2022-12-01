@@ -298,7 +298,7 @@
           <Table
             options={optionsIncoming}
             isRowClickable
-            on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+            on:rowClick={(e) => onRowClick(incomingTableData, e)}
           />
         </div>
       {/if}
