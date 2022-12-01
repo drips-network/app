@@ -30,14 +30,15 @@ export default function formatTokenAmount(
   tokenDecimals: number,
   precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
 ) {
-  const toParse = typeof amount === 'bigint' ? amount : amount.amount;
-  const parsed = parseFloat(utils.formatUnits(toParse / precisionMultiplier, tokenDecimals));
-  const decimalCount = countDecimals(parsed);
+  amount = typeof amount === 'bigint' ? amount : amount.amount;
+
+  const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
+  const decimalCount = countDecimals(parsedAmount);
   const amountDecimals = Math.max(Math.min(MAX_DECIMAL_ZEROES, decimalCount), MIN_DECIMAL_ZEROES);
 
-  const formatted = `${parsed.toFixed(amountDecimals)}`;
+  const formatted = `${parsedAmount.toFixed(amountDecimals)}`;
 
-  const isTiny = formatted === '0.00' && amount > 0n;
+  const isTiny = formatted === (0).toFixed(amountDecimals) && amount > 0n;
 
   return isTiny ? '<0.00000001' : formatted;
 }
