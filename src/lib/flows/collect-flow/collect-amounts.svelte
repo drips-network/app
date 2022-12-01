@@ -132,9 +132,7 @@
           {
             title: `Receivable ${selectedToken.symbol}`,
             subtitle: 'from incoming streams',
-            value:
-              (balances.receivable > 0 ? '+' : '') +
-              formatTokenAmount(makeAmount(balances.receivable), selectedToken.decimals, 1n),
+            value: formatTokenAmount(makeAmount(balances.receivable), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: balances.receivable === 0n,
           },
@@ -142,18 +140,19 @@
             title: `Splittable ${selectedToken.symbol}`,
             subtitle: 'from already-received streams or incoming splits & gives',
             value:
-              (balances.splittable > 0 ? '+' : '') +
-              formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
+              '+' + formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: balances.splittable === 0n,
           },
           {
             title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
-            value: formatTokenAmount(
-              makeAmount(collectableAfterSplit - splittableAfterReceive),
-              selectedToken.decimals,
-              1n,
-            ),
+            value:
+              '-' +
+              formatTokenAmount(
+                makeAmount(collectableAfterSplit - splittableAfterReceive),
+                selectedToken.decimals,
+                1n,
+              ),
             disabled: ownSplitsWeight === 1000000n,
             symbol: selectedToken.symbol,
           },
@@ -161,7 +160,7 @@
             ? {
                 title: `Previously-split funds`,
                 value:
-                  (balances.collectable > 0 ? '+' : '') +
+                  '+' +
                   formatTokenAmount(makeAmount(balances.collectable), selectedToken.decimals, 1n),
                 symbol: selectedToken.symbol,
               }
@@ -169,9 +168,7 @@
           {
             title: 'You collect',
             subtitle: 'These funds will be sent to your wallet.',
-            value:
-              (collectableAfterSplit > 0 ? '+' : '') +
-              formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
+            value: formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: collectableAfterSplit === 0n,
             highlight: true,
