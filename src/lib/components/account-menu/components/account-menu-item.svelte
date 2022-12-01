@@ -12,7 +12,7 @@
     <slot name="left" />
   {:else}
     <div class="icon-wrapper">
-      {#if icon}<svelte:component this={icon} style="fill: var(--color-primary)" />{/if}
+      {#if icon}<svelte:component this={icon} style="fill: var(--color-background)" />{/if}
     </div>
   {/if}
   <div class="description typo-text-bold">
@@ -29,7 +29,7 @@
     gap: 0.5rem;
     align-items: center;
     padding: 0.5rem;
-    border-radius: 4rem;
+    border-radius: 1rem 0 1rem 1rem;
     transition: background-color 0.3s;
   }
 
@@ -42,7 +42,7 @@
   }
 
   .account-menu-item-wrapper.clickable:hover {
-    background-color: var(--color-foreground-level-1);
+    background-color: var(--color-primary-level-1);
   }
 
   .account-menu-item-wrapper.clickable:focus {
@@ -60,12 +60,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-primary-level-1);
+    background-color: var(--color-foreground);
     border-radius: 1.5rem;
   }
 
   .description {
     flex: 1;
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 </style>

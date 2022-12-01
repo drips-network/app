@@ -17,7 +17,7 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import wallet from '$lib/stores/wallet';
   import { createEventDispatcher } from 'svelte';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -143,7 +143,7 @@
     <section>
       <div
         class="grid grid-cols-10 gap-2 typo-text-bold text-left"
-        style="color: var(--color-foreground-level-6)"
+        style="color: var(--color-foreground)"
       >
         <div class="col-span-8">Recipient*</div>
         <div>Percent*</div>

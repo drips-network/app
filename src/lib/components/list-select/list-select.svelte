@@ -114,7 +114,7 @@
 <div class="list" style:pointer-events={blockInteraction ? 'none' : 'all'}>
   {#if searchable}
     <div class="search-bar">
-      <SearchIcon />
+      <SearchIcon style="fill: var(--color-foreground)" />
       <input
         class="typo-text"
         bind:this={searchBarElem}
@@ -184,7 +184,7 @@
 
   .search-bar,
   .item {
-    border-bottom: 1px solid var(--color-foreground-level-2);
+    border-bottom: 1px solid var(--color-foreground);
     display: flex;
     gap: 0.5rem;
     color: var(--color-foreground);
@@ -200,7 +200,7 @@
     flex-direction: column;
     gap: 0.5rem;
     align-items: center;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
     text-align: center;
   }
 
@@ -234,7 +234,7 @@
 
   .item:not(.disabled):hover,
   .item:not(.disabled):focus {
-    background-color: var(--color-foreground-level-1);
+    background-color: var(--color-primary-level-2);
     outline: none;
   }
 
@@ -258,7 +258,7 @@
   }
 
   .item .content .text {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
     flex-shrink: 0;
   }
 

@@ -10,8 +10,8 @@
 </script>
 
 <svelte:head>
-  <title>Drips — Settings</title>
-  <meta name="description" value="Radicle Drips Settings Page" />
+  <title>Settings | Drips</title>
+  <meta name="description" value="Drips Settings Page" />
 </svelte:head>
 
 <div class="settings">
@@ -97,14 +97,6 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-
-  p {
-    color: var(--color-foreground-level-6);
-  }
-
-  h4 {
-    color: var(--color-foreground-level-5);
   }
 
   .section {

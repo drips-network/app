@@ -298,7 +298,7 @@
           <Table
             options={optionsIncoming}
             isRowClickable
-            on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+            on:rowClick={(e) => onRowClick(incomingTableData, e)}
           />
         </div>
       {/if}
@@ -314,7 +314,6 @@
   }
 
   .content {
-    margin: 0 -1rem 0 -1rem;
     overflow-y: scroll;
   }
 
@@ -334,10 +333,6 @@
   }
 
   @media (max-width: 1024px) {
-    .content {
-      padding: 0 1rem 0 1rem;
-    }
-
     .table-group-header {
       margin-left: none;
     }

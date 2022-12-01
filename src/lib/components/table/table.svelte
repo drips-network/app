@@ -8,7 +8,9 @@
   import { createSvelteTable, flexRender, type TableOptions } from '@tanstack/svelte-table';
   import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
   import ChevronUp from 'radicle-design-system/icons/ChevronUp.svelte';
+  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import { createEventDispatcher } from 'svelte';
+  import Tooltip from '../tooltip/tooltip.svelte';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let options: TableOptions<any>;
@@ -41,11 +43,18 @@
           >
             {#if !header.isPlaceholder}
               <div>
-                <span class="typo-all-caps">
-                  {(typeof header.column.columnDef.header === 'string' &&
-                    header.column.columnDef.header) ||
-                    ''}
-                </span>
+                <div class="header">
+                  {#if typeof header.column.columnDef.header === 'string'}
+                    <span class="typo-all-caps">{header.column.columnDef.header}</span>
+                  {/if}
+                  {#if typeof header.column.columnDef.meta === 'object'}
+                    {#if 'tooltipMessage' in header.column.columnDef.meta}
+                      <Tooltip text={header.column.columnDef.meta['tooltipMessage']}>
+                        <InfoCircle style="height: 1rem;" />
+                      </Tooltip>
+                    {/if}
+                  {/if}
+                </div>
                 {#if header.column.getIsSorted() === 'asc'}
                   <ChevronDown />
                 {:else if header.column.getIsSorted() === 'desc'}
@@ -101,11 +110,11 @@
     border-spacing: 0;
     box-sizing: border-box;
     min-width: 100%;
-    --border: 2px solid var(--color-foreground-level-1);
+    --border: 1px solid var(--color-foreground);
   }
 
-  tfoot {
-    color: gray;
+  .header {
+    display: flex;
   }
 
   tbody {
@@ -113,19 +122,15 @@
   }
 
   tbody > tr:first-child > td:first-child {
-    border-radius: 0.5rem 0;
-  }
-
-  tbody > tr:first-child > td:last-child {
-    border-radius: 0 0.5rem;
+    border-radius: 1rem 0 0 0;
   }
 
   tbody > tr:last-child > td:first-child {
-    border-radius: 0 0 0 0.5rem;
+    border-radius: 0 0 0 1rem;
   }
 
   tbody > tr:last-child > td:last-child {
-    border-radius: 0 0 0.5rem 0;
+    border-radius: 0 0 1rem 0;
   }
 
   tbody > tr > td {
@@ -145,17 +150,17 @@
   }
 
   tbody > tr:only-child > td:first-child {
-    border-radius: 0.5rem 0 0 0.5rem;
+    border-radius: 1rem 0 0 1rem;
   }
 
   tbody > tr:only-child > td:last-child {
-    border-radius: 0 0.5rem 0.5rem 0;
+    border-radius: 0 0 1rem 0;
   }
 
   td {
     padding: 0.75rem;
     vertical-align: middle;
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 
   td.sorted {
@@ -172,7 +177,7 @@
     text-align: left;
     padding: 0.75rem;
     user-select: none;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
   }
 
   thead th:first-child {
@@ -197,6 +202,6 @@
   }
 
   tr.cursor-pointer:hover {
-    background-color: var(--color-foreground-level-1);
+    background-color: var(--color-primary-level-1);
   }
 </style>

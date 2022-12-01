@@ -39,21 +39,21 @@
   }
 
   .title > h4 {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 
   .title > p {
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
   }
 
   .value {
     display: flex;
     gap: 0.5rem;
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 
   .symbol {
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
   }
 
   .highlight {

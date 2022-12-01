@@ -11,6 +11,14 @@
   }
 </script>
 
+<svelte:head>
+  <title>Drips • Stream and Split Funds on Ethereum</title>
+  <meta
+    name="description"
+    value="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+  />
+</svelte:head>
+
 <LargeEmptyState
   emoji="🌐"
   headline="Connect to Drips"

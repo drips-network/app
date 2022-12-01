@@ -23,8 +23,6 @@
     expanded = true;
   }
 
-  let direction: 'up' | 'down' = 'up';
-
   const MAX_WIDTH = 512;
 
   function updatePos() {
@@ -37,10 +35,8 @@
 
     if (triggerPos.top > contentPos.height + TOOLTIP_MARGIN * 2) {
       newTop = triggerPos.top - contentPos.height - TOOLTIP_MARGIN;
-      direction = 'up';
     } else {
       newTop = triggerPos.bottom;
-      direction = 'down';
     }
 
     const triggerCenter = triggerPos.left + triggerPos.width / 2;
@@ -81,7 +77,7 @@
     style:top={`${tooltipPos.top}px`}
   >
     <div class="target-buffer" />
-    <div transition:fly={{ y: 5, duration: 300 }} class="tooltip-content typo-text">
+    <div transition:fly|local={{ y: 5, duration: 300 }} class="tooltip-content typo-text">
       {#if copyable}
         <Copyable alwaysVisible value={text}><span class="content">{text}</span></Copyable>
       {:else}
@@ -89,7 +85,6 @@
       {/if}
     </div>
   </div>
-  <div class="triangle" class:down={direction === 'down'} class:visible={expanded} />
 </span>
 
 <style>
@@ -114,7 +109,7 @@
     border-radius: 1rem;
     padding: 0.5rem 0.75rem;
     max-width: 512px;
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
     text-align: left;
   }
 
@@ -134,31 +129,5 @@
     height: 0.5rem;
     width: 100vw;
     max-width: 24rem;
-  }
-
-  .triangle {
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    bottom: calc(100%);
-    left: 50%;
-    height: 0;
-    width: 0;
-    transform: translateX(-50%);
-    border-left: 0.5rem solid transparent;
-    border-right: 0.5rem solid transparent;
-    border-top: 0.5rem solid var(--color-background);
-    transition: opacity 0.3s;
-  }
-
-  .triangle.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .triangle.down {
-    border-top: none;
-    top: calc(100%);
-    border-bottom: 0.5rem solid var(--color-background);
   }
 </style>

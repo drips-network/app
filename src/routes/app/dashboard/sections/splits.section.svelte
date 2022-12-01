@@ -189,13 +189,15 @@
   <div class="content pl-0.5">
     <SectionSkeleton
       emptyStateHeadline="No splits"
-      emptyStateEmoji="🫧"
+      emptyStateEmoji="💀"
       emptyStateText="Anyone you split incoming funds with will appear here."
       loaded={outgoingSplits !== undefined || incomingSplits !== undefined}
       empty={isEmptySection}
       {error}
     >
-      <SplitsTableFull data={splitsTableData} />
+      <div class="border rounded-lg py-12 px-1">
+        <SplitsTableFull data={splitsTableData} />
+      </div>
     </SectionSkeleton>
   </div>
 </div>
@@ -208,13 +210,6 @@
   }
 
   .content {
-    margin: 0 -1rem 0 -1rem;
     overflow-y: scroll;
-  }
-
-  @media (max-width: 1024px) {
-    .content {
-      padding: 0 1rem 0 1rem;
-    }
   }
 </style>

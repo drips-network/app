@@ -1,16 +1,16 @@
 <script lang="ts">
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
 
   export let emoji: string;
   export let headline: string;
-  export let description: string;
+  export let description: string | undefined;
 </script>
 
 <div class="large-empty-state">
   <Emoji size="huge" {emoji} />
   <div class="content">
     <h1>{headline}</h1>
-    <p>{description}</p>
+    {#if description}<p>{description}</p>{/if}
     <p />
   </div>
 </div>

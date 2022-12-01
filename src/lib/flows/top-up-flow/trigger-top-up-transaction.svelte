@@ -10,8 +10,9 @@
   import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
   import expect from '$lib/utils/expect';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/Emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,11 +36,14 @@
     const ownAccount = $streams.accounts[ownUserId];
     const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
 
-    const currentReceivers =
-      assetConfig?.streams.map((stream) => ({
-        userId: stream.receiver.userId,
-        config: stream.dripsConfig.raw,
-      })) ?? [];
+    const currentReceivers = mapFilterUndefined(assetConfig?.streams || [], (stream) =>
+      stream.paused
+        ? undefined
+        : {
+            userId: stream.receiver.userId,
+            config: stream.dripsConfig.raw,
+          },
+    );
 
     updateAwaitStep({
       icon: {

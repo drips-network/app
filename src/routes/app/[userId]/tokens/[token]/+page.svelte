@@ -6,7 +6,6 @@
   import ArrowUp from 'radicle-design-system/icons/ArrowUp.svelte';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Minus from 'radicle-design-system/icons/Minus.svelte';
-  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import balances from '$lib/stores/balances';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
@@ -83,27 +82,19 @@
 {:else}
   <article class="flex flex-col gap-16">
     <header>
-      <div class="mb-5 flex">
-        <a
-          href="/app/dashboard"
-          class="pl-2 py-1 pr-4 -ml-2 lg:-ml-9 rounded-full flex items-center typo-header-4 text-foreground-level-5 btn-theme-transparent"
-        >
-          <div class="w-8 h-8 flex items-center">
-            <ArrowLeft />
-          </div>
-          Dashboard
-        </a>
-      </div>
       <h1>
         <Token address={tokenAddress} show="symbol" size="huge" fontSize="typo-header-1" />
       </h1>
     </header>
 
     <!-- balances -->
-    <section class="grid sm:grid-cols-2 gap-3 lg:-mx-4">
+    <section class="grid sm:grid-cols-2 gap-3">
       <h2 class="sr-only">Your Balances</h2>
 
-      <TokenStat title="Incoming">
+      <TokenStat
+        title="Incoming"
+        tooltip="Your incoming balance is the cumulative total earned from any incoming streams for this token."
+      >
         <svelte:fragment slot="detail">
           {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
             <Amount
@@ -131,7 +122,10 @@
         </svelte:fragment>
       </TokenStat>
 
-      <TokenStat title="Outgoing">
+      <TokenStat
+        title="Outgoing"
+        tooltip="Your outgoing balance is the remaining balance you can stream to others for this token."
+      >
         <svelte:fragment slot="detail">
           {#if outgoingEstimate}
             <Amount
@@ -156,7 +150,7 @@
         </svelte:fragment>
 
         <svelte:fragment slot="actions">
-          <div class="flex gap-1">
+          <div class="flex gap-2">
             <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
             <Button disabled={withdrawDisabled} icon={Minus} on:click={openWithdrawModal}
               >Withdraw</Button

@@ -44,12 +44,12 @@
   }
 
   p {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground);
   }
 
   a {
     margin-top: 1rem;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
     text-decoration: underline;
   }
 </style>
