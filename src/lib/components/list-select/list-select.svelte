@@ -146,7 +146,7 @@
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
-      {#if item.type === 'selectable'}
+      {#if item.type === 'selectable' && Object.entries(items).length > 1}
         <div class="check-icon">
           {#if multiselect}
             {#if selected.includes(slug)}
