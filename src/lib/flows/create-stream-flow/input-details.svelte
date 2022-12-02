@@ -11,7 +11,7 @@
   import streams from '$lib/stores/streams';
   import assert from '$lib/utils/assert';
   import { constants } from 'radicle-drips';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet';
@@ -70,7 +70,13 @@
     }) ?? [],
   );
 
-  let selectedTokenAddress: string[] = [];
+  let selectedTokenAddress: string[] = tokenList ? [Object.keys(tokenList)[0]] : [];
+  onMount(() => {
+    const firstToken = Object.keys(tokenList ?? {})[0];
+
+    if (firstToken) selectedTokenAddress = [firstToken];
+  });
+
   $: selectedToken =
     selectedTokenAddress.length === 1 ? tokens.getByAddress(selectedTokenAddress[0]) : undefined;
 
