@@ -18,12 +18,19 @@
       <svelte:fragment slot="left"
         ><IdentityBadge
           size="big"
+          disableLink
           address={$wallet.address}
           showIdentity={false}
+          disableSelection
         /></svelte:fragment
       >
       <svelte:fragment slot="title"
-        ><IdentityBadge address={$wallet.address} showAvatar={false} /></svelte:fragment
+        ><IdentityBadge
+          disableSelection
+          disableLink
+          address={$wallet.address}
+          showAvatar={false}
+        /></svelte:fragment
       >
       <svelte:fragment slot="right"
         ><Button icon={CrossIcon} on:click={wallet.disconnect}>Disconnect</Button></svelte:fragment

@@ -13,6 +13,7 @@
   export let showAvatar = true;
   export let hideAvatarOnMobile = false;
   export let disableLink = false;
+  export let disableSelection = false;
   export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
@@ -60,10 +61,12 @@
   $: currentFontClass = fontClasses[size];
 </script>
 
-<a
+<svelte:element
+  this={getLink() ? 'a' : 'span'}
   href={getLink()}
   class="identity-badge flex items-center relative text-left text-foreground"
   class:flex-row-reverse={isReverse}
+  class:select-none={disableSelection}
   style:height={showAvatar ? `${currentSize}px` : ''}
   style:gap={showAvatar && showIdentity ? `${currentSize / 2.5}px` : ''}
 >
@@ -77,6 +80,13 @@
   {/if}
   {#if showIdentity}
     <div class="relative flex-1">
+      <div
+        class:typo-text-mono-bold={!ens?.name}
+        class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
+        class:hideOnMobile={hideAvatarOnMobile}
+      >
+        {toDisplay}
+      </div>
       {#key toDisplay}
         <div
           transition:fade|local={{ duration: 300 }}
@@ -89,16 +99,9 @@
           {toDisplay}
         </div>
       {/key}
-      <div
-        class:typo-text-mono-bold={!ens?.name}
-        class={`${currentFontClass} identity-ellipsis opacity-0`}
-        class:hideOnMobile={hideAvatarOnMobile}
-      >
-        {toDisplay}
-      </div>
     </div>
   {/if}
-</a>
+</svelte:element>
 
 <style>
   .mono {
