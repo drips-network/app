@@ -53,7 +53,7 @@
   async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
-    newHeight = newHeight ?? contentContainerElem.offsetHeight;
+    newHeight = (newHeight ?? contentContainerElem.offsetHeight) + 1;
     containerHeight.set(newHeight);
   }
 </script>
