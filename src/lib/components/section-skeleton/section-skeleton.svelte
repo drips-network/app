@@ -120,6 +120,7 @@
 <style>
   .section-skeleton {
     position: relative;
+    overflow-y: hidden;
   }
 
   .placeholder-container {
@@ -129,6 +130,10 @@
     justify-content: center;
     align-items: center;
     color: var(--color-foreground);
+  }
+
+  .content-container {
+    overflow-y: hidden;
   }
 
   .empty-state {
