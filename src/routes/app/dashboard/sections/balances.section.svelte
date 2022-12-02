@@ -180,7 +180,7 @@
           {
             handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
             icon: Plus,
-            label: 'Add token',
+            label: 'Add funds',
           },
         ]}
   />
