@@ -223,7 +223,10 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
+  // As soon as the given account has been fetched at least once, display content.
+  let loaded = false;
+  $: if (userId && ['error', 'fetched'].includes($fetchStatuses[userId])) loaded = true;
+
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
   $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
 
