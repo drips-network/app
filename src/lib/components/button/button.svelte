@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { SvelteComponent } from 'svelte';
 
+  export let variant: 'normal' | 'primary' = 'normal';
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
@@ -13,6 +14,7 @@
   class="typo-text-bold"
   {disabled}
   on:click|stopPropagation|preventDefault
+  class:primary={variant === 'primary'}
 >
   {#if icon}
     <svelte:component this={icon} style="fill: var(--color-foreground)" />
@@ -36,6 +38,12 @@
     white-space: nowrap;
   }
 
+  button.primary {
+    background-color: var(--color-primary);
+    box-shadow: none;
+    color: #fff;
+  }
+
   button.with-icon-text {
     padding: 0 0.75rem 0 0.5rem;
   }
@@ -49,9 +57,18 @@
     background-color: var(--color-foreground-level-2);
   }
 
+  button.primary:enabled:hover,
+  button.primary:enabled:active {
+    background-color: var(--color-primary-level-6);
+  }
+
   button:focus {
     background-color: var(--color-foreground-level-1);
     box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
+  }
+
+  button.primary:focus {
+    background-color: var(--color-primary-level-6);
   }
 
   button:enabled:active {

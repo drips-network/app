@@ -126,7 +126,7 @@
     />
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={submit} disabled={validationState.type !== 'valid'}
+    <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
       >Add {tokenInfo?.info.symbol ?? ''}</Button
     >
   </svelte:fragment>

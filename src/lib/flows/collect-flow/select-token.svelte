@@ -71,7 +71,7 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
-    <Button disabled={selected.length !== 1} on:click={submit}
+    <Button variant="primary" disabled={selected.length !== 1} on:click={submit}
       >Select {selectedToken?.info.name ?? ''}</Button
     >
   </svelte:fragment>
