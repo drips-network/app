@@ -1,9 +1,11 @@
 <script lang="ts">
   import tokens from '$lib/stores/tokens';
   import { convertIpfsUri } from '$lib/utils/ipfs';
-  import QuestionIcon from 'radicle-design-system/icons/Info.svelte';
+  import seededRandomElement from '$lib/utils/seeded-random-element';
+  import QuestionIcon from 'radicle-design-system/icons/Question.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
+  import FitText from '../fit-text/fit-text.svelte';
 
   export let address: string;
   export let show: 'name' | 'symbol' | 'none' = 'name';
@@ -37,8 +39,14 @@
     setTimeout(() => sparkle2Scale.set(0, { duration: 200, easing: quintIn }), 500);
   }
 
+  $: shouldAnimate = Boolean(tokenInfo);
+
+  $: placeholderColor = tokenInfo
+    ? seededRandomElement(['red', 'green', 'blue', 'purple'], address)
+    : 'var(--color-foreground-level-2)';
+
   $: {
-    if (animateOnMount && loaded) animate();
+    if (animateOnMount && shouldAnimate) animate();
   }
 
   let loaded = false;
@@ -48,8 +56,8 @@
   <div
     class="logo"
     style={`height: ${sizes[size]}px; width: ${sizes[size]}px`}
-    on:mouseenter={() => !imageFailed && tokenInfo && loaded && animate()}
-    on:click={() => !imageFailed && tokenInfo && loaded && animate()}
+    on:mouseenter={() => shouldAnimate && animate()}
+    on:click={() => shouldAnimate && animate()}
   >
     {#if tokenInfo?.logoURI && !imageFailed}
       <div class="background" class:loaded />
@@ -62,8 +70,17 @@
         alt={`${tokenInfo.name} logo`}
       />
     {:else}
-      <div class="unknown-logo">
-        <QuestionIcon />
+      <div
+        style="transform: rotate3d(0, 1, 0, {$tokenRotationDeg}deg); background-color: {placeholderColor}"
+        class="unknown-logo typo-text-mono-bold"
+      >
+        {#if tokenInfo?.symbol}
+          <div class="symbol-wrapper px-1 w-full">
+            <FitText text={tokenInfo.symbol} />
+          </div>
+        {:else}
+          <QuestionIcon />
+        {/if}
       </div>
     {/if}
     <div
@@ -111,7 +128,7 @@
 
   .unknown-logo {
     border-radius: calc(100% / 2);
-    background-color: var(--color-foreground-level-2);
+    color: #fff;
     height: 100%;
     width: 100%;
     display: flex;

@@ -81,10 +81,18 @@
   />
 {:else}
   <article class="flex flex-col gap-16">
-    <header>
-      <h1>
-        <Token address={tokenAddress} show="symbol" size="huge" fontSize="typo-header-1" />
-      </h1>
+    <header class="flex gap-4 items-center">
+      <Token address={tokenAddress} show="none" size="huge" fontSize="typo-header-1" />
+      <div class="flex-col gap-2">
+        <h1>
+          {token?.info.name ?? 'Unknown token'}
+        </h1>
+        {#if token?.info.symbol}
+          <h4 class="typo-text-mono-bold" style="color: var(--color-foreground-level-5)">
+            {token.info.symbol}
+          </h4>
+        {/if}
+      </div>
     </header>
 
     <!-- balances -->
@@ -98,8 +106,8 @@
         <svelte:fragment slot="detail">
           {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
             <Amount
-              amountPerSecond={{ tokenAddress, amount: incomingTotals.amountPerSecond }}
               showSymbol={false}
+              amountPerSecond={{ tokenAddress, amount: incomingTotals.amountPerSecond }}
             />
           {/if}
         </svelte:fragment>
@@ -110,7 +118,7 @@
           {:else}
             {@const amount = incomingTotals.totalEarned ?? 0n}
             <span class:text-foreground-level-4={amount === 0n}>
-              <Amount amount={{ tokenAddress, amount }} showSymbol={false} amountClasses="" />
+              <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
             </span>
           {/if}
         </svelte:fragment>
@@ -129,11 +137,11 @@
         <svelte:fragment slot="detail">
           {#if outgoingEstimate}
             <Amount
+              showSymbol={false}
               amountPerSecond={{
                 tokenAddress,
                 amount: -outgoingEstimate.totals.totalAmountPerSecond,
               }}
-              showSymbol={false}
             />
           {/if}
         </svelte:fragment>
@@ -144,7 +152,7 @@
           {:else}
             {@const amount = outgoingEstimate ? outgoingEstimate.totals.remainingBalance : 0n}
             <span class:text-foreground-level-4={amount === 0n}>
-              <Amount amount={{ tokenAddress, amount }} showSymbol={false} amountClasses="" />
+              <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
             </span>
           {/if}
         </svelte:fragment>
