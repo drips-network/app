@@ -67,33 +67,6 @@
     font-family: var(--font-serif);
   }
 
-  em:hover {
-    animation-name: glitch;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-  }
-
-  @keyframes glitch {
-    0% {
-      font-family: 'Redaction 10';
-    }
-    20% {
-      font-family: 'Redaction 20';
-    }
-    40% {
-      font-family: 'Redaction 35';
-    }
-    60% {
-      font-family: 'Redaction 50';
-    }
-    80% {
-      font-family: 'Redaction 70';
-    }
-    100% {
-      font-family: 'Redaction 100';
-    }
-  }
-
   h1 {
     cursor: default;
   }
