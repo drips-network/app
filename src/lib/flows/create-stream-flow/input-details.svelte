@@ -230,7 +230,7 @@
           },
           {
             value: '31536000',
-            title: '/ year',
+            title: '/ 365 days',
           },
         ]}
       />
