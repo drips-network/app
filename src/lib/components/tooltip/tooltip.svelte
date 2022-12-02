@@ -5,6 +5,7 @@
 
   export let text: string;
   export let copyable = false;
+  export let disabled = false;
 
   let tooltipElem: HTMLSpanElement;
   let contentElem: HTMLSpanElement;
@@ -40,8 +41,9 @@
     }
 
     const triggerCenter = triggerPos.left + triggerPos.width / 2;
-    newLeft = Math.max(triggerCenter - MAX_WIDTH / 2, 0);
-    newRight = Math.max(Math.abs(triggerCenter - window.innerWidth) - MAX_WIDTH / 2, 0);
+    const width = Math.min(contentPos.width, MAX_WIDTH);
+    newLeft = Math.max(triggerCenter - width / 2, 0);
+    newRight = Math.max(Math.abs(triggerCenter - window.innerWidth) - width / 2, 0);
 
     tooltipPos = {
       left: newLeft,
@@ -64,7 +66,8 @@
 <span
   bind:this={tooltipElem}
   class="tooltip"
-  on:mouseenter={show}
+  class:disabled
+  on:mouseenter={() => !disabled && show()}
   on:mouseleave={() => (expanded = false)}
 >
   <slot />

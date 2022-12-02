@@ -17,7 +17,10 @@
 
 <div
   class="copyable"
-  on:click={() => copyClipboard(value)}
+  on:click={(e) => {
+    copyClipboard(value);
+    e.stopPropagation();
+  }}
   on:mouseenter={() => (visible = true)}
   on:mouseleave={() => (visible = false)}
 >
@@ -38,6 +41,7 @@
     gap: 0.25rem;
     display: flex;
     cursor: pointer;
+    justify-content: space-between;
   }
 
   .copy-icon {
