@@ -79,7 +79,7 @@
     />
   {/if}
   {#if showIdentity}
-    <div class="relative flex-1">
+    <div class="relative flex-1 max-w-full">
       <div
         class:typo-text-mono-bold={!ens?.name}
         class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
