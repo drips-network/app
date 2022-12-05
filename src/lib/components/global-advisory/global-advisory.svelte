@@ -59,6 +59,7 @@
       headline={nonFatalAdvisories[0].headline}
       description={nonFatalAdvisories[0].description}
       emoji={nonFatalAdvisories[0].emoji}
+      button={nonFatalAdvisories[0].button}
     />
   </div>
 {/if}

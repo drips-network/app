@@ -110,6 +110,13 @@ const walletStore = () => {
         headline: 'Waiting for wallet…',
         description: 'Please make sure your previously-connected wallet is unlocked.',
         emoji: '👛',
+        button: {
+          label: 'Disconnect wallet',
+          handler: () => {
+            disconnect();
+            window.location.reload();
+          },
+        },
       });
     }, 250);
 

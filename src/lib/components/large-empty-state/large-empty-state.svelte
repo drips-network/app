@@ -1,9 +1,11 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Button from '../button/button.svelte';
 
   export let emoji: string;
   export let headline: string;
   export let description: string | undefined;
+  export let button: { label: string; handler: () => void } | undefined = undefined;
 </script>
 
 <div class="large-empty-state">
@@ -11,7 +13,7 @@
   <div class="content">
     <h1>{headline}</h1>
     {#if description}<p>{description}</p>{/if}
-    <p />
+    {#if button}<Button on:click={button.handler}>{button.label}</Button>{/if}
   </div>
 </div>
 
