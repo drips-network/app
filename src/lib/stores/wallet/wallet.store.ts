@@ -87,18 +87,37 @@ const walletStore = () => {
     });
 
     if (web3Modal.cachedProvider) {
-      await connect();
+      await connect(true);
     }
   }
 
   /**
    * Trigger Web3Modal and let the user connect their wallet.
+   * @param initializing If true, the function will trigger a global advisory
+   * while waiting for the user's wallet to be unlocked.
    */
-  async function connect(): Promise<void> {
+  async function connect(initializing = false): Promise<void> {
     if (!browser) throw new Error('Can only connect client-side');
+
+    let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
+    let connected = false;
+
+    setTimeout(() => {
+      if (!initializing || connected) return;
+
+      clearAdvisory = globalAdvisoryStore.add({
+        fatal: false,
+        headline: 'Waiting for wallet…',
+        description: 'Please make sure your previously-connected wallet is unlocked.',
+        emoji: '👛',
+      });
+    }, 250);
 
     const instance = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(instance);
+
+    connected = true;
+    clearAdvisory?.();
 
     _attachListeners(instance);
 

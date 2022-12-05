@@ -6,6 +6,7 @@
   } from '$lib/stores/global-advisory/global-advisory.store';
   import globalErrorStore from '$lib/stores/global-advisory/global-advisory.store';
   import scroll from '$lib/stores/scroll';
+  import { fly } from 'svelte/transition';
   import LargeEmptyState from '../large-empty-state/large-empty-state.svelte';
 
   let fatalAdvisory: FatalGlobalAdvisory | undefined;
@@ -49,7 +50,11 @@
     </div>
   </div>
 {:else if nonFatalAdvisories[0]}
-  <div class="non-fatal-error">
+  <div
+    class="non-fatal-error"
+    in:fly|local={{ duration: 300, y: 16 }}
+    out:fly|local={{ duration: 300, y: 16 }}
+  >
     <LargeEmptyState
       headline={nonFatalAdvisories[0].headline}
       description={nonFatalAdvisories[0].description}
