@@ -157,7 +157,11 @@
   };
 
   const { fetchStatuses } = streams;
-  $: loaded = Boolean(userId && ['error', 'fetched'].includes($fetchStatuses[userId]));
+
+  // As soon as the given account has been fetched at least once, display content.
+  let loaded = false;
+  $: if (userId && ['error', 'fetched'].includes($fetchStatuses[userId])) loaded = true;
+
   $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
