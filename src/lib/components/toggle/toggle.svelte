@@ -23,6 +23,7 @@
   .toggle {
     display: flex;
     justify-content: space-between;
+    gap: 0.5rem;
   }
 
   input {
