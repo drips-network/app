@@ -38,7 +38,10 @@ export default function formatTokenAmount(
 
   const formatted = `${parsedAmount.toFixed(amountDecimals)}`;
 
-  const isTiny = formatted === (0).toFixed(amountDecimals) && amount > 0n;
+  const isTiny =
+    (formatted === (0).toFixed(amountDecimals) ||
+      formatted === '-' + (0).toFixed(amountDecimals)) &&
+    amount !== 0n;
 
-  return isTiny ? '<0.00000001' : formatted;
+  return isTiny ? (amount < 0n ? '- <0.00000001' : ' <0.00000001') : formatted;
 }
