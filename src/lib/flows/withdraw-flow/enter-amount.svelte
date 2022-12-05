@@ -26,6 +26,7 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -38,11 +39,15 @@
 
   let amount: string | undefined;
   let amountWei: bigint | undefined;
+  let withdrawAll = false;
+  $: if (withdrawAll) amount = formatTokenAmount(estimate.amount, tokenInfo.info.decimals);
   $: if (amount) amountWei = parseTokenAmount(amount, tokenInfo.info.decimals);
 
   let validationState: TextInputValidationState;
   $: {
-    if (amountWei && amountWei > 0n) {
+    if (withdrawAll && amountWei && amountWei > 0n) {
+      validationState = { type: 'valid' };
+    } else if (amountWei && amountWei > 0n) {
       if (amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) < estimate.amount) {
         validationState = { type: 'valid' };
       } else {
@@ -178,11 +183,15 @@
   <FormField title="Amount to withdraw">
     <TextInput
       bind:value={amount}
+      disabled={withdrawAll}
       variant={{ type: 'number', min: 0 }}
       suffix={tokenInfo.info.symbol}
       placeholder="Enter amount"
       {validationState}
     />
+    <svelte:fragment slot="toggle">
+      <Toggle bind:checked={withdrawAll} label="Max" />
+    </svelte:fragment>
   </FormField>
   <svelte:fragment slot="actions">
     <Button variant="primary" disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}
@@ -195,5 +204,6 @@
   .balance {
     border: 1px solid var(--color-foreground);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
+    overflow: hidden;
   }
 </style>

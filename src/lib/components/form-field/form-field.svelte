@@ -4,7 +4,12 @@
 </script>
 
 <label class="typo-text-bold">
-  {title}
+  <div class="title">
+    {title}
+    <span class="slot">
+      <slot name="toggle" />
+    </span>
+  </div>
   {#if description}<p>{description}</p>{/if}
   <div class="content"><slot /></div>
 </label>
@@ -19,6 +24,16 @@
     width: 100%;
     align-items: flex-start;
     text-align: left;
+  }
+
+  .slot {
+    color: var(--color-foreground-level-6);
+  }
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .content {

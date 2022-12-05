@@ -17,6 +17,7 @@
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import Token from '$lib/components/token/token.svelte';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   // TODO: Get current balance of ERC-20, validate input accordingly
 
@@ -32,6 +33,11 @@
     type: 'unvalidated',
   };
 
+  let topUpMax = false;
+  $: if (topUpMax) {
+    amountValue = formatTokenAmount($context.tokenBalance ?? 0n, tokenInfo.info.decimals, 1n);
+  }
+
   let amount: bigint | undefined = undefined;
   $: {
     if (!tokenInfo?.info || isNaN(Number(amountValue))) {
@@ -42,7 +48,9 @@
 
     const { tokenBalance } = $context;
 
-    if (amount) {
+    if (topUpMax && amount && amount > 0n) {
+      validationState = { type: 'valid' };
+    } else if (amount) {
       if (tokenBalance && amount <= tokenBalance) {
         validationState = { type: 'valid' };
       } else {
@@ -67,7 +75,7 @@
 
     context.update((c) => ({
       ...c,
-      amountToTopUp: amount,
+      amountToTopUp: topUpMax ? c.tokenBalance : amount,
     }));
 
     if (tokenAllowance && tokenAllowance >= amount) {
@@ -123,7 +131,11 @@
       {validationState}
       variant={{ type: 'number', min: 0 }}
       suffix={tokenInfo?.info.symbol}
+      disabled={topUpMax}
     />
+    <svelte:fragment slot="toggle">
+      <Toggle bind:checked={topUpMax} label="Max" />
+    </svelte:fragment>
   </FormField>
   <svelte:fragment slot="actions">
     <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
