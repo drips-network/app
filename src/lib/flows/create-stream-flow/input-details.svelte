@@ -197,7 +197,7 @@
         bind:selected={selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
-        emptyStateText={'No tokens available to stream. Top up a token first by clicking "Top up" on your Dashboard.'}
+        emptyStateText={'No tokens available to stream. Add one first by clicking "Add funds" on your Dashboard.'}
       />
     </div>
   </FormField>
