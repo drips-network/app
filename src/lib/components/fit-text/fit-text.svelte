@@ -32,7 +32,7 @@
     while (contentWidth > containerWidth) {
       fontSize = fontSize - 1;
       if (fontSize < 0) throw new Error('Wat?');
-      if (fontSize < 7 && !firstLetterOnly) {
+      if (fontSize < 1 && !firstLetterOnly) {
         firstLetterOnly = true;
         fit();
         break;
