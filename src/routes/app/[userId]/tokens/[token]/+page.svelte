@@ -73,6 +73,11 @@
   $: withdrawDisabled = !outgoingEstimate;
 </script>
 
+<svelte:head>
+  <title>{token?.info.name ?? 'Unknown Token'} | Drips</title>
+  <meta name="description" value="Drips Token Page" />
+</svelte:head>
+
 {#if error}
   <LargeEmptyState
     headline="Unable to view someone else's token page"
