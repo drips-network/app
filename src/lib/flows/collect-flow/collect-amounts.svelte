@@ -180,6 +180,7 @@
   </FormField>
   <svelte:fragment slot="actions">
     <Button
+      variant="primary"
       disabled={splittableAfterReceive === 0n && balances.collectable === 0n}
       on:click={startCollect}>Collect {selectedToken.symbol}</Button
     >

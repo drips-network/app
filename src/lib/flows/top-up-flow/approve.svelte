@@ -69,6 +69,6 @@
     } funds by executing this transaction.`}
   />
   <svelte:fragment slot="actions">
-    <Button on:click={submit}>Trigger approve transaction</Button>
+    <Button variant="primary" on:click={submit}>Trigger approve transaction</Button>
   </svelte:fragment>
 </StepLayout>

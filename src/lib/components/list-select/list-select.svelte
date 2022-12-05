@@ -5,6 +5,7 @@
   import CircleIcon from 'radicle-design-system/icons/Circle.svelte';
   import type { Items } from './list-select.types';
   import { onMount } from 'svelte';
+  import SelectedDot from '../selected-dot/selected-dot.svelte';
 
   export let items: Items;
 
@@ -145,12 +146,16 @@
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
-      {#if multiselect && item.type === 'selectable'}
+      {#if item.type === 'selectable' && Object.entries(items).length > 1}
         <div class="check-icon">
-          {#if selected.includes(slug)}
-            <CheckIcon style="fill: var(--color-primary)" />
+          {#if multiselect}
+            {#if selected.includes(slug)}
+              <CheckIcon style="fill: var(--color-positive)" />
+            {:else}
+              <CircleIcon />
+            {/if}
           {:else}
-            <CircleIcon />
+            <SelectedDot selected={selected.includes(slug)} />
           {/if}
         </div>
       {/if}
@@ -220,10 +225,6 @@
     display: none;
   }
 
-  .item.selected {
-    background-color: var(--color-primary-level-1);
-  }
-
   .item:not(.disabled) {
     cursor: pointer;
   }
@@ -234,13 +235,8 @@
 
   .item:not(.disabled):hover,
   .item:not(.disabled):focus {
-    background-color: var(--color-primary-level-2);
+    background-color: var(--color-foreground-level-1);
     outline: none;
-  }
-
-  .item.selected:hover,
-  .item.selected:focus {
-    background-color: var(--color-primary-level-2);
   }
 
   .image {

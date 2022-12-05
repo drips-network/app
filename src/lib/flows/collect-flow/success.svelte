@@ -44,7 +44,7 @@
     time for your dashboard to update.
   </p>
   <svelte:fragment slot="actions">
-    <Button on:click={() => modal.hide()}>Done</Button>
+    <Button variant="primary" on:click={() => modal.hide()}>Done</Button>
   </svelte:fragment>
 </StepLayout>
 

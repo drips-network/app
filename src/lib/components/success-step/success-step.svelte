@@ -23,7 +23,9 @@
   <CheckCircle style="height: 4rem; width: 4rem; fill: var(--color-positive);" />
   <h3>Success</h3>
   <p>{typeof message === 'function' ? message() : message}</p>
-  <Button on:click={handleConfirm}>{action === 'close' ? 'Close' : 'Continue'}</Button>
+  <Button variant="primary" on:click={handleConfirm}
+    >{action === 'close' ? 'Close' : 'Continue'}</Button
+  >
 </div>
 
 <style>

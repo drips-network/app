@@ -237,6 +237,6 @@
   {/await}
 
   <svelte:fragment slot="actions">
-    <Button disabled={!isValidForm} on:click={submit}>Confirm</Button>
+    <Button variant="primary" disabled={!isValidForm} on:click={submit}>Confirm</Button>
   </svelte:fragment>
 </StepLayout>

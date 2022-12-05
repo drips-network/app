@@ -185,7 +185,9 @@
     />
   </FormField>
   <svelte:fragment slot="actions">
-    <Button disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}>Withdraw</Button>
+    <Button variant="primary" disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}
+      >Withdraw</Button
+    >
   </svelte:fragment>
 </StepLayout>
 
