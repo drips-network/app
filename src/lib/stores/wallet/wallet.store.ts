@@ -181,14 +181,7 @@ const walletStore = () => {
         return;
       }
 
-      state.update((s) => {
-        if (!s.connected) throw new Error('Accounts changed, but no wallet is connected');
-
-        return {
-          ...s,
-          address: accounts[0],
-        };
-      });
+      window.location.reload();
     });
 
     provider.on('chainChanged', () => {
