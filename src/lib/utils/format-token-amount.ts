@@ -43,5 +43,5 @@ export default function formatTokenAmount(
       formatted === '-' + (0).toFixed(amountDecimals)) &&
     amount !== 0n;
 
-  return isTiny ? (amount < 0n ? '> -0.00000001' : ' <0.00000001') : formatted;
+  return isTiny ? (amount < 0n ? '- <0.00000001' : ' <0.00000001') : formatted;
 }
