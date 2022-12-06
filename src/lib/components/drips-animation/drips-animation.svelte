@@ -98,24 +98,7 @@
     }
   }
 
-  onMount(() => {
-    alignCanvas();
-
-    const handleBlur = () => (paused = true);
-    const handleFocus = () => {
-      lastDraw = new Date().getTime();
-      paused = false;
-      draw();
-    };
-
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('focus', handleFocus);
-    };
-  });
+  onMount(alignCanvas);
 
   function draw() {
     if (!canvasElem) return;
