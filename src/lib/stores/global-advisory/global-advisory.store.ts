@@ -5,6 +5,10 @@ export interface NonFatalGlobalAdvisory {
   headline: string;
   description?: string;
   emoji: string;
+  button?: {
+    label: string;
+    handler: () => void;
+  };
   fatal: false;
 }
 
