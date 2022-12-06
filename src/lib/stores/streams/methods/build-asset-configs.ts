@@ -65,7 +65,8 @@ export default function buildAssetConfigs(
           const nextDripsSetEvent =
             assetConfigDripsSetEvents[assetConfigDripsSetEvents.indexOf(dripsSetEvent) + 1];
 
-          /** If the receiver is not included in remaining streams, it was deleted by the user. */
+          /** If this is NOT the latest setDrips event and the receiver is not included in remaining metadata streams,
+           * it was deleted by the user. */
           if (nextDripsSetEvent && !remainingStreamIds.includes(streamId)) break;
 
           assetConfigHistoryItemStreams.push({
