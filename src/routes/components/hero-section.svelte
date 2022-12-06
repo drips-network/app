@@ -1,14 +1,18 @@
 <script>
   import Dot from './dot.svelte';
+  import MockDashboard from './mock-dashboard/mock-dashboard.svelte';
   import Star from './star.svelte';
-  import AppScreenshot from './app-screenshot.svelte';
 </script>
 
 <section class="part dots-stars">
   <h1 class="headline">
     An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds
   </h1>
-  <AppScreenshot />
+  <div class="mock-dashboard-container">
+    <div class="mock-dashboard">
+      <MockDashboard />
+    </div>
+  </div>
   <div class="top-left"><Dot /></div>
   <div class="bottom-left"><Star /></div>
   <div class="top-right"><Star /></div>
@@ -24,6 +28,28 @@
   .headline {
     font-weight: normal;
     font-size: 100%;
+    margin-bottom: 34rem;
+  }
+
+  .mock-dashboard-container {
+    border-radius: 2rem 0 0 0;
+    position: absolute;
+    bottom: 0;
+    padding-top: 4rem;
+    height: 34rem;
+    border: 1px solid var(--color-foreground);
+    border-bottom: none;
+    width: calc(100% - var(--spacing-xl) * 2);
+    overflow: hidden;
+  }
+
+  .mock-dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: scale(0.7) translateX(calc((50% * 0.326) * -1));
+    width: calc(100% * 1.3);
+    transform-origin: 50% 0;
   }
 
   .top-right {
@@ -31,21 +57,25 @@
     top: var(--spacing-m);
     right: var(--spacing-m);
   }
+
   .bottom-left {
     position: absolute;
     bottom: var(--spacing-m);
     left: var(--spacing-m);
   }
+
   .bottom-right {
     position: absolute;
     bottom: var(--spacing-m);
     right: var(--spacing-m);
   }
+
   .top-left {
     position: absolute;
     top: var(--spacing-m);
     left: var(--spacing-m);
   }
+
   .part {
     display: flex;
     position: relative;

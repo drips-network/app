@@ -17,12 +17,21 @@
   export let amountClasses = 'typo-text-mono-bold';
   export let amountPerSecClasses = 'typo-text-small-mono text-foreground-level-4';
 
+  /** Manually set token information to display. Used on the landing page's mock dashboard. */
+  export let overrideToDisplay:
+    | {
+        symbol: string;
+        decimals: number;
+      }
+    | undefined = undefined;
+
   $: amountTokenInfo = $tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined;
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
   function format(amount: Amount) {
-    const tokenDecimals = tokens.getByAddress(amount.tokenAddress)?.info.decimals;
+    const tokenDecimals =
+      overrideToDisplay?.decimals ?? tokens.getByAddress(amount.tokenAddress)?.info.decimals;
     assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
 
     return formatTokenAmount(amount, tokenDecimals, multiplier);
@@ -31,7 +40,7 @@
 
 <div class="wrapper">
   {#if amount !== undefined}
-    {#if amountTokenInfo}
+    {#if amountTokenInfo || overrideToDisplay}
       <div class="amount">
         <span class="amount-wrapper {amountClasses}">
           <span class="amount">
@@ -39,7 +48,7 @@
           </span>
           {#if showSymbol}
             <span class="symbol">
-              {amountTokenInfo.info.symbol}
+              {overrideToDisplay?.symbol ?? amountTokenInfo?.info.symbol}
             </span>
           {/if}
         </span>
@@ -49,14 +58,14 @@
     {/if}
   {/if}
   {#if amountPerSecond !== undefined}
-    {#if amountPerSecondTokenInfo}
+    {#if amountPerSecondTokenInfo || overrideToDisplay}
       <div class="amount-per-second {amountPerSecClasses}">
         <span
           class="amount"
           class:text-positive={amountPerSecond.amount > 0}
           class:text-negative={amountPerSecond.amount < 0}
           >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond)}{#if showSymbol}
-            {' ' + amountPerSecondTokenInfo.info.symbol}
+            {' ' + overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol}
           {/if}</span
         >/sec
       </div>

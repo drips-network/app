@@ -23,6 +23,12 @@
       amount: amountSchema.optional(),
       amountPerSecond: amountSchema.optional(),
       showSymbol: z.boolean().optional(),
+      overrideToDisplay: z
+        .object({
+          decimals: z.number(),
+          symbol: z.string(),
+        })
+        .optional(),
     });
 
     props = valueSchema.parse(value);
