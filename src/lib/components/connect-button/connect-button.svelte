@@ -17,5 +17,5 @@
     </div>
   </Flyout>
 {:else}
-  <Button icon={WalletIcon} on:click={wallet.connect}>Connect wallet</Button>
+  <Button icon={WalletIcon} on:click={() => wallet.connect()}>Connect wallet</Button>
 {/if}
