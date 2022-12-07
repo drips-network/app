@@ -1,7 +1,7 @@
 <script lang="ts">
   import modal from '$lib/stores/modal/index';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
   import Modal from './components/modal.svelte';
 
   const modalStore = modal.store;
@@ -23,9 +23,9 @@
 
 {#if store.overlay !== null}
   <div class="modal-layout" data-cy="modal-layout">
-    <div class="overlay" transition:fade|local={{ duration: 200 }} on:click={clickOutside} />
+    <div class="overlay" transition:fade|local={{ duration: 300 }} on:click={clickOutside} />
     <div class="content">
-      <div class="modal-wrapper" transition:fly={{ y: -10 }}>
+      <div class="modal-wrapper" transition:scale={{ start: 0.97, duration: 300 }}>
         <Modal>
           {#if store.hideable}
             <div class="close-button" on:click={modal.hide}>
