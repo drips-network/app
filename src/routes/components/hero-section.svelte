@@ -1,10 +1,13 @@
 <script>
+  import { browser } from '$app/environment';
+  import DripsAnimation from '$lib/components/drips-animation/drips-animation.svelte';
   import Dot from './dot.svelte';
   import MockDashboard from './mock-dashboard/mock-dashboard.svelte';
   import Star from './star.svelte';
 </script>
 
 <section class="part dots-stars">
+  {#if browser}<div class="animation"><DripsAnimation vertical speedMultiplier={0.5} /></div>{/if}
   <h1 class="headline">
     An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds
   </h1>
@@ -31,6 +34,18 @@
     margin-bottom: 34rem;
   }
 
+  .animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    transform: scale(1.1);
+    filter: blur(2px);
+    transform-origin: 50% 0;
+    opacity: 0.3;
+  }
+
   .mock-dashboard-container {
     border-radius: 2rem 0 0 0;
     position: absolute;
@@ -41,6 +56,7 @@
     border-bottom: none;
     width: calc(100% - var(--spacing-xl) * 2);
     overflow: hidden;
+    background-color: var(--color-background);
   }
 
   .mock-dashboard {
@@ -91,6 +107,7 @@
     padding: var(--spacing-xl);
     text-align: center;
     border-radius: var(--border-radius-pointy);
+    overflow: hidden;
   }
 
   em {

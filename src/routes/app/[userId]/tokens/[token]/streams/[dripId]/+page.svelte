@@ -386,5 +386,10 @@
     .align-right .with-info-icon {
       justify-content: flex-start;
     }
+
+    .actions {
+      display: flex;
+      justify-content: space-around;
+    }
   }
 </style>

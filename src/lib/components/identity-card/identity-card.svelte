@@ -35,7 +35,6 @@
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
-    border: 1px solid var(--color-foreground);
     padding: 0.75rem;
     border-radius: 1rem 0 1rem 1rem;
     user-select: none;
