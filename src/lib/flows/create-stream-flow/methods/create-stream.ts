@@ -7,11 +7,10 @@ import {
 import assert from '$lib/utils/assert';
 import type { Account } from '$lib/stores/streams/types';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
-import { ethers } from 'ethers';
 import { AddressDriverPresets, Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet';
-import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
+import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
 import {
   generateMetadata,
   pinAccountMetadata,
@@ -25,6 +24,7 @@ import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
+import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 
 export default async (
   updateAwaitStep: UpdateAwaitStepFn,
@@ -62,7 +62,10 @@ export default async (
     ? BigInt(Math.floor((schedule.end.getTime() - schedule.start.getTime()) / 1000))
     : 0n;
 
-  const dripId = ethers.BigNumber.from(ethers.utils.randomBytes(4)).toBigInt();
+  const dripId = randomBigintUntilUnique(
+    assetConfig.streams.map((s) => BigInt(decodeStreamId(s.id).dripId)),
+    4,
+  );
 
   const dripConfig = Utils.DripsReceiverConfiguration.toUint256({
     dripId,
