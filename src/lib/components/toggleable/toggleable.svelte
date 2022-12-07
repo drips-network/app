@@ -5,6 +5,7 @@
 
   export let toggled = false;
   export let label: string;
+  export let removeFromTabIndexIfRetracted = true;
 
   let contentElem: HTMLDivElement;
   let contentHeight = tweened(0);
@@ -13,10 +14,22 @@
 
   let firstHeightUpdate = true;
 
+  const TABBABLE_ELEMS = ['INPUT', 'BUTTON'];
+
+  function setTabIndexRecursively(elem: Element, value: '-1' | '0') {
+    for (const child of elem.children ?? []) {
+      if (TABBABLE_ELEMS.includes(child.tagName)) child.setAttribute('tabindex', value);
+      setTabIndexRecursively(child, value);
+    }
+  }
+
   function retract() {
     contentHeight.set(0, { duration: 300, easing: sineInOut });
     resizeObserver?.disconnect();
     firstHeightUpdate = true;
+
+    if (!removeFromTabIndexIfRetracted || !contentElem) return;
+    setTabIndexRecursively(contentElem, '-1');
   }
 
   function expand() {
@@ -28,6 +41,9 @@
 
     resizeObserver = new ResizeObserver(() => updateHeight(!firstHeightUpdate));
     resizeObserver.observe(contentElem);
+
+    if (!removeFromTabIndexIfRetracted || !contentElem) return;
+    setTabIndexRecursively(contentElem, '0');
   }
 
   $: {
