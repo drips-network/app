@@ -23,9 +23,13 @@
 
 {#if store.overlay !== null}
   <div class="modal-layout" data-cy="modal-layout">
-    <div class="overlay" transition:fade|local={{ duration: 300 }} on:click={clickOutside} />
+    <div class="overlay" transition:fade|local={{ duration: 200 }} on:click={clickOutside} />
     <div class="content">
-      <div class="modal-wrapper" transition:scale={{ start: 0.97, duration: 300 }}>
+      <div
+        class="modal-wrapper"
+        in:scale={{ start: 0.97, duration: 300, delay: 150 }}
+        out:scale={{ start: 0.97, duration: 200 }}
+      >
         <Modal>
           {#if store.hideable}
             <div class="close-button" on:click={modal.hide}>
@@ -56,7 +60,7 @@
 
   .overlay {
     background-color: var(--color-background);
-    opacity: 0.75;
+    opacity: 0.85;
     height: 100%;
     width: 100%;
     position: fixed;
