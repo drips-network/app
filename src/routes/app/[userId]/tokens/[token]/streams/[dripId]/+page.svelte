@@ -255,7 +255,7 @@
             <h1 class="value typo-text-mono-bold">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
-                amount={$balances.accounts[dripsUserId ?? unreachable()][tokenAddress].totals
+                amount={$balances.accounts[dripsUserId ?? unreachable()][tokenAddress].total.totals
                   .remainingBalance}
               />
               {token?.info.symbol}

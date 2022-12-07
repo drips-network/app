@@ -3,6 +3,7 @@ import { derived, get, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
 import assert from '$lib/utils/assert';
+import tuple from '$lib/utils/tuple';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -68,15 +69,15 @@ export default (() => {
       const account = await _fetchAccount(userId);
 
       const subgraphClient = getSubgraphClient();
-      const dripsReceiverSeenEventForUser =
-        await subgraphClient.getDripsReceiverSeenEventsByReceiverId(userId);
-      const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
-        (acc, event) => {
-          const senderUserId = event.senderUserId.toString();
-          return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;
-        },
-        [],
-      );
+
+      const eventPromises = tuple(subgraphClient.getDripsReceiverSeenEventsByReceiverId(userId));
+
+      const eventsForUser = await Promise.all(eventPromises);
+
+      const accountsSendingToCurrentUser = eventsForUser[0].reduce<string[]>((acc, event) => {
+        const senderUserId = event.senderUserId.toString();
+        return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;
+      }, []);
 
       await Promise.all(accountsSendingToCurrentUser.map((a) => _fetchAccount(a)));
 

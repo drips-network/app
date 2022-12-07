@@ -54,7 +54,9 @@
       assert(userId);
 
       const estimate = accountEstimate?.[tokenAddress];
-      const incomingTotals = balances.getIncomingTokenAmountsByUser(userId, tokenAddress);
+      const incomingTotals = balances.getIncomingBalanceForUser(tokenAddress, userId);
+
+      assert(incomingTotals);
 
       return {
         token: {
@@ -74,17 +76,18 @@
         streaming: {
           amount: {
             tokenAddress,
-            amount: estimate?.totals.remainingBalance ?? 0n,
+            amount: estimate?.total.totals.remainingBalance ?? 0n,
           },
           amountPerSecond: {
             tokenAddress,
-            amount: -(estimate?.totals.totalAmountPerSecond ?? 0n),
+            amount: -(estimate?.total.totals.totalAmountPerSecond ?? 0n),
           },
           showSymbol: false,
         },
         netRate: {
           amountPerSecond: {
-            amount: incomingTotals.amountPerSecond - (estimate?.totals.totalAmountPerSecond ?? 0n),
+            amount:
+              incomingTotals.amountPerSecond - (estimate?.total.totals.totalAmountPerSecond ?? 0n),
             tokenAddress,
           },
           showSymbol: false,
