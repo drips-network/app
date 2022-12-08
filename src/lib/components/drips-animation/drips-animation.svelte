@@ -6,7 +6,6 @@
 
   export let speedMultiplier = 1;
   export let vertical = false;
-  $: vertical && canvasElem && alignCanvas();
 
   let canvasElem: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -14,6 +13,7 @@
   let container: HTMLDivElement;
 
   let dripImg: HTMLImageElement;
+  let dripImgVertical: HTMLImageElement;
 
   function rr(number: number): number {
     return number * RESOLUTION_RATIO;
@@ -23,41 +23,53 @@
   let maxDripsOnScreen: number;
 
   function generateDrip(maxX = 0): Drip {
-    const maxOffset = containerSize[1] + 64;
+    const maxOffset = rr(vertical ? containerSize[0] : containerSize[1]) - rr(32);
+
+    const x = Math.floor(Math.random() * rr(maxX) - 48);
+    const y = Math.floor(Math.random() * maxOffset);
 
     return {
       pos: {
-        y: Math.floor(Math.random() * maxOffset),
-        x: Math.floor(Math.random() * rr(maxX) - 48),
+        y: vertical ? x : y,
+        x: vertical ? y : x,
       },
       layer: Math.random(),
     };
+  }
+
+  function updateContainerSize() {
+    const containerBounds = container.getBoundingClientRect();
+    containerSize = [containerBounds.width, containerBounds.height];
+    canvasElem.width = containerSize[0] * RESOLUTION_RATIO;
+    canvasElem.height = containerSize[1] * RESOLUTION_RATIO;
+    maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
+    drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
   }
 
   onMount(() => {
     const containerBounds = container.getBoundingClientRect();
     containerSize = [containerBounds.width, containerBounds.height];
 
-    function updateContainerSize() {
-      const containerBounds = container.getBoundingClientRect();
-      containerSize = [containerBounds.width, containerBounds.height];
-      canvasElem.width = containerSize[0] * RESOLUTION_RATIO;
-      canvasElem.height = containerSize[1] * RESOLUTION_RATIO;
-
-      maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
-
-      drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
-    }
     updateContainerSize();
-
-    window.addEventListener('resize', updateContainerSize);
 
     const context = canvasElem.getContext('2d');
     assert(context, 'Unable to create Canvas element');
 
     ctx = context;
+  });
 
-    return () => window.removeEventListener('resize', updateContainerSize);
+  onMount(() => {
+    let resizeTimeout: number;
+
+    const resizeHandler = () => {
+      if (resizeTimeout) window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
+        updateContainerSize();
+      }, 50);
+    };
+
+    window.addEventListener('resize', resizeHandler);
+    return () => window.removeEventListener('resize', resizeHandler);
   });
 
   interface Drip {
@@ -70,7 +82,6 @@
   }
 
   function applyParallax(layer: number): {
-    blur: number;
     /** px / ms */
     speed: number;
     size: number;
@@ -80,7 +91,6 @@
     const FOREGROUND_LAYER_SPEED = 1;
 
     return {
-      blur: Math.abs((layer + 0.5 - 1) * 8),
       speed:
         ((HORIZON_DISTANCE - layer * LAYER_DISTANCE) * FOREGROUND_LAYER_SPEED) / HORIZON_DISTANCE,
       size: (HORIZON_DISTANCE - layer * LAYER_DISTANCE) * 2,
@@ -90,42 +100,44 @@
   let lastDraw = new Date().getTime();
   let paused = false;
 
-  function alignCanvas() {
-    if (vertical) {
-      ctx.resetTransform();
-      ctx.translate(canvasElem.width / 2 + canvasElem.height / 2, 0);
-      ctx.rotate(Math.PI / 2);
-    }
-  }
-
-  onMount(alignCanvas);
-
   function draw() {
     if (!canvasElem) return;
 
     const currentMillis = new Date().getTime();
     const millisecondsSinceLastDraw = currentMillis - lastDraw;
 
-    ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+    ctx.clearRect(0, 0, rr(containerSize[0]), rr(containerSize[1]));
 
     ctx.font = `${rr(24)}px serif`;
 
     const sortedDrips = drips.sort((a, b) => a.layer - b.layer).reverse();
 
     for (const drip of sortedDrips) {
-      const { blur, speed, size } = applyParallax(drip.layer);
+      const { speed, size } = applyParallax(drip.layer);
 
       const realSpeed = speed * speedMultiplier;
 
-      ctx.filter = `blur(${blur}px) saturate(${speedMultiplier * 100}%) opacity(${
-        speedMultiplier * 100 + 50
-      }%)`;
+      ctx.filter = `saturate(${Math.floor(speedMultiplier * 100)}%) opacity(${Math.floor(
+        speedMultiplier * 100 + 50,
+      )}%)`;
 
-      ctx.drawImage(dripImg, drip.pos.x, drip.pos.y, rr(size), rr(size));
+      ctx.drawImage(
+        vertical ? dripImgVertical : dripImg,
+        drip.pos.x,
+        drip.pos.y,
+        rr(size),
+        rr(size),
+      );
 
-      drip.pos.x = Math.floor(drip.pos.x + millisecondsSinceLastDraw * realSpeed);
+      if (vertical) {
+        drip.pos.y = Math.floor(drip.pos.y + millisecondsSinceLastDraw * realSpeed);
+      } else {
+        drip.pos.x = Math.floor(drip.pos.x + millisecondsSinceLastDraw * realSpeed);
+      }
 
-      if (drip.pos.x > canvasElem.width) {
+      if (
+        (vertical ? drip.pos.y : drip.pos.x) > rr(vertical ? containerSize[1] : containerSize[0])
+      ) {
         drips.splice(drips.indexOf(drip), 1, generateDrip());
         drips = drips;
       }
@@ -142,7 +154,18 @@
     style={`width: ${containerSize?.[0]}px; height: ${containerSize?.[1]}px;`}
   />
   <div style="display: none">
-    <img bind:this={dripImg} on:load={draw} alt="rain drop" src="/assets/drip.png" />
+    <img
+      bind:this={dripImg}
+      on:load={() => !vertical && draw()}
+      alt="rain drop"
+      src="/assets/drip.png"
+    />
+    <img
+      bind:this={dripImgVertical}
+      on:load={() => vertical && draw()}
+      alt="rain drop"
+      src="/assets/drip-vertical.png"
+    />
   </div>
 </div>
 
