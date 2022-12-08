@@ -19,7 +19,7 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
         tokenAddress: TOKEN_ADDRESS,
       },
       amountPerSecond: {
-        amount: 100n,
+        amount: 3858024691358025000n / 2n,
         tokenAddress: TOKEN_ADDRESS,
       },
       overrideToDisplay: {
@@ -47,7 +47,7 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
         tokenAddress: TOKEN_ADDRESS,
       },
       amountPerSecond: {
-        amount: 100n,
+        amount: 3858024691358025000n / 3n,
         tokenAddress: TOKEN_ADDRESS,
       },
       overrideToDisplay: {
