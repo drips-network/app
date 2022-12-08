@@ -6,7 +6,6 @@ import tickStore from '../tick/tick.store';
 import type { Account, StreamId, UserId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
 import { getAddressDriverClient, getDripsHubClient } from '$lib/utils/get-drips-clients';
-import streams from '$lib/stores/streams';
 
 interface Amount {
   amount: bigint;
@@ -101,6 +100,24 @@ export default (() => {
     return get(state).accounts[senderUserId]?.[tokenAddress]?.streams.find((s) => s.id === id);
   }
 
+  function getAllStreamEstimates() {
+    return Object.values(get(state).accounts).reduce<StreamEstimate[]>((acc, account) => {
+      return [
+        ...acc,
+        ...Object.values(account).reduce<StreamEstimate[]>(
+          (acc, assetConfig) => [...acc, ...assetConfig.streams],
+          [],
+        ),
+      ];
+    }, []);
+  }
+
+  function getStreamEstimatesByReceiver(userId: string) {
+    const allStreamEstimates = getAllStreamEstimates();
+
+    return allStreamEstimates.filter((se) => se.receiver.userId === userId);
+  }
+
   /**
    * Get and calculate a user's total incoming amount and total incoming amounts-per-second
    * @param userId The desired user's ID
@@ -114,12 +131,12 @@ export default (() => {
     totalEarned: bigint;
     amountPerSecond: bigint;
   } {
-    const ownStreams = streams.getStreamsForUser(userId);
+    const ownStreams = getStreamEstimatesByReceiver(userId);
 
     if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
 
-    const incomingStreamsForToken = ownStreams.incoming.filter(
-      (stream) => stream.dripsConfig.amountPerSecond.tokenAddress === tokenAddress,
+    const incomingStreamsForToken = ownStreams.filter(
+      (stream) => stream.tokenAddress === tokenAddress,
     );
 
     return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
@@ -175,7 +192,9 @@ export default (() => {
   return {
     subscribe: state.subscribe,
     setAccounts,
+    getAllStreamEstimates,
     getEstimateByStreamId,
+    getStreamEstimatesByReceiver,
     getIncomingTokenAmountsByUser,
     connect,
     disconnect,

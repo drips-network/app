@@ -24,11 +24,13 @@
   import Button from '$lib/components/button/button.svelte';
   import PauseIcon from 'radicle-design-system/icons/Pause.svelte';
   import PlayIcon from 'radicle-design-system/icons/Play.svelte';
+  import DeleteIcon from 'radicle-design-system/icons/Trash.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
   import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
+  import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
@@ -207,6 +209,12 @@
                     steps: unpauseFlowSteps(stream ?? unreachable()),
                   })}>Unpause</Button
               >{/if}
+            {#if stream}<Button
+                icon={DeleteIcon}
+                on:click={() =>
+                  modal.show(Stepper, undefined, deleteStreamFlowSteps(stream ?? unreachable()))}
+                >Delete</Button
+              >{/if}
           </div>
         {/if}
       </div>
@@ -368,7 +376,16 @@
     text-align: right;
   }
 
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
   @media (max-width: 768px) {
+    .hero {
+      align-items: center;
+    }
+
     .title-and-state {
       flex-direction: column;
       align-items: left;

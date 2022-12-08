@@ -43,6 +43,9 @@
 
     let tokensToShow: string[] = [];
 
+    tokensToShow.push(
+      ...balances.getStreamEstimatesByReceiver(userId).map((se) => se.tokenAddress),
+    );
     tokensToShow.push(...Object.keys(accountEstimate));
     tokensToShow.push(
       ...(ownStreams.incoming.map((stream) => stream.dripsConfig.amountPerSecond.tokenAddress) ??

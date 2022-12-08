@@ -4,10 +4,20 @@ import type {
   AssetConfigHistoryItem,
   Receiver,
   StreamId,
+  User,
 } from '$lib/stores/streams/types';
 import { unwrapIdItems } from '$lib/utils/wrap-unwrap-id-item';
 
 type Millis = number;
+
+export interface StreamEstimate {
+  id: StreamId;
+  totalStreamed: bigint;
+  currentAmountPerSecond: bigint;
+  runsOutOfFunds?: Date;
+  receiver: User;
+  tokenAddress: string;
+}
 
 export interface AssetConfigEstimate {
   streams: StreamEstimate[];
@@ -33,20 +43,22 @@ export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstima
   const historyItemEstimates = assetConfig.history.map((historyItem, index, historyItems) => {
     const nextHistoryItem = historyItems[index + 1];
 
-    return estimateHistoryItem(historyItem, nextHistoryItem);
+    return estimateHistoryItem(historyItem, nextHistoryItem, assetConfig.tokenAddress);
   });
 
   const streamTotals = historyItemEstimates.reduce<{ [stream: StreamId]: StreamEstimate }>(
     (acc, historyItemEstimate) => {
+      const nextItem = historyItemEstimates[historyItemEstimates.indexOf(historyItemEstimate) + 1];
       const { streams } = historyItemEstimate;
 
       for (const stream of streams) {
         const currentVal = acc[stream.id];
 
         acc[stream.id] = {
+          ...stream,
           ...acc[stream.id],
           totalStreamed: (currentVal?.totalStreamed ?? 0n) + stream.totalStreamed,
-          currentAmountPerSecond: stream.currentAmountPerSecond,
+          currentAmountPerSecond: nextItem ? 0n : stream.currentAmountPerSecond,
         };
       }
 
@@ -71,16 +83,10 @@ export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstima
   };
 }
 
-export interface StreamEstimate {
-  id: StreamId;
-  totalStreamed: bigint;
-  currentAmountPerSecond: bigint;
-  runsOutOfFunds?: Date;
-}
-
 function estimateHistoryItem(
   historyItem: AssetConfigHistoryItem,
   nextHistoryItem: AssetConfigHistoryItem,
+  tokenAddress: string,
 ): AssetConfigEstimate {
   const streamEstimates = historyItem.streams.map((receiver) => {
     const estimate = streamedByStream(receiver, historyItem, nextHistoryItem);
@@ -89,6 +95,8 @@ function estimateHistoryItem(
       id: receiver.streamId,
       totalStreamed: estimate.streamed,
       currentAmountPerSecond: estimate.currentAmountPerSecond,
+      receiver: receiver.receiver,
+      tokenAddress,
     };
   });
 

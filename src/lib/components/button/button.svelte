@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SvelteComponent } from 'svelte';
 
-  export let variant: 'normal' | 'primary' = 'normal';
+  export let variant: 'normal' | 'primary' | 'destructive' = 'normal';
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
@@ -11,10 +11,9 @@
   aria-label={ariaLabel}
   class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
   class:with-text={Boolean($$slots.default) && !icon}
-  class="typo-text-bold"
+  class="typo-text-bold {variant}"
   {disabled}
   on:click|stopPropagation|preventDefault
-  class:primary={variant === 'primary'}
 >
   {#if icon}
     <svelte:component this={icon} style="fill: var(--color-foreground)" />
@@ -40,7 +39,11 @@
 
   button.primary {
     background-color: var(--color-primary);
-    box-shadow: none;
+    color: #fff;
+  }
+
+  button.destructive {
+    background-color: var(--color-negative);
     color: #fff;
   }
 
@@ -60,6 +63,11 @@
   button.primary:enabled:hover,
   button.primary:enabled:active {
     background-color: var(--color-primary-level-6);
+  }
+
+  button.destructive:enabled:hover,
+  button.destructive:enabled:active {
+    background-color: var(--color-negative-level-6);
   }
 
   button:focus {
