@@ -22,6 +22,7 @@
   }
 
   .headline {
+    font-family: var(--typeface-regular);
     font-weight: normal;
     font-size: 100%;
   }

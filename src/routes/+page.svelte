@@ -199,6 +199,7 @@
 
   .headline {
     font-weight: normal;
+    font-family: var(--typeface-regular);
   }
 
   @media (max-width: 768px) {
