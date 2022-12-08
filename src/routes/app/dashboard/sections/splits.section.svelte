@@ -186,7 +186,7 @@
   <div class="content pl-0.5">
     <SectionSkeleton
       emptyStateHeadline="No splits"
-      emptyStateEmoji="💀"
+      emptyStateEmoji="🫧"
       emptyStateText="Anyone you split incoming funds with will appear here."
       loaded={outgoingSplits !== undefined || incomingSplits !== undefined}
       empty={isEmptySection}

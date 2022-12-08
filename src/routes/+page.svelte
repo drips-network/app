@@ -118,19 +118,19 @@
         <p>
           <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
         </p>
-        <a href="http://rad.lol">rad.lol</a>
+        <a href="http://rad.lol" target="_blank">rad.lol</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
         <h2 class="headline"><em>DAO payments</em></h2>
         <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
-        <a href="http://wonderverse.xyz">wonderverse.xyz</a>
+        <a href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
         <h2 class="headline"><em>Grant Splitting</em></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
-        <a href="http://gitcoin.co">gitcoin.co</a>
+        <a href="http://gitcoin.co" target="_blank">gitcoin.co</a>
       </div>
     </div>
   </section>
