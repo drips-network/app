@@ -71,4 +71,8 @@
   h1 {
     cursor: default;
   }
+
+  h1.headline em {
+    font-size: 52px;
+  }
 </style>

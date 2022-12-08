@@ -27,8 +27,8 @@
       <DripsLogo />
     </a>
     <ul>
-      <li><a href="https://github.com/radicle-dev">Code</a></li>
-      <li><a href="https://docs.radicle.xyz">Docs</a></li>
+      <li><a href="https://github.com/radicle-dev" target="_blank">Code</a></li>
+      <li><a href="https://docs.radicle.xyz" target="_blank">Docs</a></li>
       <li><a class="cta" href="/app">App↗</a></li>
     </ul>
   </div>
@@ -234,11 +234,12 @@
     border-radius: var(--border-radius-pointy);
     font-family: var(--typeface-regular);
     font-size: var(--font-size-s);
+    color: white;
   }
 
   a.cta:hover {
     background-color: var(--color-foreground);
-    color: var(--color-primary);
+    color: white;
   }
 
   .part {
@@ -297,6 +298,7 @@
 
   .links a:hover {
     background-color: var(--color-primary);
+    color: white;
   }
 
   .top-drips {
@@ -312,6 +314,10 @@
     font-size: var(--font-size-xl);
     text-align: center;
     margin: 0;
+  }
+
+  h1 em {
+    font-size: 52px;
   }
 
   h2 {
@@ -368,6 +374,11 @@
 
   .columns-item.card {
     height: auto;
+  }
+
+  .columns-item.card a:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
   }
 
   .columns-item a {
