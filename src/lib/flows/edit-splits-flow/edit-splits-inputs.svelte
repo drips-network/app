@@ -34,8 +34,8 @@
   let splitsInputs: SplitInput[] = [];
   let validationError: string;
 
-  // fill-in existing splits?
   if ($context.splits.length) {
+    // fill-in existing splits?
     $context.splits.forEach(async (s) => {
       const row = emptyRow();
       row.receiver.value = AddressDriverClient.getUserAddress(s.userId);
@@ -44,6 +44,7 @@
       splitsInputs = [...splitsInputs, row];
     });
   } else {
+    // start empty
     splitsInputs.push(emptyRow());
   }
 
@@ -59,13 +60,16 @@
   $: totalPercent = splitsInputs.reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
   $: isValidPercents = totalPercent <= 100;
 
+  $: nonEmptyAddressInputsCount = splitsInputs.filter((r) => r.receiver.value.length).length;
+
   $: isValidAddresses =
-    splitsInputs.filter((row) => row.receiver.type === 'valid').length === splitsInputs.length;
+    splitsInputs.filter((row) => row.receiver.value.length && row.receiver.type === 'valid')
+      .length === nonEmptyAddressInputsCount;
 
   $: isValidForm =
     isValidPercents &&
     isValidAddresses &&
-    !splitsInputs.filter((s) => s.receiver.value.length <= 1).length &&
+    // !splitsInputs.filter((s) => s.receiver.value.length <= 1).length &&
     !splitsInputs.find((s) => Number(s.amount) === 0);
 
   $: allAddresses = splitsInputs.map((row) => row.receiver.value);
@@ -205,7 +209,7 @@
     <div class="mt-1.5 px-1.5 flex justify-between typo-text-bold">
       <div style:opacity={totalPercent >= 100 ? '0.4' : '1'}>You</div>
       <div style:opacity={totalPercent <= 0 ? '0.4' : '1'}>
-        {splitsInputs.length} account{splitsInputs.length > 1 ? 's' : ''}
+        {nonEmptyAddressInputsCount} account{nonEmptyAddressInputsCount > 1 ? 's' : ''}
       </div>
     </div>
     <!-- error msgs -->

@@ -186,7 +186,7 @@
               });
             },
             icon: PenIcon,
-            label: 'Edit',
+            label: 'Edit splits',
           },
         ]}
   />
