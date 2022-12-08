@@ -94,7 +94,7 @@
       <ThreeDrip />
       <h1 class="headline">Built for <em>developers</em></h1>
       <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
-      <a class="cta" href="/app">Check out the SDK↗</a>
+      <a class="cta" href="https://github.com/radicle-dev/drips-js-sdk">Check out the SDK↗</a>
     </div>
     <div class="right">
       <img src="/assets/code-snippet.svg" alt="Code snippet" />
