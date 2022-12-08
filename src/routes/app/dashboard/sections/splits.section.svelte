@@ -16,6 +16,8 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SplitsTableFull from '$lib/components/splits-table/splits-table-full.svelte';
   import wallet from '$lib/stores/wallet';
+  import editSplitsFlowState from '$lib/flows/edit-splits-flow/edit-splits-flow-state';
+  import FetchSplits from '$lib/flows/edit-splits-flow/fetch-splits.svelte';
 
   export let userId: UserId | undefined;
 
@@ -158,7 +160,12 @@
             handler: () => {
               modal.setHideable(true);
               modal.show(Stepper, undefined, {
+                context: editSplitsFlowState,
                 steps: [
+                  makeStep({
+                    component: FetchSplits,
+                    props: undefined,
+                  }),
                   makeStep({
                     component: EditSplitsInputs,
                     props: undefined,
