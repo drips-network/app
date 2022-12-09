@@ -24,7 +24,6 @@
 <style>
   button {
     height: 2rem;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
     min-width: 2rem;
     border-radius: 1rem 0 1rem 1rem;
     color: var(--color-foreground);
@@ -35,6 +34,10 @@
     user-select: none;
     transition: background-color 0.3s, color 0.3s, transform 0.1s, box-shadow 0.3s, opacity 0.3s;
     white-space: nowrap;
+  }
+
+  button.normal {
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
   }
 
   button.primary {
@@ -55,30 +58,28 @@
     padding: 0 0.75rem;
   }
 
-  button:enabled:hover,
-  button:enabled:active {
+  button.normal:enabled:hover,
+  button.normal:enabled:active {
     background-color: var(--color-foreground-level-2);
   }
 
   button.primary:enabled:hover,
   button.primary:enabled:active {
-    background-color: var(--color-primary-level-6);
+    opacity: 0.75;
   }
 
   button.destructive:enabled:hover,
   button.destructive:enabled:active {
-    background-color: var(--color-negative-level-6);
+    opacity: 0.75;
   }
 
   button:focus {
+    box-shadow: inset 0px 0px 0px 2.5px var(--color-foreground);
+  }
+
+  button.normal:focus {
     background-color: var(--color-foreground-level-1);
-    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
   }
-
-  button.primary:focus {
-    background-color: var(--color-primary-level-6);
-  }
-
   button:enabled:active {
     transform: scale(0.98);
   }
