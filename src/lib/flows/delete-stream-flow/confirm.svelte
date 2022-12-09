@@ -23,7 +23,7 @@
 
 <StepLayout>
   <StepHeader
-    emoji="🗑️"
+    emoji="💀"
     headline="Delete stream"
     description="Are you sure that you want to delete this stream? It will immediately stop streaming, and be irreversibly erased."
   />
