@@ -28,7 +28,9 @@
     </a>
     <ul>
       <li><a href="https://github.com/radicle-dev" target="_blank">Code</a></li>
-      <li><a href="https://docs.radicle.xyz" target="_blank">Docs</a></li>
+      <li>
+        <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank">Docs</a>
+      </li>
       <li><a class="cta" href="/app">App↗</a></li>
     </ul>
   </div>
@@ -256,7 +258,7 @@
     font-size: var(--font-size-xl);
     font-family: var(--font-serif);
     border: var(--border-width) solid var(--color-foreground);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-xl) var(--spacing-s);
     text-align: center;
     border-radius: var(--border-radius-pointy);
   }
