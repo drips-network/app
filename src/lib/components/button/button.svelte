@@ -63,14 +63,9 @@
     background-color: var(--color-foreground-level-2);
   }
 
-  button.primary:enabled:hover,
-  button.primary:enabled:active {
-    opacity: 0.75;
-  }
-
-  button.destructive:enabled:hover,
-  button.destructive:enabled:active {
-    opacity: 0.75;
+  button:enabled:hover,
+  button:enabled:active {
+    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
   }
 
   button:focus {
