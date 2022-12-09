@@ -22,6 +22,8 @@ describe('top up, create stream, view profile, search', async () => {
     browser = await chromium.launch();
     page = await browser.newPage();
 
+    page.on('console', (m) => console.log(m));
+
     await configureAppForTest(page);
   });
 
@@ -49,11 +51,11 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('opens the top-up-flow', async () => {
-      const topUpButton = page.locator('text=Top up');
+      const topUpButton = page.locator('text=Add funds');
       await topUpButton.click();
 
       const topUpFlowDescription = page.locator(
-        "text=Add funds to your Drips account's outgoing balance.",
+        'text=Add any ERC-20 token to your Drips account in order to start streaming.',
       );
       await expect(topUpFlowDescription).toHaveCount(1);
     });
@@ -62,13 +64,13 @@ describe('top up, create stream, view profile, search', async () => {
       const testcoin = page.locator('text=Testcoin');
       await testcoin.click();
 
-      const topUpButton = page.locator('text=Top up Testcoin');
+      const topUpButton = page.locator('text=Add Testcoin');
       await topUpButton.click();
     });
 
     it('displays the amount step', async () => {
-      await page.fill('label:has-text("Amount")', '100');
-      await page.locator('text=Top up 100 TEST').click();
+      await page.fill('label:has-text("Amount")', '50');
+      await page.locator('data-testid=confirm-amount-button').click();
     });
 
     it('displays the approve step', async () => {
@@ -77,7 +79,7 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('shows the topped-up amount on the dashboard', async () => {
-      await expect(page.locator('text=100.00')).toHaveCount(1);
+      await expect(page.locator('text=50.00')).toHaveCount(2);
       await page.locator('text=Close').click();
     });
   });
@@ -160,7 +162,7 @@ describe('top up, create stream, view profile, search', async () => {
   });
 
   describe('search', () => {
-    it('opens opens the searchbar', async () => {
+    it('opens the searchbar', async () => {
       const searchbar = page.locator('data-testid=searchbar');
 
       await searchbar.click();
@@ -195,6 +197,137 @@ describe('top up, create stream, view profile, search', async () => {
       expect(page.url().toLowerCase()).toBe(
         'http://localhost:3000/app/0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
       );
+    });
+  });
+
+  describe('stream detail view', () => {
+    it('opens the stream detail view', async () => {
+      await page.goto('http://localhost:3000/app/dashboard');
+      await page.locator('text=E2E Test Stream').click();
+
+      await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
+      await expect(page.locator('text=Active')).toHaveCount(1);
+      await expect(page.locator('button', { hasText: 'Delete' })).toHaveCount(1);
+      await expect(page.locator('button', { hasText: 'Pause' })).toHaveCount(1);
+    });
+  });
+
+  let streamPausedAtTotalStreamed: string | null = null;
+  let expectedRemainingTokenAmount: string | null = null;
+
+  describe('pause and unpause', () => {
+    it('pauses the stream', async () => {
+      await page.locator('button', { hasText: 'Pause' }).click();
+      await expect(page.locator('text=Your stream has been paused')).toHaveCount(1);
+      await page.locator('button', { hasText: 'Close' }).click();
+
+      await expect(page.locator('text=Paused')).toHaveCount(1);
+    }, 20000);
+
+    it('unpauses the stream', async () => {
+      await page.locator('button', { hasText: 'Unpause' }).click();
+      await expect(page.locator('text=Your stream has been unpaused')).toHaveCount(1);
+      await page.locator('button', { hasText: 'Close' }).click();
+
+      await expect(page.locator('text=Active')).toHaveCount(1);
+    }, 20000);
+
+    it('pauses the stream again', async () => {
+      await page.locator('button', { hasText: 'Pause' }).click();
+      await expect(page.locator('text=Your stream has been paused')).toHaveCount(1);
+      await page.locator('button', { hasText: 'Close' }).click();
+
+      await expect(page.locator('text=Paused')).toHaveCount(1);
+
+      streamPausedAtTotalStreamed = (
+        await page.locator('data-testid=total-streamed').innerText()
+      ).replace(' TEST', '');
+      expectedRemainingTokenAmount = (50 - Number(streamPausedAtTotalStreamed)).toFixed(2);
+    }, 20000);
+
+    it('switches back to the user receiving the stream', async () => {
+      await changeAddress(page, '0x70997970c51812dc3a010c7d01b50e0d17dc79c8');
+      await page.goto('http://localhost:3000/app/dashboard');
+
+      await page.reload();
+
+      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+    });
+
+    it('displays the right incoming earned amount on the dashboard', async () => {
+      await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(2);
+    });
+
+    it('opens the stream detail view from the recipient perspective', async () => {
+      await page.locator('text=E2E Test Stream').click();
+
+      await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
+      await expect(page.locator('text=Paused')).toHaveCount(1);
+      await expect(page.locator('button', { hasText: 'Delete' })).toHaveCount(0);
+      await expect(page.locator('button', { hasText: 'Pause' })).toHaveCount(0);
+
+      // Make sure that the inbound estimate matches that of the outgoing stream
+      expect(await page.locator('data-testid=total-streamed').innerText()).toBe(
+        `${streamPausedAtTotalStreamed} TEST`,
+      );
+    });
+  });
+
+  describe('delete stream', () => {
+    it('switches back to the original user', async () => {
+      await changeAddress(page, '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266');
+      await page.goto('http://localhost:3000/app/dashboard');
+
+      await page.reload();
+
+      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+    });
+
+    it('displays the right streamed amount on the dashboard', async () => {
+      await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(1);
+    });
+
+    it('opens the stream detail view', async () => {
+      await page.locator('text=E2E Test Stream').click();
+      await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
+      await expect(page.locator('text=Paused')).toHaveCount(1);
+      await expect(page.locator('button', { hasText: 'Delete' })).toHaveCount(1);
+      await expect(page.locator('button', { hasText: 'Unpause' })).toHaveCount(1);
+    });
+
+    it('deletes the stream', async () => {
+      await page.locator('button', { hasText: 'Delete ' }).click();
+      await page.locator('button', { hasText: 'Delete stream' }).click();
+      await page.locator('button', { hasText: 'Close' }).click();
+
+      expect(page.url().toLowerCase()).toBe('http://localhost:3000/app/dashboard');
+    }, 20000);
+
+    it('shows the streams empty state', async () => {
+      const streamsEmptyState = page.locator('text=No streams');
+      await expect(streamsEmptyState).toHaveCount(1);
+    });
+
+    it('still shows the balances section', async () => {
+      await expect(page.locator(`text=${expectedRemainingTokenAmount}`)).toHaveCount(1);
+    });
+
+    it('switches back to the recipient', async () => {
+      await changeAddress(page, '0x70997970c51812dc3a010c7d01b50e0d17dc79c8');
+      await page.goto('http://localhost:3000/app/dashboard');
+
+      await page.reload();
+
+      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+    });
+
+    it('still shows the balances section for the recipient', async () => {
+      await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(1);
+    });
+
+    it('shows the streams empty state', async () => {
+      const streamsEmptyState = page.locator('text=No streams');
+      await expect(streamsEmptyState).toHaveCount(1);
     });
   });
 });

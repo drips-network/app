@@ -138,9 +138,11 @@
     </svelte:fragment>
   </FormField>
   <svelte:fragment slot="actions">
-    <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
-      >Add {tokenInfo?.info.symbol ?? ''}</Button
-    >
+    <span data-testid="confirm-amount-button">
+      <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
+        >Add {tokenInfo?.info.symbol ?? ''}</Button
+      >
+    </span>
   </svelte:fragment>
 </StepLayout>
 
