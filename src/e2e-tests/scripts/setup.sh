@@ -26,7 +26,7 @@ make install
 
 echo "📁 Creating subgraph config file for local env"
 cd ../drips-subgraph
-printf '{ "network": "goerli", "dripsHub": { "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9", "block": 1},"nftDriver": { "address": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318", "block": 1},"metaData": { "address": "0xC58cEa5a448A761d2dE80DFa8BfE298780e9dd66", "block": 1} }' > config.json
+printf '{ "network": "goerli", "immutableSplitsDriver": { "address": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0", "block": 1 }, "dripsHub": { "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9", "block": 1}, "nftDriver": { "address": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318", "block": 1},"metaData": { "address": "0xC58cEa5a448A761d2dE80DFa8BfE298780e9dd66", "block": 1} }' > config.json
 echo "🛠 Installing subgraph deps"
 npm install
 

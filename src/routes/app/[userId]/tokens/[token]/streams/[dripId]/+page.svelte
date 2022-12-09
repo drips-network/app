@@ -231,7 +231,7 @@
       <div class="details">
         <div class="key-value">
           <h5 class="key">Total Streamed</h5>
-          <h1 class="value typo-text-mono-bold highlight">
+          <h1 class="value typo-text-mono-bold highlight" data-testid="total-streamed">
             <FormattedAmount
               amount={estimate?.totalStreamed ?? unreachable()}
               decimals={token?.info.decimals ?? unreachable()}

@@ -4,14 +4,14 @@
 </script>
 
 <label class="typo-text-bold">
+  <div class="content"><slot /></div>
+  {#if description}<p>{description}</p>{/if}
   <div class="title">
     {title}
     <span class="slot">
       <slot name="toggle" />
     </span>
   </div>
-  {#if description}<p>{description}</p>{/if}
-  <div class="content"><slot /></div>
 </label>
 
 <style>
@@ -19,7 +19,7 @@
     color: var(--color-foreground);
     width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     gap: 1rem;
     width: 100%;
     align-items: flex-start;

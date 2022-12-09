@@ -42,7 +42,7 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={startDeleting} variant="destructive">Irreversibly delete stream</Button>
+    <Button on:click={startDeleting} variant="destructive">Delete stream</Button>
   </svelte:fragment>
 </StepLayout>
 
