@@ -132,3 +132,8 @@ input[type='number'] {
   font-style: normal;
   src: url('/fonts/redaction/Redaction_100-Bold.woff2') format('woff2');
 }
+
+h1 {
+  font-family: 'Redaction 50';
+  font-style: italic;
+}
