@@ -29,7 +29,7 @@
   <meta name="twitter:site" content="@dripsnetwork" />
 </svelte:head>
 
-<div class="main" data-theme={$themeStore.currentTheme} data-sveltekit-prefetch>
+<div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme} data-sveltekit-prefetch>
   <div class="page">
     <slot />
   </div>

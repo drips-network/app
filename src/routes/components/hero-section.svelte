@@ -26,6 +26,7 @@
   }
 
   .headline {
+    font-family: var(--typeface-regular);
     font-weight: normal;
     font-size: 100%;
     margin-bottom: 34rem;
@@ -101,5 +102,9 @@
 
   h1 {
     cursor: default;
+  }
+
+  h1.headline em {
+    font-size: 52px;
   }
 </style>
