@@ -142,7 +142,7 @@
       class:hidden={!Object.values(filteredItems).includes(item)}
       on:click={item.disabled ? undefined : () => handleItemClick(slug)}
       on:keydown={item.disabled ? undefined : (e) => handleKeypress(e, slug)}
-      tabindex={item.disabled ? undefined : 0}
+      tabindex={item.disabled || blockInteraction ? undefined : 0}
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
