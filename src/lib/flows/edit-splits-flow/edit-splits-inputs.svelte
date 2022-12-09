@@ -129,13 +129,13 @@
       class="grid grid-cols-10 gap-2 typo-text-bold text-left"
       style="color: var(--color-foreground)"
     >
-      <div class="col-span-8">Recipient*</div>
-      <div>Percent*</div>
+      <div class="col-span-8">Recipients</div>
+      <div class="hidden md:block">Percents</div>
     </div>
     {#each splitsInputs as splitInput, index}
-      <div class="grid grid-cols-10 gap-2 my-3 items-start">
+      <div class="md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
         <!-- address input -->
-        <div class="col-span-8">
+        <div class="col-span-6 md:col-span-8">
           <label class="sr-only" for="control">Recipient</label>
           <InputAddress
             bind:value={splitInput.receiver.value}
@@ -148,9 +148,10 @@
             }}
           />
         </div>
+
         <!-- percent input -->
-        <div class="col-span-2 flex gap-2 items-center">
-          <div class="flex-1">
+        <div class="mt-1.5 md:mt-0 col-span-4 md:col-span-2 flex gap-2 items-center">
+          <div class="flex-1 text-right">
             <label class="sr-only" for="control">Percent</label>
             <!-- TODO add max attribute to design system :( -->
             <TextInput
@@ -187,7 +188,7 @@
       >
         <div hidden={100 - totalPercent < 11} class="px-2.5">
           {totalPercent > 0 && totalPercent < 0.01
-            ? '<100'
+            ? '>99.99'
             : Math.max(100 - totalPercent, 0)
                 .toFixed(2)
                 .replace('.00', '')}%
