@@ -243,7 +243,7 @@
 
   a.cta:hover {
     background-color: var(--color-foreground);
-    color: white;
+    color: var(--color-background);
   }
 
   .part {
