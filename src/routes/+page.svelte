@@ -401,4 +401,9 @@
     gap: var(--spacing-s);
     margin-top: var(--spacing-m);
   }
+
+  h1 {
+    font-family: --var(--typeface-medium);
+    font-style: normal;
+  }
 </style>
