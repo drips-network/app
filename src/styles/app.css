@@ -35,7 +35,8 @@ input[type='number'] {
   src: url('/fonts/redaction/Redaction_50-Bold.woff2') format('woff2');
 }
 
-h1 {
+h1,
+.typo-header-1 {
   font-family: 'Redaction 50', Times, serif;
   font-style: italic;
 }
