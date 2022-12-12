@@ -107,6 +107,7 @@
   .mono {
     font-family: var(--typeface-mono-bold);
     white-space: nowrap;
+    font-style: normal;
   }
 
   .foreground {

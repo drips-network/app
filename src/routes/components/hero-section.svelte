@@ -101,7 +101,8 @@
   }
 
   h1 {
-    cursor: default;
+    font-family: --var(--typeface-medium);
+    font-style: normal;
   }
 
   h1.headline em {
