@@ -278,6 +278,7 @@
   />
   <div class="content">
     <SectionSkeleton
+      horizontalScroll
       emptyStateEmoji="🫙"
       emptyStateHeadline="No streams"
       emptyStateText="This is where incoming and outgoing streams for your account will appear."
@@ -316,10 +317,6 @@
     gap: 2rem;
   }
 
-  .content {
-    overflow-y: scroll;
-  }
-
   .table-container {
     display: flex;
     flex-direction: column;
@@ -339,5 +336,18 @@
     .table-group-header {
       margin-left: none;
     }
+    /* 
+    .content {
+      margin: 0 -1rem 0 -1rem;
+      display: flex;
+    }
+    
+    .content::before {
+      content: ' ';
+      display: block;
+      width: 30px;
+      height: 30px;
+      color: red;
+    } */
   }
 </style>
