@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   export interface RowClickEventPayload {
     rowIndex: number;
+    event: MouseEvent;
   }
 </script>
 
@@ -24,9 +25,9 @@
 
   const dispatch = createEventDispatcher<Events>();
 
-  function onRowClick(index: number) {
+  function onRowClick(index: number, e: MouseEvent) {
     if (isRowClickable) {
-      dispatch('rowClick', { rowIndex: index });
+      dispatch('rowClick', { rowIndex: index, event: e });
     }
   }
 
@@ -91,7 +92,7 @@
   <tbody>
     {#each $table.getRowModel().rows as row, index}
       <tr
-        on:click={() => onRowClick(index)}
+        on:click={(e) => onRowClick(index, e)}
         class:cursor-pointer={isRowClickable}
         tabindex={isRowClickable ? 0 : -1}
         bind:this={rowElems[index]}
