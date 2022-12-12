@@ -29,7 +29,28 @@
       dispatch('rowClick', { rowIndex: index });
     }
   }
+
+  let rowElems: HTMLTableRowElement[] = [];
+
+  function handleKeyboard(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.code === 'Space') {
+      const focussedElem = document.activeElement;
+
+      if (
+        !focussedElem ||
+        !(focussedElem instanceof HTMLTableRowElement) ||
+        !rowElems.includes(focussedElem)
+      ) {
+        return;
+      }
+
+      e.preventDefault();
+      focussedElem.click();
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeyboard} />
 
 <table>
   <thead>
@@ -48,7 +69,7 @@
                     <span class="typo-all-caps">{header.column.columnDef.header}</span>
                   {/if}
                   {#if typeof header.column.columnDef.meta === 'object'}
-                    {#if 'tooltipMessage' in header.column.columnDef.meta}
+                    {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
                       <Tooltip text={header.column.columnDef.meta['tooltipMessage']}>
                         <InfoCircle style="height: 1rem;" />
                       </Tooltip>
@@ -69,7 +90,12 @@
   </thead>
   <tbody>
     {#each $table.getRowModel().rows as row, index}
-      <tr on:click={() => onRowClick(index)} class:cursor-pointer={isRowClickable}>
+      <tr
+        on:click={() => onRowClick(index)}
+        class:cursor-pointer={isRowClickable}
+        tabindex={isRowClickable ? 0 : -1}
+        bind:this={rowElems[index]}
+      >
         {#each row.getVisibleCells() as cell}
           <td
             class:typo-text-bold={cell.column.getIsSorted()}
@@ -203,5 +229,10 @@
 
   tr.cursor-pointer:hover {
     background-color: var(--color-primary-level-1);
+  }
+
+  tr.cursor-pointer:focus {
+    background-color: var(--color-primary-level-1);
+    outline: none;
   }
 </style>

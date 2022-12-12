@@ -79,7 +79,7 @@
     />
   {/if}
   {#if showIdentity}
-    <div class="relative flex-1 max-w-full">
+    <div class="identity relative flex-1 max-w-full">
       <div
         class:typo-text-mono-bold={!ens?.name}
         class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
@@ -104,6 +104,19 @@
 </svelte:element>
 
 <style>
+  .identity-badge:focus {
+    outline: none;
+  }
+
+  .identity-badge > .identity {
+    transition: background-color 0.3s;
+  }
+
+  .identity-badge:focus > .identity {
+    background-color: var(--color-primary-level-1);
+    border-radius: 0.25rem;
+  }
+
   .mono {
     font-family: var(--typeface-mono-bold);
     white-space: nowrap;
