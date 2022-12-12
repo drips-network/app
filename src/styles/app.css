@@ -18,25 +18,11 @@ input[type='number'] {
   font-family: 'Redaction 50';
   font-weight: 400;
   font-style: normal;
-  src: url('/fonts/redaction/Redaction_50-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 50';
-  font-weight: 400;
-  font-style: italic;
   src: url('/fonts/redaction/Redaction_50-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 50';
-  font-weight: 700;
-  font-style: bold;
-  src: url('/fonts/redaction/Redaction_50-Bold.woff2') format('woff2');
 }
 
 h1,
 .typo-header-1 {
   font-family: 'Redaction 50', Times, serif;
-  font-style: italic;
+  font-weight: normal;
 }
