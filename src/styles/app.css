@@ -21,8 +21,8 @@ input[type='number'] {
   src: url('/fonts/redaction/Redaction_50-Italic.woff2') format('woff2');
 }
 
-h1,
 .typo-header-1 {
   font-family: 'Redaction 50', Times, serif;
   font-weight: normal;
+  font-style: normal;
 }

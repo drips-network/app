@@ -16,7 +16,7 @@
 
 <div class="settings">
   <div class="header">
-    <h1>Settings</h1>
+    <h1 class="typo-header-1">Settings</h1>
     <p>All preferences below are stored locally on your device.</p>
   </div>
   <Divider />

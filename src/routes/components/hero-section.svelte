@@ -6,7 +6,10 @@
 
 <section class="part dots-stars">
   <h1 class="headline">
-    An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds
+    An <span class="typo-header-1">Ethereum</span> protocol for<br /><span class="typo-header-1"
+      >streaming</span
+    >
+    and <span class="typo-header-1">splitting</span> funds
   </h1>
   <div class="mock-dashboard-container">
     <div class="mock-dashboard">
@@ -96,7 +99,7 @@
     overflow: hidden;
   }
 
-  em {
+  span.typo-header-1 {
     font-family: var(--font-serif);
   }
 
@@ -105,7 +108,7 @@
     font-style: normal;
   }
 
-  h1.headline em {
+  h1.headline span.typo-header-1 {
     font-size: 52px;
   }
 </style>

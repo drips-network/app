@@ -189,7 +189,7 @@
     <div class="stream-page" in:fly={{ duration: 300, y: 16 }}>
       <div class="hero">
         <div class="title-and-state">
-          <h1>{stream.name ?? 'Unnamed stream'}</h1>
+          <h1 class="typo-header-1">{stream.name ?? 'Unnamed stream'}</h1>
           <StreamStateBadge state={streamState ?? unreachable()} />
         </div>
         {#if checkIsUser(stream.sender.userId) && stream.managed}

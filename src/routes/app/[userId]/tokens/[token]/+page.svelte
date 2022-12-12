@@ -89,7 +89,7 @@
     <header class="flex gap-4 items-center">
       <Token address={tokenAddress} show="none" size="huge" fontSize="typo-header-1" />
       <div class="flex-col gap-2">
-        <h1>
+        <h1 class="typo-header-1">
           {token?.info.name ?? 'Unknown token'}
         </h1>
         {#if token?.info.symbol}
