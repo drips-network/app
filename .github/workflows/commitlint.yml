@@ -9,8 +9,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Svelte Kit CLI
-        run: npm install @sveltejs/kit
+      - name: Install deps
+        run: npm ci
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync
