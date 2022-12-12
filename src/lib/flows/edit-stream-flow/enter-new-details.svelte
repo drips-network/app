@@ -272,7 +272,7 @@
     </FormField>
   </div>
   <svelte:fragment slot="actions">
-    <Button variant="primary" on:click={updateStream} disabled={!canUpdate}>Create stream</Button>
+    <Button variant="primary" on:click={updateStream} disabled={!canUpdate}>Update stream</Button>
   </svelte:fragment>
 </StepLayout>
 
