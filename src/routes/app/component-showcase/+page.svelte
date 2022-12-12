@@ -59,7 +59,7 @@
   let tokenAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
 </script>
 
-<h1 class="typo-header-1">Component showcase</h1>
+<h1>Component showcase</h1>
 
 <div class="showcase-item">
   <h2>Button</h2>

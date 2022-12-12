@@ -12,7 +12,7 @@
   }
 </script>
 
-<h1 class="typo-header-1">Step 1</h1>
+<h1>Step 1</h1>
 
 <p>Step content</p>
 <p>Step content</p>

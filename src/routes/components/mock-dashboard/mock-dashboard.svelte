@@ -16,7 +16,7 @@
 </script>
 
 <div class="mock-dashboard">
-  <h1 class="typo-header-1">Dashboard</h1>
+  <h1>Dashboard</h1>
   <div class="section">
     <SectionHeader
       icon={TokensIcon}

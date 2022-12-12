@@ -11,7 +11,7 @@
 <div class="large-empty-state">
   <Emoji size="huge" {emoji} />
   <div class="content">
-    <h1 class="typo-header-1">{headline}</h1>
+    <h1>{headline}</h1>
     {#if description}<p>{description}</p>{/if}
     {#if button}<Button on:click={button.handler}>{button.label}</Button>{/if}
   </div>

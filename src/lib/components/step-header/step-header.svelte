@@ -8,7 +8,7 @@
 
 <div class="step-header">
   {#if emoji}<Emoji {emoji} size="huge" />{/if}
-  <h1 class="typo-header-1">{headline}</h1>
+  <h1>{headline}</h1>
   <p>{description}</p>
 </div>
 

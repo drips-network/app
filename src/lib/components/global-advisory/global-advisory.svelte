@@ -29,7 +29,7 @@
 
 {#if fatalAdvisory}
   <div class="bsod">
-    <h1 class="typo-header-1"><span class="white-background">{fatalAdvisory.headline}</span></h1>
+    <h1><span class="white-background">{fatalAdvisory.headline}</span></h1>
     <div class="description">
       {#if fatalAdvisory.description}
         <p>A fatal exception has occurred.</p>

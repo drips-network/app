@@ -99,7 +99,7 @@
     overflow: hidden;
   }
 
-  span.typo-header-1 {
+  span.pixelated {
     font-family: var(--font-serif);
   }
 
