@@ -93,7 +93,6 @@
         style:position={placeholderContainerPosition}
         style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
       >
-        balanc
         <div class="empty-state">
           <Emoji emoji={emptyStateEmoji} size="huge" />
           <div class="text-group">
