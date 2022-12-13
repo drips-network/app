@@ -194,7 +194,6 @@
   <FormField title="Token*">
     <div class="list-container">
       <ListSelect
-        blockInteraction
         bind:selected={selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
