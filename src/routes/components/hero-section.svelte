@@ -6,10 +6,10 @@
 
 <section class="part dots-stars">
   <h1 class="headline">
-    An <span class="typo-header-1">Ethereum</span> protocol for<br /><span class="typo-header-1"
+    An <span class="pixelated">Ethereum</span> protocol for<br /><span class="pixelated"
       >streaming</span
     >
-    and <span class="typo-header-1">splitting</span> funds
+    and <span class="pixelated">splitting</span> funds
   </h1>
   <div class="mock-dashboard-container">
     <div class="mock-dashboard">

@@ -43,17 +43,17 @@
   <HeroSection />
 
   <section class="columns">
-    <h1 class="headline"><span class="typo-header-1">How</span> it works</h1>
+    <h1 class="headline"><span class="pixelated">How</span> it works</h1>
     <div class="columns-row">
       <div class="columns-item">
         <MultiToken />
-        <h2 class="headline"><span class="typo-header-1">Multi-Token</span></h2>
+        <h2 class="headline"><span class="pixelated">Multi-Token</span></h2>
         <p>Stream or split any ERC-20 like WETH, DAI or USDC.</p>
       </div>
       <div class="columns-item">
         <GasOptimized />
         <h2 class="headline">
-          <span class="typo-header-1">Optimized for <br />1000s of senders</span>
+          <span class="pixelated">Optimized for <br />1000s of senders</span>
         </h2>
         <p>
           Most protocols focus on 1:1 streaming. Drips optimizes for thousands of senders, like many
@@ -63,7 +63,7 @@
       <div class="columns-item">
         <OneContract />
         <h2 class="headline">
-          <span class="typo-header-1">One Contract.<br />One Payment Graph.</span>
+          <span class="pixelated">One Contract.<br />One Payment Graph.</span>
         </h2>
         <p>
           Drips uses one smart contract for streaming and splitting, enabling effortless and
@@ -75,20 +75,20 @@
     <div class="columns-row">
       <div class="columns-item">
         <NoWrappedTokens />
-        <h2 class="headline"><span class="typo-header-1">No need to wrap tokens</span></h2>
+        <h2 class="headline"><span class="pixelated">No need to wrap tokens</span></h2>
         <p>
           Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your tokens.
         </p>
       </div>
       <div class="columns-item">
         <Multichain />
-        <h2 class="headline"><span class="typo-header-1">Multi-Chain</span></h2>
+        <h2 class="headline"><span class="pixelated">Multi-Chain</span></h2>
         <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
       </div>
       <div class="columns-item">
         <OneBalance />
         <h2 class="headline">
-          <span class="typo-header-1">One balance for<br />all your streams</span>
+          <span class="pixelated">One balance for<br />all your streams</span>
         </h2>
         <p>Fund multiple streams using one account balance in a single transaction.</p>
       </div>
@@ -100,7 +100,7 @@
   <section class="part developers">
     <div class="left">
       <ThreeDrip />
-      <h1 class="headline">Built for <span class="typo-header-1">developers</span></h1>
+      <h1 class="headline">Built for <span class="pixelated">developers</span></h1>
       <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
       <a class="cta" href="https://github.com/radicle-dev/drips-js-sdk" target="_blank"
         >Check out the SDK↗</a
@@ -113,7 +113,7 @@
 
   <DotsStarsLine>
     <div class="in-use">
-      <h1 class="headline">Drips <span class="typo-header-1">in use</span></h1>
+      <h1 class="headline">Drips <span class="pixelated">in use</span></h1>
       <p>Some cool projects built on the Drips protocol.</p>
     </div>
   </DotsStarsLine>
@@ -122,7 +122,7 @@
     <div class="columns-row">
       <div class="columns-item card">
         <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
-        <h2 class="headline"><span class="typo-header-1">Crowdfunding</span></h2>
+        <h2 class="headline"><span class="pixelated">Crowdfunding</span></h2>
         <p>
           <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
         </p>
@@ -130,13 +130,13 @@
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
-        <h2 class="headline"><span class="typo-header-1">DAO payments</span></h2>
+        <h2 class="headline"><span class="pixelated">DAO payments</span></h2>
         <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
         <a href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
-        <h2 class="headline"><span class="typo-header-1">Grant Splitting</span></h2>
+        <h2 class="headline"><span class="pixelated">Grant Splitting</span></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
         <a href="http://gitcoin.co" target="_blank">gitcoin.co</a>
       </div>
@@ -144,7 +144,7 @@
   </section>
 
   <section class="part">
-    <h1 class="headline">What’s <span class="typo-header-1">new</span></h1>
+    <h1 class="headline">What’s <span class="pixelated">new</span></h1>
     <ThreeDrip />
     <div class="links">
       <a href="/">The Drips team presented at DevCon 22</a>
@@ -164,7 +164,7 @@
   </section>
 
   <DotsStarsLine>
-    <h1 class="headline">Stay <span class="typo-header-1">up to date</span></h1>
+    <h1 class="headline">Stay <span class="pixelated">up to date</span></h1>
     <div class="links">
       <a href="https://twitter.com/dripsnetwork">Twitter</a>
       <a href="https://discord.gg/vhGXkazpNc">Discord</a>
@@ -316,7 +316,7 @@
     justify-content: flex-end;
   }
 
-  span.typo-header-1 {
+  span.pixelated {
     font-family: var(--font-serif);
   }
 
