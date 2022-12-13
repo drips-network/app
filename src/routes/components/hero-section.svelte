@@ -36,7 +36,7 @@
     border-radius: 2rem 0 0 0;
     position: absolute;
     bottom: 0;
-    padding-top: 4rem;
+    padding-top: 2rem;
     height: 34rem;
     border: 1px solid var(--color-foreground);
     border-bottom: none;
@@ -49,8 +49,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: scale(0.7) translateX(calc((50% * 0.326) * -1));
-    width: calc(100% * 1.3);
+    transform: scale(0.7) translateX(calc((50% * 0.43) * -1));
+    width: calc(100% * 1.43);
     transform-origin: 50% 0;
   }
 
@@ -107,5 +107,12 @@
 
   h1.headline em {
     font-size: 52px;
+  }
+
+  @media (max-width: 768px) {
+    .part {
+      padding: var(--spacing-l);
+      padding-top: var(--spacing-xl);
+    }
   }
 </style>
