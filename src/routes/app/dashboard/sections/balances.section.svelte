@@ -43,6 +43,9 @@
 
     let tokensToShow: string[] = [];
 
+    tokensToShow.push(
+      ...balances.getStreamEstimatesByReceiver(userId).map((se) => se.tokenAddress),
+    );
     tokensToShow.push(...Object.keys(accountEstimate));
     tokensToShow.push(
       ...(ownStreams.incoming.map((stream) => stream.dripsConfig.amountPerSecond.tokenAddress) ??
@@ -190,6 +193,7 @@
   />
   <div class="content">
     <SectionSkeleton
+      horizontalScroll
       emptyStateHeadline="No tokens"
       emptyStateEmoji="🫗"
       emptyStateText="This is where any tokens balances you stream or earned show up."
@@ -207,9 +211,5 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  .content {
-    overflow-y: scroll;
   }
 </style>

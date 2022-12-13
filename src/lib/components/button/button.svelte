@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SvelteComponent } from 'svelte';
 
-  export let variant: 'normal' | 'primary' = 'normal';
+  export let variant: 'normal' | 'primary' | 'destructive' = 'normal';
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
@@ -11,10 +11,9 @@
   aria-label={ariaLabel}
   class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
   class:with-text={Boolean($$slots.default) && !icon}
-  class="typo-text-bold"
+  class="typo-text-bold {variant}"
   {disabled}
   on:click|stopPropagation|preventDefault
-  class:primary={variant === 'primary'}
 >
   {#if icon}
     <svelte:component this={icon} style="fill: var(--color-foreground)" />
@@ -25,7 +24,6 @@
 <style>
   button {
     height: 2rem;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
     min-width: 2rem;
     border-radius: 1rem 0 1rem 1rem;
     color: var(--color-foreground);
@@ -38,9 +36,17 @@
     white-space: nowrap;
   }
 
+  button.normal {
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+  }
+
   button.primary {
     background-color: var(--color-primary);
-    box-shadow: none;
+    color: #fff;
+  }
+
+  button.destructive {
+    background-color: var(--color-negative);
     color: #fff;
   }
 
@@ -52,25 +58,23 @@
     padding: 0 0.75rem;
   }
 
-  button:enabled:hover,
-  button:enabled:active {
+  button.normal:enabled:hover,
+  button.normal:enabled:active {
     background-color: var(--color-foreground-level-2);
   }
 
-  button.primary:enabled:hover,
-  button.primary:enabled:active {
-    background-color: var(--color-primary-level-6);
-  }
-
-  button:focus {
-    background-color: var(--color-foreground-level-1);
+  button:enabled:hover,
+  button:enabled:active {
     box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
   }
 
-  button.primary:focus {
-    background-color: var(--color-primary-level-6);
+  button:focus {
+    box-shadow: inset 0px 0px 0px 2.5px var(--color-foreground);
   }
 
+  button.normal:focus {
+    background-color: var(--color-foreground-level-1);
+  }
   button:enabled:active {
     transform: scale(0.98);
   }

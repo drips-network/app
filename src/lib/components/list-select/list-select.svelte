@@ -142,7 +142,7 @@
       class:hidden={!Object.values(filteredItems).includes(item)}
       on:click={item.disabled ? undefined : () => handleItemClick(slug)}
       on:keydown={item.disabled ? undefined : (e) => handleKeypress(e, slug)}
-      tabindex={item.disabled ? undefined : 0}
+      tabindex={item.disabled || blockInteraction ? undefined : 0}
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
@@ -159,13 +159,15 @@
           {/if}
         </div>
       {/if}
-      <div class="image">
-        {#if typeof item.image === 'string'}
-          <img src={item.image} alt="List item" />
-        {:else if item.image}
-          <svelte:component this={item.image.component} {...item.image.props} />
-        {/if}
-      </div>
+      {#if item.image}
+        <div class="image">
+          {#if typeof item.image === 'string'}
+            <img src={item.image} alt="List item" />
+          {:else if item.image}
+            <svelte:component this={item.image.component} {...item.image.props} />
+          {/if}
+        </div>
+      {/if}
       <div class="content" class:action={item.type === 'action'}>
         <span class="label typo-text-bold">{item.label}</span>
         {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono-bold"

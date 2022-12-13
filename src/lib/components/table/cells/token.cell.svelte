@@ -18,6 +18,13 @@
       address: z.string(),
       show: z.union([z.literal('none'), z.literal('name'), z.literal('symbol')]).optional(),
       size: z.union([z.literal('small'), z.literal('normal'), z.literal('huge')]).optional(),
+      overrideToDisplay: z
+        .object({
+          name: z.string(),
+          logoURI: z.string().optional(),
+          symbol: z.string(),
+        })
+        .optional(),
     });
 
     props = propSchema.parse(value);

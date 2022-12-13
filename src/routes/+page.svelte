@@ -27,8 +27,10 @@
       <DripsLogo />
     </a>
     <ul>
-      <li><a href="https://github.com/radicle-dev">Code</a></li>
-      <li><a href="https://docs.radicle.xyz">Docs</a></li>
+      <li><a href="https://github.com/radicle-dev" target="_blank">Code</a></li>
+      <li>
+        <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank">Docs</a>
+      </li>
       <li><a class="cta" href="/app">App↗</a></li>
     </ul>
   </div>
@@ -94,7 +96,9 @@
       <ThreeDrip />
       <h1 class="headline">Built for <em>developers</em></h1>
       <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
-      <a class="cta" href="/app">Check out the SDK↗</a>
+      <a class="cta" href="https://github.com/radicle-dev/drips-js-sdk" target="_blank"
+        >Check out the SDK↗</a
+      >
     </div>
     <div class="right">
       <img src="/assets/code-snippet.svg" alt="Code snippet" />
@@ -116,19 +120,19 @@
         <p>
           <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
         </p>
-        <a href="http://rad.lol">rad.lol</a>
+        <a href="http://rad.lol" target="_blank">rad.lol</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
         <h2 class="headline"><em>DAO payments</em></h2>
         <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
-        <a href="http://wonderverse.xyz">wonderverse.xyz</a>
+        <a href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
         <h2 class="headline"><em>Grant Splitting</em></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
-        <a href="http://gitcoin.co">gitcoin.co</a>
+        <a href="http://gitcoin.co" target="_blank">gitcoin.co</a>
       </div>
     </div>
   </section>
@@ -199,6 +203,7 @@
 
   .headline {
     font-weight: normal;
+    font-family: var(--typeface-regular);
   }
 
   @media (max-width: 768px) {
@@ -233,11 +238,12 @@
     border-radius: var(--border-radius-pointy);
     font-family: var(--typeface-regular);
     font-size: var(--font-size-s);
+    color: white;
   }
 
   a.cta:hover {
     background-color: var(--color-foreground);
-    color: var(--color-primary);
+    color: white;
   }
 
   .part {
@@ -252,7 +258,7 @@
     font-size: var(--font-size-xl);
     font-family: var(--font-serif);
     border: var(--border-width) solid var(--color-foreground);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-xl) var(--spacing-s);
     text-align: center;
     border-radius: var(--border-radius-pointy);
   }
@@ -296,6 +302,7 @@
 
   .links a:hover {
     background-color: var(--color-primary);
+    color: white;
   }
 
   .top-drips {
@@ -311,6 +318,10 @@
     font-size: var(--font-size-xl);
     text-align: center;
     margin: 0;
+  }
+
+  h1 em {
+    font-size: 52px;
   }
 
   h2 {
@@ -369,6 +380,11 @@
     height: auto;
   }
 
+  .columns-item.card a:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
   .columns-item a {
     border-bottom: 1px solid var(--color-foreground);
     padding-top: var(--spacing-s);
@@ -386,5 +402,10 @@
     flex-direction: column;
     gap: var(--spacing-s);
     margin-top: var(--spacing-m);
+  }
+
+  h1 {
+    font-family: --var(--typeface-medium);
+    font-style: normal;
   }
 </style>

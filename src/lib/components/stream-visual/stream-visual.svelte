@@ -86,7 +86,7 @@
 
     .animation {
       height: 8rem;
-      width: 100%;
+      width: 12rem;
       flex: initial;
     }
 

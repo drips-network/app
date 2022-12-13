@@ -3,6 +3,7 @@
   import { convertIpfsUri } from '$lib/utils/ipfs';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import QuestionIcon from 'radicle-design-system/icons/Question.svelte';
+  import { onMount } from 'svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
   import FitText from '../fit-text/fit-text.svelte';
@@ -13,13 +14,22 @@
   export let fontSize = 'typo-text-bold';
   export let animateOnMount = false;
 
+  /** Manually set token information to display. Used on the landing page's mock dashboard. */
+  export let overrideToDisplay:
+    | {
+        name: string;
+        logoURI?: string;
+        symbol: string;
+      }
+    | undefined = undefined;
+
   const sizes = {
     small: 24,
     normal: 32,
     huge: 48,
   };
 
-  $: tokenInfo = $tokens ? tokens.getByAddress(address)?.info : undefined;
+  $: tokenInfo = overrideToDisplay ?? ($tokens ? tokens.getByAddress(address)?.info : undefined);
   $: src = tokenInfo?.logoURI ? convertIpfsUri(tokenInfo.logoURI) : undefined;
 
   let imageFailed = false;
@@ -50,6 +60,12 @@
   }
 
   let loaded = false;
+
+  let imgElem: HTMLImageElement;
+
+  onMount(() => {
+    if (imgElem && imgElem.complete) loaded = true;
+  });
 </script>
 
 <div class="token size-{size}">
@@ -62,9 +78,10 @@
     {#if tokenInfo?.logoURI && !imageFailed}
       <div class="background" class:loaded />
       <img
+        bind:this={imgElem}
+        on:load={() => (loaded = true)}
         {src}
         class:loaded
-        on:load={() => (loaded = true)}
         style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}
         on:error={() => (imageFailed = true)}
         alt={`${tokenInfo.name} logo`}
