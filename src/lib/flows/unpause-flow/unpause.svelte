@@ -6,7 +6,7 @@
   import type { Stream } from '$lib/stores/streams/types';
   import streams from '$lib/stores/streams';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import expect from '$lib/utils/expect';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
