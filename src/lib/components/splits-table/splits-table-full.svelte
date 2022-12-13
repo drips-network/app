@@ -5,7 +5,6 @@
   import SplitsTableSplitLozenge from './splits-table-split-lozenge.svelte';
   import { isAddress } from 'ethers/lib/utils';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
-  import { onMount } from 'svelte';
 
   export let data: SplitsTableFull = {
     user: '...',
@@ -19,16 +18,10 @@
   };
 
   $: showOutgoingTotalPercent = data.outgoing.splits.length > 1;
-
-  let scroller: HTMLElement;
-  let innerBody: HTMLElement;
-  onMount(() => {
-    scroller.scrollTo(innerBody.offsetWidth / 2 - scroller.offsetWidth / 2, 0);
-  });
 </script>
 
-<section bind:this={scroller} class="splits-table-full w-full overflow-scroll lg:overflow-hidden">
-  <div bind:this={innerBody} class="m-auto w-full min-w-[540px]">
+<section class="splits-table-full w-full overflow-scroll lg:overflow-hidden">
+  <div class="py-px w-full min-w-[480px]">
     <!-- incoming -->
     {#if data.incoming.splits.length}
       <div class="flex w-full justify-start pl-[2px]">

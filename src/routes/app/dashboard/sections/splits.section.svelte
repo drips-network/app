@@ -199,7 +199,7 @@
       empty={isEmptySection}
       {error}
     >
-      <div class="border rounded-lg py-12">
+      <div class="border rounded-lg py-8 lg:py-12">
         <SplitsTableFull data={splitsTableData} />
       </div>
     </SectionSkeleton>
