@@ -326,7 +326,7 @@
     margin: 0;
   }
 
-  h1 span.typo-header-1 {
+  h1 span.pixelated {
     font-size: 52px;
   }
 

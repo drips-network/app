@@ -108,7 +108,7 @@
     font-style: normal;
   }
 
-  h1.headline span.typo-header-1 {
+  h1.headline span.pixelated {
     font-size: 52px;
   }
 </style>

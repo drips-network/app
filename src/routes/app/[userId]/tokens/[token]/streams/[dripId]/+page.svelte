@@ -360,6 +360,7 @@
 
   .key-value > .value {
     font-size: 1.5rem;
+    font-weight: bold;
   }
 
   .key-value > .value.highlight {
