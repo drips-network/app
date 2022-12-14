@@ -201,7 +201,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
+      <Table {options} rowHeight={76} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>

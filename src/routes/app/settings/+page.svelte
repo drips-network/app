@@ -2,7 +2,9 @@
   import SegmentedControl from 'radicle-design-system/SegmentedControl.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import Setting from './components/setting.svelte';
+  import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
   import themeStore, { type Theme } from '$lib/stores/theme/theme.store';
+  import Button from '$lib/components/button/button.svelte';
 
   // Theme control
   let selectedTheme: 'auto' | Theme = $themeStore.selectedTheme;
@@ -61,6 +63,14 @@
   <Divider />
   <div class="section">
     <h4 class="typo-all-caps">Advanced</h4>
+    <Setting
+      title="Custom tokens"
+      subtitle="Select which non-default tokens you want to use with Radicle Drips."
+    >
+      <a href="/app/settings/custom-tokens">
+        <Button icon={ListIcon}>Edit token list</Button>
+      </a>
+    </Setting>
     <Setting
       title="Build on Drips"
       subtitle="The Drips protocol is fully open-source and ready for you to build on."

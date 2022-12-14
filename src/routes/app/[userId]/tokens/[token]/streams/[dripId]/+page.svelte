@@ -31,12 +31,13 @@
   import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
   import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
   import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
+  import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
   let dripsUserId: string | undefined;
   let streamId: string | undefined;
-  let error: 'invalid-id' | 'not-found' | undefined;
+  let error: 'invalid-id' | 'not-found' | 'unknown-token' | undefined;
   let loading = true;
   let stream: Stream | undefined;
   let token: TokenInfoWrapper | undefined;
@@ -128,7 +129,14 @@
     }
   }
 
-  onMount(async () => {
+  async function getStreamInfo() {
+    token = tokens.getByAddress(tokenAddress);
+
+    if (!token) {
+      error = 'unknown-token';
+      return;
+    }
+
     try {
       token = tokens.getByAddress(tokenAddress) ?? unreachable();
       dripsUserId = (await decodeUserId(userId)).dripsUserId;
@@ -151,8 +159,18 @@
       assert(stream);
     } catch {
       error = 'not-found';
+      return;
     }
-  });
+
+    error = undefined;
+  }
+
+  onMount(getStreamInfo);
+
+  $: {
+    $tokens;
+    getStreamInfo();
+  }
 
   $: loading = !(stream && estimate);
 
@@ -174,6 +192,16 @@
       emoji="💀"
       headline="Invalid stream ID"
       description="Please make sure you're supplying a valid stream ID in the URL."
+    />
+  {:else if error === 'unknown-token'}
+    <LargeEmptyState
+      emoji="💀"
+      headline="Unknown token"
+      description="This stream is streaming an ERC-20 token which is not supported by default. You can manually add it to your custom tokens list."
+      button={{
+        handler: () => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress)),
+        label: 'Add custom token',
+      }}
     />
   {:else if error === 'not-found'}
     <LargeEmptyState

@@ -14,6 +14,7 @@
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let options: TableOptions<any>;
+  export let rowHeight: number | undefined = undefined;
   $: table = createSvelteTable(options);
 
   export let isRowClickable = false;
@@ -69,7 +70,11 @@
   </thead>
   <tbody>
     {#each $table.getRowModel().rows as row, index}
-      <tr on:click={() => onRowClick(index)} class:cursor-pointer={isRowClickable}>
+      <tr
+        style:height="{rowHeight}px"
+        on:click={() => onRowClick(index)}
+        class:cursor-pointer={isRowClickable}
+      >
         {#each row.getVisibleCells() as cell}
           <td
             class:typo-text-bold={cell.column.getIsSorted()}

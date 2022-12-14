@@ -290,6 +290,7 @@
         <div class="table-container">
           <h4 class="table-group-header">↑ Outgoing</h4>
           <Table
+            rowHeight={76}
             options={optionsOutgoing}
             isRowClickable
             on:rowClick={(e) => onRowClick(outgoingTableData, e)}
@@ -300,6 +301,7 @@
         <div class="table-container">
           <h4 class="table-group-header">↓ Incoming</h4>
           <Table
+            rowHeight={76}
             options={optionsIncoming}
             isRowClickable
             on:rowClick={(e) => onRowClick(incomingTableData, e)}
@@ -336,18 +338,5 @@
     .table-group-header {
       margin-left: none;
     }
-    /* 
-    .content {
-      margin: 0 -1rem 0 -1rem;
-      display: flex;
-    }
-    
-    .content::before {
-      content: ' ';
-      display: block;
-      width: 30px;
-      height: 30px;
-      color: red;
-    } */
   }
 </style>

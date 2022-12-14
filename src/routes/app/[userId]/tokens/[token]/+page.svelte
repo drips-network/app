@@ -20,6 +20,7 @@
   import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
   import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
   import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
+  import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -55,18 +56,21 @@
     modal.show(Stepper, undefined, getWithdrawSteps(tokenAddress));
   }
 
-  let error: 'connected-to-wrong-user' | undefined;
+  let error: 'connected-to-wrong-user' | 'unknown-token' | undefined;
 
   async function checkUrlUserId() {
     const decodedUrlUserId = await decodeUserId($page.params.userId);
 
     const connectedToRightUser = checkIsUser(decodedUrlUserId.dripsUserId);
-    if (!connectedToRightUser) error = 'connected-to-wrong-user';
+    if (!connectedToRightUser) return (error = 'connected-to-wrong-user');
+    if (!token) return (error = 'unknown-token');
+    error = undefined;
   }
 
   // redirect to connect page if disconnects
   $: {
     $wallet.connected;
+    $tokens;
     if (guardConnected()) checkUrlUserId();
   }
 
@@ -78,10 +82,20 @@
   <meta name="description" value="Drips Token Page" />
 </svelte:head>
 
-{#if error}
+{#if error === 'connected-to-wrong-user'}
   <LargeEmptyState
     headline="Unable to view someone else's token page"
     description="Sorry, but you currently can only view your own token pages."
+    emoji="💀"
+  />
+{:else if error === 'unknown-token'}
+  <LargeEmptyState
+    headline="Unknown token"
+    description="This token with address {tokenAddress} is not supported by default. You can manually add it to your custom tokens list."
+    button={{
+      handler: () => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress)),
+      label: 'Add custom token',
+    }}
     emoji="💀"
   />
 {:else}

@@ -9,7 +9,7 @@
   import Token from '$lib/components/token/token.svelte';
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet';
-  import fetchErc20Balance from '$lib/utils/fetch-erc20-balance';
+  import { fetchBalance } from '$lib/utils/erc20';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
@@ -50,7 +50,7 @@
     assert(address);
 
     const allowance = await (await getAddressDriverClient()).getAllowance(tokenAddress);
-    const balance = await fetchErc20Balance(tokenAddress, address, provider);
+    const balance = await fetchBalance(tokenAddress, address, provider);
 
     context.update((c) => ({
       ...c,
