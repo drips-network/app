@@ -77,7 +77,7 @@ export default function buildAssetConfigs(
   return Object.entries(dripsSetEvents).reduce<AssetConfig[]>(
     (acc, [tokenAddress, assetConfigDripsSetEvents]) => {
       const assetConfigMetadata = accountMetadata?.assetConfigs.find(
-        (ac) => ac.tokenAddress === tokenAddress,
+        (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
       );
 
       assert(

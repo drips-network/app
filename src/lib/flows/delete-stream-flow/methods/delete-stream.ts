@@ -28,7 +28,7 @@ export default async function (stream: Stream, updateAwaitStep: UpdateAwaitStepF
 
   const metadata = generateMetadata(ownAccount, address);
   const assetConfigIndex = metadata.assetConfigs.findIndex(
-    (mac) => mac.tokenAddress === tokenAddress,
+    (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
   const streamIndex = metadata.assetConfigs[assetConfigIndex].streams.findIndex(
     (ms) => ms.id === stream.id,

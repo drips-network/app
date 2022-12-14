@@ -44,7 +44,9 @@ export default async (
 
   const { address: tokenAddress } = selectedToken.info;
 
-  const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+  const assetConfig = ownAccount.assetConfigs.find(
+    (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+  );
   assert(assetConfig, "App hasn't yet fetched the right asset config");
 
   const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
@@ -97,7 +99,7 @@ export default async (
 
   const accountMetadata = generateMetadata(ownAccount, address);
   const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
-    (ac) => ac.tokenAddress === tokenAddress,
+    (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
 
   if (currentAssetConfigIndex === -1) {
