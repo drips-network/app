@@ -22,7 +22,7 @@
     <EmojiAndToken {tokenAddress} emoji="💀" />
     <StepHeader
       headline="Are you sure?"
-      description={'"{tokenName}" will be removed from your custom tokens. Any streams streaming this token will show up as "Unknown token".'}
+      description={`"${tokenName}" will be removed from your custom tokens. Any streams streaming this token will show up as "Unknown token".`}
     />
     <svelte:fragment slot="actions">
       <Button on:click={() => modal.hide()}>Cancel</Button>
