@@ -6,7 +6,10 @@
 
 <section class="part dots-stars">
   <h1 class="headline">
-    An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds
+    An <span class="pixelated">Ethereum</span> protocol for<br /><span class="pixelated"
+      >streaming</span
+    >
+    and <span class="pixelated">splitting</span> funds
   </h1>
   <div class="mock-dashboard-container">
     <div class="mock-dashboard">
@@ -96,7 +99,7 @@
     overflow: hidden;
   }
 
-  em {
+  span.pixelated {
     font-family: var(--font-serif);
   }
 
@@ -105,7 +108,7 @@
     font-style: normal;
   }
 
-  h1.headline em {
+  h1.headline span.pixelated {
     font-size: 52px;
   }
 
