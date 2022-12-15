@@ -31,6 +31,8 @@
   import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
   import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
   import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
+  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
+  import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
@@ -214,6 +216,13 @@
                 on:click={() =>
                   modal.show(Stepper, undefined, deleteStreamFlowSteps(stream ?? unreachable()))}
                 >Delete</Button
+              >{/if}
+            {#if stream}<Button
+                icon={PenIcon}
+                disabled={streamState === 'ended' || !stream.managed}
+                on:click={() =>
+                  modal.show(Stepper, undefined, editStreamFlowSteps(stream ?? unreachable()))}
+                >Edit</Button
               >{/if}
           </div>
         {/if}
