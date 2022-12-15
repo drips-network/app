@@ -192,6 +192,10 @@
     width: 100%;
   }
 
+  .search-bar input::placeholder {
+    color: var(--color-foreground-level-4);
+  }
+
   .search-bar,
   .item {
     border-bottom: 1px solid var(--color-foreground);
