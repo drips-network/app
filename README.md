@@ -13,7 +13,7 @@ As we get closer to release, we will share further documentation on the app's fe
 
 ## 💦 Getting started on Goerli Testnet
 
-You can either run the app locally by following the steps provided in the Contributor Guide, or simply access the latest main deployment at [drips-app-v2-radicle.vercel.app](https://drips-app-v2-radicle.vercel.app/).
+You can either run the app locally by following the steps provided in the [Development Guide](/docs/development.md), or simply access the latest main deployment at [drips-app-v2-radicle.vercel.app](https://drips-app-v2-radicle.vercel.app/).
 
 Click "App" in the top-right corner and connect your wallet to access your personal dashboard.
 
