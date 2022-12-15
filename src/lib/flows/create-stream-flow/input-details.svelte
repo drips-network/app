@@ -283,6 +283,7 @@
     </div>
   </Toggleable>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>
   </svelte:fragment>
 </StepLayout>

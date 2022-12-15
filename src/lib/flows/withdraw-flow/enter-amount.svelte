@@ -196,6 +196,7 @@
     </svelte:fragment>
   </FormField>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}
       >Withdraw</Button
     >

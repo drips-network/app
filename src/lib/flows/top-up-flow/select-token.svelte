@@ -15,30 +15,46 @@
   import type { Writable } from 'svelte/store';
   import type { TopUpFlowState } from './top-up-flow-state';
   import assert from '$lib/utils/assert';
+  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import addCustomTokenFlowSteps from '../add-custom-token/add-custom-token-flow-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<TopUpFlowState>;
 
   let tokenList: Items;
-  $: tokenList = Object.fromEntries(
-    $tokens?.map((token) => [
-      token.info.address,
-      {
-        type: 'selectable',
-        label: token.info.name,
-        text: token.info.symbol,
-        image: {
-          component: Token,
-          props: {
-            show: 'none',
-            address: token.info.address,
-            size: 'small',
+  $: tokenList = {
+    ...Object.fromEntries(
+      $tokens?.map((token) => [
+        token.info.address,
+        {
+          type: 'selectable',
+          label: token.info.name,
+          text: token.info.symbol,
+          image: {
+            component: Token,
+            props: {
+              show: 'none',
+              address: token.info.address,
+              size: 'small',
+            },
           },
         },
+      ]) ?? [],
+    ),
+    'add-custom-token': {
+      type: 'action',
+      label: 'Add custom token',
+      handler: () =>
+        dispatch('sidestep', {
+          steps: addCustomTokenFlowSteps().steps,
+        }),
+      image: {
+        component: Plus,
+        props: {},
       },
-    ]) ?? [],
-  );
+    },
+  };
 
   let selected: string[] = [];
   $: selectedToken = selected[0] ? tokens.getByAddress(selected[0]) : undefined;
@@ -80,6 +96,7 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" disabled={selected.length !== 1} on:click={submit}
       >Add {selectedToken?.info.name ?? ''}</Button
     >
