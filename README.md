@@ -7,7 +7,7 @@
 
 Drips 💧 is an Ethereum protocol for streaming and splitting tokens. It allows users and web3 apps to stream and split funds by the second, enabling continuous settlement for use cases like contributor payments, vesting and subscription memberships.
 
-This app enables user-friendly, simple management of token streams on the Drips network. Users can top-up any ERC-20 token to their Drips account, create streams to any Ethereum address, set up a Splits configuration for their account, and withdraw funds earned from incoming streams.
+This app enables user-friendly, simple management of token streams on the Drips network. Users can deposit any ERC-20 token to their Drips account, stream tokens to any Ethereum address, withdraw tokens earned from incoming streams, or split their incoming tokens with any Ethereum address.
 
 As we get closer to release, we will share further documentation on the app's features.
 
