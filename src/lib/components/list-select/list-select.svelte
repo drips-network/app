@@ -52,7 +52,10 @@
     }
   }
 
-  const handleItemClick = selectItem;
+  function handleItemClick(e: MouseEvent, slug: string) {
+    selectItem(slug);
+    e.preventDefault();
+  }
 
   const handleKeypress = (e: KeyboardEvent, slug: string) => {
     const selectKeys = ['Enter', ' '];
@@ -140,7 +143,7 @@
       class:selected={selected.includes(slug)}
       class:disabled={item.disabled}
       class:hidden={!Object.values(filteredItems).includes(item)}
-      on:click={item.disabled ? undefined : () => handleItemClick(slug)}
+      on:click={item.disabled ? undefined : (e) => handleItemClick(e, slug)}
       on:keydown={item.disabled ? undefined : (e) => handleKeypress(e, slug)}
       tabindex={item.disabled || blockInteraction ? undefined : 0}
       data-testid={`item-${slug}`}
