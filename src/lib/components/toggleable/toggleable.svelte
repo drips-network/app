@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { sineInOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
   import Toggle from '../toggle/toggle.svelte';
@@ -53,6 +54,10 @@
       retract();
     }
   }
+
+  onMount(() => {
+    if (!toggled) setTabIndexRecursively(contentElem, '-1');
+  });
 </script>
 
 <div class="toggleable">

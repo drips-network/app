@@ -10,7 +10,7 @@
   import { ethers } from 'ethers';
   import Button from '$lib/components/button/button.svelte';
   import modal from '$lib/stores/modal';
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import wallet from '$lib/stores/wallet';
 

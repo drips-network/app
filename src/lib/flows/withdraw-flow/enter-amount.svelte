@@ -20,7 +20,7 @@
   import assert from '$lib/utils/assert';
   import type { WithdrawFlowState } from './withdraw-flow-state';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import expect from '$lib/utils/expect';
   import { createEventDispatcher } from 'svelte';
   import etherscanLink from '$lib/utils/etherscan-link';

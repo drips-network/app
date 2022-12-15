@@ -17,7 +17,7 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import wallet from '$lib/stores/wallet';
   import { createEventDispatcher } from 'svelte';
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
