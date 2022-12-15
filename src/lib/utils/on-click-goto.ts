@@ -9,8 +9,11 @@ import { goto } from '$app/navigation';
  * @param path The path to navigate to.
  * @param event The mouse event that triggered the interaction.
  */
-export default function (path: string, event: MouseEvent) {
+export default function (path: string, event: PointerEvent) {
   if (event.metaKey || event.ctrlKey) {
+    // Prevent handling if the event has already previoulsy hit an `a` element.
+    if (event.composedPath().find((e) => e instanceof HTMLAnchorElement)) return;
+
     window?.open(path, '_blank');
   } else {
     goto(path);
