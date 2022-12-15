@@ -76,6 +76,10 @@
       subtitle="Copyright 2020 Twitter, Inc and other contributors. Licensed under CC-BY 4.0."
     />
     <Setting
+      title="Redaction"
+      subtitle="Font by Titus Kaphar, Reginald Dwayne Betts, Forest Young, Jeremy Mickel & contributors under the SIL Open Font License."
+    />
+    <Setting
       title="Inter"
       subtitle="Font by Rasmus Andersson licensed under the SIL Open Font License 1.1."
     />

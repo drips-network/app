@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Table from '$lib/components/table/table.svelte';
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
@@ -29,9 +30,11 @@
         },
       ]}
     />
-    <div class="table-container">
-      <Table options={balances} />
-    </div>
+    <PaddedHorizontalScroll>
+      <div class="table-container">
+        <Table options={balances} />
+      </div>
+    </PaddedHorizontalScroll>
   </div>
   <div class="section">
     <SectionHeader
@@ -45,15 +48,16 @@
         },
       ]}
     />
-    <div class="table-container typo-text">
-      <Table options={streams} />
-    </div>
+    <PaddedHorizontalScroll>
+      <div class="table-container typo-text">
+        <Table options={streams} />
+      </div>
+    </PaddedHorizontalScroll>
   </div>
 </div>
 
 <style>
   .mock-dashboard {
-    padding: 1rem 2rem;
     width: 100%;
     overflow: hidden;
     text-align: left;
@@ -62,12 +66,15 @@
     flex-direction: column;
     gap: 4rem;
     user-select: none;
+    padding: 0 1rem;
+    max-width: 64rem;
   }
 
   .section {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    position: relative;
   }
 
   .table-container {

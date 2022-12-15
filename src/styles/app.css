@@ -15,120 +15,16 @@ input[type='number'] {
 }
 
 @font-face {
-  font-family: 'Redaction 35';
-  font-weight: 400;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_35-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 35';
-  font-weight: 400;
-  font-style: italic;
-  src: url('/fonts/redaction/Redaction_35-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 35';
-  font-weight: 700;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_35-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 10';
-  font-weight: 400;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_10-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 10';
-  font-weight: 400;
-  font-style: italic;
-  src: url('/fonts/redaction/Redaction_10-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 10';
-  font-weight: 700;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_10-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 20';
-  font-weight: 400;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_20-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 20';
-  font-weight: 400;
-  font-style: italic;
-  src: url('/fonts/redaction/Redaction_20-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 20';
-  font-weight: 700;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_20-Bold.woff2') format('woff2');
-}
-
-@font-face {
   font-family: 'Redaction 50';
   font-weight: 400;
   font-style: normal;
-  src: url('/fonts/redaction/Redaction_50-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 50';
-  font-weight: 400;
-  font-style: italic;
   src: url('/fonts/redaction/Redaction_50-Italic.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: 'Redaction 50';
-  font-weight: 700;
+h1,
+.typo-header-1,
+.pixelated {
+  font-family: 'Redaction 50', Times, serif;
+  font-weight: normal;
   font-style: normal;
-  src: url('/fonts/redaction/Redaction_50-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 70';
-  font-weight: 400;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_50-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 70';
-  font-weight: 400;
-  font-style: italic;
-  src: url('/fonts/redaction/Redaction_70-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 100';
-  font-weight: 700;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_100-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 100';
-  font-weight: 400;
-  font-style: italic;
-  src: url('/fonts/redaction/Redaction_100-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Redaction 100';
-  font-weight: 700;
-  font-style: normal;
-  src: url('/fonts/redaction/Redaction_100-Bold.woff2') format('woff2');
 }

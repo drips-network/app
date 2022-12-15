@@ -28,7 +28,9 @@
     </a>
     <ul>
       <li><a href="https://github.com/radicle-dev" target="_blank">Code</a></li>
-      <li><a href="https://docs.radicle.xyz" target="_blank">Docs</a></li>
+      <li>
+        <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank">Docs</a>
+      </li>
       <li><a class="cta" href="/app">App↗</a></li>
     </ul>
   </div>
@@ -41,16 +43,18 @@
   <HeroSection />
 
   <section class="columns">
-    <h1 class="headline"><em>How</em> it works</h1>
+    <h1 class="headline"><span class="pixelated">How</span> it works</h1>
     <div class="columns-row">
       <div class="columns-item">
         <MultiToken />
-        <h2 class="headline"><em>Multi-Token</em></h2>
+        <h2 class="headline"><span class="pixelated">Multi-Token</span></h2>
         <p>Stream or split any ERC-20 like WETH, DAI or USDC.</p>
       </div>
       <div class="columns-item">
         <GasOptimized />
-        <h2 class="headline"><em>Optimized for <br />1000s of senders</em></h2>
+        <h2 class="headline">
+          <span class="pixelated">Optimized for <br />1000s of senders</span>
+        </h2>
         <p>
           Most protocols focus on 1:1 streaming. Drips optimizes for thousands of senders, like many
           followers → one creator.
@@ -58,7 +62,9 @@
       </div>
       <div class="columns-item">
         <OneContract />
-        <h2 class="headline"><em>One Contract.<br />One Payment Graph.</em></h2>
+        <h2 class="headline">
+          <span class="pixelated">One Contract.<br />One Payment Graph.</span>
+        </h2>
         <p>
           Drips uses one smart contract for streaming and splitting, enabling effortless and
           flexible token routing.
@@ -69,19 +75,21 @@
     <div class="columns-row">
       <div class="columns-item">
         <NoWrappedTokens />
-        <h2 class="headline"><em>No need to wrap tokens</em></h2>
+        <h2 class="headline"><span class="pixelated">No need to wrap tokens</span></h2>
         <p>
           Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your tokens.
         </p>
       </div>
       <div class="columns-item">
         <Multichain />
-        <h2 class="headline"><em>Multi-Chain</em></h2>
+        <h2 class="headline"><span class="pixelated">Multi-Chain</span></h2>
         <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
       </div>
       <div class="columns-item">
         <OneBalance />
-        <h2 class="headline"><em>One balance for<br />all your streams</em></h2>
+        <h2 class="headline">
+          <span class="pixelated">One balance for<br />all your streams</span>
+        </h2>
         <p>Fund multiple streams using one account balance in a single transaction.</p>
       </div>
     </div>
@@ -92,7 +100,7 @@
   <section class="part developers">
     <div class="left">
       <ThreeDrip />
-      <h1 class="headline">Built for <em>developers</em></h1>
+      <h1 class="headline">Built for <span class="pixelated">developers</span></h1>
       <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
       <a class="cta" href="https://github.com/radicle-dev/drips-js-sdk" target="_blank"
         >Check out the SDK↗</a
@@ -105,7 +113,7 @@
 
   <DotsStarsLine>
     <div class="in-use">
-      <h1 class="headline">Drips <em>in use</em></h1>
+      <h1 class="headline">Drips <span class="pixelated">in use</span></h1>
       <p>Some cool projects built on the Drips protocol.</p>
     </div>
   </DotsStarsLine>
@@ -114,7 +122,7 @@
     <div class="columns-row">
       <div class="columns-item card">
         <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
-        <h2 class="headline"><em>Crowdfunding</em></h2>
+        <h2 class="headline"><span class="pixelated">Crowdfunding</span></h2>
         <p>
           <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
         </p>
@@ -122,13 +130,13 @@
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
-        <h2 class="headline"><em>DAO payments</em></h2>
+        <h2 class="headline"><span class="pixelated">DAO payments</span></h2>
         <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
         <a href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
-        <h2 class="headline"><em>Grant Splitting</em></h2>
+        <h2 class="headline"><span class="pixelated">Grant Splitting</span></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
         <a href="http://gitcoin.co" target="_blank">gitcoin.co</a>
       </div>
@@ -136,7 +144,7 @@
   </section>
 
   <section class="part">
-    <h1 class="headline">What’s <em>new</em></h1>
+    <h1 class="headline">What’s <span class="pixelated">new</span></h1>
     <ThreeDrip />
     <div class="links">
       <a href="/">The Drips team presented at DevCon 22</a>
@@ -156,7 +164,7 @@
   </section>
 
   <DotsStarsLine>
-    <h1 class="headline">Stay <em>up to date</em></h1>
+    <h1 class="headline">Stay <span class="pixelated">up to date</span></h1>
     <div class="links">
       <a href="https://twitter.com/dripsnetwork">Twitter</a>
       <a href="https://discord.gg/vhGXkazpNc">Discord</a>
@@ -241,7 +249,7 @@
 
   a.cta:hover {
     background-color: var(--color-foreground);
-    color: white;
+    color: var(--color-background);
   }
 
   .part {
@@ -256,7 +264,7 @@
     font-size: var(--font-size-xl);
     font-family: var(--font-serif);
     border: var(--border-width) solid var(--color-foreground);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-xl) var(--spacing-s);
     text-align: center;
     border-radius: var(--border-radius-pointy);
   }
@@ -308,7 +316,7 @@
     justify-content: flex-end;
   }
 
-  em {
+  span.pixelated {
     font-family: var(--font-serif);
   }
 
@@ -318,7 +326,7 @@
     margin: 0;
   }
 
-  h1 em {
+  h1 span.pixelated {
     font-size: 52px;
   }
 
@@ -400,5 +408,10 @@
     flex-direction: column;
     gap: var(--spacing-s);
     margin-top: var(--spacing-m);
+  }
+
+  h1 {
+    font-family: --var(--typeface-medium);
+    font-style: normal;
   }
 </style>

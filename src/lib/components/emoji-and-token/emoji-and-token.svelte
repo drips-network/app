@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import Token from '../token/token.svelte';
 
   export let emoji: string;

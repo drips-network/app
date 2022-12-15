@@ -1,15 +1,17 @@
 <script lang="ts">
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import { fade } from 'svelte/transition';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import { tick, onDestroy } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
+  import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
 
   export let loaded = false;
   export let empty = false;
   export let error = false;
   export let placeholderOutline = true;
+  export let horizontalScroll = false;
 
   export let emptyStateEmoji = '👻';
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
@@ -101,7 +103,9 @@
       </div>
     {:else}
       <div bind:this={contentContainerElem} class="content-container" in:fade={{ duration: 250 }}>
-        <slot />
+        <PaddedHorizontalScroll enabled={horizontalScroll}>
+          <slot />
+        </PaddedHorizontalScroll>
       </div>
     {/if}
   {:else}
@@ -120,7 +124,6 @@
 <style>
   .section-skeleton {
     position: relative;
-    overflow-y: hidden;
   }
 
   .placeholder-container {
@@ -130,10 +133,6 @@
     justify-content: center;
     align-items: center;
     color: var(--color-foreground);
-  }
-
-  .content-container {
-    overflow-y: hidden;
   }
 
   .empty-state {

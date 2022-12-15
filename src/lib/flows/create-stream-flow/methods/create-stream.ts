@@ -18,7 +18,7 @@ import {
   type streamMetadataSchema,
 } from '$lib/stores/streams/metadata';
 import type { z } from 'zod';
-import Emoji from 'radicle-design-system/Emoji.svelte';
+import Emoji from '$lib/components/emoji/emoji.svelte';
 import etherscanLink from '$lib/utils/etherscan-link';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
