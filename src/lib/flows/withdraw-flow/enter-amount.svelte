@@ -27,6 +27,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import { formatUnits } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -40,7 +41,11 @@
   let amount: string | undefined;
   let amountWei: bigint | undefined;
   let withdrawAll = false;
-  $: if (withdrawAll) amount = formatTokenAmount(estimate.amount, tokenInfo.info.decimals);
+  $: if (withdrawAll)
+    amount = formatUnits(
+      estimate.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      tokenInfo.info.decimals,
+    );
   $: if (amount) amountWei = parseTokenAmount(amount, tokenInfo.info.decimals);
 
   let validationState: TextInputValidationState;

@@ -18,6 +18,7 @@
   import Token from '$lib/components/token/token.svelte';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import { formatUnits } from 'ethers/lib/utils';
 
   // TODO: Get current balance of ERC-20, validate input accordingly
 
@@ -35,7 +36,7 @@
 
   let topUpMax = false;
   $: if (topUpMax) {
-    amountValue = formatTokenAmount($context.tokenBalance ?? 0n, tokenInfo.info.decimals, 1n);
+    amountValue = formatUnits($context.tokenBalance ?? 0n, tokenInfo.info.decimals);
   }
 
   let amount: bigint | undefined = undefined;
