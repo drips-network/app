@@ -46,7 +46,11 @@
       }
 
       e.preventDefault();
-      focussedElem.click();
+      focussedElem.dispatchEvent(
+        new PointerEvent('click', {
+          metaKey: e.metaKey,
+        }),
+      );
     }
   }
 </script>
