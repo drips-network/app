@@ -144,4 +144,4 @@ After doing this, the app will display the token within all token pickers. Alter
 
 ### 🌐 Run app locally with a local testnet
 
-It's possible to connect the app runnning locally to the local E2E test environment described above. This allows simple and quick development locally, as all transactions will resolve instantly, and network requests are a lot faster. To do so, simply manually set `window.isPlaywrightTest` to `true`, for example by adding a new `<script>` tag within `app.html`. Before you do this, ensure your local E2E test environment is up & running accoring to the instructions under E2E Tests → Setup above.
+It's possible to connect the app running locally to the local E2E test environment described above. This allows simple and quick development locally, as all transactions will resolve instantly, and network requests are a lot faster. To do so, simply manually set `window.isPlaywrightTest` to `true`, for example by adding a new `<script>` tag within `app.html`. Before you do this, ensure your local E2E test environment is up & running according to the instructions under E2E Tests → Setup above.
