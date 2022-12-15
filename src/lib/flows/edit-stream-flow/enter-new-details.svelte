@@ -28,7 +28,7 @@
   import type { ContractTransaction } from 'ethers';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import expect from '$lib/utils/expect';
   import { get } from 'svelte/store';
