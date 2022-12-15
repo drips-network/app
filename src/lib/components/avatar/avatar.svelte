@@ -24,6 +24,7 @@
 
   img,
   .placeholder {
+    border: 1px solid var(--color-foreground);
     border-radius: 0.75rem;
     position: absolute;
     height: 100%;

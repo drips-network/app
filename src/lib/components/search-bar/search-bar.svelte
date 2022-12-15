@@ -11,6 +11,7 @@
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet';
   import Results from './components/results.svelte';
+  import Button from '../button/button.svelte';
 
   let focus = false;
   let mobileSearchActive = false;
@@ -170,7 +171,7 @@
     </div>
   {/if}
   <div class="mobile-search-button">
-    <SearchIcon on:click={triggerSearch} />
+    <Button icon={SearchIcon} on:click={triggerSearch} />
   </div>
 </div>
 
@@ -249,16 +250,6 @@
 
   .mobile {
     display: none;
-  }
-
-  .mobile .mobile-search-button {
-    height: 2rem;
-    width: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-foreground-level-1);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
   .mobile input {
