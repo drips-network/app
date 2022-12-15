@@ -23,7 +23,7 @@ You can also obtain Goerli RAD funds (Radicle's own governance token) by heading
 
 ## 📝 Submitting feedback
 
-Please create an issue with your feedback on our repo, and tag it with `bug` (for things that aren’t working right) or `enhancement` (for feature ideas, or improvements for existing features). Please briefly check if an issue already exists for what you’re about to report.
+Please first search this repo if your issue already exists. If so, feel free to comment. If not, create an issue with your feedback and tag it `bug` (for things that aren’t working right) or `enhancement` (for feature ideas, or improvements for existing features).
 
 If you’re suggesting copy changes, please create a single issue for all your suggestions and ideally group them sensibly (by page, section, flow, etc.)
 
