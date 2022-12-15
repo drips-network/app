@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
 
   export let emoji: string | undefined = undefined;
   export let headline: string;
