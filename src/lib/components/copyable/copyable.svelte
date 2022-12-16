@@ -13,23 +13,16 @@
     success = true;
     setTimeout(() => (success = false), 1000);
   }
-
-  function triggerCopy(e: Event) {
-    copyClipboard(value);
-    e.stopPropagation();
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter') triggerCopy(e);
-  }
 </script>
 
 <div
   class="copyable"
-  on:click={triggerCopy}
+  on:click={(e) => {
+    copyClipboard(value);
+    e.stopPropagation();
+  }}
   on:mouseenter={() => (visible = true)}
   on:mouseleave={() => (visible = false)}
-  on:keydown={handleKeydown}
 >
   <slot />
   <div

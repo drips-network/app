@@ -42,7 +42,7 @@
         <li><p>*&#8195&#8195 Ensure your browser is up-to-date.</p></li>
         <li><p>*&#8195&#8195 Try turning it on & off again.</p></li>
         <li>
-          *&#8195&#8195<a href="https://discord.gg/vhGXkazpNc" rel="noreferrer" target="_blank"
+          *&#8195&#8195<a href="https://discord.gg/vhGXkazpNc" target="_blank"
             >Get help on our Discord</a
           >
         </li>

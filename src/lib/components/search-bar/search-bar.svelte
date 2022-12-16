@@ -174,11 +174,6 @@
   </div>
 </div>
 
-<!--
-  Ignoring the accessibility error here because the search bar can also be exited
-  by pressing escape.
--->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 {#if focus}<div
     class="overlay"
     on:click={closeSearch}

@@ -55,7 +55,7 @@
   <div class="section">
     <h4 class="typo-all-caps">Get in touch</h4>
     <Setting title="Join the discussion" subtitle="Join our Discord to chat with the team.">
-      <a rel="noreferrer" class="typo-link" target="_blank" href="https://discord.gg/vhGXkazpNc"
+      <a class="typo-link" target="_blank" href="https://discord.gg/vhGXkazpNc"
         >Open Discord Server</a
       >
     </Setting>
@@ -75,9 +75,7 @@
       title="Build on Drips"
       subtitle="The Drips protocol is fully open-source and ready for you to build on."
     >
-      <a rel="noreferrer" class="typo-link" target="_blank" href="https://v2.docs.drips.network"
-        >Read the docs</a
-      >
+      <a class="typo-link" target="_blank" href="https://v2.docs.drips.network">Read the docs</a>
     </Setting>
   </div>
   <Divider />

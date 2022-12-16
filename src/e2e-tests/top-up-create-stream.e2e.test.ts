@@ -66,6 +66,11 @@ describe('top up, create stream, view profile, search', async () => {
     it('adds the test ERC-20 as a new custom token', async () => {
       await page.locator('text=Add custom token').click();
 
+      const warningText = page.locator(
+        'text=You’re about to add a custom, not officially-supported token.',
+      );
+      await expect(warningText).toHaveCount(1);
+
       /*
       Wait a little bit because the stepper `sidestep` mechanism causes an extremely quick re-render of
       inputs when beginning a sidestep.
@@ -82,6 +87,8 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('displays the custom mock erc-20 token', async () => {
+      await takeScreenshot(page, 1);
+
       const testcoin = page.locator('text=Testcoin');
       await testcoin.click();
 
@@ -101,15 +108,13 @@ describe('top up, create stream, view profile, search', async () => {
 
     it('shows the topped-up amount on the dashboard', async () => {
       await expect(page.locator('text=50.00')).toHaveCount(2);
-      await page.locator('button', { hasText: 'Got it' }).click();
+      await page.locator('text=Got it').click();
     });
   });
 
   describe('create stream flow', () => {
     it('opens the create stream modal', async () => {
-      await takeScreenshot(page, 1);
-
-      await page.locator('button', { hasText: 'Create stream' }).click();
+      await page.locator('text=Create stream').click();
 
       await expect(
         page.locator('text=Stream any ERC-20 token to anyone with an Ethereum address.'),

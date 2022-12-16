@@ -66,7 +66,7 @@
   };
 
   let searchBarElem: HTMLDivElement;
-  let itemElements: { [slug: string]: HTMLLIElement } = {};
+  let itemElements: { [slug: string]: HTMLDivElement } = {};
 
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
@@ -115,7 +115,7 @@
   });
 </script>
 
-<ul class="list" role="listbox" style:pointer-events={blockInteraction ? 'none' : 'all'}>
+<div class="list" style:pointer-events={blockInteraction ? 'none' : 'all'}>
   {#if searchable}
     <div class="search-bar">
       <SearchIcon style="fill: var(--color-foreground)" />
@@ -138,7 +138,7 @@
     </div>
   {/if}
   {#each Object.entries(items) as [slug, item]}
-    <li
+    <div
       class="item"
       class:selected={selected.includes(slug)}
       class:disabled={item.disabled}
@@ -148,8 +148,6 @@
       tabindex={item.disabled || blockInteraction ? undefined : 0}
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
-      role="option"
-      aria-selected={!item.disabled}
     >
       {#if item.type === 'selectable' && Object.entries(items).length > 1}
         <div class="check-icon">
@@ -179,9 +177,9 @@
             >{item.text}</span
           >{/if}
       </div>
-    </li>
+    </div>
   {/each}
-</ul>
+</div>
 
 <style>
   .search-bar {

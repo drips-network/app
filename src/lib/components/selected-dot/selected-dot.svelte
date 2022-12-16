@@ -2,7 +2,7 @@
   export let selected: boolean;
 </script>
 
-<div class="selected-dot">
+<div class="selected-dot" on:click={() => (selected = !selected)}>
   <div class="inner" class:selected />
   <div class="outer" class:selected />
 </div>
