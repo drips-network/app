@@ -27,6 +27,11 @@
 {#if store.overlay !== null}
   <FocusTrap containers={new Set([modalContainer])} />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
+    <!--
+      Ignoring the accessibility error here because the modal can also be closed by pressing the
+      escape button.
+    -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="overlay" transition:fade|local={{ duration: 200 }} on:click={clickOutside} />
     <div class="content">
       <div

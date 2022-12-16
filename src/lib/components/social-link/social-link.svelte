@@ -36,7 +36,7 @@
 <div class="social-link">
   <svelte:component this={icon} />
   {#if prefix !== undefined}
-    <a target="_blank" class="typo-text-bold" href={url}>{value}</a>
+    <a target="_blank" class="typo-text-bold" href={url} rel="noreferrer">{value}</a>
   {:else if network === 'ethereum'}
     <p class="typo-text-bold"><Copyable {value}>{formatAddress(value)}</Copyable></p>
   {/if}

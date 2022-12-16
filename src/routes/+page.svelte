@@ -27,9 +27,13 @@
       <DripsLogo />
     </a>
     <ul>
-      <li><a href="https://github.com/radicle-dev" target="_blank">Code</a></li>
+      <li><a rel="noreferrer" href="https://github.com/radicle-dev" target="_blank">Code</a></li>
       <li>
-        <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank">Docs</a>
+        <a
+          rel="noreferrer"
+          href="https://v2.docs.drips.network/docs/whats-a-drip.html"
+          target="_blank">Docs</a
+        >
       </li>
       <li><a class="cta" href="/app">App↗</a></li>
     </ul>
@@ -102,8 +106,11 @@
       <ThreeDrip />
       <h1 class="headline">Built for <span class="pixelated">developers</span></h1>
       <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
-      <a class="cta" href="https://github.com/radicle-dev/drips-js-sdk" target="_blank"
-        >Check out the SDK↗</a
+      <a
+        rel="noreferrer"
+        class="cta"
+        href="https://github.com/radicle-dev/drips-js-sdk"
+        target="_blank">Check out the SDK↗</a
       >
     </div>
     <div class="right">
@@ -126,19 +133,19 @@
         <p>
           <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
         </p>
-        <a href="http://rad.lol" target="_blank">rad.lol</a>
+        <a rel="noreferrer" href="http://rad.lol" target="_blank">rad.lol</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
         <h2 class="headline"><span class="pixelated">DAO payments</span></h2>
         <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
-        <a href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
+        <a rel="noreferrer" href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
       </div>
       <div class="columns-item card">
         <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
         <h2 class="headline"><span class="pixelated">Grant Splitting</span></h2>
         <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
-        <a href="http://gitcoin.co" target="_blank">gitcoin.co</a>
+        <a rel="noreferrer" href="http://gitcoin.co" target="_blank">gitcoin.co</a>
       </div>
     </div>
   </section>

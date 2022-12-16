@@ -71,6 +71,11 @@
 </script>
 
 <div class="token size-{size}">
+  <!--
+    Ignoring accessibility error here because the click handler
+    is purely for triggering a fun visual effect.default
+   -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
     class="logo"
     style={`height: ${sizes[size]}px; width: ${sizes[size]}px`}
