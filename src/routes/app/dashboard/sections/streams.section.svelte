@@ -21,7 +21,7 @@
   import type { Stream } from '$lib/stores/streams/types';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
-  import { goto } from '$app/navigation';
+  import onClickGoto from '$lib/utils/on-click-goto';
 
   export let userId: string | undefined;
   export let disableActions = true;
@@ -238,8 +238,9 @@
     const streamId = tableData[event.detail.rowIndex].streamId;
     const parsedId = decodeStreamId(streamId);
 
-    goto(
+    onClickGoto(
       `/app/${parsedId.senderUserId}/tokens/${parsedId.tokenAddress}/streams/${parsedId.dripId}`,
+      event.detail.event,
     );
   }
 </script>
