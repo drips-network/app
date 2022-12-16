@@ -1,138 +1,32 @@
-# Drips App V2
+![Drips Logo illustration](/docs/assets/drips-logo-illustration.png)
 
-This repo contains the in-development Drips App V2, which will allow users to create and manage streams on the Radicle Drips protocol, as well as provide developers with an interface for inspecting streams.
+# Radicle Drips V2 App
 
-## Development
+| 🏗️ This app is under active development, and currently available for testing as a [pre-release version on the Goerli Testnet](https://drips-app-v2-radicle.vercel.app/). |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 
-Setup:
+Drips 💧 is an Ethereum protocol for streaming and splitting tokens. It allows users and web3 apps to stream and split funds by the second, enabling continuous settlement for use cases like contributor payments, vesting and subscription memberships.
 
-```bash
-npm install
-```
+This app enables user-friendly, simple management of token streams on the Drips network. Users can deposit any ERC-20 token to their Drips account, stream tokens to any Ethereum address, withdraw tokens earned from incoming streams, or split their incoming tokens with any Ethereum address.
 
-To run a development server:
+As we get closer to release, we will share further documentation on the app's features.
 
-```bash
-npm run dev
+## 💦 Getting started on Goerli Testnet
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+You can either run the app locally by following the steps provided in the [Development Guide](/docs/DEVELOPMENT.md), or simply access the latest main deployment at [drips-app-v2-radicle.vercel.app](https://drips-app-v2-radicle.vercel.app/).
 
-## Building
+Click "App" in the top-right corner and connect your wallet to access your personal dashboard.
 
-To create a production version of your app:
+In order to top-up Goerli funds, you can use a Goerli faucet (we like [this one](https://goerli-faucet.pk910.de/)) to get some Goerli ETH, and then swap for Goerli WETH or UNI on Uniswap (make sure your wallet is connected to Goerli). After that’s done, you should be able to top up WETH or UNI within the Drips app, and test all features.
 
-```bash
-npm run build
-```
+You can also obtain Goerli RAD funds (Radicle's own governance token) by heading over to https://app.radicle.xyz/faucet with your wallet connected to Goerli. The Goerli RAD token contract is not part of our default token list, so you need to add [its address](https://github.com/radicle-dev/radicle-contracts#contracts-deployed-on-goerli) to your custom token list within the Drips App before you can use it. To do so, head over to Settings → Custom Tokens.
 
-You can preview the production build with `npm run preview`.
+## 📝 Submitting feedback
 
-## Tests
+Please first search this repo if your issue already exists. If so, feel free to comment. If not, create an issue with your feedback and tag it `bug` (for things that aren’t working right) or `enhancement` (for feature ideas, or improvements for existing features).
 
-Tests are setup with `vitest` as a runner, and `playwright` as the E2E test environment. Components can be unit-tested using `jsdom` (check `$lib/components/example/example.test.ts` for an example). Ensure unit tests follow the name format `*.unit.test.ts`, while E2E tests should be named like `*.e2e.test.ts`.
+If you’re suggesting copy changes, please create a single issue for all your suggestions and ideally group them sensibly (by page, section, flow, etc.)
 
-### Run unit tests
+If your feedback is about the landing page, please also tag it with `landing page`.
 
-With all dependencies installed, simply run:
-
-```bash
-npm run test:unit
-```
-
-### Run E2E tests
-
-The E2E setup spins up a local EVM testnet via `anvil`, deploys `drips-contracts` and a mock ERC-20 contract on it, runs a Graph node, and deploys `drips-subgraph`.
-
-In order to run E2E tests, you need a few requisites:
-
-- A Postgres database running locally at port 5432. The simplest way on Mac OS is to install https://postgresapp.com/ and running it with default settings.
-- A local IPFS node at port 8545. The simplest way on Mac OS is to install [IPFS Desktop](https://github.com/ipfs/ipfs-desktop#quick-install-shortcuts) and running it with default settings.
-- A Rust dev environment. The simplest way is to run [`rustup`](https://rustup.rs/).
-
-With everything above met, ensure the app's dependencies are installed via NPM, and execute from the root directory of the app:
-
-```bash
-npm run setup-e2e
-```
-
-This will download all projects required for the E2E env to `/src/e2e-tests/.tmp` and install their dependencies. You only need to run this command once, or after any of the required projects (`drips-contracts`, `graph-node`, `drips-subgraph`) release an update.
-
-Once done, run from the root directory of the app:
-
-```bash
-npm run start-e2e-env
-```
-
-Keep that terminal window open — if you close it, the local E2E environment will stop. If you ever run into trouble with Anvil or the Graph Node not starting because of orphan processes, you can simply run `./src/e2e-tests/scripts/stop-background-env.sh`.
-
-This script **deletes (if exists) and recreates a database called `node-graph` on your local postgres instance**, spins up a local EVM testnet using `anvil`, deploys all drips contracts and an ERC-20 mock token, launches a local graph node, and deploys the `drips-subgraph`. Note that this will be a lot faster after the first run, as the compiled smart contracts and graph-node will be cached.
-
-Once done, you can start running E2E tests with:
-
-```bash
-npm run test:e2e
-```
-
-If you want to reset the local testnet and subgraph fully, just open the terminal window in which you ran `start-e2e-env`, and hit enter. The script automatically terminates all running background processes, and you can simply run it again to start fresh.
-
-In order to connect the app to the local E2E network during an E2E test, add this `beforeAll` block in your test fixture:
-
-```ts
-beforeAll(async () => {
-  await page.addInitScript(`
-    window.isPlaywrightTest = true;
-
-    localStorage.setItem('custom-tokens', JSON.stringify([
-      {
-        "source": "custom",
-        "banned": false,
-        "info": {
-          "chainId": 5,
-          "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-          "name": "Testcoin",
-          "decimals": 18,
-          "symbol": "TEST"
-        }
-      }
-    ]));
-  `);
-});
-```
-
-This will set a window variable `isPlaywrightTest` to `true`, causing the app to connect to the local testnet and subgraph. After that, we're adding a custom ERC-20 token called TEST to the app config, at address `0x9A676e781A523b5d0C0e43731313A708CB607508` — which is where the mock ERC-20 token is deployed on the local testnet.
-
-When starting your E2E test like this, user `0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266` is automatically and immediately connected to the app, and has a balance of 100 TEST.
-
-#### Note on shared state of E2E env
-
-With our current setup, an E2E test env containing of local testnet and drips contracts is deployed before all E2E tests are executed, and not reset between runs, meaning that all E2E tests share the same local environment state. There is currently one unit test that runs through topping up, creating a stream, switching over to another user, and verifying the incoming stream is there. Other E2E tests that are independent of the top-up balance & streams may be set up to run in parallel (e.g. testing setting up a split), but anything that depends on some token being topped up, or a stream existing, should probably be appended to the existing `top-up-create-stream` fixture. In the future, we may consider writing a function that allows resetting the local testnet from within Playwright.
-
-#### `isPlaywrightTest` and `playwrightAddress`
-
-Unfortunately, two major differences in app logic for E2E tests couldn't be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for a variable `window.isPlaywrightTest` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
-
-#### Interacting with the Mock ERC-20
-
-As part of E2E environment setup, a mock ERC-20 token is deployed at `0x9A676e781A523b5d0C0e43731313A708CB607508`, and automatically grants address `0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
-
-Simply run the following in a `page.addInitScript` block: 
-
-```js
-localStorage.setItem('custom-tokens', JSON.stringify([
-  {
-    "source": "custom",
-    "banned": false,
-    "info": {
-      "chainId": 5,
-      "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-      "name": "Testcoin",
-      "decimals": 18,
-      "symbol": "TEST"
-    }
-  }
-]));
-```
-
-After doing this, the app will display the token within all token pickers.
+Thank you for your feedback! ✌️
