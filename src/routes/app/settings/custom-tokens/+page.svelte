@@ -117,9 +117,9 @@
       >
     </div>
     <p>
-      Custom token information is stored locally on your device, and distinct per network. Please
-      ensure that any custom tokens you add fully and correctly implement the ERC-20 standard,
-      otherwise <b class="typo-text-bold">you may lose your funds.</b>
+      Custom token information is stored locally in your browser, and unique to each network. Please
+      ensure that any custom tokens you add are fully compliant with the ERC-20 token standard,
+      otherwise deposits of these tokens <b class="typo-text-bold">may be unrecoverable.</b>
     </p>
   </div>
   <SectionSkeleton
