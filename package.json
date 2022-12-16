@@ -25,7 +25,6 @@
     "@playwright/test": "^1.25.0",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/adapter-auto": "next",
-    "@sveltejs/adapter-netlify": "^1.0.0-next.88",
     "@sveltejs/kit": "1.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/svelte": "^3.2.1",
