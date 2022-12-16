@@ -13,7 +13,7 @@
   class:with-text={Boolean($$slots.default) && !icon}
   class="typo-text-bold {variant}"
   {disabled}
-  on:click|stopPropagation|preventDefault
+  on:click
 >
   {#if icon}
     <svelte:component this={icon} style="fill: var(--color-foreground)" />

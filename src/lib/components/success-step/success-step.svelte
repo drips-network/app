@@ -1,5 +1,4 @@
 <script lang="ts">
-  import modal from '$lib/stores/modal';
   import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
@@ -14,7 +13,7 @@
     if (action === 'continue') {
       dispatch('goForward');
     } else {
-      modal.hide();
+      dispatch('conclude');
     }
   }
 </script>
@@ -24,7 +23,7 @@
   <h3>Success</h3>
   <p>{typeof message === 'function' ? message() : message}</p>
   <Button variant="primary" on:click={handleConfirm}
-    >{action === 'close' ? 'Close' : 'Continue'}</Button
+    >{action === 'close' ? 'Got it' : 'Continue'}</Button
   >
 </div>
 

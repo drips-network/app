@@ -44,12 +44,7 @@
   }
 
   $: {
-    if (loaded && !empty) {
-      updateContainerHeight();
-    }
-    if (!loaded) {
-      updateContainerHeight(initHeight);
-    }
+    updateContainerHeight(empty || !loaded ? initHeight : undefined);
   }
 
   async function updateContainerHeight(newHeight: number | void) {

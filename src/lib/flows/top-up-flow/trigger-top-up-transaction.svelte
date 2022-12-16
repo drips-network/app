@@ -34,7 +34,9 @@
 
     const ownUserId = (await client.getUserId()).toString();
     const ownAccount = $streams.accounts[ownUserId];
-    const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+    const assetConfig = ownAccount.assetConfigs.find(
+      (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    );
 
     const currentReceivers = mapFilterUndefined(assetConfig?.streams || [], (stream) =>
       stream.paused

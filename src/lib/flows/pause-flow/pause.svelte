@@ -26,7 +26,9 @@
     const ownAccount = $streams.accounts[dripsUserId];
     assert(ownAccount, "App hasn't yet fetched user's own account");
 
-    const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+    const assetConfig = ownAccount.assetConfigs.find(
+      (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    );
     assert(assetConfig, "App hasn't yet fetched the right asset config");
 
     const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>

@@ -4,13 +4,16 @@
   import LineItems from '$lib/components/line-items/line-items.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import modal from '$lib/stores/modal';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
+  import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { CollectFlowState } from './collect-flow-state';
+
+  const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<CollectFlowState>;
 
@@ -44,7 +47,7 @@
     time for your dashboard to update.
   </p>
   <svelte:fragment slot="actions">
-    <Button variant="primary" on:click={() => modal.hide()}>Done</Button>
+    <Button variant="primary" on:click={() => dispatch('conclude')}>Done</Button>
   </svelte:fragment>
 </StepLayout>
 

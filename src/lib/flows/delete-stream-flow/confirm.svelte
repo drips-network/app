@@ -42,6 +42,7 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button on:click={startDeleting} variant="destructive">Delete stream</Button>
   </svelte:fragment>
 </StepLayout>
