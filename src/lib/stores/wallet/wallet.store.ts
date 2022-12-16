@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import type { Network } from '@ethersproject/networks';
 import Web3Modal from 'web3modal';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { AddressDriverClient, Utils } from 'radicle-drips';
 
@@ -11,8 +11,10 @@ import testnetMockProvider from './__test__/local-testnet-mock-provider';
 import isTest from '$lib/utils/is-test';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
+import assert from '$lib/utils/assert';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
+
 const DEFAULT_NETWORK: Network = {
   chainId: 5,
   name: 'goerli',
@@ -146,6 +148,18 @@ const walletStore = () => {
     await _setConnectedState(provider);
   }
 
+  function getSupportedNetworks() {
+    return SUPPORTED_CHAINS;
+  }
+
+  async function switchNetwork(chainId: typeof SUPPORTED_CHAINS[number]) {
+    assert(SUPPORTED_CHAINS.includes(chainId), 'Unsupported chain ID');
+
+    await get(state).provider.send('wallet_switchEthereumChain', [
+      { chainId: `0x${chainId.toString(16)}` },
+    ]);
+  }
+
   /**
    * Completely clear the store and drop any cached providers from
    * Web3Modal.
@@ -205,6 +219,8 @@ const walletStore = () => {
     initialize,
     connect,
     disconnect,
+    getSupportedNetworks,
+    switchNetwork,
   };
 };
 
@@ -233,11 +249,17 @@ const mockWalletStore = () => {
     });
   }
 
+  function getSupportedNetworks() {
+    return [5];
+  }
+
   return {
     subscribe: state.subscribe,
     initialize,
     connect: () => undefined,
     disconnect: () => undefined,
+    getSupportedNetworks,
+    switchNetwork: () => undefined,
   };
 };
 

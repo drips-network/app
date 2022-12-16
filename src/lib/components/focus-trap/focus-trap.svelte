@@ -89,7 +89,7 @@
   // Handle initial focus
   onMount(handleFocus);
 
-  $: enabled && containers ? handleFocus() : restore();
+  $: if (enabled && containers) handleFocus();
 
   // When this component is being destroyed, focusElement is called
   // before handleWindowFocus is removed, so in the svelte port we add this

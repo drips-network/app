@@ -68,7 +68,7 @@
   class:flex-row-reverse={isReverse}
   class:select-none={disableSelection}
   style:height={showAvatar ? `${currentSize}px` : ''}
-  style:gap={showAvatar && showIdentity ? `${currentSize / 2.5}px` : ''}
+  style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
 >
   {#if showAvatar}
     <Avatar
@@ -93,7 +93,7 @@
           class:mono={!ens?.name}
           class:foreground={size === 'gigantic'}
           class={`${currentFontClass} identity-ellipsis absolute overlay`}
-          data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+          data-style:left={showAvatar ? `${currentSize + currentSize / 4}px` : '0'}
           class:hideOnMobile={hideAvatarOnMobile}
         >
           {toDisplay}

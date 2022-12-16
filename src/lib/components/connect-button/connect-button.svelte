@@ -9,8 +9,8 @@
 
 {#if $wallet.connected}
   <Flyout>
-    <div slot="trigger">
-      <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
+    <div slot="trigger" class="trigger">
+      <IdentityBadge hideAvatarOnMobile disableLink address={$wallet.address} />
     </div>
     <div slot="content">
       <AccountMenu />
@@ -19,3 +19,10 @@
 {:else}
   <Button icon={WalletIcon} on:click={() => wallet.connect()}>Connect wallet</Button>
 {/if}
+
+<style>
+  .trigger {
+    display: flex;
+    align-items: center;
+  }
+</style>

@@ -13,11 +13,16 @@ type ModalLayout = {
 const overlayStore = writable<ModalLayout | null>(null);
 
 const hideable = writable<boolean>(true);
+const focusTrapped = writable<boolean>(true);
 
-export const store = derived([overlayStore, hideable], ([$overlayStore, $hideableStore]) => ({
-  overlay: $overlayStore,
-  hideable: $hideableStore,
-}));
+export const store = derived(
+  [overlayStore, hideable, focusTrapped],
+  ([$overlayStore, $hideableStore, $focusTrappedStore]) => ({
+    overlay: $overlayStore,
+    hideable: $hideableStore,
+    focusTrapped: $focusTrappedStore,
+  }),
+);
 
 const doNothing = (): void => {
   null;
@@ -52,6 +57,10 @@ export const hide = (): void => {
  */
 export const setHideable = (value: boolean): void => {
   hideable.set(value);
+};
+
+export const setFocusTrapped = (value: boolean): void => {
+  focusTrapped.set(value);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

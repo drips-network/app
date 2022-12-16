@@ -13,6 +13,7 @@
     bind:checked
     on:focus={() => (focus = true)}
     on:blur={() => (focus = false)}
+    on:blur
   />
   <div class="slider" class:checked class:focus>
     <div class="head" />

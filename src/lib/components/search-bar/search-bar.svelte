@@ -208,7 +208,7 @@
     align-items: center;
     height: 3rem;
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    max-width: 32rem;
+    max-width: 28rem;
     width: 100%;
     border: 1px solid var(--color-foreground);
     transition: border 0.3s;
