@@ -2,8 +2,8 @@
 
 # Radicle Drips V2 App
 
-| 🏗️ This app is under active development, and currently available for testing as a [pre-release version on the Goerli Testnet](https://drips-app-v2-radicle.vercel.app/). |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 🏗️ This app is under active development, and currently available for testing as a [pre-release version on the Goerli Testnet](https://beta.drips.network/). |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 
 Drips 💧 is an Ethereum protocol for streaming and splitting tokens. It allows users and web3 apps to stream and split funds by the second, enabling continuous settlement for use cases like contributor payments, vesting and subscription memberships.
 
@@ -13,7 +13,7 @@ As we get closer to release, we will share further documentation on the app's fe
 
 ## 💦 Getting started on Goerli Testnet
 
-You can either run the app locally by following the steps provided in the [Development Guide](/docs/DEVELOPMENT.md), or simply access the latest main deployment at [drips-app-v2-radicle.vercel.app](https://drips-app-v2-radicle.vercel.app/).
+You can either run the app locally by following the steps provided in the [Development Guide](/docs/DEVELOPMENT.md), or simply access the latest main deployment at [beta.drips.network](https://beta.drips.network/).
 
 Click "App" in the top-right corner and connect your wallet to access your personal dashboard.
 
