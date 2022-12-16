@@ -41,19 +41,18 @@
     tokens.getByAddress(stream.dripsConfig.amountPerSecond.tokenAddress) ?? unreachable();
 
   let newName: string | undefined = stream.name;
-  let newAmountValue: string | undefined = formatUnits(
-    stream.dripsConfig.amountPerSecond.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-    token.info.decimals,
-  );
   let newSelectedMultiplier = '1';
+  let newAmountValue: string | undefined = formatUnits(
+    stream.dripsConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
+    token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+  );
 
   $: newAmountValueParsed = newAmountValue
-    ? parseTokenAmount(newAmountValue, token.info.decimals)
+    ? parseTokenAmount(newAmountValue, token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS)
     : undefined;
 
   $: newAmountPerSecond = newAmountValueParsed
-    ? (newAmountValueParsed * BigInt(constants.AMT_PER_SEC_MULTIPLIER)) /
-      BigInt(newSelectedMultiplier)
+    ? newAmountValueParsed / BigInt(newSelectedMultiplier)
     : undefined;
 
   $: nameUpdated = newName !== stream.name;
