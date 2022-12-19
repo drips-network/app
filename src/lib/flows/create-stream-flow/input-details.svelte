@@ -9,7 +9,6 @@
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import Button from '$lib/components/button/button.svelte';
   import streams from '$lib/stores/streams';
-  import assert from '$lib/utils/assert';
   import { constants } from 'radicle-drips';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
@@ -29,6 +28,7 @@
   import parseTime from './methods/parse-time';
   import combineDateAndTime from './methods/combine-date-and-time';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -47,9 +47,9 @@
 
   let tokenList: Items;
   $: tokenList = Object.fromEntries(
-    $balances.streamable.map((amount) => {
+    mapFilterUndefined($balances.streamable, (amount) => {
       const token = tokens.getByAddress(amount.tokenAddress);
-      assert(token);
+      if (!token) return undefined;
 
       return [
         token.info.address,
@@ -283,6 +283,7 @@
     </div>
   </Toggleable>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>
   </svelte:fragment>
 </StepLayout>

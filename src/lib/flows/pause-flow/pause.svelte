@@ -6,7 +6,7 @@
   import type { Stream } from '$lib/stores/streams/types';
   import streams from '$lib/stores/streams';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from 'radicle-design-system/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import expect from '$lib/utils/expect';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -26,7 +26,9 @@
     const ownAccount = $streams.accounts[dripsUserId];
     assert(ownAccount, "App hasn't yet fetched user's own account");
 
-    const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+    const assetConfig = ownAccount.assetConfigs.find(
+      (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    );
     assert(assetConfig, "App hasn't yet fetched the right asset config");
 
     const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>

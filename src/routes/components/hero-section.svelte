@@ -6,7 +6,10 @@
 
 <section class="part dots-stars">
   <h1 class="headline">
-    An <em>Ethereum</em> protocol for<br /><em>streaming</em> and <em>splitting</em> funds
+    An <span class="pixelated">Ethereum</span> protocol for<br /><span class="pixelated"
+      >streaming</span
+    >
+    and <span class="pixelated">splitting</span> funds
   </h1>
   <div class="mock-dashboard-container">
     <div class="mock-dashboard">
@@ -36,7 +39,7 @@
     border-radius: 2rem 0 0 0;
     position: absolute;
     bottom: 0;
-    padding-top: 4rem;
+    padding-top: 2rem;
     height: 34rem;
     border: 1px solid var(--color-foreground);
     border-bottom: none;
@@ -49,8 +52,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: scale(0.7) translateX(calc((50% * 0.326) * -1));
-    width: calc(100% * 1.3);
+    transform: scale(0.7) translateX(calc((50% * 0.43) * -1));
+    width: calc(100% * 1.43);
     transform-origin: 50% 0;
   }
 
@@ -96,7 +99,7 @@
     overflow: hidden;
   }
 
-  em {
+  span.pixelated {
     font-family: var(--font-serif);
   }
 
@@ -105,7 +108,14 @@
     font-style: normal;
   }
 
-  h1.headline em {
+  h1.headline span.pixelated {
     font-size: 52px;
+  }
+
+  @media (max-width: 768px) {
+    .part {
+      padding: var(--spacing-l);
+      padding-top: var(--spacing-xl);
+    }
   }
 </style>

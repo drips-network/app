@@ -54,7 +54,7 @@
         </span>
       </div>
     {:else}
-      Unknown token
+      <span class="typo-text unknown"> Unknown token </span>
     {/if}
   {/if}
   {#if amountPerSecond !== undefined}
@@ -77,5 +77,9 @@
   .wrapper {
     display: flex;
     flex-direction: column;
+  }
+
+  .unknown {
+    color: var(--color-foreground-level-4);
   }
 </style>

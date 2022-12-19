@@ -2,6 +2,7 @@
   import modal from '$lib/stores/modal/index';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
   import { fade, scale } from 'svelte/transition';
+  import FocusTrap from '../focus-trap/focus-trap.svelte';
   import Modal from './components/modal.svelte';
 
   const modalStore = modal.store;
@@ -17,12 +18,15 @@
       modal.hide();
     }
   };
+
+  let modalContainer: HTMLDivElement;
 </script>
 
 <svelte:window on:keydown={pressEscapeKey} />
 
 {#if store.overlay !== null}
-  <div class="modal-layout" data-cy="modal-layout">
+  <FocusTrap containers={new Set([modalContainer])} />
+  <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
     <div class="overlay" transition:fade|local={{ duration: 200 }} on:click={clickOutside} />
     <div class="content">
       <div
@@ -31,15 +35,15 @@
         out:scale={{ start: 0.97, duration: 200 }}
       >
         <Modal>
-          {#if store.hideable}
-            <div class="close-button" on:click={modal.hide}>
-              <Cross style="fill: var(--color-foreground)" />
-            </div>
-          {/if}
           <svelte:component
             this={store.overlay.modalComponent}
             {...store.overlay.modalComponentProps}
           />
+          {#if store.hideable}
+            <button class="close-button" on:click={modal.hide}>
+              <Cross style="fill: var(--color-foreground)" />
+            </button>
+          {/if}
         </Modal>
       </div>
     </div>
@@ -78,16 +82,23 @@
     width: 2.25rem;
     border-radius: 0 0 0 1.25rem;
     z-index: 10;
-    padding-left: 0.4rem;
-    padding-top: 0.3rem;
     cursor: pointer;
     border: 1px solid var(--color-foreground);
     border-right: none;
     border-top: none;
+    transition: border 0.3s, box-shadow 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .close-button:hover {
     background-color: var(--color-foreground-level-1);
+  }
+
+  .close-button:focus {
+    background-color: var(--color-foreground-level-1);
+    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
   }
 
   .content {

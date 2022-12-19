@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import Button from '../button/button.svelte';
 
   export let emoji: string;
@@ -19,7 +19,6 @@
 
 <style>
   .large-empty-state {
-    user-select: none;
     height: 100%;
     padding: 30vh 0;
     display: flex;

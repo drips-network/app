@@ -18,7 +18,7 @@ import {
   type streamMetadataSchema,
 } from '$lib/stores/streams/metadata';
 import type { z } from 'zod';
-import Emoji from 'radicle-design-system/Emoji.svelte';
+import Emoji from '$lib/components/emoji/emoji.svelte';
 import etherscanLink from '$lib/utils/etherscan-link';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
@@ -44,7 +44,9 @@ export default async (
 
   const { address: tokenAddress } = selectedToken.info;
 
-  const assetConfig = ownAccount.assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+  const assetConfig = ownAccount.assetConfigs.find(
+    (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+  );
   assert(assetConfig, "App hasn't yet fetched the right asset config");
 
   const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
@@ -97,7 +99,7 @@ export default async (
 
   const accountMetadata = generateMetadata(ownAccount, address);
   const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
-    (ac) => ac.tokenAddress === tokenAddress,
+    (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
 
   if (currentAssetConfigIndex === -1) {

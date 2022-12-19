@@ -14,7 +14,7 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import wallet from '$lib/stores/wallet';
   import { createEventDispatcher } from 'svelte';
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import type { Writable } from 'svelte/store';
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
 
@@ -223,6 +223,7 @@
   </section>
 
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" disabled={!isValidForm} on:click={submit}>Confirm</Button>
   </svelte:fragment>
 </StepLayout>

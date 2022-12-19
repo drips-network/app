@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Emoji from '$lib/components/emoji/Emoji.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
 
   export let emoji: string | undefined = undefined;
   export let headline: string;
@@ -9,7 +9,7 @@
 <div class="step-header">
   {#if emoji}<Emoji {emoji} size="huge" />{/if}
   <h1>{headline}</h1>
-  <p>{description}</p>
+  <p>{@html description}</p>
 </div>
 
 <style>

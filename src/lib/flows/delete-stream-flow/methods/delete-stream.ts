@@ -8,7 +8,7 @@ import { AddressDriverPresets, Utils } from 'radicle-drips';
 import assert from '$lib/utils/assert';
 import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
 import type { UpdateAwaitStepFn } from '$lib/components/stepper/types';
-import Emoji from 'radicle-design-system/Emoji.svelte';
+import Emoji from '$lib/components/emoji/emoji.svelte';
 import etherscanLink from '$lib/utils/etherscan-link';
 import wallet from '$lib/stores/wallet';
 import expect from '$lib/utils/expect';
@@ -28,7 +28,7 @@ export default async function (stream: Stream, updateAwaitStep: UpdateAwaitStepF
 
   const metadata = generateMetadata(ownAccount, address);
   const assetConfigIndex = metadata.assetConfigs.findIndex(
-    (mac) => mac.tokenAddress === tokenAddress,
+    (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
   const streamIndex = metadata.assetConfigs[assetConfigIndex].streams.findIndex(
     (ms) => ms.id === stream.id,

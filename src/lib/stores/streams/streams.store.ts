@@ -89,7 +89,9 @@ export default (() => {
   }
 
   function getAssetConfig(userId: string, tokenAddress: string) {
-    return get(state).accounts[userId].assetConfigs.find((ac) => ac.tokenAddress === tokenAddress);
+    return get(state).accounts[userId].assetConfigs.find(
+      (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    );
   }
 
   function getAllStreams() {

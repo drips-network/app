@@ -31,12 +31,15 @@
   import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
   import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
   import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
+  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
+  import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
+  import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
   let dripsUserId: string | undefined;
   let streamId: string | undefined;
-  let error: 'invalid-id' | 'not-found' | undefined;
+  let error: 'invalid-id' | 'not-found' | 'unknown-token' | undefined;
   let loading = true;
   let stream: Stream | undefined;
   let token: TokenInfoWrapper | undefined;
@@ -128,7 +131,14 @@
     }
   }
 
-  onMount(async () => {
+  async function getStreamInfo() {
+    token = tokens.getByAddress(tokenAddress);
+
+    if (!token) {
+      error = 'unknown-token';
+      return;
+    }
+
     try {
       token = tokens.getByAddress(tokenAddress) ?? unreachable();
       dripsUserId = (await decodeUserId(userId)).dripsUserId;
@@ -151,8 +161,18 @@
       assert(stream);
     } catch {
       error = 'not-found';
+      return;
     }
-  });
+
+    error = undefined;
+  }
+
+  onMount(getStreamInfo);
+
+  $: {
+    $tokens;
+    getStreamInfo();
+  }
 
   $: loading = !(stream && estimate);
 
@@ -174,6 +194,16 @@
       emoji="💀"
       headline="Invalid stream ID"
       description="Please make sure you're supplying a valid stream ID in the URL."
+    />
+  {:else if error === 'unknown-token'}
+    <LargeEmptyState
+      emoji="💀"
+      headline="Unknown token"
+      description="This stream is streaming an ERC-20 token which is not supported by default. You can manually add it to your custom tokens list."
+      button={{
+        handler: () => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress)),
+        label: 'Add custom token',
+      }}
     />
   {:else if error === 'not-found'}
     <LargeEmptyState
@@ -215,6 +245,13 @@
                   modal.show(Stepper, undefined, deleteStreamFlowSteps(stream ?? unreachable()))}
                 >Delete</Button
               >{/if}
+            {#if stream}<Button
+                icon={PenIcon}
+                disabled={streamState === 'ended' || !stream.managed}
+                on:click={() =>
+                  modal.show(Stepper, undefined, editStreamFlowSteps(stream ?? unreachable()))}
+                >Edit</Button
+              >{/if}
           </div>
         {/if}
       </div>
@@ -231,23 +268,24 @@
       <div class="details">
         <div class="key-value">
           <h5 class="key">Total Streamed</h5>
-          <h1 class="value typo-text-mono-bold highlight" data-testid="total-streamed">
+          <span class="value typo-text-mono-bold highlight" data-testid="total-streamed">
             <FormattedAmount
               amount={estimate?.totalStreamed ?? unreachable()}
               decimals={token?.info.decimals ?? unreachable()}
             />
             {token?.info.symbol}
-          </h1>
+          </span>
         </div>
         <div class="key-value-row">
           <div class="key-value">
             <h5 class="key">Scheduled start</h5>
-            <h1 class="value">{formatDate(streamStartDate ?? unreachable(), 'verbose')}</h1>
+            <span class="value">{formatDate(streamStartDate ?? unreachable(), 'verbose')}</span>
           </div>
           <div class="key-value align-right">
             <h5 class="key">Scheduled end</h5>
-            {#if streamEndDate}<h1 class="value">{formatDate(streamEndDate, 'verbose')}</h1>{:else}
-              <h1 class="value greyed-out">∞</h1>{/if}
+            {#if streamEndDate}<span class="value">{formatDate(streamEndDate, 'verbose')}</span
+              >{:else}
+              <span class="value greyed-out">∞</span>{/if}
           </div>
         </div>
         <div class="key-value-row">
@@ -260,14 +298,14 @@
                 <InfoCircleIcon style="height: 1.25rem" />
               </Tooltip>
             </div>
-            <h1 class="value typo-text-mono-bold">
+            <span class="value typo-text-mono-bold">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
                 amount={$balances.accounts[dripsUserId ?? unreachable()][tokenAddress].totals
                   .remainingBalance}
               />
               {token?.info.symbol}
-            </h1>
+            </span>
           </div>
           <div class="key-value align-right">
             <div class="with-info-icon">
@@ -281,16 +319,16 @@
               </Tooltip>
             </div>
             {#if outOfFundsDate}
-              <h1 class="value">{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</h1>
+              <span class="value">{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</span>
             {:else}
-              <h1 class="value greyed-out">∞</h1>
+              <span class="value greyed-out">∞</span>
             {/if}
           </div>
         </div>
         <div class="key-value-row">
           <div class="key-value">
             <h5 class="key">Created at</h5>
-            <h1 class="value">{formatDate(streamCreated ?? unreachable())}</h1>
+            <span class="value">{formatDate(streamCreated ?? unreachable())}</span>
           </div>
         </div>
       </div>
@@ -359,6 +397,7 @@
 
   .key-value > .value {
     font-size: 1.5rem;
+    font-weight: bold;
   }
 
   .key-value > .value.highlight {
