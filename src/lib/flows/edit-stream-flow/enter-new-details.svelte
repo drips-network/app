@@ -32,6 +32,7 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import expect from '$lib/utils/expect';
   import { get } from 'svelte/store';
+  import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -55,10 +56,15 @@
     ? newAmountValueParsed / BigInt(newSelectedMultiplier)
     : undefined;
 
+  $: amountValidationState = validateAmtPerSecInput(newAmountPerSecond);
+
   $: nameUpdated = newName !== stream.name;
   $: amountUpdated = newAmountPerSecond !== stream.dripsConfig.amountPerSecond.amount;
   $: canUpdate =
-    newAmountValueParsed && newName && (nameUpdated || amountUpdated) && newAmountValueParsed > 0;
+    newAmountValueParsed &&
+    newName &&
+    (nameUpdated || amountUpdated) &&
+    amountValidationState?.type === 'valid';
 
   function updateStream() {
     const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
@@ -236,6 +242,7 @@
         bind:value={newAmountValue}
         variant={{ type: 'number', min: 0 }}
         placeholder="Amount"
+        validationState={amountValidationState}
       />
     </FormField>
     <FormField title="Amount per*">
