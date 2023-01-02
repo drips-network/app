@@ -16,7 +16,6 @@ const CYCLE_SECS = 604800;
  * If it would stream less than 1 wei per cycle, the amtPerSec is considered invalid,
  * as it would effectively result in a stopped stream.
  * @param amtPerSec The amtPerSec value with extra precision to validate.
- * @param tokenDecimals The amount of decimal precision for the token.
  */
 export default function validateAmtPerSec(amtPerSec: bigint) {
   const amtPerCycle = amtPerSec * BigInt(CYCLE_SECS);
