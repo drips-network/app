@@ -27,6 +27,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import { formatUnits } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -34,13 +35,18 @@
 
   $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
   $: estimate =
-    $balances.streamable.find((amount) => amount.tokenAddress === $context.tokenAddress) ??
-    unreachable();
+    $balances.streamable.find(
+      (amount) => amount.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
+    ) ?? unreachable();
 
   let amount: string | undefined;
   let amountWei: bigint | undefined;
   let withdrawAll = false;
-  $: if (withdrawAll) amount = formatTokenAmount(estimate.amount, tokenInfo.info.decimals);
+  $: if (withdrawAll)
+    amount = formatUnits(
+      estimate.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      tokenInfo.info.decimals,
+    );
   $: if (amount) amountWei = parseTokenAmount(amount, tokenInfo.info.decimals);
 
   let validationState: TextInputValidationState;
@@ -65,8 +71,9 @@
 
   function getAssetConfigHistory(dripsUserId: string, tokenAddress: string) {
     return (
-      $streams.accounts[dripsUserId].assetConfigs.find((ac) => ac.tokenAddress === tokenAddress) ??
-      unreachable()
+      $streams.accounts[dripsUserId].assetConfigs.find(
+        (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+      ) ?? unreachable()
     ).history;
   }
 
@@ -80,7 +87,7 @@
     assert(ownAccount, "App hasn't yet fetched user's own account");
 
     const assetConfig = ownAccount.assetConfigs.find(
-      (ac) => ac.tokenAddress === $context.tokenAddress,
+      (ac) => ac.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
     );
     assert(assetConfig, "App hasn't yet fetched the right asset config");
 
@@ -194,6 +201,7 @@
     </svelte:fragment>
   </FormField>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}
       >Withdraw</Button
     >

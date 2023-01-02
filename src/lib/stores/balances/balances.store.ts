@@ -136,7 +136,7 @@ export default (() => {
     if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
 
     const incomingStreamsForToken = ownStreams.filter(
-      (stream) => stream.tokenAddress === tokenAddress,
+      (stream) => stream.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
     );
 
     return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(

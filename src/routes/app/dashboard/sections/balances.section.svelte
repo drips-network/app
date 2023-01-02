@@ -10,7 +10,6 @@
   import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
   import assert from '$lib/utils/assert';
-  import { goto } from '$app/navigation';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
   import { AddressDriverClient } from 'radicle-drips';
@@ -18,6 +17,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import onClickGoto from '$lib/utils/on-click-goto';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -172,7 +172,7 @@
     const tokenAddress = tableData[event.detail.rowIndex].token.address;
     assert(userId);
     const address = AddressDriverClient.getUserAddress(userId);
-    goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
+    onClickGoto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`, event.detail.event);
   }
 </script>
 
@@ -201,7 +201,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
+      <Table {options} rowHeight={76} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>

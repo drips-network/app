@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet';
-  import fetchErc20Balance from '$lib/utils/fetch-erc20-balance';
+  import { fetchBalance } from '$lib/utils/erc20';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher, onMount } from 'svelte';
   import assert from '$lib/utils/assert';
@@ -19,7 +19,7 @@
     assert(address && tokenAddress);
 
     const allowance = await (await getAddressDriverClient()).getAllowance(tokenAddress);
-    const balance = await fetchErc20Balance(tokenAddress, address, provider);
+    const balance = await fetchBalance(tokenAddress, address, provider);
 
     context.update((c) => ({
       ...c,
