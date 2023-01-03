@@ -12,6 +12,7 @@ import isTest from '$lib/utils/is-test';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 import assert from '$lib/utils/assert';
+import { NETWORK_META } from './networks';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
 
@@ -58,7 +59,7 @@ const windowProvider =
   browser && window.ethereum && new ethers.providers.Web3Provider(window.ethereum);
 
 const selectedNetwork =
-  windowProvider && new ethers.providers.Web3Provider(window.ethereum).network;
+  windowProvider && new ethers.providers.Web3Provider(window.ethereum).getNetwork;
 
 const initNetwork =
   selectedNetwork && SUPPORTED_CHAINS.includes(selectedNetwork.chainId)
@@ -149,7 +150,7 @@ const walletStore = () => {
   }
 
   function getSupportedNetworks() {
-    return SUPPORTED_CHAINS;
+    return SUPPORTED_CHAINS.map((chainId) => NETWORK_META[chainId]);
   }
 
   async function switchNetwork(chainId: typeof SUPPORTED_CHAINS[number]) {
@@ -250,7 +251,7 @@ const mockWalletStore = () => {
   }
 
   function getSupportedNetworks() {
-    return [5];
+    return { 5: NETWORK_META[5] };
   }
 
   return {

@@ -8,34 +8,39 @@
 
   let networkPickerValue = '5';
 
+  const supportedChains = wallet.getSupportedNetworks();
+
+  const networkSwitcherOptions = Object.values(supportedChains).map((sc) => ({
+    title: sc.name,
+    iconUrl: sc.logoUrl,
+    value: String(sc.chainId),
+  }));
+
   $: elevated = $scroll.pos > 16;
+
+  async function handleNetworkSwitch() {
+    await wallet.switchNetwork(Number(networkPickerValue));
+  }
+  $: {
+    networkPickerValue;
+    handleNetworkSwitch();
+  }
 </script>
 
 <header class:elevated>
   <a href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
   </a>
-  <SearchBar />
-  <div class="wallet">
+  <div class="right">
+    <div class="search-bar">
+      <SearchBar />
+    </div>
     <div class="network-switch">
       <Dropdown
         dropdownWidth={{ pixels: 200, align: 'right' }}
         noBorder
         bind:value={networkPickerValue}
-        options={[
-          {
-            value: '5',
-            title: 'Goerli',
-            iconUrl:
-              'https://blockworks.co/_next/image?url=https%3A%2F%2Fcms.blockworks.co%2Fwp-content%2Fuploads%2F2022%2F04%2FEthereum.jpg&w=1920&q=75',
-          },
-          {
-            value: '6',
-            title: 'Other Chain',
-            iconUrl:
-              'https://blockworks.co/_next/image?url=https%3A%2F%2Fcms.blockworks.co%2Fwp-content%2Fuploads%2F2022%2F04%2FEthereum.jpg&w=1920&q=75',
-          },
-        ]}
+        options={networkSwitcherOptions}
       />
     </div>
     <ConnectButton />
@@ -59,9 +64,26 @@
     box-shadow: var(--elevation-low);
   }
 
-  .wallet {
+  .right {
     display: flex;
     gap: 1rem;
     align-items: center;
+  }
+
+  .network-switch {
+    display: none;
+  }
+
+  @media (min-width: 1088px) {
+    .search-bar {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28rem;
+      z-index: 100;
+    }
+    .network-switch {
+      display: block;
+    }
   }
 </style>

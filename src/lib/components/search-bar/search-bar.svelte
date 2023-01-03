@@ -227,7 +227,6 @@
 
   .overlay {
     position: fixed;
-    /* top: 4rem; */
     right: 0;
     left: 0;
     bottom: 0;
@@ -240,10 +239,11 @@
     height: 4rem;
     position: fixed;
     top: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     right: 0;
     background-color: var(--color-background);
-    z-index: 1;
+    z-index: 2;
     padding: 0.5rem;
   }
 
@@ -282,7 +282,7 @@
     box-shadow: var(--elevation-medium);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1087px) {
     .mobile {
       width: 100%;
       display: flex;
