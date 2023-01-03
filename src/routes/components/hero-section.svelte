@@ -11,6 +11,15 @@
     >
     and <span class="pixelated">splitting</span> funds
   </h1>
+  <div class="beta-notice">
+    <p class="typo-text">
+      Drips V2 is currently in Beta and available on testnets only. <a
+        href="https://drips.network"
+        class="typo-link"
+        target="_blank">Check out Drips V1</a
+      >
+    </p>
+  </div>
   <div class="mock-dashboard-container">
     <div class="mock-dashboard">
       <MockDashboard />
@@ -32,7 +41,15 @@
     font-family: var(--typeface-regular);
     font-weight: normal;
     font-size: 100%;
-    margin-bottom: 34rem;
+    margin-bottom: 1rem;
+  }
+
+  .beta-notice {
+    margin-bottom: 36rem;
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+    padding: 0.75rem 1.25rem;
+    border-radius: 2rem 0 2rem 2rem;
   }
 
   .mock-dashboard-container {
