@@ -1,9 +1,10 @@
 <script lang="ts">
   export let title: string;
   export let description: string | undefined = undefined;
+  export let disabled = false;
 </script>
 
-<label class="typo-text-bold">
+<label class="typo-text-bold" class:disabled>
   <div class="content"><slot /></div>
   {#if description}<p>{description}</p>{/if}
   <div class="title">
@@ -34,6 +35,10 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+  }
+
+  .disabled .title {
+    color: var(--color-foreground-level-5);
   }
 
   .content {
