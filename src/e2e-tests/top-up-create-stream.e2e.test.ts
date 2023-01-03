@@ -67,7 +67,7 @@ describe('top up, create stream, view profile, search', async () => {
       await page.locator('text=Add custom token').click();
 
       const warningText = page.locator(
-        'text=You’re about to add a custom, not officially-supported token.',
+        'text=You’re about to add a token which is not officially-supported',
       );
       await expect(warningText).toHaveCount(1);
 
