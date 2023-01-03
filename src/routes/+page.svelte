@@ -200,6 +200,8 @@
     gap: var(--spacing-s);
     max-width: 1600px;
     margin: 0 auto;
+
+    animation: slideIn 1s;
   }
 
   *::selection {
@@ -413,5 +415,16 @@
   h1 {
     font-family: --var(--typeface-medium);
     font-style: normal;
+  }
+
+  @keyframes slideIn {
+    0% {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
