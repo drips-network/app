@@ -71,6 +71,7 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" disabled={selected.length !== 1} on:click={submit}
       >Select {selectedToken?.info.name ?? ''}</Button
     >

@@ -9,6 +9,7 @@ import { expect } from '@playwright/test';
 import fetch from 'node-fetch';
 import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
+import takeScreenshot from './helpers/take-screenshot';
 
 describe('top up, create stream, view profile, search', async () => {
   let server: PreviewServer;
@@ -34,7 +35,7 @@ describe('top up, create stream, view profile, search', async () => {
     });
   });
 
-  describe('top-up flow', () => {
+  describe('dashboard empty state', () => {
     it('connects', async () => {
       await page.goto('http://localhost:3000/app/dashboard');
 
@@ -49,7 +50,9 @@ describe('top up, create stream, view profile, search', async () => {
       const streamsEmptyState = page.locator('text=No streams');
       await expect(streamsEmptyState).toHaveCount(1);
     });
+  });
 
+  describe('top-up flow', () => {
     it('opens the top-up-flow', async () => {
       const topUpButton = page.locator('text=Add funds');
       await topUpButton.click();
@@ -60,7 +63,32 @@ describe('top up, create stream, view profile, search', async () => {
       await expect(topUpFlowDescription).toHaveCount(1);
     });
 
+    it('adds the test ERC-20 as a new custom token', async () => {
+      await page.locator('text=Add custom token').click();
+
+      const warningText = page.locator(
+        'text=You’re about to add a custom, not officially-supported token.',
+      );
+      await expect(warningText).toHaveCount(1);
+
+      /*
+      Wait a little bit because the stepper `sidestep` mechanism causes an extremely quick re-render of
+      inputs when beginning a sidestep.
+      */
+      await page.waitForTimeout(1000);
+
+      await page.type(
+        'label:has-text("Token contract address*")',
+        '0x9A676e781A523b5d0C0e43731313A708CB607508',
+      );
+
+      await page.locator('button', { hasText: 'Add custom token' }).click();
+      await page.locator('button', { hasText: 'Got it' }).click();
+    });
+
     it('displays the custom mock erc-20 token', async () => {
+      await takeScreenshot(page, 1);
+
       const testcoin = page.locator('text=Testcoin');
       await testcoin.click();
 
@@ -80,7 +108,7 @@ describe('top up, create stream, view profile, search', async () => {
 
     it('shows the topped-up amount on the dashboard', async () => {
       await expect(page.locator('text=50.00')).toHaveCount(2);
-      await page.locator('text=Close').click();
+      await page.locator('text=Got it').click();
     });
   });
 
@@ -219,7 +247,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('pauses the stream', async () => {
       await page.locator('button', { hasText: 'Pause' }).click();
       await expect(page.locator('text=Your stream has been paused')).toHaveCount(1);
-      await page.locator('button', { hasText: 'Close' }).click();
+      await page.locator('button', { hasText: 'Got it' }).click();
 
       await expect(page.locator('text=Paused')).toHaveCount(1);
     }, 20000);
@@ -227,7 +255,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('unpauses the stream', async () => {
       await page.locator('button', { hasText: 'Unpause' }).click();
       await expect(page.locator('text=Your stream has been unpaused')).toHaveCount(1);
-      await page.locator('button', { hasText: 'Close' }).click();
+      await page.locator('button', { hasText: 'Got it' }).click();
 
       await expect(page.locator('text=Active')).toHaveCount(1);
     }, 20000);
@@ -235,7 +263,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('pauses the stream again', async () => {
       await page.locator('button', { hasText: 'Pause' }).click();
       await expect(page.locator('text=Your stream has been paused')).toHaveCount(1);
-      await page.locator('button', { hasText: 'Close' }).click();
+      await page.locator('button', { hasText: 'Got it' }).click();
 
       await expect(page.locator('text=Paused')).toHaveCount(1);
 
@@ -298,7 +326,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('deletes the stream', async () => {
       await page.locator('button', { hasText: 'Delete ' }).click();
       await page.locator('button', { hasText: 'Delete stream' }).click();
-      await page.locator('button', { hasText: 'Close' }).click();
+      await page.locator('button', { hasText: 'Got it' }).click();
 
       expect(page.url().toLowerCase()).toBe('http://localhost:3000/app/dashboard');
     }, 20000);

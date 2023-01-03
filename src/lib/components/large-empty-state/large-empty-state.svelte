@@ -19,7 +19,6 @@
 
 <style>
   .large-empty-state {
-    user-select: none;
     height: 100%;
     padding: 30vh 0;
     display: flex;

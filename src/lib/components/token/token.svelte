@@ -2,6 +2,7 @@
   import tokens from '$lib/stores/tokens';
   import { convertIpfsUri } from '$lib/utils/ipfs';
   import seededRandomElement from '$lib/utils/seeded-random-element';
+  import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import QuestionIcon from 'radicle-design-system/icons/Question.svelte';
   import { onMount } from 'svelte';
   import { quintIn, quintOut } from 'svelte/easing';
@@ -29,7 +30,8 @@
     huge: 48,
   };
 
-  $: tokenInfo = overrideToDisplay ?? ($tokens ? tokens.getByAddress(address)?.info : undefined);
+  $: token = $tokens ? tokens.getByAddress(address) : undefined;
+  $: tokenInfo = overrideToDisplay ?? ($tokens ? token?.info : undefined);
   $: src = tokenInfo?.logoURI ? convertIpfsUri(tokenInfo.logoURI) : undefined;
 
   let imageFailed = false;
@@ -100,6 +102,14 @@
         {/if}
       </div>
     {/if}
+    {#if token?.source === 'custom'}
+      <div class="custom-token-warning">
+        <ExclamationCircle
+          style="height: {sizes[size] / 1.5}px; width: {sizes[size] /
+            1.5}px; fill: var(--color-caution); margin: -2px;"
+        />
+      </div>
+    {/if}
     <div
       class="sparkle one"
       style={`transform: scale(${$sparkle1Scale}); font-size: ${sizes[size] / 3}`}
@@ -130,6 +140,14 @@
 
   .token.size-huge {
     gap: 1.2rem;
+  }
+
+  .custom-token-warning {
+    position: absolute;
+    right: -0.3rem;
+    bottom: -0.3rem;
+    background-color: var(--color-background);
+    border-radius: 1rem;
   }
 
   .logo {
@@ -182,6 +200,7 @@
     opacity: 0.5;
   }
   .sparkle {
+    pointer-events: none;
     position: absolute;
     font-size: 10px;
     text-shadow: 0px 0px 5px yellow;

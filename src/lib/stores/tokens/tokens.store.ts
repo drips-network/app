@@ -151,7 +151,7 @@ export default (() => {
    * @param chainId The chain ID of the custom token to remove.
    */
   function removeCustomToken(address: string, chainId: number) {
-    const tokens = get(tokenList);
+    let tokens = get(tokenList);
     assert(tokens && chainId, 'Store must be connected first');
 
     const token = getByAddress(address, chainId);
@@ -162,7 +162,9 @@ export default (() => {
 
     storedTokens.deleteCustomToken(token);
 
-    tokens.splice(tokens.indexOf(token));
+    tokens = tokens.filter(
+      (v) => v.info.address.toLowerCase() !== token.info.address.toLowerCase(),
+    );
     tokenList.set(tokens);
   }
 
