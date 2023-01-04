@@ -25,7 +25,7 @@
 <svelte:window on:keydown={pressEscapeKey} />
 
 {#if store.overlay !== null}
-  <FocusTrap containers={new Set([modalContainer])} />
+  <FocusTrap enabled={store.focusTrapped} containers={new Set([modalContainer])} />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
     <div class="overlay" transition:fade|local={{ duration: 200 }} on:click={clickOutside} />
     <div class="content">
