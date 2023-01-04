@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Dropdown from 'radicle-design-system/Dropdown.svelte';
+  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
