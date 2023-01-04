@@ -328,7 +328,7 @@
         <div class="key-value-row">
           <div class="key-value">
             <h5 class="key">Created at</h5>
-            <span class="value">{formatDate(streamCreated ?? unreachable())}</span>
+            <span class="value">{formatDate(streamCreated ?? unreachable(), 'verbose')}</span>
           </div>
         </div>
       </div>
