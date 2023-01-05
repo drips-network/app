@@ -301,8 +301,8 @@
             <span class="value typo-text-mono-bold">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
-                amount={$balances.accounts[dripsUserId ?? unreachable()][tokenAddress].totals
-                  .remainingBalance}
+                amount={$balances.accounts[dripsUserId ?? unreachable()].tokens[tokenAddress].total
+                  .totals.remainingBalance}
               />
               {token?.info.symbol}
             </span>

@@ -7,9 +7,9 @@
   import balances from '$lib/stores/balances/balances.store';
   import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
   import assert from '$lib/utils/assert';
+  import { goto } from '$app/navigation';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
   import { AddressDriverClient } from 'radicle-drips';
@@ -17,7 +17,9 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
-  import onClickGoto from '$lib/utils/on-click-goto';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import tokens from '$lib/stores/tokens';
+  import accountFetchStatusesStore from '$lib/stores/account-fetch-statuses/account-fetch-statuses.store';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -39,25 +41,19 @@
       return;
     }
 
-    const ownStreams = streams.getStreamsForUser(userId);
+    // TODO: Only consider relevant tokens here.
+    const tokensToShow = $tokens?.map((t) => t.info.address) ?? [];
 
-    let tokensToShow: string[] = [];
-
-    tokensToShow.push(
-      ...balances.getStreamEstimatesByReceiver(userId).map((se) => se.tokenAddress),
-    );
-    tokensToShow.push(...Object.keys(accountEstimate));
-    tokensToShow.push(
-      ...(ownStreams.incoming.map((stream) => stream.dripsConfig.amountPerSecond.tokenAddress) ??
-        []),
-    );
-    tokensToShow = [...new Set(tokensToShow)];
-
-    tableData = tokensToShow.map((tokenAddress) => {
+    tableData = mapFilterUndefined(tokensToShow, (tokenAddress) => {
       assert(userId);
 
-      const estimate = accountEstimate?.[tokenAddress];
-      const incomingTotals = balances.getIncomingTokenAmountsByUser(userId, tokenAddress);
+      const outgoingEstimate = accountEstimate?.tokens[tokenAddress];
+      const incomingEstimate = balances.getIncomingBalanceForUser(tokenAddress, userId);
+
+      if (!incomingEstimate) return undefined;
+      if (!outgoingEstimate?.total.totals.remainingBalance && !incomingEstimate.totalEarned) {
+        return undefined;
+      }
 
       return {
         token: {
@@ -65,11 +61,11 @@
         },
         earnings: {
           amount: {
-            amount: incomingTotals.totalEarned,
+            amount: incomingEstimate.totalEarned,
             tokenAddress,
           },
           amountPerSecond: {
-            amount: incomingTotals.amountPerSecond,
+            amount: incomingEstimate.amountPerSecond,
             tokenAddress,
           },
           showSymbol: false,
@@ -77,17 +73,19 @@
         streaming: {
           amount: {
             tokenAddress,
-            amount: estimate?.totals.remainingBalance ?? 0n,
+            amount: outgoingEstimate?.total.totals.remainingBalance ?? 0n,
           },
           amountPerSecond: {
             tokenAddress,
-            amount: -(estimate?.totals.totalAmountPerSecond ?? 0n),
+            amount: -(outgoingEstimate?.total.totals.totalAmountPerSecond ?? 0n),
           },
           showSymbol: false,
         },
         netRate: {
           amountPerSecond: {
-            amount: incomingTotals.amountPerSecond - (estimate?.totals.totalAmountPerSecond ?? 0n),
+            amount:
+              incomingEstimate.amountPerSecond -
+              (outgoingEstimate?.total.totals.totalAmountPerSecond ?? 0n),
             tokenAddress,
           },
           showSymbol: false,
@@ -159,20 +157,22 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  const { fetchStatuses } = streams;
+  $: fetchStatus = userId ? $accountFetchStatusesStore[userId] : undefined;
 
   // As soon as the given account has been fetched at least once, display content.
   let loaded = false;
-  $: if (userId && ['error', 'fetched'].includes($fetchStatuses[userId])) loaded = true;
+  $: if (userId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
+    loaded = true;
+  }
 
-  $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
+  $: error = Boolean(userId && fetchStatus?.all === 'error');
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     // go to token page by address
     const tokenAddress = tableData[event.detail.rowIndex].token.address;
     assert(userId);
     const address = AddressDriverClient.getUserAddress(userId);
-    onClickGoto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`, event.detail.event);
+    goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
   }
 </script>
 
@@ -193,7 +193,6 @@
   />
   <div class="content">
     <SectionSkeleton
-      horizontalScroll
       emptyStateHeadline="No tokens"
       emptyStateEmoji="🫗"
       emptyStateText="This is where any tokens balances you stream or earned show up."
@@ -201,7 +200,7 @@
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} rowHeight={76} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
+      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>
@@ -211,5 +210,9 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .content {
+    overflow-y: scroll;
   }
 </style>

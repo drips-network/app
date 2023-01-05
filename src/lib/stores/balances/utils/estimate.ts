@@ -19,6 +19,11 @@ export interface StreamEstimate {
   tokenAddress: string;
 }
 
+export interface AssetConfigEstimates {
+  total: AssetConfigEstimate;
+  currentCycle: AssetConfigEstimate;
+}
+
 export interface AssetConfigEstimate {
   streams: StreamEstimate[];
   totals: {
@@ -28,22 +33,67 @@ export interface AssetConfigEstimate {
   };
 }
 
-type AccountEstimate = { [tokenAddress: string]: AssetConfigEstimate };
+interface Cycle {
+  start: Date;
+  duration: Millis;
+}
 
-export function estimateAccount(account: Account): AccountEstimate {
+interface TimeWindow {
+  from: Millis;
+  to: Millis;
+}
+
+type AccountEstimate = { [tokenAddress: string]: AssetConfigEstimates };
+
+export function estimateAccount(account: Account, currentCycle: Cycle): AccountEstimate {
   return Object.fromEntries(
     account.assetConfigs.map((assetConfig) => [
       assetConfig.tokenAddress,
-      estimateAssetConfig(assetConfig),
+      buildAssetConfigEstimates(assetConfig, currentCycle),
     ]),
   );
 }
 
-export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstimate {
-  const historyItemEstimates = assetConfig.history.map((historyItem, index, historyItems) => {
+function buildAssetConfigEstimates(
+  assetConfig: AssetConfig,
+  currentCycle: Cycle,
+): AssetConfigEstimates {
+  /*
+    TODO: Avoid processing the current cycle twice by bounding totalEstimate to before the current cycle,
+    and adding the estimates up.
+  */
+  const totalEstimate = estimateAssetConfig(assetConfig, { from: 0, to: Number.MAX_SAFE_INTEGER });
+  const currentCycleEstimate = estimateAssetConfig(assetConfig, {
+    from: currentCycle.start.getTime(),
+    to: currentCycle.start.getTime() + currentCycle.duration,
+  });
+
+  return {
+    total: totalEstimate,
+    currentCycle: currentCycleEstimate,
+  };
+}
+
+export function estimateAssetConfig(
+  assetConfig: AssetConfig,
+  window: TimeWindow,
+): AssetConfigEstimate {
+  // Filter out any history items not relevant to the current time window.
+  const relevantHistoryItems = assetConfig.history.filter((hi) => {
+    const timestamp = hi.timestamp.getTime();
+    const nextTimestamp = assetConfig.history[assetConfig.history.indexOf(hi)]?.timestamp.getTime();
+
+    const startsWithinWindow = timestamp <= window.to && timestamp >= window.from;
+    const windowIsAfterLastEvent = !nextTimestamp && timestamp < window.from;
+    const endsWithinWindow = nextTimestamp && nextTimestamp >= window.from;
+
+    return startsWithinWindow || windowIsAfterLastEvent || endsWithinWindow;
+  });
+
+  const historyItemEstimates = relevantHistoryItems.map((historyItem, index, historyItems) => {
     const nextHistoryItem = historyItems[index + 1];
 
-    return estimateHistoryItem(historyItem, nextHistoryItem, assetConfig.tokenAddress);
+    return estimateHistoryItem(window, historyItem, nextHistoryItem, assetConfig.tokenAddress);
   });
 
   const streamTotals = historyItemEstimates.reduce<{ [stream: StreamId]: StreamEstimate }>(
@@ -71,7 +121,7 @@ export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstima
 
   const totalStreamed = sumEstimates('totalStreamed', streams);
   const totalAmountPerSecond = sumEstimates('currentAmountPerSecond', streams);
-  const { remainingBalance } = historyItemEstimates[historyItemEstimates.length - 1].totals;
+  const { remainingBalance } = historyItemEstimates[historyItemEstimates.length - 1]?.totals ?? 0n;
 
   return {
     streams,
@@ -84,12 +134,13 @@ export function estimateAssetConfig(assetConfig: AssetConfig): AssetConfigEstima
 }
 
 function estimateHistoryItem(
+  window: TimeWindow,
   historyItem: AssetConfigHistoryItem,
   nextHistoryItem: AssetConfigHistoryItem,
   tokenAddress: string,
 ): AssetConfigEstimate {
   const streamEstimates = historyItem.streams.map((receiver) => {
-    const estimate = streamedByStream(receiver, historyItem, nextHistoryItem);
+    const estimate = streamedByStream(window, receiver, historyItem, nextHistoryItem);
 
     return {
       id: receiver.streamId,
@@ -115,6 +166,7 @@ function estimateHistoryItem(
 }
 
 function streamedByStream(
+  window: TimeWindow,
   receiver: Receiver,
   historyItem: AssetConfigHistoryItem,
   nextHistoryItem?: AssetConfigHistoryItem,
@@ -146,9 +198,9 @@ function streamedByStream(
   const duration: Millis | undefined = durationSeconds ? durationSeconds * 1000 : undefined;
   const start: Millis = startDate ? startDate.getTime() : timestamp;
 
-  const streamingFrom = minMax('max', timestamp, start);
+  const streamingFrom = minMax('max', timestamp, start, window.from);
   const scheduledToEndAt = calcScheduledEnd(streamingFrom, start, duration);
-  const streamingUntil = minMax('min', runsOutOfFunds, scheduledToEndAt, nextTimestamp);
+  const streamingUntil = minMax('min', runsOutOfFunds, scheduledToEndAt, nextTimestamp, window.to);
   const validForMillis = minMax('max', streamingUntil - streamingFrom, 0);
 
   const streamed = (BigInt(validForMillis) * amountPerSecond.amount) / 1000n;

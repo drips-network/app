@@ -22,6 +22,7 @@
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import onClickGoto from '$lib/utils/on-click-goto';
+  import accountFetchStatusesStore from '$lib/stores/account-fetch-statuses/account-fetch-statuses.store';
 
   export let userId: string | undefined;
   export let disableActions = true;
@@ -120,8 +121,6 @@
       };
     });
   }
-
-  const { fetchStatuses } = streams;
 
   $: {
     userId;
@@ -225,9 +224,10 @@
 
   // As soon as the given account has been fetched at least once, display content.
   let loaded = false;
-  $: if (userId && ['error', 'fetched'].includes($fetchStatuses[userId])) loaded = true;
+  $: if (userId && ['error', 'fetched'].includes($accountFetchStatusesStore[userId]?.all ?? ''))
+    loaded = true;
 
-  $: error = Boolean(userId && $fetchStatuses[userId] === 'error');
+  $: error = Boolean(userId && $accountFetchStatusesStore[userId]?.all === 'error');
   $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
 
   function onRowClick(

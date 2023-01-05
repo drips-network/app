@@ -11,6 +11,7 @@
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet';
   import Results from './components/results.svelte';
+  import accountFetchStatusesStore from '$lib/stores/account-fetch-statuses/account-fetch-statuses.store';
 
   let focus = false;
   let mobileSearchActive = false;
@@ -45,11 +46,10 @@
 
   let loading = true;
 
-  const { fetchStatuses } = streams;
   $: {
     const { dripsUserId } = $wallet;
 
-    if (dripsUserId && $fetchStatuses[dripsUserId] !== 'fetched') {
+    if (dripsUserId && $accountFetchStatusesStore[dripsUserId]?.all !== 'fetched') {
       loading = true;
     } else {
       loading = false;

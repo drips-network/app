@@ -3,6 +3,7 @@ import { derived, get, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
 import assert from '$lib/utils/assert';
+import type { AccountFetchStatus } from '../account-fetch-statuses/account-fetch-statuses.store';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -11,8 +12,6 @@ interface State {
     outgoing: Stream[];
   };
 }
-
-type AccountFetchStatus = 'fetching' | 'error' | 'fetched';
 
 export default (() => {
   const userId = writable<string | undefined>(undefined);
