@@ -7,17 +7,10 @@ export interface SplitsTableRow {
         component: typeof SvelteComponent;
         props: { [propName: string]: unknown };
       };
-  percent: string;
+  percent: string | boolean;
 }
 
 export interface SplitsTable {
-  splits: SplitsTableRow[];
-  splitsTotalPercent: string;
-  remainderPercent: string;
-  remainderReceiver: string;
-}
-
-export interface SplitsTableFull {
   user: string;
   incoming: {
     splits: SplitsTableRow[];
