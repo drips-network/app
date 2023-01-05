@@ -298,6 +298,20 @@
     background-color: var(--color-foreground-level-1);
   }
 
+  @media (max-width: 768px) {
+    .part .right {
+      padding: var(--spacing-s);
+      overflow: scroll;
+      width: 80vw;
+    }
+
+    .part .right img {
+      width: 1000px;
+      max-width: none;
+      padding: var(--spacing-m);
+    }
+  }
+
   .in-use {
     display: flex;
     flex-direction: column;
