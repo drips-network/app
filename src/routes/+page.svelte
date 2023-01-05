@@ -191,6 +191,7 @@
     --border-radius: 0.5rem;
     --border-radius-full: 100rem;
     --border-radius-pointy: 2rem 0 2rem 2rem;
+    --border-radius-pointy-inner: 1rem 0 1rem 1rem;
 
     --border-width: 1px;
 
@@ -266,13 +267,24 @@
     font-size: var(--font-size-xl);
     font-family: var(--font-serif);
     border: var(--border-width) solid var(--color-foreground);
-    padding: var(--spacing-xl) var(--spacing-s);
+    padding: var(--spacing-l) var(--spacing-l);
     text-align: center;
     border-radius: var(--border-radius-pointy);
   }
 
+  @media (min-width: 1200px) {
+    .part {
+      padding: var(--spacing-xl) var(--spacing-xl);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .part {
+      padding: var(--spacing-s) var(--spacing-s);
+    }
+  }
+
   .part .left {
-    /* width: 100%; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -282,7 +294,7 @@
   .part .right {
     width: 100%;
     padding: var(--spacing-l);
-    border-radius: var(--border-radius-pointy);
+    border-radius: var(--border-radius-pointy-inner);
     background-color: var(--color-foreground-level-1);
   }
 
@@ -399,7 +411,7 @@
   }
 
   .columns-item img.image {
-    border-radius: 1rem 0 1rem 1rem;
+    border-radius: var(--border-radius-pointy-inner);
   }
 
   #credit {
