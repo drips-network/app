@@ -216,7 +216,7 @@
 
   @media (max-width: 768px) {
     #home {
-      padding: var(--spacing-m) var(--spacing-l);
+      padding: var(--spacing-m) var(--spacing-m);
     }
   }
 
