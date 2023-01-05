@@ -42,11 +42,13 @@
   let amount: string | undefined;
   let amountWei: bigint | undefined;
   let withdrawAll = false;
-  $: if (withdrawAll)
+  $: if (withdrawAll) {
     amount = formatUnits(
       estimate.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
       tokenInfo.info.decimals,
     );
+  }
+
   $: if (amount) amountWei = parseTokenAmount(amount, tokenInfo.info.decimals);
 
   let validationState: TextInputValidationState;
