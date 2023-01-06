@@ -281,6 +281,7 @@
   @media (max-width: 900px) {
     .part {
       padding: var(--spacing-s) var(--spacing-s);
+      width: 100vw;
     }
   }
 
@@ -327,7 +328,7 @@
 
   .links span {
     border: 1px solid var(--color-foreground);
-    padding: var(--spacing-s) var(--spacing-l);
+    padding: var(--spacing-s) var(--spacing-m);
     font-family: var(--typeface-regular);
     font-size: var(--font-size-s);
     border-radius: var(--border-radius-pointy);
@@ -406,7 +407,7 @@
   @media (max-width: 900px) {
     .columns-item {
       height: auto;
-      width: 100%;
+      width: 100vw;
     }
   }
 
