@@ -147,12 +147,12 @@
     <h1 class="headline">What’s <span class="pixelated">new</span></h1>
     <ThreeDrip />
     <div class="links">
-      <a href="/">The Drips team presented at DevCon 22</a>
-      <a href="/">Drips JS-SDK ready for use!</a>
-      <a href="/">Version 0.2 released</a>
-      <a href="/">Drips get-together at EthCC</a>
-      <a href="/">The alpha version of our SDK is released</a>
-      <a href="/">Protocol v2 now on Goerli Testnet</a>
+      <span>The Drips team presented at DevCon 22</span>
+      <span>Drips JS-SDK ready for use!</span>
+      <span>Version 0.2 released</span>
+      <span>Drips get-together at EthCC</span>
+      <span>The alpha version of our SDK is released</span>
+      <span>Protocol v2 now on Goerli Testnet</span>
     </div>
     <div id="credit">
       <p>made by</p>
@@ -325,7 +325,7 @@
     gap: var(--spacing-s);
   }
 
-  .links a {
+  .links span {
     border: 1px solid var(--color-foreground);
     padding: var(--spacing-s) var(--spacing-l);
     font-family: var(--typeface-regular);
@@ -334,10 +334,10 @@
     white-space: nowrap;
   }
 
-  .links a:hover {
+  /* .links span:hover {
     background-color: var(--color-primary);
     color: white;
-  }
+  } */
 
   .top-drips {
     display: flex;

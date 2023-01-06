@@ -108,7 +108,7 @@
   @media (max-width: 900px) {
     svg {
       bottom: -35px;
-      right: -22px;
+      right: -60px;
     }
   }
 </style>
