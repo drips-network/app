@@ -65,6 +65,12 @@
     background-color: var(--color-background);
   }
 
+  @media only screen and (max-width: 768px) {
+    .mock-dashboard-container {
+      width: calc(100% - var(--spacing-m) * 2);
+    }
+  }
+
   .mock-dashboard {
     display: flex;
     justify-content: center;
@@ -90,6 +96,13 @@
     position: absolute;
     bottom: var(--spacing-m);
     right: var(--spacing-m);
+  }
+
+  @media only screen and (max-width: 768px) {
+    .bottom-left,
+    .bottom-right {
+      display: none;
+    }
   }
 
   .top-left {

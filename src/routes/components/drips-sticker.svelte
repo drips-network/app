@@ -111,4 +111,10 @@
       right: -60px;
     }
   }
+  @media (max-width: 600px) {
+    svg {
+      bottom: -35px;
+      right: -120px;
+    }
+  }
 </style>
