@@ -302,7 +302,7 @@
     .part .right {
       padding: var(--spacing-s);
       overflow: scroll;
-      width: 80vw;
+      width: 87vw;
     }
 
     .part .right img {
