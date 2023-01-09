@@ -1,430 +1,443 @@
-<script lang="ts">
-  import RadicleLogo from './components/radicle-logo.svelte';
-  import ThreeDrip from './components/three-drip.svelte';
-  import MultiToken from './components/multi-token.svelte';
-  import NoWrappedTokens from './components/no-wrapped-tokens.svelte';
-  import Multichain from './components/multichain.svelte';
-  import GasOptimized from './components/gas-optimized.svelte';
-  import OneContract from './components/one-contract.svelte';
-  import OneBalance from './components/one-balance.svelte';
-  import DotsStarsLine from './components/dots-stars-line.svelte';
-  import HeroSection from './components/hero-section.svelte';
-  import DripsSticker from './components/drips-sticker.svelte';
-  import DripsLogo from '$lib/components/header/drips-logo.svelte';
+<script>
+  import MultiToken from './illustrations/multi-token.svelte';
+  import ImageAndCaption from './components/image-and-caption.svelte';
+  import LpCard from './components/lp-card/lp-card.svelte';
+  import LpHeader from './components/lp-header.svelte';
+
+  import ThreeDrips from './illustrations/three-drips.svelte';
+  import GasOptimized from './illustrations/gas-optimized.svelte';
+  import OneContract from './illustrations/one-contract.svelte';
+  import NoWrappedTokens from './illustrations/no-wrapped-tokens.svelte';
+  import MultiChain from './illustrations/multi-chain.svelte';
+  import OneBalance from './illustrations/one-balance.svelte';
+  import MockDashboard from './components/mock-dashboard/mock-dashboard.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import CodeExample from './components/code-example.svelte';
+  import LpSectionHeader from './components/lp-section-header.svelte';
+  import RadicleLogo from './illustrations/radicle-logo.svelte';
+  import DripsSticker from './illustrations/drips-sticker.svelte';
+  import themeStore from '$lib/stores/theme/theme.store';
+
+  $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
 </script>
 
 <svelte:head>
   <title>Drips • Stream and Split Funds on Ethereum</title>
   <meta
     name="description"
-    value="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
   />
 </svelte:head>
 
-<div id="home">
-  <div id="header">
-    <a id="logo" href="/">
-      <DripsLogo />
-    </a>
-    <ul>
-      <li><a href="https://github.com/radicle-dev" target="_blank">Code</a></li>
-      <li>
-        <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank">Docs</a>
-      </li>
-      <li><a class="cta" href="/app">App↗</a></li>
-    </ul>
-  </div>
-  <!-- closes header -->
-
-  <div class="top-drips">
-    <ThreeDrip />
-  </div>
-
-  <HeroSection />
-
-  <section class="columns">
-    <h1 class="headline"><span class="pixelated">How</span> it works</h1>
-    <div class="columns-row">
-      <div class="columns-item">
-        <MultiToken />
-        <h2 class="headline"><span class="pixelated">Multi-Token</span></h2>
-        <p>Stream or split any ERC-20 like WETH, DAI or USDC.</p>
-      </div>
-      <div class="columns-item">
-        <GasOptimized />
-        <h2 class="headline">
-          <span class="pixelated">Optimized for <br />1000s of senders</span>
-        </h2>
-        <p>
-          Most protocols focus on 1:1 streaming. Drips optimizes for thousands of senders, like many
-          followers → one creator.
-        </p>
-      </div>
-      <div class="columns-item">
-        <OneContract />
-        <h2 class="headline">
-          <span class="pixelated">One Contract.<br />One Payment Graph.</span>
-        </h2>
-        <p>
-          Drips uses one smart contract for streaming and splitting, enabling effortless and
-          flexible token routing.
-        </p>
-      </div>
+<div id="lp">
+  <div id="wrapper">
+    <div><LpHeader /></div>
+    <div class="align-right hide-mobile">
+      <ThreeDrips />
     </div>
-    <!-- closes columns row -->
-    <div class="columns-row">
-      <div class="columns-item">
-        <NoWrappedTokens />
-        <h2 class="headline"><span class="pixelated">No need to wrap tokens</span></h2>
-        <p>
-          Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your tokens.
-        </p>
-      </div>
-      <div class="columns-item">
-        <Multichain />
-        <h2 class="headline"><span class="pixelated">Multi-Chain</span></h2>
-        <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
-      </div>
-      <div class="columns-item">
-        <OneBalance />
-        <h2 class="headline">
-          <span class="pixelated">One balance for<br />all your streams</span>
-        </h2>
-        <p>Fund multiple streams using one account balance in a single transaction.</p>
-      </div>
-    </div>
-    <!-- closes columns row -->
-  </section>
-  <!-- closes how it works columns section -->
-
-  <section class="part developers">
-    <div class="left">
-      <ThreeDrip />
-      <h1 class="headline">Built for <span class="pixelated">developers</span></h1>
-      <p>Integrating Drips into your app is extremely easy with the JavaScript SDK.</p>
-      <a class="cta" href="https://github.com/radicle-dev/drips-js-sdk" target="_blank"
-        >Check out the SDK↗</a
+    <section>
+      <LpCard stars>
+        <div id="hero">
+          <h1>
+            <span class="standard-font">An</span> Ethereum
+            <span class="standard-font">protocol for</span>
+            streaming <span class="standard-font">and</span> splitting
+            <span class="standard-font">funds.</span>
+          </h1>
+          <div id="beta-notice">
+            <p class="typo-text">
+              Drips V2 is currently in Beta and available on testnets only. <a
+                href="https://drips.network"
+                class="typo-link"
+                target="_blank">Check out Drips V1</a
+              >
+            </p>
+          </div>
+          <div id="mock-dashboard">
+            <MockDashboard />
+          </div>
+        </div>
+      </LpCard>
+    </section>
+    <section class="grid">
+      <LpCard
+        ><ImageAndCaption background>
+          <MultiToken slot="image" />
+          <div slot="caption" class="text-container">
+            <h3>Multi-token</h3>
+            <p>Stream or split any ERC-20 like WETH, DAI or USDC.</p>
+          </div>
+        </ImageAndCaption></LpCard
       >
-    </div>
-    <div class="right">
-      <img src="/assets/code-snippet.svg" alt="Code snippet" />
-    </div>
-  </section>
-
-  <DotsStarsLine>
-    <div class="in-use">
-      <h1 class="headline">Drips <span class="pixelated">in use</span></h1>
-      <p>Some cool projects built on the Drips protocol.</p>
-    </div>
-  </DotsStarsLine>
-
-  <section class="columned-layout">
-    <div class="columns-row">
-      <div class="columns-item card">
-        <img class="image" src="/assets/rad-radio.jpg" alt="Step 1" />
-        <h2 class="headline"><span class="pixelated">Crowdfunding</span></h2>
-        <p>
-          <strong>rad.lol</strong> collected tips for DJs streaming on <strong>HÖR</strong> radio
-        </p>
-        <a href="http://rad.lol" target="_blank">rad.lol</a>
+      <LpCard
+        ><ImageAndCaption background>
+          <GasOptimized slot="image" />
+          <div slot="caption" class="text-container">
+            <h3>Optimized for 1000s of senders</h3>
+            <p>
+              Most protocols focus on 1:1 streaming. Drips optimizes for thousands of senders, like
+              many followers → one creator.
+            </p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <OneContract slot="image" />
+          <div slot="caption" class="text-container">
+            <h3>One Contract. One Payment Graph.</h3>
+            <p>
+              Drips uses one smart contract for streaming and splitting, enabling effortless and
+              flexible token routing.
+            </p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <NoWrappedTokens slot="image" />
+          <div slot="caption" class="text-container">
+            <h3>No need to wrap tokens</h3>
+            <p>
+              Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your
+              tokens.
+            </p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <MultiChain slot="image" />
+          <div slot="caption" class="text-container">
+            <h3>Multi-Chain</h3>
+            <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <OneBalance slot="image" />
+          <div slot="caption" class="text-container">
+            <h3>One balance for all your streams</h3>
+            <p>Fund multiple streams using one account balance in a single transaction.</p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+    </section>
+    <section data-theme={codeSectionTheme}>
+      <LpCard>
+        <div class="card-standard-padding centered text-container background-color">
+          <ThreeDrips />
+          <h2>Build on Drips</h2>
+          <p class="text-foreground">
+            Integrating Drips into your app is easy with the JavaScript SDK.
+          </p>
+          <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank"
+            ><Button variant="primary">Check out the SDK</Button></a
+          >
+        </div>
+        <div id="code-example-wrapper">
+          <div id="code-example">
+            <div class="inner">
+              <CodeExample />
+            </div>
+          </div>
+        </div>
+      </LpCard>
+    </section>
+    <section>
+      <LpSectionHeader>
+        <div class="text-container centered">
+          <h2>Drips in use</h2>
+          <p>Some cool projects built on the Drips protocol.</p>
+        </div>
+      </LpSectionHeader>
+      <div class="grid">
+        <LpCard
+          ><ImageAndCaption>
+            <img slot="image" src="/assets/rad-radio.jpg" alt="Rad Radio Logo" />
+            <div slot="caption" class="text-container">
+              <h3>Crowdfunding</h3>
+              <p>rad.lol collected tips for DJs streaming on HÖR radio.</p>
+              <a class="typo-link" href="https://rad.lol" target="_blank">rad.lol</a>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption>
+            <img slot="image" src="/assets/wonder.jpg" alt="Wonder Logo" />
+            <div slot="caption" class="text-container">
+              <h3>DAO payments</h3>
+              <p>Wonder streams funds from DAOs using Drips</p>
+              <a class="typo-link" href="https://wonderverse.xyz" target="_blank">wonderverse.xyz</a
+              >
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption>
+            <img slot="image" src="/assets/gitcoin.jpg" alt="Gitcoin Logo" />
+            <div slot="caption" class="text-container">
+              <h3>Grant splitting</h3>
+              <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
+              <a class="typo-link" href="https://gitcoin.co" target="_blank">gitcoin.co</a>
+            </div>
+          </ImageAndCaption></LpCard
+        >
       </div>
-      <div class="columns-item card">
-        <img class="image" src="/assets/wonder.jpg" alt="Step 1" />
-        <h2 class="headline"><span class="pixelated">DAO payments</span></h2>
-        <p><strong>Wonder</strong> streams funds from DAOs using Drips</p>
-        <a href="http://wonderverse.xyz" target="_blank">wonderverse.xyz</a>
+    </section>
+    <section>
+      <LpSectionHeader>
+        <div class="text-container centered">
+          <h2>Stay up to date</h2>
+          <div class="flex gap-4">
+            <a href="https://twitter.com/dripsnetwork" target="_blank"
+              ><Button variant="primary">Twitter</Button></a
+            >
+            <a href="https://discord.gg/vhGXkazpNc" target="_blank"
+              ><Button variant="primary">Discord</Button></a
+            >
+          </div>
+        </div>
+      </LpSectionHeader>
+    </section>
+    <section class="mt-8 mb-64">
+      <div class="flex flex-col gap-4 items-center">
+        <p class="text-foreground-level-5">Made by</p>
+        <RadicleLogo />
       </div>
-      <div class="columns-item card">
-        <img class="image" src="/assets/gitcoin.jpg" alt="Step 1" />
-        <h2 class="headline"><span class="pixelated">Grant Splitting</span></h2>
-        <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
-        <a href="http://gitcoin.co" target="_blank">gitcoin.co</a>
+      <div id="drips-sticker">
+        <div class="illustration">
+          <DripsSticker />
+        </div>
       </div>
-    </div>
-  </section>
-
-  <section class="part">
-    <h1 class="headline">What’s <span class="pixelated">new</span></h1>
-    <ThreeDrip />
-    <div class="links">
-      <a href="/">The Drips team presented at DevCon 22</a>
-      <a href="/">Drips JS-SDK ready for use!</a>
-      <a href="/">Version 0.2 released</a>
-      <a href="/">Drips get-together at EthCC</a>
-      <a href="/">The alpha version of our SDK is released</a>
-      <a href="/">Protocol v2 now on Goerli Testnet</a>
-    </div>
-    <div id="credit">
-      <p>made by</p>
-      <RadicleLogo />
-    </div>
-    <div id="sticker">
-      <DripsSticker />
-    </div>
-  </section>
-
-  <DotsStarsLine>
-    <h1 class="headline">Stay <span class="pixelated">up to date</span></h1>
-    <div class="links">
-      <a href="https://twitter.com/dripsnetwork">Twitter</a>
-      <a href="https://discord.gg/vhGXkazpNc">Discord</a>
-    </div>
-  </DotsStarsLine>
+    </section>
+  </div>
 </div>
 
-<!-- closes home -->
 <style>
-  #home {
+  #lp {
     --spacing-xs: 0.5rem;
     --spacing-s: 1rem;
     --spacing-m: 1.5rem;
     --spacing-l: 3rem;
     --spacing-xl: 6rem;
 
-    --font-size-s: 1rem;
-    --font-size-m: 1.5rem;
-    --font-size-l: 2rem;
-    --font-size-xl: 3rem;
+    --border-radius-pointy: 2rem 0 2rem 2rem;
+    --border-radius-pointy-inner: 1rem 0 1rem 1rem;
 
     --font-serif: 'Redaction 50';
 
-    --border-radius: 0.5rem;
-    --border-radius-full: 100rem;
-    --border-radius-pointy: 2rem 0 2rem 2rem;
-
-    --border-width: 1px;
-
-    padding: var(--spacing-s) var(--spacing-xl);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-s);
-    max-width: 1600px;
-    margin: 0 auto;
-
-    animation: slideIn 1s;
+    --font-size-s: 1rem;
+    --font-size-m: 1.5rem;
+    --font-size-l: 2.5rem;
+    --font-size-xl: 3rem;
   }
 
-  *::selection {
-    background: var(--color-primary);
+  h1,
+  h2,
+  h3 {
     color: var(--color-foreground);
-  }
-
-  .headline {
     font-weight: normal;
-    font-family: var(--typeface-regular);
-  }
-
-  @media (max-width: 768px) {
-    #home {
-      padding: var(--spacing-m) var(--spacing-l);
-    }
-  }
-
-  #header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: var(--border-width) solid var(--color-foreground);
-    padding: var(--spacing-s) 12px var(--spacing-s) var(--spacing-m);
-    border-radius: var(--border-radius-pointy);
-  }
-
-  #header ul {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    text-transform: uppercase;
-  }
-
-  #header li {
-    margin-left: var(--spacing-s);
-  }
-
-  a.cta {
-    background-color: var(--color-primary);
-    padding: var(--spacing-xs) var(--spacing-s);
-    border-radius: var(--border-radius-pointy);
-    font-family: var(--typeface-regular);
-    font-size: var(--font-size-s);
-    color: white;
-  }
-
-  a.cta:hover {
-    background-color: var(--color-foreground);
-    color: var(--color-background);
-  }
-
-  .part {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: var(--spacing-l) 0;
-    gap: var(--spacing-m);
-    margin-top: 0;
-    font-size: var(--font-size-xl);
-    font-family: var(--font-serif);
-    border: var(--border-width) solid var(--color-foreground);
-    padding: var(--spacing-xl) var(--spacing-s);
-    text-align: center;
-    border-radius: var(--border-radius-pointy);
-  }
-
-  .part .left {
-    /* width: 100%; */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-m);
-  }
-
-  .part .right {
-    width: 100%;
-    padding: var(--spacing-l);
-    border-radius: var(--border-radius-pointy);
-    background-color: var(--color-foreground-level-1);
-  }
-
-  .in-use {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-s);
-  }
-
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-s);
-  }
-
-  .links a {
-    border: 1px solid var(--color-foreground);
-    padding: var(--spacing-s) var(--spacing-l);
-    font-family: var(--typeface-regular);
-    font-size: var(--font-size-s);
-    border-radius: var(--border-radius-pointy);
-    white-space: nowrap;
-  }
-
-  .links a:hover {
-    background-color: var(--color-primary);
-    color: white;
-  }
-
-  .top-drips {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  span.pixelated {
-    font-family: var(--font-serif);
   }
 
   h1 {
     font-size: var(--font-size-xl);
-    text-align: center;
-    margin: 0;
-  }
-
-  h1 span.pixelated {
-    font-size: 52px;
+    font-family: var(--font-serif);
   }
 
   h2 {
+    font-size: var(--font-size-l);
+    font-family: var(--font-serif);
+    line-height: 2.5rem;
+  }
+
+  h3 {
     font-size: var(--font-size-m);
-    margin: var(--spacing-m) 0 var(--spacing-s);
+    font-family: var(--font-serif);
   }
 
-  section.columns {
+  .standard-font {
+    font-family: var(--typeface-regular);
+  }
+
+  section {
+    position: relative;
+  }
+
+  .card-standard-padding {
+    padding: var(--spacing-l);
+  }
+
+  .centered {
+    text-align: center;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
   }
 
-  section.columns h1 {
-    margin-bottom: var(--font-size-l);
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .columns-row {
+  #wrapper {
+    max-width: 80rem;
+    width: 100vw;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-m);
+    align-items: center;
+  }
+
+  #wrapper > * {
+    width: 100%;
+  }
+
+  #hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+    text-align: center;
+    padding-top: 4rem;
+    padding-left: var(--spacing-s);
+    padding-right: var(--spacing-s);
+  }
+
+  #hero > h1 {
+    max-width: 40rem;
+  }
+
+  #hero > #beta-notice {
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+    padding: 0.75rem 1.25rem;
+    border-radius: 2rem 0 2rem 2rem;
+  }
+
+  #hero > #mock-dashboard {
+    border: 1px solid var(--color-foreground);
+    border-radius: var(--border-radius-pointy);
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: var(--spacing-l);
-    margin-bottom: var(--spacing-l);
+    justify-content: center;
+    padding-top: var(--spacing-l);
+    height: 48rem;
+    margin-bottom: calc(var(--spacing-xl) * -1 * 2);
+    transform: scale(0.85);
+    transform-origin: 50% 0;
   }
 
-  @media (max-width: 900px) {
-    .columns-row {
-      flex-direction: column;
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-m);
+  }
+
+  .align-right {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: var(--spacing-m);
+  }
+
+  #code-example-wrapper {
+    width: 100%;
+    background-color: var(--color-foreground-level-1);
+    padding: var(--spacing-m) 0 var(--spacing-s) 0;
+  }
+
+  #code-example {
+    text-align: left;
+    overflow: scroll;
+    max-width: 985px;
+    margin: var(--spacing-m) auto var(--spacing-l) auto;
+  }
+
+  #code-example > .inner {
+    padding: 0 var(--spacing-l);
+    width: fit-content;
+  }
+
+  #drips-sticker {
+    position: absolute;
+    width: 16rem;
+    height: 16rem;
+    border-radius: 8rem;
+    overflow: hidden;
+    right: 0;
+    top: 0;
+    transform: rotate(10deg);
+  }
+
+  #drips-sticker > .illustration {
+    animation: rotate 20s linear infinite;
+  }
+
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
     }
   }
 
-  .columns-item {
-    width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    flex-grow: 1;
-    flex-basis: 0;
-    border: var(--border-width) solid var(--color-foreground);
-    height: 400px;
-    border-radius: var(--border-radius-pointy);
-    padding: var(--spacing-m);
-  }
+  @media (max-width: 577px) {
+    .hide-mobile {
+      display: none;
+    }
 
-  @media (max-width: 900px) {
-    .columns-item {
-      height: auto;
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .centered {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .card-standard-padding {
+      padding: var(--spacing-m);
+    }
+
+    #hero > #mock-dashboard {
+      width: calc(100% * 1.1);
+    }
+
+    #code-example-wrapper {
       width: 100%;
+      background-color: var(--color-foreground-level-1);
+      padding: var(--spacing-s) 0 var(--spacing-s) 0;
+    }
+
+    #code-example {
+      text-align: left;
+      overflow: scroll;
+      max-width: 985px;
+      margin: var(--spacing-m) auto var(--spacing-m) auto;
+    }
+
+    #code-example > .inner {
+      padding: 0 var(--spacing-m);
+      width: fit-content;
+    }
+
+    #drips-sticker {
+      height: 12rem;
+      width: 12rem;
+      top: 8rem;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
 
-  .columns-item.card {
-    height: auto;
-  }
-
-  .columns-item.card a:hover {
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-
-  .columns-item a {
-    border-bottom: 1px solid var(--color-foreground);
-    padding-top: var(--spacing-s);
-  }
-
-  .columns-item img.image {
-    border-radius: 1rem 0 1rem 1rem;
-  }
-
-  #credit {
-    font-family: var(--typeface-regular);
-    font-size: var(--font-size-s);
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    gap: var(--spacing-s);
-    margin-top: var(--spacing-m);
-  }
-
-  h1 {
-    font-family: --var(--typeface-medium);
-    font-style: normal;
-  }
-
-  @keyframes slideIn {
+  @keyframes rotate {
     0% {
-      opacity: 0;
-      transform: translateY(1rem);
+      transform: rotate(0deg);
     }
     100% {
-      opacity: 1;
-      transform: translateY(0);
+      transform: rotate(360deg);
     }
   }
 </style>
