@@ -16,6 +16,9 @@
   import LpSectionHeader from './components/lp-section-header.svelte';
   import RadicleLogo from '../components/radicle-logo.svelte';
   import DripsSticker from './illustrations/drips-sticker.svelte';
+  import themeStore from '$lib/stores/theme/theme.store';
+
+  $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
 </script>
 
 <svelte:head>
@@ -26,22 +29,31 @@
   />
 </svelte:head>
 
-<div class="lp">
-  <div class="wrapper">
+<div id="lp">
+  <div id="wrapper">
     <div><LpHeader /></div>
     <div class="align-right hide-mobile">
       <ThreeDrips />
     </div>
     <section>
       <LpCard stars>
-        <div class="hero">
+        <div id="hero">
           <h1>
             <span class="standard-font">An</span> Ethereum
             <span class="standard-font">protocol for</span>
             streaming <span class="standard-font">and</span> splitting
             <span class="standard-font">funds.</span>
           </h1>
-          <div class="mock-dashboard">
+          <div id="beta-notice">
+            <p class="typo-text">
+              Drips V2 is currently in Beta and available on testnets only. <a
+                href="https://drips.network"
+                class="typo-link"
+                target="_blank">Check out Drips V1</a
+              >
+            </p>
+          </div>
+          <div id="mock-dashboard">
             <MockDashboard />
           </div>
         </div>
@@ -112,7 +124,7 @@
         </ImageAndCaption></LpCard
       >
     </section>
-    <section data-theme="dark">
+    <section data-theme={codeSectionTheme}>
       <LpCard>
         <div class="card-standard-padding centered text-container background-color">
           <ThreeDrips />
@@ -124,8 +136,8 @@
             ><Button variant="primary">Check out the SDK</Button></a
           >
         </div>
-        <div class="code-example-wrapper">
-          <div class="code-example">
+        <div id="code-example-wrapper">
+          <div id="code-example">
             <div class="inner">
               <CodeExample />
             </div>
@@ -204,7 +216,7 @@
 </div>
 
 <style>
-  .lp {
+  #lp {
     --spacing-xs: 0.5rem;
     --spacing-s: 1rem;
     --spacing-m: 1.5rem;
@@ -270,7 +282,7 @@
     gap: 1rem;
   }
 
-  .wrapper {
+  #wrapper {
     max-width: 80rem;
     width: 100vw;
     margin: 0 auto;
@@ -281,11 +293,11 @@
     align-items: center;
   }
 
-  .wrapper > * {
+  #wrapper > * {
     width: 100%;
   }
 
-  .hero {
+  #hero {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -296,11 +308,18 @@
     padding-right: var(--spacing-s);
   }
 
-  .hero > h1 {
+  #hero > h1 {
     max-width: 40rem;
   }
 
-  .hero > .mock-dashboard {
+  #hero > #beta-notice {
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+    padding: 0.75rem 1.25rem;
+    border-radius: 2rem 0 2rem 2rem;
+  }
+
+  #hero > #mock-dashboard {
     border: 1px solid var(--color-foreground);
     border-radius: var(--border-radius-pointy);
     width: 100%;
@@ -325,20 +344,20 @@
     padding-right: var(--spacing-m);
   }
 
-  .code-example-wrapper {
+  #code-example-wrapper {
     width: 100%;
     background-color: var(--color-foreground-level-1);
     padding: var(--spacing-m) 0 var(--spacing-s) 0;
   }
 
-  .code-example {
+  #code-example {
     text-align: left;
     overflow: scroll;
     max-width: 985px;
     margin: var(--spacing-m) auto var(--spacing-l) auto;
   }
 
-  .code-example > .inner {
+  #code-example > .inner {
     padding: 0 var(--spacing-l);
     width: fit-content;
   }
@@ -382,24 +401,24 @@
       padding: var(--spacing-m);
     }
 
-    .hero > .mock-dashboard {
+    #hero > #mock-dashboard {
       width: calc(100% * 1.1);
     }
 
-    .code-example-wrapper {
+    #code-example-wrapper {
       width: 100%;
       background-color: var(--color-foreground-level-1);
       padding: var(--spacing-s) 0 var(--spacing-s) 0;
     }
 
-    .code-example {
+    #code-example {
       text-align: left;
       overflow: scroll;
       max-width: 985px;
       margin: var(--spacing-m) auto var(--spacing-m) auto;
     }
 
-    .code-example > .inner {
+    #code-example > .inner {
       padding: 0 var(--spacing-m);
       width: fit-content;
     }
