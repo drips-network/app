@@ -101,7 +101,7 @@
     transform: rotate(15deg);
     position: absolute;
     position: absolute;
-    bottom: -16px;
+    bottom: -46px;
     right: 80px;
   }
 
