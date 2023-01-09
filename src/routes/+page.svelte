@@ -407,7 +407,7 @@
   @media (max-width: 900px) {
     .columns-item {
       height: auto;
-      width: 100vw;
+      width: 100%;
     }
   }
 
