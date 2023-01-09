@@ -12,11 +12,11 @@ const <span class="name">setDripsTx</span> = <span class="await">await</span> <s
     <span class="name">transferToAddress</span>,
     <span class="name">topUpAmount</span>,
 );
-await <span class="name">setDripsTx</span>.<span class="name">wait</span>();
+<span class="await">await</span> <span class="name">setDripsTx</span>.<span class="name">wait</span>();
 
 // Configure sub-account to split incoming funds.
 const <span class="name">setSplitsTx</span> = <span class="await">await</span> <span class="name">nftDriverClient</span>.<span class="function">setSplits</span>(<span class="name">subAccountId</span>, <span class="name">splitsReceivers</span>);
-await <span class="name">setSplitsTx</span>.<span class="name">wait</span>();
+<span class="await">await</span> <span class="name">setSplitsTx</span>.<span class="name">wait</span>();
 </code>
 
 <style>

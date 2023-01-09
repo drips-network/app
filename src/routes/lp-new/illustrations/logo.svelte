@@ -15,11 +15,13 @@
 </svg>
 
 <style>
-  svg {
-    width: 100%;
-  }
-
   svg * {
     fill: var(--color-primary);
+  }
+
+  @media (max-width: 577px) {
+    svg {
+      width: 100%;
+    }
   }
 </style>
