@@ -25,6 +25,6 @@
 
 <style>
   svg {
-    fill: var(--color-foreground);
+    fill: var(--color-foreground-level-5);
   }
 </style>
