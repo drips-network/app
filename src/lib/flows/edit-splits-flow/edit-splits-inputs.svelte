@@ -3,13 +3,10 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
-  import type { SplitsEntry } from '$lib/stores/splits/types';
-  import type { UserId } from '$lib/stores/streams/types';
-  import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import { AddressDriverClient, type SplitsReceiverStruct } from 'radicle-drips';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
   import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
@@ -18,6 +15,10 @@
   import wallet from '$lib/stores/wallet';
   import { createEventDispatcher } from 'svelte';
   import Emoji from '$lib/components/emoji/emoji.svelte';
+  import type { Writable } from 'svelte/store';
+  import type { EditSplitsFlowState } from './edit-splits-flow-state';
+
+  export let context: Writable<EditSplitsFlowState>;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -30,36 +31,21 @@
     return { receiver: { value: '', type: 'unvalidated' }, amount: undefined };
   };
 
-  let userId: string;
-  let splitsInputs: SplitInput[] = [emptyRow(), emptyRow()];
-  let currentSplits: SplitsEntry[] | undefined;
+  let splitsInputs: SplitInput[] = [];
   let validationError: string;
 
-  const init = async () => {
-    const client = await getAddressDriverClient();
-    userId = (await client.getUserId()).toString();
-    return getCurrentSplits(userId);
-  };
-
-  async function getCurrentSplits(userId: UserId) {
-    currentSplits = undefined;
-
-    const subgraphClient = getSubgraphClient();
-    currentSplits = await subgraphClient.getSplitsConfigByUserId(userId);
-
-    if (currentSplits.length) {
-      splitsInputs = [];
-      // format each split as input row...
-      currentSplits.forEach(async (s) => {
-        const row = emptyRow();
-        row.receiver.value = AddressDriverClient.getUserAddress(s.userId);
-        row.receiver.type = 'valid';
-        row.amount = Number(Number(getSplitPercent(s.weight)).toFixed(2));
-        splitsInputs = [...splitsInputs, row];
-      });
-
-      isValidAddresses = true;
-    }
+  if ($context.splits.length) {
+    // fill-in existing splits?
+    $context.splits.forEach(async (s) => {
+      const row = emptyRow();
+      row.receiver.value = AddressDriverClient.getUserAddress(s.userId);
+      row.receiver.type = 'valid';
+      row.amount = Number(Number(getSplitPercent(s.weight)));
+      splitsInputs = [...splitsInputs, row];
+    });
+  } else {
+    // start empty
+    splitsInputs.push(emptyRow());
   }
 
   function addRow() {
@@ -74,13 +60,16 @@
   $: totalPercent = splitsInputs.reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
   $: isValidPercents = totalPercent <= 100;
 
+  $: nonEmptyAddressInputsCount = splitsInputs.filter((r) => r.receiver.value.length).length;
+
   $: isValidAddresses =
-    splitsInputs.filter((row) => row.receiver.type === 'valid').length === splitsInputs.length;
+    splitsInputs.filter((row) => row.receiver.value.length && row.receiver.type === 'valid')
+      .length === nonEmptyAddressInputsCount;
 
   $: isValidForm =
     isValidPercents &&
     isValidAddresses &&
-    !splitsInputs.filter((s) => s.receiver.value.length <= 1).length &&
+    // !splitsInputs.filter((s) => s.receiver.value.length <= 1).length &&
     !splitsInputs.find((s) => Number(s.amount) === 0);
 
   $: allAddresses = splitsInputs.map((row) => row.receiver.value);
@@ -135,106 +124,103 @@
 <StepLayout>
   <StepHeader headline="Edit splits" description="Split your incoming funds with others!" />
 
-  {#await init()}
-    <div class="h-32 flex items-center justify-center">
-      <Spinner />
+  <section>
+    <div
+      class="grid grid-cols-10 gap-2 typo-text-bold text-left"
+      style="color: var(--color-foreground)"
+    >
+      <div class="col-span-8">Recipients</div>
+      <div class="hidden md:block">Percents</div>
     </div>
-  {:then}
-    <section>
-      <div
-        class="grid grid-cols-10 gap-2 typo-text-bold text-left"
-        style="color: var(--color-foreground)"
-      >
-        <div class="col-span-8">Recipient*</div>
-        <div>Percent*</div>
-      </div>
-      {#each splitsInputs as splitInput, index}
-        <div class="grid grid-cols-10 gap-2 my-3 items-start">
-          <!-- address input -->
-          <div class="col-span-8">
-            <label class="sr-only" for="control">Recipient</label>
-            <InputAddress
-              bind:value={splitInput.receiver.value}
-              on:validationChange={(e) => {
-                splitInput.receiver.type = e.detail.type;
-              }}
-              exclude={{
-                addresses: allAddresses.filter((_, i) => i !== index),
-                msg: 'Duplicate recipient.',
-              }}
+    {#each splitsInputs as splitInput, index}
+      <div class="md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
+        <!-- address input -->
+        <div class="col-span-6 md:col-span-8">
+          <label class="sr-only" for="control">Recipient</label>
+          <InputAddress
+            bind:value={splitInput.receiver.value}
+            on:validationChange={(e) => {
+              splitInput.receiver.type = e.detail.type;
+            }}
+            exclude={{
+              addresses: allAddresses.filter((_, i) => i !== index),
+              msg: 'Duplicate recipient.',
+            }}
+          />
+        </div>
+
+        <!-- percent input -->
+        <div class="mt-1.5 md:mt-0 col-span-4 md:col-span-2 flex gap-2 items-center">
+          <div class="flex-1 text-right">
+            <label class="sr-only" for="control">Percent</label>
+            <!-- TODO add max attribute to design system :( -->
+            <TextInput
+              variant={{ type: 'number', min: 0 }}
+              bind:value={splitInput.amount}
+              placeholder="%"
             />
           </div>
-          <!-- percent input -->
-          <div class="col-span-2 flex gap-2 items-center">
-            <div class="flex-1">
-              <label class="sr-only" for="control">Percent</label>
-              <!-- TODO add max attribute to design system :( -->
-              <TextInput
-                variant={{ type: 'number', min: 0 }}
-                bind:value={splitInput.amount}
-                placeholder="%"
-              />
-            </div>
-            <!-- remove row btn -->
-            <div>
-              <Button on:click={() => removeRow(index)} icon={Cross} />
-            </div>
+          <!-- remove row btn -->
+          <div>
+            <Button on:click={() => removeRow(index)} icon={Cross} />
           </div>
         </div>
-      {/each}
-      <div class="mt-3">
-        <Button on:click={addRow} icon={Plus}>Add recipient</Button>
       </div>
-    </section>
+    {/each}
+    <div class="mt-3">
+      <Button on:click={addRow} icon={Plus}>Add recipient</Button>
+    </div>
+  </section>
 
-    <section>
-      <h6 class="typo-text-bold text-left mb-3" style="color:var(--color-foreground-level-6)">
-        Review
-      </h6>
-      <!-- animating bar -->
-      <div class="flex w-full gap-[3.5px]">
-        <!-- your share -->
-        <div
-          class="h-10 overflow-hidden flex items-center justify-start rounded-md transition-all duration-200"
-          style="background: var(--color-primary-level-2); flex-basis: {Math.max(
-            100 - totalPercent,
-            0,
-          )}%;"
-        >
-          <div hidden={100 - totalPercent < 11} class="px-2.5">
-            {Math.max(100 - totalPercent, 0)
-              .toFixed(2)
-              .replace('.00', '')}%
-          </div>
-        </div>
-        <!-- splits total share -->
-        <div
-          class="h-10 overflow-hidden flex items-center justify-end rounded-md transition-all duration-200"
-          style="background: {totalPercent > 100
-            ? 'var(--color-negative)'
-            : 'var(--color-primary)'}; flex-basis: {Math.min(totalPercent, 100)}%;"
-        >
-          <div hidden={totalPercent < 11} class="px-2.5">
-            {totalPercent.toFixed(2).replace('.00', '')}%
-          </div>
+  <section>
+    <h6 class="typo-text-bold text-left mb-3" style="color:var(--color-foreground-level-6)">
+      Review
+    </h6>
+    <!-- animating bar -->
+    <div class="flex w-full gap-[3.5px]">
+      <!-- your share -->
+      <div
+        class="h-10 overflow-hidden flex items-center justify-start rounded-md transition-all duration-200"
+        style="background: var(--color-primary-level-2); flex-basis: {Math.max(
+          100 - totalPercent,
+          0,
+        )}%;"
+      >
+        <div hidden={100 - totalPercent < 11} class="px-2.5">
+          {totalPercent > 0 && totalPercent < 0.01
+            ? '>99.99'
+            : Math.max(100 - totalPercent, 0)
+                .toFixed(2)
+                .replace('.00', '')}%
         </div>
       </div>
-      <!-- bar labels -->
-      <div class="mt-1.5 px-1.5 flex justify-between typo-text-bold">
-        <div style:opacity={totalPercent >= 100 ? '0.4' : '1'}>You</div>
-        <div style:opacity={totalPercent <= 0 ? '0.4' : '1'}>
-          {splitsInputs.length} account{splitsInputs.length > 1 ? 's' : ''}
+      <!-- splits total share -->
+      <div
+        class="h-10 overflow-hidden flex items-center justify-end rounded-md transition-all duration-200"
+        style="background: {totalPercent > 100
+          ? 'var(--color-negative)'
+          : 'var(--color-primary)'}; flex-basis: {Math.max(1, Math.min(totalPercent, 100))}%;"
+      >
+        <div hidden={totalPercent < 11} class="px-2.5">
+          {totalPercent.toFixed(2).replace('.00', '')}%
         </div>
       </div>
-      <!-- error msgs -->
-      {#if validationError || !isValidPercents}
-        <div class="mt-1" style="color: var(--color-negative);">
-          {#if !isValidPercents}<div>Total percent cannot exceed 100%.</div>{/if}
-          {#if validationError}<div>{validationError}</div>{/if}
-        </div>
-      {/if}
-    </section>
-  {/await}
+    </div>
+    <!-- bar labels -->
+    <div class="mt-1.5 px-1.5 flex justify-between typo-text-bold">
+      <div style:opacity={totalPercent >= 100 ? '0.4' : '1'}>You</div>
+      <div style:opacity={totalPercent <= 0 ? '0.4' : '1'}>
+        {nonEmptyAddressInputsCount} account{nonEmptyAddressInputsCount > 1 ? 's' : ''}
+      </div>
+    </div>
+    <!-- error msgs -->
+    {#if validationError || !isValidPercents}
+      <div class="mt-1" style="color: var(--color-negative);">
+        {#if !isValidPercents}<div>Total percent cannot exceed 100%.</div>{/if}
+        {#if validationError}<div>{validationError}</div>{/if}
+      </div>
+    {/if}
+  </section>
 
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')}>Cancel</Button>
