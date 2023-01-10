@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SvelteComponent } from 'svelte';
 
-  export let variant: 'normal' | 'primary' | 'destructive' = 'normal';
+  export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;

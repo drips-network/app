@@ -48,6 +48,7 @@
       tokenInfo.info.decimals,
     );
   }
+
   $: if (amount) amountWei = parseTokenAmount(amount, tokenInfo.info.decimals);
 
   let validationState: TextInputValidationState;

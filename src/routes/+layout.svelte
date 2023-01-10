@@ -41,5 +41,6 @@
     min-width: 100vw;
     background-color: var(--color-background);
     color: var(--color-foreground);
+    overflow: hidden;
   }
 </style>
