@@ -19,7 +19,7 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import tokens from '$lib/stores/tokens';
-  import accountFetchStatusesStore from '$lib/stores/account-fetch-statuses/account-fetch-statuses.store';
+  import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -157,7 +157,7 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  $: fetchStatus = userId ? $accountFetchStatusesStore[userId] : undefined;
+  $: fetchStatus = userId ? $accountFetchStatussesStore[userId] : undefined;
 
   // As soon as the given account has been fetched at least once, display content.
   let loaded = false;

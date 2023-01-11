@@ -34,11 +34,11 @@ type State = {
  * is fetched in both stores, and either `fetching` or `error` if one of those is the status in either
  * store.
  */
-const store = derived<[typeof streams.fetchStatuses, typeof balances.fetchStatuses], State>(
-  [streams.fetchStatuses, balances.fetchStatuses],
-  ([streamsFetchStatuses, balancesFetchStauses]) => {
+const store = derived<[typeof streams.fetchStatusses, typeof balances.fetchStatusses], State>(
+  [streams.fetchStatusses, balances.fetchStatusses],
+  ([streamsFetchStatusses, balancesFetchStauses]) => {
     const allUserIds = [
-      Object.keys(streamsFetchStatuses),
+      Object.keys(streamsFetchStatusses),
       Object.keys(balancesFetchStauses),
     ].flat();
 
@@ -48,7 +48,7 @@ const store = derived<[typeof streams.fetchStatuses, typeof balances.fetchStatus
       let overallStatus: AccountFetchStatus;
 
       const fetchStauses = tuple(
-        streamsFetchStatuses[userId] ?? 'fetching',
+        streamsFetchStatusses[userId] ?? 'fetching',
         balancesFetchStauses[userId] ?? 'fetching',
       );
 

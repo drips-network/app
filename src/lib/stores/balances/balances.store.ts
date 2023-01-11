@@ -8,7 +8,7 @@ import { getDripsHubClient, getSubgraphClient } from '$lib/utils/get-drips-clien
 import unreachable from '$lib/utils/unreachable';
 import relevantTokens from './utils/relevant_tokens';
 import fetchBalancesForTokens from './utils/fetch_balances_for_tokens';
-import type { AccountFetchStatus } from '../account-fetch-statuses/account-fetch-statuses.store';
+import type { AccountFetchStatus } from '../account-fetch-statusses/account-fetch-statusses.store';
 
 interface Amount {
   amount: bigint;
@@ -43,7 +43,7 @@ export default (() => {
   let accounts: Readable<{ [accountId: UserId]: Account }> = readable({});
   let tickRegistration: number | undefined;
   const state = writable<State>(INITIAL_STATE);
-  const fetchStatuses = writable<{ [key: UserId]: AccountFetchStatus }>({});
+  const fetchStatusses = writable<{ [key: UserId]: AccountFetchStatus }>({});
 
   // Once per tick, we run balance estimation logic.
   if (!tickRegistration) tickRegistration = tickStore.register(_updateAccountBalances);
@@ -110,19 +110,19 @@ export default (() => {
     const accounts = Object.keys(s.accounts);
 
     for (const userId of accounts) {
-      const currentFetchStatus = get(fetchStatuses)[userId];
+      const currentFetchStatus = get(fetchStatusses)[userId];
       if (['fetching', 'fetched'].includes(currentFetchStatus)) break;
 
-      fetchStatuses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
+      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
 
       try {
         await Promise.all([updateSqueezeHistory(userId), updateBalances(userId)]);
       } catch (e) {
-        fetchStatuses.update((fs) => ({ ...fs, [userId]: 'error' }));
+        fetchStatusses.update((fs) => ({ ...fs, [userId]: 'error' }));
         throw e;
       }
 
-      fetchStatuses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
+      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
     }
   });
 
@@ -285,7 +285,7 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
-    fetchStatuses: { subscribe: fetchStatuses.subscribe },
+    fetchStatusses: { subscribe: fetchStatusses.subscribe },
     setAccounts,
     getAllStreamEstimates,
     getEstimateByStreamId,

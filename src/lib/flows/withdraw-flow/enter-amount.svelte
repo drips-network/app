@@ -35,7 +35,7 @@
 
   $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
   $: estimate =
-    $balances.streamable.find(
+    $balances.accounts[$wallet.dripsUserId ?? unreachable()].streamable.find(
       (amount) => amount.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
     ) ?? unreachable();
 
