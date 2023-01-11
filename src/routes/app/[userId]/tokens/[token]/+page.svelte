@@ -121,7 +121,7 @@
 
       <TokenStat
         title="Incoming"
-        tooltip="Your incoming balance is the cumulative total earned from any incoming streams for this token."
+        tooltip="Your incoming balance is a real-time estimate of what you've earned up until this moment, minus any prior withdrawals."
       >
         <svelte:fragment slot="detail">
           {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
