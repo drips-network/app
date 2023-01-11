@@ -13,11 +13,16 @@ type ModalLayout = {
 const overlayStore = writable<ModalLayout | null>(null);
 
 const hideable = writable<boolean>(true);
+const focusTrapped = writable<boolean>(true);
 
-export const store = derived([overlayStore, hideable], ([$overlayStore, $hideableStore]) => ({
-  overlay: $overlayStore,
-  hideable: $hideableStore,
-}));
+export const store = derived(
+  [overlayStore, hideable, focusTrapped],
+  ([$overlayStore, $hideableStore, $focusTrappedStore]) => ({
+    overlay: $overlayStore,
+    hideable: $hideableStore,
+    focusTrapped: $focusTrappedStore,
+  }),
+);
 
 const doNothing = (): void => {
   null;
@@ -52,6 +57,16 @@ export const hide = (): void => {
  */
 export const setHideable = (value: boolean): void => {
   hideable.set(value);
+};
+
+/**
+ * If value is true, the modal component will trap keyboard focus in itself and
+ * auto-select its first selectable child. Setting to false removes any already-set
+ * trap, but will not restore focus to the previously-selected element.
+ * @param value True to enable focus trap, false to disable.
+ */
+export const setFocusTrapped = (value: boolean): void => {
+  focusTrapped.set(value);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

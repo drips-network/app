@@ -31,6 +31,8 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import expect from '$lib/utils/expect';
   import { get } from 'svelte/store';
+  import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
+  import modal from '$lib/stores/modal';
   import { formatUnits } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -41,25 +43,31 @@
     tokens.getByAddress(stream.dripsConfig.amountPerSecond.tokenAddress) ?? unreachable();
 
   let newName: string | undefined = stream.name;
-  let newAmountValue: string | undefined = formatUnits(
-    stream.dripsConfig.amountPerSecond.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-    token.info.decimals,
-  );
   let newSelectedMultiplier = '1';
+  let newAmountValue: string | undefined = formatUnits(
+    stream.dripsConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
+    token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+  );
+
+  $: amountLocked = stream.paused === true;
 
   $: newAmountValueParsed = newAmountValue
-    ? parseTokenAmount(newAmountValue, token.info.decimals)
+    ? parseTokenAmount(newAmountValue, token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS)
     : undefined;
 
   $: newAmountPerSecond = newAmountValueParsed
-    ? (newAmountValueParsed * BigInt(constants.AMT_PER_SEC_MULTIPLIER)) /
-      BigInt(newSelectedMultiplier)
+    ? newAmountValueParsed / BigInt(newSelectedMultiplier)
     : undefined;
+
+  $: amountValidationState = validateAmtPerSecInput(newAmountPerSecond);
 
   $: nameUpdated = newName !== stream.name;
   $: amountUpdated = newAmountPerSecond !== stream.dripsConfig.amountPerSecond.amount;
   $: canUpdate =
-    newAmountValueParsed && newName && (nameUpdated || amountUpdated) && newAmountValueParsed > 0;
+    newAmountValueParsed &&
+    newName &&
+    (nameUpdated || amountUpdated) &&
+    amountValidationState?.type === 'valid';
 
   function updateStream() {
     const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
@@ -231,16 +239,19 @@
     <TextInput bind:value={newName} />
   </FormField>
   <div class="form-row">
-    <FormField title="New stream rate*">
+    <FormField title="New stream rate*" disabled={amountLocked}>
       <TextInput
         suffix={token.info.symbol}
         bind:value={newAmountValue}
         variant={{ type: 'number', min: 0 }}
         placeholder="Amount"
+        validationState={amountValidationState}
+        disabled={amountLocked}
       />
     </FormField>
-    <FormField title="Amount per*">
+    <FormField title="Amount per*" disabled={amountLocked}>
       <Dropdown
+        disabled={amountLocked}
         bind:value={newSelectedMultiplier}
         options={[
           {
@@ -271,7 +282,11 @@
       />
     </FormField>
   </div>
+  {#if amountLocked}
+    <p class="typo-text">Currently, the stream rate can not be edited for paused streams.</p>
+  {/if}
   <svelte:fragment slot="actions">
+    <Button on:click={modal.hide}>Cancel</Button>
     <Button variant="primary" on:click={updateStream} disabled={!canUpdate}>Update stream</Button>
   </svelte:fragment>
 </StepLayout>
@@ -280,5 +295,10 @@
   .form-row {
     display: flex;
     gap: 1rem;
+  }
+
+  p {
+    color: var(--color-foreground-level-5);
+    text-align: left;
   }
 </style>

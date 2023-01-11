@@ -92,23 +92,4 @@
     width: 100%;
     height: 100%;
   }
-
-  svg {
-    background: var(--color-primary);
-    width: 240px;
-    height: 240px;
-    border-radius: 100%;
-    transform: rotate(15deg);
-    position: absolute;
-    position: absolute;
-    bottom: -16px;
-    right: 80px;
-  }
-
-  @media (max-width: 900px) {
-    svg {
-      bottom: -35px;
-      right: -22px;
-    }
-  }
 </style>

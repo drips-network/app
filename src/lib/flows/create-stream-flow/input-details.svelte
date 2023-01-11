@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Dropdown from 'radicle-design-system/Dropdown.svelte';
+  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
@@ -29,6 +29,7 @@
   import combineDateAndTime from './methods/combine-date-and-time';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -92,7 +93,10 @@
   let amountValue: string | undefined;
   $: amountValueParsed =
     amountValue && selectedToken
-      ? parseTokenAmount(amountValue, selectedToken?.info.decimals)
+      ? parseTokenAmount(
+          amountValue,
+          selectedToken?.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+        )
       : undefined;
 
   // Multiplier dropdown
@@ -103,8 +107,10 @@
 
   $: amountPerSecond =
     amountValueParsed && selectedMultiplier && selectedToken
-      ? (amountValueParsed * BigInt(constants.AMT_PER_SEC_MULTIPLIER)) / BigInt(selectedMultiplier)
+      ? amountValueParsed / BigInt(selectedMultiplier)
       : undefined;
+
+  $: amountValidationState = validateAmtPerSecInput(amountPerSecond);
 
   let setStartAndEndDate = false;
 
@@ -147,7 +153,7 @@
   $: formValid =
     streamEndDateValidationState.type !== 'invalid' &&
     recipientAddressValidationState.type === 'valid' &&
-    amountPerSecond &&
+    amountValidationState?.type === 'valid' &&
     streamNameValue &&
     timeRangeValid;
 
@@ -183,7 +189,7 @@
     disableLinks
     fromAddress={$wallet.address}
     toAddress={recipientAddressValue}
-    {amountPerSecond}
+    amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
     headline="Create stream"
@@ -215,6 +221,7 @@
         bind:value={amountValue}
         variant={{ type: 'number', min: 0 }}
         placeholder="Amount"
+        validationState={amountValidationState}
       />
     </FormField>
     <FormField title="Amount per*">

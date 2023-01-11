@@ -728,6 +728,11 @@
 </svg>
 
 <style>
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
   .stroke-foreground {
     stroke: var(--color-foreground);
   }

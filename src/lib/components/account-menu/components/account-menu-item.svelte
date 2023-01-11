@@ -42,7 +42,7 @@
   }
 
   .account-menu-item-wrapper.clickable:hover {
-    background-color: var(--color-primary-level-1);
+    background-color: var(--color-foreground-level-1);
   }
 
   .account-menu-item-wrapper.clickable:focus {
