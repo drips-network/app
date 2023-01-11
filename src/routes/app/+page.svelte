@@ -15,7 +15,7 @@
   <title>Drips • Stream and Split Funds on Ethereum</title>
   <meta
     name="description"
-    value="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
   />
 </svelte:head>
 

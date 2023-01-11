@@ -97,7 +97,7 @@
 
 <svelte:head>
   <title>{(address && $ens[address]?.name) ?? address ?? userId} | Drips</title>
-  <meta name="description" value="Drips User Profile" />
+  <meta name="description" content="Drips User Profile" />
 </svelte:head>
 
 {#if error}
