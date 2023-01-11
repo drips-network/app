@@ -116,7 +116,7 @@
         size: (100 / 24) * 5,
         meta: {
           tooltipMessage:
-            'Your incoming balance is the cumulative total earned from any incoming streams for this token.',
+            "Your incoming balance is a real-time estimate of what you've earned up until this moment, minus any prior withdrawals.",
         },
       },
       {
