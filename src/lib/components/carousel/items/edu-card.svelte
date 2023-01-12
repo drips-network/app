@@ -57,24 +57,28 @@
   .illustration-outer {
     /* padding: 0.75rem; */
     height: 100%;
+    background-color: var(--color-primary-level-1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .illustration {
-    height: 100%;
-    background-color: var(--color-primary-level-1);
+    height: 10rem;
+    width: 10rem;
     padding: 1.5rem;
   }
 
   .content {
     height: 100%;
+    width: 100%;
+    flex-grow: 1;
     flex-basis: 65%;
-    flex-shrink: 0;
     padding: 0.75rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 2rem;
-    width: 100%;
   }
 
   .content .actions {
@@ -103,7 +107,7 @@
     background-color: var(--color-foreground-level-2);
   }
 
-  @media (max-width: 577px) {
+  @media (max-width: 768px) {
     .edu-card {
       flex-direction: column;
       align-items: flex-start;
@@ -111,15 +115,15 @@
 
     .illustration-outer {
       width: 100%;
-    }
-    .illustration {
       height: 10rem;
+    }
+
+    .illustration {
       width: 100%;
     }
 
     .content {
       flex-direction: column;
-      flex-basis: 0;
       flex-grow: 1;
     }
   }

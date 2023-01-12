@@ -8,12 +8,12 @@
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
   import EduCard from '$lib/components/carousel/items/edu-card.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
   import ArrowUp from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import GasOptimized from '$lib/components/illustrations/gas-optimized.svelte';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fly } from 'svelte/transition';
+  import MultiToken from '$lib/components/illustrations/multi-token.svelte';
 
   $: userId = $wallet.dripsUserId;
 
@@ -30,7 +30,7 @@
         id: 'set-up-first-stream',
         title: 'Create your first stream',
         description: 'Stream any ERC-20 token to anyone. All you need is an Ethereum address.',
-        illustration: NoWrappedTokens,
+        illustration: MultiToken,
         actions: [
           {
             // TODO: Real URL once doc is there

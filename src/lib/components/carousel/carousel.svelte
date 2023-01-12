@@ -150,13 +150,19 @@
     background: linear-gradient(90deg, rgba(0, 0, 0, 0), var(--color-background));
   }
 
+  @media (max-width: 1056px) {
+    .has-overflow .item {
+      flex-basis: calc(50% - 4rem);
+    }
+  }
+
   @media (max-width: 577px) {
     .items {
       gap: 1rem;
     }
 
     .item {
-      flex-basis: 100%;
+      flex-basis: calc(50% - 1rem);
       scroll-snap-align: center;
     }
 
