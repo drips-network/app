@@ -111,7 +111,7 @@ export default (() => {
 
     for (const userId of accounts) {
       const currentFetchStatus = get(fetchStatusses)[userId];
-      if (['fetching', 'fetched'].includes(currentFetchStatus)) break;
+      if (['fetching', 'fetched'].includes(currentFetchStatus)) continue;
 
       fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
 
