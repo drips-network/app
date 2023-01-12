@@ -19,7 +19,7 @@
     <svelte:component
       this={icon}
       style={variant === 'destructive' || variant === 'primary'
-        ? 'fill: var(--color-background)'
+        ? 'fill: white'
         : 'fill: var(--color-foreground)'}
     />
   {/if}
