@@ -20,14 +20,14 @@
   <button class="close-button" on:click={() => dismissablesStore.dismiss(id)}>
     <CrossSmall />
   </button>
-  <div>
+  <div class="illustration-outer">
     <div class="illustration">
       <svelte:component this={illustration} />
     </div>
   </div>
   <div class="content">
     <div class="text">
-      <h3>{title}</h3>
+      <h3 class="pixelated">{title}</h3>
       <p>{description}</p>
     </div>
     <div class="actions">
@@ -54,11 +54,15 @@
     height: 100%;
   }
 
+  .illustration-outer {
+    /* padding: 0.75rem; */
+    height: 100%;
+  }
+
   .illustration {
-    margin: 0.75rem;
-    border-radius: 0.5rem 0 0.5rem 0.5rem;
-    flex: 0 0 auto;
-    padding: 0.75rem;
+    height: 100%;
+    background-color: var(--color-primary-level-1);
+    padding: 1.5rem;
   }
 
   .content {
@@ -105,9 +109,12 @@
       align-items: flex-start;
     }
 
+    .illustration-outer {
+      width: 100%;
+    }
     .illustration {
       height: 10rem;
-      width: 10rem;
+      width: 100%;
     }
 
     .content {
