@@ -80,7 +80,7 @@
 
 <svelte:head>
   <title>{token?.info.name ?? 'Unknown Token'} | Drips</title>
-  <meta name="description" value="Drips Token Page" />
+  <meta name="description" content="Drips Token Page" />
 </svelte:head>
 
 {#if error === 'connected-to-wrong-user'}
