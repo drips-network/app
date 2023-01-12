@@ -211,8 +211,4 @@
     flex-direction: column;
     gap: 2rem;
   }
-
-  .content {
-    overflow-y: scroll;
-  }
 </style>
