@@ -5,6 +5,8 @@
   import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
   import themeStore, { type Theme } from '$lib/stores/theme/theme.store';
   import Button from '$lib/components/button/button.svelte';
+  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
 
   // Theme control
   let selectedTheme: 'auto' | Theme = $themeStore.selectedTheme;
@@ -70,6 +72,14 @@
       <a href="/app/settings/custom-tokens">
         <Button icon={ListIcon}>Edit token list</Button>
       </a>
+    </Setting>
+    <Setting
+      title="Reset educational hints"
+      subtitle="Resurface all previously-dismissed hints and cards across the app."
+    >
+      <Button on:click={() => dismissablesStore.resetDismissables()} icon={EyeOpen}
+        >Reset hints</Button
+      >
     </Setting>
     <Setting
       title="Build on Drips"
