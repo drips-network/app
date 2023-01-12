@@ -189,13 +189,6 @@ export default (() => {
       (streamEstimate) => streamEstimate.tokenAddress === tokenAddress,
     );
 
-    if (incomingStreamsForToken.length === 0) {
-      return {
-        totalEarned: 0n,
-        amountPerSecond: 0n,
-      };
-    }
-
     // Sum up the total streamed by relevant incoming streams
     const currentCycleEstimate = incomingStreamsForToken.reduce<{
       amtPerSec: bigint;
