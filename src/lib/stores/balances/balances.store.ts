@@ -48,7 +48,12 @@ export default (() => {
   // Once per tick, we run balance estimation logic.
   if (!tickRegistration) tickRegistration = tickStore.register(_updateAccountBalances);
 
-  updateCycle();
+  /**
+   * Initialize the store. Once initialized, it's ready to estimate balances.
+   */
+  async function initialize() {
+    await updateCycle();
+  }
 
   /**
    * Set a readable of accounts for which balances should be estimated
@@ -279,6 +284,7 @@ export default (() => {
   return {
     subscribe: state.subscribe,
     fetchStatusses: { subscribe: fetchStatusses.subscribe },
+    initialize,
     setAccounts,
     getAllStreamEstimates,
     getEstimateByStreamId,

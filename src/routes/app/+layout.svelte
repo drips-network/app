@@ -33,6 +33,7 @@
 
     tokens.connect(network.chainId);
     ens.connect(provider);
+    balances.initialize();
 
     walletConnected = connected;
 
