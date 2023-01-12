@@ -118,7 +118,6 @@
 
 <style>
   h4 {
-    color: var(--color-foreground-level-6);
     margin-bottom: 1.5rem;
   }
 
