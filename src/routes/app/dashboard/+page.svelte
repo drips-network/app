@@ -14,6 +14,7 @@
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fly } from 'svelte/transition';
   import MultiToken from '$lib/components/illustrations/multi-token.svelte';
+  import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
 
   $: userId = $wallet.dripsUserId;
 
@@ -61,6 +62,28 @@
                 .open('https://v2.docs.drips.network/docs/whats-a-drip.html', '_blank')
                 ?.focus(),
             label: 'Set up your splits',
+            primary: true,
+            icon: ArrowUp,
+          },
+        ],
+      },
+    }),
+    makeCarouselItem({
+      id: 'collect-earnings',
+      component: EduCard,
+      props: {
+        id: 'collect-earnings',
+        title: 'Collect earnings',
+        description: "Learn how to collect funds you've earned from incoming streams or splits.",
+        illustration: NoWrappedTokens,
+        actions: [
+          {
+            // TODO: Real URL once doc is there
+            handler: () =>
+              window
+                .open('https://v2.docs.drips.network/docs/whats-a-drip.html', '_blank')
+                ?.focus(),
+            label: 'Learn more',
             primary: true,
             icon: ArrowUp,
           },
