@@ -77,8 +77,10 @@
       title="Reset educational hints"
       subtitle="Resurface all previously-dismissed hints and cards across the app."
     >
-      <Button on:click={() => dismissablesStore.resetDismissables()} icon={EyeOpen}
-        >Reset hints</Button
+      <Button
+        disabled={$dismissablesStore.length === 0}
+        on:click={() => dismissablesStore.resetDismissables()}
+        icon={EyeOpen}>Reset hints</Button
       >
     </Setting>
     <Setting
