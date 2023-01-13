@@ -15,7 +15,7 @@
 
 <svelte:head>
   <title>Settings | Drips</title>
-  <meta name="description" value="Drips Settings Page" />
+  <meta name="description" content="Drips Settings Page" />
 </svelte:head>
 
 <div class="settings">

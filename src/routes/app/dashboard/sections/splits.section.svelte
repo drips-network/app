@@ -14,8 +14,10 @@
   import modal from '$lib/stores/modal';
   import { AddressDriverClient, type SplitsEntry } from 'radicle-drips';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import SplitsTableFull from '$lib/components/splits-table/splits-table-full.svelte';
+  import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
   import wallet from '$lib/stores/wallet';
+  import editSplitsFlowState from '$lib/flows/edit-splits-flow/edit-splits-flow-state';
+  import FetchSplits from '$lib/flows/edit-splits-flow/fetch-splits.svelte';
 
   export let userId: UserId | undefined;
 
@@ -158,7 +160,12 @@
             handler: () => {
               modal.setHideable(true);
               modal.show(Stepper, undefined, {
+                context: editSplitsFlowState,
                 steps: [
+                  makeStep({
+                    component: FetchSplits,
+                    props: undefined,
+                  }),
                   makeStep({
                     component: EditSplitsInputs,
                     props: undefined,
@@ -179,12 +186,13 @@
               });
             },
             icon: PenIcon,
-            label: 'Edit',
+            label: 'Edit splits',
           },
         ]}
   />
-  <div class="content pl-0.5">
+  <div class="content">
     <SectionSkeleton
+      horizontalScroll
       emptyStateHeadline="No splits"
       emptyStateEmoji="🫧"
       emptyStateText="Anyone you split incoming funds with will appear here."
@@ -192,9 +200,7 @@
       empty={isEmptySection}
       {error}
     >
-      <div class="border rounded-lg py-12 px-1">
-        <SplitsTableFull data={splitsTableData} />
-      </div>
+      <SplitsTable data={splitsTableData} />
     </SectionSkeleton>
   </div>
 </div>
@@ -204,9 +210,5 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  .content {
-    overflow-y: scroll;
   }
 </style>
