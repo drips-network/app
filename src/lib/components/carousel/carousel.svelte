@@ -162,7 +162,7 @@
     }
 
     .item {
-      flex-basis: calc(50% - 1rem);
+      flex-basis: 100%;
       scroll-snap-align: center;
     }
 
