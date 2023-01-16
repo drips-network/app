@@ -2,7 +2,7 @@
   import { onMount, tick, type SvelteComponent, type SvelteComponentTyped } from 'svelte';
   import { flip } from 'svelte/animate';
   import { quintInOut } from 'svelte/easing';
-  import { crossfade, fade } from 'svelte/transition';
+  import { crossfade, fade, fly } from 'svelte/transition';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type Constructor<T> = new (...args: any[]) => T;
@@ -29,6 +29,8 @@
 </script>
 
 <script lang="ts">
+  import ArrowUp from 'radicle-design-system/icons/ArrowUp.svelte';
+
   export let items: CarouselItems;
   $: resolvedItems = items.map((someCarouselItem) => someCarouselItem((i) => i));
 
@@ -70,6 +72,24 @@
   $: overflowRight = !scrolledToEnd;
   $: overflowLeft = scrollPos > 0;
 
+  function navigate(direction: 'forward' | 'backward') {
+    const scrollPadding = Number(
+      window.getComputedStyle(itemsElem, null).getPropertyValue('scroll-padding').replace('px', ''),
+    );
+    const currentElem = itemElems.find((e) => e.offsetLeft === scrollPos + scrollPadding);
+    if (!currentElem) return;
+
+    const currentIndex = itemElems.indexOf(currentElem);
+    const newOffset = itemElems[currentIndex + (direction === 'forward' ? 1 : -1)]?.offsetLeft;
+
+    if (newOffset) {
+      itemsElem.scroll({
+        left: newOffset,
+        behavior: 'smooth',
+      });
+    }
+  }
+
   const [send] = crossfade({
     duration: (d) => Math.sqrt(d * 200),
 
@@ -97,16 +117,36 @@
         bind:this={itemElems[index]}
         out:send|local={{ key: item.id }}
         animate:flip={{ duration: 300 }}
+        on:outroend={updateScrollPos}
       >
         <svelte:component this={item.component} {...item.props} />
       </div>
     {/each}
   </div>
+
   {#if overflowLeft}
     <div transition:fade={{ duration: 100 }} class="overflow-gradient left" />
+    <button
+      on:click={() => navigate('backward')}
+      tabindex="-1"
+      in:fly={{ x: 20, duration: 300 }}
+      out:fly={{ x: -20, duration: 300 }}
+      class="nav-button left"
+    >
+      <div><ArrowUp style="fill: var(--color-foreground)" /></div>
+    </button>
   {/if}
   {#if overflowRight}
     <div transition:fade={{ duration: 100 }} class="overflow-gradient right" />
+    <button
+      on:click={() => navigate('forward')}
+      tabindex="-1"
+      in:fly={{ x: -20, duration: 300 }}
+      out:fly={{ x: 20, duration: 300 }}
+      class="nav-button right"
+    >
+      <div><ArrowUp style="fill: var(--color-foreground)" /></div>
+    </button>
   {/if}
 </div>
 
@@ -150,7 +190,40 @@
     background: linear-gradient(90deg, rgba(0, 0, 0, 0), var(--color-background));
   }
 
+  .nav-button {
+    position: absolute;
+    top: calc(50% - 1.5rem);
+    height: 3rem;
+    width: 3rem;
+    border-radius: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-foreground);
+  }
+
+  .nav-button.left {
+    left: 2rem;
+  }
+
+  .nav-button.left div {
+    transform: rotate(-90deg);
+  }
+
+  .nav-button.right {
+    right: 2rem;
+  }
+
+  .nav-button.right div {
+    transform: rotate(90deg);
+  }
+
   @media (max-width: 1056px) {
+    .nav-button {
+      display: none;
+    }
+
     .has-overflow .item {
       flex-basis: calc(50% - 4rem);
     }
