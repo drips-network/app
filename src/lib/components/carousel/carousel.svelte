@@ -200,7 +200,17 @@
     justify-content: center;
     align-items: center;
     background-color: var(--color-background);
-    border: 1px solid var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s;
+  }
+
+  .nav-button:hover {
+    background-color: var(--color-foreground-level-2);
+    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
+  }
+
+  .nav-button:active {
+    transform: scale(0.98);
   }
 
   .nav-button.left {
