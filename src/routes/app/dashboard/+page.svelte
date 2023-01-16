@@ -34,10 +34,12 @@
         illustration: MultiToken,
         actions: [
           {
-            // TODO: Real URL once doc is there
             handler: () =>
               window
-                .open('https://v2.docs.drips.network/docs/whats-a-drip.html', '_blank')
+                .open(
+                  'https://v2.docs.drips.network/docs/the-drips-app/streams/create-a-stream',
+                  '_blank',
+                )
                 ?.focus(),
             label: 'Create a stream',
             primary: true,
@@ -56,10 +58,12 @@
         illustration: GasOptimized,
         actions: [
           {
-            // TODO: Real URL once doc is there
             handler: () =>
               window
-                .open('https://v2.docs.drips.network/docs/whats-a-drip.html', '_blank')
+                .open(
+                  'https://v2.docs.drips.network/docs/the-drips-app/splits/set-up-splits',
+                  '_blank',
+                )
                 ?.focus(),
             label: 'Set up your splits',
             primary: true,
@@ -78,10 +82,12 @@
         illustration: NoWrappedTokens,
         actions: [
           {
-            // TODO: Real URL once doc is there
             handler: () =>
               window
-                .open('https://v2.docs.drips.network/docs/whats-a-drip.html', '_blank')
+                .open(
+                  'https://v2.docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings',
+                  '_blank',
+                )
                 ?.focus(),
             label: 'Learn more',
             primary: true,
@@ -100,10 +106,12 @@
         illustration: OneContract,
         actions: [
           {
-            // TODO: Real URL once doc is there
             handler: () =>
               window
-                .open('https://v2.docs.drips.network/docs/whats-a-drip.html', '_blank')
+                .open(
+                  'https://v2.docs.drips.network/docs/the-drips-app/explore/drips-profiles',
+                  '_blank',
+                )
                 ?.focus(),
             label: 'Learn more',
             primary: true,
