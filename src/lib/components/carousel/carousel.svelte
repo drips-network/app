@@ -125,24 +125,24 @@
   </div>
 
   {#if overflowLeft}
-    <div transition:fade={{ duration: 100 }} class="overflow-gradient left" />
+    <div transition:fade|local={{ duration: 100 }} class="overflow-gradient left" />
     <button
       on:click={() => navigate('backward')}
       tabindex="-1"
-      in:fly={{ x: 20, duration: 300 }}
-      out:fly={{ x: -20, duration: 300 }}
+      in:fly|local={{ x: 20, duration: 300 }}
+      out:fly|local={{ x: -20, duration: 300 }}
       class="nav-button left"
     >
       <div><ArrowUp style="fill: var(--color-foreground)" /></div>
     </button>
   {/if}
   {#if overflowRight}
-    <div transition:fade={{ duration: 100 }} class="overflow-gradient right" />
+    <div transition:fade|local={{ duration: 100 }} class="overflow-gradient right" />
     <button
       on:click={() => navigate('forward')}
       tabindex="-1"
-      in:fly={{ x: -20, duration: 300 }}
-      out:fly={{ x: 20, duration: 300 }}
+      in:fly|local={{ x: -20, duration: 300 }}
+      out:fly|local={{ x: 20, duration: 300 }}
       class="nav-button right"
     >
       <div><ArrowUp style="fill: var(--color-foreground)" /></div>
