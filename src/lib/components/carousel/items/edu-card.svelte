@@ -66,7 +66,7 @@
   .illustration {
     height: 10rem;
     width: 10rem;
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .content {
