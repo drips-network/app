@@ -62,6 +62,8 @@
   }
 
   onMount(() => {
+    updateScrollPos();
+
     itemsElem.addEventListener('scroll', updateScrollPos);
     return () => itemsElem.removeEventListener('scroll', updateScrollPos);
   });
