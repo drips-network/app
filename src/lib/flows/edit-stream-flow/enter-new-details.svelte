@@ -259,6 +259,10 @@
             title: 'second',
           },
           {
+            value: '60',
+            title: 'minute',
+          },
+          {
             value: '3600',
             title: 'hour',
           },
