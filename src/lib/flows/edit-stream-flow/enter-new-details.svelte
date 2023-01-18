@@ -8,7 +8,7 @@
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import unreachable from '$lib/utils/unreachable';
   import { formatBytes32String, formatUnits, toUtf8Bytes } from 'ethers/lib/utils';
-  import Dropdown from 'radicle-design-system/Dropdown.svelte';
+  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
   import assert from '$lib/utils/assert';
