@@ -28,6 +28,7 @@
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import { formatUnits } from 'ethers/lib/utils';
+  import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -80,6 +81,8 @@
   }
 
   async function withdraw(amountWei: bigint, updateAwaitStepFn: UpdateAwaitStepFn) {
+    modal.setHideable(false);
+
     const { address, dripsUserId } = $wallet;
     assert(address && dripsUserId);
 
@@ -148,6 +151,8 @@
       5000,
       1000,
     );
+
+    modal.setHideable(true);
   }
 
   function triggerWithdraw() {

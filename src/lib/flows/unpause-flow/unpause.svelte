@@ -10,12 +10,15 @@
   import etherscanLink from '$lib/utils/etherscan-link';
   import expect from '$lib/utils/expect';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let stream: Stream;
 
   async function pause(updateAwaitStep: UpdateAwaitStepFn) {
+    modal.setHideable(false);
+
     const { dripsUserId, address } = $wallet;
     assert(dripsUserId && address);
 
@@ -87,6 +90,8 @@
       5000,
       1000,
     );
+
+    modal.setHideable(true);
   }
 
   onMount(() => {
