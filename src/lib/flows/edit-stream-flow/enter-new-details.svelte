@@ -71,6 +71,8 @@
 
   function updateStream() {
     const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
+      modal.setHideable(false);
+
       assert(newAmountPerSecond && newName);
 
       const { dripsUserId, address } = $wallet;
@@ -224,6 +226,8 @@
         5000,
         1000,
       );
+
+      modal.setHideable(true);
     };
 
     dispatch('await', {

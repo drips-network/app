@@ -5,6 +5,7 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import modal from '$lib/stores/modal';
   import type { Stream } from '$lib/stores/streams/types';
   import { createEventDispatcher } from 'svelte';
   import deleteStream from './methods/delete-stream';
@@ -15,7 +16,13 @@
 
   function startDeleting() {
     dispatch('await', {
-      promise: (fn) => deleteStream(stream, fn),
+      promise: async (fn) => {
+        modal.setHideable(false);
+
+        await deleteStream(stream, fn);
+
+        modal.setHideable(true);
+      },
       message: 'Preparing to delete stream…',
     });
   }
