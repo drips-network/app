@@ -30,9 +30,7 @@ export function getAddressDriverClient(withSigner = get(wallet).signer) {
 
   const addressDriverAddress = getNetworkConfig().CONTRACT_ADDRESS_DRIVER;
 
-  return withSigner
-    ? AddressDriverClient.create(withSigner, addressDriverAddress)
-    : AddressDriverClient.createReadonly(provider, addressDriverAddress);
+  return AddressDriverClient.create(provider, withSigner, addressDriverAddress);
 }
 
 /**
@@ -40,13 +38,11 @@ export function getAddressDriverClient(withSigner = get(wallet).signer) {
  * @returns An initialized Drips Hub client.
  */
 export function getDripsHubClient() {
-  const { provider, connected, signer } = get(wallet);
+  const { provider, signer } = get(wallet);
 
   const dripsHubAddress = getNetworkConfig().CONTRACT_DRIPS_HUB;
 
-  return connected
-    ? DripsHubClient.create(signer, dripsHubAddress)
-    : DripsHubClient.createReadonly(provider, dripsHubAddress);
+  return DripsHubClient.create(provider, signer, dripsHubAddress);
 }
 
 /**
@@ -54,10 +50,10 @@ export function getDripsHubClient() {
  * @returns An initialized Caller client.
  */
 export function getCallerClient() {
-  const { provider, connected } = get(wallet);
+  const { provider, signer, connected } = get(wallet);
   assert(connected, 'Wallet must be connected to create a CallerClient');
 
-  return CallerClient.create(provider, getNetworkConfig().CONTRACT_CALLER);
+  return CallerClient.create(provider, signer, getNetworkConfig().CONTRACT_CALLER);
 }
 
 /**

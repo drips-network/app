@@ -1,8 +1,6 @@
 <script lang="ts">
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import EyeClosedIcon from 'radicle-design-system/icons/EyeClosed.svelte';
-  import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
-  import CircleIcon from 'radicle-design-system/icons/Circle.svelte';
   import type { Items } from './list-select.types';
   import { onMount } from 'svelte';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
@@ -19,7 +17,10 @@
   $: filteredItems = Object.fromEntries(
     Object.entries(items).filter((entry) => {
       const item = entry[1];
-      const startsWithSearchString = item.label
+      const searchString =
+        (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
+
+      const startsWithSearchString = searchString
         .toLowerCase()
         .startsWith(searchString.toLowerCase());
       return startsWithSearchString || item.type === 'action';
@@ -149,17 +150,9 @@
       data-testid={`item-${slug}`}
       bind:this={itemElements[slug]}
     >
-      {#if item.type === 'selectable' && Object.entries(items).length > 1}
+      {#if item.type === 'selectable' && !blockInteraction}
         <div class="check-icon">
-          {#if multiselect}
-            {#if selected.includes(slug)}
-              <CheckIcon style="fill: var(--color-positive)" />
-            {:else}
-              <CircleIcon />
-            {/if}
-          {:else}
-            <SelectedDot selected={selected.includes(slug)} />
-          {/if}
+          <SelectedDot selected={selected.includes(slug)} />
         </div>
       {/if}
       {#if item.image}
@@ -172,7 +165,11 @@
         </div>
       {/if}
       <div class="content" class:action={item.type === 'action'}>
-        <span class="label typo-text-bold">{item.label}</span>
+        {#if typeof item.label === 'string'}
+          <span class="label typo-text-bold">{item.label}</span>
+        {:else}
+          <svelte:component this={item.label.component} {...item.label.props} />
+        {/if}
         {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono-bold"
             >{item.text}</span
           >{/if}

@@ -70,6 +70,8 @@ export interface AssetConfigHistoryItem {
    */
   runsOutOfFunds?: Date;
   streams: Receiver[];
+  historyHash: string;
+  receiversHash: string;
 }
 
 export interface AssetConfig {

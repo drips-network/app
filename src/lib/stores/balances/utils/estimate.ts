@@ -7,6 +7,7 @@ import type {
   User,
 } from '$lib/stores/streams/types';
 import { unwrapIdItems } from '$lib/utils/wrap-unwrap-id-item';
+import type { SqueezedDripsEvent } from 'radicle-drips';
 
 type Millis = number;
 
@@ -16,6 +17,7 @@ export interface StreamEstimate {
   currentAmountPerSecond: bigint;
   runsOutOfFunds?: Date;
   receiver: User;
+  sender: User;
   tokenAddress: string;
 }
 
@@ -45,11 +47,15 @@ interface TimeWindow {
 
 type AccountEstimate = { [tokenAddress: string]: AssetConfigEstimates };
 
-export function estimateAccount(account: Account, currentCycle: Cycle): AccountEstimate {
+export function estimateAccount(
+  account: Account,
+  currentCycle: Cycle,
+  excludingSqueezes: SqueezedDripsEvent[] = [],
+): AccountEstimate {
   return Object.fromEntries(
     account.assetConfigs.map((assetConfig) => [
       assetConfig.tokenAddress,
-      buildAssetConfigEstimates(assetConfig, currentCycle),
+      buildAssetConfigEstimates(assetConfig, currentCycle, account.user, excludingSqueezes),
     ]),
   );
 }
@@ -57,16 +63,27 @@ export function estimateAccount(account: Account, currentCycle: Cycle): AccountE
 function buildAssetConfigEstimates(
   assetConfig: AssetConfig,
   currentCycle: Cycle,
+  user: User,
+  excludingSqueezes: SqueezedDripsEvent[],
 ): AssetConfigEstimates {
   /*
     TODO: Avoid processing the current cycle twice by bounding totalEstimate to before the current cycle,
     and adding the estimates up.
   */
-  const totalEstimate = estimateAssetConfig(assetConfig, { from: 0, to: Number.MAX_SAFE_INTEGER });
-  const currentCycleEstimate = estimateAssetConfig(assetConfig, {
-    from: currentCycle.start.getTime(),
-    to: currentCycle.start.getTime() + currentCycle.duration,
-  });
+  const totalEstimate = estimateAssetConfig(
+    assetConfig,
+    { from: 0, to: Number.MAX_SAFE_INTEGER },
+    user,
+  );
+  const currentCycleEstimate = estimateAssetConfig(
+    assetConfig,
+    {
+      from: currentCycle.start.getTime(),
+      to: currentCycle.start.getTime() + currentCycle.duration,
+    },
+    user,
+    excludingSqueezes,
+  );
 
   return {
     total: totalEstimate,
@@ -77,6 +94,8 @@ function buildAssetConfigEstimates(
 export function estimateAssetConfig(
   assetConfig: AssetConfig,
   window: TimeWindow,
+  user: User,
+  excludingSqueezes: SqueezedDripsEvent[] = [],
 ): AssetConfigEstimate {
   // Filter out any history items not relevant to the current time window.
   const relevantHistoryItems = assetConfig.history.filter((hi) => {
@@ -93,7 +112,14 @@ export function estimateAssetConfig(
   const historyItemEstimates = relevantHistoryItems.map((historyItem, index, historyItems) => {
     const nextHistoryItem = historyItems[index + 1];
 
-    return estimateHistoryItem(window, historyItem, nextHistoryItem, assetConfig.tokenAddress);
+    return estimateHistoryItem(
+      window,
+      historyItem,
+      nextHistoryItem,
+      assetConfig.tokenAddress,
+      user,
+      excludingSqueezes,
+    );
   });
 
   const streamTotals = historyItemEstimates.reduce<{ [stream: StreamId]: StreamEstimate }>(
@@ -138,15 +164,25 @@ function estimateHistoryItem(
   historyItem: AssetConfigHistoryItem,
   nextHistoryItem: AssetConfigHistoryItem,
   tokenAddress: string,
+  sender: User,
+  excludingSqueezes: SqueezedDripsEvent[],
 ): AssetConfigEstimate {
   const streamEstimates = historyItem.streams.map((receiver) => {
-    const estimate = streamedByStream(window, receiver, historyItem, nextHistoryItem);
+    const estimate = streamedByStream(
+      window,
+      receiver,
+      sender,
+      historyItem,
+      excludingSqueezes,
+      nextHistoryItem,
+    );
 
     return {
       id: receiver.streamId,
       totalStreamed: estimate.streamed,
       currentAmountPerSecond: estimate.currentAmountPerSecond,
       receiver: receiver.receiver,
+      sender,
       tokenAddress,
     };
   });
@@ -168,7 +204,9 @@ function estimateHistoryItem(
 function streamedByStream(
   window: TimeWindow,
   receiver: Receiver,
+  sender: User,
   historyItem: AssetConfigHistoryItem,
+  excludingSqueezes: SqueezedDripsEvent[],
   nextHistoryItem?: AssetConfigHistoryItem,
 ): {
   streamed: bigint;
@@ -198,7 +236,16 @@ function streamedByStream(
   const duration: Millis | undefined = durationSeconds ? durationSeconds * 1000 : undefined;
   const start: Millis = startDate ? startDate.getTime() : timestamp;
 
-  const streamingFrom = minMax('max', timestamp, start, window.from);
+  const squeezedAtBlockTimestamp = excludingSqueezes.find(
+    (squeezeEvent) =>
+      squeezeEvent.senderId === sender.userId &&
+      squeezeEvent.dripsHistoryHashes.includes(historyItem.historyHash),
+  )?.blockTimestamp;
+  const squeezedAt: Millis | undefined = squeezedAtBlockTimestamp
+    ? Number(squeezedAtBlockTimestamp) * 1000
+    : undefined;
+
+  const streamingFrom = minMax('max', timestamp, start, window.from, squeezedAt);
   const scheduledToEndAt = calcScheduledEnd(streamingFrom, start, duration);
   const streamingUntil = minMax('min', runsOutOfFunds, scheduledToEndAt, nextTimestamp, window.to);
   const validForMillis = minMax('max', streamingUntil - streamingFrom, 0);

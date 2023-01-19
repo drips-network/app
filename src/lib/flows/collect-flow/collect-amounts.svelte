@@ -23,8 +23,15 @@
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
-  import { AddressDriverPresets } from 'radicle-drips';
+  import { AddressDriverPresets, constants } from 'radicle-drips';
   import etherscanLink from '$lib/utils/etherscan-link';
+  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import ListSelect from '$lib/components/list-select/list-select.svelte';
+  import type { Items } from '$lib/components/list-select/list-select.types';
+  import balancesStore from '$lib/stores/balances/balances.store';
+  import type { User } from '$lib/stores/streams/types';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import getSqueezeArgs from './get-squeeze-args';
   import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -42,16 +49,82 @@
 
   $: selectedToken = tokens.getByAddress($context.tokenAddress ?? '')?.info ?? unreachable();
 
-  $: splittableAfterReceive = balances.receivable + balances.splittable;
-  $: collectableAfterSplit =
-    (splittableAfterReceive * ownSplitsWeight) / 1000000n + balances.collectable;
-
   function makeAmount(fromBalance: bigint) {
     return {
       tokenAddress: tokenAddress ?? unreachable(),
       amount: fromBalance,
     };
   }
+
+  interface StreamEstimateByReceiver {
+    sender: User;
+    amount: bigint;
+  }
+
+  $: incomingEstimatesBySender =
+    $balancesStore &&
+    balancesStore
+      .getStreamEstimatesByReceiver('currentCycle', $wallet.dripsUserId ?? unreachable())
+      .reduce<StreamEstimateByReceiver[]>((acc, streamEstimate) => {
+        const senderAddress = streamEstimate.sender.address;
+        const existingEntry = acc.find((e) => e.sender.address === senderAddress);
+
+        if (existingEntry) {
+          acc[acc.indexOf(existingEntry)] = {
+            ...existingEntry,
+            amount: existingEntry.amount + streamEstimate.totalStreamed,
+          };
+        } else {
+          acc.push({
+            sender: streamEstimate.sender,
+            amount: streamEstimate.totalStreamed,
+          });
+        }
+
+        return acc;
+      }, []);
+
+  let currentCycleSenders: Items;
+  $: currentCycleSenders = Object.fromEntries(
+    mapFilterUndefined(incomingEstimatesBySender, (estimate) => {
+      if (estimate.amount === 0n) return;
+
+      return [
+        estimate.sender.userId,
+        {
+          type: 'selectable',
+          label: {
+            component: IdentityBadge,
+            props: {
+              address: estimate.sender.address,
+              size: 'normal',
+            },
+          },
+          text: `≈ ${formatTokenAmount(estimate.amount, selectedToken.decimals)} ${
+            selectedToken.symbol
+          }`,
+        },
+      ];
+    }),
+  );
+
+  let squeezeEnabled = false;
+  let selectedSqueezeSenderItems: string[] = [];
+
+  $: totalSelectedSqueezeAmount = squeezeEnabled
+    ? selectedSqueezeSenderItems.reduce<bigint>(
+        (acc, sender) =>
+          acc +
+          (incomingEstimatesBySender.find((e) => e.sender.userId === sender)?.amount ??
+            unreachable()),
+        0n,
+      ) / BigInt(constants.AMT_PER_SEC_MULTIPLIER)
+    : 0n;
+
+  $: splittableAfterReceive =
+    balances.receivable + balances.splittable + totalSelectedSqueezeAmount;
+  $: collectableAfterSplit =
+    (splittableAfterReceive * ownSplitsWeight) / 1000000n + balances.collectable;
 
   async function receiveSplitCollect(updateAwaitStep: UpdateAwaitStepFn) {
     modal.setHideable(false);
@@ -65,7 +138,13 @@
 
     const { CONTRACT_DRIPS_HUB, CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
-    const collectFlow = AddressDriverPresets.Presets.createCollectFlow({
+    let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
+    if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
+      squeezeArgs = await getSqueezeArgs(selectedSqueezeSenderItems, tokenAddress);
+    }
+
+    const collectFlow = AddressDriverPresets.Presets.createSqueezeCollectFlow({
+      squeezeArgs,
       driverAddress: CONTRACT_ADDRESS_DRIVER,
       dripsHubAddress: CONTRACT_DRIPS_HUB,
       userId,
@@ -119,21 +198,46 @@
 
 <StepLayout>
   <EmojiAndToken emoji="👛" {tokenAddress} animateTokenOnMount={splittableAfterReceive !== 0n} />
-  <StepHeader
-    headline={`Collect ${selectedToken.symbol}`}
-    description={splittableAfterReceive === 0n
-      ? `You currently don't have any ${selectedToken.symbol} to collect this cycle.`
-      : `${selectedToken.symbol} earnings can be collected from your account.`}
-  />
-  <FormField
-    title="Review"
-    description={`
-      Tokens streamed to your account become “receivable” on a weekly cycle. Your receivable balance
-      updates next on ${formatDate(currentCycleEnd)}.`}
-  >
+  <StepHeader headline={`Collect ${selectedToken.symbol}`} />
+  <p>
+    Tokens streamed to your account automatically become “receivable” on a weekly cycle. Your
+    receivable balance updates next on {formatDate(currentCycleEnd)}. Before this, you can choose to
+    collect earnings from the current cycle already, but you'll need to pay slightly higher gas
+    fees.
+  </p>
+  <Toggleable label="Include funds from current cycle" bind:toggled={squeezeEnabled}>
+    <p>
+      Select which senders from the current cycle you would like to collect from. The network fee to
+      collect will increase with each sender. Please note that the amounts shown here are estimates
+      based on your current system time, and the amounts you actually end up collecting may slightly
+      differ.
+    </p>
+    <div class="list-wrapper">
+      <ListSelect
+        items={currentCycleSenders}
+        multiselect
+        bind:selected={selectedSqueezeSenderItems}
+        searchable={false}
+      />
+    </div>
+  </Toggleable>
+  <FormField title="Review">
     <LineItems
       lineItems={mapFilterUndefined(
         [
+          {
+            title: `${selectedToken.symbol} from current cycle`,
+            subtitle: 'from incoming streams',
+            value:
+              '≈ ' +
+              formatTokenAmount(
+                makeAmount(totalSelectedSqueezeAmount ?? 0n),
+                selectedToken.decimals,
+                1n,
+              ),
+            symbol: selectedToken.symbol,
+            disabled: !totalSelectedSqueezeAmount,
+          },
           {
             title: `Receivable ${selectedToken.symbol}`,
             subtitle: 'from incoming streams',
@@ -151,12 +255,15 @@
           },
           {
             title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
-            value: formatTokenAmount(
-              makeAmount(collectableAfterSplit - splittableAfterReceive),
-              selectedToken.decimals,
-              1n,
-            ),
-            disabled: ownSplitsWeight === 1000000n,
+            value:
+              (squeezeEnabled ? '≈ ' : '') +
+              formatTokenAmount(
+                makeAmount(collectableAfterSplit - splittableAfterReceive),
+                selectedToken.decimals,
+                1n,
+              ),
+            disabled:
+              ownSplitsWeight === 1000000n || collectableAfterSplit - splittableAfterReceive === 0n,
             symbol: selectedToken.symbol,
           },
           balances.collectable !== 0n
@@ -171,7 +278,9 @@
           {
             title: 'You collect',
             subtitle: 'These funds will be sent to your wallet.',
-            value: formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
+            value:
+              (squeezeEnabled ? '≈ ' : '') +
+              formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: collectableAfterSplit === 0n,
             highlight: true,
@@ -189,3 +298,17 @@
     >
   </svelte:fragment>
 </StepLayout>
+
+<style>
+  p {
+    color: var(--color-foreground-level-6);
+    text-align: left;
+  }
+
+  .list-wrapper {
+    margin-top: 1rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
+  }
+</style>

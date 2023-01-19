@@ -8,7 +8,7 @@
  */
 export default function mapFilterUndefined<T, RT>(
   array: T[],
-  mapFn: (v: T) => RT | undefined,
+  mapFn: (value: T, index: number, array: T[]) => RT | undefined,
 ): RT[] {
   const mapped = array.map(mapFn);
 
