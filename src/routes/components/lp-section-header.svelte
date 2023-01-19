@@ -1,6 +1,6 @@
 <script>
-  import Star from '../illustrations/star.svelte';
-  import Dot from '../illustrations/dot.svelte';
+  import Star from '$lib/components/illustrations/star.svelte';
+  import Dot from '$lib/components/illustrations/dot.svelte';
 </script>
 
 <div class="section-header">

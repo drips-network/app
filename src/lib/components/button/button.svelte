@@ -16,7 +16,12 @@
   on:click|stopPropagation
 >
   {#if icon}
-    <svelte:component this={icon} style="fill: var(--color-foreground)" />
+    <svelte:component
+      this={icon}
+      style={variant === 'destructive' || variant === 'primary'
+        ? 'fill: white'
+        : 'fill: var(--color-foreground)'}
+    />
   {/if}
   <slot />
 </button>
