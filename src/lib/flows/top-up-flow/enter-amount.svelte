@@ -20,8 +20,6 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import { formatUnits } from 'ethers/lib/utils';
 
-  // TODO: Get current balance of ERC-20, validate input accordingly
-
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<TopUpFlowState>;

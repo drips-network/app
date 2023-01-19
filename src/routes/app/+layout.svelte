@@ -33,6 +33,7 @@
 
     tokens.connect(network.chainId);
     ens.connect(provider);
+    balances.initialize();
 
     walletConnected = connected;
 
@@ -40,9 +41,7 @@
 
     if (connected) {
       const addressDriverClient = await getAddressDriverClient();
-
       ens.lookup(address);
-      balances.connect();
 
       try {
         await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
@@ -61,7 +60,6 @@
         }
       }
     } else {
-      balances.disconnect();
       streams.disconnect();
     }
   }

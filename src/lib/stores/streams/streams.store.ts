@@ -3,6 +3,7 @@ import { derived, get, writable } from 'svelte/store';
 import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
 import assert from '$lib/utils/assert';
+import type { AccountFetchStatus } from '../account-fetch-statusses/account-fetch-statusses.store';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -11,8 +12,6 @@ interface State {
     outgoing: Stream[];
   };
 }
-
-type AccountFetchStatus = 'fetching' | 'error' | 'fetched';
 
 export default (() => {
   const userId = writable<string | undefined>(undefined);
@@ -37,7 +36,7 @@ export default (() => {
    * includes accounts explicitly fetched via `fetchAccount`, not any secondary accounts
    * merely fetched as dependencies to top-level accounts.
    */
-  const fetchStatuses = writable<{ [key: UserId]: AccountFetchStatus }>({});
+  const fetchStatusses = writable<{ [key: UserId]: AccountFetchStatus }>({});
 
   /**
    * Connect the store to a user, and fetch the currently-connected user's account
@@ -62,7 +61,7 @@ export default (() => {
    * @param userId The user ID to fetch.
    */
   async function fetchAccount(userId: UserId): Promise<Account> {
-    fetchStatuses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
+    fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
 
     try {
       const account = await _fetchAccount(userId);
@@ -80,10 +79,10 @@ export default (() => {
 
       await Promise.all(accountsSendingToCurrentUser.map((a) => _fetchAccount(a)));
 
-      fetchStatuses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
+      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
       return account;
     } catch (e) {
-      fetchStatuses.update((fs) => ({ ...fs, [userId]: 'error' }));
+      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'error' }));
       throw e;
     }
   }
@@ -145,7 +144,7 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
-    fetchStatuses: { subscribe: fetchStatuses.subscribe },
+    fetchStatusses: { subscribe: fetchStatusses.subscribe },
     connect,
     disconnect,
     getAllStreams,

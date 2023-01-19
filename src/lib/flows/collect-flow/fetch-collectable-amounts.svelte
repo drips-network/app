@@ -11,6 +11,7 @@
   import balances from '$lib/stores/balances';
   import tuple from '$lib/utils/tuple';
   import unreachable from '$lib/utils/unreachable';
+  import wallet from '$lib/stores/wallet';
 
   export let context: Writable<CollectFlowState>;
 
@@ -71,7 +72,7 @@
   }
 
   async function updateCollectable() {
-    await balances.updateBalances();
+    await balances.updateBalances($wallet.dripsUserId ?? unreachable());
   }
 
   async function promise() {

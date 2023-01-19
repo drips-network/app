@@ -7,7 +7,6 @@
   import tokens from '$lib/stores/tokens';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import unreachable from '$lib/utils/unreachable';
-  import { formatBytes32String, formatUnits, toUtf8Bytes } from 'ethers/lib/utils';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
@@ -34,6 +33,7 @@
   import { get } from 'svelte/store';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import modal from '$lib/stores/modal';
+  import { formatUnits } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -172,8 +172,8 @@
           newReceivers,
           userMetadata: [
             {
-              key: formatBytes32String(USER_DATA_KEY),
-              value: toUtf8Bytes(newHash),
+              key: USER_DATA_KEY,
+              value: newHash,
             },
           ],
           balanceDelta: 0,
@@ -194,8 +194,8 @@
 
         tx = await addressDriverClient.emitUserMetadata([
           {
-            key: formatBytes32String(USER_DATA_KEY),
-            value: toUtf8Bytes(newHash),
+            key: USER_DATA_KEY,
+            value: newHash,
           },
         ]);
       }
