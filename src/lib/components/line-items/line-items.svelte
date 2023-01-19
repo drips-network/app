@@ -1,6 +1,5 @@
 <script lang="ts">
   import LineItemComponent from './components/line-item.svelte';
-
   interface LineItem {
     title: string;
     subtitle?: string;
@@ -12,12 +11,13 @@
 
   type LineItems = LineItem[];
 
+  export let animateValueChanges = false;
   export let lineItems: LineItems;
 </script>
 
 <div class="line-items">
   {#each lineItems as lineItem, index}
-    <LineItemComponent {...lineItem} />
+    <LineItemComponent {animateValueChanges} {...lineItem} />
     {#if index !== lineItems.length - 1}<div class="divider" />{/if}
   {/each}
 </div>

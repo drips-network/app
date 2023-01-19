@@ -172,6 +172,8 @@ export default function buildAssetConfigs(
           },
           runsOutOfFunds,
           streams: assetConfigHistoryItemStreams,
+          historyHash: dripsSetEvent.dripsHistoryHash,
+          receiversHash: dripsSetEvent.receiversHash,
         });
       }
 
