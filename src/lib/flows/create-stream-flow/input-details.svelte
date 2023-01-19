@@ -230,27 +230,31 @@
         options={[
           {
             value: '1',
-            title: '/ second',
+            title: 'second',
+          },
+          {
+            value: '60',
+            title: 'minute',
           },
           {
             value: '3600',
-            title: '/ hour',
+            title: 'hour',
           },
           {
             value: '86400',
-            title: '/ day',
+            title: 'day',
           },
           {
             value: '604800',
-            title: '/ week',
+            title: 'week',
           },
           {
             value: '2592000',
-            title: '/ 30 days',
+            title: '30 days',
           },
           {
             value: '31536000',
-            title: '/ 365 days',
+            title: '365 days',
           },
         ]}
       />
