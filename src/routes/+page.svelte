@@ -1,21 +1,21 @@
 <script>
-  import MultiToken from './illustrations/multi-token.svelte';
+  import MultiToken from '../lib/components/illustrations/multi-token.svelte';
   import ImageAndCaption from './components/image-and-caption.svelte';
   import LpCard from './components/lp-card/lp-card.svelte';
   import LpHeader from './components/lp-header.svelte';
 
-  import ThreeDrips from './illustrations/three-drips.svelte';
-  import GasOptimized from './illustrations/gas-optimized.svelte';
-  import OneContract from './illustrations/one-contract.svelte';
-  import NoWrappedTokens from './illustrations/no-wrapped-tokens.svelte';
-  import MultiChain from './illustrations/multi-chain.svelte';
-  import OneBalance from './illustrations/one-balance.svelte';
+  import ThreeDrips from '../lib/components/illustrations/three-drips.svelte';
+  import GasOptimized from '../lib/components/illustrations/gas-optimized.svelte';
+  import OneContract from '../lib/components/illustrations/one-contract.svelte';
+  import NoWrappedTokens from '../lib/components/illustrations/no-wrapped-tokens.svelte';
+  import MultiChain from '../lib/components/illustrations/multi-chain.svelte';
+  import OneBalance from '../lib/components/illustrations/one-balance.svelte';
   import MockDashboard from './components/mock-dashboard/mock-dashboard.svelte';
   import Button from '$lib/components/button/button.svelte';
   import CodeExample from './components/code-example.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
-  import RadicleLogo from './illustrations/radicle-logo.svelte';
-  import DripsSticker from './illustrations/drips-sticker.svelte';
+  import RadicleLogo from '../lib/components/illustrations/radicle-logo.svelte';
+  import DripsSticker from '../lib/components/illustrations/drips-sticker.svelte';
   import themeStore from '$lib/stores/theme/theme.store';
 
   $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';

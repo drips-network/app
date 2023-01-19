@@ -1,6 +1,6 @@
 <script>
   import Button from '$lib/components/button/button.svelte';
-  import DripsLogo from '../illustrations/logo.svelte';
+  import DripsLogo from '$lib/components/illustrations/logo.svelte';
 </script>
 
 <header>
