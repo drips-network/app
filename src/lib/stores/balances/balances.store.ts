@@ -18,7 +18,6 @@ interface Amount {
 interface AccountBalances {
   receivable?: Amount[];
   splittable?: Amount[];
-  streamable: Amount[];
   squeezeHistory?: SqueezedDripsEvent[];
   tokens: { [tokenAddress: string]: AssetConfigEstimates };
 }
