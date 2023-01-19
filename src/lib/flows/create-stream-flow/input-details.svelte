@@ -33,6 +33,8 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
+  const userId = $wallet.dripsUserId ?? unreachable();
+
   let streamNameValue: string;
 
   // Recipient Address
@@ -48,27 +50,32 @@
 
   let tokenList: Items;
   $: tokenList = Object.fromEntries(
-    mapFilterUndefined($balances.streamable, (amount) => {
-      const token = tokens.getByAddress(amount.tokenAddress);
-      if (!token) return undefined;
+    mapFilterUndefined(
+      Object.entries($balances.accounts[userId].tokens),
+      ([tokenAddress, tokenEstimate]) => {
+        const remaining = tokenEstimate.total.totals.remainingBalance;
 
-      return [
-        token.info.address,
-        {
-          type: 'selectable',
-          label: token.info.name,
-          text: `${formatTokenAmount(amount, token.info.decimals)} ${token.info.symbol}`,
-          image: {
-            component: Token,
-            props: {
-              show: 'none',
-              address: token.info.address,
-              size: 'small',
+        const token = tokens.getByAddress(tokenAddress);
+        if (!token) return undefined;
+
+        return [
+          token.info.address,
+          {
+            type: 'selectable',
+            label: token.info.name,
+            text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
+            image: {
+              component: Token,
+              props: {
+                show: 'none',
+                address: token.info.address,
+                size: 'small',
+              },
             },
           },
-        },
-      ];
-    }) ?? [],
+        ];
+      },
+    ) ?? [],
   );
 
   let selectedTokenAddress: string[] = tokenList ? [Object.keys(tokenList)[0]] : [];

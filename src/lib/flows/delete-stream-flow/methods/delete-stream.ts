@@ -6,7 +6,6 @@ import { get } from 'svelte/store';
 import { generateMetadata, pinAccountMetadata, USER_DATA_KEY } from '$lib/stores/streams/metadata';
 import { AddressDriverPresets, Utils } from 'radicle-drips';
 import assert from '$lib/utils/assert';
-import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
 import type { UpdateAwaitStepFn } from '$lib/components/stepper/types';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import etherscanLink from '$lib/utils/etherscan-link';
@@ -66,8 +65,8 @@ export default async function (stream: Stream, updateAwaitStep: UpdateAwaitStepF
     newReceivers,
     userMetadata: [
       {
-        key: formatBytes32String(USER_DATA_KEY),
-        value: toUtf8Bytes(newHash),
+        key: USER_DATA_KEY,
+        value: newHash,
       },
     ],
     balanceDelta: 0,

@@ -146,13 +146,11 @@
           },
           {
             title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
-            value:
-              '-' +
-              formatTokenAmount(
-                makeAmount(collectableAfterSplit - splittableAfterReceive),
-                selectedToken.decimals,
-                1n,
-              ),
+            value: formatTokenAmount(
+              makeAmount(collectableAfterSplit - splittableAfterReceive),
+              selectedToken.decimals,
+              1n,
+            ),
             disabled: ownSplitsWeight === 1000000n,
             symbol: selectedToken.symbol,
           },

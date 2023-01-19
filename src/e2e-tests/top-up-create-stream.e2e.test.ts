@@ -9,7 +9,6 @@ import { expect } from '@playwright/test';
 import fetch from 'node-fetch';
 import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
-import takeScreenshot from './helpers/take-screenshot';
 
 describe('top up, create stream, view profile, search', async () => {
   let server: PreviewServer;
@@ -87,8 +86,6 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('displays the custom mock erc-20 token', async () => {
-      await takeScreenshot(page, 1);
-
       const testcoin = page.locator('text=Testcoin');
       await testcoin.click();
 

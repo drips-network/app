@@ -5,14 +5,12 @@ import type { Account, UserId } from './types';
 import seperateDripsSetEvents from './methods/separate-drips-set-events';
 import buildAssetConfigs from './methods/build-asset-configs';
 import { getAddressDriverClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
-import { formatBytes32String, toUtf8Bytes, toUtf8String } from 'ethers/lib/utils';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { reconcileDripsSetReceivers } from './methods/reconcile-drips-set-receivers';
 import isTest from '$lib/utils/is-test';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
-// TODO: Set to 'ipfs' once SDK supports non-numeric strings as metadata keys.
-export const USER_DATA_KEY = '1234';
+export const USER_DATA_KEY = 'ipfs';
 
 const addressSchema = z.preprocess((v) => {
   if (typeof v !== 'string' || !ethers.utils.isAddress(v)) {
@@ -78,7 +76,7 @@ export async function fetchAccountMetadataHash(userId: UserId): Promise<string |
   if (!getLatestUserMetadata) return undefined;
 
   try {
-    return toUtf8String(getLatestUserMetadata.value);
+    return getLatestUserMetadata.value;
   } catch {
     return undefined;
   }
@@ -208,8 +206,8 @@ export async function updateAccountMetadata(
   const client = await getAddressDriverClient();
   const tx = await client.emitUserMetadata([
     {
-      key: formatBytes32String(USER_DATA_KEY),
-      value: toUtf8Bytes(newHash),
+      key: USER_DATA_KEY,
+      value: newHash,
     },
   ]);
 

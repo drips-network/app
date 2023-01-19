@@ -84,6 +84,11 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+const TEST_WINDOW = {
+  from: 0,
+  to: 100000,
+};
+
 describe('estimate.ts', () => {
   describe('estimateAssetConfig', () => {
     it('correctly calculates a simple stream', () => {
@@ -110,6 +115,7 @@ describe('estimate.ts', () => {
             }),
           ],
         ),
+        TEST_WINDOW,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(100n);
@@ -156,6 +162,7 @@ describe('estimate.ts', () => {
             }),
           ],
         ),
+        TEST_WINDOW,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(0n);
@@ -191,6 +198,7 @@ describe('estimate.ts', () => {
             }),
           ],
         ),
+        TEST_WINDOW,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(0n);
@@ -226,6 +234,7 @@ describe('estimate.ts', () => {
             }),
           ],
         ),
+        TEST_WINDOW,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(100n);
@@ -261,6 +270,7 @@ describe('estimate.ts', () => {
             }),
           ],
         ),
+        TEST_WINDOW,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(0n);
@@ -271,5 +281,44 @@ describe('estimate.ts', () => {
         500n,
       );
     });
+  });
+
+  it('respects the time window argument', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(10 * 1000);
+
+    const activeMockStream = mockStream({
+      dripId: 1,
+      paused: false,
+      amountPerSecond: 100n,
+      durationSeconds: 0,
+      startTimestamp: 0,
+    });
+
+    const result = estimateAssetConfig(
+      mockAssetConfig(
+        [activeMockStream],
+        [
+          mockAssetConfigHistoryItem({
+            timestamp: 0,
+            streams: [activeMockStream],
+            balance: 10000n,
+            runsOutOfFundsTimestamp: 100,
+          }),
+        ],
+      ),
+      {
+        from: 0,
+        to: 5 * 1000,
+      },
+    );
+
+    expect(result.totals.totalAmountPerSecond).toBe(0n);
+    expect(result.totals.totalStreamed).toBe(500n);
+    expect(result.totals.remainingBalance).toBe(9500n);
+
+    expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
+      500n,
+    );
   });
 });

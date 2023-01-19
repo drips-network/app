@@ -37,12 +37,12 @@
 
   $: outgoingEstimate =
     userId && $balances.accounts[userId]
-      ? $balances.accounts[userId][getAddress(tokenAddress)] ?? null
+      ? $balances.accounts[userId].tokens[getAddress(tokenAddress)] ?? null
       : undefined;
 
   $: incomingTotals =
     userId && tokenAddress && $balances
-      ? balances.getIncomingTokenAmountsByUser(userId, tokenAddress) ?? null
+      ? balances.getIncomingBalanceForUser(tokenAddress, userId) ?? null
       : undefined;
 
   function openCollectModal() {
@@ -121,7 +121,7 @@
 
       <TokenStat
         title="Incoming"
-        tooltip="Your incoming balance is the cumulative total earned from any incoming streams for this token."
+        tooltip="Your incoming balance is a real-time estimate of what you've earned up until this moment, minus any prior withdrawals."
       >
         <svelte:fragment slot="detail">
           {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
@@ -136,7 +136,7 @@
           {#if incomingTotals === undefined}
             <span class="animate-pulse">...</span>
           {:else}
-            {@const amount = incomingTotals.totalEarned ?? 0n}
+            {@const amount = incomingTotals?.totalEarned ?? 0n}
             <span class:text-foreground-level-4={amount === 0n}>
               <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
             </span>
@@ -160,7 +160,7 @@
               showSymbol={false}
               amountPerSecond={{
                 tokenAddress,
-                amount: -outgoingEstimate.totals.totalAmountPerSecond,
+                amount: -outgoingEstimate.total.totals.totalAmountPerSecond,
               }}
             />
           {/if}
@@ -170,7 +170,7 @@
           {#if outgoingEstimate === undefined}
             <span class="animate-pulse">...</span>
           {:else}
-            {@const amount = outgoingEstimate ? outgoingEstimate.totals.remainingBalance : 0n}
+            {@const amount = outgoingEstimate ? outgoingEstimate.total.totals.remainingBalance : 0n}
             <span class:text-foreground-level-4={amount === 0n}>
               <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
             </span>

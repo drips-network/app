@@ -35,16 +35,15 @@
 
   $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
   $: estimate =
-    $balances.streamable.find(
-      (amount) => amount.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
-    ) ?? unreachable();
+    $balances.accounts[String($wallet.dripsUserId) ?? unreachable()].tokens[$context.tokenAddress]
+      .total.totals.remainingBalance;
 
   let amount: string | undefined;
   let amountWei: bigint | undefined;
   let withdrawAll = false;
   $: if (withdrawAll) {
     amount = formatUnits(
-      estimate.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      estimate / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
       tokenInfo.info.decimals,
     );
   }
@@ -56,7 +55,7 @@
     if (withdrawAll && amountWei && amountWei > 0n) {
       validationState = { type: 'valid' };
     } else if (amountWei && amountWei > 0n) {
-      if (amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) < estimate.amount) {
+      if (amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) < estimate) {
         validationState = { type: 'valid' };
       } else {
         validationState = {
