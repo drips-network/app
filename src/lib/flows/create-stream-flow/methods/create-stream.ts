@@ -23,7 +23,6 @@ import etherscanLink from '$lib/utils/etherscan-link';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import { formatBytes32String, toUtf8Bytes } from 'ethers/lib/utils';
 import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 
 export default async (
@@ -132,8 +131,8 @@ export default async (
     ],
     userMetadata: [
       {
-        key: formatBytes32String(USER_DATA_KEY),
-        value: toUtf8Bytes(newHash),
+        key: USER_DATA_KEY,
+        value: newHash,
       },
     ],
     balanceDelta: 0,

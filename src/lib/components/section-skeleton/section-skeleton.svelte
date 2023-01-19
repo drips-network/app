@@ -11,7 +11,7 @@
   export let empty = false;
   export let error = false;
   export let placeholderOutline = true;
-  export let horizontalScroll = false;
+  export let horizontalScroll = true;
 
   export let emptyStateEmoji = '👻';
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';

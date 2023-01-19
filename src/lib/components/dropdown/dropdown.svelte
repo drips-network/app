@@ -12,6 +12,7 @@
     iconUrl?: string;
   }
 
+  export let disabled = false;
   export let value: string;
   export let toggleValue = false;
   export let noBorder = false;
@@ -90,10 +91,11 @@
     class="dropdown"
     class:no-border={noBorder}
     class:expanded
-    tabindex="0"
+    class:disabled
+    tabindex={disabled ? -1 : 0}
     bind:this={dropdownElem}
-    on:keydown={handleDropdownKeydown}
-    on:click={handleWrapperClick}
+    on:keydown={disabled ? undefined : handleDropdownKeydown}
+    on:click={disabled ? undefined : handleWrapperClick}
     data-testid="dropdown"
   >
     {#if selectedOption.iconUrl}<img
@@ -175,6 +177,11 @@
     user-select: none;
     display: flex;
     gap: 0.25rem;
+  }
+
+  .dropdown.disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
 
   .dropdown.no-border:not(.expanded) {

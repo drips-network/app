@@ -174,7 +174,7 @@ vi.mock('radicle-drips', async () => ({
   DripsSubgraphClient: {
     create: () => ({
       getDripsSetEventsByUserId: () => MOCK_DRIPS_SET_EVENTS,
-      getLatestUserMetadata: () => ({ value: '0x666f6f' }), // 0x666f6f = Hex speak for 'foo'
+      getLatestUserMetadata: () => ({ value: 'foo' }),
     }),
   },
 }));

@@ -25,6 +25,7 @@
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { AddressDriverPresets } from 'radicle-drips';
   import etherscanLink from '$lib/utils/etherscan-link';
+  import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -53,6 +54,8 @@
   }
 
   async function receiveSplitCollect(updateAwaitStep: UpdateAwaitStepFn) {
+    modal.setHideable(false);
+
     const callerClient = await getCallerClient();
     const addressDriverClient = await getAddressDriverClient();
     const userId = await addressDriverClient.getUserId();
@@ -102,6 +105,8 @@
       // once this is added to the subgraph client.
       amountCollected: collectableAfterSplit,
     }));
+
+    modal.setHideable(true);
   }
 
   function startCollect() {
@@ -146,13 +151,11 @@
           },
           {
             title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
-            value:
-              '-' +
-              formatTokenAmount(
-                makeAmount(collectableAfterSplit - splittableAfterReceive),
-                selectedToken.decimals,
-                1n,
-              ),
+            value: formatTokenAmount(
+              makeAmount(collectableAfterSplit - splittableAfterReceive),
+              selectedToken.decimals,
+              1n,
+            ),
             disabled: ownSplitsWeight === 1000000n,
             symbol: selectedToken.symbol,
           },

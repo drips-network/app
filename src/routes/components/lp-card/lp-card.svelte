@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Dot from '../../illustrations/dot.svelte';
-  import Star from '../../illustrations/star.svelte';
+  import Dot from '$lib/components/illustrations/dot.svelte';
+  import Star from '$lib/components/illustrations/star.svelte';
 
   export let stars = false;
 </script>

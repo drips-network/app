@@ -1,50 +1,57 @@
-import type { AddressDriverClient, DripsHubClient } from 'radicle-drips';
+import { constants, type SqueezedDripsEvent } from 'radicle-drips';
 import { get, readable, writable, type Readable } from 'svelte/store';
-import assert from '$lib/utils/assert';
-import { estimateAccount, type AssetConfigEstimate, type StreamEstimate } from './utils/estimate';
+import { estimateAccount, type AssetConfigEstimates, type StreamEstimate } from './utils/estimate';
 import tickStore from '../tick/tick.store';
 import type { Account, StreamId, UserId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
-import { getAddressDriverClient, getDripsHubClient } from '$lib/utils/get-drips-clients';
+import { getDripsHubClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
+import unreachable from '$lib/utils/unreachable';
+import relevantTokens from './utils/relevant_tokens';
+import fetchBalancesForTokens from './utils/fetch_balances_for_tokens';
+import type { AccountFetchStatus } from '../account-fetch-statusses/account-fetch-statusses.store';
 
 interface Amount {
   amount: bigint;
   tokenAddress: string;
 }
 
+interface AccountBalances {
+  receivable?: Amount[];
+  splittable?: Amount[];
+  squeezeHistory?: SqueezedDripsEvent[];
+  tokens: { [tokenAddress: string]: AssetConfigEstimates };
+}
+
 interface State {
-  receivable: Amount[];
-  streamable: Amount[];
-  accounts: { [userId: string]: { [tokenAddress: string]: AssetConfigEstimate } };
+  accounts: { [userId: string]: AccountBalances };
 }
 
 const INITIAL_STATE = {
-  receivable: [],
-  streamable: [],
   accounts: {},
 };
 
 export default (() => {
-  let addressDriverClient: AddressDriverClient | undefined;
-  let dripsHubClient: DripsHubClient | undefined;
+  let currentCycle:
+    | {
+        start: Date;
+        /** Milliseconds */
+        duration: number;
+      }
+    | undefined;
 
-  let userId: string | undefined;
   let accounts: Readable<{ [accountId: UserId]: Account }> = readable({});
   let tickRegistration: number | undefined;
   const state = writable<State>(INITIAL_STATE);
+  const fetchStatusses = writable<{ [key: UserId]: AccountFetchStatus }>({});
 
-  if (!tickRegistration) tickRegistration = tickStore.register(_updateAllBalances);
+  // Once per tick, we run balance estimation logic.
+  if (!tickRegistration) tickRegistration = tickStore.register(_updateAccountBalances);
 
   /**
-   * Connect the store to a given AddressDriverClient and fetch balances.
+   * Initialize the store. Once initialized, it's ready to estimate balances.
    */
-  async function connect() {
-    addressDriverClient = await getAddressDriverClient();
-    dripsHubClient = await getDripsHubClient();
-
-    userId = (await addressDriverClient.getUserId()).toString();
-
-    await updateBalances();
+  async function initialize() {
+    await updateCycle();
   }
 
   /**
@@ -56,148 +63,234 @@ export default (() => {
     accounts = toAccounts;
   }
 
-  /** Disconnect from the provided addressDriverClient and clear the store. */
-  function disconnect() {
-    addressDriverClient = undefined;
-    userId = undefined;
-    if (tickRegistration) tickStore.deregister(tickRegistration);
-    tickRegistration = undefined;
-
-    state.update((s) => ({
-      ...s,
-      receivable: [],
-      streamable: [],
-    }));
-  }
-
   /** Update the current receivable balances for the currently connected user. */
-  async function updateBalances() {
-    assert(dripsHubClient && userId, 'Store must be connected first');
+  async function updateBalances(forUserId: string) {
+    const tokenAddresses = await Promise.all([
+      relevantTokens('receivable', forUserId),
+      relevantTokens('splittable', forUserId),
+    ]);
 
-    // TODO: Remove explicit maxCycles once SDK no longer has overflow bug with the default value
-    const allBalancesRes = await dripsHubClient.getAllReceivableBalancesForUser(userId, 10000);
+    const balances = await Promise.all([
+      fetchBalancesForTokens('receivable', tokenAddresses[0], forUserId),
+      fetchBalancesForTokens('splittable', tokenAddresses[1], forUserId),
+    ]);
 
-    state.update((s) => ({
-      ...s,
-      receivable: allBalancesRes.map((b) => ({
+    state.update((s) => {
+      s.accounts[forUserId].receivable = balances[0].map((b) => ({
         amount: b.receivableAmount,
         tokenAddress: b.tokenAddress,
         multiplier: 1n,
-      })),
-      streamable: s?.streamable ?? [],
-      accounts: s?.accounts ?? {},
-    }));
+      }));
+
+      s.accounts[forUserId].splittable = balances[1].map((b) => ({
+        amount: b.splittableAmount,
+        tokenAddress: b.tokenAddress,
+        multiplier: 1n,
+      }));
+
+      return s;
+    });
   }
+
+  /**
+   * Update the squeeze history for a given account.
+   * @param forUserId The user ID to update the squeeze history for.
+   */
+  async function updateSqueezeHistory(forUserId: string) {
+    const subgraph = getSubgraphClient();
+
+    const squeezedEvents = (await subgraph.getSqueezedDripsEventsByUserId(forUserId)).sort(
+      (a, b) => Number(a.blockTimestamp) - Number(b.blockTimestamp),
+    );
+
+    state.update((s) => {
+      s.accounts[forUserId].squeezeHistory = squeezedEvents;
+      return s;
+    });
+  }
+
+  // Ensure that squeeze history and balances are kept up to date for newly-added accounts.
+  state.subscribe(async (s) => {
+    const accounts = Object.keys(s.accounts);
+
+    for (const userId of accounts) {
+      const currentFetchStatus = get(fetchStatusses)[userId];
+      if (['fetching', 'fetched'].includes(currentFetchStatus)) continue;
+
+      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
+
+      try {
+        await Promise.all([updateSqueezeHistory(userId), updateBalances(userId)]);
+      } catch (e) {
+        fetchStatusses.update((fs) => ({ ...fs, [userId]: 'error' }));
+        throw e;
+      }
+
+      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
+    }
+  });
 
   /**
    * Find the estimate for a stream across all fetched accounts by its ID.
    * @param id The ID to find.
    * @returns The estimate for the stream, or undefined if it hasn't been estimated.
    */
-  function getEstimateByStreamId(id: StreamId): StreamEstimate | undefined {
+  function getEstimateByStreamId(
+    id: StreamId,
+    mode: 'total' | 'currentCycle' = 'total',
+  ): StreamEstimate | undefined {
     const { senderUserId, tokenAddress } = decodeStreamId(id);
 
-    return get(state).accounts[senderUserId]?.[tokenAddress]?.streams.find((s) => s.id === id);
+    return get(state).accounts[senderUserId]?.tokens[tokenAddress]?.[mode].streams.find(
+      (s) => s.id === id,
+    );
   }
 
-  function getAllStreamEstimates() {
-    return Object.values(get(state).accounts).reduce<StreamEstimate[]>((acc, account) => {
-      return [
-        ...acc,
-        ...Object.values(account).reduce<StreamEstimate[]>(
-          (acc, assetConfig) => [...acc, ...assetConfig.streams],
-          [],
-        ),
-      ];
-    }, []);
+  /**
+   * Retrieve ALL stream estimates currently in the state as an array.
+   * @param mode Which estimate to fetch; currentCycle only, or total.
+   * @returns An array of all stream estimates with the provided mode.
+   */
+  function getAllStreamEstimates(mode: 'total' | 'currentCycle' = 'total'): StreamEstimate[] {
+    return Object.values(get(state).accounts)
+      .map((accountEstimate) => Object.values(accountEstimate.tokens))
+      .flat()
+      .map((assetConfigEstimates) => assetConfigEstimates[mode])
+      .map((currentCycleEstimate) => currentCycleEstimate.streams)
+      .flat();
   }
 
-  function getStreamEstimatesByReceiver(userId: string) {
-    const allStreamEstimates = getAllStreamEstimates();
+  /**
+   * Get stream estimates for all streams streaming to a given receiver.
+   * @param userId The receiver's User ID to get streams for.
+   * @returns The relevant stream estimate objects.
+   */
+  function getStreamEstimatesByReceiver(mode: 'total' | 'currentCycle', userId: string) {
+    const allStreamEstimates = getAllStreamEstimates(mode);
 
     return allStreamEstimates.filter((se) => se.receiver.userId === userId);
   }
 
   /**
-   * Get and calculate a user's total incoming amount and total incoming amounts-per-second
-   * @param userId The desired user's ID
-   * @param tokenAddress The desired token's address
-   * @returns The total income earned and total incoming rate
+   * Calculate an estimate of the current incoming balance for the given user and
+   * token address. This estimate is equal to what the user could currently collect
+   * if they were to **squeeze all their incoming streams**, but **before splitting**.
+   * It includes funds earned from incoming splits and gives, and also takes any squeezes
+   * during the current cycle into account.
+   * @param tokenAddress The token address of the balance to fetch estimates for.
+   * @param userId The user ID of the user to get balances for.
+   * @returns The incoming balance total and current amount per second, or undefined
+   * if the receivable & splittable balances for the account haven't yet been fetched.
    */
-  function getIncomingTokenAmountsByUser(
-    userId: string,
-    tokenAddress: string,
-  ): {
-    totalEarned: bigint;
-    amountPerSecond: bigint;
-  } {
-    const ownStreams = getStreamEstimatesByReceiver(userId);
+  function getIncomingBalanceForUser(tokenAddress: string, userId: string) {
+    const accountBalances = get(state).accounts[userId];
+    if (!accountBalances) return;
 
-    if (!ownStreams) return { totalEarned: 0n, amountPerSecond: 0n };
+    const { receivable, splittable, squeezeHistory } = accountBalances;
+    if (!receivable || !splittable || !squeezeHistory) return;
 
-    const incomingStreamsForToken = ownStreams.filter(
-      (stream) => stream.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    const incomingStreamsForToken = getStreamEstimatesByReceiver('currentCycle', userId).filter(
+      (streamEstimate) => streamEstimate.tokenAddress === tokenAddress,
     );
 
-    return incomingStreamsForToken.reduce<{ totalEarned: bigint; amountPerSecond: bigint }>(
+    // Sum up the total streamed by relevant incoming streams
+    const currentCycleEstimate = incomingStreamsForToken.reduce<{
+      amtPerSec: bigint;
+      total: bigint;
+    }>(
       (acc, stream) => {
-        const estimate = getEstimateByStreamId(stream.id);
-
-        if (!estimate) throw new Error(`Unknown estimate for stream ${stream.id}`);
-
         return {
-          totalEarned: acc.totalEarned + estimate.totalStreamed,
-          amountPerSecond: acc.amountPerSecond + estimate.currentAmountPerSecond,
+          amtPerSec: acc.amtPerSec + (stream.currentAmountPerSecond ?? 0n),
+          total: acc.total + (stream.totalStreamed ?? 0n),
         };
       },
-      { totalEarned: 0n, amountPerSecond: 0n },
+      { amtPerSec: 0n, total: 0n },
     );
+
+    // Retrieve the user's `streamable` and `splittable` balances for the given token
+    const receivableForToken =
+      (receivable.find((t) => t.tokenAddress === tokenAddress)?.amount ?? 0n) *
+      BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+    const splittableForToken =
+      (splittable.find((t) => t.tokenAddress === tokenAddress)?.amount ?? 0n) *
+      BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+
+    const cycle = currentCycle ?? unreachable();
+
+    // Calculate how much of the token the user has squeezed this cycle
+    const squeezesInCurrentCycle = squeezeHistory.filter(
+      (hi) => Number(hi.blockTimestamp) * 1000 >= cycle.start.getTime(),
+    );
+    const totalAmountSqueezed = squeezesInCurrentCycle.reduce<bigint>(
+      (acc, hi) => acc + hi.amount * BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      0n,
+    );
+
+    return {
+      /*
+      The total earned is everything
+      - `receivable` (earned & not received in previous cycle)
+      - `splittable` (already-received but not-yet-split income, or income from incoming split & gives)
+      - everything streamed to the user in the current cycle, which is not yet included in figures
+        reported by the contract
+      - MINUS any funds the user has squeezed in the current cycle (which is substracted from the total
+        earned amount in order to not be double-counted)
+      */
+      totalEarned:
+        receivableForToken + splittableForToken + currentCycleEstimate.total - totalAmountSqueezed,
+      amountPerSecond: currentCycleEstimate.amtPerSec,
+    };
+  }
+
+  /**
+   * The balances store internally fetches information about the current DripsHub cycle in order to
+   * accurately estimate incoming balances. This function forces an update of the cycle information fetched on
+   * when the store was initialized.
+   */
+  async function updateCycle() {
+    const dripsHubClient = await getDripsHubClient();
+
+    const cycleSecs = await dripsHubClient.cycleSecs();
+    const currentCycleSecs = Math.floor(new Date().getTime() / 1000) % cycleSecs;
+    const currentCycleStart = new Date(new Date().getTime() - Number(currentCycleSecs) * 1000);
+
+    currentCycle = {
+      start: currentCycleStart,
+      duration: cycleSecs * 1000,
+    };
   }
 
   /** @private */
   function _updateAccountBalances() {
-    state.update((s) => ({
-      ...s,
-      accounts: Object.fromEntries(
-        Object.values(get(accounts)).map((account) => [
-          account.user.userId,
-          estimateAccount(account),
-        ]),
-      ),
-    }));
-  }
+    state.update((s) => {
+      if (!currentCycle) return s;
 
-  /** @private */
-  function _updateStreamableBalances() {
-    const account = get(state).accounts[userId ?? ''];
-    if (!account) return;
-
-    const streamable = Object.entries(account).map<Amount>(([tokenAddress, estimate]) => ({
-      tokenAddress,
-      amount: estimate.totals.remainingBalance,
-    }));
-
-    state.update((s) => ({
-      ...s,
-      streamable,
-    }));
-  }
-
-  /** @private */
-  function _updateAllBalances() {
-    _updateAccountBalances();
-    _updateStreamableBalances();
+      return {
+        ...s,
+        accounts: Object.fromEntries(
+          Object.values(get(accounts)).map((account) => [
+            account.user.userId,
+            {
+              ...get(state).accounts[account.user.userId],
+              tokens: estimateAccount(account, currentCycle ?? unreachable()),
+            },
+          ]),
+        ),
+      };
+    });
   }
 
   return {
     subscribe: state.subscribe,
+    fetchStatusses: { subscribe: fetchStatusses.subscribe },
+    initialize,
     setAccounts,
     getAllStreamEstimates,
     getEstimateByStreamId,
     getStreamEstimatesByReceiver,
-    getIncomingTokenAmountsByUser,
-    connect,
-    disconnect,
+    getIncomingBalanceForUser,
+    updateCycle,
     updateBalances,
+    updateSqueezeHistory,
   };
 })();

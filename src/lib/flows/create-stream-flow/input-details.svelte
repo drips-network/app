@@ -33,6 +33,8 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
+  const userId = $wallet.dripsUserId ?? unreachable();
+
   let streamNameValue: string;
 
   // Recipient Address
@@ -48,27 +50,32 @@
 
   let tokenList: Items;
   $: tokenList = Object.fromEntries(
-    mapFilterUndefined($balances.streamable, (amount) => {
-      const token = tokens.getByAddress(amount.tokenAddress);
-      if (!token) return undefined;
+    mapFilterUndefined(
+      Object.entries($balances.accounts[userId].tokens),
+      ([tokenAddress, tokenEstimate]) => {
+        const remaining = tokenEstimate.total.totals.remainingBalance;
 
-      return [
-        token.info.address,
-        {
-          type: 'selectable',
-          label: token.info.name,
-          text: `${formatTokenAmount(amount, token.info.decimals)} ${token.info.symbol}`,
-          image: {
-            component: Token,
-            props: {
-              show: 'none',
-              address: token.info.address,
-              size: 'small',
+        const token = tokens.getByAddress(tokenAddress);
+        if (!token) return undefined;
+
+        return [
+          token.info.address,
+          {
+            type: 'selectable',
+            label: token.info.name,
+            text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
+            image: {
+              component: Token,
+              props: {
+                show: 'none',
+                address: token.info.address,
+                size: 'small',
+              },
             },
           },
-        },
-      ];
-    }) ?? [],
+        ];
+      },
+    ) ?? [],
   );
 
   let selectedTokenAddress: string[] = tokenList ? [Object.keys(tokenList)[0]] : [];
@@ -223,27 +230,31 @@
         options={[
           {
             value: '1',
-            title: '/ second',
+            title: 'second',
+          },
+          {
+            value: '60',
+            title: 'minute',
           },
           {
             value: '3600',
-            title: '/ hour',
+            title: 'hour',
           },
           {
             value: '86400',
-            title: '/ day',
+            title: 'day',
           },
           {
             value: '604800',
-            title: '/ week',
+            title: 'week',
           },
           {
             value: '2592000',
-            title: '/ 30 days',
+            title: '30 days',
           },
           {
             value: '31536000',
-            title: '/ 365 days',
+            title: '365 days',
           },
         ]}
       />

@@ -28,6 +28,7 @@
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import { formatUnits } from 'ethers/lib/utils';
+  import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,16 +36,15 @@
 
   $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
   $: estimate =
-    $balances.streamable.find(
-      (amount) => amount.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
-    ) ?? unreachable();
+    $balances.accounts[String($wallet.dripsUserId) ?? unreachable()].tokens[$context.tokenAddress]
+      .total.totals.remainingBalance;
 
   let amount: string | undefined;
   let amountWei: bigint | undefined;
   let withdrawAll = false;
   $: if (withdrawAll) {
     amount = formatUnits(
-      estimate.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      estimate / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
       tokenInfo.info.decimals,
     );
   }
@@ -56,7 +56,7 @@
     if (withdrawAll && amountWei && amountWei > 0n) {
       validationState = { type: 'valid' };
     } else if (amountWei && amountWei > 0n) {
-      if (amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) < estimate.amount) {
+      if (amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) < estimate) {
         validationState = { type: 'valid' };
       } else {
         validationState = {
@@ -80,6 +80,8 @@
   }
 
   async function withdraw(amountWei: bigint, updateAwaitStepFn: UpdateAwaitStepFn) {
+    modal.setHideable(false);
+
     const { address, dripsUserId } = $wallet;
     assert(address && dripsUserId);
 
@@ -148,6 +150,8 @@
       5000,
       1000,
     );
+
+    modal.setHideable(true);
   }
 
   function triggerWithdraw() {
