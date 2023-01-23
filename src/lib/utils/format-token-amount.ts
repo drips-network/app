@@ -2,18 +2,10 @@ import { utils } from 'ethers';
 import { constants } from 'radicle-drips';
 
 const MAX_DECIMAL_ZEROES = 8;
-const MIN_DECIMAL_ZEROES = 2;
 
 interface Amount {
   amount: bigint;
   tokenAddress: string;
-}
-
-function countDecimals(num: number) {
-  if (isNaN(+num)) return 0;
-  const decimals = (num + '').split('.')[1];
-  if (decimals) return decimals.length;
-  return 0;
 }
 
 /**
@@ -32,9 +24,10 @@ export default function formatTokenAmount(
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 
+  if (amount === 0n) return '0.00';
+
   const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
-  const decimalCount = countDecimals(parsedAmount);
-  const amountDecimals = Math.max(Math.min(MAX_DECIMAL_ZEROES, decimalCount), MIN_DECIMAL_ZEROES);
+  const amountDecimals = MAX_DECIMAL_ZEROES;
 
   const formatted = `${parsedAmount.toFixed(amountDecimals)}`;
 
