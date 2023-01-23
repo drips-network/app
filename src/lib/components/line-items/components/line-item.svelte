@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  export let animateValueChanges;
+  export let animateValueChanges = false;
   export let title: string;
   export let subtitle: string | undefined = undefined;
   export let value: string;
