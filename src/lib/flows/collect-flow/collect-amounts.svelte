@@ -211,8 +211,6 @@
 
     context.update((c) => ({
       ...c,
-      // TODO: Display the real value from the `Collected` event emitted during the batch call,
-      // once this is added to the subgraph client.
       amountCollected,
       squeezeEnabled,
     }));
