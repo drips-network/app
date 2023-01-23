@@ -40,7 +40,6 @@
             { tokenAddress, amount: amountCollected },
             tokenInfo.info.decimals,
             1n,
-            true,
           )}`,
           symbol: tokenInfo.info.symbol,
         },
