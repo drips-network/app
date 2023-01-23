@@ -69,6 +69,8 @@ const mockAssetConfigHistoryItem = ({
     receiver: stream.receiver,
   })),
   runsOutOfFunds: runsOutOfFundsTimestamp ? new Date(runsOutOfFundsTimestamp * 1000) : undefined,
+  historyHash: '0x00',
+  receiversHash: '0x00',
 });
 
 const mockAssetConfig = (
@@ -116,6 +118,7 @@ describe('estimate.ts', () => {
           ],
         ),
         TEST_WINDOW,
+        MOCK_USER,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(100n);
@@ -163,6 +166,7 @@ describe('estimate.ts', () => {
           ],
         ),
         TEST_WINDOW,
+        MOCK_USER,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(0n);
@@ -199,6 +203,7 @@ describe('estimate.ts', () => {
           ],
         ),
         TEST_WINDOW,
+        MOCK_USER,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(0n);
@@ -235,6 +240,7 @@ describe('estimate.ts', () => {
           ],
         ),
         TEST_WINDOW,
+        MOCK_USER,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(100n);
@@ -271,6 +277,7 @@ describe('estimate.ts', () => {
           ],
         ),
         TEST_WINDOW,
+        MOCK_USER,
       );
 
       expect(result.totals.totalAmountPerSecond).toBe(0n);
@@ -311,6 +318,7 @@ describe('estimate.ts', () => {
         from: 0,
         to: 5 * 1000,
       },
+      MOCK_USER,
     );
 
     expect(result.totals.totalAmountPerSecond).toBe(0n);
