@@ -138,14 +138,16 @@
         </svelte:fragment>
 
         <svelte:fragment slot="value">
-          {#if !loaded || !incomingTotals}
-            <span class="animate-pulse">...</span>
-          {:else}
-            {@const amount = incomingTotals?.totalEarned ?? 0n}
-            <span class:text-foreground-level-4={amount === 0n}>
-              <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
-            </span>
-          {/if}
+          <div data-testid="incoming-balance">
+            {#if !loaded || !incomingTotals}
+              <span class="animate-pulse">...</span>
+            {:else}
+              {@const amount = incomingTotals?.totalEarned ?? 0n}
+              <span class:text-foreground-level-4={amount === 0n}>
+                <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
+              </span>
+            {/if}
+          </div>
         </svelte:fragment>
 
         <svelte:fragment slot="actions">
@@ -172,14 +174,18 @@
         </svelte:fragment>
 
         <svelte:fragment slot="value">
-          {#if !loaded}
-            <span class="animate-pulse">...</span>
-          {:else}
-            {@const amount = outgoingEstimate ? outgoingEstimate.total.totals.remainingBalance : 0n}
-            <span class:text-foreground-level-4={amount === 0n}>
-              <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
-            </span>
-          {/if}
+          <div data-testid="outgoing-balance">
+            {#if !loaded}
+              <span class="animate-pulse">...</span>
+            {:else}
+              {@const amount = outgoingEstimate
+                ? outgoingEstimate.total.totals.remainingBalance
+                : 0n}
+              <span class:text-foreground-level-4={amount === 0n}>
+                <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
+              </span>
+            {/if}
+          </div>
         </svelte:fragment>
 
         <svelte:fragment slot="actions">
