@@ -19,7 +19,7 @@
       "name": "Settings",
       "short_name": "Settings",
       "description": "Adjust settings for the Drips app.",
-      "url": "/app/dashboard",
+      "url": "/app/settings",
       "icons": [{ "src": "/icons/settings.png", "sizes": "256x256" }]
     }
   ],
