@@ -15,5 +15,22 @@
       "icons": [{ "src": "/icons/dashboard.png", "sizes": "256x256" }]
     }
   ],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
   "description": "Stream and split funds on Ethereum"
 }
