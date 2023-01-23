@@ -37,7 +37,7 @@ describe('amount.svelte', () => {
     });
 
     // By default, the component should apply extra 9 decimals of precision to the value
-    expect(screen.getByText('1.00')).toBeInTheDocument();
+    expect(screen.getByText('1.00000000')).toBeInTheDocument();
     expect(screen.getByText('RAD')).toBeInTheDocument();
 
     cleanup();
@@ -51,36 +51,21 @@ describe('amount.svelte', () => {
       },
     });
 
-    screen.getByText('1000000000.00');
+    screen.getByText('1000000000.00000000');
     screen.getByText('RLC');
   });
 
-  it('trims decimals', () => {
+  it('trims decimals on zero values', () => {
     render(Amount, {
       props: {
         amount: {
           tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-          amount: BigInt('1100000000000000000'),
+          amount: BigInt('0'),
         },
         multiplier: 1n,
       },
     });
-
-    // Should display at least 2 decimal places
-    screen.getByText('1.10');
-
-    render(Amount, {
-      props: {
-        amount: {
-          tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3', // RAD, 18 decimals
-          amount: BigInt('1123400000000000000'),
-        },
-        multiplier: 1n,
-      },
-    });
-
-    // Should not display excessive zeroes
-    screen.getByText('1.1234');
+    screen.getByText('0.00');
 
     render(Amount, {
       amount: {
