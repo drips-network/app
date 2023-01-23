@@ -17,10 +17,10 @@
   $: filteredItems = Object.fromEntries(
     Object.entries(items).filter((entry) => {
       const item = entry[1];
-      const searchString =
+      const itemSearchString =
         (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
 
-      const startsWithSearchString = searchString
+      const startsWithSearchString = itemSearchString
         .toLowerCase()
         .startsWith(searchString.toLowerCase());
       return startsWithSearchString || item.type === 'action';
