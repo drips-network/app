@@ -3,7 +3,7 @@
   import { cubicInOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
 
-  const INIT_HEIGHT = 0;
+  const INIT_HEIGHT = 256;
 
   let containerHeight = tweened(INIT_HEIGHT, {
     duration: 300,
@@ -37,7 +37,7 @@
   }
 </script>
 
-<div class="transitioned-height" style:height={`${$containerHeight}px`}>
+<div class="transitioned-height" style:height="{$containerHeight}px">
   <div class="inner" bind:this={contentContainerElem}>
     <slot />
   </div>
@@ -45,6 +45,7 @@
 
 <style>
   .transitioned-height {
+    height: auto;
     overflow: hidden;
   }
 </style>

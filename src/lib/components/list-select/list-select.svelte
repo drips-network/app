@@ -152,7 +152,7 @@
     >
       {#if item.type === 'selectable' && !blockInteraction}
         <div class="check-icon">
-          <SelectedDot selected={selected.includes(slug)} />
+          <SelectedDot type={multiselect ? 'check' : 'radio'} selected={selected.includes(slug)} />
         </div>
       {/if}
       {#if item.image}
@@ -254,9 +254,11 @@
 
   .item .content {
     display: flex;
+    gap: 1rem;
     justify-content: space-between;
     width: 100%;
     color: var(--color-foreground);
+    flex-wrap: wrap;
   }
 
   .item .content .text {

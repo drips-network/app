@@ -83,6 +83,11 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
     }
   : {
       ...Utils.Network.configs,
+      5: {
+        ...Utils.Network.configs[5],
+        SUBGRAPH_URL:
+          'https://api.thegraph.com/subgraphs/name/gh0stwheel/drips-v2-on-goerli-old-stable',
+      },
     };
 
 /**

@@ -16,6 +16,7 @@ export interface CollectFlowState {
     durationMillis: number;
   };
   amountCollected?: bigint;
+  squeezeEnabled?: boolean;
 }
 
 export default writable<CollectFlowState>({});

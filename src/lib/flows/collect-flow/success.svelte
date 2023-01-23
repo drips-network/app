@@ -19,7 +19,9 @@
 
   $: tokenAddress = $context.tokenAddress ?? unreachable();
   $: tokenInfo = tokens.getByAddress(tokenAddress) ?? unreachable();
-  $: amountCollected = $context.amountCollected ?? unreachable();
+  // If amountCollected is undefined, the subgraph didn't index the collect amount in time,
+  // so we just don't show the collected amount (this should rarely be the case).
+  $: amountCollected = $context.amountCollected;
   $: ownAddress = $wallet.address ?? unreachable();
 </script>
 
@@ -29,19 +31,22 @@
     headline="Success"
     description={`You've successfully collected ${tokenInfo.info.symbol}.`}
   />
-  <LineItems
-    lineItems={[
-      {
-        title: 'Amount collected',
-        value: `${formatTokenAmount(
-          { tokenAddress, amount: amountCollected },
-          tokenInfo.info.decimals,
-          1n,
-        )}`,
-        symbol: tokenInfo.info.symbol,
-      },
-    ]}
-  />
+  {#if amountCollected}
+    <LineItems
+      lineItems={[
+        {
+          title: 'Amount collected',
+          value: `${formatTokenAmount(
+            { tokenAddress, amount: amountCollected },
+            tokenInfo.info.decimals,
+            1n,
+            true,
+          )}`,
+          symbol: tokenInfo.info.symbol,
+        },
+      ]}
+    />
+  {/if}
   <p>
     Your funds have been transferred to your address {ownAddress}. Please note that it may take some
     time for your dashboard to update.

@@ -106,6 +106,8 @@ export default (() => {
       s.accounts[forUserId].squeezeHistory = squeezedEvents;
       return s;
     });
+
+    return squeezedEvents;
   }
 
   // Ensure that squeeze history and balances are kept up to date for newly-added accounts.

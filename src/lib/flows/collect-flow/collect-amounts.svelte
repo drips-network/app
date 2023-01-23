@@ -10,6 +10,7 @@
     getAddressDriverClient,
     getCallerClient,
     getNetworkConfig,
+    getSubgraphClient,
   } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import unreachable from '$lib/utils/unreachable';
@@ -23,7 +24,7 @@
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
-  import { AddressDriverPresets, constants } from 'radicle-drips';
+  import { AddressDriverPresets, constants, type CollectedEvent } from 'radicle-drips';
   import etherscanLink from '$lib/utils/etherscan-link';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
@@ -33,6 +34,8 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import getSqueezeArgs from './get-squeeze-args';
   import modal from '$lib/stores/modal';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import expect from '$lib/utils/expect';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -176,14 +179,47 @@
       },
     });
 
-    await tx.wait();
+    const receipt = await tx.wait();
+
+    updateAwaitStep({
+      message: 'Wrapping up…',
+    });
+
+    const { provider } = $wallet;
+    const { timestamp } = await provider.getBlock(receipt.blockNumber);
+    assert(timestamp);
+
+    const subgraph = getSubgraphClient();
+
+    function findMatchingEvent(events: CollectedEvent[], timestamp: number) {
+      return events.find((e) => e.blockTimestamp === BigInt(timestamp));
+    }
+
+    // Wait for the collect event to be indexed by the subgraph so we know how much was actually
+    // collected.
+    const expectation = await expect(
+      async () => subgraph.getCollectedEventsByUserId(userId),
+      (collectedEvents) => Boolean(findMatchingEvent(collectedEvents, timestamp)),
+      15000,
+      1000,
+      true,
+    );
+
+    const amountCollected = expectation.failed
+      ? undefined
+      : findMatchingEvent(expectation.result, timestamp)?.collected;
 
     context.update((c) => ({
       ...c,
       // TODO: Display the real value from the `Collected` event emitted during the batch call,
       // once this is added to the subgraph client.
-      amountCollected: collectableAfterSplit,
+      amountCollected,
+      squeezeEnabled,
     }));
+
+    // The squeeze event should be indexed by now, so this should cause the dashboard to update
+    // in the background to reflect the newly reduced incoming balance.
+    if (squeezeEnabled) await balancesStore.updateSqueezeHistory(userId);
 
     modal.setHideable(true);
   }
@@ -199,60 +235,76 @@
 <StepLayout>
   <EmojiAndToken emoji="👛" {tokenAddress} animateTokenOnMount={splittableAfterReceive !== 0n} />
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
-  <p>
-    Tokens streamed to your account automatically become “receivable” on a weekly cycle. Your
-    receivable balance updates next on {formatDate(currentCycleEnd)}. Before this, you can choose to
-    collect earnings from the current cycle already, but you'll need to pay slightly higher gas
-    fees.
-  </p>
-  <Toggleable label="Include funds from current cycle" bind:toggled={squeezeEnabled}>
+  <div>
     <p>
-      Select which senders from the current cycle you would like to collect from. The network fee to
-      collect will increase with each sender. Please note that the amounts shown here are estimates
-      based on your current system time, and the amounts you actually end up collecting may slightly
-      differ.
+      Tokens streamed to your account automatically become receivable on a weekly cycle. Your
+      receivable balance updates next on <span class="typo-text-bold"
+        >{formatDate(currentCycleEnd)}</span
+      >.
     </p>
-    <div class="list-wrapper">
-      <ListSelect
-        items={currentCycleSenders}
-        multiselect
-        bind:selected={selectedSqueezeSenderItems}
-        searchable={false}
-      />
-    </div>
-  </Toggleable>
+    <a
+      class="typo-text-small"
+      target="_blank"
+      href="https://v2.docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings"
+      >Learn more</a
+    >
+  </div>
+  <div class="squeeze-section">
+    <Toggleable label="Include funds from current cycle" bind:toggled={squeezeEnabled}>
+      <p>
+        Select which senders from the current cycle you would like to collect from. The network fee
+        for collecting increases with each selected sender.
+      </p>
+      <AnnotationBox type="warning">
+        The amounts shown below are estimated based on your system time, and the value you actually
+        end up collecting may slightly differ.
+      </AnnotationBox>
+      <div class="list-wrapper">
+        <ListSelect
+          items={currentCycleSenders}
+          multiselect
+          bind:selected={selectedSqueezeSenderItems}
+          searchable={false}
+        />
+      </div>
+    </Toggleable>
+  </div>
   <FormField title="Review">
     <LineItems
       lineItems={mapFilterUndefined(
         [
+          squeezeEnabled
+            ? {
+                title: `${selectedToken.symbol} from current cycle`,
+                subtitle: 'Earned from incoming streams',
+                value:
+                  '≈ ' +
+                  formatTokenAmount(
+                    makeAmount(totalSelectedSqueezeAmount ?? 0n),
+                    selectedToken.decimals,
+                    1n,
+                  ),
+                symbol: selectedToken.symbol,
+              }
+            : undefined,
           {
-            title: `${selectedToken.symbol} from current cycle`,
-            subtitle: 'from incoming streams',
-            value:
-              '≈ ' +
-              formatTokenAmount(
-                makeAmount(totalSelectedSqueezeAmount ?? 0n),
-                selectedToken.decimals,
-                1n,
-              ),
-            symbol: selectedToken.symbol,
-            disabled: !totalSelectedSqueezeAmount,
-          },
-          {
-            title: `Receivable ${selectedToken.symbol}`,
-            subtitle: 'from incoming streams',
+            title: `${selectedToken.symbol} from concluded cycles`,
+            subtitle: 'Earned from incoming streams',
             value: formatTokenAmount(makeAmount(balances.receivable), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: balances.receivable === 0n,
           },
-          {
-            title: `Splittable ${selectedToken.symbol}`,
-            subtitle: 'from already-received streams or incoming splits & gives',
-            value:
-              '+' + formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
-            symbol: selectedToken.symbol,
-            disabled: balances.splittable === 0n,
-          },
+          balances.splittable > 0n
+            ? {
+                title: `Splittable ${selectedToken.symbol}`,
+                subtitle: 'Earned from already-received streams or incoming splits & gives',
+                value:
+                  '+' +
+                  formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
+                symbol: selectedToken.symbol,
+                disabled: balances.splittable === 0n,
+              }
+            : undefined,
           {
             title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
             value:
@@ -302,6 +354,18 @@
 <style>
   p {
     color: var(--color-foreground-level-6);
+    text-align: left;
+  }
+
+  .squeeze-section p {
+    margin-bottom: 1rem;
+  }
+
+  a {
+    color: var(--color-foreground-level-6);
+    text-decoration: underline;
+    display: block;
+    margin-top: 0.5rem;
     text-align: left;
   }
 
