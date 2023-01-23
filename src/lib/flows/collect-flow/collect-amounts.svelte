@@ -202,7 +202,6 @@
       (collectedEvents) => Boolean(findMatchingEvent(collectedEvents, timestamp)),
       15000,
       1000,
-      true,
     );
 
     const amountCollected = expectation.failed
