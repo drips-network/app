@@ -1,6 +1,7 @@
 {
   "short_name": "Drips",
   "name": "Drips",
+  "id": "/app?homescreen=1",
   "start_url": "/app?homescreen=1",
   "background_color": "#0E171F",
   "display": "minimal-ui",
