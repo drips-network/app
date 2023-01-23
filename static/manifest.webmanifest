@@ -1,0 +1,19 @@
+{
+  "short_name": "Drips",
+  "name": "Drips",
+  "start_url": "/app?homescreen=1",
+  "background_color": "#0E171F",
+  "display": "minimal-ui",
+  "scope": "/app",
+  "theme_color": "#5555FF",
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your account's dashboard with balances, streams and splits.",
+      "url": "/app/dashboard",
+      "icons": [{ "src": "/icons/dashboard.png", "sizes": "256x256" }]
+    }
+  ],
+  "description": "Stream and split funds on Ethereum"
+}
