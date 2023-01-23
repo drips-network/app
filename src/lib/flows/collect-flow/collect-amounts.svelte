@@ -146,7 +146,7 @@
       squeezeArgs = await getSqueezeArgs(selectedSqueezeSenderItems, tokenAddress);
     }
 
-    const collectFlow = AddressDriverPresets.Presets.createSqueezeCollectFlow({
+    const collectFlow = AddressDriverPresets.Presets.createCollectFlow({
       squeezeArgs,
       driverAddress: CONTRACT_ADDRESS_DRIVER,
       dripsHubAddress: CONTRACT_DRIPS_HUB,
