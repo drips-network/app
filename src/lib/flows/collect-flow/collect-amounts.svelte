@@ -253,8 +253,8 @@
         for collecting increases with each selected sender.
       </p>
       <AnnotationBox type="warning">
-        The amounts shown below are estimated based on your system time, and the value you actually
-        end up collecting may slightly differ.
+        The amounts shown below are estimated based on your system time so the value you 
+        collect may slightly differ.
       </AnnotationBox>
       <div class="list-wrapper">
         <ListSelect
