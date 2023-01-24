@@ -1,7 +1,7 @@
 <script lang="ts">
   import modal from '$lib/stores/modal/index';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
-  import { fade, scale } from 'svelte/transition';
+  import { fade, fly, scale } from 'svelte/transition';
   import FocusTrap from '../focus-trap/focus-trap.svelte';
   import Modal from './components/modal.svelte';
 
@@ -40,9 +40,15 @@
             {...store.overlay.modalComponentProps}
           />
           {#if store.hideable}
-            <button class="close-button" on:click={modal.hide}>
-              <Cross style="fill: var(--color-foreground)" />
-            </button>
+            <div class="close-button-wrapper">
+              <button
+                transition:fly|local={{ duration: 200, y: -4, x: 4 }}
+                class="close-button"
+                on:click={modal.hide}
+              >
+                <Cross style="fill: var(--color-foreground)" />
+              </button>
+            </div>
           {/if}
         </Modal>
       </div>
@@ -74,10 +80,14 @@
     position: relative;
   }
 
-  .close-button {
+  .close-button-wrapper {
+    overflow: hidden;
     position: absolute;
     right: 0;
     top: 0;
+  }
+
+  .close-button {
     height: 2.25rem;
     width: 2.25rem;
     border-radius: 0 0 0 1.25rem;
@@ -98,7 +108,7 @@
 
   .close-button:focus {
     background-color: var(--color-foreground-level-1);
-    box-shadow: inset 0px 0px 0px 2px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
   }
 
   .content {
