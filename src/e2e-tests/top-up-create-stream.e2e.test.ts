@@ -267,7 +267,7 @@ describe('top up, create stream, view profile, search', async () => {
       streamPausedAtTotalStreamed = (
         await page.locator('data-testid=total-streamed').innerText()
       ).replace(' TEST', '');
-      expectedRemainingTokenAmount = (50 - Number(streamPausedAtTotalStreamed)).toFixed(2);
+      expectedRemainingTokenAmount = (50 - Number(streamPausedAtTotalStreamed)).toFixed(8);
     }, 20000);
 
     it('switches back to the user receiving the stream', async () => {
@@ -353,6 +353,37 @@ describe('top up, create stream, view profile, search', async () => {
     it('shows the streams empty state', async () => {
       const streamsEmptyState = page.locator('text=No streams');
       await expect(streamsEmptyState).toHaveCount(1);
+    });
+  });
+
+  describe('squeezing', () => {
+    it('opens the collect flow', async () => {
+      await page.goto('http://localhost:3000/app/dashboard');
+
+      await page.locator('text=Testcoin').click();
+      await page.locator('button', { hasText: 'Collect' }).click();
+
+      await expect(page.locator('h1', { hasText: 'Collect TEST' })).toHaveCount(1);
+    });
+
+    it('expands the squeezing section', async () => {
+      await page.locator('label:has-text("Include funds from current cycle")').click();
+
+      await page
+        .locator(`data-testid=item-1390849295786071768276380950238675083608645509734`)
+        .click();
+
+      await page.locator('button', { hasText: 'Collect TEST' }).click();
+    });
+
+    it('shows the success screen', async () => {
+      await expect(page.locator("text=You've successfully collected TEST.")).toBeVisible();
+
+      await page.locator('button', { hasText: 'Done' }).click();
+    });
+
+    it('shows an incoming balance of zero for testcoin after squeezing', async () => {
+      await expect(page.locator('data-testid=incoming-balance')).toHaveText('0.00');
     });
   });
 });

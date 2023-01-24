@@ -29,7 +29,7 @@ describe('expect.ts', () => {
     const res = await expectUtil(mockFn, (r) => r, 500, 100);
 
     expect(mockFn).toHaveBeenCalledTimes(4);
-    expect(res).toBe(true);
+    expect(res).toStrictEqual({ failed: false, result: true });
   });
 
   it('returns a FailedExpectation if the function resolves only after the max time', async () => {

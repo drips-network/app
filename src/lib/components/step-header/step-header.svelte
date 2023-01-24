@@ -3,13 +3,13 @@
 
   export let emoji: string | undefined = undefined;
   export let headline: string;
-  export let description: string;
+  export let description: string | undefined = undefined;
 </script>
 
 <div class="step-header">
   {#if emoji}<Emoji {emoji} size="huge" />{/if}
   <h1>{headline}</h1>
-  <p>{@html description}</p>
+  {#if description}<p>{@html description}</p>{/if}
 </div>
 
 <style>

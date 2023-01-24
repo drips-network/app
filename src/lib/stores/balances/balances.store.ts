@@ -30,18 +30,17 @@ const INITIAL_STATE = {
   accounts: {},
 };
 
-export default (() => {
-  let currentCycle:
-    | {
-        start: Date;
-        /** Milliseconds */
-        duration: number;
-      }
-    | undefined;
+interface Cycle {
+  start: Date;
+  /** Milliseconds */
+  duration: number;
+}
 
+export default (() => {
   let accounts: Readable<{ [accountId: UserId]: Account }> = readable({});
   let tickRegistration: number | undefined;
   const state = writable<State>(INITIAL_STATE);
+  const currentCycle = writable<Cycle | undefined>();
   const fetchStatusses = writable<{ [key: UserId]: AccountFetchStatus }>({});
 
   // Once per tick, we run balance estimation logic.
@@ -100,13 +99,15 @@ export default (() => {
     const subgraph = getSubgraphClient();
 
     const squeezedEvents = (await subgraph.getSqueezedDripsEventsByUserId(forUserId)).sort(
-      (a, b) => Number(a.blockTimestamp) - Number(b.blockTimestamp),
+      (a, b) => Number(b.blockTimestamp) - Number(a.blockTimestamp),
     );
 
     state.update((s) => {
       s.accounts[forUserId].squeezeHistory = squeezedEvents;
       return s;
     });
+
+    return squeezedEvents;
   }
 
   // Ensure that squeeze history and balances are kept up to date for newly-added accounts.
@@ -207,24 +208,13 @@ export default (() => {
       { amtPerSec: 0n, total: 0n },
     );
 
-    // Retrieve the user's `streamable` and `splittable` balances for the given token
+    // Retrieve the user's `receivable` and `splittable` balances for the given token
     const receivableForToken =
       (receivable.find((t) => t.tokenAddress === tokenAddress)?.amount ?? 0n) *
       BigInt(constants.AMT_PER_SEC_MULTIPLIER);
     const splittableForToken =
       (splittable.find((t) => t.tokenAddress === tokenAddress)?.amount ?? 0n) *
       BigInt(constants.AMT_PER_SEC_MULTIPLIER);
-
-    const cycle = currentCycle ?? unreachable();
-
-    // Calculate how much of the token the user has squeezed this cycle
-    const squeezesInCurrentCycle = squeezeHistory.filter(
-      (hi) => Number(hi.blockTimestamp) * 1000 >= cycle.start.getTime(),
-    );
-    const totalAmountSqueezed = squeezesInCurrentCycle.reduce<bigint>(
-      (acc, hi) => acc + hi.amount * BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-      0n,
-    );
 
     return {
       /*
@@ -236,8 +226,7 @@ export default (() => {
       - MINUS any funds the user has squeezed in the current cycle (which is substracted from the total
         earned amount in order to not be double-counted)
       */
-      totalEarned:
-        receivableForToken + splittableForToken + currentCycleEstimate.total - totalAmountSqueezed,
+      totalEarned: receivableForToken + splittableForToken + currentCycleEstimate.total,
       amountPerSecond: currentCycleEstimate.amtPerSec,
     };
   }
@@ -254,16 +243,24 @@ export default (() => {
     const currentCycleSecs = Math.floor(new Date().getTime() / 1000) % cycleSecs;
     const currentCycleStart = new Date(new Date().getTime() - Number(currentCycleSecs) * 1000);
 
-    currentCycle = {
+    currentCycle.set({
       start: currentCycleStart,
       duration: cycleSecs * 1000,
-    };
+    });
+  }
+
+  function getFullSqueezeHistory() {
+    return Object.values(get(state).accounts).reduce<SqueezedDripsEvent[]>((acc, account) => {
+      return [...acc, ...(account.squeezeHistory ?? [])];
+    }, []);
   }
 
   /** @private */
   function _updateAccountBalances() {
     state.update((s) => {
-      if (!currentCycle) return s;
+      if (!get(currentCycle)) return s;
+
+      const allSqueezes = getFullSqueezeHistory();
 
       return {
         ...s,
@@ -272,7 +269,7 @@ export default (() => {
             account.user.userId,
             {
               ...get(state).accounts[account.user.userId],
-              tokens: estimateAccount(account, currentCycle ?? unreachable()),
+              tokens: estimateAccount(account, get(currentCycle) ?? unreachable(), allSqueezes),
             },
           ]),
         ),
@@ -283,6 +280,7 @@ export default (() => {
   return {
     subscribe: state.subscribe,
     fetchStatusses: { subscribe: fetchStatusses.subscribe },
+    cycle: { subscribe: currentCycle.subscribe },
     initialize,
     setAccounts,
     getAllStreamEstimates,

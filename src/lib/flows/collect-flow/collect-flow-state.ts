@@ -1,3 +1,4 @@
+import type { ContractReceipt } from 'ethers';
 import type { SplitsEntry } from 'radicle-drips';
 import { writable } from 'svelte/store';
 
@@ -16,6 +17,8 @@ export interface CollectFlowState {
     durationMillis: number;
   };
   amountCollected?: bigint;
+  squeezeEnabled?: boolean;
+  receipt?: ContractReceipt;
 }
 
 export default writable<CollectFlowState>({});

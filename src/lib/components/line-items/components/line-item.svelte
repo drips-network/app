@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { fly } from 'svelte/transition';
+
+  export let animateValueChanges = false;
   export let title: string;
   export let subtitle: string | undefined = undefined;
   export let value: string;
@@ -12,7 +15,17 @@
     <h4>{title}</h4>
     {#if subtitle}<p class="typo-text-small">{subtitle}</p>{/if}
   </div>
-  <div class="value">
+  {#key value + symbol}
+    <div
+      out:fly={{ duration: animateValueChanges ? 300 : 0, y: 8 }}
+      in:fly={{ duration: animateValueChanges ? 300 : 0, y: -8 }}
+      class="value"
+    >
+      <p class="typo-text-mono-bold">{value}</p>
+      <p class="typo-text-mono-bold symbol">{symbol}</p>
+    </div>
+  {/key}
+  <div class="value placeholder">
     <p class="typo-text-mono-bold">{value}</p>
     <p class="typo-text-mono-bold symbol">{symbol}</p>
   </div>
@@ -20,11 +33,13 @@
 
 <style>
   .line-item {
+    position: relative;
     padding: 0.75rem 1rem;
     display: flex;
     text-align: left;
     align-items: center;
     justify-content: space-between;
+    transition: opacity 0.3s;
   }
 
   .line-item.disabled {
@@ -50,6 +65,13 @@
     display: flex;
     gap: 0.5rem;
     color: var(--color-foreground);
+    position: absolute;
+    right: 1rem;
+  }
+
+  .value.placeholder {
+    position: relative;
+    opacity: 0;
   }
 
   .symbol {

@@ -165,7 +165,7 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0],
-      dripsUserId: await (await AddressDriverClient.create(signer)).getUserId(),
+      dripsUserId: await (await AddressDriverClient.create(provider, signer)).getUserId(),
       provider,
       signer,
       network: await provider.getNetwork(),

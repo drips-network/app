@@ -22,6 +22,7 @@
   import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import { getAddress } from 'ethers/lib/utils';
+  import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -39,6 +40,12 @@
     userId && $balances.accounts[userId]
       ? $balances.accounts[userId].tokens[getAddress(tokenAddress)] ?? null
       : undefined;
+
+  $: fetchStatus = userId ? $accountFetchStatussesStore[userId] : undefined;
+  let loaded = false;
+  $: if (userId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
+    loaded = true;
+  }
 
   $: incomingTotals =
     userId && tokenAddress && $balances
@@ -74,8 +81,6 @@
     $tokens;
     if (guardConnected()) checkUrlUserId();
   }
-
-  $: withdrawDisabled = !outgoingEstimate;
 </script>
 
 <svelte:head>
@@ -133,19 +138,21 @@
         </svelte:fragment>
 
         <svelte:fragment slot="value">
-          {#if incomingTotals === undefined}
-            <span class="animate-pulse">...</span>
-          {:else}
-            {@const amount = incomingTotals?.totalEarned ?? 0n}
-            <span class:text-foreground-level-4={amount === 0n}>
-              <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
-            </span>
-          {/if}
+          <div data-testid="incoming-balance">
+            {#if !loaded || !incomingTotals}
+              <span class="animate-pulse">...</span>
+            {:else}
+              {@const amount = incomingTotals?.totalEarned ?? 0n}
+              <span class:text-foreground-level-4={amount === 0n}>
+                <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
+              </span>
+            {/if}
+          </div>
         </svelte:fragment>
 
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <Button icon={ArrowUp} on:click={openCollectModal}>Collect</Button>
+            <Button disabled={!loaded} icon={ArrowUp} on:click={openCollectModal}>Collect</Button>
           </div>
         </svelte:fragment>
       </TokenStat>
@@ -155,7 +162,7 @@
         tooltip="Your outgoing balance is the remaining balance you can stream to others for this token."
       >
         <svelte:fragment slot="detail">
-          {#if outgoingEstimate}
+          {#if loaded && outgoingEstimate}
             <Amount
               showSymbol={false}
               amountPerSecond={{
@@ -167,21 +174,27 @@
         </svelte:fragment>
 
         <svelte:fragment slot="value">
-          {#if outgoingEstimate === undefined}
-            <span class="animate-pulse">...</span>
-          {:else}
-            {@const amount = outgoingEstimate ? outgoingEstimate.total.totals.remainingBalance : 0n}
-            <span class:text-foreground-level-4={amount === 0n}>
-              <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
-            </span>
-          {/if}
+          <div data-testid="outgoing-balance">
+            {#if !loaded}
+              <span class="animate-pulse">...</span>
+            {:else}
+              {@const amount = outgoingEstimate
+                ? outgoingEstimate.total.totals.remainingBalance
+                : 0n}
+              <span class:text-foreground-level-4={amount === 0n}>
+                <Amount showSymbol={false} amount={{ tokenAddress, amount }} amountClasses="" />
+              </span>
+            {/if}
+          </div>
         </svelte:fragment>
 
         <svelte:fragment slot="actions">
           <div class="flex gap-2">
-            <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
-            <Button disabled={withdrawDisabled} icon={Minus} on:click={openWithdrawModal}
-              >Withdraw</Button
+            <Button disabled={!loaded} icon={Plus} on:click={openAddFundsModal}>Add</Button>
+            <Button
+              disabled={!loaded || !outgoingEstimate?.total.totals.remainingBalance}
+              icon={Minus}
+              on:click={openWithdrawModal}>Withdraw</Button
             >
           </div>
         </svelte:fragment>

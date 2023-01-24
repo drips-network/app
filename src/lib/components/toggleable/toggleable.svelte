@@ -81,7 +81,7 @@
   }
 
   .toggle {
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground-level-6);
     transition: color 0.3s;
   }
 
