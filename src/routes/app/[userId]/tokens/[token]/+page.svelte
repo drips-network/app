@@ -191,7 +191,11 @@
         <svelte:fragment slot="actions">
           <div class="flex gap-2">
             <Button disabled={!loaded} icon={Plus} on:click={openAddFundsModal}>Add</Button>
-            <Button disabled={!loaded} icon={Minus} on:click={openWithdrawModal}>Withdraw</Button>
+            <Button
+              disabled={!loaded || !outgoingEstimate?.total.totals.remainingBalance}
+              icon={Minus}
+              on:click={openWithdrawModal}>Withdraw</Button
+            >
           </div>
         </svelte:fragment>
       </TokenStat>
