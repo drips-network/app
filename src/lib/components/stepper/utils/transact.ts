@@ -13,13 +13,33 @@ type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
 
 type TransactPayload<T extends Nullable<BeforeFunc>> = {
+  /**
+   * Function to run before triggering transactions. You can return an object from this, which
+   * will be made available to both the `transactions` and `after` functions as `context`.
+   */
   before?: T;
+  /**
+   * Function that returns an array of objects, each describing a single transaction that should
+   * be triggered. You can optionally customize the messages the user will see while the transactions
+   * are waiting for signature & confirmation.
+   * @param context Object with optional context returned from `before`.
+   * @returns An array describing all transactions that should be triggered.
+   */
   transactions: (context: Context<T>) => {
     transaction: () => Promise<ContractTransaction>;
     waitingSignatureMessage?: UpdateAwaitStepParams;
     waitingConfirmationMessage?: UpdateAwaitStepParams;
   }[];
+  /**
+   * Function to run after all transactions are confirmed.
+   * @param receipts An array of transaction receipts for all transactions described in `transactions`.
+   * @param context Object with optional context returned from `before`.
+   * @returns
+   */
   after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
+  /**
+   * Optionally specify cusotm messages that appear while the `before` and `after` steps are executed.
+   */
   messages?: {
     duringBefore?: UpdateAwaitStepParams;
     duringAfter?: UpdateAwaitStepParams;
@@ -36,6 +56,13 @@ export function makeTransactPayload<T extends Nullable<BeforeFunc>>(
   return (cb) => cb(i);
 }
 
+/**
+ * Utility designed for running a standard "sign, wait for confirmation, update UI" pattern within
+ * a stepper flow. Run some logic to prepare one or multiple transactions, execute those transactions,
+ * and then run some logic at the end, before advancing the flow.
+ * @param dispatch The event dispatcher to use for communicating with the stepper.
+ * @param payload Payload for the transact operation. See annotations on the `TransactPayload` type for details.
+ */
 export default function transact(
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   payload: SomeTransactPayload,
