@@ -38,7 +38,7 @@ type TransactPayload<T extends Nullable<BeforeFunc>> = {
    */
   after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
   /**
-   * Optionally specify cusotm messages that appear while the `before` and `after` steps are executed.
+   * Optionally specify custom messages that appear while the `before` and `after` steps are executed.
    */
   messages?: {
     duringBefore?: UpdateAwaitStepParams;
