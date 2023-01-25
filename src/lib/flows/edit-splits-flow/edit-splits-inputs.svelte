@@ -9,14 +9,11 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
-  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import modal from '$lib/stores/modal';
-  import etherscanLink from '$lib/utils/etherscan-link';
-  import wallet from '$lib/stores/wallet';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import Emoji from '$lib/components/emoji/emoji.svelte';
   import type { Writable } from 'svelte/store';
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 
   export let context: Writable<EditSplitsFlowState>;
 
@@ -75,49 +72,34 @@
   $: allAddresses = splitsInputs.map((row) => row.receiver.value);
 
   function submit() {
-    const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
-      modal.setHideable(false);
-      const client = await getAddressDriverClient();
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const client = await getAddressDriverClient();
 
-      // format splits for submission
-      const splits: SplitsReceiverStruct[] = await Promise.all(
-        splitsInputs
-          .filter((s) => s.receiver && s.amount)
-          .map(async (s) => ({
-            userId: await client.getUserIdByAddress(s.receiver.value),
-            weight: BigInt(Math.floor((Number(s.amount) / 100) * 1000000)),
-          })),
-      );
+          // format splits for submission
+          const splits: SplitsReceiverStruct[] = await Promise.all(
+            splitsInputs
+              .filter((s) => s.receiver && s.amount)
+              .map(async (s) => ({
+                userId: await client.getUserIdByAddress(s.receiver.value),
+                weight: BigInt(Math.floor((Number(s.amount) / 100) * 1000000)),
+              })),
+          );
 
-      const waitingWalletIcon = {
-        component: Emoji,
-        props: { emoji: '👛', size: 'huge' },
-      };
-
-      updateAwaitStep({
-        icon: waitingWalletIcon,
-        message: 'Waiting for you to confirm the transaction in your wallet',
-      });
-
-      const tx = await client.setSplits(splits);
-
-      updateAwaitStep({
-        message: 'Waiting for transaction to be confirmed…',
-        link: {
-          label: 'View on Etherscan',
-          url: etherscanLink($wallet.network.name, tx.hash),
+          return {
+            client,
+            splits,
+          };
         },
-      });
-
-      await tx.wait();
-
-      modal.setHideable(true);
-    };
-
-    dispatch('await', {
-      message: 'Preparing to submit...',
-      promise,
-    });
+        transactions: (transactContext) => [
+          {
+            transaction: () => transactContext.client.setSplits(transactContext.splits),
+          },
+        ],
+      }),
+    );
   }
 </script>
 

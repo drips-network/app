@@ -11,8 +11,7 @@
   import streams from '$lib/stores/streams';
   import { constants } from 'radicle-drips';
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import modal from '$lib/stores/modal';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet';
   import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
@@ -158,29 +157,20 @@
     timeRangeValid;
 
   function submit() {
-    dispatch('await', {
-      message: 'Preparing to create the stream...',
-      promise: async (updateAwaitStep: UpdateAwaitStepFn) => {
-        modal.setHideable(false);
-
-        await createStream(
-          updateAwaitStep,
-          selectedToken ?? unreachable(),
-          amountPerSecond ?? unreachable(),
-          recipientAddressValue,
-          streamNameValue,
-          $streams.accounts[get(wallet).dripsUserId ?? unreachable()],
-          setStartAndEndDate
-            ? {
-                start: combinedStartDate ?? unreachable(),
-                end: combinedEndDate ?? unreachable(),
-              }
-            : undefined,
-        );
-
-        modal.setHideable(true);
-      },
-    });
+    createStream(
+      dispatch,
+      selectedToken ?? unreachable(),
+      amountPerSecond ?? unreachable(),
+      recipientAddressValue,
+      streamNameValue,
+      $streams.accounts[get(wallet).dripsUserId ?? unreachable()],
+      setStartAndEndDate
+        ? {
+            start: combinedStartDate ?? unreachable(),
+            end: combinedEndDate ?? unreachable(),
+          }
+        : undefined,
+    );
   }
 </script>
 

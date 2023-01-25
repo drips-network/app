@@ -19,16 +19,14 @@
   import type { Writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import type { WithdrawFlowState } from './withdraw-flow-state';
-  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from '$lib/components/emoji/emoji.svelte';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
   import { createEventDispatcher } from 'svelte';
-  import etherscanLink from '$lib/utils/etherscan-link';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import { formatUnits } from 'ethers/lib/utils';
-  import modal from '$lib/stores/modal';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -79,86 +77,70 @@
     ).history;
   }
 
-  async function withdraw(amountWei: bigint, updateAwaitStepFn: UpdateAwaitStepFn) {
-    modal.setHideable(false);
-
-    const { address, dripsUserId } = $wallet;
-    assert(address && dripsUserId);
-
-    const addressDriverClient = await getAddressDriverClient();
-
-    const ownAccount = $streams.accounts[dripsUserId];
-    assert(ownAccount, "App hasn't yet fetched user's own account");
-
-    const assetConfig = ownAccount.assetConfigs.find(
-      (ac) => ac.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
-    );
-    assert(assetConfig, "App hasn't yet fetched the right asset config");
-
-    const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
-      stream.paused
-        ? undefined
-        : {
-            userId: stream.receiver.userId,
-            config: stream.dripsConfig.raw,
-          },
-    );
-
-    updateAwaitStepFn({
-      icon: {
-        component: Emoji,
-        props: {
-          emoji: '👛',
-          size: 'huge',
-        },
-      },
-      message: 'Waiting for you to confirm the transaction in your wallet…',
-    });
-
-    const tx = await addressDriverClient.setDrips(
-      $context.tokenAddress,
-      currentReceivers,
-      currentReceivers,
-      address,
-      -amountWei,
-    );
-
-    updateAwaitStepFn({
-      message: 'Waiting for your transaction to be confirmed…',
-      link: {
-        url: etherscanLink($wallet.network.name, tx.hash),
-        label: 'View on Etherscan',
-      },
-    });
-
-    await tx.wait(1);
-
-    updateAwaitStepFn({
-      message: 'Wrapping up…',
-    });
-
-    const currentAssetConfigHistoryLength = getAssetConfigHistory(
-      dripsUserId,
-      $context.tokenAddress,
-    ).length;
-
-    await expect(
-      streams.refreshUserAccount,
-      () =>
-        getAssetConfigHistory(dripsUserId, $context.tokenAddress).length >
-        currentAssetConfigHistoryLength,
-      5000,
-      1000,
-    );
-
-    modal.setHideable(true);
-  }
-
   function triggerWithdraw() {
-    dispatch('await', {
-      promise: (fn) => withdraw(amountWei ?? unreachable(), fn),
-      message: 'Preparing to withdraw…',
-    });
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const { address, dripsUserId } = $wallet;
+          assert(address && dripsUserId);
+
+          const addressDriverClient = await getAddressDriverClient();
+
+          const ownAccount = $streams.accounts[dripsUserId];
+          assert(ownAccount, "App hasn't yet fetched user's own account");
+
+          const assetConfig = ownAccount.assetConfigs.find(
+            (ac) => ac.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
+          );
+          assert(assetConfig, "App hasn't yet fetched the right asset config");
+
+          const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
+            stream.paused
+              ? undefined
+              : {
+                  userId: stream.receiver.userId,
+                  config: stream.dripsConfig.raw,
+                },
+          );
+
+          assert(amountWei);
+
+          const tx = addressDriverClient.setDrips(
+            $context.tokenAddress,
+            currentReceivers,
+            currentReceivers,
+            address,
+            -amountWei,
+          );
+
+          return {
+            tx,
+            dripsUserId,
+          };
+        },
+        transactions: (transactContext) => [
+          {
+            transaction: () => transactContext.tx,
+          },
+        ],
+        after: async (_, transactContext) => {
+          const currentAssetConfigHistoryLength = getAssetConfigHistory(
+            transactContext.dripsUserId,
+            $context.tokenAddress,
+          ).length;
+
+          await expect(
+            streams.refreshUserAccount,
+            () =>
+              getAssetConfigHistory(transactContext.dripsUserId, $context.tokenAddress).length >
+              currentAssetConfigHistoryLength,
+            5000,
+            1000,
+          );
+        },
+      }),
+    );
   }
 </script>
 
