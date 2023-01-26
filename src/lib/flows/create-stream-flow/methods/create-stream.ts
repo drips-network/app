@@ -1,4 +1,4 @@
-import type { UpdateAwaitStepFn } from '$lib/components/stepper/types';
+import type { StepComponentEvents } from '$lib/components/stepper/types';
 import {
   getAddressDriverClient,
   getCallerClient,
@@ -18,15 +18,15 @@ import {
   type streamMetadataSchema,
 } from '$lib/stores/streams/metadata';
 import type { z } from 'zod';
-import Emoji from '$lib/components/emoji/emoji.svelte';
-import etherscanLink from '$lib/utils/etherscan-link';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
+import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+import type { createEventDispatcher } from 'svelte';
 
-export default async (
-  updateAwaitStep: UpdateAwaitStepFn,
+export default function (
+  dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   selectedToken: TokenInfoWrapper,
   amountPerSecond: bigint,
   recipientAddress: string,
@@ -36,146 +36,142 @@ export default async (
     start: Date;
     end: Date;
   },
-) => {
-  const callerClient = await getCallerClient();
-  const addressDriverClient = await getAddressDriverClient();
-  const ownUserId = (await addressDriverClient.getUserId()).toString();
+) {
+  transact(
+    dispatch,
+    makeTransactPayload({
+      before: async () => {
+        const callerClient = await getCallerClient();
+        const addressDriverClient = await getAddressDriverClient();
+        const ownUserId = (await addressDriverClient.getUserId()).toString();
 
-  const { address: tokenAddress } = selectedToken.info;
+        const { address: tokenAddress } = selectedToken.info;
 
-  const assetConfig = ownAccount.assetConfigs.find(
-    (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
-  );
-  assert(assetConfig, "App hasn't yet fetched the right asset config");
+        const assetConfig = ownAccount.assetConfigs.find(
+          (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+        );
+        assert(assetConfig, "App hasn't yet fetched the right asset config");
 
-  const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
-    stream.paused
-      ? undefined
-      : {
-          userId: stream.receiver.userId,
-          config: stream.dripsConfig.raw,
+        const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
+          stream.paused
+            ? undefined
+            : {
+                userId: stream.receiver.userId,
+                config: stream.dripsConfig.raw,
+              },
+        );
+
+        const start = schedule ? BigInt(schedule.start.getTime() / 1000) : 0n;
+
+        const duration = schedule
+          ? BigInt(Math.floor((schedule.end.getTime() - schedule.start.getTime()) / 1000))
+          : 0n;
+
+        const dripId = randomBigintUntilUnique(
+          assetConfig.streams.map((s) => BigInt(decodeStreamId(s.id).dripId)),
+          4,
+        );
+
+        const dripConfig = Utils.DripsReceiverConfiguration.toUint256({
+          dripId,
+          start,
+          duration,
+          amountPerSec: amountPerSecond,
+        });
+
+        const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddress);
+        const { address } = get(wallet);
+        assert(address);
+
+        const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
+          id: makeStreamId(ownUserId, tokenAddress, dripId.toString()),
+          initialDripsConfig: {
+            dripId: dripId.toString(),
+            raw: dripConfig.toString(),
+            startTimestamp: Number(start),
+            durationSeconds: Number(duration),
+            amountPerSecond,
+          },
+          receiver: {
+            userId: recipientUserId.toString(),
+            driver: 'address',
+          },
+          archived: false,
+          name: streamName,
+        };
+
+        const accountMetadata = generateMetadata(ownAccount, address);
+        const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
+          (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+        );
+
+        if (currentAssetConfigIndex === -1) {
+          accountMetadata.assetConfigs.push({
+            tokenAddress,
+            streams: [newStreamMetadata],
+          });
+        } else {
+          const current = accountMetadata.assetConfigs[currentAssetConfigIndex];
+          accountMetadata.assetConfigs[currentAssetConfigIndex] = {
+            ...current,
+            streams: [...current.streams, newStreamMetadata],
+          };
+        }
+
+        const newHash = await pinAccountMetadata(accountMetadata);
+
+        const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+
+        const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
+          driverAddress: CONTRACT_ADDRESS_DRIVER,
+          tokenAddress,
+          currentReceivers,
+          newReceivers: [
+            ...currentReceivers,
+            {
+              config: dripConfig,
+              userId: recipientUserId,
+            },
+          ],
+          userMetadata: [
+            {
+              key: USER_DATA_KEY,
+              value: newHash,
+            },
+          ],
+          balanceDelta: 0,
+          transferToAddress: address,
+        });
+
+        return {
+          createStreamBatchPreset,
+          callerClient,
+          ownUserId,
+          newHash,
+        };
+      },
+
+      transactions: (transactContext) => [
+        {
+          transaction: () =>
+            transactContext.callerClient.callBatched(transactContext.createStreamBatchPreset),
         },
-  );
+      ],
 
-  const start = schedule ? BigInt(schedule.start.getTime() / 1000) : 0n;
-
-  const duration = schedule
-    ? BigInt(Math.floor((schedule.end.getTime() - schedule.start.getTime()) / 1000))
-    : 0n;
-
-  const dripId = randomBigintUntilUnique(
-    assetConfig.streams.map((s) => BigInt(decodeStreamId(s.id).dripId)),
-    4,
-  );
-
-  const dripConfig = Utils.DripsReceiverConfiguration.toUint256({
-    dripId,
-    start,
-    duration,
-    amountPerSec: amountPerSecond,
-  });
-
-  const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddress);
-  const { address } = get(wallet);
-  assert(address);
-
-  const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
-    id: makeStreamId(ownUserId, tokenAddress, dripId.toString()),
-    initialDripsConfig: {
-      dripId: dripId.toString(),
-      raw: dripConfig.toString(),
-      startTimestamp: Number(start),
-      durationSeconds: Number(duration),
-      amountPerSecond,
-    },
-    receiver: {
-      userId: recipientUserId.toString(),
-      driver: 'address',
-    },
-    archived: false,
-    name: streamName,
-  };
-
-  const accountMetadata = generateMetadata(ownAccount, address);
-  const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
-    (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
-  );
-
-  if (currentAssetConfigIndex === -1) {
-    accountMetadata.assetConfigs.push({
-      tokenAddress,
-      streams: [newStreamMetadata],
-    });
-  } else {
-    const current = accountMetadata.assetConfigs[currentAssetConfigIndex];
-    accountMetadata.assetConfigs[currentAssetConfigIndex] = {
-      ...current,
-      streams: [...current.streams, newStreamMetadata],
-    };
-  }
-
-  const newHash = await pinAccountMetadata(accountMetadata);
-
-  const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
-
-  const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-    driverAddress: CONTRACT_ADDRESS_DRIVER,
-    tokenAddress,
-    currentReceivers,
-    newReceivers: [
-      ...currentReceivers,
-      {
-        config: dripConfig,
-        userId: recipientUserId,
+      after: async (_, transactContext) => {
+        /*
+      We wait up to five seconds for `refreshUserAccount` to update the user's own
+      account's `lastIpfsHash` to the new hash we just published.
+      */
+        await expect(
+          streams.refreshUserAccount,
+          () =>
+            get(streams).accounts[transactContext.ownUserId].lastIpfsHash ===
+            transactContext.newHash,
+          5000,
+          1000,
+        );
       },
-    ],
-    userMetadata: [
-      {
-        key: USER_DATA_KEY,
-        value: newHash,
-      },
-    ],
-    balanceDelta: 0,
-    transferToAddress: address,
-  });
-
-  const waitingWalletIcon = {
-    component: Emoji,
-    props: {
-      emoji: '👛',
-      size: 'huge',
-    },
-  };
-
-  updateAwaitStep({
-    icon: waitingWalletIcon,
-    message: 'Waiting for you to confirm the transaction in your wallet...',
-  });
-
-  const tx = await callerClient.callBatched(createStreamBatchPreset);
-
-  updateAwaitStep({
-    message: 'Waiting for your transaction to be confirmed…',
-    link: {
-      label: 'View on Etherscan',
-      url: etherscanLink(get(wallet).network.name, tx.hash),
-    },
-  });
-
-  await tx.wait();
-
-  updateAwaitStep({
-    message: 'Wrapping up…',
-  });
-
-  /*
-  We wait up to five seconds for `refreshUserAccount` to update the user's own
-  account's `lastIpfsHash` to the new hash we just published.
-  */
-  await expect(
-    streams.refreshUserAccount,
-    () => get(streams).accounts[ownUserId].lastIpfsHash === newHash,
-    5000,
-    1000,
+    }),
   );
-};
+}

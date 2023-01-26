@@ -13,6 +13,7 @@
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import etherscanLink from '$lib/utils/etherscan-link';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -109,5 +110,77 @@
       promise: topUp,
       message: 'Preparing to top up…',
     });
+
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const client = await getAddressDriverClient();
+
+          const { tokenAddress, amountToTopUp } = $context;
+          const { address } = $wallet;
+
+          assert(address, 'User is not connected to wallet');
+          assert(
+            tokenAddress && amountToTopUp,
+            'TriggerTopUpTransaction step is missing required context',
+          );
+
+          const ownUserId = (await client.getUserId()).toString();
+          const ownAccount = $streams.accounts[ownUserId];
+          const assetConfig = ownAccount.assetConfigs.find(
+            (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+          );
+
+          const currentReceivers = mapFilterUndefined(assetConfig?.streams || [], (stream) =>
+            stream.paused
+              ? undefined
+              : {
+                  userId: stream.receiver.userId,
+                  config: stream.dripsConfig.raw,
+                },
+          );
+
+          const tx = client.setDrips(
+            tokenAddress,
+            currentReceivers,
+            currentReceivers,
+            address,
+            amountToTopUp,
+          );
+
+          return { tx, tokenAddress };
+        },
+        transactions: (transactContext) => [
+          {
+            transaction: () => transactContext.tx,
+          },
+        ],
+        after: async (receipts, transactContext) => {
+          const { provider } = $wallet;
+
+          const block = await provider.getBlock(receipts[0].blockNumber);
+          const { timestamp: blockTimestamp } = block;
+
+          /*
+        We wait up to five seconds for `refreshUserAccount` to include a history item
+        matching our transaction's block timestamp, checking once a second. If it doesn't
+        after five tries, we move forward anyway, but the user will be made aware that they
+        may need to wait for a while for their dashboard to refresh.
+        */
+          await expect(
+            streams.refreshUserAccount,
+            (account) =>
+              Boolean(
+                account.assetConfigs
+                  .find((ac) => ac.tokenAddress === transactContext.tokenAddress)
+                  ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
+              ),
+            5000,
+            1000,
+          );
+        },
+      }),
+    );
   });
 </script>

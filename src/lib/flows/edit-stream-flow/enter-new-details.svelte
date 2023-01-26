@@ -26,14 +26,13 @@
   } from '$lib/utils/get-drips-clients';
   import type { ContractTransaction } from 'ethers';
   import { createEventDispatcher } from 'svelte';
-  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import Emoji from '$lib/components/emoji/emoji.svelte';
-  import etherscanLink from '$lib/utils/etherscan-link';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
   import { get } from 'svelte/store';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import modal from '$lib/stores/modal';
   import { formatUnits } from 'ethers/lib/utils';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -70,170 +69,160 @@
     amountValidationState?.type === 'valid';
 
   function updateStream() {
-    const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
-      modal.setHideable(false);
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          assert(newAmountPerSecond && newName);
 
-      assert(newAmountPerSecond && newName);
+          const { dripsUserId, address } = $wallet;
+          assert(dripsUserId && address);
+          const ownAccount = $streams.accounts[dripsUserId];
+          assert(ownAccount);
+          const assetConfig = ownAccount.assetConfigs.find(
+            (ac) => ac.tokenAddress === token.info.address,
+          );
+          assert(assetConfig);
 
-      const { dripsUserId, address } = $wallet;
-      assert(dripsUserId && address);
-      const ownAccount = $streams.accounts[dripsUserId];
-      assert(ownAccount);
-      const assetConfig = ownAccount.assetConfigs.find(
-        (ac) => ac.tokenAddress === token.info.address,
-      );
-      assert(assetConfig);
+          let newHash = ownAccount.lastIpfsHash;
 
-      let newHash = ownAccount.lastIpfsHash;
+          if (nameUpdated) {
+            const accountMetadata = generateMetadata(ownAccount, address);
 
-      if (nameUpdated) {
-        const accountMetadata = generateMetadata(ownAccount, address);
+            const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
+              (ac) => ac.tokenAddress === token.info.address,
+            );
 
-        const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
-          (ac) => ac.tokenAddress === token.info.address,
-        );
+            const currentStreamIndex = accountMetadata.assetConfigs[
+              currentAssetConfigIndex
+            ].streams.findIndex((s) => s.id === stream.id);
 
-        const currentStreamIndex = accountMetadata.assetConfigs[
-          currentAssetConfigIndex
-        ].streams.findIndex((s) => s.id === stream.id);
+            const currentStream =
+              accountMetadata.assetConfigs[currentAssetConfigIndex].streams[currentStreamIndex];
 
-        const currentStream =
-          accountMetadata.assetConfigs[currentAssetConfigIndex].streams[currentStreamIndex];
+            accountMetadata.assetConfigs[currentAssetConfigIndex].streams[currentStreamIndex] = {
+              ...currentStream,
+              name: newName,
+            };
 
-        accountMetadata.assetConfigs[currentAssetConfigIndex].streams[currentStreamIndex] = {
-          ...currentStream,
-          name: newName,
-        };
+            accountMetadata.timestamp = new Date().getTime() / 1000;
 
-        accountMetadata.timestamp = new Date().getTime() / 1000;
+            newHash = await pinAccountMetadata(accountMetadata);
+          }
 
-        newHash = await pinAccountMetadata(accountMetadata);
-      }
+          let currentReceivers: {
+            userId: string;
+            config: bigint;
+          }[] = [];
 
-      let currentReceivers: {
-        userId: string;
-        config: bigint;
-      }[] = [];
+          let newReceivers: {
+            userId: string;
+            config: bigint;
+          }[] = [];
 
-      let newReceivers: {
-        userId: string;
-        config: bigint;
-      }[] = [];
+          if (amountUpdated) {
+            currentReceivers = mapFilterUndefined(assetConfig.streams, (s) =>
+              s.paused
+                ? undefined
+                : {
+                    userId: s.receiver.userId,
+                    config: s.dripsConfig.raw,
+                  },
+            );
 
-      if (amountUpdated) {
-        currentReceivers = mapFilterUndefined(assetConfig.streams, (s) =>
-          s.paused
-            ? undefined
-            : {
-                userId: s.receiver.userId,
-                config: s.dripsConfig.raw,
+            newReceivers = structuredClone(currentReceivers);
+            const currentStreamReciverIndex = newReceivers.findIndex(
+              (r) =>
+                Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId ===
+                BigInt(stream.dripsConfig.dripId),
+            );
+            newReceivers.splice(currentStreamReciverIndex, 1, {
+              userId: stream.receiver.userId,
+              config: Utils.DripsReceiverConfiguration.toUint256({
+                dripId: BigInt(stream.dripsConfig.dripId),
+                start: BigInt(stream.dripsConfig.startDate?.getTime() ?? 0 / 1000),
+                duration: BigInt(stream.dripsConfig.durationSeconds ?? 0),
+                amountPerSec: newAmountPerSecond,
+              }),
+            });
+          }
+
+          const addressDriverClient = await getAddressDriverClient();
+          const callerClient = await getCallerClient();
+
+          let tx: Promise<ContractTransaction>;
+
+          if (amountUpdated && nameUpdated) {
+            assert(newHash);
+            const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+
+            const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
+              driverAddress: CONTRACT_ADDRESS_DRIVER,
+              tokenAddress: token.info.address,
+              currentReceivers,
+              newReceivers,
+              userMetadata: [
+                {
+                  key: USER_DATA_KEY,
+                  value: newHash,
+                },
+              ],
+              balanceDelta: 0,
+              transferToAddress: address,
+            });
+
+            tx = callerClient.callBatched(createStreamBatchPreset);
+          } else if (amountUpdated) {
+            tx = addressDriverClient.setDrips(
+              token.info.address,
+              currentReceivers,
+              newReceivers,
+              address,
+              0n,
+            );
+          } else {
+            assert(newHash);
+
+            tx = addressDriverClient.emitUserMetadata([
+              {
+                key: USER_DATA_KEY,
+                value: newHash,
               },
-        );
+            ]);
+          }
 
-        newReceivers = structuredClone(currentReceivers);
-        const currentStreamReciverIndex = newReceivers.findIndex(
-          (r) =>
-            Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId ===
-            BigInt(stream.dripsConfig.dripId),
-        );
-        newReceivers.splice(currentStreamReciverIndex, 1, {
-          userId: stream.receiver.userId,
-          config: Utils.DripsReceiverConfiguration.toUint256({
-            dripId: BigInt(stream.dripsConfig.dripId),
-            start: BigInt(stream.dripsConfig.startDate?.getTime() ?? 0 / 1000),
-            duration: BigInt(stream.dripsConfig.durationSeconds ?? 0),
-            amountPerSec: newAmountPerSecond,
-          }),
-        });
-      }
-
-      const addressDriverClient = await getAddressDriverClient();
-      const callerClient = await getCallerClient();
-
-      let tx: ContractTransaction;
-
-      updateAwaitStep({
-        icon: {
-          component: Emoji,
-          props: {
-            emoji: '👛',
-            size: 'huge',
-          },
+          return {
+            tx,
+            newHash,
+            dripsUserId,
+          };
         },
-        message: 'Waiting for you to confirm the update transaction in your wallet...',
-      });
 
-      if (amountUpdated && nameUpdated) {
-        assert(newHash);
-        const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
-
-        const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-          driverAddress: CONTRACT_ADDRESS_DRIVER,
-          tokenAddress: token.info.address,
-          currentReceivers,
-          newReceivers,
-          userMetadata: [
-            {
-              key: USER_DATA_KEY,
-              value: newHash,
-            },
-          ],
-          balanceDelta: 0,
-          transferToAddress: address,
-        });
-
-        tx = await callerClient.callBatched(createStreamBatchPreset);
-      } else if (amountUpdated) {
-        tx = await addressDriverClient.setDrips(
-          token.info.address,
-          currentReceivers,
-          newReceivers,
-          address,
-          0n,
-        );
-      } else {
-        assert(newHash);
-
-        tx = await addressDriverClient.emitUserMetadata([
+        transactions: (transactContext) => [
           {
-            key: USER_DATA_KEY,
-            value: newHash,
+            transaction: () => transactContext.tx,
           },
-        ]);
-      }
+        ],
 
-      updateAwaitStep({
-        message: 'Waiting for your transaction to be confirmed…',
-        link: {
-          label: 'View on Etherscan',
-          url: etherscanLink($wallet.network.name, tx.hash),
+        after: async (_, transactContext) => {
+          /*
+        We wait up to five seconds for `refreshUserAccount` to update either the account's
+        lastIpfsHash or the stream's amount per second.
+        */
+          await expect(
+            streams.refreshUserAccount,
+            () =>
+              nameUpdated
+                ? get(streams).accounts[transactContext.dripsUserId].lastIpfsHash ===
+                  transactContext.newHash
+                : streams.getStreamById(stream.id)?.dripsConfig.amountPerSecond.amount ===
+                  newAmountPerSecond,
+            5000,
+            1000,
+          );
         },
-      });
-
-      await tx.wait();
-
-      /*
-      We wait up to five seconds for `refreshUserAccount` to update either the account's
-      lastIpfsHash or the stream's amount per second.
-      */
-      await expect(
-        streams.refreshUserAccount,
-        () =>
-          nameUpdated
-            ? get(streams).accounts[dripsUserId].lastIpfsHash === newHash
-            : streams.getStreamById(stream.id)?.dripsConfig.amountPerSecond.amount ===
-              newAmountPerSecond,
-        5000,
-        1000,
-      );
-
-      modal.setHideable(true);
-    };
-
-    dispatch('await', {
-      message: 'Preparing to update your stream...',
-      promise: (updateAwaitStepFn) => promise(updateAwaitStepFn),
-    });
+      }),
+    );
   }
 </script>
 

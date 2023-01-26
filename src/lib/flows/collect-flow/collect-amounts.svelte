@@ -3,7 +3,6 @@
   import LineItems from '$lib/components/line-items/line-items.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
   import tokens from '$lib/stores/tokens';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import {
@@ -14,9 +13,7 @@
   } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import unreachable from '$lib/utils/unreachable';
-  import Emoji from '$lib/components/emoji/emoji.svelte';
   import type { Writable } from 'svelte/store';
-  import { createEventDispatcher } from 'svelte';
   import type { CollectFlowState } from './collect-flow-state';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import wallet from '$lib/stores/wallet';
@@ -25,7 +22,6 @@
   import formatDate from '$lib/utils/format-date';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { AddressDriverPresets, constants, type CollectedEvent } from 'radicle-drips';
-  import etherscanLink from '$lib/utils/etherscan-link';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
@@ -33,11 +29,11 @@
   import type { User } from '$lib/stores/streams/types';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import getSqueezeArgs from './get-squeeze-args';
-  import modal from '$lib/stores/modal';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import expect from '$lib/utils/expect';
-
-  const dispatch = createEventDispatcher<StepComponentEvents>();
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { createEventDispatcher } from 'svelte';
 
   export let context: Writable<CollectFlowState>;
 
@@ -129,104 +125,91 @@
   $: collectableAfterSplit =
     (splittableAfterReceive * ownSplitsWeight) / 1000000n + balances.collectable;
 
-  async function receiveSplitCollect(updateAwaitStep: UpdateAwaitStepFn) {
-    modal.setHideable(false);
+  const dispatch = createEventDispatcher<StepComponentEvents>();
 
-    const callerClient = await getCallerClient();
-    const addressDriverClient = await getAddressDriverClient();
-    const userId = await addressDriverClient.getUserId();
+  async function startCollect() {
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const callerClient = await getCallerClient();
+          const addressDriverClient = await getAddressDriverClient();
+          const userId = await addressDriverClient.getUserId();
 
-    const { address: userAddress, network } = $wallet;
-    assert(userAddress);
+          const { address: userAddress } = $wallet;
+          assert(userAddress);
 
-    const { CONTRACT_DRIPS_HUB, CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+          const { CONTRACT_DRIPS_HUB, CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
 
-    let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
-    if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
-      squeezeArgs = await getSqueezeArgs(selectedSqueezeSenderItems, tokenAddress);
-    }
+          let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
+          if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
+            squeezeArgs = await getSqueezeArgs(selectedSqueezeSenderItems, tokenAddress);
+          }
 
-    const collectFlow = AddressDriverPresets.Presets.createCollectFlow({
-      squeezeArgs,
-      driverAddress: CONTRACT_ADDRESS_DRIVER,
-      dripsHubAddress: CONTRACT_DRIPS_HUB,
-      userId,
-      tokenAddress,
-      // TODO: Replace with dynamic maxCycles
-      maxCycles: 1000,
-      currentReceivers: splitsConfig,
-      transferToAddress: userAddress,
-    });
+          const collectFlow = AddressDriverPresets.Presets.createCollectFlow({
+            squeezeArgs,
+            driverAddress: CONTRACT_ADDRESS_DRIVER,
+            dripsHubAddress: CONTRACT_DRIPS_HUB,
+            userId,
+            tokenAddress,
+            // TODO: Replace with dynamic maxCycles
+            maxCycles: 1000,
+            currentReceivers: splitsConfig,
+            transferToAddress: userAddress,
+          });
 
-    updateAwaitStep({
-      message: 'Please confirm the collect transaction in your wallet',
-      icon: {
-        component: Emoji,
-        props: {
-          emoji: '👛',
-          size: 'huge',
+          return {
+            collectFlow,
+            callerClient,
+            userId,
+          };
         },
-      },
-    });
 
-    const tx = await callerClient.callBatched(collectFlow);
+        transactions: (transactContext) => [
+          {
+            transaction: () =>
+              transactContext.callerClient.callBatched(transactContext.collectFlow),
+          },
+        ],
 
-    updateAwaitStep({
-      message: 'Waiting for your transaction to be confirmed…',
-      link: {
-        url: etherscanLink(network.name, tx.hash),
-        label: 'View on Etherscan',
-      },
-    });
+        after: async (receipts, transactContext) => {
+          const receipt = receipts[0];
+          const { provider } = $wallet;
+          const { timestamp } = await provider.getBlock(receipt.blockNumber);
+          assert(timestamp);
 
-    const receipt = await tx.wait();
+          const subgraph = getSubgraphClient();
 
-    updateAwaitStep({
-      message: 'Wrapping up…',
-    });
+          function findMatchingEvent(events: CollectedEvent[], timestamp: number) {
+            return events.find((e) => e.blockTimestamp === BigInt(timestamp));
+          }
 
-    const { provider } = $wallet;
-    const { timestamp } = await provider.getBlock(receipt.blockNumber);
-    assert(timestamp);
+          // Wait for the collect event to be indexed by the subgraph so we know how much was actually
+          // collected.
+          const expectation = await expect(
+            async () => subgraph.getCollectedEventsByUserId(transactContext.userId),
+            (collectedEvents) => Boolean(findMatchingEvent(collectedEvents, timestamp)),
+            15000,
+            1000,
+          );
 
-    const subgraph = getSubgraphClient();
+          const amountCollected = expectation.failed
+            ? undefined
+            : findMatchingEvent(expectation.result, timestamp)?.collected;
 
-    function findMatchingEvent(events: CollectedEvent[], timestamp: number) {
-      return events.find((e) => e.blockTimestamp === BigInt(timestamp));
-    }
+          context.update((c) => ({
+            ...c,
+            amountCollected,
+            squeezeEnabled,
+            receipt,
+          }));
 
-    // Wait for the collect event to be indexed by the subgraph so we know how much was actually
-    // collected.
-    const expectation = await expect(
-      async () => subgraph.getCollectedEventsByUserId(userId),
-      (collectedEvents) => Boolean(findMatchingEvent(collectedEvents, timestamp)),
-      15000,
-      1000,
+          // The squeeze event should be indexed by now, so this should cause the dashboard to update
+          // in the background to reflect the newly reduced incoming balance.
+          if (squeezeEnabled) await balancesStore.updateSqueezeHistory(transactContext.userId);
+        },
+      }),
     );
-
-    const amountCollected = expectation.failed
-      ? undefined
-      : findMatchingEvent(expectation.result, timestamp)?.collected;
-
-    context.update((c) => ({
-      ...c,
-      amountCollected,
-      squeezeEnabled,
-      receipt,
-    }));
-
-    // The squeeze event should be indexed by now, so this should cause the dashboard to update
-    // in the background to reflect the newly reduced incoming balance.
-    if (squeezeEnabled) await balancesStore.updateSqueezeHistory(userId);
-
-    modal.setHideable(true);
-  }
-
-  function startCollect() {
-    dispatch('await', {
-      promise: receiveSplitCollect,
-      message: 'Getting ready to collect...',
-    });
   }
 </script>
 
