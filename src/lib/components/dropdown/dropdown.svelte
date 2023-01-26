@@ -96,12 +96,13 @@
     bind:this={dropdownElem}
     on:keydown={disabled ? undefined : handleDropdownKeydown}
     on:click={disabled ? undefined : handleWrapperClick}
+    data-testid="dropdown"
   >
     {#if selectedOption.iconUrl}<img
         src={selectedOption.iconUrl}
         alt="{selectedOption.title} icon"
       />{/if}
-    <div class="title">
+    <div class="title" data-testid="title-field">
       {#key selectedOption.title}
         <span
           class="value"
@@ -127,6 +128,7 @@
       class:right={dropdownWidth?.align === 'right'}
       style:width={dropdownWidth ? `${dropdownWidth?.pixels}px` : '100%'}
       bind:this={optionsElem}
+      data-testid="options"
     >
       {#if toggle}
         <div class="toggle">
@@ -137,6 +139,7 @@
         <div
           class="option"
           tabindex="0"
+          data-testid="option-{option.value}"
           on:click={() => select(option)}
           on:keydown={handleOptionKeydown}
           bind:this={optionElems[index]}
