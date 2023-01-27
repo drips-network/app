@@ -357,6 +357,7 @@
   .full-width-card {
     display: grid;
     column-gap: 1rem;
+    overflow: hidden;
   }
 
   .full-width-card.illustration-left {
@@ -427,7 +428,9 @@
 
   #main-features #streaming > .card-illustration {
     padding: 2rem 0 2rem 1rem;
+    border-radius: 0 0 2rem 0;
     overflow: hidden;
+    isolation: isolate;
   }
 
   .grid {
