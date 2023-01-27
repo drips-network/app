@@ -72,7 +72,7 @@
             <h2>Share funds with the projects & individuals you care for</h2>
             <p>
               Automatically split any ERC-20 token you receive with a list of up to 200 projects &
-              individuals. So anytime you get paid they get paid.
+              individuals. Anytime you get paid, they get paid.
             </p>
           </div>
         </div></LpCard
