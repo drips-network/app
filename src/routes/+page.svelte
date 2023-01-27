@@ -150,7 +150,10 @@
             <GasOptimized slot="image" />
             <div slot="caption" class="text-container">
               <h3>You're in control</h3>
-              <p>Your data and funds on Drips are entirely decentralized.</p>
+              <p>
+                Your data and funds are yours forever. Drips runs fully on sovereign user-controlled
+                infrastructure.
+              </p>
             </div>
           </ImageAndCaption></LpCard
         >
