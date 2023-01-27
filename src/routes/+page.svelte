@@ -377,7 +377,6 @@
 
   .full-width-card > .card-illustration {
     padding: 3rem;
-    overflow: hidden;
     position: relative;
     max-height: 31rem;
   }
