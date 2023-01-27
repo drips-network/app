@@ -1,140 +1,278 @@
-<svg height="100%" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="501" height="501" viewBox="0 0 501 501" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M366.984 77.3054C366.984 94.3922 353.132 108.244 336.045 108.244L336.045 110.244C353.132 110.244 366.984 124.095 366.984 141.182L368.984 141.182C368.984 124.096 382.835 110.244 399.922 110.244V108.244C382.835 108.244 368.984 94.3923 368.984 77.3054H366.984Z"
-    fill="var(--color-background)"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M120.506 166.049C111.259 166.049 103.762 158.553 103.762 149.305H101.762C101.762 158.553 94.2658 166.049 85.0186 166.049L85.0186 168.049C94.2658 168.049 101.762 175.545 101.762 184.793H103.762C103.762 175.545 111.259 168.049 120.506 168.049V166.049Z"
+    d="M250.915 154.946L421.244 250.761L78.7928 250.761L250.915 154.946Z"
     fill="var(--color-primary)"
-  />
-  <path
-    d="M250.915 129.536L421.244 225.352L78.7928 225.352L250.915 129.536Z"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
   />
   <path
-    d="M78.0186 224.577H422.019V421.305H78.0186V224.577Z"
+    d="M78.0186 249.987H422.019V446.715H78.0186V249.987Z"
     fill="var(--color-background)"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <path
     opacity="0.98"
-    d="M250.019 322.941L78.793 225.352L421.244 225.352L250.019 322.941Z"
+    d="M250.019 348.351L78.793 250.761L421.244 250.761L250.019 348.351Z"
     fill="var(--color-primary)"
   />
+  <mask
+    id="mask0_1385_32450"
+    style="mask-type:alpha"
+    maskUnits="userSpaceOnUse"
+    x="78"
+    y="33"
+    width="344"
+    height="316"
+  >
+    <path
+      opacity="0.98"
+      d="M250.019 348.351L78.793 250.761L250.019 33.0404L421.244 250.761L250.019 348.351Z"
+      fill="var(--color-primary)"
+    />
+  </mask>
+  <g mask="url(#mask0_1385_32450)">
+    <line
+      x1="156.583"
+      y1="234.212"
+      x2="156.583"
+      y2="363.748"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="233.583"
+      y1="279.252"
+      x2="233.583"
+      y2="404.067"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="168.583"
+      y1="269.302"
+      x2="168.583"
+      y2="394.117"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="246.583"
+      y1="297.976"
+      x2="246.583"
+      y2="422.792"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="181.583"
+      y1="260.802"
+      x2="181.583"
+      y2="385.617"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="259.583"
+      y1="279.252"
+      x2="259.583"
+      y2="404.067"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="194.583"
+      y1="284.161"
+      x2="194.583"
+      y2="408.977"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="272.583"
+      y1="296.943"
+      x2="272.583"
+      y2="421.759"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="207.583"
+      y1="271.619"
+      x2="207.583"
+      y2="396.435"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="285.583"
+      y1="271.619"
+      x2="285.583"
+      y2="396.435"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="220.583"
+      y1="292.485"
+      x2="220.583"
+      y2="417.301"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="298.583"
+      y1="283.715"
+      x2="298.583"
+      y2="408.53"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="311.583"
+      y1="260.802"
+      x2="311.583"
+      y2="385.617"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="324.583"
+      y1="269.302"
+      x2="324.583"
+      y2="394.117"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+    <line
+      x1="336.583"
+      y1="234.212"
+      x2="336.583"
+      y2="359.027"
+      stroke="var(--color-foreground)"
+      stroke-width="2"
+    />
+  </g>
   <path
-    d="M78.793 225.352L421.244 420.531M78.793 420.531L421.244 225.352"
+    d="M78.793 250.761L421.244 445.941M78.793 445.941L421.244 250.761"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <path
-    d="M238.485 291.777C186.186 291.777 143.67 246.218 143.67 189.864C143.67 133.511 186.186 87.9517 238.485 87.9517H251.68V189.864L251.68 291.777H238.485Z"
+    d="M238.485 267.107C186.186 267.107 143.67 221.547 143.67 165.194C143.67 108.841 186.186 63.2812 238.485 63.2812H251.68V165.194L251.68 267.107H238.485Z"
     fill="var(--color-primary)"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <path
-    d="M347.496 189.864C347.496 246.218 304.979 291.777 252.68 291.777C200.381 291.777 157.865 246.218 157.865 189.864C157.865 133.511 200.381 87.9517 252.68 87.9517C304.979 87.9517 347.496 133.511 347.496 189.864Z"
+    d="M347.496 165.194C347.496 221.547 304.979 267.107 252.68 267.107C200.381 267.107 157.865 221.547 157.865 165.194C157.865 108.841 200.381 63.2812 252.68 63.2812C304.979 63.2812 347.496 108.841 347.496 165.194Z"
     fill="var(--color-background)"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <path
-    d="M327.978 189.864C327.978 234.454 294.203 270.485 252.68 270.485C211.157 270.485 177.383 234.454 177.383 189.864C177.383 145.274 211.157 109.244 252.68 109.244C294.203 109.244 327.978 145.274 327.978 189.864Z"
+    d="M327.978 165.194C327.978 209.784 294.203 245.814 252.68 245.814C211.157 245.814 177.383 209.784 177.383 165.194C177.383 120.604 211.157 84.5735 252.68 84.5735C294.203 84.5735 327.978 120.604 327.978 165.194Z"
     fill="var(--color-background)"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <line
     x1="168.019"
-    y1="121.305"
+    y1="96.635"
     x2="182.213"
-    y2="121.305"
+    y2="96.635"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <line
     x1="149.019"
-    y1="155.305"
+    y1="130.635"
     x2="163.019"
-    y2="155.305"
+    y2="130.635"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <line
     x1="144.019"
-    y1="188.305"
+    y1="163.635"
     x2="158.019"
-    y2="188.305"
+    y2="163.635"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <line
     x1="149.019"
-    y1="222.305"
+    y1="197.635"
     x2="163.019"
-    y2="222.305"
+    y2="197.635"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <line
     x1="167.019"
-    y1="256.305"
+    y1="231.635"
     x2="181.019"
-    y2="256.305"
+    y2="231.635"
     stroke="var(--color-foreground)"
     stroke-width="2"
   />
   <path
-    d="M336.019 109.244V109.244C353.658 109.244 367.957 123.543 367.957 141.182V141.182"
-    stroke="var(--color-foreground)"
-    stroke-width="2"
-    stroke-linejoin="round"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M372.984 50.8508C372.984 67.9377 359.132 81.7893 342.045 81.7893L342.045 83.7893C359.132 83.7893 372.984 97.6409 372.984 114.728L374.984 114.728C374.984 97.6409 388.835 83.7893 405.922 83.7893V81.7893C388.835 81.7893 374.984 67.9377 374.984 50.8508H372.984Z"
+    fill="var(--color-background)"
   />
   <path
-    d="M399.896 109.244V109.244C382.256 109.244 367.957 94.9446 367.957 77.3054V77.3054"
-    stroke="var(--color-foreground)"
-    stroke-width="2"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M367.957 141.182V141.182C367.957 123.543 382.256 109.244 399.895 109.244V109.244"
+    d="M342.019 82.7893V82.7893C359.658 82.7893 373.957 97.0886 373.957 114.728V114.728"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
   />
   <path
-    d="M367.957 77.3054V77.3054C367.957 94.9445 353.658 109.244 336.019 109.244V109.244"
+    d="M405.896 82.7893V82.7893C388.256 82.7893 373.957 68.49 373.957 50.8508V50.8508"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
   />
   <path
-    d="M85.0186 167.049V167.049C94.8181 167.049 102.762 174.993 102.762 184.793V184.793"
+    d="M373.957 114.728V114.728C373.957 97.0887 388.256 82.7893 405.895 82.7893V82.7893"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
   />
   <path
-    d="M120.506 167.049V167.049C110.706 167.049 102.762 159.105 102.762 149.305V149.305"
+    d="M373.957 50.8508V50.8508C373.957 68.49 359.658 82.7893 342.019 82.7893V82.7893"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
   />
   <path
-    d="M102.762 184.792V184.792C102.762 174.993 110.706 167.049 120.506 167.049V167.049"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M124.49 176.11C115.242 176.11 107.746 168.613 107.746 159.366H105.746C105.746 168.613 98.2497 176.11 89.0025 176.11L89.0024 178.11C98.2496 178.11 105.746 185.606 105.746 194.853H107.746C107.746 185.606 115.242 178.11 124.49 178.11V176.11Z"
+    fill="var(--color-primary)"
+  />
+  <path
+    d="M89.0024 177.11V177.11C98.802 177.11 106.746 185.054 106.746 194.853V194.853"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
   />
   <path
-    d="M102.762 149.305V149.305C102.762 159.105 94.8181 167.049 85.0186 167.049V167.049"
+    d="M124.49 177.11V177.11C114.69 177.11 106.746 169.166 106.746 159.366V159.366"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M106.746 194.853V194.853C106.746 185.054 114.69 177.11 124.49 177.11V177.11"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M106.746 159.366V159.366C106.746 169.166 98.802 177.11 89.0025 177.11V177.11"
     stroke="var(--color-foreground)"
     stroke-width="2"
     stroke-linejoin="round"
