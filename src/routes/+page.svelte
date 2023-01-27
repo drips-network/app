@@ -111,7 +111,7 @@
             alt="Drips Funding Profile"
           />
         </div>
-        <div class="card-description">
+        <div class="card-description" id="raise-funds-description">
           <ComingSoonBadge />
           <h2>Raise funds for your projects or yourself</h2>
           <p>
@@ -419,6 +419,10 @@
     margin-bottom: -7rem;
   }
 
+  #main-features > #raise-funds > #raise-funds-description {
+    transform: translateY(-2.5rem);
+  }
+
   #main-features #streaming > .card-illustration {
     padding: 2rem 0 2rem 1rem;
   }
@@ -468,7 +472,7 @@
     }
   }
 
-  @media (max-width: 577px) {
+  @media (max-width: 768px) {
     h1 {
       font-size: var(--font-size-l);
     }
@@ -521,6 +525,10 @@
 
     #main-features #streaming > .card-illustration {
       padding: 2rem 0 2rem 0;
+    }
+
+    #main-features > #raise-funds > #raise-funds-description {
+      transform: none;
     }
 
     #code-example-wrapper {
