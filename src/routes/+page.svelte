@@ -19,6 +19,7 @@
   import themeStore from '$lib/stores/theme/theme.store';
   import BigDripsLogo from '$lib/components/illustrations/big-drips-logo.svelte';
   import ComingSoonBadge from './components/coming-soon-badge.svelte';
+  import Coin from '$lib/components/illustrations/coin.svelte';
 
   $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
 </script>
@@ -35,7 +36,12 @@
   <div id="wrapper">
     <LpHeader />
     <section id="hero">
-      <BigDripsLogo />
+      <div id="hero-illustration">
+        <BigDripsLogo />
+        <div class="hover"><div class="coin first"><Coin /></div></div>
+        <div class="hover"><div class="coin second"><Coin /></div></div>
+        <div class="hover"><div class="coin third"><Coin /></div></div>
+      </div>
       <div id="title">
         <h1>Crowdfunding for the Open Web</h1>
       </div>
@@ -354,6 +360,35 @@
     text-decoration: underline;
   }
 
+  #hero #hero-illustration {
+    margin-bottom: 4rem;
+    position: relative;
+    width: 100%;
+  }
+
+  #hero #hero-illustration .coin {
+    position: absolute;
+    width: 18%;
+  }
+
+  #hero #hero-illustration .coin.first {
+    left: 10%;
+    top: 50%;
+    transform: rotate(-45deg);
+  }
+
+  #hero #hero-illustration .coin.second {
+    left: 50%;
+    transform: translate(-50%, 0) rotate(45deg);
+    top: 30%;
+  }
+
+  #hero #hero-illustration .coin.third {
+    right: 10%;
+    transform: rotate(135deg);
+    top: 50%;
+  }
+
   .full-width-card {
     display: grid;
     column-gap: 1rem;
@@ -570,6 +605,37 @@
     }
     100% {
       transform: rotate(360deg);
+    }
+  }
+
+  .hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    animation: hover 4s ease-in-out infinite;
+  }
+
+  .hover:nth-of-type(1) {
+    animation-delay: -0.5s;
+    animation-duration: 3.9s;
+  }
+
+  .hover:nth-of-type(3) {
+    animation-delay: -1s;
+    animation-duration: 4.1s;
+  }
+
+  @keyframes hover {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(0.75rem);
+    }
+    100% {
+      transform: translateY(0);
     }
   }
 </style>
