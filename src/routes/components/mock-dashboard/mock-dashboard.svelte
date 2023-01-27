@@ -17,7 +17,6 @@
 </script>
 
 <div class="mock-dashboard">
-  <h1>Dashboard</h1>
   <div class="section">
     <SectionHeader
       icon={TokensIcon}
@@ -66,7 +65,7 @@
     flex-direction: column;
     gap: 4rem;
     user-select: none;
-    padding: 0 1rem;
+    padding: 0 2rem;
     max-width: 64rem;
   }
 
@@ -75,6 +74,7 @@
     flex-direction: column;
     gap: 1rem;
     position: relative;
+    margin: 0 -1rem;
   }
 
   .table-container {

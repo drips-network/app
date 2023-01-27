@@ -18,6 +18,24 @@ input[type='number'] {
   border-radius: 0.25rem;
 }
 
+.only-dark-theme,
+.only-light-theme,
+.only-h4x0r-theme {
+  display: none;
+}
+
+.main[data-theme='light'] .only-light-theme {
+  display: initial;
+}
+
+.main[data-theme='dark'] .only-dark-theme {
+  display: initial;
+}
+
+.main[data-theme='h4x0r'] .only-h4x0r-theme {
+  display: initial;
+}
+
 @font-face {
   font-family: 'Redaction 50';
   font-weight: 400;

@@ -39,6 +39,7 @@
     user-select: none;
     transition: background-color 0.3s, color 0.3s, transform 0.1s, box-shadow 0.3s, opacity 0.3s;
     white-space: nowrap;
+    background-color: var(--color-background);
   }
 
   button.normal {

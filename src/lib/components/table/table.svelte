@@ -194,6 +194,7 @@
     padding: 0.75rem;
     vertical-align: middle;
     color: var(--color-foreground);
+    background-color: var(--color-background);
   }
 
   td.sorted {
