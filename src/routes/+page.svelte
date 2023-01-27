@@ -632,7 +632,7 @@
       transform: translateY(0);
     }
     50% {
-      transform: translateY(0.75rem);
+      transform: translateY(2%);
     }
     100% {
       transform: translateY(0);
