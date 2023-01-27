@@ -427,6 +427,7 @@
 
   #main-features #streaming > .card-illustration {
     padding: 2rem 0 2rem 1rem;
+    overflow: hidden;
   }
 
   .grid {
