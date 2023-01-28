@@ -1,4 +1,4 @@
-const PATTERN = /^(?:[a-z0-9]+:)/;
+const PROTOCOL_PATTERN = /^(?:[a-z0-9]+:)/;
 
 /**
  * Tests whether a path `input` is safe to `goto`. The path is considered unsafe
@@ -8,5 +8,8 @@ const PATTERN = /^(?:[a-z0-9]+:)/;
  * @returns True if safe to pass to `goto`, false if not.
  */
 export default function (input: string) {
-  return !PATTERN.test(input);
+  const hasProtocolPattern = PROTOCOL_PATTERN.test(input);
+  const hasDoubleSlash = input.startsWith('//');
+
+  return !hasProtocolPattern && !hasDoubleSlash;
 }
