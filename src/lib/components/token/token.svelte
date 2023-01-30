@@ -5,8 +5,6 @@
   import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import QuestionIcon from 'radicle-design-system/icons/Question.svelte';
   import { onMount } from 'svelte';
-  import { quintIn, quintOut } from 'svelte/easing';
-  import { tweened } from 'svelte/motion';
   import CoinAnimation from '../coin-animation/coin-animation.svelte';
   import FitText from '../fit-text/fit-text.svelte';
 
@@ -37,30 +35,11 @@
 
   let imageFailed = false;
 
-  let tokenRotationDeg = tweened(0);
-  let sparkle1Scale = tweened(0);
-  let sparkle2Scale = tweened(0);
-
-  async function animate() {
-    tokenRotationDeg.set(0, { duration: 0 });
-    tokenRotationDeg.set(720, { duration: 1500, easing: quintOut });
-
-    sparkle1Scale.set(2, { duration: 200, easing: quintOut, delay: 100 });
-    setTimeout(() => sparkle1Scale.set(0, { duration: 200, easing: quintIn }), 300);
-
-    sparkle2Scale.set(2, { duration: 200, easing: quintOut, delay: 300 });
-    setTimeout(() => sparkle2Scale.set(0, { duration: 200, easing: quintIn }), 500);
-  }
-
   $: shouldAnimate = Boolean(tokenInfo);
 
   $: placeholderColor = tokenInfo
     ? seededRandomElement(['red', 'green', 'blue', 'purple'], address)
     : 'var(--color-foreground-level-2)';
-
-  $: {
-    if (animateOnMount && shouldAnimate) animate();
-  }
 
   let loaded = false;
 
@@ -81,15 +60,11 @@
           on:load={() => (loaded = true)}
           {src}
           class:loaded
-          style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}
           on:error={() => (imageFailed = true)}
           alt={`${tokenInfo.name} logo`}
         />
       {:else}
-        <div
-          style="transform: rotate3d(0, 1, 0, {$tokenRotationDeg}deg); background-color: {placeholderColor}"
-          class="unknown-logo typo-text-mono-bold"
-        >
+        <div style="background-color: {placeholderColor}" class="unknown-logo typo-text-mono-bold">
           {#if tokenInfo?.symbol}
             <div class="symbol-wrapper px-1 w-full">
               <FitText text={tokenInfo.symbol} />
