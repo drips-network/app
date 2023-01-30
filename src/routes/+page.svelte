@@ -55,7 +55,7 @@
         <h1>Crowdfunding for the Open Web</h1>
       </div>
       <div class="beta-notice">
-        Drips is currently in Beta, with Token Streaming features ready for you to try.<br />
+        Drips is currently in Beta, with Token Streaming features ready for you to try on testnets.
         <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates on upcoming crowdfunding
         functionality!
       </div>
@@ -251,9 +251,11 @@
         <RadicleLogo />
       </div>
       <div id="drips-sticker">
-        <div class="illustration">
-          <DripsSticker />
-        </div>
+        <CoinAnimation>
+          <div class="illustration">
+            <DripsSticker />
+          </div>
+        </CoinAnimation>
       </div>
     </section>
   </div>
@@ -360,7 +362,7 @@
     padding: 0.5rem 1.5rem;
     border-radius: 2rem 0 2rem 2rem;
     border: 1px solid var(--color-caution-level-6);
-    max-width: 48rem;
+    max-width: 43rem;
     text-align: left;
     margin-top: 3rem;
   }
