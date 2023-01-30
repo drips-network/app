@@ -455,6 +455,7 @@
 
   #main-features > #raise-funds {
     margin-bottom: -7rem;
+    overflow: visible;
   }
 
   #main-features > #raise-funds > #raise-funds-description {
