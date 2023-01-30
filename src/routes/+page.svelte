@@ -549,24 +549,6 @@
       transform: none;
     }
 
-    #code-example-wrapper {
-      width: 100%;
-      background-color: var(--color-foreground-level-1);
-      padding: var(--spacing-s) 0 var(--spacing-s) 0;
-    }
-
-    #code-example {
-      text-align: left;
-      overflow: scroll;
-      max-width: 985px;
-      margin: var(--spacing-m) auto var(--spacing-m) auto;
-    }
-
-    #code-example > .inner {
-      padding: 0 var(--spacing-m);
-      width: fit-content;
-    }
-
     #drips-sticker {
       height: 12rem;
       width: 12rem;
