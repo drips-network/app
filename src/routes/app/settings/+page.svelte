@@ -67,7 +67,7 @@
     <h4 class="typo-all-caps">Advanced</h4>
     <Setting
       title="Custom tokens"
-      subtitle="Select which non-default tokens you want to use with Radicle Drips."
+      subtitle="Select which non-default tokens you want to use with Drips."
     >
       <a href="/app/settings/custom-tokens">
         <Button icon={ListIcon}>Edit token list</Button>
