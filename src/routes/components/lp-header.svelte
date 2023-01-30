@@ -5,11 +5,12 @@
   import scrollStore from '$lib/stores/scroll/scroll.store';
 
   $: scrolledDown = $scrollStore.pos > 10;
+  $: showLogo = $scrollStore.pos > 200;
 </script>
 
 <header class:raised={scrolledDown}>
   <div class="logo">
-    <div class="inner" class:logoOffset={scrolledDown}>
+    <div class="inner" class:logoOffset={showLogo}>
       <ThreeDrips />
       <DripsLogo />
     </div>
