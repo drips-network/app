@@ -14,14 +14,11 @@
   import LpSectionHeader from './components/lp-section-header.svelte';
   import RadicleLogo from '../lib/components/illustrations/radicle-logo.svelte';
   import DripsSticker from '../lib/components/illustrations/drips-sticker.svelte';
-  import themeStore from '$lib/stores/theme/theme.store';
   import BigDripsLogo from '$lib/components/illustrations/big-drips-logo.svelte';
   import ComingSoonBadge from './components/coming-soon-badge.svelte';
   import Coin from '$lib/components/illustrations/coin.svelte';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import BuildOnDrips from '$lib/components/illustrations/build-on-drips.svelte';
-
-  $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
 </script>
 
 <svelte:head>
