@@ -8,9 +8,16 @@
   import { balancesOptions } from './mock-balances-table';
   import { streamsOptions } from './mock-streams.table';
 
+  /** After this many millis, one of the mock balances would become negative. */
+  const MAX_MILLIS = 1004195;
+
   let millis = 0;
 
-  setInterval(() => (millis = millis + 100), 100);
+  setInterval(() => {
+    millis = millis + 100;
+
+    if (millis > MAX_MILLIS) millis = 0;
+  }, 100);
 
   $: balances = balancesOptions(millis);
   $: streams = streamsOptions(millis);
