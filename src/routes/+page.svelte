@@ -37,17 +37,20 @@
         <BigDripsLogo />
         <div class="hover">
           <div class="coin first">
-            <CoinAnimation playSound sparkles={false}><Coin /></CoinAnimation>
+            <CoinAnimation animateOnHover={false} playSound sparkles={false}><Coin /></CoinAnimation
+            >
           </div>
         </div>
         <div class="hover">
           <div class="coin second">
-            <CoinAnimation playSound sparkles={false}><Coin /></CoinAnimation>
+            <CoinAnimation animateOnHover={false} playSound sparkles={false}><Coin /></CoinAnimation
+            >
           </div>
         </div>
         <div class="hover">
           <div class="coin third">
-            <CoinAnimation playSound sparkles={false}><Coin /></CoinAnimation>
+            <CoinAnimation animateOnHover={false} playSound sparkles={false}><Coin /></CoinAnimation
+            >
           </div>
         </div>
       </div>
@@ -374,6 +377,7 @@
   #hero #hero-illustration .coin {
     position: absolute;
     width: 100%;
+    cursor: pointer;
   }
 
   #hero #hero-illustration .coin.first {

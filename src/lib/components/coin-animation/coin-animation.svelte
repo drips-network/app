@@ -8,6 +8,7 @@
   export let enable = true;
   export let animateOnMount = false;
   export let playSound = false;
+  export let animateOnHover = true;
 
   const coinSound = browser ? new Audio('/assets/coin-sound.mp3') : undefined;
   if (coinSound) coinSound.volume = 0.1;
@@ -23,6 +24,7 @@
 
   async function animate(click: boolean) {
     if (!enable) return;
+    if (!animateOnHover && !click) return;
 
     if (click && playSound && coinSound) {
       coinSound.currentTime = 0;
