@@ -251,11 +251,9 @@
         <RadicleLogo />
       </div>
       <div id="drips-sticker">
-        <CoinAnimation>
-          <div class="illustration">
-            <DripsSticker />
-          </div>
-        </CoinAnimation>
+        <div class="illustration">
+          <DripsSticker />
+        </div>
       </div>
     </section>
   </div>
