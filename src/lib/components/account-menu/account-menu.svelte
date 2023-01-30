@@ -49,6 +49,15 @@
     <AccountMenuItem icon={SettingsIcon} href="/app/settings">
       <svelte:fragment slot="title">Settings</svelte:fragment>
     </AccountMenuItem>
+    <Divider sideMargin={0.5} />
+    <ul class="links typo-text-small">
+      <li>
+        <a href="https://v2.docs.drips.network/docs/the-drips-app/getting-started" target="_blank"
+          >Help</a
+        >
+      </li>
+      <li>Supported by <a href="https://radicle.xyz" target="_blank">Radicle</a></li>
+    </ul>
   {/if}
 </div>
 
@@ -58,5 +67,28 @@
     gap: 0.25rem;
     flex-direction: column;
     padding: -0.5rem;
+  }
+
+  .links {
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .links > li {
+    color: var(--color-foreground-level-6);
+  }
+
+  .links > li:not(:last-child)::after {
+    margin-left: 0.5rem;
+    content: '•';
+  }
+
+  .links a {
+    text-decoration: underline;
+  }
+
+  .links a::after {
+    content: '↗';
   }
 </style>
