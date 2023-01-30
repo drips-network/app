@@ -87,8 +87,4 @@
   .links a {
     text-decoration: underline;
   }
-
-  .links a::after {
-    content: '↗';
-  }
 </style>
