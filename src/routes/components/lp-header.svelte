@@ -3,22 +3,13 @@
   import DripsLogo from '$lib/components/illustrations/logo.svelte';
   import ThreeDrips from '$lib/components/illustrations/three-drips.svelte';
   import scrollStore from '$lib/stores/scroll/scroll.store';
-  import mapRange from '$lib/utils/map-range';
 
-  $: scrollPos = Math.max(
-    Math.min($scrollStore.pos, ILLUSTRATION_SCROLL_POS_END) - ILLUSTRATION_SCROLL_POS_START,
-    0,
-  );
-
-  const ILLUSTRATION_SCROLL_POS_START = 100;
-  const ILLUSTRATION_SCROLL_POS_END = 400;
-
-  $: logoOffset = mapRange(scrollPos, 0, ILLUSTRATION_SCROLL_POS_END, 0, 78);
+  $: scrolledDown = $scrollStore.pos > 10;
 </script>
 
-<header class:raised={scrollPos > 10}>
+<header class:raised={scrolledDown}>
   <div class="logo">
-    <div class="inner" style:transform="translateY(-{logoOffset}px)">
+    <div class="inner" class:logoOffset={scrolledDown}>
       <ThreeDrips />
       <DripsLogo />
     </div>
@@ -59,6 +50,14 @@
   .logo {
     margin-left: var(--spacing-xs);
     height: 28px;
+  }
+
+  .logo .inner {
+    transition: transform 0.3s;
+  }
+
+  .logo .inner.logoOffset {
+    transform: translateY(-58px);
   }
 
   .logo > .inner {
