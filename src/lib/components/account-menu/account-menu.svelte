@@ -53,7 +53,7 @@
     <ul class="links typo-text-small">
       <li>
         <a href="https://v2.docs.drips.network/docs/the-drips-app/getting-started" target="_blank"
-          >Help</a
+          >Get help</a
         >
       </li>
       <li>Supported by <a href="https://radicle.xyz" target="_blank">Radicle</a></li>
