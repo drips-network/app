@@ -55,7 +55,7 @@
         </div>
       </div>
       <div id="title">
-        <h1>Crowdfunding for the Open Web</h1>
+        <h1>Crowdfunding<span class="nudge">&nbsp;</span>for the Open Web</h1>
       </div>
       <div class="beta-notice">
         Drips is currently in Beta, with Token Streaming features ready for you to try on testnets.
@@ -279,6 +279,11 @@
     --font-size-m: 1.5rem;
     --font-size-l: 2.5rem;
     --font-size-xl: 3rem;
+  }
+
+  .nudge {
+    font-size: inherit;
+    letter-spacing: 0.18em;
   }
 
   h1,
