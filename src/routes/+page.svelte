@@ -308,10 +308,6 @@
     position: relative;
   }
 
-  .card-standard-padding {
-    padding: var(--spacing-l);
-  }
-
   .centered {
     text-align: center;
     display: flex;
