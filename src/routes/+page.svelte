@@ -202,7 +202,7 @@
           ><ImageAndCaption background>
             <OneContract slot="image" />
             <div slot="caption" class="text-container">
-              <h3>One Contract. One Payment Graph.</h3>
+              <h3>One contract. One payment graph.</h3>
               <p>
                 Drips uses one smart contract for streaming and splitting, enabling effortless and
                 flexible token routing.
