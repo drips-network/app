@@ -4,7 +4,6 @@
   import LpCard from './components/lp-card/lp-card.svelte';
   import LpHeader from './components/lp-header.svelte';
 
-  import ThreeDrips from '../lib/components/illustrations/three-drips.svelte';
   import GasOptimized from '../lib/components/illustrations/gas-optimized.svelte';
   import OneContract from '../lib/components/illustrations/one-contract.svelte';
   import NoWrappedTokens from '../lib/components/illustrations/no-wrapped-tokens.svelte';
@@ -20,6 +19,7 @@
   import ComingSoonBadge from './components/coming-soon-badge.svelte';
   import Coin from '$lib/components/illustrations/coin.svelte';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
+  import BuildOnDrips from '$lib/components/illustrations/build-on-drips.svelte';
 
   $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
 </script>
@@ -206,15 +206,21 @@
         >
       </section>
     </section>
-    <section data-theme={codeSectionTheme}>
+    <section id="build-on-drips">
       <LpCard>
-        <div class="card-standard-padding centered text-container background-color">
-          <ThreeDrips />
-          <h2>Build on Drips</h2>
-          <p class="text-foreground">
-            Developers: Build your own token streaming applications using Drips crowdfunding
-            primitives.
-          </p>
+        <div id="build-on-drips-content">
+          <div class="left">
+            <div class="illustration">
+              <BuildOnDrips />
+            </div>
+            <div class="text">
+              <h3>Build on Drips</h3>
+              <p class="text-foreground">
+                Developers: Build your own token streaming applications using Drips crowdfunding
+                primitives.
+              </p>
+            </div>
+          </div>
           <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank"
             ><Button variant="primary">Check out the docs</Button></a
           >
@@ -463,6 +469,33 @@
     isolation: isolate;
   }
 
+  #build-on-drips #build-on-drips-content {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--color-primary-level-1);
+    padding: 1.5rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #build-on-drips #build-on-drips-content .left {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  #build-on-drips #build-on-drips-content .left .illustration {
+    max-height: 6rem;
+    max-width: 6rem;
+    width: 100%;
+  }
+
+  #build-on-drips #build-on-drips-content .left .text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -509,10 +542,6 @@
       text-align: left;
     }
 
-    .card-standard-padding {
-      padding: var(--spacing-m);
-    }
-
     .full-width-card.illustration-left {
       grid-template-columns: 1fr;
     }
@@ -547,6 +576,12 @@
 
     #main-features > #raise-funds > #raise-funds-description {
       transform: none;
+    }
+
+    #build-on-drips #build-on-drips-content,
+    #build-on-drips #build-on-drips-content .left {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
     #drips-sticker {
