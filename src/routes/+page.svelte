@@ -101,8 +101,8 @@
             <ComingSoonBadge />
             <h2>Discover & support exciting projects</h2>
             <p>
-              Support open-source projects with flexible token streams – and pause, top-up or cancel
-              at your own discretion.
+              Support projects with flexible token streams – and pause, top-up or cancel at your own
+              discretion.
             </p>
           </div>
           <div class="card-illustration">
