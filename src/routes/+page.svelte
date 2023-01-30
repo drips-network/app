@@ -95,8 +95,8 @@
             <ComingSoonBadge />
             <h2>Discover & support exciting projects</h2>
             <p>
-              Support projects or individuals with flexible token streams – and pause, top-up or
-              cancel at your own discretion.
+              Support open-source projects with flexible token streams – and pause, top-up or cancel
+              at your own discretion.
             </p>
           </div>
           <div class="card-illustration">
@@ -125,7 +125,7 @@
         </div>
         <div class="card-description" id="raise-funds-description">
           <ComingSoonBadge />
-          <h2>Raise funds for your projects or yourself</h2>
+          <h2>Raise funds for your open-source projects or yourself</h2>
           <p>
             Drips is a complete toolkit for raising funds, by the second — without any platform
             fees.
