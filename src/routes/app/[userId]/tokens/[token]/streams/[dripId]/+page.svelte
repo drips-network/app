@@ -185,7 +185,6 @@
 
 <svelte:head>
   <title>{stream?.name ?? 'Stream'} | Drips</title>
-  <meta name="description" content="Radicle Drips Dashboard" />
 </svelte:head>
 
 <div class="wrapper">
