@@ -20,6 +20,7 @@
   import BigDripsLogo from '$lib/components/illustrations/big-drips-logo.svelte';
   import ComingSoonBadge from './components/coming-soon-badge.svelte';
   import Coin from '$lib/components/illustrations/coin.svelte';
+  import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
 
   $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
 </script>
@@ -38,9 +39,15 @@
     <section id="hero">
       <div id="hero-illustration">
         <BigDripsLogo />
-        <div class="hover"><div class="coin first"><Coin /></div></div>
-        <div class="hover"><div class="coin second"><Coin /></div></div>
-        <div class="hover"><div class="coin third"><Coin /></div></div>
+        <div class="hover">
+          <div class="coin first"><CoinAnimation sparkles={false}><Coin /></CoinAnimation></div>
+        </div>
+        <div class="hover">
+          <div class="coin second"><CoinAnimation sparkles={false}><Coin /></CoinAnimation></div>
+        </div>
+        <div class="hover">
+          <div class="coin third"><CoinAnimation sparkles={false}><Coin /></CoinAnimation></div>
+        </div>
       </div>
       <div id="title">
         <h1>Crowdfunding for the Open Web</h1>
@@ -75,10 +82,10 @@
             <div class="relative h-full"><OneContract /></div>
           </div>
           <div class="card-description">
-            <h2>Share funds with the projects & individuals you care for</h2>
+            <h2>Split earnings with projects & people you care for</h2>
             <p>
-              Automatically split any ERC-20 token you receive with a list of up to 200 projects &
-              individuals. Anytime you get paid, they get paid.
+              Automatically forward a set percentage of funds you receive with a list of up to 200
+              projects & individuals. Anytime you get paid, they get paid.
             </p>
           </div>
         </div></LpCard
@@ -87,10 +94,10 @@
         ><div id="discover-support" class="full-width-card illustration-right text-nudged">
           <div class="card-description">
             <ComingSoonBadge />
-            <h2>Discover & support exciting projects & individuals</h2>
+            <h2>Discover & support exciting projects</h2>
             <p>
-              Support projects with flexible streams – and pause, top-up or cancel at your own
-              discretion.
+              Support projects or individuals with flexible token streams – and pause, top-up or
+              cancel at your own discretion.
             </p>
           </div>
           <div class="card-illustration">
@@ -368,25 +375,19 @@
 
   #hero #hero-illustration .coin {
     position: absolute;
-    width: 18%;
+    width: 100%;
   }
 
   #hero #hero-illustration .coin.first {
-    left: 10%;
-    top: 50%;
     transform: rotate(-45deg);
   }
 
   #hero #hero-illustration .coin.second {
-    left: 50%;
-    transform: translate(-50%, 0) rotate(45deg);
-    top: 30%;
+    transform: rotate(45deg);
   }
 
   #hero #hero-illustration .coin.third {
-    right: 10%;
     transform: rotate(135deg);
-    top: 50%;
   }
 
   .full-width-card {
@@ -611,20 +612,27 @@
 
   .hover {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    width: 18%;
+    height: 18%;
     animation: hover 4s ease-in-out infinite;
   }
 
   .hover:nth-of-type(1) {
+    top: 45%;
+    left: 10%;
     animation-delay: -0.5s;
     animation-duration: 3.9s;
   }
 
+  .hover:nth-of-type(2) {
+    top: 28%;
+    left: 41%;
+  }
+
   .hover:nth-of-type(3) {
     animation-delay: -1s;
+    top: 45%;
+    right: 10%;
     animation-duration: 4.1s;
   }
 
@@ -633,7 +641,7 @@
       transform: translateY(0);
     }
     50% {
-      transform: translateY(2%);
+      transform: translateY(10%);
     }
     100% {
       transform: translateY(0);

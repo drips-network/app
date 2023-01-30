@@ -7,6 +7,7 @@
   import { onMount } from 'svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
+  import CoinAnimation from '../coin-animation/coin-animation.svelte';
   import FitText from '../fit-text/fit-text.svelte';
 
   export let address: string;
@@ -71,37 +72,34 @@
 </script>
 
 <div class="token size-{size}">
-  <div
-    class="logo"
-    style={`height: ${sizes[size]}px; width: ${sizes[size]}px`}
-    on:mouseenter={() => shouldAnimate && animate()}
-    on:click={() => shouldAnimate && animate()}
-  >
-    {#if tokenInfo?.logoURI && !imageFailed}
-      <div class="background" class:loaded />
-      <img
-        bind:this={imgElem}
-        on:load={() => (loaded = true)}
-        {src}
-        class:loaded
-        style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}
-        on:error={() => (imageFailed = true)}
-        alt={`${tokenInfo.name} logo`}
-      />
-    {:else}
-      <div
-        style="transform: rotate3d(0, 1, 0, {$tokenRotationDeg}deg); background-color: {placeholderColor}"
-        class="unknown-logo typo-text-mono-bold"
-      >
-        {#if tokenInfo?.symbol}
-          <div class="symbol-wrapper px-1 w-full">
-            <FitText text={tokenInfo.symbol} />
-          </div>
-        {:else}
-          <QuestionIcon />
-        {/if}
-      </div>
-    {/if}
+  <div class="logo" style={`height: ${sizes[size]}px; width: ${sizes[size]}px`}>
+    <CoinAnimation enable={shouldAnimate} {animateOnMount}>
+      {#if tokenInfo?.logoURI && !imageFailed}
+        <div class="background" class:loaded />
+        <img
+          bind:this={imgElem}
+          on:load={() => (loaded = true)}
+          {src}
+          class:loaded
+          style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}
+          on:error={() => (imageFailed = true)}
+          alt={`${tokenInfo.name} logo`}
+        />
+      {:else}
+        <div
+          style="transform: rotate3d(0, 1, 0, {$tokenRotationDeg}deg); background-color: {placeholderColor}"
+          class="unknown-logo typo-text-mono-bold"
+        >
+          {#if tokenInfo?.symbol}
+            <div class="symbol-wrapper px-1 w-full">
+              <FitText text={tokenInfo.symbol} />
+            </div>
+          {:else}
+            <QuestionIcon />
+          {/if}
+        </div>
+      {/if}
+    </CoinAnimation>
     {#if token?.source === 'custom'}
       <div class="custom-token-warning">
         <ExclamationCircle
@@ -110,18 +108,6 @@
         />
       </div>
     {/if}
-    <div
-      class="sparkle one"
-      style={`transform: scale(${$sparkle1Scale}); font-size: ${sizes[size] / 3}`}
-    >
-      ✨
-    </div>
-    <div
-      class="sparkle two"
-      style={`transform: scale(${$sparkle2Scale}); font-size: ${sizes[size] / 3}`}
-    >
-      ✨
-    </div>
   </div>
   {#if show !== 'none'}
     <div class="name {fontSize}" class:unknown={tokenInfo === undefined}>
@@ -198,21 +184,5 @@
 
   .unknown {
     opacity: 0.5;
-  }
-  .sparkle {
-    pointer-events: none;
-    position: absolute;
-    font-size: 10px;
-    text-shadow: 0px 0px 5px yellow;
-  }
-
-  .sparkle.one {
-    top: 0;
-    left: 0;
-  }
-
-  .sparkle.two {
-    bottom: 0;
-    right: 0;
   }
 </style>
