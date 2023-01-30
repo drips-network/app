@@ -194,7 +194,6 @@
     padding: 0.75rem;
     vertical-align: middle;
     color: var(--color-foreground);
-    background-color: var(--color-background);
   }
 
   td.sorted {
@@ -233,6 +232,10 @@
 
   tr {
     transition: background-color 300ms;
+  }
+
+  tbody tr:not(:hover) {
+    background-color: var(--color-background);
   }
 
   tr.cursor-pointer:hover {
