@@ -12,10 +12,10 @@
 </script>
 
 <svelte:head>
-  <title>Drips • Stream and Split Funds on Ethereum</title>
+  <title>Drips • Crowdfunding for the Open Web</title>
   <meta
     name="description"
-    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+    content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
   />
 </svelte:head>
 
