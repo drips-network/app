@@ -39,13 +39,19 @@
       <div id="hero-illustration">
         <BigDripsLogo />
         <div class="hover">
-          <div class="coin first"><CoinAnimation sparkles={false}><Coin /></CoinAnimation></div>
+          <div class="coin first">
+            <CoinAnimation playSound sparkles={false}><Coin /></CoinAnimation>
+          </div>
         </div>
         <div class="hover">
-          <div class="coin second"><CoinAnimation sparkles={false}><Coin /></CoinAnimation></div>
+          <div class="coin second">
+            <CoinAnimation playSound sparkles={false}><Coin /></CoinAnimation>
+          </div>
         </div>
         <div class="hover">
-          <div class="coin third"><CoinAnimation sparkles={false}><Coin /></CoinAnimation></div>
+          <div class="coin third">
+            <CoinAnimation playSound sparkles={false}><Coin /></CoinAnimation>
+          </div>
         </div>
       </div>
       <div id="title">

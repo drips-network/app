@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { onMount } from 'svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
@@ -6,8 +7,12 @@
   export let sparkles = true;
   export let enable = true;
   export let animateOnMount = false;
+  export let playSound = false;
 
-  onMount(() => enable && animateOnMount && animate());
+  const coinSound = browser ? new Audio('/assets/coin-sound.mp3') : undefined;
+  if (coinSound) coinSound.volume = 0.1;
+
+  onMount(() => enable && animateOnMount && animate(false));
 
   let containerElem: HTMLDivElement;
   let tokenRotationDeg = tweened(0);
@@ -16,8 +21,13 @@
 
   $: sparkleFontSize = containerElem?.offsetWidth / 6;
 
-  async function animate() {
+  async function animate(click: boolean) {
     if (!enable) return;
+
+    if (click && playSound && coinSound) {
+      coinSound.currentTime = 0;
+      coinSound.play();
+    }
 
     tokenRotationDeg.set(0, { duration: 0 });
     tokenRotationDeg.set(720, { duration: 1500, easing: quintOut });
@@ -30,7 +40,12 @@
   }
 </script>
 
-<div class="coin-animation" bind:this={containerElem} on:mouseenter={animate} on:click={animate}>
+<div
+  class="coin-animation"
+  bind:this={containerElem}
+  on:mouseenter={() => animate(false)}
+  on:click={() => animate(true)}
+>
   <div class="content" style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}>
     <slot />
   </div>
