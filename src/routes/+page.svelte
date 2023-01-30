@@ -12,7 +12,6 @@
   import OneBalance from '../lib/components/illustrations/one-balance.svelte';
   import MockDashboard from './components/mock-dashboard/mock-dashboard.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import CodeExample from './components/code-example.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
   import RadicleLogo from '../lib/components/illustrations/radicle-logo.svelte';
   import DripsSticker from '../lib/components/illustrations/drips-sticker.svelte';
@@ -213,18 +212,12 @@
           <ThreeDrips />
           <h2>Build on Drips</h2>
           <p class="text-foreground">
-            Integrating Drips into your app is easy with the JavaScript SDK.
+            Developers: Build your own token streaming applications using Drips crowdfunding
+            primitives.
           </p>
           <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank"
-            ><Button variant="primary">Check out the SDK</Button></a
+            ><Button variant="primary">Check out the docs</Button></a
           >
-        </div>
-        <div id="code-example-wrapper">
-          <div id="code-example">
-            <div class="inner">
-              <CodeExample />
-            </div>
-          </div>
         </div>
       </LpCard>
     </section>
@@ -474,24 +467,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--spacing-m);
-  }
-
-  #code-example-wrapper {
-    width: 100%;
-    background-color: var(--color-foreground-level-1);
-    padding: var(--spacing-m) 0 var(--spacing-s) 0;
-  }
-
-  #code-example {
-    text-align: left;
-    overflow: scroll;
-    max-width: 985px;
-    margin: var(--spacing-m) auto var(--spacing-l) auto;
-  }
-
-  #code-example > .inner {
-    padding: 0 var(--spacing-l);
-    width: fit-content;
   }
 
   #drips-sticker {
