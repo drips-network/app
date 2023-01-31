@@ -1,6 +1,6 @@
 ![Drips Logo illustration](/docs/assets/drips-logo-illustration.png)
 
-# Radicle Drips V2 App
+# Drips V2 App
 
 | 🏗️ This app is under active development, and currently available for testing as a [pre-release version on the Goerli Testnet](https://beta.drips.network/). |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
