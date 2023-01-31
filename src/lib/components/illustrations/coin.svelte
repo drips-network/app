@@ -1,0 +1,60 @@
+<svg viewBox="0 0 179 179" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M83.4676 177.923C38.3052 177.923 1.57422 138.577 1.57422 89.8891C1.57422 41.201 38.3052 1.85547 83.4676 1.85547L94.7481 1.85547V89.8891L94.7481 177.923H83.4676Z"
+    fill="var(--color-primary)"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <path
+    d="M177.642 89.8891C177.642 138.577 140.911 177.923 95.7488 177.923C50.5865 177.923 13.8555 138.577 13.8555 89.8891C13.8555 41.201 50.5865 1.85547 95.7488 1.85547C140.911 1.85547 177.642 41.201 177.642 89.8891Z"
+    fill="var(--color-background)"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <path
+    d="M160.756 89.8883C160.756 128.399 131.588 159.501 95.7479 159.501C59.9076 159.501 30.7402 128.399 30.7402 89.8883C30.7402 51.3775 59.9076 20.2754 95.7479 20.2754C131.588 20.2754 160.756 51.3775 160.756 89.8883Z"
+    fill="var(--color-background)"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <line
+    x1="23.5996"
+    y1="30.5566"
+    x2="35.8801"
+    y2="30.5566"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <line
+    x1="6.71484"
+    y1="59.7227"
+    x2="18.9953"
+    y2="59.7227"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <line
+    x1="2.10938"
+    y1="88.8887"
+    x2="14.3899"
+    y2="88.8887"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <line
+    x1="6.71484"
+    y1="118.055"
+    x2="18.9953"
+    y2="118.055"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+  <line
+    x1="22.0645"
+    y1="147.221"
+    x2="34.345"
+    y2="147.221"
+    stroke="var(--color-foreground)"
+    stroke-width="2"
+  />
+</svg>

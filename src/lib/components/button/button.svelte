@@ -27,8 +27,8 @@
 
 <style>
   button {
-    height: calc(2rem + 8px);
-    padding: 4px 0;
+    height: calc(2rem + 10px);
+    padding: 5px 0;
     margin: -4px 0;
   }
 
@@ -43,6 +43,7 @@
     color: var(--color-foreground);
     user-select: none;
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    background-color: var(--color-background);
   }
 
   button .inner:not(.ghost) {

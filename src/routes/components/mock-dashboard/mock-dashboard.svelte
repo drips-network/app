@@ -8,16 +8,22 @@
   import { balancesOptions } from './mock-balances-table';
   import { streamsOptions } from './mock-streams.table';
 
+  /** After this many millis, one of the mock balances would become negative. */
+  const MAX_MILLIS = 1004195;
+
   let millis = 0;
 
-  setInterval(() => (millis = millis + 100), 100);
+  setInterval(() => {
+    millis = millis + 100;
+
+    if (millis > MAX_MILLIS) millis = 0;
+  }, 100);
 
   $: balances = balancesOptions(millis);
   $: streams = streamsOptions(millis);
 </script>
 
 <div class="mock-dashboard">
-  <h1>Dashboard</h1>
   <div class="section">
     <SectionHeader
       icon={TokensIcon}
@@ -59,14 +65,13 @@
 <style>
   .mock-dashboard {
     width: 100%;
-    overflow: hidden;
     text-align: left;
     max-width: 80rem;
     display: flex;
     flex-direction: column;
     gap: 4rem;
     user-select: none;
-    padding: 0 1rem;
+    padding: 0 2rem;
     max-width: 64rem;
   }
 
@@ -75,6 +80,7 @@
     flex-direction: column;
     gap: 1rem;
     position: relative;
+    margin: 0 -1rem;
   }
 
   .table-container {

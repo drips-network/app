@@ -4,7 +4,6 @@
   import LpCard from './components/lp-card/lp-card.svelte';
   import LpHeader from './components/lp-header.svelte';
 
-  import ThreeDrips from '../lib/components/illustrations/three-drips.svelte';
   import GasOptimized from '../lib/components/illustrations/gas-optimized.svelte';
   import OneContract from '../lib/components/illustrations/one-contract.svelte';
   import NoWrappedTokens from '../lib/components/illustrations/no-wrapped-tokens.svelte';
@@ -12,179 +11,227 @@
   import OneBalance from '../lib/components/illustrations/one-balance.svelte';
   import MockDashboard from './components/mock-dashboard/mock-dashboard.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import CodeExample from './components/code-example.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
   import RadicleLogo from '../lib/components/illustrations/radicle-logo.svelte';
   import DripsSticker from '../lib/components/illustrations/drips-sticker.svelte';
-  import themeStore from '$lib/stores/theme/theme.store';
-
-  $: codeSectionTheme = $themeStore.currentTheme === 'h4x0r' ? 'h4x0r' : 'dark';
+  import BigDripsLogo from '$lib/components/illustrations/big-drips-logo.svelte';
+  import ComingSoonBadge from './components/coming-soon-badge.svelte';
+  import Coin from '$lib/components/illustrations/coin.svelte';
+  import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
+  import BuildOnDrips from '$lib/components/illustrations/build-on-drips.svelte';
 </script>
 
 <svelte:head>
-  <title>Drips • Stream and Split Funds on Ethereum</title>
+  <title>Drips • Crowdfunding for the Open Web</title>
   <meta
     name="description"
-    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+    content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
   />
 </svelte:head>
 
 <div id="lp">
   <div id="wrapper">
-    <div><LpHeader /></div>
-    <div class="align-right hide-mobile">
-      <ThreeDrips />
-    </div>
-    <section>
-      <LpCard stars>
-        <div id="hero">
-          <h1>
-            <span class="standard-font">An</span> Ethereum
-            <span class="standard-font">protocol for</span>
-            streaming <span class="standard-font">and</span> splitting
-            <span class="standard-font">funds.</span>
-          </h1>
-          <div id="beta-notice">
-            <p class="typo-text">
-              Drips V2 is currently in Beta and available on testnets only. <a
-                href="https://drips.network"
-                class="typo-link"
-                target="_blank">Check out Drips V1</a
-              >
-            </p>
-          </div>
-          <div id="mock-dashboard">
-            <MockDashboard />
+    <LpHeader />
+    <section id="hero">
+      <div id="hero-illustration">
+        <BigDripsLogo />
+        <div class="hover">
+          <div class="coin first">
+            <CoinAnimation animateOnHover={false} playSound sparkles={false}><Coin /></CoinAnimation
+            >
           </div>
         </div>
-      </LpCard>
+        <div class="hover">
+          <div class="coin second">
+            <CoinAnimation animateOnHover={false} playSound sparkles={false}><Coin /></CoinAnimation
+            >
+          </div>
+        </div>
+        <div class="hover">
+          <div class="coin third">
+            <CoinAnimation animateOnHover={false} playSound sparkles={false}><Coin /></CoinAnimation
+            >
+          </div>
+        </div>
+      </div>
+      <div id="title">
+        <h1>Crowdfunding<span class="nudge">&nbsp;</span>for the Open Web</h1>
+      </div>
+      <div class="beta-notice">
+        Drips is currently in Beta, with Token Streaming features ready for you to try on testnets.
+        <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates on upcoming crowdfunding
+        functionality!
+      </div>
     </section>
-    <section class="grid">
+    <section id="main-features">
       <LpCard
-        ><ImageAndCaption background>
-          <MultiToken slot="image" />
-          <div slot="caption" class="text-container">
-            <h3>Multi-token</h3>
-            <p>Stream or split any ERC-20 like WETH, DAI or USDC.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <GasOptimized slot="image" />
-          <div slot="caption" class="text-container">
-            <h3>Optimized for 1000s of senders</h3>
+        ><div id="streaming" class="full-width-card illustration-right">
+          <div class="card-description">
+            <h2>Send & receive funds by the second</h2>
             <p>
-              Most protocols focus on 1:1 streaming. Drips optimizes for thousands of senders, like
-              many followers → one creator.
+              Drips enables token streams of any ERC-20 to any Ethereum address with per-second
+              settlement.
             </p>
           </div>
-        </ImageAndCaption></LpCard
+          <div class="card-illustration grey-background">
+            <div id="mock-dashboard">
+              <MockDashboard />
+            </div>
+          </div>
+        </div></LpCard
       >
       <LpCard
-        ><ImageAndCaption background>
-          <OneContract slot="image" />
-          <div slot="caption" class="text-container">
-            <h3>One Contract. One Payment Graph.</h3>
+        ><div id="streaming" class="full-width-card illustration-left text-nudged">
+          <div class="card-illustration">
+            <div class="blue-background" />
+            <div class="relative h-full"><OneContract /></div>
+          </div>
+          <div class="card-description">
+            <h2>Split earnings with projects & people you care for</h2>
             <p>
-              Drips uses one smart contract for streaming and splitting, enabling effortless and
-              flexible token routing.
+              Automatically forward a set percentage of funds you receive with a list of up to 200
+              projects & individuals. Anytime you get paid, they get paid.
             </p>
           </div>
-        </ImageAndCaption></LpCard
+        </div></LpCard
       >
       <LpCard
-        ><ImageAndCaption background>
-          <NoWrappedTokens slot="image" />
-          <div slot="caption" class="text-container">
-            <h3>No need to wrap tokens</h3>
+        ><div id="discover-support" class="full-width-card illustration-right text-nudged">
+          <div class="card-description">
+            <ComingSoonBadge />
+            <h2>Discover & support exciting projects</h2>
             <p>
-              Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your
-              tokens.
+              Support projects with flexible token streams – and pause, top-up or cancel at your own
+              discretion.
             </p>
           </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <MultiChain slot="image" />
-          <div slot="caption" class="text-container">
-            <h3>Multi-Chain</h3>
-            <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
+          <div class="card-illustration">
+            <div class="blue-background" />
+            <div class="relative h-full"><NoWrappedTokens /></div>
           </div>
-        </ImageAndCaption></LpCard
+        </div></LpCard
       >
-      <LpCard
-        ><ImageAndCaption background>
-          <OneBalance slot="image" />
-          <div slot="caption" class="text-container">
-            <h3>One balance for all your streams</h3>
-            <p>Fund multiple streams using one account balance in a single transaction.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-    </section>
-    <section data-theme={codeSectionTheme}>
-      <LpCard>
-        <div class="card-standard-padding centered text-container background-color">
-          <ThreeDrips />
-          <h2>Build on Drips</h2>
-          <p class="text-foreground">
-            Integrating Drips into your app is easy with the JavaScript SDK.
+      <div id="raise-funds" class="full-width-card illustration-left text-nudged">
+        <div class="card-illustration">
+          <img
+            class="elevated only-light-theme"
+            src="/assets/funding-profile.png"
+            alt="Drips Funding Profile"
+          />
+          <img
+            class="elevated only-dark-theme"
+            src="/assets/funding-profile-dark.png"
+            alt="Drips Funding Profile"
+          />
+          <img
+            class="elevated only-h4x0r-theme"
+            src="/assets/funding-profile-h4x0r.png"
+            alt="Drips Funding Profile"
+          />
+        </div>
+        <div class="card-description" id="raise-funds-description">
+          <ComingSoonBadge />
+          <h2>Raise funds for your open-source projects or yourself</h2>
+          <p>
+            Drips is a complete toolkit for raising funds, by the second — without any platform
+            fees.
           </p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <section />
+      <section class="grid">
+        <LpCard
+          ><ImageAndCaption background>
+            <MultiToken slot="image" />
+            <div slot="caption" class="text-container">
+              <h3>No platform fees</h3>
+              <p>
+                Drips is entirely open-source, and doesn't charge anything extra on top of network
+                gas fees.
+              </p>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption background>
+            <OneBalance slot="image" />
+            <div slot="caption" class="text-container">
+              <h3>One balance for all your streams</h3>
+              <p>Fund multiple streams using one account balance in a single transaction.</p>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption background>
+            <GasOptimized slot="image" />
+            <div slot="caption" class="text-container">
+              <h3>You're in control</h3>
+              <p>
+                Your data and funds are yours forever. Drips runs fully on sovereign user-controlled
+                infrastructure.
+              </p>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption background>
+            <NoWrappedTokens slot="image" />
+            <div slot="caption" class="text-container">
+              <h3>No need to wrap tokens</h3>
+              <p>
+                Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your
+                tokens.
+              </p>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption background>
+            <MultiChain slot="image" />
+            <div slot="caption" class="text-container">
+              <h3>Multi-Chain</h3>
+              <p>
+                Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.
+              </p>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+        <LpCard
+          ><ImageAndCaption background>
+            <OneContract slot="image" />
+            <div slot="caption" class="text-container">
+              <h3>One contract. One payment graph.</h3>
+              <p>
+                Drips uses one smart contract for streaming and splitting, enabling effortless and
+                flexible token routing.
+              </p>
+            </div>
+          </ImageAndCaption></LpCard
+        >
+      </section>
+    </section>
+    <section id="build-on-drips">
+      <LpCard>
+        <div id="build-on-drips-content">
+          <div class="left">
+            <div class="illustration">
+              <BuildOnDrips />
+            </div>
+            <div class="text">
+              <h3>Build on Drips</h3>
+              <p class="text-foreground">
+                Developers: Build your own token streaming applications using Drips crowdfunding
+                primitives.
+              </p>
+            </div>
+          </div>
           <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank"
-            ><Button variant="primary">Check out the SDK</Button></a
+            ><Button variant="primary">Check out the docs</Button></a
           >
         </div>
-        <div id="code-example-wrapper">
-          <div id="code-example">
-            <div class="inner">
-              <CodeExample />
-            </div>
-          </div>
-        </div>
       </LpCard>
-    </section>
-    <section>
-      <LpSectionHeader>
-        <div class="text-container centered">
-          <h2>Drips in use</h2>
-          <p>Some cool projects built on the Drips protocol.</p>
-        </div>
-      </LpSectionHeader>
-      <div class="grid">
-        <LpCard
-          ><ImageAndCaption>
-            <img slot="image" src="/assets/rad-radio.jpg" alt="Rad Radio Logo" />
-            <div slot="caption" class="text-container">
-              <h3>Crowdfunding</h3>
-              <p>rad.lol collected tips for DJs streaming on HÖR radio.</p>
-              <a class="typo-link" href="https://rad.lol" target="_blank">rad.lol</a>
-            </div>
-          </ImageAndCaption></LpCard
-        >
-        <LpCard
-          ><ImageAndCaption>
-            <img slot="image" src="/assets/wonder.jpg" alt="Wonder Logo" />
-            <div slot="caption" class="text-container">
-              <h3>DAO payments</h3>
-              <p>Wonder streams funds from DAOs using Drips</p>
-              <a class="typo-link" href="https://wonderverse.xyz" target="_blank">wonderverse.xyz</a
-              >
-            </div>
-          </ImageAndCaption></LpCard
-        >
-        <LpCard
-          ><ImageAndCaption>
-            <img slot="image" src="/assets/gitcoin.jpg" alt="Gitcoin Logo" />
-            <div slot="caption" class="text-container">
-              <h3>Grant splitting</h3>
-              <p>Stream or split any ERC-20 like ETH, DAI, or USDC</p>
-              <a class="typo-link" href="https://gitcoin.co" target="_blank">gitcoin.co</a>
-            </div>
-          </ImageAndCaption></LpCard
-        >
-      </div>
     </section>
     <section>
       <LpSectionHeader>
@@ -203,7 +250,7 @@
     </section>
     <section class="mt-8 mb-64">
       <div class="flex flex-col gap-4 items-center">
-        <p class="text-foreground-level-5">Made by</p>
+        <p class="text-foreground-level-5">Supported by</p>
         <RadicleLogo />
       </div>
       <div id="drips-sticker">
@@ -234,6 +281,11 @@
     --font-size-xl: 3rem;
   }
 
+  .nudge {
+    font-size: inherit;
+    letter-spacing: 0.18em;
+  }
+
   h1,
   h2,
   h3 {
@@ -244,6 +296,7 @@
   h1 {
     font-size: var(--font-size-xl);
     font-family: var(--font-serif);
+    color: var(--color-primary);
   }
 
   h2 {
@@ -257,16 +310,8 @@
     font-family: var(--font-serif);
   }
 
-  .standard-font {
-    font-family: var(--typeface-regular);
-  }
-
   section {
     position: relative;
-  }
-
-  .card-standard-padding {
-    padding: var(--spacing-l);
   }
 
   .centered {
@@ -287,6 +332,7 @@
     width: 100vw;
     margin: 0 auto;
     padding: 1rem;
+    padding-top: 6rem;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-m);
@@ -297,69 +343,171 @@
     width: 100%;
   }
 
+  img.elevated {
+    box-shadow: 0.5rem 0.5rem 0px var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+    border: 1px solid var(--color-foreground);
+  }
+
   #hero {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4rem;
     text-align: center;
-    padding-top: 4rem;
-    padding-left: var(--spacing-s);
-    padding-right: var(--spacing-s);
+    padding: 2rem 0.5rem 2rem 0.5rem;
+    z-index: 10;
   }
 
-  #hero > h1 {
-    max-width: 40rem;
-  }
-
-  #hero > #beta-notice {
+  #hero .beta-notice {
     background-color: var(--color-caution-level-1);
     color: var(--color-caution-level-6);
-    padding: 0.75rem 1.25rem;
+    padding: 0.5rem 1.5rem;
     border-radius: 2rem 0 2rem 2rem;
+    border: 1px solid var(--color-caution-level-6);
+    max-width: 43rem;
+    text-align: left;
+    margin-top: 3rem;
   }
 
-  #hero > #mock-dashboard {
-    border: 1px solid var(--color-foreground);
-    border-radius: var(--border-radius-pointy);
+  #hero .beta-notice a {
+    text-decoration: underline;
+  }
+
+  #hero #hero-illustration {
+    margin-bottom: 4rem;
+    position: relative;
     width: 100%;
+  }
+
+  #hero #hero-illustration .coin {
+    position: absolute;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  #hero #hero-illustration .coin.first {
+    transform: rotate(-45deg);
+  }
+
+  #hero #hero-illustration .coin.second {
+    transform: rotate(45deg);
+  }
+
+  #hero #hero-illustration .coin.third {
+    transform: rotate(135deg);
+  }
+
+  .full-width-card {
+    display: grid;
+    column-gap: 1rem;
+    overflow: hidden;
+  }
+
+  .full-width-card.illustration-left {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .full-width-card.illustration-right {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .full-width-card > .card-description {
+    padding: 3rem;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    padding-top: var(--spacing-l);
-    height: 48rem;
-    margin-bottom: calc(var(--spacing-xl) * -1 * 2);
-    transform: scale(0.85);
-    transform-origin: 50% 0;
+    gap: 1rem;
+  }
+
+  .full-width-card > .card-illustration {
+    padding: 3rem;
+    position: relative;
+    max-height: 31rem;
+  }
+
+  .full-width-card > .card-illustration > .blue-background {
+    background-color: var(--color-primary-level-1);
+    position: absolute;
+    height: calc(100% - 4rem);
+    width: 100%;
+    top: 2rem;
+  }
+
+  .full-width-card.illustration-left.text-nudged > .card-description {
+    transform: translateX(-3rem);
+  }
+
+  .full-width-card.illustration-right.text-nudged > .card-description {
+    transform: translateX(3rem);
+  }
+
+  .full-width-card.illustration-right > .card-illustration > .blue-background {
+    left: 50%;
+    border-radius: 2rem 0 0rem 2rem;
+  }
+
+  .full-width-card.illustration-left > .card-illustration > .blue-background {
+    right: 50%;
+    border-radius: 0 0 2rem 0;
+  }
+
+  .grey-background {
+    background-color: var(--color-foreground-level-1);
+  }
+
+  #main-features {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2rem;
+  }
+
+  #main-features > #raise-funds {
+    margin-bottom: -7rem;
+    overflow: visible;
+  }
+
+  #main-features > #raise-funds > #raise-funds-description {
+    transform: translateY(-2.5rem);
+  }
+
+  #main-features #streaming > .card-illustration {
+    padding: 2rem 0 2rem 1rem;
+    border-radius: 0 0 2rem 0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  #build-on-drips #build-on-drips-content {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--color-primary-level-1);
+    padding: 1.5rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #build-on-drips #build-on-drips-content .left {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  #build-on-drips #build-on-drips-content .left .illustration {
+    max-height: 6rem;
+    max-width: 6rem;
+    width: 100%;
+  }
+
+  #build-on-drips #build-on-drips-content .left .text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--spacing-m);
-  }
-
-  .align-right {
-    display: flex;
-    justify-content: flex-end;
-    padding-right: var(--spacing-m);
-  }
-
-  #code-example-wrapper {
-    width: 100%;
-    background-color: var(--color-foreground-level-1);
-    padding: var(--spacing-m) 0 var(--spacing-s) 0;
-  }
-
-  #code-example {
-    text-align: left;
-    overflow: scroll;
-    max-width: 985px;
-    margin: var(--spacing-m) auto var(--spacing-l) auto;
-  }
-
-  #code-example > .inner {
-    padding: 0 var(--spacing-l);
-    width: fit-content;
   }
 
   #drips-sticker {
@@ -383,9 +531,14 @@
     }
   }
 
-  @media (max-width: 577px) {
-    .hide-mobile {
-      display: none;
+  @media (max-width: 768px) {
+    h1 {
+      font-size: var(--font-size-l);
+    }
+
+    h2 {
+      font-size: var(--font-size-m);
+      line-height: 1.5rem;
     }
 
     .grid {
@@ -397,30 +550,46 @@
       text-align: left;
     }
 
-    .card-standard-padding {
-      padding: var(--spacing-m);
+    .full-width-card.illustration-left {
+      grid-template-columns: 1fr;
     }
 
-    #hero > #mock-dashboard {
-      width: calc(100% * 1.1);
+    .full-width-card.illustration-right {
+      grid-template-columns: 1fr;
     }
 
-    #code-example-wrapper {
-      width: 100%;
-      background-color: var(--color-foreground-level-1);
-      padding: var(--spacing-s) 0 var(--spacing-s) 0;
+    .full-width-card.illustration-left.text-nudged > .card-description {
+      transform: translateX(0);
     }
 
-    #code-example {
-      text-align: left;
-      overflow: scroll;
-      max-width: 985px;
-      margin: var(--spacing-m) auto var(--spacing-m) auto;
+    .full-width-card.illustration-right.text-nudged > .card-description {
+      transform: translateX(0);
     }
 
-    #code-example > .inner {
-      padding: 0 var(--spacing-m);
-      width: fit-content;
+    #main-features > #raise-funds {
+      margin-bottom: 0;
+    }
+
+    .full-width-card > .card-description {
+      padding: 1rem;
+    }
+
+    .full-width-card > .card-illustration {
+      padding: 1rem 0 1rem 0;
+    }
+
+    #main-features #streaming > .card-illustration {
+      padding: 2rem 0 2rem 0;
+    }
+
+    #main-features > #raise-funds > #raise-funds-description {
+      transform: none;
+    }
+
+    #build-on-drips #build-on-drips-content,
+    #build-on-drips #build-on-drips-content .left {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
     #drips-sticker {
@@ -438,6 +607,44 @@
     }
     100% {
       transform: rotate(360deg);
+    }
+  }
+
+  .hover {
+    position: absolute;
+    width: 18%;
+    height: 18%;
+    animation: hover 4s ease-in-out infinite;
+  }
+
+  .hover:nth-of-type(1) {
+    top: 45%;
+    left: 10%;
+    animation-delay: -0.5s;
+    animation-duration: 3.9s;
+  }
+
+  .hover:nth-of-type(2) {
+    top: 28%;
+    left: 41%;
+  }
+
+  .hover:nth-of-type(3) {
+    animation-delay: -1s;
+    top: 45%;
+    right: 10%;
+    animation-duration: 4.1s;
+  }
+
+  @keyframes hover {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(10%);
+    }
+    100% {
+      transform: translateY(0);
     }
   }
 </style>

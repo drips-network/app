@@ -17,7 +17,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-l);
+    gap: var(--spacing-m);
     padding: var(--spacing-m);
   }
 

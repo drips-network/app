@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import wallet from '$lib/stores/wallet';
   import Header from '$lib/components/header/header.svelte';
-  import scroll from '$lib/stores/scroll';
 
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
@@ -74,11 +73,6 @@
   onMount(async () => {
     await initializeStores();
     initialized = true;
-  });
-
-  onMount(() => {
-    scroll.attach();
-    return scroll.detach;
   });
 
   onMount(() => {

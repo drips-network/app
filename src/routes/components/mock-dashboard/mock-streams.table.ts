@@ -11,7 +11,7 @@ const TOKEN_ADDRESS = '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3';
 const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: number) => [
   {
     streamId: '',
-    name: '💸 Marketing Contributor',
+    name: '👩‍💻 Development Contributor',
     toAddress: '0x60FC49f9639468e892359Ad8D2B95F31c6E85736',
     amount: {
       amount: {

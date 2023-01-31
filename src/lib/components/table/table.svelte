@@ -234,6 +234,10 @@
     transition: background-color 300ms;
   }
 
+  tbody tr:not(:hover) {
+    background-color: var(--color-background);
+  }
+
   tr.cursor-pointer:hover {
     background-color: var(--color-primary-level-1);
   }
