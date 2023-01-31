@@ -75,6 +75,11 @@
     height: 100%;
   }
 
+  .content {
+    height: 100%;
+    width: 100%;
+  }
+
   .sparkle {
     pointer-events: none;
     position: absolute;
