@@ -78,12 +78,7 @@
 
   button:enabled:active {
     transform: translateY(0px);
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground),
-      inset 0 2px 0px 0px var(--color-foreground);
-  }
-
-  button:enabled:active .inner {
-    transform: translateY(2px);
+    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
   }
 
   button:focus {
