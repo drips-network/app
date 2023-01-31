@@ -65,7 +65,6 @@
 <style>
   .mock-dashboard {
     width: 100%;
-    overflow: hidden;
     text-align: left;
     max-width: 80rem;
     display: flex;
