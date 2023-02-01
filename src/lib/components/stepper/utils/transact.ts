@@ -2,7 +2,7 @@ import modal from '$lib/stores/modal';
 import wallet from '$lib/stores/wallet';
 import etherscanLink from '$lib/utils/etherscan-link';
 import type { ContractReceipt, ContractTransaction } from 'ethers';
-import Emoji from 'radicle-design-system/Emoji.svelte';
+import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import type { Nullable } from 'vitest';
