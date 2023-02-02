@@ -29,7 +29,7 @@ function mapReceiverToStream(
       },
       startDate:
         initialDripsConfig.startTimestamp && initialDripsConfig.startTimestamp > 0
-          ? new Date(initialDripsConfig.startTimestamp)
+          ? new Date(initialDripsConfig.startTimestamp * 1000)
           : undefined,
       durationSeconds:
         initialDripsConfig.durationSeconds !== 0 ? initialDripsConfig.durationSeconds : undefined,
