@@ -133,7 +133,7 @@ export default function buildAssetConfigs(
 
         /*
         If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
-        dripsSet event, we can assume it is paused.
+        dripsSet event, but did at least once before, we can assume it is paused.
         */
         for (const remainingStreamId of remainingStreamIds) {
           const stream = assetConfigMetadata?.streams.find(
@@ -141,16 +141,22 @@ export default function buildAssetConfigs(
           );
           if (!stream) break;
 
-          assetConfigHistoryItemStreams.push({
-            streamId: remainingStreamId,
-            // Undefined dripsConfig == stream was paused
-            dripsConfig: undefined,
-            managed: true,
-            receiver: {
-              ...stream.receiver,
-              address: AddressDriverClient.getUserAddress(stream.receiver.userId),
-            },
-          });
+          const streamExistedBefore = assetConfigHistoryItems.find((item) =>
+            item.streams.find((stream) => stream.streamId === remainingStreamId),
+          );
+
+          if (streamExistedBefore) {
+            assetConfigHistoryItemStreams.push({
+              streamId: remainingStreamId,
+              // Undefined dripsConfig == stream was paused
+              dripsConfig: undefined,
+              managed: true,
+              receiver: {
+                ...stream.receiver,
+                address: AddressDriverClient.getUserAddress(stream.receiver.userId),
+              },
+            });
+          }
         }
 
         let runsOutOfFunds: Date | undefined;
