@@ -115,17 +115,17 @@
         <div class="card-illustration">
           <img
             class="elevated only-light-theme"
-            src="/assets/funding-profile.png"
+            src="/assets/funding-profile.webp"
             alt="Drips Funding Profile"
           />
           <img
             class="elevated only-dark-theme"
-            src="/assets/funding-profile-dark.png"
+            src="/assets/funding-profile-dark.webp"
             alt="Drips Funding Profile"
           />
           <img
             class="elevated only-h4x0r-theme"
-            src="/assets/funding-profile-h4x0r.png"
+            src="/assets/funding-profile-h4x0r.webp"
             alt="Drips Funding Profile"
           />
         </div>
