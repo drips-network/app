@@ -13,7 +13,7 @@
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
   import { AddressDriverClient } from 'radicle-drips';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import Plus from 'radicle-design-system/icons/Plus.svelte';

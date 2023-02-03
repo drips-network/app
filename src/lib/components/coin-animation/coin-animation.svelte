@@ -47,6 +47,7 @@
   bind:this={containerElem}
   on:mouseenter={() => animate(false)}
   on:click={() => animate(true)}
+  on:keydown={() => animate(true)}
 >
   <div class="content" style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}>
     <slot />

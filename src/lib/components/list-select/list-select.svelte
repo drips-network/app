@@ -116,7 +116,12 @@
   });
 </script>
 
-<div class="list" style:pointer-events={blockInteraction ? 'none' : 'all'}>
+<div
+  role="listbox"
+  aria-multiselectable={multiselect}
+  class="list"
+  style:pointer-events={blockInteraction ? 'none' : 'all'}
+>
   {#if searchable}
     <div class="search-bar">
       <SearchIcon style="fill: var(--color-foreground)" />
@@ -140,6 +145,8 @@
   {/if}
   {#each Object.entries(items) as [slug, item]}
     <div
+      role="option"
+      aria-selected={selected.includes(slug)}
       class="item"
       class:selected={selected.includes(slug)}
       class:disabled={item.disabled}

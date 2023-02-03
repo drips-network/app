@@ -12,7 +12,7 @@
   import { constants } from 'radicle-drips';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import Token from '$lib/components/token/token.svelte';

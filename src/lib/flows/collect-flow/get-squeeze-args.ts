@@ -1,4 +1,4 @@
-import wallet from '$lib/stores/wallet';
+import wallet from '$lib/stores/wallet/wallet.store';
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';

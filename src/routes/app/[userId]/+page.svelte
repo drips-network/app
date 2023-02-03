@@ -4,7 +4,7 @@
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import ens from '$lib/stores/ens';
   import streams from '$lib/stores/streams';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
   import Balances from '../dashboard/sections/balances.section.svelte';
   import Splits from '../dashboard/sections/splits.section.svelte';

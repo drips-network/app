@@ -3,7 +3,7 @@
   import Streams from './sections/streams.section.svelte';
   import Splits from './sections/splits.section.svelte';
 
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
   import EduCard from '$lib/components/carousel/items/edu-card.svelte';

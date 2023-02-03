@@ -227,8 +227,10 @@
               </p>
             </div>
           </div>
-          <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank"
-            ><Button variant="primary">Check out the docs</Button></a
+          <a
+            href="https://v2.docs.drips.network/docs/whats-a-drip.html"
+            target="_blank"
+            rel="noreferrer"><Button variant="primary">Check out the docs</Button></a
           >
         </div>
       </LpCard>
@@ -238,10 +240,10 @@
         <div class="text-container centered">
           <h2>Stay up to date</h2>
           <div class="flex gap-4">
-            <a href="https://twitter.com/dripsnetwork" target="_blank"
+            <a href="https://twitter.com/dripsnetwork" target="_blank" rel="noreferrer"
               ><Button variant="primary">Twitter</Button></a
             >
-            <a href="https://discord.gg/vhGXkazpNc" target="_blank"
+            <a href="https://discord.gg/vhGXkazpNc" target="_blank" rel="noreferrer"
               ><Button variant="primary">Discord</Button></a
             >
           </div>

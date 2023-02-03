@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
-import wallet from '$lib/stores/wallet';
+import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import buildUrl from './build-url';
 

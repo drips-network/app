@@ -4,7 +4,7 @@
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
 
   export let context: Writable<EditSplitsFlowState>;

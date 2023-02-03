@@ -6,12 +6,20 @@
 </script>
 
 {#if type === 'radio'}
-  <div class="selected-dot" on:click={() => (selected = !selected)}>
+  <div
+    class="selected-dot"
+    on:click={() => (selected = !selected)}
+    on:keydown={() => (selected = !selected)}
+  >
     <div class="inner" class:selected />
     <div class="outer" class:selected />
   </div>
 {:else}
-  <div class="selected-dot check" on:click={() => (selected = !selected)}>
+  <div
+    class="selected-dot check"
+    on:click={() => (selected = !selected)}
+    on:keydown={() => (selected = !selected)}
+  >
     <div class="inner check" class:selected>
       {#if selected}
         <div class="check-icon" transition:scale|local={{ start: 1.5, duration: 300 }}>

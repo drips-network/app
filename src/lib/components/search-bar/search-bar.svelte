@@ -9,7 +9,7 @@
   import scroll from '$lib/stores/scroll';
   import streams from '$lib/stores/streams';
   import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import Results from './components/results.svelte';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
@@ -177,6 +177,7 @@
 {#if focus}<div
     class="overlay"
     on:click={closeSearch}
+    on:keydown={closeSearch}
     transition:fade={{ duration: 200, easing: sineInOut }}
   />{/if}
 

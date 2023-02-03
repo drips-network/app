@@ -21,6 +21,7 @@
     copyClipboard(value);
     e.stopPropagation();
   }}
+  on:keydown={() => (visible = true)}
   on:mouseenter={() => (visible = true)}
   on:mouseleave={() => (visible = false)}
 >

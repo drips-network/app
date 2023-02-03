@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { get } from 'svelte/store';
-import wallet from '..';
+import wallet from '../wallet.store';
 import { MockProvider } from '@rsksmart/mock-web3-provider';
 
 vi.mock('$app/environment', () => ({

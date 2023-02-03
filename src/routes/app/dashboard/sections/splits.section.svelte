@@ -15,7 +15,7 @@
   import { AddressDriverClient, type SplitsEntry } from 'radicle-drips';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import editSplitsFlowState from '$lib/flows/edit-splits-flow/edit-splits-flow-state';
   import FetchSplits from '$lib/flows/edit-splits-flow/fetch-splits.svelte';
 

@@ -12,7 +12,7 @@
   import Streams from '../../../dashboard/sections/streams.section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import checkIsUser from '$lib/utils/check-is-user';
   import decodeUserId from '$lib/utils/decode-user-id';

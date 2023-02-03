@@ -8,7 +8,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Token from '$lib/components/token/token.svelte';
   import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import { fetchBalance } from '$lib/utils/erc20';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';

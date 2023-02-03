@@ -16,7 +16,7 @@
   import type { Writable } from 'svelte/store';
   import type { CollectFlowState } from './collect-flow-state';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import assert from '$lib/utils/assert';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
@@ -226,6 +226,7 @@
     <a
       class="typo-text-small"
       target="_blank"
+      rel="noreferrer"
       href="https://v2.docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings"
       >Learn more</a
     >

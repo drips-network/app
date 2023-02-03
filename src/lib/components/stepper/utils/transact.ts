@@ -1,5 +1,5 @@
 import modal from '$lib/stores/modal';
-import wallet from '$lib/stores/wallet';
+import wallet from '$lib/stores/wallet/wallet.store';
 import etherscanLink from '$lib/utils/etherscan-link';
 import type { ContractReceipt, ContractTransaction } from 'ethers';
 import Emoji from '$lib/components/emoji/emoji.svelte';
