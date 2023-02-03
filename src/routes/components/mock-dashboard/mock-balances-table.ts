@@ -11,7 +11,7 @@ const balancesData: (millis: number) => TokenTableRow[] = (millis: number) => [
       address: TOKEN_ADDRESS,
       overrideToDisplay: {
         name: 'Radicle',
-        logoURI: 'https://research.binance.com/static/images/projects/radicle/logo.png',
+        logoURI: '/assets/rad-coin.webp',
         symbol: 'RAD',
       },
     },
@@ -60,7 +60,7 @@ const balancesData: (millis: number) => TokenTableRow[] = (millis: number) => [
       address: TOKEN_ADDRESS,
       overrideToDisplay: {
         name: 'USD Coin',
-        logoURI: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=023',
+        logoURI: '/assets/usdc-coin.webp',
         symbol: 'USDC',
       },
     },
