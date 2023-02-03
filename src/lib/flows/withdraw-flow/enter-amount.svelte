@@ -9,7 +9,7 @@
   import balances from '$lib/stores/balances';
   import streams from '$lib/stores/streams';
   import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import unreachable from '$lib/utils/unreachable';

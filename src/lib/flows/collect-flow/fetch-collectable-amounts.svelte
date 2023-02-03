@@ -11,7 +11,7 @@
   import balances from '$lib/stores/balances';
   import tuple from '$lib/utils/tuple';
   import unreachable from '$lib/utils/unreachable';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
 
   export let context: Writable<CollectFlowState>;
 

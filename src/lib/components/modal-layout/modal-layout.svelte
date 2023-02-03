@@ -27,7 +27,12 @@
 {#if store.overlay !== null}
   <FocusTrap enabled={store.focusTrapped} containers={new Set([modalContainer])} />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
-    <div class="overlay" transition:fade|local={{ duration: 200 }} on:click={clickOutside} />
+    <div
+      class="overlay"
+      transition:fade|local={{ duration: 200 }}
+      on:click={clickOutside}
+      on:keydown={clickOutside}
+    />
     <div class="content">
       <div
         class="modal-wrapper"

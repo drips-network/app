@@ -1,5 +1,5 @@
 <script>
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import SettingsIcon from 'radicle-design-system/icons/Settings.svelte';
   import ServerIcon from 'radicle-design-system/icons/Server.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
@@ -52,11 +52,15 @@
     <Divider sideMargin={0.5} />
     <ul class="links typo-text-small">
       <li>
-        <a href="https://v2.docs.drips.network/docs/the-drips-app/getting-started" target="_blank"
-          >Get help</a
+        <a
+          href="https://v2.docs.drips.network/docs/the-drips-app/getting-started"
+          target="_blank"
+          rel="noreferrer">Get help</a
         >
       </li>
-      <li>Supported by <a href="https://radicle.xyz" target="_blank">Radicle</a></li>
+      <li>
+        Supported by <a href="https://radicle.xyz" target="_blank" rel="noreferrer">Radicle</a>
+      </li>
     </ul>
   {/if}
 </div>

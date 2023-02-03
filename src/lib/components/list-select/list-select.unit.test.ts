@@ -106,7 +106,7 @@ describe('list-select.svelte', async () => {
     const item1 = screen.getByTestId('item-test-item-1');
     expect(item1).toHaveFocus();
 
-    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.tab();
 
     const item2 = screen.getByTestId('item-test-item-2');
     expect(item2).toHaveFocus();
@@ -114,14 +114,14 @@ describe('list-select.svelte', async () => {
     await userEvent.keyboard('{enter}');
     expect(item2).toHaveClass('selected');
 
-    await userEvent.keyboard('{ArrowUp}');
+    await userEvent.tab({ shift: true });
     expect(item1).toHaveFocus();
 
     await userEvent.keyboard(' ');
     expect(item1).toHaveClass('selected');
     expect(item2).toHaveClass('selected');
 
-    await userEvent.keyboard('{ArrowUp}');
+    await userEvent.tab({ shift: true });
     expect(searchBar).toHaveFocus();
   });
 

@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import isSafePath from '$lib/utils/safe-path';
 
   const backTo = $page.url.searchParams.get('backTo');

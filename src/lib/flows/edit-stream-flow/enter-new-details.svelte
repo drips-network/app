@@ -11,7 +11,7 @@
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
   import assert from '$lib/utils/assert';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import streams from '$lib/stores/streams';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import {

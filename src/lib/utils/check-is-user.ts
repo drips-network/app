@@ -1,4 +1,4 @@
-import wallet from '$lib/stores/wallet';
+import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 
 /**

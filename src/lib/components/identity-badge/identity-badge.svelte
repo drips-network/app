@@ -5,7 +5,7 @@
   import { createIcon } from 'radicle-design-system/lib/blockies';
   import Avatar from '$lib/components/avatar/avatar.svelte';
   import { browser } from '$app/environment';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import formatAddress from '$lib/utils/format-address';
 
   export let address: string;

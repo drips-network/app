@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import { fetchBalance } from '$lib/utils/erc20';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher, onMount } from 'svelte';

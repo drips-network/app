@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import Flyout from '../flyout/flyout.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenu from '../account-menu/account-menu.svelte';

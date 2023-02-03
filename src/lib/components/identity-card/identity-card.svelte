@@ -1,5 +1,5 @@
 <script lang="ts">
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import { fade } from 'svelte/transition';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
 

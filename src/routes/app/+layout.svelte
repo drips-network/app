@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import Header from '$lib/components/header/header.svelte';
 
   import tokens from '$lib/stores/tokens';

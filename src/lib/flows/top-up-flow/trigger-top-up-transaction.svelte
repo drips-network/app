@@ -6,7 +6,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
   import assert from '$lib/utils/assert';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import streams from '$lib/stores/streams';
   import modal from '$lib/stores/modal';
   import expect from '$lib/utils/expect';

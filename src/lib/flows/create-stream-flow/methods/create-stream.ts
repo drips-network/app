@@ -9,7 +9,7 @@ import type { Account } from '$lib/stores/streams/types';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { AddressDriverPresets, Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
-import wallet from '$lib/stores/wallet';
+import wallet from '$lib/stores/wallet/wallet.store';
 import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
 import {
   generateMetadata,

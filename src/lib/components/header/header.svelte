@@ -1,6 +1,6 @@
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import ConnectButton from '../connect-button/connect-button.svelte';
   import SearchBar from '../search-bar/search-bar.svelte';
   import DripsLogo from '././drips-logo.svelte';

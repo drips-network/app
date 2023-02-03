@@ -1,4 +1,4 @@
-import wallet from '$lib/stores/wallet';
+import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import {
   AddressDriverClient,

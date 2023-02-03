@@ -5,7 +5,7 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import modal from '$lib/stores/modal';
   import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
 
   export let tokenName: string;
   export let tokenAddress: string;

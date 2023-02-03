@@ -88,6 +88,8 @@
 
 <div class="wrapper typo-text-bold" bind:this={wrapperElem}>
   <div
+    role="listbox"
+    aria-multiselectable="false"
     class="dropdown"
     class:no-border={noBorder}
     class:expanded
@@ -138,6 +140,8 @@
       {#each options as option, index}
         <div
           class="option"
+          role="option"
+          aria-selected={selectedOptionIndex === index}
           tabindex="0"
           data-testid="option-{option.value}"
           on:click={() => select(option)}

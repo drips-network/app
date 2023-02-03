@@ -1,5 +1,5 @@
 <script lang="ts">
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import { createEventDispatcher, onMount } from 'svelte';
   import assert from '$lib/utils/assert';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';

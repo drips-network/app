@@ -7,7 +7,7 @@
   import Token from '$lib/components/token/token.svelte';
   import StreamIcon from 'radicle-design-system/icons/TokenStreams.svelte';
   import { type Item, SearchItemType } from '../search';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
 
   export let item: Item;

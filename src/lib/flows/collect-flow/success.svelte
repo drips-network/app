@@ -6,7 +6,7 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import etherscanLink from '$lib/utils/etherscan-link';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
@@ -54,6 +54,7 @@
   <a
     href={etherscanLink($wallet.network.name, txReceipt.transactionHash)}
     target="_blank"
+    rel="noreferrer"
     class="typo-link">View on Etherscan</a
   >
   <svelte:fragment slot="actions">

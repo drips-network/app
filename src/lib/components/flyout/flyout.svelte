@@ -27,13 +27,18 @@
 
 <div class="flyout">
   <div
+    role="menu"
     class="trigger"
     tabindex="0"
     bind:this={triggerElem}
     on:mouseenter={() => handleHover(true)}
     on:mouseleave={() => handleHover(false)}
   >
-    <div class="trigger-content" on:click|stopPropagation={() => handleHover(true)}>
+    <div
+      class="trigger-content"
+      on:keydown={() => handleHover(true)}
+      on:click|stopPropagation={() => handleHover(true)}
+    >
       <slot name="trigger" />
     </div>
     {#if visible}

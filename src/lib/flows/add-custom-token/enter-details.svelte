@@ -4,7 +4,7 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet';
+  import wallet from '$lib/stores/wallet/wallet.store';
   import { fetchInfo } from '$lib/utils/erc20';
   import { isAddress } from 'ethers/lib/utils';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
