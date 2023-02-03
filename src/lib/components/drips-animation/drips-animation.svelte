@@ -158,13 +158,13 @@
       bind:this={dripImg}
       on:load={() => !vertical && draw()}
       alt="rain drop"
-      src="/assets/drip.png"
+      src="/assets/drip.webp"
     />
     <img
       bind:this={dripImgVertical}
       on:load={() => vertical && draw()}
       alt="rain drop"
-      src="/assets/drip-vertical.png"
+      src="/assets/drip-vertical.webp"
     />
   </div>
 </div>
