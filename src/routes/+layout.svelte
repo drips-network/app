@@ -49,5 +49,6 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     overflow: hidden;
+    transition: background-color 0.5s;
   }
 </style>

@@ -29,7 +29,7 @@
   />
 </svelte:head>
 
-<div id="lp">
+<div id="lp" class="loaded">
   <div id="wrapper">
     <LpHeader />
     <section id="hero">
@@ -281,6 +281,19 @@
     --font-size-m: 1.5rem;
     --font-size-l: 2.5rem;
     --font-size-xl: 3rem;
+
+    animation: intro 0.5s;
+  }
+
+  @keyframes intro {
+    0% {
+      opacity: 0;
+      transform: translateY(2rem);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .nudge {
