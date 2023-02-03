@@ -28,7 +28,7 @@
 <style>
   button {
     height: calc(2rem + 10px);
-    padding: 5px 0;
+    padding: 5px 2px;
     margin: -4px 0;
   }
 
