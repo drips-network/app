@@ -16,7 +16,7 @@
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import TextInput from 'radicle-design-system/TextInput.svelte';
   import { constants } from 'radicle-drips';
-  import type { Writable } from 'svelte/store';
+  import { get, type Writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import type { WithdrawFlowState } from './withdraw-flow-state';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -71,7 +71,7 @@
 
   function getAssetConfigHistory(dripsUserId: string, tokenAddress: string) {
     return (
-      $streams.accounts[dripsUserId].assetConfigs.find(
+      get(streams).accounts[dripsUserId].assetConfigs.find(
         (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
       ) ?? unreachable()
     ).history;
@@ -132,9 +132,14 @@
 
           await expect(
             streams.refreshUserAccount,
-            () =>
-              getAssetConfigHistory(transactContext.dripsUserId, $context.tokenAddress).length >
-              currentAssetConfigHistoryLength,
+            () => {
+              const newLength = getAssetConfigHistory(
+                transactContext.dripsUserId,
+                $context.tokenAddress,
+              ).length;
+
+              return newLength > currentAssetConfigHistoryLength;
+            },
             5000,
             1000,
           );
