@@ -47,7 +47,7 @@
     tableData = mapFilterUndefined(tokensToShow, (tokenAddress) => {
       assert(userId);
 
-      const outgoingEstimate = accountEstimate?.tokens[tokenAddress];
+      const outgoingEstimate = accountEstimate?.tokens[tokenAddress.toLowerCase()];
       const incomingEstimate = balances.getIncomingBalanceForUser(tokenAddress, userId);
 
       if (!incomingEstimate) return undefined;
