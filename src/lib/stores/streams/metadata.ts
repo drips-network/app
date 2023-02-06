@@ -110,6 +110,8 @@ export async function pinAccountMetadata(data: z.infer<typeof accountMetadataSch
     ),
   });
 
+  if (!res.ok) throw new Error(`Pinning new account metadata failed: ${await res.text()}`);
+
   return res.text();
 }
 
