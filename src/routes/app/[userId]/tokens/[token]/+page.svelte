@@ -21,7 +21,6 @@
   import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
   import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
-  import { getAddress } from 'ethers/lib/utils';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
   const urlParamToken = $page.params.token.toLowerCase();
@@ -32,13 +31,13 @@
       token.info.symbol.toLowerCase() === urlParamToken.toLowerCase(),
   );
 
-  $: tokenAddress = token?.info.address ?? urlParamToken;
+  $: tokenAddress = token?.info.address.toLowerCase() ?? urlParamToken.toLowerCase();
 
   $: userId = $wallet.dripsUserId;
 
   $: outgoingEstimate =
     userId && $balances.accounts[userId]
-      ? $balances.accounts[userId].tokens[getAddress(tokenAddress)] ?? null
+      ? $balances.accounts[userId].tokens[tokenAddress] ?? null
       : undefined;
 
   $: fetchStatus = userId ? $accountFetchStatussesStore[userId] : undefined;
