@@ -260,7 +260,9 @@
                 steps: [
                   makeStep({
                     component: InputDetails,
-                    props: undefined,
+                    props: {
+                      tokenAddress,
+                    },
                   }),
                   makeStep({
                     component: SuccessStep,

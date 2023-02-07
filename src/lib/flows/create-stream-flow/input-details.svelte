@@ -32,6 +32,8 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
+  export let tokenAddress: string | undefined = undefined;
+
   const userId = $wallet.dripsUserId ?? unreachable();
 
   let streamNameValue: string;
@@ -58,7 +60,7 @@
         if (!token) return undefined;
 
         return [
-          token.info.address,
+          token.info.address.toLowerCase(),
           {
             type: 'selectable',
             label: token.info.name,
@@ -77,10 +79,16 @@
     ) ?? [],
   );
 
-  let selectedTokenAddress: string[] = tokenList ? [Object.keys(tokenList)[0]] : [];
-  onMount(() => {
-    const firstToken = Object.keys(tokenList ?? {})[0];
+  let selectedTokenAddress: string[] = tokenAddress
+    ? [tokenAddress.toLowerCase()]
+    : tokenList
+    ? [Object.keys(tokenList)[0]]
+    : [];
 
+  onMount(() => {
+    if (selectedTokenAddress.length !== 0) return;
+
+    const firstToken = Object.keys(tokenList ?? {})[0];
     if (firstToken) selectedTokenAddress = [firstToken];
   });
 
