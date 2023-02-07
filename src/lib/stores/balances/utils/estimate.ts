@@ -54,7 +54,7 @@ export function estimateAccount(
 ): AccountEstimate {
   return Object.fromEntries(
     account.assetConfigs.map((assetConfig) => [
-      assetConfig.tokenAddress,
+      assetConfig.tokenAddress.toLowerCase(),
       buildAssetConfigEstimates(assetConfig, currentCycle, account.user, excludingSqueezes),
     ]),
   );

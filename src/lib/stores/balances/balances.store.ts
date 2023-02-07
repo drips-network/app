@@ -77,13 +77,13 @@ export default (() => {
     state.update((s) => {
       s.accounts[forUserId].receivable = balances[0].map((b) => ({
         amount: b.receivableAmount,
-        tokenAddress: b.tokenAddress,
+        tokenAddress: b.tokenAddress.toLowerCase(),
         multiplier: 1n,
       }));
 
       s.accounts[forUserId].splittable = balances[1].map((b) => ({
         amount: b.splittableAmount,
-        tokenAddress: b.tokenAddress,
+        tokenAddress: b.tokenAddress.toLowerCase(),
         multiplier: 1n,
       }));
 
@@ -142,9 +142,9 @@ export default (() => {
   ): StreamEstimate | undefined {
     const { senderUserId, tokenAddress } = decodeStreamId(id);
 
-    return get(state).accounts[senderUserId]?.tokens[tokenAddress]?.[mode].streams.find(
-      (s) => s.id === id,
-    );
+    return get(state).accounts[senderUserId]?.tokens[tokenAddress.toLowerCase()]?.[
+      mode
+    ].streams.find((s) => s.id === id);
   }
 
   /**
@@ -191,7 +191,7 @@ export default (() => {
     if (!receivable || !splittable || !squeezeHistory) return;
 
     const incomingStreamsForToken = getStreamEstimatesByReceiver('currentCycle', userId).filter(
-      (streamEstimate) => streamEstimate.tokenAddress === tokenAddress,
+      (streamEstimate) => streamEstimate.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
     );
 
     // Sum up the total streamed by relevant incoming streams
@@ -210,11 +210,11 @@ export default (() => {
 
     // Retrieve the user's `receivable` and `splittable` balances for the given token
     const receivableForToken =
-      (receivable.find((t) => t.tokenAddress === tokenAddress)?.amount ?? 0n) *
-      BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+      (receivable.find((t) => t.tokenAddress.toLowerCase() === tokenAddress.toLowerCase())
+        ?.amount ?? 0n) * BigInt(constants.AMT_PER_SEC_MULTIPLIER);
     const splittableForToken =
-      (splittable.find((t) => t.tokenAddress === tokenAddress)?.amount ?? 0n) *
-      BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+      (splittable.find((t) => t.tokenAddress.toLowerCase() === tokenAddress.toLowerCase())
+        ?.amount ?? 0n) * BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
     return {
       /*

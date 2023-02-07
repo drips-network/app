@@ -173,7 +173,10 @@
             (account) =>
               Boolean(
                 account.assetConfigs
-                  .find((ac) => ac.tokenAddress === transactContext.tokenAddress)
+                  .find(
+                    (ac) =>
+                      ac.tokenAddress.toLowerCase() === transactContext.tokenAddress.toLowerCase(),
+                  )
                   ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
               ),
             5000,
