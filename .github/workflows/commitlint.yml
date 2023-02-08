@@ -16,3 +16,6 @@ jobs:
         run: npx svelte-kit sync
 
       - uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: commitlint.config.cjs
+
