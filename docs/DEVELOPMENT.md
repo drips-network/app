@@ -81,42 +81,28 @@ If you want to reset the local testnet and subgraph fully, just open the termina
 In order to connect the app to the local E2E network during an E2E test, add this `beforeAll` block in your test fixture:
 
 ```ts
-beforeAll(async () => {
-  await page.addInitScript(`
-    window.isPlaywrightTest = true;
+import configureAppForTest from './helpers/configure-app-for-test';
 
-    localStorage.setItem('custom-tokens', JSON.stringify([
-      {
-        "source": "custom",
-        "banned": false,
-        "info": {
-          "chainId": 5,
-          "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-          "name": "Testcoin",
-          "decimals": 18,
-          "symbol": "TEST"
-        }
-      }
-    ]));
-  `);
+// …
+
+beforeAll(async () => {
+  server = await preview({ preview: { port: 3000 } });
+  browser = await chromium.launch();
+  page = await browser.newPage();
+
+  // …
+
+  await configureAppForTest(page);
 });
 ```
 
-This will set a window variable `isPlaywrightTest` to `true`, causing the app to connect to the local testnet and subgraph. After that, we're adding a custom ERC-20 token called TEST to the app config, at address `0x9A676e781A523b5d0C0e43731313A708CB607508` — which is where the mock ERC-20 token is deployed on the local testnet.
+This utility sets a window variable `isPlaywrightTest` to `true`, causing the app to connect to the local testnet and subgraph.
 
 When starting your E2E test like this, user `0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266` is automatically and immediately connected to the app, and has a balance of 100 TEST.
 
-#### Note on shared state of E2E env
-
-With our current setup, an E2E test env containing of local testnet and drips contracts is deployed before all E2E tests are executed, and not reset between runs, meaning that all E2E tests share the same local environment state. There is currently one unit test that runs through topping up, creating a stream, switching over to another user, and verifying the incoming stream is there. Other E2E tests that are independent of the top-up balance & streams may be set up to run in parallel (e.g. testing setting up a split), but anything that depends on some token being topped up, or a stream existing, should probably be appended to the existing `top-up-create-stream` fixture. In the future, we may consider writing a function that allows resetting the local testnet from within Playwright.
-
-#### `isPlaywrightTest` and `playwrightAddress`
-
-Unfortunately, two major differences in app logic for E2E tests couldn't be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for a variable `window.isPlaywrightTest` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
-
 #### Interacting with the Mock ERC-20
 
-As part of E2E environment setup, a mock ERC-20 token is deployed at `0x9A676e781A523b5d0C0e43731313A708CB607508`, and automatically grants address `0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
+As part of E2E environment setup, a mock ERC-20 token is deployed at `0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0`, and automatically grants address `0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
 
 Simply run the following in a `page.addInitScript` block:
 
@@ -140,6 +126,14 @@ localStorage.setItem(
 ```
 
 After doing this, the app will display the token within all token pickers. Alternatively, you can also run through adding the custom token via the UI within your test.
+
+#### Note on shared state of E2E env
+
+With our current setup, an E2E test env containing of local testnet and drips contracts is deployed before all E2E tests are executed, and not reset between runs, meaning that all E2E tests share the same local environment state. There is currently one unit test that runs through topping up, creating a stream, switching over to another user, and verifying the incoming stream is there. Other E2E tests that are independent of the top-up balance & streams may be set up to run in parallel (e.g. testing setting up a split), but anything that depends on some token being topped up, or a stream existing, should probably be appended to the existing `top-up-create-stream` fixture. In the future, we may consider writing a function that allows resetting the local testnet from within Playwright.
+
+#### `isPlaywrightTest` and `playwrightAddress`
+
+Unfortunately, two major differences in app logic for E2E tests couldn't be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for a variable `window.isPlaywrightTest` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
 
 ## 😱 Advanced
 
