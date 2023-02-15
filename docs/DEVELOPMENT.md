@@ -50,6 +50,7 @@ In order to run E2E tests, you need a few requisites:
 - A Postgres database running locally at port 5432. The simplest way on Mac OS is to install https://postgresapp.com/ and running it with default settings.
 - A local IPFS node at port 8545. The simplest way on Mac OS is to install [IPFS Desktop](https://github.com/ipfs/ipfs-desktop#quick-install-shortcuts) and running it with default settings.
 - A Rust dev environment. The simplest way is to run [`rustup`](https://rustup.rs/).
+- Foundry. The simplest way is to run [`foundryup`](https://github.com/foundry-rs/foundry#installation)
 
 With everything above met, ensure the app's dependencies are installed via NPM, and execute from the root directory of the app:
 
