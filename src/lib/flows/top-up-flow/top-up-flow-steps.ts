@@ -2,7 +2,6 @@ import { makeStep } from '$lib/components/stepper/types';
 import topUpFlowState, { type TopUpFlowState } from './top-up-flow-state';
 import assert from '$lib/utils/assert';
 import EnterAmountStep from './enter-amount.svelte';
-import ApproveStep from './approve.svelte';
 import TriggerTopUpTransactionStep from './trigger-top-up-transaction.svelte';
 import FetchAllowanceAndBalanceStep from './fetch-allowance-and-balance.svelte';
 import SelectTokenStep from './select-token.svelte';
@@ -49,10 +48,6 @@ export default function getTopUpFlowSteps(tokenAddress?: string) {
           }),
       makeStep({
         component: EnterAmountStep,
-        props: undefined,
-      }),
-      makeStep({
-        component: ApproveStep,
         props: undefined,
       }),
       makeStep({

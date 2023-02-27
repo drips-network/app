@@ -58,6 +58,8 @@
   },
   "dependencies": {
     "@pinata/sdk": "^1.1.26",
+    "@safe-global/safe-apps-provider": "^0.16.0",
+    "@safe-global/safe-apps-sdk": "^7.10.0",
     "@tanstack/svelte-table": "^8.5.15",
     "@uniswap/default-token-list": "^4.1.0",
     "@uniswap/token-lists": "^1.0.0-beta.30",
@@ -66,7 +68,7 @@
     "ethers": "^5.7.0",
     "fuzzysort": "^2.0.3",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
-    "radicle-drips": "github:radicle-dev/drips-js-sdk",
+    "radicle-drips": "github:radicle-dev/drips-js-sdk#encoders",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"
   },

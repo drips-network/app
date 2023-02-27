@@ -165,12 +165,9 @@
           };
         },
 
-        transactions: (transactContext) => [
-          {
-            transaction: () =>
-              transactContext.callerClient.callBatched(transactContext.collectFlow),
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.callerClient.callBatched(transactContext.collectFlow),
+        }),
 
         after: async (receipts, transactContext) => {
           const receipt = receipts[0];

@@ -12,6 +12,12 @@ import isTest from '$lib/utils/is-test';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
+import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
+import isRunningInSafe from '$lib/utils/is-running-in-safe';
+
+const appsSdk = new SafeAppsSDK();
+
 const { SUPPORTED_CHAINS } = Utils.Network;
 const DEFAULT_NETWORK: Network = {
   chainId: 5,
@@ -29,6 +35,8 @@ const WEB_3_MODAL_PROVIDER_OPTIONS = {
   },
 };
 
+type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
+
 export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
@@ -36,6 +44,7 @@ export interface ConnectedWalletStoreState {
   provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
   signer: ethers.providers.JsonRpcSigner;
   network: Network;
+  safe?: SafeInfo;
 }
 
 interface DisconnectedWalletStoreState {
@@ -48,6 +57,7 @@ interface DisconnectedWalletStoreState {
   dripsUserId?: undefined;
   address?: undefined;
   signer?: undefined;
+  safe?: undefined;
 }
 
 type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState;
@@ -102,6 +112,8 @@ const walletStore = () => {
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
     let connected = false;
 
+    const isSafeApp = isRunningInSafe();
+
     setTimeout(() => {
       if (!initializing || connected) return;
 
@@ -120,13 +132,20 @@ const walletStore = () => {
       });
     }, 250);
 
-    const instance = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(instance);
+    let provider: ethers.providers.Web3Provider;
+    let safeInfo: SafeInfo | undefined;
+
+    if (isSafeApp) {
+      safeInfo = await appsSdk.safe.getInfo();
+      provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
+    } else {
+      const instance = await web3Modal.connect();
+      provider = new ethers.providers.Web3Provider(instance);
+      _attachListeners(instance);
+    }
 
     connected = true;
     clearAdvisory?.();
-
-    _attachListeners(instance);
 
     if (!_isNetworkSupported(await provider.getNetwork())) {
       const clearAdvisory = globalAdvisoryStore.add({
@@ -143,7 +162,7 @@ const walletStore = () => {
       clearAdvisory();
     }
 
-    await _setConnectedState(provider);
+    await _setConnectedState(provider, safeInfo);
   }
 
   /**
@@ -158,7 +177,10 @@ const walletStore = () => {
     return SUPPORTED_CHAINS.includes(network.chainId);
   }
 
-  async function _setConnectedState(provider: ethers.providers.Web3Provider): Promise<void> {
+  async function _setConnectedState(
+    provider: ethers.providers.Web3Provider,
+    safeInfo?: SafeInfo,
+  ): Promise<void> {
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
 
@@ -169,6 +191,7 @@ const walletStore = () => {
       provider,
       signer,
       network: await provider.getNetwork(),
+      safe: safeInfo,
     });
   }
 

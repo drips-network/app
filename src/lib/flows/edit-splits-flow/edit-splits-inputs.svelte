@@ -93,11 +93,9 @@
             splits,
           };
         },
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.client.setSplits(transactContext.splits),
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.client.setSplits(transactContext.splits),
+        }),
       }),
     );
   }

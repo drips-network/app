@@ -2,6 +2,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import {
   AddressDriverClient,
+  AddressDriverTxFactory,
   CallerClient,
   DripsHubClient,
   DripsSubgraphClient,
@@ -31,6 +32,18 @@ export function getAddressDriverClient(withSigner = get(wallet).signer) {
   const addressDriverAddress = getNetworkConfig().CONTRACT_ADDRESS_DRIVER;
 
   return AddressDriverClient.create(provider, withSigner, addressDriverAddress);
+}
+
+/**
+ * Get an initialized Address Driver transaction factory.
+ * @returns An initialized Address Driver transaction factory.
+ */
+export function getAddressDriverTxFactory() {
+  const { provider } = get(wallet);
+
+  const addressDriverAddress = getNetworkConfig().CONTRACT_ADDRESS_DRIVER;
+
+  return AddressDriverTxFactory.create(provider, addressDriverAddress);
 }
 
 /**

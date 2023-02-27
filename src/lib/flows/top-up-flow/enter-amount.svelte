@@ -70,21 +70,13 @@
 
   function submit() {
     if (!amount) return;
-    const { tokenAllowance } = $context;
 
     context.update((c) => ({
       ...c,
       amountToTopUp: topUpMax ? c.tokenBalance : amount,
     }));
 
-    if (tokenAllowance && tokenAllowance >= amount) {
-      // Skip the approve step
-      dispatch('goForward', {
-        by: 2,
-      });
-    } else {
-      dispatch('goForward');
-    }
+    dispatch('goForward');
   }
 </script>
 

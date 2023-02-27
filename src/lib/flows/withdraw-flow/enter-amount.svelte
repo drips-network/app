@@ -119,11 +119,9 @@
             dripsUserId,
           };
         },
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.tx,
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.tx,
+        }),
         after: async (_, transactContext) => {
           const currentAssetConfigHistoryLength = getAssetConfigHistory(
             transactContext.dripsUserId,
