@@ -6,6 +6,19 @@ check() {
   lsof -Pi :5001 -sTCP:LISTEN -t >/dev/null&& echo "🪐 IPFS node appears to be up…" || (echo "💀 Please ensure an IPFS node is available at port 5001" && exit 1)
 }
 
+spin() {
+  spinner="/|\\-/|\\-"
+  while :
+  do
+    for i in `seq 0 7`
+    do
+      echo -n "${spinner:$i:1}"
+      echo -en "\010"
+      sleep 0.1
+    done
+  done
+}
+
 setup() {
   pg_user=${PGUSER:-$(whoami)}
   pg_password=${PGPASSWORD:-postgres}
@@ -26,6 +39,7 @@ setup() {
   source ./scripts/local-env.sh
   echo "✅ Done"
 
+
   # Start anvil
   echo "🕸 Starting a local Ethereum testnet with Anvil"
   output=$(mktemp "${TMPDIR:-/tmp/}$(basename $0).XXX")
@@ -35,28 +49,40 @@ setup() {
   echo "— Anvil pid: $server_pid"
   echo "— Output: $output"
   echo "⏳ Waiting for local Ethereum testnet to come online…"
+
+  spin &
+  SPIN_PID=$!
+  trap "kill -9 $SPIN_PID 2>/dev/null" `seq 0 15`
+
   until grep -q -i 'Listening on 127.0.0.1:8545' $output
   do
     if ! ps $server_pid > /dev/null 
     then
       echo "💀 Anvil died" >&2
+      echo "- You can check the logs at $output" >&2
       exit 1
     fi
-    echo "⏳ Still waiting…"
     sleep 1
   done
+
+  kill -9 $SPIN_PID
+
+
   echo "✅ Local testnet is running!" 
+
 
   # Deploy Drips Contracts
   echo "💧 Deploying Drips Contracts"
   echo "yes" | ./scripts/deploy.sh
   echo "✅ Done"
 
+
   # Deploy mock ERC-20
   echo "💰 Deploying Mock ERC-20"
   cd ../drips-contracts
   forge create $WALLET_ARGS ./lib/openzeppelin-contracts/contracts/token/ERC20/presets/ERC20PresetFixedSupply.sol:ERC20PresetFixedSupply --constructor-args "Testcoin" "TEST" 100000000000000000000 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
   echo "✅ Done"
+
 
   # Run graph node
   echo "📈 Running Graph Node"
@@ -70,18 +96,24 @@ setup() {
   echo "— Graph node pid: $graph_pid"
   echo "— Output: $output"
   echo "⏳ Waiting for the Graph Node to compile & start…"
+
+  spin &
+  SPIN_PID=$!
+
   until grep -q -i 'Started all assigned subgraphs' $output
   do
     if ! ps $graph_pid > /dev/null 
     then
       echo "💀 Graph Node died" >&2
+      echo "- You can check the logs at $output" >&2
       exit 1
     fi
-    echo "⏳ Still waiting…"
     sleep 1
   done
-  echo 
+
+  kill -9 $SPIN_PID
   echo "✅ Graph node is running!" 
+
 
   # Deploy subgraph
   echo "Deploying Subgraph"
@@ -104,6 +136,7 @@ setup() {
     echo "👋 Bye"
   fi
 }
+
 
 skip_check=${SKIP_CHECK:-false}
 
