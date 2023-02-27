@@ -25,7 +25,7 @@
     "@playwright/test": "^1.25.0",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/adapter-auto": "^1.0.2",
-    "@sveltejs/kit": "^1.0.0",
+    "@sveltejs/kit": "^1.7.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/svelte": "^3.2.1",
     "@testing-library/user-event": "^14.4.3",
