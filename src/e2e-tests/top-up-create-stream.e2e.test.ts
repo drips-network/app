@@ -78,7 +78,7 @@ describe('top up, create stream, view profile, search', async () => {
 
       await page.type(
         'label:has-text("Token contract address*")',
-        '0x9A676e781A523b5d0C0e43731313A708CB607508',
+        '0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0',
       );
 
       await page.locator('button', { hasText: 'Add custom token' }).click();
