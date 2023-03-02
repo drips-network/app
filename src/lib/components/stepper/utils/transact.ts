@@ -161,7 +161,7 @@ export default function transact(
 
         setStepCopyWaitingForConfirmation(updateAwaitStep, network.name, tx.hash);
 
-        receipts.push(await tx.wait(1));
+        if (!safeAppMode) receipts.push(await tx.wait(1));
       }
     } else {
       setStepCopyWaitingForSignature(
@@ -174,7 +174,7 @@ export default function transact(
 
       setStepCopyWaitingForConfirmation(updateAwaitStep, network.name, tx.hash);
 
-      receipts.push(await tx.wait(1));
+      if (!safeAppMode) receipts.push(await tx.wait(1));
     }
 
     if (!safeAppMode) {
