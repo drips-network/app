@@ -7,7 +7,6 @@
 
   import KeyHint from 'radicle-design-system/KeyHint.svelte';
   import Spinner from 'radicle-design-system/Spinner.svelte';
-  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
 
   export let variant: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number } = {
     type: 'text',
@@ -53,58 +52,56 @@
   let rightContainerWidth: number;
 </script>
 
-<TransitionedHeight initHeight={40}>
-  <div {style} class="wrapper">
-    <input
-      style={`${inputStyle}; padding-right: ${
-        rightContainerWidth ? `${rightContainerWidth}px` : 'auto'
-      };`}
-      class:invalid={validationState.type === 'invalid'}
-      class:concealed={variant.type === 'password'}
-      min={variant.type === 'number' ? variant.min : undefined}
-      {placeholder}
-      {disabled}
-      {readonly}
-      spellcheck={false}
-      bind:value
-      bind:this={inputElement}
-      on:change
-      on:click
-      on:input
-      on:keydown
-      on:keypress
-    />
+<div {style} class="wrapper">
+  <input
+    style={`${inputStyle}; padding-right: ${
+      rightContainerWidth ? `${rightContainerWidth}px` : 'auto'
+    };`}
+    class:invalid={validationState.type === 'invalid'}
+    class:concealed={variant.type === 'password'}
+    min={variant.type === 'number' ? variant.min : undefined}
+    {placeholder}
+    {disabled}
+    {readonly}
+    spellcheck={false}
+    bind:value
+    bind:this={inputElement}
+    on:change
+    on:click
+    on:input
+    on:keydown
+    on:keypress
+  />
 
-    <div class="right-container" bind:clientWidth={rightContainerWidth}>
-      {#if hint && (validationState.type === 'unvalidated' || validationState.type === 'valid')}
-        <KeyHint style="margin: 0 0.5rem;">{hint}</KeyHint>
-      {/if}
+  <div class="right-container" bind:clientWidth={rightContainerWidth}>
+    {#if hint && (validationState.type === 'unvalidated' || validationState.type === 'valid')}
+      <KeyHint style="margin: 0 0.5rem;">{hint}</KeyHint>
+    {/if}
 
-      {#if suffix}
-        <span
-          class="typo-text-mono-bold"
-          style="color: var(--color-foreground-level-5); margin: 0 0.75rem;"
-        >
-          {suffix}
-        </span>
-      {/if}
+    {#if suffix}
+      <span
+        class="typo-text-mono-bold"
+        style="color: var(--color-foreground-level-5); margin: 0 0.75rem;"
+      >
+        {suffix}
+      </span>
+    {/if}
 
-      {#if validationState.type === 'pending'}
-        <Spinner style="margin: 0 0.5rem;" />
-      {:else if showSuccessCheck && validationState.type === 'valid'}
-        <CheckCircleIcon style="fill: var(--color-positive); margin: 0 0.5rem;" />
-      {:else if validationState.type === 'invalid'}
-        <ExclamationCircleIcon style="fill: var(--color-negative); margin: 0 0.5rem;" />
-      {/if}
-    </div>
-
-    {#if validationState.type === 'invalid'}
-      <div class="validation-message">
-        {validationState.message}
-      </div>
+    {#if validationState.type === 'pending'}
+      <Spinner style="margin: 0 0.5rem;" />
+    {:else if showSuccessCheck && validationState.type === 'valid'}
+      <CheckCircleIcon style="fill: var(--color-positive); margin: 0 0.5rem;" />
+    {:else if validationState.type === 'invalid'}
+      <ExclamationCircleIcon style="fill: var(--color-negative); margin: 0 0.5rem;" />
     {/if}
   </div>
-</TransitionedHeight>
+
+  {#if validationState.type === 'invalid'}
+    <div class="validation-message">
+      {validationState.message}
+    </div>
+  {/if}
+</div>
 
 <style>
   .wrapper {
