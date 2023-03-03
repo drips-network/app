@@ -12,17 +12,10 @@
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import scroll from '$lib/stores/scroll';
-  import isRunningInSafe from '$lib/utils/is-running-in-safe';
-  import { goto } from '$app/navigation';
 
   onMount(() => {
     scroll.attach();
     return scroll.detach;
-  });
-
-  onMount(() => {
-    // When launching within a Safe, we don't want to display the landing page.
-    if (isRunningInSafe()) goto('/app', { replaceState: true });
   });
 </script>
 
