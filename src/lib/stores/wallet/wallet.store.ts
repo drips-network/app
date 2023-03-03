@@ -96,8 +96,10 @@ const walletStore = () => {
       cacheProvider: true,
     });
 
-    if (web3Modal.cachedProvider) {
-      await connect(true);
+    const isSafeApp = isRunningInSafe();
+
+    if (web3Modal.cachedProvider || isSafeApp) {
+      await connect(true, isSafeApp);
     }
   }
 
@@ -106,13 +108,11 @@ const walletStore = () => {
    * @param initializing If true, the function will trigger a global advisory
    * while waiting for the user's wallet to be unlocked.
    */
-  async function connect(initializing = false): Promise<void> {
+  async function connect(initializing = false, isSafeApp = false): Promise<void> {
     if (!browser) throw new Error('Can only connect client-side');
 
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
     let connected = false;
-
-    const isSafeApp = isRunningInSafe();
 
     setTimeout(() => {
       if (!initializing || connected) return;

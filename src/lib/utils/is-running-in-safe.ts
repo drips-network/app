@@ -3,5 +3,5 @@
  * If we're running in an iFrame, we can assume we're in a safe app.
  */
 export default () => {
-  return window.self !== window.top;
+  return window.parent !== window;
 };
