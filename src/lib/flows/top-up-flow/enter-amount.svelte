@@ -19,6 +19,7 @@
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import { formatUnits } from 'ethers/lib/utils';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -128,6 +129,7 @@
       <Toggle bind:checked={topUpMax} label="Max" />
     </svelte:fragment>
   </FormField>
+  <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
     <span data-testid="confirm-amount-button">
       <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}

@@ -47,6 +47,12 @@
           <div>
             <h4 class="typo-text-small-bold">Connected to Safe</h4>
             <p class="typo-text-small">All transactions will be proposed to the connected Safe.</p>
+            <a
+              class="typo-link"
+              href="https://v2.docs.drips.network/docs/the-drips-app/advanced/safe"
+              target="_blank"
+              rel="noreferrer">Learn more</a
+            >
           </div>
         </AnnotationBox>
       </div>
@@ -93,8 +99,10 @@
     margin-bottom: 0.5rem;
   }
 
-  .connected-to-safe h4 {
-    margin-bottom: 0.5rem;
+  .connected-to-safe div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .links {

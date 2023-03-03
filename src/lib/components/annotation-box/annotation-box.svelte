@@ -5,12 +5,14 @@
 </script>
 
 <div class="annotation-box typo-text-small {type} {size}">
-  <WarningIcon
-    style="height: 1.25rem; width: 1.25rem; fill: var({type === 'info'
-      ? '--color-primary-level-6'
-      : '--color-caution-level-6'});"
-  />
-  <slot />
+  <div class="content">
+    <WarningIcon
+      style="height: 1.25rem; width: 1.25rem; fill: var({type === 'info'
+        ? '--color-primary-level-6'
+        : '--color-caution-level-6'});"
+    />
+    <slot />
+  </div>
 </div>
 
 <style>
@@ -18,6 +20,9 @@
     border-radius: 1rem 0 1rem 1rem;
     padding: 0.75rem;
     text-align: left;
+  }
+
+  .annotation-box > .content {
     display: flex;
     gap: 0.5rem;
   }
