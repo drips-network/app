@@ -1,6 +1,6 @@
 <script lang="ts">
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
   import User from 'radicle-design-system/icons/User.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';

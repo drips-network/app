@@ -21,7 +21,7 @@
     width: 100%;
     display: flex;
     flex-direction: column-reverse;
-    gap: 1rem;
+    gap: 0.75rem;
     width: 100%;
     align-items: flex-start;
     text-align: left;

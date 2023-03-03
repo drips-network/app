@@ -3,9 +3,9 @@
   import { cubicInOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
 
-  const INIT_HEIGHT = 256;
+  export let initHeight = 256;
 
-  let containerHeight = tweened(INIT_HEIGHT, {
+  let containerHeight = tweened(initHeight, {
     duration: 300,
     easing: cubicInOut,
   });

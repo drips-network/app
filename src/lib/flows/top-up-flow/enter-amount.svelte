@@ -6,7 +6,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import tokens from '$lib/stores/tokens';
   import { ethers } from 'ethers';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';

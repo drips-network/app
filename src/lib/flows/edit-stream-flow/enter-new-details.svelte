@@ -8,7 +8,7 @@
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import unreachable from '$lib/utils/unreachable';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
   import assert from '$lib/utils/assert';
   import wallet from '$lib/stores/wallet/wallet.store';
