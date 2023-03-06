@@ -14,7 +14,7 @@
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import unreachable from '$lib/utils/unreachable';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import { constants } from 'radicle-drips';
   import { get, type Writable } from 'svelte/store';
   import assert from '$lib/utils/assert';

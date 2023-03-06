@@ -3,7 +3,7 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import balances from '$lib/stores/balances';
   import tokens from '$lib/stores/tokens';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';

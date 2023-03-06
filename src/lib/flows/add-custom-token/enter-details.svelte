@@ -8,7 +8,7 @@
   import { fetchInfo } from '$lib/utils/erc20';
   import { isAddress } from 'ethers/lib/utils';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import assert from '$lib/utils/assert';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';

@@ -4,7 +4,7 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import { AddressDriverClient, type SplitsReceiverStruct } from 'radicle-drips';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import InputAddress from '$lib/components/input-address/input-address.svelte';

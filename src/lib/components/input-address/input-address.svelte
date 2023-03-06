@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TextInput from 'radicle-design-system/TextInput.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
   import ens from '$lib/stores/ens';
   import { ethers } from 'ethers';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
