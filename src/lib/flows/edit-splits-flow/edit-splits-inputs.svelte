@@ -15,6 +15,7 @@
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import { tick } from 'svelte';
 
   export let context: Writable<EditSplitsFlowState>;
 
@@ -30,6 +31,7 @@
   };
 
   let splitsInputs: SplitInput[] = [];
+  let addressContainers: HTMLDivElement[] = [];
   let validationError: string;
 
   if ($context.splits.length) {
@@ -46,9 +48,11 @@
     splitsInputs.push(emptyRow());
   }
 
-  function addRow() {
+  async function addRow() {
     splitsInputs = [...splitsInputs, emptyRow()];
-    // TODO focus into input
+    // focus into address input
+    await tick();
+    addressContainers[addressContainers.length - 1].querySelector('input')?.focus();
   }
   function removeRow(index = 0) {
     splitsInputs.splice(index, 1);
@@ -122,7 +126,7 @@
     {#each splitsInputs as splitInput, index}
       <div class="splits-input-row md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
         <!-- address input -->
-        <div class="col-span-6 md:col-span-8">
+        <div bind:this={addressContainers[index]} class="col-span-6 md:col-span-8">
           <label class="sr-only" for="control">Recipient</label>
           <InputAddress
             bind:value={splitInput.receiver.value}
