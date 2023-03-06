@@ -14,6 +14,7 @@
   import type { Writable } from 'svelte/store';
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import wallet from '$lib/stores/wallet/wallet.store';
 
   export let context: Writable<EditSplitsFlowState>;
 
@@ -124,10 +125,16 @@
             on:validationChange={(e) => {
               splitInput.receiver.type = e.detail.type;
             }}
-            exclude={{
-              addresses: allAddresses.filter((_, i) => i !== index),
-              msg: 'Duplicate recipient.',
-            }}
+            exclude={[
+              {
+                addresses: allAddresses.filter((_, i) => i !== index),
+                msg: 'Duplicate recipient.',
+              },
+              {
+                addresses: [$wallet.address],
+                msg: "You can't split to yourself.",
+              },
+            ]}
           />
         </div>
 

@@ -8,13 +8,17 @@
   export let value: string | undefined = undefined;
   export let validatedValue: string | undefined = undefined;
 
-  export let exclude: {
-    addresses: string[];
+  type ExclusionGroup = {
+    addresses: (string | undefined)[];
     msg: string;
-  } = {
-    addresses: [],
-    msg: 'You cannot use this address.',
   };
+
+  export let exclude: ExclusionGroup[] = [
+    {
+      addresses: [],
+      msg: 'You cannot use this address.',
+    },
+  ];
 
   const dispatch = createEventDispatcher();
 
@@ -53,11 +57,15 @@
       // is address
       validatedValue = input;
 
-      if (exclude.addresses.includes(input)) {
+      const exclusionMatch = exclude.find((group: ExclusionGroup) =>
+        group.addresses.includes(input),
+      );
+
+      if (exclusionMatch) {
         // is excluded!
         addressValidationState = {
           type: 'invalid',
-          message: exclude.msg,
+          message: exclusionMatch.msg,
         };
       } else {
         // valid
