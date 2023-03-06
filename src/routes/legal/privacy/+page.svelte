@@ -1,3 +1,11 @@
+<svelte:head>
+  <title>Drips • Data & Privacy Policy</title>
+  <meta
+    name="description"
+    content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
+  />
+</svelte:head>
+
 <h1>Data & Privacy Policy</h1>
 
 <p>Last edited: 21 October 2022</p>
