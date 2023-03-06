@@ -100,7 +100,8 @@ export function estimateAssetConfig(
   // Filter out any history items not relevant to the current time window.
   const relevantHistoryItems = assetConfig.history.filter((hi) => {
     const timestamp = hi.timestamp.getTime();
-    const nextTimestamp = assetConfig.history[assetConfig.history.indexOf(hi)]?.timestamp.getTime();
+    const nextTimestamp =
+      assetConfig.history[assetConfig.history.indexOf(hi) + 1]?.timestamp.getTime();
 
     const startsWithinWindow = timestamp <= window.to && timestamp >= window.from;
     const windowIsAfterLastEvent = !nextTimestamp && timestamp < window.from;
