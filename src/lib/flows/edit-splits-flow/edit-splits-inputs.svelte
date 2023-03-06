@@ -55,7 +55,9 @@
     splitsInputs = splitsInputs;
   }
 
-  $: totalPercent = splitsInputs.reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
+  $: totalPercent = splitsInputs
+    .filter((r) => r.receiver.value.length)
+    .reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
   $: isValidPercents = totalPercent <= 100;
 
   $: nonEmptyAddressInputsCount = splitsInputs.filter((r) => r.receiver.value.length).length;
@@ -68,7 +70,9 @@
     isValidPercents &&
     isValidAddresses &&
     // !splitsInputs.filter((s) => s.receiver.value.length <= 1).length &&
-    !splitsInputs.find((s) => Number(s.amount) === 0);
+    splitsInputs.filter((s) => s.receiver.value.length > 0).length ===
+      splitsInputs.filter((s) => s.amount !== undefined).length &&
+    !splitsInputs.find((s) => Number(s.amount) <= 0);
 
   $: allAddresses = splitsInputs.map((row) => row.receiver.value);
 
