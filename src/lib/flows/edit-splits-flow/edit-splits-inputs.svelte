@@ -115,7 +115,7 @@
       <div class="hidden md:block">Percents</div>
     </div>
     {#each splitsInputs as splitInput, index}
-      <div class="md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
+      <div class="splits-input-row md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
         <!-- address input -->
         <div class="col-span-6 md:col-span-8">
           <label class="sr-only" for="control">Recipient</label>
@@ -149,7 +149,7 @@
         </div>
       </div>
     {/each}
-    <div class="mt-3">
+    <div class="mt-3 flex justify-start">
       <Button on:click={addRow} icon={Plus}>Add recipient</Button>
     </div>
   </section>
@@ -181,7 +181,7 @@
         class="h-10 overflow-hidden flex items-center justify-end rounded-md transition-all duration-200"
         style="background: {totalPercent > 100
           ? 'var(--color-negative)'
-          : 'var(--color-primary)'}; flex-basis: {Math.max(1, Math.min(totalPercent, 100))}%;"
+          : 'var(--color-primary)'}; flex-basis: {Math.max(0, Math.min(totalPercent, 100))}%;"
       >
         <div hidden={totalPercent < 11} class="px-2.5">
           {totalPercent.toFixed(2).replace('.00', '')}%
@@ -191,8 +191,8 @@
     <!-- bar labels -->
     <div class="mt-1.5 px-1.5 flex justify-between typo-text-bold">
       <div style:opacity={totalPercent >= 100 ? '0.4' : '1'}>You</div>
-      <div style:opacity={totalPercent <= 0 ? '0.4' : '1'}>
-        {nonEmptyAddressInputsCount} account{nonEmptyAddressInputsCount > 1 ? 's' : ''}
+      <div style:opacity={totalPercent <= 0 ? '0' : '1'}>
+        {nonEmptyAddressInputsCount} account{nonEmptyAddressInputsCount === 1 ? '' : 's'}
       </div>
     </div>
     <!-- error msgs -->
