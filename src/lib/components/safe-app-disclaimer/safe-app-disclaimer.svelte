@@ -12,10 +12,10 @@
     <div>
       <h4 class="typo-text-small-bold">Using Drips with a Safe</h4>
       <p class="typo-text-small">
-        Please note that this transaction might fail after any previously-created, currently-pending
-        transaction that adjusts your {disclaimerType === 'drips'
-          ? 'Drips configuration for this token'
-          : 'Splits configuration'} is executed.
+        Please note that if your safe has any pending transactions {disclaimerType === 'drips'
+          ? 'for this token in your Drips account'
+          : 'that update your Splits configuration'}, you will need to wait for their confirmation
+        first, otherwise this transaction may fail.
       </p>
       <a
         class="typo-link"
