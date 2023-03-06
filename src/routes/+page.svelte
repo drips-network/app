@@ -254,6 +254,10 @@
       <div class="flex flex-col gap-4 items-center">
         <p class="text-foreground-level-5">Supported by</p>
         <RadicleLogo />
+        <div class="legal-links typo-text-small">
+          <a href="/legal/privacy">Privacy Policy</a> •
+          <a href="/legal/disclaimer">Disclaimer</a>
+        </div>
       </div>
       <div id="drips-sticker">
         <div class="illustration">
@@ -538,6 +542,15 @@
 
   #drips-sticker > .illustration {
     animation: rotate 20s linear infinite;
+  }
+
+  .legal-links {
+    margin-top: 1rem;
+    color: var(--color-foreground-level-5);
+  }
+
+  .legal-links a {
+    text-decoration: underline;
   }
 
   @media (max-width: 768px) {

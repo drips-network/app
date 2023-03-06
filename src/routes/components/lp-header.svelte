@@ -9,12 +9,12 @@
 </script>
 
 <header class:raised={scrolledDown}>
-  <div class="logo">
+  <a class="logo" href="/">
     <div class="inner" class:logoOffset={showLogo}>
       <ThreeDrips />
       <DripsLogo />
     </div>
-  </div>
+  </a>
   <nav>
     <a href="https://github.com/radicle-dev" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Code</Button></a
@@ -32,8 +32,8 @@
     justify-content: space-between;
     align-items: center;
     border: 1px solid var(--color-foreground);
-    padding: var(--spacing-s);
-    border-radius: var(--border-radius-pointy);
+    padding: 1rem;
+    border-radius: 2rem 0 2rem 2rem;
     position: fixed;
     width: calc(78rem - 3px);
     max-width: calc(100vw - 2rem);
@@ -49,7 +49,7 @@
   }
 
   .logo {
-    margin-left: var(--spacing-xs);
+    margin-left: 0.5rem;
     height: 28px;
   }
 
