@@ -22,7 +22,7 @@
   }
 
   .content {
-    width: 44rem;
+    max-width: 44rem;
     padding-top: 2rem;
     padding-left: 1rem;
   }
