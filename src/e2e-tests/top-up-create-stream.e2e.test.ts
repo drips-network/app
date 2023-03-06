@@ -375,9 +375,13 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('shows the success screen', async () => {
-      await expect(page.locator("text=You've successfully collected TEST.")).toBeVisible();
+      await expect(
+        page.locator(
+          'text=Your TEST earnings have successfully been delivered to your wallet address.',
+        ),
+      ).toBeVisible();
 
-      await page.locator('button', { hasText: 'Done' }).click();
+      await page.locator('button', { hasText: 'Got it' }).click();
     });
 
     it('shows an incoming balance of zero for testcoin after squeezing', async () => {

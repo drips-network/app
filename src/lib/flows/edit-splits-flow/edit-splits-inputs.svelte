@@ -17,6 +17,7 @@
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   export let context: Writable<EditSplitsFlowState>;
+  export let afterTx: (() => Promise<void>) | undefined = undefined;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -97,6 +98,7 @@
         transactions: (transactContext) => ({
           transaction: () => transactContext.client.setSplits(transactContext.splits),
         }),
+        after: afterTx,
       }),
     );
   }

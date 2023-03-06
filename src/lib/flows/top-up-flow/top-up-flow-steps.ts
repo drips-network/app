@@ -9,6 +9,7 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import tokens from '$lib/stores/tokens';
 import formatTokenAmount from '$lib/utils/format-token-amount';
 import { get } from 'svelte/store';
+import walletStore from '$lib/stores/wallet/wallet.store';
 
 function getSuccessMessage(state: TopUpFlowState) {
   const { tokenAddress, amountToTopUp } = state;
@@ -57,6 +58,7 @@ export default function getTopUpFlowSteps(tokenAddress?: string) {
       makeStep({
         component: SuccessStep,
         props: {
+          safeAppMode: Boolean(get(walletStore).safe),
           message: () => getSuccessMessage(get(topUpFlowState)),
         },
       }),

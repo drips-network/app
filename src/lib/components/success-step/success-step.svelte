@@ -1,5 +1,4 @@
 <script lang="ts">
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
@@ -13,7 +12,7 @@
   export let message: string | (() => string);
   export let action: 'close' | 'continue' = 'close';
 
-  $: safeAppMode = Boolean($walletStore.safe);
+  export let safeAppMode = false;
 
   function handleConfirm() {
     if (action === 'continue') {
