@@ -9,12 +9,15 @@
 </script>
 
 <header class:raised={scrolledDown}>
-  <a class="logo" href="/">
-    <div class="inner" class:logoOffset={showLogo}>
-      <ThreeDrips />
-      <DripsLogo />
-    </div>
-  </a>
+  <div class="left">
+    <a class="logo" href="/">
+      <div class="inner" class:logoOffset={showLogo}>
+        <ThreeDrips />
+        <DripsLogo />
+      </div>
+    </a>
+    <h5 class="beta-notice" class:logoOffset={showLogo}>Beta</h5>
+  </div>
   <nav>
     <a href="https://github.com/radicle-dev" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Code</Button></a
@@ -48,6 +51,11 @@
     box-shadow: var(--elevation-medium);
   }
 
+  .left {
+    display: flex;
+    gap: 0.75rem;
+  }
+
   .logo {
     margin-left: 0.5rem;
     height: 28px;
@@ -65,6 +73,22 @@
     display: flex;
     flex-direction: column;
     gap: 28px;
+  }
+
+  .beta-notice {
+    background-color: var(--color-caution-level-2);
+    padding: 0.125rem 0.625rem 0.125rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2rem 0 2rem 2rem;
+    transform: translateX(-40px);
+    transition: transform 0.3s;
+    user-select: none;
+  }
+
+  .beta-notice.logoOffset {
+    transform: translateX(0);
   }
 
   nav {
@@ -91,6 +115,10 @@
 
     nav {
       gap: 0;
+    }
+
+    .beta-notice {
+      display: none;
     }
   }
 </style>
