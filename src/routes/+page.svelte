@@ -57,12 +57,8 @@
         <h1>Crowdfunding<span class="nudge">&nbsp;</span>for the Open Web</h1>
       </div>
       <div class="beta-notice">
-        <p>
-          The new Drips is currently in Beta, with Token Streaming functionality ready for you to
-          try.
-          <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates on upcoming
-          crowdfunding functionality.
-        </p>
+        The new Drips is currently in Beta, with Token Streaming functionality ready for you to try.
+        <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates.
         <a href="https://v1.drips.network/">Back to Drips V1</a>
       </div>
     </section>
@@ -382,14 +378,10 @@
     background-color: var(--color-caution-level-1);
     color: var(--color-caution-level-6);
     padding: 0.5rem 1.5rem;
-    border-radius: 1rem 0 1rem 1rem;
+    border-radius: 2rem 0 2rem 2rem;
     border: 1px solid var(--color-caution-level-6);
-    max-width: 43rem;
+    max-width: 44rem;
     margin-top: 3rem;
-
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
   }
 
   #hero .beta-notice a {
