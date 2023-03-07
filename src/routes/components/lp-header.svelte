@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BetaBadge from '$lib/components/beta-badge/beta-badge.svelte';
   import Button from '$lib/components/button/button.svelte';
   import DripsLogo from '$lib/components/illustrations/logo.svelte';
   import ThreeDrips from '$lib/components/illustrations/three-drips.svelte';
@@ -16,7 +17,7 @@
         <DripsLogo />
       </div>
     </a>
-    <h5 class="beta-notice" class:logoOffset={showLogo}>Beta</h5>
+    <div class="beta-notice" class:offset={showLogo}><BetaBadge /></div>
   </div>
   <nav>
     <a href="https://github.com/radicle-dev" target="_blank" rel="noreferrer"
@@ -36,7 +37,7 @@
     align-items: center;
     border: 1px solid var(--color-foreground);
     padding: 1rem;
-    border-radius: 2rem 0 2rem 2rem;
+    border-radius: 2.5rem 0 2.5rem 2.5rem;
     position: fixed;
     width: calc(78rem - 3px);
     max-width: calc(100vw - 2rem);
@@ -76,19 +77,11 @@
   }
 
   .beta-notice {
-    background-color: var(--color-caution-level-2);
-    padding: 0.125rem 0.625rem 0.125rem 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2rem 0 2rem 2rem;
     transform: translateX(-40px);
     transition: transform 0.3s;
-    user-select: none;
-    color: var(--color-caution-level-6);
   }
 
-  .beta-notice.logoOffset {
+  .beta-notice.offset {
     transform: translateX(0);
   }
 
