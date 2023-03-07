@@ -23,10 +23,8 @@
     <a href="https://github.com/radicle-dev?q=drips" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Code</Button></a
     >
-    <a
-      href="https://v2.docs.drips.network/docs/the-drips-app/getting-started"
-      target="_blank"
-      rel="noreferrer"><Button variant="ghost">Docs</Button></a
+    <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank" rel="noreferrer"
+      ><Button variant="ghost">Docs</Button></a
     >
     <a class="cta" href="/app"><Button variant="primary">Open app</Button></a>
   </nav>
