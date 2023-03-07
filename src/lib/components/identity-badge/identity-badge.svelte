@@ -119,6 +119,7 @@
 
   .mono {
     font-family: var(--typeface-mono-bold);
+    font-weight: bold;
     white-space: nowrap;
     font-style: normal;
   }

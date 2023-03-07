@@ -23,12 +23,10 @@
     transact(
       dispatch,
       makeTransactPayload({
-        transactions: () => [
-          {
-            transaction: async () =>
-              (await getAddressDriverClient()).approve(tokenAddress ?? unreachable()),
-          },
-        ],
+        transactions: () => ({
+          transaction: async () =>
+            (await getAddressDriverClient()).approve(tokenAddress ?? unreachable()),
+        }),
         after: async () => {
           context.update((c) => ({
             ...c,

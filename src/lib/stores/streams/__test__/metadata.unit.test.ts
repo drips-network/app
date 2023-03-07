@@ -38,7 +38,7 @@ const MOCK_ACCOUNT_DATA = {
             dripId: '1',
           },
           receiver: {
-            userId: '875267609686611184008791658115888920329297355418',
+            userId: '1027758174339843585312137211599376373437705718139',
             driver: 'address',
           },
           archived: false,
@@ -54,7 +54,7 @@ const MOCK_ACCOUNT_DATA = {
             dripId: '2',
           },
           receiver: {
-            userId: '875267609686611184008791658115888920329297355418',
+            userId: '1027758174339843585312137211599376373437705718139',
             driver: 'address',
           },
           archived: false,
@@ -75,7 +75,7 @@ const MOCK_ACCOUNT_DATA = {
             dripId: '1',
           },
           receiver: {
-            userId: '875267609686611184008791658115888920329297355418',
+            userId: '1027758174339843585312137211599376373437705718139',
             driver: 'address',
           },
           archived: false,
@@ -108,11 +108,11 @@ const MOCK_DRIPS_SET_EVENTS = [
     assetId: 284221150502406160145256042239569169360715932835n, // RAD
     dripsReceiverSeenEvents: [
       {
-        receiverUserId: 875267609686611184008791658115888920329297355418n,
+        receiverUserId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
       {
-        receiverUserId: 875267609686611184008791658115888920329297355418n,
+        receiverUserId: '1027758174339843585312137211599376373437705718139',
         config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
@@ -126,7 +126,7 @@ const MOCK_DRIPS_SET_EVENTS = [
     assetId: 284221150502406160145256042239569169360715932835n, // RAD
     dripsReceiverSeenEvents: [
       {
-        receiverUserId: 875267609686611184008791658115888920329297355418n,
+        receiverUserId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
@@ -140,7 +140,7 @@ const MOCK_DRIPS_SET_EVENTS = [
     assetId: 611382286831621467233887798921843936019654057231n, // DAI
     dripsReceiverSeenEvents: [
       {
-        receiverUserId: 875267609686611184008791658115888920329297355418n,
+        receiverUserId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
@@ -154,11 +154,11 @@ const MOCK_DRIPS_SET_EVENTS = [
     assetId: 284221150502406160145256042239569169360715932835n, // RAD
     dripsReceiverSeenEvents: [
       {
-        receiverUserId: 875267609686611184008791658115888920329297355418n,
+        receiverUserId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
       {
-        receiverUserId: 875267609686611184008791658115888920329297355418n,
+        receiverUserId: '1027758174339843585312137211599376373437705718139',
         config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
@@ -290,9 +290,9 @@ describe('metadata.ts', () => {
           startDate: undefined,
         },
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -309,9 +309,9 @@ describe('metadata.ts', () => {
           startDate: undefined,
         },
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -337,9 +337,9 @@ describe('metadata.ts', () => {
           startDate: undefined,
         },
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -348,9 +348,9 @@ describe('metadata.ts', () => {
         dripsConfig: undefined,
         managed: true,
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
       });
 
@@ -375,9 +375,9 @@ describe('metadata.ts', () => {
           startDate: undefined,
         },
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -394,9 +394,9 @@ describe('metadata.ts', () => {
           startDate: undefined,
         },
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -436,9 +436,9 @@ describe('metadata.ts', () => {
           startDate: undefined,
         },
         receiver: {
-          address: '0x99505b669c6064bA2B2F26f2E4fffa5E8D90629A',
+          address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '875267609686611184008791658115888920329297355418',
+          userId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });

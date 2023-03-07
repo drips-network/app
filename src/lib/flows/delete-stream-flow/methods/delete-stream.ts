@@ -87,12 +87,10 @@ export default function (
         };
       },
 
-      transactions: (transactContext) => [
-        {
-          transaction: () =>
-            transactContext.callerClient.callBatched(transactContext.createStreamBatchPreset),
-        },
-      ],
+      transactions: (transactContext) => ({
+        transaction: () =>
+          transactContext.callerClient.callBatched(transactContext.createStreamBatchPreset),
+      }),
 
       after: async (_, transactContext) => {
         /*

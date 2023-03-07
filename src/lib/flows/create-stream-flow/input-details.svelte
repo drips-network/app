@@ -29,6 +29,7 @@
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -298,6 +299,7 @@
       </div>
     </div>
   </Toggleable>
+  <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>

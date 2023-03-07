@@ -34,6 +34,7 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   export let context: Writable<CollectFlowState>;
 
@@ -165,12 +166,9 @@
           };
         },
 
-        transactions: (transactContext) => [
-          {
-            transaction: () =>
-              transactContext.callerClient.callBatched(transactContext.collectFlow),
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.callerClient.callBatched(transactContext.collectFlow),
+        }),
 
         after: async (receipts, transactContext) => {
           const receipt = receipts[0];
@@ -324,6 +322,7 @@
       )}
     />
   </FormField>
+  <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
     <Button
       variant="primary"

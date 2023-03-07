@@ -19,6 +19,14 @@
   import Coin from '$lib/components/illustrations/coin.svelte';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import BuildOnDrips from '$lib/components/illustrations/build-on-drips.svelte';
+  import { onMount } from 'svelte';
+  import isRunningInSafe from '$lib/utils/is-running-in-safe';
+  import { goto } from '$app/navigation';
+
+  onMount(() => {
+    // When launching within a Safe, we don't want to display the landing page.
+    if (isRunningInSafe()) goto('/app', { replaceState: true });
+  });
 </script>
 
 <svelte:head>

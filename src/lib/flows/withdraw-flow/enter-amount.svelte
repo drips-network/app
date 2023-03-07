@@ -27,6 +27,7 @@
   import { formatUnits } from 'ethers/lib/utils';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -119,11 +120,9 @@
             dripsUserId,
           };
         },
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.tx,
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.tx,
+        }),
         after: async (_, transactContext) => {
           const currentAssetConfigHistoryLength = getAssetConfigHistory(
             transactContext.dripsUserId,
@@ -193,6 +192,7 @@
       <Toggle bind:checked={withdrawAll} label="Max" />
     </svelte:fragment>
   </FormField>
+  <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')}>Cancel</Button>
     <Button variant="primary" disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}

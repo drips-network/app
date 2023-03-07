@@ -61,11 +61,9 @@
           return { tx };
         },
 
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.tx,
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.tx,
+        }),
 
         after: async () => {
           /*

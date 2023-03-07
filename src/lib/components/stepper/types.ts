@@ -2,6 +2,7 @@ import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
 
 export interface UpdateAwaitStepParams {
   message?: string;
+  subtitle?: string;
   link?: {
     url: string;
     label: string;
