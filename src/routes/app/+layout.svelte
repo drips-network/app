@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
   import Header from '$lib/components/header/header.svelte';
-
+  import HomeIcon from 'radicle-design-system/icons/House.svelte';
+  import HeartIcon from 'radicle-design-system/icons/Heart.svelte';
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
   import balances from '$lib/stores/balances/balances.store';
@@ -18,6 +19,7 @@
   import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fly } from 'svelte/transition';
+  import Sidenav from '$lib/components/sidenav/sidenav.svelte';
 
   export let data: { pathname: string };
 
@@ -86,6 +88,25 @@
 {#if loaded}
   <div class="main" data-theme={$themeStore.currentTheme} in:fly={{ duration: 300, y: 16 }}>
     <ModalLayout />
+    <div class="sidenav">
+      <Sidenav
+        navItems={{
+          top: [
+            {
+              path: '/app',
+              icon: HomeIcon,
+              title: 'Dashboard',
+            },
+            {
+              path: '/funding',
+              icon: HeartIcon,
+              title: 'Funding Profiles',
+            },
+          ],
+          bottom: [],
+        }}
+      />
+    </div>
     <div class="page" class:loading={$navigating}>
       <PageTransition pathname={data.pathname}>
         <slot />
@@ -113,7 +134,7 @@
     min-height: 100vh;
     max-width: 64rem;
     width: 100vw;
-    padding: 6rem 1rem 4rem 1rem;
+    padding: 0 1rem 4rem 1rem;
     margin: 0 auto;
     transition: opacity 0.3s;
   }
@@ -130,5 +151,26 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .main {
+    display: grid;
+    grid-template-rows: 64px 64px 1fr;
+    grid-template-columns: 1fr 256px minmax(16px, 64px) auto 1fr;
+    grid-template-areas:
+      '. . . . .'
+      '. . . . .'
+      '. sidebar . content .';
+  }
+
+  .sidenav {
+    grid-area: sidebar;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .page {
+    grid-area: content;
   }
 </style>
