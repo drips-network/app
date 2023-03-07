@@ -14,6 +14,8 @@
   import type { Writable } from 'svelte/store';
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import wallet from '$lib/stores/wallet/wallet.store';
+  import { tick } from 'svelte';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   export let context: Writable<EditSplitsFlowState>;
@@ -31,6 +33,7 @@
   };
 
   let splitsInputs: SplitInput[] = [];
+  let addressContainers: HTMLDivElement[] = [];
   let validationError: string;
 
   if ($context.splits.length) {
@@ -47,16 +50,20 @@
     splitsInputs.push(emptyRow());
   }
 
-  function addRow() {
+  async function addRow() {
     splitsInputs = [...splitsInputs, emptyRow()];
-    // TODO focus into input
+    // focus into address input
+    await tick();
+    addressContainers[addressContainers.length - 1].querySelector('input')?.focus();
   }
   function removeRow(index = 0) {
     splitsInputs.splice(index, 1);
     splitsInputs = splitsInputs;
   }
 
-  $: totalPercent = splitsInputs.reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
+  $: totalPercent = splitsInputs
+    .filter((r) => r.receiver.value.length)
+    .reduce((acc, curr) => acc + Number(curr.amount ?? 0), 0);
   $: isValidPercents = totalPercent <= 100;
 
   $: nonEmptyAddressInputsCount = splitsInputs.filter((r) => r.receiver.value.length).length;
@@ -69,7 +76,9 @@
     isValidPercents &&
     isValidAddresses &&
     // !splitsInputs.filter((s) => s.receiver.value.length <= 1).length &&
-    !splitsInputs.find((s) => Number(s.amount) === 0);
+    splitsInputs.filter((s) => s.receiver.value.length > 0).length ===
+      splitsInputs.filter((s) => s.amount !== undefined).length &&
+    !splitsInputs.find((s) => Number(s.amount) <= 0);
 
   $: allAddresses = splitsInputs.map((row) => row.receiver.value);
 
@@ -116,19 +125,25 @@
       <div class="hidden md:block">Percents</div>
     </div>
     {#each splitsInputs as splitInput, index}
-      <div class="md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
+      <div class="splits-input-row md:grid grid-cols-10 gap-2 my-4 md:my-3 items-start">
         <!-- address input -->
-        <div class="col-span-6 md:col-span-8">
+        <div bind:this={addressContainers[index]} class="col-span-6 md:col-span-8">
           <label class="sr-only" for="control">Recipient</label>
           <InputAddress
             bind:value={splitInput.receiver.value}
             on:validationChange={(e) => {
               splitInput.receiver.type = e.detail.type;
             }}
-            exclude={{
-              addresses: allAddresses.filter((_, i) => i !== index),
-              msg: 'Duplicate recipient.',
-            }}
+            exclude={[
+              {
+                addresses: allAddresses.filter((_, i) => i !== index),
+                msg: 'Duplicate recipient.',
+              },
+              {
+                addresses: [$wallet.address],
+                msg: "You can't split to yourself.",
+              },
+            ]}
           />
         </div>
 
@@ -150,7 +165,7 @@
         </div>
       </div>
     {/each}
-    <div class="mt-3">
+    <div class="mt-3 flex justify-start">
       <Button on:click={addRow} icon={Plus}>Add recipient</Button>
     </div>
   </section>
@@ -182,7 +197,7 @@
         class="h-10 overflow-hidden flex items-center justify-end rounded-md transition-all duration-200"
         style="background: {totalPercent > 100
           ? 'var(--color-negative)'
-          : 'var(--color-primary)'}; flex-basis: {Math.max(1, Math.min(totalPercent, 100))}%;"
+          : 'var(--color-primary)'}; flex-basis: {Math.max(0, Math.min(totalPercent, 100))}%;"
       >
         <div hidden={totalPercent < 11} class="px-2.5">
           {totalPercent.toFixed(2).replace('.00', '')}%
@@ -192,8 +207,8 @@
     <!-- bar labels -->
     <div class="mt-1.5 px-1.5 flex justify-between typo-text-bold">
       <div style:opacity={totalPercent >= 100 ? '0.4' : '1'}>You</div>
-      <div style:opacity={totalPercent <= 0 ? '0.4' : '1'}>
-        {nonEmptyAddressInputsCount} account{nonEmptyAddressInputsCount > 1 ? 's' : ''}
+      <div style:opacity={totalPercent <= 0 ? '0' : '1'}>
+        {nonEmptyAddressInputsCount} account{nonEmptyAddressInputsCount === 1 ? '' : 's'}
       </div>
     </div>
     <!-- error msgs -->
