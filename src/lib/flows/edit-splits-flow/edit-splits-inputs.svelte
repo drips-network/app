@@ -14,8 +14,10 @@
   import type { Writable } from 'svelte/store';
   import type { EditSplitsFlowState } from './edit-splits-flow-state';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   export let context: Writable<EditSplitsFlowState>;
+  export let afterTx: (() => Promise<void>) | undefined = undefined;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -93,11 +95,10 @@
             splits,
           };
         },
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.client.setSplits(transactContext.splits),
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.client.setSplits(transactContext.splits),
+        }),
+        after: afterTx,
       }),
     );
   }
@@ -203,6 +204,8 @@
       </div>
     {/if}
   </section>
+
+  <SafeAppDisclaimer disclaimerType="splits" />
 
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')}>Cancel</Button>

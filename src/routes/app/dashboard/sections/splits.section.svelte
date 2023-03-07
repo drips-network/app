@@ -7,17 +7,13 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
-  import { makeStep } from '$lib/components/stepper/types';
-  import EditSplitsInputs from '../../../../lib/flows/edit-splits-flow/edit-splits-inputs.svelte';
-  import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import { AddressDriverClient, type SplitsEntry } from 'radicle-drips';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SplitsTable from '$lib/components/splits-table/splits-table.svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import editSplitsFlowState from '$lib/flows/edit-splits-flow/edit-splits-flow-state';
-  import FetchSplits from '$lib/flows/edit-splits-flow/fetch-splits.svelte';
+  import editSplitsFlowSteps from '$lib/flows/edit-splits-flow/edit-splits-flow-steps';
 
   export let userId: UserId | undefined;
 
@@ -157,34 +153,8 @@
       ? []
       : [
           {
-            handler: () => {
-              modal.setHideable(true);
-              modal.show(Stepper, undefined, {
-                context: editSplitsFlowState,
-                steps: [
-                  makeStep({
-                    component: FetchSplits,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: EditSplitsInputs,
-                    props: undefined,
-                  }),
-                  makeStep({
-                    component: SuccessStep,
-                    props: {
-                      message: () => {
-                        getOutgoingSplitsUpdate();
-                        return (
-                          'Your splits have been updated. ' +
-                          'It may take some time to see changes in your dashboard.'
-                        );
-                      },
-                    },
-                  }),
-                ],
-              });
-            },
+            handler: () =>
+              modal.show(Stepper, undefined, editSplitsFlowSteps(getOutgoingSplitsUpdate)),
             icon: PenIcon,
             label: 'Edit splits',
           },

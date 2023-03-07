@@ -59,6 +59,8 @@
   },
   "dependencies": {
     "@pinata/sdk": "^1.1.26",
+    "@safe-global/safe-apps-provider": "^0.16.0",
+    "@safe-global/safe-apps-sdk": "^7.10.0",
     "@tanstack/svelte-table": "^8.5.15",
     "@uniswap/default-token-list": "^4.1.0",
     "@uniswap/token-lists": "^1.0.0-beta.30",

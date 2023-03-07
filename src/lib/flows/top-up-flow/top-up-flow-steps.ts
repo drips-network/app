@@ -2,7 +2,6 @@ import { makeStep } from '$lib/components/stepper/types';
 import topUpFlowState, { type TopUpFlowState } from './top-up-flow-state';
 import assert from '$lib/utils/assert';
 import EnterAmountStep from './enter-amount.svelte';
-import ApproveStep from './approve.svelte';
 import TriggerTopUpTransactionStep from './trigger-top-up-transaction.svelte';
 import FetchAllowanceAndBalanceStep from './fetch-allowance-and-balance.svelte';
 import SelectTokenStep from './select-token.svelte';
@@ -10,6 +9,7 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import tokens from '$lib/stores/tokens';
 import formatTokenAmount from '$lib/utils/format-token-amount';
 import { get } from 'svelte/store';
+import walletStore from '$lib/stores/wallet/wallet.store';
 
 function getSuccessMessage(state: TopUpFlowState) {
   const { tokenAddress, amountToTopUp } = state;
@@ -52,16 +52,13 @@ export default function getTopUpFlowSteps(tokenAddress?: string) {
         props: undefined,
       }),
       makeStep({
-        component: ApproveStep,
-        props: undefined,
-      }),
-      makeStep({
         component: TriggerTopUpTransactionStep,
         props: undefined,
       }),
       makeStep({
         component: SuccessStep,
         props: {
+          safeAppMode: Boolean(get(walletStore).safe),
           message: () => getSuccessMessage(get(topUpFlowState)),
         },
       }),

@@ -33,6 +33,7 @@
   import modal from '$lib/stores/modal';
   import { formatUnits } from 'ethers/lib/utils';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -198,11 +199,9 @@
           };
         },
 
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.tx,
-          },
-        ],
+        transactions: (transactContext) => ({
+          transaction: () => transactContext.tx,
+        }),
 
         after: async (_, transactContext) => {
           /*
@@ -282,6 +281,7 @@
   {#if amountLocked}
     <p class="typo-text">Currently, the stream rate can not be edited for paused streams.</p>
   {/if}
+  <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide}>Cancel</Button>
     <Button variant="primary" on:click={updateStream} disabled={!canUpdate}>Update stream</Button>

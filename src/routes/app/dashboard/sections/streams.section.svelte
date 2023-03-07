@@ -11,10 +11,7 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { makeStep } from '$lib/components/stepper/types';
-  import InputDetails from '../../../../lib/flows/create-stream-flow/input-details.svelte';
   import balances from '$lib/stores/balances';
-  import SuccessStep from '$lib/components/success-step/success-step.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
@@ -23,6 +20,7 @@
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import onClickGoto from '$lib/utils/on-click-goto';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
+  import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
 
   export let userId: string | undefined;
   export let disableActions = true;
@@ -255,26 +253,7 @@
       ? []
       : [
           {
-            handler: () => {
-              modal.show(Stepper, undefined, {
-                steps: [
-                  makeStep({
-                    component: InputDetails,
-                    props: {
-                      tokenAddress,
-                    },
-                  }),
-                  makeStep({
-                    component: SuccessStep,
-                    props: {
-                      message:
-                        'Your stream has been successfully created. ' +
-                        'Please note that it may take a while for your dashboard to update.',
-                    },
-                  }),
-                ],
-              });
-            },
+            handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
             icon: PlusIcon,
             label: 'Create stream',
           },

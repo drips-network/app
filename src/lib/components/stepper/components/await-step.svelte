@@ -19,6 +19,7 @@
   const dispatch = createEventDispatcher<{ result: Result }>();
 
   export let message: string;
+  export let subtitle: string | undefined = undefined;
   export let link: { url: string; label: string } | undefined = undefined;
   export let icon:
     | { component: typeof SvelteComponent; props: Record<string, unknown> }
@@ -27,6 +28,7 @@
 
   const updateFn: UpdateAwaitStepFn = (params) => {
     message = params.message ?? message;
+    subtitle = params.subtitle;
     link = params.link;
     icon = params.icon;
   };
@@ -61,6 +63,7 @@
     <Spinner />
   {/if}
   <p>{message}</p>
+  {#if subtitle}<p class="subtitle typo-text-small">{subtitle}</p>{/if}
   {#if link}
     <a class="typo-link" href={link.url} target="_blank" rel="noreferrer">{link.label}</a>
   {/if}
@@ -74,5 +77,9 @@
     align-items: center;
     gap: 1rem;
     min-height: 16rem;
+  }
+
+  .subtitle {
+    color: var(--color-foreground-level-5);
   }
 </style>

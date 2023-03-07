@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { StepComponentEvents, UpdateAwaitStepFn } from '$lib/components/stepper/types';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import { onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
@@ -8,123 +8,43 @@
   import assert from '$lib/utils/assert';
   import wallet from '$lib/stores/wallet/wallet.store';
   import streams from '$lib/stores/streams';
-  import modal from '$lib/stores/modal';
   import expect from '$lib/utils/expect';
-  import Emoji from '$lib/components/emoji/emoji.svelte';
-  import etherscanLink from '$lib/utils/etherscan-link';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import { ERC20TxFactory } from 'radicle-drips';
+  import { constants } from 'ethers';
+  import Emoji from 'radicle-design-system/Emoji.svelte';
+
+  const WAITING_WALLET_ICON = {
+    component: Emoji,
+    props: {
+      emoji: '👛',
+      size: 'huge',
+    },
+  };
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<TopUpFlowState>;
 
-  async function topUp(updateAwaitStep: UpdateAwaitStepFn) {
-    modal.setHideable(false);
-
-    const client = await getAddressDriverClient();
-
-    const { tokenAddress, amountToTopUp } = $context;
-    const { address, provider } = $wallet;
-
-    assert(address, 'User is not connected to wallet');
-    assert(
-      tokenAddress && amountToTopUp,
-      'TriggerTopUpTransaction step is missing required context',
-    );
-
-    const ownUserId = (await client.getUserId()).toString();
-    const ownAccount = $streams.accounts[ownUserId];
-    const assetConfig = ownAccount.assetConfigs.find(
-      (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
-    );
-
-    const currentReceivers = mapFilterUndefined(assetConfig?.streams || [], (stream) =>
-      stream.paused
-        ? undefined
-        : {
-            userId: stream.receiver.userId,
-            config: stream.dripsConfig.raw,
-          },
-    );
-
-    updateAwaitStep({
-      icon: {
-        component: Emoji,
-        props: {
-          emoji: '👛',
-          size: 'huge',
-        },
-      },
-      message: 'Waiting for you to confirm the top-up transaction in your wallet',
-    });
-
-    const tx = await client.setDrips(
-      tokenAddress,
-      currentReceivers,
-      currentReceivers,
-      address,
-      amountToTopUp,
-    );
-
-    updateAwaitStep({
-      message: 'Waiting for your top-up transaction to be confirmed…',
-      link: {
-        label: 'View on Etherscan',
-        url: etherscanLink($wallet.network.name, tx.hash),
-      },
-    });
-
-    const receipt = await tx.wait();
-
-    updateAwaitStep({
-      message: 'Wrapping up…',
-    });
-
-    const block = await provider.getBlock(receipt.blockNumber);
-    const { timestamp: blockTimestamp } = block;
-
-    /*
-    We wait up to five seconds for `refreshUserAccount` to include a history item
-    matching our transaction's block timestamp, checking once a second. If it doesn't
-    after five tries, we move forward anyway, but the user will be made aware that they
-    may need to wait for a while for their dashboard to refresh.
-    */
-    await expect(
-      streams.refreshUserAccount,
-      (account) =>
-        Boolean(
-          account.assetConfigs
-            .find((ac) => ac.tokenAddress === tokenAddress)
-            ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
-        ),
-      5000,
-      1000,
-    );
-
-    modal.setHideable(true);
-  }
-
   onMount(() => {
-    dispatch('await', {
-      promise: topUp,
-      message: 'Preparing to top up…',
-    });
-
     transact(
       dispatch,
       makeTransactPayload({
         before: async () => {
           const client = await getAddressDriverClient();
+          const txFactory = await getAddressDriverTxFactory();
 
-          const { tokenAddress, amountToTopUp } = $context;
-          const { address } = $wallet;
+          const { tokenAddress, amountToTopUp, tokenAllowance } = $context;
+          const { address, signer } = $wallet;
 
           assert(address, 'User is not connected to wallet');
           assert(
-            tokenAddress && amountToTopUp,
+            tokenAddress && amountToTopUp && tokenAllowance !== undefined,
             'TriggerTopUpTransaction step is missing required context',
           );
+
+          const needApproval = tokenAllowance < amountToTopUp;
 
           const ownUserId = (await client.getUserId()).toString();
           const ownAccount = $streams.accounts[ownUserId];
@@ -141,7 +61,14 @@
                 },
           );
 
-          const tx = client.setDrips(
+          const setDripsPopulatedTx = await txFactory.setDrips(
+            tokenAddress,
+            currentReceivers,
+            amountToTopUp,
+            currentReceivers,
+            address,
+          );
+          const setDripsTx = client.setDrips(
             tokenAddress,
             currentReceivers,
             currentReceivers,
@@ -149,13 +76,44 @@
             amountToTopUp,
           );
 
-          return { tx, tokenAddress };
+          const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
+          const approvePopulatedTx = await erc20TxFactory.approve(
+            txFactory.driverAddress,
+            constants.MaxUint256,
+          );
+
+          return {
+            setDripsPopulatedTx,
+            setDripsTx,
+            approvePopulatedTx,
+            needApproval,
+            tokenAddress,
+          };
         },
-        transactions: (transactContext) => [
-          {
-            transaction: () => transactContext.tx,
-          },
-        ],
+
+        transactions: ({ setDripsTx, setDripsPopulatedTx, approvePopulatedTx, needApproval }) =>
+          // If the ERC-20 needs approval, we send a batch TX including the approval TX and setDrips.
+          needApproval
+            ? [
+                {
+                  transaction: approvePopulatedTx,
+                  waitingSignatureMessage: {
+                    message:
+                      'Waiting for you to approve access to the ERC-20 token in your wallet...',
+                    subtitle: 'You only have to do this once per token.',
+                    icon: WAITING_WALLET_ICON,
+                  },
+                },
+                {
+                  transaction: setDripsPopulatedTx,
+                  waitingSignatureMessage: {
+                    message: 'Waiting for you to approve the top-up transaction in your wallet...',
+                    icon: WAITING_WALLET_ICON,
+                  },
+                },
+              ]
+            : { transaction: () => setDripsTx },
+
         after: async (receipts, transactContext) => {
           const { provider } = $wallet;
 
@@ -163,11 +121,11 @@
           const { timestamp: blockTimestamp } = block;
 
           /*
-        We wait up to five seconds for `refreshUserAccount` to include a history item
-        matching our transaction's block timestamp, checking once a second. If it doesn't
-        after five tries, we move forward anyway, but the user will be made aware that they
-        may need to wait for a while for their dashboard to refresh.
-        */
+          We wait up to five seconds for `refreshUserAccount` to include a history item
+          matching our transaction's block timestamp, checking once a second. If it doesn't
+          after five tries, we move forward anyway, but the user will be made aware that they
+          may need to wait for a while for their dashboard to refresh.
+          */
           await expect(
             streams.refreshUserAccount,
             (account) =>
