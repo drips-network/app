@@ -3,7 +3,7 @@
   import LpHeader from '../components/lp-header.svelte';
 </script>
 
-<div class="wrapper">
+<div class="wrapper legal-page">
   <LpHeader />
   <div class="content">
     <slot />
