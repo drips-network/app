@@ -12,7 +12,6 @@
   import MockDashboard from './components/mock-dashboard/mock-dashboard.svelte';
   import Button from '$lib/components/button/button.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
-  import RadicleLogo from '../lib/components/illustrations/radicle-logo.svelte';
   import DripsSticker from '../lib/components/illustrations/drips-sticker.svelte';
   import BigDripsLogo from '$lib/components/illustrations/big-drips-logo.svelte';
   import ComingSoonBadge from './components/coming-soon-badge.svelte';
@@ -256,8 +255,6 @@
     </section>
     <section class="mt-8 mb-64">
       <div class="flex flex-col gap-4 items-center">
-        <p class="text-foreground-level-5">Supported by</p>
-        <RadicleLogo />
         <div class="legal-links typo-text-small">
           <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
           <a href="/legal/privacy">Privacy Policy</a> •
