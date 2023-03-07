@@ -47,6 +47,8 @@ export const hide = (): void => {
 
   stored.overlay && stored.overlay.onHide();
   overlayStore.set(null);
+
+  window.onbeforeunload = null;
 };
 
 /**
@@ -88,4 +90,6 @@ export const show = <T extends SvelteComponent>(
 ): void => {
   scroll.lock();
   overlayStore.set({ modalComponent, onHide, modalComponentProps });
+
+  window.onbeforeunload = () => true;
 };
