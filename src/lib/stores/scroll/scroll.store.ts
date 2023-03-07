@@ -15,7 +15,10 @@ const INITIAL_STATE = {
   scrolling: false,
 };
 
-const store = writable<ScrollStore>(INITIAL_STATE);
+const store = writable<ScrollStore>({
+  ...INITIAL_STATE,
+  pos: browser ? Math.max(window.scrollY, 0) : 0,
+});
 
 const html = browser && document.querySelector('html');
 

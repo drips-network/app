@@ -28,9 +28,9 @@
   />
 </svelte:head>
 
-<div id="lp" class="loaded">
+<LpHeader />
+<div id="lp">
   <div id="wrapper">
-    <LpHeader />
     <section id="hero">
       <div id="hero-illustration">
         <BigDripsLogo />
@@ -287,8 +287,6 @@
     --font-size-m: 1.5rem;
     --font-size-l: 2.5rem;
     --font-size-xl: 3rem;
-
-    animation: intro 0.5s;
   }
 
   @keyframes intro {

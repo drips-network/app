@@ -39,6 +39,8 @@
     align-items: center;
     border: 1px solid var(--color-foreground);
     padding: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
     border-radius: 2.5rem 0 2.5rem 2.5rem;
     position: fixed;
     width: calc(78rem - 3px);
