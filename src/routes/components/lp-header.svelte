@@ -85,6 +85,7 @@
     transform: translateX(-40px);
     transition: transform 0.3s;
     user-select: none;
+    color: var(--color-caution-level-6);
   }
 
   .beta-notice.logoOffset {
