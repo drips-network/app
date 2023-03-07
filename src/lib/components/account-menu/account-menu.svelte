@@ -64,6 +64,9 @@
       <li>
         <a href="/legal/disclaimer" target="_blank" rel="noreferrer">Disclaimer</a>
       </li>
+      <li>
+        <a href="/legal/access" target="_blank" rel="noreferrer">Access</a>
+      </li>
     </ul>
   {/if}
 </div>
