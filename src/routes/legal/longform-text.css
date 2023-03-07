@@ -1,0 +1,27 @@
+h1 {
+  margin-bottom: 2rem;
+}
+
+h2,
+h3 {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+h4 {
+  margin-bottom: 1rem;
+}
+
+p,
+ol {
+  margin-bottom: 1rem;
+}
+
+ol li {
+  list-style: initial;
+  margin-left: 1rem;
+}
+
+a {
+  text-decoration: underline;
+}

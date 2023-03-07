@@ -1,4 +1,5 @@
 <script>
+  import './longform-text.css';
   import LpHeader from '../components/lp-header.svelte';
 </script>
 
