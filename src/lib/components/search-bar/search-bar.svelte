@@ -135,7 +135,9 @@
       on:focus={() => (focus = true)}
       on:focusout={handleSearchBlur}
     />
-    {#if focus}<CloseIcon style="cursor: pointer;" on:click={closeSearch} />{/if}
+    {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
+        <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
+      </div>{/if}
   </div>
   {#if focus && searchTerm}
     <div
@@ -160,7 +162,9 @@
           type="text"
           placeholder="Search addresses, accounts, streams..."
         />
-        {#if focus}<CloseIcon style="cursor: pointer;" on:click={closeSearch} />{/if}
+        {#if focus}
+          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
+        {/if}
       </div>
       {#if results.length > 0 && focus}
         <div class="results">
@@ -216,6 +220,10 @@
     z-index: 2;
     position: relative;
     transition: border 0.3s, background-color 0.3s, box-shadow 0.3s;
+  }
+
+  .search-bar:hover:not(.focus) {
+    box-shadow: var(--elevation-low);
   }
 
   .search-bar-input-wrapper {
