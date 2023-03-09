@@ -102,7 +102,7 @@
 
 {#if error}
   <LargeEmptyState
-    emoji="🕸"
+    emoji="🕸️"
     headline="Unable to show profile"
     description="We weren't able to find that profile."
   />
