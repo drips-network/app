@@ -99,6 +99,7 @@
     z-index: 10;
     cursor: pointer;
     border: 1px solid var(--color-foreground);
+    background-color: var(--color-background);
     border-right: none;
     border-top: none;
     transition: border 0.3s, box-shadow 0.3s;
