@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
 
   export let text: string;
@@ -24,26 +24,53 @@
     expanded = true;
   }
 
+  function hide() {
+    expanded = false;
+
+    // Reset tooltip pos once the opacity transition is done.
+    setTimeout(
+      () =>
+        (tooltipPos = {
+          left: 0,
+          right: 0,
+          top: 0,
+        }),
+      300,
+    );
+  }
+
   const MAX_WIDTH = 512;
 
-  function updatePos() {
+  async function updatePos() {
     const triggerPos = tooltipElem.getBoundingClientRect();
-    const contentPos = contentElem.getBoundingClientRect();
+    let contentPos = contentElem.getBoundingClientRect();
 
     let newLeft: number;
     let newTop: number;
     let newRight: number;
 
+    const triggerCenter = triggerPos.left + triggerPos.width / 2;
+    const width = Math.min(contentPos.width, MAX_WIDTH);
+    newLeft = Math.max(triggerCenter - width / 2, 0);
+    newRight = Math.max(Math.abs(triggerCenter - window.innerWidth) - width / 2, 0);
+
+    // Set left & right already so that we can see how high the content will be.
+    tooltipPos = {
+      left: newLeft,
+      right: newRight,
+      top: 0,
+    };
+
+    // Wait for render, so that we can grab the actual content height given the new left & right vals.
+    await tick();
+    contentPos = contentElem.getBoundingClientRect();
+
+    // Render the tooltip either above or below depending on position on screen.
     if (triggerPos.top > contentPos.height + TOOLTIP_MARGIN * 2) {
       newTop = triggerPos.top - contentPos.height - TOOLTIP_MARGIN;
     } else {
       newTop = triggerPos.bottom;
     }
-
-    const triggerCenter = triggerPos.left + triggerPos.width / 2;
-    const width = Math.min(contentPos.width, MAX_WIDTH);
-    newLeft = Math.max(triggerCenter - width / 2, 0);
-    newRight = Math.max(Math.abs(triggerCenter - window.innerWidth) - width / 2, 0);
 
     tooltipPos = {
       left: newLeft,
@@ -68,7 +95,7 @@
   class="tooltip"
   class:disabled
   on:mouseenter={() => !disabled && show()}
-  on:mouseleave={() => (expanded = false)}
+  on:mouseleave={() => !disabled && hide()}
 >
   <slot />
   <div
