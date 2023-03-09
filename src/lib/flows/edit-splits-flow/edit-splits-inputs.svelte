@@ -1,3 +1,10 @@
+<script context="module" lang="ts">
+  export interface SplitInput {
+    receiver: { value: string; type: string };
+    amount: string | number | undefined; // percent and eventually points
+  }
+</script>
+
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -21,12 +28,9 @@
   export let context: Writable<EditSplitsFlowState>;
   export let afterTx: (() => Promise<void>) | undefined = undefined;
 
-  const dispatch = createEventDispatcher<StepComponentEvents>();
+  const restorer = $context.restorer;
 
-  interface SplitInput {
-    receiver: { value: string; type: string };
-    amount: string | number | undefined; // percent and eventually points
-  }
+  const dispatch = createEventDispatcher<StepComponentEvents>();
 
   const emptyRow = (): SplitInput => {
     return { receiver: { value: '', type: 'unvalidated' }, amount: undefined };
@@ -36,7 +40,11 @@
   let addressContainers: HTMLDivElement[] = [];
   let validationError: string;
 
-  if ($context.splits.length) {
+  const restoredSplitsInputs = restorer.restore('splitsInputs');
+
+  if (restoredSplitsInputs) {
+    splitsInputs = restoredSplitsInputs;
+  } else if ($context.splits.length) {
     // fill-in existing splits?
     $context.splits.forEach(async (s) => {
       const row = emptyRow();
@@ -111,6 +119,10 @@
       }),
     );
   }
+
+  $: restorer.saveAll({
+    splitsInputs,
+  });
 </script>
 
 <StepLayout>

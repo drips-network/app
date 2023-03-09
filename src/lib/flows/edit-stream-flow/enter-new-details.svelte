@@ -28,26 +28,34 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
-  import { get } from 'svelte/store';
+  import { get, type Writable } from 'svelte/store';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import modal from '$lib/stores/modal';
   import { formatUnits } from 'ethers/lib/utils';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
+  import type { EditStreamFlowState } from './edit-stream-flow-state';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let stream: Stream;
+  export let context: Writable<EditStreamFlowState>;
+
+  const restorer = $context.restorer;
 
   const token =
     tokens.getByAddress(stream.dripsConfig.amountPerSecond.tokenAddress) ?? unreachable();
 
-  let newName: string | undefined = stream.name;
-  let newSelectedMultiplier = '1';
-  let newAmountValue: string | undefined = formatUnits(
-    stream.dripsConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
-    token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
-  );
+  let newName: string | undefined = restorer.restore('newName') ?? stream.name;
+  let newSelectedMultiplier = restorer.restore('newAmountValue')
+    ? restorer.restore('newSelectedMultiplier')
+    : '1';
+  let newAmountValue: string | undefined =
+    restorer.restore('newAmountValue') ??
+    formatUnits(
+      stream.dripsConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
+      token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+    );
 
   $: amountLocked = stream.paused === true;
 
@@ -223,6 +231,12 @@
       }),
     );
   }
+
+  $: restorer.saveAll({
+    newAmountValue,
+    newName,
+    newSelectedMultiplier,
+  });
 </script>
 
 <StepLayout>

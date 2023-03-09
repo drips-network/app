@@ -9,7 +9,7 @@ export default function getWithdrawSteps(tokenAddress: string) {
   const state = withdrawFlowState(tokenAddress);
 
   return {
-    context: state,
+    context: () => state,
     steps: [
       makeStep({
         component: EnterAmount,

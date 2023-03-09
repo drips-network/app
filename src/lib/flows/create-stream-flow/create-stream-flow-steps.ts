@@ -2,10 +2,11 @@ import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
+import createStreamFlowState from './create-stream-flow-state';
 import InputDetails from './input-details.svelte';
 
 export default (tokenAddress?: string) => ({
-  context: undefined,
+  context: createStreamFlowState,
   steps: [
     makeStep({
       component: InputDetails,

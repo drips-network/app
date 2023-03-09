@@ -52,6 +52,7 @@
     overflow: hidden;
     align-items: center;
     height: 100%;
+    user-select: none;
   }
 
   .illustration-outer {

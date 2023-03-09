@@ -21,7 +21,7 @@
   import InputAddress from '$lib/components/input-address/input-address.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import createStream from './methods/create-stream';
-  import { get } from 'svelte/store';
+  import { get, type Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
   import parseDate from './methods/parse-date';
   import parseTime from './methods/parse-time';
@@ -30,18 +30,22 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
+  import type { CreateStreamFlowState } from './create-stream-flow-state';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
+  export let context: Writable<CreateStreamFlowState>;
   export let tokenAddress: string | undefined = undefined;
+
+  const restorer = $context.restorer;
 
   const userId = $wallet.dripsUserId ?? unreachable();
 
-  let streamNameValue: string;
+  let streamNameValue = restorer.restore('streamNameValue');
 
   // Recipient Address
 
-  let recipientAddressValue = '';
+  let recipientAddressValue = restorer.restore('recipientAddressValue');
   let recipientAddressValidationState: TextInputValidationState = { type: 'unvalidated' };
 
   function onAddressValidationChange(event: CustomEvent) {
@@ -80,11 +84,9 @@
     ) ?? [],
   );
 
-  let selectedTokenAddress: string[] = tokenAddress
-    ? [tokenAddress.toLowerCase()]
-    : tokenList
-    ? [Object.keys(tokenList)[0]]
-    : [];
+  let selectedTokenAddress: string[] =
+    restorer.restore('selectedTokenAddress') ??
+    (tokenAddress ? [tokenAddress.toLowerCase()] : tokenList ? [Object.keys(tokenList)[0]] : []);
 
   onMount(() => {
     if (selectedTokenAddress.length !== 0) return;
@@ -98,7 +100,7 @@
 
   // Amount input
 
-  let amountValue: string | undefined;
+  let amountValue: string | undefined = restorer.restore('amountValue');
   $: amountValueParsed =
     amountValue && selectedToken
       ? parseTokenAmount(
@@ -109,7 +111,7 @@
 
   // Multiplier dropdown
 
-  let selectedMultiplier = '1';
+  let selectedMultiplier = restorer.restore('selectedMultiplier');
 
   // Amount per second
 
@@ -120,25 +122,25 @@
 
   $: amountValidationState = validateAmtPerSecInput(amountPerSecond);
 
-  let setStartAndEndDate = false;
+  let setStartAndEndDate = restorer.restore('setStartAndEndDate');
 
   // Stream start date
-  let streamStartDateValue: string;
+  let streamStartDateValue = restorer.restore('streamStartDateValue');
   $: streamStartDate = parseDate(streamStartDateValue).date;
   $: streamStartDateValidationState = parseDate(streamStartDateValue).validationState;
 
   // Stream start time
-  let streamStartTimeValue: string;
+  let streamStartTimeValue = restorer.restore('streamStartTimeValue');
   $: streamStartTime = parseTime(streamStartTimeValue).time;
   $: streamStartTimeValidationState = parseTime(streamStartTimeValue).validationState;
 
   // Stream end date
-  let streamEndDateValue: string;
+  let streamEndDateValue = restorer.restore('streamEndDateValue');
   $: streamEndDate = parseDate(streamEndDateValue).date;
   $: streamEndDateValidationState = parseDate(streamEndDateValue).validationState;
 
   // Stream end time
-  let streamEndTimeValue: string;
+  let streamEndTimeValue = restorer.restore('streamEndTimeValue');
   $: streamEndTime = parseTime(streamEndTimeValue).time;
   $: streamEndTimeValidationState = parseTime(streamEndTimeValue).validationState;
 
@@ -170,8 +172,8 @@
       dispatch,
       selectedToken ?? unreachable(),
       amountPerSecond ?? unreachable(),
-      recipientAddressValue,
-      streamNameValue,
+      recipientAddressValue ?? unreachable(),
+      streamNameValue ?? unreachable(),
       $streams.accounts[get(wallet).dripsUserId ?? unreachable()],
       setStartAndEndDate
         ? {
@@ -181,6 +183,19 @@
         : undefined,
     );
   }
+
+  $: restorer.saveAll({
+    streamNameValue,
+    amountValue,
+    selectedTokenAddress,
+    selectedMultiplier,
+    recipientAddressValue,
+    streamStartDateValue,
+    streamStartTimeValue,
+    streamEndDateValue,
+    streamEndTimeValue,
+    setStartAndEndDate,
+  });
 </script>
 
 <StepLayout>
