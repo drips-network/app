@@ -111,7 +111,7 @@
   .page {
     position: relative;
     min-height: 100vh;
-    max-width: 64rem;
+    max-width: 75rem;
     width: 100vw;
     padding: 6rem 1rem 4rem 1rem;
     margin: 0 auto;
