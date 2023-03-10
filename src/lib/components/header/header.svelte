@@ -1,6 +1,7 @@
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import BetaBadge from '../beta-badge/beta-badge.svelte';
   import ConnectButton from '../connect-button/connect-button.svelte';
   import SearchBar from '../search-bar/search-bar.svelte';
   import DripsLogo from '././drips-logo.svelte';
@@ -11,6 +12,7 @@
 <header class:elevated>
   <a href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
+    <BetaBadge />
   </a>
   <SearchBar />
   <div class="wallet">
@@ -29,6 +31,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
+  }
+
+  a {
+    display: flex;
+    gap: 0.5rem;
   }
 
   header.elevated {

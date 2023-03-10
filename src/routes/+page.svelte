@@ -12,7 +12,6 @@
   import MockDashboard from './components/mock-dashboard/mock-dashboard.svelte';
   import Button from '$lib/components/button/button.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
-  import RadicleLogo from '../lib/components/illustrations/radicle-logo.svelte';
   import DripsSticker from '../lib/components/illustrations/drips-sticker.svelte';
   import BigDripsLogo from '$lib/components/illustrations/big-drips-logo.svelte';
   import ComingSoonBadge from './components/coming-soon-badge.svelte';
@@ -37,9 +36,9 @@
   />
 </svelte:head>
 
-<div id="lp" class="loaded">
+<LpHeader />
+<div id="lp">
   <div id="wrapper">
-    <LpHeader />
     <section id="hero">
       <div id="hero-illustration">
         <BigDripsLogo />
@@ -66,9 +65,9 @@
         <h1>Crowdfunding<span class="nudge">&nbsp;</span>for the Open Web</h1>
       </div>
       <div class="beta-notice">
-        Drips is currently in Beta, with Token Streaming features ready for you to try on testnets.
-        <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates on upcoming crowdfunding
-        functionality!
+        The new Drips is currently in Beta, with Token Streaming functionality ready for you to try.
+        <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates.
+        <a href="https://v1.drips.network/">Back to Drips V1</a>
       </div>
     </section>
     <section id="main-features">
@@ -260,8 +259,12 @@
     </section>
     <section class="mt-8 mb-64">
       <div class="flex flex-col gap-4 items-center">
-        <p class="text-foreground-level-5">Supported by</p>
-        <RadicleLogo />
+        <div class="legal-links typo-text-small">
+          <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
+          <a href="/legal/privacy">Privacy Policy</a> •
+          <a href="/legal/disclaimer">Disclaimer</a> •
+          <a href="/legal/access">Access</a>
+        </div>
       </div>
       <div id="drips-sticker">
         <div class="illustration">
@@ -289,8 +292,6 @@
     --font-size-m: 1.5rem;
     --font-size-l: 2.5rem;
     --font-size-xl: 3rem;
-
-    animation: intro 0.5s;
   }
 
   @keyframes intro {
@@ -387,8 +388,7 @@
     padding: 0.5rem 1.5rem;
     border-radius: 2rem 0 2rem 2rem;
     border: 1px solid var(--color-caution-level-6);
-    max-width: 43rem;
-    text-align: left;
+    max-width: 44rem;
     margin-top: 3rem;
   }
 
@@ -548,6 +548,19 @@
     animation: rotate 20s linear infinite;
   }
 
+  .legal-links {
+    margin-top: 1rem;
+    color: var(--color-foreground-level-5);
+  }
+
+  .legal-links a {
+    text-decoration: underline;
+  }
+
+  .legal-links a.highlight {
+    font-weight: bold;
+  }
+
   @media (max-width: 768px) {
     .grid {
       grid-template-columns: 1fr 1fr;
@@ -618,7 +631,7 @@
     #drips-sticker {
       height: 12rem;
       width: 12rem;
-      top: 8rem;
+      top: 9rem;
       left: 50%;
       transform: translateX(-50%);
     }

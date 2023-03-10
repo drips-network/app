@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BetaBadge from '$lib/components/beta-badge/beta-badge.svelte';
   import Button from '$lib/components/button/button.svelte';
   import DripsLogo from '$lib/components/illustrations/logo.svelte';
   import ThreeDrips from '$lib/components/illustrations/three-drips.svelte';
@@ -9,14 +10,17 @@
 </script>
 
 <header class:raised={scrolledDown}>
-  <div class="logo">
-    <div class="inner" class:logoOffset={showLogo}>
-      <ThreeDrips />
-      <DripsLogo />
-    </div>
+  <div class="left">
+    <a class="logo" href="/">
+      <div class="inner" class:logoOffset={showLogo}>
+        <ThreeDrips />
+        <DripsLogo />
+      </div>
+    </a>
+    <div class="beta-notice" class:offset={showLogo}><BetaBadge /></div>
   </div>
   <nav>
-    <a href="https://github.com/radicle-dev" target="_blank" rel="noreferrer"
+    <a href="https://github.com/radicle-dev?q=drips" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Code</Button></a
     >
     <a href="https://v2.docs.drips.network/docs/whats-a-drip.html" target="_blank" rel="noreferrer"
@@ -32,8 +36,10 @@
     justify-content: space-between;
     align-items: center;
     border: 1px solid var(--color-foreground);
-    padding: var(--spacing-s);
-    border-radius: var(--border-radius-pointy);
+    padding: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2.5rem 0 2.5rem 2.5rem;
     position: fixed;
     width: calc(78rem - 3px);
     max-width: calc(100vw - 2rem);
@@ -48,8 +54,13 @@
     box-shadow: var(--elevation-medium);
   }
 
+  .left {
+    display: flex;
+    gap: 0.75rem;
+  }
+
   .logo {
-    margin-left: var(--spacing-xs);
+    margin-left: 0.5rem;
     height: 28px;
   }
 
@@ -65,6 +76,15 @@
     display: flex;
     flex-direction: column;
     gap: 28px;
+  }
+
+  .beta-notice {
+    transform: translateX(-40px);
+    transition: transform 0.3s;
+  }
+
+  .beta-notice.offset {
+    transform: translateX(0);
   }
 
   nav {
@@ -91,6 +111,10 @@
 
     nav {
       gap: 0;
+    }
+
+    .beta-notice {
+      display: none;
     }
   }
 </style>

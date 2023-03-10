@@ -80,7 +80,13 @@
         >
       </li>
       <li>
-        Supported by <a href="https://radicle.xyz" target="_blank" rel="noreferrer">Radicle</a>
+        <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
+      </li>
+      <li>
+        <a href="/legal/disclaimer" target="_blank" rel="noreferrer">Disclaimer</a>
+      </li>
+      <li>
+        <a href="/legal/access" target="_blank" rel="noreferrer">Access</a>
       </li>
     </ul>
   {/if}
@@ -109,6 +115,7 @@
     padding: 0.5rem;
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .links > li {
