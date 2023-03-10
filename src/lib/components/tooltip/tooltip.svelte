@@ -19,24 +19,19 @@
 
   const TOOLTIP_MARGIN = 0;
 
-  function show() {
+  async function show() {
+    tooltipPos = {
+      left: 0,
+      right: 0,
+      top: 0,
+    };
+    await tick();
     updatePos();
     expanded = true;
   }
 
   function hide() {
     expanded = false;
-
-    // Reset tooltip pos once the opacity transition is done.
-    setTimeout(
-      () =>
-        (tooltipPos = {
-          left: 0,
-          right: 0,
-          top: 0,
-        }),
-      300,
-    );
   }
 
   const MAX_WIDTH = 512;
