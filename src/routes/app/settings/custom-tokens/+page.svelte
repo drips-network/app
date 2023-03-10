@@ -106,6 +106,11 @@
   };
 </script>
 
+<svelte:head>
+  <title>Custom Tokens | Drips</title>
+  <meta name="description" content="Drips Settings Page" />
+</svelte:head>
+
 <div class="custom-tokens">
   <div class="hero">
     <div class="headline">
