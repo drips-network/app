@@ -19,7 +19,7 @@
   <p class="codeblock typo-text-mono">
     {message}
   </p>
-  <Button on:click={() => dispatch('retry')}>Try again</Button>
+  <Button on:click={() => dispatch('retry')}>Go back</Button>
   <a class="typo-text-small" href="https://discord.gg/vhGXkazpNc">Ask for help on Discord ↗</a>
 </div>
 

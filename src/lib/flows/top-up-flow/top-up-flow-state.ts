@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 
 type Restorable = {
   amountValue: string;
+  topUpMax: boolean;
 };
 export interface TopUpFlowState {
   tokenAddress?: string;
@@ -14,6 +15,6 @@ export interface TopUpFlowState {
 
 export default (tokenAddress: string | undefined) =>
   writable<TopUpFlowState>({
-    restorer: newRestorer<Restorable>({ amountValue: '0' }),
+    restorer: newRestorer<Restorable>({ amountValue: '0', topUpMax: false }),
     tokenAddress,
   });

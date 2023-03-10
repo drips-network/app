@@ -20,6 +20,7 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import { formatUnits } from 'ethers/lib/utils';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
+  import topUp from './methods/top-up';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -31,13 +32,12 @@
   const restorer = $context.restorer;
 
   let amountValue = restorer.restore('amountValue');
-  $: restorer.save({ amountValue });
 
   let validationState: TextInputValidationState = {
     type: 'unvalidated',
   };
 
-  let topUpMax = false;
+  let topUpMax = restorer.restore('topUpMax');
   $: if (topUpMax) {
     amountValue = formatUnits($context.tokenBalance ?? 0n, tokenInfo.info.decimals);
   }
@@ -76,13 +76,24 @@
   function submit() {
     if (!amount) return;
 
+    const { tokenBalance, tokenAllowance } = $context;
+
+    const amountToTopUp = topUpMax ? tokenBalance : amount;
+
     context.update((c) => ({
       ...c,
-      amountToTopUp: topUpMax ? c.tokenBalance : amount,
+      amountToTopUp,
     }));
 
-    dispatch('goForward');
+    topUp(
+      dispatch,
+      tokenAddress ?? unreachable(),
+      amountToTopUp ?? unreachable(),
+      tokenAllowance ?? unreachable(),
+    );
   }
+
+  $: restorer.saveAll({ amountValue, topUpMax });
 </script>
 
 <StepLayout>
