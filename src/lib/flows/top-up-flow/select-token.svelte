@@ -78,7 +78,7 @@
 
   function submit() {
     dispatch('await', {
-      message: `Checking ${selectedToken?.info.name ?? ''} allowance…`,
+      message: `Fetching your ${selectedToken?.info.name ?? ''} balance...`,
       promise: () => updateContext(),
     });
   }
