@@ -79,7 +79,7 @@
 <style>
   .stream-state-badge {
     height: 2rem;
-    border-radius: 1rem;
+    border-radius: 1rem 0 1rem 1rem;
     display: flex;
     gap: 0.5rem;
     padding: 0 0.75rem;
