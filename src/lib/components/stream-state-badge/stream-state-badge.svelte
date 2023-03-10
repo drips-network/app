@@ -22,7 +22,7 @@
   $: assetConfig = $streams && streams.getAssetConfig(senderId, tokenAddress);
   $: streamHistory = assetConfig ? getStreamHistory(assetConfig, streamId) : undefined;
 
-  $: estimate = balances.getEstimateByStreamId(streamId);
+  $: estimate = $balances && balances.getEstimateByStreamId(streamId);
   $: streamScheduledStart = startDate;
   $: streamCreated = streamHistory?.[0].timestamp;
   $: streamStartDate = new Date(streamScheduledStart ?? streamCreated ?? unreachable());
