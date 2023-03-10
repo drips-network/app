@@ -17,6 +17,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    user-select: none;
   }
 
   p {

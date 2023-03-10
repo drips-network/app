@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { sineInOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
   import Toggle from '../toggle/toggle.svelte';
@@ -33,7 +33,9 @@
     setTabIndexRecursively(contentElem, '-1');
   }
 
-  function expand() {
+  async function expand() {
+    await tick();
+
     const updateHeight = (instant: boolean) => {
       const newHeight = contentElem.getBoundingClientRect().height;
       contentHeight.set(newHeight, { duration: instant ? 0 : 300, easing: sineInOut });

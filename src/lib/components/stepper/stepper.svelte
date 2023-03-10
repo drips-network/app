@@ -10,7 +10,8 @@
   import modal from '$lib/stores/modal';
 
   export let steps: Steps;
-  export let context: Writable<unknown> | undefined = undefined;
+  export let context: (() => Writable<unknown>) | undefined = undefined;
+  const resolvedContext = context?.();
 
   let stepElement: HTMLDivElement;
 
@@ -228,7 +229,7 @@
             on:conclude={handleConclusion}
             on:sidestep={handleSidestep}
             {...currentStep.props}
-            {context}
+            context={resolvedContext}
           />
         {/if}
       </div>

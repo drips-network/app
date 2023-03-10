@@ -31,12 +31,10 @@ function getSuccessMessage(state: TopUpFlowState) {
 }
 
 export default function getTopUpFlowSteps(tokenAddress?: string) {
-  topUpFlowState.set({
-    tokenAddress,
-  });
+  const ctx = topUpFlowState(tokenAddress);
 
   return {
-    context: topUpFlowState,
+    context: () => ctx,
     steps: [
       tokenAddress
         ? makeStep({
@@ -59,7 +57,7 @@ export default function getTopUpFlowSteps(tokenAddress?: string) {
         component: SuccessStep,
         props: {
           safeAppMode: Boolean(get(walletStore).safe),
-          message: () => getSuccessMessage(get(topUpFlowState)),
+          message: () => getSuccessMessage(get(ctx)),
         },
       }),
     ],

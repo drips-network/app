@@ -7,7 +7,7 @@ import EditSplitsInputs from './edit-splits-inputs.svelte';
 import FetchSplits from './fetch-splits.svelte';
 
 export default (afterTx: () => Promise<void>) => ({
-  context: editSplitsFlowState,
+  context: () => editSplitsFlowState,
   steps: [
     makeStep({
       component: FetchSplits,

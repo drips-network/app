@@ -33,14 +33,16 @@
 
   export let context: Writable<WithdrawFlowState>;
 
+  const restorer = $context.restorer;
+
   $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
   $: estimate =
     $balances.accounts[String($wallet.dripsUserId) ?? unreachable()].tokens[$context.tokenAddress]
       .total.totals.remainingBalance;
 
-  let amount: string | undefined;
+  let amount = restorer.restore('amount');
   let amountWei: bigint | undefined;
-  let withdrawAll = false;
+  let withdrawAll = restorer.restore('withdrawAll');
   $: if (withdrawAll) {
     amount = formatUnits(
       estimate / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
@@ -146,6 +148,11 @@
       }),
     );
   }
+
+  $: restorer.saveAll({
+    withdrawAll,
+    amount,
+  });
 </script>
 
 <StepLayout>

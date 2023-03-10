@@ -1,10 +1,19 @@
+import { newRestorer, type Restorer } from '$lib/utils/restorer';
 import { writable } from 'svelte/store';
 
+type Restorable = {
+  amountValue: string;
+};
 export interface TopUpFlowState {
   tokenAddress?: string;
   tokenAllowance?: bigint;
   tokenBalance?: bigint;
   amountToTopUp?: bigint;
+  restorer: Restorer<Restorable>;
 }
 
-export default writable<TopUpFlowState>({});
+export default (tokenAddress: string | undefined) =>
+  writable<TopUpFlowState>({
+    restorer: newRestorer<Restorable>({ amountValue: '0' }),
+    tokenAddress,
+  });

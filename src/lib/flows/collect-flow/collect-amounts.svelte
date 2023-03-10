@@ -38,6 +38,8 @@
 
   export let context: Writable<CollectFlowState>;
 
+  const restorer = $context.restorer;
+
   $: cycle = $context.currentDripsCycle ?? unreachable();
   $: currentCycleEnd = new Date(cycle.start.getTime() + cycle.durationMillis);
 
@@ -108,8 +110,8 @@
     }),
   );
 
-  let squeezeEnabled = false;
-  let selectedSqueezeSenderItems: string[] = [];
+  let squeezeEnabled = restorer.restore('squeezeEnabled');
+  let selectedSqueezeSenderItems: string[] = restorer.restore('selectedSqueezeSenderItems');
 
   $: totalSelectedSqueezeAmount = squeezeEnabled
     ? selectedSqueezeSenderItems.reduce<bigint>(
@@ -209,6 +211,11 @@
       }),
     );
   }
+
+  $: restorer.saveAll({
+    squeezeEnabled,
+    selectedSqueezeSenderItems,
+  });
 </script>
 
 <StepLayout>

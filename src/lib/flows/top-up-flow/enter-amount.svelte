@@ -28,7 +28,11 @@
   $: tokenAddress = $context.tokenAddress;
   $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
 
-  let amountValue = '0';
+  const restorer = $context.restorer;
+
+  let amountValue = restorer.restore('amountValue');
+  $: restorer.save({ amountValue });
+
   let validationState: TextInputValidationState = {
     type: 'unvalidated',
   };
