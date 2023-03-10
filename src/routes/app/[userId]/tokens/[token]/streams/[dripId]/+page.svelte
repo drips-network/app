@@ -5,7 +5,7 @@
   import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
   import { onMount } from 'svelte';
   import assert from '$lib/utils/assert';
-  import type { Receiver, Stream } from '$lib/stores/streams/types';
+  import type { Stream } from '$lib/stores/streams/types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
   import balances from '$lib/stores/balances';
@@ -34,6 +34,7 @@
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
+  import getStreamHistory from '$lib/utils/stream-history';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
@@ -46,15 +47,27 @@
 
   $: {
     $streams;
-    if (streamId) stream = streams.getStreamById(streamId);
+    if (streamId && dripsUserId) {
+      stream = streams.getStreamById(streamId);
+    }
+  }
+
+  $: {
+    if (stream && dripsUserId && streamId) {
+      streamHistory = getStreamHistory(
+        streams.getAssetConfig(dripsUserId, tokenAddress) ?? unreachable(),
+        streamId,
+      );
+    }
   }
 
   $: estimate = streamId ? $balances && balances.getEstimateByStreamId(streamId) : undefined;
   $: streamScheduledStart = stream?.dripsConfig.startDate;
   $: streamCreated = streamHistory?.[0].timestamp;
-  $: streamStartDate = stream
-    ? new Date(streamScheduledStart ?? streamCreated ?? unreachable())
-    : undefined;
+  $: streamStartDate =
+    stream && streamHistory
+      ? new Date(streamScheduledStart ?? streamCreated ?? unreachable())
+      : undefined;
   $: streamEndDate =
     streamStartDate && stream?.dripsConfig.durationSeconds
       ? new Date(streamStartDate.getTime() + stream?.dripsConfig.durationSeconds * 1000)
@@ -81,28 +94,6 @@
   }
 
   let streamHistory: ReturnType<typeof getStreamHistory> | undefined;
-
-  function getStreamHistory(dripsUserId: string, tokenAddress: string, streamId: string) {
-    const assetConfigHistory = streams.getAssetConfig(dripsUserId, tokenAddress)?.history;
-    assert(assetConfigHistory, 'Unable to find asset config history');
-
-    return assetConfigHistory.reduce<
-      { timestamp: Date; runsOutOfFunds?: Date; receiverConfig: Receiver }[]
-    >((acc, hi) => {
-      const matchingReceiver = hi.streams.find((receiver) => receiver.streamId === streamId);
-
-      return matchingReceiver
-        ? [
-            ...acc,
-            {
-              timestamp: hi.timestamp,
-              runsOutOfFunds: hi.runsOutOfFunds,
-              receiverConfig: matchingReceiver,
-            },
-          ]
-        : acc;
-    }, []);
-  }
 
   /**
    * The date at which the particular token ran out of funds, even if its associated asset
@@ -151,10 +142,11 @@
     try {
       stream = streams.getStreamById(streamId);
       if (stream) {
-        streamHistory = getStreamHistory(dripsUserId, tokenAddress, streamId);
+        streamHistory = getStreamHistory(
+          streams.getAssetConfig(userId, tokenAddress) ?? unreachable(),
+          streamId,
+        );
       }
-
-      stream?.dripsConfig.durationSeconds;
 
       await streams.fetchAccount(dripsUserId);
       stream = streams.getStreamById(streamId);
@@ -175,12 +167,6 @@
   }
 
   $: loading = !(stream && estimate);
-
-  $: {
-    if (stream && streamId && dripsUserId) {
-      streamHistory = getStreamHistory(dripsUserId, tokenAddress, streamId);
-    }
-  }
 </script>
 
 <svelte:head>
@@ -214,12 +200,19 @@
     <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
       <Spinner />
     </div>
-  {:else if stream}
+  {:else if streamId && stream}
     <div class="stream-page" in:fly={{ duration: 300, y: 16 }}>
       <div class="hero">
         <div class="title-and-state">
           <h1>{stream.name ?? 'Unnamed stream'}</h1>
-          <StreamStateBadge state={streamState ?? unreachable()} />
+          <StreamStateBadge
+            {streamId}
+            paused={stream.paused}
+            senderId={stream.sender.userId}
+            durationSeconds={stream.dripsConfig.durationSeconds}
+            startDate={stream.dripsConfig.startDate}
+            {tokenAddress}
+          />
         </div>
         {#if checkIsUser(stream.sender.userId) && stream.managed}
           <div class="actions">

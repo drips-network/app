@@ -16,6 +16,9 @@
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
   import type { Stream } from '$lib/stores/streams/types';
+  import NameAndBadgeCell, {
+    type NameAndBadgeCellProps,
+  } from '$lib/components/table/cells/name-and-badge-cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import onClickGoto from '$lib/utils/on-click-goto';
@@ -28,7 +31,7 @@
 
   interface OutgoingStreamTableRow {
     streamId: string;
-    name: string;
+    name: NameAndBadgeCellProps;
     toAddress: string;
     amount: AmountCellData;
     token: TokenCellData;
@@ -36,7 +39,7 @@
 
   interface IncomingStreamTableRow {
     streamId: string;
-    name: string;
+    name: NameAndBadgeCellProps;
     fromAddress: string;
     amount: AmountCellData;
     token: TokenCellData;
@@ -69,7 +72,15 @@
 
       return {
         streamId: stream.id,
-        name: stream.name ?? 'Unnamed stream',
+        name: {
+          name: stream.name ?? 'Unnamed stream',
+          streamId: stream.id,
+          paused: stream.paused,
+          durationSeconds: stream.dripsConfig.durationSeconds,
+          startDate: stream.dripsConfig.startDate,
+          senderId: stream.sender.userId,
+          tokenAddress: tokenAddress,
+        },
         toAddress: stream.receiver.address,
         amount: {
           amount: {
@@ -98,7 +109,15 @@
 
       return {
         streamId: stream.id,
-        name: stream.name ?? 'Unnamed stream',
+        name: {
+          name: stream.name ?? 'Unnamed stream',
+          streamId: stream.id,
+          paused: stream.paused,
+          durationSeconds: stream.dripsConfig.durationSeconds,
+          startDate: stream.dripsConfig.startDate,
+          senderId: stream.sender.userId,
+          tokenAddress: tokenAddress,
+        },
         fromAddress: stream.sender.address,
         amount: {
           amountPerSecond: {
@@ -132,7 +151,7 @@
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: (info) => info.getValue(),
+      cell: () => NameAndBadgeCell,
       enableSorting: false,
       size: (100 / 24) * 8,
     },
@@ -170,7 +189,7 @@
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: (info) => info.getValue(),
+      cell: () => NameAndBadgeCell,
       enableSorting: false,
       size: (100 / 24) * 8,
     },
