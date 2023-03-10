@@ -214,7 +214,7 @@
   </FormField>
   <FormField title="Stream to*">
     <InputAddress
-      bind:validatedValue={recipientAddressValue}
+      bind:value={recipientAddressValue}
       on:validationChange={onAddressValidationChange}
     />
   </FormField>
