@@ -99,6 +99,7 @@
       <tr
         style:height="{rowHeight}px"
         on:click={(e) => onRowClick(index, e)}
+        on:auxclick={(e) => onRowClick(index, e)}
         class:cursor-pointer={isRowClickable}
         tabindex={isRowClickable ? 0 : -1}
         bind:this={rowElems[index]}
