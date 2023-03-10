@@ -74,7 +74,7 @@ function setStepCopyWaitingForSignature(
     customMessage ?? {
       message: safeAppMode
         ? 'Waiting for you to propose the transaction to your safe...'
-        : 'Waiting for you to sign the transaction in your wallet...',
+        : 'Waiting for you to confirm the transaction in your wallet...',
       icon: {
         component: Emoji,
         props: {
@@ -94,7 +94,7 @@ function setStepCopyWaitingForConfirmation(
 ) {
   updateAwaitStep(
     customMessage ?? {
-      message: 'Waiting for your transaction to be confirmed',
+      message: 'Waiting for your transaction to be confirmed on the network.',
       link: {
         url: etherscanLink(networkName, txHash),
         label: 'View on Etherscan',
