@@ -12,8 +12,13 @@
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import decodeUserId from '$lib/utils/decode-user-id';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import CrossSmall from 'radicle-design-system/icons/CrossSmall.svelte';
+  import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
 
   $: userId = $page.params.userId;
 
@@ -93,6 +98,10 @@
   }
 
   $: dripsUserId && fetchRequestedAccount(dripsUserId);
+
+  function getDripsV1Url(address: string, ensName?: string) {
+    return `https://app.v1.drips.network/${ensName ?? address}`;
+  }
 </script>
 
 <svelte:head>
@@ -132,10 +141,46 @@
     <Balances userId={dripsUserId} />
     <Streams userId={dripsUserId} />
     <Splits userId={dripsUserId} />
+    <TransitionedHeight>
+      {#if address && !$dismissablesStore.includes('profile-drips-v1')}
+        <div out:fly|local={{ duration: 300, y: 16 }} class="drips-v1-card">
+          <button
+            class="close-button"
+            on:click={() => dismissablesStore.dismiss('profile-drips-v1')}
+          >
+            <CrossSmall />
+          </button>
+          <div class="top">
+            <div class="logo">
+              <DripsV1Logo />
+            </div>
+          </div>
+          <div class="bottom">
+            <h3 class="pixelated">Looking for Drips V1?</h3>
+            <p class="typo-text-small">
+              The new Drips is now in public beta. You can still access Drips V1 at
+              app.v1.drips.network.
+            </p>
+            <div class="action">
+              <a href={getDripsV1Url(address, $ens[address]?.name)} target="_blank" rel="noreferrer"
+                ><Button variant="normal">View profile on Drips V1</Button></a
+              >
+            </div>
+          </div>
+        </div>
+      {/if}
+    </TransitionedHeight>
   </div>
 {/if}
 
 <style>
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+
   .identity {
     display: flex;
     gap: 1.5rem;
@@ -146,6 +191,49 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .drips-v1-card {
+    border: 1px solid var(--color-foreground);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+    width: 100%;
+    max-width: 24rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .drips-v1-card > .close-button {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+  }
+
+  .drips-v1-card > .top {
+    background-color: var(--color-primary-level-1);
+    padding: 0.75rem 0.75rem 0 0.75rem;
+    max-height: 3rem;
+  }
+
+  .drips-v1-card > .top > .logo {
+    background-color: var(--color-background);
+    padding: 0.75rem;
+    border-radius: 100rem;
+    width: 4rem;
+    height: 4rem;
+    transform: translateY(1rem);
+    border: 1px solid var(--color-primary-level-1);
+  }
+
+  .drips-v1-card > .bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 3rem 0.75rem 0.75rem 0.75rem;
+  }
+
+  .drips-v1-card > .bottom > .action {
+    display: flex;
+    margin-top: 0.25rem;
   }
 
   .profile {
@@ -174,5 +262,12 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  @media (max-width: 1056px) {
+    .top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>
