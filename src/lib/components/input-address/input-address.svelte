@@ -87,6 +87,9 @@
 </script>
 
 <TextInput
+  autocomplete
+  autocapitalize={false}
+  autocorrect={false}
   showSuccessCheck
   validationState={addressValidationState}
   bind:value

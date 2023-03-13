@@ -134,6 +134,7 @@
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
       on:focusout={handleSearchBlur}
+      autocomplete="false"
     />
     {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
@@ -157,6 +158,9 @@
       <div class="search-bar-input-wrapper">
         <SearchIcon />
         <input
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
           bind:this={mobileSearchElem}
           bind:value={searchTerm}
           type="text"
