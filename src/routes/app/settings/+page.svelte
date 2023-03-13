@@ -7,10 +7,17 @@
   import Button from '$lib/components/button/button.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import amtDeltaUnitStore from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
+  import tickStore from '$lib/stores/tick/tick.store';
 
   // Theme control
   let selectedTheme: 'auto' | Theme = $themeStore.selectedTheme;
   $: themeStore.selectTheme(selectedTheme);
+
+  const { slowMode } = tickStore;
+  let slowModeEnabled = $slowMode;
+  $: tickStore.setSlowMode(slowModeEnabled);
 </script>
 
 <svelte:head>
@@ -25,7 +32,7 @@
   </div>
   <Divider />
   <div class="section">
-    <h4 class="typo-all-caps">Appearance</h4>
+    <h4 class="typo-all-caps">Display</h4>
     <Setting title="Theme" subtitle="Adjust the appearance of UI elements across the app.">
       <SegmentedControl
         active={selectedTheme}
@@ -51,6 +58,47 @@
           },
         ]}
       />
+    </Setting>
+  </div>
+  <Divider />
+  <div class="section">
+    <h4 class="typo-all-caps">Streams</h4>
+    <Setting
+      title="Amounts per time unit"
+      subtitle="Choose which time unit amount deltas should be shown in throughout the app. Months are normalized as 30 days, years as 365 days."
+    >
+      <SegmentedControl
+        active={$amtDeltaUnitStore}
+        on:select={(value) => amtDeltaUnitStore.set(value.detail)}
+        options={[
+          {
+            title: 'Sec',
+            value: 'sec',
+          },
+          {
+            title: 'Min',
+            value: 'min',
+          },
+          {
+            title: 'Day',
+            value: 'day',
+          },
+          {
+            title: 'Month',
+            value: '30-days',
+          },
+          {
+            title: 'Year',
+            value: '365-days',
+          },
+        ]}
+      />
+    </Setting>
+    <Setting
+      title="Slow mode"
+      subtitle="When enabled, balances are recalculated only once per second. Recommended on low-power devices."
+    >
+      <Toggle bind:checked={slowModeEnabled} />
     </Setting>
   </div>
   <Divider />
@@ -130,6 +178,10 @@
   .section {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2.5rem;
+  }
+
+  .section h4 {
+    margin-bottom: -0.5rem;
   }
 </style>

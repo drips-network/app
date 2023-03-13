@@ -25,6 +25,10 @@
     gap: 0.25rem;
   }
 
+  p {
+    max-width: 40rem;
+  }
+
   @media (max-width: 1024px) {
     .setting {
       flex-direction: column;

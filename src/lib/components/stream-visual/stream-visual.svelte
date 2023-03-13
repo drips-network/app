@@ -1,5 +1,9 @@
 <script lang="ts">
   import { browser } from '$app/environment';
+  import amtDeltaUnitStore, {
+    FRIENDLY_NAMES,
+    MULTIPLIERS,
+  } from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
   import { tweened } from 'svelte/motion';
   import DripsAnimation from '../drips-animation/drips-animation.svelte';
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
@@ -23,6 +27,12 @@
 
   let windowWidth = (browser && window.innerWidth) || 0;
   $: verticalAnimation = windowWidth <= 768;
+
+  function getAmtPerSec() {
+    const multiplier = MULTIPLIERS[$amtDeltaUnitStore];
+
+    return (amountPerSecond ?? 0n) * BigInt(multiplier);
+  }
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
@@ -38,8 +48,8 @@
     <IdentityCard disableLink={disableLinks} address={toAddress} title="To" />
   </div>
   {#if tokenInfo}<div class="amt-per-sec typo-text-mono-bold">
-      <FormattedAmount decimals={tokenInfo.decimals} amount={amountPerSecond} />
-      {tokenInfo.symbol} <span class="muted">/sec</span>
+      <FormattedAmount decimals={tokenInfo.decimals} amount={getAmtPerSec()} />
+      {tokenInfo.symbol} <span class="muted">/{FRIENDLY_NAMES[$amtDeltaUnitStore]}</span>
     </div>{/if}
 </div>
 

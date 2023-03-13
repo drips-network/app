@@ -45,43 +45,43 @@ describe('tick', () => {
 
     vi.advanceTimersByTime(1500);
 
-    expect(listener1).toBeCalledTimes(15);
+    expect(listener1).toBeCalledTimes(16);
 
     const listener2 = vi.fn();
     const regId2 = tick.register(listener2);
 
     vi.advanceTimersByTime(1000);
 
-    expect(listener1).toBeCalledTimes(25);
+    expect(listener1).toBeCalledTimes(26);
     expect(listener2).toBeCalledTimes(10);
 
     tick.stop();
 
     vi.advanceTimersByTime(1000);
 
-    expect(listener1).toBeCalledTimes(25);
+    expect(listener1).toBeCalledTimes(26);
     expect(listener2).toBeCalledTimes(10);
 
     tick.start();
 
     vi.advanceTimersByTime(1500);
 
-    expect(listener1).toBeCalledTimes(40);
-    expect(listener2).toBeCalledTimes(25);
+    expect(listener1).toBeCalledTimes(42);
+    expect(listener2).toBeCalledTimes(26);
 
     tick.deregister(regId1);
 
     vi.advanceTimersByTime(1000);
 
-    expect(listener1).toBeCalledTimes(40);
-    expect(listener2).toBeCalledTimes(35);
+    expect(listener1).toBeCalledTimes(42);
+    expect(listener2).toBeCalledTimes(36);
 
     tick.deregister(regId2);
 
     vi.advanceTimersByTime(1000);
 
-    expect(listener1).toBeCalledTimes(40);
-    expect(listener2).toBeCalledTimes(35);
+    expect(listener1).toBeCalledTimes(42);
+    expect(listener2).toBeCalledTimes(36);
   });
 });
 
