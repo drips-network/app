@@ -12,7 +12,9 @@
 <header class:elevated>
   <a href={$wallet.connected ? '/app/dashboard' : '/'}>
     <DripsLogo />
-    <BetaBadge />
+    <div class="beta-badge">
+      <BetaBadge />
+    </div>
   </a>
   <SearchBar />
   <div class="wallet">
@@ -46,5 +48,11 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
+  }
+
+  @media (max-width: 577px) {
+    .beta-badge {
+      display: none;
+    }
   }
 </style>
