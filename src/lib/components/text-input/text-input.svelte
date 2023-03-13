@@ -12,6 +12,10 @@
     type: 'text',
   };
 
+  export let spellcheck = false;
+  export let autocapitalize = true;
+  export let autocorrect = true;
+  export let autocomplete = true;
   export let autofocus = false;
   export let disabled = false;
   export let readonly = false;
@@ -63,7 +67,6 @@
     {placeholder}
     {disabled}
     {readonly}
-    spellcheck={false}
     bind:value
     bind:this={inputElement}
     on:change
@@ -71,6 +74,10 @@
     on:input
     on:keydown
     on:keypress
+    autocomplete={autocomplete ? 'on' : 'off'}
+    {spellcheck}
+    autocapitalize={autocapitalize ? 'on' : 'off'}
+    autocorrect={autocorrect ? 'on' : 'off'}
   />
 
   <div class="right-container" bind:clientWidth={rightContainerWidth}>
