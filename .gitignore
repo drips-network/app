@@ -14,4 +14,4 @@ static/twemoji/*
 /coverage
 /src/e2e-tests/.tmp/*
 !/src/e2e-tests/.tmp/.gitkeep
-.vercel/
+.netlify/
