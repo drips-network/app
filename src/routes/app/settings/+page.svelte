@@ -7,6 +7,7 @@
   import Button from '$lib/components/button/button.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import amtDeltaUnitStore from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
 
   // Theme control
   let selectedTheme: 'auto' | Theme = $themeStore.selectedTheme;
@@ -25,7 +26,7 @@
   </div>
   <Divider />
   <div class="section">
-    <h4 class="typo-all-caps">Appearance</h4>
+    <h4 class="typo-all-caps">Display</h4>
     <Setting title="Theme" subtitle="Adjust the appearance of UI elements across the app.">
       <SegmentedControl
         active={selectedTheme}
@@ -48,6 +49,41 @@
           {
             title: 'h4x0r',
             value: 'h4x0r',
+          },
+        ]}
+      />
+    </Setting>
+  </div>
+  <Divider />
+  <div class="section">
+    <h4 class="typo-all-caps">Streams</h4>
+    <Setting
+      title="Amounts per time unit"
+      subtitle="Choose which time unit amount deltas should be shown in throughout the app. Months are normalized as 30 days, years as 365 days."
+    >
+      <SegmentedControl
+        active={$amtDeltaUnitStore}
+        on:select={(value) => amtDeltaUnitStore.set(value.detail)}
+        options={[
+          {
+            title: 'Sec',
+            value: 'sec',
+          },
+          {
+            title: 'Min',
+            value: 'min',
+          },
+          {
+            title: 'Day',
+            value: 'day',
+          },
+          {
+            title: 'Month',
+            value: '30-days',
+          },
+          {
+            title: 'Year',
+            value: '365-days',
           },
         ]}
       />

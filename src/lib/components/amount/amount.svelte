@@ -3,6 +3,10 @@
   import assert from '$lib/utils/assert';
   import { constants } from 'radicle-drips';
   import formatTokenAmount from '$lib/utils/format-token-amount';
+  import amtDeltaUnitStore, {
+    FRIENDLY_NAMES,
+    MULTIPLIERS,
+  } from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
 
   interface Amount {
     amount: bigint;
@@ -29,10 +33,15 @@
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
-  function format(amount: Amount) {
+  function format(amount: Amount, perSec = false) {
     const tokenDecimals =
       overrideToDisplay?.decimals ?? tokens.getByAddress(amount.tokenAddress)?.info.decimals;
     assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
+
+    if (perSec) {
+      const perSecTimeUnitMultiplier = MULTIPLIERS[$amtDeltaUnitStore];
+      amount.amount = amount.amount * BigInt(perSecTimeUnitMultiplier);
+    }
 
     return formatTokenAmount(amount, tokenDecimals, multiplier);
   }
@@ -64,10 +73,10 @@
           class="amount"
           class:text-positive={amountPerSecond.amount > 0}
           class:text-negative={amountPerSecond.amount < 0}
-          >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond)}{#if showSymbol}
+          >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond, true)}{#if showSymbol}
             {' ' + overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol}
           {/if}</span
-        >/sec
+        >/{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </div>
     {/if}
   {/if}
