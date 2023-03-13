@@ -178,6 +178,10 @@
   .section {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2.5rem;
+  }
+
+  .section h4 {
+    margin-bottom: -0.5rem;
   }
 </style>
