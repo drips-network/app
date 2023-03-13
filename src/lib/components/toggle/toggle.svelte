@@ -1,6 +1,6 @@
 <script lang="ts">
   export let checked: boolean;
-  export let label: string | undefined;
+  export let label: string | undefined = undefined;
 
   let focus = false;
 </script>

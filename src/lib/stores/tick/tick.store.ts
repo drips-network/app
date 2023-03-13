@@ -1,8 +1,12 @@
+import storedWritable from '$lib/utils/stored-writable';
 import { get, writable } from 'svelte/store';
+import { z } from 'zod';
 
-const TICK_INTERVAL_MS = 100;
+const DEFAULT_TICK_INTERVAL_MS = 100;
+const SLOW_MODE_TICK_INTERVAL_MS = 1000;
 
 export default (() => {
+  const slowMode = storedWritable('slow-mode', z.boolean(), false);
   const interval = writable<ReturnType<typeof setInterval> | undefined>();
   const listeners = writable<{ [registrationId: number]: () => void }>({});
 
@@ -24,7 +28,11 @@ export default (() => {
   function start() {
     if (get(interval)) throw 'Tick already running';
 
-    interval.set(setInterval(_tick, TICK_INTERVAL_MS));
+    interval.set(
+      setInterval(_tick, get(slowMode) ? SLOW_MODE_TICK_INTERVAL_MS : DEFAULT_TICK_INTERVAL_MS),
+    );
+
+    _tick();
   }
 
   /** Stops the internal interval without de-registering any listeners. */
@@ -91,6 +99,12 @@ export default (() => {
     return get(listeners);
   }
 
+  function setSlowMode(enabled: boolean) {
+    slowMode.set(enabled);
+    stop();
+    start();
+  }
+
   /** @private */
   function _tick() {
     for (const registration of Object.values(get(listeners))) {
@@ -106,5 +120,9 @@ export default (() => {
     register,
     deregister,
     getListeners,
+    slowMode: {
+      subscribe: slowMode.subscribe,
+    },
+    setSlowMode,
   };
 })();

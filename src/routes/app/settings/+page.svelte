@@ -8,10 +8,16 @@
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import amtDeltaUnitStore from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
+  import tickStore from '$lib/stores/tick/tick.store';
 
   // Theme control
   let selectedTheme: 'auto' | Theme = $themeStore.selectedTheme;
   $: themeStore.selectTheme(selectedTheme);
+
+  const { slowMode } = tickStore;
+  let slowModeEnabled = $slowMode;
+  $: tickStore.setSlowMode(slowModeEnabled);
 </script>
 
 <svelte:head>
@@ -87,6 +93,12 @@
           },
         ]}
       />
+    </Setting>
+    <Setting
+      title="Slow mode"
+      subtitle="When enabled, balances are recalculated only once per second. Recommended on low-power devices."
+    >
+      <Toggle bind:checked={slowModeEnabled} />
     </Setting>
   </div>
   <Divider />
