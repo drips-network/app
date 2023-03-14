@@ -17,6 +17,8 @@
     scroll.attach();
     return scroll.detach;
   });
+
+  const { primaryColor } = themeStore;
 </script>
 
 <svelte:head>
@@ -37,7 +39,7 @@
 </svelte:head>
 
 <div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme}>
-  <div class="page">
+  <div class="page" data-primary-color={$primaryColor}>
     <slot />
   </div>
 </div>
