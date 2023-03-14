@@ -3,7 +3,7 @@
   import Divider from '$lib/components/divider/divider.svelte';
   import Setting from './components/setting.svelte';
   import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
-  import themeStore, { type Theme } from '$lib/stores/theme/theme.store';
+  import themeStore from '$lib/stores/theme/theme.store';
   import Button from '$lib/components/button/button.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
@@ -12,9 +12,13 @@
   import tickStore from '$lib/stores/tick/tick.store';
 
   // Theme control
-  let selectedTheme: 'auto' | Theme = $themeStore.selectedTheme;
+  let selectedTheme = $themeStore.selectedTheme;
   $: themeStore.selectTheme(selectedTheme);
+  const { primaryColor } = themeStore;
+  let selectedPrimaryColor = $primaryColor;
+  $: themeStore.selectPrimaryColor(selectedPrimaryColor);
 
+  // Tick control
   const { slowMode } = tickStore;
   let slowModeEnabled = $slowMode;
   $: tickStore.setSlowMode(slowModeEnabled);
@@ -55,6 +59,35 @@
           {
             title: 'h4x0r',
             value: 'h4x0r',
+          },
+        ]}
+      />
+    </Setting>
+    <Setting
+      title="Primary color"
+      subtitle="Adjust the primary color of UI elements within the app."
+    >
+      <SegmentedControl
+        active={selectedPrimaryColor}
+        on:select={(value) => {
+          selectedPrimaryColor = value.detail;
+        }}
+        options={[
+          {
+            title: 'Default',
+            value: 'default',
+          },
+          {
+            title: 'Blue',
+            value: 'blue',
+          },
+          {
+            title: 'Orange',
+            value: 'orange',
+          },
+          {
+            title: 'Pink',
+            value: 'pink',
           },
         ]}
       />

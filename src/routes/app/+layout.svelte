@@ -10,7 +10,6 @@
   import { derived } from 'svelte/store';
   import tick from '$lib/stores/tick/tick.store';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
-  import themeStore from '$lib/stores/theme/theme.store';
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
@@ -84,7 +83,7 @@
 <GlobalAdvisory />
 
 {#if loaded}
-  <div class="main" data-theme={$themeStore.currentTheme} in:fly={{ duration: 300, y: 16 }}>
+  <div class="main" in:fly={{ duration: 300, y: 16 }}>
     <ModalLayout />
     <div class="page" class:loading={$navigating}>
       <PageTransition pathname={data.pathname}>
@@ -92,7 +91,7 @@
       </PageTransition>
     </div>
   </div>
-  <div data-theme={$themeStore.currentTheme} class="header" in:fly={{ duration: 300, y: 16 }}>
+  <div class="header" in:fly={{ duration: 300, y: 16 }}>
     <Header />
   </div>
 {:else}
