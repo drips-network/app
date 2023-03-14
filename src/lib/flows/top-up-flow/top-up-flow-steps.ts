@@ -46,7 +46,9 @@ export default function getTopUpFlowSteps(tokenAddress?: string) {
           }),
       makeStep({
         component: EnterAmountStep,
-        props: undefined,
+        props: {
+          backButton: !tokenAddress,
+        },
       }),
       makeStep({
         component: SuccessStep,

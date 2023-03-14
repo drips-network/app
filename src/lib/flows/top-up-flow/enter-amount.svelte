@@ -25,6 +25,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<TopUpFlowState>;
+  export let backButton: boolean;
 
   $: tokenAddress = $context.tokenAddress;
   $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
@@ -146,6 +147,16 @@
   </FormField>
   <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
+    {#if backButton}
+      <Button
+        on:click={() => {
+          restorer.clear();
+          dispatch('goBackward');
+        }}
+      >
+        Go back
+      </Button>
+    {/if}
     <span data-testid="confirm-amount-button">
       <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
         >Add {tokenInfo?.info.symbol ?? ''}</Button
