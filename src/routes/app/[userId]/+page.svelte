@@ -12,8 +12,12 @@
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import decodeUserId from '$lib/utils/decode-user-id';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import Banner from '$lib/components/banner/banner.svelte';
 
   $: userId = $page.params.userId;
 
@@ -93,6 +97,10 @@
   }
 
   $: dripsUserId && fetchRequestedAccount(dripsUserId);
+
+  function getDripsV1Url(address: string, ensName?: string) {
+    return `https://app.v1.drips.network/${ensName ?? address}`;
+  }
 </script>
 
 <svelte:head>
@@ -132,6 +140,22 @@
     <Balances userId={dripsUserId} />
     <Streams userId={dripsUserId} />
     <Splits userId={dripsUserId} />
+    <TransitionedHeight>
+      {#if address && !$dismissablesStore.includes('profile-drips-v1')}
+        <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
+          <Banner
+            title="Looking for the old Drips?"
+            description="You can still access the previous Drips app at app.v1.drips.network."
+            button={{
+              label: 'View profile on Drips V1',
+              href: getDripsV1Url(address, $ens[address]?.name),
+            }}
+            icon={DripsV1Logo}
+            on:dismiss={() => dismissablesStore.dismiss('profile-drips-v1')}
+          />
+        </div>
+      {/if}
+    </TransitionedHeight>
   </div>
 {/if}
 
@@ -146,6 +170,10 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .drips-v1-banner {
+    padding-bottom: 3rem;
   }
 
   .profile {
