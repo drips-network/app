@@ -1,11 +1,12 @@
 <script lang="ts">
   export let checked: boolean;
   export let label: string | undefined = undefined;
+  export let size: 'normal' | 'big' = 'normal';
 
   let focus = false;
 </script>
 
-<label class="toggle">
+<label class="toggle {size}">
   {#if label}<span class="typo-text-bold">{label}</span>{/if}
   <input
     tabindex="0"
@@ -36,7 +37,7 @@
     cursor: pointer;
     height: 1.5rem;
     width: 2.5rem;
-    border-radius: 1rem;
+    border-radius: 1rem 0 1rem 1rem;
     position: relative;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
     transition: background-color 0.3s, box-shadow 0.2s;
@@ -62,7 +63,8 @@
     right: 1.25rem;
     border-radius: 0.5rem;
     background-color: var(--color-foreground-level-5);
-    transition: left 0.2s, right 0.2s, background-color 0.3s, box-shadow 0.3s, width 0.2s;
+    transition: border-radius 0.2s, left 0.2s, right 0.2s, background-color 0.3s, box-shadow 0.3s,
+      width 0.2s;
   }
 
   .slider.checked:active .head {
@@ -71,12 +73,13 @@
 
   .slider:not(.checked):active .head {
     right: 0.75rem;
+    border-radius: 0.5rem 0.25rem 0.5rem 0.5rem;
   }
 
   .slider.checked .head {
     left: 1.25rem;
     right: 0.25rem;
     background-color: var(--color-primary);
-    box-shadow: var(--elevation-low);
+    border-radius: 0.5rem 0 0.5rem 0.5rem;
   }
 </style>
