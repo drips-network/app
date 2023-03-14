@@ -62,7 +62,7 @@ export function newRestorer<T extends Record<string, unknown>>(
   }
 
   function clear() {
-    state.set({} as T);
+    state.set(defaults as T);
   }
 
   return {

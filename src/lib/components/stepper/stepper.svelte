@@ -225,7 +225,7 @@
             this={currentStep.component}
             on:await={handleAwait}
             on:goForward={handleGoForward}
-            on:goBackward={() => move(-1)}
+            on:goBackward={(e) => move(e.detail?.by ?? -1)}
             on:conclude={handleConclusion}
             on:sidestep={handleSidestep}
             {...currentStep.props}
