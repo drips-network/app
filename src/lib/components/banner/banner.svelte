@@ -25,7 +25,7 @@
     </div>
   </div>
   <div class="right">
-    <a href={button.href}>
+    <a href={button.href} rel="noreferrer" target="_blank">
       <Button variant="primary">
         {button.label}
       </Button>
