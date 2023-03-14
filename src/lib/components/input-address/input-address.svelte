@@ -13,12 +13,7 @@
     msg: string;
   };
 
-  export let exclude: ExclusionGroup[] = [
-    {
-      addresses: [],
-      msg: 'You cannot use this address.',
-    },
-  ];
+  export let exclude: ExclusionGroup[] = [{ addresses: [], msg: 'You cannot use this address.' }];
 
   const dispatch = createEventDispatcher();
 
@@ -78,10 +73,16 @@
       validatedValue = undefined;
       addressValidationState = {
         type: 'invalid',
-        message: 'Enter either an ENS name or valid Ethereum address',
+        message: 'Enter a valid Ethereum address or ENS name.',
       };
     }
   }
+
+  // ensure initial value is validated since validateAddress() is async
+  if (value?.length) {
+    validateAddress(value).then(() => dispatch('validationChange', addressValidationState));
+  }
+
   $: validateAddress(value);
   $: dispatch('validationChange', addressValidationState);
 </script>
@@ -93,5 +94,5 @@
   showSuccessCheck
   validationState={addressValidationState}
   bind:value
-  placeholder="ENS name or ETH address"
+  placeholder="Ethereum address or ENS name"
 />

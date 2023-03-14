@@ -202,7 +202,7 @@
   <StreamVisual
     disableLinks
     fromAddress={$wallet.address}
-    toAddress={recipientAddressValue}
+    toAddress={recipientAddressValidationState.type === 'valid' ? recipientAddressValue : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
