@@ -115,22 +115,6 @@
     description="We weren't able to find that profile."
   />
 {:else}
-  <TransitionedHeight>
-    {#if address && !$dismissablesStore.includes('profile-drips-v1')}
-      <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
-        <Banner
-          title="Looking for Drips V1?"
-          description="The new Drips is now in public beta. You can still access Drips V1 at app.v1.drips.network."
-          button={{
-            label: 'View profile on Drips V1',
-            href: getDripsV1Url(address, $ens[address]?.name),
-          }}
-          icon={DripsV1Logo}
-          on:dismiss={() => dismissablesStore.dismiss('profile-drips-v1')}
-        />
-      </div>
-    {/if}
-  </TransitionedHeight>
   <div class="profile">
     <SectionSkeleton placeholderOutline={false} loaded={Boolean(address)}>
       {#if address}
@@ -156,6 +140,22 @@
     <Balances userId={dripsUserId} />
     <Streams userId={dripsUserId} />
     <Splits userId={dripsUserId} />
+    <TransitionedHeight>
+      {#if address && !$dismissablesStore.includes('profile-drips-v1')}
+        <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
+          <Banner
+            title="Looking for Drips V1?"
+            description="The new Drips is now in public beta. You can still access Drips V1 at app.v1.drips.network."
+            button={{
+              label: 'View profile on Drips V1',
+              href: getDripsV1Url(address, $ens[address]?.name),
+            }}
+            icon={DripsV1Logo}
+            on:dismiss={() => dismissablesStore.dismiss('profile-drips-v1')}
+          />
+        </div>
+      {/if}
+    </TransitionedHeight>
   </div>
 {/if}
 
