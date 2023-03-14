@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SegmentedControl from 'radicle-design-system/SegmentedControl.svelte';
+  import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import Setting from './components/setting.svelte';
   import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
