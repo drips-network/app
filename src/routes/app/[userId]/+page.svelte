@@ -144,8 +144,8 @@
       {#if address && !$dismissablesStore.includes('profile-drips-v1')}
         <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
           <Banner
-            title="Looking for Drips V1?"
-            description="The new Drips is now in public beta. You can still access Drips V1 at app.v1.drips.network."
+            title="Looking for the old Drips?"
+            description="The new Drips is now in public beta. You can still access the old Drips at app.v1.drips.network."
             button={{
               label: 'View profile on Drips V1',
               href: getDripsV1Url(address, $ens[address]?.name),
