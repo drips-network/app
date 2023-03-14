@@ -26,12 +26,12 @@
   </div>
   <div class="right">
     <a href={button.href}>
-      <Button>
+      <Button variant="primary">
         {button.label}
       </Button>
     </a>
     <button class="close-button" on:click={() => dispatch('dismiss')}>
-      <CrossSmall style="fill: var(--color-caution-level-6)" />
+      <CrossSmall style="fill: var(--color-primary-level-6)" />
     </button>
   </div>
 </div>
@@ -39,15 +39,15 @@
 <style>
   .banner {
     position: relative;
-    background-color: var(--color-caution-level-1);
+    background-color: var(--color-primary-level-1);
     display: flex;
     gap: 1rem;
     justify-content: space-between;
     padding: 1rem 2rem 1rem 1rem;
     border-radius: 5rem 0 5rem 5rem;
-    color: var(--color-caution-level-6);
+    color: var(--color-primary-level-6);
     align-items: center;
-    border: 1px solid var(--color-caution);
+    border: 1px solid var(--color-primary);
   }
 
   .left,
@@ -63,7 +63,7 @@
     padding: 0.75rem;
     background-color: var(--color-background);
     border-radius: 2rem;
-    border: 1px solid var(--color-caution);
+    border: 1px solid var(--color-primary);
   }
 
   .left .text {
@@ -78,11 +78,11 @@
   }
 
   .close-button:hover {
-    background-color: var(--color-caution-level-2);
+    background-color: var(--color-primary-level-2);
   }
 
   .close-button:focus {
-    background-color: var(--color-caution-level-3);
+    background-color: var(--color-primary-level-3);
   }
 
   @media (max-width: 1056px) {
