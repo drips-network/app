@@ -36,6 +36,7 @@
   <meta name="twitter:image" content={`https://${$page.url.host}/assets/social-share.png`} />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@dripsnetwork" />
+  <meta name="theme-color" content={$primaryColor} />
 </svelte:head>
 
 <div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme}>
