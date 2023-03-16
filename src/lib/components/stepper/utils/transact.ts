@@ -177,7 +177,7 @@ export default function transact(
         assert(typeof estimatedGas === 'number' && estimatedGas > 0);
 
         /*
-        We add a 20% buffer to the gas estimate to cover potential extra complexity
+        We add a 10% buffer to the gas estimate to cover potential extra complexity
         caused by an advancing blockTimestamp.
         */
         estimatedGasWithBuffer = Math.ceil(estimatedGas * 1.1);
