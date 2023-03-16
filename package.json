@@ -70,7 +70,6 @@
     "ethers": "^5.7.0",
     "fuzzysort": "^2.0.3",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
-    "radicle-drips": "github:radicle-dev/drips-js-sdk#deployment-v10",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"
   },
