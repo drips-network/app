@@ -84,7 +84,7 @@
         before: async () => {
           assert(newAmountPerSecond && newName);
 
-          const { dripsUserId, address } = $wallet;
+          const { dripsUserId, address, signer } = $wallet;
           assert(dripsUserId && address);
           const ownAccount = $streams.accounts[dripsUserId];
           assert(ownAccount);
@@ -163,10 +163,11 @@
 
           if (amountUpdated && nameUpdated) {
             assert(newHash);
-            const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+            const { ADDRESS_DRIVER } = getNetworkConfig();
 
-            const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-              driverAddress: CONTRACT_ADDRESS_DRIVER,
+            const createStreamBatchPreset = await AddressDriverPresets.Presets.createNewStreamFlow({
+              signer,
+              driverAddress: ADDRESS_DRIVER,
               tokenAddress: token.info.address,
               currentReceivers,
               newReceivers,

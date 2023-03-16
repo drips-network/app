@@ -11,6 +11,7 @@ import expect from '$lib/utils/expect';
 import { goto } from '$app/navigation';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
+import walletStore from '$lib/stores/wallet/wallet.store';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -24,6 +25,9 @@ export default function (
 
         const { userId, address } = stream.sender;
         const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+
+        const { signer } = get(walletStore);
+        assert(signer);
 
         const assetConfig = streams.getAssetConfig(userId, tokenAddress);
         assert(assetConfig, "App hasn't yet fetched the right asset config for this stream");
@@ -62,10 +66,11 @@ export default function (
             stream.dripsConfig.dripId,
         );
 
-        const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+        const { ADDRESS_DRIVER } = getNetworkConfig();
 
-        const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-          driverAddress: CONTRACT_ADDRESS_DRIVER,
+        const createStreamBatchPreset = await AddressDriverPresets.Presets.createNewStreamFlow({
+          signer,
+          driverAddress: ADDRESS_DRIVER,
           tokenAddress,
           currentReceivers,
           newReceivers,

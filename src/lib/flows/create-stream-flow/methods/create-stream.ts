@@ -24,6 +24,7 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
+import { BigNumber } from 'ethers';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -80,7 +81,7 @@ export default function (
         });
 
         const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddress);
-        const { address } = get(wallet);
+        const { address, signer } = get(wallet);
         assert(address);
 
         const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
@@ -120,10 +121,11 @@ export default function (
 
         const newHash = await pinAccountMetadata(accountMetadata);
 
-        const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+        const { ADDRESS_DRIVER } = getNetworkConfig();
 
-        const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-          driverAddress: CONTRACT_ADDRESS_DRIVER,
+        const createStreamBatchPreset = await AddressDriverPresets.Presets.createNewStreamFlow({
+          signer,
+          driverAddress: ADDRESS_DRIVER,
           tokenAddress,
           currentReceivers,
           newReceivers: [
@@ -143,8 +145,14 @@ export default function (
           transferToAddress: address,
         });
 
+        // TODO: Remove when SDK includes `value` in presets.
+        const fixedBatch = createStreamBatchPreset.map((ptx) => ({
+          ...ptx,
+          value: BigNumber.from(0),
+        }));
+
         return {
-          createStreamBatchPreset,
+          createStreamBatchPreset: fixedBatch,
           callerClient,
           ownUserId,
           newHash,

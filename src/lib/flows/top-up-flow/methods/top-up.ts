@@ -63,8 +63,20 @@ export default function (
           currentReceivers,
           amountToTopUp,
           currentReceivers,
+          0,
+          0,
           address,
+          /*
+          Dirty hack to disable the SDK's built-in gas estimation, because
+          it would fail if there's no token approval yet.
+
+          TODO: Introduce a more graceful method of disabling gas estimation.
+          */
+          { gasLimit: 1 },
         );
+
+        delete setDripsPopulatedTx.gasLimit;
+
         const setDripsTx = client.setDrips(
           tokenAddress,
           currentReceivers,
