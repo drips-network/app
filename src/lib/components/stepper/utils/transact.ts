@@ -196,7 +196,6 @@ export default function transact(
       await safeAppsSdk.txs.send({
         txs,
         params: {
-          // TODO: Find a way to estimate gas cost for Safe batches and add the 10% buffer.
           safeTxGas: estimatedGasWithBuffer,
         },
       });
