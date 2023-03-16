@@ -24,7 +24,6 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
-import { BigNumber } from 'ethers';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -145,14 +144,8 @@ export default function (
           transferToAddress: address,
         });
 
-        // TODO: Remove when SDK includes `value` in presets.
-        const fixedBatch = createStreamBatchPreset.map((ptx) => ({
-          ...ptx,
-          value: BigNumber.from(0),
-        }));
-
         return {
-          createStreamBatchPreset: fixedBatch,
+          createStreamBatchPreset,
           callerClient,
           ownUserId,
           newHash,
