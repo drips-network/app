@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { registerSW } from 'virtual:pwa-register';
   import wallet from '$lib/stores/wallet/wallet.store';
   import Header from '$lib/components/header/header.svelte';
-
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
   import balances from '$lib/stores/balances/balances.store';
@@ -17,6 +17,8 @@
   import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fly } from 'svelte/transition';
+  import { browser } from '$app/environment';
+  import SwUpdatePrompt from '$lib/components/sw-update-prompt/sw-update-prompt.svelte';
 
   export let data: { pathname: string };
 
@@ -70,17 +72,77 @@
 
   let initialized = false;
   onMount(async () => {
-    await initializeStores();
-    initialized = true;
+    if (window.navigator.onLine) {
+      await initializeStores();
+      initialized = true;
+    } else {
+      displayOfflineAdvisory();
+    }
+  });
+
+  let offlineAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined = undefined;
+
+  function displayOfflineAdvisory() {
+    offlineAdvisory = globalAdvisoryStore.add({
+      fatal: false,
+      headline: 'No internet connection',
+      description: 'Please connect to the internet to use Drips.',
+      emoji: '🔌',
+    });
+  }
+
+  onMount(() => {
+    window.addEventListener('online', async () => {
+      offlineAdvisory?.();
+
+      if (!initialized) {
+        await initializeStores();
+        initialized = true;
+      }
+    });
+
+    window.addEventListener('offline', () => {
+      displayOfflineAdvisory();
+    });
   });
 
   onMount(() => {
     tick.start();
     return tick.stop;
   });
+
+  onMount(() => {
+    const SERVICE_WORKER_AUTO_UPDATE_INTERVAL = 60 * 60 * 1000;
+
+    if (browser) {
+      registerSW({
+        onRegisteredSW(swUrl, r) {
+          r &&
+            setInterval(async () => {
+              if (!(!r.installing && navigator)) return;
+
+              if ('connection' in navigator && !navigator.onLine) return;
+
+              const resp = await fetch(swUrl, {
+                cache: 'no-store',
+                headers: {
+                  cache: 'no-store',
+                  'cache-control': 'no-cache',
+                },
+              });
+
+              if (resp?.status === 200) await r.update();
+            }, SERVICE_WORKER_AUTO_UPDATE_INTERVAL);
+        },
+      });
+    }
+  });
+
+  let showingToast: boolean | undefined;
 </script>
 
 <GlobalAdvisory />
+<SwUpdatePrompt bind:showingToast />
 
 {#if loaded}
   <div class="main" in:fly={{ duration: 300, y: 16 }}>
@@ -88,6 +150,9 @@
     <div class="page" class:loading={$navigating}>
       <PageTransition pathname={data.pathname}>
         <slot />
+        {#if showingToast}
+          <div class="toast-placeholder" />
+        {/if}
       </PageTransition>
     </div>
   </div>
@@ -129,5 +194,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .toast-placeholder {
+    height: 8rem;
+    width: 100%;
   }
 </style>
