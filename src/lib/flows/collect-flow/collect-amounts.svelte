@@ -139,20 +139,21 @@
           const addressDriverClient = await getAddressDriverClient();
           const userId = await addressDriverClient.getUserId();
 
-          const { address: userAddress } = $wallet;
+          const { address: userAddress, signer } = $wallet;
           assert(userAddress);
 
-          const { CONTRACT_DRIPS_HUB, CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+          const { DRIPS_HUB, ADDRESS_DRIVER } = getNetworkConfig();
 
           let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
           if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
             squeezeArgs = await getSqueezeArgs(selectedSqueezeSenderItems, tokenAddress);
           }
 
-          const collectFlow = AddressDriverPresets.Presets.createCollectFlow({
+          const collectFlow = await AddressDriverPresets.Presets.createCollectFlow({
+            signer,
             squeezeArgs,
-            driverAddress: CONTRACT_ADDRESS_DRIVER,
-            dripsHubAddress: CONTRACT_DRIPS_HUB,
+            driverAddress: ADDRESS_DRIVER,
+            dripsHubAddress: DRIPS_HUB,
             userId,
             tokenAddress,
             // TODO: Replace with dynamic maxCycles

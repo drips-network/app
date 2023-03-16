@@ -80,7 +80,7 @@ export default function (
         });
 
         const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddress);
-        const { address } = get(wallet);
+        const { address, signer } = get(wallet);
         assert(address);
 
         const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
@@ -120,10 +120,11 @@ export default function (
 
         const newHash = await pinAccountMetadata(accountMetadata);
 
-        const { CONTRACT_ADDRESS_DRIVER } = getNetworkConfig();
+        const { ADDRESS_DRIVER } = getNetworkConfig();
 
-        const createStreamBatchPreset = AddressDriverPresets.Presets.createNewStreamFlow({
-          driverAddress: CONTRACT_ADDRESS_DRIVER,
+        const createStreamBatchPreset = await AddressDriverPresets.Presets.createNewStreamFlow({
+          signer,
+          driverAddress: ADDRESS_DRIVER,
           tokenAddress,
           currentReceivers,
           newReceivers: [

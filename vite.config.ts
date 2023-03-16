@@ -8,6 +8,7 @@ const config = defineConfig({
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.ts'],
+    exclude: ['src/e2e-tests/.tmp/**'],
     setupFiles: ['./setup-test.js'],
     deps: {
       inline: ['@ethersproject/signing-key', '@ethersproject/basex', '@depay/solana-web3.js'],

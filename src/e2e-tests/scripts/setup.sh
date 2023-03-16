@@ -20,13 +20,9 @@ git clone -b master --single-branch https://github.com/radicle-dev/drips-contrac
 echo "⬇️ Downloading drips-subgraph…"
 git clone -b v2 --single-branch https://github.com/radicle-dev/drips-subgraph
 
-echo "🛠 Installing Drips Contracts deps…"
-cd ./drips-contracts
-forge install
-
 echo "📁 Creating subgraph config file for local env"
-cd ../drips-subgraph
-printf '{ "network": "goerli", "immutableSplitsDriver": { "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e", "block": 1 }, "dripsHub": { "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0", "block": 1}, "nftDriver": { "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6", "block": 1},"metaData": { "address": "0xC58cEa5a448A761d2dE80DFa8BfE298780e9dd66", "block": 1} }' > config.json
+cd ./drips-subgraph
+printf '{ "network": "goerli", "immutableSplitsDriver": { "address": "0x275039fc0fd2eeFac30835af6aeFf24e8c52bA6B", "block": 1 }, "dripsHub": { "address": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968", "block": 1}, "nftDriver": { "address": "0x9CfA6D15c80Eb753C815079F2b32ddEFd562C3e4", "block": 1},"metaData": { "address": "0xC58cEa5a448A761d2dE80DFa8BfE298780e9dd66", "block": 1} }' > config.json
 echo "🛠 Installing subgraph deps…"
 npm install
 

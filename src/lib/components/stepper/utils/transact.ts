@@ -9,6 +9,7 @@ import type { Nullable } from 'vitest';
 import type { StepComponentEvents, UpdateAwaitStepFn, UpdateAwaitStepParams } from '../types';
 import unreachable from '$lib/utils/unreachable';
 import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
+import assert from '$lib/utils/assert';
 
 type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
@@ -120,7 +121,8 @@ export default function transact(
   payload: SomeTransactPayload,
 ) {
   const resolvedPayload = payload((payload) => payload);
-  const { safe, signer, network } = get(walletStore);
+  const { safe, signer, network, address } = get(walletStore);
+  assert(address);
   const safeAppMode = Boolean(safe);
 
   const { before, transactions: transactionsBuilder, after, messages } = resolvedPayload;
@@ -137,8 +139,51 @@ export default function transact(
     const transactions = transactionsBuilder(beforeResult);
     const isTxBatch = Array.isArray(transactions);
 
+    /*
+    If we're in a Safe and need to process more than one transaction, we send them to the 
+    Safe as a batch.
+    */
     if (safeAppMode && isTxBatch) {
       const safeAppsSdk = new SafeAppsSDK();
+
+      let estimatedGasWithBuffer: number;
+      try {
+        /* 
+        We use a third-party API provided by Tenderly to estimate this batch's gas cost, because
+        its transactions are inter-dependent, meaning they cannot be indepdently simulated.
+        */
+        const simulationRes = await (
+          await fetch('/api/tenderly/simulate', {
+            method: 'POST',
+            body: JSON.stringify({
+              simulations: transactions.map((tx) => ({
+                network_id: String(network.chainId),
+                save: true,
+                save_if_fails: true,
+                from: address,
+                to: tx.transaction.to,
+                input: tx.transaction.data,
+                value: 0,
+              })),
+            }),
+          })
+        ).json();
+
+        const estimatedGas = simulationRes.simulation_results.reduce(
+          (acc: number, res: { simulation: { gas_used: number } }) => res.simulation.gas_used + acc,
+          0,
+        );
+
+        assert(typeof estimatedGas === 'number' && estimatedGas > 0);
+
+        /*
+        We add a 10% buffer to the gas estimate to cover potential extra complexity
+        caused by an advancing blockTimestamp.
+        */
+        estimatedGasWithBuffer = Math.ceil(estimatedGas * 1.1);
+      } catch (e) {
+        throw new Error('Unable to estimate gas for Safe Batch operation.');
+      }
 
       setStepCopyWaitingForSignature(updateAwaitStep, safeAppMode);
 
@@ -148,7 +193,16 @@ export default function transact(
         value: '0',
       }));
 
-      await safeAppsSdk.txs.send({ txs });
+      await safeAppsSdk.txs.send({
+        txs,
+        params: {
+          safeTxGas: estimatedGasWithBuffer,
+        },
+      });
+      /*
+    If we need to process more than one transaction but are connected to an EOA wallet,
+    we simply trigger all the transactions in sequence.
+    */
     } else if (isTxBatch) {
       for (const transaction of transactions) {
         setStepCopyWaitingForSignature(
@@ -163,6 +217,7 @@ export default function transact(
 
         if (!safeAppMode) receipts.push(await tx.wait(1));
       }
+      // If we just need to execute a single transaction, we just do so.
     } else {
       setStepCopyWaitingForSignature(
         updateAwaitStep,
@@ -177,6 +232,7 @@ export default function transact(
       if (!safeAppMode) receipts.push(await tx.wait(1));
     }
 
+    // In Safe App Mode, `after` is omitted, as the transaction is expected to resolve later.
     if (!safeAppMode) {
       updateAwaitStep(
         messages?.duringAfter ?? {
