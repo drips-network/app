@@ -2,7 +2,6 @@
   import MultiToken from '../lib/components/illustrations/multi-token.svelte';
   import ImageAndCaption from './components/image-and-caption.svelte';
   import LpCard from './components/lp-card/lp-card.svelte';
-  import LpHeader from './components/lp-header.svelte';
 
   import GasOptimized from '../lib/components/illustrations/gas-optimized.svelte';
   import OneContract from '../lib/components/illustrations/one-contract.svelte';
@@ -36,7 +35,6 @@
   />
 </svelte:head>
 
-<LpHeader />
 <div id="lp">
   <div id="wrapper">
     <section id="hero">

@@ -12,6 +12,7 @@
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import scroll from '$lib/stores/scroll';
+  import Header from '$lib/components/header/header.svelte';
 
   onMount(() => {
     scroll.attach();
@@ -39,6 +40,9 @@
 </svelte:head>
 
 <div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme}>
+  <div class="header">
+    <Header />
+  </div>
   <div class="page" data-primary-color={$primaryColor}>
     <slot />
   </div>

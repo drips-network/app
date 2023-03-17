@@ -12,11 +12,12 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import Results from './components/results.svelte';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
+  import { browser } from '$app/environment';
 
   let focus = false;
   let mobileSearchActive = false;
 
-  $: focus ? scroll.lock() : scroll.unlock();
+  $: if (browser) focus ? scroll.lock() : scroll.unlock();
 
   let searchTerm: string | undefined;
 
@@ -182,7 +183,7 @@
   </div>
 </div>
 
-{#if focus}<div
+{#if true}<div
     class="overlay"
     on:click={closeSearch}
     on:keydown={closeSearch}
@@ -240,7 +241,7 @@
 
   .overlay {
     position: fixed;
-    /* top: 4rem; */
+    top: 0;
     right: 0;
     left: 0;
     bottom: 0;

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import Header from '$lib/components/header/header.svelte';
 
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
@@ -91,9 +90,6 @@
       </PageTransition>
     </div>
   </div>
-  <div class="header" in:fly={{ duration: 300, y: 16 }}>
-    <Header />
-  </div>
 {:else}
   <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
     <Spinner />
@@ -101,18 +97,12 @@
 {/if}
 
 <style>
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
   .page {
     position: relative;
     min-height: 100vh;
     max-width: 75rem;
     width: 100vw;
-    padding: 6rem 1rem 4rem 1rem;
+    padding: 9rem 1rem 4rem 1rem;
     margin: 0 auto;
     transition: opacity 0.3s;
   }
