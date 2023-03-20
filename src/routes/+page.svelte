@@ -108,8 +108,8 @@
             <ComingSoonBadge />
             <h2>Discover & support exciting projects</h2>
             <p>
-              Support projects with flexible token streams on Ethereum – and pause, top-up or cancel
-              at your own discretion.
+              Support projects with flexible token streams – and pause, top-up or cancel at your own
+              discretion.
             </p>
           </div>
           <div class="card-illustration">
@@ -140,8 +140,8 @@
           <ComingSoonBadge />
           <h2>Raise funds for your open-source projects or yourself</h2>
           <p>
-            Drips is a complete toolkit for raising funds, by the second — without any platform
-            fees.
+            Drips is a complete toolkit for raising funds on Ethereum, by the second — without any
+            platform fees.
           </p>
         </div>
       </div>
