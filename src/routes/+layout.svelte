@@ -26,12 +26,12 @@
   <meta property="og:image" content={`https://${$page.url.host}/assets/social-share.png`} />
   <meta
     property="og:description"
-    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+    content="A Web3 toolkit that enables FOSS developers to raise and manage funds by the second, without any platform fees."
   />
   <meta name="twitter:title" content="Drips" />
   <meta
     name="twitter:description"
-    content="An Ethereum protocol for streaming and splitting funds, built by Radicle."
+    content="A Web3 toolkit that enables FOSS developers to raise and manage funds by the second, without any platform fees."
   />
   <meta name="twitter:image" content={`https://${$page.url.host}/assets/social-share.png`} />
   <meta name="twitter:card" content="summary_large_image" />
