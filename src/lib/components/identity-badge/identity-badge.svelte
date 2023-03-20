@@ -68,7 +68,7 @@
   class:flex-row-reverse={isReverse}
   class:select-none={disableSelection}
   style:height={showAvatar ? `${currentSize}px` : ''}
-  style:gap={showAvatar && showIdentity ? `${currentSize / 2.5}px` : ''}
+  style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
 >
   {#if showAvatar}
     <Avatar
