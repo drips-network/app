@@ -645,7 +645,7 @@
     #drips-sticker {
       height: 12rem;
       width: 12rem;
-      top: 9rem;
+      top: 5rem;
       left: 50%;
       transform: translateX(-50%);
     }
