@@ -11,3 +11,8 @@
 
 [context.production]
     command = "mv robots-allow.txt ./static/robots.txt && npm run build"
+
+[[redirects]]
+  from = "https://beta.drips.network/*"
+  to = "https://drips.network/:splat"
+  status = 301
