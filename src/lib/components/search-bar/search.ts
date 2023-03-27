@@ -182,5 +182,6 @@ export default function search(input: string | undefined) {
 
   return fuzzysort.go(input, searchItems, {
     keys: ['matchStrings.primary', 'matchStrings.secondary', 'matchStrings.tertiary'],
+    limit: 20,
   });
 }
