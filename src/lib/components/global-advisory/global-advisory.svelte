@@ -60,6 +60,8 @@
       description={nonFatalAdvisories[0].description}
       emoji={nonFatalAdvisories[0].emoji}
       button={nonFatalAdvisories[0].button}
+      secondaryButton={nonFatalAdvisories[0].secondaryButton}
+      learnMoreLink={nonFatalAdvisories[0].learnMoreLink}
     />
   </div>
 {/if}
