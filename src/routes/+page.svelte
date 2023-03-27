@@ -105,7 +105,6 @@
       <LpCard
         ><div id="discover-support" class="full-width-card illustration-right text-nudged">
           <div class="card-description">
-            <ComingSoonBadge />
             <h2>Discover & support exciting projects</h2>
             <p>
               Support projects with flexible token streams – and pause, top-up or cancel at your own
@@ -196,7 +195,10 @@
         >
         <LpCard
           ><ImageAndCaption background>
-            <MultiChain slot="image" />
+            <div slot="image" class="illustration-container">
+              <div class="badge"><ComingSoonBadge size="small" /></div>
+              <div class="illustration"><MultiChain /></div>
+            </div>
             <div slot="caption" class="text-container">
               <h3>Multi-Chain</h3>
               <p>
@@ -559,6 +561,18 @@
 
   .legal-links a.highlight {
     font-weight: bold;
+  }
+
+  .illustration-container {
+    height: 100%;
+  }
+
+  .illustration-container > .badge {
+    height: 1.75rem;
+  }
+
+  .illustration-container > .illustration {
+    height: calc(100% - 1.75rem);
   }
 
   @media (max-width: 768px) {

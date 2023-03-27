@@ -1,7 +1,8 @@
 <script lang="ts">
+  export let size: 'small' | 'normal' = 'normal';
 </script>
 
-<div class="coming-soon-badge typo-text-bold">Coming soon</div>
+<div class="coming-soon-badge typo-text-bold {size}">Coming soon</div>
 
 <style>
   .coming-soon-badge {
@@ -14,5 +15,10 @@
     align-items: center;
     border-radius: 2rem 0 2rem 2rem;
     width: fit-content;
+  }
+
+  .coming-soon-badge.small {
+    padding: 0.1rem 0.5rem;
+    height: 1.75rem;
   }
 </style>
