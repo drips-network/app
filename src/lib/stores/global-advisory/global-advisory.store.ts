@@ -1,13 +1,20 @@
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
 
+interface ButtonConfig {
+  label: string;
+  handler: () => void;
+}
+
 export interface NonFatalGlobalAdvisory {
   headline: string;
   description?: string;
   emoji: string;
-  button?: {
+  button?: ButtonConfig;
+  secondaryButton?: ButtonConfig;
+  learnMoreLink?: {
     label: string;
-    handler: () => void;
+    url: string;
   };
   fatal: false;
 }
@@ -29,9 +36,12 @@ export default (() => {
    * @param advisory The advisory to display.
    * @returns A function you can call in order to resolve the created advisory.
    */
-  function add(advisory: GlobalAdvisory) {
+  function add(advisory: GlobalAdvisory | ((resolveFn: () => void) => GlobalAdvisory)) {
     const handle = Object.keys(get(errors)).length;
-    errors.update((state) => ({ ...state, [handle]: advisory }));
+    const resolvedAdvisory =
+      typeof advisory === 'function' ? advisory(() => resolve(handle)) : advisory;
+
+    errors.update((state) => ({ ...state, [handle]: resolvedAdvisory }));
 
     return () => resolve(handle);
   }

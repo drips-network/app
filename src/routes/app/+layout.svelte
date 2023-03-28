@@ -8,7 +8,7 @@
   import balances from '$lib/stores/balances/balances.store';
   import streams from '$lib/stores/streams/streams.store';
   import { derived } from 'svelte/store';
-  import tick from '$lib/stores/tick/tick.store';
+  import tickStore from '$lib/stores/tick/tick.store';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
@@ -17,17 +17,20 @@
   import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fly } from 'svelte/transition';
+  import { isSafe } from '$lib/stores/wallet/safe/is-safe';
 
   export let data: { pathname: string };
 
   let walletConnected = false;
   let loaded = false;
+  let initializing = false;
 
   async function initializeStores() {
+    initializing = true;
     await wallet.initialize();
     loaded = true;
 
-    const { connected, network, provider, address } = $wallet;
+    const { connected, network, provider, address, safe } = $wallet;
 
     tokens.connect(network.chainId);
     ens.connect(provider);
@@ -40,6 +43,13 @@
     if (connected) {
       const addressDriverClient = await getAddressDriverClient();
       ens.lookup(address);
+
+      /*
+      If the app is not running a safe app, check whether the current address is a Safe. This could be the case
+      if the user is using the WalletConnect Safe App to connect to Drips, instead of using Drips as a Safe App
+      directly. If this is the case, the function triggers a warning modal.
+      */
+      if (!safe) warnIfSafe(network.chainId, address);
 
       try {
         await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
@@ -60,23 +70,54 @@
     } else {
       streams.disconnect();
     }
+
+    initializing = false;
   }
 
-  $: {
-    if (initialized && $wallet.connected !== walletConnected) {
-      initializeStores();
+  async function warnIfSafe(chainId: number, address: string) {
+    const isASafe = await isSafe(chainId, address);
+
+    if (isASafe) {
+      globalAdvisoryStore.add((resolve) => ({
+        headline: 'Using a Safe?',
+        description:
+          'Instead of connecting to the Safe with WalletConnect, we recommend running Drips as a Safe App directly.',
+        emoji: '⚠️',
+        button: {
+          label: 'Disconnect',
+          handler: () => {
+            wallet.disconnect();
+            resolve();
+          },
+        },
+        secondaryButton: {
+          label: 'Proceed anyway',
+          handler: resolve,
+        },
+        learnMoreLink: {
+          label: 'Learn more',
+          url: 'https://v2.docs.drips.network/docs/the-drips-app/advanced/safe',
+        },
+        fatal: false,
+      }));
     }
   }
 
-  let initialized = false;
   onMount(async () => {
     await initializeStores();
-    initialized = true;
+
+    wallet.subscribe((s) => {
+      if (initializing) return;
+
+      if (s.connected !== walletConnected) {
+        initializeStores();
+      }
+    });
   });
 
   onMount(() => {
-    tick.start();
-    return tick.stop;
+    tickStore.start();
+    return tickStore.stop;
   });
 </script>
 
