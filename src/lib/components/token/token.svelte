@@ -31,7 +31,16 @@
 
   $: token = $tokens ? tokens.getByAddress(address) : undefined;
   $: tokenInfo = overrideToDisplay ?? ($tokens ? token?.info : undefined);
-  $: src = tokenInfo?.logoURI ? convertIpfsUri(tokenInfo.logoURI) : undefined;
+  $: src = tokenInfo?.logoURI ? convertIpfsUri(adjustSrcSize(tokenInfo.logoURI)) : undefined;
+
+  function adjustSrcSize(src: string) {
+    // Most token URLs are Coingecko assets using the "thumb" quality, which is very low-res.
+    if (size === 'small') {
+      return src.replaceAll('/thumb/', '/small/');
+    } else {
+      return src.replaceAll('/thumb/', '/large/');
+    }
+  }
 
   let imageFailed = false;
 
