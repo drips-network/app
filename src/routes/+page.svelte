@@ -105,6 +105,7 @@
       <LpCard
         ><div id="discover-support" class="full-width-card illustration-right text-nudged">
           <div class="card-description">
+            <ComingSoonBadge />
             <h2>Discover & support exciting projects</h2>
             <p>
               Support projects with flexible token streams – and pause, top-up or cancel at your own
