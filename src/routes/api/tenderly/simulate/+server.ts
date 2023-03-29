@@ -1,11 +1,6 @@
-import 'dotenv/config';
+import { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_SECRET } from '$env/static/private';
 
-import getEnvVar from '$lib/utils/get-env-var';
 import type { RequestHandler } from './$types';
-
-const TENDERLY_USER = getEnvVar('TENDERLY_USER');
-const TENDERLY_PROJECT = getEnvVar('TENDERLY_PROJECT');
-const TENDERLY_ACCESS_SECRET = getEnvVar('TENDERLY_ACCESS_SECRET');
 
 export const POST: RequestHandler = async ({ request }) => {
   const resp = await fetch(
