@@ -96,7 +96,7 @@
         },
         learnMoreLink: {
           label: 'Learn more',
-          url: 'https://v2.docs.drips.network/docs/the-drips-app/advanced/safe',
+          url: 'https://docs.drips.network/docs/the-drips-app/advanced/safe',
         },
         fatal: false,
       }));

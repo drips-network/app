@@ -49,7 +49,7 @@
             <p class="typo-text-small">All transactions will be proposed to the connected Safe.</p>
             <a
               class="typo-link"
-              href="https://v2.docs.drips.network/docs/the-drips-app/advanced/safe"
+              href="https://docs.drips.network/docs/the-drips-app/advanced/safe"
               target="_blank"
               rel="noreferrer">Learn more</a
             >
@@ -74,7 +74,7 @@
     <ul class="links typo-text-small">
       <li>
         <a
-          href="https://v2.docs.drips.network/docs/the-drips-app/getting-started"
+          href="https://docs.drips.network/docs/the-drips-app/getting-started"
           target="_blank"
           rel="noreferrer">Get help</a
         >

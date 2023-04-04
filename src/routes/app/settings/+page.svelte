@@ -168,7 +168,7 @@
       title="Build on Drips"
       subtitle="The Drips protocol is fully open-source and ready for you to build on."
     >
-      <a class="typo-link" target="_blank" rel="noreferrer" href="https://v2.docs.drips.network"
+      <a class="typo-link" target="_blank" rel="noreferrer" href="https://docs.drips.network"
         >Read the docs</a
       >
     </Setting>

@@ -238,7 +238,7 @@
             </div>
           </div>
           <a
-            href="https://v2.docs.drips.network/docs/whats-a-drip.html"
+            href="https://docs.drips.network/docs/whats-a-drip.html"
             target="_blank"
             rel="noreferrer"><Button variant="primary">Check out the docs</Button></a
           >

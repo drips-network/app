@@ -37,7 +37,7 @@
             handler: () =>
               window
                 .open(
-                  'https://v2.docs.drips.network/docs/the-drips-app/streams/create-a-stream',
+                  'https://docs.drips.network/docs/the-drips-app/streams/create-a-stream',
                   '_blank',
                 )
                 ?.focus(),
@@ -61,7 +61,7 @@
             handler: () =>
               window
                 .open(
-                  'https://v2.docs.drips.network/docs/the-drips-app/splits/set-up-splits',
+                  'https://docs.drips.network/docs/the-drips-app/splits/set-up-splits',
                   '_blank',
                 )
                 ?.focus(),
@@ -85,7 +85,7 @@
             handler: () =>
               window
                 .open(
-                  'https://v2.docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings',
+                  'https://docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings',
                   '_blank',
                 )
                 ?.focus(),
@@ -109,7 +109,7 @@
             handler: () =>
               window
                 .open(
-                  'https://v2.docs.drips.network/docs/the-drips-app/explore/drips-profiles',
+                  'https://docs.drips.network/docs/the-drips-app/explore/drips-profiles',
                   '_blank',
                 )
                 ?.focus(),

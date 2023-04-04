@@ -19,7 +19,7 @@
       </p>
       <a
         class="typo-link"
-        href="https://v2.docs.drips.network/docs/the-drips-app/advanced/safe#some-transactions-are-invalidated-by-updates-to-a-drips-accounts-state"
+        href="https://docs.drips.network/docs/the-drips-app/advanced/safe#some-transactions-are-invalidated-by-updates-to-a-drips-accounts-state"
         target="_blank"
         rel="noreferrer">Learn more</a
       >

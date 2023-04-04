@@ -233,7 +233,7 @@
       class="typo-text-small"
       target="_blank"
       rel="noreferrer"
-      href="https://v2.docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings"
+      href="https://docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings"
       >Learn more</a
     >
   </div>

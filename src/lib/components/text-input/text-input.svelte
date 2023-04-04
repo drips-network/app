@@ -78,6 +78,7 @@
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}
     autocorrect={autocorrect ? 'on' : 'off'}
+    lang="en-001"
   />
 
   <div class="right-container" bind:clientWidth={rightContainerWidth}>
