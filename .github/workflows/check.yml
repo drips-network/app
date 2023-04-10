@@ -9,6 +9,15 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Populate .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_PINATA_SDK_KEY: ${{ secrets.PINATA_SDK_KEY }}
+          envkey_PINATA_SDK_SECRET: ${{ secrets.PINATA_SDK_SECRET }}
+          envkey_TENDERLY_ACCESS_SECRET: ${{ secrets.TENDERLY_ACCESS_SECRET }}
+          envkey_TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
+          envkey_TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
+
       - name: Install dependencies
         run: npm ci
 
