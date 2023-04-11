@@ -9,7 +9,7 @@
   import balances from '$lib/stores/balances';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
-  import Streams from '../../../dashboard/sections/streams.section.svelte';
+  import Streams from '../../../streams/sections/streams.section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet/wallet.store';

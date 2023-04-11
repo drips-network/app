@@ -6,29 +6,39 @@
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenu from '../account-menu/account-menu.svelte';
   import SafeLogo from '../icons/safe-logo.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
   $: safeAppMode = Boolean($wallet.safe);
 </script>
 
 {#if $wallet.connected}
-  <Flyout>
-    <div class="trigger" slot="trigger">
-      {#if $wallet.network.chainId !== 1}
-        <div class="network-badge">
-          <p>{$wallet.network.name}</p>
-        </div>
-      {/if}
-      {#if safeAppMode}<div class="safe-logo">
-          <SafeLogo />
-        </div>{/if}
-      <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
-    </div>
-    <div slot="content">
-      <AccountMenu />
-    </div>
-  </Flyout>
+  <div class="desktop-only">
+    <Flyout>
+      <div class="trigger" slot="trigger">
+        {#if $wallet.network.chainId !== 1}
+          <div class="network-badge">
+            <p>{$wallet.network.name}</p>
+          </div>
+        {/if}
+        {#if safeAppMode}<div class="safe-logo">
+            <SafeLogo />
+          </div>{/if}
+        <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
+      </div>
+      <div slot="content">
+        <AccountMenu />
+      </div>
+    </Flyout>
+  </div>
+  <div
+    class="mobile-only"
+    on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+    on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+  >
+    <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
+  </div>
 {:else}
-  <Button icon={WalletIcon} on:click={() => wallet.connect()}>Connect wallet</Button>
+  <Button icon={WalletIcon} on:click={() => wallet.connect()}>Connect</Button>
 {/if}
 
 <style>
@@ -60,5 +70,19 @@
     background-color: var(--color-primary);
     margin-right: -12px;
     z-index: 1;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-only {
+      display: none;
+    }
+
+    .mobile-only {
+      display: initial;
+    }
   }
 </style>

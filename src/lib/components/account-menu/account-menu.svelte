@@ -1,6 +1,5 @@
 <script>
   import wallet from '$lib/stores/wallet/wallet.store';
-  import SettingsIcon from 'radicle-design-system/icons/Settings.svelte';
   import ServerIcon from 'radicle-design-system/icons/Server.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
 
@@ -11,6 +10,10 @@
   import Divider from '../divider/divider.svelte';
   import ens from '$lib/stores/ens';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import { navigating } from '$app/stores';
+
+  $: $navigating && cupertinoPaneStore.closeSheet();
 
   $: safeAppMode = Boolean($wallet.safe);
 </script>
@@ -36,8 +39,13 @@
         /></svelte:fragment
       >
       <svelte:fragment slot="right"
-        ><Button disabled={safeAppMode} icon={CrossIcon} on:click={wallet.disconnect}
-          >Disconnect</Button
+        ><Button
+          disabled={safeAppMode}
+          icon={CrossIcon}
+          on:click={() => {
+            cupertinoPaneStore.closeSheet();
+            wallet.disconnect();
+          }}>Disconnect</Button
         ></svelte:fragment
       >
     </AccountMenuItem>
@@ -67,18 +75,8 @@
     >
       <svelte:fragment slot="title">Profile</svelte:fragment>
     </AccountMenuItem>
-    <AccountMenuItem icon={SettingsIcon} href="/app/settings">
-      <svelte:fragment slot="title">Settings</svelte:fragment>
-    </AccountMenuItem>
     <Divider sideMargin={0.5} />
     <ul class="links typo-text-small">
-      <li>
-        <a
-          href="https://docs.drips.network/docs/the-drips-app/getting-started"
-          target="_blank"
-          rel="noreferrer">Get help</a
-        >
-      </li>
       <li>
         <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
       </li>
