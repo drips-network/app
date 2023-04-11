@@ -18,6 +18,14 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fly } from 'svelte/transition';
   import { isSafe } from '$lib/stores/wallet/safe/is-safe';
+  import Sidenav from '$lib/components/sidenav/sidenav.svelte';
+
+  import HeartIcon from 'radicle-design-system/icons/Heart.svelte';
+  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import { quintIn, quintOut } from 'svelte/easing';
+  import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
   export let data: { pathname: string };
 
@@ -119,13 +127,71 @@
     tickStore.start();
     return tickStore.stop;
   });
+
+  onMount(() => {
+    cupertinoPaneStore.attach();
+    return cupertinoPaneStore.detach();
+  });
 </script>
 
 <GlobalAdvisory />
 
+<div id="cupertino-pane">
+  <div class="inner">
+    <div class="dragger" />
+    {#if $cupertinoPaneStore.component}
+      <div class="content">
+        <svelte:component this={$cupertinoPaneStore.component} {...$cupertinoPaneStore.props} />
+      </div>
+    {/if}
+  </div>
+</div>
+
 {#if loaded}
   <div class="main" in:fly={{ duration: 300, y: 16 }}>
     <ModalLayout />
+    {#if $wallet.connected}
+      <div
+        class="sidenav"
+        in:fly={{ duration: 300, x: -64, easing: quintOut }}
+        out:fly={{ duration: 300, x: -64, easing: quintIn }}
+        data-testid="sidenav"
+      >
+        <Sidenav
+          items={{
+            top: [
+              { label: 'Crowdfunding', href: '/app/crowdfunding', icon: HeartIcon },
+              { label: 'Streams', href: '/app/streams', icon: TokenStreams },
+            ],
+            bottom: [
+              {
+                label: 'Help',
+                href: 'https://docs.drips.network/docs/the-drips-app/getting-started',
+                icon: InfoCircle,
+                external: true,
+              },
+            ],
+          }}
+        />
+      </div>
+      <div class="bottom-nav" data-testid="bottom-nav">
+        <BottomNav
+          items={[
+            {
+              label: 'Crowdfunding',
+              href: '/app/crowdfunding',
+              icon: HeartIcon,
+            },
+            {
+              label: 'Streams',
+              href: '/app/streams',
+              icon: TokenStreams,
+            },
+          ]}
+        />
+      </div>
+    {/if}
+    <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
     <div class="page" class:loading={$navigating}>
       <PageTransition pathname={data.pathname}>
         <slot />
@@ -142,20 +208,28 @@
 {/if}
 
 <style>
+  .main {
+    display: flex;
+    gap: 2rem;
+    width: 100vw;
+  }
+
   .header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
   }
+
   .page {
     position: relative;
     min-height: 100vh;
     max-width: 75rem;
     width: 100vw;
-    padding: 6rem 1rem 4rem 1rem;
+    padding: 6.5rem 2.5rem 4rem 2.5rem;
     margin: 0 auto;
     transition: opacity 0.3s;
+    min-width: 0;
   }
 
   .loading {
@@ -170,5 +244,89 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .sidenav {
+    position: fixed;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 16rem;
+    background-color: var(--color-background);
+    padding: 1rem;
+    padding-top: 6rem;
+  }
+
+  .sidenav-placeholder {
+    width: 16rem;
+    height: 1px;
+    flex-shrink: 0;
+    transition: width 0.3s;
+  }
+
+  .sidenav-placeholder.disconnected {
+    width: 0;
+  }
+
+  #cupertino-pane {
+    display: none;
+    background-color: var(--color-background);
+    border-radius: 1rem 1rem 0 0;
+  }
+
+  #cupertino-pane > .inner {
+    padding: 0 0.5rem;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  :global(.cupertino-pane-wrapper .pane) {
+    padding-bottom: 1rem;
+    background-color: var(--color-background);
+    box-shadow: var(--elevation-low);
+  }
+
+  :global(.cupertino-pane-wrapper) {
+    z-index: 200;
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+
+  .dragger {
+    width: 3rem;
+    height: 0.25rem;
+    background-color: var(--color-foreground-level-3);
+    border-radius: 0.25rem;
+    margin: 0 auto;
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 1252px) {
+    .sidenav-placeholder {
+      width: 4.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .main {
+      gap: 0;
+    }
+
+    .sidenav,
+    .sidenav-placeholder {
+      display: none;
+    }
+
+    .page {
+      padding: 6rem 1rem 8rem 1rem;
+    }
+
+    .bottom-nav {
+      display: initial;
+    }
   }
 </style>

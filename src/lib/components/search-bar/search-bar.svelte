@@ -2,7 +2,7 @@
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import CloseIcon from 'radicle-design-system/icons/CrossSmall.svelte';
 
-  import { tick } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { sineIn, sineInOut, sineOut } from 'svelte/easing';
   import { fade, fly } from 'svelte/transition';
   import search, { updateSearchItems } from './search';
@@ -13,8 +13,9 @@
   import Results from './components/results.svelte';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
-  let focus = false;
-  let mobileSearchActive = false;
+  const dispatch = createEventDispatcher<{ dismiss: never }>();
+
+  let focus = true;
 
   $: focus ? scroll.lock() : scroll.unlock();
 
@@ -29,19 +30,12 @@
       : desktopSearchElem;
   }
 
-  async function triggerSearch() {
-    mobileSearchActive = true;
-    focus = true;
-    await tick();
-
-    getActiveSearchElem().focus();
-  }
-
   function closeSearch() {
     searchTerm = '';
     getActiveSearchElem().blur();
     focus = false;
-    mobileSearchActive = false;
+
+    dispatch('dismiss');
   }
 
   let loading = true;
@@ -94,7 +88,7 @@
         accountMenuItemElems.includes(focussedElem as HTMLDivElement)
       )
     ) {
-      focus = false;
+      closeSearch();
       return;
     }
 
@@ -116,19 +110,22 @@
 
     if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== desktopSearchElem) {
       searchTerm = undefined;
-      focus = false;
+      closeSearch();
     }
   }
+
+  onMount(() => {
+    desktopSearchElem.focus();
+  });
 </script>
 
 <svelte:window on:keydown={handleKeyboard} />
 
-<div class="search-bar desktop" class:focus>
+<div class="search-bar" class:focus>
   <div class="search-bar-input-wrapper">
     <SearchIcon style="fill: var(--color-foreground)" />
     <input
       type="text"
-      data-testid="searchbar"
       placeholder="Search addresses, accounts, streams..."
       bind:this={desktopSearchElem}
       bind:value={searchTerm}
@@ -150,36 +147,6 @@
       <Results bind:resultElems {results} {loading} on:click={closeSearch} />
     </div>
   {/if}
-</div>
-
-<div class="mobile">
-  {#if mobileSearchActive}
-    <div class="search-bar search-bar-overlay">
-      <div class="search-bar-input-wrapper">
-        <SearchIcon />
-        <input
-          autocomplete="off"
-          autocapitalize="off"
-          autocorrect="off"
-          bind:this={mobileSearchElem}
-          bind:value={searchTerm}
-          type="text"
-          placeholder="Search addresses, accounts, streams..."
-        />
-        {#if focus}
-          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
-        {/if}
-      </div>
-      {#if results.length > 0 && focus}
-        <div class="results">
-          <Results bind:resultElems {results} {loading} on:click={closeSearch} />
-        </div>
-      {/if}
-    </div>
-  {/if}
-  <div class="mobile-search-button">
-    <SearchIcon on:click={triggerSearch} />
-  </div>
 </div>
 
 {#if focus}<div
@@ -221,7 +188,7 @@
     width: 100%;
     border: 1px solid var(--color-foreground);
     transition: border 0.3s;
-    z-index: 2;
+    z-index: 100;
     position: relative;
     transition: border 0.3s, background-color 0.3s, box-shadow 0.3s;
   }
@@ -249,35 +216,6 @@
     z-index: 1;
   }
 
-  .search-bar-overlay {
-    height: 4rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--color-background);
-    z-index: 1;
-    padding: 0.5rem;
-  }
-
-  .mobile {
-    display: none;
-  }
-
-  .mobile .mobile-search-button {
-    height: 2rem;
-    width: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-foreground-level-1);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-  }
-
-  .mobile input {
-    display: none;
-  }
-
   .results {
     position: absolute;
     top: 4rem;
@@ -296,27 +234,13 @@
   }
 
   @media (max-width: 768px) {
-    .mobile {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      z-index: 2;
+    .search-bar {
+      width: calc(100vw - 2rem);
+      left: 1rem;
     }
 
     .search-bar-input-wrapper {
       padding: 1rem;
-    }
-
-    .mobile input {
-      display: block;
-    }
-
-    .desktop {
-      display: none;
-    }
-
-    .desktop input {
-      display: none;
     }
 
     .overlay {
@@ -325,16 +249,13 @@
 
     .results {
       border: none;
-      padding: 0;
-    }
-
-    .search-bar {
-      border: none;
-    }
-
-    .results {
       box-shadow: none;
-      border: none;
+      padding: 0 0.5rem;
+      top: 3.5rem;
+      left: -1rem;
+      right: -1rem;
+      border-radius: 0;
+      min-height: 100vh;
     }
   }
 </style>

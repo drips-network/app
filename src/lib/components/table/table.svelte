@@ -212,6 +212,7 @@
     padding: 0.75rem;
     user-select: none;
     color: var(--color-foreground);
+    white-space: nowrap;
   }
 
   thead th:first-child {

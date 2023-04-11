@@ -30,7 +30,7 @@
   {:else if results.length === 0}
     <div class="empty-state">
       <EyeClosed />
-      <p class="typo-text">No results found</p>
+      <p class="typo-text">No results</p>
     </div>
   {/if}
 </div>
@@ -49,7 +49,7 @@
 
   .empty-state,
   .loading-state {
-    height: 4rem;
+    height: 8rem;
     text-align: center;
     display: flex;
     justify-content: center;
