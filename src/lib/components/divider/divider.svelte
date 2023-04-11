@@ -6,8 +6,8 @@
 
 <style>
   .divider {
-    height: 0.1rem;
+    height: 1px;
     border-radius: 0.25rem;
-    background-color: var(--color-foreground);
+    background-color: var(--color-foreground-level-3);
   }
 </style>
