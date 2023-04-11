@@ -35,7 +35,11 @@
 
   onMount(async () => {
     try {
-      await promise(updateFn);
+      /*
+      If the promise resolves really fast, we ensure it stays for at least 600ms
+      in order to prevent a glitchy step transition.
+      */
+      await Promise.all([promise(updateFn), new Promise((resolve) => setTimeout(resolve, 600))]);
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Failed to resolve promise');
 
