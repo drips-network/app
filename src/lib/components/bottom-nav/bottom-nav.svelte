@@ -20,6 +20,8 @@
   let selectorWidth: number | undefined = undefined;
 
   function updateSelectorPos() {
+    if (!activeElem) return;
+
     selectorOffset = activeElem.offsetLeft - 16;
     selectorWidth = activeElem.offsetWidth + 32;
   }
