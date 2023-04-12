@@ -116,6 +116,7 @@
   .tooltip {
     position: relative;
     cursor: pointer;
+    white-space: initial;
   }
 
   .expanded-tooltip {
