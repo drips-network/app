@@ -17,10 +17,11 @@
   let itemElemsBottom: ItemElems = {};
 
   $: activeElem = itemElemsTop[$page.url.pathname] || itemElemsBottom[$page.url.pathname];
+  $: activeElem && updateSelectorPos();
 
   let selectorPos: number | undefined = undefined;
 
-  $: {
+  function updateSelectorPos() {
     if (activeElem) {
       selectorPos = activeElem.offsetTop;
     } else {
@@ -28,6 +29,8 @@
     }
   }
 </script>
+
+<svelte:window on:resize={updateSelectorPos} />
 
 <nav class="sidenav">
   <div class="top">
