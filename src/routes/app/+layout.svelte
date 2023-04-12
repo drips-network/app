@@ -26,6 +26,7 @@
   import { quintIn, quintOut } from 'svelte/easing';
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
 
   export let data: { pathname: string };
 
@@ -130,7 +131,12 @@
 
   onMount(() => {
     cupertinoPaneStore.attach();
-    return cupertinoPaneStore.detach();
+    return cupertinoPaneStore.detach;
+  });
+
+  onMount(() => {
+    breakpointsStore.attach();
+    return breakpointsStore.detach;
   });
 </script>
 
@@ -150,6 +156,11 @@
 {#if loaded}
   <div class="main" in:fly={{ duration: 300, y: 16 }}>
     <ModalLayout />
+    <div class="page" class:loading={$navigating}>
+      <PageTransition pathname={data.pathname}>
+        <slot />
+      </PageTransition>
+    </div>
     {#if $wallet.connected}
       <div
         class="sidenav"
@@ -192,11 +203,6 @@
       </div>
     {/if}
     <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
-    <div class="page" class:loading={$navigating}>
-      <PageTransition pathname={data.pathname}>
-        <slot />
-      </PageTransition>
-    </div>
   </div>
   <div class="header" in:fly={{ duration: 300, y: 16 }}>
     <Header />
@@ -210,6 +216,7 @@
 <style>
   .main {
     display: flex;
+    flex-direction: row-reverse;
     gap: 2rem;
     width: 100vw;
   }
@@ -253,7 +260,6 @@
     flex-direction: column;
     height: 100%;
     width: 16rem;
-    background-color: var(--color-background);
     padding: 1rem;
     padding-top: 6rem;
   }
@@ -306,6 +312,7 @@
   }
 
   @media (max-width: 1252px) {
+    .sidenav,
     .sidenav-placeholder {
       width: 4.5rem;
     }

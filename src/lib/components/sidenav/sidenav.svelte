@@ -1,8 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import SidenavItem from './components/sidenav-item.svelte';
   import type { SidenavItems } from './types';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
 
   export let items: {
     top: SidenavItems;
@@ -28,25 +29,36 @@
       selectorPos = undefined;
     }
   }
+
+  $: shouldShowTooltips = $breakpointsStore?.breakpoint === 'desktop';
+
+  let hoveringOver: string | undefined = undefined;
 </script>
 
 <svelte:window on:resize={updateSelectorPos} />
 
 <nav class="sidenav">
-  <div class="top">
-    {#each items.top as item}
-      <div bind:this={itemElemsTop[item.href]}>
-        <SidenavItem {...item} active={$page.url.pathname === item.href} />
-      </div>
-    {/each}
-  </div>
-  <div class="bottom">
-    {#each items.bottom as item}
-      <div bind:this={itemElemsBottom[item.href]}>
-        <SidenavItem {...item} active={false} />
-      </div>
-    {/each}
-  </div>
+  {#each Object.values(items) as block}
+    <div class="block">
+      {#each block as item}
+        <div
+          style="position: relative"
+          bind:this={itemElemsTop[item.href]}
+          on:mouseenter={() => (hoveringOver = item.href)}
+          on:focusin={() => (hoveringOver = item.href)}
+          on:mouseleave={() => (hoveringOver = undefined)}
+          on:focusout={() => (hoveringOver = undefined)}
+        >
+          <SidenavItem {...item} active={$page.url.pathname === item.href} />
+          {#if shouldShowTooltips && hoveringOver === item.href}
+            <div class="tooltip" transition:fly={{ duration: 300, x: -8 }}>
+              {item.label}
+            </div>
+          {/if}
+        </div>
+      {/each}
+    </div>
+  {/each}
   {#if selectorPos !== undefined}
     <div transition:fade={{ duration: 200 }} class="selector" style={`top: ${selectorPos}px`} />
   {/if}
@@ -62,17 +74,10 @@
     height: 100%;
   }
 
-  .top {
+  .block {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .bottom {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: auto;
   }
 
   .selector {
@@ -85,6 +90,20 @@
     background-color: var(--color-primary-level-1);
     transition: top 0.3s;
     z-index: -1;
+  }
+
+  .tooltip {
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
+    left: calc(100% + 1rem);
+    display: flex;
+    align-items: center;
+    background-color: var(--color-background);
+    z-index: 200;
+    box-shadow: var(--elevation-low);
   }
 
   @media (max-width: 1252px) {
