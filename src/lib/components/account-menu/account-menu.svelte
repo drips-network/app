@@ -1,6 +1,5 @@
 <script>
   import wallet from '$lib/stores/wallet/wallet.store';
-  import ServerIcon from 'radicle-design-system/icons/Server.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
 
   import CrossIcon from 'radicle-design-system/icons/CrossSmall.svelte';
@@ -66,9 +65,6 @@
       </div>
     {/if}
     <Divider sideMargin={0.5} />
-    <AccountMenuItem icon={ServerIcon} href="/app/dashboard">
-      <svelte:fragment slot="title">Dashboard</svelte:fragment>
-    </AccountMenuItem>
     <AccountMenuItem
       icon={UserIcon}
       href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
