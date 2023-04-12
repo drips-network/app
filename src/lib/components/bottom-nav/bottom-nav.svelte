@@ -11,7 +11,10 @@
 
   let itemElems: ItemElems = {};
   $: activeElem = itemElems[$page.url.pathname];
-  $: activeElem && updateSelectorPos();
+  $: {
+    activeElem;
+    updateSelectorPos();
+  }
 
   let selectorOffset: number | undefined = undefined;
   let selectorWidth: number | undefined = undefined;
