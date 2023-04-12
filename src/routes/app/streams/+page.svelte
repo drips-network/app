@@ -125,7 +125,7 @@
 
 <svelte:head>
   <title>Streams | Drips</title>
-  <meta name="description" content="Drips Dashboard" />
+  <meta name="description" content="Drips Streams Page" />
 </svelte:head>
 
 <div class="dashboard">
