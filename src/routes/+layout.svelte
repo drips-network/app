@@ -38,8 +38,8 @@
   <meta name="twitter:site" content="@dripsnetwork" />
 </svelte:head>
 
-<div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme}>
-  <div class="page" data-primary-color={$primaryColor}>
+<div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme} data-primary-color={$primaryColor}>
+  <div class="page">
     <slot />
   </div>
 </div>

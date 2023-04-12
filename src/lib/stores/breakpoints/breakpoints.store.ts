@@ -20,7 +20,7 @@ interface State {
  * A store that tracks the current window dimensions and breakpoint.
  * Generally, we should use CSS media queries for hiding large parts of the UI
  * based on breakpoint instead of this, so that the server renders the markup for
- * all screen sizes. In some situations though, certain functionaility (like showing
+ * all screen sizes. In some situations though, certain functionality (like showing
  * a tooltip on the sidenav's collapsed state) requires knowledge on the current
  * breakpoint in JS. This is what this is for.
  */

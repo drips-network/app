@@ -88,7 +88,7 @@
     width: 100%;
     height: 3rem;
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-primary-level-6);
     background-color: var(--color-primary-level-1);
     transition: top 0.3s;
     z-index: -1;

@@ -6,7 +6,7 @@
 
 <style>
   .coming-soon-badge {
-    background-color: var(--color-primary-level-1);
+    background-color: var(--color-primary-level-2);
     color: var(--color-primary-level-6);
     padding: 0.25rem 1rem;
     height: 2.5rem;
