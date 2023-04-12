@@ -15,24 +15,17 @@
 
   const dispatch = createEventDispatcher<{ dismiss: never }>();
 
-  let focus = true;
+  let focus = false;
 
   $: focus ? scroll.lock() : scroll.unlock();
 
   let searchTerm: string | undefined;
 
-  let desktopSearchElem: HTMLDivElement;
-  let mobileSearchElem: HTMLDivElement;
-
-  function getActiveSearchElem() {
-    return window.getComputedStyle(desktopSearchElem, null).display === 'none'
-      ? mobileSearchElem
-      : desktopSearchElem;
-  }
+  let searchElem: HTMLDivElement;
 
   function closeSearch() {
     searchTerm = '';
-    getActiveSearchElem().blur();
+    searchElem.blur();
     focus = false;
 
     dispatch('dismiss');
@@ -71,12 +64,6 @@
       return;
     }
 
-    if (e.metaKey === true && e.key === 'k') {
-      getActiveSearchElem().focus();
-      e.preventDefault();
-      return;
-    }
-
     if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
 
     const focussedElem = document.activeElement;
@@ -84,8 +71,7 @@
     if (!focussedElem) return;
     if (
       !(
-        focussedElem === getActiveSearchElem() ||
-        accountMenuItemElems.includes(focussedElem as HTMLDivElement)
+        focussedElem === searchElem || accountMenuItemElems.includes(focussedElem as HTMLDivElement)
       )
     ) {
       closeSearch();
@@ -99,7 +85,7 @@
     if (nextElem) {
       (nextElem.firstChild as HTMLElement)?.focus();
     } else if (selectedIndex === 0 && changeIndexBy === -1) {
-      getActiveSearchElem().focus();
+      searchElem.focus();
     }
 
     e.preventDefault();
@@ -108,14 +94,14 @@
   function handleSearchBlur(e: FocusEvent) {
     const focussedElem = e.relatedTarget as HTMLElement;
 
-    if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== desktopSearchElem) {
+    if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== searchElem) {
       searchTerm = undefined;
       closeSearch();
     }
   }
 
   onMount(() => {
-    desktopSearchElem.focus();
+    searchElem.focus();
   });
 </script>
 
@@ -127,7 +113,7 @@
     <input
       type="text"
       placeholder="Search addresses, accounts, streams..."
-      bind:this={desktopSearchElem}
+      bind:this={searchElem}
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
       on:focusout={handleSearchBlur}
@@ -224,7 +210,7 @@
     display: flex;
     justify-content: center;
     z-index: 2;
-    max-height: calc(100vh - 5rem);
+    max-height: calc(100vh - 6rem);
     overflow: scroll;
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
