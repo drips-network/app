@@ -14,11 +14,13 @@
     [href: string]: HTMLDivElement;
   }
 
-  let itemElemsTop: ItemElems = {};
-  let itemElemsBottom: ItemElems = {};
+  let itemElems: ItemElems = {};
 
-  $: activeElem = itemElemsTop[$page.url.pathname] || itemElemsBottom[$page.url.pathname];
-  $: activeElem && updateSelectorPos();
+  $: activeElem = itemElems[$page.url.pathname];
+  $: {
+    activeElem;
+    updateSelectorPos();
+  }
 
   let selectorPos: number | undefined = undefined;
 
@@ -43,7 +45,7 @@
       {#each block as item}
         <div
           style="position: relative"
-          bind:this={itemElemsTop[item.href]}
+          bind:this={itemElems[item.href]}
           on:mouseenter={() => (hoveringOver = item.href)}
           on:focusin={() => (hoveringOver = item.href)}
           on:mouseleave={() => (hoveringOver = undefined)}
