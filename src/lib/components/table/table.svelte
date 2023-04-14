@@ -76,8 +76,11 @@
                   {/if}
                   {#if typeof header.column.columnDef.meta === 'object'}
                     {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
-                      <Tooltip text={header.column.columnDef.meta['tooltipMessage']}>
+                      <Tooltip>
                         <InfoCircle style="height: 1rem;" />
+                        <svelte:fragment slot="tooltip-content">
+                          {header.column.columnDef.meta['tooltipMessage']}
+                        </svelte:fragment>
                       </Tooltip>
                     {/if}
                   {/if}

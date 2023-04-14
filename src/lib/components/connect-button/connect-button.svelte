@@ -23,7 +23,13 @@
         {#if safeAppMode}<div class="safe-logo">
             <SafeLogo />
           </div>{/if}
-        <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
+        <IdentityBadge
+          disableTooltip
+          hideAvatarOnMobile
+          disableLink
+          size="medium"
+          address={$wallet.address}
+        />
       </div>
       <div slot="content">
         <AccountMenu />
@@ -35,7 +41,13 @@
     on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
     on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
   >
-    <IdentityBadge hideAvatarOnMobile disableLink size="medium" address={$wallet.address} />
+    <IdentityBadge
+      hideAvatarOnMobile
+      disableLink
+      size="medium"
+      address={$wallet.address}
+      disableTooltip
+    />
   </div>
 {:else}
   <Button icon={WalletIcon} on:click={() => wallet.connect()}>Connect</Button>

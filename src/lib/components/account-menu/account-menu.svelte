@@ -35,6 +35,7 @@
           disableLink
           address={$wallet.address}
           showAvatar={false}
+          disableTooltip
         /></svelte:fragment
       >
       <svelte:fragment slot="right"
