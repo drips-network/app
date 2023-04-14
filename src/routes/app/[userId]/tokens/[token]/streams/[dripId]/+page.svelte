@@ -284,10 +284,13 @@
           <div class="key-value">
             <div class="with-info-icon">
               <h5 class="key">Remaining balance for token</h5>
-              <Tooltip
-                text={`The stream sender's currently remaining ${token?.info.symbol} balance. When this cannot cover all the sender's streams for this token anymore, all their streams for this token will cease.`}
-              >
+              <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
+                <svelte:fragment slot="tooltip-content">
+                  The stream sender's currently remaining {token?.info.symbol} balance. When this cannot
+                  cover all the sender's streams for this token anymore, all their streams for this token
+                  will cease.
+                </svelte:fragment>
               </Tooltip>
             </div>
             <span class="value typo-text-mono-bold">
@@ -305,10 +308,13 @@
               <h5 class="key">
                 Token {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
               </h5>
-              <Tooltip
-                text={`Projection of when the stream ran or will run out of funds based on the sender's remaining ${token?.info.symbol} balance. This date changes if the sender adds funds, or adds / removes streams for this token.`}
-              >
+              <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
+                <svelte:fragment slot="tooltip-content">
+                  Projection of when the stream ran or will run out of funds based on the sender's
+                  remaining {token?.info.symbol} balance. This date changes if the sender adds funds,
+                  or adds / removes streams for this token.
+                </svelte:fragment>
               </Tooltip>
             </div>
             {#if outOfFundsDate}

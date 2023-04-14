@@ -16,5 +16,8 @@
 <span class="typo-text-mono">
   <Tooltip text={address} copyable>
     {formatted}
+    <svelte:fragment slot="tooltip-content">
+      <span class="typo-text-mono">{address}</span>
+    </svelte:fragment>
   </Tooltip>
 </span>
