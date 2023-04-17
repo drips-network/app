@@ -67,9 +67,9 @@
     small: 'typo-text-mono-small',
     normal: 'typo-text-mono',
     medium: 'typo-text-mono',
-    big: 'typo-header-4',
-    huge: 'typo-header-3',
-    gigantic: 'typo-header-1',
+    big: 'typo-header-4 mono',
+    huge: 'typo-header-3 mono',
+    gigantic: 'typo-header-1 mono',
   };
   $: currentFontClassAddress = fontClassesAddress[size];
 
@@ -105,7 +105,6 @@
         {#key toDisplay}
           <div
             transition:fade|local={{ duration: 300 }}
-            class:mono={!ens?.name}
             class:foreground={size === 'gigantic'}
             class={`${currentFontClass} identity-ellipsis absolute overlay`}
             data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
