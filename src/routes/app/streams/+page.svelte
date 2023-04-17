@@ -124,12 +124,11 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard | Drips</title>
-  <meta name="description" content="Drips Dashboard" />
+  <title>Streams | Drips</title>
+  <meta name="description" content="Drips Streams Page" />
 </svelte:head>
 
 <div class="dashboard">
-  <h1>Dashboard</h1>
   <div class="edu-carousel">
     <TransitionedHeight>
       {#if eduCarouselItems.length > 0}
@@ -154,10 +153,6 @@
 
   .edu-carousel {
     margin: 0 -4rem;
-  }
-
-  .edu-carousel-inner {
-    padding-top: 4rem;
   }
 
   .edu-carousel h4 {

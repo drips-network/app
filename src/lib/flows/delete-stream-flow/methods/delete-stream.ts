@@ -110,7 +110,7 @@ export default function (
           1000,
         );
 
-        goto('/app/dashboard');
+        goto('/app/streams');
       },
     }),
   );
