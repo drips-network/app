@@ -21,13 +21,13 @@
       in:fly={{ duration: animateValueChanges ? 300 : 0, y: -8 }}
       class="value"
     >
-      <p class="typo-text-mono-bold">{value}</p>
-      <p class="typo-text-mono-bold symbol">{symbol}</p>
+      <p class="typo-text-mono">{value}</p>
+      <p class="typo-text-mono symbol">{symbol}</p>
     </div>
   {/key}
   <div class="value placeholder">
-    <p class="typo-text-mono-bold">{value}</p>
-    <p class="typo-text-mono-bold symbol">{symbol}</p>
+    <p class="typo-text-mono">{value}</p>
+    <p class="typo-text-mono symbol">{symbol}</p>
   </div>
 </div>
 

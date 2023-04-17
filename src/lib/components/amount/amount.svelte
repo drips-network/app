@@ -18,7 +18,7 @@
   export let showSymbol = true;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
-  export let amountClasses = 'typo-text-mono-bold';
+  export let amountClasses = 'typo-text-mono';
   export let amountPerSecClasses = 'typo-text-small-mono text-foreground-level-4';
 
   /** Manually set token information to display. Used on the landing page's mock dashboard. */
@@ -70,7 +70,7 @@
     {#if amountPerSecondTokenInfo || overrideToDisplay}
       <div class="amount-per-second {amountPerSecClasses}">
         <span
-          class="amount"
+          class="amount typo-text-small-mono"
           class:text-positive={amountPerSecond.amount > 0}
           class:text-negative={amountPerSecond.amount < 0}
           >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond, true)}{#if showSymbol}

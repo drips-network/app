@@ -11,7 +11,7 @@
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
     class:with-text={Boolean($$slots.default) && !icon}
-    class="inner typo-text-bold {variant}"
+    class="inner typo-text {variant}"
   >
     {#if icon}
       <svelte:component

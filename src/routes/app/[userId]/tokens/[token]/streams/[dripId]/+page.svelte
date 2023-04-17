@@ -260,7 +260,7 @@
       <div class="details">
         <div class="key-value">
           <h5 class="key">Total Streamed</h5>
-          <span class="value typo-text-mono-bold highlight" data-testid="total-streamed">
+          <span class="value typo-text-mono highlight" data-testid="total-streamed">
             <FormattedAmount
               amount={estimate?.totalStreamed ?? unreachable()}
               decimals={token?.info.decimals ?? unreachable()}
@@ -293,7 +293,7 @@
                 </svelte:fragment>
               </Tooltip>
             </div>
-            <span class="value typo-text-mono-bold">
+            <span class="value typo-text-mono">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
                 amount={$balances.accounts[dripsUserId ?? unreachable()].tokens[
