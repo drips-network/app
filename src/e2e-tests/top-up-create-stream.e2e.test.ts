@@ -38,15 +38,20 @@ describe('top up, create stream, view profile, search', async () => {
     });
   });
 
-  describe('dashboard empty state', () => {
-    it('connects', async () => {
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+  describe('global nav', () => {
+    it('opens up to crowdfunding tab', async () => {
+      await page.goto('http://127.0.0.1:3000/app');
 
-      const dashboardHeadline = page.locator('text=Dashboard');
-      await expect(dashboardHeadline).toHaveCount(1);
+      await expect(page.locator('text=crowdfunding page goes here')).toHaveCount(1);
     });
 
-    it('shows dashboard empty states', async () => {
+    it('switches to the streams tab', async () => {
+      await page.locator('div[data-testid="sidenav"] a:text("Streams")').click();
+    });
+  });
+
+  describe('streams page empty state', () => {
+    it('shows streams page empty states', async () => {
       const tokensEmptyState = page.locator('text=No tokens');
       await expect(tokensEmptyState).toHaveCount(1);
 
@@ -106,7 +111,7 @@ describe('top up, create stream, view profile, search', async () => {
       await expect(page.locator('text=Approve')).toHaveCount(1);
     });
 
-    it('shows the topped-up amount on the dashboard', async () => {
+    it('shows the topped-up amount on the streams page', async () => {
       await page.locator('text=Got it').click({ timeout: 10000 });
     }, 10000);
   });
@@ -142,7 +147,7 @@ describe('top up, create stream, view profile, search', async () => {
 
       await page.reload();
 
-      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+      await expect(page.locator('text=Balances')).toHaveCount(1);
     });
 
     it('displays the incoming stream', async () => {
@@ -169,11 +174,11 @@ describe('top up, create stream, view profile, search', async () => {
 
     it('switches to another user', async () => {
       await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+      await page.goto('http://127.0.0.1:3000/app/streams');
 
       await page.reload();
 
-      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+      await expect(page.locator('text=Balances')).toHaveCount(1);
     });
 
     it('displays the recipient users incoming stream on their profile', async () => {
@@ -190,7 +195,7 @@ describe('top up, create stream, view profile, search', async () => {
 
   describe('search', () => {
     it('opens the searchbar', async () => {
-      const searchbar = page.locator('data-testid=searchbar');
+      const searchbar = page.locator('data-testid=search-button');
 
       await searchbar.click();
     });
@@ -200,27 +205,31 @@ describe('top up, create stream, view profile, search', async () => {
       await expect(
         page.locator('.account-menu-item-wrapper', { hasText: 'E2E Test Stream' }),
       ).toHaveCount(1);
+
+      await page.keyboard.press('Escape');
     });
 
     it('finds tokens', async () => {
-      const searchbar = page.locator('data-testid=searchbar');
-
-      await searchbar.fill('Test');
+      await page.locator('data-testid=search-button').click();
+      await page.keyboard.type('Test');
 
       await expect(page.locator('.account-menu-item-wrapper', { hasText: 'Testcoin' })).toHaveCount(
         1,
       );
+
+      await page.keyboard.press('Escape');
     });
 
     it('jumps to profiles', async () => {
-      const searchbar = page.locator('data-testid=searchbar');
-      await searchbar.fill('0x');
+      await page.locator('data-testid=search-button').click();
+      await page.keyboard.type('0x');
 
       await page
         .locator('.account-menu-item-wrapper', {
           hasText: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
         })
         .click();
+
       expect(page.url().toLowerCase()).toBe(
         'http://127.0.0.1:3000/app/0x433220a86126efe2b8c98a723e73ebad2d0cbadc',
       );
@@ -229,7 +238,7 @@ describe('top up, create stream, view profile, search', async () => {
 
   describe('stream detail view', () => {
     it('opens the stream detail view', async () => {
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+      await page.goto('http://127.0.0.1:3000/app/streams');
       await page.locator('text=E2E Test Stream').click();
 
       await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
@@ -274,14 +283,14 @@ describe('top up, create stream, view profile, search', async () => {
 
     it('switches back to the user receiving the stream', async () => {
       await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+      await page.goto('http://127.0.0.1:3000/app/streams');
 
       await page.reload();
 
-      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+      await expect(page.locator('text=Balances')).toHaveCount(1);
     });
 
-    it('displays the right incoming earned amount on the dashboard', async () => {
+    it('displays the right incoming earned amount on the streams page', async () => {
       await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(2);
     });
 
@@ -303,14 +312,14 @@ describe('top up, create stream, view profile, search', async () => {
   describe('delete stream', () => {
     it('switches back to the original user', async () => {
       await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+      await page.goto('http://127.0.0.1:3000/app/streams');
 
       await page.reload();
 
-      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+      await expect(page.locator('text=Balances')).toHaveCount(1);
     });
 
-    it('displays the right streamed amount on the dashboard', async () => {
+    it('displays the right streamed amount on the streams page', async () => {
       await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(1);
     });
 
@@ -327,7 +336,7 @@ describe('top up, create stream, view profile, search', async () => {
       await page.locator('button', { hasText: 'Delete stream' }).click();
       await page.locator('button', { hasText: 'Got it' }).click();
 
-      expect(page.url().toLowerCase()).toBe('http://127.0.0.1:3000/app/dashboard');
+      expect(page.url().toLowerCase()).toBe('http://127.0.0.1:3000/app/streams');
     }, 20000);
 
     it('shows the streams empty state', async () => {
@@ -341,11 +350,11 @@ describe('top up, create stream, view profile, search', async () => {
 
     it('switches back to the recipient', async () => {
       await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+      await page.goto('http://127.0.0.1:3000/app/streams');
 
       await page.reload();
 
-      await expect(page.locator('text=Dashboard')).toHaveCount(1);
+      await expect(page.locator('text=Balances')).toHaveCount(1);
     });
 
     it('still shows the balances section for the recipient', async () => {
@@ -360,7 +369,7 @@ describe('top up, create stream, view profile, search', async () => {
 
   describe('squeezing', () => {
     it('opens the collect flow', async () => {
-      await page.goto('http://127.0.0.1:3000/app/dashboard');
+      await page.goto('http://127.0.0.1:3000/app/streams');
 
       await page.locator('text=Testcoin').click();
       await page.locator('button', { hasText: 'Collect' }).click();

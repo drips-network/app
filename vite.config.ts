@@ -11,7 +11,12 @@ const config = defineConfig({
     exclude: ['src/e2e-tests/.tmp/**'],
     setupFiles: ['./setup-test.js'],
     deps: {
-      inline: ['@ethersproject/signing-key', '@ethersproject/basex', '@depay/solana-web3.js'],
+      inline: [
+        '@ethersproject/signing-key',
+        '@ethersproject/basex',
+        '@depay/solana-web3.js',
+        'cupertino-pane',
+      ],
     },
   },
   build: {
