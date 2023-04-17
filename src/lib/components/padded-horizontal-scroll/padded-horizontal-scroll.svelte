@@ -10,14 +10,14 @@
 
 <style>
   .padded-horizontal-scroll {
-    width: calc(100% + 2rem);
-    margin-left: -1rem;
+    width: calc(100% + 5rem);
+    margin-left: -2.5rem;
     overflow: scroll;
   }
 
   .padded-horizontal-scroll > .content {
     min-width: 100%;
-    padding: 0 1rem;
+    padding: 0 2.5rem;
     width: fit-content;
   }
 </style>
