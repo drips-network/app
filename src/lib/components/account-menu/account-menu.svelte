@@ -27,6 +27,7 @@
           address={$wallet.address}
           showIdentity={false}
           disableSelection
+          disableTooltip
         /></svelte:fragment
       >
       <svelte:fragment slot="title"
