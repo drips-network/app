@@ -92,7 +92,7 @@
 <div
   class="wrapper"
   style="width: {containerSize}; height: {containerSize}"
-  style:border={outline ? '1px solid var(--color-foreground)' : ''}
+  style:box-shadow={outline ? 'var(--elevation-low)' : ''}
 >
   {#if project.owner}
     <div class="project-avatar" style:background-color={project.color}>
@@ -120,14 +120,15 @@
 
 <style>
   .wrapper {
-    height: 2rem;
-    width: 2rem;
+    height: calc(2rem - 1px);
+    width: calc(2rem - 1px);
     border-radius: 1000rem;
     background-color: var(--color-foreground-level-2);
     overflow: hidden;
     user-select: none;
     position: relative;
     flex-shrink: 0;
+    margin: 1px;
   }
 
   .project-avatar {

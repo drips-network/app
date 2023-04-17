@@ -70,7 +70,7 @@
   }
 
   button:enabled:hover .inner,
-  button:enabled:focus .inner {
+  button:enabled:focus-visible .inner {
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
@@ -81,11 +81,11 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
   }
 
-  button:focus .inner {
+  button:focus-visible .inner {
     box-shadow: var(--elevation-low);
   }
 
-  button:focus .inner.normal {
+  button:focus-visible .inner.normal {
     background-color: var(--color-foreground-level-1);
   }
   button:disabled {

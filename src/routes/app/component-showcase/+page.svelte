@@ -18,6 +18,7 @@
   import SuccessStep from './examples/example-stepper-steps/success-step.svelte';
   import ProjectBadge, { type Source } from '$lib/components/project-badge/project-badge.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
+  import ProjectCard from '$lib/components/project-card/project-card.svelte';
 
   // Button
   let disabled = false;
@@ -95,6 +96,27 @@
 </script>
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item" style="max-width: 16rem">
+  <h2>Project Card</h2>
+  <ProjectCard
+    project={{
+      gitDriverAccount: {
+        userId: '0',
+        driver: 'git',
+      },
+      owner: {
+        driver: 'address',
+        userId: '0',
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      },
+      source: SOURCE_CONFIGS.github,
+      emoji: '🚶',
+      color: '#f5e342',
+      description: 'A versatile component for building stepped flows with beautiful transitions.',
+    }}
+  />
+</div>
 
 <div class="showcase-item">
   <h2>Project Badge</h2>
