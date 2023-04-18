@@ -65,8 +65,6 @@
 </script>
 
 <script lang="ts">
-  // TODO: Real verified icon
-  import VerifiedIcon from 'radicle-design-system/icons/CheckCircle.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import ProjectTooltip from './components/project-tooltip.svelte';
@@ -84,9 +82,6 @@
     <div class="name">
       <ProjectName {project} />
     </div>
-    {#if project.owner}
-      <VerifiedIcon style="fill: var(--color-positive-level-6);" />
-    {/if}
   </a>
   <svelte:fragment slot="tooltip-content">
     <ProjectTooltip {project} />

@@ -65,8 +65,10 @@
 </script>
 
 <script lang="ts">
-  import Github from 'radicle-design-system/icons/Github.svelte';
-  import Question from 'radicle-design-system/icons/Question.svelte';
+  import GithubIcon from 'radicle-design-system/icons/Github.svelte';
+  import GitlabIcon from 'radicle-design-system/icons/Gitlab.svelte';
+  import RadicleIcon from 'radicle-design-system/icons/Radicle.svelte';
+  import GitIcon from 'radicle-design-system/icons/Git.svelte';
 
   export let project: GitProject;
 
@@ -103,16 +105,16 @@
   {#if !project.owner}
     <div class="project-avatar">
       {#if project.source.type === 'github'}
-        <Github />
+        <GithubIcon />
       {:else if project.source.type === 'gitlab'}
         <!-- TODO: Real GitLab icon -->
-        <Question />
+        <GitlabIcon />
       {:else if project.source.type === 'radicle'}
         <!-- TODO: Real Radicle icon -->
-        <Question />
+        <RadicleIcon />
       {:else if project.source.type === 'generic'}
         <!-- TODO: Real Git icon -->
-        <Question />
+        <GitIcon />
       {/if}
     </div>
   {/if}
