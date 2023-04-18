@@ -69,26 +69,45 @@
   import Tooltip from '../tooltip/tooltip.svelte';
   import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
+  import buildProjectUrl from '$lib/utils/build-project-url';
 
   export let project: GitProject;
   export let tooltip = true;
-
+  export let forceUnclaimed = false;
   export let hideAvatar = false;
+  export let linkTo: 'external-url' | 'project-page' = 'project-page';
+
+  let processedProject: GitProject;
+  $: processedProject = forceUnclaimed
+    ? { ...project, owner: undefined, color: undefined, description: undefined, emoji: undefined }
+    : project;
 </script>
 
-<Tooltip disabled={!tooltip}>
-  <a class="project-badge" href="/app/projects/{project.gitDriverAccount.userId}">
-    {#if !hideAvatar}<ProjectAvatar {project} />{/if}
-    <div class="name">
-      <ProjectName {project} />
-    </div>
-  </a>
-  <svelte:fragment slot="tooltip-content">
-    <ProjectTooltip {project} />
-  </svelte:fragment>
-</Tooltip>
+<div class="wrapper">
+  <Tooltip disabled={!tooltip}>
+    <a
+      class="project-badge"
+      href={linkTo === 'project-page'
+        ? buildProjectUrl(project.source)
+        : processedProject.source.url}
+      target={linkTo === 'project-page' ? '' : '_blank'}
+    >
+      {#if !hideAvatar}<ProjectAvatar project={processedProject} />{/if}
+      <div class="name">
+        <ProjectName project={processedProject} />
+      </div>
+    </a>
+    <svelte:fragment slot="tooltip-content">
+      <ProjectTooltip project={processedProject} />
+    </svelte:fragment>
+  </Tooltip>
+</div>
 
 <style>
+  .wrapper {
+    width: fit-content;
+  }
+
   a:focus-visible {
     outline: none;
   }
