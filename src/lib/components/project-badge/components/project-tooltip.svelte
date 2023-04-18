@@ -30,6 +30,12 @@
         <IdentityBadge address={project.owner.address} disableTooltip size="small" />
       </div>
     {/if}
+    {#if project.source.type === 'generic'}
+      <div class="owner typo-text-small">
+        <span>Hosted on</span>
+        <span class="typo-text-small-bold">{new URL(project.source.url).host}</span>
+      </div>
+    {/if}
   </div>
   {#if project.source.url}
     <a class="typo-text-small" href={project.source.url} target="_blank" rel="noreferrer"
