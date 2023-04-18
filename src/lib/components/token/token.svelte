@@ -60,7 +60,7 @@
 </script>
 
 <div class="token size-{size}">
-  <div class="logo" style={`height: ${sizes[size]}px; width: ${sizes[size]}px`}>
+  <div class="logo" style="height: {sizes[size]}px; width: {sizes[size]}px">
     <CoinAnimation enable={shouldAnimate} {animateOnMount}>
       {#if tokenInfo?.logoURI && !imageFailed}
         <div class="background" class:loaded />
@@ -139,6 +139,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: var(--elevation-low);
   }
 
   .background {
@@ -160,6 +161,9 @@
     width: 100%;
     opacity: 0;
     transition: opacity 0.3s;
+    border: 1px solid var(--color-foreground-level-6);
+    background-color: white;
+    padding: 8%;
   }
 
   img.loaded {
