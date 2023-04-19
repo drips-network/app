@@ -15,11 +15,6 @@
   import streams from '$lib/stores/streams';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import {
-    generateMetadata,
-    pinAccountMetadata,
-    USER_DATA_KEY,
-  } from '$lib/stores/streams/metadata';
-  import {
     getAddressDriverClient,
     getCallerClient,
     getNetworkConfig,
@@ -35,6 +30,8 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
+  import MetadataManagerFactory from '$lib/metadata/MetadataManagerFactory';
+  import AddressDriverMetadataManager from '$lib/metadata/AddressDriverMetadataManager';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -95,8 +92,10 @@
 
           let newHash = ownAccount.lastIpfsHash;
 
+          const metadataManager = MetadataManagerFactory.getAddressDriverMetadataManager();
+
           if (nameUpdated) {
-            const accountMetadata = generateMetadata(ownAccount, address);
+            const accountMetadata = metadataManager.generateAccountMetadata(ownAccount, address);
 
             const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
               (ac) => ac.tokenAddress === token.info.address,
@@ -116,7 +115,7 @@
 
             accountMetadata.timestamp = new Date().getTime() / 1000;
 
-            newHash = await pinAccountMetadata(accountMetadata);
+            newHash = await metadataManager.pinAccountMetadata(accountMetadata);
           }
 
           let currentReceivers: {
@@ -173,7 +172,7 @@
               newReceivers,
               userMetadata: [
                 {
-                  key: USER_DATA_KEY,
+                  key: AddressDriverMetadataManager.USER_METADATA_KEY,
                   value: newHash,
                 },
               ],
@@ -195,7 +194,7 @@
 
             tx = addressDriverClient.emitUserMetadata([
               {
-                key: USER_DATA_KEY,
+                key: AddressDriverMetadataManager.USER_METADATA_KEY,
                 value: newHash,
               },
             ]);

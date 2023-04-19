@@ -8,6 +8,9 @@ import {
   DripsSubgraphClient,
   Utils,
   type NetworkConfig,
+  NFTDriverClient,
+  NFTDriverTxFactory,
+  GitDriverClient,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -35,6 +38,32 @@ export function getAddressDriverClient(withSigner = get(wallet).signer) {
 }
 
 /**
+ * Get an initialized NFT Driver client.
+ * @returns An initialized NFT Driver client.
+ */
+export function getNFTDriverClient() {
+  const { provider, signer, connected } = get(wallet);
+  assert(connected, 'Wallet must be connected to create a NFTDriverClient');
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+
+  return NFTDriverClient.create(provider, signer, nftDriverAddress);
+}
+
+/**
+ * Get an initialized Git Driver client.
+ * @returns An initialized Git Driver client.
+ */
+export function getGitDriverClient() {
+  const { provider, signer, connected } = get(wallet);
+  assert(connected, 'Wallet must be connected to create a GitDriverClient');
+
+  const gitDriverAddress = getNetworkConfig().GIT_DRIVER;
+
+  return GitDriverClient.create(provider, signer, gitDriverAddress);
+}
+
+/**
  * Get an initialized Address Driver transaction factory.
  * @returns An initialized Address Driver transaction factory.
  */
@@ -45,6 +74,19 @@ export function getAddressDriverTxFactory() {
   const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
 
   return AddressDriverTxFactory.create(signer, addressDriverAddress);
+}
+
+/**
+ * Get an initialized NFT Driver transaction factory.
+ * @returns An initialized NFT Driver transaction factory.
+ */
+export function getNFTDriverTxFactory() {
+  const { signer } = get(wallet);
+  assert(signer);
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+
+  return NFTDriverTxFactory.create(signer, nftDriverAddress);
 }
 
 /**

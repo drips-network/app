@@ -1,9 +1,9 @@
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import { derived, get, writable } from 'svelte/store';
-import * as metadata from './metadata';
 import type { Account, Stream, UserId } from './types';
 import assert from '$lib/utils/assert';
 import type { AccountFetchStatus } from '../account-fetch-statusses/account-fetch-statusses.store';
+import MetadataManagerFactory from '$lib/metadata/MetadataManagerFactory';
 
 interface State {
   accounts: { [userId: UserId]: Account };
@@ -135,7 +135,9 @@ export default (() => {
 
   /** @private */
   async function _fetchAccount(userId: UserId): Promise<Account> {
-    const account = await metadata.fetchAccount(userId);
+    const account = await MetadataManagerFactory.getAddressDriverMetadataManager().fetchAccount(
+      userId,
+    );
 
     accounts.update((s) => ({ ...s, [userId]: account }));
 

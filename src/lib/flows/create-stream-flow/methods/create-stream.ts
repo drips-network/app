@@ -11,12 +11,6 @@ import { AddressDriverPresets, Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
-import {
-  generateMetadata,
-  pinAccountMetadata,
-  USER_DATA_KEY,
-  type streamMetadataSchema,
-} from '$lib/stores/streams/metadata';
 import type { z } from 'zod';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
@@ -24,6 +18,9 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
+import type { streamMetadataSchema } from '$lib/metadata/schemas';
+import MetadataManagerFactory from '$lib/metadata/MetadataManagerFactory';
+import AddressDriverMetadataManager from '$lib/metadata/AddressDriverMetadataManager';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -100,7 +97,9 @@ export default function (
           name: streamName,
         };
 
-        const accountMetadata = generateMetadata(ownAccount, address);
+        const metadataManager = MetadataManagerFactory.getAddressDriverMetadataManager();
+
+        const accountMetadata = metadataManager.generateAccountMetadata(ownAccount, address);
         const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
           (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );
@@ -118,7 +117,7 @@ export default function (
           };
         }
 
-        const newHash = await pinAccountMetadata(accountMetadata);
+        const newHash = await metadataManager.pinAccountMetadata(accountMetadata);
 
         const { ADDRESS_DRIVER } = getNetworkConfig();
 
@@ -136,7 +135,7 @@ export default function (
           ],
           userMetadata: [
             {
-              key: USER_DATA_KEY,
+              key: AddressDriverMetadataManager.USER_METADATA_KEY,
               value: newHash,
             },
           ],

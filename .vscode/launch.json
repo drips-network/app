@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Vite All Tests",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "test"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Vite Tests by Pattern",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "test", "MetadataManagerBase"]
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome against dev server",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/examples-app/src",
+      "userDataDir": false
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import type * as radicleDrips from 'radicle-drips';
 import { readable } from 'svelte/store';
-import * as metadata from '../metadata';
+import AddressDriverMetadataManager from '../../../metadata/AddressDriverMetadataManager';
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -179,10 +179,10 @@ vi.mock('radicle-drips', async () => ({
   },
 }));
 
-describe('metadata.ts', () => {
-  describe('fetchAccount', () => {
+describe('AddressDriverMetadataManager.ts', () => {
+  describe('fetchAddressDriverAccount', () => {
     it('includes expected metadata', async () => {
-      const account = await metadata.fetchAccount(
+      const account = await new AddressDriverMetadataManager().fetchAccount(
         '875267609686611184008791658115888920329297355417',
       );
 
@@ -203,7 +203,7 @@ describe('metadata.ts', () => {
     });
 
     it('creates the expected assetConfig objects', async () => {
-      const account = await metadata.fetchAccount(
+      const account = await new AddressDriverMetadataManager().fetchAccount(
         '875267609686611184008791658115888920329297355417',
       );
 
@@ -225,7 +225,7 @@ describe('metadata.ts', () => {
     });
 
     it('creates the expected stream objects', async () => {
-      const account = await metadata.fetchAccount(
+      const account = await new AddressDriverMetadataManager().fetchAccount(
         '875267609686611184008791658115888920329297355417',
       );
 
@@ -257,7 +257,7 @@ describe('metadata.ts', () => {
     });
 
     it('builds the correct assetConfig history for RAD', async () => {
-      const account = await metadata.fetchAccount(
+      const account = await new AddressDriverMetadataManager().fetchAccount(
         '875267609686611184008791658115888920329297355417',
       );
 
@@ -403,7 +403,7 @@ describe('metadata.ts', () => {
     });
 
     it('builds the correct assetConfig history for DAI', async () => {
-      const account = await metadata.fetchAccount(
+      const account = await new AddressDriverMetadataManager().fetchAccount(
         '875267609686611184008791658115888920329297355417',
       );
 
