@@ -10,6 +10,15 @@
   export let project: GitProject;
 </script>
 
+<svelte:head>
+  <title>{project.source.repoName} | Drips</title>
+  <meta
+    name="description"
+    content="Support {project.source
+      .repoName} on Drips and help make Open-Source Software sustainable."
+  />
+</svelte:head>
+
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
   <div class="project-profile">
     <div class="header">
