@@ -70,6 +70,7 @@
   import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
+  import buildExternalUrl from '$lib/utils/build-external-url';
 
   export let project: GitProject;
   export let tooltip = true;
@@ -89,7 +90,7 @@
       class="project-badge"
       href={linkTo === 'project-page'
         ? buildProjectUrl(project.source)
-        : processedProject.source.url}
+        : buildExternalUrl(processedProject.source.url)}
       target={linkTo === 'project-page' ? '' : '_blank'}
     >
       {#if !hideAvatar}<ProjectAvatar project={processedProject} />{/if}
