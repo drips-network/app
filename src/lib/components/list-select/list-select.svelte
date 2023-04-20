@@ -137,9 +137,9 @@
     <div class="empty-state">
       <EyeClosedIcon />
       {#if noItems}
-        <p class="typo-text-bold">{emptyStateText}</p>
+        <p class="typo-text">{emptyStateText}</p>
       {:else}
-        <p class="typo-text-bold">No matches</p>
+        <p class="typo-text">No matches</p>
       {/if}
     </div>
   {/if}
@@ -173,11 +173,11 @@
       {/if}
       <div class="content" class:action={item.type === 'action'}>
         {#if typeof item.label === 'string'}
-          <span class="label typo-text-bold">{item.label}</span>
+          <span class="label typo-text">{item.label}</span>
         {:else}
           <svelte:component this={item.label.component} {...item.label.props} />
         {/if}
-        {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono-bold"
+        {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono"
             >{item.text}</span
           >{/if}
       </div>

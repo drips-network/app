@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import Avatar from './avatar.svelte';
+import Avatar from './user-avatar.svelte';
 
 describe('avatar.svelte', async () => {
   it('renders the placeholder by default', () => {

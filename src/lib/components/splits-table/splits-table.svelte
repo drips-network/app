@@ -91,7 +91,7 @@
           <IdentityBadge address={data.user} size="medium" />
         </div>
       {:else}
-        <div class="my-5 typo-text-bold" class:animate-pulse={data.user.includes('...')}>
+        <div class="my-5 typo-text" class:animate-pulse={data.user.includes('...')}>
           {data.user}
         </div>
       {/if}
