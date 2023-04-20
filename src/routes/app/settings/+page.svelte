@@ -138,7 +138,7 @@
   <div class="section">
     <h4 class="typo-all-caps">Get in touch</h4>
     <Setting title="Join the discussion" subtitle="Join our Discord to chat with the team.">
-      <a class="typo-link" target="_blank" rel="noreferrer" href="https://discord.gg/vhGXkazpNc"
+      <a class="typo-link" target="_blank" rel="noreferrer" href="https://discord.gg/BakDKKDpHF"
         >Open Discord Server</a
       >
     </Setting>
