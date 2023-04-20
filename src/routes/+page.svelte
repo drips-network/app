@@ -253,7 +253,7 @@
             <a href="https://twitter.com/dripsnetwork" target="_blank" rel="noreferrer"
               ><Button variant="primary">Twitter</Button></a
             >
-            <a href="https://discord.gg/vhGXkazpNc" target="_blank" rel="noreferrer"
+            <a href="https://discord.gg/BakDKKDpHF" target="_blank" rel="noreferrer"
               ><Button variant="primary">Discord</Button></a
             >
           </div>
