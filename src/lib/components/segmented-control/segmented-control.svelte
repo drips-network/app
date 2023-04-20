@@ -47,7 +47,7 @@
       <div
         role="radio"
         aria-checked={active === option.value}
-        class="option typo-text-bold"
+        class="option typo-text"
         bind:this={optionElems[option.value]}
         class:selected={active === option.value}
         tabindex="0"

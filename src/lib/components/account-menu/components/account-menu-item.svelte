@@ -15,7 +15,7 @@
       {#if icon}<svelte:component this={icon} style="fill: var(--color-background)" />{/if}
     </div>
   {/if}
-  <div class="description typo-text-bold">
+  <div class="description typo-text">
     <slot name="title" />
   </div>
   <slot name="right">

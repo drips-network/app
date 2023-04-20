@@ -56,7 +56,7 @@
   let rightContainerWidth: number;
 </script>
 
-<div {style} class="wrapper">
+<div {style} class="wrapper typo-text">
   <input
     style={`${inputStyle}; padding-right: ${
       rightContainerWidth ? `${rightContainerWidth}px` : 'auto'
@@ -88,7 +88,7 @@
 
     {#if suffix}
       <span
-        class="typo-text-mono-bold"
+        class="typo-text-mono"
         style="color: var(--color-foreground-level-5); margin: 0 0.75rem;"
       >
         {suffix}

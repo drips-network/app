@@ -38,7 +38,7 @@ describe('identity-badge.svelte', () => {
 
     await tick();
 
-    screen.getAllByText('1235—5678');
+    screen.getAllByText('0x12—5678');
   });
 
   it('renders the ens name if one is found', async () => {
@@ -51,7 +51,7 @@ describe('identity-badge.svelte', () => {
 
     await tick();
 
-    const address = screen.queryByText('1234—5678');
+    const address = screen.queryByText('0x12—5678');
     expect(address).toBeNull();
 
     screen.getAllByText('test.eth');

@@ -12,10 +12,13 @@
 >
   <header class="flex flex-wrap justify-between items-end">
     <div class="title">
-      <h3 class="typo-text-bold">{title}</h3>
+      <h3 class="typo-text">{title}</h3>
       {#if tooltip}
-        <Tooltip text={tooltip}>
+        <Tooltip>
           <InfoCircle style="height: 1rem;" />
+          <svelte:fragment slot="tooltip-content">
+            {tooltip}
+          </svelte:fragment>
         </Tooltip>
       {/if}
     </div>

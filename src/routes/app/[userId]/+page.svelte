@@ -120,9 +120,21 @@
       {#if address}
         <div class="identity">
           <div class="avatar-and-name">
-            <IdentityBadge disableLink {address} size="gigantic" showIdentity={false} />
+            <IdentityBadge
+              disableLink
+              {address}
+              size="gigantic"
+              showIdentity={false}
+              disableTooltip
+            />
             <div class="w-full">
-              <IdentityBadge disableLink {address} size="gigantic" showAvatar={false} />
+              <IdentityBadge
+                disableLink
+                {address}
+                size="gigantic"
+                showAvatar={false}
+                disableTooltip
+              />
             </div>
           </div>
           <div class="social-links">
