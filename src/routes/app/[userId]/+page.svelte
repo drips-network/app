@@ -6,9 +6,9 @@
   import streams from '$lib/stores/streams';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
-  import Balances from '../dashboard/sections/balances.section.svelte';
-  import Splits from '../dashboard/sections/splits.section.svelte';
-  import Streams from '../dashboard/sections/streams.section.svelte';
+  import Balances from '../streams/sections/balances.section.svelte';
+  import Splits from '../streams/sections/splits.section.svelte';
+  import Streams from '../streams/sections/streams.section.svelte';
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -28,12 +28,12 @@
   const ensRecords = ['description', 'url', 'com.twitter', 'com.github'] as const;
   const socialLinks = ['com.twitter', 'com.github', 'url'] as const;
 
-  let socialLinkValues: { [key in typeof socialLinks[number]]: string } | undefined = undefined;
+  let socialLinkValues: { [key in (typeof socialLinks)[number]]: string } | undefined = undefined;
   let description: string | undefined;
 
   async function fetchEnsRecords(
     ensName: string,
-  ): Promise<{ [key in typeof ensRecords[number]]: string } | undefined> {
+  ): Promise<{ [key in (typeof ensRecords)[number]]: string } | undefined> {
     try {
       const { provider } = $wallet;
 
@@ -82,8 +82,8 @@
     if (name) updateEnsRecords(name);
   }
 
-  function isNetwork(input: string): input is typeof socialLinks[number] {
-    return socialLinks.includes(input as typeof socialLinks[number]);
+  function isNetwork(input: string): input is (typeof socialLinks)[number] {
+    return socialLinks.includes(input as (typeof socialLinks)[number]);
   }
 
   async function fetchRequestedAccount(userId: string) {
@@ -120,9 +120,21 @@
       {#if address}
         <div class="identity">
           <div class="avatar-and-name">
-            <IdentityBadge disableLink {address} size="gigantic" showIdentity={false} />
+            <IdentityBadge
+              disableLink
+              {address}
+              size="gigantic"
+              showIdentity={false}
+              disableTooltip
+            />
             <div class="w-full">
-              <IdentityBadge disableLink {address} size="gigantic" showAvatar={false} />
+              <IdentityBadge
+                disableLink
+                {address}
+                size="gigantic"
+                showAvatar={false}
+                disableTooltip
+              />
             </div>
           </div>
           <div class="social-links">

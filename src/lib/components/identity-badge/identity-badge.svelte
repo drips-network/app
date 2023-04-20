@@ -3,10 +3,11 @@
 
   import ensStore from '$lib/stores/ens';
   import { createIcon } from 'radicle-design-system/lib/blockies';
-  import Avatar from '$lib/components/avatar/avatar.svelte';
+  import Avatar from '$lib/components/user-avatar/user-avatar.svelte';
   import { browser } from '$app/environment';
   import wallet from '$lib/stores/wallet/wallet.store';
   import formatAddress from '$lib/utils/format-address';
+  import Tooltip from '../tooltip/tooltip.svelte';
 
   export let address: string;
   export let showIdentity = true;
@@ -15,6 +16,7 @@
   export let disableLink = false;
   export let disableSelection = false;
   export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
+  export let disableTooltip = false;
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
   export let isReverse = false;
@@ -50,58 +52,74 @@
   };
   $: currentSize = sizes[size];
 
-  const fontClasses = {
+  const fontClassesEns = {
     small: 'typo-text-small',
-    normal: 'typo-text-bold',
-    medium: 'typo-text-bold',
+    normal: 'typo-text',
+    medium: 'typo-text',
     big: 'typo-header-4',
     huge: 'typo-header-3',
     gigantic: 'typo-header-1',
   };
-  $: currentFontClass = fontClasses[size];
+  $: currentFontClassEns = fontClassesEns[size];
+
+  const fontClassesAddress = {
+    tiny: 'typo-text-mono-small',
+    small: 'typo-text-mono-small',
+    normal: 'typo-text-mono',
+    medium: 'typo-text-mono',
+    big: 'typo-header-4 mono',
+    huge: 'typo-header-3 mono',
+    gigantic: 'typo-header-1 mono',
+  };
+  $: currentFontClassAddress = fontClassesAddress[size];
+
+  $: currentFontClass = ens?.name ? currentFontClassEns : currentFontClassAddress;
 </script>
 
-<svelte:element
-  this={getLink() ? 'a' : 'span'}
-  href={getLink()}
-  class="identity-badge flex items-center relative text-left text-foreground"
-  class:flex-row-reverse={isReverse}
-  class:select-none={disableSelection}
-  style:height={showAvatar ? `${currentSize}px` : ''}
-  style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
->
-  {#if showAvatar}
-    <Avatar
-      size={currentSize}
-      bind:imgElem={avatarImgElem}
-      src={ens?.avatarUrl}
-      placeholderSrc={blockyUrl}
-    />
-  {/if}
-  {#if showIdentity}
-    <div class="identity relative flex-1 max-w-full">
-      <div
-        class:typo-text-mono-bold={!ens?.name}
-        class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
-        class:hideOnMobile={hideAvatarOnMobile}
-      >
-        {toDisplay}
-      </div>
-      {#key toDisplay}
+<Tooltip text={address} copyable disabled={disableTooltip}>
+  <svelte:element
+    this={getLink() ? 'a' : 'span'}
+    href={getLink()}
+    class="identity-badge flex items-center relative text-left text-foreground"
+    class:flex-row-reverse={isReverse}
+    class:select-none={disableSelection}
+    style:height={showAvatar ? `${currentSize}px` : ''}
+    style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
+  >
+    {#if showAvatar}
+      <Avatar
+        size={currentSize}
+        bind:imgElem={avatarImgElem}
+        src={ens?.avatarUrl}
+        placeholderSrc={blockyUrl}
+      />
+    {/if}
+    {#if showIdentity}
+      <div class="identity relative flex-1 max-w-full">
         <div
-          transition:fade|local={{ duration: 300 }}
-          class:mono={!ens?.name}
-          class:foreground={size === 'gigantic'}
-          class={`${currentFontClass} identity-ellipsis absolute overlay`}
-          data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+          class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
           class:hideOnMobile={hideAvatarOnMobile}
         >
           {toDisplay}
         </div>
-      {/key}
-    </div>
-  {/if}
-</svelte:element>
+        {#key toDisplay}
+          <div
+            transition:fade|local={{ duration: 300 }}
+            class:foreground={size === 'gigantic'}
+            class={`${currentFontClass} identity-ellipsis absolute overlay`}
+            data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+            class:hideOnMobile={hideAvatarOnMobile}
+          >
+            {toDisplay}
+          </div>
+        {/key}
+      </div>
+    {/if}
+  </svelte:element>
+  <svelte:fragment slot="tooltip-content">
+    {address}
+  </svelte:fragment>
+</Tooltip>
 
 <style>
   .identity-badge:focus {
@@ -118,8 +136,7 @@
   }
 
   .mono {
-    font-family: var(--typeface-mono-bold);
-    font-weight: bold;
+    font-family: var(--typeface-mono-regular);
     white-space: nowrap;
     font-style: normal;
   }

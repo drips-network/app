@@ -9,7 +9,7 @@
   import balances from '$lib/stores/balances';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
-  import Streams from '../../../dashboard/sections/streams.section.svelte';
+  import Streams from '../../../streams/sections/streams.section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet/wallet.store';
@@ -112,7 +112,7 @@
           {token?.info.name ?? 'Unknown token'}
         </h1>
         {#if token?.info.symbol}
-          <h4 class="typo-text-mono-bold" style="color: var(--color-foreground-level-5)">
+          <h4 class="typo-text-mono" style="color: var(--color-foreground-level-5)">
             {token.info.symbol}
           </h4>
         {/if}
