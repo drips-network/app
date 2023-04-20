@@ -70,7 +70,7 @@
   <div class="stream-state-badge {size}" style:background-color={`var(--${stateColor}-level-1`}>
     <div class="dot" style:background-color={`var(--${stateColor}-level-6`} />
     <span
-      class={size === 'normal' ? 'typo-text-bold' : 'typo-text-small-bold'}
+      class={size === 'normal' ? 'typo-text' : 'typo-text-small'}
       style:color={`var(--${stateColor}-level-6`}>{stateLabel}</span
     >
   </div>

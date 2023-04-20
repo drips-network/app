@@ -5,6 +5,5 @@
  * @returns The formatted address.
  */
 export default function formatAddress(address: string) {
-  const unpadded = address.replace('0x', '');
-  return `${unpadded.substring(0, 4)}—${unpadded.slice(-4)}`;
+  return `${address.substring(0, 4)}—${address.slice(-4)}`;
 }

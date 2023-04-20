@@ -37,7 +37,7 @@
 </script>
 
 <div class="name-and-badge">
-  <span class="typo-text-bold">
+  <span class="typo-text">
     {props.name}
   </span>
   <StreamStateBadge {...props} hideActive size="small" />

@@ -16,6 +16,9 @@
   import Step_1 from './examples/example-stepper-steps/step-1.svelte';
   import Step_2 from './examples/example-stepper-steps/step-2.svelte';
   import SuccessStep from './examples/example-stepper-steps/success-step.svelte';
+  import ProjectBadge, { type Source } from '$lib/components/project-badge/project-badge.svelte';
+  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
+  import ProjectCard from '$lib/components/project-card/project-card.svelte';
 
   // Button
   let disabled = false;
@@ -57,9 +60,108 @@
   // Amount
   let amount = '1000000000000000000';
   let tokenAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
+
+  // Project Badge
+  let projectVerified = true;
+  type SourceType = 'github' | 'gitlab' | 'radicle' | 'generic';
+  let sourceType: SourceType = 'github';
+
+  const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
+    github: {
+      type: 'github',
+      repoName: 'svelte-stepper',
+      ownerName: 'efstajas',
+      url: 'https://github.com/efstajas/svelte-stepper.git',
+    },
+    gitlab: {
+      type: 'gitlab',
+      repoName: 'svelte-stepper',
+      ownerName: 'efstajas',
+      host: 'gitlab.com',
+      url: 'https://gitlab.com/efstajas/svelte-stepper.git',
+    },
+    radicle: {
+      type: 'radicle',
+      repoName: 'svelte-stepper',
+      seed: 'https://some-seed.radicle.xyz',
+      rid: 'rad:29488291001389859',
+      url: 'https://some-seed.radicle.xyz/rad:29488291001389859',
+    },
+    generic: {
+      type: 'generic',
+      repoName: 'svelte-stepper',
+      url: 'https://some-host.com/svelte-stepper.git',
+    },
+  };
 </script>
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item" style="max-width: 16rem">
+  <h2>Project Card</h2>
+  <ProjectCard
+    project={{
+      gitDriverAccount: {
+        userId: '0',
+        driver: 'git',
+      },
+      owner: {
+        driver: 'address',
+        userId: '0',
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      },
+      source: SOURCE_CONFIGS.github,
+      emoji: '🚶',
+      color: '#f5e342',
+      description: 'A versatile component for building stepped flows with beautiful transitions.',
+    }}
+  />
+</div>
+
+<div class="showcase-item">
+  <h2>Project Badge</h2>
+  <div>
+    <div>
+      <input id="project-verified-checkbox" type="checkbox" bind:checked={projectVerified} />
+      <label for="project-verified-checkbox">Verified</label>
+    </div>
+    <div class="dropdown-wrapper">
+      <p>Source type:</p>
+      <Dropdown
+        options={Object.keys(SOURCE_CONFIGS).map((k) => ({
+          value: k,
+          title: k,
+        }))}
+        bind:value={sourceType}
+      />
+    </div>
+  </div>
+  <ProjectBadge
+    project={projectVerified
+      ? {
+          gitDriverAccount: {
+            userId: '0',
+            driver: 'git',
+          },
+          owner: {
+            driver: 'address',
+            userId: '0',
+            address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+          },
+          source: SOURCE_CONFIGS[sourceType],
+          emoji: '🚶',
+          color: '#f5e342',
+        }
+      : {
+          gitDriverAccount: {
+            userId: '0',
+            driver: 'git',
+          },
+          source: SOURCE_CONFIGS[sourceType],
+          owner: undefined,
+        }}
+  />
+</div>
 
 <div class="showcase-item">
   <h2>Button</h2>
@@ -73,16 +175,18 @@
 <div class="showcase-item">
   <h2>List Select</h2>
   <div>
-    <input id="searchable-checkbox" type="checkbox" bind:checked={searchable} />
-    <label for="searchable-checkbox">Searchable</label>
+    <div>
+      <input id="searchable-checkbox" type="checkbox" bind:checked={searchable} />
+      <label for="searchable-checkbox">Searchable</label>
+    </div>
+    <div>
+      <input id="multiselect-checkbox" type="checkbox" bind:checked={multiselect} />
+      <label for="multiselect-checkbox">Multi-select</label>
+    </div>
+    <p>
+      Selected tokens: {selectedTokens}
+    </p>
   </div>
-  <div>
-    <input id="multiselect-checkbox" type="checkbox" bind:checked={multiselect} />
-    <label for="multiselect-checkbox">Multi-select</label>
-  </div>
-  <p>
-    Selected tokens: {selectedTokens}
-  </p>
   <div class="list-container">
     <ListSelect
       items={exampleListItems}
@@ -139,10 +243,12 @@
 
 <div class="showcase-item">
   <h2>Amount</h2>
-  <p>Amount</p>
-  <TextInput bind:value={amount} />
-  <p>Token Address</p>
-  <TextInput bind:value={tokenAddress} />
+  <div>
+    <p>Amount</p>
+    <TextInput bind:value={amount} />
+    <p>Token Address</p>
+    <TextInput bind:value={tokenAddress} />
+  </div>
   <p>Output:</p>
   <Amount
     amount={{
@@ -180,10 +286,21 @@
 
   .showcase-item {
     margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 
   .stepper-wrapper {
     border: 1px solid var(--color-foreground);
     border-radius: 0.5rem;
+  }
+
+  .dropdown-wrapper {
+    white-space: nowrap;
+    max-width: 24rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
   }
 </style>
