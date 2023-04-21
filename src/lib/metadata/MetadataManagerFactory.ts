@@ -1,5 +1,5 @@
 import AddressDriverMetadataManager from './AddressDriverMetadataManager';
-import GitDriverMetadataManager from './GetDriverMetadataManager';
+import GitDriverMetadataManager from './GitDriverMetadataManager';
 import NftDriverMetadataManager from './MetadataManagerFactory';
 
 export default class MetadataManagerFactory {
