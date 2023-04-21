@@ -6,7 +6,7 @@ const NETWORK = {
 };
 
 class MockProvider extends providers.StaticJsonRpcProvider {
-  address = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
+  address = '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
 
   setAddress(to: string) {
     this.address = to;
@@ -24,7 +24,7 @@ class MockProvider extends providers.StaticJsonRpcProvider {
   getSigner(): providers.JsonRpcSigner {
     const tempProvider = new providers.StaticJsonRpcProvider(
       {
-        url: 'http://localhost:8545',
+        url: 'http://127.0.0.1:8545',
         skipFetchSetup: true,
       },
       NETWORK,
@@ -39,7 +39,7 @@ class MockProvider extends providers.StaticJsonRpcProvider {
 export default (address: string) => {
   const provider = new MockProvider(
     {
-      url: 'http://localhost:8545',
+      url: 'http://127.0.0.1:8545',
       skipFetchSetup: true,
     },
     NETWORK,

@@ -1,0 +1,31 @@
+name: Run e2e tests
+
+on: [pull_request]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Populate .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_PINATA_SDK_KEY: ${{ secrets.PINATA_SDK_KEY }}
+          envkey_PINATA_SDK_SECRET: ${{ secrets.PINATA_SDK_SECRET }}
+          envkey_TENDERLY_ACCESS_SECRET: ${{ secrets.TENDERLY_ACCESS_SECRET }}
+          envkey_TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
+          envkey_TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Svelte Kit Sync
+        run: npx svelte-kit sync
+
+      - name: Run E2E tests
+        run: npm run e2e

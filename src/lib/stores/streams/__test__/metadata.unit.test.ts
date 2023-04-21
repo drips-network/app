@@ -2,6 +2,10 @@ import type * as radicleDrips from 'radicle-drips';
 import { readable } from 'svelte/store';
 import * as metadata from '../metadata';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 vi.mock('$app/environment', () => ({
   browser: true,
 }));

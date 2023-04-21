@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import IdentityBadge from './identity-badge.svelte';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 vi.mock('$app/environment', () => ({
   browser: true,
 }));
