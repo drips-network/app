@@ -63,6 +63,7 @@
           size="big"
           address={item.item.address}
           showIdentity={false}
+          disableTooltip
         />{/if}
       <div class="badge"><UserIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
     </div>
