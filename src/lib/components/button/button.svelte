@@ -1,23 +1,71 @@
 <script lang="ts">
+  import hexToRgb from '$lib/utils/hex-to-rgb';
   import type { SvelteComponent } from 'svelte';
 
   export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
   export let icon: typeof SvelteComponent | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
+  export let size: 'normal' | 'large' = 'normal';
+
+  let buttonEl: HTMLButtonElement;
+
+  $: primaryColor = buttonEl
+    ? getComputedStyle(buttonEl).getPropertyValue('--color-primary')
+    : undefined;
+
+  function getContrastColor(forColor: string): 'black' | 'white' {
+    const trimmed = forColor.trim();
+    const isHex = trimmed.startsWith('#');
+
+    let color: { r: number; g: number; b: number; a: number };
+
+    if (isHex) {
+      const converted = hexToRgb(trimmed);
+      if (!converted) return 'white';
+
+      color = { ...converted, a: 1 };
+    } else {
+      const [r, g, b, a] = trimmed
+        .replace('rgba(', '')
+        .replace('rgb(', '')
+        .replace(')', '')
+        .split(',')
+        .map((v) => Number(v));
+
+      color = { r, g, b, a };
+    }
+
+    const { r, g, b, a } = color;
+    const brightness = r * 0.299 + g * 0.587 + b * 0.114 + (1 - a) * 255;
+
+    return brightness > 186 ? 'black' : 'white';
+  }
+
+  $: textColor =
+    primaryColor && (variant === 'destructive' || variant === 'primary')
+      ? getContrastColor(primaryColor)
+      : 'var(--color-foreground)';
 </script>
 
-<button aria-label={ariaLabel} {disabled} on:click|stopPropagation>
+<button
+  class="size-{size}"
+  bind:this={buttonEl}
+  aria-label={ariaLabel}
+  {disabled}
+  on:click|stopPropagation
+>
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
     class:with-text={Boolean($$slots.default) && !icon}
     class="inner typo-text {variant}"
+    style:color={textColor}
   >
     {#if icon}
       <svelte:component
         this={icon}
         style={variant === 'destructive' || variant === 'primary'
-          ? 'fill: white'
+          ? `fill: ${textColor}`
           : 'fill: var(--color-foreground)'}
       />
     {/if}
@@ -31,6 +79,11 @@
     min-width: calc(2rem + 4px); /* so just icons are square (w=h) */
     padding: 5px 2px;
     margin: -4px 0;
+  }
+
+  button.size-large {
+    height: calc(3rem + 10px);
+    min-width: calc(3rem + 4px);
   }
 
   button .inner {
@@ -47,18 +100,20 @@
     background-color: var(--color-background);
   }
 
+  button.size-large .inner {
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+  }
+
   button .inner:not(.ghost) {
     box-shadow: var(--elevation-low);
   }
 
   button .inner.primary {
     background-color: var(--color-primary);
-    color: #fff;
   }
 
   button .inner.destructive {
     background-color: var(--color-negative);
-    color: #fff;
   }
 
   button .inner.with-icon-text {

@@ -17,7 +17,9 @@
 <div class="project-tooltip">
   <div
     class="background"
-    style:background-color={(project.owner && project.color) || 'var(--color-foreground-level-1)'}
+    style:background-color={project.owner
+      ? 'var(--color-primary-level-2)'
+      : 'var(--color-foreground-level-1)'}
   />
   <div class="header">
     <ProjectAvatar {project} size="large" outline />
@@ -70,7 +72,6 @@
     right: 0;
     height: 3rem;
     border-radius: 1rem 0 0 0;
-    opacity: 0.4;
   }
 
   .owner {
