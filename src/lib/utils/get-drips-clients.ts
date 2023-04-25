@@ -8,6 +8,9 @@ import {
   DripsSubgraphClient,
   Utils,
   type NetworkConfig,
+  NFTDriverClient,
+  NFTDriverTxFactory,
+  GitDriverClient,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -21,6 +24,45 @@ export function getSubgraphClient() {
   const { network } = get(wallet);
 
   return DripsSubgraphClient.create(network.chainId, getNetworkConfig().SUBGRAPH_URL);
+}
+
+/**
+ * Get an initialized Git Driver client.
+ * @returns An initialized Git Driver client.
+ */
+export function getGitDriverClient() {
+  const { provider, signer, connected } = get(wallet);
+  assert(connected, 'Wallet must be connected to create a GitDriverClient');
+
+  const gitDriverAddress = getNetworkConfig().GIT_DRIVER;
+
+  return GitDriverClient.create(provider, signer, gitDriverAddress);
+}
+
+/**
+ * Get an initialized NFT Driver transaction factory.
+ * @returns An initialized NFT Driver transaction factory.
+ */
+export function getNFTDriverTxFactory() {
+  const { signer } = get(wallet);
+  assert(signer);
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+
+  return NFTDriverTxFactory.create(signer, nftDriverAddress);
+}
+
+/**
+ * Get an initialized NFT Driver client.
+ * @returns An initialized NFT Driver client.
+ */
+export function getNFTDriverClient() {
+  const { provider, signer, connected } = get(wallet);
+  assert(connected, 'Wallet must be connected to create a NFTDriverClient');
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+
+  return NFTDriverClient.create(provider, signer, nftDriverAddress);
 }
 
 /**
@@ -105,6 +147,10 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
         IMMUTABLE_SPLITS_DRIVER: '0x34466661145b6D19f32Ae0f4b2BFD3874573bdf0',
         IMMUTABLE_SPLITS_DRIVER_ID: '2',
         IMMUTABLE_SPLITS_DRIVER_LOGIC: '0x427f7c59ED72bCf26DfFc634FEF3034e00922DD8',
+        GIT_DRIVER: '',
+        GIT_DRIVER_ID: '',
+        GIT_DRIVER_LOGIC: '',
+        GIT_DRIVER_ADMIN: '',
       },
     }
   : {
