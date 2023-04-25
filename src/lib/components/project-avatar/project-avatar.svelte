@@ -72,7 +72,7 @@
 
   export let project: GitProject;
 
-  type Size = 'small' | 'medium' | 'large';
+  type Size = 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
   export let outline = false;
 
@@ -80,6 +80,7 @@
     small: '2rem',
     medium: '3rem',
     large: '4rem',
+    huge: '8rem',
   };
   $: containerSize = CONTAINER_SIZES[size];
 
@@ -87,6 +88,7 @@
     small: '1.5rem',
     medium: '2rem',
     large: '3rem',
+    huge: '5rem',
   };
   $: emojiFontSize = EMOJI_FONT_SIZES[size];
 </script>
@@ -97,7 +99,7 @@
   style:box-shadow={outline ? 'var(--elevation-low)' : ''}
 >
   {#if project.owner}
-    <div class="project-avatar" style:background-color={project.color}>
+    <div class="project-avatar" style:background-color="var(--color-primary)">
       <span class="emoji" style:font-size={emojiFontSize}>{project.emoji}</span>
     </div>
   {/if}

@@ -57,17 +57,21 @@
 </script>
 
 <script lang="ts">
+  import buildProjectUrl from '$lib/utils/build-project-url';
+
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';
 
   export let project: ClaimedGitProject;
 </script>
 
-<a class="wrapper" href="/app/projects/{project.gitDriverAccount.userId}">
+<a class="wrapper" href={buildProjectUrl(project.source)}>
   <div class="project-card">
     <div
       class="background"
-      style:background-color={(project.owner && project.color) || 'var(--color-foreground-level-1)'}
+      style:background-color={project.owner
+        ? 'var(--color-primary-level-2)'
+        : 'var(--color-foreground-level-1)'}
     />
     <div class="header">
       <div class="avatar"><ProjectAvatar {project} size="large" outline /></div>
@@ -114,7 +118,6 @@
     width: 100%;
     height: 3rem;
     border-radius: 1rem 0 0 0;
-    opacity: 0.4;
   }
 
   .name-and-description {
