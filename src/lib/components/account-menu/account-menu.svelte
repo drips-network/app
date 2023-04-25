@@ -11,6 +11,7 @@
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import { navigating } from '$app/stores';
+  import LegalLinks from '../legal-links/legal-links.svelte';
 
   $: $navigating && cupertinoPaneStore.closeSheet();
 
@@ -74,17 +75,7 @@
       <svelte:fragment slot="title">Profile</svelte:fragment>
     </AccountMenuItem>
     <Divider sideMargin={0.5} />
-    <ul class="links typo-text-small">
-      <li>
-        <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
-      </li>
-      <li>
-        <a href="/legal/disclaimer" target="_blank" rel="noreferrer">Disclaimer</a>
-      </li>
-      <li>
-        <a href="/legal/access" target="_blank" rel="noreferrer">Access</a>
-      </li>
-    </ul>
+    <LegalLinks />
   {/if}
 </div>
 
@@ -105,25 +96,5 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .links {
-    padding: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .links > li {
-    color: var(--color-foreground-level-6);
-  }
-
-  .links > li:not(:last-child)::after {
-    margin-left: 0.5rem;
-    content: '•';
-  }
-
-  .links a {
-    text-decoration: underline;
   }
 </style>

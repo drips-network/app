@@ -19,6 +19,7 @@
   import ProjectBadge, { type Source } from '$lib/components/project-badge/project-badge.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
+  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
 
   // Button
   let disabled = false;
@@ -99,23 +100,25 @@
 
 <div class="showcase-item" style="max-width: 16rem">
   <h2>Project Card</h2>
-  <ProjectCard
-    project={{
-      gitDriverAccount: {
-        userId: '0',
-        driver: 'git',
-      },
-      owner: {
-        driver: 'address',
-        userId: '0',
-        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-      },
-      source: SOURCE_CONFIGS.github,
-      emoji: '🚶',
-      color: '#f5e342',
-      description: 'A versatile component for building stepped flows with beautiful transitions.',
-    }}
-  />
+  <PrimaryColorThemer colorHex="#fcc842">
+    <ProjectCard
+      project={{
+        gitDriverAccount: {
+          userId: '0',
+          driver: 'git',
+        },
+        owner: {
+          driver: 'address',
+          userId: '0',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        },
+        source: SOURCE_CONFIGS.github,
+        emoji: '🚶',
+        color: '#fcc842',
+        description: 'A versatile component for building stepped flows with beautiful transitions.',
+      }}
+    />
+  </PrimaryColorThemer>
 </div>
 
 <div class="showcase-item">
@@ -136,31 +139,33 @@
       />
     </div>
   </div>
-  <ProjectBadge
-    project={projectVerified
-      ? {
-          gitDriverAccount: {
-            userId: '0',
-            driver: 'git',
-          },
-          owner: {
-            driver: 'address',
-            userId: '0',
-            address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-          },
-          source: SOURCE_CONFIGS[sourceType],
-          emoji: '🚶',
-          color: '#f5e342',
-        }
-      : {
-          gitDriverAccount: {
-            userId: '0',
-            driver: 'git',
-          },
-          source: SOURCE_CONFIGS[sourceType],
-          owner: undefined,
-        }}
-  />
+  <PrimaryColorThemer colorHex="#fcc842">
+    <ProjectBadge
+      project={projectVerified
+        ? {
+            gitDriverAccount: {
+              userId: '0',
+              driver: 'git',
+            },
+            owner: {
+              driver: 'address',
+              userId: '0',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+            },
+            source: SOURCE_CONFIGS[sourceType],
+            emoji: '🚶',
+            color: '#fcc842',
+          }
+        : {
+            gitDriverAccount: {
+              userId: '0',
+              driver: 'git',
+            },
+            source: SOURCE_CONFIGS[sourceType],
+            owner: undefined,
+          }}
+    />
+  </PrimaryColorThemer>
 </div>
 
 <div class="showcase-item">

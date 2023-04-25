@@ -39,9 +39,9 @@
 </svelte:head>
 
 <div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme}>
-  <div class="page" data-primary-color={$primaryColor}>
+  <main class="page" data-primary-color={$primaryColor}>
     <slot />
-  </div>
+  </main>
 </div>
 
 <style>
