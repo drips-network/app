@@ -36,7 +36,7 @@ const genericGitSourceSchema = z.object({
   url: z.string(),
 });
 
-const sourceSchema = z.union([
+export const sourceSchema = z.union([
   gitHubSourceSchema,
   gitLabSourceSchema,
   radicleSourceSchema,
@@ -74,7 +74,7 @@ export const dripsConfigSchema = z.object({
 });
 
 export const dripsUserSchema = z.object({
-  driver: z.union([z.literal('address'), z.literal('nft')]),
+  driver: z.union([z.literal('address'), z.literal('nft'), z.literal('git')]),
   userId: z.string(),
 });
 

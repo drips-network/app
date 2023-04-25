@@ -3,11 +3,10 @@ import MetadataManagerBase, { type IMetadataManager } from './MetadataManagerBas
 import { gitDriverAccountMetadataSchema } from './schemas';
 import type { GitDriverAccount, UserId } from './types';
 import { getGitDriverClient } from '$lib/utils/get-drips-clients';
+import type { z } from 'zod';
 
 export interface IGitDriverMetadataManager
-  extends IMetadataManager<typeof gitDriverAccountMetadataSchema> {
-  fetchAccount(userId: UserId): Promise<GitDriverAccount>;
-
+  extends IMetadataManager<typeof gitDriverAccountMetadataSchema, GitDriverAccount> {
   /**
    * Verifies the source metadata of a project.
    *
@@ -17,10 +16,10 @@ export interface IGitDriverMetadataManager
   verifySourceMetadata(gitUrl: string): Promise<boolean>;
 }
 
-export default class GitDriverMetadataManager
-  extends MetadataManagerBase<typeof gitDriverAccountMetadataSchema>
-  implements IGitDriverMetadataManager
-{
+export default class GitDriverMetadataManager extends MetadataManagerBase<
+  typeof gitDriverAccountMetadataSchema,
+  GitDriverAccount
+> {
   private _gitDriverClient: GitDriverClient;
 
   constructor(gitDriverClient?: GitDriverClient);
@@ -54,7 +53,22 @@ export default class GitDriverMetadataManager
     return true;
   }
 
-  fetchAccount(userId: UserId): Promise<GitDriverAccount> {
+  async fetchAccount(userId: UserId): Promise<GitDriverAccount | null> {
+    const metadata = await super.fetchAccountMetadata(userId);
+
+    if (!metadata) {
+      return null;
+    }
+
+    const { data } = metadata;
+
+    return {
+      userId: data.describes.userId,
+      driver: data.describes.driver,
+    } as GitDriverAccount;
+  }
+
+  public buildAccountMetadata(context: any): z.infer<typeof gitDriverAccountMetadataSchema> {
     throw new Error('Method not implemented.');
   }
 }

@@ -95,7 +95,10 @@
           const metadataManager = MetadataManagerFactory.getAddressDriverMetadataManager();
 
           if (nameUpdated) {
-            const accountMetadata = metadataManager.generateAccountMetadata(ownAccount, address);
+            const accountMetadata = metadataManager.buildAccountMetadata({
+              forAccount: ownAccount,
+              address,
+            });
 
             const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
               (ac) => ac.tokenAddress === token.info.address,

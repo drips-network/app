@@ -99,7 +99,10 @@ export default function (
 
         const metadataManager = MetadataManagerFactory.getAddressDriverMetadataManager();
 
-        const accountMetadata = metadataManager.generateAccountMetadata(ownAccount, address);
+        const accountMetadata = metadataManager.buildAccountMetadata({
+          forAccount: ownAccount,
+          address,
+        });
         const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
           (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );

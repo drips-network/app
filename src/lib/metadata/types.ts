@@ -1,26 +1,26 @@
 export interface GitHubSource {
+  url: string;
   repoName: string;
   ownerName: string;
-  url: string;
 }
 
 export interface GitLabSource {
-  repoName: string;
-  ownerName: string;
   host: string;
   url: string;
+  repoName: string;
+  ownerName: string;
 }
 
 export interface RadicleSource {
   rid: string;
-  repoName: string;
-  seed: string;
   url: string;
+  seed: string;
+  repoName: string;
 }
 
 export interface GenericGitSource {
-  repoName: string;
   url: string;
+  repoName: string;
 }
 
 type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
@@ -34,31 +34,31 @@ export interface AddressDriverAccount {
   address: Address;
 }
 
-export interface GitDriverAccount {
-  userId: UserId;
-  driver: 'git';
-}
-
 export interface NFTDriverAccount {
-  userId: UserId;
   driver: 'nft';
+  userId: UserId;
   owner: Address;
 }
 
-export type Account = AddressDriverAccount | GitDriverAccount;
+export interface GitDriverAccount {
+  driver: 'git';
+  userId: UserId;
+}
+
+export type Account = AddressDriverAccount | NFTDriverAccount | GitDriverAccount;
 
 export interface UnclaimedGitProject {
-  gitDriverAccount: GitDriverAccount;
   owner: undefined;
+  gitDriverAccount: GitDriverAccount;
   source: Source;
 }
 
 export interface ClaimedGitProject {
-  gitDriverAccount: GitDriverAccount;
   owner: AddressDriverAccount;
+  gitDriverAccount: GitDriverAccount;
   source: Source;
-  emoji: string;
   color: string;
+  emoji: string;
   description?: string;
 }
 

@@ -177,10 +177,10 @@ describe('AddressDriverMetadataManager', () => {
       const address = '0x123';
 
       // Act
-      const accountMetadata = new AddressDriverMetadataManager().generateAccountMetadata(
+      const accountMetadata = new AddressDriverMetadataManager().buildAccountMetadata({
         forAccount,
         address,
-      );
+      });
 
       // Assert
       expect(accountMetadata.describes).toEqual(forAccount.user);

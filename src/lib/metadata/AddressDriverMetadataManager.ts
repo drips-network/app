@@ -2,29 +2,18 @@ import type { Account, UserId } from '../stores/streams/types';
 import { reconcileDripsSetReceivers } from '../stores/streams/methods/reconcile-drips-set-receivers';
 import seperateDripsSetEvents from '../stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '../stores/streams/methods/build-asset-configs';
-import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
+import { AddressDriverClient } from 'radicle-drips';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { z } from 'zod';
-import MetadataManagerBase, { type IMetadataManager } from './MetadataManagerBase';
+import MetadataManagerBase from './MetadataManagerBase';
 import { addressDriverAccountMetadataSchema } from './schemas';
 
-export interface IAddressDriverMetadataManager
-  extends IMetadataManager<typeof addressDriverAccountMetadataSchema> {
-  fetchAccount(userId: UserId): Promise<Account>;
-  generateAccountMetadata(
-    forAccount: Account,
-    address: string,
-  ): z.infer<typeof addressDriverAccountMetadataSchema>;
-}
-
-export default class AddressDriverMetadataManager
-  extends MetadataManagerBase<typeof addressDriverAccountMetadataSchema>
-  implements IAddressDriverMetadataManager
-{
-  constructor();
-  constructor(subgraphClient: DripsSubgraphClient);
-  constructor(subgraphClient?: DripsSubgraphClient) {
-    super(addressDriverAccountMetadataSchema, subgraphClient);
+export default class AddressDriverMetadataManager extends MetadataManagerBase<
+  typeof addressDriverAccountMetadataSchema,
+  Account
+> {
+  constructor() {
+    super(addressDriverAccountMetadataSchema);
   }
 
   public async fetchAccount(userId: UserId): Promise<Account> {
@@ -51,13 +40,15 @@ export default class AddressDriverMetadataManager
       lastUpdated: data ? new Date(data.timestamp * 1000) : undefined,
       lastUpdatedByAddress: data?.writtenByAddress,
       lastIpfsHash: hash,
-    };
+    } as Account;
   }
 
-  public generateAccountMetadata(
-    forAccount: Account,
-    address: string,
-  ): z.infer<typeof addressDriverAccountMetadataSchema> {
+  public buildAccountMetadata(context: {
+    forAccount: Account;
+    address: string;
+  }): z.infer<typeof addressDriverAccountMetadataSchema> {
+    const { forAccount, address } = context;
+
     return {
       describes: forAccount.user,
       name: forAccount.name,

@@ -3,12 +3,7 @@ import { z } from 'zod';
 import * as fetchIpfs from '$lib/utils/ipfs';
 import isTest from '$lib/utils/is-test';
 import type { Mock } from 'vitest';
-import {
-  AddressDriverClient,
-  DripsSubgraphClient,
-  GitDriverClient,
-  NFTDriverClient,
-} from 'radicle-drips';
+import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import MetadataManagerBase from '../MetadataManagerBase';
 import {
   addressDriverAccountMetadataSchema,
@@ -16,10 +11,18 @@ import {
   nftDriverAccountMetadataSchema,
 } from '../schemas';
 import type { ContractTransaction } from 'ethers';
+import type { NFTDriverAccount } from '../types';
 
-class TestMetadataManager<
-  TAccountMetadataSchema extends z.ZodType,
-> extends MetadataManagerBase<TAccountMetadataSchema> {
+class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends MetadataManagerBase<
+  TAccountMetadataSchema,
+  NFTDriverAccount
+> {
+  public fetchAccount<TAccount>(): Promise<TAccount | null> {
+    throw new Error('Method not implemented.');
+  }
+  public buildAccountMetadata(): z.TypeOf<TAccountMetadataSchema> {
+    throw new Error('Method not implemented.');
+  }
   constructor(metadataSchema: TAccountMetadataSchema, subgraphClient?: DripsSubgraphClient) {
     super(metadataSchema, subgraphClient ?? getDripsClients.getSubgraphClient());
   }
@@ -249,17 +252,6 @@ describe('MetadataManagerBase', () => {
         .mockResolvedValue(tx);
       MetadataManagerBase.prototype['emitUserMetadata'] = emitUserMetadataMock;
 
-      const clientMock = {
-        emitUserMetadata: vi
-          .fn(AddressDriverClient.prototype.emitUserMetadata)
-          .mockResolvedValue(tx),
-      } as unknown as AddressDriverClient;
-      const originalGetClient = TestMetadataManager.prototype['getClient'];
-      const getClientMock = vi
-        .fn(TestMetadataManager.prototype['getClient'])
-        .mockResolvedValue(clientMock);
-      MetadataManagerBase.prototype['getClient'] = getClientMock;
-
       // Act
       const result = await new TestMetadataManager(
         addressDriverAccountMetadataSchema,
@@ -270,12 +262,10 @@ describe('MetadataManagerBase', () => {
       expect(result.tx).toBeDefined();
       expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
       expect(pinAccountMetadataMock).toHaveBeenCalledWith(newData);
-      expect(emitUserMetadataMock).toHaveBeenCalledWith(clientMock, 'newHash', userId);
-      expect(getClientMock).toHaveBeenCalledWith(addressDriverAccountMetadataSchema);
+      expect(emitUserMetadataMock).toHaveBeenCalledWith('newHash', userId);
 
       TestMetadataManager.prototype.pinAccountMetadata = originalPinAccountMetadata;
       TestMetadataManager.prototype['emitUserMetadata'] = originalEmitUserMetadata;
-      TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
     it('should throw an error when current metadata hash does not match on-chain value', async () => {
@@ -302,79 +292,117 @@ describe('MetadataManagerBase', () => {
   describe('emitUserMetadata', () => {
     it('should call NFTDriverClient.emitUserMetadata when client has safeCreateAccount', async () => {
       // Arrange
-      const client: NFTDriverClient = {
+      const clientMock = {
         safeCreateAccount: vi.fn(),
-        emitUserMetadata: vi.fn().mockResolvedValue({} as ContractTransaction),
-      } as unknown as NFTDriverClient;
+        emitUserMetadata: vi
+          .fn(AddressDriverClient.prototype.emitUserMetadata)
+          .mockResolvedValue({} as ContractTransaction),
+      } as unknown as AddressDriverClient;
+      const originalGetClient = TestMetadataManager.prototype['getClient'];
+      const getClientMock = vi
+        .fn(TestMetadataManager.prototype['getClient'])
+        .mockResolvedValue(clientMock);
+      TestMetadataManager.prototype['getClient'] = getClientMock;
 
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
       const newHash = 'newHash';
       const userId = '1';
 
       // Act
-      const result = await testMetadataManager['emitUserMetadata'](client, newHash, userId);
+      const result = await testMetadataManager['emitUserMetadata'](newHash, userId);
 
       // Assert
-      expect(client.emitUserMetadata).toHaveBeenCalledWith(userId, [
+      expect(clientMock.emitUserMetadata).toHaveBeenCalledWith(userId, [
         { key: MetadataManagerBase.USER_METADATA_KEY, value: newHash },
       ]);
       expect(result).toBeDefined();
+
+      TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
     it('should call AddressDriverClient.emitUserMetadata when client has getUserId', async () => {
       // Arrange
-      const client: AddressDriverClient = {
+      const clientMock = {
         getUserId: vi.fn(),
-        emitUserMetadata: vi.fn().mockResolvedValue({} as ContractTransaction),
+        emitUserMetadata: vi
+          .fn(AddressDriverClient.prototype.emitUserMetadata)
+          .mockResolvedValue({} as ContractTransaction),
       } as unknown as AddressDriverClient;
+      const originalGetClient = TestMetadataManager.prototype['getClient'];
+      const getClientMock = vi
+        .fn(TestMetadataManager.prototype['getClient'])
+        .mockResolvedValue(clientMock);
+      TestMetadataManager.prototype['getClient'] = getClientMock;
 
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
       const newHash = 'newHash';
       const userId = '1';
 
       // Act
-      const result = await testMetadataManager['emitUserMetadata'](client, newHash, userId);
+      const result = await testMetadataManager['emitUserMetadata'](newHash, userId);
 
       // Assert
-      expect(client.emitUserMetadata).toHaveBeenCalledWith([
+      expect(clientMock.emitUserMetadata).toHaveBeenCalledWith([
         { key: MetadataManagerBase.USER_METADATA_KEY, value: newHash },
       ]);
       expect(result).toBeDefined();
+
+      TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
     it('should call GitDriverClient.emitUserMetadata when client has getProjectId', async () => {
       // Arrange
-      const client: GitDriverClient = {
+      const clientMock = {
         getProjectId: vi.fn(),
-        emitUserMetadata: vi.fn().mockResolvedValue({} as ContractTransaction),
-      } as unknown as GitDriverClient;
+        emitUserMetadata: vi
+          .fn(AddressDriverClient.prototype.emitUserMetadata)
+          .mockResolvedValue({} as ContractTransaction),
+      } as unknown as AddressDriverClient;
+      const originalGetClient = TestMetadataManager.prototype['getClient'];
+      const getClientMock = vi
+        .fn(TestMetadataManager.prototype['getClient'])
+        .mockResolvedValue(clientMock);
+      TestMetadataManager.prototype['getClient'] = getClientMock;
 
       const testMetadataManager = new TestMetadataManager(gitDriverAccountMetadataSchema);
       const newHash = 'newHash';
       const userId = '1';
 
       // Act
-      const result = await testMetadataManager['emitUserMetadata'](client, newHash, userId);
+      const result = await testMetadataManager['emitUserMetadata'](newHash, userId);
 
       // Assert
-      expect(client.emitUserMetadata).toHaveBeenCalledWith(userId, [
+      expect(clientMock.emitUserMetadata).toHaveBeenCalledWith(userId, [
         { key: MetadataManagerBase.USER_METADATA_KEY, value: newHash },
       ]);
       expect(result).toBeDefined();
+
+      TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
     it('should throw an error for unsupported client in emitUserMetadata', async () => {
       // Arrange
-      const client = {} as any;
+      const clientMock = {
+        emitUserMetadata: vi
+          .fn(AddressDriverClient.prototype.emitUserMetadata)
+          .mockResolvedValue({} as ContractTransaction),
+      } as unknown as AddressDriverClient;
+      const originalGetClient = TestMetadataManager.prototype['getClient'];
+      const getClientMock = vi
+        .fn(TestMetadataManager.prototype['getClient'])
+        .mockResolvedValue(clientMock);
+      TestMetadataManager.prototype['getClient'] = getClientMock;
 
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
       const newHash = 'newHash';
       const userId = '1';
 
       // Act & Assert
-      await expect(
-        testMetadataManager['emitUserMetadata'](client, newHash, userId),
-      ).rejects.toThrow('Unsupported client');
+      await expect(testMetadataManager['emitUserMetadata'](newHash, userId)).rejects.toThrow(
+        'Unsupported client',
+      );
+
+      TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
   });
 

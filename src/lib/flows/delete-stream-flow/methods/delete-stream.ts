@@ -38,7 +38,10 @@ export default function (
 
         const metadataManager = MetadataManagerFactory.getAddressDriverMetadataManager();
 
-        const metadata = metadataManager.generateAccountMetadata(ownAccount, address);
+        const metadata = metadataManager.buildAccountMetadata({
+          forAccount: ownAccount,
+          address,
+        });
         const assetConfigIndex = metadata.assetConfigs.findIndex(
           (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );

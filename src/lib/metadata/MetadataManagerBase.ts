@@ -4,41 +4,52 @@ import {
   getNFTDriverClient,
   getSubgraphClient,
 } from '$lib/utils/get-drips-clients';
-import type { UserId } from '../stores/streams/types';
-import isTest from '$lib/utils/is-test';
 import { fetchIpfs } from '$lib/utils/ipfs';
+import isTest from '$lib/utils/is-test';
 import type { ContractTransaction } from 'ethers';
-import type { z } from 'zod';
 import type {
   AddressDriverClient,
   DripsSubgraphClient,
   GitDriverClient,
   NFTDriverClient,
 } from 'radicle-drips';
+import type { z } from 'zod';
+import type { UserId } from '../stores/streams/types';
 import {
   addressDriverAccountMetadataSchema,
   gitDriverAccountMetadataSchema,
   nftDriverAccountMetadataSchema,
 } from './schemas';
 
-export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType> {
+export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
   fetchMetadataHashByUserId(userId: UserId): Promise<string | undefined>;
+
   fetchAccountMetadata(
     userId: UserId,
   ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | undefined>;
+
   pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string>;
+
   updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
     lastKnownHash: string | undefined,
     schema: T,
   ): Promise<{ newHash: string; tx: ContractTransaction }>;
+
+  fetchAccount(userId: UserId): Promise<TAccount | null>;
+
+  buildAccountMetadata(context: unknown): z.infer<TAccountMetadataSchema>;
 }
 
-export default abstract class MetadataManagerBase<TAccountMetadataSchema extends z.ZodType> {
+export default abstract class MetadataManagerBase<
+  TAccountMetadataSchema extends z.ZodType,
+  TAccount,
+> implements IMetadataManager<TAccountMetadataSchema, TAccount>
+{
+  public static readonly USER_METADATA_KEY = 'ipfs';
+
   private readonly _metadataSchema: TAccountMetadataSchema;
   protected readonly subgraphClient: DripsSubgraphClient;
-
-  public static readonly USER_METADATA_KEY = 'ipfs';
 
   protected constructor(metadataSchema: TAccountMetadataSchema);
   protected constructor(
@@ -53,6 +64,25 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
     this.subgraphClient = subgraphClient ?? getSubgraphClient();
   }
 
+  /**
+   * Fetches the account for a given user ID.
+   * @param userId The user ID to fetch the account for.
+   * @returns The account for the given user ID, or null if no account exists.
+   */
+  public abstract fetchAccount(userId: UserId): Promise<TAccount | null>;
+
+  /**
+   * Builds account metadata.
+   * @param context The context to build the account metadata from.
+   * @returns The built account metadata.
+   */
+  public abstract buildAccountMetadata(context: unknown): z.infer<TAccountMetadataSchema>;
+
+  /**
+   * Fetches the latest metadata hash for a given user ID.
+   * @param userId The user ID to fetch the metadata hash for.
+   * @returns The latest metadata hash for the given user ID, or undefined if no metadata hash exists.
+   */
   public async fetchMetadataHashByUserId(userId: UserId): Promise<string | undefined> {
     const userMetadata = await this.subgraphClient.getLatestUserMetadata(
       userId,
@@ -61,7 +91,11 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
 
     return userMetadata?.value;
   }
-
+  /**
+   * Fetches the latest IPFS metadata for a given user ID.
+   * @param userId The user ID to fetch the metadata for.
+   * @returns The latest IPFS metadata for the given user ID, or undefined if no metadata exists.
+   */
   public async fetchAccountMetadata(
     userId: UserId,
   ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | undefined> {
@@ -86,7 +120,12 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
       data: this._metadataSchema.parse(accountMetadataRes),
     };
   }
-
+  /**
+   * Pins account metadata to IPFS.
+   * @param data The account metadata to pin.
+   * @returns The IPFS hash of the pinned metadata.
+   * @throws If the pinning fails.
+   */
   public async pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string> {
     if (isTest()) {
       const mockHash = (Math.random() + 1).toString(36).substring(7);
@@ -112,7 +151,14 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
 
     return res.text();
   }
-
+  /**
+   * Updates account metadata.
+   * @param newData The new account metadata.
+   * @param lastKnownHash The last known IPFS hash of the account metadata.
+   * @returns The new IPFS hash of the account metadata, and the transaction that emitted the new metadata.
+   * @throws If the last known hash doesn't match the on-chain value.
+   * @throws If the update fails.
+   */
   public async updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
     lastKnownHash: string | undefined,
@@ -129,9 +175,7 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
 
     const newHash = await this.pinAccountMetadata(newData);
 
-    const client = await this.getClient(this._metadataSchema);
-
-    const tx = await this.emitUserMetadata(client, newHash, userId);
+    const tx = await this.emitUserMetadata(newHash, userId);
 
     return {
       newHash,
@@ -139,17 +183,15 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
     };
   }
 
-  private async emitUserMetadata(
-    client: AddressDriverClient | NFTDriverClient | GitDriverClient,
-    newHash: string,
-    userId: UserId,
-  ) {
+  private async emitUserMetadata(newHash: string, userId: UserId) {
     const userMetadata = [
       {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
       },
     ];
+
+    const client = await this.getClient(this._metadataSchema);
 
     let tx: ContractTransaction;
     if ('safeCreateAccount' in client) {
@@ -161,6 +203,7 @@ export default abstract class MetadataManagerBase<TAccountMetadataSchema extends
     } else {
       throw new Error('Unsupported client');
     }
+
     return tx;
   }
 
