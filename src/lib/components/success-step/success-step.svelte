@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
   import Emoji from '../emoji/emoji.svelte';
@@ -32,7 +31,7 @@
         description="Please execute the proposed transaction(s) in your Safe. Once executed, check back here to see the result."
       />
     {:else}
-      <CheckCircle style="height: 4rem; width: 4rem; fill: var(--color-positive);" />
+      <Emoji size="huge" emoji="✅" />
       <StepHeader
         headline="Success"
         description={typeof message === 'function' ? message() : message}

@@ -74,7 +74,7 @@
               Sorry, we weren't able to load this. There may be more information in the developer
               console.
             </p>
-            <a class="typo-link typo-text-small" href="https://discord.gg/vhGXkazpNc"
+            <a class="typo-link typo-text-small" href="https://discord.gg/BakDKKDpHF"
               >Ask for help</a
             >
           </div>
