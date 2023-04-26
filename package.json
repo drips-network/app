@@ -23,7 +23,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
-    "@playwright/test": "^1.25.0",
+    "@playwright/test": "^1.32.3",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/adapter-auto": "^1.0.2",
     "@sveltejs/adapter-vercel": "^2.3.0",
