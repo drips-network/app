@@ -19,7 +19,7 @@ import {
   gitDriverAccountMetadataSchema,
   nftDriverAccountMetadataSchema,
 } from './schemas';
-import type { UserId } from './types';
+import type { UserId } from '$lib/stores/streams/types';
 
 export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
   fetchMetadataHashByUserId(userId: UserId): Promise<string | undefined>;

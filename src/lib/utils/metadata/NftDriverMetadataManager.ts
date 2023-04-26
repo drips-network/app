@@ -1,8 +1,9 @@
 import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
 import { gitDriverSplitReceiverSchema, nftDriverAccountMetadataSchema } from './schemas';
-import type { NFTDriverAccount, UserId } from './types';
+import type { NFTDriverAccount } from './types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import type { UserId } from '$lib/stores/streams/types';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataSchema,

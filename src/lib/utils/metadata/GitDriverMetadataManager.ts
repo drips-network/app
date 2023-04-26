@@ -5,9 +5,10 @@ import {
   gitDriverSplitReceiverSchema,
   splitReceiverSchema,
 } from './schemas';
-import type { ClaimedGitProject, GitDriverAccount, UserId } from './types';
+import type { ClaimedGitProject, GitDriverAccount } from './types';
 import { getGitDriverClient } from '$lib/utils/get-drips-clients';
 import type { z } from 'zod';
+import type { UserId } from '$lib/stores/streams/types';
 
 export interface IGitDriverMetadataManager
   extends IMetadataManager<typeof gitDriverAccountMetadataSchema, GitDriverAccount> {
