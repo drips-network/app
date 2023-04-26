@@ -23,12 +23,14 @@ class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends Meta
   public buildAccountMetadata(): z.TypeOf<TAccountMetadataSchema> {
     throw new Error('Method not implemented.');
   }
-  constructor(metadataSchema: TAccountMetadataSchema, subgraphClient?: DripsSubgraphClient) {
-    super(metadataSchema, subgraphClient ?? getDripsClients.getSubgraphClient());
+  constructor(metadataSchema: TAccountMetadataSchema) {
+    super(metadataSchema);
   }
 }
 
 describe('MetadataManagerBase', () => {
+  vi.mock('$lib/utils/get-drips-clients');
+
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -50,11 +52,10 @@ describe('MetadataManagerBase', () => {
           .fn(DripsSubgraphClient.prototype.getLatestUserMetadata)
           .mockResolvedValue(expectedMetadata),
       } as unknown as DripsSubgraphClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
 
-      const testMetadataManager = new TestMetadataManager(
-        addressDriverAccountMetadataSchema,
-        subgraphClientMock,
-      );
+      const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
 
       // Act
       const metadataHash = await testMetadataManager.fetchMetadataHashByUserId(userId);
@@ -133,6 +134,14 @@ describe('MetadataManagerBase', () => {
       // Arrange
       const userId = '1';
       const metadataSchema = z.string();
+
+      const subgraphClientMock = {
+        getLatestUserMetadata: vi
+          .fn(DripsSubgraphClient.prototype.getLatestUserMetadata)
+          .mockResolvedValue(undefined as any),
+      } as unknown as DripsSubgraphClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
 
       // Act
       const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(userId);
@@ -419,10 +428,7 @@ describe('MetadataManagerBase', () => {
 
     it('should return a NFTDriverClient when NFT driver account metadata schema is provided', async () => {
       // Arrange
-      const testMetadataManager = new TestMetadataManager(
-        nftDriverAccountMetadataSchema,
-        {} as any,
-      );
+      const testMetadataManager = new TestMetadataManager(nftDriverAccountMetadataSchema);
 
       const spy = vi
         .spyOn(getDripsClients, 'getNFTDriverClient')
@@ -437,10 +443,7 @@ describe('MetadataManagerBase', () => {
 
     it('should return a GitDriverClient when Git driver account metadata schema is provided', async () => {
       // Arrange
-      const testMetadataManager = new TestMetadataManager(
-        nftDriverAccountMetadataSchema,
-        {} as any,
-      );
+      const testMetadataManager = new TestMetadataManager(nftDriverAccountMetadataSchema);
 
       const spy = vi
         .spyOn(getDripsClients, 'getGitDriverClient')

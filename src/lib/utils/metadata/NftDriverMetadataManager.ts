@@ -3,16 +3,13 @@ import MetadataManagerBase from './MetadataManagerBase';
 import { gitDriverSplitReceiverSchema, nftDriverAccountMetadataSchema } from './schemas';
 import type { NFTDriverAccount, UserId } from './types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { DripsSubgraphClient } from 'radicle-drips';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataSchema,
   NFTDriverAccount
 > {
-  constructor();
-  constructor(subgraphClient: DripsSubgraphClient);
-  constructor(subgraphClient?: DripsSubgraphClient) {
-    super(nftDriverAccountMetadataSchema, subgraphClient);
+  constructor() {
+    super(nftDriverAccountMetadataSchema);
   }
 
   public async fetchAccount(userId: UserId): Promise<NFTDriverAccount | null> {

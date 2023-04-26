@@ -4,6 +4,8 @@ import type { NFTDriverAccount } from '../types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
 describe('NftDriverMetadataManager', () => {
+  vi.mock('$lib/utils/get-drips-clients');
+
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -16,8 +18,10 @@ describe('NftDriverMetadataManager', () => {
           .fn(DripsSubgraphClient.prototype.getNftSubAccountOwnerByTokenId)
           .mockResolvedValue(null),
       } as unknown as DripsSubgraphClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
 
-      const metadataMgr = new NftDriverMetadataManager(subgraphClientMock);
+      const metadataMgr = new NftDriverMetadataManager();
 
       // Act
       const account = await metadataMgr.fetchAccount('1');
@@ -43,8 +47,10 @@ describe('NftDriverMetadataManager', () => {
             ownerAddress: expectedAccount.owner,
           }),
       } as unknown as DripsSubgraphClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
 
-      const metadataMgr = new NftDriverMetadataManager(subgraphClientMock);
+      const metadataMgr = new NftDriverMetadataManager();
 
       // Act & Assert
       await expect(metadataMgr.fetchAccount(expectedAccount.userId)).rejects.toThrowError();
@@ -69,8 +75,10 @@ describe('NftDriverMetadataManager', () => {
             ownerAddress: expectedAccount.owner,
           }),
       } as unknown as DripsSubgraphClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
 
-      const metadataMgr = new NftDriverMetadataManager(subgraphClientMock);
+      const metadataMgr = new NftDriverMetadataManager();
 
       // Act
       const account = await metadataMgr.fetchAccount(expectedAccount.userId);

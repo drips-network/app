@@ -1,4 +1,3 @@
-import type { GitDriverClient } from 'radicle-drips';
 import MetadataManagerBase, { type IMetadataManager } from './MetadataManagerBase';
 import {
   addressDriverSplitReceiverSchema,
@@ -25,15 +24,8 @@ export default class GitDriverMetadataManager extends MetadataManagerBase<
   typeof gitDriverAccountMetadataSchema,
   GitDriverAccount
 > {
-  private _gitDriverClient: GitDriverClient;
-
-  constructor(gitDriverClient?: GitDriverClient);
-  constructor(gitDriverClient: GitDriverClient) {
-    gitDriverClient = gitDriverClient ?? getGitDriverClient();
-
+  constructor() {
     super(gitDriverAccountMetadataSchema);
-
-    this._gitDriverClient = gitDriverClient;
   }
 
   public async verifySourceMetadata(projectId: string): Promise<boolean> {
@@ -45,7 +37,9 @@ export default class GitDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName } = metadata.data.source;
 
-    const onChainProjectId = await this._gitDriverClient.getProjectId(url);
+    const gitDriverClient = await getGitDriverClient();
+
+    const onChainProjectId = await gitDriverClient.getProjectId(url);
 
     if (onChainProjectId !== projectId) {
       return false;
