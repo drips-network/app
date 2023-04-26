@@ -2,6 +2,5 @@ import type { Page } from 'playwright';
 
 export default (page: Page) =>
   page.addInitScript(`
-    window.isPlaywrightTest = true;
-    window.playwrightAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
+    window.playwrightAddress = '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
 `);

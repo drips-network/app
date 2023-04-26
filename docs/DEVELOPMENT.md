@@ -27,6 +27,10 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
+## 🌳 Environment
+
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. You'll need access credentials for Pinata and Tenderly.
+
 ## 🧪 Tests
 
 Tests are setup with `vitest` as a runner, and `playwright` as the E2E test environment. Components can be unit-tested using `jsdom` (check `$lib/components/example/example.test.ts` for an example). Ensure unit tests follow the name format `*.unit.test.ts`, while E2E tests should be named like `*.e2e.test.ts`.
@@ -39,44 +43,36 @@ With all dependencies installed, simply run:
 npm run test:unit
 ```
 
-### Run E2E tests
+### E2E tests
 
-#### Setup
+#### Running E2E tests
 
-The E2E setup spins up a local EVM testnet via `anvil`, deploys `drips-contracts` and a mock ERC-20 contract on it, runs a Graph node, and deploys `drips-subgraph`.
+We're using `docker compose` to run a local test environment, including a `ganache` testnet with deployed Drips contracts (and a mock ERC-20), a local graph node with
 
-In order to run E2E tests, you need a few requisites:
-
-- A Postgres database running locally at port 5432. The simplest way on Mac OS is to install https://postgresapp.com/ and running it with default settings.
-- A local IPFS node at port 8545. The simplest way on Mac OS is to install [IPFS Desktop](https://github.com/ipfs/ipfs-desktop#quick-install-shortcuts) and running it with default settings.
-- A Rust dev environment. The simplest way is to run [`rustup`](https://rustup.rs/).
-- Foundry. The simplest way is to run [`foundryup`](https://github.com/foundry-rs/foundry#installation)
-
-With everything above met, ensure the app's dependencies are installed via NPM, and execute from the root directory of the app:
+To get started, make sure you have Docker installed & running, ensure the app's dependencies are installed via NPM, and execute from the root directory of the app:
 
 ```bash
-npm run setup-e2e
+npm run e2e
 ```
 
-This will download all projects required for the E2E env to `/src/e2e-tests/.tmp` and install their dependencies. You only need to run this command once, or after any of the required projects (`drips-contracts`, `graph-node`, `drips-subgraph`) release an update.
+This will build a production version of the app, and execute all E2E test suites. Each test suite itself will run `docker compose up` to start the E2E test environment (ipfs node, anvil testnet w/ Drips contracts, and Graph Node w/ Drips subgraph). On first run, you'll see `Pinging Graph Node…` being logged for an extended amount of time. On subsequent runs, this step will be a lot faster, because much of the E2E Docker environment is being cached.
 
-Once done, run from the root directory of the app:
+**Important:** The local testnet is based on a static chain state which is copied into the testnet image from ./src/e2e-tests/docker/testnet/state. When a new version of contracts is released, this state needs to be updated. The subgraph is downloaded at image build time from the latest state of the `drips-subgraph` repo's `v2` branch.
 
-```bash
-npm run start-e2e-env
+#### Writing E2E tests
+
+##### Starting the E2E test environment
+
+To start the E2E environment (local testnet & graph node with deployed Drips contracts and subgraph), register the following Vitest callbacks on your test suites:
+
+```ts
+beforeAll(environment.start, 14400000);
+afterAll(environment.stop);
 ```
 
-Keep that terminal window open — if you close it, the local E2E environment will stop. If you ever run into trouble with Anvil or the Graph Node not starting because of orphan processes, you can simply run `./src/e2e-tests/scripts/stop-background-env.sh`.
+This will start the Docker environment before the tests run, and shut it down at the end.
 
-This script **deletes (if exists) and recreates a database called `node-graph` on your local postgres instance**, spins up a local EVM testnet using `anvil`, deploys all drips contracts and an ERC-20 mock token, launches a local graph node, and deploys the `drips-subgraph`. Note that this will be a lot faster after the first run, as the compiled smart contracts and graph-node will be cached.
-
-Once done, you can start running E2E tests with:
-
-```bash
-npm run test:e2e
-```
-
-If you want to reset the local testnet and subgraph fully, just open the terminal window in which you ran `start-e2e-env`, and hit enter. The script automatically terminates all running background processes, and you can simply run it again to start fresh.
+##### Configuring the app for testing
 
 In order to connect the app to the local E2E network during an E2E test, add this `beforeAll` block in your test fixture:
 
@@ -102,7 +98,7 @@ When starting your E2E test like this, user `0xf39fd6e51aad88f6f4ce6ab8827279cff
 
 #### Interacting with the Mock ERC-20
 
-As part of E2E environment setup, a mock ERC-20 token is deployed at `0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0`, and automatically grants address `0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
+As part of E2E environment setup, a mock ERC-20 token is deployed at `0x176aA34a1a36F0A43736aBDcd3D9f011a107cdF8`, and automatically grants address `0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
 
 Simply run the following in a `page.addInitScript` block:
 
@@ -115,7 +111,7 @@ localStorage.setItem(
       banned: false,
       info: {
         chainId: 5,
-        address: '0x9A676e781A523b5d0C0e43731313A708CB607508',
+        address: '0x176aA34a1a36F0A43736aBDcd3D9f011a107cdF8',
         name: 'Testcoin',
         decimals: 18,
         symbol: 'TEST',
@@ -127,16 +123,12 @@ localStorage.setItem(
 
 After doing this, the app will display the token within all token pickers. Alternatively, you can also run through adding the custom token via the UI within your test.
 
-#### Note on shared state of E2E env
+#### `PUBLIC_TEST_MODE` and `playwrightAddress`
 
-With our current setup, an E2E test env containing of local testnet and drips contracts is deployed before all E2E tests are executed, and not reset between runs, meaning that all E2E tests share the same local environment state. There is currently one unit test that runs through topping up, creating a stream, switching over to another user, and verifying the incoming stream is there. Other E2E tests that are independent of the top-up balance & streams may be set up to run in parallel (e.g. testing setting up a split), but anything that depends on some token being topped up, or a stream existing, should probably be appended to the existing `top-up-create-stream` fixture. In the future, we may consider writing a function that allows resetting the local testnet from within Playwright.
-
-#### `isPlaywrightTest` and `playwrightAddress`
-
-Unfortunately, two major differences in app logic for E2E tests couldn't be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for a variable `window.isPlaywrightTest` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
+Unfortunately, two major differences in app logic for E2E tests couldn't be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for an env variable `PUBLIC_TEST_MODE` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
 
 ## 😱 Advanced
 
 ### 🌐 Run app locally with a local testnet
 
-It's possible to connect the app running locally to the local E2E test environment described above. This allows simple and quick development locally, as all transactions will resolve instantly, and network requests are a lot faster. To do so, simply manually set `window.isPlaywrightTest` to `true`, for example by adding a new `<script>` tag within `app.html`. Before you do this, ensure your local E2E test environment is up & running according to the instructions under E2E Tests → Setup above.
+It's possible to connect the app running locally to the local E2E test environment described above. This allows simple and quick development locally, as all transactions will resolve instantly, and network requests are a lot faster. To do so, run `npm run dev:local-env:start-env` to up the local development environment, then run `dev:local-env:start-app` to start the dev server and connect it to the local services. Once done, run `npm run dev:local-env:stop-env` to stop the local development environment.

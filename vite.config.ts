@@ -22,6 +22,9 @@ const config = defineConfig({
       target: 'es2020',
     },
   },
+  preview: {
+    host: '0.0.0.0',
+  },
 });
 
 export default config;

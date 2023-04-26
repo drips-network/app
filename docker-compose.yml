@@ -1,0 +1,52 @@
+services:
+  ipfs:
+    image: ipfs/go-ipfs
+    ports:
+      - '5001:5001'
+
+  postgres:
+    image: postgres
+    ports:
+      - '5432:5432'
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: graph-node
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+
+  testnet:
+    build:
+      dockerfile: ./src/e2e-tests/docker/testnet/Dockerfile
+      context: .
+    ports:
+      - "8545:8545"
+
+  graph-node:
+    image: graphprotocol/graph-node
+    ports:
+      - '8000:8000'
+      - '8001:8001'
+      - '8020:8020'
+      - '8030:8030'
+      - '8040:8040'
+    depends_on:
+      - ipfs
+      - postgres
+      - testnet
+    environment:
+      postgres_host: postgres
+      postgres_user: graph-node
+      postgres_pass: postgres
+      postgres_db: graph-node
+      ipfs: 'ipfs:5001'
+      ethereum: "goerli:http://testnet:8545"
+      GRAPH_LOG: info
+
+  subgraph-deployer:
+    build:
+      dockerfile: ./src/e2e-tests/docker/subgraph-deployer/Dockerfile
+      context: .
+    depends_on:
+      - testnet
+      - graph-node

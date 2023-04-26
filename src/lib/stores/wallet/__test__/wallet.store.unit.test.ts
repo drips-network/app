@@ -3,6 +3,10 @@ import { get } from 'svelte/store';
 import wallet from '../wallet.store';
 import { MockProvider } from '@rsksmart/mock-web3-provider';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 vi.mock('$app/environment', () => ({
   browser: true,
 }));
