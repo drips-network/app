@@ -51,17 +51,9 @@ export default abstract class MetadataManagerBase<
   private readonly _metadataSchema: TAccountMetadataSchema;
   protected readonly subgraphClient: DripsSubgraphClient;
 
-  protected constructor(metadataSchema: TAccountMetadataSchema);
-  protected constructor(
-    metadataSchema: TAccountMetadataSchema,
-    subgraphClient?: DripsSubgraphClient,
-  );
-  protected constructor(
-    metadataSchema: TAccountMetadataSchema,
-    subgraphClient?: DripsSubgraphClient,
-  ) {
+  protected constructor(metadataSchema: TAccountMetadataSchema) {
     this._metadataSchema = metadataSchema;
-    this.subgraphClient = subgraphClient ?? getSubgraphClient();
+    this.subgraphClient = getSubgraphClient();
   }
 
   /**
