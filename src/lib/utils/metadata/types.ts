@@ -1,3 +1,5 @@
+import type { UserId } from '$lib/stores/streams/types';
+
 export interface GitHubSource {
   url: string;
   repoName: string;
@@ -26,7 +28,6 @@ export interface GenericGitSource {
 type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
 
 export type Address = string;
-export type UserId = string;
 
 export interface AddressDriverAccount {
   driver: 'address';

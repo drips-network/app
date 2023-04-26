@@ -1,14 +1,10 @@
+import type { AddressDriverAccount } from '$lib/utils/metadata/types';
+
 /** \<senderUserId\>-\<tokenAddress\>-\<dripId\> */
 export type StreamId = string;
 export type UserId = string;
 
-interface AddressDriverUser {
-  driver: 'address';
-  address: string;
-  userId: UserId;
-}
-
-export type User = AddressDriverUser;
+export type User = AddressDriverAccount;
 
 interface Amount {
   tokenAddress: string;

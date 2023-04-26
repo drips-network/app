@@ -1,11 +1,15 @@
 import { AddressDriverClient, constants, Utils } from 'radicle-drips';
 import type { z } from 'zod';
-import type { accountMetadataSchema, assetConfigMetadataSchema } from '../metadata';
 import type { AssetConfig, AssetConfigHistoryItem, DripsConfig, Receiver, Stream } from '../types';
 import makeStreamId from './make-stream-id';
 import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
 import type { DripsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
+import type {
+  addressDriverAccountMetadataSchema,
+  assetConfigMetadataSchema,
+} from '$lib/utils/metadata/schemas';
+import type { AddressDriverAccount } from '$lib/utils/metadata/types';
 
 function mapReceiverToStream(
   receiver: Receiver,
@@ -71,7 +75,7 @@ function mapReceiverToStream(
  */
 export default function buildAssetConfigs(
   userId: string,
-  accountMetadata: z.infer<typeof accountMetadataSchema> | undefined,
+  accountMetadata: z.infer<typeof addressDriverAccountMetadataSchema> | undefined,
   dripsSetEvents: { [tokenAddress: string]: DripsSetEventWithFullReceivers[] },
 ) {
   return Object.entries(dripsSetEvents).reduce<AssetConfig[]>(
@@ -152,7 +156,7 @@ export default function buildAssetConfigs(
               dripsConfig: undefined,
               managed: true,
               receiver: {
-                ...stream.receiver,
+                ...(stream.receiver as AddressDriverAccount),
                 address: AddressDriverClient.getUserAddress(stream.receiver.userId),
               },
             });

@@ -1,6 +1,8 @@
+import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
 import type * as radicleDrips from 'radicle-drips';
 import { readable } from 'svelte/store';
-import * as metadata from '../metadata';
+
+const metadata = new AddressDriverMetadataManager();
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
