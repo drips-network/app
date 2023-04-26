@@ -93,12 +93,12 @@ export default abstract class MetadataManagerBase<
   ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | undefined> {
     const metadataHash = await this.fetchMetadataHashByUserId(userId);
 
+    if (!metadataHash) return undefined;
+
     if (isTest()) {
       const val = JSON.parse(localStorage.getItem(`mock_ipfs_${metadataHash}`) ?? '');
       return val;
     }
-
-    if (!metadataHash) return undefined;
 
     let accountMetadataRes: Awaited<ReturnType<typeof fetchIpfs>>;
     try {
