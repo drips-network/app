@@ -230,6 +230,8 @@ describe('top up, create stream, view profile, search', async () => {
         })
         .click();
 
+      await page.waitForTimeout(1000);
+
       expect(page.url().toLowerCase()).toBe(
         'http://127.0.0.1:3000/app/0x433220a86126efe2b8c98a723e73ebad2d0cbadc',
       );
