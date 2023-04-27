@@ -1,6 +1,6 @@
+import type { streamMetadataSchema } from '$lib/utils/metadata/schemas';
 import { Utils } from 'radicle-drips';
 import type { z } from 'zod';
-import type { streamMetadataSchema } from '../metadata';
 
 /**
  * Given a particular dripsReceiverSeenEvent, find matching metadata from an array of metadata

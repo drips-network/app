@@ -104,7 +104,7 @@ export default abstract class MetadataManagerBase<
     const metadataHash = await this.fetchMetadataHashByUserId(userId);
     if (!metadataHash) return undefined;
 
-    let accountMetadataRes: Awaited<ReturnType<typeof this.fetchIpfs>>;
+    let accountMetadataRes: Awaited<ReturnType<typeof MetadataManagerBase.prototype.fetchIpfs>>;
 
     try {
       accountMetadataRes = await this.fetchIpfs(metadataHash);

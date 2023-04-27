@@ -2,7 +2,7 @@
 export type StreamId = string;
 export type UserId = string;
 
-interface AddressDriverUser {
+export interface AddressDriverUser {
   driver: 'address';
   address: string;
   userId: UserId;
