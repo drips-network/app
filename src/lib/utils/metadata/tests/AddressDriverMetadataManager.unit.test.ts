@@ -16,6 +16,10 @@ import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 import type { Account } from '$lib/stores/streams/types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 describe('AddressDriverMetadataManager', () => {
   beforeEach(() => {
     vi.restoreAllMocks();

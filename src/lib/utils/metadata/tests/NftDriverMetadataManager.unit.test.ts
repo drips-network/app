@@ -3,6 +3,10 @@ import NftDriverMetadataManager from '../NftDriverMetadataManager';
 import type { NFTDriverAccount } from '../types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 describe('NftDriverMetadataManager', () => {
   vi.mock('$lib/utils/get-drips-clients');
 
