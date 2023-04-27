@@ -28,12 +28,12 @@
   const ensRecords = ['description', 'url', 'com.twitter', 'com.github'] as const;
   const socialLinks = ['com.twitter', 'com.github', 'url'] as const;
 
-  let socialLinkValues: { [key in typeof socialLinks[number]]: string } | undefined = undefined;
+  let socialLinkValues: { [key in (typeof socialLinks)[number]]: string } | undefined = undefined;
   let description: string | undefined;
 
   async function fetchEnsRecords(
     ensName: string,
-  ): Promise<{ [key in typeof ensRecords[number]]: string } | undefined> {
+  ): Promise<{ [key in (typeof ensRecords)[number]]: string } | undefined> {
     try {
       const { provider } = $wallet;
 
@@ -82,8 +82,8 @@
     if (name) updateEnsRecords(name);
   }
 
-  function isNetwork(input: string): input is typeof socialLinks[number] {
-    return socialLinks.includes(input as typeof socialLinks[number]);
+  function isNetwork(input: string): input is (typeof socialLinks)[number] {
+    return socialLinks.includes(input as (typeof socialLinks)[number]);
   }
 
   async function fetchRequestedAccount(userId: string) {
