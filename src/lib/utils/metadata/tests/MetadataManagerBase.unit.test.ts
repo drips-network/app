@@ -13,6 +13,10 @@ import {
 import type { ContractTransaction } from 'ethers';
 import type { NFTDriverAccount } from '../types';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends MetadataManagerBase<
   TAccountMetadataSchema,
   NFTDriverAccount

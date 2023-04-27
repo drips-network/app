@@ -2,6 +2,10 @@ import { GitDriverClient } from 'radicle-drips';
 import GitDriverMetadataManager from '../GitDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
 
+vi.mock('$env/dynamic/public', () => ({
+  env: {},
+}));
+
 describe('GitDriverMetadataManager', () => {
   vi.mock('$lib/utils/get-drips-clients');
 
