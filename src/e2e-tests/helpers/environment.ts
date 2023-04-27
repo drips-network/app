@@ -36,7 +36,7 @@ export async function start() {
 
 export async function stop() {
   console.log('Stopping E2E env…');
-  await execa('docker', ['compose', 'down']);
+  await execa('docker', ['compose', 'down', '--volumes']);
 }
 
 export default { start, stop };
