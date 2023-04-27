@@ -8,7 +8,6 @@ import type { UserId } from './types';
 import { reconcileDripsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateDripsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
-import type { accountMetadataSchema } from '$lib/stores/streams/metadata';
 
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
   typeof addressDriverAccountMetadataSchema,
@@ -29,7 +28,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
 
     const assetConfigs = buildAssetConfigs(
       userId,
-      data as z.infer<typeof accountMetadataSchema>,
+      data as z.infer<typeof addressDriverAccountMetadataSchema>,
       dripsSetEventsByTokenAddress,
     );
 

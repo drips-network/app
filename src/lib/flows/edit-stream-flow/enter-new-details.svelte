@@ -15,11 +15,6 @@
   import streams from '$lib/stores/streams';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import {
-    generateMetadata,
-    pinAccountMetadata,
-    USER_DATA_KEY,
-  } from '$lib/stores/streams/metadata';
-  import {
     getAddressDriverClient,
     getCallerClient,
     getNetworkConfig,
@@ -35,6 +30,8 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
+  import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
+  import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -96,7 +93,12 @@
           let newHash = ownAccount.lastIpfsHash;
 
           if (nameUpdated) {
-            const accountMetadata = generateMetadata(ownAccount, address);
+            const metadataMgr = new AddressDriverMetadataManager();
+
+            const accountMetadata = metadataMgr.buildAccountMetadata({
+              forAccount: ownAccount,
+              address,
+            });
 
             const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
               (ac) => ac.tokenAddress === token.info.address,
@@ -116,7 +118,7 @@
 
             accountMetadata.timestamp = new Date().getTime() / 1000;
 
-            newHash = await pinAccountMetadata(accountMetadata);
+            newHash = await metadataMgr.pinAccountMetadata(accountMetadata);
           }
 
           let currentReceivers: {
@@ -173,7 +175,7 @@
               newReceivers,
               userMetadata: [
                 {
-                  key: USER_DATA_KEY,
+                  key: MetadataManagerBase.USER_METADATA_KEY,
                   value: newHash,
                 },
               ],
@@ -195,7 +197,7 @@
 
             tx = addressDriverClient.emitUserMetadata([
               {
-                key: USER_DATA_KEY,
+                key: MetadataManagerBase.USER_METADATA_KEY,
                 value: newHash,
               },
             ]);

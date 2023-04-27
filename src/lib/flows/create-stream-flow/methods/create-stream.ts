@@ -11,12 +11,6 @@ import { AddressDriverPresets, Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
-import {
-  generateMetadata,
-  pinAccountMetadata,
-  USER_DATA_KEY,
-  type streamMetadataSchema,
-} from '$lib/stores/streams/metadata';
 import type { z } from 'zod';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
@@ -24,6 +18,9 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
+import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
+import type { streamMetadataSchema } from '$lib/utils/metadata/schemas';
+import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -83,6 +80,8 @@ export default function (
         const { address, signer } = get(wallet);
         assert(address);
 
+        const metadataMgr = new AddressDriverMetadataManager();
+
         const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
           id: makeStreamId(ownUserId, tokenAddress, dripId.toString()),
           initialDripsConfig: {
@@ -100,7 +99,10 @@ export default function (
           name: streamName,
         };
 
-        const accountMetadata = generateMetadata(ownAccount, address);
+        const accountMetadata = metadataMgr.buildAccountMetadata({
+          forAccount: ownAccount,
+          address,
+        });
         const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
           (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );
@@ -118,7 +120,7 @@ export default function (
           };
         }
 
-        const newHash = await pinAccountMetadata(accountMetadata);
+        const newHash = await metadataMgr.pinAccountMetadata(accountMetadata);
 
         const { ADDRESS_DRIVER } = getNetworkConfig();
 
@@ -136,7 +138,7 @@ export default function (
           ],
           userMetadata: [
             {
-              key: USER_DATA_KEY,
+              key: MetadataManagerBase.USER_METADATA_KEY,
               value: newHash,
             },
           ],

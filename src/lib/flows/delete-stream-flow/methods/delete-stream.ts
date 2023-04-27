@@ -3,7 +3,6 @@ import type { Stream } from '$lib/stores/streams/types';
 import { getCallerClient, getNetworkConfig } from '$lib/utils/get-drips-clients';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { get } from 'svelte/store';
-import { generateMetadata, pinAccountMetadata, USER_DATA_KEY } from '$lib/stores/streams/metadata';
 import { AddressDriverPresets, Utils } from 'radicle-drips';
 import assert from '$lib/utils/assert';
 import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -12,6 +11,8 @@ import { goto } from '$app/navigation';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
+import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
+import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -35,7 +36,9 @@ export default function (
         const ownAccount = get(streams).accounts[userId];
         assert(assetConfig, "App hasn't yet fetched user's own account");
 
-        const metadata = generateMetadata(ownAccount, address);
+        const metadataMgr = new AddressDriverMetadataManager();
+
+        const metadata = metadataMgr.buildAccountMetadata({ forAccount: ownAccount, address });
         const assetConfigIndex = metadata.assetConfigs.findIndex(
           (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );
@@ -49,7 +52,7 @@ export default function (
           metadata.assetConfigs.splice(assetConfigIndex, 1);
         }
 
-        const newHash = await pinAccountMetadata(metadata);
+        const newHash = await metadataMgr.pinAccountMetadata(metadata);
 
         const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
           stream.paused
@@ -76,7 +79,7 @@ export default function (
           newReceivers,
           userMetadata: [
             {
-              key: USER_DATA_KEY,
+              key: MetadataManagerBase.USER_METADATA_KEY,
               value: newHash,
             },
           ],

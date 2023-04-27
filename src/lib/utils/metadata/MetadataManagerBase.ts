@@ -4,7 +4,6 @@ import {
   getNFTDriverClient,
   getSubgraphClient,
 } from '$lib/utils/get-drips-clients';
-import { fetchIpfs } from '$lib/utils/ipfs';
 import isTest from '$lib/utils/is-test';
 import type { ContractTransaction } from 'ethers';
 import type {
@@ -20,6 +19,7 @@ import {
   nftDriverAccountMetadataSchema,
 } from './schemas';
 import type { UserId } from './types';
+import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
 export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
   fetchMetadataHashByUserId(userId: UserId): Promise<string | undefined>;
@@ -83,6 +83,16 @@ export default abstract class MetadataManagerBase<
 
     return userMetadata?.value;
   }
+
+  private async fetchIpfs(hash: string) {
+    if (isTest()) {
+      const val = JSON.parse(localStorage.getItem(`mock_ipfs_${hash}`) ?? '');
+      return val;
+    }
+
+    return await (await ipfsFetch(hash)).json();
+  }
+
   /**
    * Fetches the latest IPFS metadata for a given user ID.
    * @param userId The user ID to fetch the metadata for.
@@ -92,17 +102,12 @@ export default abstract class MetadataManagerBase<
     userId: UserId,
   ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | undefined> {
     const metadataHash = await this.fetchMetadataHashByUserId(userId);
-
-    if (isTest()) {
-      const val = JSON.parse(localStorage.getItem(`mock_ipfs_${metadataHash}`) ?? '');
-      return val;
-    }
-
     if (!metadataHash) return undefined;
 
-    let accountMetadataRes: Awaited<ReturnType<typeof fetchIpfs>>;
+    let accountMetadataRes: Awaited<ReturnType<typeof this.fetchIpfs>>;
+
     try {
-      accountMetadataRes = await (await fetchIpfs(metadataHash)).json();
+      accountMetadataRes = await this.fetchIpfs(metadataHash);
     } catch (e) {
       return undefined;
     }
@@ -112,6 +117,7 @@ export default abstract class MetadataManagerBase<
       data: this._metadataSchema.parse(accountMetadataRes),
     };
   }
+
   /**
    * Pins account metadata to IPFS.
    * @param data The account metadata to pin.
@@ -143,6 +149,7 @@ export default abstract class MetadataManagerBase<
 
     return res.text();
   }
+
   /**
    * Updates account metadata.
    * @param newData The new account metadata.

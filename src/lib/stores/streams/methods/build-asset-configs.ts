@@ -1,11 +1,11 @@
 import { AddressDriverClient, constants, Utils } from 'radicle-drips';
 import type { z } from 'zod';
-import type { accountMetadataSchema, assetConfigMetadataSchema } from '../metadata';
 import type { AssetConfig, AssetConfigHistoryItem, DripsConfig, Receiver, Stream } from '../types';
 import makeStreamId from './make-stream-id';
 import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
 import type { DripsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
+import type { assetConfigMetadataSchema } from '$lib/utils/metadata/schemas';
 
 function mapReceiverToStream(
   receiver: Receiver,

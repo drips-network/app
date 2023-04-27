@@ -100,11 +100,15 @@ describe('MetadataManagerBase', () => {
 
       // Act
       const result = await new TestMetadataManager(
-        addressDriverAccountMetadataSchema,
+        z.object({
+          name: z.string().optional(),
+          description: z.string().optional(),
+          emoji: z.string().optional(),
+        }),
       ).fetchAccountMetadata(userId);
 
       // Assert
-      expect(result).toEqual(expectedMetadata);
+      expect(result).toEqual({ hash: metadataHash, data: expectedMetadata });
       expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
     });
 
