@@ -2,6 +2,8 @@ import { DripsSubgraphClient } from 'radicle-drips';
 import NftDriverMetadataManager from '../NftDriverMetadataManager';
 import type { NFTDriverAccount } from '../types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import type { z } from 'zod';
+import type { sourceSchema } from '../schemas';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -114,7 +116,7 @@ describe('NftDriverMetadataManager', () => {
               forge: 'github',
               repoName: 'repo',
               url: 'repo.com',
-            },
+            } as z.infer<typeof sourceSchema>,
           },
         ],
       };
