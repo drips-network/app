@@ -12,12 +12,14 @@ const ethAddressSchema = z.preprocess((v) => {
 const bigintSchema = z.preprocess((v) => typeof v === 'string' && BigInt(v), z.bigint());
 
 const gitHubSourceSchema = z.object({
+  forge: z.literal('github'),
   repoName: z.string(),
   ownerName: z.string(),
   url: z.string(),
 });
 
 const gitLabSourceSchema = z.object({
+  forge: z.literal('gitlab'),
   repoName: z.string(),
   ownerName: z.string(),
   host: z.string(),
@@ -25,6 +27,7 @@ const gitLabSourceSchema = z.object({
 });
 
 const radicleSourceSchema = z.object({
+  forge: z.literal('radicle'),
   rid: z.string(),
   repoName: z.string(),
   seed: z.string(),
@@ -32,6 +35,7 @@ const radicleSourceSchema = z.object({
 });
 
 const genericGitSourceSchema = z.object({
+  forge: z.literal('generic'),
   repoName: z.string(),
   url: z.string(),
 });
@@ -48,7 +52,7 @@ export const addressDriverSplitReceiverSchema = z.object({
   userId: z.string(),
 });
 
-export const gitDriverSplitReceiverSchema = z.object({
+export const repoDriverSplitReceiverSchema = z.object({
   weight: z.number(),
   userId: z.string(),
   source: sourceSchema,
@@ -74,7 +78,7 @@ export const dripsConfigSchema = z.object({
 });
 
 export const dripsUserSchema = z.object({
-  driver: z.union([z.literal('address'), z.literal('nft'), z.literal('git')]),
+  driver: z.union([z.literal('address'), z.literal('nft'), z.literal('repo')]),
   userId: z.string(),
 });
 
@@ -105,10 +109,10 @@ export const addressDriverAccountMetadataSchema = z.object({
   writtenByAddress: ethAddressSchema,
 });
 
-export const gitDriverAccountMetadataSchema = z.object({
-  driver: z.literal('git'),
+export const repoDriverAccountMetadataSchema = z.object({
+  driver: z.literal('repo'),
   describes: z.object({
-    driver: z.literal('git'),
+    driver: z.literal('repo'),
     userId: z.string(),
   }),
   source: sourceSchema,
@@ -117,7 +121,7 @@ export const gitDriverAccountMetadataSchema = z.object({
   description: z.string().optional(),
   splits: z.object({
     maintainers: z.array(addressDriverSplitReceiverSchema),
-    dependencies: z.array(gitDriverSplitReceiverSchema),
+    dependencies: z.array(repoDriverSplitReceiverSchema),
     dripsDonation: splitReceiverSchema.optional(),
   }),
 });
@@ -129,5 +133,5 @@ export const nftDriverAccountMetadataSchema = z.object({
     userId: z.string(),
   }),
   isDripList: z.literal(true),
-  projects: z.array(gitDriverSplitReceiverSchema),
+  projects: z.array(repoDriverSplitReceiverSchema),
 });

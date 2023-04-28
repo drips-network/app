@@ -103,9 +103,9 @@
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
       project={{
-        gitDriverAccount: {
+        repoDriverAccount: {
           userId: '0',
-          driver: 'git',
+          driver: 'repo',
         },
         owner: {
           driver: 'address',
@@ -143,9 +143,9 @@
     <ProjectBadge
       project={projectVerified
         ? {
-            gitDriverAccount: {
+            repoDriverAccount: {
               userId: '0',
-              driver: 'git',
+              driver: 'repo',
             },
             owner: {
               driver: 'address',
@@ -157,9 +157,9 @@
             color: '#fcc842',
           }
         : {
-            gitDriverAccount: {
+            repoDriverAccount: {
               userId: '0',
-              driver: 'git',
+              driver: 'repo',
             },
             source: SOURCE_CONFIGS[sourceType],
             owner: undefined,

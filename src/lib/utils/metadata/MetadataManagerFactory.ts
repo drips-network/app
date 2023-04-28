@@ -1,5 +1,5 @@
 import AddressDriverMetadataManager from './AddressDriverMetadataManager';
-import GitDriverMetadataManager from './GitDriverMetadataManager';
+import RepoDriverMetadataManager from './RepoDriverMetadataManager';
 import NftDriverMetadataManager from './NftDriverMetadataManager';
 
 export default class MetadataManagerFactory {
@@ -11,7 +11,7 @@ export default class MetadataManagerFactory {
     return new NftDriverMetadataManager();
   }
 
-  public static getGitDriverMetadataManager(): GitDriverMetadataManager {
-    return new GitDriverMetadataManager();
+  public static getRepoDriverMetadataManager(): RepoDriverMetadataManager {
+    return new RepoDriverMetadataManager();
   }
 }

@@ -10,9 +10,9 @@ export const load: PageLoad = ({ params }) => {
 
   if (rid === 'rad:1234') {
     project = {
-      gitDriverAccount: {
+      repoDriverAccount: {
         userId: '0',
-        driver: 'git',
+        driver: 'repo',
       },
       owner: {
         driver: 'address',
@@ -31,9 +31,9 @@ export const load: PageLoad = ({ params }) => {
     };
   } else {
     project = {
-      gitDriverAccount: {
+      repoDriverAccount: {
         userId: '0',
-        driver: 'git',
+        driver: 'repo',
       },
       source: {
         type: 'radicle',

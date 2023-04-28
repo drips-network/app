@@ -1,12 +1,12 @@
-import { GitDriverClient } from 'radicle-drips';
-import GitDriverMetadataManager from '../GitDriverMetadataManager';
+import { Forge, RepoDriverClient } from 'radicle-drips';
+import RepoDriverMetadataManager from '../RepoDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
 }));
 
-describe('GitDriverMetadataManager', () => {
+describe('RepoDriverMetadataManager', () => {
   vi.mock('$lib/utils/get-drips-clients');
 
   beforeEach(() => {
@@ -16,7 +16,8 @@ describe('GitDriverMetadataManager', () => {
   describe('verifySourceMetadata', () => {
     it('should return true if the source metadata is valid', async () => {
       // Arrange
-      const projectId = '1';
+      const repoId = '1';
+      const userId = '2';
       const gitUrl = 'http://github.com/username/repo';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
@@ -25,6 +26,7 @@ describe('GitDriverMetadataManager', () => {
         .mockResolvedValue({
           data: {
             source: {
+              forge: 'github',
               url: gitUrl,
               repoName: 'repo',
             },
@@ -32,26 +34,28 @@ describe('GitDriverMetadataManager', () => {
         } as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue(projectId),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoId),
+        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new GitDriverMetadataManager().verifySourceMetadata(projectId);
+      const result = await new RepoDriverMetadataManager().verifySourceMetadata('2');
 
       // Assert
       expect(result).toBe(true);
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(projectId);
-      expect(gitDriverClientMock.getProjectId).toHaveBeenCalledWith(gitUrl);
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(repoId);
+      expect(repoDriverClientMock.getRepoId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
     it('should return false if the source metadata is invalid', async () => {
-      // Arrange
-      const projectId = '1';
+      const repoId = '1';
+      const userId = '2';
       const gitUrl = 'http://github.com/username/repo';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
@@ -60,6 +64,7 @@ describe('GitDriverMetadataManager', () => {
         .mockResolvedValue({
           data: {
             source: {
+              forge: 'github',
               url: gitUrl,
               repoName: 'repo',
             },
@@ -67,26 +72,29 @@ describe('GitDriverMetadataManager', () => {
         } as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue('2'),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoId),
+        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new GitDriverMetadataManager().verifySourceMetadata(projectId);
+      const result = await new RepoDriverMetadataManager().verifySourceMetadata('200');
 
       // Assert
       expect(result).toBe(false);
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(projectId);
-      expect(gitDriverClientMock.getProjectId).toHaveBeenCalledWith(gitUrl);
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith('200');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(repoId);
+      expect(repoDriverClientMock.getRepoId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
     it('should return false if the source metadata is missing', async () => {
       // Arrange
-      const projectId = '1';
+      const repoId = '1';
+      const userId = '2';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
       const fetchAccountMetadataMock = vi
@@ -94,26 +102,29 @@ describe('GitDriverMetadataManager', () => {
         .mockResolvedValue(undefined as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue('2'),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoId),
+        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new GitDriverMetadataManager().verifySourceMetadata(projectId);
+      const result = await new RepoDriverMetadataManager().verifySourceMetadata('2');
 
       // Assert
       expect(result).toBe(false);
-      expect(gitDriverClientMock.getProjectId).not.toBeCalled();
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(projectId);
+      expect(repoDriverClientMock.getRepoId).not.toBeCalled();
+      expect(repoDriverClientMock.getUserId).not.toBeCalled();
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
     it('should return false if the url does not include the repo name', async () => {
       // Arrange
-      const projectId = '1';
+      const repoId = '1';
+      const userId = '2';
       const gitUrl = 'http://github.com/username/repo';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
@@ -122,26 +133,29 @@ describe('GitDriverMetadataManager', () => {
         .mockResolvedValue({
           data: {
             source: {
+              forge: 'github',
               url: gitUrl,
-              repoName: 'random',
+              repoName: 'random-repo-name',
             },
           },
-        } as any);
+        } as any as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue(projectId),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoId),
+        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new GitDriverMetadataManager().verifySourceMetadata(projectId);
+      const result = await new RepoDriverMetadataManager().verifySourceMetadata('2');
 
       // Assert
       expect(result).toBe(false);
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(projectId);
-      expect(gitDriverClientMock.getProjectId).toHaveBeenCalledWith(gitUrl);
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(repoId);
+      expect(repoDriverClientMock.getRepoId).toHaveBeenCalledWith(Forge.GitHub, 'random-repo-name');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
@@ -155,13 +169,13 @@ describe('GitDriverMetadataManager', () => {
         .mockResolvedValue(undefined as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue('2'),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue('2'),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
-      const metadataMgr = new GitDriverMetadataManager();
+      const metadataMgr = new RepoDriverMetadataManager();
 
       // Act
       const account = await metadataMgr.fetchAccount('1');
@@ -178,19 +192,19 @@ describe('GitDriverMetadataManager', () => {
           data: {
             describes: {
               userId: '1',
-              driver: 'git',
+              driver: 'repo',
             },
           },
         } as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue('2'),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue('2'),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
-      const metadataMgr = new GitDriverMetadataManager();
+      const metadataMgr = new RepoDriverMetadataManager();
 
       // Act
       const account = await metadataMgr.fetchAccount('1');
@@ -198,7 +212,7 @@ describe('GitDriverMetadataManager', () => {
       // Assert
       expect(account).toEqual({
         userId: '1',
-        driver: 'git',
+        driver: 'repo',
       });
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith('1');
     });
@@ -212,13 +226,13 @@ describe('GitDriverMetadataManager', () => {
         .mockResolvedValue(undefined as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
-      const gitDriverClientMock = {
-        getProjectId: vi.fn(GitDriverClient.prototype.getProjectId).mockResolvedValue('2'),
-      } as unknown as GitDriverClient;
+      const repoDriverClientMock = {
+        getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue('2'),
+      } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getGitDriverClient = vi.fn().mockImplementation(() => gitDriverClientMock);
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
-      const metadataMgr = new GitDriverMetadataManager();
+      const metadataMgr = new RepoDriverMetadataManager();
       const context = {
         forProject: {
           owner: {
@@ -226,8 +240,8 @@ describe('GitDriverMetadataManager', () => {
             userId: '2',
             address: '0x123',
           },
-          gitDriverAccount: {
-            driver: 'git',
+          repoDriverAccount: {
+            driver: 'repo',
             userId: '1',
           },
           source: {
@@ -263,10 +277,10 @@ describe('GitDriverMetadataManager', () => {
 
       // Assert
       expect(metadata).toEqual({
-        driver: 'git',
+        driver: 'repo',
         describes: {
           userId: '1',
-          driver: 'git',
+          driver: 'repo',
         },
         source: {
           url: 'repo',

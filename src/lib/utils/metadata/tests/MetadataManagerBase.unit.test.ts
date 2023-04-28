@@ -7,7 +7,7 @@ import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import MetadataManagerBase from '../MetadataManagerBase';
 import {
   addressDriverAccountMetadataSchema,
-  gitDriverAccountMetadataSchema,
+  repoDriverAccountMetadataSchema,
   nftDriverAccountMetadataSchema,
 } from '../schemas';
 import type { ContractTransaction } from 'ethers';
@@ -367,10 +367,10 @@ describe('MetadataManagerBase', () => {
       TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
-    it('should call GitDriverClient.emitUserMetadata when client has getProjectId', async () => {
+    it('should call RepoDriverClient.emitUserMetadata when client has getRepoId', async () => {
       // Arrange
       const clientMock = {
-        getProjectId: vi.fn(),
+        getRepoId: vi.fn(),
         emitUserMetadata: vi
           .fn(AddressDriverClient.prototype.emitUserMetadata)
           .mockResolvedValue({} as ContractTransaction),
@@ -381,7 +381,7 @@ describe('MetadataManagerBase', () => {
         .mockResolvedValue(clientMock);
       TestMetadataManager.prototype['getClient'] = getClientMock;
 
-      const testMetadataManager = new TestMetadataManager(gitDriverAccountMetadataSchema);
+      const testMetadataManager = new TestMetadataManager(repoDriverAccountMetadataSchema);
       const newHash = 'newHash';
       const userId = '1';
 
@@ -449,16 +449,16 @@ describe('MetadataManagerBase', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('should return a GitDriverClient when Git driver account metadata schema is provided', async () => {
+    it('should return a RepoDriverClient when Git driver account metadata schema is provided', async () => {
       // Arrange
       const testMetadataManager = new TestMetadataManager(nftDriverAccountMetadataSchema);
 
       const spy = vi
-        .spyOn(getDripsClients, 'getGitDriverClient')
+        .spyOn(getDripsClients, 'getRepoDriverClient')
         .mockImplementation(() => ({} as any));
 
       // Act
-      await testMetadataManager['getClient'](gitDriverAccountMetadataSchema);
+      await testMetadataManager['getClient'](repoDriverAccountMetadataSchema);
 
       // Assert
       expect(spy).toHaveBeenCalled();

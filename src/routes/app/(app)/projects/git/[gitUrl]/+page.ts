@@ -12,9 +12,9 @@ export const load: PageLoad = ({ params }) => {
 
   if (decodedGitUrl.href === 'https://some-host.com/svelte-stepper.git') {
     project = {
-      gitDriverAccount: {
+      repoDriverAccount: {
         userId: '0',
-        driver: 'git',
+        driver: 'repo',
       },
       owner: {
         driver: 'address',
@@ -31,9 +31,9 @@ export const load: PageLoad = ({ params }) => {
     };
   } else {
     project = {
-      gitDriverAccount: {
+      repoDriverAccount: {
         userId: '0',
-        driver: 'git',
+        driver: 'repo',
       },
       source: {
         type: 'generic',

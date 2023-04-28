@@ -1,10 +1,12 @@
 export interface GitHubSource {
+  forge: 'github';
   url: string;
   repoName: string;
   ownerName: string;
 }
 
 export interface GitLabSource {
+  forge: 'gitlab';
   host: string;
   url: string;
   repoName: string;
@@ -12,6 +14,7 @@ export interface GitLabSource {
 }
 
 export interface RadicleSource {
+  forge: 'radicle';
   rid: string;
   url: string;
   seed: string;
@@ -19,6 +22,7 @@ export interface RadicleSource {
 }
 
 export interface GenericGitSource {
+  forge: 'generic';
   url: string;
   repoName: string;
 }
@@ -40,22 +44,22 @@ export interface NFTDriverAccount {
   owner: Address;
 }
 
-export interface GitDriverAccount {
-  driver: 'git';
+export interface RepoDriverAccount {
+  driver: 'repo';
   userId: UserId;
 }
 
-export type Account = AddressDriverAccount | NFTDriverAccount | GitDriverAccount;
+export type Account = AddressDriverAccount | NFTDriverAccount | RepoDriverAccount;
 
 export interface UnclaimedGitProject {
   owner: undefined;
-  gitDriverAccount: GitDriverAccount;
+  repoDriverAccount: RepoDriverAccount;
   source: Source;
 }
 
 export interface ClaimedGitProject {
   owner: AddressDriverAccount;
-  gitDriverAccount: GitDriverAccount;
+  repoDriverAccount: RepoDriverAccount;
   source: Source;
   color: string;
   emoji: string;

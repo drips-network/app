@@ -1,6 +1,6 @@
 import {
   getAddressDriverClient,
-  getGitDriverClient,
+  getRepoDriverClient,
   getNFTDriverClient,
   getSubgraphClient,
 } from '$lib/utils/get-drips-clients';
@@ -9,13 +9,13 @@ import type { ContractTransaction } from 'ethers';
 import type {
   AddressDriverClient,
   DripsSubgraphClient,
-  GitDriverClient,
+  RepoDriverClient,
   NFTDriverClient,
 } from 'radicle-drips';
 import type { z } from 'zod';
 import {
   addressDriverAccountMetadataSchema,
-  gitDriverAccountMetadataSchema,
+  repoDriverAccountMetadataSchema,
   nftDriverAccountMetadataSchema,
 } from './schemas';
 import type { UserId } from './types';
@@ -197,8 +197,8 @@ export default abstract class MetadataManagerBase<
       tx = await (client as NFTDriverClient).emitUserMetadata(userId, userMetadata);
     } else if ('getUserId' in client) {
       tx = await (client as AddressDriverClient).emitUserMetadata(userMetadata);
-    } else if ('getProjectId' in client) {
-      tx = await (client as GitDriverClient).emitUserMetadata(userId, userMetadata);
+    } else if ('getRepoId' in client) {
+      tx = await (client as RepoDriverClient).emitUserMetadata(userId, userMetadata);
     } else {
       throw new Error('Unsupported client');
     }
@@ -208,13 +208,13 @@ export default abstract class MetadataManagerBase<
 
   private async getClient(
     schema: z.ZodType,
-  ): Promise<AddressDriverClient | NFTDriverClient | GitDriverClient> {
+  ): Promise<AddressDriverClient | NFTDriverClient | RepoDriverClient> {
     if (schema === addressDriverAccountMetadataSchema) {
       return await getAddressDriverClient();
     } else if (schema === nftDriverAccountMetadataSchema) {
       return await getNFTDriverClient();
-    } else if (schema === gitDriverAccountMetadataSchema) {
-      return await getGitDriverClient();
+    } else if (schema === repoDriverAccountMetadataSchema) {
+      return await getRepoDriverClient();
     } else {
       throw new Error('Unsupported schema');
     }

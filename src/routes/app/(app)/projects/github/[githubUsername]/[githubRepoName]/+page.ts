@@ -10,9 +10,9 @@ export const load = (({ params }) => {
 
   if (githubRepoName === 'svelte-stepper') {
     project = {
-      gitDriverAccount: {
+      repoDriverAccount: {
         userId: '0',
-        driver: 'git',
+        driver: 'repo',
       },
       owner: {
         driver: 'address',
@@ -30,9 +30,9 @@ export const load = (({ params }) => {
     };
   } else {
     project = {
-      gitDriverAccount: {
+      repoDriverAccount: {
         userId: '0',
-        driver: 'git',
+        driver: 'repo',
       },
       source: {
         type: 'github',

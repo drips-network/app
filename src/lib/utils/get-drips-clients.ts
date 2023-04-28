@@ -10,7 +10,7 @@ import {
   type NetworkConfig,
   NFTDriverClient,
   NFTDriverTxFactory,
-  GitDriverClient,
+  RepoDriverClient,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -30,13 +30,13 @@ export function getSubgraphClient() {
  * Get an initialized Git Driver client.
  * @returns An initialized Git Driver client.
  */
-export function getGitDriverClient() {
+export function getRepoDriverClient() {
   const { provider, signer, connected } = get(wallet);
-  assert(connected, 'Wallet must be connected to create a GitDriverClient');
+  assert(connected, 'Wallet must be connected to create a RepoDriverClient');
 
-  const gitDriverAddress = getNetworkConfig().GIT_DRIVER;
+  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
 
-  return GitDriverClient.create(provider, signer, gitDriverAddress);
+  return RepoDriverClient.create(provider, signer, repoDriverAddress);
 }
 
 /**
@@ -147,10 +147,10 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
         IMMUTABLE_SPLITS_DRIVER: '0x34466661145b6D19f32Ae0f4b2BFD3874573bdf0',
         IMMUTABLE_SPLITS_DRIVER_ID: '2',
         IMMUTABLE_SPLITS_DRIVER_LOGIC: '0x427f7c59ED72bCf26DfFc634FEF3034e00922DD8',
-        GIT_DRIVER: '',
-        GIT_DRIVER_ID: '',
-        GIT_DRIVER_LOGIC: '',
-        GIT_DRIVER_ADMIN: '',
+        REPO_DRIVER: '',
+        REPO_DRIVER_ID: '',
+        REPO_DRIVER_LOGIC: '',
+        REPO_DRIVER_ADMIN: '',
       },
     }
   : {

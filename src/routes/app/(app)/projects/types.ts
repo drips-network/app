@@ -40,9 +40,9 @@ export interface AddressDriverAccount {
   address: Address;
 }
 
-export interface GitDriverAccount {
+export interface RepoDriverAccount {
   userId: UserId;
-  driver: 'git';
+  driver: 'repo';
 }
 
 export interface NFTDriverAccount {
@@ -51,16 +51,16 @@ export interface NFTDriverAccount {
   owner: Address;
 }
 
-export type Account = AddressDriverAccount | GitDriverAccount;
+export type Account = AddressDriverAccount | RepoDriverAccount;
 
 export interface UnclaimedGitProject<S extends Source = Source> {
-  gitDriverAccount: GitDriverAccount;
+  repoDriverAccount: RepoDriverAccount;
   owner: undefined;
   source: S;
 }
 
 export interface ClaimedGitProject<S extends Source = Source> {
-  gitDriverAccount: GitDriverAccount;
+  repoDriverAccount: RepoDriverAccount;
   owner: AddressDriverAccount;
   source: S;
   emoji: string;

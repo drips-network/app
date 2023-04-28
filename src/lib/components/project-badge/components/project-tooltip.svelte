@@ -23,7 +23,7 @@
   />
   <div class="header">
     <ProjectAvatar {project} size="large" outline />
-    <a class="name typo-header-4" href="/app/projects/{project.gitDriverAccount.userId}"
+    <a class="name typo-header-4" href="/app/projects/{project.repoDriverAccount.userId}"
       ><ProjectName {project} /></a
     >
     {#if project.owner}

@@ -41,13 +41,13 @@
     address: Address;
   }
 
-  export interface GitDriverAccount {
+  export interface RepoDriverAccount {
     userId: UserId;
-    driver: 'git';
+    driver: 'repo';
   }
 
   export interface ClaimedGitProject {
-    gitDriverAccount: GitDriverAccount;
+    repoDriverAccount: RepoDriverAccount;
     owner: AddressDriverAccount;
     source: Source;
     emoji: string;

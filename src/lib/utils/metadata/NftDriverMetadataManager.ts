@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
-import { gitDriverSplitReceiverSchema, nftDriverAccountMetadataSchema } from './schemas';
+import { repoDriverSplitReceiverSchema, nftDriverAccountMetadataSchema } from './schemas';
 import type { NFTDriverAccount, UserId } from './types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
@@ -34,7 +34,7 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
   public buildAccountMetadata(context: {
     forAccount: NFTDriverAccount;
-    projects: z.infer<typeof gitDriverSplitReceiverSchema>[];
+    projects: z.infer<typeof repoDriverSplitReceiverSchema>[];
   }): z.infer<typeof nftDriverAccountMetadataSchema> {
     const { forAccount, projects } = context;
 
