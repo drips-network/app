@@ -310,4 +310,24 @@ describe('RepoDriverMetadataManager', () => {
       });
     });
   });
+
+  describe('forgeFromString', () => {
+    it('should return the expected forge', () => {
+      // Act
+      const ghForge = RepoDriverMetadataManager.forgeFromString('github');
+      const glForge = RepoDriverMetadataManager.forgeFromString('gitlab');
+
+      // Assert
+      expect(ghForge).toBe(Forge.GitHub);
+      expect(glForge).toBe(Forge.GitLab);
+    });
+
+    it('should throw an error if the forge is not supported', () => {
+      // Act
+      const forge = () => RepoDriverMetadataManager.forgeFromString('not-supported');
+
+      // Assert
+      expect(forge).toThrow();
+    });
+  });
 });

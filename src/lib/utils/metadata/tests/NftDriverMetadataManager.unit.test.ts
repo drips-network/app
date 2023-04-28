@@ -111,6 +111,7 @@ describe('NftDriverMetadataManager', () => {
             weight: 1,
             userId: '1',
             source: {
+              forge: 'github',
               repoName: 'repo',
               url: 'repo.com',
             },
