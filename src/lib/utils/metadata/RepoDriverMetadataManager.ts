@@ -1,4 +1,4 @@
-import MetadataManagerBase, { type IMetadataManager } from './MetadataManagerBase';
+import MetadataManagerBase from './MetadataManagerBase';
 import {
   addressDriverSplitReceiverSchema,
   repoDriverAccountMetadataSchema,
@@ -6,20 +6,9 @@ import {
   splitReceiverSchema,
 } from './schemas';
 import type { ClaimedGitProject, RepoDriverAccount, UserId } from './types';
-import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
-import type { z } from 'zod';
 import { Forge } from 'radicle-drips';
-
-export interface IRepoDriverMetadataManager
-  extends IMetadataManager<typeof repoDriverAccountMetadataSchema, RepoDriverAccount> {
-  /**
-   * Verifies the source metadata of a project.
-   *
-   * @param repoId - The ID of the user to verify the source metadata for.
-   * @returns A Promise that resolves to a boolean indicating whether the source metadata is valid.
-   */
-  verifySourceMetadata(userId: string): Promise<boolean>;
-}
+import { getRepoDriverClient } from '../get-drips-clients';
+import type { z } from 'zod';
 
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
   typeof repoDriverAccountMetadataSchema,
@@ -27,34 +16,6 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 > {
   constructor() {
     super(repoDriverAccountMetadataSchema);
-  }
-
-  public async verifySourceMetadata(userId: string): Promise<boolean> {
-    const metadata = await super.fetchAccountMetadata(userId);
-
-    if (!metadata?.data.source) {
-      return false;
-    }
-
-    const { url, repoName, forge: forgeAsString } = metadata.data.source;
-
-    const forge: Forge = RepoDriverMetadataManager.forgeFromString(forgeAsString);
-
-    const repoDriverClient = await getRepoDriverClient();
-
-    const repoId = await repoDriverClient.getRepoId(forge, repoName);
-
-    const onChainUserId = await repoDriverClient.getUserId(repoId);
-
-    if (onChainUserId !== userId) {
-      return false;
-    }
-
-    if (!url.includes(repoName)) {
-      return false;
-    }
-
-    return true;
   }
 
   public static forgeFromString(forgeAsString: string) {
@@ -72,7 +33,48 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     return forge;
   }
 
-  async fetchAccount(userId: UserId): Promise<RepoDriverAccount | null> {
+  /**
+   * Fetches the latest IPFS metadata for a given user ID.
+   * @param userId The user ID to fetch the metadata for.
+   * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
+   * @throws If the metadata is invalid.
+   */
+  public override async fetchAccountMetadata(
+    userId: UserId,
+  ): Promise<{ hash: string; data: z.infer<typeof repoDriverAccountMetadataSchema> } | null> {
+    const metadata = await super.fetchAccountMetadata(userId);
+
+    if (!metadata) {
+      return null;
+    }
+
+    const { url, repoName, forge } = metadata.data.source;
+
+    const repoDriverClient = await getRepoDriverClient();
+
+    // Calculate the *expected* on-chain repo ID and user ID for the metadata forge and repo name.
+    const onChainRepoId = await repoDriverClient.getRepoId(
+      RepoDriverMetadataManager.forgeFromString(forge),
+      repoName,
+    );
+    const onChainUserId = await repoDriverClient.getUserId(onChainRepoId);
+
+    if (onChainUserId !== userId) {
+      throw new Error(
+        `The user ID ${userId} does not match the on-chain user ID ${onChainUserId} for the repo ${repoName} on ${forge}.`,
+      );
+    }
+
+    if (!url.includes(repoName)) {
+      throw new Error(
+        `The repo name ${repoName} is not included in the URL ${url} for the repo ${repoName} on ${forge}.`,
+      );
+    }
+
+    return metadata;
+  }
+
+  public async fetchAccount(userId: UserId): Promise<RepoDriverAccount | null> {
     const metadata = await super.fetchAccountMetadata(userId);
 
     if (!metadata) {

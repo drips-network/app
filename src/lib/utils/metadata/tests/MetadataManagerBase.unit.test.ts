@@ -138,7 +138,7 @@ describe('MetadataManagerBase', () => {
       expect(fetchIpfsMock).toHaveBeenCalledWith(metadataHash);
     });
 
-    it('should return undefined when metadata hash is not found', async () => {
+    it('should return null when metadata hash is not found', async () => {
       // Arrange
       const userId = '1';
       const metadataSchema = z.string();
@@ -146,7 +146,7 @@ describe('MetadataManagerBase', () => {
       const subgraphClientMock = {
         getLatestUserMetadata: vi
           .fn(DripsSubgraphClient.prototype.getLatestUserMetadata)
-          .mockResolvedValue(undefined as any),
+          .mockResolvedValue(null as any),
       } as unknown as DripsSubgraphClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
@@ -155,10 +155,10 @@ describe('MetadataManagerBase', () => {
       const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(userId);
 
       // Assert
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
 
-    it('should return undefined when fetchIpfs throws an error', async () => {
+    it('should return null when fetchIpfs throws an error', async () => {
       // Arrange
       const userId = '1';
       const metadataHash = 'QmX';
@@ -176,7 +176,7 @@ describe('MetadataManagerBase', () => {
       const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(userId);
 
       // Assert
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
       expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
       expect(fetchIpfsMock).toHaveBeenCalledWith(metadataHash);
     });

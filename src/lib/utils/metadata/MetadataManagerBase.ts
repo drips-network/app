@@ -22,17 +22,17 @@ import type { UserId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
 export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
-  fetchMetadataHashByUserId(userId: UserId): Promise<string | undefined>;
+  fetchMetadataHashByUserId(userId: UserId): Promise<string | null>;
 
   fetchAccountMetadata(
     userId: UserId,
-  ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | undefined>;
+  ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | null>;
 
   pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string>;
 
   updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
-    lastKnownHash: string | undefined,
+    lastKnownHash: string | null,
     schema: T,
   ): Promise<{ newHash: string; tx: ContractTransaction }>;
 
@@ -73,15 +73,15 @@ export default abstract class MetadataManagerBase<
   /**
    * Fetches the latest metadata hash for a given user ID.
    * @param userId The user ID to fetch the metadata hash for.
-   * @returns The latest metadata hash for the given user ID, or undefined if no metadata hash exists.
+   * @returns The latest metadata hash for the given user ID, or null if no metadata hash exists.
    */
-  public async fetchMetadataHashByUserId(userId: UserId): Promise<string | undefined> {
+  public async fetchMetadataHashByUserId(userId: UserId): Promise<string | null> {
     const userMetadata = await this.subgraphClient.getLatestUserMetadata(
       userId,
       MetadataManagerBase.USER_METADATA_KEY,
     );
 
-    return userMetadata?.value;
+    return userMetadata?.value ?? null;
   }
 
   private async fetchIpfs(hash: string) {
@@ -96,20 +96,20 @@ export default abstract class MetadataManagerBase<
   /**
    * Fetches the latest IPFS metadata for a given user ID.
    * @param userId The user ID to fetch the metadata for.
-   * @returns The latest IPFS metadata for the given user ID, or undefined if no metadata exists.
+   * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
    */
   public async fetchAccountMetadata(
     userId: UserId,
-  ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | undefined> {
+  ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | null> {
     const metadataHash = await this.fetchMetadataHashByUserId(userId);
-    if (!metadataHash) return undefined;
+    if (!metadataHash) return null;
 
     let accountMetadataRes: Awaited<ReturnType<typeof MetadataManagerBase.prototype.fetchIpfs>>;
 
     try {
       accountMetadataRes = await this.fetchIpfs(metadataHash);
     } catch (e) {
-      return undefined;
+      return null;
     }
 
     return {
@@ -160,7 +160,7 @@ export default abstract class MetadataManagerBase<
    */
   public async updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
-    lastKnownHash: string | undefined,
+    lastKnownHash: string | null,
   ): Promise<{ newHash: string; tx: ContractTransaction }> {
     const { userId } = newData.describes;
     const currentOnChainHash = await this.fetchMetadataHashByUserId(userId);

@@ -13,8 +13,8 @@ describe('RepoDriverMetadataManager', () => {
     vi.restoreAllMocks();
   });
 
-  describe('verifySourceMetadata', () => {
-    it('should return true if the source metadata is valid', async () => {
+  describe('fetchAccountMetadata', () => {
+    it('should return the metadata if metadata is valid', async () => {
       // Arrange
       const repoId = '1';
       const userId = '2';
@@ -24,6 +24,7 @@ describe('RepoDriverMetadataManager', () => {
       const fetchAccountMetadataMock = vi
         .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
         .mockResolvedValue({
+          hash: '0x123',
           data: {
             source: {
               forge: 'github',
@@ -31,7 +32,7 @@ describe('RepoDriverMetadataManager', () => {
               repoName: 'repo',
             },
           },
-        } as any);
+        });
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
@@ -42,10 +43,19 @@ describe('RepoDriverMetadataManager', () => {
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new RepoDriverMetadataManager().verifySourceMetadata('2');
+      const result = await new RepoDriverMetadataManager().fetchAccountMetadata('2');
 
       // Assert
-      expect(result).toBe(true);
+      expect(result).toEqual({
+        hash: '0x123',
+        data: {
+          source: {
+            forge: 'github',
+            url: gitUrl,
+            repoName: 'repo',
+          },
+        },
+      });
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
       expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(repoId);
       expect(repoDriverClientMock.getRepoId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
@@ -53,7 +63,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
-    it('should return false if the source metadata is invalid', async () => {
+    it('should throw if on-chain user ID does not match with the provided user ID', async () => {
       const repoId = '1';
       const userId = '2';
       const gitUrl = 'http://github.com/username/repo';
@@ -62,6 +72,7 @@ describe('RepoDriverMetadataManager', () => {
       const fetchAccountMetadataMock = vi
         .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
         .mockResolvedValue({
+          hash: '0x123',
           data: {
             source: {
               forge: 'github',
@@ -69,7 +80,7 @@ describe('RepoDriverMetadataManager', () => {
               repoName: 'repo',
             },
           },
-        } as any);
+        });
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
@@ -80,18 +91,17 @@ describe('RepoDriverMetadataManager', () => {
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new RepoDriverMetadataManager().verifySourceMetadata('200');
+      await expect(new RepoDriverMetadataManager().fetchAccountMetadata('3')).rejects.toThrow();
 
       // Assert
-      expect(result).toBe(false);
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith('200');
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith('3');
       expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(repoId);
       expect(repoDriverClientMock.getRepoId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
-    it('should return false if the source metadata is missing', async () => {
+    it('should return null if the account metadata is missing', async () => {
       // Arrange
       const repoId = '1';
       const userId = '2';
@@ -99,7 +109,7 @@ describe('RepoDriverMetadataManager', () => {
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
       const fetchAccountMetadataMock = vi
         .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
-        .mockResolvedValue(undefined as any);
+        .mockResolvedValue(null as any);
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
@@ -110,10 +120,10 @@ describe('RepoDriverMetadataManager', () => {
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new RepoDriverMetadataManager().verifySourceMetadata('2');
+      const result = await new RepoDriverMetadataManager().fetchAccountMetadata('2');
 
       // Assert
-      expect(result).toBe(false);
+      expect(result).toBeNull;
       expect(repoDriverClientMock.getRepoId).not.toBeCalled();
       expect(repoDriverClientMock.getUserId).not.toBeCalled();
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
@@ -121,7 +131,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
-    it('should return false if the url does not include the repo name', async () => {
+    it('should throw if the url does not include the repo name', async () => {
       // Arrange
       const repoId = '1';
       const userId = '2';
@@ -131,6 +141,7 @@ describe('RepoDriverMetadataManager', () => {
       const fetchAccountMetadataMock = vi
         .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
         .mockResolvedValue({
+          hash: '0x123',
           data: {
             source: {
               forge: 'github',
@@ -149,10 +160,9 @@ describe('RepoDriverMetadataManager', () => {
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      const result = await new RepoDriverMetadataManager().verifySourceMetadata('2');
+      await expect(new RepoDriverMetadataManager().fetchAccountMetadata(userId)).rejects.toThrow();
 
       // Assert
-      expect(result).toBe(false);
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
       expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(repoId);
       expect(repoDriverClientMock.getRepoId).toHaveBeenCalledWith(Forge.GitHub, 'random-repo-name');
