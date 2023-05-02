@@ -101,6 +101,7 @@
     if (groupExpanded) {
       groupHeight.set(groupElem.scrollHeight);
     } else {
+      groupHeight.set(groupElem.scrollHeight, { duration: 0 });
       groupHeight.set(48);
     }
   }
