@@ -1,4 +1,4 @@
-import type { GenericGitSource, GitProject } from '../../types';
+import type { GenericGitSource, GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -12,6 +12,7 @@ export const load: PageLoad = ({ params }) => {
 
   if (decodedGitUrl.href === 'https://some-host.com/svelte-stepper.git') {
     project = {
+      claimed: true,
       gitDriverAccount: {
         userId: '0',
         driver: 'git',
@@ -31,6 +32,7 @@ export const load: PageLoad = ({ params }) => {
     };
   } else {
     project = {
+      claimed: false,
       gitDriverAccount: {
         userId: '0',
         driver: 'git',

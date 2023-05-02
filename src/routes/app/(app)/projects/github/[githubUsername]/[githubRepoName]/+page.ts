@@ -1,4 +1,4 @@
-import type { GitHubSource, GitProject } from '../../../types';
+import type { GitHubSource, GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load = (({ params }) => {
@@ -10,6 +10,7 @@ export const load = (({ params }) => {
 
   if (githubRepoName === 'svelte-stepper') {
     project = {
+      claimed: true,
       gitDriverAccount: {
         userId: '0',
         driver: 'git',
@@ -30,6 +31,7 @@ export const load = (({ params }) => {
     };
   } else {
     project = {
+      claimed: false,
       gitDriverAccount: {
         userId: '0',
         driver: 'git',

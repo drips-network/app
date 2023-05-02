@@ -1,74 +1,10 @@
-<script lang="ts" context="module">
-  //TODO: Replace with imported types once centrally defined
-
-  export interface GitHubSource {
-    type: 'github';
-    repoName: string;
-    ownerName: string;
-    url: string;
-  }
-
-  export interface GitLabSource {
-    type: 'gitlab';
-    repoName: string;
-    ownerName: string;
-    host: string;
-    url: string;
-  }
-
-  export interface RadicleSource {
-    type: 'radicle';
-    rid: string;
-    repoName: string;
-    seed: string;
-    url: string;
-  }
-
-  export interface GenericGitSource {
-    type: 'generic';
-    repoName: string;
-    url: string;
-  }
-
-  type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
-
-  type Address = string;
-  type UserId = string;
-
-  export interface AddressDriverAccount {
-    driver: 'address';
-    userId: UserId;
-    address: Address;
-  }
-
-  export interface GitDriverAccount {
-    userId: UserId;
-    driver: 'git';
-  }
-
-  export interface UnclaimedGitProject {
-    gitDriverAccount: GitDriverAccount;
-    owner: undefined;
-    source: Source;
-  }
-
-  export interface ClaimedGitProject {
-    gitDriverAccount: GitDriverAccount;
-    owner: AddressDriverAccount;
-    source: Source;
-    emoji: string;
-    color: string;
-    description?: string;
-  }
-
-  export type GitProject = UnclaimedGitProject | ClaimedGitProject;
-</script>
-
 <script lang="ts">
   import GithubIcon from 'radicle-design-system/icons/Github.svelte';
   import GitlabIcon from 'radicle-design-system/icons/Gitlab.svelte';
   import RadicleIcon from 'radicle-design-system/icons/Radicle.svelte';
   import GitIcon from 'radicle-design-system/icons/Git.svelte';
+  import type { GitProject } from '$lib/utils/metadata/types';
+  import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
   export let project: GitProject;
 
@@ -93,34 +29,36 @@
   $: emojiFontSize = EMOJI_FONT_SIZES[size];
 </script>
 
-<div
-  class="wrapper"
-  style="width: {containerSize}; height: {containerSize}"
-  style:box-shadow={outline ? 'var(--elevation-low)' : ''}
->
-  {#if project.owner}
-    <div class="project-avatar" style:background-color="var(--color-primary)">
-      <span class="emoji" style:font-size={emojiFontSize}>{project.emoji}</span>
-    </div>
-  {/if}
+<PrimaryColorThemer colorHex={project.claimed ? project.color : undefined}>
+  <div
+    class="wrapper"
+    style="width: {containerSize}; height: {containerSize}"
+    style:box-shadow={outline ? 'var(--elevation-low)' : ''}
+  >
+    {#if project.owner}
+      <div class="project-avatar" style:background-color="var(--color-primary)">
+        <span class="emoji" style:font-size={emojiFontSize}>{project.emoji}</span>
+      </div>
+    {/if}
 
-  {#if !project.owner}
-    <div class="project-avatar">
-      {#if project.source.type === 'github'}
-        <GithubIcon />
-      {:else if project.source.type === 'gitlab'}
-        <!-- TODO: Real GitLab icon -->
-        <GitlabIcon />
-      {:else if project.source.type === 'radicle'}
-        <!-- TODO: Real Radicle icon -->
-        <RadicleIcon />
-      {:else if project.source.type === 'generic'}
-        <!-- TODO: Real Git icon -->
-        <GitIcon />
-      {/if}
-    </div>
-  {/if}
-</div>
+    {#if !project.owner}
+      <div class="project-avatar">
+        {#if project.source.type === 'github'}
+          <GithubIcon />
+        {:else if project.source.type === 'gitlab'}
+          <!-- TODO: Real GitLab icon -->
+          <GitlabIcon />
+        {:else if project.source.type === 'radicle'}
+          <!-- TODO: Real Radicle icon -->
+          <RadicleIcon />
+        {:else if project.source.type === 'generic'}
+          <!-- TODO: Real Git icon -->
+          <GitIcon />
+        {/if}
+      </div>
+    {/if}
+  </div>
+</PrimaryColorThemer>
 
 <style>
   .wrapper {

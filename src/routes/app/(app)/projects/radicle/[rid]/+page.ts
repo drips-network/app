@@ -1,4 +1,4 @@
-import type { GitProject, RadicleSource } from '../../types';
+import type { RadicleSource, GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -10,6 +10,7 @@ export const load: PageLoad = ({ params }) => {
 
   if (rid === 'rad:1234') {
     project = {
+      claimed: true,
       gitDriverAccount: {
         userId: '0',
         driver: 'git',
@@ -31,6 +32,7 @@ export const load: PageLoad = ({ params }) => {
     };
   } else {
     project = {
+      claimed: false,
       gitDriverAccount: {
         userId: '0',
         driver: 'git',

@@ -1,69 +1,3 @@
-<script lang="ts" context="module">
-  //TODO: Replace with imported types once centrally defined
-
-  export interface GitHubSource {
-    type: 'github';
-    repoName: string;
-    ownerName: string;
-    url: string;
-  }
-
-  export interface GitLabSource {
-    type: 'gitlab';
-    repoName: string;
-    ownerName: string;
-    host: string;
-    url: string;
-  }
-
-  export interface RadicleSource {
-    type: 'radicle';
-    rid: string;
-    repoName: string;
-    seed: string;
-    url: string;
-  }
-
-  export interface GenericGitSource {
-    type: 'generic';
-    repoName: string;
-    url: string;
-  }
-
-  export type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
-
-  type Address = string;
-  type UserId = string;
-
-  export interface AddressDriverAccount {
-    driver: 'address';
-    userId: UserId;
-    address: Address;
-  }
-
-  export interface GitDriverAccount {
-    userId: UserId;
-    driver: 'git';
-  }
-
-  export interface UnclaimedGitProject {
-    gitDriverAccount: GitDriverAccount;
-    owner: undefined;
-    source: Source;
-  }
-
-  export interface ClaimedGitProject {
-    gitDriverAccount: GitDriverAccount;
-    owner: AddressDriverAccount;
-    source: Source;
-    emoji: string;
-    color: string;
-    description?: string;
-  }
-
-  export type GitProject = UnclaimedGitProject | ClaimedGitProject;
-</script>
-
 <script lang="ts">
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
@@ -71,6 +5,7 @@
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
+  import type { GitProject } from '$lib/utils/metadata/types';
 
   export let project: GitProject;
   export let tooltip = true;
@@ -80,7 +15,14 @@
 
   let processedProject: GitProject;
   $: processedProject = forceUnclaimed
-    ? { ...project, owner: undefined, color: undefined, description: undefined, emoji: undefined }
+    ? {
+        ...project,
+        owner: undefined,
+        color: undefined,
+        description: undefined,
+        emoji: undefined,
+        claimed: false,
+      }
     : project;
 </script>
 

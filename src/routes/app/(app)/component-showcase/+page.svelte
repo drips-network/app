@@ -16,10 +16,12 @@
   import Step_1 from './examples/example-stepper-steps/step-1.svelte';
   import Step_2 from './examples/example-stepper-steps/step-2.svelte';
   import SuccessStep from './examples/example-stepper-steps/success-step.svelte';
-  import ProjectBadge, { type Source } from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
+  import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
+  import type { GitProject, Source } from '$lib/utils/metadata/types';
 
   // Button
   let disabled = false;
@@ -94,9 +96,153 @@
       url: 'https://some-host.com/svelte-stepper.git',
     },
   };
+
+  // Splits
+
+  const MOCK_PROJECT_1: GitProject = {
+    claimed: true,
+    gitDriverAccount: {
+      userId: '0',
+      driver: 'git',
+    },
+    owner: {
+      driver: 'address',
+      userId: '0',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+    },
+    source: {
+      type: 'github',
+      repoName: 'svelte-stepper',
+      ownerName: 'efstajas',
+      url: 'https://github.com/efstajas/svelte-stepper.git',
+    },
+    emoji: '🚶',
+    color: '#fcc842',
+  };
+
+  const MOCK_PROJECT_2: GitProject = {
+    claimed: true,
+    gitDriverAccount: {
+      userId: '0',
+      driver: 'git',
+    },
+    owner: {
+      driver: 'address',
+      userId: '0',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+    },
+    source: {
+      type: 'github',
+      repoName: 'svelte-stored-writable',
+      ownerName: 'efstajas',
+      url: 'https://github.com/efstajas/svelte-stepper.git',
+    },
+    emoji: '💾',
+    color: '#FF0000',
+  };
+
+  const mockSplits: Splits = [
+    {
+      type: 'project-split',
+      project: MOCK_PROJECT_1,
+      weight: 62500,
+    },
+    {
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      weight: 62500,
+    },
+    {
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      weight: 62500,
+    },
+    {
+      type: 'split-group',
+      name: 'Dependencies',
+      list: [
+        {
+          type: 'project-split',
+          project: MOCK_PROJECT_2,
+          weight: 62500,
+        },
+        {
+          type: 'split-group',
+          name: 'Some nested stuff',
+          list: [
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_1,
+              weight: 62500,
+            },
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_1,
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_2,
+              weight: 62500,
+            },
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_1,
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+          ],
+        },
+        {
+          type: 'address-split',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+          weight: 62500,
+        },
+        {
+          type: 'project-split',
+          project: MOCK_PROJECT_2,
+          weight: 62500,
+        },
+      ],
+    },
+    {
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      weight: 62500,
+    },
+    {
+      type: 'project-split',
+      project: MOCK_PROJECT_2,
+      weight: 62500,
+    },
+  ];
 </script>
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Splits</h2>
+  <SplitsComponent list={mockSplits} />
+</div>
 
 <div class="showcase-item" style="max-width: 16rem">
   <h2>Project Card</h2>
@@ -143,6 +289,7 @@
     <ProjectBadge
       project={projectVerified
         ? {
+            claimed: true,
             gitDriverAccount: {
               userId: '0',
               driver: 'git',
@@ -157,6 +304,7 @@
             color: '#fcc842',
           }
         : {
+            claimed: false,
             gitDriverAccount: {
               userId: '0',
               driver: 'git',

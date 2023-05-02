@@ -142,6 +142,7 @@
     border: 8px solid transparent;
     box-sizing: border-box;
     max-width: fit-content;
+    z-index: 2000;
   }
 
   .tooltip-content {
