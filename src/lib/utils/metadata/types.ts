@@ -27,7 +27,7 @@ export interface GenericGitSource {
   repoName: string;
 }
 
-type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
+export type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
 
 export type Address = string;
 export type UserId = string;
@@ -51,22 +51,26 @@ export interface RepoDriverAccount {
 
 export type Account = AddressDriverAccount | NFTDriverAccount | RepoDriverAccount;
 
-export interface UnclaimedGitProject {
+export interface UnclaimedGitProject<ST extends Source = Source> {
+  claimed: false;
   owner: undefined;
   repoDriverAccount: RepoDriverAccount;
-  source: Source;
+  source: ST;
 }
 
-export interface ClaimedGitProject {
+export interface ClaimedGitProject<ST extends Source = Source> {
+  claimed: true;
   owner: AddressDriverAccount;
   repoDriverAccount: RepoDriverAccount;
-  source: Source;
+  source: ST;
   color: string;
   emoji: string;
   description?: string;
 }
 
-export type GitProject = UnclaimedGitProject | ClaimedGitProject;
+export type GitProject<ST extends Source = Source> =
+  | UnclaimedGitProject<ST>
+  | ClaimedGitProject<ST>;
 
 export interface DripList {
   account: NFTDriverAccount;

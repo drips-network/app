@@ -1,63 +1,6 @@
-<script lang="ts" context="module">
-  //TODO: Replace with imported types once centrally defined
-
-  export interface GitHubSource {
-    type: 'github';
-    repoName: string;
-    ownerName: string;
-    url: string;
-  }
-
-  export interface GitLabSource {
-    type: 'gitlab';
-    repoName: string;
-    ownerName: string;
-    host: string;
-    url: string;
-  }
-
-  export interface RadicleSource {
-    type: 'radicle';
-    rid: string;
-    repoName: string;
-    seed: string;
-    url: string;
-  }
-
-  export interface GenericGitSource {
-    type: 'generic';
-    repoName: string;
-    url: string;
-  }
-
-  type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
-
-  type Address = string;
-  type UserId = string;
-
-  export interface AddressDriverAccount {
-    driver: 'address';
-    userId: UserId;
-    address: Address;
-  }
-
-  export interface RepoDriverAccount {
-    userId: UserId;
-    driver: 'repo';
-  }
-
-  export interface ClaimedGitProject {
-    repoDriverAccount: RepoDriverAccount;
-    owner: AddressDriverAccount;
-    source: Source;
-    emoji: string;
-    color: string;
-    description?: string;
-  }
-</script>
-
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
+  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';

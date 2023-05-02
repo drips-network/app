@@ -17,6 +17,7 @@
   export let disableSelection = false;
   export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
   export let disableTooltip = false;
+  export let outline = false;
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
   export let isReverse = false;
@@ -76,52 +77,59 @@
   $: currentFontClass = ens?.name ? currentFontClassEns : currentFontClassAddress;
 </script>
 
-<Tooltip text={address} copyable disabled={disableTooltip}>
-  <svelte:element
-    this={getLink() ? 'a' : 'span'}
-    href={getLink()}
-    class="identity-badge flex items-center relative text-left text-foreground"
-    class:flex-row-reverse={isReverse}
-    class:select-none={disableSelection}
-    style:height={showAvatar ? `${currentSize}px` : ''}
-    style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
-  >
-    {#if showAvatar}
-      <Avatar
-        size={currentSize}
-        bind:imgElem={avatarImgElem}
-        src={ens?.avatarUrl}
-        placeholderSrc={blockyUrl}
-      />
-    {/if}
-    {#if showIdentity}
-      <div class="identity relative flex-1 max-w-full">
-        <div
-          class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
-          class:hideOnMobile={hideAvatarOnMobile}
-        >
-          {toDisplay}
-        </div>
-        {#key toDisplay}
+<div class="wrapper">
+  <Tooltip text={address} copyable disabled={disableTooltip}>
+    <svelte:element
+      this={getLink() ? 'a' : 'span'}
+      href={getLink()}
+      class="identity-badge flex items-center relative text-left text-foreground"
+      class:flex-row-reverse={isReverse}
+      class:select-none={disableSelection}
+      style:height={showAvatar ? `${currentSize}px` : ''}
+      style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
+    >
+      {#if showAvatar}
+        <Avatar
+          size={currentSize}
+          bind:imgElem={avatarImgElem}
+          src={ens?.avatarUrl}
+          placeholderSrc={blockyUrl}
+          {outline}
+        />
+      {/if}
+      {#if showIdentity}
+        <div class="identity relative flex-1 max-w-full">
           <div
-            transition:fade|local={{ duration: 300 }}
-            class:foreground={size === 'gigantic'}
-            class={`${currentFontClass} identity-ellipsis absolute overlay`}
-            data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+            class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
             class:hideOnMobile={hideAvatarOnMobile}
           >
             {toDisplay}
           </div>
-        {/key}
-      </div>
-    {/if}
-  </svelte:element>
-  <svelte:fragment slot="tooltip-content">
-    {address}
-  </svelte:fragment>
-</Tooltip>
+          {#key toDisplay}
+            <div
+              transition:fade|local={{ duration: 300 }}
+              class:foreground={size === 'gigantic'}
+              class={`${currentFontClass} identity-ellipsis absolute overlay`}
+              data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
+              class:hideOnMobile={hideAvatarOnMobile}
+            >
+              {toDisplay}
+            </div>
+          {/key}
+        </div>
+      {/if}
+    </svelte:element>
+    <svelte:fragment slot="tooltip-content">
+      {address}
+    </svelte:fragment>
+  </Tooltip>
+</div>
 
 <style>
+  .wrapper {
+    width: fit-content;
+  }
+
   .identity-badge:focus {
     outline: none;
   }

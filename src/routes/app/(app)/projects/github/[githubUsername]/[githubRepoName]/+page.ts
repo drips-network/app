@@ -1,4 +1,4 @@
-import type { GitHubSource, GitProject } from '../../../types';
+import type { GitHubSource, GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load = (({ params }) => {
@@ -10,6 +10,7 @@ export const load = (({ params }) => {
 
   if (githubRepoName === 'svelte-stepper') {
     project = {
+      claimed: true,
       repoDriverAccount: {
         userId: '0',
         driver: 'repo',
@@ -20,7 +21,7 @@ export const load = (({ params }) => {
         address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       },
       source: {
-        type: 'github',
+        forge: 'github',
         repoName: githubRepoName,
         ownerName: githubUsername,
         url: `https://github.com/${githubUsername}/${githubRepoName}.git`,
@@ -30,12 +31,13 @@ export const load = (({ params }) => {
     };
   } else {
     project = {
+      claimed: false,
       repoDriverAccount: {
         userId: '0',
         driver: 'repo',
       },
       source: {
-        type: 'github',
+        forge: 'github',
         repoName: githubRepoName,
         ownerName: githubUsername,
         url: `https://github.com/${githubUsername}/${githubRepoName}.git`,

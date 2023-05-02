@@ -1,4 +1,4 @@
-import type { GitLabSource, GitProject } from '../../../types';
+import type { GitLabSource, GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -10,6 +10,7 @@ export const load: PageLoad = ({ params }) => {
 
   if (gitlabRepoName === 'svelte-stepper') {
     project = {
+      claimed: true,
       repoDriverAccount: {
         userId: '0',
         driver: 'repo',
@@ -20,7 +21,7 @@ export const load: PageLoad = ({ params }) => {
         address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       },
       source: {
-        type: 'gitlab',
+        forge: 'gitlab',
         repoName: gitlabRepoName,
         ownerName: gitlabUsername,
         host: 'gitlab.com',
@@ -31,12 +32,13 @@ export const load: PageLoad = ({ params }) => {
     };
   } else {
     project = {
+      claimed: false,
       repoDriverAccount: {
         userId: '0',
         driver: 'repo',
       },
       source: {
-        type: 'gitlab',
+        forge: 'gitlab',
         repoName: gitlabRepoName,
         ownerName: gitlabUsername,
         host: 'gitlab.com',

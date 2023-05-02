@@ -36,6 +36,17 @@
     expanded = false;
   }
 
+  let hoverTimeout: ReturnType<typeof setTimeout> | undefined;
+  function handleHover(hovering: boolean) {
+    clearTimeout(hoverTimeout);
+
+    if (hovering) {
+      hoverTimeout = setTimeout(show, 400);
+    } else {
+      hide();
+    }
+  }
+
   const MAX_WIDTH = 512;
 
   async function updatePos() {
@@ -97,8 +108,8 @@
   bind:this={tooltipElem}
   class="tooltip"
   class:disabled
-  on:mouseenter={() => !disabled && show()}
-  on:mouseleave={() => !disabled && hide()}
+  on:mouseenter={() => !disabled && handleHover(true)}
+  on:mouseleave={() => !disabled && handleHover(false)}
 >
   <div class="trigger"><slot /></div>
   <div
@@ -142,6 +153,7 @@
     border: 8px solid transparent;
     box-sizing: border-box;
     max-width: fit-content;
+    z-index: 2000;
   }
 
   .tooltip-content {

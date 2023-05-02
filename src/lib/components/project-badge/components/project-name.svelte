@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { GitProject } from '../project-badge.svelte';
+  import type { GitProject } from '$lib/utils/metadata/types';
 
   export let project: GitProject;
 </script>
 
 <span class="project-name">
-  {#if project.source.type === 'github' || project.source.type === 'gitlab'}
+  {#if project.source.forge === 'github' || project.source.forge === 'gitlab'}
     <span style:color="var(--color-foreground-level-5)">{project.source.ownerName}/</span><span
       class="repo-name">{project.source.repoName}</span
     >

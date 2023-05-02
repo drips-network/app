@@ -1,4 +1,4 @@
-import type { GitProject, RadicleSource } from '../../types';
+import type { RadicleSource, GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -10,6 +10,7 @@ export const load: PageLoad = ({ params }) => {
 
   if (rid === 'rad:1234') {
     project = {
+      claimed: true,
       repoDriverAccount: {
         userId: '0',
         driver: 'repo',
@@ -20,7 +21,7 @@ export const load: PageLoad = ({ params }) => {
         address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       },
       source: {
-        type: 'radicle',
+        forge: 'radicle',
         rid,
         repoName: 'Svelte Stepper',
         seed: 'seed.radicle.xyz',
@@ -31,12 +32,13 @@ export const load: PageLoad = ({ params }) => {
     };
   } else {
     project = {
+      claimed: false,
       repoDriverAccount: {
         userId: '0',
         driver: 'repo',
       },
       source: {
-        type: 'radicle',
+        forge: 'radicle',
         rid,
         repoName: 'Svelte Stepper',
         seed: 'seed.radicle.xyz',

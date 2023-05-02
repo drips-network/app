@@ -1,9 +1,9 @@
 <script lang="ts">
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import Sun from 'radicle-design-system/icons/Sun.svelte';
-  import type { ClaimedGitProject } from '../../types';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
+  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 
   export let project: ClaimedGitProject;
 </script>
