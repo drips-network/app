@@ -1,6 +1,6 @@
 <script lang="ts">
   import DesignSystemEmoji from 'radicle-design-system/Emoji.svelte';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import { CUSTOM_EMOJI_COMPONENTS } from './emoji';
 
   export let emoji: string;
@@ -16,7 +16,7 @@
 
   $: sizePx = SIZES_PX[size];
 
-  let customEmoji: typeof SvelteComponent | undefined;
+  let customEmoji: ComponentType | undefined;
   $: customEmoji = CUSTOM_EMOJI_COMPONENTS[emoji];
 </script>
 

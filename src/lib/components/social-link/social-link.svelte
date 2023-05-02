@@ -3,7 +3,7 @@
   import Web from 'radicle-design-system/icons/Globe.svelte';
   import Ethereum from 'radicle-design-system/icons/Ethereum.svelte';
   import Github from 'radicle-design-system/icons/Github.svelte';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import formatAddress from '$lib/utils/format-address';
 
@@ -12,7 +12,7 @@
   export let network: SocialNetwork;
   export let value: string;
 
-  const icons: { [key in SocialNetwork]: typeof SvelteComponent } = {
+  const icons: { [key in SocialNetwork]: ComponentType } = {
     ethereum: Ethereum,
     'com.twitter': Twitter,
     'com.github': Github,

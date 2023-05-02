@@ -1,8 +1,8 @@
-import type { SvelteComponent } from 'svelte';
+import type { ComponentType } from 'svelte';
 
 export interface SidenavItem {
   label: string;
-  icon: typeof SvelteComponent;
+  icon: ComponentType;
   href: string;
   external?: boolean;
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import CrossSmall from 'radicle-design-system/icons/CrossSmall.svelte';
-  import { createEventDispatcher, type SvelteComponent } from 'svelte';
+  import { createEventDispatcher, type ComponentType } from 'svelte';
   import Button from '../button/button.svelte';
 
   const dispatch = createEventDispatcher<{ dismiss: undefined }>();
@@ -11,7 +11,7 @@
     href: string;
     label: string;
   };
-  export let icon: typeof SvelteComponent;
+  export let icon: ComponentType;
 </script>
 
 <div class="banner">

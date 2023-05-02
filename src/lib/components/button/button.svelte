@@ -1,9 +1,9 @@
 <script lang="ts">
   import getContrastColor from '$lib/utils/get-contrast-text-color';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
 
   export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
-  export let icon: typeof SvelteComponent | undefined = undefined;
+  export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
   export let size: 'normal' | 'large' = 'normal';

@@ -1,6 +1,6 @@
 import * as CupertinoPane from 'cupertino-pane';
 
-import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponentTyped } from 'svelte';
 import { get, writable } from 'svelte/store';
 
 import scroll from '$lib/stores/scroll';
@@ -10,7 +10,7 @@ export type Props<T> = T extends SvelteComponentTyped<infer P, any, any> ? P : n
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
 interface CupertinoSheetStore {
-  component?: typeof SvelteComponent;
+  component?: ComponentType;
   props?: { [key: string]: unknown };
 }
 
@@ -37,10 +37,7 @@ export default (() => {
     get(pane).destroy();
   }
 
-  function openSheet<T extends typeof SvelteComponent>(
-    component: T,
-    props: PropsOrUndefined<T>,
-  ): void {
+  function openSheet<T extends ComponentType>(component: T, props: PropsOrUndefined<T>): void {
     const p = get(pane);
 
     if (!p) {
