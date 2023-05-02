@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
 
   export let label: string;
   export let href: string;
   export let active: boolean;
-  export let icon: typeof SvelteComponent;
+  export let icon: ComponentType;
   export let external = false;
 </script>
 

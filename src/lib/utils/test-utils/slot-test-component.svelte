@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
 
-  export let component: typeof SvelteComponent;
+  export let component: ComponentType;
   export let text: string;
 
   export let componentProps: { [propName: string]: unknown } | undefined = undefined;

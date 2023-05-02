@@ -1,4 +1,4 @@
-import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponent, SvelteComponentTyped } from 'svelte';
 
 export interface UpdateAwaitStepParams {
   message?: string;
@@ -8,7 +8,7 @@ export interface UpdateAwaitStepParams {
     label: string;
   };
   icon?: {
-    component: typeof SvelteComponent;
+    component: ComponentType;
     props: Record<string, unknown>;
   };
 }

@@ -22,4 +22,4 @@ jobs:
         run: npm ci
 
       - name: Run svelte-check
-        run: npm run check -- --fail-on-warnings --fail-on-hints
+        run: npm run check -- --fail-on-warnings

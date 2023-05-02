@@ -1,11 +1,11 @@
 import { derived, get, writable } from 'svelte/store';
-import type { SvelteComponent, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponentTyped } from 'svelte';
 import scroll from '../scroll';
 
 type OnHide = () => void;
 
 type ModalLayout = {
-  modalComponent: typeof SvelteComponent;
+  modalComponent: ComponentType;
   onHide: OnHide;
   modalComponentProps: { [key: string]: unknown };
 };
@@ -83,7 +83,7 @@ export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undef
  * @param onHide An optional function that gets triggered when the modal is closed.
  * @param modalComponentProps Props for the modal component.
  */
-export const show = <T extends SvelteComponent>(
+export const show = <T extends SvelteComponentTyped>(
   modalComponent: Constructor<T>,
   onHide: OnHide = doNothing,
   modalComponentProps: Props<T>,
