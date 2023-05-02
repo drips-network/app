@@ -16,10 +16,12 @@
   import Step_1 from './examples/example-stepper-steps/step-1.svelte';
   import Step_2 from './examples/example-stepper-steps/step-2.svelte';
   import SuccessStep from './examples/example-stepper-steps/success-step.svelte';
-  import ProjectBadge, { type Source } from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
+  import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
+  import type { GitProject, Source } from '$lib/utils/metadata/types';
 
   // Button
   let disabled = false;
@@ -69,40 +71,185 @@
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
     github: {
-      type: 'github',
+      forge: 'github',
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
     gitlab: {
-      type: 'gitlab',
+      forge: 'gitlab',
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       host: 'gitlab.com',
       url: 'https://gitlab.com/efstajas/svelte-stepper.git',
     },
     radicle: {
-      type: 'radicle',
+      forge: 'radicle',
       repoName: 'svelte-stepper',
       seed: 'https://some-seed.radicle.xyz',
       rid: 'rad:29488291001389859',
       url: 'https://some-seed.radicle.xyz/rad:29488291001389859',
     },
     generic: {
-      type: 'generic',
+      forge: 'generic',
       repoName: 'svelte-stepper',
       url: 'https://some-host.com/svelte-stepper.git',
     },
   };
+
+  // Splits
+
+  const MOCK_PROJECT_1: GitProject = {
+    claimed: true,
+    repoDriverAccount: {
+      userId: '0',
+      driver: 'repo',
+    },
+    owner: {
+      driver: 'address',
+      userId: '0',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+    },
+    source: {
+      forge: 'github',
+      repoName: 'svelte-stepper',
+      ownerName: 'efstajas',
+      url: 'https://github.com/efstajas/svelte-stepper.git',
+    },
+    emoji: '🚶',
+    color: '#fcc842',
+  };
+
+  const MOCK_PROJECT_2: GitProject = {
+    claimed: true,
+    repoDriverAccount: {
+      userId: '0',
+      driver: 'repo',
+    },
+    owner: {
+      driver: 'address',
+      userId: '0',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+    },
+    source: {
+      forge: 'github',
+      repoName: 'svelte-stored-writable',
+      ownerName: 'efstajas',
+      url: 'https://github.com/efstajas/svelte-stepper.git',
+    },
+    emoji: '💾',
+    color: '#FF0000',
+  };
+
+  const mockSplits: Splits = [
+    {
+      type: 'project-split',
+      project: MOCK_PROJECT_1,
+      weight: 62500,
+    },
+    {
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      weight: 62500,
+    },
+    {
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      weight: 62500,
+    },
+    {
+      type: 'split-group',
+      name: 'Dependencies',
+      list: [
+        {
+          type: 'project-split',
+          project: MOCK_PROJECT_2,
+          weight: 62500,
+        },
+        {
+          type: 'split-group',
+          name: 'Some nested stuff',
+          list: [
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_1,
+              weight: 62500,
+            },
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_1,
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_2,
+              weight: 62500,
+            },
+            {
+              type: 'project-split',
+              project: MOCK_PROJECT_1,
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+            {
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              weight: 62500,
+            },
+          ],
+        },
+        {
+          type: 'address-split',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+          weight: 62500,
+        },
+        {
+          type: 'project-split',
+          project: MOCK_PROJECT_2,
+          weight: 62500,
+        },
+      ],
+    },
+    {
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      weight: 62500,
+    },
+    {
+      type: 'project-split',
+      project: MOCK_PROJECT_2,
+      weight: 62500,
+    },
+  ];
 </script>
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Splits</h2>
+  <SplitsComponent list={mockSplits} />
+</div>
 
 <div class="showcase-item" style="max-width: 16rem">
   <h2>Project Card</h2>
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
       project={{
+        claimed: true,
         repoDriverAccount: {
           userId: '0',
           driver: 'repo',
@@ -143,6 +290,7 @@
     <ProjectBadge
       project={projectVerified
         ? {
+            claimed: true,
             repoDriverAccount: {
               userId: '0',
               driver: 'repo',
@@ -157,6 +305,7 @@
             color: '#fcc842',
           }
         : {
+            claimed: false,
             repoDriverAccount: {
               userId: '0',
               driver: 'repo',

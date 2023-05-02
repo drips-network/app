@@ -1,7 +1,7 @@
 <script lang="ts">
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
-  import type { GitProject } from '../project-badge.svelte';
+  import type { GitProject } from '$lib/utils/metadata/types';
   import ProjectName from './project-name.svelte';
 
   export let project: GitProject;
@@ -32,7 +32,7 @@
         <IdentityBadge address={project.owner.address} disableTooltip size="small" />
       </div>
     {/if}
-    {#if project.source.type === 'generic'}
+    {#if project.source.forge === 'generic'}
       <div class="owner typo-text-small">
         <span>Hosted on</span>
         <span class="typo-text-small-bold">{new URL(project.source.url).host}</span>
@@ -41,7 +41,7 @@
   </div>
   {#if project.source.url}
     <a class="typo-text-small" href={project.source.url} target="_blank" rel="noreferrer"
-      >View repo {SOURCE_TYPE_STRINGS[project.source.type]}</a
+      >View repo {SOURCE_TYPE_STRINGS[project.source.forge]}</a
     >
   {/if}
 </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import type { GitProject } from '../../types';
+  import type { GitProject } from '$lib/utils/metadata/types';
 
   export let project: GitProject;
 </script>
