@@ -21,6 +21,8 @@ import {
 import type { UserId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
+type IpfsHash = string;
+
 export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
   fetchMetadataHashByUserId(userId: UserId): Promise<string | null>;
 
@@ -32,7 +34,7 @@ export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAcc
 
   updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
-    lastKnownHash: string | null,
+    lastKnownHash: string | undefined,
     schema: T,
   ): Promise<{ newHash: string; tx: ContractTransaction }>;
 
@@ -124,7 +126,7 @@ export default abstract class MetadataManagerBase<
    * @returns The IPFS hash of the pinned metadata.
    * @throws If the pinning fails.
    */
-  public async pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string> {
+  public async pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<IpfsHash> {
     if (isTest()) {
       const mockHash = (Math.random() + 1).toString(36).substring(7);
       const mockData = JSON.stringify(data, (_, value) =>
@@ -160,7 +162,7 @@ export default abstract class MetadataManagerBase<
    */
   public async updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
-    lastKnownHash: string | null,
+    lastKnownHash: string | undefined,
   ): Promise<{ newHash: string; tx: ContractTransaction }> {
     const { userId } = newData.describes;
     const currentOnChainHash = await this.fetchMetadataHashByUserId(userId);

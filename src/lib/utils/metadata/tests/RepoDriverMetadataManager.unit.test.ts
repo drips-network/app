@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Forge, RepoDriverClient } from 'radicle-drips';
 import RepoDriverMetadataManager from '../RepoDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
@@ -18,6 +19,7 @@ describe('RepoDriverMetadataManager', () => {
       // Arrange
       const repoId = '1';
       const userId = '2';
+      const repoOwner = '0x123';
       const gitUrl = 'http://github.com/username/repo';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
@@ -38,6 +40,7 @@ describe('RepoDriverMetadataManager', () => {
       const repoDriverClientMock = {
         getRepoId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoId),
         getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+        getRepoOwner: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoOwner),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -318,26 +321,6 @@ describe('RepoDriverMetadataManager', () => {
           },
         },
       });
-    });
-  });
-
-  describe('forgeFromString', () => {
-    it('should return the expected forge', () => {
-      // Act
-      const ghForge = RepoDriverMetadataManager.forgeFromString('github');
-      const glForge = RepoDriverMetadataManager.forgeFromString('gitlab');
-
-      // Assert
-      expect(ghForge).toBe(Forge.GitHub);
-      expect(glForge).toBe(Forge.GitLab);
-    });
-
-    it('should throw an error if the forge is not supported', () => {
-      // Act
-      const forge = () => RepoDriverMetadataManager.forgeFromString('not-supported');
-
-      // Assert
-      expect(forge).toThrow();
     });
   });
 });

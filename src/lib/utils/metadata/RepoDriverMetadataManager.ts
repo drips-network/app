@@ -6,9 +6,9 @@ import {
   splitReceiverSchema,
 } from './schemas';
 import type { ClaimedGitProject, RepoDriverAccount, UserId } from './types';
-import { Forge } from 'radicle-drips';
-import { getRepoDriverClient } from '../get-drips-clients';
+
 import type { z } from 'zod';
+import RepoDriverUtils from '../RepoDriverUtils';
 
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
   typeof repoDriverAccountMetadataSchema,
@@ -18,23 +18,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     super(repoDriverAccountMetadataSchema);
   }
 
-  public static forgeFromString(forgeAsString: string) {
-    let forge: Forge;
-    if (forgeAsString === 'github') {
-      forge = Forge.GitHub;
-    } else if (forgeAsString === 'gitlab') {
-      forge = Forge.GitLab;
-    } else if (forgeAsString === 'radicle') {
-      throw new Error('Radicle forges are not supported yet.');
-    } else {
-      throw new Error(`Unknown forge type: ${forgeAsString}`);
-    }
-
-    return forge;
-  }
-
   /**
-   * Fetches the latest IPFS metadata for a given user ID.
+   * Fetches (and verifies) the latest IPFS metadata for a given user ID.
    * @param userId The user ID to fetch the metadata for.
    * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
    * @throws If the metadata is invalid.
@@ -50,14 +35,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName, forge } = metadata.data.source;
 
-    const repoDriverClient = await getRepoDriverClient();
-
-    // Calculate the *expected* on-chain repo ID and user ID for the metadata forge and repo name.
-    const onChainRepoId = await repoDriverClient.getRepoId(
-      RepoDriverMetadataManager.forgeFromString(forge),
-      repoName,
-    );
-    const onChainUserId = await repoDriverClient.getUserId(onChainRepoId);
+    const { userId: onChainUserId } = await RepoDriverUtils.getOnChainInfo(repoName, forge);
 
     if (onChainUserId !== userId) {
       throw new Error(
