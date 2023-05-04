@@ -28,15 +28,15 @@ export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAcc
 
   fetchAccountMetadata(
     userId: UserId,
-  ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | null>;
+  ): Promise<{ hash: IpfsHash; data: z.infer<TAccountMetadataSchema> } | null>;
 
   pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string>;
 
   updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
-    lastKnownHash: string | undefined,
+    lastKnownHash: IpfsHash | undefined,
     schema: T,
-  ): Promise<{ newHash: string; tx: ContractTransaction }>;
+  ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }>;
 
   fetchAccount(userId: UserId): Promise<TAccount | null>;
 
@@ -86,7 +86,7 @@ export default abstract class MetadataManagerBase<
     return userMetadata?.value ?? null;
   }
 
-  private async fetchIpfs(hash: string) {
+  private async fetchIpfs(hash: IpfsHash) {
     if (isTest()) {
       const val = JSON.parse(localStorage.getItem(`mock_ipfs_${hash}`) ?? '');
       return val;
@@ -102,7 +102,7 @@ export default abstract class MetadataManagerBase<
    */
   public async fetchAccountMetadata(
     userId: UserId,
-  ): Promise<{ hash: string; data: z.infer<TAccountMetadataSchema> } | null> {
+  ): Promise<{ hash: IpfsHash; data: z.infer<TAccountMetadataSchema> } | null> {
     const metadataHash = await this.fetchMetadataHashByUserId(userId);
     if (!metadataHash) return null;
 
@@ -162,8 +162,8 @@ export default abstract class MetadataManagerBase<
    */
   public async updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
-    lastKnownHash: string | undefined,
-  ): Promise<{ newHash: string; tx: ContractTransaction }> {
+    lastKnownHash: IpfsHash | undefined,
+  ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }> {
     const { userId } = newData.describes;
     const currentOnChainHash = await this.fetchMetadataHashByUserId(userId);
 
@@ -184,7 +184,7 @@ export default abstract class MetadataManagerBase<
     };
   }
 
-  private async emitUserMetadata(newHash: string, userId: UserId) {
+  private async emitUserMetadata(newHash: IpfsHash, userId: UserId) {
     const userMetadata = [
       {
         key: MetadataManagerBase.USER_METADATA_KEY,

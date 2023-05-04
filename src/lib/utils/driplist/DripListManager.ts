@@ -30,7 +30,7 @@ import assert from '$lib/utils/assert';
 /**
  * A class for managing `DripList`s.
  *
- * **Important**: This class assumes that *all* clients and factories are connected to the *same* singer.
+ * **Important**: This class assumes that *all* clients and factories are connected to the *same* signer.
  */
 export default class DripListManager {
   private _nftDriverClient!: NFTDriverClient;
