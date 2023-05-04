@@ -18,6 +18,8 @@
 
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import trackRelevantTokens from '$lib/utils/fiat-estimates/track-relevant-tokens';
 
   let walletConnected = false;
   let loaded = false;
@@ -126,6 +128,16 @@
   onMount(() => {
     breakpointsStore.attach();
     return breakpointsStore.detach;
+  });
+
+  onMount(async () => {
+    await fiatEstimates.start();
+    trackRelevantTokens.start();
+
+    return () => {
+      trackRelevantTokens.stop();
+      fiatEstimates.stop();
+    };
   });
 </script>
 
