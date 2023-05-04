@@ -13,7 +13,12 @@
     weight: number;
   }
 
-  export type Split = ProjectSplit | AddressSplit;
+  interface DripsDonationSplit {
+    type: 'drips-donation-split';
+    weight: number;
+  }
+
+  export type Split = ProjectSplit | AddressSplit | DripsDonationSplit;
 
   export interface SplitGroup {
     type: 'split-group';
@@ -56,8 +61,8 @@
     background: linear-gradient(
       to bottom,
       var(--color-background) 0%,
-      var(--color-foreground-level-5) 1rem,
-      var(--color-foreground-level-5) 100%
+      var(--color-foreground) 1rem,
+      var(--color-foreground) 100%
     );
   }
 </style>

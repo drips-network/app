@@ -230,8 +230,7 @@
       weight: 62500,
     },
     {
-      type: 'project-split',
-      project: MOCK_PROJECT_2,
+      type: 'drips-donation-split',
       weight: 62500,
     },
   ];

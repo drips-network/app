@@ -16,7 +16,9 @@
 
 <header class:elevated class:search-mode={searchMode}>
   <a href={'/'}>
-    <DripsLogo />
+    <div class="logo">
+      <DripsLogo />
+    </div>
     <div class="beta-badge">
       <BetaBadge />
     </div>
@@ -65,9 +67,14 @@
     padding: 1rem 1.5rem;
   }
 
+  .logo {
+    height: 1.5rem;
+  }
+
   a {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
   }
 
   header.elevated {

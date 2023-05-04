@@ -13,6 +13,8 @@
   import { tweened } from 'svelte/motion';
   import { sineInOut } from 'svelte/easing';
   import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
+  import DripsLogo from '$lib/components/header/drips-logo.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let split: Split | SplitGroup;
 
@@ -51,7 +53,9 @@
   function getPileComponents(list: Splits): ComponentAndProps[] {
     const containedSplits = flattenList(list);
 
-    return containedSplits.map((s) => {
+    return mapFilterUndefined(containedSplits, (s) => {
+      if (s.type === 'drips-donation-split') return;
+
       if (s.type === 'address-split') {
         return {
           component: IdentityBadge,
@@ -119,7 +123,7 @@
       >
         <path
           d="M1 1C1 1 1 25 25 25C55.0704 25 102 25 102 25M102 25L95.5 18.5M102 25L95.5 31.5"
-          stroke="var(--color-foreground-level-5)"
+          stroke="var(--color-foreground)"
           stroke-linecap="round"
         />
       </svg>
@@ -133,6 +137,10 @@
     <div class="receiver">
       {#if split.type === 'address-split'}
         <IdentityBadge address={split.address} size="medium" />
+      {:else if split.type === 'drips-donation-split'}
+        <div class="drips-logo">
+          <DripsLogo />
+        </div>
       {:else if split.type === 'project-split'}
         <PrimaryColorThemer colorHex={split.project.claimed ? split.project.color : undefined}>
           <ProjectBadge project={split.project} />
@@ -188,10 +196,13 @@
     top: 0.85rem;
     left: calc(0.25rem + 50%);
     transform: translateX(-50%);
-    height: fit-content;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: fit-content;
-    padding: 0.125rem 0.25rem;
-    border-radius: 1rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.75rem 0 0.75rem 0.75rem;
     background-color: var(--color-primary);
   }
 
@@ -235,5 +246,9 @@
 
   .name .chevron {
     transition: transform 0.4s;
+  }
+
+  .drips-logo {
+    height: 1.25rem;
   }
 </style>
