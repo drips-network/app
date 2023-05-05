@@ -21,10 +21,10 @@
   $: containerSize = CONTAINER_SIZES[size];
 
   const EMOJI_FONT_SIZES: Record<Size, string> = {
-    small: '1.5rem',
-    medium: '2rem',
-    large: '3rem',
-    huge: '5rem',
+    small: '1.25rem',
+    medium: '1.75rem',
+    large: '2.75rem',
+    huge: '4.5rem',
   };
   $: emojiFontSize = EMOJI_FONT_SIZES[size];
 </script>
