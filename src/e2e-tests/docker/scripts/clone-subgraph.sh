@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "⬇️ Downloading drips-subgraph…"
-git clone -b v2 --single-branch https://github.com/radicle-dev/drips-subgraph
+git clone -b feature/dependency-funding --single-branch https://github.com/radicle-dev/drips-subgraph
 
 echo "📁 Creating subgraph config file for local env"
 cd ./drips-subgraph
