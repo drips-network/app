@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-  <title>Drips • Crowdfunding for the Open Web</title>
+  <title>Drips • Continuous Drip-Down Funding</title>
   <meta
     name="description"
     content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
@@ -62,10 +62,11 @@
         </div>
       </div>
       <div id="title">
-        <h1>Crowdfunding<span class="nudge">&nbsp;</span>for the Open Web</h1>
+        <h1>Continuous Drip-Down Funding</h1>
       </div>
       <div class="beta-notice">
-        The new Drips is currently in Beta, with Token Streaming functionality ready for you to try.
+        The new, decentralized Drips protocol is currently in Beta, with Token Streaming
+        functionality ready for you to try.
         <a href="https://twitter.com/dripsnetwork">Follow us on Twitter</a> for updates.
         <a href="https://v1.drips.network/">Back to Drips V1</a>
       </div>
@@ -74,11 +75,8 @@
       <LpCard
         ><div id="streaming" class="full-width-card illustration-right">
           <div class="card-description">
-            <h2>Send & receive funds by the second</h2>
-            <p>
-              Drips enables token streams of any ERC-20 to any Ethereum address with per-second
-              settlement.
-            </p>
+            <h2>Stream funds by the second</h2>
+            <p>Drips enables token streams of any ERC-20 to any Ethereum address by the second.</p>
           </div>
           <div class="card-illustration grey-background">
             <div id="mock-dashboard">
@@ -94,10 +92,10 @@
             <div class="relative h-full"><OneContract /></div>
           </div>
           <div class="card-description">
-            <h2>Split earnings with projects & people you care for</h2>
+            <h2>Split funds with projects & people you care for</h2>
             <p>
               Automatically forward a set percentage of funds you receive with a list of up to 200
-              projects & individuals. Anytime you get paid, they get paid.
+              projects & individuals. Anytime you receive funds, they do too.
             </p>
           </div>
         </div></LpCard
@@ -138,10 +136,10 @@
         </div>
         <div class="card-description" id="raise-funds-description">
           <ComingSoonBadge />
-          <h2>Raise funds for your open-source projects or yourself</h2>
+          <h2>Receive funds for your open-source projects or yourself</h2>
           <p>
-            Drips is a complete toolkit for raising funds on Ethereum, by the second — without any
-            platform fees.
+            Drips is a decentralized toolkit for receiving ongoing support without any platform
+            fees.
           </p>
         </div>
       </div>
@@ -232,8 +230,7 @@
             <div class="text">
               <h3>Build on Drips</h3>
               <p class="text-foreground">
-                Developers: Build your own token streaming applications using Drips crowdfunding
-                primitives.
+                Developers: come build your own token streaming applications.
               </p>
             </div>
           </div>
@@ -306,11 +303,6 @@
       opacity: 1;
       transform: translateY(0);
     }
-  }
-
-  .nudge {
-    font-size: inherit;
-    letter-spacing: 0.18em;
   }
 
   h1,
