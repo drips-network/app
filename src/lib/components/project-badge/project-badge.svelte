@@ -5,7 +5,8 @@
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
+  import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
   export let project: GitProject;
   export let tooltip = true;
@@ -13,37 +14,46 @@
   export let hideAvatar = false;
   export let linkTo: 'external-url' | 'project-page' = 'project-page';
 
-  let processedProject: GitProject;
-  $: processedProject = forceUnclaimed
-    ? {
-        ...project,
-        owner: undefined,
-        color: undefined,
-        description: undefined,
-        emoji: undefined,
-        claimed: false,
-      }
-    : project;
+  let unclaimedProject: UnclaimedGitProject;
+  $: unclaimedProject = {
+    ...project,
+    owner: undefined,
+    color: undefined,
+    description: undefined,
+    emoji: undefined,
+    claimed: false,
+  };
+
+  $: processedProject = forceUnclaimed ? unclaimedProject : project;
 </script>
 
 <div class="wrapper">
-  <Tooltip disabled={!tooltip}>
-    <a
-      class="project-badge"
-      href={linkTo === 'project-page'
-        ? buildProjectUrl(project.source)
-        : buildExternalUrl(processedProject.source.url)}
-      target={linkTo === 'project-page' ? '' : '_blank'}
-    >
-      {#if !hideAvatar}<ProjectAvatar project={processedProject} />{/if}
-      <div class="name">
-        <ProjectName project={processedProject} />
-      </div>
-    </a>
-    <svelte:fragment slot="tooltip-content">
-      <ProjectTooltip project={processedProject} />
-    </svelte:fragment>
-  </Tooltip>
+  <PrimaryColorThemer colorHex={processedProject.claimed ? processedProject.color : undefined}>
+    <Tooltip disabled={!tooltip}>
+      <a
+        class="project-badge"
+        href={linkTo === 'project-page'
+          ? buildProjectUrl(project.source)
+          : buildExternalUrl(processedProject.source.url)}
+        target={linkTo === 'project-page' ? '' : '_blank'}
+      >
+        {#if !hideAvatar}<div class="avatar-and-forge">
+            {#if !forceUnclaimed && project.claimed}
+              <div>
+                <ProjectAvatar project={unclaimedProject} />
+              </div>
+            {/if}
+            <div><ProjectAvatar project={processedProject} /></div>
+          </div>{/if}
+        <div class="name typo-text">
+          <ProjectName project={processedProject} />
+        </div>
+      </a>
+      <svelte:fragment slot="tooltip-content">
+        <ProjectTooltip project={processedProject} />
+      </svelte:fragment>
+    </Tooltip>
+  </PrimaryColorThemer>
 </div>
 
 <style>
@@ -73,5 +83,14 @@
   .name {
     display: flex;
     min-width: 0;
+  }
+
+  .avatar-and-forge {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .avatar-and-forge > *:nth-child(2) {
+    margin-left: -0.75rem;
   }
 </style>
