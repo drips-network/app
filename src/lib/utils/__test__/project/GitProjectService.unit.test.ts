@@ -1,3 +1,5 @@
+import * as getClient from '$lib/utils/get-drips-clients';
+import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
 import type { repoDriverAccountMetadataSchema } from '$lib/utils/metadata/schemas';
 import {
   VerificationStatus,
@@ -6,7 +8,6 @@ import {
 } from '$lib/utils/metadata/types';
 import type { GitProject } from '$lib/utils/metadata/types';
 import GitProjectService from '$lib/utils/project/GitProjectService';
-import { RepoAccountStatus } from '$lib/utils/project/types';
 import { constants, Wallet, type ContractTransaction } from 'ethers';
 import { AddressDriverClient, Forge, RepoDriverClient, type RepoAccount } from 'radicle-drips';
 import type { z } from 'zod';
@@ -17,6 +18,7 @@ vi.mock('$env/dynamic/public', () => ({
 
 vi.mock('$lib/utils/get-drips-clients');
 vi.mock('$lib/utils/metadata/RepoDriverMetadataManager');
+vi.mock('$lib/utils/get-drips-clients');
 
 describe('GitProjectService', () => {
   let sut: GitProjectService;
@@ -26,32 +28,31 @@ describe('GitProjectService', () => {
   let repoDriverMetadataManagerMock: any;
 
   beforeEach(async () => {
-    const getClient = await import('$lib/utils/get-drips-clients');
-    const RepoDriverMetadataManager = await import('$lib/utils/metadata/RepoDriverMetadataManager');
-
     addressDriverClientMock = {
       getUserIdByAddress: vi.fn(AddressDriverClient.prototype.getUserIdByAddress),
     };
-    getClient.getAddressDriverClient = vi.fn().mockImplementation(() => addressDriverClientMock);
+    (getClient.getAddressDriverClient as any) = vi
+      .fn()
+      .mockImplementation(() => addressDriverClientMock);
 
     repoDriverClientMock = {
       getOwner: vi.fn(RepoDriverClient.prototype.getOwner),
       getUserId: vi.fn(RepoDriverClient.prototype.getUserId),
       requestOwnerUpdate: vi.fn(RepoDriverClient.prototype.requestOwnerUpdate),
     };
-    getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
+    (getClient.getRepoDriverClient as any) = vi.fn().mockImplementation(() => repoDriverClientMock);
 
     subgraphClientMock = {
       repoDriverQueries: {
         getRepoAccountById: vi.fn(),
       },
     };
-    getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
+    (getClient.getSubgraphClient as any) = vi.fn().mockImplementation(() => subgraphClientMock);
 
     repoDriverMetadataManagerMock = {
-      fetchAccountMetadata: vi.fn(RepoDriverMetadataManager.default.prototype.fetchAccountMetadata),
+      fetchAccountMetadata: vi.fn(RepoDriverMetadataManager.prototype.fetchAccountMetadata),
     };
-    (RepoDriverMetadataManager.default as any) = vi
+    (RepoDriverMetadataManager as any) = vi
       .fn()
       .mockImplementation(() => repoDriverMetadataManagerMock);
 
@@ -153,7 +154,7 @@ describe('GitProjectService', () => {
     it('should return the expected unclaimed project', async () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.NOT_STARTED,
+        status: 'not-started',
       } as unknown as RepoAccount;
 
       subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
@@ -191,7 +192,7 @@ describe('GitProjectService', () => {
 
       const repoAccount = {
         ownerAddress,
-        status: RepoAccountStatus.CLAIMED,
+        status: 'claimed',
       } as unknown as RepoAccount;
 
       subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
@@ -231,7 +232,7 @@ describe('GitProjectService', () => {
     it('should throw if the project is claimed but the repo account is not', () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.NOT_STARTED,
+        status: 'not-started',
       } as unknown as RepoAccount;
 
       const isClaimed = true;
@@ -245,7 +246,7 @@ describe('GitProjectService', () => {
     it('should throw if the project is not claimed but the repo account is', () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.CLAIMED,
+        status: 'claimed',
       } as unknown as RepoAccount;
 
       const isClaimed = false;
@@ -261,7 +262,7 @@ describe('GitProjectService', () => {
     it('should return the expected verification status if the repo account status is NOT_STARTED', () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.NOT_STARTED,
+        status: 'not-started',
       } as unknown as RepoAccount;
 
       // Act
@@ -274,7 +275,7 @@ describe('GitProjectService', () => {
     it('should return the expected verification status if the repo account status is OWNER_UPDATE_REQUESTED and request is still in progress', () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.OWNER_UPDATE_REQUESTED,
+        status: 'owner-update-requested',
         lastUpdatedBlockTimestamp: new Date().getTime(),
       } as unknown as RepoAccount;
 
@@ -288,7 +289,7 @@ describe('GitProjectService', () => {
     it('should return the expected verification status if the repo account status is OWNER_UPDATE_REQUESTED and request has failed after 5 mins', () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.OWNER_UPDATE_REQUESTED,
+        status: 'owner-update-requested',
         lastUpdatedBlockTimestamp: new Date().getTime() - (new Date().getTime() - 1),
       } as unknown as RepoAccount;
 
@@ -302,7 +303,7 @@ describe('GitProjectService', () => {
     it('should throw if the repo account status is CLAIMED', () => {
       // Arrange
       const repoAccount = {
-        status: RepoAccountStatus.CLAIMED,
+        status: 'claimed',
         lastUpdatedBlockTimestamp: new Date().getTime() - (new Date().getTime() - 1),
       } as unknown as RepoAccount;
 

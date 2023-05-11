@@ -110,14 +110,14 @@ export default class GitProjectService {
     repoAccount: RepoAccount,
     userId: string,
   ): void {
-    if (!isClaimed && repoAccount.status === RepoAccountStatus.CLAIMED) {
+    if (!isClaimed && repoAccount.status === 'claimed') {
       throw new Error(
         `The repo account with user ID ${userId} is not claimed on-chain (has no owner address set) but has a status of ${repoAccount.status} in the subgraph.
         This means the subgraph is out of sync with the on-chain state.`,
       );
     }
 
-    if (isClaimed && repoAccount.status !== RepoAccountStatus.CLAIMED) {
+    if (isClaimed && repoAccount.status !== 'claimed') {
       throw new Error(
         `The repo account with user ID ${userId} is claimed on-chain (has an owner address set) but has a status of ${repoAccount.status} in the subgraph. 
         This means the subgraph is out of sync with the on-chain state.`,
@@ -135,9 +135,9 @@ export default class GitProjectService {
 
     let verificationStatus: VerificationStatus;
 
-    if ((repoAccount.status as RepoAccountStatus) === RepoAccountStatus.CLAIMED) {
+    if ((repoAccount.status as RepoAccountStatus) === 'claimed') {
       throw new Error('Repo account status should not be claimed at this point.');
-    } else if ((repoAccount.status as RepoAccountStatus) === RepoAccountStatus.NOT_STARTED) {
+    } else if ((repoAccount.status as RepoAccountStatus) === 'not-started') {
       verificationStatus = VerificationStatus.NOT_STARTED;
     } else {
       if (haveFiveMinutesPassed(repoAccount.lastUpdatedBlockTimestamp)) {
