@@ -1,4 +1,4 @@
-import type { GitLabSource, GitProject } from '$lib/utils/metadata/types';
+import { VerificationStatus, type GitLabSource, type GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -45,6 +45,7 @@ export const load: PageLoad = ({ params }) => {
         url: `https://github.com/${gitlabUsername}/${gitlabRepoName}.git`,
       },
       owner: undefined,
+      verificationStatus: VerificationStatus.NOT_STARTED,
     };
   }
 

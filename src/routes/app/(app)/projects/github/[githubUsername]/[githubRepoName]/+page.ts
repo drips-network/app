@@ -1,4 +1,4 @@
-import type { GitHubSource, GitProject } from '$lib/utils/metadata/types';
+import { VerificationStatus, type GitHubSource, type GitProject } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load = (({ params }) => {
@@ -43,6 +43,7 @@ export const load = (({ params }) => {
         url: `https://github.com/${githubUsername}/${githubRepoName}.git`,
       },
       owner: undefined,
+      verificationStatus: VerificationStatus.NOT_STARTED,
     };
   }
 

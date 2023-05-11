@@ -1,4 +1,8 @@
-import type { GenericGitSource, GitProject } from '$lib/utils/metadata/types';
+import {
+  VerificationStatus,
+  type GenericGitSource,
+  type GitProject,
+} from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -43,6 +47,7 @@ export const load: PageLoad = ({ params }) => {
         url: decodedGitUrl.href,
       },
       owner: undefined,
+      verificationStatus: VerificationStatus.NOT_STARTED,
     };
   }
 

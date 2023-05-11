@@ -5,7 +5,11 @@
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
+  import {
+    VerificationStatus,
+    type GitProject,
+    type UnclaimedGitProject,
+  } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
   export let project: GitProject;
@@ -22,6 +26,7 @@
     description: undefined,
     emoji: undefined,
     claimed: false,
+    verificationStatus: VerificationStatus.NOT_STARTED,
   };
 
   $: processedProject = forceUnclaimed ? unclaimedProject : project;

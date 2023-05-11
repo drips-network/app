@@ -21,7 +21,7 @@
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
-  import type { GitProject, Source } from '$lib/utils/metadata/types';
+  import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
 
   // Button
   let disabled = false;
@@ -311,6 +311,7 @@
             },
             source: SOURCE_CONFIGS[sourceType],
             owner: undefined,
+            verificationStatus: VerificationStatus.NOT_STARTED,
           }}
     />
   </PrimaryColorThemer>

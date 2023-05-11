@@ -1,4 +1,4 @@
-import type { RadicleSource, GitProject } from '$lib/utils/metadata/types';
+import { type RadicleSource, type GitProject, VerificationStatus } from '$lib/utils/metadata/types';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ params }) => {
@@ -45,6 +45,7 @@ export const load: PageLoad = ({ params }) => {
         url: `https://seed.radicle.xyz/${rid}`,
       },
       owner: undefined,
+      verificationStatus: VerificationStatus.NOT_STARTED,
     };
   }
 
