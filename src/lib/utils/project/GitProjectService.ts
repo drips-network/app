@@ -13,7 +13,7 @@ import {
   type UserId,
 } from '../metadata/types';
 import { constants, type ContractTransaction } from 'ethers';
-import { RepoAccountStatus } from './types';
+import type { RepoAccountStatus } from './types';
 
 export default class GitProjectService {
   private _repoDriverClient!: RepoDriverClient;
