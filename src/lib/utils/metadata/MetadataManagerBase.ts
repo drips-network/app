@@ -199,7 +199,7 @@ export default abstract class MetadataManagerBase<
       tx = await (client as NFTDriverClient).emitUserMetadata(userId, userMetadata);
     } else if ('getUserId' in client) {
       tx = await (client as AddressDriverClient).emitUserMetadata(userMetadata);
-    } else if ('getRepoId' in client) {
+    } else if ('requestOwnerUpdate' in client) {
       tx = await (client as RepoDriverClient).emitUserMetadata(userId, userMetadata);
     } else {
       throw new Error('Unsupported client');

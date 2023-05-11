@@ -51,7 +51,14 @@ export interface RepoDriverAccount {
 
 export type Account = AddressDriverAccount | NFTDriverAccount | RepoDriverAccount;
 
+export enum VerificationStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  FAILED = 'FAILED',
+}
+
 export interface UnclaimedGitProject<ST extends Source = Source> {
+  verificationStatus: VerificationStatus;
   claimed: false;
   owner: undefined;
   repoDriverAccount: RepoDriverAccount;

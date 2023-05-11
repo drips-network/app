@@ -5,7 +5,7 @@ import {
   getSubgraphClient,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import type { ClaimedGitProject, DripList, UnclaimedGitProject } from '../metadata/types';
+import type { DripList } from '../metadata/types';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import type { z } from 'zod';
 import type { repoDriverSplitReceiverSchema } from '../metadata/schemas';
@@ -19,13 +19,13 @@ import {
   type Preset,
   type DripsReceiverStruct,
 } from 'radicle-drips';
-import RepoDriverUtils from '../RepoDriverUtils';
 import mapFilterUndefined from '../map-filter-undefined';
 import type { UserId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { DripsReceiverConfig } from 'radicle-drips';
 import type { BigNumberish, ContractTransaction } from 'ethers';
 import assert from '$lib/utils/assert';
+import GitProjectService from '../project/GitProjectService';
 
 /**
  * A class for managing `DripList`s.
@@ -34,6 +34,7 @@ import assert from '$lib/utils/assert';
  */
 export default class DripListManager {
   private _nftDriverClient!: NFTDriverClient;
+  private _gitProjectService!: GitProjectService;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
   private readonly _dripsSubgraphClient = getSubgraphClient();
@@ -51,6 +52,7 @@ export default class DripListManager {
     const dripListManager = new DripListManager();
 
     dripListManager._nftDriverClient = await getNFTDriverClient();
+    dripListManager._gitProjectService = await GitProjectService.new();
     dripListManager._nftDriverTxFactory = await getNFTDriverTxFactory();
     dripListManager._addressDriverClient = await getAddressDriverClient();
 
@@ -90,10 +92,7 @@ export default class DripListManager {
           owner: ownerAddress,
           userId: nftSubAccount.tokenId,
         },
-        projects: await this._getDripListProjects(
-          ownerAddress,
-          nftSubAccountMetadata.data.projects,
-        ),
+        projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
         // TODO: properties below are post-MVP.
         isPublic: false,
         name: undefined,
@@ -215,7 +214,6 @@ export default class DripListManager {
   }
 
   private async _getDripListProjects(
-    ownerAddress: Address,
     projects: z.infer<typeof repoDriverSplitReceiverSchema>[],
   ): Promise<
     {
@@ -224,54 +222,18 @@ export default class DripListManager {
     }[]
   > {
     const projectPromises = await Promise.all(
-      // Iterate over the projects.
-      projects.map(async (project) => {
-        // For each project, get the metadata.
-        const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(
-          project.userId,
-        );
+      projects.map(async (listProjMetadata) => {
+        const { userId } = listProjMetadata;
 
-        if (!projectMetadata?.data) {
+        const project = await this._gitProjectService.getByUserId(userId);
+
+        if (!project) {
           return;
         }
 
-        const { repoName, forge } = projectMetadata.data.source;
-
-        const { isClaimed } = await RepoDriverUtils.getOnChainInfo(repoName, forge);
-
-        if (!isClaimed) {
-          return {
-            weight: project.weight,
-            project: {
-              claimed: false,
-              owner: undefined,
-              repoDriverAccount: {
-                driver: 'repo',
-                userId: project.userId,
-              },
-              source: project.source,
-            } as UnclaimedGitProject,
-          };
-        }
-
         return {
-          weight: project.weight,
-          project: {
-            claimed: true,
-            owner: {
-              driver: 'address',
-              userId: await this._addressDriverClient.getUserIdByAddress(ownerAddress),
-              address: ownerAddress,
-            },
-            repoDriverAccount: {
-              driver: 'repo',
-              userId: project.userId,
-            },
-            source: project.source,
-            color: projectMetadata.data.color,
-            emoji: projectMetadata.data.emoji,
-            description: projectMetadata.data.description,
-          } as ClaimedGitProject,
+          project,
+          weight: listProjMetadata.weight,
         };
       }),
     );

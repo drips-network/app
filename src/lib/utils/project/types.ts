@@ -1,0 +1,5 @@
+export enum RepoAccountStatus {
+  NOT_STARTED = '',
+  CLAIMED = 'CLAIMED',
+  OWNER_UPDATE_REQUESTED = 'OWNER_UPDATE_REQUESTED',
+}

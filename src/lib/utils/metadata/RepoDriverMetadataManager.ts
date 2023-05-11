@@ -1,3 +1,5 @@
+import RepoDriverUtils from '../RepoDriverUtils';
+import { getRepoDriverClient } from '../get-drips-clients';
 import MetadataManagerBase from './MetadataManagerBase';
 import {
   addressDriverSplitReceiverSchema,
@@ -8,7 +10,6 @@ import {
 import type { ClaimedGitProject, RepoDriverAccount, UserId } from './types';
 
 import type { z } from 'zod';
-import RepoDriverUtils from '../RepoDriverUtils';
 
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
   typeof repoDriverAccountMetadataSchema,
@@ -35,7 +36,11 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName, forge } = metadata.data.source;
 
-    const { userId: onChainUserId } = await RepoDriverUtils.getOnChainInfo(repoName, forge);
+    const repoDriverClient = await getRepoDriverClient();
+    const onChainUserId = await repoDriverClient.getUserId(
+      RepoDriverUtils.forgeFromString(forge),
+      repoName,
+    );
 
     if (onChainUserId !== userId) {
       throw new Error(

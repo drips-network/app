@@ -367,10 +367,10 @@ describe('MetadataManagerBase', () => {
       TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
-    it('should call RepoDriverClient.emitUserMetadata when client has getRepoId', async () => {
+    it('should call RepoDriverClient.emitUserMetadata when client has requestOwnerUpdate', async () => {
       // Arrange
       const clientMock = {
-        getRepoId: vi.fn(),
+        requestOwnerUpdate: vi.fn(),
         emitUserMetadata: vi
           .fn(AddressDriverClient.prototype.emitUserMetadata)
           .mockResolvedValue({} as ContractTransaction),

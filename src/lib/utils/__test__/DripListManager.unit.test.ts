@@ -9,8 +9,12 @@ import {
 } from 'radicle-drips';
 import DripListManager from '../driplist/DripListManager';
 import type { z } from 'zod';
-import RepoDriverUtils from '../RepoDriverUtils';
-import type { ClaimedGitProject, NFTDriverAccount } from '../metadata/types';
+import {
+  VerificationStatus,
+  type ClaimedGitProject,
+  type NFTDriverAccount,
+  type UnclaimedGitProject,
+} from '../metadata/types';
 import type { DripsReceiverStruct } from 'radicle-drips';
 import type {
   nftDriverAccountMetadataSchema,
@@ -27,10 +31,12 @@ vi.mock('$lib/utils/get-drips-clients');
 vi.mock('../metadata/NftDriverMetadataManager');
 vi.mock('../metadata/RepoDriverMetadataManager');
 vi.mock('../RepoDriverUtils');
+vi.mock('.../project/GitProjectService');
 
 describe('DripListManager', () => {
   let subgraphClientMock: any;
   let nftDriverClientMock: any;
+  let gitProjectManagerMock: any;
   let nftDriverTxFactoryMock: any;
   let addressDriverClientMock: any;
   let nftDriverMetadataManagerMock: any;
@@ -38,6 +44,7 @@ describe('DripListManager', () => {
 
   beforeEach(async () => {
     const getClient = await import('$lib/utils/get-drips-clients');
+    const GitProjectService = await import('../project/GitProjectService');
     const NftDriverMetadataManager = await import('../metadata/NftDriverMetadataManager');
     const RepoDriverMetadataManager = await import('../metadata/RepoDriverMetadataManager');
 
@@ -83,6 +90,13 @@ describe('DripListManager', () => {
     (RepoDriverMetadataManager.default as any) = vi
       .fn()
       .mockImplementation(() => repoDriverMetadataManagerMock);
+
+    gitProjectManagerMock = {
+      getByUserId: vi.fn(GitProjectService.default.prototype.getByUserId),
+    };
+    (GitProjectService.default.new as any) = vi
+      .fn()
+      .mockImplementation(() => gitProjectManagerMock);
   });
 
   afterEach(() => {
@@ -261,10 +275,9 @@ describe('DripListManager', () => {
     });
   });
 
-  describe('getByProjectUserId', () => {
+  describe('_getDripListProjects', () => {
     it('should return the expected unclaimed project', async () => {
       // Arrange
-      const owner = '0x123';
       subgraphClientMock.getNftSubAccountsByOwner.mockResolvedValue([] as NftSubAccount[]);
 
       const projectMetadata = {
@@ -279,12 +292,6 @@ describe('DripListManager', () => {
         projectMetadata as any,
       );
 
-      const originalGetOnChainInfo = RepoDriverUtils.getOnChainInfo;
-      const getOnChainInfoMock = vi.fn(RepoDriverUtils.getOnChainInfo).mockResolvedValueOnce({
-        isClaimed: false,
-      } as any);
-      (RepoDriverUtils.getOnChainInfo as any) = getOnChainInfoMock;
-
       const projects: z.infer<typeof repoDriverSplitReceiverSchema>[] = [
         {
           weight: 1,
@@ -297,10 +304,26 @@ describe('DripListManager', () => {
         },
       ];
 
+      const expectedProject = {
+        verificationStatus: VerificationStatus.NOT_STARTED,
+        claimed: false,
+        owner: undefined,
+        repoDriverAccount: {
+          driver: 'repo',
+          userId: '1',
+        },
+        source: {
+          forge: 'generic',
+          repoName: 'repoName',
+          url: 'url',
+        },
+      } as UnclaimedGitProject;
+      gitProjectManagerMock.getByUserId.mockResolvedValueOnce(expectedProject);
+
       const dripListManager = await DripListManager.new();
 
       // Act
-      const result = await dripListManager['_getDripListProjects'](owner, projects);
+      const result = await dripListManager['_getDripListProjects'](projects);
 
       // Assert
       expect(result).toHaveLength(1);
@@ -310,10 +333,6 @@ describe('DripListManager', () => {
       expect(result[0].project.source.url).toBe('url');
       expect(result[0].project.source.forge).toBe('generic');
       expect(result[0].project.claimed).toBe(false);
-      expect(repoDriverMetadataManagerMock.fetchAccountMetadata).toHaveBeenCalledTimes(1);
-      expect(getOnChainInfoMock).toHaveBeenCalledTimes(1);
-
-      RepoDriverUtils.getOnChainInfo = originalGetOnChainInfo;
     });
 
     it('should return the expected claimed project', async () => {
@@ -336,12 +355,6 @@ describe('DripListManager', () => {
         projectMetadata as any,
       );
 
-      const originalGetOnChainInfo = RepoDriverUtils.getOnChainInfo;
-      const getOnChainInfoMock = vi.fn(RepoDriverUtils.getOnChainInfo).mockResolvedValueOnce({
-        isClaimed: true,
-      } as any);
-      (RepoDriverUtils.getOnChainInfo as any) = getOnChainInfoMock;
-
       const projects: z.infer<typeof repoDriverSplitReceiverSchema>[] = [
         {
           weight: 1,
@@ -356,15 +369,32 @@ describe('DripListManager', () => {
 
       addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce('111');
 
+      const expectedProject = {
+        claimed: true,
+        owner: {
+          driver: 'address',
+          userId: '111',
+          address: owner,
+        },
+        source: {
+          forge: 'generic',
+          repoName: 'repoName',
+          url: 'url',
+        },
+        color: 'color',
+        description: 'description',
+        emoji: 'emoji',
+      } as ClaimedGitProject;
+      gitProjectManagerMock.getByUserId.mockResolvedValueOnce(expectedProject);
+
       const dripListManager = await DripListManager.new();
 
       // Act
-      const result = await dripListManager['_getDripListProjects'](owner, projects);
+      const result = await dripListManager['_getDripListProjects'](projects);
 
       // Assert
       expect(result).toHaveLength(1);
       expect(result[0].weight).toBe(1);
-      expect(result[0].project.repoDriverAccount.userId).toBe('1');
       expect(result[0].project.source.repoName).toBe('repoName');
       expect(result[0].project.source.url).toBe('url');
       expect(result[0].project.source.forge).toBe('generic');
@@ -372,15 +402,9 @@ describe('DripListManager', () => {
       expect(result[0].project.owner?.address).toBe(owner);
       expect(result[0].project.owner?.userId).toBe('111');
       expect(result[0].project.owner?.driver).toBe('address');
-      expect(result[0].project.repoDriverAccount.driver).toBe('repo');
-      expect(result[0].project.repoDriverAccount.userId).toBe('1');
       expect((result[0].project as ClaimedGitProject).color).toBe('color');
       expect((result[0].project as ClaimedGitProject).description).toBe('description');
       expect((result[0].project as ClaimedGitProject).emoji).toBe('emoji');
-      expect(repoDriverMetadataManagerMock.fetchAccountMetadata).toHaveBeenCalledTimes(1);
-      expect(getOnChainInfoMock).toHaveBeenCalledTimes(1);
-
-      RepoDriverUtils.getOnChainInfo = originalGetOnChainInfo;
     });
   });
 
