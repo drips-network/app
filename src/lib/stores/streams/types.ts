@@ -11,8 +11,8 @@ export interface AddressDriverUser {
 export type User = AddressDriverUser;
 
 interface Amount {
-  tokenAddress: string;
   amount: bigint;
+  tokenAddress: string;
 }
 
 export interface DripsConfig {
