@@ -119,6 +119,8 @@
     style:left={`${tooltipPos.left}px`}
     style:right={`${tooltipPos.right}px`}
     style:top={`${tooltipPos.top}px`}
+    on:click|stopPropagation
+    on:keydown|stopPropagation
   >
     <div class="target-buffer" />
     <div class="tooltip-content typo-text" style:max-width={MAX_WIDTH}>

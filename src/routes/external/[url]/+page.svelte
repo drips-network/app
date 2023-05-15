@@ -48,6 +48,10 @@
     padding: 1rem;
   }
 
+  .logo {
+    max-width: 8rem;
+  }
+
   .content {
     display: flex;
     flex-direction: column;

@@ -1,0 +1,107 @@
+<script lang="ts">
+  export let percentage = 0;
+  export let disabled = false;
+
+  let error = false;
+  let empty = false;
+  let inputWidth = 'auto';
+
+  let percentageValue: string | number = percentage.toString();
+
+  let prevPercentage: number = percentage;
+  let prevPercentageValue = Number(percentageValue);
+
+  $: {
+    const percentageChanged = prevPercentage !== percentage;
+    const percentageValueChanged = Number(prevPercentageValue) !== Number(percentageValue);
+
+    if (percentageValueChanged) {
+      let pv = percentageValue;
+
+      if (pv === null || pv === '') pv = 0;
+
+      if (typeof pv === 'string') pv = Number(pv.replace(/[^0-9.]/g, ''));
+
+      if (pv?.toString().startsWith('0')) {
+        pv = parseFloat(pv.toString().trim());
+      }
+
+      percentage = pv;
+      percentageValue = pv;
+    } else if (percentageChanged) {
+      percentageValue = (Math.round(percentage * 100) / 100).toString();
+    }
+
+    inputWidth = `${percentageValue?.toString().length ?? 1}ch`;
+
+    error = Number(percentage) > 100;
+    empty = Number(percentage) === 0;
+
+    prevPercentage = percentage;
+    prevPercentageValue = Number(percentageValue);
+  }
+
+  let focus = false;
+
+  let inputElem: HTMLInputElement;
+</script>
+
+<div
+  class="percentage-editor typo-text-mono"
+  class:focus
+  class:error
+  class:empty
+  class:disabled
+  on:click|stopPropagation
+  on:keypress|stopPropagation
+>
+  <input
+    bind:this={inputElem}
+    tabindex={disabled ? -1 : 0}
+    on:focus={() => {
+      focus = true;
+      inputElem.select();
+    }}
+    on:blur={() => (focus = false)}
+    step="0.01"
+    style:width={inputWidth}
+    bind:value={percentageValue}
+    min="0"
+    max="100"
+  />%
+</div>
+
+<style>
+  .percentage-editor {
+    display: flex;
+    background-color: var(--color-background);
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 0px 1px var(--color-foreground);
+    padding: 0 0.125rem;
+    box-sizing: border-box;
+    transition: box-shadow 0.2s, color 0.2s;
+  }
+
+  .percentage-editor.disabled {
+    pointer-events: none;
+  }
+
+  .percentage-editor.empty,
+  .percentage-editor.disabled {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-5);
+    color: var(--color-foreground-level-5);
+  }
+
+  .percentage-editor:not(.disabled).error {
+    box-shadow: 0px 0px 0px 2px var(--color-negative);
+    color: var(--color-negative);
+  }
+
+  .percentage-editor:not(.error).focus {
+    box-shadow: 0px 0px 0px 2px var(--color-primary);
+  }
+
+  .percentage-editor input:focus {
+    outline: none;
+  }
+</style>

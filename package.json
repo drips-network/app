@@ -60,6 +60,7 @@
     "vitest": "^0.25.3"
   },
   "dependencies": {
+    "@octokit/rest": "^19.0.7",
     "@pinata/sdk": "^1.1.26",
     "@safe-global/safe-apps-provider": "^0.16.0",
     "@safe-global/safe-apps-sdk": "^7.10.0",
@@ -71,6 +72,7 @@
     "cupertino-pane": "^1.3.2",
     "ethers": "^5.7.0",
     "fuzzysort": "^2.0.3",
+    "isomorphic-fetch": "^3.0.0",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
     "web3modal": "^1.9.9",

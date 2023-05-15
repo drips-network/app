@@ -30,6 +30,12 @@ const config = defineConfig({
   preview: {
     host: '0.0.0.0',
   },
+  resolve: {
+    alias: {
+      // Required for octokit.
+      'node-fetch': 'isomorphic-fetch',
+    },
+  },
 });
 
 export default config;

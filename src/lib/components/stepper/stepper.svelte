@@ -12,6 +12,7 @@
   export let steps: Steps;
   export let context: (() => Writable<unknown>) | undefined = undefined;
   const resolvedContext = context?.();
+  export let minHeightPx = 0;
 
   let stepElement: HTMLDivElement;
 
@@ -66,7 +67,7 @@
     transitioning = newVal;
   }
 
-  let containerHeight = tweened(0);
+  let containerHeight = tweened(minHeightPx);
 
   let resizeObserver = new ResizeObserver(() => updateContainerHeight());
   let observedElement: HTMLDivElement | undefined;
@@ -87,7 +88,7 @@
   async function updateContainerHeight() {
     if (!observedElement) return;
 
-    const stepHeight = observedElement.offsetHeight;
+    const stepHeight = Math.max(observedElement.offsetHeight, minHeightPx);
 
     containerHeight.set(stepHeight, {
       duration: firstHeightUpdate || !transitioning ? 0 : 300,

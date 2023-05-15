@@ -33,8 +33,9 @@
     background-color: var(--color-background);
     box-shadow: var(--elevation-low);
     border-radius: 2rem 0 2rem 2rem;
-    min-height: 48rem;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .logo {

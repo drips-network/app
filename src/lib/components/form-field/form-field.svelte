@@ -2,9 +2,10 @@
   export let title: string;
   export let description: string | undefined = undefined;
   export let disabled = false;
+  export let type: 'label' | 'div' = 'label';
 </script>
 
-<label class="typo-text-bold" class:disabled>
+<svelte:element this={type} class="wrapper typo-text-bold" class:disabled>
   <div class="content"><slot /></div>
   {#if description}<p>{description}</p>{/if}
   <div class="title">
@@ -13,10 +14,10 @@
       <slot name="toggle" />
     </span>
   </div>
-</label>
+</svelte:element>
 
 <style>
-  label {
+  .wrapper {
     color: var(--color-foreground);
     width: 100%;
     display: flex;
@@ -25,6 +26,7 @@
     width: 100%;
     align-items: flex-start;
     text-align: left;
+    transition: opacity 0.3s;
   }
 
   .slot {
@@ -37,15 +39,16 @@
     width: 100%;
   }
 
-  .disabled .title {
-    color: var(--color-foreground-level-5);
-  }
-
   .content {
     color: var(--color-foreground);
     font-weight: normal;
     width: 100%;
     height: 100%;
+  }
+
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   p {
