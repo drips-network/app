@@ -208,7 +208,7 @@
       </ul>
     </div>
   </AnnotationBox>
-  <FormField type="div" title="Drips account">
+  <FormField type="div" title="Wallet">
     <AccountBox />
   </FormField>
   <FormField type="div" disabled={currentStage < 1} title="Select a token to stream">

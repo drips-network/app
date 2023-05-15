@@ -9,8 +9,8 @@
   import type { Items, ListItem } from '$lib/components/list-select/list-select.types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isValidUrl from '$lib/utils/is-valid-url';
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
-  import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import CheckIcon from 'radicle-design-system/icons/Check.svelte';
+  import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import Git from 'radicle-design-system/icons/Git.svelte';
   import { fade, scale } from 'svelte/transition';
   import projectItem from './item-templates/project';
@@ -18,6 +18,7 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { onMount } from 'svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import unclaimedHeader from './item-templates/unclaimed-header';
 
   let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
   let percentages: Percentages = {};
@@ -92,13 +93,7 @@
         initialWeight: 500000,
       },
     },
-    'unclaimed-header': {
-      type: 'interstitial',
-      label: 'Unclaimed projects',
-      // TODO: "Learn More" link once docs are there
-      description:
-        'Projects below have 100 days to claim funds before they start streaming to a community-owned fund for FOSS development.',
-    },
+    unclaimedHeader,
     'foo-bar': {
       type: 'selectable',
       label: {
@@ -283,7 +278,7 @@
             in:scale={{ duration: 300, start: 1.5 }}
             out:scale={{ duration: 300, start: 0.8 }}
           >
-            <ExclamationCircle style="fill: var(--color-background);" />
+            <ExclamationIcon style="fill: var(--color-background);" />
           </div>
         {:else if valid}
           <div
@@ -291,7 +286,7 @@
             in:scale={{ duration: 300, start: 1.5 }}
             out:scale={{ duration: 300, start: 0.8 }}
           >
-            <CheckCircle style="fill: var(--color-background);" />
+            <CheckIcon style="fill: var(--color-background);" />
           </div>
         {/if}
       </div>
