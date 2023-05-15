@@ -1,21 +1,33 @@
+<script lang="ts" context="module">
+  export type { Items, ListItem };
+
+  export type Percentages = { [slug: string]: number };
+</script>
+
 <script lang="ts">
   import ListSelect from '$lib/components/list-select/list-select.svelte';
-  import type { Items } from '$lib/components/list-select/list-select.types';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import type { Items, ListItem } from '$lib/components/list-select/list-select.types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isValidUrl from '$lib/utils/is-valid-url';
   import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
   import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import Git from 'radicle-design-system/icons/Git.svelte';
   import { fade, scale } from 'svelte/transition';
+  import projectItem from './item-templates/project';
+  import type { GitProject } from '$lib/utils/metadata/types';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import { onMount } from 'svelte';
+  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
 
   let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
-  let percentages: { [slug: string]: number } = {};
+  let percentages: Percentages = {};
+
+  export let selectedPercentages: Percentages;
   $: selectedPercentages = Object.fromEntries(
     Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
   );
 
-  let items: Items = {
+  export let items: Items = {
     'svelte-stepper': {
       type: 'selectable',
       label: {
@@ -41,6 +53,7 @@
             emoji: '🚶',
             color: '#fcc842',
           },
+          linkTo: 'nothing',
         },
       },
       editablePercentage: {
@@ -72,6 +85,7 @@
             emoji: '💾',
             color: '#FF0000',
           },
+          linkTo: 'nothing',
         },
       },
       editablePercentage: {
@@ -103,6 +117,7 @@
               url: 'https://github.com/efstajas/svelte-stepper.git',
             },
           },
+          linkTo: 'nothing',
         },
       },
       editablePercentage: {
@@ -111,37 +126,31 @@
     },
   };
 
-  async function addProject() {
-    addInProgress = true;
+  let gitProjectService: GitProjectService | undefined = undefined;
 
-    await new Promise((r) => setTimeout(r, 1000));
+  onMount(async () => {
+    gitProjectService = await GitProjectService.new();
+  });
+
+  async function addProject() {
+    if (!gitProjectService) gitProjectService = await GitProjectService.new();
+    addInProgress = true;
 
     const id = crypto.randomUUID();
 
-    items[id] = {
-      type: 'selectable',
-      label: {
-        component: ProjectBadge,
-        props: {
-          project: {
-            claimed: false,
-            repoDriverAccount: {
-              userId: '0',
-              driver: 'repo',
-            },
-            source: {
-              forge: 'github',
-              repoName: 'svelte-stored-writable',
-              ownerName: 'efstajas',
-              url: 'https://github.com/efstajas/svelte-stepper.git',
-            },
-          },
-        },
+    items[id] = projectItem({
+      claimed: false,
+      repoDriverAccount: {
+        userId: '0',
+        driver: 'repo',
       },
-      editablePercentage: {
-        initialWeight: 0,
+      source: {
+        forge: 'github',
+        repoName: 'svelte-stored-writable',
+        ownerName: 'efstajas',
+        url: 'https://github.com/efstajas/svelte-stepper.git',
       },
-    };
+    } as GitProject);
 
     projectUrlInputValue = '';
 

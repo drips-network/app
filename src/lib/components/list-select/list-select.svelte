@@ -2,7 +2,6 @@
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import EyeClosedIcon from 'radicle-design-system/icons/EyeClosed.svelte';
   import type { Items } from './list-select.types';
-  import { onMount } from 'svelte';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
   import PercentageEditor from './components/percentage-editor.svelte';
 
@@ -81,6 +80,7 @@
 
   let searchBarElem: HTMLDivElement;
   let itemElements: { [slug: string]: HTMLDivElement } = {};
+  let focussedSlug: string | undefined;
 
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
@@ -121,13 +121,9 @@
 
     e.preventDefault();
   }
-
-  onMount(() => {
-    window.addEventListener('keydown', handleArrowKeys);
-
-    return () => window.removeEventListener('keydown', handleArrowKeys);
-  });
 </script>
+
+<svelte:window on:keydown={handleArrowKeys} on:keydown={handleArrowKeys} />
 
 <div
   role="listbox"
@@ -175,10 +171,13 @@
         tabindex={item.disabled || blockInteraction ? undefined : 0}
         data-testid={`item-${slug}`}
         bind:this={itemElements[slug]}
+        on:focus={() => (focussedSlug = slug)}
+        on:blur={() => (focussedSlug = undefined)}
       >
         {#if item.type === 'selectable'}
           <div class="check-icon">
             <SelectedDot
+              focussed={focussedSlug === slug}
               type={multiselect ? 'check' : 'radio'}
               selected={selected.includes(slug)}
             />

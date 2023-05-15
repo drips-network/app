@@ -6,10 +6,14 @@
   import Github from 'radicle-design-system/icons/Github.svelte';
   import Gitlab from 'radicle-design-system/icons/Gitlab.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import ListEditor from './components/list-editor.svelte';
+  import ListEditor, { type Percentages } from './components/list-editor/list-editor.svelte';
   import Check from 'radicle-design-system/icons/Check.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  // let items: Items = {};
+
+  let selectedPercentages: Percentages;
 
   let valid: boolean;
 </script>
@@ -20,7 +24,7 @@
 >
   <FormField title="Projects">
     <div class="project-list">
-      <ListEditor bind:valid />
+      <ListEditor bind:selectedPercentages bind:valid />
       <div class="supported-forges">
         <div class="forge"><Github style="fill: var(--color-background)" /></div>
         <div class="forge"><Gitlab style="fill: var(--color-background)" /></div>

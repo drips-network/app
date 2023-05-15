@@ -51,6 +51,7 @@
     min-width: calc(2rem + 4px); /* so just icons are square (w=h) */
     padding: 5px 2px;
     margin: -4px 0;
+    transition: opacity 0.3s;
   }
 
   button.size-large {

@@ -248,11 +248,11 @@
       suffix={listSelected[0] ? `${tokensStore.getByAddress(listSelected[0])?.info.symbol}` : ''}
     />
     <div class="suggestions">
-      <Button on:click={() => applyTopUpSuggestion(1)}>1 month</Button>
-      <Button on:click={() => applyTopUpSuggestion(3)}>3 months</Button>
-      <Button on:click={() => applyTopUpSuggestion(6)}>6 months</Button>
-      <Button on:click={() => applyTopUpSuggestion(12)}>1 year</Button>
-      <Button on:click={() => applyTopUpSuggestion(24)}>2 years</Button>
+      <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(1)}>1 month</Button>
+      <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(3)}>3 months</Button>
+      <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(6)}>6 months</Button>
+      <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(12)}>1 year</Button>
+      <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(24)}>2 years</Button>
       <Button disabled={fetchedBalances[selectedToken] === undefined} on:click={applyMaxTopUp}
         >Max</Button
       >

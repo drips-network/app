@@ -31,8 +31,7 @@ export function getSubgraphClient() {
  * @returns An initialized Git Driver client.
  */
 export function getRepoDriverClient() {
-  const { provider, signer, connected } = get(wallet);
-  assert(connected, 'Wallet must be connected to create a RepoDriverClient');
+  const { provider, signer } = get(wallet);
 
   const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
 
