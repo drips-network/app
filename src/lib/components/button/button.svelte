@@ -6,7 +6,7 @@
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
-  export let size: 'normal' | 'large' = 'normal';
+  export let size: 'small' | 'normal' | 'large' = 'normal';
 
   let buttonEl: HTMLButtonElement;
 
@@ -59,6 +59,11 @@
     min-width: calc(3rem + 4px);
   }
 
+  button.size-small {
+    height: 2.5rem;
+    min-width: calc(3rem);
+  }
+
   button .inner {
     height: 100%;
     border-radius: 1rem 0 1rem 1rem;
@@ -75,6 +80,10 @@
 
   button.size-large .inner {
     border-radius: 1.5rem 0 1.5rem 1.5rem;
+  }
+
+  button.size-small .inner {
+    font-size: 14px;
   }
 
   button .inner:not(.ghost) {

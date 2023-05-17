@@ -11,7 +11,7 @@
   <div class="title">
     {title}
     <span class="slot">
-      <slot name="toggle" />
+      <slot name="action" />
     </span>
   </div>
 </svelte:element>
@@ -37,6 +37,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+    align-items: center;
   }
 
   .content {

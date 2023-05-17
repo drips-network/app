@@ -195,7 +195,7 @@
       placeholder="Enter amount"
       {validationState}
     />
-    <svelte:fragment slot="toggle">
+    <svelte:fragment slot="action">
       <Toggle bind:checked={withdrawAll} label="Max" />
     </svelte:fragment>
   </FormField>

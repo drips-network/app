@@ -1,12 +1,26 @@
 <script lang="ts" context="module">
-  export type { Items, ListItem };
+  import type {
+    InterstitialItem,
+    SelectableItem,
+  } from '$lib/components/list-select/list-select.types';
+
+  interface ProjectItem extends SelectableItem {
+    label: {
+      component: typeof ProjectBadge;
+      props: {
+        project: GitProject;
+      };
+    };
+  }
+
+  export type ListItem = ProjectItem | InterstitialItem;
+  export type Items = { [slug: string]: ListItem };
 
   export type Percentages = { [slug: string]: number };
 </script>
 
 <script lang="ts">
   import ListSelect from '$lib/components/list-select/list-select.svelte';
-  import type { Items, ListItem } from '$lib/components/list-select/list-select.types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isValidUrl from '$lib/utils/is-valid-url';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
@@ -15,120 +29,27 @@
   import { fade, scale } from 'svelte/transition';
   import projectItem from './item-templates/project';
   import type { GitProject } from '$lib/utils/metadata/types';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
-  import { onMount } from 'svelte';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import unclaimedHeader from './item-templates/unclaimed-header';
+  import Button from '$lib/components/button/button.svelte';
+  import { tick } from 'svelte';
+  import type ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
 
-  let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
-  let percentages: Percentages = {};
+  const MAX_ITEMS = 10;
 
-  export let selectedPercentages: Percentages;
+  export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
+  export let percentages: Percentages = {};
+  export let blockInteraction = false;
+
   $: selectedPercentages = Object.fromEntries(
     Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
   );
 
-  export let items: Items = {
-    'svelte-stepper': {
-      type: 'selectable',
-      label: {
-        component: ProjectBadge,
-        props: {
-          project: {
-            claimed: true,
-            repoDriverAccount: {
-              userId: '0',
-              driver: 'repo',
-            },
-            owner: {
-              driver: 'address',
-              userId: '0',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-            },
-            source: {
-              forge: 'github',
-              repoName: 'svelte-stepper',
-              ownerName: 'efstajas',
-              url: 'https://github.com/efstajas/svelte-stepper.git',
-            },
-            emoji: '🚶',
-            color: '#fcc842',
-          },
-          linkTo: 'nothing',
-        },
-      },
-      editablePercentage: {
-        initialWeight: 500000,
-      },
-    },
-    'svelte-stored-writable': {
-      type: 'selectable',
-      label: {
-        component: ProjectBadge,
-        props: {
-          project: {
-            claimed: true,
-            repoDriverAccount: {
-              userId: '0',
-              driver: 'repo',
-            },
-            owner: {
-              driver: 'address',
-              userId: '0',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-            },
-            source: {
-              forge: 'github',
-              repoName: 'svelte-stored-writable',
-              ownerName: 'efstajas',
-              url: 'https://github.com/efstajas/svelte-stepper.git',
-            },
-            emoji: '💾',
-            color: '#FF0000',
-          },
-          linkTo: 'nothing',
-        },
-      },
-      editablePercentage: {
-        initialWeight: 500000,
-      },
-    },
-    unclaimedHeader,
-    'foo-bar': {
-      type: 'selectable',
-      label: {
-        component: ProjectBadge,
-        props: {
-          project: {
-            claimed: false,
-            repoDriverAccount: {
-              userId: '0',
-              driver: 'repo',
-            },
-            source: {
-              forge: 'github',
-              repoName: 'svelte-stored-writable',
-              ownerName: 'efstajas',
-              url: 'https://github.com/efstajas/svelte-stepper.git',
-            },
-          },
-          linkTo: 'nothing',
-        },
-      },
-      editablePercentage: {
-        initialWeight: 500000,
-      },
-    },
-  };
+  export let items: Items;
 
-  let gitProjectService: GitProjectService | undefined = undefined;
-
-  onMount(async () => {
-    gitProjectService = await GitProjectService.new();
-  });
+  let listElem: HTMLDivElement;
+  let inputElem: HTMLInputElement;
 
   async function addProject() {
-    if (!gitProjectService) gitProjectService = await GitProjectService.new();
+    // TODO: Really fetch project
     addInProgress = true;
 
     const id = crypto.randomUUID();
@@ -149,7 +70,17 @@
 
     projectUrlInputValue = '';
 
-    selected.push(id);
+    if (selected.length < MAX_ITEMS) selected.push(id);
+    percentages = { ...percentages, [id]: 0 };
+
+    await tick();
+
+    listElem.scroll({
+      top: listElem.scrollHeight,
+    });
+
+    // It doesn't work without setTimeout for some reason 🤷‍♂️
+    setTimeout(() => inputElem.focus(), 0);
 
     addInProgress = false;
   }
@@ -167,9 +98,9 @@
     0,
   );
   export let valid = false;
-  $: valid = selected.length > 0 && totalPercentage === 100;
+  $: valid = selected.length > 0 && Math.round(totalPercentage * 100) / 100 === 100;
   export let error = false;
-  $: error = totalPercentage > 100;
+  $: error = Math.round(totalPercentage * 100) / 100 > 100;
 
   $: canDistributeEvenly = selected.length > 0;
 
@@ -201,97 +132,107 @@
 
   $: canClearPercentages = Object.values(selectedPercentages).filter((v) => v !== 0).length > 0;
 
+  // Clears all selected percentages
   function clearPercentages() {
-    percentages = Object.fromEntries(Object.keys(items).map((i) => [i, 0]));
+    selected.forEach((id) => {
+      percentages[id] = 0;
+    });
   }
 </script>
 
 <div class="list-editor">
-  <div class="add-project">
-    <div class="icon">
-      <Git style="fill: var(--color-foreground)" />
-    </div>
-    <input
-      bind:value={projectUrlInputValue}
-      disabled={addInProgress}
-      class="typo-text"
-      type="text"
-      placeholder="Paste GitHub or GitLab URL"
-    />
-    {#if addInProgress}
-      <Spinner />
-    {/if}
-  </div>
-  <div class="list">
-    <ListSelect
-      bind:percentages
-      bind:selected
-      searchable={false}
-      multiselect
-      {items}
-      showEmptyState={false}
-    />
-  </div>
-  <div class="distribution-tools">
-    <div class="actions">
-      <button class="typo-text-small" on:click={distributeEvenly} disabled={!canDistributeEvenly}
-        >Distribute evenly</button
-      >
-      <button
-        class="typo-text-small"
-        on:click={distributeRemaining}
-        disabled={!canDistributeRemaining}>Distribute remaining</button
-      >
-      <button class="typo-text-small" on:click={clearPercentages} disabled={!canClearPercentages}
-        >Clear distribution</button
-      >
-    </div>
-    <div class="remaining-percentage-indicator" class:error class:valid>
-      <div class="typo-text-small-bold">
-        {Math.round(totalPercentage)}% allocated
+  {#if !blockInteraction}
+    <div class="add-project">
+      <div class="icon">
+        <Git style="fill: var(--color-foreground)" />
       </div>
-      <div class="pie">
-        <svg height="32" width="32" viewBox="0 0 32 32">
-          {#if !error && !valid}
+      <input
+        bind:this={inputElem}
+        bind:value={projectUrlInputValue}
+        disabled={addInProgress}
+        class="typo-text"
+        type="text"
+        placeholder="Paste GitHub or GitLab URL to add project"
+      />
+      {#if addInProgress}
+        <Spinner />
+      {/if}
+    </div>
+  {/if}
+  {#if Object.keys(items).length > 0}
+    <div class="list" bind:this={listElem}>
+      <ListSelect
+        hideUnselected={blockInteraction}
+        {blockInteraction}
+        bind:percentages
+        bind:selected
+        searchable={false}
+        multiselect
+        {items}
+        showEmptyState={false}
+      />
+    </div>
+  {/if}
+  {#if !blockInteraction && Object.keys(items).length > 0}
+    <div class="distribution-tools">
+      <div class="actions">
+        <Button size="small" on:click={distributeEvenly} disabled={!canDistributeEvenly}
+          >Distribute evenly</Button
+        >
+        <Button size="small" on:click={distributeRemaining} disabled={!canDistributeRemaining}
+          >Distribute remaining</Button
+        >
+        <Button size="small" on:click={clearPercentages} disabled={!canClearPercentages}
+          >Clear distribution</Button
+        >
+      </div>
+      <div class="remaining-percentage-indicator" class:error class:valid>
+        <div class="typo-text-small-bold">
+          {Math.round(totalPercentage * 100) / 100}% allocated
+        </div>
+        <div class="pie">
+          <svg height="32" width="32" viewBox="0 0 32 32">
+            {#if !error && !valid}
+              <circle
+                transition:fade={{ duration: 200 }}
+                r="12"
+                cx="16"
+                cy="16"
+                fill="var(--color-primary-level-1"
+              />
+            {/if}
             <circle
-              transition:fade={{ duration: 200 }}
-              r="12"
+              class="pie-piece"
+              r="6"
               cx="16"
               cy="16"
-              fill="var(--color-primary-level-1"
-            />
+              fill="transparent"
+              stroke-width="12"
+              stroke-dasharray="calc({totalPercentage} * 37.6991118431 / 100) 37.6991118431"
+              transform="rotate(-90) translate(-32)"
+            /></svg
+          >
+          {#if error}
+            <div
+              class="icon"
+              in:scale={{ duration: 300, start: 1.5 }}
+              out:scale={{ duration: 300, start: 0.8 }}
+            >
+              <ExclamationIcon style="fill: var(--color-background);" />
+            </div>
+          {:else if valid}
+            <div
+              class="icon"
+              in:scale={{ duration: 300, start: 1.5 }}
+              out:scale={{ duration: 300, start: 0.8 }}
+            >
+              <CheckIcon style="fill: var(--color-background);" />
+            </div>
           {/if}
-          <circle
-            class="pie-piece"
-            r="6"
-            cx="16"
-            cy="16"
-            fill="transparent"
-            stroke-width="12"
-            stroke-dasharray="calc({totalPercentage} * 37.6991118431 / 100) 37.6991118431"
-            transform="rotate(-90) translate(-32)"
-          /></svg
-        >
-        {#if error}
-          <div
-            class="icon"
-            in:scale={{ duration: 300, start: 1.5 }}
-            out:scale={{ duration: 300, start: 0.8 }}
-          >
-            <ExclamationIcon style="fill: var(--color-background);" />
-          </div>
-        {:else if valid}
-          <div
-            class="icon"
-            in:scale={{ duration: 300, start: 1.5 }}
-            out:scale={{ duration: 300, start: 0.8 }}
-          >
-            <CheckIcon style="fill: var(--color-background);" />
-          </div>
-        {/if}
+        </div>
       </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style>
@@ -300,6 +241,12 @@
     box-shadow: var(--elevation-low);
     border-radius: 0 0 1.5rem 1.5rem;
     overflow: hidden;
+    max-height: 32rem;
+    overflow-y: scroll;
+  }
+
+  .list:first-child {
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
   .add-project {
@@ -308,7 +255,11 @@
     padding: 1rem;
     background-color: var(--color-background);
     box-shadow: var(--elevation-low);
-    border-radius: 1rem 0 0 0;
+    border-radius: 1.5rem 0 0 0;
+  }
+
+  .add-project:only-child {
+    border-radius: 2rem 0 2rem 2rem;
   }
 
   .add-project input {
@@ -333,12 +284,7 @@
 
   .distribution-tools .actions {
     display: flex;
-    gap: 1rem;
-    text-decoration: underline;
-  }
-
-  .distribution-tools .actions button:disabled {
-    opacity: 0.5;
+    gap: 0.5rem;
   }
 
   .remaining-percentage-indicator {
@@ -381,10 +327,5 @@
 
   .remaining-percentage-indicator.valid .pie .pie-piece {
     stroke: var(--color-positive-level-6);
-  }
-
-  .typo-text-small {
-    font-weight: normal;
-    font-family: var(--typeface-regular);
   }
 </style>

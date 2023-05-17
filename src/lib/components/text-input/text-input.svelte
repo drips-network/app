@@ -133,7 +133,7 @@
     background-color: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
-    height: 2.5rem;
+    height: 3rem;
     padding: 0.5rem 0.75rem;
     width: 100%;
     transition: background-color 0.3s, box-shadow 0.3s;
@@ -161,7 +161,7 @@
   .right-container {
     align-items: center;
     display: flex;
-    height: 2.5rem;
+    height: 3rem;
     position: absolute;
     right: 0;
     top: 0;

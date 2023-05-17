@@ -6,7 +6,7 @@
   let empty = false;
   let inputWidth = 'auto';
 
-  let percentageValue: string | number = percentage.toString();
+  let percentageValue: string | number = (Math.round(percentage * 100) / 100).toString();
 
   let prevPercentage: number = percentage;
   let prevPercentageValue = Number(percentageValue);

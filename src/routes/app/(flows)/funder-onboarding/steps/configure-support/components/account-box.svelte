@@ -6,6 +6,8 @@
   import CrossCircle from 'radicle-design-system/icons/CrossCircle.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
+  export let hideDisconnect = false;
+
   $: address = $walletStore.address;
 
   async function connect() {
@@ -19,9 +21,11 @@
 <div class="account-box" class:connected={address}>
   {#if address}
     <IdentityBadge disableLink {address} disableTooltip size="big" showFullAddress />
-    <Button variant="ghost" icon={CrossCircle} on:click={() => walletStore.disconnect()}
-      >Disconnect</Button
-    >
+    {#if !hideDisconnect}
+      <Button variant="ghost" icon={CrossCircle} on:click={() => walletStore.disconnect()}
+        >Disconnect</Button
+      >
+    {/if}
   {:else}
     Connect your Ethereum wallet to continue
     <Button icon={Wallet} variant="primary" on:click={connect}>Connect wallet</Button>
@@ -33,7 +37,7 @@
     background-color: var(--color-background);
     padding: 1rem;
     box-shadow: var(--elevation-low);
-    border-radius: 1rem 0 1rem 1rem;
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;

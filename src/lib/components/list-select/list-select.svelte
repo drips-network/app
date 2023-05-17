@@ -10,8 +10,10 @@
   export let searchable = true;
   export let multiselect = false;
   export let blockInteraction = false;
+  export let hideUnselected = false;
   export let showEmptyState = true;
   export let emptyStateText = 'Nothing to see here';
+  export let maxSelected = 10;
 
   let searchString = '';
 
@@ -45,7 +47,13 @@
     return acc;
   }, {});
 
-  function selectItem(slug: string) {
+  let lastSelectedSlug: string | undefined;
+
+  $: canSelectAnother = selected.length < maxSelected;
+
+  function selectItem(slug: string, shiftKey = false) {
+    if (!canSelectAnother && !selected.includes(slug)) return;
+
     const item = items[slug];
 
     if (item.type === 'action') {
@@ -53,7 +61,31 @@
       return;
     }
 
-    if (multiselect) {
+    // If shift key pressed, select all selectable items between the previously focussed item and the clicked item
+    if (multiselect && shiftKey && lastSelectedSlug) {
+      const focussedItem = items[lastSelectedSlug];
+      const clickedItem = items[slug];
+
+      if (focussedItem.type !== 'selectable' || clickedItem.type !== 'selectable') return;
+
+      const focussedItemIndex = Object.keys(filteredItems).indexOf(lastSelectedSlug);
+      const clickedItemIndex = Object.keys(filteredItems).indexOf(slug);
+
+      const [startIndex, endIndex] =
+        focussedItemIndex < clickedItemIndex
+          ? [focussedItemIndex, clickedItemIndex]
+          : [clickedItemIndex, focussedItemIndex];
+
+      const itemsToSelect = Object.entries(filteredItems).slice(startIndex, endIndex + 1);
+
+      selected = [
+        ...selected,
+        ...itemsToSelect
+          .filter((item) => item[1].type === 'selectable')
+          .filter(([slug]) => !selected.includes(slug))
+          .map(([slug]) => slug),
+      ];
+    } else if (multiselect) {
       if (selected.includes(slug)) {
         selected.splice(selected.indexOf(slug), 1);
         selected = selected;
@@ -63,10 +95,12 @@
     } else {
       selected = [slug];
     }
+
+    lastSelectedSlug = slug;
   }
 
   function handleItemClick(e: MouseEvent, slug: string) {
-    selectItem(slug);
+    selectItem(slug, e.shiftKey);
     e.preventDefault();
   }
 
@@ -74,7 +108,7 @@
     const selectKeys = ['Enter', ' '];
     if (!selectKeys.includes(e.key)) return;
 
-    selectItem(slug);
+    selectItem(slug, e.shiftKey);
     e.preventDefault();
   };
 
@@ -121,6 +155,15 @@
 
     e.preventDefault();
   }
+
+  function isItemDisabled(slug: string) {
+    const item = items[slug];
+
+    return (
+      item.type !== 'interstitial' &&
+      (item.disabled || (!canSelectAnother && !selected.includes(slug)))
+    );
+  }
 </script>
 
 <svelte:window on:keydown={handleArrowKeys} on:keydown={handleArrowKeys} />
@@ -158,23 +201,23 @@
         <h4>{item.label}</h4>
         <p class="typo-text-small">{item.description}</p>
       </div>
-    {:else}
+    {:else if !hideUnselected || selected.includes(slug)}
       <div
         role="option"
         aria-selected={selected.includes(slug)}
         class="item"
         class:selected={selected.includes(slug)}
-        class:disabled={item.disabled}
+        class:disabled={isItemDisabled(slug)}
         class:hidden={!Object.values(filteredItems).includes(item)}
-        on:click={item.disabled ? undefined : (e) => handleItemClick(e, slug)}
-        on:keydown={item.disabled ? undefined : (e) => handleKeypress(e, slug)}
-        tabindex={item.disabled || blockInteraction ? undefined : 0}
+        on:click={isItemDisabled(slug) ? undefined : (e) => handleItemClick(e, slug)}
+        on:keydown={isItemDisabled(slug) ? undefined : (e) => handleKeypress(e, slug)}
+        tabindex={isItemDisabled(slug) || blockInteraction ? undefined : 0}
         data-testid={`item-${slug}`}
         bind:this={itemElements[slug]}
         on:focus={() => (focussedSlug = slug)}
         on:blur={() => (focussedSlug = undefined)}
       >
-        {#if item.type === 'selectable'}
+        {#if item.type === 'selectable' && !hideUnselected}
           <div class="check-icon">
             <SelectedDot
               focussed={focussedSlug === slug}
@@ -287,6 +330,7 @@
 
   .item.disabled {
     opacity: 0.5;
+    pointer-events: none;
   }
 
   .item:not(.disabled):hover,

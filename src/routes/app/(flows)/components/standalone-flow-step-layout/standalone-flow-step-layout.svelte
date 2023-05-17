@@ -1,22 +1,25 @@
 <script lang="ts">
-  export let headline: string | undefined = undefined;
-  export let subtitle: string | undefined = undefined;
+  export let description: string | undefined = undefined;
 </script>
 
 <div class="step-layout">
   <div class="top">
-    {#if headline || subtitle}
+    {#if description}
       <div class="header">
-        {#if headline}<h1>{headline}</h1>{/if}
-        {#if subtitle}
-          <p>{subtitle}</p>
+        {#if description}
+          <p>{description}</p>
         {/if}
       </div>
     {/if}
     <slot />
   </div>
   <div class="actions">
-    <slot name="actions" />
+    <div class="left">
+      <slot name="left-actions" />
+    </div>
+    <div class="right">
+      <slot name="actions" />
+    </div>
   </div>
 </div>
 
@@ -27,6 +30,7 @@
     gap: 2rem;
     justify-content: space-between;
     height: 100%;
+    min-height: 32rem;
   }
 
   .top {
@@ -38,8 +42,12 @@
   .actions {
     display: flex;
     justify-content: space-between;
-    margin-left: auto;
     gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .actions > .right {
+    margin-left: auto;
   }
 
   .header {

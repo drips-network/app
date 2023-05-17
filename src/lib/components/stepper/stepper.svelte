@@ -1,13 +1,21 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { onDestroy, onMount, tick } from 'svelte';
-  import type { AwaitPendingPayload, Steps, MovePayload, SidestepPayload } from './types';
+  import { createEventDispatcher, onDestroy, onMount, tick } from 'svelte';
+  import type {
+    AwaitPendingPayload,
+    Steps,
+    MovePayload,
+    SidestepPayload,
+    GoToStepPayload,
+  } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
   import AwaitErrorStep from './components/await-error-step.svelte';
   import type { Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
+
+  const dispatch = createEventDispatcher<{ stepChange: never }>();
 
   export let steps: Steps;
   export let context: (() => Writable<unknown>) | undefined = undefined;
@@ -20,10 +28,20 @@
 
   $: resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
 
-  let currentStepIndex = 0;
+  export let currentStepIndex = 0;
   $: currentStep = resolvedSteps[currentStepIndex];
 
+  let prevStepIndex = 0;
   let direction: 'forward' | 'backward' = 'forward';
+  $: {
+    if (currentStepIndex > prevStepIndex) {
+      direction = 'forward';
+    } else if (currentStepIndex < prevStepIndex) {
+      direction = 'backward';
+    }
+
+    prevStepIndex = currentStepIndex;
+  }
 
   /**
    * Advances `by` amount of steps in the flow (or goes backwards with a negative number).
@@ -31,11 +49,13 @@
    * @param by The amount of steps to move by.
    */
   async function move(by: number) {
+    dispatch('stepChange');
+
     if (!resolvedSteps[currentStepIndex + by]) {
       return;
     }
 
-    direction = by > 0 ? 'forward' : 'backward';
+    // direction = by > 0 ? 'forward' : 'backward';
 
     currentStepIndex += by;
 
@@ -123,6 +143,14 @@
   function handleAwaitErrorRetry() {
     direction = 'backward';
     awaitError = undefined;
+  }
+
+  function handleGoToStep(event: CustomEvent<GoToStepPayload>) {
+    const { stepIndex } = event.detail;
+
+    const moveBy = stepIndex - currentStepIndex;
+
+    move(moveBy);
   }
 
   let sidestepConfig: SidestepPayload | undefined = undefined;
@@ -229,6 +257,7 @@
             on:goBackward={(e) => move(e.detail?.by ?? -1)}
             on:conclude={handleConclusion}
             on:sidestep={handleSidestep}
+            on:goToStep={handleGoToStep}
             {...currentStep.props}
             context={resolvedContext}
           />
@@ -249,7 +278,7 @@
   }
 
   .step {
-    padding: 2.5rem;
+    padding: 2rem;
     width: 100%;
   }
 

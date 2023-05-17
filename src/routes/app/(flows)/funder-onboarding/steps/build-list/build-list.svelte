@@ -3,32 +3,36 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import Github from 'radicle-design-system/icons/Github.svelte';
-  import Gitlab from 'radicle-design-system/icons/Gitlab.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import ListEditor, { type Percentages } from './components/list-editor/list-editor.svelte';
+  import ListEditor from './components/list-editor/list-editor.svelte';
   import Check from 'radicle-design-system/icons/Check.svelte';
+  import type { State } from '../funder-onboarding-state';
+  import type { Writable } from 'svelte/store';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  // let items: Items = {};
+  export let context: Writable<State>;
 
-  let selectedPercentages: Percentages;
+  let listValid: boolean;
 
-  let valid: boolean;
+  $: valid = listValid && $context.dripList.title.length > 0;
 </script>
 
-<StandaloneFlowStepLayout
-  headline="Create your Drip List"
-  subtitle="Paste a GitHub or GitLab repo URL below to start building your list."
->
-  <FormField title="Projects">
+<StandaloneFlowStepLayout description="What projects would you like to support?">
+  <FormField title="Drip List*">
     <div class="project-list">
-      <ListEditor bind:selectedPercentages bind:valid />
-      <div class="supported-forges">
-        <div class="forge"><Github style="fill: var(--color-background)" /></div>
-        <div class="forge"><Gitlab style="fill: var(--color-background)" /></div>
-      </div>
+      <ListEditor
+        bind:percentages={$context.dripList.percentages}
+        bind:selected={$context.dripList.selected}
+        bind:items={$context.dripList.items}
+        bind:valid={listValid}
+      />
+    </div>
+  </FormField>
+  <FormField title="List Title*">
+    <div class="project-list">
+      <TextInput bind:value={$context.dripList.title} />
     </div>
   </FormField>
   <svelte:fragment slot="actions">
@@ -39,17 +43,6 @@
 </StandaloneFlowStepLayout>
 
 <style>
-  .supported-forges {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .supported-forges .forge {
-    background-color: var(--color-foreground-level-5);
-    border-radius: 50%;
-    padding: 0.25rem;
-  }
-
   .project-list {
     display: flex;
     flex-direction: column;

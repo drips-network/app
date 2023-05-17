@@ -8,6 +8,7 @@ const projectItem: (project: GitProject) => ListItem = (project: GitProject) => 
     component: ProjectBadge,
     props: {
       project,
+      linkTo: 'nothing',
     },
   },
   editablePercentage: {

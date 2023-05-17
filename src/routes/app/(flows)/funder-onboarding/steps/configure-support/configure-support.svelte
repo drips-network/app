@@ -22,8 +22,13 @@
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
+  import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
+  import type { Writable } from 'svelte/store';
+  import type { State } from '../funder-onboarding-state';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  export let context: Writable<State>;
 
   let tokenList: Items = {};
   $: tokenList = Object.fromEntries(
@@ -49,11 +54,11 @@
     }) ?? [],
   );
 
-  let listSelected: string[] = [];
-  $: selectedToken = listSelected[0];
   let fetchedBalances: { [tokenAddress: string]: bigint } = {};
 
   function fetchSelectedErc20Balance() {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
     const { address, provider } = $walletStore;
     assert(selectedToken && address);
 
@@ -61,6 +66,8 @@
   }
 
   $: {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
     if (selectedToken && !(selectedToken in fetchedBalances)) {
       fetchSelectedErc20Balance().then((balance) => {
         fetchedBalances = {
@@ -74,17 +81,17 @@
   // –––––––––––––––––––––––––
   // STREAM RATE VALUE
 
-  let streamRateValue = '';
-  let streamRateValueParsed: bigint | undefined = undefined;
   $: {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
     if (selectedToken) {
       const token = tokensStore.getByAddress(selectedToken);
       assert(token);
 
-      streamRateValueParsed =
-        streamRateValue && selectedToken
+      $context.supportConfig.streamRateValueParsed =
+        $context.supportConfig.streamRateValue && selectedToken
           ? parseTokenAmount(
-              streamRateValue,
+              $context.supportConfig.streamRateValue,
               token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
             )
           : undefined;
@@ -93,35 +100,39 @@
 
   let streamRateValueValidation: TextInputValidationState;
   $: {
-    if (!streamRateValueParsed) {
+    if (!$context.supportConfig.streamRateValueParsed) {
       streamRateValueValidation = {
         type: 'unvalidated',
       };
     } else {
-      streamRateValueValidation = validateAmtPerSecInput(streamRateValueParsed);
+      streamRateValueValidation = validateAmtPerSecInput(
+        $context.supportConfig.streamRateValueParsed,
+      );
     }
   }
 
   // –––––––––––––––––––––––––
   // TOP UP AMOUNT VALUE
 
-  let topUpAmountValue = '';
-  let topUpAmountValueParsed: bigint | undefined = undefined;
   $: {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
     if (selectedToken) {
       const token = tokensStore.getByAddress(selectedToken);
       assert(token);
 
-      topUpAmountValueParsed =
-        topUpAmountValue && selectedToken
-          ? parseTokenAmount(topUpAmountValue, token.info.decimals)
+      $context.supportConfig.topUpAmountValueParsed =
+        $context.supportConfig.topUpAmountValue && selectedToken
+          ? parseTokenAmount($context.supportConfig.topUpAmountValue, token.info.decimals)
           : undefined;
     }
   }
 
   let topUpAmountValueValidation: TextInputValidationState;
   $: {
-    if (topUpAmountValueParsed === undefined) {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
+    if ($context.supportConfig.topUpAmountValueParsed === undefined) {
       topUpAmountValueValidation = {
         type: 'unvalidated',
       };
@@ -129,7 +140,9 @@
       topUpAmountValueValidation = {
         type: 'pending',
       };
-    } else if (topUpAmountValueParsed > (fetchedBalances[selectedToken] ?? 0n)) {
+    } else if (
+      $context.supportConfig.topUpAmountValueParsed > (fetchedBalances[selectedToken] ?? 0n)
+    ) {
       const token = tokensStore.getByAddress(selectedToken) ?? unreachable();
 
       topUpAmountValueValidation = {
@@ -147,24 +160,33 @@
   }
 
   function applyTopUpSuggestion(months: number) {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
     assert(selectedToken);
     const token = tokensStore.getByAddress(selectedToken);
     assert(token);
     const { decimals } = token.info;
 
-    topUpAmountValue = formatUnits(
-      ((streamRateValueParsed ?? 0n) / BigInt(constants.AMT_PER_SEC_MULTIPLIER)) * BigInt(months),
+    $context.supportConfig.topUpAmountValue = formatUnits(
+      (($context.supportConfig.streamRateValueParsed ?? 0n) /
+        BigInt(constants.AMT_PER_SEC_MULTIPLIER)) *
+        BigInt(months),
       decimals,
     );
   }
 
   function applyMaxTopUp() {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
     assert(selectedToken);
     const token = tokensStore.getByAddress(selectedToken);
     assert(token);
     const { decimals } = token.info;
 
-    topUpAmountValue = formatUnits(fetchedBalances[selectedToken] ?? 0n, decimals);
+    $context.supportConfig.topUpAmountValue = formatUnits(
+      fetchedBalances[selectedToken] ?? 0n,
+      decimals,
+    );
   }
 
   // –––––––––––––––––––––––––
@@ -176,7 +198,9 @@
   // 3: 'set-top-up-amount'
   let currentStage = 0;
   $: {
-    if ($walletStore.connected && selectedToken && streamRateValue !== '') {
+    const selectedToken = $context.supportConfig.listSelected[0];
+
+    if ($walletStore.connected && selectedToken && $context.supportConfig.streamRateValue !== '') {
       currentStage = 3;
     } else if ($walletStore.connected && selectedToken) {
       currentStage = 2;
@@ -190,14 +214,11 @@
   $: formValid =
     currentStage === 3 &&
     streamRateValueValidation.type === 'valid' &&
-    (streamRateValueParsed ?? 0n) > 0n &&
+    ($context.supportConfig.streamRateValueParsed ?? 0n) > 0n &&
     topUpAmountValueValidation.type === 'valid';
 </script>
 
-<StandaloneFlowStepLayout
-  headline="Support your Drip List"
-  subtitle="Set up a stream to support the projects on your Drip List."
->
+<StandaloneFlowStepLayout description="Set up a stream to support the projects on your Drip List.">
   <AnnotationBox type="info">
     <div class="support-type-explainer">
       <h4 class="typo-text-small-bold">Support monthly with token streaming</h4>
@@ -215,7 +236,7 @@
     <div class="list-container">
       <ListSelect
         blockInteraction={currentStage < 1}
-        bind:selected={listSelected}
+        bind:selected={$context.supportConfig.listSelected}
         items={tokenList}
       />
     </div>
@@ -227,11 +248,13 @@
   >
     <TextInput
       variant={{ type: 'number', min: 0 }}
-      bind:value={streamRateValue}
+      bind:value={$context.supportConfig.streamRateValue}
       disabled={currentStage < 2}
       validationState={streamRateValueValidation}
       placeholder="Amount"
-      suffix={listSelected[0] ? `${tokensStore.getByAddress(listSelected[0])?.info.symbol}/mo` : ''}
+      suffix={$context.supportConfig.listSelected[0]
+        ? `${tokensStore.getByAddress($context.supportConfig.listSelected[0])?.info.symbol}/mo`
+        : ''}
     />
   </FormField>
   <FormField
@@ -241,11 +264,13 @@
   >
     <TextInput
       variant={{ type: 'number', min: 0 }}
-      bind:value={topUpAmountValue}
+      bind:value={$context.supportConfig.topUpAmountValue}
       disabled={currentStage < 3}
       placeholder="Amount"
       validationState={topUpAmountValueValidation}
-      suffix={listSelected[0] ? `${tokensStore.getByAddress(listSelected[0])?.info.symbol}` : ''}
+      suffix={$context.supportConfig.listSelected[0]
+        ? `${tokensStore.getByAddress($context.supportConfig.listSelected[0])?.info.symbol}`
+        : ''}
     />
     <div class="suggestions">
       <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(1)}>1 month</Button>
@@ -253,11 +278,15 @@
       <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(6)}>6 months</Button>
       <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(12)}>1 year</Button>
       <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(24)}>2 years</Button>
-      <Button disabled={fetchedBalances[selectedToken] === undefined} on:click={applyMaxTopUp}
-        >Max</Button
+      <Button
+        disabled={fetchedBalances[$context.supportConfig.listSelected[0]] === undefined}
+        on:click={applyMaxTopUp}>Max</Button
       >
     </div>
   </FormField>
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>
+  </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
       disabled={!formValid}
