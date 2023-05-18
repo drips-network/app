@@ -33,10 +33,6 @@ export interface SidestepPayload {
   onSidestepComplete?: () => void;
 }
 
-export interface GoToStepPayload {
-  stepIndex: number;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -51,7 +47,6 @@ export type StepComponentEvents = {
    * the promise rejects, displays a rich error message step, with
    * the ability to jump back to the step that triggered the await.
    */
-  goToStep: GoToStepPayload;
   await: AwaitPendingPayload;
   /**
    * Temporarily append a secondary flow after the current step, and

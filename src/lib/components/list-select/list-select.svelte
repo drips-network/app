@@ -81,7 +81,7 @@
       selected = [
         ...selected,
         ...itemsToSelect
-          .filter((item) => item[1].type === 'selectable')
+          .filter(([, item]) => item.type === 'selectable')
           .filter(([slug]) => !selected.includes(slug))
           .map(([slug]) => slug),
       ];

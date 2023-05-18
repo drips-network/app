@@ -12,7 +12,6 @@ export interface SelectableItem {
   text?: string;
   disabled?: boolean;
   image?: string | ComponentAndProps;
-  rightSlotProps?: ComponentAndProps;
   editablePercentage?: {
     initialWeight: number;
   };

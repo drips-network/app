@@ -1,13 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
   import { createEventDispatcher, onDestroy, onMount, tick } from 'svelte';
-  import type {
-    AwaitPendingPayload,
-    Steps,
-    MovePayload,
-    SidestepPayload,
-    GoToStepPayload,
-  } from './types';
+  import type { AwaitPendingPayload, Steps, MovePayload, SidestepPayload } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
@@ -54,8 +48,6 @@
     if (!resolvedSteps[currentStepIndex + by]) {
       return;
     }
-
-    // direction = by > 0 ? 'forward' : 'backward';
 
     currentStepIndex += by;
 
@@ -143,14 +135,6 @@
   function handleAwaitErrorRetry() {
     direction = 'backward';
     awaitError = undefined;
-  }
-
-  function handleGoToStep(event: CustomEvent<GoToStepPayload>) {
-    const { stepIndex } = event.detail;
-
-    const moveBy = stepIndex - currentStepIndex;
-
-    move(moveBy);
   }
 
   let sidestepConfig: SidestepPayload | undefined = undefined;
@@ -257,7 +241,6 @@
             on:goBackward={(e) => move(e.detail?.by ?? -1)}
             on:conclude={handleConclusion}
             on:sidestep={handleSidestep}
-            on:goToStep={handleGoToStep}
             {...currentStep.props}
             context={resolvedContext}
           />
