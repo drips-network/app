@@ -19,6 +19,8 @@
   import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
   import CoinIcon from 'radicle-design-system/icons/Coin.svelte';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import assert from '$lib/utils/assert';
+  import formatDate from '$lib/utils/format-date';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -29,6 +31,17 @@
 
   $: tokenAddress = $context.supportConfig.listSelected[0] ?? unreachable();
   $: token = tokensStore.getByAddress(tokenAddress) ?? unreachable();
+
+  let lastsUntil: string | undefined;
+  $: {
+    assert(streamRateValueParsed !== undefined && topUpAmountValueParsed !== undefined);
+
+    const durationSeconds = topUpAmountValueParsed / streamRateValueParsed;
+
+    const timestamp = new Date(Date.now() + Number(durationSeconds) * 1000);
+
+    lastsUntil = topUpAmountValueParsed > 0 ? `≈ ${formatDate(timestamp, 'onlyDay')}` : undefined;
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -68,9 +81,11 @@
               undefined,
               false,
             )}
-            {token.info.symbol}/mo</span
+            <span class="muted">{token.info.symbol}/mo</span></span
           >
         </div>
+      </div>
+      <div class="key-value-row">
         <div class="key-value-pair">
           <h5 class="key">Initial top-up</h5>
           <span class="value typo-text-mono"
@@ -79,20 +94,15 @@
               token.info.decimals,
               1n,
               false,
-            )}</span
+            )} <span class="muted">{token.info.symbol}</span></span
           >
         </div>
-        <div class="key-value-pair">
-          <h5 class="key">Lasts until</h5>
-          <span class="value typo-text-mono"
-            >{formatTokenAmount(
-              topUpAmountValueParsed ?? unreachable(),
-              token.info.decimals,
-              1n,
-              false,
-            )}</span
-          >
-        </div>
+        {#if lastsUntil}
+          <div class="key-value-pair">
+            <h5 class="key">Lasts until</h5>
+            <span class="value typo-text">{lastsUntil}</span>
+          </div>
+        {/if}
       </div>
     </div>
   </FormField>
@@ -163,11 +173,15 @@
     gap: 1rem;
   }
 
+  .key-value-row:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
   .key-value-pair {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    flex-grow: 1;
+    width: 50%;
   }
 
   .key-value-pair h5 {
@@ -184,5 +198,9 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+  }
+
+  .muted {
+    color: var(--color-foreground-level-6);
   }
 </style>
