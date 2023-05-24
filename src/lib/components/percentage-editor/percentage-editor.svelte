@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
   export let percentage = 0;
   export let disabled = false;
 
@@ -44,6 +46,26 @@
   let focus = false;
 
   let inputElem: HTMLInputElement;
+
+  const dispatch = createEventDispatcher<{
+    /** Fired when the user blurs the input after selecting or hits enter to confirm. */
+    confirm: never;
+  }>();
+
+  function handleBlur() {
+    if (focus) {
+      dispatch('confirm');
+    }
+
+    focus = false;
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      dispatch('confirm');
+      inputElem.blur();
+    }
+  }
 </script>
 
 <div
@@ -62,7 +84,8 @@
       focus = true;
       inputElem.select();
     }}
-    on:blur={() => (focus = false)}
+    on:blur={handleBlur}
+    on:keydown={handleKeydown}
     step="0.01"
     style:width={inputWidth}
     bind:value={percentageValue}

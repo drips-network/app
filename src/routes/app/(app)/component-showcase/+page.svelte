@@ -22,6 +22,7 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
   import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
+  import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
 
   // Button
   let disabled = false;
@@ -234,9 +235,34 @@
       weight: 62500,
     },
   ];
+
+  // Visual Percentage Editor
+
+  const DEFAULT_PERCENTAGES = { 'option-1': 50, 'option-2': 45, 'option-3': 5 };
 </script>
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Visual Percentage Editor</h2>
+  <VisualPercentageEditor
+    items={[
+      {
+        id: 'option-1',
+        label: 'Option 1',
+      },
+      {
+        id: 'option-2',
+        label: 'Option 2',
+      },
+      {
+        id: 'option-3',
+        label: 'Option 3',
+      },
+    ]}
+    percentages={DEFAULT_PERCENTAGES}
+  />
+</div>
 
 <div class="showcase-item">
   <h2>Splits</h2>

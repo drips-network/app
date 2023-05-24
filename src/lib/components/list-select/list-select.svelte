@@ -3,7 +3,7 @@
   import EyeClosedIcon from 'radicle-design-system/icons/EyeClosed.svelte';
   import type { Items } from './list-select.types';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
-  import PercentageEditor from './components/percentage-editor.svelte';
+  import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
 
   export let items: Items;
 
@@ -14,6 +14,7 @@
   export let showEmptyState = true;
   export let emptyStateText = 'Nothing to see here';
   export let maxSelected = 10;
+  export let blockSelecting = false;
 
   let searchString = '';
 
@@ -209,15 +210,19 @@
         class:selected={selected.includes(slug)}
         class:disabled={isItemDisabled(slug)}
         class:hidden={!Object.values(filteredItems).includes(item)}
-        on:click={isItemDisabled(slug) ? undefined : (e) => handleItemClick(e, slug)}
-        on:keydown={isItemDisabled(slug) ? undefined : (e) => handleKeypress(e, slug)}
-        tabindex={isItemDisabled(slug) || blockInteraction ? undefined : 0}
+        on:click={isItemDisabled(slug) || blockSelecting
+          ? undefined
+          : (e) => handleItemClick(e, slug)}
+        on:keydown={isItemDisabled(slug) || blockSelecting
+          ? undefined
+          : (e) => handleKeypress(e, slug)}
+        tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction ? undefined : 0}
         data-testid={`item-${slug}`}
         bind:this={itemElements[slug]}
         on:focus={() => (focussedSlug = slug)}
         on:blur={() => (focussedSlug = undefined)}
       >
-        {#if item.type === 'selectable' && !hideUnselected}
+        {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
           <div class="check-icon">
             <SelectedDot
               focussed={focussedSlug === slug}
