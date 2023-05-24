@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
   import { fade } from 'svelte/transition';
   import type { BottomNavItems } from './types';
-  import { onMount } from 'svelte';
 
   export let items: BottomNavItems;
 
@@ -11,8 +10,6 @@
   }
 
   let itemElems: ItemElems = {};
-  let labels: HTMLSpanElement[] = [];
-
   $: activeElem = itemElems[$page.url.pathname];
   $: {
     activeElem;
@@ -22,15 +19,23 @@
   let selectorOffset: number | undefined = undefined;
   let selectorWidth: number | undefined = undefined;
 
-  onMount(() => {
-    let maxLabelWidth = Math.max(...labels.map((label) => label.offsetWidth));
-    selectorWidth = maxLabelWidth + 8;
-    updateSelectorPos();
+  let resizeObserver: ResizeObserver = new ResizeObserver(() => {
+    selectorWidth = activeElem.offsetWidth + 20;
   });
 
+  function updateResizeObserver(elem: HTMLElement | undefined) {
+    if (!elem) return;
+
+    resizeObserver.disconnect();
+    resizeObserver.observe(elem);
+  }
+
+  $: updateResizeObserver(activeElem);
+
   function updateSelectorPos() {
-    if (!activeElem || selectorWidth === undefined) return;
-    selectorOffset = activeElem.offsetLeft + (activeElem.offsetWidth - selectorWidth) / 2;
+    if (!activeElem) return;
+
+    selectorOffset = activeElem.offsetLeft - 10;
   }
 </script>
 
@@ -51,7 +56,7 @@
             ? 'fill: var(--color-primary-level-6)'
             : 'fill: var(--color-foreground)'}; transition: fill 0.3s;"
         />
-        <span bind:this={labels[index]}>
+        <span>
           {item.label}
         </span>
       </a>
@@ -114,6 +119,6 @@
     height: calc(100% - 0.5rem);
     margin: 0.25rem 0;
     border-radius: 1rem 0 1rem 1rem;
-    transition: left 0.3s;
+    transition: left 0.3s, width 0.3s;
   }
 </style>
