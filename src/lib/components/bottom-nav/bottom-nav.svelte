@@ -43,7 +43,7 @@
 
 <div class="bottom-nav">
   <div class="items">
-    {#each items as item, index}
+    {#each items as item}
       <a
         class="item typo-text-small-bold"
         class:active={$page.url.pathname === item.href}
@@ -93,6 +93,7 @@
     height: 100%;
     width: 100%;
     justify-content: space-between;
+    max-width: 512px;
     margin: 0 auto;
     position: relative;
   }
@@ -116,6 +117,7 @@
   .selector {
     background-color: var(--color-primary-level-1);
     position: absolute;
+    left: 0;
     height: calc(100% - 0.5rem);
     margin: 0.25rem 0;
     border-radius: 1rem 0 1rem 1rem;
