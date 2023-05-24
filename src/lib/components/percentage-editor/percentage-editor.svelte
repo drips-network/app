@@ -3,6 +3,7 @@
 
   export let percentage = 0;
   export let disabled = false;
+  export let editable = true;
 
   let error = false;
   let empty = false;
@@ -22,7 +23,17 @@
 
       if (pv === null || pv === '') pv = 0;
 
-      if (typeof pv === 'string') pv = Number(pv.replace(/[^0-9.]/g, ''));
+      if (typeof pv === 'string') {
+        pv = Number(
+          pv
+            // Only allow numbers and dots
+            .replace(/[^0-9.]/g, '')
+            // Prevent multiple periods
+            .replace(/([.])\1{1,}/g, '.'),
+        );
+
+        if (isNaN(pv)) pv = 0;
+      }
 
       if (pv?.toString().startsWith('0')) {
         pv = parseFloat(pv.toString().trim());
@@ -74,6 +85,7 @@
   class:error
   class:empty
   class:disabled
+  class:editable
   on:click|stopPropagation
   on:keypress|stopPropagation
 >
@@ -91,6 +103,7 @@
     bind:value={percentageValue}
     min="0"
     max="100"
+    disabled={!editable || disabled}
   />%
 </div>
 
@@ -99,10 +112,13 @@
     display: flex;
     background-color: var(--color-background);
     border-radius: 0.25rem;
-    box-shadow: 0px 0px 0px 1px var(--color-foreground);
     padding: 0 0.125rem;
     box-sizing: border-box;
     transition: box-shadow 0.2s, color 0.2s;
+  }
+
+  .percentage-editor.editable {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground);
   }
 
   .percentage-editor.disabled {
@@ -111,8 +127,11 @@
 
   .percentage-editor.empty,
   .percentage-editor.disabled {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-5);
     color: var(--color-foreground-level-5);
+  }
+
+  .percentage-editor.editable.disabled {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-5);
   }
 
   .percentage-editor:not(.disabled).error {

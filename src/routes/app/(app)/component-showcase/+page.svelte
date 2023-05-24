@@ -2,7 +2,7 @@
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
-  import User from 'radicle-design-system/icons/User.svelte';
+  import UserIcon from 'radicle-design-system/icons/User.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
 
   import ListSelect from '$lib/components/list-select/list-select.svelte';
@@ -23,6 +23,7 @@
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
   import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
+  import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
 
   // Button
   let disabled = false;
@@ -249,15 +250,18 @@
     items={[
       {
         id: 'option-1',
-        label: 'Option 1',
+        label: 'Maintainers',
+        overflowIcon: UserIcon,
       },
       {
         id: 'option-2',
-        label: 'Option 2',
+        label: 'Dependencies',
+        overflowIcon: SplitsIcon,
       },
       {
         id: 'option-3',
-        label: 'Option 3',
+        label: 'Drips',
+        overflowIcon: UserIcon,
       },
     ]}
     percentages={DEFAULT_PERCENTAGES}
@@ -385,7 +389,7 @@
     actions={[
       {
         label: 'Trigger existential crisis',
-        icon: User,
+        icon: UserIcon,
         handler: () => undefined,
       },
       {

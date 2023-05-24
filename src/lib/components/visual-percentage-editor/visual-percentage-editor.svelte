@@ -1,27 +1,38 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { SvelteComponent, onMount } from 'svelte';
   import Knob from './components/knob.svelte';
   import PercentageEditor from '../percentage-editor/percentage-editor.svelte';
 
-  const MIN_ITEM_WIDTH_PX = 32;
+  const MIN_ITEM_WIDTH_PX = 48;
 
-  export let items: { id: string; label: string }[];
+  export let items: { id: string; label: string; overflowIcon: SvelteComponent }[];
 
   /** The last item provided always takes the remainder of all previous percentages. */
   $: remainderItem = items[items.length - 1];
 
-  export let percentages: { [id: string]: number } = Object.fromEntries(
-    items.map((item, index) => [item.id, index === 0 ? 1 : 0]),
-  );
+  export let percentages: { [id: string]: number };
 
   let blocksElem: HTMLDivElement;
   let blocksElemWidth: number;
 
-  onMount(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      const { width } = entries[0].contentRect;
+  let percentageElems: { [id: string]: number } | undefined = undefined;
 
-      blocksElemWidth = width;
+  function updatePercentageElemsBasedOnPercentages() {
+    percentageElems = Object.fromEntries(
+      Object.entries(percentages).map(([item, percentage], _, array) => {
+        const totalCount = array.length;
+        const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
+
+        return [item, Math.round(MIN_ITEM_WIDTH_PX + maxWidth * (percentage / 100))];
+      }),
+    );
+  }
+
+  onMount(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      blocksElemWidth = blocksElem.offsetWidth - 16;
+
+      updatePercentageElemsBasedOnPercentages();
     });
 
     resizeObserver.observe(blocksElem);
@@ -29,20 +40,13 @@
     return () => resizeObserver.disconnect();
   });
 
-  $: percentageElems = blocksElemWidth
-    ? Object.fromEntries(
-        Object.entries(percentages).map(([item, percentage], _, array) => {
-          const totalCount = array.length;
+  let blockDivs: { [id: string]: HTMLDivElement } = {};
 
-          const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX;
-
-          return [
-            item,
-            MIN_ITEM_WIDTH_PX + (maxWidth - Math.max(totalCount - 1, 0) * 8) * (percentage / 100),
-          ];
-        }),
-      )
-    : undefined;
+  $: overflownBlockDivs =
+    percentageElems &&
+    Object.fromEntries(
+      Object.entries(blockDivs).filter(([, div]) => div.scrollWidth > div.clientWidth),
+    );
 
   let dragging = false;
   let draggingIndex: number | undefined;
@@ -58,6 +62,7 @@
   }
 
   let lastXPos: number | undefined;
+
   function drag(e: MouseEvent) {
     if (
       !percentageElems ||
@@ -78,8 +83,10 @@
     const draggingItemWidth = percentageElems[draggingItemId];
     const nextItemWidth = percentageElems[nextItemId];
 
-    const newDraggingItemWidth = Math.max(draggingItemWidth + deltaX, MIN_ITEM_WIDTH_PX);
-    const newNextItemWidth = Math.max(nextItemWidth - deltaX, MIN_ITEM_WIDTH_PX);
+    const newDraggingItemWidth = Math.round(
+      Math.max(draggingItemWidth + deltaX, MIN_ITEM_WIDTH_PX),
+    );
+    const newNextItemWidth = Math.round(Math.max(nextItemWidth - deltaX, MIN_ITEM_WIDTH_PX));
 
     const itemThatHitMin = [
       [draggingItemId, newDraggingItemWidth],
@@ -97,21 +104,28 @@
           [nextItemId]: newNextItemWidth,
         };
 
-    const totalCount = Object.keys(percentageElems).length;
-
-    percentages = {
-      ...percentages,
+    percentageElems = {
+      ...percentageElems,
       ...Object.fromEntries(
         Object.entries(updatedItems).map(([item, width]) => {
-          const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX;
-
-          return [
-            item,
-            ((width - MIN_ITEM_WIDTH_PX) / (maxWidth - Math.max(totalCount - 1, 0) * 8)) * 100,
-          ];
+          return [item, width];
         }),
       ),
     };
+
+    const totalCount = items.length;
+    const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
+
+    percentages = Object.fromEntries(
+      Object.entries(percentageElems).map(([item, width]) => {
+        return [
+          item,
+          width === MIN_ITEM_WIDTH_PX
+            ? 0
+            : Math.round(((width - MIN_ITEM_WIDTH_PX) / maxWidth) * 100),
+        ];
+      }),
+    );
 
     if (!itemThatHitMin) lastXPos = e.clientX;
   }
@@ -164,6 +178,8 @@
         [id]: maxPossibleValue,
       };
     }
+
+    updatePercentageElemsBasedOnPercentages();
   }
 </script>
 
@@ -172,13 +188,27 @@
     {#if percentageElems}
       {#each Object.entries(percentageElems) as [id, width], index}
         <div class="block-wrapper" style="width: {width}px">
-          <div class="block" class:zero-percent={percentages[id] === 0}>
-            <h4 class="typo-text label">{items[index].label}</h4>
-            <div class="overflow-gradient" />
+          <div class="block" bind:this={blockDivs[id]} class:zero-percent={percentages[id] === 0}>
+            <h4
+              class="typo-text label"
+              class:overflown={overflownBlockDivs && id in overflownBlockDivs}
+            >
+              {items[index].label}
+            </h4>
+            {#if overflownBlockDivs && id in overflownBlockDivs}
+              <div class="overflown-icon">
+                <svelte:component
+                  this={items[index].overflowIcon}
+                  style="fill: {percentages[id] === 0
+                    ? 'var(--color-foreground-level-5)'
+                    : 'var(--color-foreground)'}"
+                />
+              </div>
+            {/if}
           </div>
           {#if index !== Object.keys(percentageElems).length - 1}
             <div class="knob" on:mousedown={(e) => startDragging(index, e)}>
-              <Knob />
+              <Knob dragging={draggingIndex === index} />
             </div>
             <div class="percentage-input">
               <PercentageEditor
@@ -189,7 +219,7 @@
           {:else}
             <div class="percentage-input">
               <PercentageEditor
-                disabled
+                editable={false}
                 bind:percentage={percentageInputValues[id]}
                 on:confirm={() => handleConfirmPercentageInput(id)}
               />
@@ -221,19 +251,6 @@
     box-shadow: var(--elevation-low);
   }
 
-  .too-much-error {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--color-negative);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   .block-wrapper {
     flex-shrink: 0;
     position: relative;
@@ -258,6 +275,7 @@
 
   .block-wrapper:last-child .block {
     border-radius: 0.25rem 0 1rem 0.25rem;
+    opacity: 0.75;
   }
 
   .block.zero-percent {
@@ -267,7 +285,7 @@
   .knob {
     position: absolute;
     top: -16px;
-    right: -13.5px;
+    right: -16px;
     z-index: 5;
   }
 
@@ -275,10 +293,31 @@
     white-space: nowrap;
     width: fit-content;
     color: var(--color-primary-level-4);
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
+  }
+
+  .overflown-icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .label.overflown {
+    opacity: 0;
   }
 
   .zero-percent .label {
     opacity: 0;
+  }
+
+  .percentage-input {
+    position: absolute;
+    bottom: -3rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>
