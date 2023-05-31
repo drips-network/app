@@ -3,7 +3,7 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import AccountBox from '../configure-support/components/account-box.svelte';
+  import AccountBox from '$lib/components/account-box/account-box.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';

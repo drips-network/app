@@ -70,7 +70,7 @@
     style={`${inputStyle}; padding-right: ${
       rightContainerWidth ? `${rightContainerWidth}px` : 'auto'
     };`}
-    style:padding-left={icon ? '2.5rem' : 'auto'}
+    style:padding-left={icon ? '2.75rem' : 'auto'}
     class:invalid={validationState.type === 'invalid'}
     class:concealed={variant.type === 'password'}
     min={variant.type === 'number' ? variant.min : undefined}
@@ -204,7 +204,7 @@
 
   .icon-container {
     position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
+    top: 0.75rem;
+    left: 0.75rem;
   }
 </style>

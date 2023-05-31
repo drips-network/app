@@ -30,7 +30,7 @@
     gap: 2rem;
     justify-content: space-between;
     height: 100%;
-    min-height: 32rem;
+    min-height: 30rem;
   }
 
   .top {

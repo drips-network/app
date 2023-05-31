@@ -10,7 +10,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Check from 'radicle-design-system/icons/Check.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import AccountBox from './components/account-box.svelte';
+  import AccountBox from '$lib/components/account-box/account-box.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { fetchBalance } from '$lib/utils/erc20';
