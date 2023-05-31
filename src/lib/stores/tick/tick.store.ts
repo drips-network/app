@@ -1,4 +1,5 @@
-import storedWritable from '$lib/utils/stored-writable';
+import { browser } from '$app/environment';
+import storedWritable from '@efstajas/svelte-stored-writable';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 
@@ -6,7 +7,7 @@ const DEFAULT_TICK_INTERVAL_MS = 100;
 const SLOW_MODE_TICK_INTERVAL_MS = 1000;
 
 export default (() => {
-  const slowMode = storedWritable('slow-mode', z.boolean(), false);
+  const slowMode = storedWritable('slow-mode', z.boolean(), false, !browser);
   const interval = writable<ReturnType<typeof setInterval> | undefined>();
   const listeners = writable<{ [registrationId: number]: () => void }>({});
 

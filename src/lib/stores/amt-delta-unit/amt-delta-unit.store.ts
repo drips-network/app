@@ -1,4 +1,5 @@
-import storedWritable from '$lib/utils/stored-writable';
+import { browser } from '$app/environment';
+import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 
 const schema = z.union([
@@ -27,7 +28,7 @@ export const FRIENDLY_NAMES: { [key in AmtDeltaUnit]: string } = {
 };
 
 export default (() => {
-  const state = storedWritable('amt-delta-unit', schema, 'sec');
+  const state = storedWritable('amt-delta-unit', schema, 'sec', !browser);
 
   function set(unit: AmtDeltaUnit) {
     state.set(unit);
