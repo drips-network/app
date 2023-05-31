@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { SvelteComponent, onMount } from 'svelte';
+  import { onMount, type ComponentType } from 'svelte';
   import Knob from './components/knob.svelte';
   import PercentageEditor from '../percentage-editor/percentage-editor.svelte';
 
   const MIN_ITEM_WIDTH_PX = 48;
 
-  export let items: { id: string; label: string; overflowIcon: SvelteComponent }[];
+  export let items: { id: string; label: string; overflowIcon: ComponentType }[];
 
   /** The last item provided always takes the remainder of all previous percentages. */
   $: remainderItem = items[items.length - 1];
