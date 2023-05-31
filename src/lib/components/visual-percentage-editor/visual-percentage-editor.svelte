@@ -117,14 +117,25 @@
     const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
 
     percentages = Object.fromEntries(
-      Object.entries(percentageElems).map(([item, width]) => {
-        return [
-          item,
-          width === MIN_ITEM_WIDTH_PX
-            ? 0
-            : Math.round(((width - MIN_ITEM_WIDTH_PX) / maxWidth) * 100),
-        ];
-      }),
+      Object.entries(percentageElems).reduce<[item: string, percentage: number][]>(
+        (acc, [item, width], index, array) => {
+          const isLastItem = index === array.length - 1;
+
+          // If it's the last (remainder) item, we assign the remainder of the percentages.
+          return [
+            ...acc,
+            isLastItem
+              ? [item, 100 - acc.reduce<number>((acc, [, percentage]) => acc + percentage, 0)]
+              : [
+                  item,
+                  width === MIN_ITEM_WIDTH_PX
+                    ? 0
+                    : Math.round(((width - MIN_ITEM_WIDTH_PX) / maxWidth) * 100),
+                ],
+          ];
+        },
+        [],
+      ),
     );
 
     if (!itemThatHitMin) lastXPos = e.clientX;
