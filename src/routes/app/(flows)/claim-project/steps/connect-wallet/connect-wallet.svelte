@@ -12,6 +12,18 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   $: formValid = $walletStore.connected;
+
+  function verifyProject() {
+    dispatch('await', {
+      promise: () =>
+        new Promise<void>((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        }),
+      message: 'Verifying project ownership...',
+    });
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -24,11 +36,8 @@
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRightIcon}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={verifyProject}
+      >Continue</Button
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
