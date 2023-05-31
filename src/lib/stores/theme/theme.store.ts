@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import storedWritable from '$lib/utils/stored-writable';
+import storedWritable from '@efstajas/svelte-stored-writable';
 import { derived, writable } from 'svelte/store';
 import { z } from 'zod';
 
@@ -29,8 +29,13 @@ export default (() => {
   const darkModeQuery = browser && window.matchMedia('(prefers-color-scheme: dark)');
   const prefersDarkMode = darkModeQuery ? darkModeQuery.matches : false;
 
-  const storedPrimaryColor = storedWritable('primary-color', storedPrimaryColorSchema, 'blue');
-  const storedThemePreference = storedWritable('theme', storedThemeSchema, 'auto');
+  const storedPrimaryColor = storedWritable(
+    'primary-color',
+    storedPrimaryColorSchema,
+    'blue',
+    !browser,
+  );
+  const storedThemePreference = storedWritable('theme', storedThemeSchema, 'auto', !browser);
   const systemTheme = writable<'light' | 'dark'>(prefersDarkMode ? 'dark' : 'light');
 
   const currentThemeState = derived<[typeof storedThemePreference, typeof systemTheme], State>(
