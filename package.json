@@ -60,6 +60,7 @@
     "vitest": "^0.25.3"
   },
   "dependencies": {
+    "@efstajas/svelte-stored-writable": "^0.2.0",
     "@pinata/sdk": "^1.1.26",
     "@safe-global/safe-apps-provider": "^0.16.0",
     "@safe-global/safe-apps-sdk": "^7.10.0",

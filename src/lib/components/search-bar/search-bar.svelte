@@ -117,7 +117,7 @@
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
       on:focusout={handleSearchBlur}
-      autocomplete="false"
+      autocomplete="off"
     />
     {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
