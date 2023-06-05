@@ -24,7 +24,7 @@
   import unreachable from '$lib/utils/unreachable';
   import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
   import type { Writable } from 'svelte/store';
-  import type { State } from '../funder-onboarding-flow';
+  import type { State } from '../../funder-onboarding-flow';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

@@ -184,16 +184,21 @@ export function convert(amount: Amount) {
 }
 
 /**
- * Create a deduplicated readable that notifies whenever the price for the given
- * symbol changes.
- * @param symbol The symbol to subscribe to.
+ * Create a deduplicated readable that notifies whenever the price for any of the given
+ * symbols changes.
+ * @param symbols The symbols to subscribe to.
  */
-const price = (symbol: string) =>
+const price = (symbols: string[]) =>
   deduplicateReadable(
     derived(prices, ($prices) => {
-      symbol = TOKEN_SUBSTITUTIONS[symbol] || symbol;
-      _validateSymbol(symbol);
-      return $prices[symbol];
+      symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
+
+      for (const symbol of symbols) {
+        _validateSymbol(symbol);
+      }
+
+      // Return an object of all the prices for the given symbols.
+      return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol]]));
     }),
   );
 

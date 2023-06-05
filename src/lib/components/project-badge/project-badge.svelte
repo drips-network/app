@@ -51,7 +51,7 @@
             {/if}
             <div><ProjectAvatar project={processedProject} /></div>
           </div>{/if}
-        <div class="name typo-text">
+        <div class="name typo-text-bold">
           <ProjectName project={processedProject} />
         </div>
       </svelte:element>

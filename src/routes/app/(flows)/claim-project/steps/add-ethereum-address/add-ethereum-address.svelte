@@ -7,7 +7,7 @@
 </script>
 
 <StandaloneFlowStepLayout
-  description="To verify you are the owner of this project, please add a drips.json file with your Ethereum address to the root of your code repo. "
+  description="To verify you are the owner of this project, please add a funding.json file with your Ethereum address to the root of your code repo. "
 >
-  <CodeBox path="./drips.json" code={dripsJsonTemplate($walletStore.address ?? unreachable())} />
+  <CodeBox path="./funding.json" code={dripsJsonTemplate($walletStore.address ?? unreachable())} />
 </StandaloneFlowStepLayout>

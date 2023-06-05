@@ -11,7 +11,7 @@
   import TransactionsIcon from 'radicle-design-system/icons/Transactions.svelte';
   import type { Writable } from 'svelte/store';
   import ListEditor from '../build-list/components/list-editor/list-editor.svelte';
-  import type { State } from '../funder-onboarding-flow';
+  import type { State } from '../../funder-onboarding-flow';
   import unreachable from '$lib/utils/unreachable';
   import Token from '$lib/components/token/token.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';

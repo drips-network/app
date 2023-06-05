@@ -1,7 +1,7 @@
 <script lang="ts">
   import StandaloneFlowStepHeader from '../components/standalone-flow-step-header/standalone-flow-step-header.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { slotsTemplate, state, steps } from './steps/funder-onboarding-flow';
+  import { slotsTemplate, state, steps } from './funder-onboarding-flow';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import { onDestroy, onMount } from 'svelte';
   import StandaloneFlowSlots from '../components/standalone-flow-slots/standalone-flow-slots.svelte';

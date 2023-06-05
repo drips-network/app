@@ -24,7 +24,7 @@
   }
 
   // TODO: make it use the real project URL
-  $: gitHubProposalUrl = `https://github.com/radicle-dev/drips-app-v2/new/main?filename=drips.json&value=${encodeURIComponent(
+  $: gitHubProposalUrl = `https://github.com/radicle-dev/drips-app-v2/new/main?filename=funding.json&value=${encodeURIComponent(
     code,
   )}`;
 </script>

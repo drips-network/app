@@ -106,7 +106,7 @@
     {/if}
 
     {#if validationState.type === 'pending'}
-      <Spinner style="margin: 0 0.5rem;" />
+      <Spinner style="margin: 0 0.75rem;" />
     {:else if showSuccessCheck && validationState.type === 'valid'}
       <CheckCircleIcon style="fill: var(--color-positive); margin: 0 0.5rem;" />
     {:else if validationState.type === 'invalid'}

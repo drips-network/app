@@ -3,7 +3,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import StandaloneFlowSlots from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
   import StandaloneFlowStepHeader from '../components/standalone-flow-step-header/standalone-flow-step-header.svelte';
-  import { slotsTemplate, state, steps } from './steps/claim-project-flow';
+  import { slotsTemplate, state, steps } from './claim-project-flow';
 
   let currentStepIndex = 0;
 

@@ -5,28 +5,36 @@
 
   const dispatch = createEventDispatcher<{ edit: { stepIndex: number } }>();
 
-  export let icon: ComponentType;
+  interface ComponentAndProps {
+    component: ComponentType;
+    props: Record<string, unknown>;
+  }
+
+  export let leftComponent: ComponentAndProps | undefined = undefined;
+  export let rightComponent: ComponentAndProps | undefined = undefined;
+  export let icon: ComponentType | undefined = undefined;
   export let title: string;
   export let editStepIndex: number | undefined;
-  export let preview:
-    | {
-        component: ComponentType;
-        props: Record<string, unknown>;
-      }
-    | undefined;
 </script>
 
 <div class="slot">
   <div class="left">
-    <div class="icon">
-      <svelte:component this={icon} style="fill: var(--color-background);" />
-    </div>
-    <h4>{title}</h4>
-    {#if preview}
-      <svelte:component this={preview.component} {...preview.props} />
+    {#if icon}
+      <div class="icon">
+        <svelte:component this={icon} style="fill: var(--color-background);" />
+      </div>
+    {/if}
+    {#if title}
+      <h4>{title}</h4>
+    {/if}
+    {#if leftComponent}
+      <svelte:component this={leftComponent.component} {...leftComponent.props} />
     {/if}
   </div>
   <div class="right">
+    {#if rightComponent}
+      <svelte:component this={rightComponent.component} {...rightComponent.props} />
+    {/if}
     {#if editStepIndex !== undefined}<Button
         variant="ghost"
         icon={Pen}

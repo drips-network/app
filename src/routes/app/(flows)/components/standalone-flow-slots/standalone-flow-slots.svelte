@@ -1,16 +1,17 @@
 <script lang="ts" context="module">
   import { tick, type ComponentType } from 'svelte';
 
+  interface ComponentAndProps {
+    component: ComponentType;
+    props: Record<string, unknown>;
+  }
+
   export interface Slot {
-    icon: ComponentType;
-    title: string;
-    preview:
-      | {
-          component: ComponentType;
-          props: Record<string, unknown>;
-        }
-      | undefined;
-    editStepIndex: number | undefined;
+    icon?: ComponentType | undefined;
+    title?: string | undefined;
+    leftComponent?: ComponentAndProps | undefined;
+    rightComponent?: ComponentAndProps | undefined;
+    editStepIndex?: number | undefined;
   }
 
   export type Slots = Slot[];
