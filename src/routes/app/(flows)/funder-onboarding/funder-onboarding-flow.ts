@@ -12,6 +12,7 @@ import ListIcon from 'radicle-design-system/icons/List.svelte';
 import Pile from '$lib/components/pile/pile.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
 export interface State {
   dripList: {
@@ -51,13 +52,24 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
                   if (item.type !== 'selectable') return;
                   if (!state.dripList.selected.includes(slug)) return;
 
-                  return {
-                    component: ProjectAvatar,
-                    props: {
-                      project: item.label.props.project,
-                      outline: true,
-                    },
-                  };
+                  return 'project' in item.label.props
+                    ? {
+                        component: ProjectAvatar,
+                        props: {
+                          project: item.label.props.project,
+                          outline: true,
+                        },
+                      }
+                    : {
+                        component: IdentityBadge,
+                        props: {
+                          address: item.label.props.address,
+                          showIdentity: false,
+                          size: 'medium',
+                          outline: true,
+                          disableLink: true,
+                        },
+                      };
                 },
               ),
               maxItems: 3,

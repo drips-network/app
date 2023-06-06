@@ -19,7 +19,9 @@
   $: valid = listValid && $context.dripList.title.length > 0;
 </script>
 
-<StandaloneFlowStepLayout description="What projects would you like to support?">
+<StandaloneFlowStepLayout
+  description="What projects, individuals, or organizations would you like to fund with your Drip List?"
+>
   <FormField title="Drip List*">
     <div class="project-list">
       <ListEditor

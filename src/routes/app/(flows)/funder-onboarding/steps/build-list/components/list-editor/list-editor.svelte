@@ -13,7 +13,16 @@
     };
   }
 
-  export type ListItem = ProjectItem | InterstitialItem;
+  interface EthAddressItem extends SelectableItem {
+    label: {
+      component: typeof IdentityBadge;
+      props: {
+        address: string;
+      };
+    };
+  }
+
+  export type ListItem = EthAddressItem | ProjectItem | InterstitialItem;
   export type Items = { [slug: string]: ListItem };
 
   export type Percentages = { [slug: string]: number };
@@ -32,7 +41,11 @@
   import Button from '$lib/components/button/button.svelte';
   import { tick } from 'svelte';
   import type ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import type IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import ethAddressItem from './item-templates/eth-address';
+  import { isAddress } from 'ethers/lib/utils';
 
+  // TOOD: Set to 200
   const MAX_ITEMS = 10;
 
   export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
@@ -47,6 +60,11 @@
 
   let listElem: HTMLDivElement;
   let inputElem: HTMLInputElement;
+
+  let addInProgress = false;
+  let inputValue = '';
+
+  // TODO: Prevent duplicate entries
 
   async function addProject() {
     // TODO: Really fetch project
@@ -68,7 +86,7 @@
       },
     } as GitProject);
 
-    projectUrlInputValue = '';
+    inputValue = '';
 
     if (selected.length < MAX_ITEMS) selected.push(id);
     percentages = { ...percentages, [id]: 0 };
@@ -85,12 +103,23 @@
     addInProgress = false;
   }
 
-  let addInProgress = false;
+  function addEthAddress() {
+    if (items[inputValue]) return;
 
-  let projectUrlInputValue = '';
+    items[inputValue] = ethAddressItem(inputValue);
 
-  $: if (isValidUrl(projectUrlInputValue)) {
+    if (selected.length < MAX_ITEMS) selected.push(inputValue);
+    percentages = { ...percentages, [inputValue]: 0 };
+
+    inputValue = '';
+  }
+
+  $: if (isValidUrl(inputValue)) {
     addProject();
+  }
+
+  $: if (isAddress(inputValue)) {
+    addEthAddress();
   }
 
   $: totalPercentage = Object.values(selectedPercentages ?? {}).reduce<number>(
@@ -148,11 +177,11 @@
       </div>
       <input
         bind:this={inputElem}
-        bind:value={projectUrlInputValue}
+        bind:value={inputValue}
         disabled={addInProgress}
         class="typo-text"
         type="text"
-        placeholder="Paste GitHub or GitLab URL to add project"
+        placeholder="Paste GitHub/GitLab URL or Ethereum address"
       />
       {#if addInProgress}
         <Spinner />

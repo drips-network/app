@@ -7,6 +7,7 @@ import AddEthereumAddress from './steps/add-ethereum-address/add-ethereum-addres
 import ProjectSlot from './slots/project-slot.svelte';
 import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
+import WalletSlot from './slots/wallet-slot.svelte';
 
 export interface State {
   gitUrl: string;
@@ -19,6 +20,7 @@ export interface State {
       }
     | undefined;
   unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined;
+  highLevelPercentages: { [key: string]: number };
 }
 
 export const state = writable<State>({
@@ -26,6 +28,7 @@ export const state = writable<State>({
   project: undefined,
   projectMetadata: undefined,
   unclaimedFunds: undefined,
+  highLevelPercentages: { maintainers: 50, dependencies: 45, drips: 5 },
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
@@ -39,13 +42,21 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     editStepIndex: 0,
   };
 
+  const walletSlot = {
+    leftComponent: {
+      component: WalletSlot,
+      props: {},
+    },
+    editStepIndex: 1,
+  };
+
   switch (stepIndex) {
     case 1:
       return [projectSlot];
     case 2:
-      return [projectSlot];
+      return [projectSlot, walletSlot];
     case 3:
-      return [projectSlot];
+      return [projectSlot, walletSlot];
     default:
       return [];
   }

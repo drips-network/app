@@ -9,12 +9,15 @@
   import User from 'radicle-design-system/icons/User.svelte';
   import Splits from '$lib/components/splits/splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
+  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import type { State } from '../../claim-project-flow';
+  import type { Writable } from 'svelte/store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  const formValid = true;
+  export let context: Writable<State>;
 
-  let percentages = { maintainers: 50, dependencies: 45, drips: 5 };
+  const formValid = true;
 </script>
 
 <StandaloneFlowStepLayout
@@ -39,8 +42,12 @@
         overflowIcon: DripsLogo,
       },
     ]}
-    bind:percentages
+    bind:percentages={$context.highLevelPercentages}
   />
+  <div class="info-box">
+    <InfoCircle style="fill: var(--color-foreground-level-6)" />
+    <p class="typo-text-small">You’ll list your maintainers and dependencies in the next step.</p>
+  </div>
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>
@@ -53,3 +60,12 @@
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
+
+<style>
+  .info-box {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    color: var(--color-foreground-level-6);
+  }
+</style>
