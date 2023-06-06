@@ -5,5 +5,5 @@
   export let project: GitProject;
 </script>
 
-<ProjectBadge {project} />
+<ProjectBadge linkToNewTab {project} />
 <!-- TODO: Add claimable funds preview -->

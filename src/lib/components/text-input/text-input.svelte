@@ -7,7 +7,10 @@
 
   import KeyHint from 'radicle-design-system/KeyHint.svelte';
   import Spinner from 'radicle-design-system/Spinner.svelte';
-  import type { ComponentType } from 'svelte';
+  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import Cross from 'radicle-design-system/icons/Cross.svelte';
+
+  const dispatch = createEventDispatcher<{ clear: never }>();
 
   export let variant: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number } = {
     type: 'text',
@@ -21,6 +24,7 @@
   export let disabled = false;
   export let readonly = false;
   export let showSuccessCheck = false;
+  export let showClearButton = false;
 
   export let icon: ComponentType | undefined = undefined;
 
@@ -54,6 +58,11 @@
   // cannot be dynamic if input uses two-way binding (svelte).
   $: if (inputElement) {
     inputElement.type = variant.type;
+  }
+
+  function clear() {
+    value = '';
+    dispatch('clear');
   }
 
   let rightContainerWidth: number;
@@ -94,6 +103,12 @@
   <div class="right-container" bind:clientWidth={rightContainerWidth}>
     {#if hint && (validationState.type === 'unvalidated' || validationState.type === 'valid')}
       <KeyHint style="margin: 0 0.5rem;">{hint}</KeyHint>
+    {/if}
+
+    {#if showClearButton}
+      <button style="color: var(--color-foreground); margin: 0 0.75rem;" on:click={clear}>
+        <Cross />
+      </button>
     {/if}
 
     {#if suffix}

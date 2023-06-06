@@ -6,6 +6,7 @@ import EnterGitUrl from './steps/enter-git-url/enter-git-url.svelte';
 import AddEthereumAddress from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
 import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
+import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 
 export interface State {
   gitUrl: string;
@@ -28,19 +29,23 @@ export const state = writable<State>({
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
+  const projectSlot = {
+    leftComponent: {
+      component: ProjectSlot,
+      props: {
+        project: state.project,
+      },
+    },
+    editStepIndex: 0,
+  };
+
   switch (stepIndex) {
     case 1:
-      return [
-        {
-          leftComponent: {
-            component: ProjectSlot,
-            props: {
-              project: state.project,
-            },
-          },
-          editStepIndex: 0,
-        },
-      ];
+      return [projectSlot];
+    case 2:
+      return [projectSlot];
+    case 3:
+      return [projectSlot];
     default:
       return [];
   }
@@ -57,6 +62,10 @@ export const steps = () => [
   }),
   makeStep({
     component: AddEthereumAddress,
+    props: undefined,
+  }),
+  makeStep({
+    component: SplitYourFunds,
     props: undefined,
   }),
 ];

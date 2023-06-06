@@ -132,6 +132,8 @@ export async function track(symbols: string[]) {
     };
   });
 
+  if (symbols.length === 0) return;
+
   connection.send({
     method: 'SUBSCRIBE',
     params: symbols.map((symbol) => `${symbol.toLowerCase()}usdt@ticker`),
@@ -162,7 +164,8 @@ export async function untrack(symbols: string[]) {
  */
 export function convert(amount: Amount) {
   const token = tokensStore.getByAddress(amount.tokenAddress);
-  assert(token);
+
+  if (!token) return 'unsupported';
 
   let symbol = token.info.symbol;
   symbol = TOKEN_SUBSTITUTIONS[symbol] || symbol;

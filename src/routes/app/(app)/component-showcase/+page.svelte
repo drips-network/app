@@ -24,6 +24,7 @@
   import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
+  import DripsLogo from '$lib/components/header/drips-logo.svelte';
 
   // Button
   let disabled = false;
@@ -261,7 +262,7 @@
       {
         id: 'option-3',
         label: 'Drips',
-        overflowIcon: UserIcon,
+        overflowIcon: DripsLogo,
       },
     ]}
     percentages={DEFAULT_PERCENTAGES}

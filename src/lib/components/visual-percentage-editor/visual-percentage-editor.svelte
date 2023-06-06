@@ -116,27 +116,24 @@
     const totalCount = items.length;
     const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
 
-    percentages = Object.fromEntries(
-      Object.entries(percentageElems).reduce<[item: string, percentage: number][]>(
-        (acc, [item, width], index, array) => {
-          const isLastItem = index === array.length - 1;
-
-          // If it's the last (remainder) item, we assign the remainder of the percentages.
-          return [
-            ...acc,
-            isLastItem
-              ? [item, 100 - acc.reduce<number>((acc, [, percentage]) => acc + percentage, 0)]
-              : [
-                  item,
-                  width === MIN_ITEM_WIDTH_PX
-                    ? 0
-                    : Math.round(((width - MIN_ITEM_WIDTH_PX) / maxWidth) * 100),
-                ],
-          ];
-        },
-        [],
-      ),
+    percentages[draggingItemId] = Math.round(
+      ((percentageElems[draggingItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100,
     );
+
+    if (nextItemId !== remainderItem.id) {
+      percentages[nextItemId] = Math.round(
+        ((percentageElems[nextItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100,
+      );
+
+      percentages[remainderItem.id] = 100 - percentages[draggingItemId] - percentages[nextItemId];
+    } else {
+      const totalPercentage = Object.values(percentages).reduce(
+        (acc, curr, i, arr) => acc + (i === arr.length - 1 ? 0 : curr),
+        0,
+      );
+
+      percentages[remainderItem.id] = 100 - totalPercentage;
+    }
 
     if (!itemThatHitMin) lastXPos = e.clientX;
   }

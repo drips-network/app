@@ -27,6 +27,7 @@
 </script>
 
 <StandaloneFlowStepLayout
+  headline="Connect your wallet"
   description="If you maintain this git project, connect an Ethereum wallet that will control funds and manage the project's Drips profile."
 >
   <FormField type="div" title="Project Owner Ethereum Address">

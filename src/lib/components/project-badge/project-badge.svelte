@@ -16,6 +16,7 @@
   export let tooltip = true;
   export let forceUnclaimed = false;
   export let hideAvatar = false;
+  export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
 
   let unclaimedProject: UnclaimedGitProject;
@@ -41,7 +42,7 @@
         href={linkTo === 'project-page'
           ? buildProjectUrl(project.source)
           : buildExternalUrl(processedProject.source.url)}
-        target={linkTo === 'project-page' ? '' : '_blank'}
+        target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
       >
         {#if !hideAvatar}<div class="avatar-and-forge">
             {#if !forceUnclaimed && project.claimed}

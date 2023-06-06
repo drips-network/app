@@ -13,7 +13,7 @@
   import isValidUrl from '$lib/utils/is-valid-url';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import { fly } from 'svelte/transition';
-  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -42,40 +42,6 @@
         amount: 100000000000000000000n,
       },
     ];
-
-    fiatEstimates.track(['WETH']);
-  }
-
-  $: priceStore = fiatEstimates.price(['WETH']);
-
-  let unclaimedFundsFiatEstimate: number | 'pending' = 'pending';
-  let unclaimedFundsIncludeUnknown = false;
-
-  $: {
-    const prices = $priceStore;
-
-    unclaimedFundsIncludeUnknown = false;
-
-    const unclaimedFunds = $context.unclaimedFunds ?? [];
-
-    if (Object.values(prices).includes('pending')) {
-      unclaimedFundsFiatEstimate = 'pending';
-    } else {
-      unclaimedFundsFiatEstimate = unclaimedFunds.reduce((sum, { tokenAddress, amount }) => {
-        const res = fiatEstimates.convert({ amount, tokenAddress });
-
-        if (res === 'unsupported') {
-          unclaimedFundsIncludeUnknown = true;
-          return sum;
-        }
-
-        if (!res || res === 'pending') {
-          return sum;
-        }
-
-        return sum + res / 100;
-      }, 0);
-    }
   }
 
   async function fetchProject() {
@@ -101,6 +67,9 @@
       owner: undefined,
     };
 
+    // TODO: Validate that project is unclaimed
+
+    // TODO: Parallelize these requests
     await fetchProjectMetadata();
     await fetchUnclaimedFunds();
 
@@ -113,7 +82,6 @@
   }
 
   function clearProject() {
-    $context.gitUrl = '';
     $context.project = undefined;
     $context.projectMetadata = undefined;
 
@@ -132,18 +100,21 @@
     placeholder="Paste GitHub or GitLab project URL"
     disabled={validationState.type !== 'unvalidated'}
     {validationState}
+    showClearButton={validationState.type === 'valid'}
+    on:clear={clearProject}
   />
-  <Button on:click={clearProject}>Clear</Button>
   {#if $context.project && validationState.type === 'valid'}
     <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
-      <ProjectBadge project={$context.project} />
+      <ProjectBadge linkToNewTab project={$context.project} />
       {#if $context.projectMetadata?.description}
         <p class="description typo-text">
           {$context.projectMetadata.description}
         </p>
       {/if}
       {#if $context.unclaimedFunds}
-        ≈{unclaimedFundsFiatEstimate}
+        <div class="unclaimed-funds">
+          <AggregateFiatEstimate amounts={$context.unclaimedFunds} />
+        </div>
       {/if}
     </div>
   {/if}

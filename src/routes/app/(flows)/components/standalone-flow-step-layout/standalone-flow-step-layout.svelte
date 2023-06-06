@@ -1,9 +1,13 @@
 <script lang="ts">
+  export let headline: string | undefined = undefined;
   export let description: string | undefined = undefined;
 </script>
 
 <div class="step-layout">
   <div class="top">
+    {#if headline}
+      <h2 class="pixelated">{headline}</h2>
+    {/if}
     {#if description}
       <div class="header">
         {#if description}
