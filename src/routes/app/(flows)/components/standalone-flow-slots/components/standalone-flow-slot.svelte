@@ -13,8 +13,8 @@
   export let leftComponent: ComponentAndProps | undefined = undefined;
   export let rightComponent: ComponentAndProps | undefined = undefined;
   export let icon: ComponentType | undefined = undefined;
-  export let title: string;
-  export let editStepIndex: number | undefined;
+  export let title: string | undefined = undefined;
+  export let editStepIndex: number | undefined = undefined;
 </script>
 
 <div class="slot">

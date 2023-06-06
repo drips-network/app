@@ -8,6 +8,15 @@ import ProjectSlot from './slots/project-slot.svelte';
 import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import WalletSlot from './slots/wallet-slot.svelte';
+import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
+import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
+
+interface SplitsConfig {
+  selected: string[];
+  items: Items;
+  percentages: Percentages;
+}
 
 export interface State {
   gitUrl: string;
@@ -21,6 +30,9 @@ export interface State {
     | undefined;
   unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined;
   highLevelPercentages: { [key: string]: number };
+  maintainerSplits: SplitsConfig;
+  dependencySplits: SplitsConfig;
+  dependenciesAutoImported: boolean;
 }
 
 export const state = writable<State>({
@@ -29,6 +41,17 @@ export const state = writable<State>({
   projectMetadata: undefined,
   unclaimedFunds: undefined,
   highLevelPercentages: { maintainers: 50, dependencies: 45, drips: 5 },
+  maintainerSplits: {
+    selected: [],
+    items: {},
+    percentages: {},
+  },
+  dependencySplits: {
+    selected: [],
+    items: {},
+    percentages: {},
+  },
+  dependenciesAutoImported: false,
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
@@ -57,6 +80,10 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       return [projectSlot, walletSlot];
     case 3:
       return [projectSlot, walletSlot];
+    case 4:
+      return [projectSlot, walletSlot];
+    case 5:
+      return [projectSlot, walletSlot];
     default:
       return [];
   }
@@ -77,6 +104,14 @@ export const steps = () => [
   }),
   makeStep({
     component: SplitYourFunds,
+    props: undefined,
+  }),
+  makeStep({
+    component: ConfigureMaintainers,
+    props: undefined,
+  }),
+  makeStep({
+    component: ConfigureDependencies,
     props: undefined,
   }),
 ];

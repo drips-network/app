@@ -8,12 +8,13 @@
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { VerificationStatus } from '$lib/utils/metadata/types';
+  import { VerificationStatus, type ClaimedGitProject } from '$lib/utils/metadata/types';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import isValidUrl from '$lib/utils/is-valid-url';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import { fly } from 'svelte/transition';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import projectItem from '$lib/components/list-editor/item-templates/project';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -44,6 +45,37 @@
     ];
   }
 
+  async function prePopulateDependencies() {
+    if (Object.keys($context.dependencySplits.items).length > 0) return;
+
+    // TODO: Really fetch dependencies
+    $context.dependencySplits.items = {
+      foobar: projectItem({
+        claimed: true,
+        repoDriverAccount: {
+          userId: '0',
+          driver: 'repo',
+        },
+        source: {
+          forge: 'github',
+          repoName: 'svelte',
+          ownerName: 'sveltejs',
+          url: 'https://github.com/sveltejs/svelte.git',
+        },
+        owner: {
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+          userId: '1234',
+          driver: 'address',
+        },
+        emoji: '🦸',
+        color: '#ff0008',
+      } as ClaimedGitProject),
+    };
+    $context.dependencySplits.selected = ['foobar'];
+    $context.dependencySplits.percentages = { foobar: 100 };
+    $context.dependenciesAutoImported = true;
+  }
+
   async function fetchProject() {
     // TODO: Really fetch project
 
@@ -72,6 +104,7 @@
     // TODO: Parallelize these requests
     await fetchProjectMetadata();
     await fetchUnclaimedFunds();
+    await prePopulateDependencies();
 
     validationState = { type: 'valid' };
   }

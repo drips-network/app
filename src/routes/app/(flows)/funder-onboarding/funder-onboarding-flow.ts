@@ -3,16 +3,13 @@ import { writable } from 'svelte/store';
 import BuildListStep from './steps/build-list/build-list.svelte';
 import ConfigureSupportStep from './steps/configure-support/configure-support.svelte';
 import ReviewStep from './steps/review/review.svelte';
-import type {
-  Items,
-  Percentages,
-} from './steps/build-list/components/list-editor/list-editor.svelte';
 import type { Slots } from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import ListIcon from 'radicle-design-system/icons/List.svelte';
 import Pile from '$lib/components/pile/pile.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
 
 export interface State {
   dripList: {

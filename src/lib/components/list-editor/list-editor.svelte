@@ -34,7 +34,6 @@
   import isValidUrl from '$lib/utils/is-valid-url';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
-  import Git from 'radicle-design-system/icons/Git.svelte';
   import { fade, scale } from 'svelte/transition';
   import projectItem from './item-templates/project';
   import type { GitProject } from '$lib/utils/metadata/types';
@@ -43,7 +42,10 @@
   import type ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import type IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ethAddressItem from './item-templates/eth-address';
-  import { isAddress } from 'ethers/lib/utils';
+  import { getAddress, isAddress } from 'ethers/lib/utils';
+  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import ensStore from '$lib/stores/ens/ens.store';
+  import assert from '$lib/utils/assert';
 
   // TOOD: Set to 200
   const MAX_ITEMS = 10;
@@ -56,6 +58,7 @@
     Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
   );
 
+  export let allowedItems: 'all' | 'eth-addresses' = 'all';
   export let items: Items;
 
   let listElem: HTMLDivElement;
@@ -67,6 +70,8 @@
   // TODO: Prevent duplicate entries
 
   async function addProject() {
+    if (allowedItems === 'eth-addresses') return;
+
     // TODO: Really fetch project
     addInProgress = true;
 
@@ -103,22 +108,33 @@
     addInProgress = false;
   }
 
-  function addEthAddress() {
-    if (items[inputValue]) return;
+  async function addEthAddress() {
+    addInProgress = true;
 
-    items[inputValue] = ethAddressItem(inputValue);
+    const address = isAddress(inputValue)
+      ? getAddress(inputValue)
+      : await ensStore.reverseLookup(inputValue);
+    assert(address);
 
-    if (selected.length < MAX_ITEMS) selected.push(inputValue);
-    percentages = { ...percentages, [inputValue]: 0 };
+    if (items[address]) {
+      addInProgress = false;
+      return;
+    }
+
+    items[address] = ethAddressItem(address);
+
+    if (selected.length < MAX_ITEMS) selected.push(address);
+    percentages = { ...percentages, [address]: 0 };
 
     inputValue = '';
+    addInProgress = false;
   }
 
-  $: if (isValidUrl(inputValue)) {
+  $: if (isValidUrl(inputValue) && allowedItems === 'all') {
     addProject();
   }
 
-  $: if (isAddress(inputValue)) {
+  $: if (isAddress(inputValue) || inputValue.endsWith('.eth')) {
     addEthAddress();
   }
 
@@ -173,7 +189,7 @@
   {#if !blockInteraction}
     <div class="add-project">
       <div class="icon">
-        <Git style="fill: var(--color-foreground)" />
+        <Plus style="fill: var(--color-foreground)" />
       </div>
       <input
         bind:this={inputElem}
@@ -181,7 +197,9 @@
         disabled={addInProgress}
         class="typo-text"
         type="text"
-        placeholder="Paste GitHub/GitLab URL or Ethereum address"
+        placeholder={allowedItems === 'all'
+          ? 'Paste GitHub/GitLab URL or Ethereum address'
+          : 'Ethereum address or ENS name'}
       />
       {#if addInProgress}
         <Spinner />

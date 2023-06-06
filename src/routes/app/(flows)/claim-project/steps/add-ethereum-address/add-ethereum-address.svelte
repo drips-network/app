@@ -9,16 +9,40 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import VerifiedIcon from 'radicle-design-system/icons/Registered.svelte';
+  import type { Writable } from 'svelte/store';
+  import type { State } from '../../claim-project-flow';
+  import assert from '$lib/utils/assert';
+  import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  const formValid = true;
+  export let context: Writable<State>;
+
+  const formValid = $walletStore.connected;
 
   function verify() {
     dispatch('await', {
       promise: () =>
         new Promise<void>((resolve) => {
           setTimeout(() => {
+            const { address } = $walletStore;
+            assert(address);
+
+            const addressInMaintainers = $context.maintainerSplits.items[address];
+            const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
+
+            if (!addressInMaintainers && maintainersListEmpty) {
+              $context.maintainerSplits.items = {
+                [address]: ethAddressItem(address),
+              };
+
+              $context.maintainerSplits.selected = [address];
+
+              $context.maintainerSplits.percentages = {
+                [address]: 100,
+              };
+            }
+
             resolve();
           }, 1000);
         }),

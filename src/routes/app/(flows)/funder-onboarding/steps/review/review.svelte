@@ -10,7 +10,6 @@
   import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
   import TransactionsIcon from 'radicle-design-system/icons/Transactions.svelte';
   import type { Writable } from 'svelte/store';
-  import ListEditor from '../build-list/components/list-editor/list-editor.svelte';
   import type { State } from '../../funder-onboarding-flow';
   import unreachable from '$lib/utils/unreachable';
   import Token from '$lib/components/token/token.svelte';
@@ -21,6 +20,7 @@
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import assert from '$lib/utils/assert';
   import formatDate from '$lib/utils/format-date';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

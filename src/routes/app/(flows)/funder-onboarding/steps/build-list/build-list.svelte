@@ -4,11 +4,11 @@
   import { createEventDispatcher } from 'svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import ListEditor from './components/list-editor/list-editor.svelte';
   import Check from 'radicle-design-system/icons/Check.svelte';
   import type { Writable } from 'svelte/store';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { State } from '../../funder-onboarding-flow';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
