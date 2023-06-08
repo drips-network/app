@@ -7,7 +7,7 @@ import {
   type NftSubAccount,
   NFTDriverTxFactory,
 } from 'radicle-drips';
-import DripListManager from '../driplist/DripListManager';
+import DripListService from '../driplist/DripListService';
 import type { z } from 'zod';
 import {
   VerificationStatus,
@@ -33,7 +33,7 @@ vi.mock('../metadata/RepoDriverMetadataManager');
 vi.mock('../RepoDriverUtils');
 vi.mock('.../project/GitProjectService');
 
-describe('DripListManager', () => {
+describe('DripListService', () => {
   let subgraphClientMock: any;
   let nftDriverClientMock: any;
   let gitProjectManagerMock: any;
@@ -109,10 +109,10 @@ describe('DripListManager', () => {
       const owner = '0x123';
       subgraphClientMock.getNftSubAccountsByOwner.mockResolvedValue([] as NftSubAccount[]);
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       // Act
-      const dripLists = await dripListManager.getByOwnerAddress(owner);
+      const dripLists = await dripListService.getByOwnerAddress(owner);
 
       // Assert
       expect(dripLists).toEqual([]);
@@ -154,12 +154,12 @@ describe('DripListManager', () => {
         nftSubAccountMetadata[0],
       );
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
-      const originalGetDripListProjects = DripListManager.prototype['_getDripListProjects'];
+      const originalGetDripListProjects = DripListService.prototype['_getDripListProjects'];
 
-      dripListManager['_getDripListProjects'] = vi
-        .fn(DripListManager.prototype['_getDripListProjects'])
+      dripListService['_getDripListProjects'] = vi
+        .fn(DripListService.prototype['_getDripListProjects'])
         .mockResolvedValueOnce([
           {
             weight: nftSubAccountMetadata[0].data.projects[0].weight,
@@ -172,7 +172,7 @@ describe('DripListManager', () => {
         ]);
 
       // Act
-      const dripLists = await dripListManager.getByOwnerAddress(owner);
+      const dripLists = await dripListService.getByOwnerAddress(owner);
 
       // Assert
       expect(dripLists).toHaveLength(1);
@@ -185,9 +185,9 @@ describe('DripListManager', () => {
       );
       expect(nftDriverMetadataManagerMock.fetchAccountMetadata).toHaveBeenCalledTimes(1);
       expect(subgraphClientMock.getNftSubAccountsByOwner).toHaveBeenCalledTimes(1);
-      expect(dripListManager['_getDripListProjects']).toHaveBeenCalledTimes(1);
+      expect(dripListService['_getDripListProjects']).toHaveBeenCalledTimes(1);
 
-      DripListManager.prototype['_getDripListProjects'] = originalGetDripListProjects;
+      DripListService.prototype['_getDripListProjects'] = originalGetDripListProjects;
     });
 
     it('should throw when the user has more than one DripList', async () => {
@@ -241,12 +241,12 @@ describe('DripListManager', () => {
         .mockResolvedValueOnce(nftSubAccountMetadata[0])
         .mockResolvedValueOnce(nftSubAccountMetadata[1]);
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
-      const originalGetDripListProjects = DripListManager.prototype['_getDripListProjects'];
+      const originalGetDripListProjects = DripListService.prototype['_getDripListProjects'];
 
-      dripListManager['_getDripListProjects'] = vi
-        .fn(DripListManager.prototype['_getDripListProjects'])
+      dripListService['_getDripListProjects'] = vi
+        .fn(DripListService.prototype['_getDripListProjects'])
         .mockResolvedValueOnce([
           {
             weight: nftSubAccountMetadata[0].data.projects[0].weight,
@@ -269,9 +269,9 @@ describe('DripListManager', () => {
         ]);
 
       // Act & Assert
-      await expect(dripListManager.getByOwnerAddress(owner)).rejects.toThrow();
+      await expect(dripListService.getByOwnerAddress(owner)).rejects.toThrow();
 
-      DripListManager.prototype['_getDripListProjects'] = originalGetDripListProjects;
+      DripListService.prototype['_getDripListProjects'] = originalGetDripListProjects;
     });
   });
 
@@ -320,10 +320,10 @@ describe('DripListManager', () => {
       } as UnclaimedGitProject;
       gitProjectManagerMock.getByUserId.mockResolvedValueOnce(expectedProject);
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       // Act
-      const result = await dripListManager['_getDripListProjects'](projects);
+      const result = await dripListService['_getDripListProjects'](projects);
 
       // Assert
       expect(result).toHaveLength(1);
@@ -387,10 +387,10 @@ describe('DripListManager', () => {
       } as ClaimedGitProject;
       gitProjectManagerMock.getByUserId.mockResolvedValueOnce(expectedProject);
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       // Act
-      const result = await dripListManager['_getDripListProjects'](projects);
+      const result = await dripListService['_getDripListProjects'](projects);
 
       // Assert
       expect(result).toHaveLength(1);
@@ -411,28 +411,28 @@ describe('DripListManager', () => {
   describe('create', () => {
     it('should throw if the user already has a drip list', async () => {
       // Arrange
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
-      dripListManager.getByOwnerAddress = vi
-        .fn(dripListManager.getByOwnerAddress)
+      dripListService.getByOwnerAddress = vi
+        .fn(dripListService.getByOwnerAddress)
         .mockResolvedValue([{}, {}] as any);
 
       // Act & Assert
-      await expect(dripListManager.create(1, '0x123')).rejects.toThrow();
+      await expect(dripListService.create(1, '0x123')).rejects.toThrow();
     });
 
     it('should return the new DripList token ID', async () => {
       // Arrange
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       nftDriverClientMock.safeCreateAccountWithSalt.mockResolvedValueOnce('1');
 
-      dripListManager.getByOwnerAddress = vi
-        .fn(dripListManager.getByOwnerAddress)
+      dripListService.getByOwnerAddress = vi
+        .fn(dripListService.getByOwnerAddress)
         .mockResolvedValue([] as any);
 
       // Act
-      const result = await dripListManager.create(1, '0x123');
+      const result = await dripListService.create(1, '0x123');
 
       // Assert
       expect(result).toBe('1');
@@ -462,10 +462,10 @@ describe('DripListManager', () => {
 
       addressDriverClientMock.setDrips = vi.fn();
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       // Act
-      await dripListManager.setStream(dripListId, tokenAddress, config, balanceDelta);
+      await dripListService.setStream(dripListId, tokenAddress, config, balanceDelta);
 
       // Assert
       expect(addressDriverClientMock.setDrips).toHaveBeenCalledWith(
@@ -488,10 +488,10 @@ describe('DripListManager', () => {
       // Arrange
       nftDriverMetadataManagerMock.fetchAccount.mockResolvedValueOnce(null);
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       // Act & Assert
-      await expect(dripListManager.buildSetSplitsBatchTx('1', [])).rejects.toThrow();
+      await expect(dripListService.buildSetSplitsBatchTx('1', [])).rejects.toThrow();
     });
 
     it('should return the expected preset', async () => {
@@ -519,10 +519,10 @@ describe('DripListManager', () => {
       const emitMetadataTx = {} as unknown as PopulatedTransaction;
       nftDriverTxFactoryMock.emitUserMetadata.mockResolvedValueOnce(emitMetadataTx);
 
-      const dripListManager = await DripListManager.new();
+      const dripListService = await DripListService.new();
 
       // Act
-      const result = await dripListManager.buildSetSplitsBatchTx(dripListId, projects);
+      const result = await dripListService.buildSetSplitsBatchTx(dripListId, projects);
 
       // Assert
       expect(result).toEqual([setSplitsTx, emitMetadataTx]);

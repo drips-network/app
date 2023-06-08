@@ -32,7 +32,7 @@ import GitProjectService from '../project/GitProjectService';
  *
  * **Important**: This class assumes that *all* clients and factories are connected to the *same* signer.
  */
-export default class DripListManager {
+export default class DripListService {
   private _nftDriverClient!: NFTDriverClient;
   private _gitProjectService!: GitProjectService;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
@@ -45,18 +45,18 @@ export default class DripListManager {
   private constructor() {}
 
   /**
-   * Creates a new `DripListManager` instance.
-   * @returns A new `DripListManager` instance.
+   * Creates a new `DripListService` instance.
+   * @returns A new `DripListService` instance.
    */
-  public static async new(): Promise<DripListManager> {
-    const dripListManager = new DripListManager();
+  public static async new(): Promise<DripListService> {
+    const dripListService = new DripListService();
 
-    dripListManager._nftDriverClient = await getNFTDriverClient();
-    dripListManager._gitProjectService = await GitProjectService.new();
-    dripListManager._nftDriverTxFactory = await getNFTDriverTxFactory();
-    dripListManager._addressDriverClient = await getAddressDriverClient();
+    dripListService._nftDriverClient = await getNFTDriverClient();
+    dripListService._gitProjectService = await GitProjectService.new();
+    dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
+    dripListService._addressDriverClient = await getAddressDriverClient();
 
-    return dripListManager;
+    return dripListService;
   }
 
   /**
