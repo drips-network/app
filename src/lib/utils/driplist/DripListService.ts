@@ -10,7 +10,6 @@ import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import type { z } from 'zod';
 import type { repoDriverSplitReceiverSchema } from '../metadata/schemas';
 import type { GitProject } from '../metadata/types';
-import type { Address } from '../metadata/types';
 import {
   NFTDriverTxFactory,
   type AddressDriverClient,
@@ -26,6 +25,7 @@ import type { DripsReceiverConfig } from 'radicle-drips';
 import type { BigNumberish, ContractTransaction } from 'ethers';
 import assert from '$lib/utils/assert';
 import GitProjectService from '../project/GitProjectService';
+import type { Address } from '../common-types';
 
 /**
  * A class for managing `DripList`s.
