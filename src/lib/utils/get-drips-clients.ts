@@ -27,15 +27,15 @@ export function getSubgraphClient() {
 }
 
 /**
- * Get an initialized Git Driver client.
- * @returns An initialized Git Driver client.
+ * Get an initialized Repo Driver client.
+ * @returns An initialized Repo Driver client.
  */
-export function getRepoDriverClient() {
-  const { provider, signer } = get(wallet);
+export function getRepoDriverClient(withSigner = get(wallet).signer) {
+  const { provider } = get(wallet);
 
   const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
 
-  return RepoDriverClient.create(provider, signer, repoDriverAddress);
+  return RepoDriverClient.create(provider, withSigner, repoDriverAddress);
 }
 
 /**
@@ -120,7 +120,7 @@ export function getCallerClient() {
 export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
   ? {
       5: {
-        CHAIN: 'goerli',
+        CHAIN: 'sepolia',
         DEPLOYMENT_TIME: 'foobar',
         COMMIT_HASH: '3809b5fa68c81af3fe0ac9200f8c806d7aa78c88',
         WALLET: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
@@ -146,10 +146,13 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
         IMMUTABLE_SPLITS_DRIVER: '0x34466661145b6D19f32Ae0f4b2BFD3874573bdf0',
         IMMUTABLE_SPLITS_DRIVER_ID: '2',
         IMMUTABLE_SPLITS_DRIVER_LOGIC: '0x427f7c59ED72bCf26DfFc634FEF3034e00922DD8',
-        REPO_DRIVER: '',
-        REPO_DRIVER_ID: '',
-        REPO_DRIVER_LOGIC: '',
-        REPO_DRIVER_ADMIN: '',
+        REPO_DRIVER: ' ',
+        REPO_DRIVER_LOGIC: ' ',
+        REPO_DRIVER_ADMIN: ' ',
+        REPO_DRIVER_ID: ' ',
+        REPO_DRIVER_ANYAPI_OPERATOR: ' ',
+        REPO_DRIVER_ANYAPI_JOB_ID: ' ',
+        REPO_DRIVER_ANYAPI_DEFAULT_FEE: ' ',
       },
     }
   : {

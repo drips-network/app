@@ -151,7 +151,7 @@ const walletStore = () => {
       const clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
-        description: 'Please switch your connected wallet to Ethereum Mainnet or Goerli.',
+        description: 'Please switch your connected wallet to Ethereum Mainnet or Sepolia.',
         emoji: '🔌',
       });
 
