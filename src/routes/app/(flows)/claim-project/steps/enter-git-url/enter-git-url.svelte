@@ -15,6 +15,12 @@
   import { fly } from 'svelte/transition';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import projectItem from '$lib/components/list-editor/item-templates/project';
+  import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
+  import Token from '$lib/components/token/token.svelte';
+  import TokenAmountsTable from '$lib/components/token-amounts-table/token-amounts-table.svelte';
+  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -25,7 +31,7 @@
   async function fetchProjectMetadata() {
     // TODO: Really fetch project metadata from github / gitlab
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     $context.projectMetadata = {
       description: 'A Svelte store that persists to localStorage',
@@ -42,6 +48,15 @@
         tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
         amount: 100000000000000000000n,
       },
+      {
+        tokenAddress: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+        amount: 100000000000000000000n,
+      },
+      // UNCOMMENT THIS FOR AN UNKNOWN TOKEN AMOUNT
+      // {
+      //   tokenAddress: '0x0000000000000000000000000000000000000000',
+      //   amount: 100000000000000000000n,
+      // }
     ];
   }
 
@@ -81,7 +96,7 @@
 
     validationState = { type: 'pending' };
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     $context.project = {
       claimed: false,
@@ -122,6 +137,16 @@
   }
 
   $: formValid = validationState.type === 'valid';
+
+  $: unclaimedTokenPile = $context.unclaimedFunds?.map((fund) => ({
+    component: Token,
+    props: {
+      address: fund.tokenAddress,
+      show: 'none',
+    },
+  }));
+
+  let unclaimedTokensExpanded = false;
 </script>
 
 <StandaloneFlowStepLayout
@@ -138,15 +163,38 @@
   />
   {#if $context.project && validationState.type === 'valid'}
     <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
-      <ProjectBadge linkToNewTab project={$context.project} />
-      {#if $context.projectMetadata?.description}
-        <p class="description typo-text">
-          {$context.projectMetadata.description}
-        </p>
-      {/if}
+      <div class="basic-info">
+        <ProjectBadge linkToNewTab project={$context.project} />
+        {#if $context.projectMetadata?.description}
+          <p class="description typo-text">
+            {$context.projectMetadata.description}
+          </p>
+        {/if}
+      </div>
       {#if $context.unclaimedFunds}
         <div class="unclaimed-funds">
-          <AggregateFiatEstimate amounts={$context.unclaimedFunds} />
+          <div class="row">
+            {#if unclaimedTokenPile}
+              <KeyValuePair key="Claimable tokens">
+                <Pile maxItems={4} components={unclaimedTokenPile} />
+                <button
+                  class="expand-chevron"
+                  on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                  style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
+                >
+                  <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+                </button>
+              </KeyValuePair>
+            {/if}
+            <KeyValuePair highlight key="Total est. claimable funds">
+              <span style="color: var(--color-primary)"
+                ><AggregateFiatEstimate amounts={$context.unclaimedFunds} /></span
+              >
+            </KeyValuePair>
+          </div>
+          <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
+            <TokenAmountsTable amounts={$context.unclaimedFunds} />
+          </Toggleable>
         </div>
       {/if}
     </div>
@@ -165,9 +213,34 @@
   .project-info {
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     box-shadow: var(--elevation-low);
-    padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .basic-info {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+  }
+
+  .unclaimed-funds {
+    padding-bottom: 1rem;
+  }
+
+  .unclaimed-funds .row {
+    padding: 0 1rem;
+    display: flex;
+    gap: 3rem;
+  }
+
+  .expand-chevron {
+    transition: transform 0.2s, background-color 0.3s;
+    border-radius: 50%;
+  }
+
+  .expand-chevron:focus-visible {
+    background-color: var(--color-primary-level-1);
   }
 </style>

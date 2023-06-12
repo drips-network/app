@@ -64,5 +64,6 @@
   .content {
     display: inline-block;
     white-space: nowrap;
+    font-weight: bold;
   }
 </style>

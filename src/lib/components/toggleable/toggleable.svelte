@@ -6,8 +6,9 @@
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
 
   export let toggled = false;
-  export let label: string;
+  export let label: string | undefined = undefined;
   export let removeFromTabIndexIfRetracted = true;
+  export let showToggle = true;
 
   let contentElem: HTMLDivElement;
   let contentHeight = tweened(0);
@@ -55,9 +56,11 @@
 </script>
 
 <div class="toggleable">
-  <div class="toggle" class:toggled>
-    <Toggle bind:checked={toggled} {label} />
-  </div>
+  {#if showToggle}
+    <div class="toggle" class:toggled>
+      <Toggle bind:checked={toggled} {label} />
+    </div>
+  {/if}
   <div style:height={`${$contentHeight}px`} class="content">
     <div class="content-inner" bind:this={contentElem}>
       <slot />

@@ -20,6 +20,7 @@
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import trackRelevantTokens from '$lib/utils/fiat-estimates/track-relevant-tokens';
+  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
 
   let walletConnected = false;
   let loaded = false;
@@ -153,6 +154,8 @@
     {/if}
   </div>
 </div>
+
+<ModalLayout />
 
 {#if loaded}
   <div in:fade={{ duration: 300, delay: 300 }}>
