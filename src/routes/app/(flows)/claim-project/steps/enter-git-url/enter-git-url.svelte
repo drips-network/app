@@ -46,7 +46,7 @@
     $context.unclaimedFunds = [
       {
         tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-        amount: 100000000000000000000n,
+        amount: 1500000000000000000n,
       },
       {
         tokenAddress: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',

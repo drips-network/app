@@ -4,7 +4,7 @@
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
 
   $: formattedFiatEstimate =
-    typeof fiatEstimateCents === 'number' ? (fiatEstimateCents / 100).toFixed(2) : undefined;
+    typeof fiatEstimateCents === 'number' ? fiatEstimateCents.toFixed(2) : undefined;
 </script>
 
 <div class="wrapper">
