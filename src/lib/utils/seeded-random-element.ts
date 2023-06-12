@@ -5,7 +5,7 @@
  * @param seed The seed to use to generate the random index.
  * @returns The randomly-selected element.
  */
-export default function (array: unknown[], seed: string) {
+export default function <T>(array: T[], seed: string) {
   const charCodes = seed.split('').reduce<number>((a, b, i) => {
     return (i == 1 ? String(a).charCodeAt(0) : +a) + b.charCodeAt(0);
   }, 0);

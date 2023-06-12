@@ -9,18 +9,10 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { VerificationStatus, type ClaimedGitProject } from '$lib/utils/metadata/types';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import isValidUrl from '$lib/utils/is-valid-url';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import { fly } from 'svelte/transition';
-  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import projectItem from '$lib/components/list-editor/item-templates/project';
-  import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
-  import Pile from '$lib/components/pile/pile.svelte';
-  import Token from '$lib/components/token/token.svelte';
-  import TokenAmountsTable from '$lib/components/token-amounts-table/token-amounts-table.svelte';
-  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
-  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -137,16 +129,6 @@
   }
 
   $: formValid = validationState.type === 'valid';
-
-  $: unclaimedTokenPile = $context.unclaimedFunds?.map((fund) => ({
-    component: Token,
-    props: {
-      address: fund.tokenAddress,
-      show: 'none',
-    },
-  }));
-
-  let unclaimedTokensExpanded = false;
 </script>
 
 <StandaloneFlowStepLayout
@@ -162,42 +144,11 @@
     on:clear={clearProject}
   />
   {#if $context.project && validationState.type === 'valid'}
-    <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
-      <div class="basic-info">
-        <ProjectBadge linkToNewTab project={$context.project} />
-        {#if $context.projectMetadata?.description}
-          <p class="description typo-text">
-            {$context.projectMetadata.description}
-          </p>
-        {/if}
-      </div>
-      {#if $context.unclaimedFunds}
-        <div class="unclaimed-funds">
-          <div class="row">
-            {#if unclaimedTokenPile}
-              <KeyValuePair key="Claimable tokens">
-                <Pile maxItems={4} components={unclaimedTokenPile} />
-                <button
-                  class="expand-chevron"
-                  on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
-                  style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
-                >
-                  <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
-                </button>
-              </KeyValuePair>
-            {/if}
-            <KeyValuePair highlight key="Total est. claimable funds">
-              <span style="color: var(--color-primary)"
-                ><AggregateFiatEstimate amounts={$context.unclaimedFunds} /></span
-              >
-            </KeyValuePair>
-          </div>
-          <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
-            <TokenAmountsTable amounts={$context.unclaimedFunds} />
-          </Toggleable>
-        </div>
-      {/if}
-    </div>
+    <UnclaimedProjectCard
+      project={$context.project}
+      projectMetadata={$context.projectMetadata}
+      unclaimedFunds={$context.unclaimedFunds}
+    />
   {/if}
   <svelte:fragment slot="actions">
     <Button
@@ -208,39 +159,3 @@
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-  .project-info {
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    box-shadow: var(--elevation-low);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .basic-info {
-    padding: 1rem;
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-  }
-
-  .unclaimed-funds {
-    padding-bottom: 1rem;
-  }
-
-  .unclaimed-funds .row {
-    padding: 0 1rem;
-    display: flex;
-    gap: 3rem;
-  }
-
-  .expand-chevron {
-    transition: transform 0.2s, background-color 0.3s;
-    border-radius: 50%;
-  }
-
-  .expand-chevron:focus-visible {
-    background-color: var(--color-primary-level-1);
-  }
-</style>

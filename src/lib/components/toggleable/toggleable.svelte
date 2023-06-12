@@ -62,7 +62,7 @@
     </div>
   {/if}
   <div style:height={`${$contentHeight}px`} class="content">
-    <div class="content-inner" bind:this={contentElem}>
+    <div class="content-inner" style:padding-top={showToggle ? '1rem' : ''} bind:this={contentElem}>
       <slot />
     </div>
   </div>
@@ -71,10 +71,6 @@
 <style>
   .content {
     overflow: hidden;
-  }
-
-  .content-inner {
-    padding-top: 1rem;
   }
 
   .toggle {
