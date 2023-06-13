@@ -11,6 +11,7 @@ import WalletSlot from './slots/wallet-slot.svelte';
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
+import Review from './steps/review/review.svelte';
 
 interface SplitsConfig {
   selected: string[];
@@ -40,7 +41,7 @@ export const state = writable<State>({
   project: undefined,
   projectMetadata: undefined,
   unclaimedFunds: undefined,
-  highLevelPercentages: { maintainers: 50, dependencies: 45, drips: 5 },
+  highLevelPercentages: { maintainers: 60, dependencies: 40 },
   maintainerSplits: {
     selected: [],
     items: {},
@@ -112,6 +113,10 @@ export const steps = () => [
   }),
   makeStep({
     component: ConfigureDependencies,
+    props: undefined,
+  }),
+  makeStep({
+    component: Review,
     props: undefined,
   }),
 ];

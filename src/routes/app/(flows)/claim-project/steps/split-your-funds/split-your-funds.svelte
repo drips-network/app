@@ -7,11 +7,10 @@
   import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import User from 'radicle-design-system/icons/User.svelte';
-  import Splits from '$lib/components/splits/splits.svelte';
-  import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import type { State } from '../../claim-project-flow';
   import type { Writable } from 'svelte/store';
+  import Splits from 'radicle-design-system/icons/Splits.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,11 +34,6 @@
         id: 'dependencies',
         label: 'Dependencies',
         overflowIcon: Splits,
-      },
-      {
-        id: 'drips',
-        label: 'Drips',
-        overflowIcon: DripsLogo,
       },
     ]}
     bind:percentages={$context.highLevelPercentages}

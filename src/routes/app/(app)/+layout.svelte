@@ -1,6 +1,5 @@
 <script lang="ts">
   import wallet from '$lib/stores/wallet/wallet.store';
-  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
   import Header from '$lib/components/header/header.svelte';
@@ -17,7 +16,6 @@
 </script>
 
 <div class="main" in:fly={{ duration: 300, y: 16 }}>
-  <ModalLayout />
   <div class="page" class:loading={$navigating}>
     <PageTransition pathname={data.pathname}>
       <slot />

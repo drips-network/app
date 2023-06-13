@@ -9,12 +9,10 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { VerificationStatus, type ClaimedGitProject } from '$lib/utils/metadata/types';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import isValidUrl from '$lib/utils/is-valid-url';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import { fly } from 'svelte/transition';
-  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import projectItem from '$lib/components/list-editor/item-templates/project';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -25,7 +23,7 @@
   async function fetchProjectMetadata() {
     // TODO: Really fetch project metadata from github / gitlab
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     $context.projectMetadata = {
       description: 'A Svelte store that persists to localStorage',
@@ -40,8 +38,17 @@
     $context.unclaimedFunds = [
       {
         tokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+        amount: 1500000000000000000n,
+      },
+      {
+        tokenAddress: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
         amount: 100000000000000000000n,
       },
+      // UNCOMMENT THIS FOR AN UNKNOWN TOKEN AMOUNT
+      // {
+      //   tokenAddress: '0x0000000000000000000000000000000000000000',
+      //   amount: 100000000000000000000n,
+      // }
     ];
   }
 
@@ -81,7 +88,7 @@
 
     validationState = { type: 'pending' };
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     $context.project = {
       claimed: false,
@@ -137,19 +144,11 @@
     on:clear={clearProject}
   />
   {#if $context.project && validationState.type === 'valid'}
-    <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
-      <ProjectBadge linkToNewTab project={$context.project} />
-      {#if $context.projectMetadata?.description}
-        <p class="description typo-text">
-          {$context.projectMetadata.description}
-        </p>
-      {/if}
-      {#if $context.unclaimedFunds}
-        <div class="unclaimed-funds">
-          <AggregateFiatEstimate amounts={$context.unclaimedFunds} />
-        </div>
-      {/if}
-    </div>
+    <UnclaimedProjectCard
+      project={$context.project}
+      projectMetadata={$context.projectMetadata}
+      unclaimedFunds={$context.unclaimedFunds}
+    />
   {/if}
   <svelte:fragment slot="actions">
     <Button
@@ -160,14 +159,3 @@
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-  .project-info {
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    box-shadow: var(--elevation-low);
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-</style>
