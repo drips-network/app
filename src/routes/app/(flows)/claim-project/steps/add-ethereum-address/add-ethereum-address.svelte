@@ -13,12 +13,11 @@
   import type { State } from '../../claim-project-flow';
   import assert from '$lib/utils/assert';
   import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
+  import Checkbox from '$lib/components/checkbox/checkbox.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-
-  const formValid = $walletStore.connected;
 
   function verify() {
     dispatch('await', {
@@ -51,6 +50,9 @@
         'We’re scanning your git project’s main branch for a drips.json file with your Ethereum address',
     });
   }
+
+  let checked = false;
+  $: formValid = $walletStore.connected && checked;
 </script>
 
 <StandaloneFlowStepLayout
@@ -58,6 +60,7 @@
   description="To verify you are the owner of this project, please add a funding.json file with your Ethereum address to the root of your code repo. "
 >
   <CodeBox path="./funding.json" code={dripsJsonTemplate($walletStore.address ?? unreachable())} />
+  <Checkbox bind:checked label="I added the funding.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>
