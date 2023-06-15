@@ -19,11 +19,23 @@
   let selectorOffset: number | undefined = undefined;
   let selectorWidth: number | undefined = undefined;
 
+  let resizeObserver: ResizeObserver = new ResizeObserver(() => {
+    selectorWidth = activeElem.offsetWidth + 20;
+  });
+
+  function updateResizeObserver(elem: HTMLElement | undefined) {
+    if (!elem) return;
+
+    resizeObserver.disconnect();
+    resizeObserver.observe(elem);
+  }
+
+  $: updateResizeObserver(activeElem);
+
   function updateSelectorPos() {
     if (!activeElem) return;
 
-    selectorOffset = activeElem.offsetLeft - 16;
-    selectorWidth = activeElem.offsetWidth + 32;
+    selectorOffset = activeElem.offsetLeft - 10;
   }
 </script>
 
@@ -44,7 +56,9 @@
             ? 'fill: var(--color-primary-level-6)'
             : 'fill: var(--color-foreground)'}; transition: fill 0.3s;"
         />
-        {item.label}
+        <span>
+          {item.label}
+        </span>
       </a>
     {/each}
     <div class="selector">
@@ -67,7 +81,6 @@
     right: 0;
     height: 5rem;
     align-items: center;
-    padding: var(--spacing-m);
     background-color: var(--color-background);
     border-top: 1px solid var(--color-foreground);
     z-index: 100;
@@ -76,17 +89,17 @@
 
   .items {
     display: flex;
-    gap: 1rem;
     align-items: center;
     height: 100%;
     width: 100%;
     justify-content: space-between;
+    max-width: 512px;
     margin: 0 auto;
-    max-width: 18rem;
     position: relative;
   }
 
   .item {
+    white-space: nowrap;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -94,7 +107,7 @@
     gap: 0.5rem;
     z-index: 100;
     transition: color 0.3s;
-    min-width: 7rem;
+    font-size: 0.75rem;
   }
 
   .item.active {
@@ -104,9 +117,10 @@
   .selector {
     background-color: var(--color-primary-level-1);
     position: absolute;
+    left: 0;
     height: calc(100% - 0.5rem);
     margin: 0.25rem 0;
     border-radius: 1rem 0 1rem 1rem;
-    transition: width 0.3s, left 0.3s;
+    transition: left 0.3s, width 0.3s;
   }
 </style>

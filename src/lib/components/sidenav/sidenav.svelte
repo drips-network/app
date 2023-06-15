@@ -95,6 +95,7 @@
   }
 
   .tooltip {
+    white-space: nowrap;
     position: absolute;
     top: 0.5rem;
     bottom: 0.5rem;

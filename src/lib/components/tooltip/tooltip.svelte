@@ -92,14 +92,16 @@
   }
 
   onMount(() => {
-    window.addEventListener('scroll', () => expanded && updatePos());
-    window.addEventListener('resize', () => expanded && updatePos());
+    const updatePosIfExpanded = () => expanded && updatePos();
+
+    window.addEventListener('scroll', updatePosIfExpanded);
+    window.addEventListener('resize', updatePosIfExpanded);
 
     setContentFocussable(false);
 
     return () => {
-      window.removeEventListener('resize', () => expanded && updatePos());
-      window.removeEventListener('scroll', () => expanded && updatePos());
+      window.removeEventListener('scroll', updatePosIfExpanded);
+      window.removeEventListener('resize', updatePosIfExpanded);
     };
   });
 </script>

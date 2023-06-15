@@ -39,10 +39,10 @@ describe('top up, create stream, view profile, search', async () => {
   });
 
   describe('global nav', () => {
-    it('opens up to crowdfunding tab', async () => {
+    it('opens up to dashboard tab', async () => {
       await page.goto('http://127.0.0.1:3000/app');
 
-      await expect(page.locator('text=crowdfunding page goes here')).toHaveCount(1);
+      await expect(page.locator('text=dashboard page goes here')).toHaveCount(1);
     });
 
     it('switches to the streams tab', async () => {

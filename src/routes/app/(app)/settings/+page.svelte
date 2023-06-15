@@ -11,16 +11,11 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
 
-  // Theme control
-  let selectedTheme = $themeStore.selectedTheme;
-  $: themeStore.selectTheme(selectedTheme);
   const { primaryColor } = themeStore;
-  let selectedPrimaryColor = $primaryColor;
-  $: themeStore.selectPrimaryColor(selectedPrimaryColor);
 
   // Tick control
   const { slowMode } = tickStore;
-  let slowModeEnabled = $slowMode;
+  $: slowModeEnabled = $slowMode;
   $: tickStore.setSlowMode(slowModeEnabled);
 </script>
 
@@ -39,9 +34,9 @@
     <h4 class="typo-all-caps">Display</h4>
     <Setting title="Theme" subtitle="Adjust the appearance of UI elements across the app.">
       <SegmentedControl
-        active={selectedTheme}
+        active={$themeStore.selectedTheme}
         on:select={(value) => {
-          selectedTheme = value.detail;
+          themeStore.selectTheme(value.detail);
         }}
         options={[
           {
@@ -68,9 +63,9 @@
       subtitle="Adjust the primary color of UI elements within the app."
     >
       <SegmentedControl
-        active={selectedPrimaryColor}
+        active={$primaryColor}
         on:select={(value) => {
-          selectedPrimaryColor = value.detail;
+          themeStore.selectPrimaryColor(value.detail);
         }}
         options={[
           {
