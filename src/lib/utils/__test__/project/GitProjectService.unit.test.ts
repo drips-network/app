@@ -8,7 +8,7 @@ import {
 } from '$lib/utils/metadata/types';
 import type { GitProject } from '$lib/utils/metadata/types';
 import GitProjectService from '$lib/utils/project/GitProjectService';
-import { constants, Wallet, type ContractTransaction } from 'ethers';
+import { Wallet, type ContractTransaction } from 'ethers';
 import { AddressDriverClient, Forge, RepoDriverClient, type RepoAccount } from 'radicle-drips';
 import type { z } from 'zod';
 
@@ -81,49 +81,30 @@ describe('GitProjectService', () => {
     });
   });
 
-  describe('getByForgeAndRepoName', () => {
+  describe('getByUrl', () => {
     it('should return the expected project', async () => {
       // Arrange
-      repoDriverClientMock.getUserId.mockResolvedValueOnce('userId');
+      const userId = 'userId';
+      repoDriverClientMock.getUserId.mockResolvedValueOnce(userId);
 
-      const originalGetDripListProjects = sut['_getProject'];
+      const originalGetDripListProjects = sut['getByUserId'];
 
       const expectedProject = {} as unknown as GitProject;
 
-      sut['_getProject'] = vi.fn(sut['_getProject']).mockResolvedValueOnce(expectedProject);
+      sut['getByUserId'] = vi.fn(sut['getByUserId']).mockResolvedValueOnce(expectedProject);
 
       // Act
-      const actualProject = await sut.getByForgeAndRepoName(Forge.GitHub, 'repo-name');
+      const actualProject = await sut.getByUrl('https://github.com/jtourkos/git-dep-ur');
 
       // Assert
       expect(actualProject).toBe(expectedProject);
-      expect(sut['_getProject']).toHaveBeenCalledWith('userId');
+      expect(sut['getByUserId']).toHaveBeenCalledWith(userId);
 
-      sut['_getProject'] = originalGetDripListProjects;
+      sut['getByUserId'] = originalGetDripListProjects;
     });
   });
 
   describe('getByUserId', () => {
-    it('should return the expected project', async () => {
-      // Arrange
-      const originalGetDripListProjects = sut['_getProject'];
-
-      const expectedProject = {} as unknown as GitProject;
-
-      sut['_getProject'] = vi.fn(sut['_getProject']).mockResolvedValueOnce(expectedProject);
-
-      // Act
-      const actualProject = await sut.getByUserId('userId');
-
-      // Assert
-      expect(actualProject).toBe(expectedProject);
-      expect(sut['_getProject']).toHaveBeenCalledWith('userId');
-
-      sut['_getProject'] = originalGetDripListProjects;
-    });
-  });
-
-  describe('_getProject', () => {
     it('should return null if the repo account is not found', async () => {
       // Arrange
       subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
@@ -131,31 +112,22 @@ describe('GitProjectService', () => {
         .mockResolvedValueOnce(null);
 
       // Act
-      const actualProject = await sut['_getProject']('userId');
+      const actualProject = await sut['getByUserId']('userId');
 
       // Assert
       expect(actualProject).toBeNull();
     });
 
-    it('should throw if the projectMetadata are not found', async () => {
-      // Arrange
-      subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
-        .fn(subgraphClientMock.repoDriverQueries.getRepoAccountById)
-        .mockResolvedValueOnce({} as unknown as RepoAccount);
-
-      repoDriverMetadataManagerMock.fetchAccountMetadata.mockResolvedValueOnce(null);
-
-      // Act & Assert
-      await expect(sut['_getProject']('userId')).rejects.toThrow();
-      expect(repoDriverMetadataManagerMock.fetchAccountMetadata).toHaveBeenCalledWith('userId');
-      expect(repoDriverMetadataManagerMock.fetchAccountMetadata).toHaveBeenCalledTimes(1);
-    });
-
     it('should return the expected unclaimed project', async () => {
       // Arrange
-      const repoAccount = {
-        status: 'not-started',
-      } as unknown as RepoAccount;
+      const repoAccount: RepoAccount = {
+        status: null,
+        forge: BigInt(0),
+        name: 'jtourkos/git-dep-url',
+        ownerAddress: null,
+        userId: 'userId',
+        lastUpdatedBlockTimestamp: BigInt(Date.now()),
+      };
 
       subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
         .fn(subgraphClientMock.repoDriverQueries.getRepoAccountById)
@@ -172,14 +144,16 @@ describe('GitProjectService', () => {
         data: projectMetadata,
       });
 
-      repoDriverClientMock.getOwner.mockResolvedValueOnce(constants.AddressZero);
+      repoDriverClientMock.getOwner.mockResolvedValueOnce(null);
 
       // Act
-      const actualProject = (await sut['_getProject']('userId')) as UnclaimedGitProject;
+      const actualProject = (await sut['getByUserId']('userId')) as UnclaimedGitProject;
 
       // Assert
       expect(actualProject.claimed).toBe(false);
-      expect(actualProject.source).toBe(projectMetadata.source);
+      expect(actualProject.source.url).toBe(
+        GitProjectService.populateSource(Number(repoAccount.forge), 'git-dep-url', 'jtourkos').url,
+      );
       expect(actualProject.owner).toBeUndefined();
       expect(actualProject.verificationStatus).toBe(VerificationStatus.NOT_STARTED);
       expect(actualProject.repoDriverAccount.driver).toBe('repo');
@@ -190,10 +164,14 @@ describe('GitProjectService', () => {
       // Arrange
       const ownerAddress = Wallet.createRandom().address;
 
-      const repoAccount = {
+      const repoAccount: RepoAccount = {
+        status: 'CLAIMED',
+        forge: BigInt(0),
+        name: 'jtourkos/git-dep-url',
         ownerAddress,
-        status: 'claimed',
-      } as unknown as RepoAccount;
+        userId: 'userId',
+        lastUpdatedBlockTimestamp: BigInt(Date.now()),
+      };
 
       subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
         .fn(subgraphClientMock.repoDriverQueries.getRepoAccountById)
@@ -215,7 +193,7 @@ describe('GitProjectService', () => {
       addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce('userId');
 
       // Act
-      const actualProject = (await sut['_getProject']('userId')) as ClaimedGitProject;
+      const actualProject = (await sut['getByUserId']('userId')) as ClaimedGitProject;
 
       // Assert
       expect(actualProject.claimed).toBe(true);
@@ -232,7 +210,7 @@ describe('GitProjectService', () => {
     it('should throw if the project is claimed but the repo account is not', () => {
       // Arrange
       const repoAccount = {
-        status: 'not-started',
+        status: 'NOT_STARTED',
       } as unknown as RepoAccount;
 
       const isClaimed = true;
@@ -246,7 +224,7 @@ describe('GitProjectService', () => {
     it('should throw if the project is not claimed but the repo account is', () => {
       // Arrange
       const repoAccount = {
-        status: 'claimed',
+        status: 'CLAIMED',
       } as unknown as RepoAccount;
 
       const isClaimed = false;

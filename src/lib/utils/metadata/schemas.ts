@@ -134,4 +134,5 @@ export const nftDriverAccountMetadataSchema = z.object({
   }),
   isDripList: z.literal(true),
   projects: z.array(repoDriverSplitReceiverSchema),
+  name: z.string().optional(),
 });

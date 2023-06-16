@@ -4,13 +4,12 @@
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
   import TransactionsIcon from 'radicle-design-system/icons/Transactions.svelte';
   import type { Writable } from 'svelte/store';
-  import type { State } from '../../funder-onboarding-flow';
   import unreachable from '$lib/utils/unreachable';
   import Token from '$lib/components/token/token.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
@@ -20,7 +19,15 @@
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import assert from '$lib/utils/assert';
   import formatDate from '$lib/utils/format-date';
+  import DripListService from '$lib/utils/driplist/DripListService';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import type { State } from '../../funder-onboarding-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import { goto } from '$app/navigation';
+  import expect from '$lib/utils/expect';
+  import type { DripsSubgraphClient } from 'radicle-drips';
+  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
+  import streamsStore from '$lib/stores/streams/streams.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -41,6 +48,50 @@
     const timestamp = new Date(Date.now() + Number(durationSeconds) * 1000);
 
     lastsUntil = topUpAmountValueParsed > 0 ? `≈ ${formatDate(timestamp, 'onlyDay')}` : undefined;
+  }
+
+  let dripListService: DripListService;
+  let subgraphClient: DripsSubgraphClient;
+
+  onMount(async () => {
+    dripListService = await DripListService.new();
+    subgraphClient = await getSubgraphClient();
+  });
+
+  async function createDripList() {
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const transactContext = await dripListService.buildTransactContext($context);
+
+          return transactContext;
+        },
+        transactions: ({ callerClient, approvalFlowTxs, normalFlowTxs, needsApproval }) => {
+          if (needsApproval) {
+            return approvalFlowTxs;
+          } else {
+            return {
+              transaction: () =>
+                callerClient.callBatched(normalFlowTxs.txs, {
+                  gasLimit: normalFlowTxs.gasLimitWithBuffer,
+                }),
+            };
+          }
+        },
+        after: async (_, { callerClient, dripListId }) => {
+          await expect(
+            async () =>
+              subgraphClient.getNftSubAccountsByOwner(await callerClient.signer.getAddress()),
+            (subAccounts) => subAccounts.filter((s) => s.tokenId === dripListId).length === 1,
+            10000,
+            1000,
+          );
+          await streamsStore.refreshUserAccount();
+          goto(`${await callerClient.signer.getAddress()}/tokens/${token.info.address}`);
+        },
+      }),
+    );
   }
 </script>
 
@@ -120,10 +171,13 @@
       <ul>
         <UlIconLi icon={TransactionsIcon}
           ><span class="typo-text-bold"
-            >6,000 DAI will be transferred from your wallet into your Drips account</span
+            >{$context.supportConfig.topUpAmountValue}
+            {token.info.symbol} will be transferred from your wallet into your Drips account</span
           >
           and immediately begin streaming to your Drip List recipients at a rate of
-          <span class="typo-text-bold">1,000 DAI per month</span>.</UlIconLi
+          <span class="typo-text-bold"
+            >{$context.supportConfig.streamRateValue} {token.info.symbol} per month</span
+          >.</UlIconLi
         >
         <UlIconLi icon={ListIcon}
           >Your new Drip List will appear on your <span class="typo-text-bold">public profile</span
@@ -151,9 +205,7 @@
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={() => dispatch('goForward')}
-      >Confirm in wallet</Button
-    >
+    <Button icon={WalletIcon} variant="primary" on:click={createDripList}>Confirm in wallet</Button>
   </svelte:fragment>
 </StandaloneFlowStepLayout>
 

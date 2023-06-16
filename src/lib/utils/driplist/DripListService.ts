@@ -1,31 +1,48 @@
 import {
   getAddressDriverClient,
+  getAddressDriverTxFactory,
+  getCallerClient,
   getNFTDriverClient,
   getNFTDriverTxFactory,
+  getRepoDriverClient,
   getSubgraphClient,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import type { DripList } from '../metadata/types';
-import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import type { z } from 'zod';
 import type { repoDriverSplitReceiverSchema } from '../metadata/schemas';
 import type { GitProject } from '../metadata/types';
 import {
   NFTDriverTxFactory,
   type AddressDriverClient,
-  type NFTDriverClient,
   Utils,
-  type Preset,
   type DripsReceiverStruct,
+  AddressDriverTxFactory,
+  NFTDriverClient,
+  ERC20TxFactory,
+  RepoDriverClient,
 } from 'radicle-drips';
 import mapFilterUndefined from '../map-filter-undefined';
 import type { UserId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { DripsReceiverConfig } from 'radicle-drips';
-import type { BigNumberish, ContractTransaction } from 'ethers';
-import assert from '$lib/utils/assert';
+import type { CallerClient, DripsReceiverConfig } from 'radicle-drips';
+import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
-import type { Address } from '../common-types';
+import assert from '$lib/utils/assert';
+import unreachable from '../unreachable';
+import type { Address, IpfsHash } from '../common-types';
+import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder-onboarding-flow';
+import wallet from '$lib/stores/wallet/wallet.store';
+import { get } from 'svelte/store';
+import Emoji from '$lib/components/emoji/emoji.svelte';
+
+const WAITING_WALLET_ICON = {
+  component: Emoji,
+  props: {
+    emoji: '👛',
+    size: 'huge',
+  },
+};
 
 /**
  * A class for managing `DripList`s.
@@ -33,13 +50,18 @@ import type { Address } from '../common-types';
  * **Important**: This class assumes that *all* clients and factories are connected to the *same* signer.
  */
 export default class DripListService {
+  private readonly SEED_CONSTANT = 'Drips App';
+
+  private _owner!: Signer;
+  private _ownerAddress!: Address;
   private _nftDriverClient!: NFTDriverClient;
+  private _repoDriverClient!: RepoDriverClient;
   private _gitProjectService!: GitProjectService;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
+  private _addressDriverTxFactory!: AddressDriverTxFactory;
   private readonly _dripsSubgraphClient = getSubgraphClient();
   private readonly _nftDriverMetadataManager = new NftDriverMetadataManager();
-  private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
@@ -52,9 +74,16 @@ export default class DripListService {
     const dripListService = new DripListService();
 
     dripListService._nftDriverClient = await getNFTDriverClient();
+    dripListService._repoDriverClient = await getRepoDriverClient();
     dripListService._gitProjectService = await GitProjectService.new();
     dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
     dripListService._addressDriverClient = await getAddressDriverClient();
+    dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
+
+    const signer = dripListService._addressDriverClient.signer;
+    assert(signer, 'Signer address is undefined.');
+    dripListService._owner = signer;
+    dripListService._ownerAddress = await signer.getAddress();
 
     return dripListService;
   }
@@ -101,62 +130,48 @@ export default class DripListService {
 
       dripLists.push(dripList);
 
+      // TODO: enable this after development.
       // TODO: remove this after the MVP.
-      if (dripLists.length === 2) {
-        throw new Error(`More than one drip list found for the owner ${ownerAddress}.`);
-      }
+      // if (dripLists.length === 2) {
+      //   throw new Error(`More than one drip list found for the owner ${ownerAddress}.`);
+      // }
     }
 
     return dripLists;
   }
 
-  /**
-   * Creates a new `DripList`.
-   * @param ownerAddress(optional) The address to transfer the `DripList` to. If not provided, the signer address of the NFT driver client will be used.
-   * @param salt The salt to use for the `DripList` user ID.
-   * @returns The new `DripList` user ID.
-   * @throws If owner has more than one `DripList` (for the MVP only).
-   */
-  public async create(salt: number, ownerAddress?: Address): Promise<UserId> {
-    // Assuming all clients are connected to the *same* signer we can use any of them.
-    ownerAddress = (ownerAddress || (await this._nftDriverClient.signer.getAddress())) as Address;
+  public async buildTransactContext(context: State) {
+    const token = context.supportConfig.listSelected[0] ?? unreachable();
+    let amountPerSec = context.supportConfig.streamRateValueParsed ?? unreachable();
+    amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
+    const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
+    const dripListName = context.dripList.title;
 
-    // TODO: remove this after the MVP.
-    const existingDripLists = await this.getByOwnerAddress(ownerAddress);
-    if (existingDripLists.length > 0) {
-      throw new Error(`Cannot create more than one drip list for the owner ${ownerAddress}.`);
+    const projects: z.infer<typeof repoDriverSplitReceiverSchema>[] = [];
+    for (const [url, percentage] of Object.entries(context.dripList.percentages)) {
+      const { forge, repoName, username } = GitProjectService.deconstructUrl(url);
+      const projectName = `${username}/${repoName}`;
+
+      projects.push({
+        weight: percentage,
+        source: GitProjectService.populateSource(forge, repoName, username),
+        userId: await this._repoDriverClient.getUserId(forge, projectName),
+      });
     }
 
-    return this._nftDriverClient.safeCreateAccountWithSalt(salt, ownerAddress, 'Drips App');
-  }
+    const ownerNftSubAccountsCount = (
+      await this._dripsSubgraphClient.getNftSubAccountsByOwner(this._ownerAddress)
+    ).length;
 
-  /**
-   * Pins the new `DripList` metadata and creates a batch transaction that consist of the following transactions:
-   * - `setSplits` transaction to set the `DripList` splits.
-   * - `emitUserMetadata` transaction to set the the latest `DripList` IPFS hash on-chain.
-   * @param dripListId The `DripList` user ID.
-   * @param listReceivers The `DripList` split receivers.
-   * @returns The batch transaction.
-   * @throws If the `DripList` does not exist.
-   */
-  public async buildSetSplitsBatchTx(
-    dripListId: UserId,
-    projects: z.infer<typeof repoDriverSplitReceiverSchema>[],
-  ): Promise<Preset> {
-    const dripListNftSubAccount = await this._nftDriverMetadataManager.fetchAccount(dripListId);
+    const salt = this._calcSaltFromAddress(this._ownerAddress, ownerNftSubAccountsCount);
 
-    if (!dripListNftSubAccount) {
-      throw new Error(`DripList ${dripListId} not found.`);
-    }
+    const dripListId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
 
-    const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
-      forAccount: dripListNftSubAccount,
-      projects,
-    });
+    const ipfsHash = await this._publishMetadataToIpfs(dripListId, projects, dripListName);
 
-    const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);
+    const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
-    const setSplitsTx = await this._nftDriverTxFactory.setSplits(
+    const setDripListProjectsTx = await this._nftDriverTxFactory.setSplits(
       dripListId,
       projects.map((project) => ({
         userId: project.userId,
@@ -164,8 +179,131 @@ export default class DripListService {
       })),
     );
 
-    const emitMetadataTx = await this._nftDriverTxFactory.emitUserMetadata(
+    const tokenApprovalTx = await this._buildTokenApprovalTx(token);
+
+    const setStreamTx = await this._buildSetDripListStreamTxs(
+      salt,
+      token,
       dripListId,
+      topUpAmount,
+      0n,
+      0n,
+      amountPerSec,
+    );
+
+    const allowance = await this._addressDriverClient.getAllowance(token);
+    const needsApproval = allowance < topUpAmount;
+
+    const txs: { [name: string]: PopulatedTransaction } = {
+      tokenApprovalTx,
+      createDripListTx,
+      setDripListProjectsTx,
+      setStreamTx,
+    };
+
+    const callerClient = await getCallerClient();
+    const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
+    const normalFlowTxs = await this._getNormalFlowTxs(txs, needsApproval, callerClient);
+
+    return {
+      dripListId,
+      needsApproval,
+      callerClient,
+      approvalFlowTxs,
+      normalFlowTxs,
+    };
+  }
+
+  private async _getApprovalFlowTxs(
+    txs: { [name: string]: PopulatedTransaction },
+    needsApproval: boolean,
+    callerClient: CallerClient,
+  ) {
+    const { tokenApprovalTx, createDripListTx, setDripListProjectsTx, setStreamTx } = txs;
+
+    const batchTx = await callerClient.populateCallBatchedTx([
+      createDripListTx,
+      setDripListProjectsTx,
+      setStreamTx,
+    ]);
+
+    if (!needsApproval) {
+      const estimatedGasLimit = await callerClient.signer.estimateGas(batchTx);
+      const gasLimit = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
+
+      batchTx.gasLimit = gasLimit;
+    } else {
+      // !HACK: Hardcoded gas limit for now to avoid the "out of gas" error.
+      batchTx.gasLimit = BigNumber.from('0x0a05b6');
+    }
+
+    return [
+      {
+        transaction: tokenApprovalTx,
+        waitingSignatureMessage: {
+          message: 'Waiting for you to approve access to the ERC-20 token in your wallet...',
+          subtitle: 'You only have to do this once per token.',
+          icon: WAITING_WALLET_ICON,
+        },
+      },
+      {
+        transaction: batchTx,
+      },
+    ];
+  }
+
+  private async _getNormalFlowTxs(
+    txs: { [name: string]: PopulatedTransaction },
+    needsApproval: boolean,
+    callerClient: CallerClient,
+  ) {
+    const { createDripListTx, setDripListProjectsTx, setStreamTx } = txs;
+
+    if (!needsApproval) {
+      const batchTx = await callerClient.populateCallBatchedTx([
+        createDripListTx,
+        setDripListProjectsTx,
+        setStreamTx,
+      ]);
+
+      const estimatedGasLimit = await callerClient.signer.estimateGas(batchTx);
+      const gasLimitWithBuffer = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
+
+      return {
+        txs: [createDripListTx, setDripListProjectsTx, setStreamTx],
+        gasLimitWithBuffer,
+      };
+    }
+
+    return {
+      txs: [createDripListTx, setDripListProjectsTx, setStreamTx],
+    };
+  }
+
+  private async _publishMetadataToIpfs(
+    dripListId: string,
+    projects: z.infer<typeof repoDriverSplitReceiverSchema>[],
+    name?: string,
+  ): Promise<IpfsHash> {
+    const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
+      forAccount: {
+        driver: 'nft',
+        owner: this._ownerAddress,
+        userId: dripListId,
+      },
+      projects,
+      name,
+    });
+
+    const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);
+
+    return ipfsHash;
+  }
+
+  private async _buildCreateDripListTx(salt: bigint, ipfsHash: IpfsHash) {
+    const createDripListTx = await this._nftDriverTxFactory.safeMintWithSalt(
+      salt,
+      this._ownerAddress,
       [
         {
           key: MetadataManagerBase.USER_METADATA_KEY,
@@ -174,25 +312,35 @@ export default class DripListService {
       ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
     );
 
-    return [setSplitsTx, emitMetadataTx];
+    return createDripListTx;
   }
 
-  /**
-   * Sets the token stream for the given `DripList`.
-   * @param dripListId The `DripList` user ID.
-   * @param tokenAddress The token address.
-   * @param config The `DripList` configuration.
-   * @param balanceDelta The drips balance change to be applied.
-   * @returns The contract transaction.
-   */
-  public async setStream(
+  private async _buildSetDripListStreamTxs(
+    salt: bigint,
+    token: Address,
     dripListId: UserId,
-    tokenAddress: Address,
-    config: DripsReceiverConfig,
-    balanceDelta: BigNumberish,
-  ): Promise<ContractTransaction> {
+    topUpAmount: bigint,
+    start: bigint,
+    duration: bigint,
+    amountPerSec: bigint,
+  ) {
+    const ownerAddressDriverUserId = await this._addressDriverClient.getUserIdByAddress(
+      this._ownerAddress,
+    );
+
     const currentReceivers: DripsReceiverStruct[] =
-      await this._dripsSubgraphClient.getCurrentDripsReceivers(dripListId, tokenAddress);
+      await this._dripsSubgraphClient.getCurrentDripsReceivers(
+        ownerAddressDriverUserId,
+        token,
+        get(wallet).provider,
+      );
+
+    const config: DripsReceiverConfig = {
+      start,
+      duration,
+      amountPerSec,
+      dripId: BigInt(this._generateDripIdFromSalt(salt)),
+    };
 
     const newReceivers: DripsReceiverStruct[] = [
       {
@@ -201,17 +349,59 @@ export default class DripListService {
       },
     ];
 
-    const transferToAddress = await this._addressDriverClient.signer?.getAddress();
-    assert(transferToAddress);
-
-    return this._addressDriverClient.setDrips(
-      tokenAddress,
+    const setStreamTx = await this._addressDriverTxFactory.setDrips(
+      token,
       currentReceivers,
+      topUpAmount,
       newReceivers,
-      transferToAddress,
-      balanceDelta,
+      0,
+      0,
+      this._ownerAddress,
+      /*
+      Dirty hack to disable the SDK's built-in gas estimation, because
+      it would fail if there's no token approval yet. See `top-up.ts`.
+
+      TODO: Introduce a more graceful method of disabling gas estimation.
+      */ { gasLimit: 1 },
     );
+
+    delete setStreamTx.gasLimit;
+
+    return setStreamTx;
   }
+
+  private async _buildTokenApprovalTx(token: Address): Promise<PopulatedTransaction> {
+    const erc20TxFactory = await ERC20TxFactory.create(this._owner, token);
+
+    const tokenApprovalTx = await erc20TxFactory.approve(
+      this._addressDriverTxFactory.driverAddress,
+      constants.MaxUint256,
+    );
+
+    return tokenApprovalTx;
+  }
+
+  // We use the count of *all* NFT sub-accounts to generate the salt for the Drip List ID.
+  // This is because we want to avoid making HTTP requests to the subgraph for each NFT sub-account to check if it's a Drip List.
+  private _calcSaltFromAddress = (address: string, listCount: number): bigint /* 64bit */ => {
+    const hash = ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(['string'], [this.SEED_CONSTANT + address]),
+    );
+    const randomBigInt = ethers.BigNumber.from('0x' + hash.slice(26));
+
+    let random64BitBigInt = BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
+
+    const listCountBigInt = BigInt(listCount);
+    random64BitBigInt = random64BitBigInt ^ listCountBigInt;
+
+    return random64BitBigInt;
+  };
+
+  private _generateDripIdFromSalt = (salt: bigint): number /* 32bit */ => {
+    const random32BitNumber = Number(salt & BigInt(0xffffffff));
+
+    return random32BitNumber;
+  };
 
   private async _getDripListProjects(
     projects: z.infer<typeof repoDriverSplitReceiverSchema>[],

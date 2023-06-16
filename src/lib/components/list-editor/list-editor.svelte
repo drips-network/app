@@ -38,7 +38,7 @@
   import projectItem from './item-templates/project';
   import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
-  import { tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import type ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import type IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ethAddressItem from './item-templates/eth-address';
@@ -46,6 +46,7 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
   import assert from '$lib/utils/assert';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
 
   // TOOD: Set to 200
   const MAX_ITEMS = 10;
@@ -64,52 +65,46 @@
   let listElem: HTMLDivElement;
   let inputElem: HTMLInputElement;
 
-  let addInProgress = false;
+  let isAddingProject = false;
   let inputValue = '';
 
-  // TODO: Prevent duplicate entries
+  let gitProjectService: GitProjectService;
+
+  onMount(async () => {
+    gitProjectService = await GitProjectService.new();
+  });
 
   async function addProject() {
     if (allowedItems === 'eth-addresses') return;
 
-    // TODO: Really fetch project
-    addInProgress = true;
+    isAddingProject = true;
 
-    const id = crypto.randomUUID();
+    let gitProject = await gitProjectService.getByUrl(inputValue);
 
-    items[id] = projectItem({
-      claimed: false,
-      repoDriverAccount: {
-        userId: '0',
-        driver: 'repo',
-      },
-      source: {
-        forge: 'github',
-        repoName: 'svelte-stored-writable',
-        ownerName: 'efstajas',
-        url: 'https://github.com/efstajas/svelte-stepper.git',
-      },
-    } as GitProject);
+    const id = gitProject.source.url;
+    // Prevent duplicates.
+    if (selected.indexOf(id) === -1) {
+      items[id] = projectItem(gitProject);
+
+      if (selected.length < MAX_ITEMS) selected.push(id);
+      percentages = { ...percentages, [id]: 0 };
+
+      await tick();
+
+      listElem.scroll({
+        top: listElem.scrollHeight,
+      });
+
+      // It doesn't work without setTimeout for some reason 🤷‍♂️
+      setTimeout(() => inputElem.focus(), 0);
+    }
 
     inputValue = '';
-
-    if (selected.length < MAX_ITEMS) selected.push(id);
-    percentages = { ...percentages, [id]: 0 };
-
-    await tick();
-
-    listElem.scroll({
-      top: listElem.scrollHeight,
-    });
-
-    // It doesn't work without setTimeout for some reason 🤷‍♂️
-    setTimeout(() => inputElem.focus(), 0);
-
-    addInProgress = false;
+    isAddingProject = false;
   }
 
   async function addEthAddress() {
-    addInProgress = true;
+    isAddingProject = true;
 
     const address = isAddress(inputValue)
       ? getAddress(inputValue)
@@ -117,7 +112,7 @@
     assert(address);
 
     if (items[address]) {
-      addInProgress = false;
+      isAddingProject = false;
       return;
     }
 
@@ -127,7 +122,7 @@
     percentages = { ...percentages, [address]: 0 };
 
     inputValue = '';
-    addInProgress = false;
+    isAddingProject = false;
   }
 
   $: if (isValidUrl(inputValue) && allowedItems === 'all') {
@@ -194,14 +189,14 @@
       <input
         bind:this={inputElem}
         bind:value={inputValue}
-        disabled={addInProgress}
+        disabled={isAddingProject}
         class="typo-text"
         type="text"
         placeholder={allowedItems === 'all'
           ? 'Paste GitHub/GitLab URL or Ethereum address'
           : 'Ethereum address or ENS name'}
       />
-      {#if addInProgress}
+      {#if isAddingProject}
         <Spinner />
       {/if}
     </div>
