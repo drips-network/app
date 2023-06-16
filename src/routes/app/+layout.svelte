@@ -27,7 +27,6 @@
 
   async function initializeStores() {
     initializing = true;
-    await wallet.initialize();
     loaded = true;
 
     const { connected, network, provider, address, safe } = $wallet;
@@ -83,13 +82,6 @@
         description:
           'Instead of connecting to the Safe with WalletConnect, we recommend running Drips as a Safe App directly.',
         emoji: '⚠️',
-        button: {
-          label: 'Disconnect',
-          handler: () => {
-            wallet.disconnect();
-            resolve();
-          },
-        },
         secondaryButton: {
           label: 'Proceed anyway',
           handler: resolve,

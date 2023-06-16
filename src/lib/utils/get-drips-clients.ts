@@ -27,12 +27,13 @@ export function getSubgraphClient() {
  * Get an initialized Address Driver client.
  * @returns An initialized Address Driver client.
  */
-export function getAddressDriverClient(withSigner = get(wallet).signer) {
-  const { provider } = get(wallet);
-
+export function getAddressDriverClient(
+  withSigner = get(wallet).signer,
+  withProvider = get(wallet).provider,
+) {
   const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
 
-  return AddressDriverClient.create(provider, withSigner, addressDriverAddress);
+  return AddressDriverClient.create(withProvider, withSigner, addressDriverAddress);
 }
 
 /**

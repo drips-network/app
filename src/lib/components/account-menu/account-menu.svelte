@@ -4,13 +4,13 @@
   import ServerIcon from 'radicle-design-system/icons/Server.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
 
-  import CrossIcon from 'radicle-design-system/icons/CrossSmall.svelte';
   import Button from '../button/button.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenuItem from './components/account-menu-item.svelte';
   import Divider from '../divider/divider.svelte';
   import ens from '$lib/stores/ens';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
+  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
   $: safeAppMode = Boolean($wallet.safe);
 </script>
@@ -36,8 +36,7 @@
         /></svelte:fragment
       >
       <svelte:fragment slot="right"
-        ><Button disabled={safeAppMode} icon={CrossIcon} on:click={wallet.disconnect}
-          >Disconnect</Button
+        ><Button disabled={safeAppMode} icon={Wallet} on:click={wallet.openModal}>Manage</Button
         ></svelte:fragment
       >
     </AccountMenuItem>

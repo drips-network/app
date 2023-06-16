@@ -138,7 +138,11 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('switches to another user', async () => {
-      await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
+      await changeAddress(
+        page,
+        '0xAa90c43123ACEc193A35D33db5D71011B019779D',
+        '973756829077940576545868822396905123856621598621',
+      );
 
       await page.reload();
 
@@ -168,7 +172,11 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('switches to another user', async () => {
-      await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
+      await changeAddress(
+        page,
+        '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
+        '383620263794848526656662033323214000554911775452',
+      );
       await page.goto('http://127.0.0.1:3000/app/dashboard');
 
       await page.reload();
@@ -221,6 +229,9 @@ describe('top up, create stream, view profile, search', async () => {
           hasText: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
         })
         .click();
+
+      await page.waitForTimeout(500);
+
       expect(page.url().toLowerCase()).toBe(
         'http://127.0.0.1:3000/app/0x433220a86126efe2b8c98a723e73ebad2d0cbadc',
       );
@@ -273,7 +284,11 @@ describe('top up, create stream, view profile, search', async () => {
     }, 20000);
 
     it('switches back to the user receiving the stream', async () => {
-      await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
+      await changeAddress(
+        page,
+        '0xAa90c43123ACEc193A35D33db5D71011B019779D',
+        '973756829077940576545868822396905123856621598621',
+      );
       await page.goto('http://127.0.0.1:3000/app/dashboard');
 
       await page.reload();
@@ -302,7 +317,11 @@ describe('top up, create stream, view profile, search', async () => {
 
   describe('delete stream', () => {
     it('switches back to the original user', async () => {
-      await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
+      await changeAddress(
+        page,
+        '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
+        '383620263794848526656662033323214000554911775452',
+      );
       await page.goto('http://127.0.0.1:3000/app/dashboard');
 
       await page.reload();
@@ -340,7 +359,11 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('switches back to the recipient', async () => {
-      await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
+      await changeAddress(
+        page,
+        '0xAa90c43123ACEc193A35D33db5D71011B019779D',
+        '973756829077940576545868822396905123856621598621',
+      );
       await page.goto('http://127.0.0.1:3000/app/dashboard');
 
       await page.reload();

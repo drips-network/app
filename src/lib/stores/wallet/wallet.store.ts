@@ -1,39 +1,42 @@
-import { ethers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import type { Network } from '@ethersproject/networks';
-import Web3Modal from 'web3modal';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { AddressDriverClient, Utils } from 'radicle-drips';
+import { AddressDriverClient } from 'radicle-drips';
 
 // https://github.com/vitejs/vite/issues/7257#issuecomment-1079579892
-import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 import testnetMockProvider from './__test__/local-testnet-mock-provider';
 import isTest from '$lib/utils/is-test';
-import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
 import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
 import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import isRunningInSafe from '$lib/utils/is-running-in-safe';
 
+import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum';
+import { Web3Modal } from '@web3modal/html';
+import {
+  configureChains,
+  createConfig,
+  watchAccount,
+  watchWalletClient,
+  watchNetwork,
+  getNetwork,
+  type WalletClient,
+  getWalletClient,
+} from '@wagmi/core';
+import { mainnet, goerli } from '@wagmi/core/chains';
+import unreachable from '$lib/utils/unreachable';
+
 const appsSdk = new SafeAppsSDK();
 
-const { SUPPORTED_CHAINS } = Utils.Network;
 const DEFAULT_NETWORK: Network = {
   chainId: 1,
   name: 'homestead',
 };
 
-const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
-
-const WEB_3_MODAL_PROVIDER_OPTIONS = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      infuraId: INFURA_ID,
-    },
-  },
-};
+const WAGMI_CHAINS = [mainnet, goerli];
+const WALLETCONNECT_PROJECT_ID = 'c09f5d8545d67c604ccf454219fd8f4d';
 
 type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
 
@@ -62,119 +65,127 @@ interface DisconnectedWalletStoreState {
 
 type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState;
 
-const windowProvider =
-  browser && window.ethereum && new ethers.providers.Web3Provider(window.ethereum);
-
-const selectedNetwork =
-  windowProvider && new ethers.providers.Web3Provider(window.ethereum).network;
-
-const initNetwork =
-  selectedNetwork && SUPPORTED_CHAINS.includes(selectedNetwork.chainId)
-    ? selectedNetwork
-    : DEFAULT_NETWORK;
-
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
-  network: initNetwork,
-  provider: new ethers.providers.InfuraProvider(initNetwork),
+  network: DEFAULT_NETWORK,
+  provider: new ethers.providers.InfuraProvider(DEFAULT_NETWORK),
 };
 
 const walletStore = () => {
   const state = writable<WalletStoreState>(INITIAL_STATE);
 
-  let web3Modal: Web3Modal;
+  let web3modal: Web3Modal;
+  let ethereumClient: EthereumClient;
 
-  /**
-   * Initialize the store and restore any previously-connected,
-   * cached provider.
-   */
-  async function initialize(): Promise<void> {
-    if (!browser) return;
+  const publicClient = configureChains(WAGMI_CHAINS, [
+    w3mProvider({ projectId: WALLETCONNECT_PROJECT_ID }),
+  ]).publicClient;
+  const wagmiConfig = createConfig({
+    autoConnect: true,
+    connectors: w3mConnectors({
+      projectId: WALLETCONNECT_PROJECT_ID,
+      version: 1,
+      chains: WAGMI_CHAINS,
+    }),
+    publicClient,
+  });
 
-    web3Modal = new Web3Modal({
-      providerOptions: WEB_3_MODAL_PROVIDER_OPTIONS,
-      cacheProvider: true,
-    });
+  let isSafeApp: boolean | undefined;
 
-    const isSafeApp = isRunningInSafe();
-
-    if (web3Modal.cachedProvider || isSafeApp) {
-      await connect(true, isSafeApp);
-    }
-  }
-
-  /**
-   * Trigger Web3Modal and let the user connect their wallet.
-   * @param initializing If true, the function will trigger a global advisory
-   * while waiting for the user's wallet to be unlocked.
-   */
-  async function connect(initializing = false, isSafeApp = false): Promise<void> {
-    if (!browser) throw new Error('Can only connect client-side');
-
-    let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
-    let connected = false;
-
-    setTimeout(() => {
-      if (!initializing || connected) return;
-
-      clearAdvisory = globalAdvisoryStore.add({
-        fatal: false,
-        headline: 'Waiting for wallet…',
-        description: 'Please make sure your previously-connected wallet is unlocked.',
-        emoji: '👛',
-        button: {
-          label: 'Disconnect wallet',
-          handler: () => {
-            disconnect();
-            window.location.reload();
-          },
-        },
-      });
-    }, 250);
-
-    let provider: ethers.providers.Web3Provider;
-    let safeInfo: SafeInfo | undefined;
+  if (browser) {
+    isSafeApp = isRunningInSafe();
 
     if (isSafeApp) {
-      safeInfo = await appsSdk.safe.getInfo();
-      provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
+      _initSafe();
     } else {
-      const instance = await web3Modal.connect();
-      provider = new ethers.providers.Web3Provider(instance);
-      _attachListeners(instance);
+      ethereumClient = new EthereumClient(wagmiConfig, WAGMI_CHAINS);
+      web3modal = new Web3Modal({ projectId: WALLETCONNECT_PROJECT_ID }, ethereumClient);
     }
-
-    connected = true;
-    clearAdvisory?.();
-
-    if (!_isNetworkSupported(await provider.getNetwork())) {
-      const clearAdvisory = globalAdvisoryStore.add({
-        fatal: false,
-        headline: 'Unsupported network',
-        description: 'Please switch your connected wallet to Ethereum Mainnet or Goerli.',
-        emoji: '🔌',
-      });
-
-      await provider.send('wallet_switchEthereumChain', [
-        { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
-      ]);
-
-      clearAdvisory();
-    }
-
-    await _setConnectedState(provider, safeInfo);
   }
 
-  /**
-   * Completely clear the store and drop any cached providers from
-   * Web3Modal.
-   */
-  function disconnect(): void {
-    _clear();
+  let walletClientUnwatcher: () => void | undefined;
+
+  if (!isSafeApp) {
+    watchAccount(async (a) => {
+      const { isConnected } = a;
+
+      const chain = getNetwork().chain;
+
+      if (isConnected && chain && !chain.unsupported) {
+        const network = getNetwork();
+
+        const walletClient = (await getWalletClient()) ?? unreachable();
+
+        const provider = await _buildEthersProvider(walletClient);
+        _setConnectedState(provider);
+
+        walletClientUnwatcher = watchWalletClient(
+          {
+            chainId: network.chain?.id ?? unreachable(),
+          },
+          async (wc) => {
+            if (!wc) return;
+
+            const provider = await _buildEthersProvider(wc);
+            _setConnectedState(provider);
+          },
+        );
+      } else {
+        walletClientUnwatcher?.();
+        state.set(INITIAL_STATE);
+      }
+    });
+
+    let unsupportedNetworkId: number | undefined;
+
+    watchNetwork((n) => {
+      const newChainId = n.chain?.id;
+
+      if (n.chain?.unsupported) {
+        globalAdvisoryStore.add({
+          fatal: false,
+          headline: 'Unsupported network',
+          description: 'Please switch your connected wallet to Ethereum Mainnet or Goerli.',
+          emoji: '🔌',
+        });
+
+        unsupportedNetworkId = n.chain.id;
+      }
+
+      const supportedChainChanged =
+        newChainId && get(state).connected && newChainId !== get(state).network.chainId;
+      const unsupportedChainChanged = unsupportedNetworkId && n.chain?.id !== unsupportedNetworkId;
+
+      if (supportedChainChanged || unsupportedChainChanged) {
+        window.location.reload();
+      }
+    });
   }
 
-  function _isNetworkSupported(network: Network): boolean {
-    return SUPPORTED_CHAINS.includes(network.chainId);
+  function openModal() {
+    web3modal.openModal();
+  }
+
+  async function _buildEthersProvider(wc: WalletClient) {
+    const externalProvider: providers.ExternalProvider = {
+      isMetaMask: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      request: async (request: { method: string; params?: Array<any> }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return await wc?.request(request as any);
+      },
+    };
+
+    const provider = new providers.Web3Provider(externalProvider);
+
+    return provider;
+  }
+
+  async function _initSafe() {
+    const safeInfo = await appsSdk.safe.getInfo();
+    const provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
+
+    _setConnectedState(provider, safeInfo);
   }
 
   async function _setConnectedState(
@@ -195,39 +206,9 @@ const walletStore = () => {
     });
   }
 
-  function _clear() {
-    web3Modal?.clearCachedProvider();
-
-    localStorage.removeItem('walletconnect');
-    localStorage.removeItem('WALLETCONNECT_DEEPLINK_CHOICE');
-
-    state.set(INITIAL_STATE);
-  }
-
-  function _attachListeners(provider: ethers.providers.Web3Provider): void {
-    provider.on('accountsChanged', (accounts: string[]) => {
-      if (accounts.length === 0) {
-        _clear();
-        return;
-      }
-
-      window.location.reload();
-    });
-
-    provider.on('chainChanged', () => {
-      window.location.reload();
-    });
-
-    provider.on('disconnect', () => {
-      _clear();
-    });
-  }
-
   return {
     subscribe: state.subscribe,
-    initialize,
-    connect,
-    disconnect,
+    openModal,
   };
 };
 
@@ -235,32 +216,24 @@ const mockWalletStore = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const address = (window as any).playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
+  const signer = provider.getSigner();
 
   const state = writable<WalletStoreState>({
-    connected: false,
-    network: provider.network,
+    connected: true,
+    address,
     provider,
+    signer,
+    network: provider.network,
+    dripsUserId:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).playwrightDripsUserId ?? '383620263794848526656662033323214000554911775452',
   });
-
-  async function initialize() {
-    const signer = provider.getSigner();
-    const userId = await (await getAddressDriverClient(signer)).getUserId();
-
-    state.set({
-      connected: true,
-      address,
-      provider,
-      signer,
-      network: provider.network,
-      dripsUserId: userId,
-    });
-  }
 
   return {
     subscribe: state.subscribe,
-    initialize,
     connect: () => undefined,
     disconnect: () => undefined,
+    openModal: () => undefined,
   };
 };
 
