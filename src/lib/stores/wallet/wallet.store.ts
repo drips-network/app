@@ -27,6 +27,7 @@ import {
 } from '@wagmi/core';
 import { mainnet, goerli } from '@wagmi/core/chains';
 import unreachable from '$lib/utils/unreachable';
+import themeStore, { type Theme } from '../theme/theme.store';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -98,8 +99,15 @@ const walletStore = () => {
     if (isSafeApp) {
       _initSafe();
     } else {
-      ethereumClient = new EthereumClient(wagmiConfig, WAGMI_CHAINS);
-      web3modal = new Web3Modal({ projectId: WALLETCONNECT_PROJECT_ID }, ethereumClient);
+      themeStore.subscribe((v) => {
+        const web3ModalThemeForAppTheme: { [theme in Theme]: 'light' | 'dark' } = {
+          light: 'light',
+          dark: 'dark',
+          h4x0r: 'dark',
+        };
+
+        initWeb3Modal({ themeMode: web3ModalThemeForAppTheme[v.currentTheme] });
+      });
     }
   }
 
@@ -188,6 +196,16 @@ const walletStore = () => {
     _setConnectedState(provider, safeInfo);
   }
 
+  function initWeb3Modal(
+    themeOptions?: Pick<ConstructorParameters<typeof Web3Modal>[0], 'themeMode' | 'themeVariables'>,
+  ) {
+    ethereumClient = new EthereumClient(wagmiConfig, WAGMI_CHAINS);
+    web3modal = new Web3Modal(
+      { projectId: WALLETCONNECT_PROJECT_ID, ...themeOptions },
+      ethereumClient,
+    );
+  }
+
   async function _setConnectedState(
     provider: ethers.providers.Web3Provider,
     safeInfo?: SafeInfo,
@@ -208,6 +226,7 @@ const walletStore = () => {
 
   return {
     subscribe: state.subscribe,
+    initWeb3Modal,
     openModal,
   };
 };
@@ -231,9 +250,8 @@ const mockWalletStore = () => {
 
   return {
     subscribe: state.subscribe,
-    connect: () => undefined,
-    disconnect: () => undefined,
     openModal: () => undefined,
+    initWeb3Modal: () => undefined,
   };
 };
 
