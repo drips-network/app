@@ -15,7 +15,7 @@
 
         if (isSafe) goto(decoded);
       } else {
-        goto('/app/crowdfunding');
+        goto('/app/dashboard');
       }
     }
   }
