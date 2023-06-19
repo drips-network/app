@@ -18,6 +18,8 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fly } from 'svelte/transition';
   import { isSafe } from '$lib/stores/wallet/safe/is-safe';
+  import themeStore from '$lib/stores/theme/theme.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let data: { pathname: string };
 
@@ -35,6 +37,12 @@
     tokens.connect(network.chainId);
     ens.connect(provider);
     balances.initialize();
+
+    themeStore.subscribe((v) => {
+      const onboardTheme = v.currentTheme === 'h4x0r' ? 'dark' : v.currentTheme;
+
+      walletStore.setOnboardTheme(onboardTheme);
+    });
 
     walletConnected = connected;
 
