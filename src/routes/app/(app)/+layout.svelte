@@ -14,6 +14,7 @@
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
   import { fly } from 'svelte/transition';
   import ens from '$lib/stores/ens';
+  import User from 'radicle-design-system/icons/User.svelte';
 
   export let data: { pathname: string };
 </script>
@@ -39,7 +40,7 @@
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: Ledger,
+              icon: User,
             },
             { label: 'Projects', href: '/app/projects', icon: Folder },
             { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
