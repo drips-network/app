@@ -22,6 +22,12 @@
   import deduplicateReadable from '$lib/utils/deduplicate-readable';
   import { derived } from 'svelte/store';
   import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
+  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
+  import CrossIcon from 'radicle-design-system/icons/Cross.svelte';
+  import { fade } from 'svelte/transition';
 
   $: {
     $walletStore.connected;
@@ -142,7 +148,7 @@
     <SectionHeader icon={TokensIcon} label="Earnings" />
     <SectionSkeleton initHeight={106} loaded={Boolean(userId && $splittableStore && cycle)}>
       {#if userId && $splittableStore && cycle}
-        <div class="earnings-card">
+        <div class="earnings card">
           <div class="content">
             <div class="values">
               <KeyValuePair key="Collectable now" highlight>
@@ -159,6 +165,7 @@
               <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
             </div>
             <div>
+              <!-- TODO: Add collection modal -->
               <Button disabled={!tokensAvailableToCollect} variant="primary" icon={DownloadIcon}
                 >Collect earnings</Button
               >
@@ -173,6 +180,32 @@
           </div>
         </div>
       {/if}
+      <div class="edu-card-wrapper">
+        <TransitionedHeight>
+          {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
+            <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
+              <div class="illustration">
+                <SplittingGraph />
+              </div>
+              <div class="content">
+                <h2>How donations reach your projects</h2>
+                <p>
+                  Donations from funders are automatically trickled down a global dependency tree
+                  every seven days.
+                </p>
+                <!-- TODO: Add link -->
+                <div><Button icon={ArrowBoxUpRight}>Learn more</Button></div>
+              </div>
+              <button
+                class="close-button"
+                on:click={() => dismissablesStore.dismiss('splitting-graph-edu-card')}
+              >
+                <CrossIcon />
+              </button>
+            </div>
+          {/if}
+        </TransitionedHeight>
+      </div>
     </SectionSkeleton>
   </div>
 </div>
@@ -201,6 +234,7 @@
 
   .projects > * {
     flex: 1;
+    min-width: 16rem;
     max-width: calc(25% - 0.75rem);
   }
 
@@ -208,14 +242,15 @@
     transition: transform 0.2s;
   }
 
-  .earnings-card {
+  .card {
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
+    position: relative;
   }
 
-  .earnings-card > .content {
+  .earnings.card > .content {
     display: flex;
     gap: 4rem;
     padding: 1rem;
@@ -223,17 +258,50 @@
     align-items: center;
   }
 
-  .earnings-card > .content > .values {
+  .earnings.card > .content > .values {
     display: flex;
     gap: 4rem;
   }
 
-  .earnings-card > .token-breakdown .token-amounts-table {
+  .earnings.card > .token-breakdown .token-amounts-table {
     padding: 0.5rem 0;
     background-color: var(--color-foreground-level-1);
   }
 
   button:disabled {
     opacity: 0.5;
+  }
+
+  .splitting-graph-edu.card {
+    display: flex;
+    gap: 2rem;
+    padding-right: 2rem;
+    align-items: center;
+  }
+
+  .splitting-graph-edu.card .content {
+    display: flex;
+    flex-direction: column;
+    max-width: 40rem;
+    gap: 1rem;
+  }
+
+  .splitting-graph-edu.card .close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    transition: background-color 0.3s;
+    border-radius: 1rem;
+  }
+
+  .edu-card-wrapper {
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 560px) {
+    .projects > * {
+      width: 100%;
+      max-width: 100%;
+    }
   }
 </style>
