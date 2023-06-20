@@ -102,7 +102,7 @@
   }
 
   .expand-chevron {
-    transition: transform 0.2s, background-color 0.3s;
+    transition: transform 0.3s, background-color 0.3s;
     border-radius: 50%;
   }
 

@@ -69,9 +69,10 @@
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      forge: 'github',
+      forge: 'gitlab',
       repoName: 'svelte-stored-writable',
       ownerName: 'efstajas',
+      host: 'foobar',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
     emoji: '💾',
@@ -159,7 +160,9 @@
                   disabled={!tokensAvailableToCollect}
                   style:transform="rotate({collectableAmountsExpanded ? 180 : 0}deg)"
                 >
-                  <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+                  <ChevronDown
+                    style="fill: var(--color-foreground); width: 1.5rem; height: 1.5rem; transform: scale(1.5);"
+                  />
                 </button>
               </KeyValuePair>
               <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
@@ -239,7 +242,7 @@
   }
 
   .expand-chevron {
-    transition: transform 0.2s;
+    transition: transform 0.3s;
   }
 
   .card {

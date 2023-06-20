@@ -44,7 +44,6 @@
         {#if project.source.forge === 'github'}
           <GithubIcon />
         {:else if project.source.forge === 'gitlab'}
-          <!-- TODO: Real GitLab icon -->
           <GitlabIcon />
         {/if}
       </div>
