@@ -10,6 +10,23 @@
   import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
+  import balancesStore from '$lib/stores/balances/balances.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import guardConnected from '$lib/utils/guard-connected';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import getCycle from '$lib/utils/drips/get-cycle';
+  import { onMount } from 'svelte';
+  import formatDate from '$lib/utils/format-date';
+  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import TokenAmountsTable from '$lib/components/token-amounts-table/token-amounts-table.svelte';
+  import deduplicateReadable from '$lib/utils/deduplicate-readable';
+  import { derived } from 'svelte/store';
+  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
+
+  $: {
+    $walletStore.connected;
+    guardConnected();
+  }
 
   // TODO: Really fetch projects
 
@@ -56,6 +73,31 @@
   };
 
   const projects = [MOCK_PROJECT_1, MOCK_PROJECT_2, MOCK_PROJECT_1, MOCK_PROJECT_2, MOCK_PROJECT_2];
+
+  $: userId = $walletStore.dripsUserId;
+
+  const splittableStore = deduplicateReadable(
+    derived([balancesStore], ([balances]) => {
+      return userId ? balances.accounts[userId]?.splittable : undefined;
+    }),
+  );
+
+  let cycle: Awaited<ReturnType<typeof getCycle>> | undefined;
+  onMount(async () => {
+    cycle = await getCycle();
+  });
+
+  let collectableAmountsExpanded = false;
+
+  $: tokensAvailableToCollect = $splittableStore && $splittableStore.length > 0;
+
+  $: {
+    if (collectableAmountsExpanded && !tokensAvailableToCollect) tokensAvailableToCollect = false;
+  }
+
+  function handleExpandTokens() {
+    if (tokensAvailableToCollect) collectableAmountsExpanded = !collectableAmountsExpanded;
+  }
 </script>
 
 <svelte:head>
@@ -98,17 +140,39 @@
 
   <div class="section">
     <SectionHeader icon={TokensIcon} label="Earnings" />
-    <SectionSkeleton loaded>
-      <div class="earnings-card">
-        <div class="values">
-          <KeyValuePair key="Collectable now" highlight>$0.00</KeyValuePair>
-          <KeyValuePair key="Total earned">$0.00</KeyValuePair>
-          <KeyValuePair key="Next payout">April 17</KeyValuePair>
+    <SectionSkeleton initHeight={106} loaded={Boolean(userId && $splittableStore && cycle)}>
+      {#if userId && $splittableStore && cycle}
+        <div class="earnings-card">
+          <div class="content">
+            <div class="values">
+              <KeyValuePair key="Collectable now" highlight>
+                <AggregateFiatEstimate amounts={$splittableStore} />
+                <button
+                  class="expand-chevron"
+                  on:click={handleExpandTokens}
+                  disabled={!tokensAvailableToCollect}
+                  style:transform="rotate({collectableAmountsExpanded ? 180 : 0}deg)"
+                >
+                  <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+                </button>
+              </KeyValuePair>
+              <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
+            </div>
+            <div>
+              <Button disabled={!tokensAvailableToCollect} variant="primary" icon={DownloadIcon}
+                >Collect earnings</Button
+              >
+            </div>
+          </div>
+          <div class="token-breakdown">
+            <Toggleable showToggle={false} toggled={collectableAmountsExpanded}>
+              <div class="token-amounts-table">
+                <TokenAmountsTable amounts={$splittableStore} />
+              </div>
+            </Toggleable>
+          </div>
         </div>
-        <div>
-          <Button variant="primary" icon={DownloadIcon}>Collect earnings</Button>
-        </div>
-      </div>
+      {/if}
     </SectionSkeleton>
   </div>
 </div>
@@ -140,19 +204,36 @@
     max-width: calc(25% - 0.75rem);
   }
 
+  .expand-chevron {
+    transition: transform 0.2s;
+  }
+
   .earnings-card {
-    display: flex;
-    gap: 4rem;
-    justify-content: space-between;
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
-    padding: 1.5rem;
     border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
+  }
+
+  .earnings-card > .content {
+    display: flex;
+    gap: 4rem;
+    padding: 1rem;
+    justify-content: space-between;
     align-items: center;
   }
 
-  .earnings-card > .values {
+  .earnings-card > .content > .values {
     display: flex;
     gap: 4rem;
+  }
+
+  .earnings-card > .token-breakdown .token-amounts-table {
+    padding: 0.5rem 0;
+    background-color: var(--color-foreground-level-1);
+  }
+
+  button:disabled {
+    opacity: 0.5;
   }
 </style>
