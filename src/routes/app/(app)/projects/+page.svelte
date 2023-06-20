@@ -242,7 +242,12 @@
   }
 
   .expand-chevron {
-    transition: transform 0.3s;
+    transition: transform 0.3s, background-color 0.3s;
+    border-radius: 50%;
+  }
+
+  .expand-chevron:focus-visible {
+    background-color: var(--color-foreground-level-2);
   }
 
   .card {
@@ -295,6 +300,10 @@
     right: 1rem;
     transition: background-color 0.3s;
     border-radius: 1rem;
+  }
+
+  .splitting-graph-edu.card .close-button:focus-visible {
+    background-color: var(--color-foreground-level-2);
   }
 
   .edu-card-wrapper {
