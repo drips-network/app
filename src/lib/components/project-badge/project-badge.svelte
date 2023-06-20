@@ -16,7 +16,8 @@
   export let tooltip = true;
   export let forceUnclaimed = false;
   export let hideAvatar = false;
-  export let linkTo: 'external-url' | 'project-page' = 'project-page';
+  export let linkToNewTab = false;
+  export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
 
   let unclaimedProject: UnclaimedGitProject;
   $: unclaimedProject = {
@@ -35,12 +36,13 @@
 <div class="wrapper">
   <PrimaryColorThemer colorHex={processedProject.claimed ? processedProject.color : undefined}>
     <Tooltip disabled={!tooltip}>
-      <a
+      <svelte:element
+        this={linkTo === 'nothing' ? 'div' : 'a'}
         class="project-badge"
         href={linkTo === 'project-page'
           ? buildProjectUrl(project.source)
           : buildExternalUrl(processedProject.source.url)}
-        target={linkTo === 'project-page' ? '' : '_blank'}
+        target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
       >
         {#if !hideAvatar}<div class="avatar-and-forge">
             {#if !forceUnclaimed && project.claimed}
@@ -50,10 +52,10 @@
             {/if}
             <div><ProjectAvatar project={processedProject} /></div>
           </div>{/if}
-        <div class="name typo-text">
+        <div class="name">
           <ProjectName project={processedProject} />
         </div>
-      </a>
+      </svelte:element>
       <svelte:fragment slot="tooltip-content">
         <ProjectTooltip project={processedProject} />
       </svelte:fragment>

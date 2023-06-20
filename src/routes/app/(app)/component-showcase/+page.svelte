@@ -2,7 +2,7 @@
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
-  import User from 'radicle-design-system/icons/User.svelte';
+  import UserIcon from 'radicle-design-system/icons/User.svelte';
   import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
 
   import ListSelect from '$lib/components/list-select/list-select.svelte';
@@ -22,6 +22,9 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
   import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
+  import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
+  import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
+  import DripsLogo from '$lib/components/header/drips-logo.svelte';
 
   // Button
   let disabled = false;
@@ -234,9 +237,37 @@
       weight: 62500,
     },
   ];
+
+  // Visual Percentage Editor
+
+  const DEFAULT_PERCENTAGES = { 'option-1': 50, 'option-2': 45, 'option-3': 5 };
 </script>
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Visual Percentage Editor</h2>
+  <VisualPercentageEditor
+    items={[
+      {
+        id: 'option-1',
+        label: 'Maintainers',
+        overflowIcon: UserIcon,
+      },
+      {
+        id: 'option-2',
+        label: 'Dependencies',
+        overflowIcon: SplitsIcon,
+      },
+      {
+        id: 'option-3',
+        label: 'Drips',
+        overflowIcon: DripsLogo,
+      },
+    ]}
+    percentages={DEFAULT_PERCENTAGES}
+  />
+</div>
 
 <div class="showcase-item">
   <h2>Splits</h2>
@@ -359,7 +390,7 @@
     actions={[
       {
         label: 'Trigger existential crisis',
-        icon: User,
+        icon: UserIcon,
         handler: () => undefined,
       },
       {

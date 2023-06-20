@@ -35,8 +35,9 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
   public buildAccountMetadata(context: {
     forAccount: NFTDriverAccount;
     projects: z.infer<typeof repoDriverSplitReceiverSchema>[];
+    name?: string;
   }): z.infer<typeof nftDriverAccountMetadataSchema> {
-    const { forAccount, projects } = context;
+    const { forAccount, projects, name } = context;
 
     return {
       driver: 'nft',
@@ -46,10 +47,11 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       },
       isDripList: true,
       projects: mapFilterUndefined(projects, (listProj) => ({
-        userId: forAccount.userId,
+        userId: listProj.userId,
         weight: listProj.weight,
         source: listProj.source,
       })),
+      name,
     };
   }
 }

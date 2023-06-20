@@ -150,7 +150,7 @@ export default function transact(
       try {
         /* 
         We use a third-party API provided by Tenderly to estimate this batch's gas cost, because
-        its transactions are inter-dependent, meaning they cannot be indepdently simulated.
+        its transactions are inter-dependent, meaning they cannot be independently simulated.
         */
         const simulationRes = await (
           await fetch('/api/tenderly/simulate', {

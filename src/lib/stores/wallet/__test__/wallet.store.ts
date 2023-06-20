@@ -3,8 +3,8 @@ import { readable } from 'svelte/store';
 import type { ConnectedWalletStoreState } from '../wallet.store';
 
 const NETWORK = {
-  chainId: 5,
-  name: 'Goerli',
+  chainId: 11155111,
+  name: 'sepolia',
 };
 
 const provider = new providers.StaticJsonRpcProvider(

@@ -1,7 +1,7 @@
 import { utils } from 'ethers';
 import { constants } from 'radicle-drips';
 
-const MAX_DECIMAL_ZEROES = 8;
+const MAX_DECIMAL_ZEROES_IN_MOTION = 8;
 
 interface Amount {
   amount: bigint;
@@ -21,13 +21,14 @@ export default function formatTokenAmount(
   amount: Amount | bigint,
   tokenDecimals: number,
   precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+  inMotion = true,
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 
   if (amount === 0n) return '0.00';
 
   const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
-  const amountDecimals = MAX_DECIMAL_ZEROES;
+  const amountDecimals = inMotion ? MAX_DECIMAL_ZEROES_IN_MOTION : 2;
 
   const formatted = `${parsedAmount.toFixed(amountDecimals)}`;
 

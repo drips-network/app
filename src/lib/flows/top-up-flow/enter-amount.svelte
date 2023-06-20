@@ -141,7 +141,7 @@
       suffix={tokenInfo?.info.symbol}
       disabled={topUpMax}
     />
-    <svelte:fragment slot="toggle">
+    <svelte:fragment slot="action">
       <Toggle bind:checked={topUpMax} label="Max" />
     </svelte:fragment>
   </FormField>

@@ -3,23 +3,16 @@
   import { scale } from 'svelte/transition';
   export let selected: boolean;
   export let type: 'radio' | 'check' = 'radio';
+  export let focussed = false;
 </script>
 
 {#if type === 'radio'}
-  <div
-    class="selected-dot"
-    on:click={() => (selected = !selected)}
-    on:keydown={() => (selected = !selected)}
-  >
+  <div class="selected-dot" class:focussed>
     <div class="inner" class:selected />
     <div class="outer" class:selected />
   </div>
 {:else}
-  <div
-    class="selected-dot check"
-    on:click={() => (selected = !selected)}
-    on:keydown={() => (selected = !selected)}
-  >
+  <div class="selected-dot check" class:focussed>
     <div class="inner check" class:selected>
       {#if selected}
         <div class="check-icon" transition:scale|local={{ start: 1.5, duration: 300 }}>
@@ -39,6 +32,14 @@
     height: 1.5rem;
     width: 1.5rem;
     position: relative;
+  }
+
+  .focussed .selected.outer {
+    box-shadow: inset 0px 0px 0px 2px var(--color-primary);
+  }
+
+  .focussed .outer:not(.selected) {
+    box-shadow: inset 0px 0px 0px 2px var(--color-primary);
   }
 
   .inner {
@@ -76,8 +77,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 2rem;
-    height: 2rem;
+    width: 1.75rem;
+    height: 1.75rem;
     border-radius: 1.5rem;
     box-shadow: red;
     transition: width 0.3s, height 0.3s, box-shadow 0.3s;

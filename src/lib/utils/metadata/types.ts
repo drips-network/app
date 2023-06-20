@@ -1,3 +1,5 @@
+import type { Address } from '../common-types';
+
 export interface GitHubSource {
   forge: 'github';
   url: string;
@@ -29,7 +31,6 @@ export interface GenericGitSource {
 
 export type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
 
-export type Address = string;
 export type UserId = string;
 
 export interface AddressDriverAccount {

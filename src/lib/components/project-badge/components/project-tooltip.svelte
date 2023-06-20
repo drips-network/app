@@ -1,6 +1,7 @@
 <script lang="ts">
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import buildExternalUrl from '$lib/utils/build-external-url';
   import type { GitProject } from '$lib/utils/metadata/types';
   import ProjectName from './project-name.svelte';
 
@@ -29,7 +30,7 @@
     {#if project.owner}
       <div class="owner typo-text-small">
         <span>Owned by </span>
-        <IdentityBadge address={project.owner.address} disableTooltip size="small" />
+        <IdentityBadge linkToNewTab address={project.owner.address} disableTooltip size="small" />
       </div>
     {/if}
     {#if project.source.forge === 'generic'}
@@ -40,8 +41,11 @@
     {/if}
   </div>
   {#if project.source.url}
-    <a class="typo-text-small" href={project.source.url} target="_blank" rel="noreferrer"
-      >View repo {SOURCE_TYPE_STRINGS[project.source.forge]}</a
+    <a
+      class="typo-text-small"
+      href={buildExternalUrl(project.source.url)}
+      target="_blank"
+      rel="noreferrer">View repo {SOURCE_TYPE_STRINGS[project.source.forge]}</a
     >
   {/if}
 </div>

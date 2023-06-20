@@ -18,6 +18,8 @@
   export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
   export let disableTooltip = false;
   export let outline = false;
+  export let linkToNewTab = false;
+  export let showFullAddress = false;
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
   export let isReverse = false;
@@ -41,7 +43,7 @@
     return `/app/${ens?.name ?? address}`;
   }
 
-  $: toDisplay = ens?.name ?? formatAddress(address);
+  $: toDisplay = ens?.name ?? (showFullAddress ? address : formatAddress(address));
 
   const sizes = {
     small: 16,
@@ -82,6 +84,7 @@
     <svelte:element
       this={getLink() ? 'a' : 'span'}
       href={getLink()}
+      target={linkToNewTab ? '_blank' : undefined}
       class="identity-badge flex items-center relative text-left text-foreground"
       class:flex-row-reverse={isReverse}
       class:select-none={disableSelection}
@@ -100,20 +103,26 @@
       {#if showIdentity}
         <div class="identity relative flex-1 max-w-full">
           <div
-            class={`${currentFontClass} identity-ellipsis opacity-0 pointer-events-none`}
+            class={`${currentFontClass} identity opacity-0 pointer-events-none`}
             class:hideOnMobile={hideAvatarOnMobile}
           >
             {toDisplay}
+            {#if ens?.name && showFullAddress}<span class="typo-text-small-mono full-address"
+                >{address}</span
+              >{/if}
           </div>
           {#key toDisplay}
             <div
               transition:fade|local={{ duration: 300 }}
               class:foreground={size === 'gigantic'}
-              class={`${currentFontClass} identity-ellipsis absolute overlay`}
+              class={`${currentFontClass} identity absolute overlay`}
               data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
               class:hideOnMobile={hideAvatarOnMobile}
             >
               {toDisplay}
+              {#if ens?.name && showFullAddress}<span class="typo-text-small-mono full-address"
+                  >{address}</span
+                >{/if}
             </div>
           {/key}
         </div>
@@ -127,7 +136,7 @@
 
 <style>
   .wrapper {
-    width: fit-content;
+    max-width: fit-content;
   }
 
   .identity-badge:focus {
@@ -153,7 +162,16 @@
     color: var(--color-foreground);
   }
 
-  .identity-ellipsis {
+  .identity {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .full-address {
+    color: var(--color-foreground-level-5);
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

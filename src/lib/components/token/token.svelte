@@ -139,7 +139,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: var(--elevation-low);
+    border: 1px solid var(--color-foreground-level-6);
   }
 
   .background {

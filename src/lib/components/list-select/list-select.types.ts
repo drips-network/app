@@ -12,6 +12,15 @@ export interface SelectableItem {
   text?: string;
   disabled?: boolean;
   image?: string | ComponentAndProps;
+  editablePercentage?: {
+    initialWeight: number;
+  };
+}
+
+export interface InterstitialItem {
+  type: 'interstitial';
+  label: string;
+  description: string;
 }
 
 export interface ActionItem {
@@ -28,6 +37,6 @@ export interface ActionItem {
       };
 }
 
-export type ListItem = SelectableItem | ActionItem;
+export type ListItem = SelectableItem | ActionItem | InterstitialItem;
 
 export type Items = { [slug: string]: ListItem };
