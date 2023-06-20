@@ -17,7 +17,7 @@
 
   .padded-horizontal-scroll > .content {
     min-width: 100%;
-    padding: 0 2.5rem;
+    padding: 2px 2.5rem;
     width: fit-content;
   }
 </style>

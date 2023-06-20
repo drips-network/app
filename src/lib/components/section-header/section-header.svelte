@@ -8,6 +8,7 @@
     handler: (event: MouseEvent) => void;
     label?: string;
     icon?: ComponentType;
+    variant?: 'primary';
   }[] = [];
   export let actionsDisabled = false;
 </script>
@@ -23,8 +24,11 @@
   </div>
   <div class="actions">
     {#each actions as action}
-      <Button disabled={actionsDisabled} icon={action.icon} on:click={action.handler}
-        >{action.label}</Button
+      <Button
+        disabled={actionsDisabled}
+        variant={action.variant}
+        icon={action.icon}
+        on:click={action.handler}>{action.label}</Button
       >
     {/each}
   </div>
