@@ -11,9 +11,5 @@ export default function (source: Source) {
       return `/app/projects/github/${source.ownerName}/${source.repoName}`;
     case 'gitlab':
       return `/app/projects/gitlab/${source.ownerName}/${source.repoName}`;
-    case 'radicle':
-      return `/app/projects/radicle/${source.rid}`;
-    case 'generic':
-      return `/app/projects/git/${encodeURIComponent(source.url)}`;
   }
 }

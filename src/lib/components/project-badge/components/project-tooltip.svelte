@@ -10,8 +10,6 @@
   const SOURCE_TYPE_STRINGS = {
     github: 'on GitHub',
     gitlab: 'on GitLab',
-    radicle: 'on Radicle',
-    generic: '',
   };
 </script>
 
@@ -31,12 +29,6 @@
       <div class="owner typo-text-small">
         <span>Owned by </span>
         <IdentityBadge linkToNewTab address={project.owner.address} disableTooltip size="small" />
-      </div>
-    {/if}
-    {#if project.source.forge === 'generic'}
-      <div class="owner typo-text-small">
-        <span>Hosted on</span>
-        <span class="typo-text-small-bold">{new URL(project.source.url).host}</span>
       </div>
     {/if}
   </div>
