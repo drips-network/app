@@ -15,21 +15,7 @@ export interface GitLabSource {
   ownerName: string;
 }
 
-export interface RadicleSource {
-  forge: 'radicle';
-  rid: string;
-  url: string;
-  seed: string;
-  repoName: string;
-}
-
-export interface GenericGitSource {
-  forge: 'generic';
-  url: string;
-  repoName: string;
-}
-
-export type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
+export type Source = GitHubSource | GitLabSource;
 
 export type UserId = string;
 

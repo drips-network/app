@@ -26,26 +26,7 @@ const gitLabSourceSchema = z.object({
   url: z.string(),
 });
 
-const radicleSourceSchema = z.object({
-  forge: z.literal('radicle'),
-  rid: z.string(),
-  repoName: z.string(),
-  seed: z.string(),
-  url: z.string(),
-});
-
-const genericGitSourceSchema = z.object({
-  forge: z.literal('generic'),
-  repoName: z.string(),
-  url: z.string(),
-});
-
-export const sourceSchema = z.union([
-  gitHubSourceSchema,
-  gitLabSourceSchema,
-  radicleSourceSchema,
-  genericGitSourceSchema,
-]);
+export const sourceSchema = z.union([gitHubSourceSchema, gitLabSourceSchema]);
 
 export const addressDriverSplitReceiverSchema = z.object({
   weight: z.number(),
