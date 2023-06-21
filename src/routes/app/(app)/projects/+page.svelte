@@ -28,58 +28,13 @@
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import CrossIcon from 'radicle-design-system/icons/Cross.svelte';
   import { fade } from 'svelte/transition';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import assert from '$lib/utils/assert';
 
   $: {
     $walletStore.connected;
     guardConnected();
   }
-
-  // TODO: Really fetch projects
-
-  const MOCK_PROJECT_1: ClaimedGitProject = {
-    claimed: true,
-    repoDriverAccount: {
-      userId: '0',
-      driver: 'repo',
-    },
-    owner: {
-      driver: 'address',
-      userId: '0',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-    },
-    source: {
-      forge: 'github',
-      repoName: 'svelte-stepper',
-      ownerName: 'efstajas',
-      url: 'https://github.com/efstajas/svelte-stepper.git',
-    },
-    emoji: '🚶',
-    color: '#fcc842',
-  };
-
-  const MOCK_PROJECT_2: ClaimedGitProject = {
-    claimed: true,
-    repoDriverAccount: {
-      userId: '0',
-      driver: 'repo',
-    },
-    owner: {
-      driver: 'address',
-      userId: '0',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-    },
-    source: {
-      forge: 'gitlab',
-      repoName: 'svelte-stored-writable',
-      ownerName: 'efstajas',
-      host: 'foobar',
-      url: 'https://github.com/efstajas/svelte-stepper.git',
-    },
-    emoji: '💾',
-    color: '#FF0000',
-  };
-
-  const projects = [MOCK_PROJECT_1, MOCK_PROJECT_2, MOCK_PROJECT_1, MOCK_PROJECT_2, MOCK_PROJECT_2];
 
   $: userId = $walletStore.dripsUserId;
 
@@ -92,6 +47,15 @@
   let cycle: Awaited<ReturnType<typeof getCycle>> | undefined;
   onMount(async () => {
     cycle = await getCycle();
+  });
+
+  let projects: ClaimedGitProject[] | undefined;
+  onMount(async () => {
+    const service = await GitProjectService.new();
+    const { address } = $walletStore;
+
+    assert(address);
+    projects = await service.getAllOwnedBy(address);
   });
 
   let collectableAmountsExpanded = false;
@@ -128,20 +92,23 @@
     />
     <SectionSkeleton
       horizontalScroll={false}
-      loaded
+      loaded={projects !== undefined}
+      empty={projects?.length === 0}
       emptyStateEmoji="🫙"
       emptyStateHeadline="No claimed projects"
       emptyStateText="If you develop an open-source project, click &quot;Claim project&quot; to get started."
     >
-      <div class="projects">
-        {#each projects as project}
-          <div>
-            <PrimaryColorThemer colorHex={project.color}
-              ><ProjectCard {project} /></PrimaryColorThemer
-            >
-          </div>
-        {/each}
-      </div>
+      {#if projects}
+        <div class="projects">
+          {#each projects as project}
+            <div>
+              <PrimaryColorThemer colorHex={project.color}
+                ><ProjectCard {project} /></PrimaryColorThemer
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
     </SectionSkeleton>
   </div>
 
