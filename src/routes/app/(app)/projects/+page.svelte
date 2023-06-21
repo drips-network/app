@@ -273,6 +273,7 @@
 
   .earnings.card > .token-breakdown .token-amounts-table {
     padding: 0.5rem 0;
+    border-top: 1px solid var(--color-foreground);
     background-color: var(--color-foreground-level-1);
   }
 

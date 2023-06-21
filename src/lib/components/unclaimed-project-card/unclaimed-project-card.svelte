@@ -69,7 +69,7 @@
         </KeyValuePair>
       </div>
       <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
-        <TokenAmountsTable amounts={unclaimedFunds} />
+        <div class="token-amounts-table"><TokenAmountsTable amounts={unclaimedFunds} /></div>
       </Toggleable>
     </div>
   {/if}
@@ -82,6 +82,11 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    overflow: hidden;
+  }
+
+  .token-amounts-table {
+    border-top: 1px solid var(--color-foreground);
   }
 
   .basic-info {
