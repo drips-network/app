@@ -75,7 +75,7 @@
     "fuzzysort": "^2.0.3",
     "isomorphic-fetch": "^3.0.0",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
-    "radicle-drips": "github:radicle-dev/drips-js-sdk#jason/add-repo-accounts-by-owner-query",
+    "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
     "web3modal": "^1.9.9",
     "zod": "^3.19.1"
   },
