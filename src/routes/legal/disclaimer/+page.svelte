@@ -327,18 +327,19 @@
 <p>
   The User acknowledges that by using the Drips Network (including Content) and/or contributing
   Content to the Drips Network certain personal data (&ldquo;Personal Data&rdquo;, as further
-  described under &ldquo;Data in P2P and Blockchain Infrastructures&rdquo; in the Privacy Policy)
-  may be shared with the other Users of the Drips Network. Since the Personal Data used to interact
-  with the Drips Network (which is listed in the Privacy Policy) is not collected by the Association
-  nor by the Foundation but rather shared directly between the Users, the Association and/or the
-  Foundation do not qualify as a data controller or data processor according to the GDPR. Users
-  understand that the Association as well as the Foundation have no control over Personal Data
-  provided to other Users of the Drips Network and agree to not hold the Association and/or the
-  Foundation liable for any misuse of Personal Data by other Users of the Drips Network. The Users
-  further understand that the Personal Data is not recorded, stored or otherwise processed by the
-  Association and/or the Foundation. Consequently, the rights of the Users relating to their
-  Personal Data as provided in the GDPR cannot be asserted against the Association and/or the
-  Foundation.
+  described under &ldquo;Data in P2P and Blockchain Infrastructures&rdquo; in the <a
+    href="/legal/privacy">Privacy Policy</a
+  >) may be shared with the other Users of the Drips Network. Since the Personal Data used to
+  interact with the Drips Network (which is listed in the
+  <a href="/legal/privacy">Privacy Policy</a>) is not collected by the Association nor by the
+  Foundation but rather shared directly between the Users, the Association and/or the Foundation do
+  not qualify as a data controller or data processor according to the GDPR. Users understand that
+  the Association as well as the Foundation have no control over Personal Data provided to other
+  Users of the Drips Network and agree to not hold the Association and/or the Foundation liable for
+  any misuse of Personal Data by other Users of the Drips Network. The Users further understand that
+  the Personal Data is not recorded, stored or otherwise processed by the Association and/or the
+  Foundation. Consequently, the rights of the Users relating to their Personal Data as provided in
+  the GDPR cannot be asserted against the Association and/or the Foundation.
 </p>
 
 <h2>Governing Law</h2>

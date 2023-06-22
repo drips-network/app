@@ -25,10 +25,10 @@
 </p>
 <p>
   The Association voluntarily supports the growth and development of the Drips project, including
-  the Drips Network (further defined in the Disclaimer) as well as the Drips Websites and other
-  communication channels for the Drips community (as described below). The Association has posted
-  this Data &amp; Privacy Policy for the benefit of the community of supporters of the Drips
-  project.&nbsp;
+  the Drips Network (further defined in the <a href="/legal/disclaimer">Disclaimer</a>) as well as
+  the Drips Websites and other communication channels for the Drips community (as described below).
+  The Association has posted this Data &amp; Privacy Policy for the benefit of the community of
+  supporters of the Drips project.&nbsp;
 </p>
 <p>
   In this Data &amp; Privacy Policy, &quot;Association&quot; refers to Public Goods Association, an
@@ -234,8 +234,8 @@
   Association has enabled <a href="https://docs.netlify.com/monitor-sites/analytics/"
     >Netlify Analytics (see above).</a
   >
-  For further information and the applicable data protection provisions of Netlify, visit their
-  privacy policies <a href="https://www.netlify.com/privacy/">here</a> and
+  For further information and the applicable data protection provisions of Netlify, visit their privacy
+  policies <a href="https://www.netlify.com/privacy/">here</a> and
   <a href="https://www.netlify.com/gdpr-ccpa/">here</a>.&nbsp;
 </p>
 <h4>GitHub:</h4>
