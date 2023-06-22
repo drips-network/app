@@ -27,6 +27,7 @@ type Prices = {
 /** Some ERC-20s not directly traded on Binance are pegged to the value of another currency. */
 const TOKEN_SUBSTITUTIONS: { [symbol: string]: SupportedSymbol } = {
   WETH: 'ETH',
+  WEENUS: 'ETH',
   WBTC: 'BTC',
 };
 
@@ -97,7 +98,11 @@ export function stop() {
 export async function track(symbols: string[]) {
   assert(connection, 'Socket not initialized');
 
-  symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
+  const pv = get(prices);
+
+  symbols = symbols
+    .map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol)
+    .filter((symbol) => !pv[symbol]);
 
   // Set values for all unsupported symbols in prices store to unsupported.
   prices.update((prices) => {
@@ -195,10 +200,6 @@ const price = (symbols: string[]) =>
   deduplicateReadable(
     derived(prices, ($prices) => {
       symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
-
-      for (const symbol of symbols) {
-        _validateSymbol(symbol);
-      }
 
       // Return an object of all the prices for the given symbols.
       return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol]]));

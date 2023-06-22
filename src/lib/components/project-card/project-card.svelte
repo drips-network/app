@@ -1,9 +1,11 @@
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
   import type { ClaimedGitProject } from '$lib/utils/metadata/types';
+  import Github from 'radicle-design-system/icons/Github.svelte';
 
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';
+  import Gitlab from 'radicle-design-system/icons/Gitlab.svelte';
 
   export let project: ClaimedGitProject;
 </script>
@@ -20,7 +22,17 @@
       <div class="avatar"><ProjectAvatar {project} size="large" outline /></div>
     </div>
     <div class="name-and-description">
-      <h4 class="name"><ProjectName {project} /></h4>
+      <div class="source">
+        <div class="icon">
+          {#if project.source.forge === 'github'}
+            <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
+          {:else if project.source.forge === 'gitlab'}
+            <Gitlab style="height: 20px; fill: var(--color-foreground-level-6)" />
+          {/if}
+        </div>
+        <span class="owner-name">{project.source.ownerName}</span>
+      </div>
+      <h4 class="name"><ProjectName showSource={false} {project} /></h4>
       {#if project.description}<p class="description">{project.description}</p>{/if}
     </div>
   </div>
@@ -78,5 +90,12 @@
     -webkit-line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .source {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    color: var(--color-foreground-level-6);
   }
 </style>

@@ -47,7 +47,8 @@
 
     const timestamp = new Date(Date.now() + Number(durationSeconds) * 1000);
 
-    lastsUntil = topUpAmountValueParsed > 0 ? `≈ ${formatDate(timestamp, 'onlyDay')}` : undefined;
+    lastsUntil =
+      topUpAmountValueParsed > 0 ? `≈ ${formatDate(timestamp, 'dayAndYear')}` : undefined;
   }
 
   let dripListService: DripListService;

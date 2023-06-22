@@ -84,6 +84,18 @@ export default class GitProjectService {
     return onChainProject;
   }
 
+  public async getAllByOwner(address: Address): Promise<ClaimedGitProject[]> {
+    const res = await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountsOwnedByAddress(
+      address,
+    );
+
+    const promises = res.map((r) => this._mapRepoAccountToGitProject(r));
+
+    return (await Promise.all(promises)).filter(
+      (a): a is ClaimedGitProject => a !== null && Boolean(a.owner),
+    );
+  }
+
   public static deconstructUrl(url: string): {
     forge: Forge;
     username: string;
@@ -115,6 +127,69 @@ export default class GitProjectService {
     const onChainProject: RepoAccount | null =
       await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(userId);
 
+    if (!onChainProject) return null;
+
+    return await this._mapRepoAccountToGitProject(onChainProject);
+  }
+
+  public static populateSource(forge: Forge, repoName: string, username: string): Source {
+    let url: string;
+
+    switch (forge) {
+      case Forge.GitHub:
+        url = `https://github.com/${username}/${repoName}`;
+        break;
+      case Forge.GitLab:
+        url = `https://gitlab.com/${username}/${repoName}`;
+        break;
+      default:
+        throw new Error(`Unsupported forge: ${forge}`);
+    }
+
+    switch (forge) {
+      case Forge.GitHub:
+        return {
+          url,
+          repoName,
+          forge: 'github',
+          ownerName: username,
+        };
+      case Forge.GitLab:
+        return {
+          url,
+          repoName,
+          forge: 'gitlab',
+          host: 'gitlab.com',
+          ownerName: username,
+        };
+      default:
+        throw new Error(`Unsupported forge: ${forge}`);
+    }
+  }
+
+  private _verifySubgraphAndOnChainStateIsInSync(
+    isClaimed: boolean,
+    repoAccount: RepoAccount,
+    userId: string,
+  ): void {
+    if (!isClaimed && repoAccount.status === 'CLAIMED') {
+      throw new Error(
+        `The repo account with user ID ${userId} is not claimed on-chain (has no owner address set) but has a status of ${repoAccount.status} in the subgraph.
+        This means the subgraph is out of sync with the on-chain state.`,
+      );
+    }
+
+    if (isClaimed && repoAccount.status !== 'CLAIMED') {
+      throw new Error(
+        `The repo account with user ID ${userId} is claimed on-chain (has an owner address set) but has a status of ${repoAccount.status} in the subgraph. 
+        This means the subgraph is out of sync with the on-chain state.`,
+      );
+    }
+  }
+
+  private async _mapRepoAccountToGitProject(
+    onChainProject: RepoAccount,
+  ): Promise<GitProject | null> {
     // The project doesn't exist on-chain.
     if (!onChainProject) {
       return null;
@@ -122,6 +197,7 @@ export default class GitProjectService {
 
     // The project exists on-chain...
 
+    const { userId } = onChainProject;
     const ownerAddress = await this._repoDriverClient.getOwner(userId);
     const isClaimed = Boolean(ownerAddress);
 
@@ -185,61 +261,6 @@ export default class GitProjectService {
     };
 
     return claimedProject;
-  }
-
-  public static populateSource(forge: Forge, repoName: string, username: string): Source {
-    let url: string;
-
-    switch (forge) {
-      case Forge.GitHub:
-        url = `https://github.com/${username}/${repoName}`;
-        break;
-      case Forge.GitLab:
-        url = `https://gitlab.com/${username}/${repoName}`;
-        break;
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
-
-    switch (forge) {
-      case Forge.GitHub:
-        return {
-          url,
-          repoName,
-          forge: 'github',
-          ownerName: username,
-        };
-      case Forge.GitLab:
-        return {
-          url,
-          repoName,
-          forge: 'gitlab',
-          host: 'gitlab.com',
-          ownerName: username,
-        };
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
-  }
-
-  private _verifySubgraphAndOnChainStateIsInSync(
-    isClaimed: boolean,
-    repoAccount: RepoAccount,
-    userId: string,
-  ): void {
-    if (!isClaimed && repoAccount.status === 'CLAIMED') {
-      throw new Error(
-        `The repo account with user ID ${userId} is not claimed on-chain (has no owner address set) but has a status of ${repoAccount.status} in the subgraph.
-        This means the subgraph is out of sync with the on-chain state.`,
-      );
-    }
-
-    if (isClaimed && repoAccount.status !== 'CLAIMED') {
-      throw new Error(
-        `The repo account with user ID ${userId} is claimed on-chain (has an owner address set) but has a status of ${repoAccount.status} in the subgraph. 
-        This means the subgraph is out of sync with the on-chain state.`,
-      );
-    }
   }
 
   private _calculateVerificationStatus(repoAccount: RepoAccount): VerificationStatus {

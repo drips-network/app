@@ -17,7 +17,7 @@
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
 
-  const initHeight = 256;
+  export let initHeight = 256;
 
   let containerHeight = tweened(initHeight, {
     duration: 300,

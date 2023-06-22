@@ -8,18 +8,18 @@
 </script>
 
 <div class="wrapper">
-  {#if typeof fiatEstimateCents === 'number'}
-    {#key fiatEstimateCents}
-      <span transition:fade={{ duration: 100 }} class="amount"
-        ><span class="currency">$</span>{formattedFiatEstimate}</span
+  {#if typeof fiatEstimateCents === 'number' && formattedFiatEstimate}
+    {#key formattedFiatEstimate}
+      <span transition:fade|local={{ duration: 200 }} class="amount"
+        ><span class="currency">≈$</span>{formattedFiatEstimate}</span
       >
     {/key}
-    <span class="amount placeholder">${formattedFiatEstimate}</span>
+    <span class="amount placeholder">≈${formattedFiatEstimate}</span>
   {:else if fiatEstimateCents === 'pending'}
-    <span transition:fade={{ duration: 100 }} class="pending"
-      ><span class="currency">$</span>...</span
+    <span transition:fade|local={{ duration: 100 }} class="pending"
+      ><span class="currency">≈$</span>...</span
     >
-    <span class="pending placeholder"><span class="currency">$</span>...</span>
+    <span class="pending placeholder"><span class="currency">≈$</span>...</span>
   {:else}
     Unknown amount
   {/if}
@@ -42,6 +42,7 @@
     top: 0;
     left: 0;
     position: absolute;
+    animation: loading 2s infinite;
   }
 
   .placeholder {
@@ -52,5 +53,17 @@
 
   .currency {
     opacity: 0.5;
+  }
+
+  @keyframes loading {
+    0% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.25;
+    }
   }
 </style>
