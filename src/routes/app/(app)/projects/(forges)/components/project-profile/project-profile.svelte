@@ -6,6 +6,7 @@
   import BecomeSupporterCard from '../become-supporter-card/become-supporter-card.svelte';
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
 
   export let project: GitProject;
 </script>
@@ -28,6 +29,8 @@
       {#if project.owner}
         <SectionHeader icon={Heart} label="Supporters" />
         <SectionHeader icon={Splits} label="Splits" />
+      {:else}
+        <UnclaimedProjectCard {project} />
       {/if}
     </div>
     {#if project.owner}

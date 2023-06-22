@@ -17,7 +17,7 @@
 
 <style>
   .project-name {
-    display: inline-block;
+    display: inline-flex;
     width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
