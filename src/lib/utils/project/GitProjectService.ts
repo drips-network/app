@@ -84,7 +84,7 @@ export default class GitProjectService {
     return onChainProject;
   }
 
-  public async getAllOwnedBy(address: string): Promise<ClaimedGitProject[]> {
+  public async getAllByOwner(address: string): Promise<ClaimedGitProject[]> {
     const res = await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountsOwnedByAddress(
       address,
     );
