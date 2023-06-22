@@ -7,8 +7,10 @@
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
   export let project: GitProject;
+  export let unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined = undefined;
 </script>
 
 <svelte:head>
@@ -30,7 +32,13 @@
         <SectionHeader icon={Heart} label="Supporters" />
         <SectionHeader icon={Splits} label="Splits" />
       {:else}
-        <UnclaimedProjectCard {project} />
+        <div class="section">
+          <SectionHeader icon={Wallet} label="Claimable funds" />
+          <UnclaimedProjectCard
+            unclaimedTokensExpanded={unclaimedFunds && unclaimedFunds.length > 0}
+            {unclaimedFunds}
+          />
+        </div>
       {/if}
     </div>
     {#if project.owner}
@@ -64,6 +72,7 @@
 
   .header {
     grid-area: header;
+    margin-bottom: 3rem;
   }
 
   aside {
@@ -88,5 +97,11 @@
     aside {
       padding: 2rem 0;
     }
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 </style>
