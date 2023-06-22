@@ -6,8 +6,8 @@ import type { Account, StreamId, UserId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
 import { getDripsHubClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
-import relevantTokens from './utils/relevant_tokens';
-import fetchBalancesForTokens from './utils/fetch_balances_for_tokens';
+import relevantTokens from '$lib/utils/drips/relevant-tokens';
+import fetchBalancesForTokens from '$lib/utils/drips/fetch-balances-for-tokens';
 import type { AccountFetchStatus } from '../account-fetch-statusses/account-fetch-statusses.store';
 
 interface Amount {

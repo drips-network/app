@@ -4,6 +4,7 @@
 
   export let data: PageData;
   $: project = data.project;
+  $: unclaimedFunds = data.unclaimedFunds;
 </script>
 
-<ProjectProfile {project} />
+<ProjectProfile {project} {unclaimedFunds} />

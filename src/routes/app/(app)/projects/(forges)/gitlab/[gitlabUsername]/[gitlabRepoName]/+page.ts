@@ -2,6 +2,7 @@ import GitProjectService from '$lib/utils/project/GitProjectService';
 import type { PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import isForge from '$lib/utils/project/is-forge';
+import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 
 // TODO: Add support for GitLab "project groups"
 
@@ -19,7 +20,14 @@ export const load = (async ({ params }) => {
     );
   }
 
+  const unclaimedFunds = project.claimed
+    ? undefined
+    : await fetchUnclaimedFunds(project.repoDriverAccount.userId);
+
+  // TODO: Check if this project exists on GitHub
+
   return {
     project,
+    unclaimedFunds,
   };
 }) satisfies PageLoad;
