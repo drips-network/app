@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let key = 'key';
+  export let key: string;
   export let size: 'medium' | 'large' = 'large';
   export let highlight = false;
 </script>

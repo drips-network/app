@@ -10,15 +10,65 @@
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import type { Splits } from '$lib/components/splits/splits.svelte';
+  import type { Splits, Split } from '$lib/components/splits/splits.svelte';
   import SplitsComponent from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
+  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+
+  interface Amount {
+    tokenAddress: string;
+    amount: bigint;
+  }
 
   export let project: GitProject;
-  export let unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined = undefined;
+
+  export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
+  export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
   export let maintainerSplits: Promise<Splits> | undefined = undefined;
   export let dependencySplits: Promise<Splits> | undefined = undefined;
+
+  function flattenSplits(list: Splits): Split[] {
+    return list.reduce<Split[]>((acc, i) => {
+      if (i.type === 'split-group') {
+        return [...acc, ...flattenSplits(i.list)];
+      }
+      return [...acc, i];
+    }, []);
+  }
+
+  function getSplitsPile(splitCollections: Splits[]) {
+    const splits = splitCollections.flat();
+    const flattened = flattenSplits(splits);
+
+    return mapFilterUndefined(flattened, (v) => {
+      switch (v.type) {
+        case 'address-split':
+          return {
+            component: IdentityBadge,
+            props: {
+              address: v.address,
+              showIdentity: false,
+              outline: true,
+            },
+          };
+        case 'project-split':
+          return {
+            component: ProjectAvatar,
+            props: {
+              project: v.project,
+            },
+          };
+        default:
+          return undefined;
+      }
+    });
+  }
 </script>
 
 <svelte:head>
@@ -39,6 +89,34 @@
         </div>
       {/if}
       <ProjectProfileHeader {project} />
+      <div class="stats">
+        {#if earnedFunds}
+          <div class="stat">
+            {#await earnedFunds}
+              <div class="loading">
+                <Spinner />
+              </div>
+            {:then result}
+              <KeyValuePair key="Total income">
+                <AggregateFiatEstimate amounts={result} />
+              </KeyValuePair>
+            {/await}
+          </div>
+        {/if}
+        {#if maintainerSplits && dependencySplits}
+          <div class="stat">
+            {#await Promise.all([maintainerSplits, dependencySplits])}
+              <div class="loading">
+                <Spinner />
+              </div>
+            {:then result}
+              <KeyValuePair key="Splits with">
+                <Pile maxItems={5} components={getSplitsPile(result)} />
+              </KeyValuePair>
+            {/await}
+          </div>
+        {/if}
+      </div>
     </div>
     <div class="content">
       {#if project.owner}
@@ -79,13 +157,19 @@
             {/await}
           {/if}
         </div>
-      {:else}
+      {:else if unclaimedFunds}
         <div class="section">
           <SectionHeader icon={Wallet} label="Claimable funds" />
-          <UnclaimedProjectCard
-            unclaimedTokensExpanded={unclaimedFunds && unclaimedFunds.length > 0}
-            {unclaimedFunds}
-          />
+          {#await unclaimedFunds}
+            <SectionSkeleton loaded={false} />
+          {:then result}
+            <SectionSkeleton loaded={true}>
+              <UnclaimedProjectCard
+                unclaimedTokensExpanded={result.length > 0}
+                unclaimedFunds={result}
+              />
+            </SectionSkeleton>
+          {/await}
         </div>
       {/if}
     </div>
@@ -128,6 +212,19 @@
     gap: 0.5rem;
     align-items: center;
     margin-bottom: 1.5rem;
+  }
+
+  .stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .stats .stat {
+    padding: 1rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
   }
 
   aside {

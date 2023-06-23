@@ -5,6 +5,7 @@ import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
 import buildProjectSplitsData from '../../../methods/build-project-splits-data';
+import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 
 export const load = (async ({ params }) => {
   const { githubUsername, githubRepoName } = params;
@@ -28,12 +29,17 @@ export const load = (async ({ params }) => {
 
   const unclaimedFunds = project.claimed
     ? undefined
-    : await fetchUnclaimedFunds(project.repoDriverAccount.userId);
+    : fetchUnclaimedFunds(project.repoDriverAccount.userId);
+
+  const earnedFunds = project.claimed
+    ? fetchEarnedFunds(project.repoDriverAccount.userId)
+    : undefined;
 
   return {
     project,
-    unclaimedFunds,
     streamed: {
+      unclaimedFunds,
+      earnedFunds,
       splits: buildProjectSplitsData(project),
     },
   };

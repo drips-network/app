@@ -3,8 +3,12 @@
   import ProjectProfile from '../../../components/project-profile/project-profile.svelte';
 
   export let data: PageData;
-  $: project = data.project;
-  $: unclaimedFunds = data.unclaimedFunds;
 </script>
 
-<ProjectProfile {project} {unclaimedFunds} />
+<ProjectProfile
+  project={data.project}
+  unclaimedFunds={data.streamed.unclaimedFunds}
+  earnedFunds={data.streamed.earnedFunds}
+  dependencySplits={data.streamed.splits?.dependencies}
+  maintainerSplits={data.streamed.splits?.maintainers}
+/>

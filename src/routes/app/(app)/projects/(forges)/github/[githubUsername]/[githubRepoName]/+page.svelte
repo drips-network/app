@@ -7,7 +7,8 @@
 
 <ProjectProfile
   project={data.project}
-  unclaimedFunds={data.unclaimedFunds}
+  unclaimedFunds={data.streamed.unclaimedFunds}
+  earnedFunds={data.streamed.earnedFunds}
   dependencySplits={data.streamed.splits?.dependencies}
   maintainerSplits={data.streamed.splits?.maintainers}
 />
