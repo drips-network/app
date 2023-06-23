@@ -2,9 +2,9 @@ import GitProjectService from '$lib/utils/project/GitProjectService';
 import { error } from '@sveltejs/kit';
 import isForge from '$lib/utils/project/is-forge';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
-// This should be `PageServerLoad`, but for some reason SvelteKit isn't generating one. TODO: Figure out why
-import type { PageLoad } from './$types';
 import siteExists from '$lib/utils/site-exists';
+import buildProjectSplitsData from '../../../methods/build-project-splits-data';
+import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
   const { gitlabRepoName, gitlabUsername } = params;
@@ -33,5 +33,8 @@ export const load = (async ({ params }) => {
   return {
     project,
     unclaimedFunds,
+    streamed: {
+      splits: buildProjectSplitsData(project),
+    },
   };
-}) satisfies PageLoad;
+}) satisfies PageServerLoad;

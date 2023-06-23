@@ -26,7 +26,7 @@
     Join <b>radworks.eth</b>, <b>maker-dao.eth</b> and 23 others in supporting
     <b>{project.source.repoName}</b> on Drips.
   </p>
-  <Button size="large" icon={Heart} variant="primary">Support this project</Button>
+  <Button size="large" icon={Heart} variant="primary">Create a Drip List</Button>
   <div class="benefits typo-text-small">
     You'll get…
     <div class="benefit">

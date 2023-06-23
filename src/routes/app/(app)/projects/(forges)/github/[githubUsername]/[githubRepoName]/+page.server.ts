@@ -4,6 +4,7 @@ import isForge from '$lib/utils/project/is-forge';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
+import buildProjectSplitsData from '../../../methods/build-project-splits-data';
 
 export const load = (async ({ params }) => {
   const { githubUsername, githubRepoName } = params;
@@ -32,5 +33,8 @@ export const load = (async ({ params }) => {
   return {
     project,
     unclaimedFunds,
+    streamed: {
+      splits: buildProjectSplitsData(project),
+    },
   };
 }) satisfies PageServerLoad;

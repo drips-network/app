@@ -2,16 +2,23 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Heart from 'radicle-design-system/icons/Heart.svelte';
-  import Splits from 'radicle-design-system/icons/Splits.svelte';
+  import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import BecomeSupporterCard from '../become-supporter-card/become-supporter-card.svelte';
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
+  import type { Splits } from '$lib/components/splits/splits.svelte';
+  import SplitsComponent from '$lib/components/splits/splits.svelte';
+  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
 
   export let project: GitProject;
   export let unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined = undefined;
+
+  export let maintainerSplits: Promise<Splits> | undefined = undefined;
+  export let dependencySplits: Promise<Splits> | undefined = undefined;
 </script>
 
 <svelte:head>
@@ -36,7 +43,42 @@
     <div class="content">
       {#if project.owner}
         <SectionHeader icon={Heart} label="Supporters" />
-        <SectionHeader icon={Splits} label="Splits" />
+        <div class="section">
+          <SectionHeader icon={SplitsIcon} label="Splits" />
+          {#if maintainerSplits && dependencySplits}
+            {#await Promise.all([maintainerSplits, dependencySplits])}
+              <SectionSkeleton loaded={false} />
+            {:then result}
+              <SectionSkeleton
+                loaded={true}
+                empty={result.every((v) => v.length === 0)}
+                emptyStateHeadline="No splits"
+                emptyStateEmoji="🫧"
+                emptyStateText="This project isn't sharing incoming funds with any maintainers or dependencies."
+              >
+                <div class="card">
+                  <div class="outgoing-splits">
+                    <ProjectBadge {project} />
+                    <SplitsComponent
+                      list={[
+                        {
+                          type: 'split-group',
+                          name: 'Maintainers',
+                          list: result[0],
+                        },
+                        {
+                          type: 'split-group',
+                          name: 'Dependencies',
+                          list: result[1],
+                        },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </SectionSkeleton>
+            {/await}
+          {/if}
+        </div>
       {:else}
         <div class="section">
           <SectionHeader icon={Wallet} label="Claimable funds" />
@@ -95,6 +137,16 @@
   .become-supporter-card {
     position: sticky;
     top: 0;
+  }
+
+  .card {
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
+  }
+
+  .outgoing-splits {
+    padding: 1.5rem;
   }
 
   @media (max-width: 1024px) {
