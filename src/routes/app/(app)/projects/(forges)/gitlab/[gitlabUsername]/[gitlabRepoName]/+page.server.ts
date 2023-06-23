@@ -1,17 +1,23 @@
 import GitProjectService from '$lib/utils/project/GitProjectService';
-import type { PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import isForge from '$lib/utils/project/is-forge';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
-
-// TODO: Add support for GitLab "project groups"
+// This should be `PageServerLoad`, but for some reason SvelteKit isn't generating one. TODO: Figure out why
+import type { PageLoad } from './$types';
+import siteExists from '$lib/utils/site-exists';
 
 export const load = (async ({ params }) => {
   const { gitlabRepoName, gitlabUsername } = params;
 
   const service = await GitProjectService.new();
 
-  const project = await service.getByUrl(`https://gitlab.com/${gitlabUsername}/${gitlabRepoName}`);
+  const gitLabUrl = `https://gitlab.com/${gitlabUsername}/${gitlabRepoName}`;
+
+  if (!(await siteExists(gitLabUrl))) {
+    throw error(404);
+  }
+
+  const project = await service.getByUrl(gitLabUrl);
 
   if (!isForge('gitlab', project)) {
     throw error(
@@ -23,8 +29,6 @@ export const load = (async ({ params }) => {
   const unclaimedFunds = project.claimed
     ? undefined
     : await fetchUnclaimedFunds(project.repoDriverAccount.userId);
-
-  // TODO: Check if this project exists on GitHub
 
   return {
     project,

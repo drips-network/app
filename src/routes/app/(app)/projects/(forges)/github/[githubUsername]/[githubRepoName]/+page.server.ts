@@ -1,15 +1,22 @@
 import GitProjectService from '$lib/utils/project/GitProjectService';
-import type { PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import isForge from '$lib/utils/project/is-forge';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
+import siteExists from '$lib/utils/site-exists';
+import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
   const { githubUsername, githubRepoName } = params;
 
   const service = await GitProjectService.new();
 
-  const project = await service.getByUrl(`https://github.com/${githubUsername}/${githubRepoName}`);
+  const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
+
+  if (!(await siteExists(gitHubUrl))) {
+    throw error(404);
+  }
+
+  const project = await service.getByUrl(gitHubUrl);
 
   if (!isForge('github', project)) {
     throw error(
@@ -22,10 +29,8 @@ export const load = (async ({ params }) => {
     ? undefined
     : await fetchUnclaimedFunds(project.repoDriverAccount.userId);
 
-  // TODO: Check if this project exists on GitHub
-
   return {
     project,
     unclaimedFunds,
   };
-}) satisfies PageLoad;
+}) satisfies PageServerLoad;
