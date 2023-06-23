@@ -8,6 +8,7 @@
   import type { GitProject } from '$lib/utils/metadata/types';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let project: GitProject;
   export let unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined = undefined;
@@ -25,6 +26,11 @@
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
   <div class="project-profile">
     <div class="header">
+      {#if project.owner}
+        <div class="owner">
+          <IdentityBadge address={project.owner.address} /> is raising funds for...
+        </div>
+      {/if}
       <ProjectProfileHeader {project} />
     </div>
     <div class="content">
@@ -73,6 +79,13 @@
   .header {
     grid-area: header;
     margin-bottom: 3rem;
+  }
+
+  .header .owner {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
   }
 
   aside {
