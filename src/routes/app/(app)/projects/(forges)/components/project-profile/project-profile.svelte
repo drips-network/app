@@ -101,37 +101,43 @@
         </div>
       {/if}
       <ProjectProfileHeader {project} />
-      <div class="stats">
-        {#if earnedFunds}
-          <div class="stat">
-            {#await earnedFunds}
-              <div class="loading">
-                <Spinner />
-              </div>
-            {:then result}
-              <KeyValuePair key="Total income">
-                <AggregateFiatEstimate amounts={result} />
-              </KeyValuePair>
-            {/await}
-          </div>
-        {/if}
-        {#if splits}
-          <div class="stat">
-            {#await splits}
-              <div class="loading">
-                <Spinner />
-              </div>
-            {:then result}
-              <KeyValuePair key="Splits with">
-                <Pile
-                  maxItems={5}
-                  components={getSplitsPile([result.maintainers, result.dependencies])}
-                />
-              </KeyValuePair>
-            {/await}
-          </div>
-        {/if}
-      </div>
+      {#if project.claimed}
+        <div class="stats">
+          {#if earnedFunds}
+            <div class="stat">
+              {#await earnedFunds}
+                <div class="loading">
+                  <Spinner />
+                </div>
+              {:then result}
+                <KeyValuePair key="Total income">
+                  <AggregateFiatEstimate amounts={result} />
+                </KeyValuePair>
+              {/await}
+            </div>
+          {/if}
+          {#if splits}
+            <div class="stat">
+              {#await splits}
+                <div class="loading">
+                  <Spinner />
+                </div>
+              {:then result}
+                <KeyValuePair key="Splits with">
+                  {#if result && [result.maintainers, result.dependencies].flat().length > 0}
+                    <Pile
+                      maxItems={5}
+                      components={getSplitsPile([result.maintainers, result.dependencies])}
+                    />
+                  {:else}
+                    None
+                  {/if}
+                </KeyValuePair>
+              {/await}
+            </div>
+          {/if}
+        </div>
+      {/if}
     </div>
     <div class="content">
       {#if project.owner}
