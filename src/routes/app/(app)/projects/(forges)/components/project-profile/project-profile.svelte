@@ -92,6 +92,9 @@
   />
 </svelte:head>
 
+<!-- TODO: Add claim project button -->
+<!-- TODO: Display supporters on unclaimed projects -->
+
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
   <div class="project-profile">
     <div class="header">
