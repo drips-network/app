@@ -4,11 +4,13 @@ import isForge from '$lib/utils/project/is-forge';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
-import buildProjectSplitsData from '../../../methods/build-project-splits-data';
+import { buildProjectSplitsData } from '../../../methods/project-splits';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
+import getIncomingSplits from '../../../methods/get-incoming-splits';
+import uriDecodeParams from '$lib/utils/url-decode-params';
 
 export const load = (async ({ params }) => {
-  const { githubUsername, githubRepoName } = params;
+  const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
   const service = await GitProjectService.new();
 
@@ -40,6 +42,7 @@ export const load = (async ({ params }) => {
     streamed: {
       unclaimedFunds,
       earnedFunds,
+      incomingSplits: getIncomingSplits(project.repoDriverAccount.userId),
       splits: buildProjectSplitsData(project),
     },
   };

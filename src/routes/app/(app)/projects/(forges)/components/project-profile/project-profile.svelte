@@ -19,6 +19,8 @@
   import Pile from '$lib/components/pile/pile.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type getIncomingSplits from '../../methods/get-incoming-splits';
+  import { getSplitPercent } from '$lib/utils/get-split-percent';
 
   interface Amount {
     tokenAddress: string;
@@ -30,8 +32,10 @@
   export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
-  export let maintainerSplits: Promise<Splits> | undefined = undefined;
-  export let dependencySplits: Promise<Splits> | undefined = undefined;
+  export let splits: Promise<{ maintainers: Splits; dependencies: Splits } | null> | undefined =
+    undefined;
+
+  export let incomingSplits: ReturnType<typeof getIncomingSplits>;
 
   function flattenSplits(list: Splits): Split[] {
     return list.reduce<Split[]>((acc, i) => {
@@ -69,6 +73,14 @@
       }
     });
   }
+
+  function flattenIncomingSplits(incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>>) {
+    return [
+      ...incomingSplits.dripLists.map((v) => ({ type: 'dripList' as const, item: v })),
+      ...incomingSplits.projects.map((v) => ({ type: 'project' as const, item: v })),
+      ...incomingSplits.users.map((v) => ({ type: 'user' as const, item: v })),
+    ];
+  }
 </script>
 
 <svelte:head>
@@ -103,15 +115,18 @@
             {/await}
           </div>
         {/if}
-        {#if maintainerSplits && dependencySplits}
+        {#if splits}
           <div class="stat">
-            {#await Promise.all([maintainerSplits, dependencySplits])}
+            {#await splits}
               <div class="loading">
                 <Spinner />
               </div>
             {:then result}
               <KeyValuePair key="Splits with">
-                <Pile maxItems={5} components={getSplitsPile(result)} />
+                <Pile
+                  maxItems={5}
+                  components={getSplitsPile([result.maintainers, result.dependencies])}
+                />
               </KeyValuePair>
             {/await}
           </div>
@@ -120,39 +135,72 @@
     </div>
     <div class="content">
       {#if project.owner}
-        <SectionHeader icon={Heart} label="Supporters" />
+        <div class="section">
+          <SectionHeader icon={Heart} label="Supporters" />
+          {#await incomingSplits}
+            <SectionSkeleton loaded={false} />
+          {:then result}
+            <SectionSkeleton loaded={true} empty={flattenIncomingSplits(result).length === 0}>
+              <!-- TODO: Limit supporters list to some max amount, make expandable -->
+              <div class="supporters-list">
+                {#each flattenIncomingSplits(result) as incomingSplit}
+                  <div class="item">
+                    {#if incomingSplit.type === 'user'}
+                      <IdentityBadge address={incomingSplit.item.value.address} />
+                    {:else if incomingSplit.type === 'dripList'}
+                      <IdentityBadge address={incomingSplit.item.value.account.owner} />
+                    {:else if incomingSplit.type === 'project'}
+                      <ProjectBadge project={incomingSplit.item.value} />
+                    {/if}
+                    <span class="muted"
+                      >{getSplitPercent(incomingSplit.item.weight)}% of {incomingSplit.type ===
+                      'dripList'
+                        ? 'donations'
+                        : 'income'}</span
+                    >
+                  </div>
+                {/each}
+              </div>
+            </SectionSkeleton>
+          {/await}
+        </div>
         <div class="section">
           <SectionHeader icon={SplitsIcon} label="Splits" />
-          {#if maintainerSplits && dependencySplits}
-            {#await Promise.all([maintainerSplits, dependencySplits])}
+          {#if splits}
+            {#await splits}
               <SectionSkeleton loaded={false} />
             {:then result}
               <SectionSkeleton
                 loaded={true}
-                empty={result.every((v) => v.length === 0)}
+                error={result === null}
+                empty={result
+                  ? result.maintainers.length === 0 && result.dependencies.length === 0
+                  : false}
                 emptyStateHeadline="No splits"
                 emptyStateEmoji="🫧"
                 emptyStateText="This project isn't sharing incoming funds with any maintainers or dependencies."
               >
-                <div class="card">
-                  <div class="outgoing-splits">
-                    <ProjectBadge {project} />
-                    <SplitsComponent
-                      list={[
-                        {
-                          type: 'split-group',
-                          name: 'Maintainers',
-                          list: result[0],
-                        },
-                        {
-                          type: 'split-group',
-                          name: 'Dependencies',
-                          list: result[1],
-                        },
-                      ]}
-                    />
+                {#if result}
+                  <div class="card">
+                    <div class="outgoing-splits">
+                      <ProjectBadge {project} />
+                      <SplitsComponent
+                        list={[
+                          {
+                            type: 'split-group',
+                            name: 'Maintainers',
+                            list: result.maintainers,
+                          },
+                          {
+                            type: 'split-group',
+                            name: 'Dependencies',
+                            list: result.dependencies,
+                          },
+                        ]}
+                      />
+                    </div>
                   </div>
-                </div>
+                {/if}
               </SectionSkeleton>
             {/await}
           {/if}
@@ -244,6 +292,26 @@
 
   .outgoing-splits {
     padding: 1.5rem;
+  }
+
+  .supporters-list {
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  .supporters-list .item {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .supporters-list .item:not(:last-child) {
+    border-bottom: 1px solid var(--color-foreground);
+  }
+
+  .muted {
+    color: var(--color-foreground-level-6);
   }
 
   @media (max-width: 1024px) {

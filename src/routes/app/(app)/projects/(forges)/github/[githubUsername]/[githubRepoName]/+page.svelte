@@ -8,7 +8,7 @@
 <ProjectProfile
   project={data.project}
   unclaimedFunds={data.streamed.unclaimedFunds}
+  incomingSplits={data.streamed.incomingSplits}
   earnedFunds={data.streamed.earnedFunds}
-  dependencySplits={data.streamed.splits?.dependencies}
-  maintainerSplits={data.streamed.splits?.maintainers}
+  splits={data.streamed.splits}
 />

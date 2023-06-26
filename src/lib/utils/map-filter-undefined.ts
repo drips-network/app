@@ -12,5 +12,5 @@ export default function mapFilterUndefined<T, RT>(
 ): RT[] {
   const mapped = array.map(mapFn);
 
-  return mapped.filter<RT>((v): v is RT => v !== undefined);
+  return mapped.filter<RT>((v): v is RT => v !== undefined && v !== null);
 }

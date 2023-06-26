@@ -52,9 +52,9 @@ const WAITING_WALLET_ICON = {
 export default class DripListService {
   private readonly SEED_CONSTANT = 'Drips App';
 
-  private _owner!: Signer;
-  private _ownerAddress!: Address;
-  private _nftDriverClient!: NFTDriverClient;
+  private _owner!: Signer | undefined;
+  private _ownerAddress!: Address | undefined;
+  private _nftDriverClient!: NFTDriverClient | undefined;
   private _repoDriverClient!: RepoDriverClient;
   private _gitProjectService!: GitProjectService;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
@@ -73,17 +73,22 @@ export default class DripListService {
   public static async new(): Promise<DripListService> {
     const dripListService = new DripListService();
 
-    dripListService._nftDriverClient = await getNFTDriverClient();
     dripListService._repoDriverClient = await getRepoDriverClient();
     dripListService._gitProjectService = await GitProjectService.new();
-    dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
     dripListService._addressDriverClient = await getAddressDriverClient();
-    dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
 
-    const signer = dripListService._addressDriverClient.signer;
-    assert(signer, 'Signer address is undefined.');
-    dripListService._owner = signer;
-    dripListService._ownerAddress = await signer.getAddress();
+    const { connected } = get(wallet);
+
+    if (connected) {
+      dripListService._nftDriverClient = await getNFTDriverClient();
+      dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
+      dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
+
+      const signer = dripListService._addressDriverClient.signer;
+      assert(signer, 'Signer address is undefined.');
+      dripListService._owner = signer;
+      dripListService._ownerAddress = await signer.getAddress();
+    }
 
     return dripListService;
   }
@@ -106,41 +111,63 @@ export default class DripListService {
     const dripLists: DripList[] = [];
 
     for (const nftSubAccount of ownerNftSubAccounts) {
-      const nftSubAccountMetadata = await this._nftDriverMetadataManager.fetchAccountMetadata(
-        nftSubAccount.tokenId,
-      );
+      const dripList = await this._mapNftSubAccountToDripList(nftSubAccount);
 
-      // For now, *all* NFT sub-accounts "are" drip lists, so this check is should always pass.
-      if (!nftSubAccountMetadata?.data.isDripList) {
-        continue;
-      }
-
-      const dripList: DripList = {
-        account: {
-          driver: 'nft',
-          owner: ownerAddress,
-          userId: nftSubAccount.tokenId,
-        },
-        projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
-        // TODO: properties below are post-MVP.
-        isPublic: false,
-        name: undefined,
-        description: undefined,
-      };
-
-      dripLists.push(dripList);
-
-      // TODO: enable this after development.
-      // TODO: remove this after the MVP.
-      // if (dripLists.length === 2) {
-      //   throw new Error(`More than one drip list found for the owner ${ownerAddress}.`);
-      // }
+      if (dripList) dripLists.push(dripList);
     }
 
     return dripLists;
   }
 
+  public async getByTokenId(tokenId: UserId): Promise<DripList | null> {
+    const subAccount = await this._dripsSubgraphClient.getNftSubAccountOwnerByTokenId(tokenId);
+
+    if (!subAccount) return null;
+
+    return await this._mapNftSubAccountToDripList(subAccount);
+  }
+
+  private async _mapNftSubAccountToDripList(nftSubAccount: {
+    tokenId: string;
+    ownerAddress: string;
+  }): Promise<DripList | null> {
+    const nftSubAccountMetadata = await this._nftDriverMetadataManager.fetchAccountMetadata(
+      nftSubAccount.tokenId,
+    );
+
+    // For now, *all* NFT sub-accounts "are" drip lists, so this check is should always pass.
+    if (!nftSubAccountMetadata?.data.isDripList) {
+      return null;
+    }
+
+    const dripList: DripList = {
+      account: {
+        driver: 'nft',
+        owner: nftSubAccount.ownerAddress,
+        userId: nftSubAccount.tokenId,
+      },
+      projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
+      // TODO: properties below are post-MVP.
+      isPublic: false,
+      name: undefined,
+      description: undefined,
+    };
+
+    return dripList;
+
+    // TODO: enable this after development.
+    // TODO: remove this after the MVP.
+    // if (dripLists.length === 2) {
+    //   throw new Error(`More than one drip list found for the owner ${ownerAddress}.`);
+    // }
+  }
+
   public async buildTransactContext(context: State) {
+    assert(
+      this._ownerAddress && this._nftDriverClient,
+      `This function requires an active wallet connection.`,
+    );
+
     const token = context.supportConfig.listSelected[0] ?? unreachable();
     let amountPerSec = context.supportConfig.streamRateValueParsed ?? unreachable();
     amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
@@ -285,6 +312,8 @@ export default class DripListService {
     projects: z.infer<typeof repoDriverSplitReceiverSchema>[],
     name?: string,
   ): Promise<IpfsHash> {
+    assert(this._ownerAddress, `This function requires an active wallet connection.`);
+
     const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
       forAccount: {
         driver: 'nft',
@@ -301,6 +330,8 @@ export default class DripListService {
   }
 
   private async _buildCreateDripListTx(salt: bigint, ipfsHash: IpfsHash) {
+    assert(this._ownerAddress, `This function requires an active wallet connection.`);
+
     const createDripListTx = await this._nftDriverTxFactory.safeMintWithSalt(
       salt,
       this._ownerAddress,
@@ -324,6 +355,8 @@ export default class DripListService {
     duration: bigint,
     amountPerSec: bigint,
   ) {
+    assert(this._ownerAddress, `This function requires an active wallet connection.`);
+
     const ownerAddressDriverUserId = await this._addressDriverClient.getUserIdByAddress(
       this._ownerAddress,
     );
@@ -371,6 +404,8 @@ export default class DripListService {
   }
 
   private async _buildTokenApprovalTx(token: Address): Promise<PopulatedTransaction> {
+    assert(this._owner, `This function requires an active wallet connection.`);
+
     const erc20TxFactory = await ERC20TxFactory.create(this._owner, token);
 
     const tokenApprovalTx = await erc20TxFactory.approve(
