@@ -33,7 +33,7 @@
     },
   }));
 
-  let unclaimedTokensExpanded = false;
+  export let unclaimedTokensExpanded = false;
 </script>
 
 <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
@@ -52,14 +52,18 @@
       <div class="row">
         {#if unclaimedTokenPile}
           <KeyValuePair key="Claimable tokens">
-            <Pile maxItems={4} components={unclaimedTokenPile} />
-            <button
-              class="expand-chevron"
-              on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
-              style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
-            >
-              <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
-            </button>
+            {#if unclaimedFunds.length > 0}
+              <Pile maxItems={4} components={unclaimedTokenPile} />
+              <button
+                class="expand-chevron"
+                on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
+              >
+                <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+              </button>
+            {:else}
+              <span class="muted">None</span>
+            {/if}
           </KeyValuePair>
         {/if}
         <KeyValuePair highlight key="Total est. claimable funds">
@@ -69,7 +73,7 @@
         </KeyValuePair>
       </div>
       <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
-        <TokenAmountsTable amounts={unclaimedFunds} />
+        <div class="token-amounts-table"><TokenAmountsTable amounts={unclaimedFunds} /></div>
       </Toggleable>
     </div>
   {/if}
@@ -82,6 +86,11 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    overflow: hidden;
+  }
+
+  .token-amounts-table {
+    border-top: 1px solid var(--color-foreground);
   }
 
   .basic-info {
@@ -102,11 +111,15 @@
   }
 
   .expand-chevron {
-    transition: transform 0.2s, background-color 0.3s;
+    transition: transform 0.3s, background-color 0.3s;
     border-radius: 50%;
   }
 
   .expand-chevron:focus-visible {
     background-color: var(--color-primary-level-1);
+  }
+
+  .muted {
+    color: var(--color-foreground-level-5);
   }
 </style>

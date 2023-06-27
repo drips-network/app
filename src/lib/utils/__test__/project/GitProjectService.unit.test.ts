@@ -182,6 +182,26 @@ describe('GitProjectService', () => {
         description: 'description',
         emoji: 'emoji',
         source: {},
+        splits: {
+          maintainers: [
+            {
+              weight: 500000,
+              userId: '875267609686611184008791658115888920329297355417',
+            },
+          ],
+          dependencies: [
+            {
+              weight: 500000,
+              userId: '1235',
+              source: {
+                forge: 'github',
+                repoName: 'foo',
+                ownerName: 'bar',
+                url: 'https://foo.bar/',
+              },
+            },
+          ],
+        },
       } as unknown as z.infer<typeof repoDriverAccountMetadataSchema>;
 
       repoDriverMetadataManagerMock.fetchAccountMetadata.mockResolvedValueOnce({
@@ -203,6 +223,31 @@ describe('GitProjectService', () => {
       expect(actualProject.owner.driver).toBe('address');
       expect(actualProject.owner.userId).toBe('userId');
       expect(actualProject.owner.address).toBe(ownerAddress);
+      expect(actualProject.splits.maintainers).toStrictEqual([
+        {
+          weight: 500000,
+          account: {
+            address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+            driver: 'address',
+            userId: '875267609686611184008791658115888920329297355417',
+          },
+        },
+      ]);
+      expect(actualProject.splits.dependencies).toStrictEqual([
+        {
+          weight: 500000,
+          account: {
+            driver: 'repo',
+            userId: '1235',
+          },
+          source: {
+            forge: 'github',
+            repoName: 'foo',
+            ownerName: 'bar',
+            url: 'https://foo.bar/',
+          },
+        },
+      ]);
     });
   });
 

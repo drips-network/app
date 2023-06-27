@@ -69,7 +69,7 @@
 
   // Project Badge
   let projectVerified = true;
-  type SourceType = 'github' | 'gitlab' | 'radicle' | 'generic';
+  type SourceType = 'github' | 'gitlab';
   let sourceType: SourceType = 'github';
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
@@ -85,18 +85,6 @@
       ownerName: 'efstajas',
       host: 'gitlab.com',
       url: 'https://gitlab.com/efstajas/svelte-stepper.git',
-    },
-    radicle: {
-      forge: 'radicle',
-      repoName: 'svelte-stepper',
-      seed: 'https://some-seed.radicle.xyz',
-      rid: 'rad:29488291001389859',
-      url: 'https://some-seed.radicle.xyz/rad:29488291001389859',
-    },
-    generic: {
-      forge: 'generic',
-      repoName: 'svelte-stepper',
-      url: 'https://some-host.com/svelte-stepper.git',
     },
   };
 
@@ -121,6 +109,7 @@
     },
     emoji: '🚶',
     color: '#fcc842',
+    splits: { maintainers: [], dependencies: [] },
   };
 
   const MOCK_PROJECT_2: GitProject = {
@@ -142,6 +131,7 @@
     },
     emoji: '💾',
     color: '#FF0000',
+    splits: { maintainers: [], dependencies: [] },
   };
 
   const mockSplits: Splits = [
@@ -293,6 +283,7 @@
         emoji: '🚶',
         color: '#fcc842',
         description: 'A versatile component for building stepped flows with beautiful transitions.',
+        splits: { maintainers: [], dependencies: [] },
       }}
     />
   </PrimaryColorThemer>
@@ -333,6 +324,7 @@
             source: SOURCE_CONFIGS[sourceType],
             emoji: '🚶',
             color: '#fcc842',
+            splits: { maintainers: [], dependencies: [] },
           }
         : {
             claimed: false,

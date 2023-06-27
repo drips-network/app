@@ -28,6 +28,7 @@ vi.mock('$env/dynamic/public', () => ({
   env: {},
 }));
 
+vi.mock('$lib/stores/wallet/wallet.store');
 vi.mock('$lib/utils/get-drips-clients');
 vi.mock('../metadata/NftDriverMetadataManager');
 vi.mock('../metadata/RepoDriverMetadataManager');
@@ -251,6 +252,7 @@ describe('DripListService', () => {
         data: {
           source: {
             repoName: 'repoName',
+            ownerName: 'test',
             url: 'url',
           },
         },
@@ -264,7 +266,8 @@ describe('DripListService', () => {
           weight: 1,
           userId: '1',
           source: {
-            forge: 'generic',
+            forge: 'github',
+            ownerName: 'test',
             repoName: 'repoName',
             url: 'url',
           },
@@ -280,8 +283,9 @@ describe('DripListService', () => {
           userId: '1',
         },
         source: {
-          forge: 'generic',
+          forge: 'github',
           repoName: 'repoName',
+          ownerName: 'test',
           url: 'url',
         },
       } as UnclaimedGitProject;
@@ -298,7 +302,7 @@ describe('DripListService', () => {
       expect(result[0].project.repoDriverAccount.userId).toBe('1');
       expect(result[0].project.source.repoName).toBe('repoName');
       expect(result[0].project.source.url).toBe('url');
-      expect(result[0].project.source.forge).toBe('generic');
+      expect(result[0].project.source.forge).toBe('github');
       expect(result[0].project.claimed).toBe(false);
     });
 
@@ -327,8 +331,9 @@ describe('DripListService', () => {
           weight: 1,
           userId: '1',
           source: {
-            forge: 'generic',
+            forge: 'github',
             repoName: 'repoName',
+            ownerName: 'test',
             url: 'url',
           },
         },
@@ -344,8 +349,9 @@ describe('DripListService', () => {
           address: owner,
         },
         source: {
-          forge: 'generic',
+          forge: 'github',
           repoName: 'repoName',
+          ownerName: 'test',
           url: 'url',
         },
         color: 'color',
@@ -364,7 +370,7 @@ describe('DripListService', () => {
       expect(result[0].weight).toBe(1);
       expect(result[0].project.source.repoName).toBe('repoName');
       expect(result[0].project.source.url).toBe('url');
-      expect(result[0].project.source.forge).toBe('generic');
+      expect(result[0].project.source.forge).toBe('github');
       expect(result[0].project.claimed).toBe(true);
       expect(result[0].project.owner?.address).toBe(owner);
       expect(result[0].project.owner?.userId).toBe('111');

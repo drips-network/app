@@ -62,6 +62,10 @@
 </div>
 
 <style>
+  .token-amounts-dropdown {
+    background-color: var(--color-foreground-level-1);
+  }
+
   .token-amount {
     display: flex;
     gap: 1rem;

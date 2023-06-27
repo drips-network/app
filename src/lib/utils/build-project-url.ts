@@ -8,12 +8,12 @@ import type { Source } from './metadata/types';
 export default function (source: Source) {
   switch (source.forge) {
     case 'github':
-      return `/app/projects/github/${source.ownerName}/${source.repoName}`;
+      return `/app/projects/github/${encodeURIComponent(source.ownerName)}/${encodeURIComponent(
+        source.repoName,
+      )}`;
     case 'gitlab':
-      return `/app/projects/gitlab/${source.ownerName}/${source.repoName}`;
-    case 'radicle':
-      return `/app/projects/radicle/${source.rid}`;
-    case 'generic':
-      return `/app/projects/git/${encodeURIComponent(source.url)}`;
+      return `/app/projects/gitlab/${encodeURIComponent(source.ownerName)}/${encodeURIComponent(
+        source.repoName,
+      )}`;
   }
 }

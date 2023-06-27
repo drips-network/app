@@ -12,6 +12,7 @@
   import tuple from '$lib/utils/tuple';
   import unreachable from '$lib/utils/unreachable';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import getCycle from '$lib/utils/drips/get-cycle';
 
   export let context: Writable<CollectFlowState>;
 
@@ -46,20 +47,16 @@
   }
 
   async function updateContext() {
-    const client = await getDripsHubClient();
-
-    const cycleDurationMillis = (await client.cycleSecs()) * 1000;
-    const currentCycleMillis = new Date().getTime() % cycleDurationMillis;
-    const currentCycleStart = new Date().getTime() - currentCycleMillis;
-
     const { splittable, collectable, receivable, ownSplitsWeight, splitsConfig } =
       await fetchBalancesAndSplits();
+
+    const { start, durationMillis } = await getCycle();
 
     context.update((c) => ({
       ...c,
       currentDripsCycle: {
-        start: new Date(currentCycleStart),
-        durationMillis: cycleDurationMillis,
+        start,
+        durationMillis,
       },
       balances: {
         splittable: splittable.splittableAmount,

@@ -1,9 +1,4 @@
-import {
-  Forge,
-  type AddressDriverClient,
-  type RepoAccount,
-  type RepoDriverClient,
-} from 'radicle-drips';
+import { Forge, AddressDriverClient, type RepoAccount, type RepoDriverClient } from 'radicle-drips';
 import {
   getAddressDriverClient,
   getRepoDriverClient,
@@ -17,15 +12,23 @@ import {
   type UnclaimedGitProject,
   type UserId,
   type Source,
+  type AddressDriverSplitReceiver,
+  type RepoDriverSplitReceiver,
 } from '../metadata/types';
 import type { ContractTransaction } from 'ethers';
 import type { RepoAccountStatus } from './types';
 import isValidGitUrl from '../is-valid-git-url';
 import type { Address } from '../common-types';
+import type { z } from 'zod';
+import type {
+  addressDriverSplitReceiverSchema,
+  repoDriverAccountSplitsSchema,
+  repoDriverSplitReceiverSchema,
+} from '../metadata/schemas';
 
 export default class GitProjectService {
-  private static readonly DEFAULT_COLOR = '#fcc842';
-  private static readonly DEFAULT_EMOJI = '💧';
+  private static readonly DEFAULT_COLOR = '#5555FF';
+  private static readonly DEFAULT_EMOJI = '?';
 
   private _repoDriverClient!: RepoDriverClient;
   private _addressDriverClient!: AddressDriverClient;
@@ -84,6 +87,18 @@ export default class GitProjectService {
     return onChainProject;
   }
 
+  public async getAllByOwner(address: Address): Promise<ClaimedGitProject[]> {
+    const res = await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountsOwnedByAddress(
+      address,
+    );
+
+    const promises = res.map((r) => this._mapRepoAccountToGitProject(r));
+
+    return (await Promise.all(promises)).filter(
+      (a): a is ClaimedGitProject => a !== null && Boolean(a.owner),
+    );
+  }
+
   public static deconstructUrl(url: string): {
     forge: Forge;
     username: string;
@@ -115,76 +130,9 @@ export default class GitProjectService {
     const onChainProject: RepoAccount | null =
       await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(userId);
 
-    // The project doesn't exist on-chain.
-    if (!onChainProject) {
-      return null;
-    }
+    if (!onChainProject) return null;
 
-    // The project exists on-chain...
-
-    const ownerAddress = await this._repoDriverClient.getOwner(userId);
-    const isClaimed = Boolean(ownerAddress);
-
-    this._verifySubgraphAndOnChainStateIsInSync(isClaimed, onChainProject, userId);
-
-    const username = onChainProject.name.split('/')[0];
-    const repoName = onChainProject.name.split('/')[1];
-
-    // ... and is unclaimed.
-    if (!isClaimed) {
-      const unclaimedProject: UnclaimedGitProject = {
-        claimed: false,
-        owner: undefined,
-        repoDriverAccount: {
-          userId,
-          driver: 'repo',
-        },
-        verificationStatus: this._calculateVerificationStatus(onChainProject),
-        source: GitProjectService.populateSource(Number(onChainProject.forge), repoName, username),
-      };
-
-      return unclaimedProject;
-    }
-
-    // The project exists on-chain and is claimed...
-
-    const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(userId);
-
-    // Someone could claim a project "manually" without using the Drips app, in which case there won't be any metadata.
-    // That's why we need to set default values for color and emoji.
-    let description: string | undefined;
-    let color = GitProjectService.DEFAULT_COLOR;
-    let emoji = GitProjectService.DEFAULT_EMOJI;
-    let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
-
-    // ...and has metadata.
-    if (projectMetadata?.data) {
-      color = projectMetadata.data.color;
-      emoji = projectMetadata.data.emoji;
-      description = projectMetadata.data.description;
-      source = projectMetadata.data.source;
-    }
-
-    const claimedProject: ClaimedGitProject = {
-      source,
-      color,
-      emoji,
-      description,
-      claimed: true,
-      repoDriverAccount: {
-        driver: 'repo',
-        userId: userId,
-      },
-      owner: {
-        driver: 'address',
-        address: onChainProject.ownerAddress as Address,
-        userId: await this._addressDriverClient.getUserIdByAddress(
-          onChainProject.ownerAddress as Address,
-        ),
-      },
-    };
-
-    return claimedProject;
+    return await this._mapRepoAccountToGitProject(onChainProject);
   }
 
   public static populateSource(forge: Forge, repoName: string, username: string): Source {
@@ -240,6 +188,115 @@ export default class GitProjectService {
         This means the subgraph is out of sync with the on-chain state.`,
       );
     }
+  }
+
+  private async _mapRepoAccountToGitProject(
+    onChainProject: RepoAccount,
+  ): Promise<GitProject | null> {
+    // The project doesn't exist on-chain.
+    if (!onChainProject) {
+      return null;
+    }
+
+    // The project exists on-chain...
+
+    const { userId } = onChainProject;
+    const ownerAddress = await this._repoDriverClient.getOwner(userId);
+    const isClaimed = Boolean(ownerAddress);
+
+    this._verifySubgraphAndOnChainStateIsInSync(isClaimed, onChainProject, userId);
+
+    const username = onChainProject.name.split('/')[0];
+    const repoName = onChainProject.name.split('/')[1];
+
+    // ... and is unclaimed.
+    if (!isClaimed) {
+      const unclaimedProject: UnclaimedGitProject = {
+        claimed: false,
+        owner: undefined,
+        repoDriverAccount: {
+          userId,
+          driver: 'repo',
+        },
+        verificationStatus: this._calculateVerificationStatus(onChainProject),
+        source: GitProjectService.populateSource(Number(onChainProject.forge), repoName, username),
+      };
+
+      return unclaimedProject;
+    }
+
+    // The project exists on-chain and is claimed...
+
+    const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(userId);
+
+    // Someone could claim a project "manually" without using the Drips app, in which case there won't be any metadata.
+    // That's why we need to set default values for color and emoji.
+    let description: string | undefined;
+    let color = GitProjectService.DEFAULT_COLOR;
+    let emoji = GitProjectService.DEFAULT_EMOJI;
+    let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
+    let splits: z.infer<typeof repoDriverAccountSplitsSchema> = {
+      maintainers: [],
+      dependencies: [],
+    };
+
+    // ...and has metadata.
+    if (projectMetadata?.data) {
+      color = projectMetadata.data.color;
+      emoji = projectMetadata.data.emoji;
+      description = projectMetadata.data.description;
+      source = projectMetadata.data.source;
+      splits = projectMetadata.data.splits;
+    }
+
+    const mapAddressDriverSplitReceiver = (
+      metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
+    ): AddressDriverSplitReceiver => ({
+      weight: metadata.weight,
+      account: {
+        driver: 'address',
+        userId: metadata.userId,
+        address: AddressDriverClient.getUserAddress(metadata.userId),
+      },
+    });
+
+    const mapRepoDriverSplitReceiver = (
+      metadata: z.infer<typeof repoDriverSplitReceiverSchema>,
+    ): RepoDriverSplitReceiver => ({
+      weight: metadata.weight,
+      account: {
+        driver: 'repo',
+        userId: metadata.userId,
+      },
+      source: metadata.source,
+    });
+
+    const claimedProject: ClaimedGitProject = {
+      source,
+      color,
+      emoji,
+      description,
+      claimed: true,
+      repoDriverAccount: {
+        driver: 'repo',
+        userId: userId,
+      },
+      owner: {
+        driver: 'address',
+        address: onChainProject.ownerAddress as Address,
+        userId: await this._addressDriverClient.getUserIdByAddress(
+          onChainProject.ownerAddress as Address,
+        ),
+      },
+      splits: {
+        maintainers: splits.maintainers.map((m) => mapAddressDriverSplitReceiver(m)),
+        dependencies: splits.dependencies.map((d) =>
+          'source' in d ? mapRepoDriverSplitReceiver(d) : mapAddressDriverSplitReceiver(d),
+        ),
+      },
+    };
+
+    return claimedProject;
   }
 
   private _calculateVerificationStatus(repoAccount: RepoAccount): VerificationStatus {

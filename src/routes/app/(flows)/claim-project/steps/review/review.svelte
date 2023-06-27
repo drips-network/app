@@ -100,6 +100,7 @@
           },
           color: projectColor,
           emoji: projectEmoji,
+          splits: { maintainers: [], dependencies: [] },
         }}
       />
     </div>

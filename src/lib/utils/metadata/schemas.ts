@@ -26,26 +26,7 @@ const gitLabSourceSchema = z.object({
   url: z.string(),
 });
 
-const radicleSourceSchema = z.object({
-  forge: z.literal('radicle'),
-  rid: z.string(),
-  repoName: z.string(),
-  seed: z.string(),
-  url: z.string(),
-});
-
-const genericGitSourceSchema = z.object({
-  forge: z.literal('generic'),
-  repoName: z.string(),
-  url: z.string(),
-});
-
-export const sourceSchema = z.union([
-  gitHubSourceSchema,
-  gitLabSourceSchema,
-  radicleSourceSchema,
-  genericGitSourceSchema,
-]);
+export const sourceSchema = z.union([gitHubSourceSchema, gitLabSourceSchema]);
 
 export const addressDriverSplitReceiverSchema = z.object({
   weight: z.number(),
@@ -109,6 +90,12 @@ export const addressDriverAccountMetadataSchema = z.object({
   writtenByAddress: ethAddressSchema,
 });
 
+export const repoDriverAccountSplitsSchema = z.object({
+  maintainers: z.array(addressDriverSplitReceiverSchema),
+  dependencies: z.array(z.union([addressDriverSplitReceiverSchema, repoDriverSplitReceiverSchema])),
+  dripsDonation: splitReceiverSchema.optional(),
+});
+
 export const repoDriverAccountMetadataSchema = z.object({
   driver: z.literal('repo'),
   describes: z.object({
@@ -119,11 +106,7 @@ export const repoDriverAccountMetadataSchema = z.object({
   emoji: z.string(),
   color: z.string(),
   description: z.string().optional(),
-  splits: z.object({
-    maintainers: z.array(addressDriverSplitReceiverSchema),
-    dependencies: z.array(repoDriverSplitReceiverSchema),
-    dripsDonation: splitReceiverSchema.optional(),
-  }),
+  splits: repoDriverAccountSplitsSchema,
 });
 
 export const nftDriverAccountMetadataSchema = z.object({

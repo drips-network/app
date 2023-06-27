@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let key = 'key';
+  export let key: string;
   export let size: 'medium' | 'large' = 'large';
   export let highlight = false;
 </script>
@@ -10,17 +10,22 @@
 </div>
 
 <style>
+  h5 {
+    line-height: 16px;
+  }
+
   .key-value-pair {
     display: flex;
     flex-direction: column;
+    white-space: nowrap;
   }
 
   .size-medium {
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
 
   .size-large {
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   .size-large .value {

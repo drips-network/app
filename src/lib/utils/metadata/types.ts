@@ -15,21 +15,7 @@ export interface GitLabSource {
   ownerName: string;
 }
 
-export interface RadicleSource {
-  forge: 'radicle';
-  rid: string;
-  url: string;
-  seed: string;
-  repoName: string;
-}
-
-export interface GenericGitSource {
-  forge: 'generic';
-  url: string;
-  repoName: string;
-}
-
-export type Source = GitHubSource | GitLabSource | RadicleSource | GenericGitSource;
+export type Source = GitHubSource | GitLabSource;
 
 export type UserId = string;
 
@@ -66,6 +52,22 @@ export interface UnclaimedGitProject<ST extends Source = Source> {
   source: ST;
 }
 
+export interface AddressDriverSplitReceiver {
+  weight: number;
+  account: AddressDriverAccount;
+}
+
+export interface RepoDriverSplitReceiver {
+  weight: number;
+  account: RepoDriverAccount;
+  source: Source;
+}
+
+export interface RepoDriverAccountSplits {
+  maintainers: AddressDriverSplitReceiver[];
+  dependencies: (AddressDriverSplitReceiver | RepoDriverSplitReceiver)[];
+}
+
 export interface ClaimedGitProject<ST extends Source = Source> {
   claimed: true;
   owner: AddressDriverAccount;
@@ -74,6 +76,7 @@ export interface ClaimedGitProject<ST extends Source = Source> {
   color: string;
   emoji: string;
   description?: string;
+  splits: RepoDriverAccountSplits;
 }
 
 export type GitProject<ST extends Source = Source> =
