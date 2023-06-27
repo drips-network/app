@@ -48,7 +48,7 @@ export interface ConnectedWalletStoreState {
   safe?: SafeInfo;
 }
 
-interface DisconnectedWalletStoreState {
+export interface DisconnectedWalletStoreState {
   connected: false;
   network: Network;
   provider:

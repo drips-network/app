@@ -77,14 +77,13 @@ export default class DripListService {
     dripListService._gitProjectService = await GitProjectService.new();
     dripListService._addressDriverClient = await getAddressDriverClient();
 
-    const { connected } = get(wallet);
+    const { connected, signer } = get(wallet);
 
     if (connected) {
       dripListService._nftDriverClient = await getNFTDriverClient();
       dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
       dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
 
-      const signer = dripListService._addressDriverClient.signer;
       assert(signer, 'Signer address is undefined.');
       dripListService._owner = signer;
       dripListService._ownerAddress = await signer.getAddress();
