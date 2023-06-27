@@ -33,7 +33,7 @@
     },
   }));
 
-  let unclaimedTokensExpanded = false;
+  export let unclaimedTokensExpanded = false;
 </script>
 
 <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
@@ -52,14 +52,18 @@
       <div class="row">
         {#if unclaimedTokenPile}
           <KeyValuePair key="Claimable tokens">
-            <Pile maxItems={4} components={unclaimedTokenPile} />
-            <button
-              class="expand-chevron"
-              on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
-              style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
-            >
-              <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
-            </button>
+            {#if unclaimedFunds.length > 0}
+              <Pile maxItems={4} components={unclaimedTokenPile} />
+              <button
+                class="expand-chevron"
+                on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
+              >
+                <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+              </button>
+            {:else}
+              <span class="muted">None</span>
+            {/if}
           </KeyValuePair>
         {/if}
         <KeyValuePair highlight key="Total est. claimable funds">
@@ -113,5 +117,9 @@
 
   .expand-chevron:focus-visible {
     background-color: var(--color-primary-level-1);
+  }
+
+  .muted {
+    color: var(--color-foreground-level-5);
   }
 </style>

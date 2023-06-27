@@ -28,6 +28,7 @@ vi.mock('$env/dynamic/public', () => ({
   env: {},
 }));
 
+vi.mock('$lib/stores/wallet/wallet.store');
 vi.mock('$lib/utils/get-drips-clients');
 vi.mock('../metadata/NftDriverMetadataManager');
 vi.mock('../metadata/RepoDriverMetadataManager');

@@ -1,9 +1,4 @@
-import {
-  Forge,
-  type AddressDriverClient,
-  type RepoAccount,
-  type RepoDriverClient,
-} from 'radicle-drips';
+import { Forge, AddressDriverClient, type RepoAccount, type RepoDriverClient } from 'radicle-drips';
 import {
   getAddressDriverClient,
   getRepoDriverClient,
@@ -17,15 +12,23 @@ import {
   type UnclaimedGitProject,
   type UserId,
   type Source,
+  type AddressDriverSplitReceiver,
+  type RepoDriverSplitReceiver,
 } from '../metadata/types';
 import type { ContractTransaction } from 'ethers';
 import type { RepoAccountStatus } from './types';
 import isValidGitUrl from '../is-valid-git-url';
 import type { Address } from '../common-types';
+import type { z } from 'zod';
+import type {
+  addressDriverSplitReceiverSchema,
+  repoDriverAccountSplitsSchema,
+  repoDriverSplitReceiverSchema,
+} from '../metadata/schemas';
 
 export default class GitProjectService {
-  private static readonly DEFAULT_COLOR = '#fcc842';
-  private static readonly DEFAULT_EMOJI = '💧';
+  private static readonly DEFAULT_COLOR = '#5555FF';
+  private static readonly DEFAULT_EMOJI = '?';
 
   private _repoDriverClient!: RepoDriverClient;
   private _addressDriverClient!: AddressDriverClient;
@@ -232,6 +235,10 @@ export default class GitProjectService {
     let color = GitProjectService.DEFAULT_COLOR;
     let emoji = GitProjectService.DEFAULT_EMOJI;
     let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
+    let splits: z.infer<typeof repoDriverAccountSplitsSchema> = {
+      maintainers: [],
+      dependencies: [],
+    };
 
     // ...and has metadata.
     if (projectMetadata?.data) {
@@ -239,7 +246,30 @@ export default class GitProjectService {
       emoji = projectMetadata.data.emoji;
       description = projectMetadata.data.description;
       source = projectMetadata.data.source;
+      splits = projectMetadata.data.splits;
     }
+
+    const mapAddressDriverSplitReceiver = (
+      metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
+    ): AddressDriverSplitReceiver => ({
+      weight: metadata.weight,
+      account: {
+        driver: 'address',
+        userId: metadata.userId,
+        address: AddressDriverClient.getUserAddress(metadata.userId),
+      },
+    });
+
+    const mapRepoDriverSplitReceiver = (
+      metadata: z.infer<typeof repoDriverSplitReceiverSchema>,
+    ): RepoDriverSplitReceiver => ({
+      weight: metadata.weight,
+      account: {
+        driver: 'repo',
+        userId: metadata.userId,
+      },
+      source: metadata.source,
+    });
 
     const claimedProject: ClaimedGitProject = {
       source,
@@ -256,6 +286,12 @@ export default class GitProjectService {
         address: onChainProject.ownerAddress as Address,
         userId: await this._addressDriverClient.getUserIdByAddress(
           onChainProject.ownerAddress as Address,
+        ),
+      },
+      splits: {
+        maintainers: splits.maintainers.map((m) => mapAddressDriverSplitReceiver(m)),
+        dependencies: splits.dependencies.map((d) =>
+          'source' in d ? mapRepoDriverSplitReceiver(d) : mapAddressDriverSplitReceiver(d),
         ),
       },
     };

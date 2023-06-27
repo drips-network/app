@@ -12,18 +12,36 @@
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
-  import { fly } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import ens from '$lib/stores/ens';
   import User from 'radicle-design-system/icons/User.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
 
   export let data: { pathname: string };
+
+  let showLoadingSpinner = false;
+  let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  $: {
+    if ($navigating) {
+      loadingSpinnerTimeout = setTimeout(() => (showLoadingSpinner = true), 300);
+    } else {
+      showLoadingSpinner = false;
+      clearTimeout(loadingSpinnerTimeout);
+    }
+  }
 </script>
 
 <div class="main" in:fly={{ duration: 300, y: 16 }}>
-  <div class="page" class:loading={$navigating}>
+  <div class="page">
     <PageTransition pathname={data.pathname}>
-      <slot />
+      <div class:loading={$navigating}><slot /></div>
     </PageTransition>
+    {#if showLoadingSpinner}
+      <div transition:fade={{ duration: 300 }} class="loading-spinner">
+        <Spinner />
+      </div>
+    {/if}
   </div>
 
   {#if $wallet.connected}
@@ -103,12 +121,23 @@
     width: 100vw;
     padding: 6.5rem 2.5rem 4rem 2.5rem;
     margin: 0 auto;
-    transition: opacity 0.3s;
     min-width: 0;
   }
 
+  div {
+    transition: opacity 0.3s;
+  }
+
   .loading {
-    opacity: 0.5s;
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  .loading-spinner {
+    position: absolute;
+    top: calc(100vh * 0.5);
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .sidenav {

@@ -109,6 +109,7 @@
     },
     emoji: '🚶',
     color: '#fcc842',
+    splits: { maintainers: [], dependencies: [] },
   };
 
   const MOCK_PROJECT_2: GitProject = {
@@ -130,6 +131,7 @@
     },
     emoji: '💾',
     color: '#FF0000',
+    splits: { maintainers: [], dependencies: [] },
   };
 
   const mockSplits: Splits = [
@@ -281,6 +283,7 @@
         emoji: '🚶',
         color: '#fcc842',
         description: 'A versatile component for building stepped flows with beautiful transitions.',
+        splits: { maintainers: [], dependencies: [] },
       }}
     />
   </PrimaryColorThemer>
@@ -321,6 +324,7 @@
             source: SOURCE_CONFIGS[sourceType],
             emoji: '🚶',
             color: '#fcc842',
+            splits: { maintainers: [], dependencies: [] },
           }
         : {
             claimed: false,

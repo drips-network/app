@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   import type { GitProject } from '$lib/utils/metadata/types';
+  import { onMount } from 'svelte';
 
   interface ProjectSplit {
     type: 'project-split';
@@ -35,13 +36,34 @@
   export let list: Splits;
 
   export let isGroup = false;
+
+  let wrapperElem: HTMLDivElement;
+  let splitElems: HTMLDivElement[] = [];
+
+  let lineHeight = 0;
+
+  function getLineHeight() {
+    lineHeight = splitElems.reduce<number>((acc, curr, index, array) => {
+      // If this is the last item in the list, its height shouldn't be covered be the line.
+      if (index === array.length - 1) return acc;
+
+      return acc + curr.clientHeight;
+    }, 16);
+  }
+
+  onMount(() => {
+    const observer = new ResizeObserver(getLineHeight);
+    observer.observe(wrapperElem);
+
+    return () => observer.disconnect();
+  });
 </script>
 
-<div class="splits-list" class:group={isGroup}>
-  {#each list as listItem}
-    <SplitComponent split={listItem} />
+<div bind:this={wrapperElem} class="splits-list" class:group={isGroup}>
+  {#each list as listItem, index}
+    <div bind:this={splitElems[index]} class="split"><SplitComponent split={listItem} /></div>
   {/each}
-  <div class="line" />
+  <div class="line" style:height="{lineHeight}px" />
 </div>
 
 <style>
@@ -49,14 +71,13 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    padding-top: 1rem;
+    padding-top: 16px;
   }
 
   .line {
     width: 1px;
     left: 0.5px;
     top: 0;
-    height: calc(100% - 3rem);
     position: absolute;
     background: linear-gradient(
       to bottom,

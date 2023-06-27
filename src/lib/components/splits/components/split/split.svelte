@@ -92,6 +92,7 @@
 
   async function toggleGroup() {
     if (!groupElem) return;
+    if (split.type !== 'split-group' || split.list.length === 0) return;
 
     groupExpanded = !groupExpanded;
 
@@ -157,12 +158,14 @@
             </div>
             <div class="label" style:transform="translateX({$groupNameOffset}px)">
               <h4>{split.name}</h4>
-              <div
-                class="chevron"
-                style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 180deg)' : ''}
-              >
-                <ChevronDown />
-              </div>
+              {#if split.list.length > 0}
+                <div
+                  class="chevron"
+                  style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 180deg)' : ''}
+                >
+                  <ChevronDown />
+                </div>
+              {/if}
             </div>
           </button>
           {#if groupExpanded}
