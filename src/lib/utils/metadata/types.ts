@@ -77,10 +77,6 @@ export type GitProject<ST extends Source = Source> =
 
 export interface DripList {
   account: NFTDriverAccount;
-  projects: {
-    weight: number;
-    project: GitProject;
-  }[];
   name: string;
   // Properties below are post-MVP
   isPublic: false;
