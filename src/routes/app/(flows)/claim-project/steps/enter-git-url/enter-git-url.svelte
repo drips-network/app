@@ -21,7 +21,7 @@
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
   async function fetchProjectMetadata() {
-    // TODO: Really fetch project metadata from github / gitlab
+    // TODO: Really fetch project metadata from github
 
     await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -137,7 +137,7 @@
   <TextInput
     bind:value={$context.gitUrl}
     icon={LinkIcon}
-    placeholder="Paste GitHub or GitLab project URL"
+    placeholder="Paste GitHub project URL"
     disabled={validationState.type !== 'unvalidated'}
     {validationState}
     showClearButton={validationState.type === 'valid'}
