@@ -48,7 +48,7 @@
       if (index === array.length - 1) return acc;
 
       return acc + curr.clientHeight;
-    }, 16);
+    }, 18);
   }
 
   onMount(() => {
