@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -24,6 +24,8 @@
   } from '$lib/components/splits/splits.svelte';
   import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -80,6 +82,26 @@
     $context.maintainerSplits.percentages,
     'maintainers',
   );
+
+  let gitProjectService: GitProjectService;
+
+  onMount(async () => {
+    gitProjectService = await GitProjectService.new();
+  });
+
+  async function requestOwnerUpdate() {
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const requestOwnerUpdateTx = gitProjectService.buildRequestOwnerUpdateTx($context);
+
+          return { requestOwnerUpdateTx };
+        },
+        transactions: ({ requestOwnerUpdateTx }) => ({ transaction: () => requestOwnerUpdateTx }),
+      }),
+    );
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -160,7 +182,9 @@
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button disabled={true} icon={WalletIcon} variant="primary">Confirm in wallet</Button>
+    <Button icon={WalletIcon} variant="primary" on:click={requestOwnerUpdate}
+      >Confirm in wallet</Button
+    >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
 

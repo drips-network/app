@@ -2,18 +2,50 @@
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import ListEditor, { type ListItem } from '$lib/components/list-editor/list-editor.svelte';
+  import projectItem from '$lib/components/list-editor/item-templates/project';
+  import type { GitProject } from '$lib/utils/metadata/types';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
 
   let formValid: boolean;
+
+  onMount(async () => {
+    await fetchProjectDeps();
+  });
+
+  async function fetchProjectDeps() {
+    try {
+      if ($context.dependencySplits.itemsPromise) {
+        const promises = ($context.dependencySplits.itemsPromise as Promise<GitProject>[]).map(
+          (p) =>
+            p.catch((error) => {
+              console.log('💧 ~ Could not fetch project:', error);
+              return undefined;
+            }),
+        );
+
+        const depsGitProjects = mapFilterUndefined(await Promise.all(promises), (v) => v);
+
+        let dependencySplits: { [key: string]: ListItem } = {};
+        depsGitProjects.forEach((d) => {
+          dependencySplits[d.source.url] = projectItem(d);
+        });
+
+        $context.dependencySplits.items = dependencySplits;
+      }
+    } catch (error) {
+      console.log('💧 ~ Could not fetch project dependencies:', error);
+    }
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -21,7 +53,11 @@
   description="Decide how you want to divide the {$context.highLevelPercentages[
     'maintainers'
   ]}% split to your project’s dependencies. {$context.dependenciesAutoImported
-    ? 'We’ve imported these projects from your package.json to give you a head start.'
+    ? $context.dependencySplits.items &&
+      typeof $context.dependencySplits.items === 'object' &&
+      Object.keys($context.dependencySplits.items).length
+      ? 'We’ve imported these projects from your package.json to give you a head start.'
+      : ''
     : ''}"
 >
   <ListEditor

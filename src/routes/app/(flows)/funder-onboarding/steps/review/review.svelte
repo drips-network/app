@@ -56,7 +56,7 @@
 
   onMount(async () => {
     dripListService = await DripListService.new();
-    subgraphClient = await getSubgraphClient();
+    subgraphClient = getSubgraphClient();
   });
 
   async function createDripList() {

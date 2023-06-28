@@ -7,7 +7,13 @@ import {
   repoDriverSplitReceiverSchema,
   splitReceiverSchema,
 } from './schemas';
-import type { ClaimedGitProject, RepoDriverAccount, UserId } from './types';
+import type {
+  ClaimedGitProject,
+  GitHubSource,
+  GitLabSource,
+  RepoDriverAccount,
+  UserId,
+} from './types';
 
 import type { z } from 'zod';
 
@@ -36,10 +42,13 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName, forge } = metadata.data.source;
 
+    // TODO: This would only work for GitHub and GitLab, not Radicle or generic Git. Update this when we add support other forges.
+    const username = (metadata.data.source as GitLabSource | GitHubSource).ownerName;
+
     const repoDriverClient = await getRepoDriverClient();
     const onChainUserId = await repoDriverClient.getUserId(
       RepoDriverUtils.forgeFromString(forge),
-      repoName,
+      `${username}/${repoName}`,
     );
 
     if (onChainUserId !== userId) {
@@ -76,7 +85,10 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     forProject: ClaimedGitProject;
     forSplits: {
       maintainers: z.infer<typeof addressDriverSplitReceiverSchema>[];
-      dependencies: z.infer<typeof repoDriverSplitReceiverSchema>[];
+      dependencies: (
+        | z.infer<typeof addressDriverSplitReceiverSchema>
+        | z.infer<typeof repoDriverSplitReceiverSchema>
+      )[];
       dripsDonation?: z.infer<typeof splitReceiverSchema>;
     };
   }): z.infer<typeof repoDriverAccountMetadataSchema> {

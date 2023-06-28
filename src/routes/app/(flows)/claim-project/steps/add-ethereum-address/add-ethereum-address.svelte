@@ -14,6 +14,8 @@
   import assert from '$lib/utils/assert';
   import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
+  import github from '$lib/utils/github/github';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -22,32 +24,47 @@
   function verify() {
     dispatch('await', {
       promise: () =>
-        new Promise<void>((resolve) => {
-          setTimeout(() => {
-            const { address } = $walletStore;
-            assert(address);
+        new Promise<void>((resolve, reject) => {
+          const { address } = $walletStore;
+          assert(address);
 
-            const addressInMaintainers = $context.maintainerSplits.items[address];
-            const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
+          console.log($context);
 
-            if (!addressInMaintainers && maintainersListEmpty) {
-              $context.maintainerSplits.items = {
-                [address]: ethAddressItem(address),
-              };
+          const addressInMaintainers = $context.maintainerSplits.items[address];
+          const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
 
-              $context.maintainerSplits.selected = [address];
+          if (!addressInMaintainers && maintainersListEmpty) {
+            $context.maintainerSplits.items = {
+              [address]: ethAddressItem(address),
+            };
 
-              $context.maintainerSplits.percentages = {
-                [address]: 100,
-              };
-            }
+            $context.maintainerSplits.selected = [address];
 
-            resolve();
-          }, 1000);
+            $context.maintainerSplits.percentages = {
+              [address]: 100,
+            };
+          }
+
+          try {
+            const { username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+
+            resolve(
+              github.getFundingJson(
+                username,
+                repoName,
+                dripsJsonTemplate(
+                  $walletStore.address ?? unreachable(),
+                  $walletStore.network.name ?? unreachable(),
+                ),
+              ),
+            );
+          } catch (error) {
+            reject('FUNDING.json not found.');
+          }
         }),
       message: 'Verifying...',
       subtitle:
-        'We’re scanning your git project’s main branch for a drips.json file with your Ethereum address',
+        'We’re scanning your git project’s main branch for a FUNDING.json file with your Ethereum address.',
     });
   }
 
@@ -57,10 +74,18 @@
 
 <StandaloneFlowStepLayout
   headline="Verify project ownership"
-  description="To verify you are the owner of this project, please add a funding.json file with your Ethereum address to the root of your code repo. "
+  description="To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. "
 >
-  <CodeBox path="./funding.json" code={dripsJsonTemplate($walletStore.address ?? unreachable())} />
-  <Checkbox bind:checked label="I added the funding.json file to the root of my repo." />
+  <CodeBox
+    repoUrl={$context.gitUrl}
+    defaultBranch={$context.projectMetadata?.defaultBranch}
+    path="./FUNDING.json"
+    code={dripsJsonTemplate(
+      $walletStore.address ?? unreachable(),
+      $walletStore.network.name ?? unreachable(),
+    )}
+  />
+  <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>

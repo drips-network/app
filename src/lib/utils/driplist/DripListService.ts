@@ -179,7 +179,7 @@ export default class DripListService {
       const projectName = `${username}/${repoName}`;
 
       projects.push({
-        weight: percentage,
+        weight: Math.floor((Number(percentage) / 100) * 1000000),
         source: GitProjectService.populateSource(forge, repoName, username),
         userId: await this._repoDriverClient.getUserId(forge, projectName),
       });

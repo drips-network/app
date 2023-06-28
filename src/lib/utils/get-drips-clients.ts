@@ -11,6 +11,7 @@ import {
   NFTDriverClient,
   NFTDriverTxFactory,
   RepoDriverClient,
+  RepoDriverTxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -36,6 +37,19 @@ export function getRepoDriverClient(withSigner = get(wallet).signer) {
   const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
 
   return RepoDriverClient.create(provider, withSigner, repoDriverAddress);
+}
+
+/**
+ * Get an initialized Repo Driver transaction factory.
+ * @returns An initialized Repo Driver transaction factory.
+ */
+export function getRepoDriverTxFactory() {
+  const { signer } = get(wallet);
+  assert(signer);
+
+  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
+
+  return RepoDriverTxFactory.create(signer, repoDriverAddress);
 }
 
 /**

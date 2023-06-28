@@ -6,6 +6,8 @@
 
   export let path: string;
   export let code: string;
+  export let repoUrl: string;
+  export let defaultBranch = 'main';
 
   let headerElem: HTMLDivElement | undefined;
 
@@ -23,8 +25,8 @@
     setTimeout(() => (copySuccess = false), 1000);
   }
 
-  // TODO: make it use the real project URL
-  $: gitHubProposalUrl = `https://github.com/radicle-dev/drips-app-v2/new/main?filename=funding.json&value=${encodeURIComponent(
+  // TODO: add support for Gitlab.
+  $: gitHubProposalUrl = `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(
     code,
   )}`;
 </script>
@@ -33,9 +35,11 @@
   <div class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
     {path}
     <div class="actions">
-      <a href={gitHubProposalUrl} target="_blank">
-        <ArrowBoxUpRight style="fill: {textColor}" />
-      </a>
+      {#if repoUrl.includes('github')}
+        <a href={gitHubProposalUrl} target="_blank">
+          <ArrowBoxUpRight style="fill: {textColor}" />
+        </a>
+      {/if}
       <button on:click={() => copyClipboard(code)}>
         {#if copySuccess}
           <CheckIcon style="fill: {textColor}" />

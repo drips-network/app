@@ -14,7 +14,7 @@
   }
 </script>
 
-<StandaloneFlowStepHeader title="Claim a Git project">
+<StandaloneFlowStepHeader title="Claim a GitHub project">
   <MultiChain slot="illustration" />
 </StandaloneFlowStepHeader>
 
