@@ -6,7 +6,7 @@ export default class RepoDriverUtils {
     if (forgeAsString === 'github') {
       forge = Forge.GitHub;
     } else if (forgeAsString === 'gitlab') {
-      forge = Forge.GitLab;
+      throw new Error('GitLab forges are not supported yet.');
     } else if (forgeAsString === 'radicle') {
       throw new Error('Radicle forges are not supported yet.');
     } else {

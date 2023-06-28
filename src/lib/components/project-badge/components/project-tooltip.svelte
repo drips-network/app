@@ -9,7 +9,6 @@
 
   const SOURCE_TYPE_STRINGS = {
     github: 'on GitHub',
-    gitlab: 'on GitLab',
   };
 </script>
 

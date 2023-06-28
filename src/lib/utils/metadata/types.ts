@@ -7,15 +7,7 @@ export interface GitHubSource {
   ownerName: string;
 }
 
-export interface GitLabSource {
-  forge: 'gitlab';
-  host: string;
-  url: string;
-  repoName: string;
-  ownerName: string;
-}
-
-export type Source = GitHubSource | GitLabSource;
+export type Source = GitHubSource;
 
 export type UserId = string;
 

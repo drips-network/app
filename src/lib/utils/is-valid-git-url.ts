@@ -2,7 +2,7 @@ export default function isValidGitUrl(url: string): boolean {
   try {
     const parsedURL = new URL(url);
 
-    if (parsedURL.hostname !== 'github.com' && parsedURL.hostname !== 'gitlab.com') {
+    if (parsedURL.hostname !== 'github.com') {
       return false;
     }
 
