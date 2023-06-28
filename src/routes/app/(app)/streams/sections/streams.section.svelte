@@ -7,7 +7,7 @@
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
-  import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
+  import UserBadgeCell from '$lib/components/table/cells/user-badge.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
@@ -15,7 +15,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
-  import type { Stream } from '$lib/stores/streams/types';
+  import type { AddressDriverUser, NFTDriverUser, Stream } from '$lib/stores/streams/types';
   import NameAndBadgeCell, {
     type NameAndBadgeCellProps,
   } from '$lib/components/table/cells/name-and-badge-cell.svelte';
@@ -32,7 +32,7 @@
   interface OutgoingStreamTableRow {
     streamId: string;
     name: NameAndBadgeCellProps;
-    toAddress: string;
+    to: NFTDriverUser | AddressDriverUser;
     amount: AmountCellData;
     token: TokenCellData;
   }
@@ -40,7 +40,7 @@
   interface IncomingStreamTableRow {
     streamId: string;
     name: NameAndBadgeCellProps;
-    fromAddress: string;
+    from: AddressDriverUser;
     amount: AmountCellData;
     token: TokenCellData;
   }
@@ -70,10 +70,16 @@
 
       const { tokenAddress } = stream.dripsConfig.amountPerSecond;
 
+      // TODO: Don't presume that any stream to an NFT subaccount is going to a Drip List.
+      const streamName =
+        stream.receiver.driver === 'nft'
+          ? 'Drip List Support Stream'
+          : stream.name ?? 'Unnamed stream';
+
       return {
         streamId: stream.id,
         name: {
-          name: stream.name ?? 'Unnamed stream',
+          name: streamName,
           streamId: stream.id,
           paused: stream.paused,
           durationSeconds: stream.dripsConfig.durationSeconds,
@@ -81,7 +87,7 @@
           senderId: stream.sender.userId,
           tokenAddress: tokenAddress,
         },
-        toAddress: stream.receiver.address,
+        to: stream.receiver,
         amount: {
           amount: {
             amount: estimate.totalStreamed,
@@ -118,7 +124,7 @@
           senderId: stream.sender.userId,
           tokenAddress: tokenAddress,
         },
-        fromAddress: stream.sender.address,
+        from: stream.sender,
         amount: {
           amountPerSecond: {
             amount: estimate.currentAmountPerSecond,
@@ -156,9 +162,9 @@
       size: (100 / 24) * 8,
     },
     {
-      accessorKey: 'toAddress',
+      accessorKey: 'to',
       header: 'To',
-      cell: () => IdentityBadgeCell,
+      cell: () => UserBadgeCell,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
@@ -194,9 +200,9 @@
       size: (100 / 24) * 8,
     },
     {
-      accessorKey: 'fromAddress',
+      accessorKey: 'from',
       header: 'From',
-      cell: () => IdentityBadgeCell,
+      cell: () => UserBadgeCell,
       enableSorting: false,
       size: (100 / 24) * 5,
     },

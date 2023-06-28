@@ -10,7 +10,7 @@
   } from '@tanstack/svelte-table';
   import type { AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import AmountCell from '$lib/components/table/cells/amount.cell.svelte';
-  import IdentityBadgeCell from '$lib/components/table/cells/identity-badge.cell.svelte';
+  import IdentityBadgeCell from '$lib/components/table/cells/user-badge.cell.svelte';
   import Table from '$lib/components/table/table.svelte';
 
   interface IncomingStreamInfo {

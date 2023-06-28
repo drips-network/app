@@ -26,7 +26,6 @@
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import balancesStore from '$lib/stores/balances/balances.store';
-  import type { User } from '$lib/stores/streams/types';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import getSqueezeArgs from './get-squeeze-args';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
@@ -35,6 +34,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
+  import type { AddressDriverUser } from '$lib/stores/streams/types';
 
   export let context: Writable<CollectFlowState>;
 
@@ -59,7 +59,7 @@
   }
 
   interface StreamEstimateByReceiver {
-    sender: User;
+    sender: AddressDriverUser;
     amount: bigint;
   }
 

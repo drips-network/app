@@ -201,8 +201,18 @@
 <StepLayout>
   <StreamVisual
     disableLinks
-    fromAddress={$wallet.address}
-    toAddress={recipientAddressValidationState.type === 'valid' ? recipientAddressValue : undefined}
+    from={$wallet.address
+      ? {
+          driver: 'address',
+          address: $wallet.address,
+        }
+      : undefined}
+    to={recipientAddressValidationState.type === 'valid' && recipientAddressValue
+      ? {
+          driver: 'address',
+          address: recipientAddressValue,
+        }
+      : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
