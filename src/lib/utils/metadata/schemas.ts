@@ -18,15 +18,8 @@ const gitHubSourceSchema = z.object({
   url: z.string(),
 });
 
-const gitLabSourceSchema = z.object({
-  forge: z.literal('gitlab'),
-  repoName: z.string(),
-  ownerName: z.string(),
-  host: z.string(),
-  url: z.string(),
-});
-
-export const sourceSchema = z.union([gitHubSourceSchema, gitLabSourceSchema]);
+// This will be a union type when we add support for other forges.
+export const sourceSchema = gitHubSourceSchema;
 
 export const addressDriverSplitReceiverSchema = z.object({
   weight: z.number(),

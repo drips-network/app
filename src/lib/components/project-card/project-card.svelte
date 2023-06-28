@@ -5,7 +5,6 @@
 
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';
-  import Gitlab from 'radicle-design-system/icons/Gitlab.svelte';
 
   export let project: ClaimedGitProject;
 </script>
@@ -24,11 +23,7 @@
     <div class="name-and-description">
       <div class="source">
         <div class="icon">
-          {#if project.source.forge === 'github'}
-            <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
-          {:else if project.source.forge === 'gitlab'}
-            <Gitlab style="height: 20px; fill: var(--color-foreground-level-6)" />
-          {/if}
+          <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
         </div>
         <span class="owner-name">{project.source.ownerName}</span>
       </div>

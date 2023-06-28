@@ -69,7 +69,7 @@
 
   // Project Badge
   let projectVerified = true;
-  type SourceType = 'github' | 'gitlab';
+  type SourceType = 'github';
   let sourceType: SourceType = 'github';
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
@@ -78,13 +78,6 @@
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
-    },
-    gitlab: {
-      forge: 'gitlab',
-      repoName: 'svelte-stepper',
-      ownerName: 'efstajas',
-      host: 'gitlab.com',
-      url: 'https://gitlab.com/efstajas/svelte-stepper.git',
     },
   };
 

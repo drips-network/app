@@ -11,9 +11,5 @@ export default function (source: Source) {
       return `/app/projects/github/${encodeURIComponent(source.ownerName)}/${encodeURIComponent(
         source.repoName,
       )}`;
-    case 'gitlab':
-      return `/app/projects/gitlab/${encodeURIComponent(source.ownerName)}/${encodeURIComponent(
-        source.repoName,
-      )}`;
   }
 }

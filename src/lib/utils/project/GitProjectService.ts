@@ -168,9 +168,6 @@ export default class GitProjectService {
       case 'github.com':
         forge = Forge.GitHub;
         break;
-      case 'gitlab.com':
-        forge = Forge.GitLab;
-        break;
       default:
         throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
     }
@@ -207,9 +204,6 @@ export default class GitProjectService {
       case Forge.GitHub:
         url = `https://github.com/${username}/${repoName}`;
         break;
-      case Forge.GitLab:
-        url = `https://gitlab.com/${username}/${repoName}`;
-        break;
       default:
         throw new Error(`Unsupported forge: ${forge}`);
     }
@@ -220,14 +214,6 @@ export default class GitProjectService {
           url,
           repoName,
           forge: 'github',
-          ownerName: username,
-        };
-      case Forge.GitLab:
-        return {
-          url,
-          repoName,
-          forge: 'gitlab',
-          host: 'gitlab.com',
           ownerName: username,
         };
       default:

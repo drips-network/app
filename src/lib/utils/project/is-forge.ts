@@ -1,4 +1,4 @@
-import type { GitHubSource, GitLabSource, GitProject } from '$lib/utils/metadata/types';
+import type { GitHubSource, GitProject } from '$lib/utils/metadata/types';
 
 /**
  * Validate that a GitProject is from a specific forge.
@@ -6,10 +6,10 @@ import type { GitHubSource, GitLabSource, GitProject } from '$lib/utils/metadata
  * @param project The project the source of which should be validated.
  * @returns True if it's the expected source, false otherwise.
  */
-export default function isForge<FT extends 'gitlab' | 'github'>(
+export default function isForge<FT extends 'github'>(
   forge: FT,
   project: GitProject,
-): project is GitProject<FT extends 'gitlab' ? GitLabSource : GitHubSource> {
+): project is GitProject<FT extends 'github' ? GitHubSource : never> {
   if (project.source.forge !== forge) return false;
 
   return true;

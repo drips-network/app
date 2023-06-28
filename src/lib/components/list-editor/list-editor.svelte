@@ -193,7 +193,7 @@
         class="typo-text"
         type="text"
         placeholder={allowedItems === 'all'
-          ? 'Paste GitHub/GitLab URL or Ethereum address'
+          ? 'Paste GitHub URL or Ethereum address'
           : 'Ethereum address or ENS name'}
       />
       {#if isAddingProject}

@@ -157,7 +157,10 @@
                     {#if incomingSplit.type === 'user'}
                       <IdentityBadge address={incomingSplit.item.value.address} />
                     {:else if incomingSplit.type === 'dripList'}
-                      <IdentityBadge address={incomingSplit.item.value.account.owner} />
+                      <IdentityBadge
+                        size="medium"
+                        address={incomingSplit.item.value.account.owner}
+                      />
                     {:else if incomingSplit.type === 'project'}
                       <ProjectBadge project={incomingSplit.item.value} />
                     {/if}

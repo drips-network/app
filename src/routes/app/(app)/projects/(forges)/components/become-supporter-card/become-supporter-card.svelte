@@ -59,6 +59,7 @@
     opacity: 0.4;
     background-color: var(--color-primary-level-2);
     height: 3rem;
+    border-radius: 1rem 0 0 0;
   }
 
   .header > .circles {

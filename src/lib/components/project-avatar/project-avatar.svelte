@@ -1,6 +1,5 @@
 <script lang="ts">
   import GithubIcon from 'radicle-design-system/icons/Github.svelte';
-  import GitlabIcon from 'radicle-design-system/icons/Gitlab.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
@@ -41,11 +40,7 @@
 
     {#if !project.owner}
       <div class="project-avatar">
-        {#if project.source.forge === 'github'}
-          <GithubIcon />
-        {:else if project.source.forge === 'gitlab'}
-          <GitlabIcon />
-        {/if}
+        <GithubIcon />
       </div>
     {/if}
   </div>
