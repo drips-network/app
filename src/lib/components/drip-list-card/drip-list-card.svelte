@@ -32,7 +32,7 @@
   .card {
     border: 1px solid var(--color-foreground);
     padding: 1.5rem;
-    border-radius: 2rem 0 2rem 2rem;
+    border-radius: 1rem 0 1rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
