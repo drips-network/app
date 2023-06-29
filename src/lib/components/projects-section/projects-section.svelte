@@ -79,4 +79,26 @@
     flex-direction: column;
     gap: 2rem;
   }
+
+  .projects {
+    display: flex;
+    gap: 1rem;
+    max-width: 100%;
+    position: relative;
+    padding-top: 2px;
+    flex-wrap: wrap;
+  }
+
+  .projects > * {
+    flex: 1;
+    min-width: 16rem;
+    max-width: calc(25% - 0.75rem);
+  }
+
+  @media (max-width: 560px) {
+    .projects > * {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
 </style>
