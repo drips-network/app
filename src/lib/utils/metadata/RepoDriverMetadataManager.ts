@@ -34,12 +34,12 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       return null;
     }
 
-    const { url, repoName, forge } = metadata.data.source;
+    const { url, repoName, ownerName, forge } = metadata.data.source;
 
     const repoDriverClient = await getRepoDriverClient();
     const onChainUserId = await repoDriverClient.getUserId(
       RepoDriverUtils.forgeFromString(forge),
-      repoName,
+      `${ownerName}/${repoName}`,
     );
 
     if (onChainUserId !== userId) {
