@@ -26,6 +26,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type getIncomingSplits from '../../methods/get-incoming-splits';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
   import Pen from 'radicle-design-system/icons/Pen.svelte';
@@ -108,14 +109,11 @@
   }
 </script>
 
-<svelte:head>
-  <title>{project.source.repoName} | Drips</title>
-  <meta
-    name="description"
-    content="Support {project.source
-      .repoName} on Drips and help make Open-Source Software sustainable."
-  />
-</svelte:head>
+<HeadMeta
+  title="{project.source.ownerName}/{project.source.repoName}"
+  description="Support {project.source
+    .repoName} on Drips and help make Open-Source Software sustainable."
+/>
 
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
   <div class="project-profile">

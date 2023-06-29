@@ -21,6 +21,7 @@
   import CrossIcon from 'radicle-design-system/icons/Cross.svelte';
   import { fade } from 'svelte/transition';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: {
     $walletStore.connected;
@@ -43,10 +44,7 @@
   $: tokensAvailableToCollect = $splittableStore && $splittableStore.length > 0;
 </script>
 
-<svelte:head>
-  <title>Projects | Drips</title>
-  <meta name="description" content="Drips Projects Page" />
-</svelte:head>
+<HeadMeta title="Projects" />
 
 <div class="page">
   <div class="section">

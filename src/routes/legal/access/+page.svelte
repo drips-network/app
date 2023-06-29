@@ -1,10 +1,8 @@
-<svelte:head>
-  <title>Drips • Access</title>
-  <meta
-    name="description"
-    content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
-  />
-</svelte:head>
+<script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+</script>
+
+<HeadMeta title="Access" />
 
 <h1>Access</h1>
 <p class="typo-text-small">Last edited: 07 March 2023</p>

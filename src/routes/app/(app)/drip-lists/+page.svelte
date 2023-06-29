@@ -4,6 +4,7 @@
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
 
   const walletInitialized = walletStore.initialized;
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: {
     $walletStore.connected;
@@ -13,10 +14,7 @@
   }
 </script>
 
-<svelte:head>
-  <title>Drip Lists | Drips</title>
-  <meta name="description" content="Drip Lists Page" />
-</svelte:head>
+<HeadMeta title="Drip List" />
 
 {#if $walletStore.address}
   <DripListsSection address={$walletStore.address} />

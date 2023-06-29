@@ -25,6 +25,7 @@
     default as AddressCell,
   } from '$lib/components/table/cells/address.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -106,10 +107,7 @@
   };
 </script>
 
-<svelte:head>
-  <title>Custom Tokens | Drips</title>
-  <meta name="description" content="Drips Settings Page" />
-</svelte:head>
+<HeadMeta title="Custom tokens" />
 
 <div class="custom-tokens">
   <div class="hero">

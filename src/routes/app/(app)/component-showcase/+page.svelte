@@ -25,6 +25,7 @@
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   // Button
   let disabled = false;
@@ -225,6 +226,8 @@
 
   const DEFAULT_PERCENTAGES = { 'option-1': 50, 'option-2': 45, 'option-3': 5 };
 </script>
+
+<HeadMeta />
 
 <h1>Component showcase</h1>
 
