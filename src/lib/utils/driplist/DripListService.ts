@@ -142,7 +142,11 @@ export default class DripListService {
     const dripList: DripList = {
       account: {
         driver: 'nft',
-        owner: nftSubAccount.ownerAddress,
+        owner: {
+          driver: 'address',
+          userId: await this._addressDriverClient.getUserIdByAddress(nftSubAccount.ownerAddress),
+          address: nftSubAccount.ownerAddress,
+        },
         userId: nftSubAccount.tokenId,
       },
       projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),

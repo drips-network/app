@@ -7,7 +7,7 @@
 </script>
 
 <div class="owner">
-  <IdentityBadge address={data.dripList.account.owner} />
+  <IdentityBadge address={data.dripList.account.owner.address} />
   <span>created a Drip List…</span>
 </div>
 <DripListCard dripList={data.dripList} representationalSplits={data.representationalSplits} />

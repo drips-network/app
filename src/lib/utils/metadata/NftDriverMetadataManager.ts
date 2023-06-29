@@ -3,6 +3,7 @@ import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverSplitReceiverSchema, nftDriverAccountMetadataSchema } from './schemas';
 import type { NFTDriverAccount, UserId } from './types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { getAddressDriverClient } from '../get-drips-clients';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataSchema,
@@ -25,10 +26,16 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       );
     }
 
+    const addressDriverClient = await getAddressDriverClient();
+
     return {
       driver: 'nft',
       userId: ownerSubAccount.tokenId,
-      owner: ownerSubAccount.ownerAddress,
+      owner: {
+        driver: 'address',
+        userId: await addressDriverClient.getUserIdByAddress(ownerSubAccount.ownerAddress),
+        address: ownerSubAccount.ownerAddress,
+      },
     } as NFTDriverAccount;
   }
 

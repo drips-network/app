@@ -20,7 +20,7 @@ export interface AddressDriverAccount {
 export interface NFTDriverAccount {
   driver: 'nft';
   userId: UserId;
-  owner: Address;
+  owner: AddressDriverAccount;
 }
 
 export interface RepoDriverAccount {

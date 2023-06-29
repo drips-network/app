@@ -12,6 +12,7 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import type { Splits as RepresentationalSplits } from '$lib/components/splits/splits.svelte';
   import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
+  import { goto } from '$app/navigation';
 
   $: {
     $walletStore.connected;
@@ -58,8 +59,7 @@
         label: 'Create Drip List',
         icon: Plus,
         variant: 'primary',
-        // TODO: Add handler
-        handler: () => undefined,
+        handler: () => goto('/app/funder-onboarding'),
       },
     ]}
   />
