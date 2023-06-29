@@ -32,7 +32,6 @@ describe('RepoDriverMetadataManager', () => {
               url: gitUrl,
               ownerName: 'username',
               repoName: 'repo',
-              ownerName: 'username',
             },
           },
         });
@@ -57,7 +56,6 @@ describe('RepoDriverMetadataManager', () => {
             url: gitUrl,
             ownerName: 'username',
             repoName: 'repo',
-            ownerName: 'username',
           },
         },
       });
@@ -82,7 +80,6 @@ describe('RepoDriverMetadataManager', () => {
               url: gitUrl,
               ownerName: 'username',
               repoName: 'repo',
-              ownerName: 'username',
             },
           },
         });
@@ -147,7 +144,6 @@ describe('RepoDriverMetadataManager', () => {
               url: gitUrl,
               ownerName: 'username',
               repoName: 'random-repo-name',
-              ownerName: 'username',
             },
           },
         } as any as any);
