@@ -27,6 +27,7 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
+  import Drip from '$lib/components/illustrations/drip.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -146,20 +147,28 @@
         >Edit</Button
       >
     </svelte:fragment>
-    <Splits
-      list={[
-        {
-          type: 'split-group',
-          name: 'Dependencies',
-          list: dependencyRepresentationalSplits,
-        },
-        {
-          type: 'split-group',
-          name: 'Maintainers',
-          list: maintainerRepresentationalSplits,
-        },
-      ]}
-    />
+    <div class="list">
+      <!-- TODO: Show the total amount that will be split on tx confirmation -->
+      <div class="drip-icon">
+        <Drip />
+      </div>
+      <div class="splits-component">
+        <Splits
+          list={[
+            {
+              type: 'split-group',
+              name: 'Dependencies',
+              list: dependencyRepresentationalSplits,
+            },
+            {
+              type: 'split-group',
+              name: 'Maintainers',
+              list: maintainerRepresentationalSplits,
+            },
+          ]}
+        />
+      </div>
+    </div>
   </FormField>
   <div class="whats-next">
     <div class="card">
@@ -220,5 +229,19 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+  }
+
+  .drip-icon {
+    width: 1.5rem;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .splits-component {
+    margin-left: 10px;
   }
 </style>

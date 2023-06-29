@@ -3,8 +3,8 @@
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import Spinner from 'radicle-design-system/Spinner.svelte';
-  import Folder from 'radicle-design-system/icons/Folder.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
+  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
 
   export let context: Writable<State>;
 
@@ -16,18 +16,19 @@
     const forge = $context.project?.source.forge;
     const username = $context.project?.source.ownerName;
     const repoName = $context.project?.source.repoName;
-    await goto(`/app/projects/${forge}/${username}/${repoName}`);
 
-    loading = false;
+    await goto(`/app/projects/${forge}/${username}/${repoName}`).then(() => {
+      loading = false;
+    });
   }
 </script>
 
 <div class="center-div">
-  {#if !loading}
-    <p>Claimed project successfully!</p>
-    <Button variant="primary" icon={Folder} on:click={viewProject}>View project</Button>
-  {:else}
+  {#if loading}
     <Spinner />
+  {:else}
+    <p>Claimed project successfully!</p>
+    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}>View project</Button>
   {/if}
 </div>
 

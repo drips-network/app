@@ -99,7 +99,7 @@
 <StandaloneFlowStepLayout
   description="Review your new Drip List, monthly support, and initial top-up amount."
 >
-  <FormField type="div" title="Drip List">
+  <FormField type="div" title="Your Drip List">
     <svelte:fragment slot="action">
       <Button variant="ghost" on:click={() => dispatch('goForward', { by: -2 })} icon={PenIcon}
         >Edit</Button
