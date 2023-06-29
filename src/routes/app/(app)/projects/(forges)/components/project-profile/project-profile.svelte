@@ -84,15 +84,6 @@
   }
 </script>
 
-<svelte:head>
-  <title>{project.source.repoName} | Drips</title>
-  <meta
-    name="description"
-    content="Support {project.source
-      .repoName} on Drips and help make Open-Source Software sustainable."
-  />
-</svelte:head>
-
 <HeadMeta title="{project.source.ownerName}/{project.source.repoName} | Drips" />
 
 <!-- TODO: Add claim project button -->
