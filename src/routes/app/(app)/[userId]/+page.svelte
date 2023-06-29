@@ -18,6 +18,7 @@
   import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import Banner from '$lib/components/banner/banner.svelte';
+  import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
 
   $: userId = $page.params.userId;
 
@@ -149,6 +150,9 @@
         </div>
       {/if}
     </SectionSkeleton>
+    {#if address}
+      <ProjectsSection {address} />
+    {/if}
     <Balances userId={dripsUserId} />
     <Streams userId={dripsUserId} />
     <Splits userId={dripsUserId} />
