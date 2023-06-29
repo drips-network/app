@@ -84,7 +84,11 @@
   }
 </script>
 
-<HeadMeta title="{project.source.ownerName}/{project.source.repoName} | Drips" />
+<HeadMeta
+  title="{project.source.ownerName}/{project.source.repoName} | Drips"
+  description="Support {project.source
+    .repoName} on Drips and help make Open-Source Software sustainable."
+/>
 
 <!-- TODO: Add claim project button -->
 <!-- TODO: Display supporters on unclaimed projects -->
