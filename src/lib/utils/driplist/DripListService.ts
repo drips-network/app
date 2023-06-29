@@ -146,9 +146,9 @@ export default class DripListService {
         userId: nftSubAccount.tokenId,
       },
       projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
+      name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
       // TODO: properties below are post-MVP.
       isPublic: false,
-      name: undefined,
       description: undefined,
     };
 

@@ -1,11 +1,28 @@
 import type { Split as RepresentationalSplit, Split } from '$lib/components/splits/splits.svelte';
-import type {
-  AddressDriverSplitReceiver,
-  RepoDriverSplitReceiver,
-} from '$lib/utils/metadata/types';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
-import { AddressDriverClient } from 'radicle-drips';
+import { AddressDriverClient, Utils } from 'radicle-drips';
+import { getSubgraphClient } from '../get-drips-clients';
+
+/**
+ * Fetch splits for a given user ID, and map to representational splits for the `Splits` component.
+ * @param userId The user ID to build representational splits for.
+ * @returns Representational splits.
+ */
+export async function getRepresentationalSplitsForAccount(userId: string) {
+  const subgraph = getSubgraphClient();
+
+  const splits = await subgraph.getSplitsConfigByUserId(userId);
+
+  return await buildRepresentationalSplits(
+    splits.map((s) => ({
+      account: {
+        userId: s.userId,
+      },
+      weight: Number(s.weight),
+    })),
+  );
+}
 
 /**
  * Map project splits to representational splits for the `Splits` component.
@@ -13,13 +30,13 @@ import { AddressDriverClient } from 'radicle-drips';
  * @returns The mapped representational splits for `Splits` component.
  */
 export async function buildRepresentationalSplits(
-  splits: (AddressDriverSplitReceiver | RepoDriverSplitReceiver)[],
+  splits: { account: { userId: string }; weight: number }[],
 ): Promise<RepresentationalSplit[]> {
   const gitProjectService = await GitProjectService.new();
 
   const promises = splits.map((s) =>
     (async () => {
-      const splitType = 'source' in s ? 'repo' : 'address';
+      const splitType = Utils.UserId.getDriver(s.account.userId);
 
       if (splitType === 'repo') {
         const project = await gitProjectService.getByUserId(s.account.userId);

@@ -81,8 +81,8 @@ export interface DripList {
     weight: number;
     project: GitProject;
   }[];
+  name: string;
   // Properties below are post-MVP
   isPublic: false;
-  name: undefined;
   description: undefined;
 }

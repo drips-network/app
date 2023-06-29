@@ -30,6 +30,7 @@ describe('RepoDriverMetadataManager', () => {
             source: {
               forge: 'github',
               url: gitUrl,
+              ownerName: 'username',
               repoName: 'repo',
               ownerName: 'username',
             },
@@ -54,6 +55,7 @@ describe('RepoDriverMetadataManager', () => {
           source: {
             forge: 'github',
             url: gitUrl,
+            ownerName: 'username',
             repoName: 'repo',
             ownerName: 'username',
           },
@@ -78,6 +80,7 @@ describe('RepoDriverMetadataManager', () => {
             source: {
               forge: 'github',
               url: gitUrl,
+              ownerName: 'username',
               repoName: 'repo',
               ownerName: 'username',
             },
@@ -142,6 +145,7 @@ describe('RepoDriverMetadataManager', () => {
             source: {
               forge: 'github',
               url: gitUrl,
+              ownerName: 'username',
               repoName: 'random-repo-name',
               ownerName: 'username',
             },

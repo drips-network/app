@@ -7,7 +7,7 @@ import {
   repoDriverSplitReceiverSchema,
   splitReceiverSchema,
 } from './schemas';
-import type { ClaimedGitProject, GitHubSource, RepoDriverAccount, UserId } from './types';
+import type { ClaimedGitProject, RepoDriverAccount, UserId } from './types';
 
 import type { z } from 'zod';
 
@@ -34,15 +34,12 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       return null;
     }
 
-    const { url, repoName, forge } = metadata.data.source;
-
-    // TODO: This would only work for GitHub. Update this when we add support other forges.
-    const username = (metadata.data.source as GitHubSource).ownerName;
+    const { url, repoName, ownerName, forge } = metadata.data.source;
 
     const repoDriverClient = await getRepoDriverClient();
     const onChainUserId = await repoDriverClient.getUserId(
       RepoDriverUtils.forgeFromString(forge),
-      `${username}/${repoName}`,
+      `${ownerName}/${repoName}`, // TODO: This would only work for GitHub. Update this when we add support other forges.
     );
 
     if (onChainUserId !== userId) {
