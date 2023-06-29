@@ -28,6 +28,7 @@
         const promises = ($context.dependencySplits.itemsPromise as Promise<GitProject>[]).map(
           (p) =>
             p.catch((error) => {
+              // eslint-disable-next-line no-console
               console.log('💧 ~ Could not fetch project:', error);
               return undefined;
             }),
@@ -43,6 +44,7 @@
         $context.dependencySplits.items = dependencySplits;
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log('💧 ~ Could not fetch project dependencies:', error);
     }
   }

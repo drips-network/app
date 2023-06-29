@@ -7,13 +7,7 @@ import {
   repoDriverSplitReceiverSchema,
   splitReceiverSchema,
 } from './schemas';
-import type {
-  ClaimedGitProject,
-  GitHubSource,
-  GitLabSource,
-  RepoDriverAccount,
-  UserId,
-} from './types';
+import type { ClaimedGitProject, GitHubSource, RepoDriverAccount, UserId } from './types';
 
 import type { z } from 'zod';
 
@@ -42,8 +36,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName, forge } = metadata.data.source;
 
-    // TODO: This would only work for GitHub and GitLab, not Radicle or generic Git. Update this when we add support other forges.
-    const username = (metadata.data.source as GitLabSource | GitHubSource).ownerName;
+    // TODO: This would only work for GitHub. Update this when we add support other forges.
+    const username = (metadata.data.source as GitHubSource).ownerName;
 
     const repoDriverClient = await getRepoDriverClient();
     const onChainUserId = await repoDriverClient.getUserId(

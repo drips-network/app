@@ -31,6 +31,7 @@ describe('RepoDriverMetadataManager', () => {
               forge: 'github',
               url: gitUrl,
               repoName: 'repo',
+              ownerName: 'username',
             },
           },
         });
@@ -54,11 +55,12 @@ describe('RepoDriverMetadataManager', () => {
             forge: 'github',
             url: gitUrl,
             repoName: 'repo',
+            ownerName: 'username',
           },
         },
       });
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
@@ -77,6 +79,7 @@ describe('RepoDriverMetadataManager', () => {
               forge: 'github',
               url: gitUrl,
               repoName: 'repo',
+              ownerName: 'username',
             },
           },
         });
@@ -93,7 +96,7 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith('3');
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
@@ -140,6 +143,7 @@ describe('RepoDriverMetadataManager', () => {
               forge: 'github',
               url: gitUrl,
               repoName: 'random-repo-name',
+              ownerName: 'username',
             },
           },
         } as any as any);
@@ -156,7 +160,10 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'random-repo-name');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(
+        Forge.GitHub,
+        'username/random-repo-name',
+      );
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });

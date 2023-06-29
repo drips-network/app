@@ -8,14 +8,14 @@
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
-  import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { UserId } from '$lib/utils/common-types';
+  // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
+  // import type { GitProject } from '$lib/utils/metadata/types';
 
   export let context: Writable<State>;
 
@@ -33,6 +33,8 @@
   $: formValid = validationState.type === 'valid';
 
   async function fetchProject() {
+    $context.linkedToRepo = false;
+
     gitProjectService = await GitProjectService.new();
 
     try {
@@ -52,9 +54,8 @@
         fetchUnclaimedProjectFunds(project.repoDriverAccount.userId),
       ]);
 
-      console.log($context);
-
       validationState = { type: 'valid' };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       validationState = { type: 'invalid', message: error.message };
     }
@@ -76,64 +77,66 @@
     $context.unclaimedFunds = await fetchUnclaimedFunds(userId);
   }
 
-  async function prePopulateDependencies() {
-    if (Object.keys($context.dependencySplits.items).length > 0) return;
+  // async function prePopulateDependencies() {
+  //   if (Object.keys($context.dependencySplits.items).length > 0) return;
 
-    const response = await fetch(`/api/project-deps?projectUrl=${$context.gitUrl}`, {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
+  //   const response = await fetch(`/api/project-deps?projectUrl=${$context.gitUrl}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //   });
 
-    const deps: PackageManagerDependencies = await response.json();
+  //   const deps: PackageManagerDependencies = await response.json();
 
-    const depsPromises: Promise<GitProject>[] = [];
+  //   const depsPromises: Promise<GitProject>[] = [];
 
-    Object.keys(deps).forEach((packageManager) => {
-      if (dependenciesFound(deps)) {
-        deps[packageManager].forEach((dependency) => {
-          if (dependency.urls.repo) {
-            const task = gitProjectService.getByUrl(dependency.urls.repo);
+  //   Object.keys(deps).forEach((packageManager) => {
+  //     if (dependenciesFound(deps)) {
+  //       deps[packageManager].forEach((dependency) => {
+  //         if (dependency.urls.repo) {
+  //           const task = gitProjectService.getByUrl(dependency.urls.repo);
 
-            depsPromises.push(task);
-            return;
-          }
-        });
+  //           depsPromises.push(task);
+  //           return;
+  //         }
+  //       });
 
-        $context.dependencySplits.itemsPromise = depsPromises;
-      } else {
-        console.log('💧 ~ Could not pre-populate dependencies:', deps);
-      }
-    });
+  //       $context.dependencySplits.itemsPromise = depsPromises;
+  //     } else {
+  //       // eslint-disable-next-line no-console
+  //       console.log('💧 ~ Could not pre-populate dependencies:', deps);
+  //     }
+  //   });
 
-    $context.dependenciesAutoImported = true;
-  }
+  //   $context.dependenciesAutoImported = true;
+  // }
 
-  function dependenciesFound(obj: any): obj is PackageManagerDependencies {
-    if (typeof obj !== 'object' || obj === null) {
-      return false;
-    }
+  // function dependenciesFound(obj: any): obj is PackageManagerDependencies {
+  //   if (typeof obj !== 'object' || obj === null) {
+  //     return false;
+  //   }
 
-    for (const key in obj) {
-      const dependenciesArray = obj[key];
+  //   for (const key in obj) {
+  //     const dependenciesArray = obj[key];
 
-      if (!Array.isArray(dependenciesArray)) {
-        return false;
-      }
+  //     if (!Array.isArray(dependenciesArray)) {
+  //       return false;
+  //     }
 
-      for (const dependency of dependenciesArray) {
-        if (typeof dependency.name !== 'string' || typeof dependency.urls.package !== 'string') {
-          return false;
-        }
-      }
-    }
+  //     for (const dependency of dependenciesArray) {
+  //       if (typeof dependency.name !== 'string' || typeof dependency.urls.package !== 'string') {
+  //         return false;
+  //       }
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
   function clearProject() {
     $context.project = undefined;
+    $context.linkedToRepo = false;
     $context.projectMetadata = undefined;
 
     validationState = { type: 'unvalidated' };

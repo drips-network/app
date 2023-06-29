@@ -16,7 +16,7 @@
   onMount(() =>
     dispatch('await', {
       promise: pollSubgraph,
-      message: 'Checking if project is claimed on-chain. This may take a while...',
+      message: 'Checking if the Drips Subgraph is updated. This may take a while...',
     }),
   );
 
@@ -24,6 +24,7 @@
     let start = Date.now();
     let timeout = 5 * 60 * 1000; // Timeout after 5 minutes
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const gitProjectService = await GitProjectService.new();
       const project = await gitProjectService.getByUrl($context.gitUrl, false);

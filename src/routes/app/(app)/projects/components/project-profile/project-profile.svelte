@@ -3,9 +3,9 @@
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import Splits from 'radicle-design-system/icons/Splits.svelte';
-  import BecomeSupporterCard from '../become-supporter-card/become-supporter-card.svelte';
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
+  import BecomeSupporterCard from '../../(forges)/components/become-supporter-card/become-supporter-card.svelte';
 
   export let project: GitProject;
 </script>

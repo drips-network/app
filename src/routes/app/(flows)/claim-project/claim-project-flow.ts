@@ -5,7 +5,6 @@ import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
 import EnterGitUrl from './steps/enter-git-url/enter-git-url.svelte';
 import AddEthereumAddress from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
-import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import WalletSlot from './slots/wallet-slot.svelte';
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
@@ -14,6 +13,9 @@ import ConfigureDependencies from './steps/configure-dependencies/configure-depe
 import Review from './steps/review/review.svelte';
 import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
+import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
+import LinkedProject from './slots/linked-project.svelte';
+import Success from './steps/success/success.svelte';
 
 interface SplitsConfig {
   selected: string[];
@@ -23,6 +25,7 @@ interface SplitsConfig {
 }
 
 export interface State {
+  linkedToRepo: boolean;
   gitUrl: string;
   project: UnclaimedGitProject | undefined;
   projectMetadata:
@@ -41,6 +44,7 @@ export interface State {
 }
 
 export const state = writable<State>({
+  linkedToRepo: false,
   gitUrl: '',
   project: undefined,
   projectMetadata: undefined,
@@ -77,7 +81,13 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       component: WalletSlot,
       props: {},
     },
-    editStepIndex: 1,
+    editStepIndex: state.linkedToRepo ? undefined : 0,
+    rightComponent: state.linkedToRepo
+      ? {
+          component: LinkedProject,
+          props: {},
+        }
+      : undefined,
   };
 
   switch (stepIndex) {
@@ -92,8 +102,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     case 5:
       return [projectSlot, walletSlot];
     case 6:
-      return [projectSlot, walletSlot];
-
+      return [];
     default:
       return [];
   }
@@ -134,6 +143,10 @@ export const steps = () => [
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,
+    props: undefined,
+  }),
+  makeStep({
+    component: Success,
     props: undefined,
   }),
 ];

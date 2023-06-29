@@ -2,7 +2,7 @@
   import CodeBox from '$lib/components/code-box/code-box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import dripsJsonTemplate from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -21,14 +21,16 @@
 
   export let context: Writable<State>;
 
+  onMount(() => {
+    $context.linkedToRepo = false;
+  });
+
   function verify() {
     dispatch('await', {
       promise: () =>
         new Promise<void>((resolve, reject) => {
           const { address } = $walletStore;
           assert(address);
-
-          console.log($context);
 
           const addressInMaintainers = $context.maintainerSplits.items[address];
           const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
@@ -49,14 +51,18 @@
             const { username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
 
             resolve(
-              github.getFundingJson(
-                username,
-                repoName,
-                dripsJsonTemplate(
-                  $walletStore.address ?? unreachable(),
-                  $walletStore.network.name ?? unreachable(),
-                ),
-              ),
+              github
+                .getFundingJson(
+                  username,
+                  repoName,
+                  dripsJsonTemplate(
+                    $walletStore.address ?? unreachable(),
+                    $walletStore.network.name ?? unreachable(),
+                  ),
+                )
+                .then(() => {
+                  $context.linkedToRepo = true;
+                }),
             );
           } catch (error) {
             reject('FUNDING.json not found.');

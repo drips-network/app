@@ -30,10 +30,10 @@ async function getFundingJson(owner: string, repo: string, template: string): Pr
       path: 'FUNDING.json',
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
 
     const fundingJson = JSON.parse(fileContent);
-    console.log('💧 ~ file: github.ts:36 ~ getFundingJson ~ fundingJson:', fundingJson);
 
     if (JSON.stringify(fundingJson).replace(/\s/g, '') !== template.replace(/\s/g, '')) {
       throw new Error(`Invalid FUNDING.json: ${fileContent}`);

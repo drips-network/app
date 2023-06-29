@@ -6,7 +6,6 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
-  import { goto } from '$app/navigation';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -21,10 +20,6 @@
 
           const setSplitsAndEmitMetadataBatch =
             await gitProjectService.buildSetSplitsAndEmitMetadataBatchTx($context);
-          console.log(
-            '💧 ~ file: set-splits-and-emit-metadata.svelte:23 ~ before: ~ setSplitsAndEmitMetadataBatch:',
-            setSplitsAndEmitMetadataBatch,
-          );
 
           return { callerClient: await getCallerClient(), setSplitsAndEmitMetadataBatch };
         },
@@ -37,9 +32,6 @@
         transactions: ({ callerClient, setSplitsAndEmitMetadataBatch }) => ({
           transaction: () => callerClient.callBatched(setSplitsAndEmitMetadataBatch),
         }),
-        after: async () => {
-          goto('/app');
-        },
       }),
     ),
   );

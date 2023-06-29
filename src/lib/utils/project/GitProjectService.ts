@@ -41,7 +41,6 @@ import { isAddress } from 'ethers/lib/utils';
 import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
 import type { ContractTransaction, PopulatedTransaction } from 'ethers';
 import { getRepoByUrl as getGithubRepoByUrl } from '../github/github';
-import { getRepoByUrl as getGitlabRepoByUrl } from '../gitlab/gitlab';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
@@ -163,6 +162,7 @@ export default class GitProjectService {
   } {
     const parsedURL = new URL(url);
 
+    // TODO: support more forges.
     let forge: Forge;
     switch (parsedURL.hostname) {
       case 'github.com':
@@ -208,6 +208,7 @@ export default class GitProjectService {
         throw new Error(`Unsupported forge: ${forge}`);
     }
 
+    // TODO: support more forges.
     switch (forge) {
       case Forge.GitHub:
         return {
@@ -375,20 +376,6 @@ export default class GitProjectService {
         description,
         defaultBranch,
       };
-    } else if (forge === Forge.GitLab) {
-      const {
-        description,
-        forks_count: forksCount,
-        stargazers_count: starsCount,
-        default_branch: defaultBranch,
-      } = await getGitlabRepoByUrl(url);
-
-      return {
-        forksCount,
-        starsCount,
-        description,
-        defaultBranch,
-      };
     } else {
       throw new Error(`Cannot get project info: unsupported forge: ${forge}`);
     }
@@ -418,7 +405,9 @@ export default class GitProjectService {
       | z.infer<typeof addressDriverSplitReceiverSchema>
       | z.infer<typeof repoDriverSplitReceiverSchema>
     )[] = [];
-    for (const [urlOrAddress, percentage] of Object.entries(context.dependencySplits.percentages)) {
+    for (const [urlOrAddress, percentage] of Object.entries(
+      context.dependencySplits.percentages,
+    ).filter((d) => context.dependencySplits.selected.includes(d[0]))) {
       const isAddr = isAddress(urlOrAddress);
 
       if (isAddr) {
@@ -441,7 +430,9 @@ export default class GitProjectService {
 
     // Populate maintainers splits and metadata.
     const maintainers: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
-    for (const [address, percentage] of Object.entries(context.maintainerSplits.percentages)) {
+    for (const [address, percentage] of Object.entries(context.maintainerSplits.percentages).filter(
+      (d) => context.maintainerSplits.selected.includes(d[0]),
+    )) {
       const receiver = {
         weight: Math.floor((Number(percentage) / 100) * 1000000),
         userId: await this._addressDriverClient.getUserIdByAddress(address),
@@ -466,7 +457,6 @@ export default class GitProjectService {
     });
 
     const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
-    console.log('💧 ~ ipfs hash:', ipfsHash);
 
     const userMetadataAsBytes = [
       {
@@ -489,8 +479,6 @@ export default class GitProjectService {
     switch (parsedURL.hostname) {
       case 'github.com':
         return Forge.GitHub;
-      case 'gitlab.com':
-        return Forge.GitLab;
       default:
         throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
     }

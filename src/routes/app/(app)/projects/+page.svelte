@@ -30,6 +30,7 @@
   import { fade } from 'svelte/transition';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import assert from '$lib/utils/assert';
+  import { goto } from '$app/navigation';
 
   $: {
     $walletStore.connected;
@@ -55,7 +56,8 @@
     const { address } = $walletStore;
 
     assert(address);
-    projects = await service.getAllByOwner(address);
+    //! TODO: addresses on the Subgraph are not checksummed! This is a hack to make it work for now.
+    projects = await service.getAllByOwner(address.toLowerCase());
   });
 
   let collectableAmountsExpanded = false;
@@ -83,7 +85,7 @@
       label="Your projects"
       actions={[
         {
-          handler: () => undefined,
+          handler: () => goto('/app/claim-project'),
           label: 'Claim project',
           icon: PlusIcon,
           variant: 'primary',

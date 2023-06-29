@@ -26,6 +26,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
+  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -128,6 +129,11 @@
     </div>
   </FormField>
   <FormField type="div" title="Owned by">
+    <svelte:fragment slot="action">
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+        >Edit</Button
+      >
+    </svelte:fragment>
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
@@ -135,6 +141,11 @@
   </FormField>
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">
+    <svelte:fragment slot="action">
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+        >Edit</Button
+      >
+    </svelte:fragment>
     <Splits
       list={[
         {
