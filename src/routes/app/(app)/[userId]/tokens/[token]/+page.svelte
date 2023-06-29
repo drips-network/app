@@ -22,6 +22,7 @@
   import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   const urlParamToken = $page.params.token.toLowerCase();
 
@@ -82,10 +83,7 @@
   }
 </script>
 
-<svelte:head>
-  <title>{token?.info.name ?? 'Unknown Token'} | Drips</title>
-  <meta name="description" content="Drips Token Page" />
-</svelte:head>
+<HeadMeta title={token?.info.name ?? 'Unknown Token'} />
 
 {#if error === 'connected-to-wrong-user'}
   <LargeEmptyState

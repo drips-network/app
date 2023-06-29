@@ -15,6 +15,7 @@
   import { fly } from 'svelte/transition';
   import MultiToken from '$lib/components/illustrations/multi-token.svelte';
   import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: userId = $wallet.dripsUserId;
 
@@ -123,10 +124,7 @@
   ].filter((ci) => !$dismissablesStore.includes(ci((i) => i).id));
 </script>
 
-<svelte:head>
-  <title>Streams | Drips</title>
-  <meta name="description" content="Drips Streams Page" />
-</svelte:head>
+<HeadMeta title="Streams | Drips" />
 
 <div class="dashboard">
   <div class="edu-carousel">

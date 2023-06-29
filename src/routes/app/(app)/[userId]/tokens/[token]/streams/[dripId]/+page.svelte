@@ -35,6 +35,7 @@
   import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import getStreamHistory from '$lib/utils/stream-history';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   const { userId, token: tokenAddress, dripId } = $page.params;
 
@@ -169,9 +170,7 @@
   $: loading = !(stream && estimate);
 </script>
 
-<svelte:head>
-  <title>{stream?.name ?? 'Stream'} | Drips</title>
-</svelte:head>
+<HeadMeta title={stream?.name ?? 'Stream'} />
 
 <div class="wrapper">
   {#if error === 'invalid-id'}

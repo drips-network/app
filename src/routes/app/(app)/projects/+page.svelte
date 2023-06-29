@@ -30,6 +30,7 @@
   import { fade } from 'svelte/transition';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import assert from '$lib/utils/assert';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: {
     $walletStore.connected;
@@ -71,10 +72,7 @@
   }
 </script>
 
-<svelte:head>
-  <title>Projects | Drips</title>
-  <meta name="description" content="Drips Projects Page" />
-</svelte:head>
+<HeadMeta title="Projects | Drips" />
 
 <div class="page">
   <div class="section">

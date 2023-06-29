@@ -21,6 +21,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type getIncomingSplits from '../../methods/get-incoming-splits';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -91,6 +92,8 @@
       .repoName} on Drips and help make Open-Source Software sustainable."
   />
 </svelte:head>
+
+<HeadMeta title="{project.source.ownerName}/{project.source.repoName} | Drips" />
 
 <!-- TODO: Add claim project button -->
 <!-- TODO: Display supporters on unclaimed projects -->

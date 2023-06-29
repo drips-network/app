@@ -1,6 +1,7 @@
-<svelte:head>
-  <title>Dashboard | Drips</title>
-  <meta name="description" content="Drips Dashboard Page" />
-</svelte:head>
+<script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+</script>
+
+<HeadMeta title="Dashboard | Drips" />
 
 dashboard page goes here

@@ -12,6 +12,7 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import type { Splits as RepresentationalSplits } from '$lib/components/splits/splits.svelte';
   import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: {
     $walletStore.connected;
@@ -43,10 +44,7 @@
   });
 </script>
 
-<svelte:head>
-  <title>Drip Lists | Drips</title>
-  <meta name="description" content="Drip Lists Page" />
-</svelte:head>
+<HeadMeta title="Drip List | Drips" />
 
 <div class="section">
   <SectionHeader

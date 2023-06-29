@@ -18,6 +18,7 @@
   import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import Banner from '$lib/components/banner/banner.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: userId = $page.params.userId;
 
@@ -103,10 +104,7 @@
   }
 </script>
 
-<svelte:head>
-  <title>{(address && $ens[address]?.name) ?? address ?? userId} | Drips</title>
-  <meta name="description" content="Drips User Profile" />
-</svelte:head>
+<HeadMeta title={(address && $ens[address]?.name) ?? address ?? userId} />
 
 {#if error}
   <LargeEmptyState

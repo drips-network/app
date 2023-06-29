@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Emoji from '$lib/components/emoji/emoji.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
   import type { PageData } from './$types';
@@ -9,9 +10,7 @@
   $: url = data.url;
 </script>
 
-<svelte:head>
-  <title>External Link | Drips</title>
-</svelte:head>
+<HeadMeta title="External Link | Drips" />
 
 <div class="external-link-warning">
   <div class="logo">
