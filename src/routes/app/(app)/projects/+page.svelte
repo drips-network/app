@@ -2,14 +2,9 @@
   import Button from '$lib/components/button/button.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import BoxIcon from 'radicle-design-system/icons/Box.svelte';
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
   import DownloadIcon from 'radicle-design-system/icons/Download.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
-  import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
-  import ProjectCard from '$lib/components/project-card/project-card.svelte';
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
@@ -28,8 +23,7 @@
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import CrossIcon from 'radicle-design-system/icons/Cross.svelte';
   import { fade } from 'svelte/transition';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
-  import assert from '$lib/utils/assert';
+  import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   $: {
@@ -50,15 +44,6 @@
     cycle = await getCycle();
   });
 
-  let projects: ClaimedGitProject[] | undefined;
-  onMount(async () => {
-    const service = await GitProjectService.new();
-    const { address } = $walletStore;
-
-    assert(address);
-    projects = await service.getAllByOwner(address.toLowerCase());
-  });
-
   let collectableAmountsExpanded = false;
 
   $: tokensAvailableToCollect = $splittableStore && $splittableStore.length > 0;
@@ -76,38 +61,9 @@
 
 <div class="page">
   <div class="section">
-    <SectionHeader
-      icon={BoxIcon}
-      label="Your projects"
-      actions={[
-        {
-          handler: () => undefined,
-          label: 'Claim project',
-          icon: PlusIcon,
-          variant: 'primary',
-        },
-      ]}
-    />
-    <SectionSkeleton
-      horizontalScroll={false}
-      loaded={projects !== undefined}
-      empty={projects?.length === 0}
-      emptyStateEmoji="🫙"
-      emptyStateHeadline="No claimed projects"
-      emptyStateText="If you develop an open-source project, click &quot;Claim project&quot; to get started."
-    >
-      {#if projects}
-        <div class="projects">
-          {#each projects as project}
-            <div>
-              <PrimaryColorThemer colorHex={project.color}
-                ><ProjectCard {project} /></PrimaryColorThemer
-              >
-            </div>
-          {/each}
-        </div>
-      {/if}
-    </SectionSkeleton>
+    {#if $walletStore.address}
+      <ProjectsSection address={$walletStore.address} />
+    {/if}
   </div>
 
   <div class="section">
@@ -191,21 +147,6 @@
     gap: 4rem;
   }
 
-  .projects {
-    display: flex;
-    gap: 1rem;
-    max-width: 100%;
-    position: relative;
-    padding-top: 2px;
-    flex-wrap: wrap;
-  }
-
-  .projects > * {
-    flex: 1;
-    min-width: 16rem;
-    max-width: calc(25% - 0.75rem);
-  }
-
   .expand-chevron {
     transition: transform 0.3s, background-color 0.3s;
     border-radius: 50%;
@@ -274,12 +215,5 @@
 
   .edu-card-wrapper {
     margin-top: 2rem;
-  }
-
-  @media (max-width: 560px) {
-    .projects > * {
-      width: 100%;
-      max-width: 100%;
-    }
   }
 </style>

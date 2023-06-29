@@ -30,6 +30,7 @@ describe('RepoDriverMetadataManager', () => {
             source: {
               forge: 'github',
               url: gitUrl,
+              ownerName: 'username',
               repoName: 'repo',
             },
           },
@@ -53,12 +54,13 @@ describe('RepoDriverMetadataManager', () => {
           source: {
             forge: 'github',
             url: gitUrl,
+            ownerName: 'username',
             repoName: 'repo',
           },
         },
       });
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
@@ -76,6 +78,7 @@ describe('RepoDriverMetadataManager', () => {
             source: {
               forge: 'github',
               url: gitUrl,
+              ownerName: 'username',
               repoName: 'repo',
             },
           },
@@ -93,7 +96,7 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith('3');
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'repo');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
@@ -139,6 +142,7 @@ describe('RepoDriverMetadataManager', () => {
             source: {
               forge: 'github',
               url: gitUrl,
+              ownerName: 'username',
               repoName: 'random-repo-name',
             },
           },
@@ -156,7 +160,10 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'random-repo-name');
+      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(
+        Forge.GitHub,
+        'username/random-repo-name',
+      );
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
