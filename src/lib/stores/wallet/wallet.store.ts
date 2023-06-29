@@ -85,6 +85,8 @@ const walletStore = () => {
 
   let web3Modal: Web3Modal;
 
+  const initialized = writable(false);
+
   /**
    * Initialize the store and restore any previously-connected,
    * cached provider.
@@ -102,6 +104,8 @@ const walletStore = () => {
     if (web3Modal.cachedProvider || isSafeApp) {
       await connect(true, isSafeApp);
     }
+
+    initialized.set(true);
   }
 
   /**
@@ -226,6 +230,7 @@ const walletStore = () => {
 
   return {
     subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
     initialize,
     connect,
     disconnect,
@@ -236,6 +241,8 @@ const mockWalletStore = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const address = (window as any).playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
+
+  const initialized = writable(false);
 
   const state = writable<WalletStoreState>({
     connected: false,
@@ -255,10 +262,13 @@ const mockWalletStore = () => {
       network: provider.network,
       dripsUserId: userId,
     });
+
+    initialized.set(true);
   }
 
   return {
     subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
     initialize,
     connect: () => undefined,
     disconnect: () => undefined,

@@ -19,7 +19,7 @@
   import Pile from '$lib/components/pile/pile.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import type getIncomingSplits from '../../methods/get-incoming-splits';
+  import type getIncomingSplits from '../../../../(wallet-required)/(app)/projects/(forges)/methods/get-incoming-splits';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 

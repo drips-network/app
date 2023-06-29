@@ -32,13 +32,13 @@
   }
 </script>
 
-<div class="main" in:fly={{ duration: 300, y: 16 }}>
+<div class="main" in:fly|local={{ duration: 300, y: 16 }}>
   <div class="page">
     <PageTransition pathname={data.pathname}>
       <div class:loading={$navigating}><slot /></div>
     </PageTransition>
     {#if showLoadingSpinner}
-      <div transition:fade={{ duration: 300 }} class="loading-spinner">
+      <div transition:fade|local={{ duration: 300 }} class="loading-spinner">
         <Spinner />
       </div>
     {/if}
@@ -47,8 +47,8 @@
   {#if $wallet.connected}
     <div
       class="sidenav"
-      in:fly={{ duration: 300, x: -64, easing: quintOut }}
-      out:fly={{ duration: 300, x: -64, easing: quintIn }}
+      in:fly|local={{ duration: 300, x: -64, easing: quintOut }}
+      out:fly|local={{ duration: 300, x: -64, easing: quintIn }}
       data-testid="sidenav"
     >
       <Sidenav
@@ -94,7 +94,7 @@
 
   <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
 
-  <div class="header" in:fly={{ duration: 300, y: 16 }}>
+  <div class="header" in:fly|local={{ duration: 300, y: 16 }}>
     <Header />
   </div>
 </div>

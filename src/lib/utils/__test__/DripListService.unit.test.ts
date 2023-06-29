@@ -11,7 +11,7 @@ import {
   ERC20TxFactory,
 } from 'radicle-drips';
 import DripListService from '../driplist/DripListService';
-import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder-onboarding-flow';
+import type { State } from '../../../routes/app/(wallet-required)/(flows)/funder-onboarding/funder-onboarding-flow';
 import { BigNumber, type PopulatedTransaction } from 'ethers';
 import type { z } from 'zod';
 import type {

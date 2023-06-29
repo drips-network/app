@@ -12,8 +12,6 @@
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import globalAdvisoryStore from '$lib/stores/global-advisory/global-advisory.store';
   import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { fade, fly } from 'svelte/transition';
   import { isSafe } from '$lib/stores/wallet/safe/is-safe';
 
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
@@ -156,28 +154,9 @@
 </div>
 
 <ModalLayout />
-
-{#if loaded}
-  <div in:fade={{ duration: 300, delay: 300 }}>
-    <slot />
-  </div>
-{:else}
-  <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
-    <Spinner />
-  </div>
-{/if}
+<slot />
 
 <style>
-  .loading-state {
-    display: fixed;
-    height: 100vh;
-    width: 100vw;
-    background-color: var(--color-background);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
   #cupertino-pane {
     display: none;
     background-color: var(--color-background);

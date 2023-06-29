@@ -31,7 +31,7 @@ import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import unreachable from '../unreachable';
 import type { Address, IpfsHash } from '../common-types';
-import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder-onboarding-flow';
+import type { State } from '../../../routes/app/(wallet-required)/(flows)/funder-onboarding/funder-onboarding-flow';
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
