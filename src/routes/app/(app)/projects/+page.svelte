@@ -55,7 +55,7 @@
     const { address } = $walletStore;
 
     assert(address);
-    projects = await service.getAllByOwner(address);
+    projects = await service.getAllByOwner(address.toLowerCase());
   });
 
   let collectableAmountsExpanded = false;
