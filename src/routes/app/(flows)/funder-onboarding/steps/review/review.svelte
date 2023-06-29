@@ -25,7 +25,7 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import { goto } from '$app/navigation';
   import expect from '$lib/utils/expect';
-  import type { DripsSubgraphClient } from 'radicle-drips';
+  import { constants, type DripsSubgraphClient } from 'radicle-drips';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import streamsStore from '$lib/stores/streams/streams.store';
 
@@ -43,7 +43,11 @@
   $: {
     assert(streamRateValueParsed !== undefined && topUpAmountValueParsed !== undefined);
 
-    const durationSeconds = topUpAmountValueParsed / streamRateValueParsed;
+    const durationSeconds =
+      (topUpAmountValueParsed /
+        (streamRateValueParsed / BigInt(constants.AMT_PER_SEC_MULTIPLIER))) *
+      86400n *
+      30n;
 
     const timestamp = new Date(Date.now() + Number(durationSeconds) * 1000);
 
