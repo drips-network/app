@@ -80,6 +80,7 @@
     align-items: center;
     gap: 1rem;
     min-height: 16rem;
+    text-align: center;
   }
 
   .subtitle {

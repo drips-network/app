@@ -16,8 +16,8 @@
   onMount(() =>
     dispatch('await', {
       promise: pollSubgraph,
-      message:
-        'Checking if the Drips Subgraph is updated. Do not refresh or close the page. This may take a while...',
+      message: 'Waiting for the verification to finalize…',
+      subtitle: "This might take a few minutes. Please don't close this window.",
     }),
   );
 

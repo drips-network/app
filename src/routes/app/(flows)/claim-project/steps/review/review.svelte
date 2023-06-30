@@ -100,7 +100,14 @@
 
           return { requestOwnerUpdateTx };
         },
-        transactions: ({ requestOwnerUpdateTx }) => ({ transaction: () => requestOwnerUpdateTx }),
+        transactions: ({ requestOwnerUpdateTx }) => ({
+          transaction: () => requestOwnerUpdateTx,
+          waitingSignatureMessage: {
+            message: 'Waiting for you to confirm the transaction in your wallet…',
+            subtitle:
+              "The first transaction validates your project's FUNDING.json file on-chain. You'll need to send a second transaction after to finalize the claiming process.",
+          },
+        }),
       }),
     );
   }
@@ -147,7 +154,7 @@
         >Edit</Button
       >
     </svelte:fragment>
-    <div class="list">
+    <div class="card">
       <!-- TODO: Show the total amount that will be split on tx confirmation -->
       <div class="drip-icon">
         <Drip />
@@ -171,6 +178,11 @@
     </div>
   </FormField>
   <div class="whats-next">
+    <p>
+      You'll need to send two transactions to claim your project. The first one validates your
+      FUNDING.json file on-chain, and the second applies your split configuration. Click "Confirm in
+      Wallet" to get started.
+    </p>
     <div class="card">
       <h4>On transaction confirmation…</h4>
       <ul>

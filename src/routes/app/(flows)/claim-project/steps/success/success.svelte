@@ -27,8 +27,11 @@
   {#if loading}
     <Spinner />
   {:else}
-    <p>Claimed project successfully!</p>
-    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}>View project</Button>
+    <h4>Congratulations!</h4>
+    <p>You've successfully claimed your project.</p>
+    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}
+      >View project profile</Button
+    >
   {/if}
 </div>
 

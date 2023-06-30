@@ -62,6 +62,7 @@
       : ''
     : ''}"
 >
+  <!-- TODO: Prevent splitting to the same project we're trying to claim. -->
   <ListEditor
     bind:selected={$context.dependencySplits.selected}
     bind:percentages={$context.dependencySplits.percentages}

@@ -25,12 +25,16 @@
         },
         messages: {
           duringBefore: {
-            message:
-              'Preparing transactions for setting the Drip List splits and emitting the IPFS metadata...',
+            message: 'Preparing the second transaction…',
           },
         },
         transactions: ({ callerClient, setSplitsAndEmitMetadataBatch }) => ({
           transaction: () => callerClient.callBatched(setSplitsAndEmitMetadataBatch),
+          waitingSignatureMessage: {
+            message: 'Waiting for you to confirm the transaction in your wallet…',
+            subtitle:
+              "This second transaction applies your project's splits and concludes the claiming process.",
+          },
         }),
       }),
     ),
