@@ -12,10 +12,9 @@
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import ens from '$lib/stores/ens';
   import User from 'radicle-design-system/icons/User.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
 
   export let data: { pathname: string };
 
@@ -37,11 +36,6 @@
     <PageTransition pathname={data.pathname}>
       <div class:loading={$navigating}><slot /></div>
     </PageTransition>
-    {#if showLoadingSpinner}
-      <div transition:fade={{ duration: 300 }} class="loading-spinner">
-        <Spinner />
-      </div>
-    {/if}
   </div>
 
   {#if $wallet.connected}
@@ -95,7 +89,7 @@
   <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
 
   <div class="header" in:fly={{ duration: 300, y: 16 }}>
-    <Header />
+    <Header showLoadingIndicator={showLoadingSpinner} />
   </div>
 </div>
 
@@ -131,13 +125,6 @@
   .loading {
     opacity: 0.2;
     pointer-events: none;
-  }
-
-  .loading-spinner {
-    position: absolute;
-    top: calc(100vh * 0.5);
-    left: 50%;
-    transform: translate(-50%, -50%);
   }
 
   .sidenav {
