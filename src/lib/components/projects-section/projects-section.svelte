@@ -42,7 +42,7 @@
     actions={isSelf
       ? [
           {
-            // TODO: clicking this button after completing the claim project flow freezes the UI. It shouldn't. 😊
+            // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldn't. 😊
             handler: () => goto(`/app/claim-project`),
             label: 'Claim project',
             icon: Plus,

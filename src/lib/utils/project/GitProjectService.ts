@@ -401,44 +401,62 @@ export default class GitProjectService {
     const receivers: SplitsReceiverStruct[] = [];
 
     // Populate dependencies splits and metadata.
-    const dependencies: (
+    const dependenciesInput = Object.entries(context.dependencySplits.percentages).filter((d) =>
+      context.dependencySplits.selected.includes(d[0]),
+    );
+
+    const dependenciesSplitMetadata: (
       | z.infer<typeof addressDriverSplitReceiverSchema>
       | z.infer<typeof repoDriverSplitReceiverSchema>
     )[] = [];
-    for (const [urlOrAddress, percentage] of Object.entries(
-      context.dependencySplits.percentages,
-    ).filter((d) => context.dependencySplits.selected.includes(d[0]))) {
+
+    for (const [urlOrAddress, percentage] of dependenciesInput) {
       const isAddr = isAddress(urlOrAddress);
+
+      const weight =
+        Math.floor((Number(percentage) / 100) * 1000000) *
+        (context.highLevelPercentages['dependencies'] / 100);
 
       if (isAddr) {
         const receiver = {
-          weight: Math.floor((Number(percentage) / 100) * 1000000),
+          weight,
           userId: await this._addressDriverClient.getUserIdByAddress(urlOrAddress as Address),
         };
 
-        dependencies.push(receiver);
+        dependenciesSplitMetadata.push(receiver);
+        receivers.push(receiver);
       } else {
         const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
 
-        dependencies.push({
-          weight: Math.floor((Number(percentage) / 100) * 1000000),
+        const receiver = {
+          weight,
           userId: await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`),
+        };
+
+        dependenciesSplitMetadata.push({
+          ...receiver,
           source: GitProjectService.populateSource(forge, repoName, username),
         });
+        receivers.push(receiver);
       }
     }
 
     // Populate maintainers splits and metadata.
-    const maintainers: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
-    for (const [address, percentage] of Object.entries(context.maintainerSplits.percentages).filter(
-      (d) => context.maintainerSplits.selected.includes(d[0]),
-    )) {
+    const maintainersInput = Object.entries(context.maintainerSplits.percentages).filter((d) =>
+      context.maintainerSplits.selected.includes(d[0]),
+    );
+
+    const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
+
+    for (const [address, percentage] of maintainersInput) {
       const receiver = {
-        weight: Math.floor((Number(percentage) / 100) * 1000000),
+        weight:
+          Math.floor((Number(percentage) / 100) * 1000000) *
+          (context.highLevelPercentages['maintainers'] / 100),
         userId: await this._addressDriverClient.getUserIdByAddress(address),
       };
 
-      maintainers.push(receiver);
+      maintainersSplitsMetadata.push(receiver);
       receivers.push(receiver);
     }
 
@@ -451,8 +469,8 @@ export default class GitProjectService {
     const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
       forProject: project,
       forSplits: {
-        dependencies,
-        maintainers,
+        dependencies: dependenciesSplitMetadata,
+        maintainers: maintainersSplitsMetadata,
       },
     });
 
