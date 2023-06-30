@@ -6,9 +6,11 @@ import {
   RepoDriverTxFactory,
   Utils,
   type SplitsReceiverStruct,
+  DripsHubTxFactory,
 } from 'radicle-drips';
 import {
   getAddressDriverClient,
+  getDripsTxFactory,
   getRepoDriverClient,
   getRepoDriverTxFactory,
   getSubgraphClient,
@@ -39,7 +41,7 @@ import EMOJI from '$lib/utils/emoji/emoji';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
 import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
-import type { ContractTransaction, PopulatedTransaction } from 'ethers';
+import { BigNumber, type ContractTransaction, type PopulatedTransaction } from 'ethers';
 import { getRepoByUrl as getGithubRepoByUrl } from '../github/github';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
@@ -47,6 +49,7 @@ import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 
 export default class GitProjectService {
+  private _dripsTxFactory!: DripsHubTxFactory;
   private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
@@ -61,6 +64,7 @@ export default class GitProjectService {
 
     gitProjectService._repoDriverClient = await getRepoDriverClient();
     gitProjectService._addressDriverClient = await getAddressDriverClient();
+    gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
     const { connected, signer } = get(wallet);
 
@@ -222,6 +226,216 @@ export default class GitProjectService {
     }
   }
 
+  public async getProjectInfo(url: string): Promise<{
+    description: string | null;
+    defaultBranch: string | null;
+    starsCount: number;
+    forksCount: number;
+  }> {
+    const forge = this._getForge(url);
+
+    if (forge === Forge.GitHub) {
+      const {
+        description,
+        forks_count: forksCount,
+        stargazers_count: starsCount,
+        default_branch: defaultBranch,
+      } = await getGithubRepoByUrl(url);
+
+      return {
+        forksCount,
+        starsCount,
+        description,
+        defaultBranch,
+      };
+    } else {
+      throw new Error(`Cannot get project info: unsupported forge: ${forge}`);
+    }
+  }
+
+  public async buildRequestOwnerUpdateTx(context: State): Promise<ContractTransaction> {
+    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
+    const projectName = `${username}/${repoName}`;
+
+    const requestOwnerUpdateTx = await this._repoDriverClient.requestOwnerUpdate(
+      forge,
+      projectName,
+    );
+
+    return requestOwnerUpdateTx;
+  }
+
+  public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {
+    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
+
+    const receivers: SplitsReceiverStruct[] = [];
+
+    // Populate dependencies splits and metadata.
+    const dependenciesInput = Object.entries(context.dependencySplits.percentages).filter((d) =>
+      context.dependencySplits.selected.includes(d[0]),
+    );
+
+    const dependenciesSplitMetadata: (
+      | z.infer<typeof addressDriverSplitReceiverSchema>
+      | z.infer<typeof repoDriverSplitReceiverSchema>
+    )[] = [];
+
+    for (const [urlOrAddress, percentage] of dependenciesInput) {
+      const isAddr = isAddress(urlOrAddress);
+
+      const weight =
+        Math.floor((Number(percentage) / 100) * 1000000) *
+        (context.highLevelPercentages['dependencies'] / 100);
+
+      if (isAddr) {
+        const receiver = {
+          weight,
+          userId: await this._addressDriverClient.getUserIdByAddress(urlOrAddress as Address),
+        };
+
+        dependenciesSplitMetadata.push(receiver);
+        receivers.push(receiver);
+      } else {
+        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
+
+        const receiver = {
+          weight,
+          userId: await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`),
+        };
+
+        dependenciesSplitMetadata.push({
+          ...receiver,
+          source: GitProjectService.populateSource(forge, repoName, username),
+        });
+        receivers.push(receiver);
+      }
+    }
+
+    // Populate maintainers splits and metadata.
+    const maintainersInput = Object.entries(context.maintainerSplits.percentages).filter((d) =>
+      context.maintainerSplits.selected.includes(d[0]),
+    );
+
+    const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
+
+    for (const [address, percentage] of maintainersInput) {
+      const receiver = {
+        weight:
+          Math.floor((Number(percentage) / 100) * 1000000) *
+          (context.highLevelPercentages['maintainers'] / 100),
+        userId: await this._addressDriverClient.getUserIdByAddress(address),
+      };
+
+      maintainersSplitsMetadata.push(receiver);
+      receivers.push(receiver);
+    }
+
+    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
+    const userId = await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`);
+    const setSplitsTx = await this._repoDriverTxFactory.setSplits(
+      userId,
+      this._formatSplitReceivers(receivers),
+    );
+
+    const project = (await this.getByUrl(context.gitUrl, false)) as ClaimedGitProject;
+
+    const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
+      forProject: project,
+      forSplits: {
+        dependencies: dependenciesSplitMetadata,
+        maintainers: maintainersSplitsMetadata,
+      },
+    });
+
+    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
+
+    const userMetadataAsBytes = [
+      {
+        key: MetadataManagerBase.USER_METADATA_KEY,
+        value: ipfsHash,
+      },
+    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
+
+    const emitUserMetadataTx = await this._repoDriverTxFactory.emitUserMetadata(
+      userId,
+      userMetadataAsBytes,
+    );
+
+    const splitTxs: Promise<PopulatedTransaction>[] = [];
+    context.unclaimedFunds?.map(({ tokenAddress }) => {
+      splitTxs.push(this._dripsTxFactory.split(userId, tokenAddress, receivers));
+    });
+
+    return [setSplitsTx, emitUserMetadataTx, ...(await Promise.all(splitTxs))];
+  }
+
+  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
+  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
+    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
+
+    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
+      if (
+        !unique.some(
+          (obj: SplitsReceiverStruct) => obj.userId === o.userId && obj.weight === o.weight,
+        )
+      ) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    const sortedReceivers = uniqueReceivers.sort((a, b) =>
+      // Sort by user ID.
+      BigNumber.from(a.userId).gt(BigNumber.from(b.userId))
+        ? 1
+        : BigNumber.from(a.userId).lt(BigNumber.from(b.userId))
+        ? -1
+        : 0,
+    );
+
+    return sortedReceivers;
+  }
+
+  private _getForge(url: string): Forge {
+    const parsedURL = new URL(url);
+
+    switch (parsedURL.hostname) {
+      case 'github.com':
+        return Forge.GitHub;
+      default:
+        throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
+    }
+  }
+
+  private _calculateVerificationStatus(repoAccount: RepoAccount): VerificationStatus {
+    if (!repoAccount.status) {
+      return VerificationStatus.NOT_STARTED;
+    }
+
+    const haveFiveMinutesPassed = (utcTimestamp: bigint): boolean => {
+      const FIVE_MINUTES_IN_MS = BigInt(5n * 60n * 1000n);
+      const now = BigInt(Date.now());
+
+      return now - BigInt(utcTimestamp * 1000n) >= FIVE_MINUTES_IN_MS;
+    };
+
+    let verificationStatus: VerificationStatus;
+
+    if ((repoAccount.status as RepoAccountStatus) === 'claimed') {
+      throw new Error('Repo account status should not be claimed at this point.');
+    } else if ((repoAccount.status as RepoAccountStatus) === 'not-started') {
+      verificationStatus = VerificationStatus.NOT_STARTED;
+    } else {
+      if (haveFiveMinutesPassed(repoAccount.lastUpdatedBlockTimestamp)) {
+        verificationStatus = VerificationStatus.FAILED;
+      } else {
+        verificationStatus = VerificationStatus.IN_PROGRESS;
+      }
+    }
+
+    return verificationStatus;
+  }
+
   private _verifySubgraphAndOnChainStateIsInSync(
     isClaimed: boolean,
     repoAccount: RepoAccount,
@@ -352,182 +566,5 @@ export default class GitProjectService {
     };
 
     return claimedProject;
-  }
-
-  public async getProjectInfo(url: string): Promise<{
-    description: string | null;
-    defaultBranch: string | null;
-    starsCount: number;
-    forksCount: number;
-  }> {
-    const forge = this._getForge(url);
-
-    if (forge === Forge.GitHub) {
-      const {
-        description,
-        forks_count: forksCount,
-        stargazers_count: starsCount,
-        default_branch: defaultBranch,
-      } = await getGithubRepoByUrl(url);
-
-      return {
-        forksCount,
-        starsCount,
-        description,
-        defaultBranch,
-      };
-    } else {
-      throw new Error(`Cannot get project info: unsupported forge: ${forge}`);
-    }
-  }
-
-  public async buildRequestOwnerUpdateTx(context: State): Promise<ContractTransaction> {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const projectName = `${username}/${repoName}`;
-
-    const requestOwnerUpdateTx = await this._repoDriverClient.requestOwnerUpdate(
-      forge,
-      projectName,
-    );
-
-    return requestOwnerUpdateTx;
-  }
-
-  public async buildSetSplitsAndEmitMetadataBatchTx(
-    context: State,
-  ): Promise<PopulatedTransaction[]> {
-    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
-
-    const receivers: SplitsReceiverStruct[] = [];
-
-    // Populate dependencies splits and metadata.
-    const dependenciesInput = Object.entries(context.dependencySplits.percentages).filter((d) =>
-      context.dependencySplits.selected.includes(d[0]),
-    );
-
-    const dependenciesSplitMetadata: (
-      | z.infer<typeof addressDriverSplitReceiverSchema>
-      | z.infer<typeof repoDriverSplitReceiverSchema>
-    )[] = [];
-
-    for (const [urlOrAddress, percentage] of dependenciesInput) {
-      const isAddr = isAddress(urlOrAddress);
-
-      const weight =
-        Math.floor((Number(percentage) / 100) * 1000000) *
-        (context.highLevelPercentages['dependencies'] / 100);
-
-      if (isAddr) {
-        const receiver = {
-          weight,
-          userId: await this._addressDriverClient.getUserIdByAddress(urlOrAddress as Address),
-        };
-
-        dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
-      } else {
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
-
-        const receiver = {
-          weight,
-          userId: await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`),
-        };
-
-        dependenciesSplitMetadata.push({
-          ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
-        });
-        receivers.push(receiver);
-      }
-    }
-
-    // Populate maintainers splits and metadata.
-    const maintainersInput = Object.entries(context.maintainerSplits.percentages).filter((d) =>
-      context.maintainerSplits.selected.includes(d[0]),
-    );
-
-    const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
-
-    for (const [address, percentage] of maintainersInput) {
-      const receiver = {
-        weight:
-          Math.floor((Number(percentage) / 100) * 1000000) *
-          (context.highLevelPercentages['maintainers'] / 100),
-        userId: await this._addressDriverClient.getUserIdByAddress(address),
-      };
-
-      maintainersSplitsMetadata.push(receiver);
-      receivers.push(receiver);
-    }
-
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const userId = await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`);
-    const setSplitsTx = await this._repoDriverTxFactory.setSplits(userId, receivers);
-
-    const project = (await this.getByUrl(context.gitUrl, false)) as ClaimedGitProject;
-
-    const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
-      forProject: project,
-      forSplits: {
-        dependencies: dependenciesSplitMetadata,
-        maintainers: maintainersSplitsMetadata,
-      },
-    });
-
-    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
-
-    const userMetadataAsBytes = [
-      {
-        key: MetadataManagerBase.USER_METADATA_KEY,
-        value: ipfsHash,
-      },
-    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
-
-    const emitUserMetadataTx = await this._repoDriverTxFactory.emitUserMetadata(
-      userId,
-      userMetadataAsBytes,
-    );
-
-    return [setSplitsTx, emitUserMetadataTx];
-  }
-
-  private _getForge(url: string): Forge {
-    const parsedURL = new URL(url);
-
-    switch (parsedURL.hostname) {
-      case 'github.com':
-        return Forge.GitHub;
-      default:
-        throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
-    }
-  }
-
-  private _calculateVerificationStatus(repoAccount: RepoAccount): VerificationStatus {
-    if (!repoAccount.status) {
-      return VerificationStatus.NOT_STARTED;
-    }
-
-    const haveFiveMinutesPassed = (utcTimestamp: bigint): boolean => {
-      const FIVE_MINUTES_IN_MS = BigInt(5n * 60n * 1000n);
-      const now = BigInt(Date.now());
-
-      return now - BigInt(utcTimestamp * 1000n) >= FIVE_MINUTES_IN_MS;
-    };
-
-    let verificationStatus: VerificationStatus;
-
-    if ((repoAccount.status as RepoAccountStatus) === 'claimed') {
-      throw new Error('Repo account status should not be claimed at this point.');
-    } else if ((repoAccount.status as RepoAccountStatus) === 'not-started') {
-      verificationStatus = VerificationStatus.NOT_STARTED;
-    } else {
-      if (haveFiveMinutesPassed(repoAccount.lastUpdatedBlockTimestamp)) {
-        verificationStatus = VerificationStatus.FAILED;
-      } else {
-        verificationStatus = VerificationStatus.IN_PROGRESS;
-      }
-    }
-
-    return verificationStatus;
   }
 }

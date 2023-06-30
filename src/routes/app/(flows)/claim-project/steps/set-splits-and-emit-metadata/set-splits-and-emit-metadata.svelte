@@ -18,8 +18,7 @@
         before: async () => {
           const gitProjectService = await GitProjectService.new();
 
-          const setSplitsAndEmitMetadataBatch =
-            await gitProjectService.buildSetSplitsAndEmitMetadataBatchTx($context);
+          const setSplitsAndEmitMetadataBatch = await gitProjectService.buildBatchTx($context);
 
           return { callerClient: await getCallerClient(), setSplitsAndEmitMetadataBatch };
         },

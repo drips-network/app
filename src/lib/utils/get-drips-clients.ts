@@ -12,6 +12,7 @@ import {
   NFTDriverTxFactory,
   RepoDriverClient,
   RepoDriverTxFactory,
+  DripsHubTxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -113,6 +114,18 @@ export function getDripsHubClient() {
   const dripsHubAddress = getNetworkConfig().DRIPS_HUB;
 
   return DripsHubClient.create(provider, signer, dripsHubAddress);
+}
+
+/**
+ * Get an initialized Drips transaction factory.
+ * @returns An initialized Drips transaction factory.
+ */
+export function getDripsTxFactory() {
+  const { provider } = get(wallet);
+
+  const dripsAddress = getNetworkConfig().DRIPS_HUB;
+
+  return DripsHubTxFactory.create(provider, dripsAddress);
 }
 
 /**
