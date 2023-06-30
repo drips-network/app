@@ -247,12 +247,6 @@
     width: 1.5rem;
   }
 
-  .list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .splits-component {
     margin-left: 10px;
   }
