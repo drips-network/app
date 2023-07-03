@@ -48,7 +48,7 @@ async function getValidMetadataSplits(
     usedOnChainSplitEntryIds.push(matchingOnChainSplit.id);
   }
 
-  for (const dependencyMetadataSplit of project.splits.maintainers) {
+  for (const dependencyMetadataSplit of project.splits.dependencies) {
     const matchingOnChainSplit = onChainSplitsConfig.find(
       (v) =>
         v.userId === dependencyMetadataSplit.account.userId &&

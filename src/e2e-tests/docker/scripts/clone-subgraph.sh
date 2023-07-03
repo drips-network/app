@@ -10,5 +10,5 @@ printf '{ "network": "goerli", "immutableSplitsDriver": { "address": "0x34466661
 echo "🛠 Installing subgraph deps…"
 npm install
 
-echo "📁 Writing subgraph.yaml for local deployment…"
+echo "📁 Writing subgraph.yaml for local deployment …"
 npx mustache config.json subgraph.template.yaml > subgraph.yaml

@@ -39,7 +39,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     const repoDriverClient = await getRepoDriverClient();
     const onChainUserId = await repoDriverClient.getUserId(
       RepoDriverUtils.forgeFromString(forge),
-      `${ownerName}/${repoName}`,
+      `${ownerName}/${repoName}`, // TODO: This would only work for GitHub. Update this when we add support other forges.
     );
 
     if (onChainUserId !== userId) {
@@ -76,7 +76,10 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     forProject: ClaimedGitProject;
     forSplits: {
       maintainers: z.infer<typeof addressDriverSplitReceiverSchema>[];
-      dependencies: z.infer<typeof repoDriverSplitReceiverSchema>[];
+      dependencies: (
+        | z.infer<typeof addressDriverSplitReceiverSchema>
+        | z.infer<typeof repoDriverSplitReceiverSchema>
+      )[];
       dripsDonation?: z.infer<typeof splitReceiverSchema>;
     };
   }): z.infer<typeof repoDriverAccountMetadataSchema> {

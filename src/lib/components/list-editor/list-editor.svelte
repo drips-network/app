@@ -31,7 +31,6 @@
 <script lang="ts">
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import isValidUrl from '$lib/utils/is-valid-url';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import { fade, scale } from 'svelte/transition';
@@ -47,6 +46,7 @@
   import ensStore from '$lib/stores/ens/ens.store';
   import assert from '$lib/utils/assert';
   import GitProjectService from '$lib/utils/project/GitProjectService';
+  import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
 
   // TOOD: Set to 200
   const MAX_ITEMS = 10;
@@ -125,7 +125,7 @@
     isAddingProject = false;
   }
 
-  $: if (isValidUrl(inputValue) && allowedItems === 'all') {
+  $: if (isSupportedGitUrl(inputValue) && allowedItems === 'all') {
     addProject();
   }
 

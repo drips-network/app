@@ -5,21 +5,27 @@ import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
 import EnterGitUrl from './steps/enter-git-url/enter-git-url.svelte';
 import AddEthereumAddress from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
-import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import WalletSlot from './slots/wallet-slot.svelte';
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
 import Review from './steps/review/review.svelte';
+import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
+import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
+import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
+import LinkedProject from './slots/linked-project.svelte';
+import Success from './steps/success/success.svelte';
 
 interface SplitsConfig {
   selected: string[];
   items: Items;
+  itemsPromise: Promise<GitProject>[] | undefined;
   percentages: Percentages;
 }
 
 export interface State {
+  linkedToRepo: boolean;
   gitUrl: string;
   project: UnclaimedGitProject | undefined;
   projectMetadata:
@@ -27,6 +33,7 @@ export interface State {
         starCount: number;
         forkCount: number;
         description?: string | undefined;
+        defaultBranch: string | undefined;
       }
     | undefined;
   unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined;
@@ -34,25 +41,32 @@ export interface State {
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
   dependenciesAutoImported: boolean;
+  projectEmoji: string;
+  projectColor: string;
 }
 
 export const state = writable<State>({
+  linkedToRepo: false,
   gitUrl: '',
   project: undefined,
   projectMetadata: undefined,
   unclaimedFunds: undefined,
   highLevelPercentages: { maintainers: 60, dependencies: 40 },
   maintainerSplits: {
+    itemsPromise: undefined,
     selected: [],
     items: {},
     percentages: {},
   },
   dependencySplits: {
+    itemsPromise: undefined,
     selected: [],
     items: {},
     percentages: {},
   },
   dependenciesAutoImported: false,
+  projectEmoji: '❓',
+  projectColor: '#000000',
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
@@ -71,7 +85,13 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       component: WalletSlot,
       props: {},
     },
-    editStepIndex: 1,
+    editStepIndex: state.linkedToRepo ? undefined : 0,
+    rightComponent: state.linkedToRepo
+      ? {
+          component: LinkedProject,
+          props: {},
+        }
+      : undefined,
   };
 
   switch (stepIndex) {
@@ -85,6 +105,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       return [projectSlot, walletSlot];
     case 5:
       return [projectSlot, walletSlot];
+    case 6:
+      return [];
     default:
       return [];
   }
@@ -117,6 +139,18 @@ export const steps = () => [
   }),
   makeStep({
     component: Review,
+    props: undefined,
+  }),
+  makeStep({
+    component: PollSubgraph,
+    props: undefined,
+  }),
+  makeStep({
+    component: SetSplitsAndEmitMetadata,
+    props: undefined,
+  }),
+  makeStep({
+    component: Success,
     props: undefined,
   }),
 ];

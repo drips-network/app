@@ -1,6 +1,6 @@
-export default (address: string) => `{
+export default (address: string, network = 'ethereum') => `{
   "drips": {
-    "ethereum": {
+    "${network}": {
       "ownedBy": "${address}"
     }
   }

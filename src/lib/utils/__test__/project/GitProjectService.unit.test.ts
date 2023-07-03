@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as getClient from '$lib/utils/get-drips-clients';
 import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
 import type { repoDriverAccountMetadataSchema } from '$lib/utils/metadata/schemas';
@@ -8,8 +9,8 @@ import {
 } from '$lib/utils/metadata/types';
 import type { GitProject } from '$lib/utils/metadata/types';
 import GitProjectService from '$lib/utils/project/GitProjectService';
-import { Wallet, type ContractTransaction } from 'ethers';
-import { AddressDriverClient, Forge, RepoDriverClient, type RepoAccount } from 'radicle-drips';
+import { Wallet } from 'ethers';
+import { AddressDriverClient, RepoDriverClient, type RepoAccount } from 'radicle-drips';
 import type { z } from 'zod';
 
 vi.mock('$env/dynamic/public', () => ({
@@ -63,24 +64,6 @@ describe('GitProjectService', () => {
     vi.restoreAllMocks();
   });
 
-  describe('requestOwnerUpdate', () => {
-    it('should call the repo driver client with the expected params', async () => {
-      // Arrange
-      repoDriverClientMock.requestOwnerUpdate.mockResolvedValueOnce(
-        {} as unknown as ContractTransaction,
-      );
-
-      // Act
-      await sut.requestOwnerUpdate(Forge.GitHub, 'repo-name');
-
-      // Assert
-      expect(repoDriverClientMock.requestOwnerUpdate).toHaveBeenCalledWith(
-        Forge.GitHub,
-        'repo-name',
-      );
-    });
-  });
-
   describe('getByUrl', () => {
     it('should return the expected project', async () => {
       // Arrange
@@ -94,11 +77,11 @@ describe('GitProjectService', () => {
       sut['getByUserId'] = vi.fn(sut['getByUserId']).mockResolvedValueOnce(expectedProject);
 
       // Act
-      const actualProject = await sut.getByUrl('https://github.com/jtourkos/git-dep-ur');
+      const actualProject = await sut.getByUrl('https://github.com/jtourkos/git-dep-url');
 
       // Assert
       expect(actualProject).toBe(expectedProject);
-      expect(sut['getByUserId']).toHaveBeenCalledWith(userId);
+      expect(sut['getByUserId']).toHaveBeenCalledWith(userId, true);
 
       sut['getByUserId'] = originalGetDripListProjects;
     });
@@ -299,7 +282,7 @@ describe('GitProjectService', () => {
       // Arrange
       const repoAccount = {
         status: 'owner-update-requested',
-        lastUpdatedBlockTimestamp: new Date().getTime(),
+        lastUpdatedBlockTimestamp: BigInt(new Date().getTime()),
       } as unknown as RepoAccount;
 
       // Act
@@ -313,7 +296,8 @@ describe('GitProjectService', () => {
       // Arrange
       const repoAccount = {
         status: 'owner-update-requested',
-        lastUpdatedBlockTimestamp: new Date().getTime() - (new Date().getTime() - 1),
+        lastUpdatedBlockTimestamp:
+          BigInt(new Date().getTime()) - (BigInt(new Date().getTime()) - 1n),
       } as unknown as RepoAccount;
 
       // Act

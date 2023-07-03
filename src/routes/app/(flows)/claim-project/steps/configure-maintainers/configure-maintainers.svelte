@@ -2,7 +2,7 @@
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
@@ -12,6 +12,12 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+
+  onMount(async () => {
+    if ($context.highLevelPercentages['maintainers'] === 0) {
+      dispatch('goForward');
+    }
+  });
 
   let formValid: boolean;
 </script>

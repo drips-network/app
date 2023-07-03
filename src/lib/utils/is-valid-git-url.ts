@@ -1,8 +1,8 @@
-export default function isValidGitUrl(url: string): boolean {
+function validateUrl(url: string, allowedHosts: string[]): boolean {
   try {
     const parsedURL = new URL(url);
 
-    if (parsedURL.hostname !== 'github.com') {
+    if (!allowedHosts.includes(parsedURL.hostname)) {
       return false;
     }
 
@@ -21,4 +21,12 @@ export default function isValidGitUrl(url: string): boolean {
   } catch (error) {
     return false;
   }
+}
+
+export function isValidGitUrl(url: string): boolean {
+  return validateUrl(url, ['github.com', 'gitlab.com']);
+}
+
+export function isSupportedGitUrl(url: string): boolean {
+  return validateUrl(url, ['github.com']);
 }
