@@ -14,10 +14,8 @@
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
-  import type { Writable } from 'svelte/store';
+  import { get, writable, type Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import seededRandomElement from '$lib/utils/seeded-random-element';
-  import EMOJI from '$lib/utils/emoji/emoji';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, {
     type Split as RepresentationalSplit,
@@ -28,6 +26,9 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
+  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import modal from '$lib/stores/modal';
+  import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,11 +36,19 @@
 
   $: project = $context.project ?? unreachable();
 
-  $: projectEmoji = seededRandomElement(EMOJI, project.repoDriverAccount.userId);
-  $: projectColor = seededRandomElement(
-    ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
-    project.repoDriverAccount.userId,
-  );
+  // For previewing what the project will look like after claiming
+  $: fakeClaimedProject = {
+    ...project,
+    claimed: true as const,
+    owner: {
+      driver: 'address' as const,
+      address: $walletStore.address ?? unreachable(),
+      userId: $walletStore.dripsUserId ?? unreachable(),
+    },
+    color: $context.projectColor,
+    emoji: $context.projectEmoji,
+    splits: { maintainers: [], dependencies: [] },
+  };
 
   function getRepresentationalSplits(
     selected: string[],
@@ -113,6 +122,21 @@
       }),
     );
   }
+
+  function customize() {
+    const projectWritable = writable(fakeClaimedProject);
+
+    modal.show(
+      ProjectCustomizer,
+      () => {
+        const { emoji, color } = get(projectWritable);
+
+        $context.projectEmoji = emoji;
+        $context.projectColor = color;
+      },
+      { project: projectWritable },
+    );
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -121,21 +145,8 @@
 >
   <FormField type="div" title="Git project">
     <div class="card">
-      <!-- TODO: Add ability to customize color and emoji -->
-      <ProjectProfileHeader
-        project={{
-          ...project,
-          claimed: true,
-          owner: {
-            driver: 'address',
-            address: $walletStore.address ?? unreachable(),
-            userId: $walletStore.dripsUserId ?? unreachable(),
-          },
-          color: projectColor,
-          emoji: projectEmoji,
-          splits: { maintainers: [], dependencies: [] },
-        }}
-      />
+      <ProjectProfileHeader project={fakeClaimedProject} />
+      <Button icon={Pen} on:click={customize}>Customize</Button>
     </div>
   </FormField>
   <FormField type="div" title="Owned by">

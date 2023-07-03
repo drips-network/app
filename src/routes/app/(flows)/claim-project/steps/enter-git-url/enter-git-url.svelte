@@ -14,6 +14,8 @@
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { UserId } from '$lib/utils/common-types';
+  import seededRandomElement from '$lib/utils/seeded-random-element';
+  import emoji from '$lib/utils/emoji/emoji';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -46,6 +48,15 @@
       }
 
       $context.project = project;
+
+      $context.projectEmoji = seededRandomElement(
+        emoji.map((e) => e.unicode),
+        project.repoDriverAccount.userId,
+      );
+      $context.projectColor = seededRandomElement(
+        ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
+        project.repoDriverAccount.userId,
+      );
 
       // TODO: enable pre-population of dependencies.
       // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.userId), prePopulateDependencies()]);

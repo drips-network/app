@@ -339,6 +339,9 @@ export default class GitProjectService {
 
     const project = (await this.getByUrl(context.gitUrl, false)) as ClaimedGitProject;
 
+    project.emoji = context.projectEmoji;
+    project.color = context.projectColor;
+
     const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
       forProject: project,
       forSplits: {
@@ -501,13 +504,19 @@ export default class GitProjectService {
     // Someone could claim a project "manually" without using the Drips app, in which case there won't be any metadata.
     // That's why we need to set default values for color and emoji.
     let description: string | undefined;
-    let emoji = seededRandomElement(EMOJI, userId);
+    // TODO: Restrict random emojis to a few safe ones.
+    let emoji = seededRandomElement(
+      EMOJI.map((e) => e.unicode),
+      userId,
+    );
     let color = seededRandomElement(['#5555FF', '#53DB53', '#FFC555', '#FF5555'], userId);
     let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
     let splits: z.infer<typeof repoDriverAccountSplitsSchema> = {
       maintainers: [],
       dependencies: [],
     };
+
+    // TODO: Pretend projects without metadata are unclaimed.
 
     // ...and has metadata.
     if (projectMetadata?.data) {

@@ -41,6 +41,8 @@ export interface State {
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
   dependenciesAutoImported: boolean;
+  projectEmoji: string;
+  projectColor: string;
 }
 
 export const state = writable<State>({
@@ -63,6 +65,8 @@ export const state = writable<State>({
     percentages: {},
   },
   dependenciesAutoImported: false,
+  projectEmoji: '❓',
+  projectColor: '#000000',
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
