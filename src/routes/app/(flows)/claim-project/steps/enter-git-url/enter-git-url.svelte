@@ -8,139 +8,162 @@
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { VerificationStatus, type ClaimedGitProject } from '$lib/utils/metadata/types';
-  import isValidUrl from '$lib/utils/is-valid-url';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import projectItem from '$lib/components/list-editor/item-templates/project';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-
-  const dispatch = createEventDispatcher<StepComponentEvents>();
+  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
+  import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
+  import type { UserId } from '$lib/utils/common-types';
+  import seededRandomElement from '$lib/utils/seeded-random-element';
+  import emoji from '$lib/utils/emoji/emoji';
+  // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
+  // import type { GitProject } from '$lib/utils/metadata/types';
 
   export let context: Writable<State>;
 
+  const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  let gitProjectService: GitProjectService;
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
-  async function fetchProjectMetadata() {
-    // TODO: Really fetch project metadata from github
-
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    $context.projectMetadata = {
-      description: 'A Svelte store that persists to localStorage',
-      starCount: 42,
-      forkCount: 2,
-    };
-  }
-
-  async function fetchUnclaimedFunds() {
-    // TODO: Really fetch project's unclaimed funds
-
-    $context.unclaimedFunds = [
-      {
-        tokenAddress: '0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9',
-        amount: 1500000000000000000n,
-      },
-      {
-        tokenAddress: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
-        amount: 100000000000000000000n,
-      },
-      // UNCOMMENT THIS FOR AN UNKNOWN TOKEN AMOUNT
-      // {
-      //   tokenAddress: '0x0000000000000000000000000000000000000000',
-      //   amount: 100000000000000000000n,
-      // }
-    ];
-  }
-
-  async function prePopulateDependencies() {
-    if (Object.keys($context.dependencySplits.items).length > 0) return;
-
-    // TODO: Really fetch dependencies
-    $context.dependencySplits.items = {
-      foobar: projectItem({
-        claimed: true,
-        repoDriverAccount: {
-          userId: '0',
-          driver: 'repo',
-        },
-        source: {
-          forge: 'github',
-          repoName: 'svelte',
-          ownerName: 'sveltejs',
-          url: 'https://github.com/sveltejs/svelte.git',
-        },
-        owner: {
-          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-          userId: '1234',
-          driver: 'address',
-        },
-        emoji: '🦸',
-        color: '#ff0008',
-      } as ClaimedGitProject),
-    };
-    $context.dependencySplits.selected = ['foobar'];
-    $context.dependencySplits.percentages = { foobar: 100 };
-    $context.dependenciesAutoImported = true;
-  }
-
-  async function fetchProject() {
-    // TODO: Really fetch project
-
-    validationState = { type: 'pending' };
-
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    $context.project = {
-      claimed: false,
-      repoDriverAccount: {
-        userId: '0',
-        driver: 'repo',
-      },
-      source: {
-        forge: 'github',
-        repoName: 'svelte-stored-writable',
-        ownerName: 'efstajas',
-        url: 'https://github.com/efstajas/svelte-stepper.git',
-      },
-      verificationStatus: VerificationStatus.NOT_STARTED,
-      owner: undefined,
-    };
-
-    // TODO: Validate that project is unclaimed
-
-    // TODO: Parallelize these requests
-    await fetchProjectMetadata();
-    await fetchUnclaimedFunds();
-    await prePopulateDependencies();
-
-    validationState = { type: 'valid' };
-  }
-
-  // TODO: Check if it's a valid git project URL
-  $: if (isValidUrl($context.gitUrl) && validationState.type === 'unvalidated') {
+  $: if (isSupportedGitUrl($context.gitUrl) && validationState.type === 'unvalidated') {
     fetchProject();
   }
+  $: if (isValidGitUrl($context.gitUrl) && !isSupportedGitUrl($context.gitUrl)) {
+    validationState = { type: 'invalid', message: 'Unsupported URL' };
+  }
+  $: formValid = validationState.type === 'valid';
+
+  async function fetchProject() {
+    $context.linkedToRepo = false;
+
+    gitProjectService = await GitProjectService.new();
+
+    try {
+      validationState = { type: 'pending' };
+
+      const project = await gitProjectService.getByUrl($context.gitUrl);
+      if (project.claimed) {
+        throw new Error('Project already claimed');
+      }
+
+      $context.project = project;
+
+      $context.projectEmoji = seededRandomElement(
+        emoji.map((e) => e.unicode),
+        project.repoDriverAccount.userId,
+      );
+      $context.projectColor = seededRandomElement(
+        ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
+        project.repoDriverAccount.userId,
+      );
+
+      // TODO: enable pre-population of dependencies.
+      // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.userId), prePopulateDependencies()]);
+      await Promise.all([
+        fetchProjectMetadata(),
+        fetchUnclaimedProjectFunds(project.repoDriverAccount.userId),
+      ]);
+
+      validationState = { type: 'valid' };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      validationState = { type: 'invalid', message: error.message };
+    }
+  }
+
+  async function fetchProjectMetadata() {
+    const { defaultBranch, description, forksCount, starsCount } =
+      await gitProjectService.getProjectInfo($context.gitUrl);
+
+    $context.projectMetadata = {
+      starCount: starsCount,
+      forkCount: forksCount,
+      description: description ?? undefined,
+      defaultBranch: defaultBranch ?? undefined,
+    };
+  }
+
+  async function fetchUnclaimedProjectFunds(userId: UserId) {
+    $context.unclaimedFunds = await fetchUnclaimedFunds(userId);
+  }
+
+  // async function prePopulateDependencies() {
+  //   if (Object.keys($context.dependencySplits.items).length > 0) return;
+
+  //   const response = await fetch(`/api/project-deps?projectUrl=${$context.gitUrl}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //   });
+
+  //   const deps: PackageManagerDependencies = await response.json();
+
+  //   const depsPromises: Promise<GitProject>[] = [];
+
+  //   Object.keys(deps).forEach((packageManager) => {
+  //     if (dependenciesFound(deps)) {
+  //       deps[packageManager].forEach((dependency) => {
+  //         if (dependency.urls.repo) {
+  //           const task = gitProjectService.getByUrl(dependency.urls.repo);
+
+  //           depsPromises.push(task);
+  //           return;
+  //         }
+  //       });
+
+  //       $context.dependencySplits.itemsPromise = depsPromises;
+  //     } else {
+  //       // eslint-disable-next-line no-console
+  //       console.log('💧 ~ Could not pre-populate dependencies:', deps);
+  //     }
+  //   });
+
+  //   $context.dependenciesAutoImported = true;
+  // }
+
+  // function dependenciesFound(obj: any): obj is PackageManagerDependencies {
+  //   if (typeof obj !== 'object' || obj === null) {
+  //     return false;
+  //   }
+
+  //   for (const key in obj) {
+  //     const dependenciesArray = obj[key];
+
+  //     if (!Array.isArray(dependenciesArray)) {
+  //       return false;
+  //     }
+
+  //     for (const dependency of dependenciesArray) {
+  //       if (typeof dependency.name !== 'string' || typeof dependency.urls.package !== 'string') {
+  //         return false;
+  //       }
+  //     }
+  //   }
+
+  //   return true;
+  // }
 
   function clearProject() {
     $context.project = undefined;
+    $context.linkedToRepo = false;
     $context.projectMetadata = undefined;
 
     validationState = { type: 'unvalidated' };
   }
-
-  $: formValid = validationState.type === 'valid';
 </script>
 
 <StandaloneFlowStepLayout
-  description="Enter your Git project’s URL to see if it has claimable funds and start the registration."
+  description="Enter your project’s URL to see if it has claimable funds and start the registration."
 >
   <TextInput
     bind:value={$context.gitUrl}
     icon={LinkIcon}
-    placeholder="Paste GitHub project URL"
+    placeholder="Paste your GitHub project URL"
     disabled={validationState.type !== 'unvalidated'}
     {validationState}
-    showClearButton={validationState.type === 'valid'}
+    showClearButton={validationState.type === 'valid' || validationState.type === 'invalid'}
     on:clear={clearProject}
   />
   {#if $context.project && validationState.type === 'valid'}

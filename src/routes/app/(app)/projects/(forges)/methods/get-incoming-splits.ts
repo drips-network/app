@@ -44,6 +44,7 @@ export default async function getIncomingSplits(projectUserId: string): Promise<
   const incomingRepoDriverSplits = incomingSplits.filter(
     (s) => Utils.UserId.getDriver(s.senderId) === 'repo',
   );
+
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
     const gitProject = await gitProjectService.getByUserId(s.senderId);
     if (!gitProject) return undefined;

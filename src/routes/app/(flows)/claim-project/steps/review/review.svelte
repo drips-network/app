@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -14,16 +14,21 @@
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
-  import type { Writable } from 'svelte/store';
+  import { get, writable, type Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import seededRandomElement from '$lib/utils/seeded-random-element';
-  import EMOJI from '$lib/utils/emoji/emoji';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, {
     type Split as RepresentationalSplit,
   } from '$lib/components/splits/splits.svelte';
   import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
+  import Drip from '$lib/components/illustrations/drip.svelte';
+  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import modal from '$lib/stores/modal';
+  import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -31,11 +36,19 @@
 
   $: project = $context.project ?? unreachable();
 
-  $: projectEmoji = seededRandomElement(EMOJI, project.repoDriverAccount.userId);
-  $: projectColor = seededRandomElement(
-    ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
-    project.repoDriverAccount.userId,
-  );
+  // For previewing what the project will look like after claiming
+  $: fakeClaimedProject = {
+    ...project,
+    claimed: true as const,
+    owner: {
+      driver: 'address' as const,
+      address: $walletStore.address ?? unreachable(),
+      userId: $walletStore.dripsUserId ?? unreachable(),
+    },
+    color: $context.projectColor,
+    emoji: $context.projectEmoji,
+    splits: { maintainers: [], dependencies: [] },
+  };
 
   function getRepresentationalSplits(
     selected: string[],
@@ -48,6 +61,8 @@
       const groupPercentage = $context.highLevelPercentages[group];
 
       const percentage = (groupPercentage / 100) * (percentages[slug] / 100) * 1000000;
+
+      if (!percentage) return;
 
       if (item.type === 'interstitial') return;
 
@@ -80,6 +95,48 @@
     $context.maintainerSplits.percentages,
     'maintainers',
   );
+
+  let gitProjectService: GitProjectService;
+
+  onMount(async () => {
+    gitProjectService = await GitProjectService.new();
+  });
+
+  async function requestOwnerUpdate() {
+    transact(
+      dispatch,
+      makeTransactPayload({
+        before: async () => {
+          const requestOwnerUpdateTx = gitProjectService.buildRequestOwnerUpdateTx($context);
+
+          return { requestOwnerUpdateTx };
+        },
+        transactions: ({ requestOwnerUpdateTx }) => ({
+          transaction: () => requestOwnerUpdateTx,
+          waitingSignatureMessage: {
+            message: 'Waiting for you to confirm the transaction in your wallet…',
+            subtitle:
+              "The first transaction validates your project's FUNDING.json file on-chain. You'll need to send a second transaction after to finalize the claiming process.",
+          },
+        }),
+      }),
+    );
+  }
+
+  function customize() {
+    const projectWritable = writable(fakeClaimedProject);
+
+    modal.show(
+      ProjectCustomizer,
+      () => {
+        const { emoji, color } = get(projectWritable);
+
+        $context.projectEmoji = emoji;
+        $context.projectColor = color;
+      },
+      { project: projectWritable },
+    );
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -88,24 +145,16 @@
 >
   <FormField type="div" title="Git project">
     <div class="card">
-      <!-- TODO: Add ability to customize color and emoji -->
-      <ProjectProfileHeader
-        project={{
-          ...project,
-          claimed: true,
-          owner: {
-            driver: 'address',
-            address: $walletStore.address ?? unreachable(),
-            userId: $walletStore.dripsUserId ?? unreachable(),
-          },
-          color: projectColor,
-          emoji: projectEmoji,
-          splits: { maintainers: [], dependencies: [] },
-        }}
-      />
+      <ProjectProfileHeader project={fakeClaimedProject} />
+      <Button icon={Pen} on:click={customize}>Customize</Button>
     </div>
   </FormField>
   <FormField type="div" title="Owned by">
+    <svelte:fragment slot="action">
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+        >Edit</Button
+      >
+    </svelte:fragment>
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
@@ -113,22 +162,40 @@
   </FormField>
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">
-    <Splits
-      list={[
-        {
-          type: 'split-group',
-          name: 'Dependencies',
-          list: dependencyRepresentationalSplits,
-        },
-        {
-          type: 'split-group',
-          name: 'Maintainers',
-          list: maintainerRepresentationalSplits,
-        },
-      ]}
-    />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+        >Edit</Button
+      >
+    </svelte:fragment>
+    <div class="card">
+      <!-- TODO: Show the total amount that will be split on tx confirmation -->
+      <div class="drip-icon">
+        <Drip />
+      </div>
+      <div class="splits-component">
+        <Splits
+          list={[
+            {
+              type: 'split-group',
+              name: 'Dependencies',
+              list: dependencyRepresentationalSplits,
+            },
+            {
+              type: 'split-group',
+              name: 'Maintainers',
+              list: maintainerRepresentationalSplits,
+            },
+          ]}
+        />
+      </div>
+    </div>
   </FormField>
   <div class="whats-next">
+    <p>
+      You'll need to send two transactions to claim your project. The first one validates your
+      FUNDING.json file on-chain, and the second applies your split configuration. Click "Confirm in
+      Wallet" to get started.
+    </p>
     <div class="card">
       <h4>On transaction confirmation…</h4>
       <ul>
@@ -157,10 +224,18 @@
     </div>
   </div>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button
+      icon={ArrowLeft}
+      on:click={() =>
+        dispatch('goForward', {
+          by: $context.highLevelPercentages['dependencies'] === 0 ? -2 : -1,
+        })}>Go back</Button
+    >
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button disabled={true} icon={WalletIcon} variant="primary">Confirm in wallet</Button>
+    <Button icon={WalletIcon} variant="primary" on:click={requestOwnerUpdate}
+      >Confirm in wallet</Button
+    >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
 
@@ -185,5 +260,13 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+  }
+
+  .drip-icon {
+    width: 1.5rem;
+  }
+
+  .splits-component {
+    margin-left: 10px;
   }
 </style>

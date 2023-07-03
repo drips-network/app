@@ -2,7 +2,7 @@
   import CodeBox from '$lib/components/code-box/code-box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import dripsJsonTemplate from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -14,40 +14,63 @@
   import assert from '$lib/utils/assert';
   import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
+  import github from '$lib/utils/github/github';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
 
+  onMount(() => {
+    $context.linkedToRepo = false;
+  });
+
   function verify() {
     dispatch('await', {
       promise: () =>
-        new Promise<void>((resolve) => {
-          setTimeout(() => {
-            const { address } = $walletStore;
-            assert(address);
+        new Promise<void>((resolve, reject) => {
+          const { address } = $walletStore;
+          assert(address);
 
-            const addressInMaintainers = $context.maintainerSplits.items[address];
-            const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
+          const addressInMaintainers = $context.maintainerSplits.items[address];
+          const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
 
-            if (!addressInMaintainers && maintainersListEmpty) {
-              $context.maintainerSplits.items = {
-                [address]: ethAddressItem(address),
-              };
+          if (!addressInMaintainers && maintainersListEmpty) {
+            $context.maintainerSplits.items = {
+              [address]: ethAddressItem(address),
+            };
 
-              $context.maintainerSplits.selected = [address];
+            $context.maintainerSplits.selected = [address];
 
-              $context.maintainerSplits.percentages = {
-                [address]: 100,
-              };
-            }
+            $context.maintainerSplits.percentages = {
+              [address]: 100,
+            };
+          }
 
-            resolve();
-          }, 1000);
+          try {
+            const { username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+
+            resolve(
+              github
+                .getFundingJson(
+                  username,
+                  repoName,
+                  dripsJsonTemplate(
+                    $walletStore.address ?? unreachable(),
+                    $walletStore.network.name ?? unreachable(),
+                  ),
+                )
+                .then(() => {
+                  $context.linkedToRepo = true;
+                }),
+            );
+          } catch (error) {
+            reject('FUNDING.json not found.');
+          }
         }),
       message: 'Verifying...',
       subtitle:
-        'We’re scanning your git project’s main branch for a drips.json file with your Ethereum address',
+        'We’re scanning your git project’s main branch for a FUNDING.json file with your Ethereum address.',
     });
   }
 
@@ -57,10 +80,18 @@
 
 <StandaloneFlowStepLayout
   headline="Verify project ownership"
-  description="To verify you are the owner of this project, please add a funding.json file with your Ethereum address to the root of your code repo. "
+  description="To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. "
 >
-  <CodeBox path="./funding.json" code={dripsJsonTemplate($walletStore.address ?? unreachable())} />
-  <Checkbox bind:checked label="I added the funding.json file to the root of my repo." />
+  <CodeBox
+    repoUrl={$context.gitUrl}
+    defaultBranch={$context.projectMetadata?.defaultBranch}
+    path="./FUNDING.json"
+    code={dripsJsonTemplate(
+      $walletStore.address ?? unreachable(),
+      $walletStore.network.name ?? unreachable(),
+    )}
+  />
+  <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
   </svelte:fragment>

@@ -21,7 +21,7 @@
 
 <StandaloneFlowStepLayout
   headline="Split your funds"
-  description="Decide how much of your claimable funds (and any future funds) you’d like to split with your maintainers and dependencies. Any remainder will be donated to Drips."
+  description="Decide how much of your claimable funds (and any future funds) you’d like to split with your maintainers and dependencies."
 >
   <VisualPercentageEditor
     items={[

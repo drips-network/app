@@ -14,21 +14,13 @@
   $: formValid = $walletStore.connected;
 
   function verifyProject() {
-    dispatch('await', {
-      promise: () =>
-        new Promise<void>((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, 1000);
-        }),
-      message: 'Verifying project ownership...',
-    });
+    dispatch('goForward');
   }
 </script>
 
 <StandaloneFlowStepLayout
   headline="Connect your wallet"
-  description="If you maintain this git project, connect an Ethereum wallet that will control funds and manage the project's Drips profile."
+  description="If you maintain this GitHub project, connect an Ethereum wallet that will control funds and manage the project's Drips profile."
 >
   <FormField type="div" title="Project Owner Ethereum Address">
     <AccountBox />

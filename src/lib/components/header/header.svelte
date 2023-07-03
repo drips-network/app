@@ -8,8 +8,11 @@
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import { fade, fly } from 'svelte/transition';
   import { quadInOut, sineInOut } from 'svelte/easing';
+  import Spinner from '../spinner/spinner.svelte';
 
   $: elevated = $scroll.pos > 16;
+
+  export let showLoadingIndicator = true;
 
   let searchMode = false;
 </script>
@@ -22,6 +25,15 @@
     <div class="beta-badge">
       <BetaBadge />
     </div>
+    {#if showLoadingIndicator}
+      <div
+        in:fly={{ duration: 300, y: -16 }}
+        out:fly={{ duration: 300, y: 16 }}
+        class="loading-indicator"
+      >
+        <Spinner />
+      </div>
+    {/if}
   </a>
   {#if searchMode}
     <div class="search-bar" transition:fly|local={{ duration: 300, x: 64, easing: sineInOut }}>
@@ -132,6 +144,10 @@
     background-color: var(--color-background);
     opacity: 0.75;
     z-index: 50;
+  }
+
+  .loading-indicator {
+    margin-left: 0.5rem;
   }
 
   @media (max-width: 577px) {
