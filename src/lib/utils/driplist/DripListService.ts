@@ -9,8 +9,6 @@ import {
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import type { DripList } from '../metadata/types';
-import type { z } from 'zod';
-import type { repoDriverSplitReceiverSchema } from '../metadata/schemas';
 import {
   NFTDriverTxFactory,
   type AddressDriverClient,
@@ -140,7 +138,11 @@ export default class DripListService {
     const dripList: DripList = {
       account: {
         driver: 'nft',
-        owner: nftSubAccount.ownerAddress,
+        owner: {
+          driver: 'address',
+          userId: await this._addressDriverClient.getUserIdByAddress(nftSubAccount.ownerAddress),
+          address: nftSubAccount.ownerAddress,
+        },
         userId: nftSubAccount.tokenId,
       },
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
@@ -170,14 +172,13 @@ export default class DripListService {
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
 
-    const projects: z.infer<typeof repoDriverSplitReceiverSchema>[] = [];
+    const projects: { weight: number; userId: string }[] = [];
     for (const [url, percentage] of Object.entries(context.dripList.percentages)) {
       const { forge, repoName, username } = GitProjectService.deconstructUrl(url);
       const projectName = `${username}/${repoName}`;
 
       projects.push({
         weight: Math.floor((Number(percentage) / 100) * 1000000),
-        source: GitProjectService.populateSource(forge, repoName, username),
         userId: await this._repoDriverClient.getUserId(forge, projectName),
       });
     }
@@ -190,7 +191,7 @@ export default class DripListService {
 
     const dripListId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
 
-    const ipfsHash = await this._publishMetadataToIpfs(dripListId, projects, dripListName);
+    const ipfsHash = await this._publishMetadataToIpfs(dripListId, dripListName);
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
@@ -303,20 +304,19 @@ export default class DripListService {
     };
   }
 
-  private async _publishMetadataToIpfs(
-    dripListId: string,
-    projects: z.infer<typeof repoDriverSplitReceiverSchema>[],
-    name?: string,
-  ): Promise<IpfsHash> {
+  private async _publishMetadataToIpfs(dripListId: string, name?: string): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
     const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
       forAccount: {
         driver: 'nft',
-        owner: this._ownerAddress,
+        owner: {
+          driver: 'address',
+          userId: await this._addressDriverClient.getUserIdByAddress(this._ownerAddress),
+          address: this._ownerAddress,
+        },
         userId: dripListId,
       },
-      projects,
       name,
     });
 

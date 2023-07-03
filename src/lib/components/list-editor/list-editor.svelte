@@ -18,6 +18,7 @@
       component: typeof IdentityBadge;
       props: {
         address: string;
+        size: 'medium';
       };
     };
   }
@@ -326,7 +327,7 @@
 
   .distribution-tools .actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.125rem;
   }
 
   .remaining-percentage-indicator {

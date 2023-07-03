@@ -34,16 +34,21 @@
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
   function format(amount: Amount, perSec = false) {
+    let amountToShow = { ...amount };
+
     const tokenDecimals =
       overrideToDisplay?.decimals ?? tokens.getByAddress(amount.tokenAddress)?.info.decimals;
-    assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
+    assert(
+      tokenDecimals,
+      `Unable to determine decimals for tokenAddress ${amountToShow.tokenAddress}`,
+    );
 
     if (perSec) {
       const perSecTimeUnitMultiplier = MULTIPLIERS[$amtDeltaUnitStore];
-      amount.amount = amount.amount * BigInt(perSecTimeUnitMultiplier);
+      amountToShow.amount = amountToShow.amount * BigInt(perSecTimeUnitMultiplier);
     }
 
-    return formatTokenAmount(amount, tokenDecimals, multiplier);
+    return formatTokenAmount(amountToShow, tokenDecimals, multiplier, !perSec);
   }
 </script>
 
@@ -74,7 +79,7 @@
           class:text-positive={amountPerSecond.amount > 0}
           class:text-negative={amountPerSecond.amount < 0}
           >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond, true)}{#if showSymbol}
-            {' ' + overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol}
+            {' ' + (overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol)}
           {/if}</span
         >/{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </div>

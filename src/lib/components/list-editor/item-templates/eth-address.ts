@@ -12,9 +12,7 @@ const ethAddressItem: (address: string) => ListItem = (address: string) => ({
       disableLink: true,
     },
   },
-  editablePercentage: {
-    initialWeight: 0,
-  },
+  editablePercentage: true,
 });
 
 export default ethAddressItem;

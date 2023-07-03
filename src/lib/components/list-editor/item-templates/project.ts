@@ -11,9 +11,7 @@ const projectItem: (project: GitProject) => ListItem = (project: GitProject) => 
       linkTo: 'nothing',
     },
   },
-  editablePercentage: {
-    initialWeight: 0,
-  },
+  editablePercentage: true,
 });
 
 export default projectItem;

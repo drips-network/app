@@ -159,7 +159,7 @@
                     {:else if incomingSplit.type === 'dripList'}
                       <IdentityBadge
                         size="medium"
-                        address={incomingSplit.item.value.account.owner}
+                        address={incomingSplit.item.value.account.owner.address}
                       />
                     {:else if incomingSplit.type === 'project'}
                       <ProjectBadge project={incomingSplit.item.value} />

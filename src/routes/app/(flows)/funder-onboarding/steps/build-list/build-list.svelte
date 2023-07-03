@@ -24,6 +24,7 @@
 >
   <FormField title="Drip List*">
     <div class="project-list">
+      <!-- TODO: This crashes when entering some non-valid github url -->
       <ListEditor
         bind:percentages={$context.dripList.percentages}
         bind:selected={$context.dripList.selected}

@@ -19,6 +19,7 @@
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import Banner from '$lib/components/banner/banner.svelte';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
+  import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
 
   $: userId = $page.params.userId;
 
@@ -152,6 +153,7 @@
     </SectionSkeleton>
     {#if address}
       <ProjectsSection {address} />
+      <DripListsSection {address} />
     {/if}
     <Balances userId={dripsUserId} />
     <Streams userId={dripsUserId} />

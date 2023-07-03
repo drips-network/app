@@ -56,7 +56,11 @@ describe('DripListService', () => {
       getNftSubAccountsByOwner: vi.fn(DripsSubgraphClient.prototype.getNftSubAccountsByOwner),
       getCurrentDripsReceivers: vi.fn(DripsSubgraphClient.prototype.getCurrentDripsReceivers),
     };
+    addressDriverClientMock = {
+      getUserIdByAddress: vi.fn(AddressDriverClient.prototype.getUserIdByAddress),
+    };
     getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
+    getClient.getAddressDriverClient = vi.fn().mockImplementation(() => addressDriverClientMock);
 
     callerDriverClientMock = {
       populateCallBatchedTx: vi.fn(CallerClient.prototype.populateCallBatchedTx),
@@ -151,7 +155,7 @@ describe('DripListService', () => {
   describe('getByOwnerAddress', () => {
     it('should return an empty array if the owner has no DripLists', async () => {
       // Arrange
-      const owner = '0x123';
+      const owner = '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a';
       subgraphClientMock.getNftSubAccountsByOwner.mockResolvedValue([] as NftSubAccount[]);
 
       const dripListService = await DripListService.new();
@@ -165,7 +169,7 @@ describe('DripListService', () => {
 
     it("should return the owner's DripLists", async () => {
       // Arrange
-      const owner = '0x123';
+      const owner = '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a';
       const ownerNftSubAccounts: NftSubAccount[] = [
         {
           tokenId: '1',
@@ -174,6 +178,7 @@ describe('DripListService', () => {
       ];
 
       subgraphClientMock.getNftSubAccountsByOwner.mockResolvedValue(ownerNftSubAccounts);
+      addressDriverClientMock.getUserIdByAddress.mockResolvedValue('1');
 
       const nftSubAccountMetadata: {
         hash: string;
@@ -393,9 +398,10 @@ describe('DripListService', () => {
       const sut = await DripListService.new();
 
       nftDriverMetadataManagerMock.pinAccountMetadata.mockResolvedValueOnce('hash');
+      addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce('1');
 
       // Act
-      const hash = await sut['_publishMetadataToIpfs']('1', []);
+      const hash = await sut['_publishMetadataToIpfs']('1');
 
       // Assert
       expect(hash).toBe('hash');
