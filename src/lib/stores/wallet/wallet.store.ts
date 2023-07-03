@@ -30,8 +30,6 @@ const DEFAULT_NETWORK: Network = {
   name: 'homestead',
 };
 
-type SupportedWallet = 'metamask' | 'walletconnect';
-
 const injected = injectedWallets();
 
 const onboard = Onboard({
@@ -71,9 +69,9 @@ const onboard = Onboard({
   },
 });
 
-const lastConnectedWallet = storedWritable<SupportedWallet | undefined>(
+const lastConnectedWallet = storedWritable<string | undefined>(
   'last-connected-wallet',
-  z.union([z.literal('walletconnect'), z.literal('metamask')]).optional(),
+  z.string(),
   undefined,
   !browser,
 );
@@ -183,14 +181,6 @@ const walletStore = () => {
 
       const wallet = wallets[0];
       const walletName = wallet.label.toLowerCase();
-
-      const walletSupported = (label: string): label is SupportedWallet => {
-        return ['metamask', 'walletconnect'].includes(label);
-      };
-
-      if (!walletSupported(walletName)) {
-        throw new Error('Somehow tried to connect an unsupported wallet.');
-      }
 
       lastConnectedWallet.set(walletName);
 

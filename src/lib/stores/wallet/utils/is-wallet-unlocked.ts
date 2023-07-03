@@ -3,9 +3,7 @@
 import { browser } from '$app/environment';
 
 /* Check if the wallet is unlocked. */
-export const isWalletUnlocked = async (
-  walletName: 'metamask' | 'walletconnect',
-): Promise<boolean> => {
+export const isWalletUnlocked = async (walletName: string): Promise<boolean> => {
   if (!browser) return false;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,7 +14,7 @@ export const isWalletUnlocked = async (
   }
 
   // Only MetaMask exposes a method to check if the wallet is unlocked
-  if (walletName === 'metamask') {
+  if (walletName === 'metamask' || walletName === 'brave browser' || win.ethereum.isMetamask) {
     return win.ethereum?._metamask?.isUnlocked?.() || false;
   }
 
