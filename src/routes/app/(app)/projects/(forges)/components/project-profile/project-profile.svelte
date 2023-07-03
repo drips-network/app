@@ -151,7 +151,13 @@
           {#await incomingSplits}
             <SectionSkeleton loaded={false} />
           {:then result}
-            <SectionSkeleton loaded={true} empty={flattenIncomingSplits(result).length === 0}>
+            <SectionSkeleton
+              loaded={true}
+              empty={flattenIncomingSplits(result).length === 0}
+              emptyStateEmoji="🫙"
+              emptyStateHeadline="No supporters"
+              emptyStateText="This project doesn't have any supporters yet."
+            >
               <!-- TODO: Limit supporters list to some max amount, make expandable -->
               <div class="supporters-list">
                 {#each flattenIncomingSplits(result) as incomingSplit}
