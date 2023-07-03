@@ -15,21 +15,29 @@
 
   export let address: string;
 
+  let error = false;
+
   let dripLists: DripList[] | undefined;
   let representationalSplits: RepresentationalSplits | undefined;
   onMount(async () => {
-    const service = await DripListService.new();
+    try {
+      const service = await DripListService.new();
 
-    assert(address);
-    dripLists = await service.getByOwnerAddress(address);
+      assert(address);
+      dripLists = await service.getByOwnerAddress(address);
 
-    // We only support a single Drip List right now. The user should have no way to create more than one.
-    const canonicalDripList = dripLists[0];
-    if (!canonicalDripList) return;
+      // We only support a single Drip List right now. The user should have no way to create more than one.
+      const canonicalDripList = dripLists[0];
+      if (!canonicalDripList) return;
 
-    representationalSplits = await getRepresentationalSplitsForAccount(
-      canonicalDripList.account.userId,
-    );
+      representationalSplits = await getRepresentationalSplitsForAccount(
+        canonicalDripList.account.userId,
+      );
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      error = true;
+    }
   });
 
   $: isSelf = address.toLowerCase() === $walletStore.address?.toLowerCase();
@@ -52,9 +60,11 @@
       : []}
   />
   <SectionSkeleton
-    loaded={dripLists?.length === 0 ||
+    loaded={error ||
+      dripLists?.length === 0 ||
       (dripLists !== undefined && representationalSplits !== undefined)}
     empty={dripLists && dripLists.length === 0}
+    {error}
     emptyStateEmoji="🫗"
     emptyStateHeadline="You don't have a Drip List"
     emptyStateText="Create your Drip List to start supporting your dependencies"
