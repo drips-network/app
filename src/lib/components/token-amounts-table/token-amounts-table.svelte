@@ -5,9 +5,14 @@
   import fiatEstimatesStore from '$lib/utils/fiat-estimates/fiat-estimates';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
+  import Download from 'radicle-design-system/icons/Download.svelte';
   import FiatEstimateValue from '../aggregate-fiat-estimate/fiat-estimate-value.svelte';
+  import Button from '../button/button.svelte';
   import Stepper from '../stepper/stepper.svelte';
   import Token from '../token/token.svelte';
+  import getCollectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
+
+  export let showCollectButtons = false;
 
   interface Amount {
     tokenAddress: string;
@@ -33,6 +38,10 @@
 
     fiatEstimates = fiatEstimates;
   }
+
+  function openCollectModal(tokenAddress: string) {
+    modal.show(Stepper, undefined, getCollectFlowSteps(tokenAddress));
+  }
 </script>
 
 <div class="token-amounts-dropdown">
@@ -50,6 +59,13 @@
           <div class="fiat amount">
             <FiatEstimateValue fiatEstimateCents={fiatEstimates[i]} />
           </div>
+          {#if showCollectButtons}
+            <div class="collect-button">
+              <Button icon={Download} on:click={() => openCollectModal(tokenAddress)}
+                >Collect</Button
+              >
+            </div>
+          {/if}
         </div>
       {:else}
         <button
@@ -87,12 +103,14 @@
     gap: 1rem;
     align-items: center;
     flex: 1;
-    flex-wrap: wrap;
   }
 
   .amounts .amount {
     flex: 1;
-    flex-wrap: wrap;
+  }
+
+  .amount {
+    white-space: nowrap;
   }
 
   .fiat.amount {

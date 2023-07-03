@@ -3,7 +3,6 @@
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
-  import DownloadIcon from 'radicle-design-system/icons/Download.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -12,11 +11,9 @@
   import getCycle from '$lib/utils/drips/get-cycle';
   import { onMount } from 'svelte';
   import formatDate from '$lib/utils/format-date';
-  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import TokenAmountsTable from '$lib/components/token-amounts-table/token-amounts-table.svelte';
   import deduplicateReadable from '$lib/utils/deduplicate-readable';
   import { derived } from 'svelte/store';
-  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
@@ -43,17 +40,7 @@
     cycle = await getCycle();
   });
 
-  let collectableAmountsExpanded = false;
-
   $: tokensAvailableToCollect = $splittableStore && $splittableStore.length > 0;
-
-  $: {
-    if (collectableAmountsExpanded && !tokensAvailableToCollect) tokensAvailableToCollect = false;
-  }
-
-  function handleExpandTokens() {
-    if (tokensAvailableToCollect) collectableAmountsExpanded = !collectableAmountsExpanded;
-  }
 </script>
 
 <svelte:head>
@@ -77,33 +64,18 @@
             <div class="values">
               <KeyValuePair key="Collectable now" highlight>
                 <AggregateFiatEstimate amounts={$splittableStore} />
-                <button
-                  class="expand-chevron"
-                  on:click={handleExpandTokens}
-                  disabled={!tokensAvailableToCollect}
-                  style:transform="rotate({collectableAmountsExpanded ? 180 : 0}deg)"
-                >
-                  <ChevronDown
-                    style="fill: var(--color-foreground); width: 1.5rem; height: 1.5rem; transform: scale(1.5);"
-                  />
-                </button>
               </KeyValuePair>
               <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
             </div>
-            <div>
-              <!-- TODO: Add collection modal -->
-              <Button disabled={!tokensAvailableToCollect} variant="primary" icon={DownloadIcon}
-                >Collect earnings</Button
-              >
-            </div>
+            <div />
           </div>
-          <div class="token-breakdown">
-            <Toggleable showToggle={false} toggled={collectableAmountsExpanded}>
+          {#if tokensAvailableToCollect}
+            <div class="token-breakdown">
               <div class="token-amounts-table">
-                <TokenAmountsTable amounts={$splittableStore} />
+                <TokenAmountsTable showCollectButtons amounts={$splittableStore} />
               </div>
-            </Toggleable>
-          </div>
+            </div>
+          {/if}
         </div>
       {/if}
       <div class="edu-card-wrapper">
