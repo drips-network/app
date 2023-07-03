@@ -121,15 +121,6 @@
     gap: 4rem;
   }
 
-  .expand-chevron {
-    transition: transform 0.3s, background-color 0.3s;
-    border-radius: 50%;
-  }
-
-  .expand-chevron:focus-visible {
-    background-color: var(--color-foreground-level-2);
-  }
-
   .card {
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
