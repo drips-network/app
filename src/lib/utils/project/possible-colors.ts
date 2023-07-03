@@ -1,4 +1,3 @@
-// TODO: add more
 export default [
   '#27C537',
   '#FF5F5F',
