@@ -1,8 +1,7 @@
 import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
-import { repoDriverSplitReceiverSchema, nftDriverAccountMetadataSchema } from './schemas';
+import { nftDriverAccountMetadataSchema } from './schemas';
 import type { NFTDriverAccount, UserId } from './types';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { getAddressDriverClient } from '../get-drips-clients';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
@@ -41,10 +40,9 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
   public buildAccountMetadata(context: {
     forAccount: NFTDriverAccount;
-    projects: z.infer<typeof repoDriverSplitReceiverSchema>[];
     name?: string;
   }): z.infer<typeof nftDriverAccountMetadataSchema> {
-    const { forAccount, projects, name } = context;
+    const { forAccount, name } = context;
 
     return {
       driver: 'nft',
@@ -53,11 +51,6 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
         userId: forAccount.userId,
       },
       isDripList: true,
-      projects: mapFilterUndefined(projects, (listProj) => ({
-        userId: listProj.userId,
-        weight: listProj.weight,
-        source: listProj.source,
-      })),
       name,
     };
   }

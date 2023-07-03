@@ -39,14 +39,7 @@
 
   export let selected: string[] = [];
 
-  export let percentages: { [slug: string]: number } = Object.entries(items).reduce<{
-    [slug: string]: number;
-  }>((acc, [slug, item]) => {
-    if (item.type === 'selectable') {
-      acc[slug] = (item.editablePercentage?.initialWeight ?? 0) / 10000;
-    }
-    return acc;
-  }, {});
+  export let percentages: { [slug: string]: number } = {};
 
   let lastSelectedSlug: string | undefined;
 

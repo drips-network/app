@@ -15,7 +15,9 @@
   import { onMount } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
-
+  import modal from '$lib/stores/modal';
+  import Stepper from '../stepper/stepper.svelte';
+  import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
 
@@ -47,6 +49,14 @@
 
     loadingSupportStream = false;
   });
+
+  function triggerEditModal() {
+    modal.show(
+      Stepper,
+      undefined,
+      editDripListSteps(dripList.account.userId, representationalSplits),
+    );
+  }
 </script>
 
 <div class="card">
@@ -54,8 +64,7 @@
     <h1>{dripList.name}</h1>
     <div class="actions">
       {#if isOwnList}
-        <!-- TODO: Add handler -->
-        <Button icon={Pen}>Edit list</Button>
+        <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
       {/if}
     </div>
   </div>

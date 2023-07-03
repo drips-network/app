@@ -12,9 +12,7 @@ export interface SelectableItem {
   text?: string;
   disabled?: boolean;
   image?: string | ComponentAndProps;
-  editablePercentage?: {
-    initialWeight: number;
-  };
+  editablePercentage?: true;
 }
 
 export interface InterstitialItem {

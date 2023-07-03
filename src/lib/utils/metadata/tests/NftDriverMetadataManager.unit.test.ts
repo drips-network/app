@@ -1,13 +1,12 @@
-import { DripsSubgraphClient } from 'radicle-drips';
+import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import NftDriverMetadataManager from '../NftDriverMetadataManager';
 import type { NFTDriverAccount } from '../types';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { z } from 'zod';
-import type { sourceSchema } from '../schemas';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
 }));
+
+vi.mock('$lib/stores/wallet/wallet.store');
 
 describe('NftDriverMetadataManager', () => {
   vi.mock('$lib/utils/get-drips-clients');
@@ -42,7 +41,11 @@ describe('NftDriverMetadataManager', () => {
       const expectedAccount = {
         driver: 'nft',
         userId: '1',
-        owner: '0x123',
+        owner: {
+          address: '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a',
+          userId: '1245',
+          driver: 'address',
+        },
       } as NFTDriverAccount;
 
       const subgraphClientMock = {
@@ -50,7 +53,7 @@ describe('NftDriverMetadataManager', () => {
           .fn(DripsSubgraphClient.prototype.getNftSubAccountOwnerByTokenId)
           .mockResolvedValue({
             tokenId: '2',
-            ownerAddress: expectedAccount.owner,
+            ownerAddress: expectedAccount.owner.address,
           }),
       } as unknown as DripsSubgraphClient;
       const getClient = await import('$lib/utils/get-drips-clients');
@@ -70,7 +73,11 @@ describe('NftDriverMetadataManager', () => {
       const expectedAccount = {
         driver: 'nft',
         userId: '1',
-        owner: '0x123',
+        owner: {
+          address: '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a',
+          userId: '1245',
+          driver: 'address',
+        },
       } as NFTDriverAccount;
 
       const subgraphClientMock = {
@@ -78,11 +85,17 @@ describe('NftDriverMetadataManager', () => {
           .fn(DripsSubgraphClient.prototype.getNftSubAccountOwnerByTokenId)
           .mockResolvedValue({
             tokenId: expectedAccount.userId,
-            ownerAddress: expectedAccount.owner,
+            ownerAddress: expectedAccount.owner.address,
           }),
       } as unknown as DripsSubgraphClient;
+      const addressDriverClientMock = {
+        getUserIdByAddress: vi
+          .fn(AddressDriverClient.prototype.getUserIdByAddress)
+          .mockResolvedValue(expectedAccount.owner.userId),
+      };
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
+      getClient.getAddressDriverClient = vi.fn().mockImplementation(() => addressDriverClientMock);
 
       const metadataMgr = new NftDriverMetadataManager();
 
@@ -90,6 +103,7 @@ describe('NftDriverMetadataManager', () => {
       const account = await metadataMgr.fetchAccount(expectedAccount.userId);
 
       // Assert
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(account!).toEqual(expectedAccount);
       expect(subgraphClientMock.getNftSubAccountOwnerByTokenId).toHaveBeenCalledWith(
         expectedAccount.userId,
@@ -106,19 +120,12 @@ describe('NftDriverMetadataManager', () => {
         forAccount: {
           driver: 'nft',
           userId: '1',
-          owner: '0x123',
-        } as NFTDriverAccount,
-        projects: [
-          {
-            weight: 1,
-            userId: '1',
-            source: {
-              forge: 'github',
-              repoName: 'repo',
-              url: 'repo.com',
-            } as z.infer<typeof sourceSchema>,
+          owner: {
+            address: '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a',
+            userId: '1245',
+            driver: 'address',
           },
-        ],
+        } as NFTDriverAccount,
       };
 
       // Act
@@ -132,11 +139,6 @@ describe('NftDriverMetadataManager', () => {
           userId: context.forAccount.userId,
         },
         isDripList: true,
-        projects: mapFilterUndefined(context.projects, (listProj) => ({
-          userId: context.forAccount.userId,
-          weight: listProj.weight,
-          source: listProj.source,
-        })),
       });
     });
   });
