@@ -59,6 +59,7 @@
               address: v.address,
               showIdentity: false,
               outline: true,
+              size: 'medium',
             },
           };
         case 'project-split':
@@ -66,6 +67,7 @@
             component: ProjectAvatar,
             props: {
               project: v.project,
+              outline: true,
             },
           };
         default:
