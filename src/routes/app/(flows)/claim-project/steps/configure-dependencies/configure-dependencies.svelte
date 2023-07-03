@@ -19,6 +19,9 @@
   let formValid: boolean;
 
   onMount(async () => {
+    if ($context.highLevelPercentages['dependencies'] === 0) {
+      dispatch('goForward');
+    }
     await fetchProjectDeps();
   });
 
@@ -53,7 +56,7 @@
 <StandaloneFlowStepLayout
   headline="Split to your dependencies"
   description="Decide how you want to divide the {$context.highLevelPercentages[
-    'maintainers'
+    'dependencies'
   ]}% split to your project’s dependencies. {$context.dependenciesAutoImported
     ? $context.dependencySplits.items &&
       typeof $context.dependencySplits.items === 'object' &&
@@ -70,7 +73,13 @@
     bind:valid={formValid}
   />
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button
+      icon={ArrowLeftIcon}
+      on:click={() =>
+        dispatch('goForward', {
+          by: $context.highLevelPercentages['maintainers'] === 0 ? -2 : -1,
+        })}>Go back</Button
+    >
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button

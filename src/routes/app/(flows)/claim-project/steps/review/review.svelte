@@ -53,6 +53,8 @@
 
       const percentage = (groupPercentage / 100) * (percentages[slug] / 100) * 1000000;
 
+      if (!percentage) return;
+
       if (item.type === 'interstitial') return;
 
       if ('project' in item.label.props) {
@@ -211,7 +213,13 @@
     </div>
   </div>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button
+      icon={ArrowLeft}
+      on:click={() =>
+        dispatch('goForward', {
+          by: $context.highLevelPercentages['dependencies'] === 0 ? -2 : -1,
+        })}>Go back</Button
+    >
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button icon={WalletIcon} variant="primary" on:click={requestOwnerUpdate}
