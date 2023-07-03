@@ -129,6 +129,7 @@
 
   .colors {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 
@@ -148,6 +149,7 @@
 
   .color.selected .color-label {
     opacity: 1;
+    box-shadow: var(--elevation-low);
   }
 
   .actions {

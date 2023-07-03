@@ -66,5 +66,6 @@
     align-items: center;
     justify-content: center;
     font-size: 95%;
+    transition: background-color 0.3s;
   }
 </style>
