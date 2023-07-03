@@ -21,21 +21,23 @@ export default function formatTokenAmount(
   amount: Amount | bigint,
   tokenDecimals: number,
   precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-  inMotion = true,
+  preserveTrailingZeroes = true,
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 
   if (amount === 0n) return '0.00';
 
   const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
-  const amountDecimals = inMotion ? MAX_DECIMAL_ZEROES_IN_MOTION : 2;
 
-  const formatted = `${parsedAmount.toFixed(amountDecimals)}`;
+  const formatted = `${parsedAmount.toFixed(MAX_DECIMAL_ZEROES_IN_MOTION)}`;
 
   const isTiny =
-    (formatted === (0).toFixed(amountDecimals) ||
-      formatted === '-' + (0).toFixed(amountDecimals)) &&
+    (formatted === (0).toFixed(MAX_DECIMAL_ZEROES_IN_MOTION) ||
+      formatted === '-' + (0).toFixed(MAX_DECIMAL_ZEROES_IN_MOTION)) &&
     amount !== 0n;
 
-  return isTiny ? (amount < 0n ? '- <0.00000001' : ' <0.00000001') : formatted;
+  if (isTiny) return amount < 0n ? '- <0.00000001' : ' <0.00000001';
+  if (!preserveTrailingZeroes) return Number(formatted).toString();
+
+  return formatted;
 }
