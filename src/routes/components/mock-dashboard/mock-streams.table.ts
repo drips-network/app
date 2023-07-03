@@ -1,7 +1,7 @@
 import type { AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
 import Amount from '$lib/components/table/cells/amount.cell.svelte';
 import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
-import IdentityBadge from '$lib/components/table/cells/identity-badge.cell.svelte';
+import IdentityBadge from '$lib/components/table/cells/user-badge.cell.svelte';
 import type { TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
 import Token from '$lib/components/table/cells/token.cell.svelte';
 import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';

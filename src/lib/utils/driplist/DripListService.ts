@@ -11,7 +11,6 @@ import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import type { DripList } from '../metadata/types';
 import type { z } from 'zod';
 import type { repoDriverSplitReceiverSchema } from '../metadata/schemas';
-import type { GitProject } from '../metadata/types';
 import {
   NFTDriverTxFactory,
   type AddressDriverClient,
@@ -22,7 +21,6 @@ import {
   ERC20TxFactory,
   RepoDriverClient,
 } from 'radicle-drips';
-import mapFilterUndefined from '../map-filter-undefined';
 import type { UserId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { CallerClient, DripsReceiverConfig } from 'radicle-drips';
@@ -145,7 +143,6 @@ export default class DripListService {
         owner: nftSubAccount.ownerAddress,
         userId: nftSubAccount.tokenId,
       },
-      projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
       // TODO: properties below are post-MVP.
       isPublic: false,
@@ -436,32 +433,4 @@ export default class DripListService {
 
     return random32BitNumber;
   };
-
-  private async _getDripListProjects(
-    projects: z.infer<typeof repoDriverSplitReceiverSchema>[],
-  ): Promise<
-    {
-      weight: number;
-      project: GitProject;
-    }[]
-  > {
-    const projectPromises = await Promise.all(
-      projects.map(async (listProjMetadata) => {
-        const { userId } = listProjMetadata;
-
-        const project = await this._gitProjectService.getByUserId(userId);
-
-        if (!project) {
-          return;
-        }
-
-        return {
-          project,
-          weight: listProjMetadata.weight,
-        };
-      }),
-    );
-
-    return mapFilterUndefined(projectPromises, (value) => value);
-  }
 }

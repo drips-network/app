@@ -61,6 +61,16 @@
     }
   }
 
+  let streamName: string | undefined;
+  $: {
+    if (stream) {
+      streamName =
+        stream.receiver.driver === 'nft'
+          ? 'Drip List Support Stream'
+          : stream.name ?? 'Unnamed stream';
+    }
+  }
+
   $: estimate = streamId ? $balances && balances.getEstimateByStreamId(streamId) : undefined;
   $: streamScheduledStart = stream?.dripsConfig.startDate;
   $: streamCreated = streamHistory?.[0].timestamp;
@@ -170,7 +180,7 @@
 </script>
 
 <svelte:head>
-  <title>{stream?.name ?? 'Stream'} | Drips</title>
+  <title>{streamName} | Drips</title>
 </svelte:head>
 
 <div class="wrapper">
@@ -204,7 +214,7 @@
     <div class="stream-page" in:fly={{ duration: 300, y: 16 }}>
       <div class="hero">
         <div class="title-and-state">
-          <h1>{stream.name ?? 'Unnamed stream'}</h1>
+          <h1>{streamName}</h1>
           <StreamStateBadge
             {streamId}
             paused={stream.paused}
@@ -248,8 +258,8 @@
         {/if}
       </div>
       <StreamVisual
-        fromAddress={stream.sender.address}
-        toAddress={stream.receiver.address}
+        from={stream.sender}
+        to={stream.receiver}
         amountPerSecond={stream.dripsConfig.amountPerSecond.amount}
         tokenInfo={{
           symbol: token?.info.symbol ?? unreachable(),

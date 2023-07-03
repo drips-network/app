@@ -16,6 +16,7 @@ import type {
   addressDriverAccountMetadataSchema,
   assetConfigMetadataSchema,
 } from '$lib/utils/metadata/schemas';
+import buildStreamReceiver from './build-stream-receiver';
 
 function mapReceiverToStream(
   receiver: Receiver,
@@ -117,6 +118,8 @@ export default function buildAssetConfigs(
 
           const streamId = makeStreamId(userId, tokenAddress, eventConfig.dripId.toString());
 
+          const receiver = buildStreamReceiver(dripsReceiverSeenEvent.receiverUserId);
+
           assetConfigHistoryItemStreams.push({
             streamId,
             dripsConfig: {
@@ -131,11 +134,7 @@ export default function buildAssetConfigs(
               durationSeconds: eventConfig.duration > 0n ? Number(eventConfig.duration) : undefined,
             },
             managed: Boolean(matchingStream),
-            receiver: {
-              address: AddressDriverClient.getUserAddress(dripsReceiverSeenEvent.receiverUserId),
-              driver: 'address',
-              userId: String(dripsReceiverSeenEvent.receiverUserId),
-            },
+            receiver,
           });
 
           remainingStreamIds.splice(remainingStreamIds.indexOf(streamId), 1);
