@@ -96,6 +96,7 @@
 
   .token {
     flex: 1.25;
+    white-space: nowrap;
   }
 
   .amounts {

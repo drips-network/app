@@ -181,4 +181,18 @@
   .edu-card-wrapper {
     margin-top: 2rem;
   }
+
+  @media (max-width: 716px) {
+    .splitting-graph-edu.card {
+      flex-direction: column;
+    }
+
+    .splitting-graph-edu.card .illustration {
+      display: none;
+    }
+
+    .splitting-graph-edu.card .content {
+      padding: 1rem;
+    }
+  }
 </style>

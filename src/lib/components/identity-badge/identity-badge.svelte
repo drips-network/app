@@ -136,7 +136,9 @@
 
 <style>
   .wrapper {
-    max-width: fit-content;
+    width: fit-content;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .identity-badge:focus {
@@ -166,7 +168,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
   }
 

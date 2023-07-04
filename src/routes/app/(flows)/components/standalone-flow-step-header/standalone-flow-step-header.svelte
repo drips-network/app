@@ -29,4 +29,20 @@
     height: 130%;
     transform: translateY(-15%);
   }
+
+  @media (max-width: 514px) {
+    .step-header {
+      padding: 1rem;
+      height: auto;
+    }
+
+    .illustration {
+      display: none;
+    }
+
+    h1 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+  }
 </style>

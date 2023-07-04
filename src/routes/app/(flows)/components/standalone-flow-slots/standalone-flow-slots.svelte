@@ -75,4 +75,10 @@
   .wrapper {
     overflow: hidden;
   }
+
+  @media (max-width: 514px) {
+    .slots {
+      padding: 1rem 1rem;
+    }
+  }
 </style>

@@ -253,6 +253,7 @@
 <style>
   .container {
     position: relative;
+    margin: 0 auto;
   }
 
   .step-container {

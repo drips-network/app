@@ -64,6 +64,10 @@
     gap: 0.5rem;
   }
 
+  .slot > .left {
+    min-width: 0;
+  }
+
   .icon {
     height: 2rem;
     width: 2rem;

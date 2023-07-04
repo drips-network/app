@@ -122,4 +122,11 @@
   .muted {
     color: var(--color-foreground-level-5);
   }
+
+  @media (max-width: 514px) {
+    .unclaimed-funds .row {
+      flex-direction: column;
+      gap: 2rem;
+    }
+  }
 </style>
