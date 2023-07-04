@@ -9,9 +9,9 @@
   "theme_color": "#5555FF",
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "View your account's dashboard with balances, streams and splits.",
+      "name": "Streams",
+      "short_name": "Streams",
+      "description": "View your account's streams and balances.",
       "url": "/app/dashboard",
       "icons": [{ "src": "/icons/dashboard.png", "sizes": "256x256" }]
     },

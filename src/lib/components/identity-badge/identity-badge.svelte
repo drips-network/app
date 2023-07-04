@@ -38,7 +38,7 @@
 
   function getLink() {
     if (disableLink) return undefined;
-    if (address === $wallet.address) return '/app/dashboard';
+    if (address === $wallet.address) return '/app/streams';
 
     return `/app/${ens?.name ?? address}`;
   }
