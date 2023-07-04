@@ -67,9 +67,9 @@ export default (() => {
       const account = await _fetchAccount(userId);
 
       const subgraphClient = getSubgraphClient();
-      const dripsReceiverSeenEventForUser =
-        await subgraphClient.getDripsReceiverSeenEventsByReceiverId(userId);
-      const accountsSendingToCurrentUser = dripsReceiverSeenEventForUser.reduce<string[]>(
+      const streamReceiverSeenEventForUser =
+        await subgraphClient.getStreamReceiverSeenEventsByReceiverId(userId);
+      const accountsSendingToCurrentUser = streamReceiverSeenEventForUser.reduce<string[]>(
         (acc, event) => {
           const senderUserId = event.senderUserId.toString();
           return !acc.includes(senderUserId) ? [...acc, senderUserId] : acc;

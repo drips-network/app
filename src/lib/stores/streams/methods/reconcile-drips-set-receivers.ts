@@ -2,14 +2,14 @@ import deduplicateArray from '$lib/utils/deduplicate-array';
 import type { DripsSetEvent } from 'radicle-drips';
 import sortDripsSetEvents from './sort-drips-set-events';
 
-interface DripsReceiverSeenEvent {
+interface DtreamReceiverSeenEvent {
   id: string;
   receiverUserId: string;
   config: bigint;
 }
 
 export type DripsSetEventWithFullReceivers = {
-  currentReceivers: DripsReceiverSeenEvent[];
+  currentReceivers: DtreamReceiverSeenEvent[];
 } & DripsSetEvent;
 
 type ReceiversHash = string;
@@ -37,14 +37,14 @@ export function reconcileDripsSetReceivers(
     return !acc.includes(receiversHash) ? [...acc, receiversHash] : acc;
   }, []);
 
-  const dripsReceiverSeenEventsByReceiversHash = receiversHashes.reduce<{
-    [receiversHash: string]: DripsReceiverSeenEvent[];
+  const streamReceiverSeenEventsByReceiversHash = receiversHashes.reduce<{
+    [receiversHash: string]: DtreamReceiverSeenEvent[];
   }>((acc, receiversHash) => {
     const receivers = deduplicateArray(
       sortedDripsSetEvents
         .filter((event) => event.receiversHash === receiversHash)
-        .reduce<DripsReceiverSeenEvent[]>(
-          (acc, event) => [...acc, ...event.dripsReceiverSeenEvents],
+        .reduce<DtreamReceiverSeenEvent[]>(
+          (acc, event) => [...acc, ...event.streamReceiverSeenEvents],
           [],
         ),
       'config',
@@ -61,7 +61,8 @@ export function reconcileDripsSetReceivers(
       ...acc,
       {
         ...dripsSetEvent,
-        currentReceivers: dripsReceiverSeenEventsByReceiversHash[dripsSetEvent.receiversHash] ?? [],
+        currentReceivers:
+          streamReceiverSeenEventsByReceiversHash[dripsSetEvent.receiversHash] ?? [],
       },
     ],
     [],

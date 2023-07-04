@@ -358,7 +358,7 @@ export default class DripListService {
     );
 
     const currentReceivers: StreamReceiverStruct[] =
-      await this._dripsSubgraphClient.getCurrentDripsReceivers(
+      await this._dripsSubgraphClient.getCurrentStreamsReceivers(
         ownerAddressDriverUserId,
         token,
         get(wallet).provider,

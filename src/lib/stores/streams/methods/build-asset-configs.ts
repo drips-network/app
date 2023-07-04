@@ -106,22 +106,22 @@ export default function buildAssetConfigs(
             makeStreamId(userId, tokenAddress, stream.initialDripsConfig.dripId),
           ) ?? [];
 
-        for (const dripsReceiverSeenEvent of dripsSetEvent.currentReceivers) {
+        for (const streamReceiverSeenEvent of dripsSetEvent.currentReceivers) {
           const matchingStream = matchMetadataStreamToReceiver(
-            dripsReceiverSeenEvent,
+            streamReceiverSeenEvent,
             assetConfigMetadata?.streams ?? [],
           );
 
-          const eventConfig = Utils.StreamConfiguration.fromUint256(dripsReceiverSeenEvent.config);
+          const eventConfig = Utils.StreamConfiguration.fromUint256(streamReceiverSeenEvent.config);
 
           const streamId = makeStreamId(userId, tokenAddress, eventConfig.dripId.toString());
 
-          const receiver = buildStreamReceiver(dripsReceiverSeenEvent.receiverUserId);
+          const receiver = buildStreamReceiver(streamReceiverSeenEvent.receiverUserId);
 
           assetConfigHistoryItemStreams.push({
             streamId,
             dripsConfig: {
-              raw: dripsReceiverSeenEvent.config,
+              raw: streamReceiverSeenEvent.config,
               startDate:
                 eventConfig.start > 0n ? new Date(Number(eventConfig.start) * 1000) : undefined,
               amountPerSecond: {
@@ -139,7 +139,7 @@ export default function buildAssetConfigs(
         }
 
         /*
-        If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
+        If a particular stream doesn't appear within streamReceiverSeenEvents of a given
         dripsSet event, but did at least once before, we can assume it is paused.
         */
         for (const remainingStreamId of remainingStreamIds) {

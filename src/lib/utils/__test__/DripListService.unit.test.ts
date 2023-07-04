@@ -54,7 +54,7 @@ describe('DripListService', () => {
 
     subgraphClientMock = {
       getNftSubAccountsByOwner: vi.fn(DripsSubgraphClient.prototype.getNftSubAccountsByOwner),
-      getCurrentDripsReceivers: vi.fn(DripsSubgraphClient.prototype.getCurrentDripsReceivers),
+      getCurrentStreamsReceivers: vi.fn(DripsSubgraphClient.prototype.getCurrentStreamsReceivers),
     };
     addressDriverClientMock = {
       getUserIdByAddress: vi.fn(AddressDriverClient.prototype.getUserIdByAddress),
@@ -427,7 +427,7 @@ describe('DripListService', () => {
       const setStreamTx = {} as unknown as PopulatedTransaction;
       addressDriverTxFactoryMock.setStreams.mockResolvedValue(setStreamTx);
 
-      subgraphClientMock.getCurrentDripsReceivers.mockResolvedValueOnce([]);
+      subgraphClientMock.getCurrentStreamsReceivers.mockResolvedValueOnce([]);
 
       // Act
       const result = await sut['_buildSetDripListStreamTxs'](

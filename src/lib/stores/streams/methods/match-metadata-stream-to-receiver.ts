@@ -3,7 +3,7 @@ import { Utils } from 'radicle-drips';
 import type { z } from 'zod';
 
 /**
- * Given a particular dripsReceiverSeenEvent, find matching metadata from an array of metadata
+ * Given a particular streamReceiverSeenEvent, find matching metadata from an array of metadata
  * stream objects and return the first match.
  * @param receiverSeenEvent The on-chain receiverSeenEvent to find a matching metadata object for.
  * @param metadataStreams The stream metadata objects to match against the receiverSeenEvent.
