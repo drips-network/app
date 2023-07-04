@@ -1,14 +1,14 @@
 import {
   DripsSubgraphClient,
-  type DripsSetEvent,
-  type DripsSetEventWithFullReceivers,
+  type StreamsSetEvent,
+  type StreamsSetEventWithFullReceivers,
   AddressDriverClient,
 } from 'radicle-drips';
 import type { addressDriverAccountMetadataSchema } from '../schemas';
 import * as getDripsClients from '$lib/utils/get-drips-clients';
-import * as reconcileDripsSetReceivers from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
+import * as reconcileStreamsSetReceivers from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import type { Mock } from 'vitest';
-import seperateDripsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
+import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import AddressDriverMetadataManager from '../AddressDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
 import type { z } from 'zod';
@@ -30,43 +30,43 @@ describe('AddressDriverMetadataManager', () => {
       // Arrange
       const userId = '1';
 
-      const expectedDripsSetEvents = [
+      const expectedStreamsSetEvents = [
         {
-          dripsSetId: '1',
+          streamsSetId: '1',
         },
-      ] as unknown as DripsSetEvent[];
+      ] as unknown as StreamsSetEvent[];
 
       const mockSubgraphClient = {
-        getDripsSetEventsByUserId: vi
-          .fn(DripsSubgraphClient.prototype.getDripsSetEventsByUserId)
-          .mockResolvedValue(expectedDripsSetEvents),
+        getStreamsSetEventsByUserId: vi
+          .fn(DripsSubgraphClient.prototype.getStreamsSetEventsByUserId)
+          .mockResolvedValue(expectedStreamsSetEvents),
       } as unknown as DripsSubgraphClient;
 
       vi.spyOn(getDripsClients, 'getSubgraphClient').mockReturnValue(mockSubgraphClient);
 
-      const expectedDripsSetEventsWithFullReceivers = [
+      const expectedStreamsSetEventsWithFullReceivers = [
         {
-          dripsSetId: '1',
+          streamsSetId: '1',
         },
-      ] as unknown as DripsSetEventWithFullReceivers[];
+      ] as unknown as StreamsSetEventWithFullReceivers[];
 
-      const reconcileDripsSetReceiversMock = vi
+      const reconcileStreamsSetReceiversMock = vi
         .fn()
-        .mockReturnValue(expectedDripsSetEventsWithFullReceivers);
+        .mockReturnValue(expectedStreamsSetEventsWithFullReceivers);
 
-      vi.spyOn(reconcileDripsSetReceivers, 'reconcileDripsSetReceivers').mockImplementation(
-        reconcileDripsSetReceiversMock,
+      vi.spyOn(reconcileStreamsSetReceivers, 'reconcileStreamsSetReceivers').mockImplementation(
+        reconcileStreamsSetReceiversMock,
       );
 
-      const seperateDripsSetEventsMock = vi
+      const seperateStreamsSetEventsMock = vi
         .fn()
-        .mockReturnValue(expectedDripsSetEventsWithFullReceivers);
+        .mockReturnValue(expectedStreamsSetEventsWithFullReceivers);
 
       vi.mock('$lib/stores/streams/methods/separate-drips-set-events', () => ({
         default: vi.fn(),
       }));
 
-      (seperateDripsSetEvents as Mock).mockImplementation(seperateDripsSetEventsMock);
+      (seperateStreamsSetEvents as Mock).mockImplementation(seperateStreamsSetEventsMock);
 
       const expectedMetadata = {
         data: {
@@ -89,7 +89,7 @@ describe('AddressDriverMetadataManager', () => {
 
       const expectedAssetConfigs = [
         {
-          dripsSetId: '1',
+          streamsSetId: '1',
         },
       ];
 
@@ -120,15 +120,15 @@ describe('AddressDriverMetadataManager', () => {
         lastIpfsHash: expectedMetadata.hash,
       });
 
-      expect(mockSubgraphClient.getDripsSetEventsByUserId).toHaveBeenCalledWith(userId);
-      expect(reconcileDripsSetReceiversMock).toHaveBeenCalledWith(expectedDripsSetEvents);
-      expect(seperateDripsSetEventsMock).toHaveBeenCalledWith(
-        expectedDripsSetEventsWithFullReceivers,
+      expect(mockSubgraphClient.getStreamsSetEventsByUserId).toHaveBeenCalledWith(userId);
+      expect(reconcileStreamsSetReceiversMock).toHaveBeenCalledWith(expectedStreamsSetEvents);
+      expect(seperateStreamsSetEventsMock).toHaveBeenCalledWith(
+        expectedStreamsSetEventsWithFullReceivers,
       );
       expect(buildAssetConfigsMock).toHaveBeenCalledWith(
         userId,
         expectedMetadata.data,
-        expectedDripsSetEventsWithFullReceivers,
+        expectedStreamsSetEventsWithFullReceivers,
       );
     });
   });

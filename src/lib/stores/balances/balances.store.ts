@@ -98,7 +98,7 @@ export default (() => {
   async function updateSqueezeHistory(forUserId: string) {
     const subgraph = getSubgraphClient();
 
-    const squeezedEvents = (await subgraph.getSqueezedDripsEventsByUserId(forUserId)).sort(
+    const squeezedEvents = (await subgraph.getSqueezedStreamsEventsByUserId(forUserId)).sort(
       (a, b) => Number(b.blockTimestamp) - Number(a.blockTimestamp),
     );
 

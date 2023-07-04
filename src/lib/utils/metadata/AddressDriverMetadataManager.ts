@@ -5,8 +5,8 @@ import MetadataManagerBase from './MetadataManagerBase';
 import { addressDriverAccountMetadataSchema } from './schemas';
 import type { Account } from '$lib/stores/streams/types';
 import type { UserId } from './types';
-import { reconcileDripsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
-import seperateDripsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
+import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
+import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
@@ -20,16 +20,18 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
   public async fetchAccount(userId: UserId): Promise<Account> {
     const { data, hash } = (await this.fetchAccountMetadata(userId)) ?? {};
 
-    const dripsSetEvents = await this.subgraphClient.getDripsSetEventsByUserId(userId);
+    const streamsSetEvents = await this.subgraphClient.getStreamsSetEventsByUserId(userId);
 
-    const dripsSetEventsWithFullReceivers = reconcileDripsSetReceivers(dripsSetEvents);
+    const streamsSetEventsWithFullReceivers = reconcileStreamsSetReceivers(streamsSetEvents);
 
-    const dripsSetEventsByTokenAddress = seperateDripsSetEvents(dripsSetEventsWithFullReceivers);
+    const streamsSetEventsByTokenAddress = seperateStreamsSetEvents(
+      streamsSetEventsWithFullReceivers,
+    );
 
     const assetConfigs = buildAssetConfigs(
       userId,
       data as z.infer<typeof addressDriverAccountMetadataSchema>,
-      dripsSetEventsByTokenAddress,
+      streamsSetEventsByTokenAddress,
     );
 
     return {

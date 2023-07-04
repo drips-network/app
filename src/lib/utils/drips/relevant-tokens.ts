@@ -11,7 +11,7 @@ export default async function relevantTokens(
 
   if (forBalance === 'receivable') {
     assetIds = (await subgraph.getStreamReceiverSeenEventsByReceiverId(userId)).map((e) =>
-      Utils.Asset.getAddressFromId(e.dripsSetEvent.assetId),
+      Utils.Asset.getAddressFromId(e.streamsSetEvent.assetId),
     );
   } else {
     const events = await Promise.all([
