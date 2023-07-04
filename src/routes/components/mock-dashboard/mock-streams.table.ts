@@ -12,7 +12,11 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
   {
     streamId: '',
     name: '👩‍💻 Development Contributor',
-    toAddress: '0x60FC49f9639468e892359Ad8D2B95F31c6E85736',
+    to: {
+      address: '0x60FC49f9639468e892359Ad8D2B95F31c6E85736',
+      driver: 'address',
+      userId: '1234',
+    },
     amount: {
       amount: {
         amount: 1493289595996838272747n / 2n + (3858024691358025000n / 2n / 1000n) * BigInt(millis),
@@ -40,7 +44,11 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
   {
     streamId: '',
     name: '🪙 Token Vesting',
-    toAddress: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
+    to: {
+      address: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
+      driver: 'address',
+      userId: '1234',
+    },
     amount: {
       amount: {
         amount: 1493289595996838272747n / 3n + (3858024691358025000n / 3n / 1000n) * BigInt(millis),
@@ -68,7 +76,11 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
   {
     streamId: '',
     name: '💸 Engineering Contributor',
-    toAddress: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
+    to: {
+      address: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
+      driver: 'address',
+      userId: '1234',
+    },
     amount: {
       amount: {
         amount: 100n,
@@ -112,7 +124,7 @@ const streamsTableColumns: ColumnDef<OutgoingStreamTableRow>[] = [
     size: (100 / 24) * 8,
   },
   {
-    accessorKey: 'toAddress',
+    accessorKey: 'to',
     header: 'To',
     cell: () => IdentityBadge,
     enableSorting: false,
