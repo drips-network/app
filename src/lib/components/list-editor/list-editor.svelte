@@ -328,6 +328,7 @@
   .distribution-tools .actions {
     display: flex;
     gap: 0.125rem;
+    flex-wrap: wrap;
   }
 
   .remaining-percentage-indicator {

@@ -6,7 +6,6 @@
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
 
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
-  import House from 'radicle-design-system/icons/House.svelte';
   import Folder from 'radicle-design-system/icons/Folder.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
@@ -48,15 +47,14 @@
       <Sidenav
         items={{
           top: [
-            { label: 'Dashboard', href: '/app/dashboard', icon: House },
+            { label: 'Streams', href: '/app/streams', icon: TokenStreams },
+            { label: 'Projects', href: '/app/projects', icon: Folder },
+            { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
               icon: User,
             },
-            { label: 'Projects', href: '/app/projects', icon: Folder },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
-            { label: 'Streams', href: '/app/streams', icon: TokenStreams },
           ],
           bottom: [
             {
@@ -72,15 +70,14 @@
     <div class="bottom-nav" data-testid="bottom-nav">
       <BottomNav
         items={[
-          { label: 'Dashboard', href: '/app/dashboard', icon: House },
+          { label: 'Streams', href: '/app/streams', icon: TokenStreams },
+          { label: 'Projects', href: '/app/projects', icon: Folder },
+          { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
           {
             label: 'Profile',
             href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-            icon: Ledger,
+            icon: User,
           },
-          { label: 'Projects', href: '/app/projects', icon: Folder },
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
-          { label: 'Streams', href: '/app/streams', icon: TokenStreams },
         ]}
       />
     </div>

@@ -262,6 +262,10 @@
     gap: 2rem;
   }
 
+  .project-profile > * {
+    max-width: 100%;
+  }
+
   .content {
     grid-area: content;
     align-self: top;
@@ -322,8 +326,10 @@
   .supporters-list .item {
     padding: 1rem 1.5rem;
     display: flex;
+    gap: 3rem;
     align-items: center;
     justify-content: space-between;
+    white-space: nowrap;
   }
 
   .supporters-list .item:not(:last-child) {
@@ -336,7 +342,7 @@
 
   @media (max-width: 1024px) {
     .project-profile {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
       grid-template-areas:
         'header'
