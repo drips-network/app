@@ -8,7 +8,6 @@
   import EduCard from '$lib/components/carousel/items/edu-card.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import ArrowUp from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
-  import GasOptimized from '$lib/components/illustrations/gas-optimized.svelte';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fly } from 'svelte/transition';
@@ -41,30 +40,6 @@
                 )
                 ?.focus(),
             label: 'Create a stream',
-            primary: true,
-            icon: ArrowUp,
-          },
-        ],
-      },
-    }),
-    makeCarouselItem({
-      id: 'configure-splits',
-      component: EduCard,
-      props: {
-        id: 'configure-splits',
-        title: 'Split income automatically',
-        description: 'Configure automatic distribution of incoming funds to your peers.',
-        illustration: GasOptimized,
-        actions: [
-          {
-            handler: () =>
-              window
-                .open(
-                  'https://docs.drips.network/docs/the-drips-app/splits/set-up-splits',
-                  '_blank',
-                )
-                ?.focus(),
-            label: 'Set up your splits',
             primary: true,
             icon: ArrowUp,
           },
