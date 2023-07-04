@@ -48,7 +48,7 @@
   }
 
   img.with-outline {
-    box-shadow: var(--elevation-low);
+    border: 1px solid var(--color-foreground);
   }
 
   .placeholder {
