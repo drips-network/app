@@ -9,6 +9,7 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { State } from '../../funder-onboarding-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import { page } from '$app/stores';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -17,6 +18,9 @@
   let listValid: boolean;
 
   $: valid = listValid && $context.dripList.title.length > 0;
+
+  const { searchParams } = $page.url;
+  const projectUrlToAdd = searchParams.get('projectToAdd') ?? undefined;
 </script>
 
 <StandaloneFlowStepLayout
@@ -30,6 +34,7 @@
         bind:selected={$context.dripList.selected}
         bind:items={$context.dripList.items}
         bind:valid={listValid}
+        addOnMount={projectUrlToAdd}
       />
     </div>
   </FormField>

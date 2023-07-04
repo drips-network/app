@@ -55,6 +55,7 @@
   export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
   export let percentages: Percentages = {};
   export let blockInteraction = false;
+  export let addOnMount: string | undefined = undefined;
 
   $: selectedPercentages = Object.fromEntries(
     Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
@@ -71,11 +72,9 @@
 
   let gitProjectService: GitProjectService;
 
-  onMount(async () => {
-    gitProjectService = await GitProjectService.new();
-  });
-
   async function addProject() {
+    if (!gitProjectService) gitProjectService = await GitProjectService.new();
+
     if (allowedItems === 'eth-addresses') return;
 
     isAddingProject = true;
@@ -179,6 +178,12 @@
       percentages[id] = 0;
     });
   }
+
+  onMount(() => {
+    if (addOnMount) {
+      inputValue = addOnMount;
+    }
+  });
 </script>
 
 <div class="list-editor">
