@@ -8,7 +8,7 @@ import type {
   StreamId,
 } from '$lib/stores/streams/types';
 import { unwrapIdItems } from '$lib/utils/wrap-unwrap-id-item';
-import type { SqueezedDripsEvent } from 'radicle-drips';
+import type { SqueezedStreamsEvent } from 'radicle-drips';
 
 type Millis = number;
 
@@ -51,7 +51,7 @@ type AccountEstimate = { [tokenAddress: string]: AssetConfigEstimates };
 export function estimateAccount(
   account: Account,
   currentCycle: Cycle,
-  excludingSqueezes: SqueezedDripsEvent[] = [],
+  excludingSqueezes: SqueezedStreamsEvent[] = [],
 ): AccountEstimate {
   return Object.fromEntries(
     account.assetConfigs.map((assetConfig) => [
@@ -65,7 +65,7 @@ function buildAssetConfigEstimates(
   assetConfig: AssetConfig,
   currentCycle: Cycle,
   user: AddressDriverUser,
-  excludingSqueezes: SqueezedDripsEvent[],
+  excludingSqueezes: SqueezedStreamsEvent[],
 ): AssetConfigEstimates {
   /*
     TODO: Avoid processing the current cycle twice by bounding totalEstimate to before the current cycle,
@@ -96,7 +96,7 @@ export function estimateAssetConfig(
   assetConfig: AssetConfig,
   window: TimeWindow,
   user: AddressDriverUser,
-  excludingSqueezes: SqueezedDripsEvent[] = [],
+  excludingSqueezes: SqueezedStreamsEvent[] = [],
 ): AssetConfigEstimate {
   // Filter out any history items not relevant to the current time window.
   const relevantHistoryItems = assetConfig.history.filter((hi) => {
@@ -167,7 +167,7 @@ function estimateHistoryItem(
   nextHistoryItem: AssetConfigHistoryItem,
   tokenAddress: string,
   sender: AddressDriverUser,
-  excludingSqueezes: SqueezedDripsEvent[],
+  excludingSqueezes: SqueezedStreamsEvent[],
 ): AssetConfigEstimate {
   const streamEstimates = historyItem.streams.map((receiver) => {
     const estimate = streamedByStream(
@@ -208,7 +208,7 @@ function streamedByStream(
   receiver: Receiver,
   sender: AddressDriverUser,
   historyItem: AssetConfigHistoryItem,
-  excludingSqueezes: SqueezedDripsEvent[],
+  excludingSqueezes: SqueezedStreamsEvent[],
   nextHistoryItem?: AssetConfigHistoryItem,
 ): {
   streamed: bigint;

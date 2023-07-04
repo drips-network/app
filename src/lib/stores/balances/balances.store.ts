@@ -1,4 +1,4 @@
-import { constants, type SqueezedDripsEvent } from 'radicle-drips';
+import { constants, type SqueezedStreamsEvent } from 'radicle-drips';
 import { get, readable, writable, type Readable } from 'svelte/store';
 import { estimateAccount, type AssetConfigEstimates, type StreamEstimate } from './utils/estimate';
 import tickStore from '../tick/tick.store';
@@ -18,7 +18,7 @@ interface Amount {
 interface AccountBalances {
   receivable?: Amount[];
   splittable?: Amount[];
-  squeezeHistory?: SqueezedDripsEvent[];
+  squeezeHistory?: SqueezedStreamsEvent[];
   tokens: { [tokenAddress: string]: AssetConfigEstimates };
 }
 
@@ -250,7 +250,7 @@ export default (() => {
   }
 
   function getFullSqueezeHistory() {
-    return Object.values(get(state).accounts).reduce<SqueezedDripsEvent[]>((acc, account) => {
+    return Object.values(get(state).accounts).reduce<SqueezedStreamsEvent[]>((acc, account) => {
       return [...acc, ...(account.squeezeHistory ?? [])];
     }, []);
   }
