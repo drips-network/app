@@ -78,12 +78,12 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
   {
     streamId: '',
     name: '💸 Engineering Contributor',
+    toAddress: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
     to: {
       address: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
       driver: 'address',
       userId: '1234',
     },
-    toAddress: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
     amount: {
       amount: {
         amount: 100n,
