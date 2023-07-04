@@ -51,7 +51,7 @@
             },
           ];
 
-          const tx = addressDriverClient.setDrips(
+          const tx = addressDriverClient.setStreams(
             tokenAddress,
             currentReceivers,
             newReceivers,

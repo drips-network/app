@@ -4,7 +4,7 @@ import {
   AddressDriverClient,
   AddressDriverTxFactory,
   CallerClient,
-  DripsHubClient,
+  DripsClient,
   DripsSubgraphClient,
   Utils,
   type NetworkConfig,
@@ -12,7 +12,7 @@ import {
   NFTDriverTxFactory,
   RepoDriverClient,
   RepoDriverTxFactory,
-  DripsHubTxFactory,
+  DripsTxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -108,12 +108,12 @@ export function getAddressDriverTxFactory() {
  * Get an initialized Drips Hub client.
  * @returns An initialized Drips Hub client.
  */
-export function getDripsHubClient() {
+export function getDripsClient() {
   const { provider, signer } = get(wallet);
 
-  const dripsHubAddress = getNetworkConfig().DRIPS_HUB;
+  const dripsAddress = getNetworkConfig().DRIPS;
 
-  return DripsHubClient.create(provider, signer, dripsHubAddress);
+  return DripsClient.create(provider, signer, dripsAddress);
 }
 
 /**
@@ -123,9 +123,9 @@ export function getDripsHubClient() {
 export function getDripsTxFactory() {
   const { provider } = get(wallet);
 
-  const dripsAddress = getNetworkConfig().DRIPS_HUB;
+  const dripsAddress = getNetworkConfig().DRIPS;
 
-  return DripsHubTxFactory.create(provider, dripsAddress);
+  return DripsTxFactory.create(provider, dripsAddress);
 }
 
 /**
@@ -146,15 +146,15 @@ export function getCallerClient() {
  */
 export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
   ? {
-      11155111: {
-        CHAIN: 'sepolia',
+      5: {
+        CHAIN: 'goerli',
         DEPLOYMENT_TIME: 'foobar',
         COMMIT_HASH: '3809b5fa68c81af3fe0ac9200f8c806d7aa78c88',
         WALLET: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
-        WALLET_NONCE: '1',
-        DEPLOYER: '0xefbF81372aBC3723463746a89CEb42080563684C',
-        DRIPS_HUB_CYCLE_SECONDS: '604800',
-        DRIPS_HUB_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
+        DRIPS_DEPLOYER: '0xefbF81372aBC3723463746a89CEb42080563684C',
+        DRIPS_DEPLOYER_SALT: 'DripsDeployer8',
+        DRIPS_CYCLE_SECONDS: '604800',
+        DRIPS_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
         ADDRESS_DRIVER_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
         NFT_DRIVER_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
         IMMUTABLE_SPLITS_DRIVER_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
@@ -162,11 +162,11 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
           env?.PUBLIC_TEST_SUBGRAPH_HOST ?? 'localhost'
         }:8000/subgraphs/name/drips-subgraph-local`,
         CALLER: '0x97c1349650F9ab72fD46CAab8f215F8e677fdCF4',
-        DRIPS_HUB: '0xa328B55BFF30EfF12591Cdfb3dcF4c12d804f583',
+        DRIPS: '0xa328B55BFF30EfF12591Cdfb3dcF4c12d804f583',
         NFT_DRIVER: '0x55329C69414e88279a21c862b8195c1C64b4da96',
         NFT_DRIVER_ID: '1',
         ADDRESS_DRIVER: '0xDDE80B7eDC6BFc55bB5f3449f016635c55C56b6e',
-        DRIPS_HUB_LOGIC: '0xb2b3204FcA749d885483E8BaDA131dBeb11501E9',
+        DRIPS_LOGIC: '0xb2b3204FcA749d885483E8BaDA131dBeb11501E9',
         ADDRESS_DRIVER_ID: '0',
         NFT_DRIVER_LOGIC: '0xD2D2d4b4996ff83f9c967C3cD9d27181cD9da5DE',
         ADDRESS_DRIVER_LOGIC: '0xB6A122d7c20b5eE6ee322db85964DA8A7825389A',

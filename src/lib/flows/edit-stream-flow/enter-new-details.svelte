@@ -144,12 +144,12 @@
             newReceivers = structuredClone(currentReceivers);
             const currentStreamReciverIndex = newReceivers.findIndex(
               (r) =>
-                Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId ===
+                Utils.StreamConfiguration.fromUint256(r.config).dripId ===
                 BigInt(stream.dripsConfig.dripId),
             );
             newReceivers.splice(currentStreamReciverIndex, 1, {
               userId: stream.receiver.userId,
-              config: Utils.DripsReceiverConfiguration.toUint256({
+              config: Utils.StreamConfiguration.toUint256({
                 dripId: BigInt(stream.dripsConfig.dripId),
                 start: BigInt(stream.dripsConfig.startDate?.getTime() ?? 0 / 1000),
                 duration: BigInt(stream.dripsConfig.durationSeconds ?? 0),
@@ -185,7 +185,7 @@
 
             tx = callerClient.callBatched(createStreamBatchPreset);
           } else if (amountUpdated) {
-            tx = addressDriverClient.setDrips(
+            tx = addressDriverClient.setStreams(
               token.info.address,
               currentReceivers,
               newReceivers,

@@ -58,7 +58,7 @@ export default function (
               },
         );
 
-        const setDripsPopulatedTx = await txFactory.setDrips(
+        const setStreamsPopulatedTx = await txFactory.setStreams(
           tokenAddress,
           currentReceivers,
           amountToTopUp,
@@ -75,9 +75,9 @@ export default function (
           { gasLimit: 1 },
         );
 
-        delete setDripsPopulatedTx.gasLimit;
+        delete setStreamsPopulatedTx.gasLimit;
 
-        const setDripsTx = client.setDrips(
+        const setStreamsTx = client.setStreams(
           tokenAddress,
           currentReceivers,
           currentReceivers,
@@ -92,16 +92,16 @@ export default function (
         );
 
         return {
-          setDripsPopulatedTx,
-          setDripsTx,
+          setStreamsPopulatedTx,
+          setStreamsTx,
           approvePopulatedTx,
           needApproval,
           tokenAddress,
         };
       },
 
-      transactions: ({ setDripsTx, setDripsPopulatedTx, approvePopulatedTx, needApproval }) =>
-        // If the ERC-20 needs approval, we send a batch TX including the approval TX and setDrips.
+      transactions: ({ setStreamsTx, setStreamsPopulatedTx, approvePopulatedTx, needApproval }) =>
+        // If the ERC-20 needs approval, we send a batch TX including the approval TX and setStreams.
         needApproval
           ? [
               {
@@ -114,14 +114,14 @@ export default function (
                 },
               },
               {
-                transaction: setDripsPopulatedTx,
+                transaction: setStreamsPopulatedTx,
                 waitingSignatureMessage: {
                   message: 'Waiting for you to approve the top-up transaction in your wallet...',
                   icon: WAITING_WALLET_ICON,
                 },
               },
             ]
-          : { transaction: () => setDripsTx },
+          : { transaction: () => setStreamsTx },
 
       after: async (receipts, transactContext) => {
         const { provider } = get(walletStore);

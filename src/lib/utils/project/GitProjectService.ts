@@ -6,7 +6,7 @@ import {
   RepoDriverTxFactory,
   Utils,
   type SplitsReceiverStruct,
-  DripsHubTxFactory,
+  DripsTxFactory,
 } from 'radicle-drips';
 import {
   getAddressDriverClient,
@@ -49,7 +49,7 @@ import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 
 export default class GitProjectService {
-  private _dripsTxFactory!: DripsHubTxFactory;
+  private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;

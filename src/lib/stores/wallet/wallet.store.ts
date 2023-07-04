@@ -21,8 +21,8 @@ const appsSdk = new SafeAppsSDK();
 const { SUPPORTED_CHAINS } = Utils.Network;
 // TODO: change this after development.
 const DEFAULT_NETWORK: Network = {
-  chainId: 11155111,
-  name: 'sepolia',
+  chainId: 5,
+  name: 'goerli',
 };
 
 const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
@@ -152,7 +152,7 @@ const walletStore = () => {
       const clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
-        description: 'Please switch your connected wallet to Ethereum Mainnet or Sepolia.',
+        description: 'Please switch your connected wallet to Ethereum Mainnet, Sepolia or Goerli.',
         emoji: '🔌',
       });
 

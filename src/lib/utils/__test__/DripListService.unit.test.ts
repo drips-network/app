@@ -75,8 +75,8 @@ describe('DripListService', () => {
       signer: {
         getAddress: vi.fn(),
       },
-      setDrips: vi.fn(AddressDriverClient.prototype.setDrips),
-      getAllowance: vi.fn(AddressDriverClient.prototype.setDrips),
+      setStreams: vi.fn(AddressDriverClient.prototype.setStreams),
+      getAllowance: vi.fn(AddressDriverClient.prototype.setStreams),
     };
     getClient.getAddressDriverClient = vi.fn().mockImplementation(() => addressDriverClientMock);
 
@@ -98,7 +98,7 @@ describe('DripListService', () => {
     getClient.getNFTDriverTxFactory = vi.fn().mockImplementation(() => nftDriverTxFactoryMock);
 
     addressDriverTxFactoryMock = {
-      setDrips: vi.fn(AddressDriverTxFactory.prototype.setDrips),
+      setStreams: vi.fn(AddressDriverTxFactory.prototype.setStreams),
     };
     getClient.getAddressDriverTxFactory = vi
       .fn()
@@ -425,7 +425,7 @@ describe('DripListService', () => {
       addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce(ownerAddressDriverUserId);
 
       const setStreamTx = {} as unknown as PopulatedTransaction;
-      addressDriverTxFactoryMock.setDrips.mockResolvedValue(setStreamTx);
+      addressDriverTxFactoryMock.setStreams.mockResolvedValue(setStreamTx);
 
       subgraphClientMock.getCurrentDripsReceivers.mockResolvedValueOnce([]);
 

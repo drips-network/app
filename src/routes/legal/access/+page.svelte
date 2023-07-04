@@ -34,7 +34,7 @@
     href="https://docs.drips.network/docs/for-developers/smart-contract-and-subgraph-details"
     target="_blank"
     rel="noopener noreferrer">Smart Contract and Subgraph Details Page</a
-  >. For example, the DripsHub smart contract on the Rinkeby testnet can be acessed
+  >. For example, the Drips smart contract on the Rinkeby testnet can be acessed
   <a
     href="https://rinkeby.etherscan.io/address/0xfbcD6918907902c106A99058146CBdBb76a812f6"
     target="_blank"

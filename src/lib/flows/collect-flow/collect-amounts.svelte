@@ -142,7 +142,7 @@
           const { address: userAddress, signer } = $wallet;
           assert(userAddress);
 
-          const { DRIPS_HUB, ADDRESS_DRIVER } = getNetworkConfig();
+          const { DRIPS, ADDRESS_DRIVER } = getNetworkConfig();
 
           let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
           if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
@@ -153,7 +153,7 @@
             signer,
             squeezeArgs,
             driverAddress: ADDRESS_DRIVER,
-            dripsHubAddress: DRIPS_HUB,
+            dripsAddress: DRIPS,
             userId,
             tokenAddress,
             // TODO: Replace with dynamic maxCycles

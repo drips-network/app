@@ -28,7 +28,7 @@ const mockStream = ({
   sender: MOCK_USER,
   receiver: MOCK_USER,
   dripsConfig: {
-    raw: Utils.DripsReceiverConfiguration.toUint256({
+    raw: Utils.StreamConfiguration.toUint256({
       amountPerSec: amountPerSecond,
       start: BigInt(startTimestamp),
       duration: BigInt(durationSeconds),

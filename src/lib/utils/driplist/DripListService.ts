@@ -13,7 +13,7 @@ import {
   NFTDriverTxFactory,
   type AddressDriverClient,
   Utils,
-  type DripsReceiverStruct,
+  type StreamReceiverStruct,
   AddressDriverTxFactory,
   NFTDriverClient,
   ERC20TxFactory,
@@ -21,7 +21,7 @@ import {
 } from 'radicle-drips';
 import type { UserId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { CallerClient, DripsReceiverConfig } from 'radicle-drips';
+import type { CallerClient, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
@@ -357,28 +357,28 @@ export default class DripListService {
       this._ownerAddress,
     );
 
-    const currentReceivers: DripsReceiverStruct[] =
+    const currentReceivers: StreamReceiverStruct[] =
       await this._dripsSubgraphClient.getCurrentDripsReceivers(
         ownerAddressDriverUserId,
         token,
         get(wallet).provider,
       );
 
-    const config: DripsReceiverConfig = {
+    const config: StreamConfig = {
       start,
       duration,
       amountPerSec,
       dripId: BigInt(this._generateDripIdFromSalt(salt)),
     };
 
-    const newReceivers: DripsReceiverStruct[] = [
+    const newReceivers: StreamReceiverStruct[] = [
       {
         userId: dripListId,
-        config: Utils.DripsReceiverConfiguration.toUint256(config),
+        config: Utils.StreamConfiguration.toUint256(config),
       },
     ];
 
-    const setStreamTx = await this._addressDriverTxFactory.setDrips(
+    const setStreamTx = await this._addressDriverTxFactory.setStreams(
       token,
       currentReceivers,
       topUpAmount,

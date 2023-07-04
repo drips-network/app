@@ -4,7 +4,7 @@ import { estimateAccount, type AssetConfigEstimates, type StreamEstimate } from 
 import tickStore from '../tick/tick.store';
 import type { Account, StreamId, UserId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
-import { getDripsHubClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
+import { getDripsClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
 import relevantTokens from '$lib/utils/drips/relevant-tokens';
 import fetchBalancesForTokens from '$lib/utils/drips/fetch-balances-for-tokens';
@@ -232,14 +232,14 @@ export default (() => {
   }
 
   /**
-   * The balances store internally fetches information about the current DripsHub cycle in order to
+   * The balances store internally fetches information about the current Drips cycle in order to
    * accurately estimate incoming balances. This function forces an update of the cycle information fetched on
    * when the store was initialized.
    */
   async function updateCycle() {
-    const dripsHubClient = await getDripsHubClient();
+    const dripsClient = await getDripsClient();
 
-    const cycleSecs = await dripsHubClient.cycleSecs();
+    const cycleSecs = await dripsClient.cycleSecs();
     const currentCycleSecs = Math.floor(new Date().getTime() / 1000) % cycleSecs;
     const currentCycleStart = new Date(new Date().getTime() - Number(currentCycleSecs) * 1000);
 

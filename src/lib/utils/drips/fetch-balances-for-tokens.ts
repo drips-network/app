@@ -1,4 +1,4 @@
-import { getDripsHubClient } from '$lib/utils/get-drips-clients';
+import { getDripsClient } from '$lib/utils/get-drips-clients';
 import type { ReceivableBalance, SplittableBalance } from 'radicle-drips';
 
 type BalanceType = 'receivable' | 'splittable';
@@ -14,7 +14,7 @@ export default async function fetchBalancesForTokens<T extends BalanceType>(
   tokens: Set<string>,
   userId: string,
 ): Promise<BalanceReturnType<T>[]> {
-  const client = await getDripsHubClient();
+  const client = await getDripsClient();
 
   const promises = Array.from(tokens).map((ta) =>
     balance === 'receivable'

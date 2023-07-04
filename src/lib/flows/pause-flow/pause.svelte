@@ -50,7 +50,7 @@
             config: stream.dripsConfig.raw,
           }));
 
-          const tx = addressDriverClient.setDrips(
+          const tx = addressDriverClient.setStreams(
             tokenAddress,
             currentReceivers,
             newReceivers,

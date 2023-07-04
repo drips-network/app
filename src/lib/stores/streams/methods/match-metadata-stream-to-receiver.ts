@@ -18,7 +18,7 @@ export default function matchMetadataStreamToReceiver(
   const results = metadataStreams.filter(
     (stream) =>
       stream.initialDripsConfig.dripId ===
-      Utils.DripsReceiverConfiguration.fromUint256(receiverSeenEvent.config).dripId.toString(),
+      Utils.StreamConfiguration.fromUint256(receiverSeenEvent.config).dripId.toString(),
   );
 
   if (results.length > 1) {

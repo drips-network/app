@@ -109,7 +109,7 @@
 
           assert(amountWei);
 
-          const tx = addressDriverClient.setDrips(
+          const tx = addressDriverClient.setStreams(
             $context.tokenAddress,
             currentReceivers,
             currentReceivers,

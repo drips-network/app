@@ -2,7 +2,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import {
     getAddressDriverClient,
-    getDripsHubClient,
+    getDripsClient,
     getSubgraphClient,
   } from '$lib/utils/get-drips-clients';
   import type { Writable } from 'svelte/store';
@@ -19,19 +19,19 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   async function fetchBalancesAndSplits() {
-    const dripsHubClient = await getDripsHubClient();
+    const dripsClient = await getDripsClient();
     const driverClient = await getAddressDriverClient();
     const subgraphClient = getSubgraphClient();
     const userId = await driverClient.getUserId();
 
     const calls = tuple(
-      await dripsHubClient.getReceivableBalanceForUser(
+      await dripsClient.getReceivableBalanceForUser(
         userId,
         $context.tokenAddress ?? unreachable(),
         100,
       ),
-      dripsHubClient.getSplittableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      dripsHubClient.getCollectableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
+      dripsClient.getSplittableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
+      dripsClient.getCollectableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
       subgraphClient.getSplitsConfigByUserId(userId),
     );
 

@@ -69,7 +69,7 @@ export default function (
           4,
         );
 
-        const dripConfig = Utils.DripsReceiverConfiguration.toUint256({
+        const dripConfig = Utils.StreamConfiguration.toUint256({
           dripId,
           start,
           duration,

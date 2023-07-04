@@ -24,7 +24,7 @@ export interface DripsConfig {
   dripId: string;
   /**
    * The amount per second in the smallest possible unit of the respective token, plus
-   * extra decimal precision provided by DripsHub. To get an amount in the token decimal
+   * extra decimal precision provided by Drips. To get an amount in the token decimal
    * unit, divide by 10 ^ 18.
    */
   amountPerSecond: Amount;

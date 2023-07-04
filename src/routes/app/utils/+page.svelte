@@ -10,7 +10,7 @@
 
   $: token = tokensStore.getByAddress(tokenAddresssValue);
 
-  const decode = Utils.DripsReceiverConfiguration.fromUint256;
+  const decode = Utils.StreamConfiguration.fromUint256;
 
   let decoded: ReturnType<typeof decode> | undefined;
 
@@ -28,9 +28,9 @@
   <div class="section">
     <h3>Decode Drips Config</h3>
     <p>
-      The Drips Config is a string used in setDrips transactions that encodes the stream rate, start
-      date and duration, as well as the unique drips stream ID. Paste one below alongside the token
-      address that this particular stream will stream to decode it into its parts.
+      The Drips Config is a string used in setStreams transactions that encodes the stream rate,
+      start date and duration, as well as the unique drips stream ID. Paste one below alongside the
+      token address that this particular stream will stream to decode it into its parts.
     </p>
     <FormField title="Token Address">
       <TextInput placeholder="Paste token address here" bind:value={tokenAddresssValue} />

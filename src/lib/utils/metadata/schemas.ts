@@ -44,7 +44,7 @@ export const dripsConfigSchema = z.object({
   /** If zero, the stream runs indefinitely. */
   durationSeconds: z.number(),
   /**
-   * If undefined, the block timestamp from the initial setDrips event
+   * If undefined, the block timestamp from the initial setStreams event
    * corresponding to this stream should be considered as the stream
    * start date.
    */

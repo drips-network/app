@@ -112,9 +112,7 @@ export default function buildAssetConfigs(
             assetConfigMetadata?.streams ?? [],
           );
 
-          const eventConfig = Utils.DripsReceiverConfiguration.fromUint256(
-            dripsReceiverSeenEvent.config,
-          );
+          const eventConfig = Utils.StreamConfiguration.fromUint256(dripsReceiverSeenEvent.config);
 
           const streamId = makeStreamId(userId, tokenAddress, eventConfig.dripId.toString());
 

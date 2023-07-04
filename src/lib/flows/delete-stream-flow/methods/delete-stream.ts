@@ -65,7 +65,7 @@ export default function (
 
         const newReceivers = currentReceivers.filter(
           (r) =>
-            Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId.toString() !==
+            Utils.StreamConfiguration.fromUint256(r.config).dripId.toString() !==
             stream.dripsConfig.dripId,
         );
 
