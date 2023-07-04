@@ -7,7 +7,6 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
   import Balances from '../streams/sections/balances.section.svelte';
-  import Splits from '../streams/sections/splits.section.svelte';
   import Streams from '../streams/sections/streams.section.svelte';
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
@@ -157,7 +156,6 @@
     {/if}
     <Balances userId={dripsUserId} />
     <Streams userId={dripsUserId} />
-    <Splits userId={dripsUserId} />
     <TransitionedHeight>
       {#if address && !$dismissablesStore.includes('profile-drips-v1')}
         <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
