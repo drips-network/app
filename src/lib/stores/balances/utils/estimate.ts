@@ -241,7 +241,7 @@ function streamedByStream(
   const squeezedAtBlockTimestamp = excludingSqueezes.find(
     (squeezeEvent) =>
       squeezeEvent.senderId === sender.userId &&
-      squeezeEvent.dripsHistoryHashes.includes(historyItem.historyHash),
+      squeezeEvent.streamsHistoryHashes.includes(historyItem.historyHash),
   )?.blockTimestamp;
   const squeezedAt: Millis | undefined = squeezedAtBlockTimestamp
     ? Number(squeezedAtBlockTimestamp) * 1000
