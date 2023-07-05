@@ -39,10 +39,10 @@ describe('top up, create stream, view profile, search', async () => {
   });
 
   describe('global nav', () => {
-    it('opens up to dashboard tab', async () => {
+    it('opens up to streams tab', async () => {
       await page.goto('http://127.0.0.1:3000/app');
 
-      await expect(page.locator('text=dashboard page goes here')).toHaveCount(1);
+      await expect(page.locator('text=Streams')).toHaveCount(1);
     });
 
     it('switches to the streams tab', async () => {
@@ -87,7 +87,7 @@ describe('top up, create stream, view profile, search', async () => {
 
       await page.type(
         'label:has-text("Token contract address*")',
-        '0x176aA34a1a36F0A43736aBDcd3D9f011a107cdF8',
+        '0xefbF81372aBC3723463746a89CEb42080563684C',
       );
 
       await page.locator('button', { hasText: 'Add custom token' }).click();
