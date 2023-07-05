@@ -72,6 +72,7 @@
   }
 
   .code-wrapper {
+    overflow: scroll;
     padding: 0.75rem;
     background-color: var(--color-foreground-level-1);
   }
