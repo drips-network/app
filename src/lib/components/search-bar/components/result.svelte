@@ -20,7 +20,7 @@
   <AccountMenuItem
     on:click
     icon={StreamIcon}
-    href={`/app/${item.item.sender.address}/tokens/${item.item.dripsConfig.amountPerSecond.tokenAddress}/streams/${item.item.dripsConfig.dripId}`}
+    href={`/app/${item.item.sender.address}/tokens/${item.item.streamConfig.amountPerSecond.tokenAddress}/streams/${item.item.streamConfig.dripId}`}
   >
     <div class="icon" slot="title">
       <div class="highlighted">

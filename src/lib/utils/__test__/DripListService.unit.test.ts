@@ -41,7 +41,7 @@ describe('DripListService', () => {
   let originalPublishMetadataToIpfs: any;
   let originalBuildCreateDripListTx: any;
   let originalBuildTokenApprovalTx: any;
-  let originalBuildSetDripListStreamTxs: any;
+  let originalBuildSetStreamListStreamTxs: any;
   let originalGetApprovalFlowTxs: any;
   let originalGetNormalFlowTxs: any;
   let erc20DriverTxFactoryMock: any;
@@ -136,7 +136,7 @@ describe('DripListService', () => {
     originalPublishMetadataToIpfs = DripListService.prototype['_publishMetadataToIpfs'];
     originalBuildCreateDripListTx = DripListService.prototype['_buildCreateDripListTx'];
     originalBuildTokenApprovalTx = DripListService.prototype['_buildTokenApprovalTx'];
-    originalBuildSetDripListStreamTxs = DripListService.prototype['_buildSetDripListStreamTxs'];
+    originalBuildSetStreamListStreamTxs = DripListService.prototype['_buildSetStreamListStreamTxs'];
     originalGetApprovalFlowTxs = DripListService.prototype['_getApprovalFlowTxs'];
     originalGetNormalFlowTxs = DripListService.prototype['_getNormalFlowTxs'];
   });
@@ -147,7 +147,7 @@ describe('DripListService', () => {
     DripListService.prototype['_publishMetadataToIpfs'] = originalPublishMetadataToIpfs;
     DripListService.prototype['_buildCreateDripListTx'] = originalBuildCreateDripListTx;
     DripListService.prototype['_buildTokenApprovalTx'] = originalBuildTokenApprovalTx;
-    DripListService.prototype['_buildSetDripListStreamTxs'] = originalBuildSetDripListStreamTxs;
+    DripListService.prototype['_buildSetStreamListStreamTxs'] = originalBuildSetStreamListStreamTxs;
     DripListService.prototype['_getApprovalFlowTxs'] = originalGetApprovalFlowTxs;
     DripListService.prototype['_getNormalFlowTxs'] = originalGetNormalFlowTxs;
   });
@@ -268,12 +268,12 @@ describe('DripListService', () => {
         .fn(DripListService.prototype['_buildTokenApprovalTx'])
         .mockResolvedValueOnce(tokenApprovalTx);
 
-      const setDripListProjectsTx = {} as unknown as PopulatedTransaction;
-      nftDriverTxFactoryMock.setSplits.mockResolvedValueOnce(setDripListProjectsTx);
+      const setStreamListProjectsTx = {} as unknown as PopulatedTransaction;
+      nftDriverTxFactoryMock.setSplits.mockResolvedValueOnce(setStreamListProjectsTx);
 
       const setStreamTx = {} as unknown as PopulatedTransaction;
-      sut['_buildSetDripListStreamTxs'] = vi
-        .fn(DripListService.prototype['_buildSetDripListStreamTxs'])
+      sut['_buildSetStreamListStreamTxs'] = vi
+        .fn(DripListService.prototype['_buildSetStreamListStreamTxs'])
         .mockResolvedValueOnce(setStreamTx);
 
       const allowance = BigInt(100);
@@ -350,7 +350,7 @@ describe('DripListService', () => {
       const sut = await DripListService.new();
       const txs: { [name: string]: PopulatedTransaction } = {
         createDripListTx: {},
-        setDripListProjectsTx: {},
+        setStreamListProjectsTx: {},
         setStreamTx: {},
       };
 
@@ -363,7 +363,7 @@ describe('DripListService', () => {
 
       // Assert
       expect(normalFlowTxs.txs[0]).toBe(txs.createDripListTx);
-      expect(normalFlowTxs.txs[1]).toBe(txs.setDripListProjectsTx);
+      expect(normalFlowTxs.txs[1]).toBe(txs.setStreamListProjectsTx);
       expect(normalFlowTxs.txs[2]).toBe(txs.setStreamTx);
       expect(normalFlowTxs.gasLimitWithBuffer?.toNumber()).toBe(2000);
     });
@@ -373,7 +373,7 @@ describe('DripListService', () => {
       const sut = await DripListService.new();
       const txs: { [name: string]: PopulatedTransaction } = {
         createDripListTx: {},
-        setDripListProjectsTx: {},
+        setStreamListProjectsTx: {},
         setStreamTx: {},
       };
 
@@ -386,7 +386,7 @@ describe('DripListService', () => {
 
       // Assert
       expect(normalFlowTxs.txs[0]).toBe(txs.createDripListTx);
-      expect(normalFlowTxs.txs[1]).toBe(txs.setDripListProjectsTx);
+      expect(normalFlowTxs.txs[1]).toBe(txs.setStreamListProjectsTx);
       expect(normalFlowTxs.txs[2]).toBe(txs.setStreamTx);
       expect(normalFlowTxs.gasLimitWithBuffer).toBeUndefined();
     });
@@ -408,7 +408,7 @@ describe('DripListService', () => {
     });
   });
 
-  describe('_buildSetDripListStreamTxs', () => {
+  describe('_buildSetStreamListStreamTxs', () => {
     it('should return the expected transaction', async () => {
       // Arrange
       const sut = await DripListService.new();
@@ -430,7 +430,7 @@ describe('DripListService', () => {
       subgraphClientMock.getCurrentStreamsReceivers.mockResolvedValueOnce([]);
 
       // Act
-      const result = await sut['_buildSetDripListStreamTxs'](
+      const result = await sut['_buildSetStreamListStreamTxs'](
         salt,
         token,
         dripListId,

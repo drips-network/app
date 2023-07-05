@@ -56,7 +56,7 @@
     // filter by tokenAddress ?
     if (tokenAddress) {
       const byToken = (stream: Stream) =>
-        stream.dripsConfig.amountPerSecond.tokenAddress.toLowerCase() ===
+        stream.streamConfig.amountPerSecond.tokenAddress.toLowerCase() ===
         tokenAddress?.toLowerCase();
       ownStreams = {
         outgoing: ownStreams.outgoing.filter(byToken),
@@ -68,7 +68,7 @@
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
-      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+      const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
       // TODO: Don't presume that any stream to an NFT subaccount is going to a Drip List.
       const streamName =
@@ -82,8 +82,8 @@
           name: streamName,
           streamId: stream.id,
           paused: stream.paused,
-          durationSeconds: stream.dripsConfig.durationSeconds,
-          startDate: stream.dripsConfig.startDate,
+          durationSeconds: stream.streamConfig.durationSeconds,
+          startDate: stream.streamConfig.startDate,
           senderId: stream.sender.userId,
           tokenAddress: tokenAddress,
         },
@@ -111,7 +111,7 @@
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
-      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+      const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
       return {
         streamId: stream.id,
@@ -119,8 +119,8 @@
           name: stream.name ?? 'Unnamed stream',
           streamId: stream.id,
           paused: stream.paused,
-          durationSeconds: stream.dripsConfig.durationSeconds,
-          startDate: stream.dripsConfig.startDate,
+          durationSeconds: stream.streamConfig.durationSeconds,
+          startDate: stream.streamConfig.startDate,
           senderId: stream.sender.userId,
           tokenAddress: tokenAddress,
         },

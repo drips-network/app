@@ -5,7 +5,7 @@
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import { Utils, constants } from 'radicle-drips';
 
-  let dripsConfigValue = '';
+  let streamConfigValue = '';
   let tokenAddresssValue = '';
 
   $: token = tokensStore.getByAddress(tokenAddresssValue);
@@ -16,7 +16,7 @@
 
   $: {
     try {
-      decoded = decode(dripsConfigValue);
+      decoded = decode(streamConfigValue);
     } catch (e) {
       decoded = undefined;
     }
@@ -36,7 +36,7 @@
       <TextInput placeholder="Paste token address here" bind:value={tokenAddresssValue} />
     </FormField>
     <FormField title="Drips Config">
-      <TextInput placeholder="Paste config here" bind:value={dripsConfigValue} />
+      <TextInput placeholder="Paste config here" bind:value={streamConfigValue} />
     </FormField>
     {#if decoded && token}
       <div class="result">

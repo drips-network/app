@@ -195,7 +195,7 @@ export default class DripListService {
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
-    const setDripListProjectsTx = await this._nftDriverTxFactory.setSplits(
+    const setStreamListProjectsTx = await this._nftDriverTxFactory.setSplits(
       dripListId,
       projects.map((project) => ({
         userId: project.userId,
@@ -205,7 +205,7 @@ export default class DripListService {
 
     const tokenApprovalTx = await this._buildTokenApprovalTx(token);
 
-    const setStreamTx = await this._buildSetDripListStreamTxs(
+    const setStreamTx = await this._buildSetStreamListStreamTxs(
       salt,
       token,
       dripListId,
@@ -221,7 +221,7 @@ export default class DripListService {
     const txs: { [name: string]: PopulatedTransaction } = {
       tokenApprovalTx,
       createDripListTx,
-      setDripListProjectsTx,
+      setStreamListProjectsTx,
       setStreamTx,
     };
 
@@ -243,11 +243,11 @@ export default class DripListService {
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { tokenApprovalTx, createDripListTx, setDripListProjectsTx, setStreamTx } = txs;
+    const { tokenApprovalTx, createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
 
     const batchTx = await callerClient.populateCallBatchedTx([
       createDripListTx,
-      setDripListProjectsTx,
+      setStreamListProjectsTx,
       setStreamTx,
     ]);
 
@@ -281,12 +281,12 @@ export default class DripListService {
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { createDripListTx, setDripListProjectsTx, setStreamTx } = txs;
+    const { createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
 
     if (!needsApproval) {
       const batchTx = await callerClient.populateCallBatchedTx([
         createDripListTx,
-        setDripListProjectsTx,
+        setStreamListProjectsTx,
         setStreamTx,
       ]);
 
@@ -294,13 +294,13 @@ export default class DripListService {
       const gasLimitWithBuffer = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
 
       return {
-        txs: [createDripListTx, setDripListProjectsTx, setStreamTx],
+        txs: [createDripListTx, setStreamListProjectsTx, setStreamTx],
         gasLimitWithBuffer,
       };
     }
 
     return {
-      txs: [createDripListTx, setDripListProjectsTx, setStreamTx],
+      txs: [createDripListTx, setStreamListProjectsTx, setStreamTx],
     };
   }
 
@@ -342,7 +342,7 @@ export default class DripListService {
     return createDripListTx;
   }
 
-  private async _buildSetDripListStreamTxs(
+  private async _buildSetStreamListStreamTxs(
     salt: bigint,
     token: Address,
     dripListId: UserId,

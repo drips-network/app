@@ -44,7 +44,7 @@ export type Item =
 
 function searchMatchStringsForStream(stream: Stream): MatchStrings {
   const { name } = stream;
-  const { dripId } = stream.dripsConfig;
+  const { dripId } = stream.streamConfig;
 
   const strings = [];
   if (name) strings.push(name);

@@ -25,7 +25,7 @@ export default function (
         const callerClient = await getCallerClient();
 
         const { userId, address } = stream.sender;
-        const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+        const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
         const { signer } = get(walletStore);
         assert(signer);
@@ -59,14 +59,14 @@ export default function (
             ? undefined
             : {
                 userId: stream.receiver.userId,
-                config: stream.dripsConfig.raw,
+                config: stream.streamConfig.raw,
               },
         );
 
         const newReceivers = currentReceivers.filter(
           (r) =>
             Utils.StreamConfiguration.fromUint256(r.config).dripId.toString() !==
-            stream.dripsConfig.dripId,
+            stream.streamConfig.dripId,
         );
 
         const { ADDRESS_DRIVER } = getNetworkConfig();

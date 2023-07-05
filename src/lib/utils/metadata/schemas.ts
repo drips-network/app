@@ -37,7 +37,7 @@ export const splitReceiverSchema = z.object({
   userId: z.string(),
 });
 
-export const dripsConfigSchema = z.object({
+export const streamConfigSchema = z.object({
   raw: z.string(),
   dripId: z.string(),
   amountPerSecond: bigintSchema,
@@ -58,7 +58,7 @@ export const dripsUserSchema = z.object({
 
 export const streamMetadataSchema = z.object({
   id: z.string(),
-  initialDripsConfig: dripsConfigSchema,
+  initialDripsConfig: streamConfigSchema,
   receiver: dripsUserSchema,
   archived: z.boolean(),
   name: z.string().optional(),

@@ -214,8 +214,8 @@ function streamedByStream(
   streamed: bigint;
   currentAmountPerSecond: bigint;
 } {
-  // Undefined dripsConfig means the stream was paused.
-  if (!receiver.dripsConfig) {
+  // Undefined streamConfig means the stream was paused.
+  if (!receiver.streamConfig) {
     return {
       streamed: 0n,
       currentAmountPerSecond: 0n,
@@ -233,7 +233,7 @@ function streamedByStream(
     : undefined;
   const timestamp: Millis = timestampDate.getTime();
 
-  const { durationSeconds, amountPerSecond, startDate } = receiver.dripsConfig;
+  const { durationSeconds, amountPerSecond, startDate } = receiver.streamConfig;
 
   const duration: Millis | undefined = durationSeconds ? durationSeconds * 1000 : undefined;
   const start: Millis = startDate ? startDate.getTime() : timestamp;

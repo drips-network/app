@@ -27,7 +27,7 @@ const mockStream = ({
   id: `${MOCK_USER.userId}-0x00-${dripId}`,
   sender: MOCK_USER,
   receiver: MOCK_USER,
-  dripsConfig: {
+  streamConfig: {
     raw: Utils.StreamConfiguration.toUint256({
       amountPerSec: amountPerSecond,
       start: BigInt(startTimestamp),
@@ -64,7 +64,7 @@ const mockAssetConfigHistoryItem = ({
   },
   streams: streams.map((stream) => ({
     streamId: stream.id,
-    dripsConfig: stream.paused ? undefined : stream.dripsConfig,
+    streamConfig: stream.paused ? undefined : stream.streamConfig,
     managed: stream.managed,
     receiver: stream.receiver,
   })),

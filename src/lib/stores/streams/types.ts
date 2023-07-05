@@ -39,7 +39,7 @@ export interface Stream {
   sender: AddressDriverUser;
   receiver: AddressDriverUser | NFTDriverUser;
   /** Initial stream settings, not taking into account a paused stream. */
-  dripsConfig: DripsConfig;
+  streamConfig: DripsConfig;
   paused: boolean;
   name?: string;
   description?: string;
@@ -55,7 +55,7 @@ export interface Stream {
 export interface Receiver {
   streamId: string;
   /** If undefined, stream is paused. */
-  dripsConfig?: DripsConfig;
+  streamConfig?: DripsConfig;
   /**
    * If true, the stream was created through the Drips App. If false, it was created
    * by an unknown third party application.

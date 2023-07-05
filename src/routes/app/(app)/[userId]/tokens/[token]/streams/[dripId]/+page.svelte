@@ -72,15 +72,15 @@
   }
 
   $: estimate = streamId ? $balances && balances.getEstimateByStreamId(streamId) : undefined;
-  $: streamScheduledStart = stream?.dripsConfig.startDate;
+  $: streamScheduledStart = stream?.streamConfig.startDate;
   $: streamCreated = streamHistory?.[0].timestamp;
   $: streamStartDate =
     stream && streamHistory
       ? new Date(streamScheduledStart ?? streamCreated ?? unreachable())
       : undefined;
   $: streamEndDate =
-    streamStartDate && stream?.dripsConfig.durationSeconds
-      ? new Date(streamStartDate.getTime() + stream?.dripsConfig.durationSeconds * 1000)
+    streamStartDate && stream?.streamConfig.durationSeconds
+      ? new Date(streamStartDate.getTime() + stream?.streamConfig.durationSeconds * 1000)
       : undefined;
 
   let streamState: StreamState | undefined;
@@ -91,8 +91,8 @@
       } else if (stream && streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
         streamState = 'ended';
       } else if (
-        stream?.dripsConfig.startDate &&
-        stream.dripsConfig.startDate.getTime() > new Date().getTime()
+        stream?.streamConfig.startDate &&
+        stream.streamConfig.startDate.getTime() > new Date().getTime()
       ) {
         streamState = 'scheduled';
       } else if (stream && estimate.currentAmountPerSecond === 0n) {
@@ -219,8 +219,8 @@
             {streamId}
             paused={stream.paused}
             senderId={stream.sender.userId}
-            durationSeconds={stream.dripsConfig.durationSeconds}
-            startDate={stream.dripsConfig.startDate}
+            durationSeconds={stream.streamConfig.durationSeconds}
+            startDate={stream.streamConfig.startDate}
             {tokenAddress}
           />
         </div>
@@ -260,7 +260,7 @@
       <StreamVisual
         from={stream.sender}
         to={stream.receiver}
-        amountPerSecond={stream.dripsConfig.amountPerSecond.amount}
+        amountPerSecond={stream.streamConfig.amountPerSecond.amount}
         tokenInfo={{
           symbol: token?.info.symbol ?? unreachable(),
           decimals: token?.info.decimals ?? unreachable(),

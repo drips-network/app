@@ -54,7 +54,7 @@ export default function (
             ? undefined
             : {
                 userId: stream.receiver.userId,
-                config: stream.dripsConfig.raw,
+                config: stream.streamConfig.raw,
               },
         );
 

@@ -29,8 +29,8 @@ function mapReceiverToStream(
   );
   const initialDripsConfig = streamMetadata?.initialDripsConfig;
 
-  const dripsConfig: DripsConfig | undefined =
-    receiver.dripsConfig ||
+  const streamConfig: DripsConfig | undefined =
+    receiver.streamConfig ||
     (initialDripsConfig && {
       dripId: initialDripsConfig.dripId,
       raw: BigInt(initialDripsConfig.raw),
@@ -47,8 +47,8 @@ function mapReceiverToStream(
     });
 
   assert(
-    dripsConfig,
-    'Both stream metadata and on-chain data cannot have an undefined dripsConfig',
+    streamConfig,
+    'Both stream metadata and on-chain data cannot have an undefined streamConfig',
   );
 
   return {
@@ -59,8 +59,8 @@ function mapReceiverToStream(
       address: AddressDriverClient.getUserAddress(senderUserId),
     },
     receiver: receiver.receiver,
-    dripsConfig,
-    paused: !receiver.dripsConfig,
+    streamConfig,
+    paused: !receiver.streamConfig,
     managed: Boolean(streamMetadata),
     name: streamMetadata?.name,
     description: streamMetadata?.description,
@@ -120,7 +120,7 @@ export default function buildAssetConfigs(
 
           assetConfigHistoryItemStreams.push({
             streamId,
-            dripsConfig: {
+            streamConfig: {
               raw: streamReceiverSeenEvent.config,
               startDate:
                 eventConfig.start > 0n ? new Date(Number(eventConfig.start) * 1000) : undefined,
@@ -155,8 +155,8 @@ export default function buildAssetConfigs(
           if (streamExistedBefore) {
             assetConfigHistoryItemStreams.push({
               streamId: remainingStreamId,
-              // Undefined dripsConfig == stream was paused
-              dripsConfig: undefined,
+              // Undefined streamConfig == stream was paused
+              streamConfig: undefined,
               managed: true,
               receiver: {
                 ...(stream.receiver as AddressDriverUser),

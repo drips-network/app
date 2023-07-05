@@ -41,7 +41,7 @@
   const restorer = $context.restorer;
 
   const token =
-    tokens.getByAddress(stream.dripsConfig.amountPerSecond.tokenAddress) ?? unreachable();
+    tokens.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress) ?? unreachable();
 
   let newName: string | undefined = restorer.restore('newName') ?? stream.name;
   let newSelectedMultiplier = restorer.restore('newAmountValue')
@@ -50,7 +50,7 @@
   let newAmountValue: string | undefined =
     restorer.restore('newAmountValue') ??
     formatUnits(
-      stream.dripsConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
+      stream.streamConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
       token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
     );
 
@@ -67,7 +67,7 @@
   $: amountValidationState = validateAmtPerSecInput(newAmountPerSecond);
 
   $: nameUpdated = newName !== stream.name;
-  $: amountUpdated = newAmountPerSecond !== stream.dripsConfig.amountPerSecond.amount;
+  $: amountUpdated = newAmountPerSecond !== stream.streamConfig.amountPerSecond.amount;
   $: canUpdate =
     newAmountValueParsed &&
     newName &&
@@ -137,7 +137,7 @@
                 ? undefined
                 : {
                     userId: s.receiver.userId,
-                    config: s.dripsConfig.raw,
+                    config: s.streamConfig.raw,
                   },
             );
 
@@ -145,14 +145,14 @@
             const currentStreamReciverIndex = newReceivers.findIndex(
               (r) =>
                 Utils.StreamConfiguration.fromUint256(r.config).dripId ===
-                BigInt(stream.dripsConfig.dripId),
+                BigInt(stream.streamConfig.dripId),
             );
             newReceivers.splice(currentStreamReciverIndex, 1, {
               userId: stream.receiver.userId,
               config: Utils.StreamConfiguration.toUint256({
-                dripId: BigInt(stream.dripsConfig.dripId),
-                start: BigInt(stream.dripsConfig.startDate?.getTime() ?? 0 / 1000),
-                duration: BigInt(stream.dripsConfig.durationSeconds ?? 0),
+                dripId: BigInt(stream.streamConfig.dripId),
+                start: BigInt(stream.streamConfig.startDate?.getTime() ?? 0 / 1000),
+                duration: BigInt(stream.streamConfig.durationSeconds ?? 0),
                 amountPerSec: newAmountPerSecond,
               }),
             });
@@ -225,7 +225,7 @@
               nameUpdated
                 ? get(streams).accounts[transactContext.dripsUserId].lastIpfsHash ===
                   transactContext.newHash
-                : streams.getStreamById(stream.id)?.dripsConfig.amountPerSecond.amount ===
+                : streams.getStreamById(stream.id)?.streamConfig.amountPerSecond.amount ===
                   newAmountPerSecond,
             5000,
             1000,

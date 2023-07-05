@@ -36,7 +36,7 @@
 
   $: accountEstimate = $balancesStore.accounts[ownerUserId];
   $: outgoingEstimate = supportStream
-    ? accountEstimate?.tokens[supportStream.dripsConfig.amountPerSecond.tokenAddress.toLowerCase()]
+    ? accountEstimate?.tokens[supportStream.streamConfig.amountPerSecond.tokenAddress.toLowerCase()]
     : undefined;
 
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.userId);
@@ -93,16 +93,16 @@
     {:else if supportStream}
       <div in:fade={{ duration: 300 }} class="support-stats">
         <KeyValuePair size="medium" key="Token">
-          <Token size="small" address={supportStream.dripsConfig.amountPerSecond.tokenAddress} />
+          <Token size="small" address={supportStream.streamConfig.amountPerSecond.tokenAddress} />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Rate">
-          <Amount amountPerSecond={supportStream.dripsConfig.amountPerSecond} />
+          <Amount amountPerSecond={supportStream.streamConfig.amountPerSecond} />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Balance">
           {#if outgoingEstimate}
             <Amount
               amount={{
-                tokenAddress: supportStream.dripsConfig.amountPerSecond.tokenAddress,
+                tokenAddress: supportStream.streamConfig.amountPerSecond.tokenAddress,
                 amount: outgoingEstimate.total.totals.remainingBalance,
               }}
             />

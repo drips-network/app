@@ -151,7 +151,7 @@ describe('AddressDriverMetadataManager', () => {
             streams: [
               {
                 id: '1',
-                dripsConfig: {
+                streamConfig: {
                   dripId: '2',
                   raw: BigInt(1000),
                   startDate: new Date(),
@@ -204,11 +204,11 @@ describe('AddressDriverMetadataManager', () => {
             return {
               id: stream.id,
               initialDripsConfig: {
-                dripId: stream.dripsConfig.dripId,
-                raw: stream.dripsConfig.raw.toString(),
-                startTimestamp: Math.floor((stream.dripsConfig.startDate?.getTime() || 0) / 1000),
-                durationSeconds: stream.dripsConfig.durationSeconds || 0,
-                amountPerSecond: stream.dripsConfig.amountPerSecond.amount,
+                dripId: stream.streamConfig.dripId,
+                raw: stream.streamConfig.raw.toString(),
+                startTimestamp: Math.floor((stream.streamConfig.startDate?.getTime() || 0) / 1000),
+                durationSeconds: stream.streamConfig.durationSeconds || 0,
+                amountPerSecond: stream.streamConfig.amountPerSecond.amount,
               },
               receiver: stream.receiver,
               archived: stream.archived ?? false,

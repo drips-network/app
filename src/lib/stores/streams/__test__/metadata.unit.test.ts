@@ -285,7 +285,7 @@ describe('metadata.ts', () => {
 
       expect(radHistoryItem1Streams?.find((s) => s.streamId === radStreams[0].id)).toStrictEqual({
         streamId: radStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -304,7 +304,7 @@ describe('metadata.ts', () => {
       });
       expect(radHistoryItem1Streams?.find((s) => s.streamId === radStreams[1].id)).toStrictEqual({
         streamId: radStreams[1].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -332,7 +332,7 @@ describe('metadata.ts', () => {
 
       expect(radHistoryItem2Streams?.find((s) => s.streamId === radStreams[0].id)).toStrictEqual({
         streamId: radStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -351,7 +351,7 @@ describe('metadata.ts', () => {
       });
       expect(radHistoryItem2Streams?.find((s) => s.streamId === radStreams[1].id)).toStrictEqual({
         streamId: radStreams[1].id,
-        dripsConfig: undefined,
+        streamConfig: undefined,
         managed: true,
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
@@ -370,7 +370,7 @@ describe('metadata.ts', () => {
 
       expect(radHistoryItem3Streams?.find((s) => s.streamId === radStreams[0].id)).toStrictEqual({
         streamId: radStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -389,7 +389,7 @@ describe('metadata.ts', () => {
       });
       expect(radHistoryItem3Streams?.find((s) => s.streamId === radStreams[1].id)).toStrictEqual({
         streamId: radStreams[1].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -431,7 +431,7 @@ describe('metadata.ts', () => {
 
       expect(daiHistoryItem1Streams?.find((s) => s.streamId === daiStreams[0].id)).toStrictEqual({
         streamId: daiStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',

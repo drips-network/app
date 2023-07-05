@@ -24,7 +24,7 @@
 
           const addressDriverClient = await getAddressDriverClient();
 
-          const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+          const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
           const ownAccount = $streams.accounts[dripsUserId];
           assert(ownAccount, "App hasn't yet fetched user's own account");
@@ -39,7 +39,7 @@
               ? undefined
               : {
                   userId: stream.receiver.userId,
-                  config: stream.dripsConfig.raw,
+                  config: stream.streamConfig.raw,
                 },
           );
 
@@ -47,7 +47,7 @@
 
           const newReceivers = newStreams.map((stream) => ({
             userId: stream.receiver.userId,
-            config: stream.dripsConfig.raw,
+            config: stream.streamConfig.raw,
           }));
 
           const tx = addressDriverClient.setStreams(
