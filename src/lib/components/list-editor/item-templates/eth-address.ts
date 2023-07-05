@@ -7,7 +7,6 @@ const ethAddressItem: (address: string) => ListItem = (address: string) => ({
     component: IdentityBadge,
     props: {
       address,
-      showFullAddress: true,
       size: 'medium',
       disableLink: true,
     },

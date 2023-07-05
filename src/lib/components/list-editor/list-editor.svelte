@@ -34,7 +34,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
-  import { fade, scale } from 'svelte/transition';
+  import { fade, fly, scale } from 'svelte/transition';
   import projectItem from './item-templates/project';
   import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
@@ -73,65 +73,80 @@
   let gitProjectService: GitProjectService;
 
   async function addProject() {
+    // TODO: This needs to fail if the project doesn't exist on GitHub
+
     if (!gitProjectService) gitProjectService = await GitProjectService.new();
 
     if (allowedItems === 'eth-addresses') return;
 
-    isAddingProject = true;
+    try {
+      isAddingProject = true;
 
-    let gitProject = await gitProjectService.getByUrl(inputValue);
+      let gitProject = await gitProjectService.getByUrl(inputValue);
 
-    const id = gitProject.source.url;
-    // Prevent duplicates.
-    if (selected.indexOf(id) === -1) {
-      items[id] = projectItem(gitProject);
+      const id = gitProject.source.url;
+      // Prevent duplicates.
+      if (selected.indexOf(id) === -1) {
+        items[id] = projectItem(gitProject);
 
-      if (selected.length < MAX_ITEMS) selected.push(id);
-      percentages = { ...percentages, [id]: 0 };
+        if (selected.length < MAX_ITEMS) selected.push(id);
+        percentages = { ...percentages, [id]: 0 };
 
-      await tick();
+        await tick();
 
-      listElem.scroll({
-        top: listElem.scrollHeight,
-      });
+        listElem.scroll({
+          top: listElem.scrollHeight,
+        });
 
-      // It doesn't work without setTimeout for some reason 🤷‍♂️
-      setTimeout(() => inputElem.focus(), 0);
+        // It doesn't work without setTimeout for some reason 🤷‍♂️
+        setTimeout(() => inputElem.focus(), 0);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    } finally {
+      inputValue = '';
+      isAddingProject = false;
     }
-
-    inputValue = '';
-    isAddingProject = false;
   }
 
   async function addEthAddress() {
     isAddingProject = true;
 
-    const address = isAddress(inputValue)
-      ? getAddress(inputValue)
-      : await ensStore.reverseLookup(inputValue);
-    assert(address);
+    try {
+      const address = isAddress(inputValue)
+        ? getAddress(inputValue)
+        : await ensStore.reverseLookup(inputValue);
+      assert(address);
 
-    if (items[address]) {
+      if (items[address]) {
+        isAddingProject = false;
+        return;
+      }
+
+      items[address] = ethAddressItem(address);
+
+      if (selected.length < MAX_ITEMS) selected.push(address);
+      percentages = { ...percentages, [address]: 0 };
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    } finally {
+      inputValue = '';
       isAddingProject = false;
-      return;
     }
-
-    items[address] = ethAddressItem(address);
-
-    if (selected.length < MAX_ITEMS) selected.push(address);
-    percentages = { ...percentages, [address]: 0 };
-
-    inputValue = '';
-    isAddingProject = false;
   }
 
-  $: if (isSupportedGitUrl(inputValue) && allowedItems === 'all') {
-    addProject();
+  function handleSubmitInput() {
+    if (isSupportedGitUrl(inputValue) && allowedItems === 'all') {
+      addProject();
+    } else if (isAddress(inputValue) || inputValue.endsWith('.eth')) {
+      addEthAddress();
+    }
   }
 
-  $: if (isAddress(inputValue) || inputValue.endsWith('.eth')) {
-    addEthAddress();
-  }
+  $: validInput =
+    isSupportedGitUrl(inputValue) || isAddress(inputValue) || inputValue.endsWith('.eth');
 
   $: totalPercentage = Object.values(selectedPercentages ?? {}).reduce<number>(
     (acc, v) => acc + v,
@@ -196,6 +211,7 @@
         bind:this={inputElem}
         bind:value={inputValue}
         disabled={isAddingProject}
+        on:keydown={(e) => e.key === 'Enter' && handleSubmitInput()}
         class="typo-text"
         type="text"
         placeholder={allowedItems === 'all'
@@ -203,7 +219,22 @@
           : 'Ethereum address or ENS name'}
       />
       {#if isAddingProject}
-        <Spinner />
+        <div in:fly={{ duration: 300, y: -4 }} out:fly={{ duration: 300, y: 4 }}>
+          <Spinner />
+        </div>
+      {:else}
+        <div
+          in:fly={{ duration: 300, y: -4 }}
+          out:fly={{ duration: 300, y: 4 }}
+          class="submit-button"
+        >
+          <Button
+            icon={Plus}
+            disabled={!validInput}
+            variant={validInput ? 'primary' : undefined}
+            on:click={handleSubmitInput}>Add</Button
+          >
+        </div>
       {/if}
     </div>
   {/if}
@@ -299,15 +330,17 @@
 
   .add-project {
     display: flex;
+    align-items: center;
     gap: 0.75rem;
     padding: 1rem;
     background-color: var(--color-background);
     box-shadow: var(--elevation-low);
     border-radius: 1.5rem 0 0 0;
+    position: relative;
   }
 
   .add-project:only-child {
-    border-radius: 2rem 0 2rem 2rem;
+    border-radius: 2.5rem 0 2.5rem 2.5rem;
   }
 
   .add-project input {
@@ -320,6 +353,11 @@
 
   .add-project input:focus {
     outline: none;
+  }
+
+  .add-project .submit-button {
+    position: absolute;
+    right: 0.75rem;
   }
 
   .distribution-tools {
@@ -341,6 +379,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: 0.25rem;
+    white-space: nowrap;
   }
 
   .remaining-percentage-indicator.error {
