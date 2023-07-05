@@ -336,6 +336,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: 0.25rem;
+    white-space: nowrap;
   }
 
   .remaining-percentage-indicator.error {
