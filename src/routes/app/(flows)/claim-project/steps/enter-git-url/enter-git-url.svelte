@@ -26,12 +26,6 @@
   let gitProjectService: GitProjectService;
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
-  $: if (isSupportedGitUrl($context.gitUrl) && validationState.type === 'unvalidated') {
-    fetchProject();
-  }
-  $: if (isValidGitUrl($context.gitUrl) && !isSupportedGitUrl($context.gitUrl)) {
-    validationState = { type: 'invalid', message: 'Unsupported URL' };
-  }
   $: formValid = validationState.type === 'valid';
 
   async function fetchProject() {
@@ -152,20 +146,42 @@
 
     validationState = { type: 'unvalidated' };
   }
+
+  function submitInput() {
+    if (isSupportedGitUrl($context.gitUrl)) {
+      fetchProject();
+    } else if (isValidGitUrl($context.gitUrl) && !isSupportedGitUrl($context.gitUrl)) {
+      validationState = { type: 'invalid', message: 'Unsupported URL' };
+    }
+  }
+
+  $: inputSubmittable =
+    isSupportedGitUrl($context.gitUrl) &&
+    validationState.type !== 'valid' &&
+    validationState.type !== 'pending';
 </script>
 
 <StandaloneFlowStepLayout
-  description="Enter your project’s URL to see if it has claimable funds and start the registration."
+  description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration."
 >
-  <TextInput
-    bind:value={$context.gitUrl}
-    icon={LinkIcon}
-    placeholder="Paste your GitHub project URL"
-    disabled={validationState.type !== 'unvalidated'}
-    {validationState}
-    showClearButton={validationState.type === 'valid' || validationState.type === 'invalid'}
-    on:clear={clearProject}
-  />
+  <div class="input">
+    <TextInput
+      bind:value={$context.gitUrl}
+      icon={LinkIcon}
+      placeholder="Paste your GitHub project URL"
+      disabled={validationState.type === 'valid' || validationState.type === 'pending'}
+      {validationState}
+      showClearButton={validationState.type === 'valid' || validationState.type === 'invalid'}
+      on:clear={clearProject}
+    />
+    <div class="submit-button">
+      <Button
+        disabled={!inputSubmittable}
+        variant={inputSubmittable ? 'primary' : undefined}
+        on:click={submitInput}>Submit</Button
+      >
+    </div>
+  </div>
   {#if $context.project && validationState.type === 'valid'}
     <UnclaimedProjectCard
       project={$context.project}
@@ -182,3 +198,12 @@
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
+
+<style>
+  .input {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+</style>
