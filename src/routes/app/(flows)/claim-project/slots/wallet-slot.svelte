@@ -4,7 +4,7 @@
 </script>
 
 {#if $walletStore.address}
-  <IdentityBadge disableLink showFullAddress size="medium" address={$walletStore.address} />
+  <IdentityBadge disableLink size="medium" address={$walletStore.address} />
 {:else}
   No wallet connected
 {/if}
