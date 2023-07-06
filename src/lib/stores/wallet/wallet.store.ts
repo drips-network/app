@@ -245,6 +245,7 @@ const mockWalletStore = () => {
 
   async function initialize() {
     const signer = provider.getSigner();
+
     const accountId = await (await getAddressDriverClient(signer)).getAccountId();
 
     state.set({
