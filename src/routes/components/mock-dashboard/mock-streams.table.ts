@@ -116,7 +116,7 @@ interface OutgoingStreamTableRow {
   to: {
     driver: 'address';
     address: string;
-    userId: string;
+    accountId: string;
   };
   amount: AmountCellData;
   token: TokenCellData;

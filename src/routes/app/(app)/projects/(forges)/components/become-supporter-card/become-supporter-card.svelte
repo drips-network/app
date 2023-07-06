@@ -33,10 +33,10 @@
 
     if (result[0]) {
       const subgraph = getSubgraphClient();
-      const dripListSplits = await subgraph.getSplitsConfigByUserId(result[0].account.userId);
+      const dripListSplits = await subgraph.getSplitsConfigByAccountId(result[0].account.accountId);
 
       isSupportingProject = Boolean(
-        dripListSplits.find((s) => s.userId === project.repoDriverAccount.userId),
+        dripListSplits.find((s) => s.accountId === project.repoDriverAccount.accountId),
       );
       dripList = result[0];
     } else {
@@ -52,13 +52,13 @@
       // TODO: Refresh profile state after becoming a supporter
       loadingModal = true;
       const representationalSplits = await getRepresentationalSplitsForAccount(
-        dripList.account.userId,
+        dripList.account.accountId,
       );
 
       modal.show(
         Stepper,
         undefined,
-        editDripListSteps(dripList.account.userId, representationalSplits, project),
+        editDripListSteps(dripList.account.accountId, representationalSplits, project),
       );
       loadingModal = false;
     }
