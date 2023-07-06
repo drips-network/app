@@ -1,5 +1,5 @@
 export interface SplitsEntry {
   id: string;
-  userId: string;
+  accountId: string;
   weight: bigint;
 }

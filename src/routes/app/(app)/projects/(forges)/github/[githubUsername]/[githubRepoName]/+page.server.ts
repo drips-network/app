@@ -31,10 +31,10 @@ export const load = (async ({ params }) => {
 
   const unclaimedFunds = project.claimed
     ? undefined
-    : fetchUnclaimedFunds(project.repoDriverAccount.userId);
+    : fetchUnclaimedFunds(project.repoDriverAccount.accountId);
 
   const earnedFunds = project.claimed
-    ? fetchEarnedFunds(project.repoDriverAccount.userId)
+    ? fetchEarnedFunds(project.repoDriverAccount.accountId)
     : undefined;
 
   return {
@@ -42,7 +42,7 @@ export const load = (async ({ params }) => {
     streamed: {
       unclaimedFunds,
       earnedFunds,
-      incomingSplits: getIncomingSplits(project.repoDriverAccount.userId),
+      incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
       splits: buildProjectSplitsData(project),
     },
   };

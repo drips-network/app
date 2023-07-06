@@ -19,7 +19,7 @@ import {
   ERC20TxFactory,
   RepoDriverClient,
 } from 'radicle-drips';
-import type { UserId } from '../metadata/types';
+import type { AccountId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { CallerClient, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
@@ -114,7 +114,7 @@ export default class DripListService {
     return dripLists;
   }
 
-  public async getByTokenId(tokenId: UserId): Promise<DripList | null> {
+  public async getByTokenId(tokenId: AccountId): Promise<DripList | null> {
     const subAccount = await this._dripsSubgraphClient.getNftSubAccountOwnerByTokenId(tokenId);
 
     if (!subAccount) return null;
@@ -140,10 +140,12 @@ export default class DripListService {
         driver: 'nft',
         owner: {
           driver: 'address',
-          userId: await this._addressDriverClient.getUserIdByAddress(nftSubAccount.ownerAddress),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(
+            nftSubAccount.ownerAddress,
+          ),
           address: nftSubAccount.ownerAddress,
         },
-        userId: nftSubAccount.tokenId,
+        accountId: nftSubAccount.tokenId,
       },
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
       // TODO: properties below are post-MVP.
@@ -172,14 +174,14 @@ export default class DripListService {
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
 
-    const projects: { weight: number; userId: string }[] = [];
+    const projects: { weight: number; accountId: string }[] = [];
     for (const [url, percentage] of Object.entries(context.dripList.percentages)) {
       const { forge, repoName, username } = GitProjectService.deconstructUrl(url);
       const projectName = `${username}/${repoName}`;
 
       projects.push({
         weight: Math.floor((Number(percentage) / 100) * 1000000),
-        userId: await this._repoDriverClient.getUserId(forge, projectName),
+        accountId: await this._repoDriverClient.getAccountId(forge, projectName),
       });
     }
 
@@ -198,7 +200,7 @@ export default class DripListService {
     const setStreamListProjectsTx = await this._nftDriverTxFactory.setSplits(
       dripListId,
       projects.map((project) => ({
-        userId: project.userId,
+        accountId: project.accountId,
         weight: project.weight,
       })),
     );
@@ -312,10 +314,10 @@ export default class DripListService {
         driver: 'nft',
         owner: {
           driver: 'address',
-          userId: await this._addressDriverClient.getUserIdByAddress(this._ownerAddress),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(this._ownerAddress),
           address: this._ownerAddress,
         },
-        userId: dripListId,
+        accountId: dripListId,
       },
       name,
     });
@@ -345,7 +347,7 @@ export default class DripListService {
   private async _buildSetStreamListStreamTxs(
     salt: bigint,
     token: Address,
-    dripListId: UserId,
+    dripListId: AccountId,
     topUpAmount: bigint,
     start: bigint,
     duration: bigint,
@@ -353,13 +355,13 @@ export default class DripListService {
   ) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
-    const ownerAddressDriverUserId = await this._addressDriverClient.getUserIdByAddress(
+    const ownerAddressDriverAccountId = await this._addressDriverClient.getAccountIdByAddress(
       this._ownerAddress,
     );
 
     const currentReceivers: StreamReceiverStruct[] =
       await this._dripsSubgraphClient.getCurrentStreamsReceivers(
-        ownerAddressDriverUserId,
+        ownerAddressDriverAccountId,
         token,
         get(wallet).provider,
       );
@@ -373,7 +375,7 @@ export default class DripListService {
 
     const newReceivers: StreamReceiverStruct[] = [
       {
-        userId: dripListId,
+        accountId: dripListId,
         config: Utils.StreamConfiguration.toUint256(config),
       },
     ];

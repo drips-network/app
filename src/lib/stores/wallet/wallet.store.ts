@@ -41,7 +41,7 @@ type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
 export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
-  dripsUserId: string;
+  dripsAccountId: string;
   provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
   signer: ethers.providers.JsonRpcSigner;
   network: Network;
@@ -55,7 +55,7 @@ export interface DisconnectedWalletStoreState {
     | ethers.providers.Web3Provider
     | ethers.providers.InfuraProvider
     | ethers.providers.JsonRpcProvider;
-  dripsUserId?: undefined;
+  dripsAccountId?: undefined;
   address?: undefined;
   signer?: undefined;
   safe?: undefined;
@@ -188,7 +188,7 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0],
-      dripsUserId: await (await AddressDriverClient.create(provider, signer)).getUserId(),
+      dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
       provider,
       signer,
       network: await provider.getNetwork(),
@@ -245,7 +245,7 @@ const mockWalletStore = () => {
 
   async function initialize() {
     const signer = provider.getSigner();
-    const userId = await (await getAddressDriverClient(signer)).getUserId();
+    const accountId = await (await getAddressDriverClient(signer)).getAccountId();
 
     state.set({
       connected: true,
@@ -253,7 +253,7 @@ const mockWalletStore = () => {
       provider,
       signer,
       network: provider.network,
-      dripsUserId: userId,
+      dripsAccountId: accountId,
     });
   }
 

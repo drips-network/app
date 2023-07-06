@@ -4,7 +4,7 @@ import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
 import { addressDriverAccountMetadataSchema } from './schemas';
 import type { Account } from '$lib/stores/streams/types';
-import type { UserId } from './types';
+import type { AccountId } from './types';
 import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
@@ -17,10 +17,10 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
     super(addressDriverAccountMetadataSchema);
   }
 
-  public async fetchAccount(userId: UserId): Promise<Account> {
-    const { data, hash } = (await this.fetchAccountMetadata(userId)) ?? {};
+  public async fetchAccount(accountId: AccountId): Promise<Account> {
+    const { data, hash } = (await this.fetchAccountMetadata(accountId)) ?? {};
 
-    const streamsSetEvents = await this.subgraphClient.getStreamsSetEventsByUserId(userId);
+    const streamsSetEvents = await this.subgraphClient.getStreamsSetEventsByAccountId(accountId);
 
     const streamsSetEventsWithFullReceivers = reconcileStreamsSetReceivers(streamsSetEvents);
 
@@ -29,16 +29,16 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
     );
 
     const assetConfigs = buildAssetConfigs(
-      userId,
+      accountId,
       data as z.infer<typeof addressDriverAccountMetadataSchema>,
       streamsSetEventsByTokenAddress,
     );
 
     return {
       user: {
-        userId,
+        accountId,
         driver: 'address',
-        address: AddressDriverClient.getUserAddress(userId),
+        address: AddressDriverClient.getUserAddress(accountId),
       },
       name: data?.name,
       description: data?.description,

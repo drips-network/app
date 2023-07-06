@@ -102,15 +102,15 @@
           const addressDriverClient = await getAddressDriverClient();
           const repoDriverClient = await getRepoDriverClient();
 
-          const userIds = await Promise.all(
+          const accountIds = await Promise.all(
             selected.map(async (s) => {
               if (s.startsWith('0x')) {
-                return await addressDriverClient.getUserIdByAddress(s);
+                return await addressDriverClient.getAccountIdByAddress(s);
               } else {
                 const { forge, repoName, username } = GitProjectService.deconstructUrl(s);
                 const projectName = `${username}/${repoName}`;
 
-                return await repoDriverClient.getUserId(forge, projectName);
+                return await repoDriverClient.getAccountId(forge, projectName);
               }
             }),
           );
@@ -118,14 +118,14 @@
           const tx = nftDriverClient.setSplits(
             dripListId,
             mapFilterUndefined(selected, (slug, index) => {
-              const userId = userIds[index];
+              const accountId = accountIds[index];
 
               const percentage = percentages[slug];
               // If percentage is zero, omit split
               if (!percentage) return undefined;
 
               return {
-                userId,
+                accountId,
                 weight: Math.floor((percentage / 100) * 1000000),
               };
             }),

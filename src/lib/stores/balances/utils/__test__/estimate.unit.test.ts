@@ -3,11 +3,11 @@ import { estimateAssetConfig } from '../estimate';
 
 const MOCK_USER = {
   driver: 'address',
-  userId: '1234',
+  accountId: '1234',
   address: '0x00',
 } as {
   driver: 'address';
-  userId: string;
+  accountId: string;
   address: string;
 };
 
@@ -24,7 +24,7 @@ const mockStream = ({
   durationSeconds: number;
   startTimestamp: number;
 }) => ({
-  id: `${MOCK_USER.userId}-0x00-${dripId}`,
+  id: `${MOCK_USER.accountId}-0x00-${dripId}`,
   sender: MOCK_USER,
   receiver: MOCK_USER,
   streamConfig: {
@@ -125,9 +125,9 @@ describe('estimate.ts', () => {
       expect(result.totals.totalStreamed).toBe(1000n);
       expect(result.totals.remainingBalance).toBe(9000n);
 
-      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
-        1000n,
-      );
+      expect(
+        result.streams.find((s) => s.id === `${MOCK_USER.accountId}-0x00-1`)?.totalStreamed,
+      ).toBe(1000n);
     });
 
     it('handles a stream being paused and unpaused', () => {
@@ -173,9 +173,9 @@ describe('estimate.ts', () => {
       expect(result.totals.totalStreamed).toBe(500n);
       expect(result.totals.remainingBalance).toBe(9500n);
 
-      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
-        500n,
-      );
+      expect(
+        result.streams.find((s) => s.id === `${MOCK_USER.accountId}-0x00-1`)?.totalStreamed,
+      ).toBe(500n);
     });
 
     it('handles streams running out of funds', () => {
@@ -210,9 +210,9 @@ describe('estimate.ts', () => {
       expect(result.totals.totalStreamed).toBe(250n);
       expect(result.totals.remainingBalance).toBe(0n);
 
-      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
-        250n,
-      );
+      expect(
+        result.streams.find((s) => s.id === `${MOCK_USER.accountId}-0x00-1`)?.totalStreamed,
+      ).toBe(250n);
     });
 
     it('handles start dates', () => {
@@ -247,9 +247,9 @@ describe('estimate.ts', () => {
       expect(result.totals.totalStreamed).toBe(500n);
       expect(result.totals.remainingBalance).toBe(500n);
 
-      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
-        500n,
-      );
+      expect(
+        result.streams.find((s) => s.id === `${MOCK_USER.accountId}-0x00-1`)?.totalStreamed,
+      ).toBe(500n);
     });
 
     it('handles durations', () => {
@@ -284,9 +284,9 @@ describe('estimate.ts', () => {
       expect(result.totals.totalStreamed).toBe(500n);
       expect(result.totals.remainingBalance).toBe(500n);
 
-      expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
-        500n,
-      );
+      expect(
+        result.streams.find((s) => s.id === `${MOCK_USER.accountId}-0x00-1`)?.totalStreamed,
+      ).toBe(500n);
     });
   });
 
@@ -325,8 +325,8 @@ describe('estimate.ts', () => {
     expect(result.totals.totalStreamed).toBe(500n);
     expect(result.totals.remainingBalance).toBe(9500n);
 
-    expect(result.streams.find((s) => s.id === `${MOCK_USER.userId}-0x00-1`)?.totalStreamed).toBe(
-      500n,
-    );
+    expect(
+      result.streams.find((s) => s.id === `${MOCK_USER.accountId}-0x00-1`)?.totalStreamed,
+    ).toBe(500n);
   });
 });

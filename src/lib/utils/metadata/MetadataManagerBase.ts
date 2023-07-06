@@ -18,16 +18,16 @@ import {
   repoDriverAccountMetadataSchema,
   nftDriverAccountMetadataSchema,
 } from './schemas';
-import type { UserId } from './types';
+import type { AccountId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 
 type IpfsHash = string;
 
 export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
-  fetchMetadataHashByUserId(userId: UserId): Promise<string | null>;
+  fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null>;
 
   fetchAccountMetadata(
-    userId: UserId,
+    accountId: AccountId,
   ): Promise<{ hash: IpfsHash; data: z.infer<TAccountMetadataSchema> } | null>;
 
   pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string>;
@@ -38,7 +38,7 @@ export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAcc
     schema: T,
   ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }>;
 
-  fetchAccount(userId: UserId): Promise<TAccount | null>;
+  fetchAccount(accountId: AccountId): Promise<TAccount | null>;
 
   buildAccountMetadata(context: unknown): z.infer<TAccountMetadataSchema>;
 }
@@ -60,10 +60,10 @@ export default abstract class MetadataManagerBase<
 
   /**
    * Fetches the account for a given user ID.
-   * @param userId The user ID to fetch the account for.
+   * @param accountId The user ID to fetch the account for.
    * @returns The account for the given user ID, or null if no account exists.
    */
-  public abstract fetchAccount(userId: UserId): Promise<TAccount | null>;
+  public abstract fetchAccount(accountId: AccountId): Promise<TAccount | null>;
 
   /**
    * Builds account metadata.
@@ -74,16 +74,16 @@ export default abstract class MetadataManagerBase<
 
   /**
    * Fetches the latest metadata hash for a given user ID.
-   * @param userId The user ID to fetch the metadata hash for.
+   * @param accountId The user ID to fetch the metadata hash for.
    * @returns The latest metadata hash for the given user ID, or null if no metadata hash exists.
    */
-  public async fetchMetadataHashByUserId(userId: UserId): Promise<string | null> {
-    const userMetadata = await this.subgraphClient.getLatestUserMetadata(
-      userId,
+  public async fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null> {
+    const accountMetadata = await this.subgraphClient.getLatestAccountMetadata(
+      accountId,
       MetadataManagerBase.USER_METADATA_KEY,
     );
 
-    return userMetadata?.value ?? null;
+    return accountMetadata?.value ?? null;
   }
 
   private async fetchIpfs(hash: IpfsHash) {
@@ -97,13 +97,13 @@ export default abstract class MetadataManagerBase<
 
   /**
    * Fetches the latest IPFS metadata for a given user ID.
-   * @param userId The user ID to fetch the metadata for.
+   * @param accountId The user ID to fetch the metadata for.
    * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
    */
   public async fetchAccountMetadata(
-    userId: UserId,
+    accountId: AccountId,
   ): Promise<{ hash: IpfsHash; data: z.infer<TAccountMetadataSchema> } | null> {
-    const metadataHash = await this.fetchMetadataHashByUserId(userId);
+    const metadataHash = await this.fetchMetadataHashByAccountId(accountId);
     if (!metadataHash) return null;
 
     let accountMetadataRes: Awaited<ReturnType<typeof MetadataManagerBase.prototype.fetchIpfs>>;
@@ -164,8 +164,8 @@ export default abstract class MetadataManagerBase<
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
   ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }> {
-    const { userId } = newData.describes;
-    const currentOnChainHash = await this.fetchMetadataHashByUserId(userId);
+    const { accountId } = newData.describes;
+    const currentOnChainHash = await this.fetchMetadataHashByAccountId(accountId);
 
     if (currentOnChainHash !== lastKnownHash) {
       throw new Error(
@@ -176,7 +176,7 @@ export default abstract class MetadataManagerBase<
 
     const newHash = await this.pinAccountMetadata(newData);
 
-    const tx = await this.emitUserMetadata(newHash, userId);
+    const tx = await this.emitAccountMetadata(newHash, accountId);
 
     return {
       newHash,
@@ -184,8 +184,8 @@ export default abstract class MetadataManagerBase<
     };
   }
 
-  private async emitUserMetadata(newHash: IpfsHash, userId: UserId) {
-    const userMetadata = [
+  private async emitAccountMetadata(newHash: IpfsHash, accountId: AccountId) {
+    const accountMetadata = [
       {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
@@ -196,11 +196,11 @@ export default abstract class MetadataManagerBase<
 
     let tx: ContractTransaction;
     if ('safeCreateAccount' in client) {
-      tx = await (client as NFTDriverClient).emitUserMetadata(userId, userMetadata);
-    } else if ('getUserId' in client) {
-      tx = await (client as AddressDriverClient).emitUserMetadata(userMetadata);
+      tx = await (client as NFTDriverClient).emitAccountMetadata(accountId, accountMetadata);
+    } else if ('getAccountId' in client) {
+      tx = await (client as AddressDriverClient).emitAccountMetadata(accountMetadata);
     } else if ('requestOwnerUpdate' in client) {
-      tx = await (client as RepoDriverClient).emitUserMetadata(userId, userMetadata);
+      tx = await (client as RepoDriverClient).emitAccountMetadata(accountId, accountMetadata);
     } else {
       throw new Error('Unsupported client');
     }

@@ -22,17 +22,17 @@
     const dripsClient = await getDripsClient();
     const driverClient = await getAddressDriverClient();
     const subgraphClient = getSubgraphClient();
-    const userId = await driverClient.getUserId();
+    const accountId = await driverClient.getAccountId();
 
     const calls = tuple(
       await dripsClient.getReceivableBalanceForUser(
-        userId,
+        accountId,
         $context.tokenAddress ?? unreachable(),
         100,
       ),
-      dripsClient.getSplittableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      dripsClient.getCollectableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      subgraphClient.getSplitsConfigByUserId(userId),
+      dripsClient.getSplittableBalanceForUser(accountId, $context.tokenAddress ?? unreachable()),
+      dripsClient.getCollectableBalanceForUser(accountId, $context.tokenAddress ?? unreachable()),
+      subgraphClient.getSplitsConfigByAccountId(accountId),
     );
 
     const [receivable, splittable, collectable, splitsData] = await Promise.all(calls);
@@ -69,7 +69,7 @@
   }
 
   async function updateCollectable() {
-    await balances.updateBalances($wallet.dripsUserId ?? unreachable());
+    await balances.updateBalances($wallet.dripsAccountId ?? unreachable());
   }
 
   async function promise() {

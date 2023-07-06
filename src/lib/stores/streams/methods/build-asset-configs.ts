@@ -1,7 +1,7 @@
 import { AddressDriverClient, constants, Utils } from 'radicle-drips';
 import type { z } from 'zod';
 import type {
-  AddressDriverUser,
+  AddressDriverAccount,
   AssetConfig,
   AssetConfigHistoryItem,
   DripsConfig,
@@ -20,7 +20,7 @@ import buildStreamReceiver from './build-stream-receiver';
 
 function mapReceiverToStream(
   receiver: Receiver,
-  senderUserId: string,
+  senderAccountId: string,
   tokenAddress: string,
   assetConfigMetadata?: z.infer<typeof assetConfigMetadataSchema>,
 ): Stream {
@@ -55,8 +55,8 @@ function mapReceiverToStream(
     id: receiver.streamId,
     sender: {
       driver: 'address',
-      userId: senderUserId,
-      address: AddressDriverClient.getUserAddress(senderUserId),
+      accountId: senderAccountId,
+      address: AddressDriverClient.getUserAddress(senderAccountId),
     },
     receiver: receiver.receiver,
     streamConfig,
@@ -72,7 +72,7 @@ function mapReceiverToStream(
  * Given accountMetadata and on-chain streamsSetEvents, construct an object describing
  * the account, including the full history of all its assetConfigs, with on-chain receivers
  * matched onto IPFS stream metadata.
- * @param userId The userId to build assetConfigs for.
+ * @param accountId The accountId to build assetConfigs for.
  * @param accountMetadata The metadata for the given account fetched from IPFS.
  * @param streamsSetEvents The on-chain history of streamsSetEvents for the given account.
  * @returns The constructed Account object.
@@ -81,7 +81,7 @@ function mapReceiverToStream(
  * in metadata.
  */
 export default function buildAssetConfigs(
-  userId: string,
+  accountId: string,
   accountMetadata: z.infer<typeof addressDriverAccountMetadataSchema> | undefined,
   streamsSetEvents: { [tokenAddress: string]: StreamsSetEventWithFullReceivers[] },
 ) {
@@ -103,7 +103,7 @@ export default function buildAssetConfigs(
 
         const remainingStreamIds =
           assetConfigMetadata?.streams.map((stream) =>
-            makeStreamId(userId, tokenAddress, stream.initialDripsConfig.dripId),
+            makeStreamId(accountId, tokenAddress, stream.initialDripsConfig.dripId),
           ) ?? [];
 
         for (const streamReceiverSeenEvent of streamsSetEvent.currentReceivers) {
@@ -114,9 +114,9 @@ export default function buildAssetConfigs(
 
           const eventConfig = Utils.StreamConfiguration.fromUint256(streamReceiverSeenEvent.config);
 
-          const streamId = makeStreamId(userId, tokenAddress, eventConfig.dripId.toString());
+          const streamId = makeStreamId(accountId, tokenAddress, eventConfig.dripId.toString());
 
-          const receiver = buildStreamReceiver(streamReceiverSeenEvent.receiverUserId);
+          const receiver = buildStreamReceiver(streamReceiverSeenEvent.receiverAccountId);
 
           assetConfigHistoryItemStreams.push({
             streamId,
@@ -159,8 +159,8 @@ export default function buildAssetConfigs(
               streamConfig: undefined,
               managed: true,
               receiver: {
-                ...(stream.receiver as AddressDriverUser),
-                address: AddressDriverClient.getUserAddress(stream.receiver.userId),
+                ...(stream.receiver as AddressDriverAccount),
+                address: AddressDriverClient.getUserAddress(stream.receiver.accountId),
               },
             });
           }
@@ -195,7 +195,7 @@ export default function buildAssetConfigs(
       acc.push({
         tokenAddress: tokenAddress,
         streams: currentStreams.map((receiver) =>
-          mapReceiverToStream(receiver, userId, tokenAddress, assetConfigMetadata),
+          mapReceiverToStream(receiver, accountId, tokenAddress, assetConfigMetadata),
         ),
         history: assetConfigHistoryItems,
       });

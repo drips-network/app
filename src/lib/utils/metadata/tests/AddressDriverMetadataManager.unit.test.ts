@@ -28,7 +28,7 @@ describe('AddressDriverMetadataManager', () => {
   describe('fetchAccount', () => {
     it('should fetch account', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
 
       const expectedStreamsSetEvents = [
         {
@@ -37,8 +37,8 @@ describe('AddressDriverMetadataManager', () => {
       ] as unknown as StreamsSetEvent[];
 
       const mockSubgraphClient = {
-        getStreamsSetEventsByUserId: vi
-          .fn(DripsSubgraphClient.prototype.getStreamsSetEventsByUserId)
+        getStreamsSetEventsByAccountId: vi
+          .fn(DripsSubgraphClient.prototype.getStreamsSetEventsByAccountId)
           .mockResolvedValue(expectedStreamsSetEvents),
       } as unknown as DripsSubgraphClient;
 
@@ -102,14 +102,14 @@ describe('AddressDriverMetadataManager', () => {
         .mockReturnValue('0x123');
 
       // Act
-      const account = await new AddressDriverMetadataManager().fetchAccount(userId);
+      const account = await new AddressDriverMetadataManager().fetchAccount(accountId);
 
       // Assert
       expect(account).toEqual({
         user: {
-          userId,
+          accountId,
           driver: 'address',
-          address: AddressDriverClient.getUserAddress(userId),
+          address: AddressDriverClient.getUserAddress(accountId),
         },
         name: expectedMetadata.data.name,
         description: expectedMetadata.data.description,
@@ -120,13 +120,13 @@ describe('AddressDriverMetadataManager', () => {
         lastIpfsHash: expectedMetadata.hash,
       });
 
-      expect(mockSubgraphClient.getStreamsSetEventsByUserId).toHaveBeenCalledWith(userId);
+      expect(mockSubgraphClient.getStreamsSetEventsByAccountId).toHaveBeenCalledWith(accountId);
       expect(reconcileStreamsSetReceiversMock).toHaveBeenCalledWith(expectedStreamsSetEvents);
       expect(seperateStreamsSetEventsMock).toHaveBeenCalledWith(
         expectedStreamsSetEventsWithFullReceivers,
       );
       expect(buildAssetConfigsMock).toHaveBeenCalledWith(
-        userId,
+        accountId,
         expectedMetadata.data,
         expectedStreamsSetEventsWithFullReceivers,
       );
@@ -138,7 +138,7 @@ describe('AddressDriverMetadataManager', () => {
       // Arrange
       const forAccount: Account = {
         user: {
-          userId: '1',
+          accountId: '1',
           driver: 'address',
           address: '0x123',
         },
@@ -163,7 +163,7 @@ describe('AddressDriverMetadataManager', () => {
                 },
                 managed: true,
                 receiver: {
-                  userId: '2',
+                  accountId: '2',
                   driver: 'address',
                   address: '0x789',
                 },

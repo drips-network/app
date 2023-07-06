@@ -81,9 +81,9 @@
         before: async () => {
           assert(newAmountPerSecond && newName);
 
-          const { dripsUserId, address, signer } = $wallet;
-          assert(dripsUserId && address);
-          const ownAccount = $streams.accounts[dripsUserId];
+          const { dripsAccountId, address, signer } = $wallet;
+          assert(dripsAccountId && address);
+          const ownAccount = $streams.accounts[dripsAccountId];
           assert(ownAccount);
           const assetConfig = ownAccount.assetConfigs.find(
             (ac) => ac.tokenAddress === token.info.address,
@@ -122,12 +122,12 @@
           }
 
           let currentReceivers: {
-            userId: string;
+            accountId: string;
             config: bigint;
           }[] = [];
 
           let newReceivers: {
-            userId: string;
+            accountId: string;
             config: bigint;
           }[] = [];
 
@@ -136,7 +136,7 @@
               s.paused
                 ? undefined
                 : {
-                    userId: s.receiver.userId,
+                    accountId: s.receiver.accountId,
                     config: s.streamConfig.raw,
                   },
             );
@@ -148,7 +148,7 @@
                 BigInt(stream.streamConfig.dripId),
             );
             newReceivers.splice(currentStreamReciverIndex, 1, {
-              userId: stream.receiver.userId,
+              accountId: stream.receiver.accountId,
               config: Utils.StreamConfiguration.toUint256({
                 dripId: BigInt(stream.streamConfig.dripId),
                 start: BigInt(stream.streamConfig.startDate?.getTime() ?? 0 / 1000),
@@ -173,7 +173,7 @@
               tokenAddress: token.info.address,
               currentReceivers,
               newReceivers,
-              userMetadata: [
+              accountMetadata: [
                 {
                   key: MetadataManagerBase.USER_METADATA_KEY,
                   value: newHash,
@@ -195,7 +195,7 @@
           } else {
             assert(newHash);
 
-            tx = addressDriverClient.emitUserMetadata([
+            tx = addressDriverClient.emitAccountMetadata([
               {
                 key: MetadataManagerBase.USER_METADATA_KEY,
                 value: newHash,
@@ -206,7 +206,7 @@
           return {
             tx,
             newHash,
-            dripsUserId,
+            dripsAccountId,
           };
         },
 
@@ -223,7 +223,7 @@
             streams.refreshUserAccount,
             () =>
               nameUpdated
-                ? get(streams).accounts[transactContext.dripsUserId].lastIpfsHash ===
+                ? get(streams).accounts[transactContext.dripsAccountId].lastIpfsHash ===
                   transactContext.newHash
                 : streams.getStreamById(stream.id)?.streamConfig.amountPerSecond.amount ===
                   newAmountPerSecond,

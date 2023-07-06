@@ -23,18 +23,18 @@ export const sourceSchema = gitHubSourceSchema;
 
 export const addressDriverSplitReceiverSchema = z.object({
   weight: z.number(),
-  userId: z.string(),
+  accountId: z.string(),
 });
 
 export const repoDriverSplitReceiverSchema = z.object({
   weight: z.number(),
-  userId: z.string(),
+  accountId: z.string(),
   source: sourceSchema,
 });
 
 export const splitReceiverSchema = z.object({
   weight: z.number(),
-  userId: z.string(),
+  accountId: z.string(),
 });
 
 export const streamConfigSchema = z.object({
@@ -53,7 +53,7 @@ export const streamConfigSchema = z.object({
 
 export const dripsUserSchema = z.object({
   driver: z.union([z.literal('address'), z.literal('nft'), z.literal('repo')]),
-  userId: z.string(),
+  accountId: z.string(),
 });
 
 export const streamMetadataSchema = z.object({
@@ -73,7 +73,7 @@ export const assetConfigMetadataSchema = z.object({
 export const addressDriverAccountMetadataSchema = z.object({
   describes: z.object({
     driver: z.literal('address'),
-    userId: z.string(),
+    accountId: z.string(),
   }),
   name: z.string().optional(),
   description: z.string().optional(),
@@ -93,7 +93,7 @@ export const repoDriverAccountMetadataSchema = z.object({
   driver: z.literal('repo'),
   describes: z.object({
     driver: z.literal('repo'),
-    userId: z.string(),
+    accountId: z.string(),
   }),
   source: sourceSchema,
   emoji: z.string(),
@@ -106,7 +106,7 @@ export const nftDriverAccountMetadataSchema = z.object({
   driver: z.literal('nft'),
   describes: z.object({
     driver: z.literal('nft'),
-    userId: z.string(),
+    accountId: z.string(),
   }),
   isDripList: z.literal(true),
   name: z.string().optional(),

@@ -30,7 +30,7 @@ describe('GitProjectService', () => {
 
   beforeEach(async () => {
     addressDriverClientMock = {
-      getUserIdByAddress: vi.fn(AddressDriverClient.prototype.getUserIdByAddress),
+      getAccountIdByAddress: vi.fn(AddressDriverClient.prototype.getAccountIdByAddress),
     };
     (getClient.getAddressDriverClient as any) = vi
       .fn()
@@ -38,7 +38,7 @@ describe('GitProjectService', () => {
 
     repoDriverClientMock = {
       getOwner: vi.fn(RepoDriverClient.prototype.getOwner),
-      getUserId: vi.fn(RepoDriverClient.prototype.getUserId),
+      getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId),
       requestOwnerUpdate: vi.fn(RepoDriverClient.prototype.requestOwnerUpdate),
     };
     (getClient.getRepoDriverClient as any) = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -67,27 +67,27 @@ describe('GitProjectService', () => {
   describe('getByUrl', () => {
     it('should return the expected project', async () => {
       // Arrange
-      const userId = 'userId';
-      repoDriverClientMock.getUserId.mockResolvedValueOnce(userId);
+      const accountId = 'accountId';
+      repoDriverClientMock.getAccountId.mockResolvedValueOnce(accountId);
 
-      const originalGetDripListProjects = sut['getByUserId'];
+      const originalGetDripListProjects = sut['getByAccountId'];
 
       const expectedProject = {} as unknown as GitProject;
 
-      sut['getByUserId'] = vi.fn(sut['getByUserId']).mockResolvedValueOnce(expectedProject);
+      sut['getByAccountId'] = vi.fn(sut['getByAccountId']).mockResolvedValueOnce(expectedProject);
 
       // Act
       const actualProject = await sut.getByUrl('https://github.com/jtourkos/git-dep-url');
 
       // Assert
       expect(actualProject).toBe(expectedProject);
-      expect(sut['getByUserId']).toHaveBeenCalledWith(userId, true);
+      expect(sut['getByAccountId']).toHaveBeenCalledWith(accountId, true);
 
-      sut['getByUserId'] = originalGetDripListProjects;
+      sut['getByAccountId'] = originalGetDripListProjects;
     });
   });
 
-  describe('getByUserId', () => {
+  describe('getByAccountId', () => {
     it('should return null if the repo account is not found', async () => {
       // Arrange
       subgraphClientMock.repoDriverQueries.getRepoAccountById = vi
@@ -95,7 +95,7 @@ describe('GitProjectService', () => {
         .mockResolvedValueOnce(null);
 
       // Act
-      const actualProject = await sut['getByUserId']('userId');
+      const actualProject = await sut['getByAccountId']('accountId');
 
       // Assert
       expect(actualProject).toBeNull();
@@ -108,7 +108,7 @@ describe('GitProjectService', () => {
         forge: BigInt(0),
         name: 'jtourkos/git-dep-url',
         ownerAddress: null,
-        userId: 'userId',
+        accountId: 'accountId',
         lastUpdatedBlockTimestamp: BigInt(Date.now()),
       };
 
@@ -130,7 +130,7 @@ describe('GitProjectService', () => {
       repoDriverClientMock.getOwner.mockResolvedValueOnce(null);
 
       // Act
-      const actualProject = (await sut['getByUserId']('userId')) as UnclaimedGitProject;
+      const actualProject = (await sut['getByAccountId']('accountId')) as UnclaimedGitProject;
 
       // Assert
       expect(actualProject.claimed).toBe(false);
@@ -140,7 +140,7 @@ describe('GitProjectService', () => {
       expect(actualProject.owner).toBeUndefined();
       expect(actualProject.verificationStatus).toBe(VerificationStatus.NOT_STARTED);
       expect(actualProject.repoDriverAccount.driver).toBe('repo');
-      expect(actualProject.repoDriverAccount.userId).toBe('userId');
+      expect(actualProject.repoDriverAccount.accountId).toBe('accountId');
     });
 
     it('should return the expected claimed project', async () => {
@@ -152,7 +152,7 @@ describe('GitProjectService', () => {
         forge: BigInt(0),
         name: 'jtourkos/git-dep-url',
         ownerAddress,
-        userId: 'userId',
+        accountId: 'accountId',
         lastUpdatedBlockTimestamp: BigInt(Date.now()),
       };
 
@@ -169,13 +169,13 @@ describe('GitProjectService', () => {
           maintainers: [
             {
               weight: 500000,
-              userId: '875267609686611184008791658115888920329297355417',
+              accountId: '875267609686611184008791658115888920329297355417',
             },
           ],
           dependencies: [
             {
               weight: 500000,
-              userId: '1235',
+              accountId: '1235',
               source: {
                 forge: 'github',
                 repoName: 'foo',
@@ -193,18 +193,18 @@ describe('GitProjectService', () => {
 
       repoDriverClientMock.getOwner.mockResolvedValueOnce(ownerAddress);
 
-      addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce('userId');
+      addressDriverClientMock.getAccountIdByAddress.mockResolvedValueOnce('accountId');
 
       // Act
-      const actualProject = (await sut['getByUserId']('userId')) as ClaimedGitProject;
+      const actualProject = (await sut['getByAccountId']('accountId')) as ClaimedGitProject;
 
       // Assert
       expect(actualProject.claimed).toBe(true);
       expect(actualProject.source).toBe(projectMetadata.source);
       expect(actualProject.repoDriverAccount.driver).toBe('repo');
-      expect(actualProject.repoDriverAccount.userId).toBe('userId');
+      expect(actualProject.repoDriverAccount.accountId).toBe('accountId');
       expect(actualProject.owner.driver).toBe('address');
-      expect(actualProject.owner.userId).toBe('userId');
+      expect(actualProject.owner.accountId).toBe('accountId');
       expect(actualProject.owner.address).toBe(ownerAddress);
       expect(actualProject.splits.maintainers).toStrictEqual([
         {
@@ -212,7 +212,7 @@ describe('GitProjectService', () => {
           account: {
             address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             driver: 'address',
-            userId: '875267609686611184008791658115888920329297355417',
+            accountId: '875267609686611184008791658115888920329297355417',
           },
         },
       ]);
@@ -221,7 +221,7 @@ describe('GitProjectService', () => {
           weight: 500000,
           account: {
             driver: 'repo',
-            userId: '1235',
+            accountId: '1235',
           },
           source: {
             forge: 'github',
@@ -245,7 +245,7 @@ describe('GitProjectService', () => {
 
       // Act & Assert
       expect(() =>
-        sut['_verifySubgraphAndOnChainStateIsInSync'](isClaimed, repoAccount, 'userId'),
+        sut['_verifySubgraphAndOnChainStateIsInSync'](isClaimed, repoAccount, 'accountId'),
       ).toThrow();
     });
 
@@ -259,7 +259,7 @@ describe('GitProjectService', () => {
 
       // Act & Assert
       expect(() =>
-        sut['_verifySubgraphAndOnChainStateIsInSync'](isClaimed, repoAccount, 'userId'),
+        sut['_verifySubgraphAndOnChainStateIsInSync'](isClaimed, repoAccount, 'accountId'),
       ).toThrow();
     });
   });

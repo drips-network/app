@@ -6,18 +6,18 @@ import { getSubgraphClient } from '../get-drips-clients';
 
 /**
  * Fetch splits for a given user ID, and map to representational splits for the `Splits` component.
- * @param userId The user ID to build representational splits for.
+ * @param accountId The user ID to build representational splits for.
  * @returns Representational splits.
  */
-export async function getRepresentationalSplitsForAccount(userId: string) {
+export async function getRepresentationalSplitsForAccount(accountId: string) {
   const subgraph = getSubgraphClient();
 
-  const splits = await subgraph.getSplitsConfigByUserId(userId);
+  const splits = await subgraph.getSplitsConfigByAccountId(accountId);
 
   return await buildRepresentationalSplits(
     splits.map((s) => ({
       account: {
-        userId: s.userId,
+        accountId: s.accountId,
       },
       weight: Number(s.weight),
     })),
@@ -30,17 +30,17 @@ export async function getRepresentationalSplitsForAccount(userId: string) {
  * @returns The mapped representational splits for `Splits` component.
  */
 export async function buildRepresentationalSplits(
-  splits: { account: { userId: string }; weight: number }[],
+  splits: { account: { accountId: string }; weight: number }[],
 ): Promise<RepresentationalSplit[]> {
   const gitProjectService = await GitProjectService.new();
 
   const promises = splits.map((s) =>
     (async () => {
-      const splitType = Utils.UserId.getDriver(s.account.userId);
+      const splitType = Utils.AccountId.getDriver(s.account.accountId);
 
       if (splitType === 'repo') {
-        const project = await gitProjectService.getByUserId(s.account.userId);
-        assert(project, `Unable to locate RepoDriver account with user ID ${s.account.userId}`);
+        const project = await gitProjectService.getByAccountId(s.account.accountId);
+        assert(project, `Unable to locate RepoDriver account with user ID ${s.account.accountId}`);
 
         return {
           type: 'project-split',
@@ -50,7 +50,7 @@ export async function buildRepresentationalSplits(
       } else {
         return {
           type: 'address-split',
-          address: AddressDriverClient.getUserAddress(s.account.userId),
+          address: AddressDriverClient.getUserAddress(s.account.accountId),
           weight: s.weight,
         } as Split;
       }

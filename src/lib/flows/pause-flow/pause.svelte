@@ -19,14 +19,14 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const { dripsUserId, address } = $wallet;
-          assert(dripsUserId && address);
+          const { dripsAccountId, address } = $wallet;
+          assert(dripsAccountId && address);
 
           const addressDriverClient = await getAddressDriverClient();
 
           const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
-          const ownAccount = $streams.accounts[dripsUserId];
+          const ownAccount = $streams.accounts[dripsAccountId];
           assert(ownAccount, "App hasn't yet fetched user's own account");
 
           const assetConfig = ownAccount.assetConfigs.find(
@@ -38,7 +38,7 @@
             stream.paused
               ? undefined
               : {
-                  userId: stream.receiver.userId,
+                  accountId: stream.receiver.accountId,
                   config: stream.streamConfig.raw,
                 },
           );
@@ -46,7 +46,7 @@
           const newStreams = assetConfig.streams.filter((s) => s.id !== stream.id);
 
           const newReceivers = newStreams.map((stream) => ({
-            userId: stream.receiver.userId,
+            accountId: stream.receiver.accountId,
             config: stream.streamConfig.raw,
           }));
 

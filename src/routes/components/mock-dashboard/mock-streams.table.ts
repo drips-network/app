@@ -15,7 +15,7 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
     to: {
       address: '0x60FC49f9639468e892359Ad8D2B95F31c6E85736',
       driver: 'address',
-      userId: '1234',
+      accountId: '1234',
     },
     toAddress: '0x60FC49f9639468e892359Ad8D2B95F31c6E85736',
     amount: {
@@ -48,7 +48,7 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
     to: {
       address: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
       driver: 'address',
-      userId: '1234',
+      accountId: '1234',
     },
     toAddress: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
     amount: {
@@ -82,7 +82,7 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
     to: {
       address: '0x8fAcf07E6101ed99986C2FA5d594354b776c7088',
       driver: 'address',
-      userId: '1234',
+      accountId: '1234',
     },
     amount: {
       amount: {

@@ -40,10 +40,10 @@ describe('NftDriverMetadataManager', () => {
       // Arrange
       const expectedAccount = {
         driver: 'nft',
-        userId: '1',
+        accountId: '1',
         owner: {
           address: '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a',
-          userId: '1245',
+          accountId: '1245',
           driver: 'address',
         },
       } as NFTDriverAccount;
@@ -62,9 +62,9 @@ describe('NftDriverMetadataManager', () => {
       const metadataMgr = new NftDriverMetadataManager();
 
       // Act & Assert
-      await expect(metadataMgr.fetchAccount(expectedAccount.userId)).rejects.toThrowError();
+      await expect(metadataMgr.fetchAccount(expectedAccount.accountId)).rejects.toThrowError();
       expect(subgraphClientMock.getNftSubAccountOwnerByTokenId).toHaveBeenCalledWith(
-        expectedAccount.userId,
+        expectedAccount.accountId,
       );
     });
 
@@ -72,10 +72,10 @@ describe('NftDriverMetadataManager', () => {
       // Arrange
       const expectedAccount = {
         driver: 'nft',
-        userId: '1',
+        accountId: '1',
         owner: {
           address: '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a',
-          userId: '1245',
+          accountId: '1245',
           driver: 'address',
         },
       } as NFTDriverAccount;
@@ -84,14 +84,14 @@ describe('NftDriverMetadataManager', () => {
         getNftSubAccountOwnerByTokenId: vi
           .fn(DripsSubgraphClient.prototype.getNftSubAccountOwnerByTokenId)
           .mockResolvedValue({
-            tokenId: expectedAccount.userId,
+            tokenId: expectedAccount.accountId,
             ownerAddress: expectedAccount.owner.address,
           }),
       } as unknown as DripsSubgraphClient;
       const addressDriverClientMock = {
-        getUserIdByAddress: vi
-          .fn(AddressDriverClient.prototype.getUserIdByAddress)
-          .mockResolvedValue(expectedAccount.owner.userId),
+        getAccountIdByAddress: vi
+          .fn(AddressDriverClient.prototype.getAccountIdByAddress)
+          .mockResolvedValue(expectedAccount.owner.accountId),
       };
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
@@ -100,13 +100,13 @@ describe('NftDriverMetadataManager', () => {
       const metadataMgr = new NftDriverMetadataManager();
 
       // Act
-      const account = await metadataMgr.fetchAccount(expectedAccount.userId);
+      const account = await metadataMgr.fetchAccount(expectedAccount.accountId);
 
       // Assert
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(account!).toEqual(expectedAccount);
       expect(subgraphClientMock.getNftSubAccountOwnerByTokenId).toHaveBeenCalledWith(
-        expectedAccount.userId,
+        expectedAccount.accountId,
       );
     });
   });
@@ -119,10 +119,10 @@ describe('NftDriverMetadataManager', () => {
       const context = {
         forAccount: {
           driver: 'nft',
-          userId: '1',
+          accountId: '1',
           owner: {
             address: '0x2902A95209dD88b9C7c379C824AF5B07D8C7Fc5a',
-            userId: '1245',
+            accountId: '1245',
             driver: 'address',
           },
         } as NFTDriverAccount,
@@ -136,7 +136,7 @@ describe('NftDriverMetadataManager', () => {
         driver: 'nft',
         describes: {
           driver: context.forAccount.driver,
-          userId: context.forAccount.userId,
+          accountId: context.forAccount.accountId,
         },
         isDripList: true,
       });

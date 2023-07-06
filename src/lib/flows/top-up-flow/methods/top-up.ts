@@ -43,8 +43,8 @@ export default function (
 
         const needApproval = tokenAllowance < amountToTopUp;
 
-        const ownUserId = (await client.getUserId()).toString();
-        const ownAccount = get(streams).accounts[ownUserId];
+        const ownAccountId = (await client.getAccountId()).toString();
+        const ownAccount = get(streams).accounts[ownAccountId];
         const assetConfig = ownAccount.assetConfigs.find(
           (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );
@@ -53,7 +53,7 @@ export default function (
           stream.paused
             ? undefined
             : {
-                userId: stream.receiver.userId,
+                accountId: stream.receiver.accountId,
                 config: stream.streamConfig.raw,
               },
         );

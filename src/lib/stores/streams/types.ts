@@ -1,16 +1,16 @@
-/** \<senderUserId\>-\<tokenAddress\>-\<dripId\> */
+/** \<senderAccountId\>-\<tokenAddress\>-\<dripId\> */
 export type StreamId = string;
-export type UserId = string;
+export type AccountId = string;
 
-export interface AddressDriverUser {
+export interface AddressDriverAccount {
   driver: 'address';
   address: string;
-  userId: UserId;
+  accountId: AccountId;
 }
 
-export interface NFTDriverUser {
+export interface NFTDriverAccount {
   driver: 'nft';
-  userId: UserId;
+  accountId: AccountId;
 }
 
 interface Amount {
@@ -36,8 +36,8 @@ export interface DripsConfig {
 
 export interface Stream {
   id: StreamId;
-  sender: AddressDriverUser;
-  receiver: AddressDriverUser | NFTDriverUser;
+  sender: AddressDriverAccount;
+  receiver: AddressDriverAccount | NFTDriverAccount;
   /** Initial stream settings, not taking into account a paused stream. */
   streamConfig: DripsConfig;
   paused: boolean;
@@ -61,7 +61,7 @@ export interface Receiver {
    * by an unknown third party application.
    */
   managed: boolean;
-  receiver: AddressDriverUser | NFTDriverUser;
+  receiver: AddressDriverAccount | NFTDriverAccount;
 }
 
 export interface AssetConfigHistoryItem {
@@ -86,7 +86,7 @@ export interface AssetConfig {
 }
 
 export interface Account {
-  user: AddressDriverUser;
+  user: AddressDriverAccount;
   name?: string;
   description?: string;
   emoji?: string;

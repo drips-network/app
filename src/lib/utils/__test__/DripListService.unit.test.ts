@@ -57,7 +57,7 @@ describe('DripListService', () => {
       getCurrentStreamsReceivers: vi.fn(DripsSubgraphClient.prototype.getCurrentStreamsReceivers),
     };
     addressDriverClientMock = {
-      getUserIdByAddress: vi.fn(AddressDriverClient.prototype.getUserIdByAddress),
+      getAccountIdByAddress: vi.fn(AddressDriverClient.prototype.getAccountIdByAddress),
     };
     getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
     getClient.getAddressDriverClient = vi.fn().mockImplementation(() => addressDriverClientMock);
@@ -71,7 +71,7 @@ describe('DripListService', () => {
     getClient.getCallerClient = vi.fn().mockImplementation(() => callerDriverClientMock);
 
     addressDriverClientMock = {
-      getUserIdByAddress: vi.fn(AddressDriverClient.prototype.getUserIdByAddress),
+      getAccountIdByAddress: vi.fn(AddressDriverClient.prototype.getAccountIdByAddress),
       signer: {
         getAddress: vi.fn(),
       },
@@ -87,13 +87,13 @@ describe('DripListService', () => {
     getClient.getNFTDriverClient = vi.fn().mockImplementation(() => nftDriverClientMock);
 
     repoDriverClientMock = {
-      getUserId: vi.fn(RepoDriverClient.prototype.getUserId),
+      getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId),
     };
     getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
     nftDriverTxFactoryMock = {
       setSplits: vi.fn(NFTDriverTxFactory.prototype.setSplits),
-      emitUserMetadata: vi.fn(NFTDriverTxFactory.prototype.emitUserMetadata),
+      emitAccountMetadata: vi.fn(NFTDriverTxFactory.prototype.emitAccountMetadata),
     };
     getClient.getNFTDriverTxFactory = vi.fn().mockImplementation(() => nftDriverTxFactoryMock);
 
@@ -127,7 +127,7 @@ describe('DripListService', () => {
       .mockImplementation(() => repoDriverMetadataManagerMock);
 
     gitProjectManagerMock = {
-      getByUserId: vi.fn(GitProjectService.default.prototype.getByUserId),
+      getByAccountId: vi.fn(GitProjectService.default.prototype.getByAccountId),
     };
     (GitProjectService.default.new as any) = vi
       .fn()
@@ -178,7 +178,7 @@ describe('DripListService', () => {
       ];
 
       subgraphClientMock.getNftSubAccountsByOwner.mockResolvedValue(ownerNftSubAccounts);
-      addressDriverClientMock.getUserIdByAddress.mockResolvedValue('1');
+      addressDriverClientMock.getAccountIdByAddress.mockResolvedValue('1');
 
       const nftSubAccountMetadata: {
         hash: string;
@@ -189,7 +189,7 @@ describe('DripListService', () => {
             isDripList: true,
             projects: [
               {
-                userId: 'tokenId1-1',
+                accountId: 'tokenId1-1',
                 weight: 1,
               },
             ],
@@ -233,8 +233,8 @@ describe('DripListService', () => {
         },
       } as unknown as State;
 
-      const repoDriverUserId = '1';
-      repoDriverClientMock.getUserId.mockResolvedValueOnce(repoDriverUserId);
+      const repoDriverAccountId = '1';
+      repoDriverClientMock.getAccountId.mockResolvedValueOnce(repoDriverAccountId);
 
       const dripListId = '1000';
       const listOwner = '0x123';
@@ -398,7 +398,7 @@ describe('DripListService', () => {
       const sut = await DripListService.new();
 
       nftDriverMetadataManagerMock.pinAccountMetadata.mockResolvedValueOnce('hash');
-      addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce('1');
+      addressDriverClientMock.getAccountIdByAddress.mockResolvedValueOnce('1');
 
       // Act
       const hash = await sut['_publishMetadataToIpfs']('1');
@@ -419,10 +419,12 @@ describe('DripListService', () => {
       const start = BigInt(100);
       const duration = BigInt(100);
       const amountPerSecond = BigInt(100);
-      const ownerAddressDriverUserId = '1';
+      const ownerAddressDriverAccountId = '1';
 
       addressDriverClientMock.signer.getAddress.mockResolvedValueOnce('0x000');
-      addressDriverClientMock.getUserIdByAddress.mockResolvedValueOnce(ownerAddressDriverUserId);
+      addressDriverClientMock.getAccountIdByAddress.mockResolvedValueOnce(
+        ownerAddressDriverAccountId,
+      );
 
       const setStreamTx = {} as unknown as PopulatedTransaction;
       addressDriverTxFactoryMock.setStreams.mockResolvedValue(setStreamTx);

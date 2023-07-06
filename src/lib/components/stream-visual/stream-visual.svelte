@@ -10,18 +10,18 @@
   import IdentityCard from '../identity-card/identity-card.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
 
-  interface AddressDriverUser {
+  interface AddressDriverAccount {
     driver: 'address';
     address: string;
   }
 
-  interface NFTDriverUser {
+  interface NFTDriverAccount {
     driver: 'nft';
-    userId: string;
+    accountId: string;
   }
 
-  export let from: AddressDriverUser | undefined = undefined;
-  export let to: NFTDriverUser | AddressDriverUser | undefined = undefined;
+  export let from: AddressDriverAccount | undefined = undefined;
+  export let to: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
   export let disableLinks = false;
   export let amountPerSecond: bigint | undefined = undefined;
   export let halted = false;
@@ -45,10 +45,10 @@
     return (amountPerSecond ?? 0n) * BigInt(multiplier);
   }
 
-  async function fetchDripList(userId: string) {
+  async function fetchDripList(accountId: string) {
     const service = await DripListService.new();
 
-    return service.getByTokenId(userId);
+    return service.getByTokenId(accountId);
   }
 </script>
 
@@ -65,7 +65,7 @@
     {#if to && to.driver === 'address'}
       <IdentityCard disableLink={disableLinks} address={to.address} title="To" />
     {:else if to && to.driver === 'nft'}
-      {#await fetchDripList(to.userId)}
+      {#await fetchDripList(to.accountId)}
         <IdentityCard loading />
       {:then result}
         {#if result}

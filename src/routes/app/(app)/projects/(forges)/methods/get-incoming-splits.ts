@@ -12,11 +12,11 @@ export interface SplitsEntryWrapper<T> {
   weight: number;
 }
 
-export default async function getIncomingSplits(projectUserId: string): Promise<{
+export default async function getIncomingSplits(projectAccountId: string): Promise<{
   users: SplitsEntryWrapper<{
     driver: 'address';
     address: string;
-    userId: string;
+    accountId: string;
   }>[];
   projects: SplitsEntryWrapper<GitProject>[];
   dripLists: SplitsEntryWrapper<DripList>[];
@@ -25,14 +25,14 @@ export default async function getIncomingSplits(projectUserId: string): Promise<
   const dripListService = await DripListService.new();
   const gitProjectService = await GitProjectService.new();
 
-  const incomingSplits = await subgraph.getSplitEntriesByReceiverUserId(projectUserId);
+  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(projectAccountId);
 
   const incomingAddressDriverSplits = incomingSplits.filter(
-    (s) => Utils.UserId.getDriver(s.senderId) === 'address',
+    (s) => Utils.AccountId.getDriver(s.senderId) === 'address',
   );
 
   const incomingNFTDriverSplits = incomingSplits.filter(
-    (s) => Utils.UserId.getDriver(s.senderId) === 'nft',
+    (s) => Utils.AccountId.getDriver(s.senderId) === 'nft',
   );
   const dripListFetches = incomingNFTDriverSplits.map(async (s) => {
     const dripList = await dripListService.getByTokenId(s.senderId);
@@ -42,11 +42,11 @@ export default async function getIncomingSplits(projectUserId: string): Promise<
   });
 
   const incomingRepoDriverSplits = incomingSplits.filter(
-    (s) => Utils.UserId.getDriver(s.senderId) === 'repo',
+    (s) => Utils.AccountId.getDriver(s.senderId) === 'repo',
   );
 
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
-    const gitProject = await gitProjectService.getByUserId(s.senderId);
+    const gitProject = await gitProjectService.getByAccountId(s.senderId);
     if (!gitProject) return undefined;
 
     return { value: gitProject, weight: Number(s.weight) };
@@ -63,7 +63,7 @@ export default async function getIncomingSplits(projectUserId: string): Promise<
       value: {
         address: AddressDriverClient.getUserAddress(s.senderId),
         driver: 'address',
-        userId: s.senderId,
+        accountId: s.senderId,
       },
     })),
     projects: mapFilterUndefined(fetchResults[1], (v) => v as SplitsEntryWrapper<GitProject>),

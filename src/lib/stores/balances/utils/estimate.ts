@@ -1,9 +1,9 @@
 import type {
   Account,
-  AddressDriverUser,
+  AddressDriverAccount,
   AssetConfig,
   AssetConfigHistoryItem,
-  NFTDriverUser,
+  NFTDriverAccount,
   Receiver,
   StreamId,
 } from '$lib/stores/streams/types';
@@ -17,8 +17,8 @@ export interface StreamEstimate {
   totalStreamed: bigint;
   currentAmountPerSecond: bigint;
   runsOutOfFunds?: Date;
-  receiver: NFTDriverUser | AddressDriverUser;
-  sender: AddressDriverUser;
+  receiver: NFTDriverAccount | AddressDriverAccount;
+  sender: AddressDriverAccount;
   tokenAddress: string;
 }
 
@@ -64,7 +64,7 @@ export function estimateAccount(
 function buildAssetConfigEstimates(
   assetConfig: AssetConfig,
   currentCycle: Cycle,
-  user: AddressDriverUser,
+  user: AddressDriverAccount,
   excludingSqueezes: SqueezedStreamsEvent[],
 ): AssetConfigEstimates {
   /*
@@ -95,7 +95,7 @@ function buildAssetConfigEstimates(
 export function estimateAssetConfig(
   assetConfig: AssetConfig,
   window: TimeWindow,
-  user: AddressDriverUser,
+  user: AddressDriverAccount,
   excludingSqueezes: SqueezedStreamsEvent[] = [],
 ): AssetConfigEstimate {
   // Filter out any history items not relevant to the current time window.
@@ -166,7 +166,7 @@ function estimateHistoryItem(
   historyItem: AssetConfigHistoryItem,
   nextHistoryItem: AssetConfigHistoryItem,
   tokenAddress: string,
-  sender: AddressDriverUser,
+  sender: AddressDriverAccount,
   excludingSqueezes: SqueezedStreamsEvent[],
 ): AssetConfigEstimate {
   const streamEstimates = historyItem.streams.map((receiver) => {
@@ -206,7 +206,7 @@ function estimateHistoryItem(
 function streamedByStream(
   window: TimeWindow,
   receiver: Receiver,
-  sender: AddressDriverUser,
+  sender: AddressDriverAccount,
   historyItem: AssetConfigHistoryItem,
   excludingSqueezes: SqueezedStreamsEvent[],
   nextHistoryItem?: AssetConfigHistoryItem,
@@ -240,7 +240,7 @@ function streamedByStream(
 
   const squeezedAtBlockTimestamp = excludingSqueezes.find(
     (squeezeEvent) =>
-      squeezeEvent.senderId === sender.userId &&
+      squeezeEvent.senderId === sender.accountId &&
       squeezeEvent.streamsHistoryHashes.includes(historyItem.historyHash),
   )?.blockTimestamp;
   const squeezedAt: Millis | undefined = squeezedAtBlockTimestamp

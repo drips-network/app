@@ -4,7 +4,7 @@ import sortStreamsSetEvents from './sort-drips-set-events';
 
 interface DtreamReceiverSeenEvent {
   id: string;
-  receiverUserId: string;
+  receiverAccountId: string;
   config: bigint;
 }
 

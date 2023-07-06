@@ -25,26 +25,26 @@
   // TODO: Display the monthly stream amount on top of the list.
   // TODO: Add top up and withdraw buttons.
 
-  $: ownerUserId = dripList.account.owner.userId;
+  $: ownerAccountId = dripList.account.owner.accountId;
   $: supportStreams =
     $streamsStore &&
     streamsStore
-      .getStreamsForUser(ownerUserId)
-      .outgoing.filter((s) => s.receiver.userId === dripList.account.userId);
+      .getStreamsForUser(ownerAccountId)
+      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
 
   $: supportStream = supportStreams[0];
 
-  $: accountEstimate = $balancesStore.accounts[ownerUserId];
+  $: accountEstimate = $balancesStore.accounts[ownerAccountId];
   $: outgoingEstimate = supportStream
     ? accountEstimate?.tokens[supportStream.streamConfig.amountPerSecond.tokenAddress.toLowerCase()]
     : undefined;
 
-  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.userId);
+  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 
   let loadingSupportStream = true;
   onMount(async () => {
-    if (!$streamsStore.accounts[ownerUserId]) {
-      await streamsStore.fetchAccount(ownerUserId);
+    if (!$streamsStore.accounts[ownerAccountId]) {
+      await streamsStore.fetchAccount(ownerAccountId);
     }
 
     loadingSupportStream = false;
@@ -54,7 +54,7 @@
     modal.show(
       Stepper,
       undefined,
-      editDripListSteps(dripList.account.userId, representationalSplits),
+      editDripListSteps(dripList.account.accountId, representationalSplits),
     );
   }
 </script>
