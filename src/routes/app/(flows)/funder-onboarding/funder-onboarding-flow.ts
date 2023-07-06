@@ -20,16 +20,14 @@ export interface State {
   };
   supportConfig: {
     listSelected: string[];
-    streamRateValue: string;
     streamRateValueParsed?: bigint | undefined;
-    topUpAmountValue: string;
     topUpAmountValueParsed?: bigint | undefined;
   };
 }
 
 export const state = writable<State>({
   dripList: { title: 'My Drip List', percentages: {}, items: {}, selected: [] },
-  supportConfig: { listSelected: [], streamRateValue: '', topUpAmountValue: '' },
+  supportConfig: { listSelected: [] },
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {

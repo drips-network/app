@@ -56,7 +56,7 @@ export function reconcileDripsSetReceivers(
     };
   }, {});
 
-  return sortedDripsSetEvents.reduce<DripsSetEventWithFullReceivers[]>(
+  const result = sortedDripsSetEvents.reduce<DripsSetEventWithFullReceivers[]>(
     (acc, dripsSetEvent) => [
       ...acc,
       {
@@ -66,4 +66,6 @@ export function reconcileDripsSetReceivers(
     ],
     [],
   );
+
+  return result;
 }

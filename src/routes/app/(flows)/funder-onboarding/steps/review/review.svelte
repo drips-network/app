@@ -176,12 +176,23 @@
       <ul>
         <UlIconLi icon={TransactionsIcon}
           ><span class="typo-text-bold"
-            >{$context.supportConfig.topUpAmountValue}
+            >{formatTokenAmount(
+              topUpAmountValueParsed ?? unreachable(),
+              token.info.decimals,
+              1n,
+              false,
+            )}
             {token.info.symbol} will be transferred from your wallet into your Drips account</span
           >
           and immediately begin streaming to your Drip List recipients at a rate of
           <span class="typo-text-bold"
-            >{$context.supportConfig.streamRateValue} {token.info.symbol} per month</span
+            >{formatTokenAmount(
+              streamRateValueParsed ?? unreachable(),
+              token.info.decimals,
+              undefined,
+              false,
+            )}
+            {token.info.symbol} per month</span
           >.</UlIconLi
         >
         <UlIconLi icon={ListIcon}

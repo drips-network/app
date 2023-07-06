@@ -18,6 +18,8 @@
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
+  import editDripListStreamSteps from '$lib/flows/edit-drip-list-stream/edit-drip-list-stream-steps';
+  import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
 
@@ -79,10 +81,20 @@
       <h4>Continuous support</h4>
       {#if isOwnList}
         {#if supportStream}
-          <!-- TODO: Add handler -->
-          <Button icon={TokenStreams}>Edit stream</Button>
+          <Button
+            icon={TokenStreams}
+            on:click={() =>
+              modal.show(Stepper, undefined, editDripListStreamSteps(dripList.account.userId))}
+            >Edit stream</Button
+          >
         {:else}
-          <Button icon={TokenStreams} variant="primary">Support your Drip List</Button>
+          <Button
+            icon={TokenStreams}
+            variant="primary"
+            on:click={() =>
+              modal.show(Stepper, undefined, createDripListStreamSteps(dripList.account.userId))}
+            >Support your Drip List</Button
+          >
         {/if}
       {/if}
     </div>

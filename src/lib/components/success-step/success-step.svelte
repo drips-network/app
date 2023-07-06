@@ -5,17 +5,20 @@
   import StepHeader from '../step-header/step-header.svelte';
   import StepLayout from '../step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '../stepper/types';
+  import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let message: string | (() => string);
-  export let action: 'close' | 'continue' = 'close';
+  export let action: 'close' | 'hide-modal' | 'continue' = 'close';
 
   export let safeAppMode = false;
 
   function handleConfirm() {
     if (action === 'continue') {
       dispatch('goForward');
+    } else if (action === 'hide-modal') {
+      modal.hide();
     } else {
       dispatch('conclude');
     }
