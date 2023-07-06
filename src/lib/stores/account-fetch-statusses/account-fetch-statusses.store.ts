@@ -2,12 +2,12 @@ import tuple from '$lib/utils/tuple';
 import { derived } from 'svelte/store';
 import balances from '../balances';
 import streams from '../streams';
-import type { UserId } from '../streams/types';
+import type { AccountId } from '../streams/types';
 
 export type AccountFetchStatus = 'fetching' | 'error' | 'fetched';
 
 type State = {
-  [key: UserId]: {
+  [key: AccountId]: {
     /** The fetch status from the `streams` store. */
     information: AccountFetchStatus;
     /** The fetch status from the `balances` store. */
@@ -37,19 +37,19 @@ type State = {
 const store = derived<[typeof streams.fetchStatusses, typeof balances.fetchStatusses], State>(
   [streams.fetchStatusses, balances.fetchStatusses],
   ([streamsFetchStatusses, balancesFetchStauses]) => {
-    const allUserIds = [
+    const allAccountIds = [
       Object.keys(streamsFetchStatusses),
       Object.keys(balancesFetchStauses),
     ].flat();
 
     const newState: State = {};
 
-    for (const userId of allUserIds) {
+    for (const accountId of allAccountIds) {
       let overallStatus: AccountFetchStatus;
 
       const fetchStauses = tuple(
-        streamsFetchStatusses[userId] ?? 'fetching',
-        balancesFetchStauses[userId] ?? 'fetching',
+        streamsFetchStatusses[accountId] ?? 'fetching',
+        balancesFetchStauses[accountId] ?? 'fetching',
       );
 
       if (fetchStauses.filter((s) => s === 'fetched').length === 2) {
@@ -62,7 +62,7 @@ const store = derived<[typeof streams.fetchStatusses, typeof balances.fetchStatu
         overallStatus = 'fetching';
       }
 
-      newState[userId] = {
+      newState[accountId] = {
         information: fetchStauses[0],
         balances: fetchStauses[1],
         all: overallStatus,

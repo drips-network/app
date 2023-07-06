@@ -12,7 +12,7 @@
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade, fly } from 'svelte/transition';
-  import decodeUserId from '$lib/utils/decode-user-id';
+  import decodeAccountId from '$lib/utils/decode-user-id';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
@@ -20,9 +20,9 @@
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
 
-  $: userId = $page.params.userId;
+  $: accountId = $page.params.accountId;
 
-  let dripsUserId: string | undefined;
+  let dripsAccountId: string | undefined;
   let address: string | undefined;
   let error: Error | undefined;
 
@@ -69,10 +69,10 @@
 
   onMount(async () => {
     try {
-      const decodedUserId = await decodeUserId(userId);
+      const decodedAccountId = await decodeAccountId(accountId);
 
-      address = decodedUserId.address;
-      dripsUserId = decodedUserId.dripsUserId;
+      address = decodedAccountId.address;
+      dripsAccountId = decodedAccountId.dripsAccountId;
     } catch (e) {
       error = e instanceof Error ? e : new Error();
     }
@@ -87,9 +87,9 @@
     return socialLinks.includes(input as (typeof socialLinks)[number]);
   }
 
-  async function fetchRequestedAccount(userId: string) {
+  async function fetchRequestedAccount(accountId: string) {
     try {
-      await streams.fetchAccount(userId);
+      await streams.fetchAccount(accountId);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -97,7 +97,7 @@
     }
   }
 
-  $: dripsUserId && fetchRequestedAccount(dripsUserId);
+  $: dripsAccountId && fetchRequestedAccount(dripsAccountId);
 
   function getDripsV1Url(address: string, ensName?: string) {
     return `https://app.v1.drips.network/${ensName ?? address}`;
@@ -105,7 +105,7 @@
 </script>
 
 <svelte:head>
-  <title>{(address && $ens[address]?.name) ?? address ?? userId} | Drips</title>
+  <title>{(address && $ens[address]?.name) ?? address ?? accountId} | Drips</title>
   <meta name="description" content="Drips User Profile" />
 </svelte:head>
 
@@ -154,8 +154,8 @@
       <ProjectsSection {address} />
       <DripListsSection {address} />
     {/if}
-    <Balances userId={dripsUserId} />
-    <Streams userId={dripsUserId} />
+    <Balances accountId={dripsAccountId} />
+    <Streams accountId={dripsAccountId} />
     <TransitionedHeight>
       {#if address && !$dismissablesStore.includes('profile-drips-v1')}
         <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>

@@ -34,9 +34,9 @@
   let loading = true;
 
   $: {
-    const { dripsUserId } = $wallet;
+    const { dripsAccountId } = $wallet;
 
-    if (dripsUserId && $accountFetchStatussesStore[dripsUserId]?.all !== 'fetched') {
+    if (dripsAccountId && $accountFetchStatussesStore[dripsAccountId]?.all !== 'fetched') {
       loading = true;
     } else {
       loading = false;
@@ -50,7 +50,7 @@
     $streams;
     $tokens;
     if (!loading) {
-      updateSearchItems($wallet.dripsUserId);
+      updateSearchItems($wallet.dripsAccountId);
       results = search(searchTerm);
     }
   }

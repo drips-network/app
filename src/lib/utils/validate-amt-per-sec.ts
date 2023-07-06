@@ -2,7 +2,7 @@ import { constants } from 'radicle-drips';
 import type { TextInputValidationState } from 'radicle-design-system/TextInput';
 
 /**
- * Constant representation of DripsHub's cycle_secs value. This value
+ * Constant representation of Drips's cycle_secs value. This value
  * is immutable per deployment, so only needs to be changed when pointing
  * the app at a new deployment.
  *

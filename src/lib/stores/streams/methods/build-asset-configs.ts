@@ -1,7 +1,7 @@
 import { AddressDriverClient, constants, Utils } from 'radicle-drips';
 import type { z } from 'zod';
 import type {
-  AddressDriverUser,
+  AddressDriverAccount,
   AssetConfig,
   AssetConfigHistoryItem,
   DripsConfig,
@@ -11,7 +11,7 @@ import type {
 import makeStreamId from './make-stream-id';
 import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
-import type { DripsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
+import type { StreamsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
 import type {
   addressDriverAccountMetadataSchema,
   assetConfigMetadataSchema,
@@ -20,7 +20,7 @@ import buildStreamReceiver from './build-stream-receiver';
 
 function mapReceiverToStream(
   receiver: Receiver,
-  senderUserId: string,
+  senderAccountId: string,
   tokenAddress: string,
   assetConfigMetadata?: z.infer<typeof assetConfigMetadataSchema>,
 ): Stream {
@@ -29,8 +29,8 @@ function mapReceiverToStream(
   );
   const initialDripsConfig = streamMetadata?.initialDripsConfig;
 
-  const dripsConfig: DripsConfig | undefined =
-    receiver.dripsConfig ||
+  const streamConfig: DripsConfig | undefined =
+    receiver.streamConfig ||
     (initialDripsConfig && {
       dripId: initialDripsConfig.dripId,
       raw: BigInt(initialDripsConfig.raw),
@@ -47,20 +47,20 @@ function mapReceiverToStream(
     });
 
   assert(
-    dripsConfig,
-    'Both stream metadata and on-chain data cannot have an undefined dripsConfig',
+    streamConfig,
+    'Both stream metadata and on-chain data cannot have an undefined streamConfig',
   );
 
   return {
     id: receiver.streamId,
     sender: {
       driver: 'address',
-      userId: senderUserId,
-      address: AddressDriverClient.getUserAddress(senderUserId),
+      accountId: senderAccountId,
+      address: AddressDriverClient.getUserAddress(senderAccountId),
     },
     receiver: receiver.receiver,
-    dripsConfig,
-    paused: !receiver.dripsConfig,
+    streamConfig,
+    paused: !receiver.streamConfig,
     managed: Boolean(streamMetadata),
     name: streamMetadata?.name,
     description: streamMetadata?.description,
@@ -69,61 +69,59 @@ function mapReceiverToStream(
 }
 
 /**
- * Given accountMetadata and on-chain dripsSetEvents, construct an object describing
+ * Given accountMetadata and on-chain streamsSetEvents, construct an object describing
  * the account, including the full history of all its assetConfigs, with on-chain receivers
  * matched onto IPFS stream metadata.
- * @param userId The userId to build assetConfigs for.
+ * @param accountId The accountId to build assetConfigs for.
  * @param accountMetadata The metadata for the given account fetched from IPFS.
- * @param dripsSetEvents The on-chain history of dripsSetEvents for the given account.
+ * @param streamsSetEvents The on-chain history of streamsSetEvents for the given account.
  * @returns The constructed Account object.
- * @throw An error if an assetConfig exists in metadata that no dripsSet events exist for.
+ * @throw An error if an assetConfig exists in metadata that no streamsSet events exist for.
  * @throw An error if any of the receivers existing onChain match multiple streams described
  * in metadata.
  */
 export default function buildAssetConfigs(
-  userId: string,
+  accountId: string,
   accountMetadata: z.infer<typeof addressDriverAccountMetadataSchema> | undefined,
-  dripsSetEvents: { [tokenAddress: string]: DripsSetEventWithFullReceivers[] },
+  streamsSetEvents: { [tokenAddress: string]: StreamsSetEventWithFullReceivers[] },
 ) {
-  return Object.entries(dripsSetEvents).reduce<AssetConfig[]>(
-    (acc, [tokenAddress, assetConfigDripsSetEvents]) => {
+  return Object.entries(streamsSetEvents).reduce<AssetConfig[]>(
+    (acc, [tokenAddress, assetConfigStreamsSetEvents]) => {
       const assetConfigMetadata = accountMetadata?.assetConfigs.find(
         (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
       );
 
       assert(
-        assetConfigDripsSetEvents && assetConfigDripsSetEvents.length > 0,
-        `Unable to find dripsSet events for asset config with token address ${tokenAddress}`,
+        assetConfigStreamsSetEvents && assetConfigStreamsSetEvents.length > 0,
+        `Unable to find streamsSet events for asset config with token address ${tokenAddress}`,
       );
 
       const assetConfigHistoryItems: AssetConfigHistoryItem[] = [];
 
-      for (const dripsSetEvent of assetConfigDripsSetEvents) {
+      for (const streamsSetEvent of assetConfigStreamsSetEvents) {
         const assetConfigHistoryItemStreams: Receiver[] = [];
 
         const remainingStreamIds =
           assetConfigMetadata?.streams.map((stream) =>
-            makeStreamId(userId, tokenAddress, stream.initialDripsConfig.dripId),
+            makeStreamId(accountId, tokenAddress, stream.initialDripsConfig.dripId),
           ) ?? [];
 
-        for (const dripsReceiverSeenEvent of dripsSetEvent.currentReceivers) {
+        for (const streamReceiverSeenEvent of streamsSetEvent.currentReceivers) {
           const matchingStream = matchMetadataStreamToReceiver(
-            dripsReceiverSeenEvent,
+            streamReceiverSeenEvent,
             assetConfigMetadata?.streams ?? [],
           );
 
-          const eventConfig = Utils.DripsReceiverConfiguration.fromUint256(
-            dripsReceiverSeenEvent.config,
-          );
+          const eventConfig = Utils.StreamConfiguration.fromUint256(streamReceiverSeenEvent.config);
 
-          const streamId = makeStreamId(userId, tokenAddress, eventConfig.dripId.toString());
+          const streamId = makeStreamId(accountId, tokenAddress, eventConfig.dripId.toString());
 
-          const receiver = buildStreamReceiver(dripsReceiverSeenEvent.receiverUserId);
+          const receiver = buildStreamReceiver(streamReceiverSeenEvent.receiverAccountId);
 
           assetConfigHistoryItemStreams.push({
             streamId,
-            dripsConfig: {
-              raw: dripsReceiverSeenEvent.config,
+            streamConfig: {
+              raw: streamReceiverSeenEvent.config,
               startDate:
                 eventConfig.start > 0n ? new Date(Number(eventConfig.start) * 1000) : undefined,
               amountPerSecond: {
@@ -137,13 +135,14 @@ export default function buildAssetConfigs(
             receiver,
           });
 
-          if (remainingStreamIds.includes(streamId))
+          if (remainingStreamIds.includes(streamId)) {
             remainingStreamIds.splice(remainingStreamIds.indexOf(streamId), 1);
+          }
         }
 
         /*
-        If a particular stream doesn't appear within dripsReceiverSeenEvents of a given
-        dripsSet event, but did at least once before, we can assume it is paused.
+        If a particular stream doesn't appear within streamReceiverSeenEvents of a given
+        streamsSet event, but did at least once before, we can assume it is paused.
         */
         for (const remainingStreamId of remainingStreamIds) {
           const stream = assetConfigMetadata?.streams.find(
@@ -158,12 +157,12 @@ export default function buildAssetConfigs(
           if (streamExistedBefore) {
             assetConfigHistoryItemStreams.push({
               streamId: remainingStreamId,
-              // Undefined dripsConfig == stream was paused
-              dripsConfig: undefined,
+              // Undefined streamConfig == stream was paused
+              streamConfig: undefined,
               managed: true,
               receiver: {
-                ...(stream.receiver as AddressDriverUser),
-                address: AddressDriverClient.getUserAddress(stream.receiver.userId),
+                ...(stream.receiver as AddressDriverAccount),
+                address: AddressDriverClient.getUserAddress(stream.receiver.accountId),
               },
             });
           }
@@ -172,24 +171,24 @@ export default function buildAssetConfigs(
         let runsOutOfFunds: Date | undefined;
 
         // If maxEnd is the largest possible timestamp, all current streams end before balance is depleted.
-        if (dripsSetEvent.maxEnd === 2n ** 32n - 1n) {
+        if (streamsSetEvent.maxEnd === 2n ** 32n - 1n) {
           runsOutOfFunds = undefined;
-        } else if (dripsSetEvent.maxEnd === 0n) {
+        } else if (streamsSetEvent.maxEnd === 0n) {
           runsOutOfFunds = undefined;
         } else {
-          runsOutOfFunds = new Date(Number(dripsSetEvent.maxEnd) * 1000);
+          runsOutOfFunds = new Date(Number(streamsSetEvent.maxEnd) * 1000);
         }
 
         assetConfigHistoryItems.push({
-          timestamp: new Date(Number(dripsSetEvent.blockTimestamp) * 1000),
+          timestamp: new Date(Number(streamsSetEvent.blockTimestamp) * 1000),
           balance: {
             tokenAddress: tokenAddress,
-            amount: dripsSetEvent.balance * BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+            amount: streamsSetEvent.balance * BigInt(constants.AMT_PER_SEC_MULTIPLIER),
           },
           runsOutOfFunds,
           streams: assetConfigHistoryItemStreams,
-          historyHash: dripsSetEvent.dripsHistoryHash,
-          receiversHash: dripsSetEvent.receiversHash,
+          historyHash: streamsSetEvent.streamsHistoryHash,
+          receiversHash: streamsSetEvent.receiversHash,
         });
       }
 
@@ -198,7 +197,7 @@ export default function buildAssetConfigs(
       acc.push({
         tokenAddress: tokenAddress,
         streams: currentStreams.map((receiver) =>
-          mapReceiverToStream(receiver, userId, tokenAddress, assetConfigMetadata),
+          mapReceiverToStream(receiver, accountId, tokenAddress, assetConfigMetadata),
         ),
         history: assetConfigHistoryItems,
       });

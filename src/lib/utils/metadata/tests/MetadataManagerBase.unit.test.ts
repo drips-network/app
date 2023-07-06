@@ -39,21 +39,21 @@ describe('MetadataManagerBase', () => {
     vi.restoreAllMocks();
   });
 
-  describe('fetchMetadataHashByUserId', () => {
+  describe('fetchMetadataHashByAccountId', () => {
     it('should fetch metadata hash', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
       const expectedMetadata = {
         id: '1',
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: 'QmX',
-        userId: '1',
+        accountId: '1',
         lastUpdatedBlockTimestamp: 1n,
       };
 
       const subgraphClientMock = {
-        getLatestUserMetadata: vi
-          .fn(DripsSubgraphClient.prototype.getLatestUserMetadata)
+        getLatestAccountMetadata: vi
+          .fn(DripsSubgraphClient.prototype.getLatestAccountMetadata)
           .mockResolvedValue(expectedMetadata),
       } as unknown as DripsSubgraphClient;
       const getClient = await import('$lib/utils/get-drips-clients');
@@ -62,12 +62,12 @@ describe('MetadataManagerBase', () => {
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
 
       // Act
-      const metadataHash = await testMetadataManager.fetchMetadataHashByUserId(userId);
+      const metadataHash = await testMetadataManager.fetchMetadataHashByAccountId(accountId);
 
       // Assert
       expect(metadataHash).toEqual(expectedMetadata.value);
-      expect(subgraphClientMock.getLatestUserMetadata).toHaveBeenCalledWith(
-        userId,
+      expect(subgraphClientMock.getLatestAccountMetadata).toHaveBeenCalledWith(
+        accountId,
         MetadataManagerBase.USER_METADATA_KEY,
       );
     });
@@ -76,13 +76,13 @@ describe('MetadataManagerBase', () => {
   describe('fetchAccountMetadata', () => {
     it('should return the mocked metadata from localStorage when running in test mode', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
       const metadataHash = 'QmX';
 
-      const fetchMetadataHashByUserIdMock = vi
-        .fn(MetadataManagerBase.prototype.fetchMetadataHashByUserId)
+      const fetchMetadataHashByAccountIdMock = vi
+        .fn(MetadataManagerBase.prototype.fetchMetadataHashByAccountId)
         .mockResolvedValue(metadataHash);
-      MetadataManagerBase.prototype.fetchMetadataHashByUserId = fetchMetadataHashByUserIdMock;
+      MetadataManagerBase.prototype.fetchMetadataHashByAccountId = fetchMetadataHashByAccountIdMock;
 
       const isTestMock = vi.fn(isTest).mockReturnValue(true);
       vi.mock('$lib/utils/is-test', () => ({
@@ -105,24 +105,24 @@ describe('MetadataManagerBase', () => {
           description: z.string().optional(),
           emoji: z.string().optional(),
         }),
-      ).fetchAccountMetadata(userId);
+      ).fetchAccountMetadata(accountId);
 
       // Assert
       expect(result).toEqual({ hash: metadataHash, data: expectedMetadata });
-      expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
+      expect(fetchMetadataHashByAccountIdMock).toHaveBeenCalledWith(accountId);
     });
 
     it('should return metadata when metadata hash is found and IPFS fetch is successful', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
       const metadataHash = 'QmX';
       const metadataSchema = z.string();
       const expectedMetadata = 'Sample metadata';
 
-      const fetchMetadataHashByUserIdMock = vi
-        .fn(MetadataManagerBase.prototype.fetchMetadataHashByUserId)
+      const fetchMetadataHashByAccountIdMock = vi
+        .fn(MetadataManagerBase.prototype.fetchMetadataHashByAccountId)
         .mockResolvedValue(metadataHash);
-      MetadataManagerBase.prototype.fetchMetadataHashByUserId = fetchMetadataHashByUserIdMock;
+      MetadataManagerBase.prototype.fetchMetadataHashByAccountId = fetchMetadataHashByAccountIdMock;
 
       const fetchIpfsMock = vi
         .fn()
@@ -130,29 +130,29 @@ describe('MetadataManagerBase', () => {
       vi.spyOn(fetchIpfs, 'fetchIpfs').mockImplementation(fetchIpfsMock);
 
       // Act
-      const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(userId);
+      const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(accountId);
 
       // Assert
       expect(result).toEqual({ hash: metadataHash, data: expectedMetadata });
-      expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
+      expect(fetchMetadataHashByAccountIdMock).toHaveBeenCalledWith(accountId);
       expect(fetchIpfsMock).toHaveBeenCalledWith(metadataHash);
     });
 
     it('should return null when metadata hash is not found', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
       const metadataSchema = z.string();
 
       const subgraphClientMock = {
-        getLatestUserMetadata: vi
-          .fn(DripsSubgraphClient.prototype.getLatestUserMetadata)
+        getLatestAccountMetadata: vi
+          .fn(DripsSubgraphClient.prototype.getLatestAccountMetadata)
           .mockResolvedValue(null as any),
       } as unknown as DripsSubgraphClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
 
       // Act
-      const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(userId);
+      const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(accountId);
 
       // Assert
       expect(result).toBeNull();
@@ -160,24 +160,24 @@ describe('MetadataManagerBase', () => {
 
     it('should return null when fetchIpfs throws an error', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
       const metadataHash = 'QmX';
       const metadataSchema = z.string();
 
-      const fetchMetadataHashByUserIdMock = vi
-        .fn(MetadataManagerBase.prototype.fetchMetadataHashByUserId)
+      const fetchMetadataHashByAccountIdMock = vi
+        .fn(MetadataManagerBase.prototype.fetchMetadataHashByAccountId)
         .mockResolvedValue(metadataHash);
-      MetadataManagerBase.prototype.fetchMetadataHashByUserId = fetchMetadataHashByUserIdMock;
+      MetadataManagerBase.prototype.fetchMetadataHashByAccountId = fetchMetadataHashByAccountIdMock;
 
       const fetchIpfsMock = vi.fn().mockRejectedValue(new Error('Error fetching IPFS data'));
       vi.spyOn(fetchIpfs, 'fetchIpfs').mockImplementation(fetchIpfsMock);
 
       // Act
-      const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(userId);
+      const result = await new TestMetadataManager(metadataSchema).fetchAccountMetadata(accountId);
 
       // Assert
       expect(result).toBeNull();
-      expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
+      expect(fetchMetadataHashByAccountIdMock).toHaveBeenCalledWith(accountId);
       expect(fetchIpfsMock).toHaveBeenCalledWith(metadataHash);
     });
   });
@@ -247,14 +247,14 @@ describe('MetadataManagerBase', () => {
   describe('updateAccountMetadata', () => {
     it('should update metadata when current metadata hash matches on-chain value', async () => {
       // Arrange
-      const userId = '1';
-      const newData = { describes: { userId }, key: 'test', value: 'value' };
+      const accountId = '1';
+      const newData = { describes: { accountId }, key: 'test', value: 'value' };
 
       const lastKnownHash = 'QmX';
-      const fetchMetadataHashByUserIdMock = vi
-        .fn(MetadataManagerBase.prototype.fetchMetadataHashByUserId)
+      const fetchMetadataHashByAccountIdMock = vi
+        .fn(MetadataManagerBase.prototype.fetchMetadataHashByAccountId)
         .mockResolvedValue(lastKnownHash);
-      MetadataManagerBase.prototype.fetchMetadataHashByUserId = fetchMetadataHashByUserIdMock;
+      MetadataManagerBase.prototype.fetchMetadataHashByAccountId = fetchMetadataHashByAccountIdMock;
 
       const originalPinAccountMetadata = TestMetadataManager.prototype.pinAccountMetadata;
       const pinAccountMetadataMock = vi
@@ -263,11 +263,11 @@ describe('MetadataManagerBase', () => {
       TestMetadataManager.prototype.pinAccountMetadata = pinAccountMetadataMock;
 
       const tx = {} as ContractTransaction;
-      const originalEmitUserMetadata = TestMetadataManager.prototype['emitUserMetadata'];
-      const emitUserMetadataMock = vi
-        .fn(TestMetadataManager.prototype['emitUserMetadata'])
+      const originalEmitAccountMetadata = TestMetadataManager.prototype['emitAccountMetadata'];
+      const emitAccountMetadataMock = vi
+        .fn(TestMetadataManager.prototype['emitAccountMetadata'])
         .mockResolvedValue(tx);
-      MetadataManagerBase.prototype['emitUserMetadata'] = emitUserMetadataMock;
+      MetadataManagerBase.prototype['emitAccountMetadata'] = emitAccountMetadataMock;
 
       // Act
       const result = await new TestMetadataManager(
@@ -277,22 +277,22 @@ describe('MetadataManagerBase', () => {
       // Assert
       expect(result.newHash).toEqual('newHash');
       expect(result.tx).toBeDefined();
-      expect(fetchMetadataHashByUserIdMock).toHaveBeenCalledWith(userId);
+      expect(fetchMetadataHashByAccountIdMock).toHaveBeenCalledWith(accountId);
       expect(pinAccountMetadataMock).toHaveBeenCalledWith(newData);
-      expect(emitUserMetadataMock).toHaveBeenCalledWith('newHash', userId);
+      expect(emitAccountMetadataMock).toHaveBeenCalledWith('newHash', accountId);
 
       TestMetadataManager.prototype.pinAccountMetadata = originalPinAccountMetadata;
-      TestMetadataManager.prototype['emitUserMetadata'] = originalEmitUserMetadata;
+      TestMetadataManager.prototype['emitAccountMetadata'] = originalEmitAccountMetadata;
     });
 
     it('should throw an error when current metadata hash does not match on-chain value', async () => {
-      const userId = '1';
-      const newData = { describes: { userId }, key: 'test', value: 'value' };
+      const accountId = '1';
+      const newData = { describes: { accountId }, key: 'test', value: 'value' };
 
       const lastKnownHash = 'QmX';
       const currentOnChainHash = 'QmY';
-      const fetchMetadataHashByUserIdMock = vi
-        .spyOn(MetadataManagerBase.prototype, 'fetchMetadataHashByUserId')
+      const fetchMetadataHashByAccountIdMock = vi
+        .spyOn(MetadataManagerBase.prototype, 'fetchMetadataHashByAccountId')
         .mockResolvedValue(currentOnChainHash);
 
       const instance = new TestMetadataManager(addressDriverAccountMetadataSchema);
@@ -302,17 +302,17 @@ describe('MetadataManagerBase', () => {
           'If your account was edited elsewhere previously, please refresh the page before making further changes.',
       );
 
-      fetchMetadataHashByUserIdMock.mockRestore();
+      fetchMetadataHashByAccountIdMock.mockRestore();
     });
   });
 
-  describe('emitUserMetadata', () => {
-    it('should call NFTDriverClient.emitUserMetadata when client has safeCreateAccount', async () => {
+  describe('emitAccountMetadata', () => {
+    it('should call NFTDriverClient.emitAccountMetadata when client has safeCreateAccount', async () => {
       // Arrange
       const clientMock = {
         safeCreateAccount: vi.fn(),
-        emitUserMetadata: vi
-          .fn(AddressDriverClient.prototype.emitUserMetadata)
+        emitAccountMetadata: vi
+          .fn(AddressDriverClient.prototype.emitAccountMetadata)
           .mockResolvedValue({} as ContractTransaction),
       } as unknown as AddressDriverClient;
       const originalGetClient = TestMetadataManager.prototype['getClient'];
@@ -323,13 +323,13 @@ describe('MetadataManagerBase', () => {
 
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
       const newHash = 'newHash';
-      const userId = '1';
+      const accountId = '1';
 
       // Act
-      const result = await testMetadataManager['emitUserMetadata'](newHash, userId);
+      const result = await testMetadataManager['emitAccountMetadata'](newHash, accountId);
 
       // Assert
-      expect(clientMock.emitUserMetadata).toHaveBeenCalledWith(userId, [
+      expect(clientMock.emitAccountMetadata).toHaveBeenCalledWith(accountId, [
         { key: MetadataManagerBase.USER_METADATA_KEY, value: newHash },
       ]);
       expect(result).toBeDefined();
@@ -337,12 +337,12 @@ describe('MetadataManagerBase', () => {
       TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
-    it('should call AddressDriverClient.emitUserMetadata when client has getUserId', async () => {
+    it('should call AddressDriverClient.emitAccountMetadata when client has getAccountId', async () => {
       // Arrange
       const clientMock = {
-        getUserId: vi.fn(),
-        emitUserMetadata: vi
-          .fn(AddressDriverClient.prototype.emitUserMetadata)
+        getAccountId: vi.fn(),
+        emitAccountMetadata: vi
+          .fn(AddressDriverClient.prototype.emitAccountMetadata)
           .mockResolvedValue({} as ContractTransaction),
       } as unknown as AddressDriverClient;
       const originalGetClient = TestMetadataManager.prototype['getClient'];
@@ -353,13 +353,13 @@ describe('MetadataManagerBase', () => {
 
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
       const newHash = 'newHash';
-      const userId = '1';
+      const accountId = '1';
 
       // Act
-      const result = await testMetadataManager['emitUserMetadata'](newHash, userId);
+      const result = await testMetadataManager['emitAccountMetadata'](newHash, accountId);
 
       // Assert
-      expect(clientMock.emitUserMetadata).toHaveBeenCalledWith([
+      expect(clientMock.emitAccountMetadata).toHaveBeenCalledWith([
         { key: MetadataManagerBase.USER_METADATA_KEY, value: newHash },
       ]);
       expect(result).toBeDefined();
@@ -367,12 +367,12 @@ describe('MetadataManagerBase', () => {
       TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
-    it('should call RepoDriverClient.emitUserMetadata when client has requestOwnerUpdate', async () => {
+    it('should call RepoDriverClient.emitAccountMetadata when client has requestOwnerUpdate', async () => {
       // Arrange
       const clientMock = {
         requestOwnerUpdate: vi.fn(),
-        emitUserMetadata: vi
-          .fn(AddressDriverClient.prototype.emitUserMetadata)
+        emitAccountMetadata: vi
+          .fn(AddressDriverClient.prototype.emitAccountMetadata)
           .mockResolvedValue({} as ContractTransaction),
       } as unknown as AddressDriverClient;
       const originalGetClient = TestMetadataManager.prototype['getClient'];
@@ -383,13 +383,13 @@ describe('MetadataManagerBase', () => {
 
       const testMetadataManager = new TestMetadataManager(repoDriverAccountMetadataSchema);
       const newHash = 'newHash';
-      const userId = '1';
+      const accountId = '1';
 
       // Act
-      const result = await testMetadataManager['emitUserMetadata'](newHash, userId);
+      const result = await testMetadataManager['emitAccountMetadata'](newHash, accountId);
 
       // Assert
-      expect(clientMock.emitUserMetadata).toHaveBeenCalledWith(userId, [
+      expect(clientMock.emitAccountMetadata).toHaveBeenCalledWith(accountId, [
         { key: MetadataManagerBase.USER_METADATA_KEY, value: newHash },
       ]);
       expect(result).toBeDefined();
@@ -397,11 +397,11 @@ describe('MetadataManagerBase', () => {
       TestMetadataManager.prototype['getClient'] = originalGetClient;
     });
 
-    it('should throw an error for unsupported client in emitUserMetadata', async () => {
+    it('should throw an error for unsupported client in emitAccountMetadata', async () => {
       // Arrange
       const clientMock = {
-        emitUserMetadata: vi
-          .fn(AddressDriverClient.prototype.emitUserMetadata)
+        emitAccountMetadata: vi
+          .fn(AddressDriverClient.prototype.emitAccountMetadata)
           .mockResolvedValue({} as ContractTransaction),
       } as unknown as AddressDriverClient;
       const originalGetClient = TestMetadataManager.prototype['getClient'];
@@ -412,10 +412,10 @@ describe('MetadataManagerBase', () => {
 
       const testMetadataManager = new TestMetadataManager(addressDriverAccountMetadataSchema);
       const newHash = 'newHash';
-      const userId = '1';
+      const accountId = '1';
 
       // Act & Assert
-      await expect(testMetadataManager['emitUserMetadata'](newHash, userId)).rejects.toThrow(
+      await expect(testMetadataManager['emitAccountMetadata'](newHash, accountId)).rejects.toThrow(
         'Unsupported client',
       );
 

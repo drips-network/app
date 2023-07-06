@@ -27,11 +27,11 @@
     guardConnected();
   }
 
-  $: userId = $walletStore.dripsUserId;
+  $: accountId = $walletStore.dripsAccountId;
 
   const splittableStore = deduplicateReadable(
     derived([balancesStore], ([balances]) => {
-      return userId ? balances.accounts[userId]?.splittable : undefined;
+      return accountId ? balances.accounts[accountId]?.splittable : undefined;
     }),
   );
 
@@ -57,8 +57,8 @@
 
   <div class="section">
     <SectionHeader icon={TokensIcon} label="Earnings" />
-    <SectionSkeleton initHeight={106} loaded={Boolean(userId && $splittableStore && cycle)}>
-      {#if userId && $splittableStore && cycle}
+    <SectionSkeleton initHeight={106} loaded={Boolean(accountId && $splittableStore && cycle)}>
+      {#if accountId && $splittableStore && cycle}
         <div class="earnings card">
           <div class="content">
             <div class="values">

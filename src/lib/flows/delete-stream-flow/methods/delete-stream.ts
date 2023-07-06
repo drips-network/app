@@ -24,16 +24,16 @@ export default function (
       before: async () => {
         const callerClient = await getCallerClient();
 
-        const { userId, address } = stream.sender;
-        const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+        const { accountId, address } = stream.sender;
+        const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
         const { signer } = get(walletStore);
         assert(signer);
 
-        const assetConfig = streams.getAssetConfig(userId, tokenAddress);
+        const assetConfig = streams.getAssetConfig(accountId, tokenAddress);
         assert(assetConfig, "App hasn't yet fetched the right asset config for this stream");
 
-        const ownAccount = get(streams).accounts[userId];
+        const ownAccount = get(streams).accounts[accountId];
         assert(assetConfig, "App hasn't yet fetched user's own account");
 
         const metadataMgr = new AddressDriverMetadataManager();
@@ -58,15 +58,15 @@ export default function (
           stream.paused
             ? undefined
             : {
-                userId: stream.receiver.userId,
-                config: stream.dripsConfig.raw,
+                accountId: stream.receiver.accountId,
+                config: stream.streamConfig.raw,
               },
         );
 
         const newReceivers = currentReceivers.filter(
           (r) =>
-            Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId.toString() !==
-            stream.dripsConfig.dripId,
+            Utils.StreamConfiguration.fromUint256(r.config).dripId.toString() !==
+            stream.streamConfig.dripId,
         );
 
         const { ADDRESS_DRIVER } = getNetworkConfig();
@@ -77,7 +77,7 @@ export default function (
           tokenAddress,
           currentReceivers,
           newReceivers,
-          userMetadata: [
+          accountMetadata: [
             {
               key: MetadataManagerBase.USER_METADATA_KEY,
               value: newHash,
@@ -90,7 +90,7 @@ export default function (
         return {
           callerClient,
           createStreamBatchPreset,
-          userId,
+          accountId,
           newHash,
         };
       },
@@ -108,7 +108,8 @@ export default function (
         await expect(
           streams.refreshUserAccount,
           () =>
-            get(streams).accounts[transactContext.userId].lastIpfsHash === transactContext.newHash,
+            get(streams).accounts[transactContext.accountId].lastIpfsHash ===
+            transactContext.newHash,
           5000,
           1000,
         );

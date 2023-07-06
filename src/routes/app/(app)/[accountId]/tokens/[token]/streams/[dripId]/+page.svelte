@@ -9,7 +9,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
   import balances from '$lib/stores/balances';
-  import decodeUserId from '$lib/utils/decode-user-id';
+  import decodeAccountId from '$lib/utils/decode-user-id';
   import unreachable from '$lib/utils/unreachable';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
   import tokens from '$lib/stores/tokens';
@@ -36,9 +36,9 @@
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import getStreamHistory from '$lib/utils/stream-history';
 
-  const { userId, token: tokenAddress, dripId } = $page.params;
+  const { accountId, token: tokenAddress, dripId } = $page.params;
 
-  let dripsUserId: string | undefined;
+  let dripsAccountId: string | undefined;
   let streamId: string | undefined;
   let error: 'invalid-id' | 'not-found' | 'unknown-token' | undefined;
   let loading = true;
@@ -47,15 +47,15 @@
 
   $: {
     $streams;
-    if (streamId && dripsUserId) {
+    if (streamId && dripsAccountId) {
       stream = streams.getStreamById(streamId);
     }
   }
 
   $: {
-    if (stream && dripsUserId && streamId) {
+    if (stream && dripsAccountId && streamId) {
       streamHistory = getStreamHistory(
-        streams.getAssetConfig(dripsUserId, tokenAddress) ?? unreachable(),
+        streams.getAssetConfig(dripsAccountId, tokenAddress) ?? unreachable(),
         streamId,
       );
     }
@@ -72,15 +72,15 @@
   }
 
   $: estimate = streamId ? $balances && balances.getEstimateByStreamId(streamId) : undefined;
-  $: streamScheduledStart = stream?.dripsConfig.startDate;
+  $: streamScheduledStart = stream?.streamConfig.startDate;
   $: streamCreated = streamHistory?.[0].timestamp;
   $: streamStartDate =
     stream && streamHistory
       ? new Date(streamScheduledStart ?? streamCreated ?? unreachable())
       : undefined;
   $: streamEndDate =
-    streamStartDate && stream?.dripsConfig.durationSeconds
-      ? new Date(streamStartDate.getTime() + stream?.dripsConfig.durationSeconds * 1000)
+    streamStartDate && stream?.streamConfig.durationSeconds
+      ? new Date(streamStartDate.getTime() + stream?.streamConfig.durationSeconds * 1000)
       : undefined;
 
   let streamState: StreamState | undefined;
@@ -91,8 +91,8 @@
       } else if (stream && streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
         streamState = 'ended';
       } else if (
-        stream?.dripsConfig.startDate &&
-        stream.dripsConfig.startDate.getTime() > new Date().getTime()
+        stream?.streamConfig.startDate &&
+        stream.streamConfig.startDate.getTime() > new Date().getTime()
       ) {
         streamState = 'scheduled';
       } else if (stream && estimate.currentAmountPerSecond === 0n) {
@@ -142,8 +142,8 @@
 
     try {
       token = tokens.getByAddress(tokenAddress) ?? unreachable();
-      dripsUserId = (await decodeUserId(userId)).dripsUserId;
-      streamId = makeStreamId(dripsUserId, tokenAddress, dripId);
+      dripsAccountId = (await decodeAccountId(accountId)).dripsAccountId;
+      streamId = makeStreamId(dripsAccountId, tokenAddress, dripId);
     } catch {
       error = 'invalid-id';
       return;
@@ -153,12 +153,12 @@
       stream = streams.getStreamById(streamId);
       if (stream) {
         streamHistory = getStreamHistory(
-          streams.getAssetConfig(userId, tokenAddress) ?? unreachable(),
+          streams.getAssetConfig(accountId, tokenAddress) ?? unreachable(),
           streamId,
         );
       }
 
-      await streams.fetchAccount(dripsUserId);
+      await streams.fetchAccount(dripsAccountId);
       stream = streams.getStreamById(streamId);
       assert(stream);
     } catch {
@@ -218,13 +218,13 @@
           <StreamStateBadge
             {streamId}
             paused={stream.paused}
-            senderId={stream.sender.userId}
-            durationSeconds={stream.dripsConfig.durationSeconds}
-            startDate={stream.dripsConfig.startDate}
+            senderId={stream.sender.accountId}
+            durationSeconds={stream.streamConfig.durationSeconds}
+            startDate={stream.streamConfig.startDate}
             {tokenAddress}
           />
         </div>
-        {#if checkIsUser(stream.sender.userId) && stream.managed}
+        {#if checkIsUser(stream.sender.accountId) && stream.managed}
           <div class="actions">
             {#if stream && !stream.paused}<Button
                 icon={PauseIcon}
@@ -260,7 +260,7 @@
       <StreamVisual
         from={stream.sender}
         to={stream.receiver}
-        amountPerSecond={stream.dripsConfig.amountPerSecond.amount}
+        amountPerSecond={stream.streamConfig.amountPerSecond.amount}
         tokenInfo={{
           symbol: token?.info.symbol ?? unreachable(),
           decimals: token?.info.decimals ?? unreachable(),
@@ -306,7 +306,7 @@
             <span class="value typo-text-mono">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
-                amount={$balances.accounts[dripsUserId ?? unreachable()].tokens[
+                amount={$balances.accounts[dripsAccountId ?? unreachable()].tokens[
                   tokenAddress.toLowerCase()
                 ].total.totals.remainingBalance}
               />

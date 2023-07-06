@@ -3,12 +3,14 @@ import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 
 /**
  * Fetches all funds previously split to this project.
- * @param projectUserId The project's user ID.
+ * @param projectAccountId The project's user ID.
  * @returns An array of amount objects, one for each previously-split token.
  */
-export default async function fetchEarnedFunds(projectUserId: string) {
+export default async function fetchEarnedFunds(projectAccountId: string) {
   const subgraphClient = getSubgraphClient();
-  const incomingSplitEvents = await subgraphClient.getSplitEventsByReceiverUserId(projectUserId);
+  const incomingSplitEvents = await subgraphClient.getSplitEventsByReceiverAccountId(
+    projectAccountId,
+  );
 
   return incomingSplitEvents.reduce<{ tokenAddress: string; amount: bigint }[]>((acc, curr) => {
     const address = Utils.Asset.getAddressFromId(curr.assetId);

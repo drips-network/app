@@ -31,7 +31,7 @@
       if (!canonicalDripList) return;
 
       representationalSplits = await getRepresentationalSplitsForAccount(
-        canonicalDripList.account.userId,
+        canonicalDripList.account.accountId,
       );
     } catch (e) {
       // eslint-disable-next-line no-console

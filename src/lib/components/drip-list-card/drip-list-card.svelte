@@ -27,26 +27,26 @@
   // TODO: Display the monthly stream amount on top of the list.
   // TODO: Add top up and withdraw buttons.
 
-  $: ownerUserId = dripList.account.owner.userId;
+  $: ownerAccountId = dripList.account.owner.accountId;
   $: supportStreams =
     $streamsStore &&
     streamsStore
-      .getStreamsForUser(ownerUserId)
-      .outgoing.filter((s) => s.receiver.userId === dripList.account.userId);
+      .getStreamsForUser(ownerAccountId)
+      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
 
   $: supportStream = supportStreams[0];
 
-  $: accountEstimate = $balancesStore.accounts[ownerUserId];
+  $: accountEstimate = $balancesStore.accounts[ownerAccountId];
   $: outgoingEstimate = supportStream
-    ? accountEstimate?.tokens[supportStream.dripsConfig.amountPerSecond.tokenAddress.toLowerCase()]
+    ? accountEstimate?.tokens[supportStream.streamConfig.amountPerSecond.tokenAddress.toLowerCase()]
     : undefined;
 
-  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.userId);
+  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 
   let loadingSupportStream = true;
   onMount(async () => {
-    if (!$streamsStore.accounts[ownerUserId]) {
-      await streamsStore.fetchAccount(ownerUserId);
+    if (!$streamsStore.accounts[ownerAccountId]) {
+      await streamsStore.fetchAccount(ownerAccountId);
     }
 
     loadingSupportStream = false;
@@ -56,7 +56,7 @@
     modal.show(
       Stepper,
       undefined,
-      editDripListSteps(dripList.account.userId, representationalSplits),
+      editDripListSteps(dripList.account.accountId, representationalSplits),
     );
   }
 </script>
@@ -105,16 +105,16 @@
     {:else if supportStream}
       <div in:fade={{ duration: 300 }} class="support-stats">
         <KeyValuePair size="medium" key="Token">
-          <Token size="small" address={supportStream.dripsConfig.amountPerSecond.tokenAddress} />
+          <Token size="small" address={supportStream.streamConfig.amountPerSecond.tokenAddress} />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Rate">
-          <Amount amountPerSecond={supportStream.dripsConfig.amountPerSecond} />
+          <Amount amountPerSecond={supportStream.streamConfig.amountPerSecond} />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Balance">
           {#if outgoingEstimate}
             <Amount
               amount={{
-                tokenAddress: supportStream.dripsConfig.amountPerSecond.tokenAddress,
+                tokenAddress: supportStream.streamConfig.amountPerSecond.tokenAddress,
                 amount: outgoingEstimate.total.totals.remainingBalance,
               }}
             />

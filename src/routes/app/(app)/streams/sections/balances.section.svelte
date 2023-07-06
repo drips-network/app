@@ -28,15 +28,15 @@
     netRate: AmountCellData;
   }
 
-  export let userId: string | undefined;
+  export let accountId: string | undefined;
   export let disableActions = true;
 
-  $: accountEstimate = userId ? $balances.accounts[userId] : undefined;
+  $: accountEstimate = accountId ? $balances.accounts[accountId] : undefined;
 
   let tableData: TokenTableRow[] = [];
 
   function updateTable() {
-    if (!$balances || !accountEstimate || !userId) {
+    if (!$balances || !accountEstimate || !accountId) {
       tableData = [];
       return;
     }
@@ -45,10 +45,10 @@
     const tokensToShow = $tokens?.map((t) => t.info.address) ?? [];
 
     tableData = mapFilterUndefined(tokensToShow, (tokenAddress) => {
-      assert(userId);
+      assert(accountId);
 
       const outgoingEstimate = accountEstimate?.tokens[tokenAddress.toLowerCase()];
-      const incomingEstimate = balances.getIncomingBalanceForUser(tokenAddress, userId);
+      const incomingEstimate = balances.getIncomingBalanceForUser(tokenAddress, accountId);
 
       if (!incomingEstimate) return undefined;
       if (!outgoingEstimate?.total.totals.remainingBalance && !incomingEstimate.totalEarned) {
@@ -96,7 +96,7 @@
 
   $: {
     $balances;
-    if (userId) updateTable();
+    if (accountId) updateTable();
   }
 
   function buildTableColumns(isClickable = false): ColumnDef<TokenTableRow>[] {
@@ -146,7 +146,7 @@
       },
     ];
   }
-  $: isMyBalances = userId === $wallet.dripsUserId;
+  $: isMyBalances = accountId === $wallet.dripsAccountId;
   $: tableColumns = buildTableColumns(isMyBalances);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -157,21 +157,21 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  $: fetchStatus = userId ? $accountFetchStatussesStore[userId] : undefined;
+  $: fetchStatus = accountId ? $accountFetchStatussesStore[accountId] : undefined;
 
   // As soon as the given account has been fetched at least once, display content.
   let loaded = false;
-  $: if (userId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
+  $: if (accountId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
     loaded = true;
   }
 
-  $: error = Boolean(userId && fetchStatus?.all === 'error');
+  $: error = Boolean(accountId && fetchStatus?.all === 'error');
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     // go to token page by address
     const tokenAddress = tableData[event.detail.rowIndex].token.address;
-    assert(userId);
-    const address = AddressDriverClient.getUserAddress(userId);
+    assert(accountId);
+    const address = AddressDriverClient.getUserAddress(accountId);
     goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
   }
 </script>

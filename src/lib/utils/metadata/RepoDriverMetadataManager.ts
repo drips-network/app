@@ -7,7 +7,7 @@ import {
   repoDriverSplitReceiverSchema,
   splitReceiverSchema,
 } from './schemas';
-import type { ClaimedGitProject, RepoDriverAccount, UserId } from './types';
+import type { ClaimedGitProject, RepoDriverAccount, AccountId } from './types';
 
 import type { z } from 'zod';
 
@@ -21,14 +21,14 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
   /**
    * Fetches (and verifies) the latest IPFS metadata for a given user ID.
-   * @param userId The user ID to fetch the metadata for.
+   * @param accountId The user ID to fetch the metadata for.
    * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
    * @throws If the metadata is invalid.
    */
   public override async fetchAccountMetadata(
-    userId: UserId,
+    accountId: AccountId,
   ): Promise<{ hash: string; data: z.infer<typeof repoDriverAccountMetadataSchema> } | null> {
-    const metadata = await super.fetchAccountMetadata(userId);
+    const metadata = await super.fetchAccountMetadata(accountId);
 
     if (!metadata) {
       return null;
@@ -37,14 +37,14 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     const { url, repoName, ownerName, forge } = metadata.data.source;
 
     const repoDriverClient = await getRepoDriverClient();
-    const onChainUserId = await repoDriverClient.getUserId(
+    const onChainAccountId = await repoDriverClient.getAccountId(
       RepoDriverUtils.forgeFromString(forge),
       `${ownerName}/${repoName}`, // TODO: This would only work for GitHub. Update this when we add support other forges.
     );
 
-    if (onChainUserId !== userId) {
+    if (onChainAccountId !== accountId) {
       throw new Error(
-        `The user ID ${userId} does not match the on-chain user ID ${onChainUserId} for the repo ${repoName} on ${forge}.`,
+        `The user ID ${accountId} does not match the on-chain user ID ${onChainAccountId} for the repo ${repoName} on ${forge}.`,
       );
     }
 
@@ -57,8 +57,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     return metadata;
   }
 
-  public async fetchAccount(userId: UserId): Promise<RepoDriverAccount | null> {
-    const metadata = await super.fetchAccountMetadata(userId);
+  public async fetchAccount(accountId: AccountId): Promise<RepoDriverAccount | null> {
+    const metadata = await super.fetchAccountMetadata(accountId);
 
     if (!metadata) {
       return null;
@@ -67,7 +67,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     const { data } = metadata;
 
     return {
-      userId: data.describes.userId,
+      accountId: data.describes.accountId,
       driver: data.describes.driver,
     } as RepoDriverAccount;
   }
@@ -89,7 +89,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       driver: 'repo',
       describes: {
         driver: 'repo',
-        userId: forProject.repoDriverAccount.userId,
+        accountId: forProject.repoDriverAccount.accountId,
       },
       source: forProject.source,
       emoji: forProject.emoji,

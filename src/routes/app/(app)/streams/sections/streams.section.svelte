@@ -15,7 +15,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { onMount } from 'svelte';
-  import type { AddressDriverUser, NFTDriverUser, Stream } from '$lib/stores/streams/types';
+  import type { AddressDriverAccount, NFTDriverAccount, Stream } from '$lib/stores/streams/types';
   import NameAndBadgeCell, {
     type NameAndBadgeCellProps,
   } from '$lib/components/table/cells/name-and-badge-cell.svelte';
@@ -25,14 +25,14 @@
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
 
-  export let userId: string | undefined;
+  export let accountId: string | undefined;
   export let disableActions = true;
   export let tokenAddress: string | undefined = undefined;
 
   interface OutgoingStreamTableRow {
     streamId: string;
     name: NameAndBadgeCellProps;
-    to: NFTDriverUser | AddressDriverUser;
+    to: NFTDriverAccount | AddressDriverAccount;
     amount: AmountCellData;
     token: TokenCellData;
   }
@@ -40,7 +40,7 @@
   interface IncomingStreamTableRow {
     streamId: string;
     name: NameAndBadgeCellProps;
-    from: AddressDriverUser;
+    from: AddressDriverAccount;
     amount: AmountCellData;
     token: TokenCellData;
   }
@@ -51,12 +51,12 @@
   let ownStreams: ReturnType<typeof streams.getStreamsForUser> = { outgoing: [], incoming: [] };
 
   function updateTable() {
-    ownStreams = userId ? streams.getStreamsForUser(userId) : { outgoing: [], incoming: [] };
+    ownStreams = accountId ? streams.getStreamsForUser(accountId) : { outgoing: [], incoming: [] };
 
     // filter by tokenAddress ?
     if (tokenAddress) {
       const byToken = (stream: Stream) =>
-        stream.dripsConfig.amountPerSecond.tokenAddress.toLowerCase() ===
+        stream.streamConfig.amountPerSecond.tokenAddress.toLowerCase() ===
         tokenAddress?.toLowerCase();
       ownStreams = {
         outgoing: ownStreams.outgoing.filter(byToken),
@@ -68,7 +68,7 @@
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
-      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+      const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
       // TODO: Don't presume that any stream to an NFT subaccount is going to a Drip List.
       const streamName =
@@ -82,9 +82,9 @@
           name: streamName,
           streamId: stream.id,
           paused: stream.paused,
-          durationSeconds: stream.dripsConfig.durationSeconds,
-          startDate: stream.dripsConfig.startDate,
-          senderId: stream.sender.userId,
+          durationSeconds: stream.streamConfig.durationSeconds,
+          startDate: stream.streamConfig.startDate,
+          senderId: stream.sender.accountId,
           tokenAddress: tokenAddress,
         },
         to: stream.receiver,
@@ -111,7 +111,7 @@
       const estimate = balances.getEstimateByStreamId(stream.id);
       if (!estimate) return undefined;
 
-      const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+      const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
       return {
         streamId: stream.id,
@@ -119,9 +119,9 @@
           name: stream.name ?? 'Unnamed stream',
           streamId: stream.id,
           paused: stream.paused,
-          durationSeconds: stream.dripsConfig.durationSeconds,
-          startDate: stream.dripsConfig.startDate,
-          senderId: stream.sender.userId,
+          durationSeconds: stream.streamConfig.durationSeconds,
+          startDate: stream.streamConfig.startDate,
+          senderId: stream.sender.accountId,
           tokenAddress: tokenAddress,
         },
         from: stream.sender,
@@ -146,7 +146,7 @@
   }
 
   $: {
-    userId;
+    accountId;
     $balances;
     updateTable();
   }
@@ -247,11 +247,14 @@
 
   // As soon as the given account has been fetched at least once, display content.
   let loaded = false;
-  $: if (userId && ['error', 'fetched'].includes($accountFetchStatussesStore[userId]?.all ?? '')) {
+  $: if (
+    accountId &&
+    ['error', 'fetched'].includes($accountFetchStatussesStore[accountId]?.all ?? '')
+  ) {
     loaded = true;
   }
 
-  $: error = Boolean(userId && $accountFetchStatussesStore[userId]?.all === 'error');
+  $: error = Boolean(accountId && $accountFetchStatussesStore[accountId]?.all === 'error');
   $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
 
   function onRowClick(
@@ -263,7 +266,7 @@
     const parsedId = decodeStreamId(streamId);
 
     onClickGoto(
-      `/app/${parsedId.senderUserId}/tokens/${parsedId.tokenAddress}/streams/${parsedId.dripId}`,
+      `/app/${parsedId.senderAccountId}/tokens/${parsedId.tokenAddress}/streams/${parsedId.dripId}`,
       event.detail.event,
     );
   }

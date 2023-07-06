@@ -16,14 +16,14 @@ vi.mock('$lib/stores/wallet', () => ({
   default: readable({
     network: {
       chainId: 5,
-      name: 'sepolia',
+      name: 'goerli',
     },
   }),
 }));
 
 const MOCK_ACCOUNT_DATA = {
   describes: {
-    userId: '875267609686611184008791658115888920329297355417',
+    accountId: '875267609686611184008791658115888920329297355417',
     driver: 'address',
   },
   name: 'Test Account 1',
@@ -44,7 +44,7 @@ const MOCK_ACCOUNT_DATA = {
             dripId: '1',
           },
           receiver: {
-            userId: '1027758174339843585312137211599376373437705718139',
+            accountId: '1027758174339843585312137211599376373437705718139',
             driver: 'address',
           },
           archived: false,
@@ -60,7 +60,7 @@ const MOCK_ACCOUNT_DATA = {
             dripId: '2',
           },
           receiver: {
-            userId: '1027758174339843585312137211599376373437705718139',
+            accountId: '1027758174339843585312137211599376373437705718139',
             driver: 'address',
           },
           archived: false,
@@ -81,7 +81,7 @@ const MOCK_ACCOUNT_DATA = {
             dripId: '1',
           },
           receiver: {
-            userId: '1027758174339843585312137211599376373437705718139',
+            accountId: '1027758174339843585312137211599376373437705718139',
             driver: 'address',
           },
           archived: false,
@@ -110,15 +110,15 @@ History sequence for tests, with one hour between each update:
 */
 const MOCK_DRIPS_SET_EVENTS = [
   {
-    userId: 875267609686611184008791658115888920329297355417n,
+    accountId: 875267609686611184008791658115888920329297355417n,
     assetId: 284221150502406160145256042239569169360715932835n, // RAD
-    dripsReceiverSeenEvents: [
+    streamReceiverSeenEvents: [
       {
-        receiverUserId: '1027758174339843585312137211599376373437705718139',
+        receiverAccountId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
       {
-        receiverUserId: '1027758174339843585312137211599376373437705718139',
+        receiverAccountId: '1027758174339843585312137211599376373437705718139',
         config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
@@ -128,11 +128,11 @@ const MOCK_DRIPS_SET_EVENTS = [
     maxEnd: 100n,
   },
   {
-    userId: 875267609686611184008791658115888920329297355417n,
+    accountId: 875267609686611184008791658115888920329297355417n,
     assetId: 284221150502406160145256042239569169360715932835n, // RAD
-    dripsReceiverSeenEvents: [
+    streamReceiverSeenEvents: [
       {
-        receiverUserId: '1027758174339843585312137211599376373437705718139',
+        receiverAccountId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
@@ -142,11 +142,11 @@ const MOCK_DRIPS_SET_EVENTS = [
     maxEnd: 100n,
   },
   {
-    userId: 875267609686611184008791658115888920329297355417n,
+    accountId: 875267609686611184008791658115888920329297355417n,
     assetId: 611382286831621467233887798921843936019654057231n, // DAI
-    dripsReceiverSeenEvents: [
+    streamReceiverSeenEvents: [
       {
-        receiverUserId: '1027758174339843585312137211599376373437705718139',
+        receiverAccountId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
     ],
@@ -156,15 +156,15 @@ const MOCK_DRIPS_SET_EVENTS = [
     maxEnd: 100n,
   },
   {
-    userId: 875267609686611184008791658115888920329297355417n,
+    accountId: 875267609686611184008791658115888920329297355417n,
     assetId: 284221150502406160145256042239569169360715932835n, // RAD
-    dripsReceiverSeenEvents: [
+    streamReceiverSeenEvents: [
       {
-        receiverUserId: '1027758174339843585312137211599376373437705718139',
+        receiverAccountId: '1027758174339843585312137211599376373437705718139',
         config: 26959946667150639794667015087019630704137713327499230465504634208256n,
       },
       {
-        receiverUserId: '1027758174339843585312137211599376373437705718139',
+        receiverAccountId: '1027758174339843585312137211599376373437705718139',
         config: 53919893334301279589334030174039261377774857750039802946608244457472n,
       },
     ],
@@ -179,8 +179,8 @@ vi.mock('radicle-drips', async () => ({
   ...((await vi.importActual('radicle-drips')) as typeof radicleDrips),
   DripsSubgraphClient: {
     create: () => ({
-      getDripsSetEventsByUserId: () => MOCK_DRIPS_SET_EVENTS,
-      getLatestUserMetadata: () => ({ value: 'foo' }),
+      getStreamsSetEventsByAccountId: () => MOCK_DRIPS_SET_EVENTS,
+      getLatestAccountMetadata: () => ({ value: 'foo' }),
     }),
   },
 }));
@@ -196,7 +196,7 @@ describe('metadata.ts', () => {
       expect(account.description).toBe(MOCK_ACCOUNT_DATA.description);
       expect(account.emoji).toBe(MOCK_ACCOUNT_DATA.emoji);
 
-      expect(account.user.userId).toBe(MOCK_ACCOUNT_DATA.describes.userId);
+      expect(account.user.accountId).toBe(MOCK_ACCOUNT_DATA.describes.accountId);
       expect(account.user.driver).toBe(MOCK_ACCOUNT_DATA.describes.driver);
       expect(account.user.address).toBe('0x99505B669C6064BA2B2f26f2E4fffa5e8d906299');
 
@@ -285,7 +285,7 @@ describe('metadata.ts', () => {
 
       expect(radHistoryItem1Streams?.find((s) => s.streamId === radStreams[0].id)).toStrictEqual({
         streamId: radStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -298,13 +298,13 @@ describe('metadata.ts', () => {
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
       expect(radHistoryItem1Streams?.find((s) => s.streamId === radStreams[1].id)).toStrictEqual({
         streamId: radStreams[1].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -317,7 +317,7 @@ describe('metadata.ts', () => {
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -332,7 +332,7 @@ describe('metadata.ts', () => {
 
       expect(radHistoryItem2Streams?.find((s) => s.streamId === radStreams[0].id)).toStrictEqual({
         streamId: radStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -345,18 +345,18 @@ describe('metadata.ts', () => {
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
       expect(radHistoryItem2Streams?.find((s) => s.streamId === radStreams[1].id)).toStrictEqual({
         streamId: radStreams[1].id,
-        dripsConfig: undefined,
+        streamConfig: undefined,
         managed: true,
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
       });
 
@@ -370,7 +370,7 @@ describe('metadata.ts', () => {
 
       expect(radHistoryItem3Streams?.find((s) => s.streamId === radStreams[0].id)).toStrictEqual({
         streamId: radStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -383,13 +383,13 @@ describe('metadata.ts', () => {
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
       expect(radHistoryItem3Streams?.find((s) => s.streamId === radStreams[1].id)).toStrictEqual({
         streamId: radStreams[1].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -402,7 +402,7 @@ describe('metadata.ts', () => {
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });
@@ -431,7 +431,7 @@ describe('metadata.ts', () => {
 
       expect(daiHistoryItem1Streams?.find((s) => s.streamId === daiStreams[0].id)).toStrictEqual({
         streamId: daiStreams[0].id,
-        dripsConfig: {
+        streamConfig: {
           amountPerSecond: {
             amount: 1653439153440n,
             tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
@@ -444,7 +444,7 @@ describe('metadata.ts', () => {
         receiver: {
           address: '0xb406453BdEaa335e7C0f75ae7806aee91333897B',
           driver: 'address',
-          userId: '1027758174339843585312137211599376373437705718139',
+          accountId: '1027758174339843585312137211599376373437705718139',
         },
         managed: true,
       });

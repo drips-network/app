@@ -1,3 +1,3 @@
-export type UserId = string;
+export type AccountId = string;
 export type Address = string;
 export type IpfsHash = string;

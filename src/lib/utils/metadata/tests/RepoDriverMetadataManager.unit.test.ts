@@ -17,7 +17,7 @@ describe('RepoDriverMetadataManager', () => {
   describe('fetchAccountMetadata', () => {
     it('should return the metadata if metadata is valid', async () => {
       // Arrange
-      const userId = '2';
+      const accountId = '2';
       const repoOwner = '0x123';
       const gitUrl = 'http://github.com/username/repo';
 
@@ -38,8 +38,8 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
-        getRepoOwner: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(repoOwner),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue(accountId),
+        getRepoOwner: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue(repoOwner),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -59,14 +59,14 @@ describe('RepoDriverMetadataManager', () => {
           },
         },
       });
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(accountId);
+      expect(repoDriverClientMock.getAccountId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
     it('should throw if on-chain user ID does not match with the provided user ID', async () => {
-      const userId = '2';
+      const accountId = '2';
       const gitUrl = 'http://github.com/username/repo';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
@@ -86,7 +86,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue(accountId),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -96,14 +96,14 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith('3');
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
+      expect(repoDriverClientMock.getAccountId).toHaveBeenCalledWith(Forge.GitHub, 'username/repo');
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
     it('should return null if the account metadata is missing', async () => {
       // Arrange
-      const userId = '2';
+      const accountId = '2';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
       const fetchAccountMetadataMock = vi
@@ -112,7 +112,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue(accountId),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -122,15 +122,15 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(result).toBeNull;
-      expect(repoDriverClientMock.getUserId).not.toBeCalled();
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
+      expect(repoDriverClientMock.getAccountId).not.toBeCalled();
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(accountId);
 
       MetadataManagerBase.prototype.fetchAccountMetadata = originalFetchAccountMetadata;
     });
 
     it('should throw if the url does not include the repo name', async () => {
       // Arrange
-      const userId = '2';
+      const accountId = '2';
       const gitUrl = 'http://github.com/username/repo';
 
       const originalFetchAccountMetadata = MetadataManagerBase.prototype.fetchAccountMetadata;
@@ -150,17 +150,19 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue(userId),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue(accountId),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
 
       // Act
-      await expect(new RepoDriverMetadataManager().fetchAccountMetadata(userId)).rejects.toThrow();
+      await expect(
+        new RepoDriverMetadataManager().fetchAccountMetadata(accountId),
+      ).rejects.toThrow();
 
       // Assert
-      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(userId);
-      expect(repoDriverClientMock.getUserId).toHaveBeenCalledWith(
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith(accountId);
+      expect(repoDriverClientMock.getAccountId).toHaveBeenCalledWith(
         Forge.GitHub,
         'username/random-repo-name',
       );
@@ -178,7 +180,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue('2'),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue('2'),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -199,7 +201,7 @@ describe('RepoDriverMetadataManager', () => {
         .mockResolvedValue({
           data: {
             describes: {
-              userId: '1',
+              accountId: '1',
               driver: 'repo',
             },
           },
@@ -207,7 +209,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue('2'),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue('2'),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -219,7 +221,7 @@ describe('RepoDriverMetadataManager', () => {
 
       // Assert
       expect(account).toEqual({
-        userId: '1',
+        accountId: '1',
         driver: 'repo',
       });
       expect(fetchAccountMetadataMock).toHaveBeenCalledWith('1');
@@ -235,7 +237,7 @@ describe('RepoDriverMetadataManager', () => {
       MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
 
       const repoDriverClientMock = {
-        getUserId: vi.fn(RepoDriverClient.prototype.getUserId).mockResolvedValue('2'),
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue('2'),
       } as unknown as RepoDriverClient;
       const getClient = await import('$lib/utils/get-drips-clients');
       getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
@@ -245,12 +247,12 @@ describe('RepoDriverMetadataManager', () => {
         forProject: {
           owner: {
             driver: 'address',
-            userId: '2',
+            accountId: '2',
             address: '0x123',
           },
           repoDriverAccount: {
             driver: 'repo',
-            userId: '1',
+            accountId: '1',
           },
           source: {
             url: 'repo',
@@ -264,18 +266,18 @@ describe('RepoDriverMetadataManager', () => {
           maintainers: [
             {
               weight: 1,
-              userId: '10',
+              accountId: '10',
             },
           ],
           dependencies: [
             {
               weight: 10,
-              userId: '100',
+              accountId: '100',
             },
           ],
           dripsDonation: {
             weight: 100,
-            userId: '1000',
+            accountId: '1000',
           },
         },
       } as any;
@@ -287,7 +289,7 @@ describe('RepoDriverMetadataManager', () => {
       expect(metadata).toEqual({
         driver: 'repo',
         describes: {
-          userId: '1',
+          accountId: '1',
           driver: 'repo',
         },
         source: {
@@ -301,18 +303,18 @@ describe('RepoDriverMetadataManager', () => {
           maintainers: [
             {
               weight: 1,
-              userId: '10',
+              accountId: '10',
             },
           ],
           dependencies: [
             {
               weight: 10,
-              userId: '100',
+              accountId: '100',
             },
           ],
           dripsDonation: {
             weight: 100,
-            userId: '1000',
+            accountId: '1000',
           },
         },
       });

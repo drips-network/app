@@ -3,15 +3,15 @@ import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 
-export default async function (senderUserIds: string[], tokenAddress: string) {
+export default async function (senderAccountIds: string[], tokenAddress: string) {
   const subgraphClient = getSubgraphClient();
 
-  const { dripsUserId: ownUserId } = get(wallet);
-  assert(ownUserId);
+  const { dripsAccountId: ownAccountId } = get(wallet);
+  assert(ownAccountId);
 
   return await Promise.all(
-    senderUserIds.map((senderUserId) =>
-      subgraphClient.getArgsForSqueezingAllDrips(ownUserId, senderUserId, tokenAddress),
+    senderAccountIds.map((senderAccountId) =>
+      subgraphClient.getArgsForSqueezingAllDrips(ownAccountId, senderAccountId, tokenAddress),
     ),
   );
 }

@@ -40,7 +40,7 @@ export default function (
       before: async () => {
         const callerClient = await getCallerClient();
         const addressDriverClient = await getAddressDriverClient();
-        const ownUserId = (await addressDriverClient.getUserId()).toString();
+        const ownAccountId = (await addressDriverClient.getAccountId()).toString();
 
         const { address: tokenAddress } = selectedToken.info;
 
@@ -53,8 +53,8 @@ export default function (
           stream.paused
             ? undefined
             : {
-                userId: stream.receiver.userId,
-                config: stream.dripsConfig.raw,
+                accountId: stream.receiver.accountId,
+                config: stream.streamConfig.raw,
               },
         );
 
@@ -69,21 +69,23 @@ export default function (
           4,
         );
 
-        const dripConfig = Utils.DripsReceiverConfiguration.toUint256({
+        const dripConfig = Utils.StreamConfiguration.toUint256({
           dripId,
           start,
           duration,
           amountPerSec: amountPerSecond,
         });
 
-        const recipientUserId = await addressDriverClient.getUserIdByAddress(recipientAddress);
+        const recipientAccountId = await addressDriverClient.getAccountIdByAddress(
+          recipientAddress,
+        );
         const { address, signer } = get(wallet);
         assert(address);
 
         const metadataMgr = new AddressDriverMetadataManager();
 
         const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
-          id: makeStreamId(ownUserId, tokenAddress, dripId.toString()),
+          id: makeStreamId(ownAccountId, tokenAddress, dripId.toString()),
           initialDripsConfig: {
             dripId: dripId.toString(),
             raw: dripConfig.toString(),
@@ -92,7 +94,7 @@ export default function (
             amountPerSecond,
           },
           receiver: {
-            userId: recipientUserId.toString(),
+            accountId: recipientAccountId.toString(),
             driver: 'address',
           },
           archived: false,
@@ -133,10 +135,10 @@ export default function (
             ...currentReceivers,
             {
               config: dripConfig,
-              userId: recipientUserId,
+              accountId: recipientAccountId,
             },
           ],
-          userMetadata: [
+          accountMetadata: [
             {
               key: MetadataManagerBase.USER_METADATA_KEY,
               value: newHash,
@@ -149,7 +151,7 @@ export default function (
         return {
           createStreamBatchPreset,
           callerClient,
-          ownUserId,
+          ownAccountId,
           newHash,
         };
       },
@@ -167,7 +169,7 @@ export default function (
         await expect(
           streams.refreshUserAccount,
           () =>
-            get(streams).accounts[transactContext.ownUserId].lastIpfsHash ===
+            get(streams).accounts[transactContext.ownAccountId].lastIpfsHash ===
             transactContext.newHash,
           5000,
           1000,

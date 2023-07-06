@@ -86,12 +86,12 @@
   const MOCK_PROJECT_1: GitProject = {
     claimed: true,
     repoDriverAccount: {
-      userId: '0',
+      accountId: '0',
       driver: 'repo',
     },
     owner: {
       driver: 'address',
-      userId: '0',
+      accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
@@ -108,12 +108,12 @@
   const MOCK_PROJECT_2: GitProject = {
     claimed: true,
     repoDriverAccount: {
-      userId: '0',
+      accountId: '0',
       driver: 'repo',
     },
     owner: {
       driver: 'address',
-      userId: '0',
+      accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
@@ -264,12 +264,12 @@
       project={{
         claimed: true,
         repoDriverAccount: {
-          userId: '0',
+          accountId: '0',
           driver: 'repo',
         },
         owner: {
           driver: 'address',
-          userId: '0',
+          accountId: '0',
           address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
         },
         source: SOURCE_CONFIGS.github,
@@ -306,12 +306,12 @@
         ? {
             claimed: true,
             repoDriverAccount: {
-              userId: '0',
+              accountId: '0',
               driver: 'repo',
             },
             owner: {
               driver: 'address',
-              userId: '0',
+              accountId: '0',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
             source: SOURCE_CONFIGS[sourceType],
@@ -322,7 +322,7 @@
         : {
             claimed: false,
             repoDriverAccount: {
-              userId: '0',
+              accountId: '0',
               driver: 'repo',
             },
             source: SOURCE_CONFIGS[sourceType],
