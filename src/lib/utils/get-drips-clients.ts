@@ -180,6 +180,8 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
         REPO_DRIVER_ANYAPI_OPERATOR: '0x0000000000000000000000000000000000000000',
         REPO_DRIVER_ANYAPI_JOB_ID: '00000000000000000000000000000000',
         REPO_DRIVER_ANYAPI_DEFAULT_FEE: '0',
+        DETERMINISTIC_DEPLOYER: '',
+        CREATE3_FACTORY: '',
       },
     }
   : {
