@@ -33,10 +33,10 @@
         before: async () => {
           assert(selectedTokenAddress && streamRateValueParsed);
 
-          const { dripsUserId } = $walletStore;
-          assert(dripsUserId);
+          const { dripsAccountId } = $walletStore;
+          assert(dripsAccountId);
 
-          const ownAccount = $streamsStore.accounts[dripsUserId];
+          const ownAccount = $streamsStore.accounts[dripsAccountId];
           assert(ownAccount);
 
           const assetConfig = ownAccount.assetConfigs.find(
@@ -50,8 +50,8 @@
             stream.paused
               ? undefined
               : {
-                  userId: stream.receiver.userId,
-                  config: stream.dripsConfig.raw,
+                  accountId: stream.receiver.accountId,
+                  config: stream.streamConfig.raw,
                 },
           );
 
@@ -60,7 +60,7 @@
             4,
           );
 
-          const dripConfig = Utils.DripsReceiverConfiguration.toUint256({
+          const dripConfig = Utils.StreamConfiguration.toUint256({
             dripId,
             start: 0n,
             duration: 0n,
@@ -69,13 +69,13 @@
 
           const addressDriverClient = await getAddressDriverClient();
 
-          const tx = addressDriverClient.setDrips(
+          const tx = addressDriverClient.setStreams(
             assetConfig.tokenAddress,
             currentReceivers,
             [
               ...currentReceivers,
               {
-                userId: dripListId,
+                accountId: dripListId,
                 config: dripConfig,
               },
             ],

@@ -20,17 +20,17 @@
 
   export let dripListId: string;
 
-  let ownerUserId = $walletStore.dripsUserId ?? unreachable();
+  let ownerAccountId = $walletStore.dripsAccountId ?? unreachable();
   let supportStreams =
     $streamsStore &&
     streamsStore
-      .getStreamsForUser(ownerUserId)
-      .outgoing.filter((s) => s.receiver.userId === dripListId);
+      .getStreamsForUser(ownerAccountId)
+      .outgoing.filter((s) => s.receiver.accountId === dripListId);
 
   let supportStream = supportStreams[0] ?? unreachable();
 
-  let selectedTokenAddress = supportStream.dripsConfig.amountPerSecond.tokenAddress;
-  let streamRateValueParsed = supportStream.dripsConfig.amountPerSecond.amount * 2592000n; // 30 days in seconds
+  let selectedTokenAddress = supportStream.streamConfig.amountPerSecond.tokenAddress;
+  let streamRateValueParsed = supportStream.streamConfig.amountPerSecond.amount * 2592000n; // 30 days in seconds
 
   let formValid: boolean;
 
@@ -39,7 +39,7 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const ownAccount = $streamsStore.accounts[ownerUserId];
+          const ownAccount = $streamsStore.accounts[ownerAccountId];
           assert(ownAccount);
 
           const token = tokensStore.getByAddress(selectedTokenAddress) ?? unreachable();
@@ -53,17 +53,17 @@
             s.paused
               ? undefined
               : {
-                  userId: s.receiver.userId,
-                  config: s.dripsConfig.raw,
+                  accountId: s.receiver.accountId,
+                  config: s.streamConfig.raw,
                 },
           );
 
           const newReceivers = structuredClone(currentReceivers);
 
           const receiverToInsert = {
-            userId: supportStream.receiver.userId,
-            config: Utils.DripsReceiverConfiguration.toUint256({
-              dripId: BigInt(supportStream.dripsConfig.dripId),
+            accountId: supportStream.receiver.accountId,
+            config: Utils.StreamConfiguration.toUint256({
+              dripId: BigInt(supportStream.streamConfig.dripId),
               start: 0n,
               duration: 0n,
               amountPerSec: streamRateValueParsed / 2592000n, // 30 days in seconds
@@ -72,15 +72,15 @@
 
           const currentStreamReceiverIndex = newReceivers.findIndex(
             (r) =>
-              Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId ===
-              BigInt(supportStream.dripsConfig.dripId),
+              Utils.StreamConfiguration.fromUint256(r.config).dripId ===
+              BigInt(supportStream.streamConfig.dripId),
           );
 
           newReceivers.splice(currentStreamReceiverIndex, 1, receiverToInsert);
 
           const addressDriverClient = await getAddressDriverClient();
 
-          const setNewStreamTx = addressDriverClient.setDrips(
+          const setNewStreamTx = addressDriverClient.setStreams(
             token.info.address,
             currentReceivers,
             newReceivers,

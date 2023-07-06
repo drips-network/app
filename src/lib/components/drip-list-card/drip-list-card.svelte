@@ -84,7 +84,7 @@
           <Button
             icon={TokenStreams}
             on:click={() =>
-              modal.show(Stepper, undefined, editDripListStreamSteps(dripList.account.userId))}
+              modal.show(Stepper, undefined, editDripListStreamSteps(dripList.account.accountId))}
             >Edit stream</Button
           >
         {:else}
@@ -92,7 +92,7 @@
             icon={TokenStreams}
             variant="primary"
             on:click={() =>
-              modal.show(Stepper, undefined, createDripListStreamSteps(dripList.account.userId))}
+              modal.show(Stepper, undefined, createDripListStreamSteps(dripList.account.accountId))}
             >Support your Drip List</Button
           >
         {/if}

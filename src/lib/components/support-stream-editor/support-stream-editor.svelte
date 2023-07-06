@@ -49,14 +49,14 @@
         )
       : '';
 
-  $: ownUserId = $walletStore.dripsUserId;
+  $: ownAccountId = $walletStore.dripsAccountId;
 
   // If top up is disabled, the token list should only show available token balances to stream.
   let tokenList: Items = {};
   $: tokenList = withoutTopUp
     ? Object.fromEntries(
         mapFilterUndefined(
-          Object.entries($balancesStore.accounts[ownUserId ?? unreachable()].tokens),
+          Object.entries($balancesStore.accounts[ownAccountId ?? unreachable()].tokens),
           ([tokenAddress, tokenEstimate]) => {
             const remaining = tokenEstimate.total.totals.remainingBalance;
 

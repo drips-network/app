@@ -15,12 +15,12 @@
 
   export let dripListId: string;
 
-  let ownerUserId = $walletStore.dripsUserId ?? unreachable();
+  let ownerAccountId = $walletStore.dripsAccountId ?? unreachable();
   let supportStreams =
     $streamsStore &&
     streamsStore
-      .getStreamsForUser(ownerUserId)
-      .outgoing.filter((s) => s.receiver.userId === dripListId);
+      .getStreamsForUser(ownerAccountId)
+      .outgoing.filter((s) => s.receiver.accountId === dripListId);
 
   let supportStream = supportStreams[0] ?? unreachable();
 
@@ -29,14 +29,14 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const { dripsUserId } = $walletStore;
-          assert(dripsUserId);
+          const { dripsAccountId } = $walletStore;
+          assert(dripsAccountId);
 
-          const ownAccount = $streamsStore.accounts[dripsUserId];
+          const ownAccount = $streamsStore.accounts[dripsAccountId];
           assert(ownAccount);
 
           const token =
-            tokensStore.getByAddress(supportStream.dripsConfig.amountPerSecond.tokenAddress) ??
+            tokensStore.getByAddress(supportStream.streamConfig.amountPerSecond.tokenAddress) ??
             unreachable();
 
           const assetConfig = ownAccount.assetConfigs.find(
@@ -48,8 +48,8 @@
             s.paused
               ? undefined
               : {
-                  userId: s.receiver.userId,
-                  config: s.dripsConfig.raw,
+                  accountId: s.receiver.accountId,
+                  config: s.streamConfig.raw,
                 },
           );
 
@@ -57,15 +57,15 @@
 
           const currentStreamReceiverIndex = newReceivers.findIndex(
             (r) =>
-              Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId ===
-              BigInt(supportStream.dripsConfig.dripId),
+              Utils.StreamConfiguration.fromUint256(r.config).dripId ===
+              BigInt(supportStream.streamConfig.dripId),
           );
 
           newReceivers.splice(currentStreamReceiverIndex, 1);
 
           const addressDriverClient = await getAddressDriverClient();
 
-          const tx = addressDriverClient.setDrips(
+          const tx = addressDriverClient.setStreams(
             token.info.address,
             currentReceivers,
             newReceivers,
