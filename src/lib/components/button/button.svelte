@@ -37,8 +37,8 @@
       <svelte:component
         this={icon}
         style={variant === 'destructive' || variant === 'primary'
-          ? `fill: ${textColor}`
-          : 'fill: var(--color-foreground)'}
+          ? `fill: ${textColor}; transition: fill 0.3s;`
+          : 'fill: var(--color-foreground); transition: fill 0.3s;'}
       />
     {/if}
     <slot />
