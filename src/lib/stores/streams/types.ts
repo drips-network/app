@@ -1,16 +1,16 @@
-/** \<senderUserId\>-\<tokenAddress\>-\<dripId\> */
+/** \<senderAccountId\>-\<tokenAddress\>-\<dripId\> */
 export type StreamId = string;
-export type UserId = string;
+export type AccountId = string;
 
-export interface AddressDriverUser {
+export interface AddressDriverAccount {
   driver: 'address';
   address: string;
-  userId: UserId;
+  accountId: AccountId;
 }
 
-export interface NFTDriverUser {
+export interface NFTDriverAccount {
   driver: 'nft';
-  userId: UserId;
+  accountId: AccountId;
 }
 
 interface Amount {
@@ -24,7 +24,7 @@ export interface DripsConfig {
   dripId: string;
   /**
    * The amount per second in the smallest possible unit of the respective token, plus
-   * extra decimal precision provided by DripsHub. To get an amount in the token decimal
+   * extra decimal precision provided by Drips. To get an amount in the token decimal
    * unit, divide by 10 ^ 18.
    */
   amountPerSecond: Amount;
@@ -36,10 +36,10 @@ export interface DripsConfig {
 
 export interface Stream {
   id: StreamId;
-  sender: AddressDriverUser;
-  receiver: AddressDriverUser | NFTDriverUser;
+  sender: AddressDriverAccount;
+  receiver: AddressDriverAccount | NFTDriverAccount;
   /** Initial stream settings, not taking into account a paused stream. */
-  dripsConfig: DripsConfig;
+  streamConfig: DripsConfig;
   paused: boolean;
   name?: string;
   description?: string;
@@ -55,13 +55,13 @@ export interface Stream {
 export interface Receiver {
   streamId: string;
   /** If undefined, stream is paused. */
-  dripsConfig?: DripsConfig;
+  streamConfig?: DripsConfig;
   /**
    * If true, the stream was created through the Drips App. If false, it was created
    * by an unknown third party application.
    */
   managed: boolean;
-  receiver: AddressDriverUser | NFTDriverUser;
+  receiver: AddressDriverAccount | NFTDriverAccount;
 }
 
 export interface AssetConfigHistoryItem {
@@ -86,7 +86,7 @@ export interface AssetConfig {
 }
 
 export interface Account {
-  user: AddressDriverUser;
+  user: AddressDriverAccount;
   name?: string;
   description?: string;
   emoji?: string;

@@ -4,9 +4,9 @@ import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
 import { addressDriverAccountMetadataSchema } from './schemas';
 import type { Account } from '$lib/stores/streams/types';
-import type { UserId } from './types';
-import { reconcileDripsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
-import seperateDripsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
+import type { AccountId } from './types';
+import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
+import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
@@ -17,26 +17,28 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
     super(addressDriverAccountMetadataSchema);
   }
 
-  public async fetchAccount(userId: UserId): Promise<Account> {
-    const { data, hash } = (await this.fetchAccountMetadata(userId)) ?? {};
+  public async fetchAccount(accountId: AccountId): Promise<Account> {
+    const { data, hash } = (await this.fetchAccountMetadata(accountId)) ?? {};
 
-    const dripsSetEvents = await this.subgraphClient.getDripsSetEventsByUserId(userId);
+    const streamsSetEvents = await this.subgraphClient.getStreamsSetEventsByAccountId(accountId);
 
-    const dripsSetEventsWithFullReceivers = reconcileDripsSetReceivers(dripsSetEvents);
+    const streamsSetEventsWithFullReceivers = reconcileStreamsSetReceivers(streamsSetEvents);
 
-    const dripsSetEventsByTokenAddress = seperateDripsSetEvents(dripsSetEventsWithFullReceivers);
+    const streamsSetEventsByTokenAddress = seperateStreamsSetEvents(
+      streamsSetEventsWithFullReceivers,
+    );
 
     const assetConfigs = buildAssetConfigs(
-      userId,
+      accountId,
       data as z.infer<typeof addressDriverAccountMetadataSchema>,
-      dripsSetEventsByTokenAddress,
+      streamsSetEventsByTokenAddress,
     );
 
     return {
       user: {
-        userId,
+        accountId,
         driver: 'address',
-        address: AddressDriverClient.getUserAddress(userId),
+        address: AddressDriverClient.getUserAddress(accountId),
       },
       name: data?.name,
       description: data?.description,
@@ -69,11 +71,11 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
           return {
             id: stream.id,
             initialDripsConfig: {
-              dripId: stream.dripsConfig.dripId,
-              raw: stream.dripsConfig.raw.toString(),
-              startTimestamp: Math.floor((stream.dripsConfig.startDate?.getTime() || 0) / 1000),
-              durationSeconds: stream.dripsConfig.durationSeconds || 0,
-              amountPerSecond: stream.dripsConfig.amountPerSecond.amount,
+              dripId: stream.streamConfig.dripId,
+              raw: stream.streamConfig.raw.toString(),
+              startTimestamp: Math.floor((stream.streamConfig.startDate?.getTime() || 0) / 1000),
+              durationSeconds: stream.streamConfig.durationSeconds || 0,
+              amountPerSecond: stream.streamConfig.amountPerSecond.amount,
             },
             receiver: stream.receiver,
             archived: stream.archived ?? false,

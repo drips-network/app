@@ -13,15 +13,15 @@ import {
   NFTDriverTxFactory,
   type AddressDriverClient,
   Utils,
-  type DripsReceiverStruct,
+  type StreamReceiverStruct,
   AddressDriverTxFactory,
   NFTDriverClient,
   ERC20TxFactory,
   RepoDriverClient,
 } from 'radicle-drips';
-import type { UserId } from '../metadata/types';
+import type { AccountId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { CallerClient, DripsReceiverConfig } from 'radicle-drips';
+import type { CallerClient, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
@@ -114,7 +114,7 @@ export default class DripListService {
     return dripLists;
   }
 
-  public async getByTokenId(tokenId: UserId): Promise<DripList | null> {
+  public async getByTokenId(tokenId: AccountId): Promise<DripList | null> {
     const subAccount = await this._dripsSubgraphClient.getNftSubAccountOwnerByTokenId(tokenId);
 
     if (!subAccount) return null;
@@ -140,10 +140,12 @@ export default class DripListService {
         driver: 'nft',
         owner: {
           driver: 'address',
-          userId: await this._addressDriverClient.getUserIdByAddress(nftSubAccount.ownerAddress),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(
+            nftSubAccount.ownerAddress,
+          ),
           address: nftSubAccount.ownerAddress,
         },
-        userId: nftSubAccount.tokenId,
+        accountId: nftSubAccount.tokenId,
       },
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
       // TODO: properties below are post-MVP.
@@ -172,14 +174,14 @@ export default class DripListService {
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
 
-    const projects: { weight: number; userId: string }[] = [];
+    const projects: { weight: number; accountId: string }[] = [];
     for (const [url, percentage] of Object.entries(context.dripList.percentages)) {
       const { forge, repoName, username } = GitProjectService.deconstructUrl(url);
       const projectName = `${username}/${repoName}`;
 
       projects.push({
         weight: Math.floor((Number(percentage) / 100) * 1000000),
-        userId: await this._repoDriverClient.getUserId(forge, projectName),
+        accountId: await this._repoDriverClient.getAccountId(forge, projectName),
       });
     }
 
@@ -195,17 +197,17 @@ export default class DripListService {
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
-    const setDripListProjectsTx = await this._nftDriverTxFactory.setSplits(
+    const setStreamListProjectsTx = await this._nftDriverTxFactory.setSplits(
       dripListId,
       projects.map((project) => ({
-        userId: project.userId,
+        accountId: project.accountId,
         weight: project.weight,
       })),
     );
 
     const tokenApprovalTx = await this._buildTokenApprovalTx(token);
 
-    const setStreamTx = await this._buildSetDripListStreamTxs(
+    const setStreamTx = await this._buildSetStreamListStreamTxs(
       salt,
       token,
       dripListId,
@@ -221,7 +223,7 @@ export default class DripListService {
     const txs: { [name: string]: PopulatedTransaction } = {
       tokenApprovalTx,
       createDripListTx,
-      setDripListProjectsTx,
+      setStreamListProjectsTx,
       setStreamTx,
     };
 
@@ -243,11 +245,11 @@ export default class DripListService {
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { tokenApprovalTx, createDripListTx, setDripListProjectsTx, setStreamTx } = txs;
+    const { tokenApprovalTx, createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
 
     const batchTx = await callerClient.populateCallBatchedTx([
       createDripListTx,
-      setDripListProjectsTx,
+      setStreamListProjectsTx,
       setStreamTx,
     ]);
 
@@ -281,12 +283,12 @@ export default class DripListService {
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { createDripListTx, setDripListProjectsTx, setStreamTx } = txs;
+    const { createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
 
     if (!needsApproval) {
       const batchTx = await callerClient.populateCallBatchedTx([
         createDripListTx,
-        setDripListProjectsTx,
+        setStreamListProjectsTx,
         setStreamTx,
       ]);
 
@@ -294,13 +296,13 @@ export default class DripListService {
       const gasLimitWithBuffer = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
 
       return {
-        txs: [createDripListTx, setDripListProjectsTx, setStreamTx],
+        txs: [createDripListTx, setStreamListProjectsTx, setStreamTx],
         gasLimitWithBuffer,
       };
     }
 
     return {
-      txs: [createDripListTx, setDripListProjectsTx, setStreamTx],
+      txs: [createDripListTx, setStreamListProjectsTx, setStreamTx],
     };
   }
 
@@ -312,10 +314,10 @@ export default class DripListService {
         driver: 'nft',
         owner: {
           driver: 'address',
-          userId: await this._addressDriverClient.getUserIdByAddress(this._ownerAddress),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(this._ownerAddress),
           address: this._ownerAddress,
         },
-        userId: dripListId,
+        accountId: dripListId,
       },
       name,
     });
@@ -342,10 +344,10 @@ export default class DripListService {
     return createDripListTx;
   }
 
-  private async _buildSetDripListStreamTxs(
+  private async _buildSetStreamListStreamTxs(
     salt: bigint,
     token: Address,
-    dripListId: UserId,
+    dripListId: AccountId,
     topUpAmount: bigint,
     start: bigint,
     duration: bigint,
@@ -353,32 +355,32 @@ export default class DripListService {
   ) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
-    const ownerAddressDriverUserId = await this._addressDriverClient.getUserIdByAddress(
+    const ownerAddressDriverAccountId = await this._addressDriverClient.getAccountIdByAddress(
       this._ownerAddress,
     );
 
-    const currentReceivers: DripsReceiverStruct[] =
-      await this._dripsSubgraphClient.getCurrentDripsReceivers(
-        ownerAddressDriverUserId,
+    const currentReceivers: StreamReceiverStruct[] =
+      await this._dripsSubgraphClient.getCurrentStreamsReceivers(
+        ownerAddressDriverAccountId,
         token,
         get(wallet).provider,
       );
 
-    const config: DripsReceiverConfig = {
+    const config: StreamConfig = {
       start,
       duration,
       amountPerSec,
       dripId: BigInt(this._generateDripIdFromSalt(salt)),
     };
 
-    const newReceivers: DripsReceiverStruct[] = [
+    const newReceivers: StreamReceiverStruct[] = [
       {
-        userId: dripListId,
-        config: Utils.DripsReceiverConfiguration.toUint256(config),
+        accountId: dripListId,
+        config: Utils.StreamConfiguration.toUint256(config),
       },
     ];
 
-    const setStreamTx = await this._addressDriverTxFactory.setDrips(
+    const setStreamTx = await this._addressDriverTxFactory.setStreams(
       token,
       currentReceivers,
       topUpAmount,

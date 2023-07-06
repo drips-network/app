@@ -9,23 +9,23 @@ export interface GitHubSource {
 
 export type Source = GitHubSource;
 
-export type UserId = string;
+export type AccountId = string;
 
 export interface AddressDriverAccount {
   driver: 'address';
-  userId: UserId;
+  accountId: AccountId;
   address: Address;
 }
 
 export interface NFTDriverAccount {
   driver: 'nft';
-  userId: UserId;
+  accountId: AccountId;
   owner: AddressDriverAccount;
 }
 
 export interface RepoDriverAccount {
   driver: 'repo';
-  userId: UserId;
+  accountId: AccountId;
 }
 
 export type Account = AddressDriverAccount | NFTDriverAccount | RepoDriverAccount;

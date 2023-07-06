@@ -3,36 +3,36 @@ import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import { isAddress } from 'ethers/lib/utils';
 import { AddressDriverClient } from 'radicle-drips';
 
-export default async function (userId: string): Promise<{
+export default async function (accountId: string): Promise<{
   address: string;
-  dripsUserId: string;
+  dripsAccountId: string;
 }> {
-  if (isAddress(userId)) {
-    const address = userId;
-    const dripsUserId = await (await getAddressDriverClient()).getUserIdByAddress(userId);
+  if (isAddress(accountId)) {
+    const address = accountId;
+    const dripsAccountId = await (await getAddressDriverClient()).getAccountIdByAddress(accountId);
 
     return {
       address,
-      dripsUserId,
+      dripsAccountId,
     };
-  } else if (/^\d+$/.test(userId)) {
+  } else if (/^\d+$/.test(accountId)) {
     // User ID param has only numbers and is probably a drips user ID
-    const dripsUserId = userId;
-    const address = AddressDriverClient.getUserAddress(userId);
+    const dripsAccountId = accountId;
+    const address = AddressDriverClient.getUserAddress(accountId);
 
     return {
       address,
-      dripsUserId,
+      dripsAccountId,
     };
-  } else if (userId.endsWith('.eth')) {
-    const lookup = await ens.reverseLookup(userId);
+  } else if (accountId.endsWith('.eth')) {
+    const lookup = await ens.reverseLookup(accountId);
     if (lookup) {
-      const dripsUserId = await (await getAddressDriverClient()).getUserIdByAddress(lookup);
+      const dripsAccountId = await (await getAddressDriverClient()).getAccountIdByAddress(lookup);
       const address = lookup;
 
       return {
         address,
-        dripsUserId,
+        dripsAccountId,
       };
     } else {
       throw new Error('Not found');

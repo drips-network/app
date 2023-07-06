@@ -1,14 +1,14 @@
 import {
   DripsSubgraphClient,
-  type DripsSetEvent,
-  type DripsSetEventWithFullReceivers,
+  type StreamsSetEvent,
+  type StreamsSetEventWithFullReceivers,
   AddressDriverClient,
 } from 'radicle-drips';
 import type { addressDriverAccountMetadataSchema } from '../schemas';
 import * as getDripsClients from '$lib/utils/get-drips-clients';
-import * as reconcileDripsSetReceivers from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
+import * as reconcileStreamsSetReceivers from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import type { Mock } from 'vitest';
-import seperateDripsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
+import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import AddressDriverMetadataManager from '../AddressDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
 import type { z } from 'zod';
@@ -28,45 +28,45 @@ describe('AddressDriverMetadataManager', () => {
   describe('fetchAccount', () => {
     it('should fetch account', async () => {
       // Arrange
-      const userId = '1';
+      const accountId = '1';
 
-      const expectedDripsSetEvents = [
+      const expectedStreamsSetEvents = [
         {
-          dripsSetId: '1',
+          streamsSetId: '1',
         },
-      ] as unknown as DripsSetEvent[];
+      ] as unknown as StreamsSetEvent[];
 
       const mockSubgraphClient = {
-        getDripsSetEventsByUserId: vi
-          .fn(DripsSubgraphClient.prototype.getDripsSetEventsByUserId)
-          .mockResolvedValue(expectedDripsSetEvents),
+        getStreamsSetEventsByAccountId: vi
+          .fn(DripsSubgraphClient.prototype.getStreamsSetEventsByAccountId)
+          .mockResolvedValue(expectedStreamsSetEvents),
       } as unknown as DripsSubgraphClient;
 
       vi.spyOn(getDripsClients, 'getSubgraphClient').mockReturnValue(mockSubgraphClient);
 
-      const expectedDripsSetEventsWithFullReceivers = [
+      const expectedStreamsSetEventsWithFullReceivers = [
         {
-          dripsSetId: '1',
+          streamsSetId: '1',
         },
-      ] as unknown as DripsSetEventWithFullReceivers[];
+      ] as unknown as StreamsSetEventWithFullReceivers[];
 
-      const reconcileDripsSetReceiversMock = vi
+      const reconcileStreamsSetReceiversMock = vi
         .fn()
-        .mockReturnValue(expectedDripsSetEventsWithFullReceivers);
+        .mockReturnValue(expectedStreamsSetEventsWithFullReceivers);
 
-      vi.spyOn(reconcileDripsSetReceivers, 'reconcileDripsSetReceivers').mockImplementation(
-        reconcileDripsSetReceiversMock,
+      vi.spyOn(reconcileStreamsSetReceivers, 'reconcileStreamsSetReceivers').mockImplementation(
+        reconcileStreamsSetReceiversMock,
       );
 
-      const seperateDripsSetEventsMock = vi
+      const seperateStreamsSetEventsMock = vi
         .fn()
-        .mockReturnValue(expectedDripsSetEventsWithFullReceivers);
+        .mockReturnValue(expectedStreamsSetEventsWithFullReceivers);
 
       vi.mock('$lib/stores/streams/methods/separate-drips-set-events', () => ({
         default: vi.fn(),
       }));
 
-      (seperateDripsSetEvents as Mock).mockImplementation(seperateDripsSetEventsMock);
+      (seperateStreamsSetEvents as Mock).mockImplementation(seperateStreamsSetEventsMock);
 
       const expectedMetadata = {
         data: {
@@ -89,7 +89,7 @@ describe('AddressDriverMetadataManager', () => {
 
       const expectedAssetConfigs = [
         {
-          dripsSetId: '1',
+          streamsSetId: '1',
         },
       ];
 
@@ -102,14 +102,14 @@ describe('AddressDriverMetadataManager', () => {
         .mockReturnValue('0x123');
 
       // Act
-      const account = await new AddressDriverMetadataManager().fetchAccount(userId);
+      const account = await new AddressDriverMetadataManager().fetchAccount(accountId);
 
       // Assert
       expect(account).toEqual({
         user: {
-          userId,
+          accountId,
           driver: 'address',
-          address: AddressDriverClient.getUserAddress(userId),
+          address: AddressDriverClient.getUserAddress(accountId),
         },
         name: expectedMetadata.data.name,
         description: expectedMetadata.data.description,
@@ -120,15 +120,15 @@ describe('AddressDriverMetadataManager', () => {
         lastIpfsHash: expectedMetadata.hash,
       });
 
-      expect(mockSubgraphClient.getDripsSetEventsByUserId).toHaveBeenCalledWith(userId);
-      expect(reconcileDripsSetReceiversMock).toHaveBeenCalledWith(expectedDripsSetEvents);
-      expect(seperateDripsSetEventsMock).toHaveBeenCalledWith(
-        expectedDripsSetEventsWithFullReceivers,
+      expect(mockSubgraphClient.getStreamsSetEventsByAccountId).toHaveBeenCalledWith(accountId);
+      expect(reconcileStreamsSetReceiversMock).toHaveBeenCalledWith(expectedStreamsSetEvents);
+      expect(seperateStreamsSetEventsMock).toHaveBeenCalledWith(
+        expectedStreamsSetEventsWithFullReceivers,
       );
       expect(buildAssetConfigsMock).toHaveBeenCalledWith(
-        userId,
+        accountId,
         expectedMetadata.data,
-        expectedDripsSetEventsWithFullReceivers,
+        expectedStreamsSetEventsWithFullReceivers,
       );
     });
   });
@@ -138,7 +138,7 @@ describe('AddressDriverMetadataManager', () => {
       // Arrange
       const forAccount: Account = {
         user: {
-          userId: '1',
+          accountId: '1',
           driver: 'address',
           address: '0x123',
         },
@@ -151,7 +151,7 @@ describe('AddressDriverMetadataManager', () => {
             streams: [
               {
                 id: '1',
-                dripsConfig: {
+                streamConfig: {
                   dripId: '2',
                   raw: BigInt(1000),
                   startDate: new Date(),
@@ -163,7 +163,7 @@ describe('AddressDriverMetadataManager', () => {
                 },
                 managed: true,
                 receiver: {
-                  userId: '2',
+                  accountId: '2',
                   driver: 'address',
                   address: '0x789',
                 },
@@ -204,11 +204,11 @@ describe('AddressDriverMetadataManager', () => {
             return {
               id: stream.id,
               initialDripsConfig: {
-                dripId: stream.dripsConfig.dripId,
-                raw: stream.dripsConfig.raw.toString(),
-                startTimestamp: Math.floor((stream.dripsConfig.startDate?.getTime() || 0) / 1000),
-                durationSeconds: stream.dripsConfig.durationSeconds || 0,
-                amountPerSecond: stream.dripsConfig.amountPerSecond.amount,
+                dripId: stream.streamConfig.dripId,
+                raw: stream.streamConfig.raw.toString(),
+                startTimestamp: Math.floor((stream.streamConfig.startDate?.getTime() || 0) / 1000),
+                durationSeconds: stream.streamConfig.durationSeconds || 0,
+                amountPerSecond: stream.streamConfig.amountPerSecond.amount,
               },
               receiver: stream.receiver,
               archived: stream.archived ?? false,

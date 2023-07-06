@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
 import { nftDriverAccountMetadataSchema } from './schemas';
-import type { NFTDriverAccount, UserId } from './types';
+import type { NFTDriverAccount, AccountId } from './types';
 import { getAddressDriverClient } from '../get-drips-clients';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
@@ -12,16 +12,16 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
     super(nftDriverAccountMetadataSchema);
   }
 
-  public async fetchAccount(userId: UserId): Promise<NFTDriverAccount | null> {
-    const ownerSubAccount = await this.subgraphClient.getNftSubAccountOwnerByTokenId(userId);
+  public async fetchAccount(accountId: AccountId): Promise<NFTDriverAccount | null> {
+    const ownerSubAccount = await this.subgraphClient.getNftSubAccountOwnerByTokenId(accountId);
 
     if (!ownerSubAccount) {
       return null;
     }
 
-    if (ownerSubAccount.tokenId !== userId) {
+    if (ownerSubAccount.tokenId !== accountId) {
       throw new Error(
-        `The provided user ID ${userId} does not match the expected owner sub-account tokenId ${ownerSubAccount.tokenId} found on-chain.`,
+        `The provided user ID ${accountId} does not match the expected owner sub-account tokenId ${ownerSubAccount.tokenId} found on-chain.`,
       );
     }
 
@@ -29,10 +29,10 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
     return {
       driver: 'nft',
-      userId: ownerSubAccount.tokenId,
+      accountId: ownerSubAccount.tokenId,
       owner: {
         driver: 'address',
-        userId: await addressDriverClient.getUserIdByAddress(ownerSubAccount.ownerAddress),
+        accountId: await addressDriverClient.getAccountIdByAddress(ownerSubAccount.ownerAddress),
         address: ownerSubAccount.ownerAddress,
       },
     } as NFTDriverAccount;
@@ -48,7 +48,7 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       driver: 'nft',
       describes: {
         driver: forAccount.driver,
-        userId: forAccount.userId,
+        accountId: forAccount.accountId,
       },
       isDripList: true,
       name,

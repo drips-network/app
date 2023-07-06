@@ -13,7 +13,7 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
-  import type { UserId } from '$lib/utils/common-types';
+  import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import emoji from '$lib/utils/emoji/emoji';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
@@ -45,18 +45,18 @@
 
       $context.projectEmoji = seededRandomElement(
         emoji.map((e) => e.unicode),
-        project.repoDriverAccount.userId,
+        project.repoDriverAccount.accountId,
       );
       $context.projectColor = seededRandomElement(
         ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
-        project.repoDriverAccount.userId,
+        project.repoDriverAccount.accountId,
       );
 
       // TODO: enable pre-population of dependencies.
-      // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.userId), prePopulateDependencies()]);
+      // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId), prePopulateDependencies()]);
       await Promise.all([
         fetchProjectMetadata(),
-        fetchUnclaimedProjectFunds(project.repoDriverAccount.userId),
+        fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId),
       ]);
 
       validationState = { type: 'valid' };
@@ -78,8 +78,8 @@
     };
   }
 
-  async function fetchUnclaimedProjectFunds(userId: UserId) {
-    $context.unclaimedFunds = await fetchUnclaimedFunds(userId);
+  async function fetchUnclaimedProjectFunds(accountId: AccountId) {
+    $context.unclaimedFunds = await fetchUnclaimedFunds(accountId);
   }
 
   // async function prePopulateDependencies() {

@@ -1,22 +1,22 @@
 import { AddressDriverClient, Utils } from 'radicle-drips';
-import type { AddressDriverUser, NFTDriverUser, UserId } from '../types';
+import type { AddressDriverAccount, NFTDriverAccount, AccountId } from '../types';
 
 export default function buildStreamReceiver(
-  receiverUserId: UserId,
-): AddressDriverUser | NFTDriverUser {
-  const receiverDriver = Utils.UserId.getDriver(receiverUserId);
+  receiverAccountId: AccountId,
+): AddressDriverAccount | NFTDriverAccount {
+  const receiverDriver = Utils.AccountId.getDriver(receiverAccountId);
 
   switch (receiverDriver) {
     case 'address':
       return {
         driver: 'address',
-        address: AddressDriverClient.getUserAddress(receiverUserId),
-        userId: receiverUserId,
+        address: AddressDriverClient.getUserAddress(receiverAccountId),
+        accountId: receiverAccountId,
       };
     case 'nft':
       return {
         driver: 'nft',
-        userId: receiverUserId,
+        accountId: receiverAccountId,
       };
     default:
       throw new Error(`Unsupported stream receiver driver type: ${receiverDriver}`);

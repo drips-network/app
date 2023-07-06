@@ -15,7 +15,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import checkIsUser from '$lib/utils/check-is-user';
-  import decodeUserId from '$lib/utils/decode-user-id';
+  import decodeAccountId from '$lib/utils/decode-user-id';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
   import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
@@ -33,22 +33,22 @@
 
   $: tokenAddress = token?.info.address.toLowerCase() ?? urlParamToken.toLowerCase();
 
-  $: userId = $wallet.dripsUserId;
+  $: accountId = $wallet.dripsAccountId;
 
   $: outgoingEstimate =
-    userId && $balances.accounts[userId]
-      ? $balances.accounts[userId].tokens[tokenAddress] ?? null
+    accountId && $balances.accounts[accountId]
+      ? $balances.accounts[accountId].tokens[tokenAddress] ?? null
       : undefined;
 
-  $: fetchStatus = userId ? $accountFetchStatussesStore[userId] : undefined;
+  $: fetchStatus = accountId ? $accountFetchStatussesStore[accountId] : undefined;
   let loaded = false;
-  $: if (userId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
+  $: if (accountId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
     loaded = true;
   }
 
   $: incomingTotals =
-    userId && tokenAddress && $balances
-      ? balances.getIncomingBalanceForUser(tokenAddress, userId) ?? null
+    accountId && tokenAddress && $balances
+      ? balances.getIncomingBalanceForUser(tokenAddress, accountId) ?? null
       : undefined;
 
   function openCollectModal() {
@@ -65,10 +65,10 @@
 
   let error: 'connected-to-wrong-user' | 'unknown-token' | undefined;
 
-  async function checkUrlUserId() {
-    const decodedUrlUserId = await decodeUserId($page.params.userId);
+  async function checkUrlAccountId() {
+    const decodedUrlAccountId = await decodeAccountId($page.params.accountId);
 
-    const connectedToRightUser = checkIsUser(decodedUrlUserId.dripsUserId);
+    const connectedToRightUser = checkIsUser(decodedUrlAccountId.dripsAccountId);
     if (!connectedToRightUser) return (error = 'connected-to-wrong-user');
     if (!token) return (error = 'unknown-token');
     error = undefined;
@@ -78,7 +78,7 @@
   $: {
     $wallet.connected;
     $tokens;
-    if (guardConnected()) checkUrlUserId();
+    if (guardConnected()) checkUrlAccountId();
   }
 </script>
 
@@ -200,6 +200,6 @@
       </TokenStat>
     </section>
 
-    <Streams {userId} disableActions={false} {tokenAddress} />
+    <Streams {accountId} disableActions={false} {tokenAddress} />
   </article>
 {/if}

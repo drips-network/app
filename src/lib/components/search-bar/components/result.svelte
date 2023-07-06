@@ -20,7 +20,7 @@
   <AccountMenuItem
     on:click
     icon={StreamIcon}
-    href={`/app/${item.item.sender.address}/tokens/${item.item.dripsConfig.amountPerSecond.tokenAddress}/streams/${item.item.dripsConfig.dripId}`}
+    href={`/app/${item.item.sender.address}/tokens/${item.item.streamConfig.amountPerSecond.tokenAddress}/streams/${item.item.streamConfig.dripId}`}
   >
     <div class="icon" slot="title">
       <div class="highlighted">
@@ -55,7 +55,7 @@
   <AccountMenuItem
     icon={item.item.address ? undefined : UserIcon}
     on:click
-    href={`/app/${item.item.name ?? item.item.address ?? item.item.dripsUserId}`}
+    href={`/app/${item.item.name ?? item.item.address ?? item.item.dripsAccountId}`}
   >
     <div class="icon" slot="left">
       {#if item.item.address}<IdentityBadge
@@ -70,7 +70,7 @@
     <svelte:fragment slot="title">
       <div class="highlighted">
         <span style="color: var(--color-foreground)">
-          {#if !item.item.name && !item.item.address && item.item.dripsUserId}
+          {#if !item.item.name && !item.item.address && item.item.dripsAccountId}
             Jump to user ID:
           {/if}
         </span>

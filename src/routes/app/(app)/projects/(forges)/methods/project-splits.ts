@@ -24,8 +24,8 @@ async function getValidMetadataSplits(
 
   const subgraphClient = getSubgraphClient();
 
-  const onChainSplitsConfig = await subgraphClient.getSplitsConfigByUserId(
-    project.repoDriverAccount.userId,
+  const onChainSplitsConfig = await subgraphClient.getSplitsConfigByAccountId(
+    project.repoDriverAccount.accountId,
   );
 
   const result: RepoDriverAccountSplits = { maintainers: [], dependencies: [] };
@@ -34,7 +34,7 @@ async function getValidMetadataSplits(
   for (const maintainerMetadataSplit of project.splits.maintainers) {
     const matchingOnChainSplit = onChainSplitsConfig.find(
       (v) =>
-        v.userId === maintainerMetadataSplit.account.userId &&
+        v.accountId === maintainerMetadataSplit.account.accountId &&
         !usedOnChainSplitEntryIds.includes(v.id),
     );
 
@@ -51,7 +51,7 @@ async function getValidMetadataSplits(
   for (const dependencyMetadataSplit of project.splits.dependencies) {
     const matchingOnChainSplit = onChainSplitsConfig.find(
       (v) =>
-        v.userId === dependencyMetadataSplit.account.userId &&
+        v.accountId === dependencyMetadataSplit.account.accountId &&
         !usedOnChainSplitEntryIds.includes(v.id),
     );
 

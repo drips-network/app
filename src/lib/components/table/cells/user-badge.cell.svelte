@@ -2,24 +2,24 @@
   import type { CellContext } from '@tanstack/svelte-table';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import { z } from 'zod';
-  import type { AddressDriverUser, NFTDriverUser } from '$lib/stores/streams/types';
+  import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
 
   export let context: CellContext<unknown, unknown>;
 
-  let user: AddressDriverUser | NFTDriverUser;
+  let user: AddressDriverAccount | NFTDriverAccount;
   $: {
     const value = context.getValue();
 
     const userSchema = z.union([
       z.object({
         driver: z.literal('address'),
-        userId: z.string(),
+        accountId: z.string(),
         address: z.string(),
       }),
       z.object({
         driver: z.literal('nft'),
-        userId: z.string(),
+        accountId: z.string(),
       }),
     ]);
 

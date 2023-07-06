@@ -6,7 +6,7 @@ import {
   RepoDriverTxFactory,
   Utils,
   type SplitsReceiverStruct,
-  DripsHubTxFactory,
+  DripsTxFactory,
 } from 'radicle-drips';
 import {
   getAddressDriverClient,
@@ -21,7 +21,7 @@ import {
   type ClaimedGitProject,
   type GitProject,
   type UnclaimedGitProject,
-  type UserId,
+  type AccountId,
   type Source,
   type AddressDriverSplitReceiver,
   type RepoDriverSplitReceiver,
@@ -49,7 +49,7 @@ import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 
 export default class GitProjectService {
-  private _dripsTxFactory!: DripsHubTxFactory;
+  private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
@@ -93,9 +93,9 @@ export default class GitProjectService {
     const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
     const projectName = `${username}/${repoName}`;
 
-    const userId = await this._repoDriverClient.getUserId(forge, projectName);
+    const accountId = await this._repoDriverClient.getAccountId(forge, projectName);
 
-    const onChainProject = await this.getByUserId(userId, shouldVerifyState);
+    const onChainProject = await this.getByAccountId(accountId, shouldVerifyState);
 
     // If the project doesn't exist on-chain yet, return an unclaimed project.
     if (!onChainProject) {
@@ -103,7 +103,7 @@ export default class GitProjectService {
         claimed: false,
         owner: undefined,
         repoDriverAccount: {
-          userId,
+          accountId,
           driver: 'repo',
         },
         verificationStatus: 'NOT_STARTED',
@@ -116,11 +116,11 @@ export default class GitProjectService {
     return onChainProject;
   }
 
-  public async getUserIdByUrl(url: string): Promise<UserId> {
+  public async getAccountIdByUrl(url: string): Promise<AccountId> {
     const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
     const projectName = `${username}/${repoName}`;
 
-    return this._repoDriverClient.getUserId(forge, projectName);
+    return this._repoDriverClient.getAccountId(forge, projectName);
   }
 
   public async getAllByOwner(address: Address): Promise<ClaimedGitProject[]> {
@@ -145,12 +145,12 @@ export default class GitProjectService {
     const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
     const projectName = `${username}/${repoName}`;
 
-    const userId = await this._repoDriverClient.getUserId(forge, projectName);
+    const accountId = await this._repoDriverClient.getAccountId(forge, projectName);
 
-    const tokenAddresses = await Promise.all([relevantTokens('splittable', userId)]);
+    const tokenAddresses = await Promise.all([relevantTokens('splittable', accountId)]);
 
     const balances = await Promise.all([
-      fetchBalancesForTokens('splittable', tokenAddresses[0], userId),
+      fetchBalancesForTokens('splittable', tokenAddresses[0], accountId),
     ]);
 
     return balances[0].map((b) => ({
@@ -186,15 +186,18 @@ export default class GitProjectService {
 
   /**
    * Returns the `GitProject` for the given user ID.
-   * @param userId The user ID.
+   * @param accountId The user ID.
    * @param shouldVerifyState Whether to verify the state of the project on-chain and the subgraph is in sync.
    * If you just created the project, you should set this to `false` as it takes a while for the subgraph to index.
    * @returns The on-chain `GitProject`. If the project does not exist on-chain, it returns `null`.
    * @throws if the user ID is invalid.
    */
-  public async getByUserId(userId: UserId, shouldVerifyState = true): Promise<GitProject | null> {
+  public async getByAccountId(
+    accountId: AccountId,
+    shouldVerifyState = true,
+  ): Promise<GitProject | null> {
     const onChainProject: RepoAccount | null =
-      await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(userId);
+      await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(accountId);
 
     if (!onChainProject) return null;
 
@@ -290,7 +293,7 @@ export default class GitProjectService {
       if (isAddr) {
         const receiver = {
           weight,
-          userId: await this._addressDriverClient.getUserIdByAddress(urlOrAddress as Address),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
         };
 
         dependenciesSplitMetadata.push(receiver);
@@ -300,7 +303,7 @@ export default class GitProjectService {
 
         const receiver = {
           weight,
-          userId: await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`),
+          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
         };
 
         dependenciesSplitMetadata.push({
@@ -323,7 +326,7 @@ export default class GitProjectService {
         weight:
           Math.floor((Number(percentage) / 100) * 1000000) *
           (context.highLevelPercentages['maintainers'] / 100),
-        userId: await this._addressDriverClient.getUserIdByAddress(address),
+        accountId: await this._addressDriverClient.getAccountIdByAddress(address),
       };
 
       maintainersSplitsMetadata.push(receiver);
@@ -331,9 +334,9 @@ export default class GitProjectService {
     }
 
     const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const userId = await this._repoDriverClient.getUserId(forge, `${username}/${repoName}`);
+    const accountId = await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`);
     const setSplitsTx = await this._repoDriverTxFactory.setSplits(
-      userId,
+      accountId,
       this._formatSplitReceivers(receivers),
     );
 
@@ -352,24 +355,24 @@ export default class GitProjectService {
 
     const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
 
-    const userMetadataAsBytes = [
+    const accountMetadataAsBytes = [
       {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: ipfsHash,
       },
     ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
 
-    const emitUserMetadataTx = await this._repoDriverTxFactory.emitUserMetadata(
-      userId,
-      userMetadataAsBytes,
+    const emitAccountMetadataTx = await this._repoDriverTxFactory.emitAccountMetadata(
+      accountId,
+      accountMetadataAsBytes,
     );
 
     const splitTxs: Promise<PopulatedTransaction>[] = [];
     context.unclaimedFunds?.map(({ tokenAddress }) => {
-      splitTxs.push(this._dripsTxFactory.split(userId, tokenAddress, receivers));
+      splitTxs.push(this._dripsTxFactory.split(accountId, tokenAddress, receivers));
     });
 
-    return [setSplitsTx, emitUserMetadataTx, ...(await Promise.all(splitTxs))];
+    return [setSplitsTx, emitAccountMetadataTx, ...(await Promise.all(splitTxs))];
   }
 
   // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
@@ -379,7 +382,7 @@ export default class GitProjectService {
     const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
       if (
         !unique.some(
-          (obj: SplitsReceiverStruct) => obj.userId === o.userId && obj.weight === o.weight,
+          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
         )
       ) {
         unique.push(o);
@@ -389,9 +392,9 @@ export default class GitProjectService {
 
     const sortedReceivers = uniqueReceivers.sort((a, b) =>
       // Sort by user ID.
-      BigNumber.from(a.userId).gt(BigNumber.from(b.userId))
+      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
         ? 1
-        : BigNumber.from(a.userId).lt(BigNumber.from(b.userId))
+        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
         ? -1
         : 0,
     );
@@ -442,18 +445,18 @@ export default class GitProjectService {
   private _verifySubgraphAndOnChainStateIsInSync(
     isClaimed: boolean,
     repoAccount: RepoAccount,
-    userId: string,
+    accountId: string,
   ): void {
     if (!isClaimed && repoAccount.status === 'CLAIMED') {
       throw new Error(
-        `The repo account with user ID ${userId} is not claimed on-chain (has no owner address set) but has a status of ${repoAccount.status} in the subgraph.
+        `The repo account with user ID ${accountId} is not claimed on-chain (has no owner address set) but has a status of ${repoAccount.status} in the subgraph.
         This means the subgraph is out of sync with the on-chain state.`,
       );
     }
 
     if (isClaimed && repoAccount.status !== 'CLAIMED') {
       throw new Error(
-        `The repo account with user ID ${userId} is claimed on-chain (has an owner address set) but has a status of ${repoAccount.status} in the subgraph. 
+        `The repo account with user ID ${accountId} is claimed on-chain (has an owner address set) but has a status of ${repoAccount.status} in the subgraph. 
         This means the subgraph is out of sync with the on-chain state.`,
       );
     }
@@ -470,12 +473,12 @@ export default class GitProjectService {
 
     // The project exists on-chain...
 
-    const { userId } = onChainProject;
-    const ownerAddress = await this._repoDriverClient.getOwner(userId);
+    const { accountId } = onChainProject;
+    const ownerAddress = await this._repoDriverClient.getOwner(accountId);
     const isClaimed = Boolean(ownerAddress);
 
     if (shouldVerifyState) {
-      this._verifySubgraphAndOnChainStateIsInSync(isClaimed, onChainProject, userId);
+      this._verifySubgraphAndOnChainStateIsInSync(isClaimed, onChainProject, accountId);
     }
 
     const username = onChainProject.name.split('/')[0];
@@ -487,7 +490,7 @@ export default class GitProjectService {
         claimed: false,
         owner: undefined,
         repoDriverAccount: {
-          userId,
+          accountId,
           driver: 'repo',
         },
         verificationStatus: this._calculateVerificationStatus(onChainProject),
@@ -499,7 +502,7 @@ export default class GitProjectService {
 
     // The project exists on-chain and is claimed...
 
-    const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(userId);
+    const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
 
     // Someone could claim a project "manually" without using the Drips app, in which case there won't be any metadata.
     // That's why we need to set default values for color and emoji.
@@ -507,9 +510,9 @@ export default class GitProjectService {
     // TODO: Restrict random emojis to a few safe ones.
     let emoji = seededRandomElement(
       EMOJI.map((e) => e.unicode),
-      userId,
+      accountId,
     );
-    let color = seededRandomElement(['#5555FF', '#53DB53', '#FFC555', '#FF5555'], userId);
+    let color = seededRandomElement(['#5555FF', '#53DB53', '#FFC555', '#FF5555'], accountId);
     let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
     let splits: z.infer<typeof repoDriverAccountSplitsSchema> = {
       maintainers: [],
@@ -533,8 +536,8 @@ export default class GitProjectService {
       weight: metadata.weight,
       account: {
         driver: 'address',
-        userId: metadata.userId,
-        address: AddressDriverClient.getUserAddress(metadata.userId),
+        accountId: metadata.accountId,
+        address: AddressDriverClient.getUserAddress(metadata.accountId),
       },
     });
 
@@ -544,7 +547,7 @@ export default class GitProjectService {
       weight: metadata.weight,
       account: {
         driver: 'repo',
-        userId: metadata.userId,
+        accountId: metadata.accountId,
       },
       source: metadata.source,
     });
@@ -557,12 +560,12 @@ export default class GitProjectService {
       claimed: true,
       repoDriverAccount: {
         driver: 'repo',
-        userId: userId,
+        accountId: accountId,
       },
       owner: {
         driver: 'address',
         address: onChainProject.ownerAddress as Address,
-        userId: await this._addressDriverClient.getUserIdByAddress(
+        accountId: await this._addressDriverClient.getAccountIdByAddress(
           onChainProject.ownerAddress as Address,
         ),
       },

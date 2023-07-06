@@ -1,10 +1,10 @@
-import { constants, type SqueezedDripsEvent } from 'radicle-drips';
+import { constants, type SqueezedStreamsEvent } from 'radicle-drips';
 import { get, readable, writable, type Readable } from 'svelte/store';
 import { estimateAccount, type AssetConfigEstimates, type StreamEstimate } from './utils/estimate';
 import tickStore from '../tick/tick.store';
-import type { Account, StreamId, UserId } from '../streams/types';
+import type { Account, StreamId, AccountId } from '../streams/types';
 import { decodeStreamId } from '../streams/methods/make-stream-id';
-import { getDripsHubClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
+import { getDripsClient, getSubgraphClient } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
 import relevantTokens from '$lib/utils/drips/relevant-tokens';
 import fetchBalancesForTokens from '$lib/utils/drips/fetch-balances-for-tokens';
@@ -18,12 +18,12 @@ interface Amount {
 interface AccountBalances {
   receivable?: Amount[];
   splittable?: Amount[];
-  squeezeHistory?: SqueezedDripsEvent[];
+  squeezeHistory?: SqueezedStreamsEvent[];
   tokens: { [tokenAddress: string]: AssetConfigEstimates };
 }
 
 interface State {
-  accounts: { [userId: string]: AccountBalances };
+  accounts: { [accountId: string]: AccountBalances };
 }
 
 const INITIAL_STATE = {
@@ -37,11 +37,11 @@ interface Cycle {
 }
 
 export default (() => {
-  let accounts: Readable<{ [accountId: UserId]: Account }> = readable({});
+  let accounts: Readable<{ [accountId: AccountId]: Account }> = readable({});
   let tickRegistration: number | undefined;
   const state = writable<State>(INITIAL_STATE);
   const currentCycle = writable<Cycle | undefined>();
-  const fetchStatusses = writable<{ [key: UserId]: AccountFetchStatus }>({});
+  const fetchStatusses = writable<{ [key: AccountId]: AccountFetchStatus }>({});
 
   // Once per tick, we run balance estimation logic.
   if (!tickRegistration) tickRegistration = tickStore.register(_updateAccountBalances);
@@ -58,30 +58,30 @@ export default (() => {
    * recurringly.
    * @param toAccounts The accounts readable to connect to.
    */
-  async function setAccounts(toAccounts: Readable<{ [accountId: UserId]: Account }>) {
+  async function setAccounts(toAccounts: Readable<{ [accountId: AccountId]: Account }>) {
     accounts = toAccounts;
   }
 
   /** Update the current receivable balances for the currently connected user. */
-  async function updateBalances(forUserId: string) {
+  async function updateBalances(forAccountId: string) {
     const tokenAddresses = await Promise.all([
-      relevantTokens('receivable', forUserId),
-      relevantTokens('splittable', forUserId),
+      relevantTokens('receivable', forAccountId),
+      relevantTokens('splittable', forAccountId),
     ]);
 
     const balances = await Promise.all([
-      fetchBalancesForTokens('receivable', tokenAddresses[0], forUserId),
-      fetchBalancesForTokens('splittable', tokenAddresses[1], forUserId),
+      fetchBalancesForTokens('receivable', tokenAddresses[0], forAccountId),
+      fetchBalancesForTokens('splittable', tokenAddresses[1], forAccountId),
     ]);
 
     state.update((s) => {
-      s.accounts[forUserId].receivable = balances[0].map((b) => ({
+      s.accounts[forAccountId].receivable = balances[0].map((b) => ({
         amount: b.receivableAmount,
         tokenAddress: b.tokenAddress.toLowerCase(),
         multiplier: 1n,
       }));
 
-      s.accounts[forUserId].splittable = balances[1].map((b) => ({
+      s.accounts[forAccountId].splittable = balances[1].map((b) => ({
         amount: b.splittableAmount,
         tokenAddress: b.tokenAddress.toLowerCase(),
         multiplier: 1n,
@@ -93,17 +93,17 @@ export default (() => {
 
   /**
    * Update the squeeze history for a given account.
-   * @param forUserId The user ID to update the squeeze history for.
+   * @param forAccountId The user ID to update the squeeze history for.
    */
-  async function updateSqueezeHistory(forUserId: string) {
+  async function updateSqueezeHistory(forAccountId: string) {
     const subgraph = getSubgraphClient();
 
-    const squeezedEvents = (await subgraph.getSqueezedDripsEventsByUserId(forUserId)).sort(
+    const squeezedEvents = (await subgraph.getSqueezedStreamsEventsByAccountId(forAccountId)).sort(
       (a, b) => Number(b.blockTimestamp) - Number(a.blockTimestamp),
     );
 
     state.update((s) => {
-      s.accounts[forUserId].squeezeHistory = squeezedEvents;
+      s.accounts[forAccountId].squeezeHistory = squeezedEvents;
       return s;
     });
 
@@ -114,20 +114,20 @@ export default (() => {
   state.subscribe(async (s) => {
     const accounts = Object.keys(s.accounts);
 
-    for (const userId of accounts) {
-      const currentFetchStatus = get(fetchStatusses)[userId];
+    for (const accountId of accounts) {
+      const currentFetchStatus = get(fetchStatusses)[accountId];
       if (['fetching', 'fetched'].includes(currentFetchStatus)) continue;
 
-      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetching' }));
+      fetchStatusses.update((fs) => ({ ...fs, [accountId]: 'fetching' }));
 
       try {
-        await Promise.all([updateSqueezeHistory(userId), updateBalances(userId)]);
+        await Promise.all([updateSqueezeHistory(accountId), updateBalances(accountId)]);
       } catch (e) {
-        fetchStatusses.update((fs) => ({ ...fs, [userId]: 'error' }));
+        fetchStatusses.update((fs) => ({ ...fs, [accountId]: 'error' }));
         throw e;
       }
 
-      fetchStatusses.update((fs) => ({ ...fs, [userId]: 'fetched' }));
+      fetchStatusses.update((fs) => ({ ...fs, [accountId]: 'fetched' }));
     }
   });
 
@@ -140,9 +140,9 @@ export default (() => {
     id: StreamId,
     mode: 'total' | 'currentCycle' = 'total',
   ): StreamEstimate | undefined {
-    const { senderUserId, tokenAddress } = decodeStreamId(id);
+    const { senderAccountId, tokenAddress } = decodeStreamId(id);
 
-    return get(state).accounts[senderUserId]?.tokens[tokenAddress.toLowerCase()]?.[
+    return get(state).accounts[senderAccountId]?.tokens[tokenAddress.toLowerCase()]?.[
       mode
     ].streams.find((s) => s.id === id);
   }
@@ -163,13 +163,13 @@ export default (() => {
 
   /**
    * Get stream estimates for all streams streaming to a given receiver.
-   * @param userId The receiver's User ID to get streams for.
+   * @param accountId The receiver's User ID to get streams for.
    * @returns The relevant stream estimate objects.
    */
-  function getStreamEstimatesByReceiver(mode: 'total' | 'currentCycle', userId: string) {
+  function getStreamEstimatesByReceiver(mode: 'total' | 'currentCycle', accountId: string) {
     const allStreamEstimates = getAllStreamEstimates(mode);
 
-    return allStreamEstimates.filter((se) => se.receiver.userId === userId);
+    return allStreamEstimates.filter((se) => se.receiver.accountId === accountId);
   }
 
   /**
@@ -179,18 +179,18 @@ export default (() => {
    * It includes funds earned from incoming splits and gives, and also takes any squeezes
    * during the current cycle into account.
    * @param tokenAddress The token address of the balance to fetch estimates for.
-   * @param userId The user ID of the user to get balances for.
+   * @param accountId The user ID of the user to get balances for.
    * @returns The incoming balance total and current amount per second, or undefined
    * if the receivable & splittable balances for the account haven't yet been fetched.
    */
-  function getIncomingBalanceForUser(tokenAddress: string, userId: string) {
-    const accountBalances = get(state).accounts[userId];
+  function getIncomingBalanceForUser(tokenAddress: string, accountId: string) {
+    const accountBalances = get(state).accounts[accountId];
     if (!accountBalances) return;
 
     const { receivable, splittable, squeezeHistory } = accountBalances;
     if (!receivable || !splittable || !squeezeHistory) return;
 
-    const incomingStreamsForToken = getStreamEstimatesByReceiver('currentCycle', userId).filter(
+    const incomingStreamsForToken = getStreamEstimatesByReceiver('currentCycle', accountId).filter(
       (streamEstimate) => streamEstimate.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
     );
 
@@ -232,14 +232,14 @@ export default (() => {
   }
 
   /**
-   * The balances store internally fetches information about the current DripsHub cycle in order to
+   * The balances store internally fetches information about the current Drips cycle in order to
    * accurately estimate incoming balances. This function forces an update of the cycle information fetched on
    * when the store was initialized.
    */
   async function updateCycle() {
-    const dripsHubClient = await getDripsHubClient();
+    const dripsClient = await getDripsClient();
 
-    const cycleSecs = await dripsHubClient.cycleSecs();
+    const cycleSecs = await dripsClient.cycleSecs();
     const currentCycleSecs = Math.floor(new Date().getTime() / 1000) % cycleSecs;
     const currentCycleStart = new Date(new Date().getTime() - Number(currentCycleSecs) * 1000);
 
@@ -250,7 +250,7 @@ export default (() => {
   }
 
   function getFullSqueezeHistory() {
-    return Object.values(get(state).accounts).reduce<SqueezedDripsEvent[]>((acc, account) => {
+    return Object.values(get(state).accounts).reduce<SqueezedStreamsEvent[]>((acc, account) => {
       return [...acc, ...(account.squeezeHistory ?? [])];
     }, []);
   }
@@ -266,9 +266,9 @@ export default (() => {
         ...s,
         accounts: Object.fromEntries(
           Object.values(get(accounts)).map((account) => [
-            account.user.userId,
+            account.user.accountId,
             {
-              ...get(state).accounts[account.user.userId],
+              ...get(state).accounts[account.user.accountId],
               tokens: estimateAccount(account, get(currentCycle) ?? unreachable(), allSqueezes),
             },
           ]),

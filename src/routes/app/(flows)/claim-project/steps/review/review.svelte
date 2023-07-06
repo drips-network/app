@@ -43,7 +43,7 @@
     owner: {
       driver: 'address' as const,
       address: $walletStore.address ?? unreachable(),
-      userId: $walletStore.dripsUserId ?? unreachable(),
+      accountId: $walletStore.dripsAccountId ?? unreachable(),
     },
     color: $context.projectColor,
     emoji: $context.projectEmoji,

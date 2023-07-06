@@ -2,7 +2,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import {
     getAddressDriverClient,
-    getDripsHubClient,
+    getDripsClient,
     getSubgraphClient,
   } from '$lib/utils/get-drips-clients';
   import type { Writable } from 'svelte/store';
@@ -19,20 +19,20 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   async function fetchBalancesAndSplits() {
-    const dripsHubClient = await getDripsHubClient();
+    const dripsClient = await getDripsClient();
     const driverClient = await getAddressDriverClient();
     const subgraphClient = getSubgraphClient();
-    const userId = await driverClient.getUserId();
+    const accountId = await driverClient.getAccountId();
 
     const calls = tuple(
-      await dripsHubClient.getReceivableBalanceForUser(
-        userId,
+      await dripsClient.getReceivableBalanceForUser(
+        accountId,
         $context.tokenAddress ?? unreachable(),
         100,
       ),
-      dripsHubClient.getSplittableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      dripsHubClient.getCollectableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      subgraphClient.getSplitsConfigByUserId(userId),
+      dripsClient.getSplittableBalanceForUser(accountId, $context.tokenAddress ?? unreachable()),
+      dripsClient.getCollectableBalanceForUser(accountId, $context.tokenAddress ?? unreachable()),
+      subgraphClient.getSplitsConfigByAccountId(accountId),
     );
 
     const [receivable, splittable, collectable, splitsData] = await Promise.all(calls);
@@ -69,7 +69,7 @@
   }
 
   async function updateCollectable() {
-    await balances.updateBalances($wallet.dripsUserId ?? unreachable());
+    await balances.updateBalances($wallet.dripsAccountId ?? unreachable());
   }
 
   async function promise() {

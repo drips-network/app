@@ -39,7 +39,7 @@
 
   const restorer = $context.restorer;
 
-  const userId = $wallet.dripsUserId ?? unreachable();
+  const accountId = $wallet.dripsAccountId ?? unreachable();
 
   let streamNameValue = restorer.restore('streamNameValue');
 
@@ -57,7 +57,7 @@
   let tokenList: Items;
   $: tokenList = Object.fromEntries(
     mapFilterUndefined(
-      Object.entries($balances.accounts[userId].tokens),
+      Object.entries($balances.accounts[accountId].tokens),
       ([tokenAddress, tokenEstimate]) => {
         const remaining = tokenEstimate.total.totals.remainingBalance;
 
@@ -174,7 +174,7 @@
       amountPerSecond ?? unreachable(),
       recipientAddressValue ?? unreachable(),
       streamNameValue ?? unreachable(),
-      $streams.accounts[get(wallet).dripsUserId ?? unreachable()],
+      $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
       setStartAndEndDate
         ? {
             start: combinedStartDate ?? unreachable(),

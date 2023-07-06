@@ -15,7 +15,7 @@
   let avatarImgElem: HTMLImageElement | undefined;
 
   function getLink() {
-    return dripList ? `/app/drip-lists/${dripList.account.userId}` : `/app/${address}`;
+    return dripList ? `/app/drip-lists/${dripList.account.accountId}` : `/app/${address}`;
   }
 </script>
 

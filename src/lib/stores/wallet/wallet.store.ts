@@ -21,8 +21,8 @@ const appsSdk = new SafeAppsSDK();
 const { SUPPORTED_CHAINS } = Utils.Network;
 // TODO: change this after development.
 const DEFAULT_NETWORK: Network = {
-  chainId: 11155111,
-  name: 'sepolia',
+  chainId: 5,
+  name: 'goerli',
 };
 
 const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
@@ -41,7 +41,7 @@ type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
 export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
-  dripsUserId: string;
+  dripsAccountId: string;
   provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
   signer: ethers.providers.JsonRpcSigner;
   network: Network;
@@ -55,7 +55,7 @@ export interface DisconnectedWalletStoreState {
     | ethers.providers.Web3Provider
     | ethers.providers.InfuraProvider
     | ethers.providers.JsonRpcProvider;
-  dripsUserId?: undefined;
+  dripsAccountId?: undefined;
   address?: undefined;
   signer?: undefined;
   safe?: undefined;
@@ -152,7 +152,7 @@ const walletStore = () => {
       const clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
-        description: 'Please switch your connected wallet to Ethereum Mainnet or Sepolia.',
+        description: 'Please switch your connected wallet to Ethereum Mainnet, Sepolia or Goerli.',
         emoji: '🔌',
       });
 
@@ -188,7 +188,7 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0],
-      dripsUserId: await (await AddressDriverClient.create(provider, signer)).getUserId(),
+      dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
       provider,
       signer,
       network: await provider.getNetwork(),
@@ -245,7 +245,8 @@ const mockWalletStore = () => {
 
   async function initialize() {
     const signer = provider.getSigner();
-    const userId = await (await getAddressDriverClient(signer)).getUserId();
+
+    const accountId = await (await getAddressDriverClient(signer)).getAccountId();
 
     state.set({
       connected: true,
@@ -253,7 +254,7 @@ const mockWalletStore = () => {
       provider,
       signer,
       network: provider.network,
-      dripsUserId: userId,
+      dripsAccountId: accountId,
     });
   }
 

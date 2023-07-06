@@ -14,7 +14,7 @@
   import MultiToken from '$lib/components/illustrations/multi-token.svelte';
   import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
 
-  $: userId = $wallet.dripsUserId;
+  $: accountId = $wallet.dripsAccountId;
 
   $: {
     $wallet.connected;
@@ -114,8 +114,8 @@
     </TransitionedHeight>
   </div>
   <div class="sections">
-    <Balances {userId} disableActions={false} />
-    <Streams {userId} disableActions={false} />
+    <Balances {accountId} disableActions={false} />
+    <Streams {accountId} disableActions={false} />
   </div>
 </div>
 

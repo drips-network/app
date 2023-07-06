@@ -53,7 +53,9 @@
       if (!safe) warnIfSafe(network.chainId, address);
 
       try {
-        await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
+        await streams.connect(
+          (await addressDriverClient.getAccountIdByAddress(address)).toString(),
+        );
       } catch (e) {
         if (e instanceof Error) {
           globalAdvisoryStore.add({

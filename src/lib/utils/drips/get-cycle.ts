@@ -1,11 +1,11 @@
-import { getDripsHubClient } from '../get-drips-clients';
+import { getDripsClient } from '../get-drips-clients';
 
 /**
  * Fetches the current Drips cycle from on-chain and calculates the start and end dates.
  * @returns Information about the current Drips cycle.
  */
 export default async function getCycle() {
-  const client = await getDripsHubClient();
+  const client = await getDripsClient();
 
   const cycleDurationMillis = (await client.cycleSecs()) * 1000;
   const currentCycleMillis = new Date().getTime() % cycleDurationMillis;
