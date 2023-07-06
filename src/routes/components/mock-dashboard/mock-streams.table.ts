@@ -113,7 +113,11 @@ const balancesData: (millis: number) => OutgoingStreamTableRow[] = (millis: numb
 interface OutgoingStreamTableRow {
   streamId: string;
   name: string;
-  toAddress: string;
+  to: {
+    driver: 'address';
+    address: string;
+    userId: string;
+  };
   amount: AmountCellData;
   token: TokenCellData;
 }

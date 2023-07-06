@@ -17,11 +17,13 @@
     getRepoDriverClient,
   } from '$lib/utils/get-drips-clients';
   import GitProjectService from '$lib/utils/project/GitProjectService';
+  import type { GitProject } from '$lib/utils/metadata/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let dripListId: string;
   export let representationalSplits: Splits;
+  export let projectToAdd: GitProject | undefined = undefined;
 
   // TODO: Ensure these values are saved in case there's some TX error.
 
@@ -62,6 +64,7 @@
                 size: 'medium',
               },
             },
+            editablePercentage: true,
           },
         ];
       } else {
@@ -89,6 +92,21 @@
   );
 
   let selected = Object.keys(percentages);
+
+  if (projectToAdd) {
+    items[projectToAdd.source.url] = {
+      type: 'selectable',
+      label: {
+        component: ProjectBadge,
+        props: {
+          project: projectToAdd,
+        },
+      },
+      editablePercentage: true,
+    };
+
+    selected.push(projectToAdd.source.url);
+  }
 
   let listValid = false;
 

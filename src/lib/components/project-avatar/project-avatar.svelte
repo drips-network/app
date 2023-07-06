@@ -30,7 +30,7 @@
   <div
     class="wrapper"
     style="width: {containerSize}; height: {containerSize}"
-    style:box-shadow={outline ? 'var(--elevation-low)' : ''}
+    class:with-outline={outline}
   >
     {#if project.owner}
       <div class="project-avatar" style:background-color="var(--color-primary)">
@@ -48,15 +48,14 @@
 
 <style>
   .wrapper {
-    height: calc(2rem - 1px);
-    width: calc(2rem - 1px);
-    border-radius: 1000rem;
+    height: 2rem;
+    width: 2rem;
     background-color: var(--color-foreground-level-2);
     overflow: hidden;
     user-select: none;
     position: relative;
     flex-shrink: 0;
-    margin: 1px;
+    border-radius: 50%;
   }
 
   .project-avatar {
@@ -67,5 +66,9 @@
     justify-content: center;
     font-size: 95%;
     transition: background-color 0.3s;
+  }
+
+  .with-outline {
+    border: 1px solid var(--color-foreground);
   }
 </style>

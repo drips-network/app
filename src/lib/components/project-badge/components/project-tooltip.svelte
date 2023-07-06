@@ -2,6 +2,7 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import buildExternalUrl from '$lib/utils/build-external-url';
+  import buildProjectUrl from '$lib/utils/build-project-url';
   import type { GitProject } from '$lib/utils/metadata/types';
   import ProjectName from './project-name.svelte';
 
@@ -21,7 +22,7 @@
   />
   <div class="header">
     <ProjectAvatar {project} size="large" outline />
-    <a class="name typo-header-4" href="/app/projects/{project.repoDriverAccount.accountId}"
+    <a class="name typo-header-4" href={buildProjectUrl(project.source)}
       ><ProjectName {project} /></a
     >
     {#if project.owner}
