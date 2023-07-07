@@ -80,7 +80,7 @@
 </script>
 
 <div
-  class="percentage-editor typo-text-mono"
+  class="percentage-editor typo-text tabular-nums"
   class:focus
   class:error
   class:empty

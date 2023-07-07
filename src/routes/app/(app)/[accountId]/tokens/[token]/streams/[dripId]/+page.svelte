@@ -270,7 +270,7 @@
       <div class="details">
         <div class="key-value">
           <h5 class="key">Total Streamed</h5>
-          <span class="value typo-text-mono highlight" data-testid="total-streamed">
+          <span class="value typo-text tabular-nums highlight" data-testid="total-streamed">
             <FormattedAmount
               amount={estimate?.totalStreamed ?? unreachable()}
               decimals={token?.info.decimals ?? unreachable()}
@@ -281,13 +281,16 @@
         <div class="key-value-row">
           <div class="key-value">
             <h5 class="key">Scheduled start</h5>
-            <span class="value">{formatDate(streamStartDate ?? unreachable(), 'verbose')}</span>
+            <span class="value typo-text"
+              >{formatDate(streamStartDate ?? unreachable(), 'verbose')}</span
+            >
           </div>
           <div class="key-value align-right">
             <h5 class="key">Scheduled end</h5>
-            {#if streamEndDate}<span class="value">{formatDate(streamEndDate, 'verbose')}</span
+            {#if streamEndDate}<span class="value typo-text"
+                >{formatDate(streamEndDate, 'verbose')}</span
               >{:else}
-              <span class="value greyed-out">∞</span>{/if}
+              <span class="value typo-text greyed-out">∞</span>{/if}
           </div>
         </div>
         <div class="key-value-row">
@@ -303,7 +306,7 @@
                 </svelte:fragment>
               </Tooltip>
             </div>
-            <span class="value typo-text-mono">
+            <span class="value typo-text tabular-nums">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
                 amount={$balances.accounts[dripsAccountId ?? unreachable()].tokens[
@@ -328,16 +331,20 @@
               </Tooltip>
             </div>
             {#if outOfFundsDate}
-              <span class="value">{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</span>
+              <span class="value typo-text"
+                >{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</span
+              >
             {:else}
-              <span class="value greyed-out">∞</span>
+              <span class="value typo-text greyed-out">∞</span>
             {/if}
           </div>
         </div>
         <div class="key-value-row">
           <div class="key-value">
             <h5 class="key">Created at</h5>
-            <span class="value">{formatDate(streamCreated ?? unreachable(), 'verbose')}</span>
+            <span class="value typo-text"
+              >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
+            >
           </div>
         </div>
       </div>

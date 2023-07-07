@@ -20,6 +20,10 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import editDripListStreamSteps from '$lib/flows/edit-drip-list-stream/edit-drip-list-stream-steps';
   import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
+  import StreamStateBadge from '../stream-state-badge/stream-state-badge.svelte';
+  import formatTokenAmount from '$lib/utils/format-token-amount';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
+
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
 
@@ -35,11 +39,15 @@
       .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
 
   $: supportStream = supportStreams[0];
+  $: supportStreamToken = supportStream
+    ? tokensStore.getByAddress(supportStream?.streamConfig.amountPerSecond.tokenAddress)
+    : undefined;
 
   $: accountEstimate = $balancesStore.accounts[ownerAccountId];
   $: outgoingEstimate = supportStream
     ? accountEstimate?.tokens[supportStream.streamConfig.amountPerSecond.tokenAddress.toLowerCase()]
     : undefined;
+  $: totalStreamed = outgoingEstimate?.total.totals.totalStreamed;
 
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 
@@ -71,8 +79,19 @@
     </div>
   </div>
   <div class="list">
-    <div class="drip-icon">
-      <Drip />
+    <div class="totals">
+      <div class="drip-icon">
+        <Drip />
+      </div>
+      {#if totalStreamed && supportStreamToken}
+        <div class="total-streamed-badge">
+          <span class="typo-text tabular-nums"
+            >{formatTokenAmount(totalStreamed, supportStreamToken.info.decimals)}
+            {supportStreamToken.info.symbol}</span
+          >
+          <span class="muted">&nbsp;total</span>
+        </div>
+      {/if}
     </div>
     <div class="splits-component"><Splits list={representationalSplits} /></div>
   </div>
@@ -104,13 +123,22 @@
       </div>
     {:else if supportStream}
       <div in:fade={{ duration: 300 }} class="support-stats">
+        <KeyValuePair size="medium" key="Status">
+          <StreamStateBadge
+            streamId={supportStream.id}
+            paused={false}
+            senderId={supportStream.sender.accountId}
+            tokenAddress={supportStream.streamConfig.amountPerSecond.tokenAddress}
+            size="small"
+          />
+        </KeyValuePair>
         <KeyValuePair size="medium" key="Token">
           <Token size="small" address={supportStream.streamConfig.amountPerSecond.tokenAddress} />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Rate">
           <Amount amountPerSecond={supportStream.streamConfig.amountPerSecond} />
         </KeyValuePair>
-        <KeyValuePair size="medium" key="Balance">
+        <KeyValuePair size="medium" key="Remaining Balance">
           {#if outgoingEstimate}
             <Amount
               amount={{
@@ -122,7 +150,7 @@
         </KeyValuePair>
       </div>
     {:else}
-      This Drip List isn't receiving any continuous support.
+      <span class="muted">This Drip List isn't receiving any continuous support.</span>
     {/if}
   </div>
 </div>
@@ -142,8 +170,22 @@
     justify-content: space-between;
   }
 
-  .drip-icon {
+  .totals {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .totals .drip-icon {
     width: 1.5rem;
+  }
+
+  .totals .total-streamed-badge {
+    background-color: var(--color-foreground-level-2);
+    border-radius: 1rem 0 1rem 1rem;
+    display: flex;
+    align-items: last baseline;
+    padding: 0.25rem 0.5rem;
   }
 
   .list {
@@ -185,5 +227,9 @@
     justify-content: center;
     align-items: center;
     height: 3rem;
+  }
+
+  .muted {
+    color: var(--color-foreground-level-5);
   }
 </style>

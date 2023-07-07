@@ -50,3 +50,7 @@ h1,
   font-weight: normal;
   font-style: normal;
 }
+
+.tabular-nums {
+  font-feature-settings: 'tnum', 'zero';
+}

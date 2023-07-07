@@ -18,7 +18,7 @@
   export let showSymbol = true;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
-  export let amountClasses = 'typo-text-mono';
+  export let amountClasses = 'typo-text tabular-nums';
   export let amountPerSecClasses = 'typo-text-small-mono text-foreground-level-4';
 
   /** Manually set token information to display. Used on the landing page's mock dashboard. */

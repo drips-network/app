@@ -73,7 +73,10 @@
           alt={`${tokenInfo.name} logo`}
         />
       {:else}
-        <div style="background-color: {placeholderColor}" class="unknown-logo typo-text-mono">
+        <div
+          style="background-color: {placeholderColor}"
+          class="unknown-logo typo-text tabular-nums"
+        >
           {#if tokenInfo?.symbol}
             <div class="symbol-wrapper px-1 w-full">
               <FitText text={tokenInfo.symbol} />

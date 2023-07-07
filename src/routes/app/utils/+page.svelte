@@ -43,11 +43,11 @@
         <h4>Result</h4>
         <p>
           Stream Rate (wei / sec including extra {constants.AMT_PER_SEC_EXTRA_DECIMALS} decimals of precision):
-          <span class="typo-text-mono">{decoded?.amountPerSec}</span>
+          <span class="typo-text tabular-nums">{decoded?.amountPerSec}</span>
         </p>
         <p class="indented">
           Approx. Stream Rate ({token.info.symbol} / sec):
-          <span class="typo-text-mono"
+          <span class="typo-text tabular-nums"
             >{decoded
               ? formatTokenAmount(decoded.amountPerSec, token.info.decimals)
               : undefined}</span
@@ -55,15 +55,15 @@
         </p>
         <p class="indented">
           Approx. Stream Rate ({token.info.symbol} / day):
-          <span class="typo-text-mono"
+          <span class="typo-text tabular-nums"
             >{decoded
               ? formatTokenAmount(decoded.amountPerSec * 86400n, token.info.decimals)
               : undefined}</span
           >
         </p>
-        <p>Start Date: <span class="typo-text-mono">{decoded?.start}</span></p>
-        <p>Duration seconds: <span class="typo-text-mono">{decoded?.duration}</span></p>
-        <p>Stream ID: <span class="typo-text-mono">{decoded?.dripId}</span></p>
+        <p>Start Date: <span class="typo-text tabular-nums">{decoded?.start}</span></p>
+        <p>Duration seconds: <span class="typo-text tabular-nums">{decoded?.duration}</span></p>
+        <p>Stream ID: <span class="typo-text tabular-nums">{decoded?.dripId}</span></p>
       </div>
     {/if}
   </div>

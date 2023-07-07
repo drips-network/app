@@ -76,7 +76,7 @@
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}
   </div>
-  {#if tokenInfo}<div class="amt-per-sec typo-text-mono">
+  {#if tokenInfo}<div class="amt-per-sec typo-text tabular-nums">
       <FormattedAmount decimals={tokenInfo.decimals} amount={getAmtPerSec()} />
       {tokenInfo.symbol} <span class="muted">/{FRIENDLY_NAMES[$amtDeltaUnitStore]}</span>
     </div>{/if}

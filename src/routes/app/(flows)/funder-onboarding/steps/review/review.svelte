@@ -130,7 +130,7 @@
         </div>
         <div class="key-value-pair">
           <h5 class="key">Stream rate</h5>
-          <span class="value typo-text-mono"
+          <span class="value typo-text tabular-nums"
             >{formatTokenAmount(
               streamRateValueParsed ?? unreachable(),
               token.info.decimals,
@@ -144,7 +144,7 @@
       <div class="key-value-row">
         <div class="key-value-pair">
           <h5 class="key">Initial top-up</h5>
-          <span class="value typo-text-mono"
+          <span class="value typo-text tabular-nums"
             >{formatTokenAmount(
               topUpAmountValueParsed ?? unreachable(),
               token.info.decimals,

@@ -33,7 +33,7 @@
   <!-- TODO: Don't presume any NFT account is a Drip List. -->
   <div class="drip-list-badge">
     <div class="icon">
-      <Ledger style="fill: var(--color-background)" />
+      <Ledger style="fill: var(--color-background); height: 1.25rem;" />
     </div>
     <span class="typo-text">Your Drip List</span>
   </div>
@@ -47,8 +47,8 @@
   }
 
   .icon {
-    height: 2rem;
-    width: 2rem;
+    height: 1.5rem;
+    width: 1.5rem;
     display: flex;
     justify-content: center;
     align-items: center;

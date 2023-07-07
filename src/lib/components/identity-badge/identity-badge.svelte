@@ -66,10 +66,10 @@
   $: currentFontClassEns = fontClassesEns[size];
 
   const fontClassesAddress = {
-    tiny: 'typo-text-mono-small',
-    small: 'typo-text-mono-small',
-    normal: 'typo-text-mono',
-    medium: 'typo-text-mono',
+    tiny: 'typo-text-small tabular-nums',
+    small: 'typo-text-small tabular-nums',
+    normal: 'typo-text tabular-nums',
+    medium: 'typo-text tabular-nums',
     big: 'typo-header-4 mono',
     huge: 'typo-header-3 mono',
     gigantic: 'typo-header-1 mono',

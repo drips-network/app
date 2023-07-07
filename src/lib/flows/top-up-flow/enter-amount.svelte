@@ -106,6 +106,7 @@
   <FormField title="Wallet Balance">
     <div class="balance">
       <ListSelect
+        blockSelecting
         blockInteraction
         searchable={false}
         items={{
