@@ -8,7 +8,6 @@
   import TextInput from '../text-input/text-input.svelte';
 
   export let project: Writable<ClaimedGitProject>;
-  export let withPadding = false;
 
   let selectedEmoji = $project.emoji;
   $: $project.emoji = selectedEmoji;
@@ -26,7 +25,7 @@
   $: $project.color = selectedColor;
 </script>
 
-<div class="project-customizer" class:with-padding={withPadding}>
+<div class="project-customizer">
   <FormField type="div" title="Preview">
     <ProjectProfileHeader project={$project} />
   </FormField>
@@ -70,10 +69,6 @@
     display: flex;
     gap: 1.5rem;
     flex-direction: column;
-  }
-
-  .project-customizer.with-padding {
-    padding: 1rem;
   }
 
   .emojis-container {
