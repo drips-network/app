@@ -48,6 +48,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 
+// TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
 export default class GitProjectService {
   private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;

@@ -109,5 +109,6 @@ export const nftDriverAccountMetadataSchema = z.object({
     accountId: z.string(),
   }),
   isDripList: z.literal(true),
+  projects: z.array(z.union([repoDriverSplitReceiverSchema, addressDriverSplitReceiverSchema])),
   name: z.string().optional(),
 });

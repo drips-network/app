@@ -2,7 +2,11 @@
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { ClaimedGitProject, DripList } from '$lib/utils/metadata/types';
+  import type {
+    ClaimedGitProject,
+    DripList,
+    RepoDriverSplitReceiver,
+  } from '$lib/utils/metadata/types';
   import { onMount } from 'svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -53,6 +57,7 @@
       loadingModal = true;
       const representationalSplits = await getRepresentationalSplitsForAccount(
         dripList.account.accountId,
+        dripList.projects.filter((s): s is RepoDriverSplitReceiver => 'source' in s),
       );
 
       modal.show(

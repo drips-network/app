@@ -80,5 +80,6 @@ export interface DripList {
   name: string;
   // Properties below are post-MVP
   isPublic: false;
+  projects: (AddressDriverSplitReceiver | RepoDriverSplitReceiver)[];
   description: undefined;
 }
