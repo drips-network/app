@@ -21,6 +21,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type getIncomingSplits from '../../methods/get-incoming-splits';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -104,6 +105,13 @@
         <div class="owner">
           <IdentityBadge address={project.owner.address} /> is raising funds for...
         </div>
+      {:else}
+        <div class="unclaimed-project-notice">
+          <AnnotationBox>
+            This project is unclaimed. Know the owner? Share it with them to collect claimable funds
+            and start fundraising on Drips.
+          </AnnotationBox>
+        </div>
       {/if}
       <ProjectProfileHeader {project} />
       {#if project.claimed}
@@ -145,44 +153,6 @@
       {/if}
     </div>
     <div class="content">
-      <div class="section">
-        <SectionHeader icon={Heart} label="Supporters" />
-        {#await incomingSplits}
-          <SectionSkeleton loaded={false} />
-        {:then result}
-          <SectionSkeleton
-            loaded={true}
-            empty={flattenIncomingSplits(result).length === 0}
-            emptyStateEmoji="🫙"
-            emptyStateHeadline="No supporters"
-            emptyStateText="This project doesn't have any supporters yet."
-          >
-            <!-- TODO: Limit supporters list to some max amount, make expandable -->
-            <div class="supporters-list">
-              {#each flattenIncomingSplits(result) as incomingSplit}
-                <div class="item">
-                  {#if incomingSplit.type === 'user'}
-                    <IdentityBadge address={incomingSplit.item.value.address} />
-                  {:else if incomingSplit.type === 'dripList'}
-                    <IdentityBadge
-                      size="medium"
-                      address={incomingSplit.item.value.account.owner.address}
-                    />
-                  {:else if incomingSplit.type === 'project'}
-                    <ProjectBadge project={incomingSplit.item.value} />
-                  {/if}
-                  <span class="muted"
-                    >{getSplitPercent(incomingSplit.item.weight)}% of {incomingSplit.type ===
-                    'dripList'
-                      ? 'donations'
-                      : 'income'}</span
-                  >
-                </div>
-              {/each}
-            </div>
-          </SectionSkeleton>
-        {/await}
-      </div>
       {#if project.owner}
         <div class="section">
           <SectionHeader icon={SplitsIcon} label="Splits" />
@@ -240,6 +210,44 @@
           {/await}
         </div>
       {/if}
+      <div class="section">
+        <SectionHeader icon={Heart} label="Supporters" />
+        {#await incomingSplits}
+          <SectionSkeleton loaded={false} />
+        {:then result}
+          <SectionSkeleton
+            loaded={true}
+            empty={flattenIncomingSplits(result).length === 0}
+            emptyStateEmoji="🫙"
+            emptyStateHeadline="No supporters"
+            emptyStateText="This project doesn't have any supporters yet."
+          >
+            <!-- TODO: Limit supporters list to some max amount, make expandable -->
+            <div class="supporters-list">
+              {#each flattenIncomingSplits(result) as incomingSplit}
+                <div class="item">
+                  {#if incomingSplit.type === 'user'}
+                    <IdentityBadge address={incomingSplit.item.value.address} />
+                  {:else if incomingSplit.type === 'dripList'}
+                    <IdentityBadge
+                      size="medium"
+                      address={incomingSplit.item.value.account.owner.address}
+                    />
+                  {:else if incomingSplit.type === 'project'}
+                    <ProjectBadge project={incomingSplit.item.value} />
+                  {/if}
+                  <span class="muted"
+                    >{getSplitPercent(incomingSplit.item.weight)}% of {incomingSplit.type ===
+                    'dripList'
+                      ? 'donations'
+                      : 'income'}</span
+                  >
+                </div>
+              {/each}
+            </div>
+          </SectionSkeleton>
+        {/await}
+      </div>
     </div>
     {#if project.owner}
       <aside>
@@ -272,6 +280,10 @@
     display: flex;
     flex-direction: column;
     gap: 4rem;
+  }
+
+  .unclaimed-project-notice {
+    margin-bottom: 2rem;
   }
 
   .header {
