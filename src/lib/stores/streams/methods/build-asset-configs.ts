@@ -135,7 +135,9 @@ export default function buildAssetConfigs(
             receiver,
           });
 
-          remainingStreamIds.splice(remainingStreamIds.indexOf(streamId), 1);
+          if (remainingStreamIds.includes(streamId)) {
+            remainingStreamIds.splice(remainingStreamIds.indexOf(streamId), 1);
+          }
         }
 
         /*

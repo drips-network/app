@@ -18,6 +18,7 @@
   } from '$lib/utils/get-drips-clients';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import type { GitProject } from '$lib/utils/metadata/types';
+  import modal from '$lib/stores/modal';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -168,6 +169,7 @@
   />
   <ListEditor bind:items bind:percentages bind:selected bind:valid={listValid} />
   <svelte:fragment slot="actions">
+    <Button on:click={modal.hide}>Cancel</Button>
     <Button on:click={submit} disabled={!listValid} icon={Wallet} variant="primary"
       >Confirm changes in wallet</Button
     >
