@@ -27,6 +27,7 @@
   <FormField title="Stream">
     <div class="list-container">
       <ListSelect
+        blockSelecting
         blockInteraction
         searchable={false}
         items={{
