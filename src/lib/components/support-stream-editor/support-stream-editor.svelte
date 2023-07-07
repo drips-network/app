@@ -198,21 +198,23 @@
   // –––––––––––––––––––––––––
   // STAGE LOGIC
 
-  // Stages:
-  // 0: 'completely disabled',
-  // 1: 'select-token',
-  // 2: 'set-stream-rate',
-  // 3: 'set-top-up-amount'
-  let currentStage = 0;
+  enum Stage {
+    COMPLETELY_DISABLED,
+    SELECT_TOKEN,
+    SET_STREAM_RATE,
+    SET_TOP_UP_AMOUNT,
+  }
+
+  let currentStage: Stage = 0;
   $: {
     if (disabled) {
-      currentStage = 0;
+      currentStage = Stage.COMPLETELY_DISABLED;
     } else if ($walletStore.connected && selectedToken && streamRateValue !== '') {
-      currentStage = 3;
+      currentStage = Stage.SET_TOP_UP_AMOUNT;
     } else if ($walletStore.connected && selectedToken) {
-      currentStage = 2;
+      currentStage = Stage.SET_STREAM_RATE;
     } else if ($walletStore.connected) {
-      currentStage = 1;
+      currentStage = Stage.SELECT_TOKEN;
     }
   }
 
