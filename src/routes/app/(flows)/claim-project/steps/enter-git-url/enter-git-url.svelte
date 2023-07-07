@@ -6,7 +6,7 @@
   import LinkIcon from 'radicle-design-system/icons/Link.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
@@ -16,6 +16,7 @@
   import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import emoji from '$lib/utils/emoji/emoji';
+  import { page } from '$app/stores';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -27,6 +28,13 @@
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
   $: formValid = validationState.type === 'valid';
+
+  const { searchParams } = $page.url;
+  const projectUrlToAdd = searchParams.get('projectToAdd') ?? undefined;
+
+  onMount(() => {
+    if (projectUrlToAdd) $context.gitUrl = projectUrlToAdd;
+  });
 
   async function fetchProject() {
     $context.linkedToRepo = false;

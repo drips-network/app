@@ -27,6 +27,10 @@
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import Registered from 'radicle-design-system/icons/Registered.svelte';
+  import OneContract from '$lib/components/illustrations/one-contract.svelte';
+  import buildUrl from '$lib/utils/build-url';
 
   interface Amount {
     tokenAddress: string;
@@ -103,15 +107,19 @@
   />
 </svelte:head>
 
-<!-- TODO: Add claim project button -->
-<!-- TODO: Display supporters on unclaimed projects -->
-
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
   <div class="project-profile">
     <div class="header">
       {#if project.owner}
         <div class="owner">
           <IdentityBadge address={project.owner.address} /> is raising funds for...
+        </div>
+      {:else}
+        <div class="unclaimed-project-notice">
+          <AnnotationBox>
+            This project is unclaimed. Know the owner? Share it with them to collect claimable funds
+            and start fundraising on Drips.
+          </AnnotationBox>
         </div>
       {/if}
       <div class="project-profile-header">
@@ -166,44 +174,6 @@
     <div class="content">
       {#if project.owner}
         <div class="section">
-          <SectionHeader icon={Heart} label="Supporters" />
-          {#await incomingSplits}
-            <SectionSkeleton loaded={false} />
-          {:then result}
-            <SectionSkeleton
-              loaded={true}
-              empty={flattenIncomingSplits(result).length === 0}
-              emptyStateEmoji="🫙"
-              emptyStateHeadline="No supporters"
-              emptyStateText="This project doesn't have any supporters yet."
-            >
-              <!-- TODO: Limit supporters list to some max amount, make expandable -->
-              <div class="supporters-list">
-                {#each flattenIncomingSplits(result) as incomingSplit}
-                  <div class="item">
-                    {#if incomingSplit.type === 'user'}
-                      <IdentityBadge address={incomingSplit.item.value.address} />
-                    {:else if incomingSplit.type === 'dripList'}
-                      <IdentityBadge
-                        size="medium"
-                        address={incomingSplit.item.value.account.owner.address}
-                      />
-                    {:else if incomingSplit.type === 'project'}
-                      <ProjectBadge project={incomingSplit.item.value} />
-                    {/if}
-                    <span class="muted"
-                      >{getSplitPercent(incomingSplit.item.weight)}% of {incomingSplit.type ===
-                      'dripList'
-                        ? 'donations'
-                        : 'income'}</span
-                    >
-                  </div>
-                {/each}
-              </div>
-            </SectionSkeleton>
-          {/await}
-        </div>
-        <div class="section">
           <SectionHeader icon={SplitsIcon} label="Splits" />
           {#if splits}
             {#await splits}
@@ -251,14 +221,78 @@
             <SectionSkeleton loaded={false} />
           {:then result}
             <SectionSkeleton loaded={true}>
-              <UnclaimedProjectCard
-                unclaimedTokensExpanded={result.length > 0}
-                unclaimedFunds={result}
-              />
+              <div class="unclaimed-funds-section">
+                <UnclaimedProjectCard
+                  unclaimedTokensExpanded={result.length > 0}
+                  unclaimedFunds={result}
+                />
+                <div class="unclaimed-project-edu-card">
+                  <div class="illustration"><OneContract /></div>
+                  <div class="edu-card-content">
+                    <div class="text">
+                      <h3>Are you a maintainer of {project.source.repoName}?</h3>
+                      <p>
+                        Claim your repository on Drips to raise funds from supporters, configure
+                        your project's dependencies and help build the Drips Dependency Tree.
+                      </p>
+                      <!-- TODO: Docs link -->
+                      <a
+                        href="https://docs.drips.network/"
+                        class="typo-text-small learn-more-link"
+                        target="_blank">Learn more</a
+                      >
+                    </div>
+                    <a
+                      href={buildUrl('/app/claim-project', { projectToAdd: project.source.url })}
+                      class="claim-button"
+                    >
+                      <Button icon={Registered} variant="primary">Claim project</Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </SectionSkeleton>
           {/await}
         </div>
       {/if}
+      <div class="section">
+        <SectionHeader icon={Heart} label="Supporters" />
+        {#await incomingSplits}
+          <SectionSkeleton loaded={false} />
+        {:then result}
+          <SectionSkeleton
+            loaded={true}
+            empty={flattenIncomingSplits(result).length === 0}
+            emptyStateEmoji="🫙"
+            emptyStateHeadline="No supporters"
+            emptyStateText="This project doesn't have any supporters yet."
+          >
+            <!-- TODO: Limit supporters list to some max amount, make expandable -->
+            <div class="supporters-list">
+              {#each flattenIncomingSplits(result) as incomingSplit}
+                <div class="item">
+                  {#if incomingSplit.type === 'user'}
+                    <IdentityBadge address={incomingSplit.item.value.address} />
+                  {:else if incomingSplit.type === 'dripList'}
+                    <IdentityBadge
+                      size="medium"
+                      address={incomingSplit.item.value.account.owner.address}
+                    />
+                  {:else if incomingSplit.type === 'project'}
+                    <ProjectBadge project={incomingSplit.item.value} />
+                  {/if}
+                  <span class="muted"
+                    >{getSplitPercent(incomingSplit.item.weight)}% of {incomingSplit.type ===
+                    'dripList'
+                      ? 'donations'
+                      : 'income'}</span
+                  >
+                </div>
+              {/each}
+            </div>
+          </SectionSkeleton>
+        {/await}
+      </div>
     </div>
     {#if project.owner}
       <aside>
@@ -293,9 +327,13 @@
     gap: 4rem;
   }
 
+  .unclaimed-project-notice {
+    margin-bottom: 2rem;
+  }
+
   .header {
     grid-area: header;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .header .project-profile-header {
@@ -366,6 +404,53 @@
     color: var(--color-foreground-level-6);
   }
 
+  .unclaimed-funds-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .unclaimed-project-edu-card {
+    padding: 1rem;
+    box-shadow: var(--elevation-low);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .unclaimed-project-edu-card .illustration {
+    height: 12rem;
+    width: 12rem;
+    flex-shrink: 0;
+    background-color: var(--color-primary-level-1);
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  .unclaimed-project-edu-card .edu-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+
+  .unclaimed-project-edu-card .learn-more-link {
+    color: var(--color-foreground-level-6);
+    text-decoration: underline;
+  }
+
+  .unclaimed-project-edu-card .claim-button {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .unclaimed-project-edu-card .edu-card-content .text {
+    display: flex;
+    padding-right: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   @media (max-width: 1024px) {
     .project-profile {
       grid-template-columns: minmax(0, 1fr);
@@ -385,6 +470,11 @@
 
     aside {
       padding: 2rem 0;
+    }
+
+    .unclaimed-project-edu-card {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 
