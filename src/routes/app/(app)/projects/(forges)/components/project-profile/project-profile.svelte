@@ -434,7 +434,7 @@
     justify-content: space-between;
   }
 
-  .unclaimed-project-edu-card a {
+  .unclaimed-project-edu-card .learn-more-link {
     color: var(--color-foreground-level-6);
     text-decoration: underline;
   }
