@@ -3,12 +3,9 @@
   import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import possibleColors from '$lib/utils/project/possible-colors';
   import type { Writable } from 'svelte/store';
-  import Button from '../button/button.svelte';
   import FormField from '../form-field/form-field.svelte';
   import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import TextInput from '../text-input/text-input.svelte';
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
-  import modal from '$lib/stores/modal';
 
   export let project: Writable<ClaimedGitProject>;
 
@@ -65,14 +62,10 @@
       {/each}
     </div>
   </FormField>
-  <div class="actions">
-    <Button on:click={modal.hide} icon={CheckCircle} variant="primary">Confirm</Button>
-  </div>
 </div>
 
 <style>
   .project-customizer {
-    padding: 1.5rem;
     display: flex;
     gap: 1.5rem;
     flex-direction: column;
@@ -150,10 +143,5 @@
   .color.selected .color-label {
     opacity: 1;
     box-shadow: var(--elevation-low);
-  }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
   }
 </style>
