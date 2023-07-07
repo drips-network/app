@@ -144,9 +144,4 @@
     opacity: 1;
     box-shadow: var(--elevation-low);
   }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-  }
 </style>
