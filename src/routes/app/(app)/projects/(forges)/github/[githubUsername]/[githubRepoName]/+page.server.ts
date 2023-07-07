@@ -9,6 +9,8 @@ import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import getIncomingSplits from '../../../methods/get-incoming-splits';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 
+// TODO: This fails if the network is not the default one. We need to support other networks.
+
 export const load = (async ({ params }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
 

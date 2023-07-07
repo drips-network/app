@@ -3,6 +3,8 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
 
+// TODO: This fails if the network is not the default one. We need to support other networks.
+
 export const load = (async ({ params }) => {
   const { listId } = params;
 
