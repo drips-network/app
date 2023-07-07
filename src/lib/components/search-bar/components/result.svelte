@@ -9,6 +9,7 @@
   import { type Item, SearchItemType } from '../search';
   import wallet from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
+  import Folder from 'radicle-design-system/icons/Folder.svelte';
 
   export let item: Item;
   export let highlighted: string;
@@ -79,6 +80,19 @@
       {#if highlightPlainText !== item.item.name && item.item.name}<div class="typo-text-small">
           {item.item.name}
         </div>{/if}
+    </svelte:fragment>
+  </AccountMenuItem>
+{:else if item.type === SearchItemType.REPO}
+  <AccountMenuItem
+    on:click
+    href={`/app/projects/${item.item.forge}/${item.item.username}/${item.item.repoName}`}
+    icon={Folder}
+  >
+    <svelte:fragment slot="title">
+      <div class="highlighted">
+        <span style="color: var(--color-foreground)"> Jump to GitHub repo on Drips: </span>
+        {@html highlighted}
+      </div>
     </svelte:fragment>
   </AccountMenuItem>
 {/if}
