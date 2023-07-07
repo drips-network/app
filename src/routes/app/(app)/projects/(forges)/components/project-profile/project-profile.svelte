@@ -21,6 +21,12 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type getIncomingSplits from '../../methods/get-incoming-splits';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import Button from '$lib/components/button/button.svelte';
+  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
 
   interface Amount {
     tokenAddress: string;
@@ -36,6 +42,9 @@
     undefined;
 
   export let incomingSplits: ReturnType<typeof getIncomingSplits>;
+
+  $: ownAccountId = $walletStore.dripsAccountId;
+  $: isOwnProject = ownAccountId === project.owner?.accountId;
 
   function flattenSplits(list: Splits): Split[] {
     return list.reduce<Split[]>((acc, i) => {
@@ -105,7 +114,17 @@
           <IdentityBadge address={project.owner.address} /> is raising funds for...
         </div>
       {/if}
-      <ProjectProfileHeader {project} />
+      <div class="project-profile-header">
+        <ProjectProfileHeader {project} />
+        {#if project.claimed && isOwnProject}
+          <Button
+            icon={Pen}
+            on:click={() =>
+              project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
+            >Edit</Button
+          >
+        {/if}
+      </div>
       {#if project.claimed}
         <div class="stats">
           {#if earnedFunds}
@@ -279,6 +298,13 @@
     margin-bottom: 3rem;
   }
 
+  .header .project-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .header .owner {
     display: flex;
     gap: 0.5rem;
@@ -348,6 +374,13 @@
         'header'
         'sidebar'
         'content';
+    }
+
+    .header .project-profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-direction: column;
     }
 
     aside {

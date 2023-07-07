@@ -28,7 +28,7 @@
   import Drip from '$lib/components/illustrations/drip.svelte';
   import Pen from 'radicle-design-system/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
-  import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
+  import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -127,7 +127,7 @@
     const projectWritable = writable(fakeClaimedProject);
 
     modal.show(
-      ProjectCustomizer,
+      ProjectCustomizerModal,
       () => {
         const { emoji, color } = get(projectWritable);
 
