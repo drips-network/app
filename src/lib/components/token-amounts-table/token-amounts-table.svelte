@@ -51,7 +51,7 @@
         <div class="token">
           <Token address={tokenAddress} />
         </div>
-        <div class="amounts typo-text-mono">
+        <div class="amounts typo-text tabular-nums">
           <div class="token amount muted">
             {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
             {tokens[i]?.info.symbol}

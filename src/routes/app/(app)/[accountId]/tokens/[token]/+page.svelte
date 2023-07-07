@@ -112,7 +112,7 @@
           {token?.info.name ?? 'Unknown token'}
         </h1>
         {#if token?.info.symbol}
-          <h4 class="typo-text-mono" style="color: var(--color-foreground-level-5)">
+          <h4 class="typo-text tabular-nums" style="color: var(--color-foreground-level-5)">
             {token.info.symbol}
           </h4>
         {/if}

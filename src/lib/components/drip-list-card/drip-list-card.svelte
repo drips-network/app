@@ -85,7 +85,7 @@
       </div>
       {#if totalStreamed && supportStreamToken}
         <div class="total-streamed-badge">
-          <span class="typo-text-mono"
+          <span class="typo-text tabular-nums"
             >{formatTokenAmount(totalStreamed, supportStreamToken.info.decimals)}
             {supportStreamToken.info.symbol}</span
           >

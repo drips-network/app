@@ -113,7 +113,7 @@
 
     {#if suffix}
       <span
-        class="typo-text-mono"
+        class="typo-text tabular-nums"
         style="color: var(--color-foreground-level-5); margin: 0 0.75rem;"
       >
         {suffix}

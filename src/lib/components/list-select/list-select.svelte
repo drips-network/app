@@ -240,7 +240,7 @@
             <svelte:component this={item.label.component} {...item.label.props} />
           {/if}
           <div class="right">
-            {#if item.type === 'selectable' && item.text}<span class="text typo-text-mono"
+            {#if item.type === 'selectable' && item.text}<span class="text typo-text tabular-nums"
                 >{item.text}</span
               >{/if}
             {#if item.type === 'selectable' && item.editablePercentage}

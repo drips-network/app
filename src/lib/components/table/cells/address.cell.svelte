@@ -13,11 +13,11 @@
   $: formatted = formatAddress(address);
 </script>
 
-<span class="typo-text-mono">
+<span class="typo-text tabular-nums">
   <Tooltip text={address} copyable>
     {formatted}
     <svelte:fragment slot="tooltip-content">
-      <span class="typo-text-mono">{address}</span>
+      <span class="typo-text tabular-nums">{address}</span>
     </svelte:fragment>
   </Tooltip>
 </span>
