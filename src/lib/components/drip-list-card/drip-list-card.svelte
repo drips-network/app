@@ -20,6 +20,8 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import editDripListStreamSteps from '$lib/flows/edit-drip-list-stream/edit-drip-list-stream-steps';
   import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
+  import StreamStateBadge from '../stream-state-badge/stream-state-badge.svelte';
+
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
 
@@ -104,6 +106,15 @@
       </div>
     {:else if supportStream}
       <div in:fade={{ duration: 300 }} class="support-stats">
+        <KeyValuePair size="medium" key="Status">
+          <StreamStateBadge
+            streamId={supportStream.id}
+            paused={false}
+            senderId={supportStream.sender.accountId}
+            tokenAddress={supportStream.streamConfig.amountPerSecond.tokenAddress}
+            size="small"
+          />
+        </KeyValuePair>
         <KeyValuePair size="medium" key="Token">
           <Token size="small" address={supportStream.streamConfig.amountPerSecond.tokenAddress} />
         </KeyValuePair>
