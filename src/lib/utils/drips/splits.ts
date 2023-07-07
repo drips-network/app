@@ -1,8 +1,8 @@
 import type { Split as RepresentationalSplit, Split } from '$lib/components/splits/splits.svelte';
 import GitProjectService from '../project/GitProjectService';
-import assert from '$lib/utils/assert';
 import { AddressDriverClient, Utils } from 'radicle-drips';
 import { getSubgraphClient } from '../get-drips-clients';
+import type { RepoDriverSplitReceiver } from '../metadata/types';
 
 /**
  * Fetch splits for a given user ID, and map to representational splits for the `Splits` component.
@@ -31,6 +31,7 @@ export async function getRepresentationalSplitsForAccount(accountId: string) {
  */
 export async function buildRepresentationalSplits(
   splits: { account: { accountId: string }; weight: number }[],
+  projectSplitsMeta: RepoDriverSplitReceiver[] = [],
 ): Promise<RepresentationalSplit[]> {
   const gitProjectService = await GitProjectService.new();
 
@@ -39,8 +40,15 @@ export async function buildRepresentationalSplits(
       const splitType = Utils.AccountId.getDriver(s.account.accountId);
 
       if (splitType === 'repo') {
-        const project = await gitProjectService.getByAccountId(s.account.accountId);
-        assert(project, `Unable to locate RepoDriver account with user ID ${s.account.accountId}`);
+        const matchingMetadata = projectSplitsMeta.find(
+          (v) => v.account.accountId === s.account.accountId,
+        );
+
+        const project = await gitProjectService.getByAccountId(
+          s.account.accountId,
+          true,
+          matchingMetadata?.source,
+        );
 
         return {
           type: 'project-split',

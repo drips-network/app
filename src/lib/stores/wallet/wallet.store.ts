@@ -21,8 +21,8 @@ const appsSdk = new SafeAppsSDK();
 const { SUPPORTED_CHAINS } = Utils.Network;
 // TODO: change this after development.
 const DEFAULT_NETWORK: Network = {
-  chainId: 5,
-  name: 'goerli',
+  chainId: 11155111,
+  name: 'sepolia',
 };
 
 const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';

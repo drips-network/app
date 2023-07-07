@@ -195,11 +195,40 @@ export default class GitProjectService {
   public async getByAccountId(
     accountId: AccountId,
     shouldVerifyState = true,
+    source: Source | null = null,
   ): Promise<GitProject | null> {
     const onChainProject: RepoAccount | null =
       await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(accountId);
 
-    if (!onChainProject) return null;
+    // If the project doesn't exist on-chain yet, return an unclaimed project.
+    if (!onChainProject) {
+      if (!source) return null;
+
+      // TODO: Don't hardcode Forge.GitHub
+      const { forge, username, repoName } = GitProjectService.deconstructUrl(source.url);
+
+      const accountIdForSource = await this._repoDriverClient.getAccountId(
+        forge,
+        `${username}/${repoName}`,
+      );
+      assert(
+        accountId === accountIdForSource,
+        `The account ID ${accountId} does not match the account ID ${accountIdForSource} for the source ${source}.`,
+      );
+
+      const unclaimedProject = {
+        claimed: false,
+        owner: undefined,
+        repoDriverAccount: {
+          accountId,
+          driver: 'repo',
+        },
+        verificationStatus: 'NOT_STARTED',
+        source,
+      } as UnclaimedGitProject;
+
+      return unclaimedProject;
+    }
 
     return await this._mapRepoAccountToGitProject(onChainProject, shouldVerifyState);
   }

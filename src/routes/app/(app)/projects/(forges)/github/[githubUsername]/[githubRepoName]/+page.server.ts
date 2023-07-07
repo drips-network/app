@@ -8,6 +8,7 @@ import { buildProjectSplitsData } from '../../../methods/project-splits';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import getIncomingSplits from '../../../methods/get-incoming-splits';
 import uriDecodeParams from '$lib/utils/url-decode-params';
+import type { RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
@@ -45,7 +46,12 @@ export const load = (async ({ params }) => {
       unclaimedFunds,
       earnedFunds,
       incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
-      splits: buildProjectSplitsData(project),
+      splits: buildProjectSplitsData(
+        project,
+        project.claimed
+          ? project.splits.dependencies.filter((s): s is RepoDriverSplitReceiver => 'source' in s)
+          : [],
+      ),
     },
   };
 }) satisfies PageServerLoad;

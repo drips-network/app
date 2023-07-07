@@ -85,7 +85,7 @@ export const addressDriverAccountMetadataSchema = z.object({
 
 export const repoDriverAccountSplitsSchema = z.object({
   maintainers: z.array(addressDriverSplitReceiverSchema),
-  dependencies: z.array(z.union([addressDriverSplitReceiverSchema, repoDriverSplitReceiverSchema])),
+  dependencies: z.array(z.union([repoDriverSplitReceiverSchema, addressDriverSplitReceiverSchema])),
   dripsDonation: splitReceiverSchema.optional(),
 });
 
