@@ -1,6 +1,9 @@
 import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import NftDriverMetadataManager from '../NftDriverMetadataManager';
 import type { NFTDriverAccount } from '../types';
+import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import type { z } from 'zod';
+import type { sourceSchema } from '../schemas';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -126,6 +129,17 @@ describe('NftDriverMetadataManager', () => {
             driver: 'address',
           },
         } as NFTDriverAccount,
+        projects: [
+          {
+            weight: 1,
+            accountId: '1',
+            source: {
+              forge: 'github',
+              repoName: 'repo',
+              url: 'repo.com',
+            } as z.infer<typeof sourceSchema>,
+          },
+        ],
       };
 
       // Act
@@ -134,11 +148,17 @@ describe('NftDriverMetadataManager', () => {
       // Assert
       expect(metadata).toEqual({
         driver: 'nft',
+        name: undefined,
         describes: {
           driver: context.forAccount.driver,
           accountId: context.forAccount.accountId,
         },
         isDripList: true,
+        projects: mapFilterUndefined(context.projects, (listProj) => ({
+          accountId: context.forAccount.accountId,
+          weight: listProj.weight,
+          source: listProj.source,
+        })),
       });
     });
   });
