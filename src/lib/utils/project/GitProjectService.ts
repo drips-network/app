@@ -47,6 +47,7 @@ import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
+import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 
 // TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
 export default class GitProjectService {
@@ -298,76 +299,69 @@ export default class GitProjectService {
     return requestOwnerUpdateTx;
   }
 
+  public async buildUpdateSplitsBatchTx(
+    accountId: string,
+    highLevelPercentages: { [slug: string]: number },
+    maintainers: ListEditorConfig,
+    dependencies: ListEditorConfig,
+  ): Promise<PopulatedTransaction[]> {
+    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
+
+    const {
+      tx: setSplitsTx,
+      dependenciesSplitMetadata,
+      maintainersSplitsMetadata,
+    } = await this._buildSetSplitsTxAndMetadata(
+      accountId,
+      highLevelPercentages,
+      maintainers,
+      dependencies,
+    );
+
+    const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
+    assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
+
+    const newMetadata = {
+      ...currentMetadata.data,
+      splits: {
+        dependencies: dependenciesSplitMetadata,
+        maintainers: maintainersSplitsMetadata,
+      },
+    };
+
+    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(newMetadata);
+
+    const accountMetadataAsBytes = [
+      {
+        key: MetadataManagerBase.USER_METADATA_KEY,
+        value: ipfsHash,
+      },
+    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
+
+    const emitAccountMetadataTx = await this._repoDriverTxFactory.emitAccountMetadata(
+      accountId,
+      accountMetadataAsBytes,
+    );
+
+    return [setSplitsTx, emitAccountMetadataTx];
+  }
+
   public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
-    const receivers: SplitsReceiverStruct[] = [];
-
-    // Populate dependencies splits and metadata.
-    const dependenciesInput = Object.entries(context.dependencySplits.percentages).filter((d) =>
-      context.dependencySplits.selected.includes(d[0]),
-    );
-
-    const dependenciesSplitMetadata: (
-      | z.infer<typeof addressDriverSplitReceiverSchema>
-      | z.infer<typeof repoDriverSplitReceiverSchema>
-    )[] = [];
-
-    for (const [urlOrAddress, percentage] of dependenciesInput) {
-      const isAddr = isAddress(urlOrAddress);
-
-      const weight =
-        Math.floor((Number(percentage) / 100) * 1000000) *
-        (context.highLevelPercentages['dependencies'] / 100);
-
-      if (isAddr) {
-        const receiver = {
-          weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
-        };
-
-        dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
-      } else {
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
-
-        const receiver = {
-          weight,
-          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
-        };
-
-        dependenciesSplitMetadata.push({
-          ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
-        });
-        receivers.push(receiver);
-      }
-    }
-
-    // Populate maintainers splits and metadata.
-    const maintainersInput = Object.entries(context.maintainerSplits.percentages).filter((d) =>
-      context.maintainerSplits.selected.includes(d[0]),
-    );
-
-    const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
-
-    for (const [address, percentage] of maintainersInput) {
-      const receiver = {
-        weight:
-          Math.floor((Number(percentage) / 100) * 1000000) *
-          (context.highLevelPercentages['maintainers'] / 100),
-        accountId: await this._addressDriverClient.getAccountIdByAddress(address),
-      };
-
-      maintainersSplitsMetadata.push(receiver);
-      receivers.push(receiver);
-    }
-
     const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
     const accountId = await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`);
-    const setSplitsTx = await this._repoDriverTxFactory.setSplits(
+
+    const {
+      tx: setSplitsTx,
+      dependenciesSplitMetadata,
+      maintainersSplitsMetadata,
+      receivers,
+    } = await this._buildSetSplitsTxAndMetadata(
       accountId,
-      this._formatSplitReceivers(receivers),
+      context.highLevelPercentages,
+      context.maintainerSplits,
+      context.dependencySplits,
     );
 
     const project = (await this.getByUrl(context.gitUrl, false)) as ClaimedGitProject;
@@ -430,6 +424,85 @@ export default class GitProjectService {
     );
 
     return sortedReceivers;
+  }
+
+  private async _buildSetSplitsTxAndMetadata(
+    accountId: string,
+    highLevelPercentages: { [slug: string]: number },
+    maintainerListEditorConfig: ListEditorConfig,
+    dependencyListEditorConfig: ListEditorConfig,
+  ) {
+    const receivers: SplitsReceiverStruct[] = [];
+
+    // Populate dependencies splits and metadata.
+    const dependenciesInput = Object.entries(dependencyListEditorConfig.percentages).filter((d) =>
+      dependencyListEditorConfig.selected.includes(d[0]),
+    );
+
+    const dependenciesSplitMetadata: (
+      | z.infer<typeof addressDriverSplitReceiverSchema>
+      | z.infer<typeof repoDriverSplitReceiverSchema>
+    )[] = [];
+
+    for (const [urlOrAddress, percentage] of dependenciesInput) {
+      const isAddr = isAddress(urlOrAddress);
+
+      const weight =
+        Math.floor((Number(percentage) / 100) * 1000000) *
+        (highLevelPercentages['dependencies'] / 100);
+
+      if (isAddr) {
+        const receiver = {
+          weight,
+          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
+        };
+
+        dependenciesSplitMetadata.push(receiver);
+        receivers.push(receiver);
+      } else {
+        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
+
+        const receiver = {
+          weight,
+          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
+        };
+
+        dependenciesSplitMetadata.push({
+          ...receiver,
+          source: GitProjectService.populateSource(forge, repoName, username),
+        });
+        receivers.push(receiver);
+      }
+    }
+
+    // Populate maintainers splits and metadata.
+    const maintainersInput = Object.entries(maintainerListEditorConfig.percentages).filter((d) =>
+      maintainerListEditorConfig.selected.includes(d[0]),
+    );
+
+    const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
+
+    for (const [address, percentage] of maintainersInput) {
+      const receiver = {
+        weight:
+          Math.floor((Number(percentage) / 100) * 1000000) *
+          (highLevelPercentages['maintainers'] / 100),
+        accountId: await this._addressDriverClient.getAccountIdByAddress(address),
+      };
+
+      maintainersSplitsMetadata.push(receiver);
+      receivers.push(receiver);
+    }
+
+    return {
+      tx: await this._repoDriverTxFactory.setSplits(
+        accountId,
+        this._formatSplitReceivers(receivers),
+      ),
+      dependenciesSplitMetadata,
+      maintainersSplitsMetadata,
+      receivers,
+    };
   }
 
   private _getForge(url: string): Forge {

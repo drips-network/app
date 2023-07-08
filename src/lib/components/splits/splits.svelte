@@ -2,13 +2,13 @@
   import type { GitProject } from '$lib/utils/metadata/types';
   import { onMount } from 'svelte';
 
-  interface ProjectSplit {
+  export interface ProjectSplit {
     type: 'project-split';
     project: GitProject;
     weight: number;
   }
 
-  interface AddressSplit {
+  export interface AddressSplit {
     type: 'address-split';
     address: string;
     weight: number;

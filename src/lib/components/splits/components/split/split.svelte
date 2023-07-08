@@ -211,6 +211,7 @@
 
   .receiver {
     display: flex;
+    position: relative;
     width: 100%;
     align-items: center;
   }
