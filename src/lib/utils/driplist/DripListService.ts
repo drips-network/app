@@ -8,10 +8,14 @@ import {
   getSubgraphClient,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import type { DripList } from '../metadata/types';
+import type {
+  AddressDriverSplitReceiver,
+  DripList,
+  RepoDriverSplitReceiver,
+} from '../metadata/types';
 import {
   NFTDriverTxFactory,
-  type AddressDriverClient,
+  AddressDriverClient,
   Utils,
   type StreamReceiverStruct,
   AddressDriverTxFactory,
@@ -21,7 +25,7 @@ import {
 } from 'radicle-drips';
 import type { AccountId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { CallerClient, StreamConfig } from 'radicle-drips';
+import type { CallerClient, SplitsReceiverStruct, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
@@ -31,6 +35,13 @@ import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
+import type {
+  addressDriverSplitReceiverSchema,
+  repoDriverSplitReceiverSchema,
+} from '../metadata/schemas';
+import { isAddress } from 'ethers/lib/utils';
+import type { z } from 'zod';
+import mapFilterUndefined from '../map-filter-undefined';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -150,6 +161,7 @@ export default class DripListService {
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
       // TODO: properties below are post-MVP.
       isPublic: false,
+      projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
       description: undefined,
     };
 
@@ -174,15 +186,44 @@ export default class DripListService {
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
 
-    const projects: { weight: number; accountId: string }[] = [];
-    for (const [url, percentage] of Object.entries(context.dripList.percentages)) {
-      const { forge, repoName, username } = GitProjectService.deconstructUrl(url);
-      const projectName = `${username}/${repoName}`;
+    const receivers: SplitsReceiverStruct[] = [];
 
-      projects.push({
-        weight: Math.floor((Number(percentage) / 100) * 1000000),
-        accountId: await this._repoDriverClient.getAccountId(forge, projectName),
-      });
+    const projectsInput = Object.entries(context.dripList.percentages).filter((d) =>
+      context.dripList.selected.includes(d[0]),
+    );
+
+    const projectsSplitMetadata: (
+      | z.infer<typeof addressDriverSplitReceiverSchema>
+      | z.infer<typeof repoDriverSplitReceiverSchema>
+    )[] = [];
+
+    for (const [urlOrAddress, percentage] of projectsInput) {
+      const isAddr = isAddress(urlOrAddress);
+
+      const weight = Math.floor((Number(percentage) / 100) * 1000000);
+
+      if (isAddr) {
+        const receiver = {
+          weight,
+          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
+        };
+
+        projectsSplitMetadata.push(receiver);
+        receivers.push(receiver);
+      } else {
+        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
+
+        const receiver = {
+          weight,
+          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
+        };
+
+        projectsSplitMetadata.push({
+          ...receiver,
+          source: GitProjectService.populateSource(forge, repoName, username),
+        });
+        receivers.push(receiver);
+      }
     }
 
     const ownerNftSubAccountsCount = (
@@ -193,16 +234,17 @@ export default class DripListService {
 
     const dripListId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
 
-    const ipfsHash = await this._publishMetadataToIpfs(dripListId, dripListName);
+    const ipfsHash = await this._publishMetadataToIpfs(
+      dripListId,
+      projectsSplitMetadata,
+      dripListName,
+    );
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
     const setStreamListProjectsTx = await this._nftDriverTxFactory.setSplits(
       dripListId,
-      projects.map((project) => ({
-        accountId: project.accountId,
-        weight: project.weight,
-      })),
+      this._formatSplitReceivers(receivers),
     );
 
     const tokenApprovalTx = await this._buildTokenApprovalTx(token);
@@ -238,6 +280,71 @@ export default class DripListService {
       approvalFlowTxs,
       normalFlowTxs,
     };
+  }
+
+  private async _getDripListProjects(
+    projects: z.infer<
+      typeof repoDriverSplitReceiverSchema | typeof addressDriverSplitReceiverSchema
+    >[],
+  ) {
+    const projectPromises = await Promise.all(
+      projects.map(async (listProjMetadata) => {
+        const mapRepoDriverSplitReceiver = (
+          metadata: z.infer<typeof repoDriverSplitReceiverSchema>,
+        ): RepoDriverSplitReceiver => ({
+          weight: metadata.weight,
+          account: {
+            driver: 'repo',
+            accountId: metadata.accountId,
+          },
+          source: metadata.source,
+        });
+
+        const mapAddressDriverSplitReceiver = (
+          metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
+        ): AddressDriverSplitReceiver => ({
+          weight: metadata.weight,
+          account: {
+            driver: 'address',
+            accountId: metadata.accountId,
+            address: AddressDriverClient.getUserAddress(metadata.accountId),
+          },
+        });
+
+        return 'source' in listProjMetadata
+          ? mapRepoDriverSplitReceiver(listProjMetadata)
+          : mapAddressDriverSplitReceiver(listProjMetadata);
+      }),
+    );
+
+    return mapFilterUndefined(projectPromises, (value) => value);
+  }
+
+  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
+  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
+    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
+
+    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
+      if (
+        !unique.some(
+          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
+        )
+      ) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    const sortedReceivers = uniqueReceivers.sort((a, b) =>
+      // Sort by user ID.
+      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
+        ? 1
+        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
+        ? -1
+        : 0,
+    );
+
+    return sortedReceivers;
   }
 
   private async _getApprovalFlowTxs(
@@ -306,7 +413,13 @@ export default class DripListService {
     };
   }
 
-  private async _publishMetadataToIpfs(dripListId: string, name?: string): Promise<IpfsHash> {
+  private async _publishMetadataToIpfs(
+    dripListId: string,
+    projects: z.infer<
+      typeof repoDriverSplitReceiverSchema | typeof addressDriverSplitReceiverSchema
+    >[],
+    name?: string,
+  ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
     const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
@@ -319,6 +432,7 @@ export default class DripListService {
         },
         accountId: dripListId,
       },
+      projects,
       name,
     });
 

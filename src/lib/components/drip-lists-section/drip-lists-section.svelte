@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DripList } from '$lib/utils/metadata/types';
+  import type { DripList, RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
   import type { Splits as RepresentationalSplits } from '$lib/components/splits/splits.svelte';
   import { onMount } from 'svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -32,6 +32,7 @@
 
       representationalSplits = await getRepresentationalSplitsForAccount(
         canonicalDripList.account.accountId,
+        canonicalDripList.projects.filter((s): s is RepoDriverSplitReceiver => 'source' in s),
       );
     } catch (e) {
       // eslint-disable-next-line no-console

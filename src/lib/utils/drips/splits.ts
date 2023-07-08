@@ -9,7 +9,10 @@ import type { RepoDriverSplitReceiver } from '../metadata/types';
  * @param accountId The user ID to build representational splits for.
  * @returns Representational splits.
  */
-export async function getRepresentationalSplitsForAccount(accountId: string) {
+export async function getRepresentationalSplitsForAccount(
+  accountId: string,
+  projectSplitsMeta: RepoDriverSplitReceiver[] = [],
+) {
   const subgraph = getSubgraphClient();
 
   const splits = await subgraph.getSplitsConfigByAccountId(accountId);
@@ -21,6 +24,7 @@ export async function getRepresentationalSplitsForAccount(accountId: string) {
       },
       weight: Number(s.weight),
     })),
+    projectSplitsMeta,
   );
 }
 

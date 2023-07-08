@@ -189,7 +189,7 @@ describe('DripListService', () => {
             isDripList: true,
             projects: [
               {
-                accountId: 'tokenId1-1',
+                accountId: '1234',
                 weight: 1,
               },
             ],
@@ -230,6 +230,7 @@ describe('DripListService', () => {
           percentages: {
             'https://github.com/jtourkos/git-dep-url': 100,
           },
+          selected: [],
         },
       } as unknown as State;
 
@@ -401,7 +402,7 @@ describe('DripListService', () => {
       addressDriverClientMock.getAccountIdByAddress.mockResolvedValueOnce('1');
 
       // Act
-      const hash = await sut['_publishMetadataToIpfs']('1');
+      const hash = await sut['_publishMetadataToIpfs']('1', []);
 
       // Assert
       expect(hash).toBe('hash');
