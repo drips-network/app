@@ -361,7 +361,6 @@
     margin-bottom: 2rem;
   }
 
-  h2,
   h3 {
     margin-top: 2rem;
     margin-bottom: 1.5rem;
