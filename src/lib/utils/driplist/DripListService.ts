@@ -42,6 +42,7 @@ import type {
 import { isAddress } from 'ethers/lib/utils';
 import type { z } from 'zod';
 import mapFilterUndefined from '../map-filter-undefined';
+import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -186,45 +187,9 @@ export default class DripListService {
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
 
-    const receivers: SplitsReceiverStruct[] = [];
-
-    const projectsInput = Object.entries(context.dripList.percentages).filter((d) =>
-      context.dripList.selected.includes(d[0]),
+    const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
+      context.dripList,
     );
-
-    const projectsSplitMetadata: (
-      | z.infer<typeof addressDriverSplitReceiverSchema>
-      | z.infer<typeof repoDriverSplitReceiverSchema>
-    )[] = [];
-
-    for (const [urlOrAddress, percentage] of projectsInput) {
-      const isAddr = isAddress(urlOrAddress);
-
-      const weight = Math.floor((Number(percentage) / 100) * 1000000);
-
-      if (isAddr) {
-        const receiver = {
-          weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
-        };
-
-        projectsSplitMetadata.push(receiver);
-        receivers.push(receiver);
-      } else {
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
-
-        const receiver = {
-          weight,
-          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
-        };
-
-        projectsSplitMetadata.push({
-          ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
-        });
-        receivers.push(receiver);
-      }
-    }
 
     const ownerNftSubAccountsCount = (
       await this._dripsSubgraphClient.getNftSubAccountsByOwner(this._ownerAddress)
@@ -279,6 +244,53 @@ export default class DripListService {
       callerClient,
       approvalFlowTxs,
       normalFlowTxs,
+    };
+  }
+
+  public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {
+    const projectsInput = Object.entries(listEditorConfig.percentages).filter((d) =>
+      listEditorConfig.selected.includes(d[0]),
+    );
+
+    const receivers: SplitsReceiverStruct[] = [];
+
+    const projectsSplitMetadata: (
+      | z.infer<typeof addressDriverSplitReceiverSchema>
+      | z.infer<typeof repoDriverSplitReceiverSchema>
+    )[] = [];
+
+    for (const [urlOrAddress, percentage] of projectsInput) {
+      const isAddr = isAddress(urlOrAddress);
+
+      const weight = Math.floor((Number(percentage) / 100) * 1000000);
+
+      if (isAddr) {
+        const receiver = {
+          weight,
+          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
+        };
+
+        projectsSplitMetadata.push(receiver);
+        receivers.push(receiver);
+      } else {
+        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
+
+        const receiver = {
+          weight,
+          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
+        };
+
+        projectsSplitMetadata.push({
+          ...receiver,
+          source: GitProjectService.populateSource(forge, repoName, username),
+        });
+        receivers.push(receiver);
+      }
+    }
+
+    return {
+      projectsSplitMetadata,
+      receivers,
     };
   }
 
