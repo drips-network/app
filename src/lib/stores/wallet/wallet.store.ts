@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
 import type { Network } from '@ethersproject/networks';
-import Web3Modal from 'web3modal';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { AddressDriverClient, Utils } from 'radicle-drips';
+import Onboard, { type EIP1193Provider } from '@web3-onboard/core';
+import injectedWallets from '@web3-onboard/injected-wallets';
+import walletConnectModule from '@web3-onboard/walletconnect';
 
-// https://github.com/vitejs/vite/issues/7257#issuecomment-1079579892
-import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 import testnetMockProvider from './__test__/local-testnet-mock-provider';
 import isTest from '$lib/utils/is-test';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
@@ -15,8 +15,14 @@ import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
 import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import isRunningInSafe from '$lib/utils/is-running-in-safe';
+import storedWritable from '@efstajas/svelte-stored-writable';
+import { z } from 'zod';
+import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 
 const appsSdk = new SafeAppsSDK();
+
+const MAINNET_RPC_URL = 'https://mainnet.infura.io/v3/f88a1229d473471bbf94d168401b9c93';
+const GOERLI_RPC_URL = 'https://goerli.infura.io/v3/f88a1229d473471bbf94d168401b9c93';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
 // TODO: change this after development.
@@ -25,16 +31,51 @@ const DEFAULT_NETWORK: Network = {
   name: 'sepolia',
 };
 
-const INFURA_ID = 'aadcb5b20a6e4cc09edfdd664ed6334c';
+const injected = injectedWallets();
 
-const WEB_3_MODAL_PROVIDER_OPTIONS = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      infuraId: INFURA_ID,
+const onboard = Onboard({
+  wallets: [
+    injected,
+    walletConnectModule({
+      version: 2,
+      projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
+      requiredChains: [1],
+    }),
+  ],
+  chains: [
+    {
+      id: '0x1',
+      token: 'ETH',
+      label: 'Ethereum Mainnet',
+      rpcUrl: MAINNET_RPC_URL,
     },
+    {
+      id: '0x5',
+      token: 'ETH',
+      label: 'Ethereum Goerli',
+      rpcUrl: GOERLI_RPC_URL,
+    },
+  ],
+  accountCenter: {
+    mobile: { enabled: false },
+    desktop: { enabled: false },
   },
-};
+  notify: {
+    enabled: false,
+  },
+  appMetadata: {
+    name: 'Drips',
+    description: 'Please select a wallet to connect to Drips',
+    icon: '<svg height="100%"><image href="/assets/onboard-logo.png" height="100%" /></svg>',
+  },
+});
+
+const lastConnectedWallet = storedWritable<string | undefined>(
+  'last-connected-wallet',
+  z.string(),
+  undefined,
+  !browser,
+);
 
 type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
 
@@ -63,16 +104,7 @@ export interface DisconnectedWalletStoreState {
 
 type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState;
 
-const windowProvider =
-  browser && window.ethereum && new ethers.providers.Web3Provider(window.ethereum);
-
-const selectedNetwork =
-  windowProvider && new ethers.providers.Web3Provider(window.ethereum).network;
-
-const initNetwork =
-  selectedNetwork && SUPPORTED_CHAINS.includes(selectedNetwork.chainId)
-    ? selectedNetwork
-    : DEFAULT_NETWORK;
+const initNetwork = DEFAULT_NETWORK;
 
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
@@ -83,29 +115,35 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
 const walletStore = () => {
   const state = writable<WalletStoreState>(INITIAL_STATE);
 
-  let web3Modal: Web3Modal;
-
   /**
    * Initialize the store and restore any previously-connected,
-   * cached provider.
+   * cached connection.
    */
   async function initialize(): Promise<void> {
     if (!browser) return;
 
-    web3Modal = new Web3Modal({
-      providerOptions: WEB_3_MODAL_PROVIDER_OPTIONS,
-      cacheProvider: true,
-    });
-
     const isSafeApp = isRunningInSafe();
 
-    if (web3Modal.cachedProvider || isSafeApp) {
+    if (isSafeApp) {
       await connect(true, isSafeApp);
+    } else {
+      if (onboard.state.get().wallets.length > 0) return;
+
+      const label = get(lastConnectedWallet);
+      if (!label) return;
+
+      if (await isWalletUnlocked(label)) {
+        const wallets = await onboard.connectWallet({ autoSelect: { label, disableModals: true } });
+
+        const provider = new ethers.providers.Web3Provider(wallets[0].provider);
+        _attachListeners(wallets[0].provider);
+        _setConnectedState(provider);
+      }
     }
   }
 
   /**
-   * Trigger Web3Modal and let the user connect their wallet.
+   * Trigger Onboard and let the user connect their wallet.
    * @param initializing If true, the function will trigger a global advisory
    * while waiting for the user's wallet to be unlocked.
    */
@@ -140,9 +178,15 @@ const walletStore = () => {
       safeInfo = await appsSdk.safe.getInfo();
       provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
     } else {
-      const instance = await web3Modal.connect();
-      provider = new ethers.providers.Web3Provider(instance);
-      _attachListeners(instance);
+      const wallets = await onboard.connectWallet();
+
+      const wallet = wallets[0];
+      const walletName = wallet.label.toLowerCase();
+
+      lastConnectedWallet.set(walletName);
+
+      provider = new ethers.providers.Web3Provider(wallets[0].provider);
+      _attachListeners(wallets[0].provider);
     }
 
     connected = true;
@@ -167,10 +211,13 @@ const walletStore = () => {
   }
 
   /**
-   * Completely clear the store and drop any cached providers from
-   * Web3Modal.
+   * Completely clear the store and drop any connected wallets.
    */
   function disconnect(): void {
+    onboard.state.get().wallets.forEach((w) => {
+      onboard.disconnectWallet({ label: w.label });
+    });
+
     _clear();
   }
 
@@ -197,15 +244,11 @@ const walletStore = () => {
   }
 
   function _clear() {
-    web3Modal?.clearCachedProvider();
-
-    localStorage.removeItem('walletconnect');
-    localStorage.removeItem('WALLETCONNECT_DEEPLINK_CHOICE');
-
+    lastConnectedWallet.clear();
     state.set(INITIAL_STATE);
   }
 
-  function _attachListeners(provider: ethers.providers.Web3Provider): void {
+  function _attachListeners(provider: EIP1193Provider): void {
     provider.on('accountsChanged', (accounts: string[]) => {
       if (accounts.length === 0) {
         _clear();
@@ -229,6 +272,7 @@ const walletStore = () => {
     initialize,
     connect,
     disconnect,
+    setOnboardTheme: onboard.state.actions.updateTheme,
   };
 };
 
@@ -263,6 +307,7 @@ const mockWalletStore = () => {
     initialize,
     connect: () => undefined,
     disconnect: () => undefined,
+    setOnboardTheme: () => undefined,
   };
 };
 

@@ -15,6 +15,8 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade, fly } from 'svelte/transition';
   import { isSafe } from '$lib/stores/wallet/safe/is-safe';
+  import themeStore from '$lib/stores/theme/theme.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
@@ -36,6 +38,12 @@
     tokens.connect(network.chainId);
     ens.connect(provider);
     balances.initialize();
+
+    themeStore.subscribe((v) => {
+      const onboardTheme = v.currentTheme === 'h4x0r' ? 'dark' : v.currentTheme;
+
+      walletStore.setOnboardTheme(onboardTheme);
+    });
 
     walletConnected = connected;
 
