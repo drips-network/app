@@ -165,6 +165,10 @@ export default class GitProjectService {
     username: string;
     repoName: string;
   } {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
     const parsedURL = new URL(url);
 
     // TODO: support more forges.
