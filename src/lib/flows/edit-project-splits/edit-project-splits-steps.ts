@@ -2,9 +2,7 @@ import type { Items, ListItem, Percentages } from '$lib/components/list-editor/l
 import { makeStep } from '$lib/components/stepper/types';
 import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import { get, writable } from 'svelte/store';
-import NewSplits from './steps/set-new-dependency-maintainer-split.svelte';
-import type { SplitsEntry } from 'radicle-drips';
-import FetchSplitsConfig from './steps/fetch-splits-config.svelte';
+import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
 import type { AddressSplit, ProjectSplit } from '$lib/components/splits/splits.svelte';
 import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -24,7 +22,6 @@ interface SplitsConfig {
 
 export interface State {
   project: ClaimedGitProject;
-  onChainSplitsConfig: SplitsEntry[] | undefined;
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
@@ -122,7 +119,6 @@ const state = (
 
   return writable<State>({
     project,
-    onChainSplitsConfig: undefined,
     highLevelPercentages,
     maintainerSplits,
     dependencySplits,
@@ -139,11 +135,7 @@ export default (
   context: () => state(project, representationalSplits),
   steps: [
     makeStep({
-      component: FetchSplitsConfig,
-      props: undefined,
-    }),
-    makeStep({
-      component: NewSplits,
+      component: SetNewDependencyMaintainerSplit,
       props: undefined,
     }),
     makeStep({
