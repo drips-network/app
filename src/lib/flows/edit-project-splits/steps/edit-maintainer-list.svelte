@@ -14,6 +14,15 @@
   export let context: Writable<State>;
 
   let formValid: boolean;
+
+  function nextStep() {
+    // If high level split says 0% for dependencies, we skip the next step
+    if ($context.highLevelPercentages.dependencies === 0) {
+      dispatch('goForward', { by: 2 });
+    } else {
+      dispatch('goForward');
+    }
+  }
 </script>
 
 <StepLayout>
@@ -31,11 +40,8 @@
     allowedItems="eth-addresses"
   />
   <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRight}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+    <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={nextStep}
+      >Continue</Button
     >
   </svelte:fragment>
 </StepLayout>

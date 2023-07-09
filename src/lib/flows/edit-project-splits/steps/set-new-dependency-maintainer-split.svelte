@@ -14,6 +14,15 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+
+  function nextStep() {
+    // If high level split says 0% for maintainers, we skip the next step
+    if ($context.highLevelPercentages.maintainers === 0) {
+      dispatch('goForward', { by: 2 });
+    } else {
+      dispatch('goForward');
+    }
+  }
 </script>
 
 <StepLayout>
@@ -38,8 +47,6 @@
     bind:percentages={$context.highLevelPercentages}
   />
   <svelte:fragment slot="actions">
-    <Button icon={ArrowRight} variant="primary" on:click={() => dispatch('goForward')}
-      >Continue</Button
-    >
+    <Button icon={ArrowRight} variant="primary" on:click={nextStep}>Continue</Button>
   </svelte:fragment>
 </StepLayout>
