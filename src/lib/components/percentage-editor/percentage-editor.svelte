@@ -91,6 +91,7 @@
 >
   <input
     bind:this={inputElem}
+    class="typo-text tabular-nums"
     tabindex={disabled ? -1 : 0}
     on:focus={() => {
       focus = true;
