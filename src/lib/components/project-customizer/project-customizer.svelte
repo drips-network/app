@@ -97,6 +97,7 @@
     opacity: 0.5;
     transition: all 0.3s;
     cursor: pointer;
+    font-family: initial;
   }
 
   .emoji-label {

@@ -71,4 +71,8 @@
   .with-outline {
     border: 1px solid var(--color-foreground);
   }
+
+  .emoji {
+    font-family: initial;
+  }
 </style>
