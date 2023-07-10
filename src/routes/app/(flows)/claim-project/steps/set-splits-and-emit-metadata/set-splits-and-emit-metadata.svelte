@@ -24,7 +24,9 @@
         },
         messages: {
           duringBefore: {
-            message: 'Preparing the second transaction…',
+            message: $context.isPartiallyClaimed
+              ? 'Preparing...'
+              : 'Preparing the second transaction…',
           },
         },
         transactions: ({ callerClient, setSplitsAndEmitMetadataBatch }) => ({

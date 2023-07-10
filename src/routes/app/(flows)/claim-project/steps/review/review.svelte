@@ -103,6 +103,11 @@
   });
 
   async function requestOwnerUpdate() {
+    if ($context.isPartiallyClaimed) {
+      dispatch('goForward', { by: 2 });
+      return;
+    }
+
     transact(
       dispatch,
       makeTransactPayload({
@@ -192,9 +197,10 @@
   </FormField>
   <div class="whats-next">
     <p>
-      You'll need to send two transactions to claim your project. The first one validates your
-      FUNDING.json file on-chain, and the second applies your split configuration. Click "Confirm in
-      Wallet" to get started.
+      {!$context.isPartiallyClaimed
+        ? "You'll need to send two transactions to claim your project. The first one validates your FUNDING.json file on-chain, and the second applies your split configuration."
+        : "You'll need to send one transaction to claim your project. The transaction will apply your splits configuration."}
+      Click "Confirm in Wallet" to get started.
     </p>
     <div class="card">
       <h4>On transaction confirmation…</h4>

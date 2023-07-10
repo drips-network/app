@@ -41,7 +41,7 @@
 
       if (!project?.claimed) {
         if (Date.now() - start >= timeout) {
-          throw new Error('Project verification failed after 5'); // Throw error after timeout
+          throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
         }
         if (project.verificationStatus === VerificationStatus.FAILED) {
           throw new Error('Project verification failed');
