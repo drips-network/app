@@ -498,7 +498,8 @@
   }
 
   @media (max-width: 1024px) {
-    .project-profile {
+    .project-profile,
+    .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
       grid-template-areas:
