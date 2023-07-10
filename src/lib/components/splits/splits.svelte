@@ -35,6 +35,15 @@
 
   export let list: Splits;
 
+  // Sort splits by highest percentage first, with groups at the bottom always.
+  $: sortedList = list.sort((a, b) => {
+    if (a.type === 'split-group' && b.type === 'split-group') return 0;
+    if (a.type === 'split-group') return 1;
+    if (b.type === 'split-group') return -1;
+
+    return b.weight - a.weight;
+  });
+
   export let isGroup = false;
 
   let wrapperElem: HTMLDivElement;
@@ -60,7 +69,7 @@
 </script>
 
 <div bind:this={wrapperElem} class="splits-list" class:group={isGroup}>
-  {#each list as listItem, index}
+  {#each sortedList as listItem, index}
     <div bind:this={splitElems[index]} class="split"><SplitComponent split={listItem} /></div>
   {/each}
   <div class="line" style:height="{lineHeight}px" />
