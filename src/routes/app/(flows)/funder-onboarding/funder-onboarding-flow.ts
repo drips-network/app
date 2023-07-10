@@ -10,6 +10,7 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import Success from './steps/success/success.svelte';
 
 export interface State {
   dripList: {
@@ -88,6 +89,10 @@ export const steps = () => [
   }),
   makeStep({
     component: ReviewStep,
+    props: undefined,
+  }),
+  makeStep({
+    component: Success,
     props: undefined,
   }),
 ];
