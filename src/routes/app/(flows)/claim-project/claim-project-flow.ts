@@ -24,6 +24,7 @@ interface SplitsConfig extends ListEditorConfig {
 export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
+  isPartiallyClaimed: boolean;
   project: UnclaimedGitProject | undefined;
   projectMetadata:
     | {
@@ -43,6 +44,7 @@ export interface State {
 }
 
 export const state = writable<State>({
+  isPartiallyClaimed: false,
   linkedToRepo: false,
   gitUrl: '',
   project: undefined,

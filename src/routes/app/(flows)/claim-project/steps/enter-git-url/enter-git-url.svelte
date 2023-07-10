@@ -17,6 +17,9 @@
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import emoji from '$lib/utils/emoji/emoji';
   import { page } from '$app/stores';
+  import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
+  import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
+  import walletStore from '$lib/stores/wallet/wallet.store';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -45,11 +48,23 @@
       validationState = { type: 'pending' };
 
       const project = await gitProjectService.getByUrl($context.gitUrl);
-      if (project.claimed) {
+
+      // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
+      const repoDriverMetadataManager = new RepoDriverMetadataManager();
+      const projectMetadata = await repoDriverMetadataManager.fetchAccountMetadata(
+        project.repoDriverAccount.accountId,
+      );
+      if (project.claimed && projectMetadata) {
         throw new Error('Project already claimed');
       }
+      if (
+        project.owner?.address.toLowerCase() === $walletStore.address?.toLowerCase() &&
+        !projectMetadata
+      ) {
+        $context.isPartiallyClaimed = true;
+      }
 
-      $context.project = project;
+      $context.project = project as UnclaimedGitProject;
 
       $context.projectEmoji = seededRandomElement(
         emoji.map((e) => e.unicode),
@@ -150,6 +165,7 @@
   function clearProject() {
     $context.project = undefined;
     $context.linkedToRepo = false;
+    $context.isPartiallyClaimed = false;
     $context.projectMetadata = undefined;
 
     validationState = { type: 'unvalidated' };
