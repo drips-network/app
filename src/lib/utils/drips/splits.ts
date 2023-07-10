@@ -1,8 +1,11 @@
-import type { Split as RepresentationalSplit, Split } from '$lib/components/splits/splits.svelte';
+import type { AddressSplit, ProjectSplit } from '$lib/components/splits/splits.svelte';
 import GitProjectService from '../project/GitProjectService';
 import { AddressDriverClient, Utils } from 'radicle-drips';
 import { getSubgraphClient } from '../get-drips-clients';
 import type { RepoDriverSplitReceiver } from '../metadata/types';
+import assert from '$lib/utils/assert';
+
+type RepresentationalSplit = AddressSplit | ProjectSplit;
 
 /**
  * Fetch splits for a given user ID, and map to representational splits for the `Splits` component.
@@ -54,17 +57,19 @@ export async function buildRepresentationalSplits(
           matchingMetadata?.source,
         );
 
+        assert(project);
+
         return {
-          type: 'project-split',
+          type: 'project-split' as const,
           project,
           weight: s.weight,
-        } as Split;
+        };
       } else {
         return {
-          type: 'address-split',
+          type: 'address-split' as const,
           address: AddressDriverClient.getUserAddress(s.account.accountId),
           weight: s.weight,
-        } as Split;
+        };
       }
     })(),
   );

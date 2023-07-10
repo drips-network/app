@@ -10,7 +10,12 @@
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import type { Splits, Split } from '$lib/components/splits/splits.svelte';
+  import type {
+    Splits,
+    Split,
+    AddressSplit,
+    ProjectSplit,
+  } from '$lib/components/splits/splits.svelte';
   import SplitsComponent from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
@@ -31,6 +36,7 @@
   import Registered from 'radicle-design-system/icons/Registered.svelte';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import buildUrl from '$lib/utils/build-url';
+  import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
 
   interface Amount {
     tokenAddress: string;
@@ -42,8 +48,12 @@
   export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
-  export let splits: Promise<{ maintainers: Splits; dependencies: Splits } | null> | undefined =
-    undefined;
+  export let splits:
+    | Promise<{
+        maintainers: (AddressSplit | ProjectSplit)[];
+        dependencies: (AddressSplit | ProjectSplit)[];
+      } | null>
+    | undefined = undefined;
 
   export let incomingSplits: ReturnType<typeof getIncomingSplits>;
 
@@ -174,11 +184,27 @@
     <div class="content">
       {#if project.owner}
         <div class="section">
-          <SectionHeader icon={SplitsIcon} label="Splits" />
           {#if splits}
             {#await splits}
+              <SectionHeader icon={SplitsIcon} label="Splits" />
               <SectionSkeleton loaded={false} />
             {:then result}
+              <SectionHeader
+                icon={SplitsIcon}
+                label="Splits"
+                actions={isOwnProject
+                  ? [
+                      {
+                        handler: () =>
+                          project.claimed &&
+                          result &&
+                          modal.show(Stepper, undefined, editProjectSplitsSteps(project, result)),
+                        label: 'Edit',
+                        icon: Pen,
+                      },
+                    ]
+                  : []}
+              />
               <SectionSkeleton
                 loaded={true}
                 error={result === null}
