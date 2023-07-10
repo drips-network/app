@@ -55,8 +55,7 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
 
-  // TOOD: Set to 200
-  const MAX_ITEMS = 10;
+  export let max_items = 200;
 
   export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
   export let percentages: Percentages = {};
@@ -95,7 +94,7 @@
       if (selected.indexOf(id) === -1) {
         items[id] = projectItem(gitProject);
 
-        if (selected.length < MAX_ITEMS) selected.push(id);
+        if (selected.length < max_items) selected.push(id);
         percentages = { ...percentages, [id]: 0 };
 
         await tick();
@@ -132,7 +131,7 @@
 
       items[address] = ethAddressItem(address);
 
-      if (selected.length < MAX_ITEMS) selected.push(address);
+      if (selected.length < max_items) selected.push(address);
       percentages = { ...percentages, [address]: 0 };
     } catch (e) {
       // eslint-disable-next-line no-console
