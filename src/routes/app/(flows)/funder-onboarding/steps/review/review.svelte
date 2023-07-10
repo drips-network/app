@@ -107,6 +107,7 @@
         >Edit</Button
       >
     </svelte:fragment>
+    <h2 class="pixelated drip-list-title">{$context.dripList.title}</h2>
     <ListEditor
       bind:percentages={$context.dripList.percentages}
       bind:selected={$context.dripList.selected}
@@ -232,6 +233,10 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
+  }
+
+  .drip-list-title {
+    margin-bottom: 1rem;
   }
 
   .key-value-row {
