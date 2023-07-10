@@ -8,11 +8,14 @@ import { get } from 'svelte/store';
 import ens from '$lib/stores/ens';
 import { isAddress } from 'ethers/lib/utils';
 import { AddressDriverClient } from 'radicle-drips';
+import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
+import GitProjectService from '$lib/utils/project/GitProjectService';
 
 export enum SearchItemType {
   PROFILE,
   STREAM,
   TOKEN,
+  REPO,
 }
 
 interface MatchStrings {
@@ -40,6 +43,16 @@ export type Item =
       type: SearchItemType.TOKEN;
       matchStrings: MatchStrings;
       item: TokenInfoWrapper;
+    }
+  | {
+      type: SearchItemType.REPO;
+      matchStrings: MatchStrings;
+      item: {
+        forge: string;
+        repoName: string;
+        username: string;
+        url: string;
+      };
     };
 
 function searchMatchStringsForStream(stream: Stream): MatchStrings {
@@ -130,6 +143,23 @@ export function updateSearchItems(accountId: string | undefined) {
 
 export default function search(input: string | undefined) {
   if (!input) return [];
+
+  if (isValidGitUrl(input)) {
+    const { username, repoName } = GitProjectService.deconstructUrl(input);
+
+    searchItems.push({
+      type: SearchItemType.REPO,
+      matchStrings: {
+        primary: input,
+      },
+      item: {
+        forge: 'github',
+        username,
+        repoName,
+        url: input,
+      },
+    });
+  }
 
   if (
     input?.endsWith('.eth') &&

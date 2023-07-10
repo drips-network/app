@@ -7,369 +7,353 @@
 </svelte:head>
 
 <h1>Data & Privacy Policy</h1>
-
-<p class="typo-text-small">Last edited: 07 March 2023</p>
+<p class="typo-text-small">Last edited: June 20th, 2023</p>
 <p>
-  Radicle websites (including *.drips.network) are maintained on a voluntary basis by the Radicle
-  Foundation (the “Foundation”). The Foundation is a Swiss foundation whose purpose is to support
-  the development of resilient and humane software infrastructures. The Foundation is committed to
-  supporting projects and people that develop non-extractive peer-to-peer technologies that promote
-  internet freedom, including, among others, the Radicle project. While the Foundation previously
-  assisted in the development and deployment of the Radicle Network, the Foundation does not own,
-  manage, or control or act as an administrator of the Radicle Network. The Radicle Network
-  presently operates in a fully decentralized and autonomous manner and has an opt-in Ethereum
-  protocol integration. The Foundation is neither involved in nor in any way responsible for the
-  ongoing operation, running, or functioning of the Radicle Network and/or any of the interactions,
-  collaborations or contractual relationships between Users on the Radicle Network.
+  Drips websites (including drips.network, docs.drips.network, v1.drips.network,
+  docs.v1.drips.network, app.drips.network - hereinafter referred to as &ldquo;Drips
+  Websites&rdquo;) are maintained on a voluntary basis by the Public Goods Association (the
+  &ldquo;Association&rdquo;). The Association is a Swiss Association whose purpose is to build
+  digital coordination infrastructure that enables the development of public goods, including the
+  Drips project. While the Switzerland-based Radicle Foundation (the &ldquo;Foundation&rdquo;)
+  previously assisted in the development and deployment of the Drips Network, the Radicle Foundation
+  and the Public Goods Association do not own, manage, or control or act as an administrator or
+  operator of the Drips Network. The Drips Network presently operates in a fully decentralized and
+  autonomous manner and is fully integrated with the Ethereum protocol. Neither the Association nor
+  the Foundation is involved in nor in any way responsible for the ongoing operation, running, or
+  functioning of the Drips Network and/or any of the interactions, collaborations or contractual
+  relationships between Users on the Drips Network.
 </p>
 <p>
-  The Foundation voluntarily supports the growth and development of the Radicle project, including
-  the Radicle Network (further defined in the <router-link to="/disclaimer">Disclaimer</router-link
-  >) as well as the Radicle websites and other communication channels for the Radicle community (as
-  described below). The Foundation has posted this Privacy Policy for the benefit of the community
-  of supporters of the Radicle project. The Foundation takes Radicle community member’s data and
-  privacy seriously - and is committed to protecting the rights of Radicle community members when it
-  comes to their data and privacy.
+  The Association voluntarily supports the growth and development of the Drips project, including
+  the Drips Network (further defined in the <a href="/legal/disclaimer">Disclaimer</a>) as well as
+  the Drips Websites and other communication channels for the Drips community (as described below).
+  The Association has posted this Data &amp; Privacy Policy for the benefit of the community of
+  supporters of the Drips project.&nbsp;
 </p>
 <p>
-  This policy applies to all of the Foundation’s data processing activities where it acts as a data
-  controller. In this policy, "Foundation" refers to Radicle Foundation, a foundation incorporated
-  in Switzerland with its registered address at Suurstoffi 37, 6343 Rotkreuz. For more information
-  about the Foundation, see the Imprint or the “Contact” section of this policy.
+  In this Data &amp; Privacy Policy, &quot;Association&quot; refers to Public Goods Association, an
+  Association incorporated in Switzerland with its address at c/o MJP Partners AG, Bahnhofstrasse
+  20, 6300 Zug. For more information about the Association, see the Imprint or the
+  &ldquo;Contact&rdquo; section of this Data &amp; Privacy Policy. The term &ldquo;data&rdquo; is
+  used herein interchangeably with &ldquo;personal data&rdquo;. More:
+</p>
+<ul>
+  <li>
+    <p>
+      &laquo;Personal data&raquo; means any information relating to an identified or identifiable
+      natural person (&laquo;data subject&raquo;); an identifiable natural person is one who can be
+      identified, directly or indirectly, in particular by reference to an identifier such as a
+      name, an identification number, location data, an online identifier or to one or more factors
+      specific to the physical, physiological, genetic, mental, economic, cultural or social
+      identity of that natural person; &laquo;sensitive personal data&raquo; is a subset of personal
+      data and revealing e.g. racial or ethnic origin, political opinions, religious or
+      philosophical beliefs, or trade union membership, genetic data, biometric data, health data or
+      data concerning a natural person&apos;s sex life or sexual orientation.
+    </p>
+  </li>
+  <li>
+    <p>
+      &laquo;Processing&raquo; means any operation or set of operations which is performed on
+      personal data or on sets of personal data, whether or not by automated means, such as
+      collection, recording, organisation, structuring, storage, adaptation or alteration,
+      retrieval, consultation, use, disclosure by transmission, dissemination or otherwise making
+      available, alignment or combination, restriction, erasure or destruction.
+    </p>
+  </li>
+</ul>
+<p>
+  The Association may make changes to this Data &amp; Privacy Policy every so often. When changed,
+  the Association will change the &ldquo;Last edited&rdquo; date at the top of the page. You
+  (hereinafter referred to as &quot;You&rdquo; or &ldquo;User&rdquo;) are encouraged to review this
+  Data &amp; Privacy Policy regularly in order to stay informed. If You do not agree to the revised
+  Data &amp; Privacy Policy, do not use, access, or interact with the Drips Network, the Drips
+  Technology Stack, the Drips Websites, and any other Drips communication outlet (and unsubscribe
+  where applicable).
+</p>
+<h3>Data in P2P and Blockchain Infrastructures</h3>
+<p>
+  When You decide to send or receive funds, share, or stream ERC-20 tokens, all such information
+  and/or contribution is or may become public. Because any sending or receipt of funds, sharing or
+  streaming of ERC-20 tokens by You on the Drips Network is linked to a public key, all
+  contributions can be verified as coming from a public key, which could be considered as personal
+  data. If Your public key is linked to additional personal data, like Your git username or email,
+  this information will also be publicly accessible.
 </p>
 <p>
-  The Foundation may make changes to this policy every so often. When changed, the Foundation will
-  change the “Last edited” date at the top of the page. You are encouraged to review this policy
-  regularly in order to stay informed about the Foundation’s information practices. If you do not
-  agree to the revised policy, do not use, access, or interact with the Radicle Network, the Radicle
-  Technology Stack, the Radicle websites, and any other Radicle communication outlet (and
-  unsubscribe where applicable).
-</p>
-<h2>Data in P2P and Blockchain Infrastructures</h2>
-<p>
-  While you could use Radicle software to privately edit your own code on your computer, without
-  sharing to the Radicle Network, all code that you publish to the Radicle Network is to be
-  considered public. Because any contribution on the Radicle Network is linked to a public key, all
-  contributions can be verified as coming from a public key. If your public key is linked to
-  personally identifiable information, like your git username or email, this information will also
-  be publicly accessible.
+  Data is disseminated through the Drips Network via a collection of public, open smart contracts
+  deployed on Ethereum-Virtual-Machine-based (&ldquo;EVM&rdquo;) blockchains, equally accessible to
+  every User and application. Therefore, data and transactions pushed via the Drips Network are part
+  of Ethereum&rsquo;s public, immutable state machine.
 </p>
 <p>
-  Data is disseminated through the Radicle Network via a process called gossip. That is,
-  participants in the Radicle Network share and spread data they are "interested" in by keeping
-  redundant copies locally and sharing deltas with peers. In the Radicle Network, data is replicated
-  across connected code repositories according to a “social graph” of contributors and maintainers,
-  enabling source code and changesets to be disseminated according to use and value: the more peers
-  who are interested in a certain project, the more available this project is made to the Radicle
-  Network.
+  Furthermore, metadata (and any personal data embedded therein) provided by Users when setting up
+  token transfers in the Drips App [app.drips.network], is sent to and stored in the InterPlanetary
+  File System (IPFS). IPFS is a distributed system for storing and accessing files, websites,
+  applications, and data. Each piece of data stored in the IPFS network gets its own unique content
+  identifier (CID). IPFS uses transport-encryption, which means Your metadata (and any personal data
+  embedded therein) is secure when being sent from one IPFS node to another. So by design, anyone is
+  able to download and view that data (and any personal data embedded therein) if they have the
+  CID.&nbsp;
 </p>
 <p>
-  It’s important to understand that any information you publish onto the Radicle Network is <b
-    >public by design</b
-  >. Because of the way gossip works, once you contribute to code on or share a repository with the
-  Radicle Network, any information that is held in git (potentially your name, email, or public key)
-  will be exposed. It is not possible to remove, revoke or rectify this information from the Radicle
-  Network. This is because the Radicle Network is a decentralized (public) peer-to-peer network (not
-  operated by us) which stores data committed to it around the world. Your use of a client and
-  interaction with Radicle Network will lead you to interact with other Radicle Network
-  participants; you should note that other participants on the Radicle Network may be able to
-  determine certain things about you through your use of the Radicle Network. Similarly, your use of
-  or interaction with the Funding Functions (as defined in the
-  <router-link to="/disclaimer">Disclaimer</router-link>) in the Radicle Network could lead other
-  Radicle Network participants to determine certain things about you through your use of the Funding
-  Functions.
-  <b>Radicle Foundation does neither collect this data from you nor process it in any way</b>.
-</p>
-<h2>How Personal Data is Used</h2>
-<h3>When subscribing to the Radicle newsletter:</h3>
-<p>
-  When you subscribe to the Radicle newsletter, the Foundation collects personal data via its
-  newsletter service provider MailChimp. This data may include:
-</p>
-<ol>
-  <li>your email address</li>
-  <li>the date and time of registration</li>
-  <li>your IP address</li>
-  <li>your browser type</li>
-  <li>your language</li>
-  <li>the preferred email format</li>
-</ol>
-<p>
-  This data is collected and processed for the purpose of subscribing you to and sending you
-  Radicle’s newsletter (via radicle.xyz) with updates on the project’s development as well as
-  ensuring the security and reliability of the newsletter service.
+  It&rsquo;s important to understand that any information or personal data You publish onto, via or
+  within the Drips Network (e.g., by streaming, sharing, or transferring of tokens) is&nbsp;public
+  by design. It is not possible to remove, revoke or rectify this information and data from the
+  Drips Network. This is because the Drips Network is a decentralized (public) peer-to-peer network
+  (not operated by the Association nor the Foundation) which stores data committed to it around the
+  world. Your use of a client and interaction with Drips Network will lead You to interact with
+  other Drips Network participants; You should note that other participants on the Drips Network
+  and/or third parties may be able to determine certain things about You through Your use of the
+  Drips Network. Similarly, Your use of or interaction with the funding, sharing or streaming
+  functions (as outlined and defined in the Disclaimer) in the Drips Network could lead other Drips
+  Network participants to determine certain things about You through Your use of those
+  functions.&nbsp;Neither Public Goods Association nor Radicle Foundation collect this data from You
+  nor process it in any way.
 </p>
 <p>
-  The legal basis for this processing is your consent as provided in the double opt-in confirmation
-  part of the Radicle newsletter sign-up process. This data will be stored as long as the Foundation
-  has your consent to send you a newsletter. If you wish to unsubscribe from the Radicle newsletter,
-  you can do so by clicking on the link at the end of each newsletter or by sending the Foundation
-  an email. You can read more about MailChimp’s data access as well as their legitimate interests in
-  and purposes for collecting this data <a
-    href="https://mailchimp.com/legal/privacy/#3._Privacy_for_Contacts"
-    target="_blank"
-    rel="noopener noreferrer">here</a
-  >.
+  By using Drips Network and/or Drips App you acknowledge that Your personal data, including Your
+  wallet address (and/or any third-party recipient&rsquo;s wallet address), is/are stored on public
+  searchable blockchains and neither Public Goods Association nor Radicle Foundation, nor any third
+  party, has any power to delete such data published by You or by its users to the blockchain. Any
+  details of any transfer initiated and made by You are public information and are stored on the
+  blockchain. You hereby release and indemnify Public Goods Association and/or Radicle Foundation of
+  any data privacy liabilities associated with personal data that You (and/or third parties) publish
+  to the blockchain by using Drips Network and/ or Drips App. Neither Public Goods Association nor
+  Radicle Foundation is acting as a data controller in this regard within the meaning of the data
+  protection legislation.&nbsp;
 </p>
-<h3>When receiving the Radicle newsletter:</h3>
 <p>
-  If you have subscribed to the Radicle newsletter, each time you receive and open a newsletter, a
-  third-party service provider MailChimp collects data, including:
+  The Association, the Drips Websites, Drips App and/or any third-party provider as outlined below
+  and Your personal data can become victims of cyber-attacks, cybercrime, brute force, hacker
+  attacks and further fraudulent and malicious activity including but not limited to viruses,
+  forgeries, malfunctions and interruptions which is out of the Association and/or the Radicle
+  Foundation&rsquo;s control and responsibility.
 </p>
-<ol>
-  <li>your email address</li>
-  <li>the date and time you opened the email</li>
-  <li>your location, as indicated by your IP address</li>
-</ol>
+<h3>How Personal Data is Used</h3>
+<h4>When browsing the Drips Websites:</h4>
 <p>
-  This data is collected and processed by the Foundation for the purpose of ensuring the security
-  and reliability of the newsletter service as well as the Foundation’s legitimate interest in the
-  effectiveness of and general user interest in the Radicle newsletter. Because the Radicle
-  newsletter service is hosted by MailChimp, you can view more information about the data they
-  collect and their legitimate interests in and purposes for collecting this data <a
-    href="https://mailchimp.com/legal/privacy/#3._Privacy_for_Contacts"
-    target="_blank"
-    rel="noopener noreferrer">here</a
-  >.
+  If You go to the Drips Websites, the Association does not collect any of Your information and data
+  as You browse. However, the Drips Websites are hosted by Netlify, Inc., 44 Montgomery Street,
+  Suite 300, San Francisco, CA 94104 (&ldquo;Netlify&rdquo;), which does collect Your data (e.g., IP
+  address, user agent, referrer, full URL with query string) and which uses cookies and log files to
+  track user information. They use cookies to track which page variant a visitor/User has seen, to
+  track if a visitor/User has clicked on a page variant, to monitor traffic patterns and to gauge
+  popularity of service options. This information is used to deliver relevant content and services
+  to You and other users. Generally, this data is stored by Netlify for 30 days. Furthermore, the
+  Association has enabled <a href="https://docs.netlify.com/monitor-sites/analytics/"
+    >Netlify Analytics</a
+  >, to better understand the Drips User community based on the User information Netlify collects
+  about Websites visitors. This data is collected and processed by Netlify and is accessible for the
+  last 30 days in an anonymized (dashboard of anonymized data) form only. For more information about
+  the information collected, visit Netlify&rsquo;s privacy policies
+  <a href="https://www.netlify.com/privacy/">here</a>
+  and <a href="https://www.netlify.com/gdpr-ccpa/">here</a>.
 </p>
-<h3>When browsing the radicle.xyz website:</h3>
+<h4>When downloading Drips:</h4>
 <p>
-  If you go to the <a href="http://radicle.xyz" target="_blank" rel="noopener noreferrer"
-    >radicle.xyz website</a
-  >, the Foundation does not collect any of your information as you browse. However, the Radicle
-  website is hosted by Netlify, which collects access logs (including the IP addresses)
-  <a href="http://radicle.xyz" target="_blank" rel="noopener noreferrer">radicle.xyz</a>
-  visitors. This is stored for less than 30 days. For more information about the information collected,
-  visit Netlify’s privacy policies
-  <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener noreferrer">here</a>
-  and
-  <a href="https://www.netlify.com/gdpr-ccpa/" target="_blank" rel="noopener noreferrer">here</a>.
-</p>
-<h3>When browsing the drips.network and app.drips.network websites:</h3>
-<p>
-  If you go to the drips.network and app.drips.network websites, the Foundation does not collect any
-  of your information as you browse. However, these websites are hosted by Netlify, which collects
-  access logs (including the IP addresses) drips.network and app.drips.network visitors. This is
-  stored for less than 30 days. These websites have also enabled <a
-    href="https://www.netlify.com/products/analytics/"
-    target="_blank"
-    rel="noopener noreferrer">Netlify Analytics</a
-  >
-  to collect page hits. For more information about the information collected, visit Netlify’s privacy
-  policies
-  <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener noreferrer">here</a>
-  and
-  <a href="https://www.netlify.com/gdpr-ccpa/" target="_blank" rel="noopener noreferrer">here</a>.
-</p>
-<h3>When downloading Radicle:</h3>
-<p>
-  When you download Radicle binary files, Github servers may collect and save information regarding
-  the pages you view, the referring site, your IP address and information about your device, session
-  information, the date and time of each request, and telemetry data (i.e., information about how a
-  specific feature or service is performing) regarding your use of other features and functionality
-  of Github's service. They use this information to provide, administer, analyze, manage, and
-  operate their service. The Foundation does not collect, store, or process the information
-  collected by Github. For more information about the information Github collects and how it uses
-  this information, please visit <a
+  When You download Drips source code, GitHub servers may collect and save information/data
+  regarding the pages You view, the referring site, Your IP address and information/data about Your
+  device, session information, the date and time of each request, and telemetry data (i.e.,
+  information about how a specific feature or service is performing) regarding Your use of other
+  features, Your interaction with GitHub and functionality of GitHub&apos;s service. They use this
+  information/data to provide, administer, analyze, manage, and operate their service. The
+  Association does not collect, store, or process the information and/or data collected by GitHub.
+  For more information about the information/data GitHub collects and how it uses this
+  information/data, please visit <a
     href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement#what-information-github-collects"
-    target="_blank"
-    rel="noopener noreferrer">Github’s privacy policies</a
-  >. Regarding your use of Radicle Technology Stack, the Foundation does not process any of your
-  personal data (see above: Data in P2P and Blockchain Infrastructures).
+    >GitHub&rsquo;s privacy policies</a
+  > by GitHub Inc. 88 Colin P Kelly Jr St, San Francisco, CA 94107 United States and/or by GitHub B.V.,
+  Vijzelstraat 68-72, 1017 HL Amsterdam, The Netherlands. Regarding Your use of Drips Technology Stack,
+  the Association does not process any of Your personal data (see above: Data in P2P and Blockchain Infrastructures).
 </p>
-<h3>When you join the Radicle Matrix server:</h3>
+<h4>When using the Drips Protocol and Drips App:</h4>
 <p>
-  If you want to join Radicle’s Matrix server to chat with the Radicle community, you will need to
-  join it via a client. You have the option of creating a Matrix account on Radicle's server, hosted
-  by Ungleich; if you do, the Foundation, via Ungleich, collects your user name, display name, email
-  address (if you provided one to the client), and your IP address each time you access the Radicle
-  Matrix server. When you join a chat room on the Radicle Matrix server, whether you have an account
-  on Radicle’s server or not, the Foundation will collect your user name and display name. This
-  information is collected in order to deliver the chat service and enable its features, as well as
-  ensure the security and reliability of the service.
-</p>
-<h3>When you contribute to the Radicle Matrix server:</h3>
-<p>
-  Once you’ve joined Radicle’s Matrix server, you can participate in the public chat room by
-  contributing messages and files. When you contribute to Radicle’s Matrix server, everyone who has
-  joined the room will collect: your username, display name, message content, message files, and
-  message date/time. When you communicate directly with another user via a private room, the user
-  will collect: your username, display name, message content, message files, and message date/time.
-  This information, collected in public chat rooms or in private rooms, is stored on Radicle’s
-  Matrix homeserver, which is hosted by Ungleich.
+  When You/a User sets up a token stream or transfer via the Drips Protocol (which can be done via
+  the Drips App, app.drips.network), You/they will need to connect the token sender&rsquo;s Ethereum
+  address (likely Your/their own Ethereum address, i.e. Your/their public key). You/They will also
+  need to indicate the Ethereum address that should be able to access and receive the sent tokens.
+  This use of Ethereum addresses (public keys) is critical to ensure tokens streamed, shared, or
+  transferred are accessed by the correct recipient.&nbsp;
 </p>
 <p>
-  This data is collected and processed by Ungleich for the purpose of delivering the chat service
-  and features, as well as ensuring the security and reliability of the chat service. You can view
-  more information about how they handle this data <a
-    href="https://redmine.ungleich.ch/projects/open-infrastructure/wiki/Security_and_Privacy_Policy"
-    target="_blank"
-    rel="noopener noreferrer">here</a
-  >. If you wish to leave the Radicle Matrix server and delete all the data that was contributed by
-  you, you can do so by sending the Foundation an email (ops@radicle.foundation).
+  When using the Drips App, the metadata a User gives the token stream or transfer - including the
+  Ethereum addresses of the sender and recipient(s) You indicate, the name You give to the stream or
+  transfer, the amount of tokens You transfer, and the time and frequency parameters You set for the
+  token transfer - are published to and stored in the InterPlanetary File System (IPFS). Each piece
+  of data stored in the IPFS network gets its own unique content identifier (CID), a hash of the
+  metadata sent to IPFS, which is created by IPFS.&nbsp;The Drips App retrieves the CID of the
+  published IPFS document (i.e. the User&rsquo;s metadata), and then writes this CID on-chain (via
+  the Drips Protocol) in association with the User&rsquo;s Drips account. By design, details of any
+  transfer initiated and made by You are public information and are stored on the blockchain and
+  anyone is able to download, access and view Your metadata (and any personal data embedded therein)
+  stored in the IPFS if they have the CID.
 </p>
-<h2>How Third Party Applications are Used</h2>
-<h3>MailChimp:</h3>
 <p>
-  The Foundation uses MailChimp (based in the United States) to collect subscriber emails and to
-  send out the Radicle newsletter to subscribers. The Foundation hereby informs you and you hereby
-  acknowledge that the United States, in the view of the European Commission, does not ensure an
-  adequate level of protection of personal data and that the personal data can be transferred to the
-  recipients in the United States without any further safeguards; furthermore, during the newsletter
-  signup process, the user consents to this transfer of personal data and confirms their
-  understanding of the possible risks of such a transfer via the double opt-in confirmation part of
-  the newsletter signup process. MailChimp’s privacy policy can be found <a
-    href="https://mailchimp.com/legal/privacy/#3._Privacy_for_Contacts"
-    target="_blank"
-    rel="noopener noreferrer">here</a
-  >.
+  The Association does not collect, store, or process the information and/or data sent to IPFS based
+  on the User inputs. For more information about the lifecycle of data and information in IPFS,
+  please visit <a href="https://docs.ipfs.tech/concepts/lifecycle/">this site</a>. &nbsp;
+  &nbsp;&nbsp;
 </p>
-<h3>Netlify:</h3>
 <p>
-  The Radicle websites are hosted by Netlify. User personal information from visitors to the Radicle
-  websites, including logs of visitor IP addresses, may be collected by Netlify to comply with legal
-  obligations, and to maintain the security and integrity of the Website and the Service. For
-  further information and the applicable data protection provisions of Netlify, visit their privacy
-  policies <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener noreferrer"
-    >here</a
+  To use Drips App, You must use a third-party wallet (e.g., MetaMask, WalletConnect) which allows
+  You to engage in transactions on the Ethereum Network. Your activities and interactions with any
+  third-party wallet provider are within Your responsibility and are governed by the applicable
+  terms of use and data privacy policy of that third party.&nbsp;
+</p>
+<p>
+  By using Drips Network and/or Drips App You acknowledge that Your personal data, including Your
+  wallet address (and/or any third-party recipient&rsquo;s wallet address), is/are stored on the
+  Ethereum Network and neither Public Goods Association nor Radicle Foundation, nor any third party,
+  has any power to delete such data published by You or other/its users to the blockchain. Any
+  details of any transfer initiated and made by You are public information and are stored on the
+  blockchain. You hereby release and indemnify Public Goods Association and/or Radicle Foundation of
+  any data privacy liabilities associated with personal data that You (and/or third parties) publish
+  to the Ethereum Network by using Drips Network and/ or Drips App. Neither Public Goods Association
+  nor Radicle Foundation is acting as a data controller in this regard within the meaning of the
+  data protection legislation.
+</p>
+<h3>How Third Party Applications are Used</h3>
+<p>
+  The Drips Website and/or Drips App may contain third-party websites and/or third-party
+  applications. If You use Drips Website and/or Drips App, personal data that You provide may be
+  processed by third parties. Public Goods Association or Radicle Foundation have no control over,
+  do not review and cannot be responsible for these third-party websites, applications, or their
+  content. It is encouraged that You read the privacy policies of every website and/or application
+  You visit. Any links to third-party websites, applications or locations are for Your convenience
+  and do not signify our endorsement of such third parties or their products, content, applications,
+  or websites.
+</p>
+<h4>Netlify:</h4>
+<p>
+  The Drips Websites are hosted by Netlify, which does collect personal data as You browse (e.g., IP
+  address, user agent, referrer, full URL with query string) and which uses cookies and log files to
+  track user information. They use cookies to track which page variant a visitor/User has seen, to
+  track if a visitor/User has clicked on a page variant, to monitor traffic patterns and to gauge
+  popularity of service options. This information is used to deliver relevant content and services
+  to You/users. Generally, this data is stored by Netlify for 30 days. &nbsp;Furthermore, the
+  Association has enabled <a href="https://docs.netlify.com/monitor-sites/analytics/"
+    >Netlify Analytics (see above).</a
   >
-  and
-  <a href="https://www.netlify.com/gdpr-ccpa/" target="_blank" rel="noopener noreferrer">here</a>.
+  For further information and the applicable data protection provisions of Netlify, visit their privacy
+  policies <a href="https://www.netlify.com/privacy/">here</a> and
+  <a href="https://www.netlify.com/gdpr-ccpa/">here</a>.&nbsp;
 </p>
-<h3>Github:</h3>
+<h4>GitHub:</h4>
 <p>
-  The Foundation uses Github servers to store Radicle binary files. For further information and the
-  applicable data protection provisions of Github, <a
+  GitHub servers are used to store Drips source code (see above). For further information and the
+  applicable data protection provisions of GitHub, visit <a
     href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement"
-    target="_blank"
-    rel="noopener noreferrer">visit this site</a
+    >this site</a
   >.
 </p>
-<h3>Matrix:</h3>
+<h4>InterPlanetary File System (IPFS):&nbsp;</h4>
 <p>
-  The Foundation has set up an instance of Matrix, a chat protocol, which enables users to securely
-  publish and subscribe to data. The Matrix Network is a decentralised and openly federated
-  communication network. This means that a user's messages are stored on both the homeserver where
-  they have their account and the Radicle Matrix homeserver, which hosts the Radicle community chat
-  room where the user makes their contributions. For more information about how Matrix works, you
-  can read their privacy policy <a
-    href="https://matrix.org/legal/privacy-notice"
-    target="_blank"
-    rel="noopener noreferrer">here</a
+  IPFS is a third-party, decentralized, peer-to-peer, distributed file storage protocol. When You
+  setup any sort of token &ldquo;stream&rdquo; or transfer using the Drips App [app.drips.network],
+  the metadata (and any personal data embedded therein) You create for the token transfer -
+  including the name You give to the stream or transfer, the Ethereum addresses of the sender and
+  recipient(s) You indicate, the amount of tokens You transfer, and the time and frequency
+  parameters You set for the token transfer - are published to and stored in the InterPlanetary File
+  System (IPFS) by design. Once data is added and stored in the IPFS, it cannot be changed anymore
+  (immutable). For further information and the applicable data privacy provisions of IPFS, visit <a
+    href="https://docs.ipfs.tech/concepts/privacy-and-encryption/">this site</a
   >.
 </p>
-<h3>Ungleich:</h3>
+<h4>Pinata Technologies, Inc. (Pinata):</h4>
 <p>
-  The Foundation uses Ungleich to host an instance of Matrix and Radicle’s Matrix homeserver. A
-  username and display name is collected to give a user access to the chat room on Radicle’s Matrix
-  homeserver, then all contributions by the user to the Radicle chat room are stored on Radicle’s
-  homeserver. Optionally, a user can create a Matrix account on Radicle’s homeserver, in which case
-  Ungleich may store an email for the purpose of recovering their password as well as the user’s IP
-  address. Radicl’s Matrix homeserver is hosted in Ungleich’s own datacenter in Switzerland. For
-  further information about how Ungleich handles security and privacy concerns, <a
-    href="https://redmine.ungleich.ch/projects/open-infrastructure/wiki/Security_and_Privacy_Policy"
-    target="_blank"
-    rel="noopener noreferrer">visit this site</a
+  When You setup any sort of token &ldquo;stream&rdquo; or transfer using the Drips App
+  [app.drips.network], the metadata (and any personal data embedded therein) You create for the
+  token transfer is published to IPFS via an IPFS node provided by Pinata Technologies, Inc., 3555
+  Farnam St. #905, Omaha, NE 68131 (&ldquo;Pinata&rdquo;). The Drips App accesses IPFS both for
+  reading and writing metadata through an IPFS node provided by Pinata. They can use data for their
+  own purposes. The Association has no control what happens with data and does not process this
+  data. &nbsp;For further information and the applicable data privacy provisions of Pinata, visit <a
+    href="https://www.pinata.cloud/privacy-policy">this site</a
   >.
 </p>
-<h3>Links to Social Media:</h3>
+<h4>Links to Social Media:</h4>
 <p>
-  On the Radicle websites, there are links to social media profiles. Those services might also
-  collect personal data. Please refer to their privacy policies for more information.
+  The Drips Websites may link to social media profiles and may contain icons of social media
+  providers (e.g., Twitter). Those services might collect personal data. If You are logged in with
+  Your social media platform account, such data collected may even be assigned to Your account or
+  profile.&nbsp;For further information on the purpose and scope of data collection and processing
+  by the social media platform/provider, please review the privacy notices of these social media
+  platforms/providers, where You will also receive further information about Your rights and about
+  setting options for protecting your privacy.&nbsp;Please refer to their privacy policies for more
+  information.
 </p>
 <ol>
   <li>
-    <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">Discord</a>
+    <p><a href="https://discord.com/privacy">Discord</a>&nbsp;</p>
   </li>
   <li>
-    <a href="https://twitter.com/de/privacy" target="_blank" rel="noopener noreferrer">Twitter</a>
+    <p><a href="https://twitter.com/de/privacy">Twitter</a>&nbsp;</p>
   </li>
   <li>
-    <a href="https://radicle.community/privacy" target="_blank" rel="noopener noreferrer"
-      >Discourse</a
-    >
+    <p><a href="https://radicle.community/privacy">Discourse</a></p>
   </li>
   <li>
-    <a href="https://telegram.org/privacy" target="_blank" rel="noopener noreferrer">Telegram</a>
+    <p><a href="https://telegram.org/privacy">Telegram</a></p>
   </li>
   <li>
-    <a
-      href="https://help.github.com/en/articles/github-privacy-statement"
-      target="_blank"
-      rel="noopener noreferrer">GitHub</a
-    >
-  </li>
-  <li>
-    <a
-      href="https://www.notion.so/Terms-and-Privacy-28ffdd083dc3473e9c2da6ec011b58ac"
-      target="_blank"
-      rel="noopener noreferrer">Notion</a
-    >
+    <p><a href="https://help.github.com/en/articles/github-privacy-statement">GitHub</a></p>
   </li>
 </ol>
-<h2>Storing Your Personal Data</h2>
+<h3>Storing Your Personal Data&nbsp;</h3>
 <p>
-  The Foundation retains your information only for as long as is necessary for the purposes for
-  which it processes the information as set out in this policy. However, the Foundation may retain
-  your personal data for a longer period of time where such retention is necessary for compliance
-  with a legal obligation to which the Foundation is subject, or in order to protect your vital
-  interests or the vital interests of another natural person.
-</p>
-<h2>Transferring Data Outside the EU</h2>
-<p>
-  The Radicle newsletter subscription function is realized with the help of MailChimp, which is
-  based in the United States (see above).
+  The Association does not process or retain the metadata (and any personal data embedded therein)
+  that the User creates when the User sets up a token transfer or stream in the Drips App; this
+  metadata (and any personal data embedded therein) is sent to IPFS [see &ldquo;How Third Party
+  Applications are Used&rdquo; under &ldquo;IPFS&rdquo; above] where it becomes an immutable stored
+  object.
 </p>
 <p>
-  Furthermore, any metadata associated with contributions made while using Radicle (including your
-  git username and, potentially, your email address if it’s associated with your git username) may
-  be replicated and stored around the world.
+  By using Drips Network and/or Drips App You acknowledge that your personal data, including Your
+  wallet address (and/or any third-party recipient&rsquo;s wallet address), is/are stored on public
+  searchable blockchains and neither Public Goods Association nor Radicle Foundation, nor any third
+  party, has any power to delete such data published by You or other/its users to the blockchain.
 </p>
-<h2>User Rights Under GDPR</h2>
+<h3>Transferring Data Outside the EU</h3>
 <p>
-  The Radicle Foundation takes user rights and privacy seriously - and this philosophy is built into
-  each one of the projects it supports. The Foundation has limited the data collected to the
-  absolute minimum it needs to enable the projects to work for the user.
-</p>
-<p>
-  MailChimp makes the assurance that they take the appropriate security measures to prevent access
-  to the Radicle newsletter subscriber list for any purpose other than the purpose of using it to
-  inform supporters of Radicle’s progress. Furthermore, as a Radicle newsletter subscriber and a
-  contributor to the Radicle Community Matrix, you have the right to information, correction,
-  limitation of data processing, deletion of personal data, objection, revocation of the declaration
-  of consent under data protection law for the future and data transferability within the framework
-  of the data protection law applicable to you and to the extent provided for therein (such as in
-  the case of the GDPR). Please note that while the Foundation can delete your data from the Radicle
-  Matrix homeserver, this does not apply to the data on Matrix servers run by others, including,
-  potentially, the homeserver where you have your Matrix account.
+  Any metadata and personal data associated with interactions with or contributions made while using
+  Drips Websites and/or Drips App (including Your Ethereum address and, potentially, any information
+  that&rsquo;s associated with Your Ethereum address) may be replicated by anybody, transferred to
+  third parties and stored around the world as it is public by design (see &ldquo;How Personal Data
+  is Used&rdquo;).
 </p>
 <p>
-  In addition, you have the right to assert your claims in court or to file a complaint with the
-  responsible data protection authority. Switzerland's competent data protection authority is the
-  Federal Data Protection and Information Commissioner.
+  Furthermore, and as it is explained under &ldquo;How Personal Data is Used&rdquo; and &ldquo;How
+  Third Party Applications are Used&rdquo;, when You choose to use Drips Websites and/or Drips App
+  and/or any third party provider as outlined above, Your data may be processed by them in the
+  European Economic Area (EEA), in countries outside the EEA and around the world, which includes
+  countries that do not provide the same level of data protection as Switzerland or the EEA and are
+  not recognized as providing an adequate level of data protection. &nbsp;
+</p>
+<h3>User Rights Under GDPR</h3>
+<p>
+  The Public Goods Association takes user rights and privacy seriously - and this philosophy is
+  built into each one of the projects it supports.&nbsp;
 </p>
 <p>
-  However, because of the Radicle Network’s peer-to-peer, gossip-based code collaboration
-  infrastructure, the deletion or editing of any contributions you make to your or other
-  repositories on the Radicle Network and any personal data made available to the public in this
-  regard (see above: Data in P2P and Blockchain Infrastructures) cannot be (fully) enforced. This is
-  because Radicle Network is a decentralized network and it stores data committed to it around the
-  world. The Foundation can only ensure your rights regarding data for which the Foundation
-  qualifies as a controller (data processed by the Radicle Foundation – see above: How Personal Data
-  is Used).
+  You have the right to assert Your claims in court or to file a complaint with the responsible data
+  protection authority. Switzerland&apos;s competent data protection authority is the Federal Data
+  Protection and Information Commissioner.
 </p>
-<h2>Contact</h2>
 <p>
-  The Radicle websites are maintained on a voluntary basis by the Radicle Foundation. The Foundation
-  is registered in the canton of Zug, Switzerland, under the commercial register number
-  CHE405.696.942 [CHE-405.696.942 MWST]. The Foundation’s registered office is located at:
+  However, because the Drips Network is based on the Ethereum Protocol, a decentralized
+  infrastructure, any tokens You send, receive, stream, or share using the Drips Network and any
+  personal data made available to the public in this regard (see above: Data in P2P and Blockchain
+  Infrastructures) cannot be (fully) enforced and such data published by You and/or its Users cannot
+  be rectified nor deleted by anybody. This is because Ethereum Network is a decentralized network
+  and it stores data committed to it around the world. You are solely responsible for any data that
+  You share, publish or which You make accessible on or via Drips Network.&nbsp;
 </p>
-<p>Suurstoffi 37<br />6343 Rotkreuz<br />Switzerland</p>
+<h3>Contact</h3>
 <p>
-  If you have any queries concerning the Radicle websites, other Radicle communication channels, or
-  your rights under this Privacy Policy, please contact <a href="mailto:ops@radicle.foundation"
-    >ops@radicle.foundation</a
-  >.
+  The Drips Websites are maintained on a voluntary basis by the Public Goods Association. The
+  Association is based in Switzerland at c/o MJP Partners AG, Bahnhofstrasse 20, 6300 Zug. If You
+  have any queries concerning the Drips Websites, other Drips communication channels, or Your rights
+  under this Data &amp; Privacy Policy, please contact ops@drips.network.
 </p>
 
 <style>
@@ -377,18 +361,17 @@
     margin-bottom: 2rem;
   }
 
-  h2,
   h3 {
     margin-top: 2rem;
     margin-bottom: 1.5rem;
   }
 
   p,
-  ol {
+  ul {
     margin-bottom: 1rem;
   }
 
-  ol li {
+  ul li {
     list-style: initial;
     margin-left: 1rem;
   }

@@ -25,8 +25,9 @@
   });
 
   let placeholderContainerPosition = 'absolute';
-
   let contentContainerElem: HTMLDivElement;
+
+  let transitionHeight = true;
 
   let observer: ResizeObserver;
   function observeContentChanges() {
@@ -52,7 +53,17 @@
 
     // Adding +1px to fix https://github.com/radicle-dev/drips-app-v2/issues/184
     newHeight = (newHeight ?? contentContainerElem.offsetHeight) + 1;
-    containerHeight.set(newHeight);
+
+    containerHeight.set(
+      newHeight,
+      transitionHeight ? { duration: 300, easing: cubicInOut } : { duration: 0 },
+    );
+
+    if (loaded) {
+      setTimeout(() => (transitionHeight = false), 300);
+    } else {
+      transitionHeight = true;
+    }
   }
 </script>
 

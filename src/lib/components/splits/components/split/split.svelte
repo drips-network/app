@@ -143,9 +143,14 @@
           <DripsLogo />
         </div>
       {:else if split.type === 'project-split'}
-        <PrimaryColorThemer colorHex={split.project.claimed ? split.project.color : undefined}>
-          <ProjectBadge project={split.project} />
-        </PrimaryColorThemer>
+        {#if split.project}
+          <PrimaryColorThemer colorHex={split.project.claimed ? split.project.color : undefined}>
+            <ProjectBadge project={split.project} />
+          </PrimaryColorThemer>
+        {:else}
+          <!-- This happens when the subgraph doesn't immediately update after adding an unclaimed project to a list. -->
+          <span class="muted">Error loading this project</span>
+        {/if}
       {:else if split.type === 'split-group'}
         <div
           class="group"
@@ -254,5 +259,9 @@
 
   .drips-logo {
     height: 1.25rem;
+  }
+
+  .muted {
+    color: var(--color-foreground-level-5);
   }
 </style>
