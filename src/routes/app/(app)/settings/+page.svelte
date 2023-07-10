@@ -10,6 +10,7 @@
   import amtDeltaUnitStore from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   const { primaryColor } = themeStore;
 
@@ -19,10 +20,7 @@
   $: tickStore.setSlowMode(slowModeEnabled);
 </script>
 
-<svelte:head>
-  <title>Settings | Drips</title>
-  <meta name="description" content="Drips Settings Page" />
-</svelte:head>
+<HeadMeta title="Settings" />
 
 <div class="settings">
   <div class="header">

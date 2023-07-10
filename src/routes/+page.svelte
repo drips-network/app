@@ -21,6 +21,7 @@
   import { onMount } from 'svelte';
   import isRunningInSafe from '$lib/utils/is-running-in-safe';
   import { goto } from '$app/navigation';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   onMount(() => {
     // When launching within a Safe, we don't want to display the landing page.
@@ -28,13 +29,7 @@
   });
 </script>
 
-<svelte:head>
-  <title>Drips • Continuous Drip-Down Funding</title>
-  <meta
-    name="description"
-    content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
-  />
-</svelte:head>
+<HeadMeta />
 
 <LpHeader />
 <div id="lp">

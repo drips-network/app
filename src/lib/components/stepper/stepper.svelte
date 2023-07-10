@@ -8,6 +8,7 @@
   import AwaitErrorStep from './components/await-error-step.svelte';
   import type { Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
+  import { browser } from '$app/environment';
 
   const dispatch = createEventDispatcher<{ stepChange: never }>();
 
@@ -81,10 +82,12 @@
 
   let containerHeight = tweened(minHeightPx);
 
-  let resizeObserver = new ResizeObserver(() => updateContainerHeight());
+  let resizeObserver = browser ? new ResizeObserver(() => updateContainerHeight()) : undefined;
   let observedElement: HTMLDivElement | undefined;
 
   async function updateMutationObserver() {
+    if (!resizeObserver) return;
+
     await tick();
 
     resizeObserver.disconnect();
@@ -212,7 +215,7 @@
     return () => window.removeEventListener('resize', windowResizeListener);
   });
 
-  onDestroy(() => resizeObserver.disconnect());
+  onDestroy(() => resizeObserver?.disconnect());
 </script>
 
 <div

@@ -114,6 +114,7 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
 
 const walletStore = () => {
   const state = writable<WalletStoreState>(INITIAL_STATE);
+  const initialized = writable(false);
 
   /**
    * Initialize the store and restore any previously-connected,
@@ -130,7 +131,10 @@ const walletStore = () => {
       if (onboard.state.get().wallets.length > 0) return;
 
       const label = get(lastConnectedWallet);
-      if (!label) return;
+      if (!label) {
+        initialized.set(true);
+        return;
+      }
 
       if (await isWalletUnlocked(label)) {
         const wallets = await onboard.connectWallet({ autoSelect: { label, disableModals: true } });
@@ -140,6 +144,8 @@ const walletStore = () => {
         _setConnectedState(provider);
       }
     }
+
+    initialized.set(true);
   }
 
   /**
@@ -269,6 +275,7 @@ const walletStore = () => {
 
   return {
     subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
     initialize,
     connect,
     disconnect,
@@ -280,6 +287,7 @@ const mockWalletStore = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const address = (window as any).playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
+  const initialized = writable(false);
 
   const state = writable<WalletStoreState>({
     connected: false,
@@ -300,10 +308,13 @@ const mockWalletStore = () => {
       network: provider.network,
       dripsAccountId: accountId,
     });
+
+    initialized.set(true);
   }
 
   return {
     subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
     initialize,
     connect: () => undefined,
     disconnect: () => undefined,

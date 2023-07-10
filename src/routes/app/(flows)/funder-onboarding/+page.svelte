@@ -5,9 +5,11 @@
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import { onDestroy, onMount } from 'svelte';
   import StandaloneFlowSlots from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
+  import { browser } from '$app/environment';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
-  onMount(() => (window.onbeforeunload = () => true));
-  onDestroy(() => (window.onbeforeunload = null));
+  onMount(() => browser && (window.onbeforeunload = () => true));
+  onDestroy(() => browser && (window.onbeforeunload = null));
 
   let currentStepIndex = 0;
 
@@ -17,6 +19,8 @@
     currentStepIndex = e.detail.stepIndex;
   }
 </script>
+
+<HeadMeta title="Create Drip List" />
 
 <StandaloneFlowStepHeader title="Create a Drip List">
   <OneBalance slot="illustration" />

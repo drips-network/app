@@ -26,6 +26,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type getIncomingSplits from '../../methods/get-incoming-splits';
   import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
   import Pen from 'radicle-design-system/icons/Pen.svelte';
@@ -37,6 +38,7 @@
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import buildUrl from '$lib/utils/build-url';
   import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import { fade } from 'svelte/transition';
 
   interface Amount {
     tokenAddress: string;
@@ -108,17 +110,14 @@
   }
 </script>
 
-<svelte:head>
-  <title>{project.source.repoName} | Drips</title>
-  <meta
-    name="description"
-    content="Support {project.source
-      .repoName} on Drips and help make Open-Source Software sustainable."
-  />
-</svelte:head>
+<HeadMeta
+  title="{project.source.ownerName}/{project.source.repoName}"
+  description="Support {project.source
+    .repoName} on Drips and help make Open-Source Software sustainable."
+/>
 
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
-  <div class="project-profile">
+  <div class="project-profile" class:claimed={project.claimed}>
     <div class="header">
       {#if project.owner}
         <div class="owner">
@@ -144,41 +143,38 @@
         {/if}
       </div>
       {#if project.claimed}
-        <div class="stats">
-          {#if earnedFunds}
-            <div class="stat">
-              {#await earnedFunds}
-                <div class="loading">
-                  <Spinner />
-                </div>
-              {:then result}
+        {#await Promise.all([earnedFunds, splits])}
+          <div class="stats loading">
+            <Spinner />
+          </div>
+        {:then [earnedFundsResult, splitsResult]}
+          <div class="stats" in:fade={{ duration: 300 }}>
+            {#if earnedFundsResult}
+              <div class="stat">
                 <KeyValuePair key="Total income">
-                  <AggregateFiatEstimate amounts={result} />
+                  <AggregateFiatEstimate amounts={earnedFundsResult} />
                 </KeyValuePair>
-              {/await}
-            </div>
-          {/if}
-          {#if splits}
-            <div class="stat">
-              {#await splits}
-                <div class="loading">
-                  <Spinner />
-                </div>
-              {:then result}
+              </div>
+            {/if}
+            {#if splitsResult}
+              <div class="stat">
                 <KeyValuePair key="Splits with">
-                  {#if result && [result.maintainers, result.dependencies].flat().length > 0}
+                  {#if splitsResult && [splitsResult.maintainers, splitsResult.dependencies].flat().length > 0}
                     <Pile
                       maxItems={5}
-                      components={getSplitsPile([result.maintainers, result.dependencies])}
+                      components={getSplitsPile([
+                        splitsResult.maintainers,
+                        splitsResult.dependencies,
+                      ])}
                     />
                   {:else}
                     None
                   {/if}
                 </KeyValuePair>
-              {/await}
-            </div>
-          {/if}
-        </div>
+              </div>
+            {/if}
+          </div>
+        {/await}
       {/if}
     </div>
     <div class="content">
@@ -237,6 +233,9 @@
                   </div>
                 {/if}
               </SectionSkeleton>
+            {:catch}
+              <SectionHeader icon={SplitsIcon} label="Splits" />
+              <SectionSkeleton loaded={true} error={true} />
             {/await}
           {/if}
         </div>
@@ -278,6 +277,8 @@
                 </div>
               </div>
             </SectionSkeleton>
+          {:catch}
+            <SectionSkeleton loaded={true} error={true} />
           {/await}
         </div>
       {/if}
@@ -317,6 +318,8 @@
               {/each}
             </div>
           </SectionSkeleton>
+        {:catch}
+          <SectionSkeleton loaded={true} error={true} />
         {/await}
       </div>
     </div>
@@ -333,6 +336,14 @@
 <style>
   .project-profile {
     display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'header'
+      'content';
+  }
+
+  .project-profile.claimed {
     grid-template-columns: 3fr minmax(auto, 18rem);
     grid-template-rows: auto auto;
     grid-template-areas:
@@ -383,10 +394,19 @@
     margin-top: 2rem;
   }
 
+  .stats.loading {
+    min-height: 6.125rem;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
   .stats .stat {
     padding: 1rem;
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
+    min-height: 6.125rem;
   }
 
   aside {

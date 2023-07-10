@@ -63,7 +63,7 @@ export default (() => {
    */
   function getByAddress(address: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
-    assert(tokens, 'Store must be connected first');
+    if (!tokens) return;
 
     return tokens.find((t) => {
       const addressMatch = t.info.address.toLowerCase() === address.toLowerCase();
@@ -82,7 +82,7 @@ export default (() => {
    */
   function getBySymbol(symbol: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
-    assert(tokens, 'Store must be connected first');
+    if (!tokens) return;
 
     return tokens.find((t) => {
       const symbolMatch = t.info.symbol.toLowerCase() === symbol.toLowerCase();
@@ -102,7 +102,7 @@ export default (() => {
    */
   function getByDripsAssetId(dripsAssetId: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
-    assert(tokens, 'Store must be connected first');
+    if (!tokens) return;
 
     return tokens.find((t) => {
       const assetAddress = Utils.Asset.getAddressFromId(BigInt(dripsAssetId));
@@ -123,7 +123,7 @@ export default (() => {
    */
   function addCustomToken(tokenInfo: TokenInfo) {
     const tokens = get(tokenList);
-    assert(tokens && chainId, 'Store must be connected first');
+    if (!tokens) return;
 
     assert(
       !tokens.find((t) => t.info.address === tokenInfo.address),
@@ -152,7 +152,7 @@ export default (() => {
    */
   function removeCustomToken(address: string, chainId: number) {
     let tokens = get(tokenList);
-    assert(tokens && chainId, 'Store must be connected first');
+    if (!tokens) return;
 
     const token = getByAddress(address, chainId);
     assert(
@@ -178,7 +178,7 @@ export default (() => {
    */
   function setCustomTokenBanStatus(address: string, chainId: number, banned: boolean) {
     const tokens = get(tokenList);
-    assert(tokens && chainId, 'Store must be connected first');
+    if (!tokens) return;
 
     const token = getByAddress(address, chainId);
     assert(
