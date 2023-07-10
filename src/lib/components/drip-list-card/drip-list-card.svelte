@@ -136,7 +136,10 @@
           <Token size="small" address={supportStream.streamConfig.amountPerSecond.tokenAddress} />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Rate">
-          <Amount amountPerSecond={supportStream.streamConfig.amountPerSecond} />
+          <Amount
+            amountPerSecClasses="typo-text tabular-nums"
+            amountPerSecond={supportStream.streamConfig.amountPerSecond}
+          />
         </KeyValuePair>
         <KeyValuePair size="medium" key="Remaining Balance">
           {#if outgoingEstimate}
