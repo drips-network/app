@@ -16,8 +16,12 @@
 
   $: accountId = $wallet.dripsAccountId;
 
+  const walletInitialized = wallet.initialized;
+
   $: {
     $wallet.connected;
+    $walletInitialized;
+
     guardConnected();
   }
 

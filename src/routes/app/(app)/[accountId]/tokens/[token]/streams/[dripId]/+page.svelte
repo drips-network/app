@@ -35,6 +35,10 @@
   import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import getStreamHistory from '$lib/utils/stream-history';
+  import { browser } from '$app/environment';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+
+  const walletInitialized = walletStore.initialized;
 
   const { accountId, token: tokenAddress, dripId } = $page.params;
 
@@ -133,6 +137,8 @@
   }
 
   async function getStreamInfo() {
+    if (!browser || !$walletInitialized) return;
+
     token = tokens.getByAddress(tokenAddress);
 
     if (!token) {
@@ -206,7 +212,7 @@
       headline="Stream not found"
       description="We weren't able to find a stream with this ID."
     />
-  {:else if loading}
+  {:else if loading || !walletInitialized}
     <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
       <Spinner />
     </div>

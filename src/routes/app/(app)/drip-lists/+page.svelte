@@ -3,8 +3,12 @@
   import guardConnected from '$lib/utils/guard-connected';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
 
+  const walletInitialized = walletStore.initialized;
+
   $: {
     $walletStore.connected;
+    $walletInitialized;
+
     guardConnected();
   }
 </script>
