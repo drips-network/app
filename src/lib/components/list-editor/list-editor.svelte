@@ -27,6 +27,12 @@
   export type Items = { [slug: string]: ListItem };
 
   export type Percentages = { [slug: string]: number };
+
+  export interface ListEditorConfig {
+    selected: string[];
+    items: Items;
+    percentages: Percentages;
+  }
 </script>
 
 <script lang="ts">

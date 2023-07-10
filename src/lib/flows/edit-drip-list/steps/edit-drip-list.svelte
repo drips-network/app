@@ -11,14 +11,16 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import {
-    getAddressDriverClient,
-    getNFTDriverClient,
-    getRepoDriverClient,
-  } from '$lib/utils/get-drips-clients';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import { getCallerClient, getNFTDriverTxFactory } from '$lib/utils/get-drips-clients';
   import type { GitProject } from '$lib/utils/metadata/types';
   import modal from '$lib/stores/modal';
+  import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
+  import DripListService from '$lib/utils/driplist/DripListService';
+  import type { z } from 'zod';
+  import type { nftDriverAccountMetadataSchema } from '$lib/utils/metadata/schemas';
+  import assert from '$lib/utils/assert';
+  import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
+  import { Utils } from 'radicle-drips';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -117,44 +119,46 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const nftDriverClient = await getNFTDriverClient();
-          const addressDriverClient = await getAddressDriverClient();
-          const repoDriverClient = await getRepoDriverClient();
+          const nftDriverTxFactory = await getNFTDriverTxFactory();
+          const dripListService = await DripListService.new();
+          const callerClient = await getCallerClient();
 
-          const accountIds = await Promise.all(
-            selected.map(async (s) => {
-              if (s.startsWith('0x')) {
-                return await addressDriverClient.getAccountIdByAddress(s);
-              } else {
-                const { forge, repoName, username } = GitProjectService.deconstructUrl(s);
-                const projectName = `${username}/${repoName}`;
+          const { receivers, projectsSplitMetadata } =
+            await dripListService.getProjectsSplitMetadataAndReceivers({
+              selected,
+              percentages,
+              items,
+            });
 
-                return await repoDriverClient.getAccountId(forge, projectName);
-              }
-            }),
-          );
+          const setSplitsTx = await nftDriverTxFactory.setSplits(dripListId, receivers);
 
-          const tx = nftDriverClient.setSplits(
+          const metadataManager = new NftDriverMetadataManager();
+
+          const currentMetadata = await metadataManager.fetchAccountMetadata(dripListId);
+          assert(currentMetadata);
+
+          const newMetadata: z.infer<typeof nftDriverAccountMetadataSchema> = {
+            ...currentMetadata.data,
+            projects: projectsSplitMetadata,
+          };
+
+          const hash = await metadataManager.pinAccountMetadata(newMetadata);
+
+          const metadataTx = await nftDriverTxFactory.emitAccountMetadata(
             dripListId,
-            mapFilterUndefined(selected, (slug, index) => {
-              const accountId = accountIds[index];
-
-              const percentage = percentages[slug];
-              // If percentage is zero, omit split
-              if (!percentage) return undefined;
-
-              return {
-                accountId,
-                weight: Math.floor((percentage / 100) * 1000000),
-              };
-            }),
+            [
+              {
+                key: MetadataManagerBase.USER_METADATA_KEY,
+                value: hash,
+              },
+            ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
           );
 
-          return { tx };
+          return { callerClient, setSplitsTx, metadataTx };
         },
 
-        transactions: (transactContext) => ({
-          transaction: () => transactContext.tx,
+        transactions: ({ callerClient, setSplitsTx, metadataTx }) => ({
+          transaction: () => callerClient.callBatched([setSplitsTx, metadataTx]),
         }),
       }),
     );
