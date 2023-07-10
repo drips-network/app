@@ -26,7 +26,7 @@
   headline="Split to your maintainers"
   description="Decide how you want to divide the {$context.highLevelPercentages[
     'maintainers'
-  ]}% split to your project’s maintainers."
+  ]}% split to your project’s maintainers. You can change this later anytime."
 >
   <ListEditor
     bind:selected={$context.maintainerSplits.selected}

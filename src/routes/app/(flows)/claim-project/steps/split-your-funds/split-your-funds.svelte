@@ -21,7 +21,7 @@
 
 <StandaloneFlowStepLayout
   headline="Split your funds"
-  description="Decide how much of your claimable funds (and any future funds) you’d like to split with your maintainers and dependencies."
+  description="Decide how much of your claimable funds (and any future funds) you’d like to split with your maintainers and dependencies. You can change this later anytime."
 >
   <VisualPercentageEditor
     items={[

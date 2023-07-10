@@ -57,13 +57,13 @@
   headline="Split to your dependencies"
   description="Decide how you want to divide the {$context.highLevelPercentages[
     'dependencies'
-  ]}% split to your project’s dependencies. {$context.dependenciesAutoImported
+  ]}% split to your project’s dependencies.{$context.dependenciesAutoImported
     ? $context.dependencySplits.items &&
       typeof $context.dependencySplits.items === 'object' &&
       Object.keys($context.dependencySplits.items).length
-      ? 'We’ve imported these projects from your package.json to give you a head start.'
+      ? ' We’ve imported these projects from your package.json to give you a head start.'
       : ''
-    : ''}"
+    : ''} You can change this later anytime."
 >
   <!-- TODO: Prevent splitting to the same project we're trying to claim. -->
   <ListEditor
