@@ -13,45 +13,51 @@ import type { RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
 export const load = (async ({ params }) => {
-  const { githubUsername, githubRepoName } = uriDecodeParams(params);
+  try {
+    const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
-  const service = await GitProjectService.new();
+    const service = await GitProjectService.new();
 
-  const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
+    const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
-  if (!(await siteExists(gitHubUrl))) {
-    throw error(404);
+    if (!(await siteExists(gitHubUrl))) {
+      throw error(404);
+    }
+
+    const project = await service.getByUrl(gitHubUrl);
+
+    if (!isForge('github', project)) {
+      throw error(
+        500,
+        'Expected project to be a GitHub project, but it was a ${project.source} project',
+      );
+    }
+
+    const unclaimedFunds = project.claimed
+      ? undefined
+      : fetchUnclaimedFunds(project.repoDriverAccount.accountId);
+
+    const earnedFunds = project.claimed
+      ? fetchEarnedFunds(project.repoDriverAccount.accountId)
+      : undefined;
+
+    return {
+      project,
+      streamed: {
+        unclaimedFunds,
+        earnedFunds,
+        incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
+        splits: buildProjectSplitsData(
+          project,
+          project.claimed
+            ? project.splits.dependencies.filter((s): s is RepoDriverSplitReceiver => 'source' in s)
+            : [],
+        ),
+      },
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw error(500);
   }
-
-  const project = await service.getByUrl(gitHubUrl);
-
-  if (!isForge('github', project)) {
-    throw error(
-      500,
-      'Expected project to be a GitHub project, but it was a ${project.source} project',
-    );
-  }
-
-  const unclaimedFunds = project.claimed
-    ? undefined
-    : fetchUnclaimedFunds(project.repoDriverAccount.accountId);
-
-  const earnedFunds = project.claimed
-    ? fetchEarnedFunds(project.repoDriverAccount.accountId)
-    : undefined;
-
-  return {
-    project,
-    streamed: {
-      unclaimedFunds,
-      earnedFunds,
-      incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
-      splits: buildProjectSplitsData(
-        project,
-        project.claimed
-          ? project.splits.dependencies.filter((s): s is RepoDriverSplitReceiver => 'source' in s)
-          : [],
-      ),
-    },
-  };
 }) satisfies PageServerLoad;
