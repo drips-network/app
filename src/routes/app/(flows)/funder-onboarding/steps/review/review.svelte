@@ -23,7 +23,6 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../funder-onboarding-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
-  import { goto } from '$app/navigation';
   import expect from '$lib/utils/expect';
   import { constants, type DripsSubgraphClient } from 'radicle-drips';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
@@ -93,7 +92,6 @@
             1000,
           );
           await streamsStore.refreshUserAccount();
-          goto(`${await callerClient.signer.getAddress()}/tokens/${token.info.address}`);
         },
       }),
     );
