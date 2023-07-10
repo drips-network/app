@@ -22,6 +22,7 @@
 
   $: {
     if ($navigating) {
+      clearTimeout(loadingSpinnerTimeout);
       loadingSpinnerTimeout = setTimeout(() => (showLoadingSpinner = true), 300);
     } else {
       showLoadingSpinner = false;
