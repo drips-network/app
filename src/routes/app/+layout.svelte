@@ -171,16 +171,6 @@
 </div>
 
 <style>
-  .loading-state {
-    display: fixed;
-    height: 100vh;
-    width: 100vw;
-    background-color: var(--color-background);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
   #cupertino-pane {
     display: none;
     background-color: var(--color-background);
