@@ -50,7 +50,7 @@
           top: [
             { label: 'Streams', href: '/app/streams', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Folder },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
+            { label: 'Drip List', href: '/app/drip-lists', icon: Ledger },
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
@@ -73,7 +73,7 @@
         items={[
           { label: 'Streams', href: '/app/streams', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Folder },
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: Ledger },
+          { label: 'Drip List', href: '/app/drip-lists', icon: Ledger },
           {
             label: 'Profile',
             href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
