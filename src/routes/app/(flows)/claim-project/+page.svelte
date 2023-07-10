@@ -6,6 +6,7 @@
   import StandaloneFlowStepHeader from '../components/standalone-flow-step-header/standalone-flow-step-header.svelte';
   import { slotsTemplate, state, steps } from './claim-project-flow';
   import { browser } from '$app/environment';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   onMount(() => browser && (window.onbeforeunload = () => true));
   onDestroy(() => browser && (window.onbeforeunload = null));
@@ -18,6 +19,8 @@
     currentStepIndex = e.detail.stepIndex;
   }
 </script>
+
+<HeadMeta title="Claim GitHub project" />
 
 <StandaloneFlowStepHeader title="Claim a GitHub project">
   <MultiChain slot="illustration" />
