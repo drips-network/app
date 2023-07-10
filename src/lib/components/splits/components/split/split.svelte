@@ -17,6 +17,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let split: Split | SplitGroup;
+  export let isNested = false;
 
   let element: HTMLDivElement;
 
@@ -128,7 +129,11 @@
           stroke-linecap="round"
         />
       </svg>
-      <div class="percentage typo-text-small" style:color={percentageTextColor}>
+      <div
+        class="percentage typo-text-small"
+        class:is-nested={isNested}
+        style:color={isNested ? 'var(--color-foreground)' : percentageTextColor}
+      >
         {getSplitPercent(
           split.type === 'split-group' ? calcGroupWeight(split) : split.weight,
           'pretty',
@@ -212,6 +217,11 @@
     padding: 0.125rem 0.5rem;
     border-radius: 0.75rem 0 0.75rem 0.75rem;
     background-color: var(--color-primary);
+  }
+
+  .arrow .percentage.is-nested {
+    background: linear-gradient(45deg, var(--color-primary-level-2), var(--color-primary-level-2)),
+      linear-gradient(45deg, var(--color-background), var(--color-background));
   }
 
   .receiver {

@@ -70,7 +70,9 @@
 
 <div bind:this={wrapperElem} class="splits-list" class:group={isGroup}>
   {#each sortedList as listItem, index}
-    <div bind:this={splitElems[index]} class="split"><SplitComponent split={listItem} /></div>
+    <div bind:this={splitElems[index]} class="split">
+      <SplitComponent isNested={isGroup} split={listItem} />
+    </div>
   {/each}
   <div class="line" style:height="{lineHeight}px" />
 </div>
