@@ -5,9 +5,10 @@
   export let amount = 0n;
   export let decimals = 16;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+  export let preserveTrailingZeroes = true;
 </script>
 
-<span>{formatTokenAmount(amount, decimals, multiplier)}</span>
+<span>{formatTokenAmount(amount, decimals, multiplier, preserveTrailingZeroes)}</span>
 
 <style>
   span {
