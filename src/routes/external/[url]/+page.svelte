@@ -48,7 +48,8 @@
   }
 
   .logo {
-    max-width: 8rem;
+    height: 100%;
+    max-height: 1.5rem;
   }
 
   .content {
