@@ -57,7 +57,11 @@
                   repoName,
                   dripsJsonTemplate(
                     $walletStore.address ?? unreachable(),
-                    $walletStore.network.name ?? unreachable(),
+                    $walletStore.network.name
+                      ? $walletStore.network.name === 'homestead'
+                        ? 'ethereum'
+                        : $walletStore.network.name
+                      : unreachable(),
                   ),
                 )
                 .then(() => {
@@ -88,7 +92,11 @@
     path="./FUNDING.json"
     code={dripsJsonTemplate(
       $walletStore.address ?? unreachable(),
-      $walletStore.network.name ?? unreachable(),
+      $walletStore.network.name
+        ? $walletStore.network.name === 'homestead'
+          ? 'ethereum'
+          : $walletStore.network.name
+        : unreachable(),
     )}
   />
   <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
