@@ -1,4 +1,4 @@
-import type { Items, ListItem, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import type { ListEditorConfig, ListItem } from '$lib/components/list-editor/list-editor.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import { get, writable } from 'svelte/store';
@@ -14,17 +14,11 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 
 type RepresentationalSplit = AddressSplit | ProjectSplit;
 
-interface SplitsConfig {
-  selected: string[];
-  items: Items;
-  percentages: Percentages;
-}
-
 export interface State {
   project: ClaimedGitProject;
   highLevelPercentages: { [key: string]: number };
-  maintainerSplits: SplitsConfig;
-  dependencySplits: SplitsConfig;
+  maintainerSplits: ListEditorConfig;
+  dependencySplits: ListEditorConfig;
 }
 
 const MAX_SPLITS_WEIGHT = 1000000;
