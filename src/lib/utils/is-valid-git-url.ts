@@ -1,7 +1,7 @@
 function validateUrl(url: string, allowedHosts: string[]): boolean {
   try {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
+    if (!url.startsWith('https://')) {
+      return false;
     }
 
     const parsedURL = new URL(url);
