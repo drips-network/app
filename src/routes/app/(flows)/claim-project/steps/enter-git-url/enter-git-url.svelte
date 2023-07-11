@@ -186,7 +186,7 @@
 </script>
 
 <StandaloneFlowStepLayout
-  description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration."
+  description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
   <div class="input">
     <TextInput
