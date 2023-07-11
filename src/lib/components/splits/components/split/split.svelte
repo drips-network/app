@@ -177,6 +177,9 @@
                 </div>
               {/if}
             </div>
+            <div class="label placeholder" aria-hidden="true">
+              <h4>{split.name}</h4>
+            </div>
           </button>
           {#if groupExpanded}
             <div transition:fade={{ duration: GROUP_EXPAND_DURATION }} class="members">
@@ -273,5 +276,13 @@
 
   .muted {
     color: var(--color-foreground-level-5);
+  }
+
+  .name .label.placeholder {
+    position: relative;
+    opacity: 0;
+    pointer-events: none;
+    margin-left: 8px;
+    margin-right: 24px;
   }
 </style>
