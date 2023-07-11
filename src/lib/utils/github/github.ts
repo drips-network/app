@@ -28,6 +28,9 @@ async function getFundingJson(owner: string, repo: string, template: string): Pr
       owner,
       repo,
       path: 'FUNDING.json',
+      request: {
+        cache: 'reload',
+      },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
