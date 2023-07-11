@@ -254,6 +254,7 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
+    overflow-x: scroll;
   }
 
   ul {
@@ -274,5 +275,6 @@
 
   .splits-component {
     margin-left: 10px;
+    width: fit-content;
   }
 </style>

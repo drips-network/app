@@ -83,6 +83,7 @@
     flex-direction: column;
     position: relative;
     padding-top: 16px;
+    width: fit-content;
   }
 
   .line {
