@@ -21,13 +21,13 @@
   .card {
     position: relative;
     border: 1px solid var(--color-foreground);
-    border-radius: var(--border-radius-pointy);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     overflow: hidden;
     background-color: var(--color-background);
   }
 
   .stars * {
-    padding: var(--spacing-m);
+    padding: 1.5rem;
     position: absolute;
   }
 
