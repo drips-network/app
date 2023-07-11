@@ -13,17 +13,17 @@ import type { RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
 export const load = (async ({ params }) => {
+  const { githubUsername, githubRepoName } = uriDecodeParams(params);
+
+  const service = await GitProjectService.new();
+
+  const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
+
+  if (!(await siteExists(gitHubUrl))) {
+    throw error(404);
+  }
+
   try {
-    const { githubUsername, githubRepoName } = uriDecodeParams(params);
-
-    const service = await GitProjectService.new();
-
-    const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
-
-    if (!(await siteExists(gitHubUrl))) {
-      throw error(404);
-    }
-
     const project = await service.getByUrl(gitHubUrl);
 
     if (!isForge('github', project)) {
