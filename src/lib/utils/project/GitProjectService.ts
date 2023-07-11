@@ -451,9 +451,9 @@ export default class GitProjectService {
     for (const [urlOrAddress, percentage] of dependenciesInput) {
       const isAddr = isAddress(urlOrAddress);
 
-      const weight =
-        Math.floor((Number(percentage) / 100) * 1000000) *
-        (highLevelPercentages['dependencies'] / 100);
+      const weight = Math.floor(
+        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['dependencies'] / 100),
+      );
 
       if (weight === 0) continue;
 
@@ -489,9 +489,9 @@ export default class GitProjectService {
     const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
 
     for (const [address, percentage] of maintainersInput) {
-      const weight =
-        Math.floor((Number(percentage) / 100) * 1000000) *
-        (highLevelPercentages['maintainers'] / 100);
+      const weight = Math.floor(
+        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['maintainers'] / 100),
+      );
 
       if (weight === 0) continue;
 
