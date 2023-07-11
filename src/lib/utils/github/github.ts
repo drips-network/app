@@ -23,29 +23,29 @@ export async function getRepoByUrl(repoUrl: string) {
 }
 
 async function getFundingJson(owner: string, repo: string, template: string): Promise<any> {
-  try {
-    const { data } = await octokit.repos.getContent({
+  const { data } = await octokit.repos
+    .getContent({
       owner,
       repo,
       path: 'FUNDING.json',
       request: {
         cache: 'reload',
       },
+    })
+    .catch(() => {
+      throw new Error('FUNDING.json not found.');
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
 
-    const fundingJson = JSON.parse(fileContent);
+  const fundingJson = JSON.parse(fileContent);
 
-    if (JSON.stringify(fundingJson).replace(/\s/g, '') !== template.replace(/\s/g, '')) {
-      throw new Error(`Invalid FUNDING.json: ${fileContent}`);
-    }
-
-    return fundingJson;
-  } catch (error) {
-    throw new Error('FUNDING.json not found.');
+  if (JSON.stringify(fundingJson).replace(/\s/g, '') !== template.replace(/\s/g, '')) {
+    throw new Error('Invalid FUNDING.json file. Does it have the correct Ethereum address?');
   }
+
+  return fundingJson;
 }
 
 export default {
