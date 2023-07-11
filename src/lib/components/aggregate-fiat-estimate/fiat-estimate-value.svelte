@@ -14,12 +14,12 @@
         ><span class="currency">≈$</span>{formattedFiatEstimate}</span
       >
     {/key}
-    <span class="amount placeholder">≈${formattedFiatEstimate}</span>
+    <span class="amount placeholder" aria-hidden="true">≈${formattedFiatEstimate}</span>
   {:else if fiatEstimateCents === 'pending'}
     <span transition:fade|local={{ duration: 100 }} class="pending"
       ><span class="currency">≈$</span>...</span
     >
-    <span class="pending placeholder"><span class="currency">≈$</span>...</span>
+    <span class="pending placeholder" aria-hidden="true"><span class="currency">≈$</span>...</span>
   {:else}
     Unknown amount
   {/if}

@@ -114,7 +114,7 @@
           {selectedOption.title}
         </span>
       {/key}
-      <span class="placeholder">
+      <span class="placeholder" aria-hidden="true">
         {selectedOption.title}
       </span>
     </div>

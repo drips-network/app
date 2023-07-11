@@ -25,7 +25,7 @@
       <p class="typo-text tabular-nums symbol">{symbol}</p>
     </div>
   {/key}
-  <div class="value placeholder">
+  <div class="value placeholder" aria-hidden="true">
     <p class="typo-text tabular-nums">{value}</p>
     <p class="typo-text tabular-nums symbol">{symbol}</p>
   </div>
