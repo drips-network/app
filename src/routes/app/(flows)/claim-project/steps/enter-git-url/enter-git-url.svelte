@@ -47,6 +47,10 @@
     try {
       validationState = { type: 'pending' };
 
+      if (!$context.gitUrl.startsWith('http://') && !$context.gitUrl.startsWith('https://')) {
+        $context.gitUrl = 'https://' + $context.gitUrl;
+      }
+
       const project = await gitProjectService.getByUrl($context.gitUrl);
 
       // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
@@ -188,7 +192,7 @@
 <StandaloneFlowStepLayout
   description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
-  <div class="input">
+  <div class="input" on:keydown={(e) => e.key === 'Enter' && submitInput()}>
     <TextInput
       bind:value={$context.gitUrl}
       icon={LinkIcon}
