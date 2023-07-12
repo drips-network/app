@@ -82,9 +82,10 @@
   }
 
   .emojis {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr));
     flex-wrap: wrap;
-    gap: 0.38rem;
+    gap: 0.5rem;
   }
 
   .emoji {
@@ -92,10 +93,11 @@
     justify-content: center;
     align-items: center;
     height: 2rem;
-    width: 2rem;
+    width: 8%;
+    min-width: 2rem;
     font-size: 1.5rem;
     border-radius: 0.5rem 0 0.5rem 0.5rem;
-    opacity: 0.5;
+    opacity: 0.7;
     transition: all 0.3s;
     cursor: pointer;
     font-family: initial;
@@ -125,8 +127,8 @@
   }
 
   .colors {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
     gap: 0.5rem;
   }
 
@@ -136,8 +138,9 @@
 
   .color .color-label {
     display: block;
+    height: 100%;
+    width: 100%;
     height: 4rem;
-    width: 4rem;
     opacity: 0.5;
     transition: all 0.3s;
     border-radius: 1rem 0 1rem 1rem;
