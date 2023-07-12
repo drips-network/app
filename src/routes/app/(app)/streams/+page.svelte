@@ -35,7 +35,7 @@
       props: {
         id: 'create-a-drip-list',
         title: 'Support Open-Source Software',
-        description: 'Create your Drip List now to start supporting spen-source public goods.',
+        description: 'Create your Drip List now to start supporting open-source public goods.',
         illustration: OneBalance,
         actions: [
           {
