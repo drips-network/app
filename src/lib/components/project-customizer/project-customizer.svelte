@@ -86,6 +86,7 @@
     grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr));
     flex-wrap: wrap;
     gap: 0.5rem;
+    user-select: none;
   }
 
   .emoji {
