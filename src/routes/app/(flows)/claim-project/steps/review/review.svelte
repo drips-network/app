@@ -179,6 +179,7 @@
       </div>
       <div class="splits-component">
         <Splits
+          linkToNewTab={true}
           list={[
             {
               type: 'split-group',

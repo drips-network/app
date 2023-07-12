@@ -17,6 +17,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let split: Split | SplitGroup;
+  export let linkToNewTab = false;
   export let isNested = false;
 
   let element: HTMLDivElement;
@@ -142,7 +143,7 @@
     </div>
     <div class="receiver">
       {#if split.type === 'address-split'}
-        <IdentityBadge address={split.address} size="medium" />
+        <IdentityBadge {linkToNewTab} address={split.address} size="medium" />
       {:else if split.type === 'drips-donation-split'}
         <div class="drips-logo">
           <DripsLogo />
@@ -150,7 +151,7 @@
       {:else if split.type === 'project-split'}
         {#if split.project}
           <PrimaryColorThemer colorHex={split.project.claimed ? split.project.color : undefined}>
-            <ProjectBadge project={split.project} />
+            <ProjectBadge {linkToNewTab} project={split.project} />
           </PrimaryColorThemer>
         {:else}
           <!-- This happens when the subgraph doesn't immediately update after adding an unclaimed project to a list. -->
@@ -183,7 +184,7 @@
           </button>
           {#if groupExpanded}
             <div transition:fade={{ duration: GROUP_EXPAND_DURATION }} class="members">
-              <SplitsListComponent isGroup list={split.list} />
+              <SplitsListComponent {linkToNewTab} isGroup list={split.list} />
             </div>
           {/if}
           <div class="cutoff-gradient" />

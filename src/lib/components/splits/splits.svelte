@@ -44,6 +44,7 @@
     return b.weight - a.weight;
   });
 
+  export let linkToNewTab = false;
   export let isGroup = false;
 
   let wrapperElem: HTMLDivElement;
@@ -71,7 +72,7 @@
 <div bind:this={wrapperElem} class="splits-list" class:group={isGroup}>
   {#each sortedList as listItem, index}
     <div bind:this={splitElems[index]} class="split">
-      <SplitComponent isNested={isGroup} split={listItem} />
+      <SplitComponent {linkToNewTab} isNested={isGroup} split={listItem} />
     </div>
   {/each}
   <div class="line" style:height="{lineHeight}px" />
