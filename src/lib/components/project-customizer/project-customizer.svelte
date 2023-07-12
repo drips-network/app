@@ -6,6 +6,7 @@
   import FormField from '../form-field/form-field.svelte';
   import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import TextInput from '../text-input/text-input.svelte';
+  import twemoji from 'twemoji';
 
   export let project: Writable<ClaimedGitProject>;
 
@@ -14,11 +15,9 @@
 
   let searchTerm = '';
   $: filteredEmoji = emoji.filter((e) => {
-    let { alias } = e;
+    let { tags, description } = e;
 
-    if (!Array.isArray(alias)) alias = [alias];
-
-    return alias.some((a) => a.toLowerCase().startsWith(searchTerm.toLowerCase()));
+    return [...tags, description].some((a) => a.toLowerCase().startsWith(searchTerm.toLowerCase()));
   });
 
   let selectedColor = $project.color;
@@ -45,7 +44,9 @@
               type="radio"
               class="radio"
             />
-            <label class="emoji-label" for={e.unicode}>{e.unicode}</label>
+            <label class="emoji-label" for={e.unicode}
+              >{@html twemoji.parse(e.unicode, { folder: 'svg', ext: '.svg' })}</label
+            >
           </div>
         {/each}
       </div>
@@ -102,6 +103,8 @@
 
   .emoji-label {
     cursor: pointer;
+    height: 24px;
+    width: 24px;
   }
 
   .emoji:hover {
