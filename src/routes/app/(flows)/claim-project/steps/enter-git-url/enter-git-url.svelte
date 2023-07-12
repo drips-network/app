@@ -15,11 +15,11 @@
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
-  import emoji from '$lib/utils/emoji/emoji';
   import { page } from '$app/stores';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
   import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -67,7 +67,7 @@
       $context.project = project as UnclaimedGitProject;
 
       $context.projectEmoji = seededRandomElement(
-        emoji.map((e) => e.unicode),
+        possibleRandomEmoji,
         project.repoDriverAccount.accountId,
       );
       $context.projectColor = seededRandomElement(
