@@ -68,6 +68,7 @@
           token.info.address.toLowerCase(),
           {
             type: 'selectable',
+            searchString: [token.info.name, token.info.symbol],
             label: token.info.name,
             text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
             image: {

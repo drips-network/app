@@ -5,10 +5,12 @@ interface ComponentAndProps {
   props: { [propName: string]: unknown };
 }
 
+type SearchString = string | string[];
+
 export interface SelectableItem {
   type: 'selectable';
   label: string | ComponentAndProps;
-  searchString?: string;
+  searchString?: SearchString;
   text?: string;
   disabled?: boolean;
   image?: string | ComponentAndProps;
@@ -24,7 +26,7 @@ export interface InterstitialItem {
 export interface ActionItem {
   type: 'action';
   label: string;
-  searchString?: string;
+  searchString?: SearchString;
   handler: () => void;
   disabled?: boolean;
   image?:

@@ -29,6 +29,7 @@
         token.info.address,
         {
           type: 'selectable',
+          searchString: [token.info.name, token.info.symbol],
           label: token.info.name,
           text: token.info.symbol,
           image: {

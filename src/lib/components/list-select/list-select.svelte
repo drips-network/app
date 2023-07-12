@@ -26,9 +26,12 @@
       const itemSearchString =
         (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
 
-      const startsWithSearchString = itemSearchString
-        .toLowerCase()
-        .startsWith(searchString.toLowerCase());
+      const searchStrings = Array.isArray(itemSearchString) ? itemSearchString : [itemSearchString];
+
+      const startsWithSearchString = searchStrings.some((s) =>
+        s.toLowerCase().startsWith(searchString.toLowerCase()),
+      );
+
       return startsWithSearchString || item.type === 'action';
     }),
   );
