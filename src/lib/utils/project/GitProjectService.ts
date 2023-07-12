@@ -170,6 +170,11 @@ export default class GitProjectService {
       url = 'https://' + url;
     }
 
+    // If URL ends with /, remove it
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+
     const parsedURL = new URL(url);
 
     // TODO: support more forges.

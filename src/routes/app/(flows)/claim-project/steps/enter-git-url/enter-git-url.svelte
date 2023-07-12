@@ -51,6 +51,11 @@
         $context.gitUrl = 'https://' + $context.gitUrl;
       }
 
+      // if url ends with /, remove it
+      if ($context.gitUrl.endsWith('/')) {
+        $context.gitUrl = $context.gitUrl.slice(0, -1);
+      }
+
       const project = await gitProjectService.getByUrl($context.gitUrl);
 
       // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
