@@ -229,12 +229,6 @@ export default [
   },
   {
     category: 'Smileys & Emotion',
-    description: 'eye in speech bubble',
-    unicode: '👁️‍🗨️',
-    tags: [],
-  },
-  {
-    category: 'Smileys & Emotion',
     description: 'left speech bubble',
     unicode: '🗨️',
     tags: [],
