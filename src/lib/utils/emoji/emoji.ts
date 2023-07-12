@@ -313,6 +313,12 @@ export default [
   },
   {
     category: 'People & Body',
+    description: 'middle finger',
+    unicode: '🖕',
+    tags: ['gesture'],
+  },
+  {
+    category: 'People & Body',
     description: 'palms up together',
     unicode: '🤲',
     tags: [],
