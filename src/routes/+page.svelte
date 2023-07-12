@@ -12,7 +12,6 @@
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import LpInterstitialIllustration1 from '$lib/components/illustrations/lp-interstitial-illustration-1.svelte';
   import LpDripListIllustration from '$lib/components/illustrations/lp-drip-list-illustration.svelte';
-  import Token from '$lib/components/token/token.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
   import LpCard from './components/lp-card/lp-card.svelte';
   import ImageAndCaption from './components/image-and-caption.svelte';
@@ -21,6 +20,9 @@
   import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
+  import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
+  import buildUrl from '$lib/utils/build-url';
 
   onMount(() => {
     // When launching within a Safe, we don't want to display the landing page.
@@ -38,6 +40,9 @@
 
     return (startValue + amtPerSec * secondsSinceStart).toFixed(6);
   }
+
+  let claimProjectInput = '';
+  $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
 </script>
 
 <HeadMeta />
@@ -49,8 +54,8 @@
       <h1>Funding that flows</h1>
       <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
       <div class="actions">
-        <div><Button icon={Globe}>Get your project funded</Button></div>
-        <div><Button icon={TokenStreams}>Fund your dependencies</Button></div>
+        <a href="#get-funding"><Button icon={Globe}>Get your project funded</Button></a>
+        <a href="#fund-projects"><Button icon={TokenStreams}>Fund your dependencies</Button></a>
       </div>
     </div>
     <div class="illustration">
@@ -59,10 +64,14 @@
   </div>
 
   <section class="card two-column">
+    <div class="anchor" id="get-funding" />
     <div class="section-inner">
       <div class="text">
         <h2>Get the funding you need for your project</h2>
-        <p>Lorem ipsum</p>
+        <p>
+          On Drips, your open-source projects earn funds from direct supporters, as well as other
+          projects that depend on yours.
+        </p>
       </div>
       <div class="illustration padded">
         <OneBalance />
@@ -71,56 +80,95 @@
     </div>
   </section>
 
-  <div class="section-spacer hide-on-desktop" />
+  <div class="section-spacer" />
 
-  <section class="one-column hide-on-mobile">
+  <section class="two-column">
+    <div class="section-inner">
+      <div class="card">
+        <div class="illustration-background top" />
+        <div class="illustration">
+          <MultiChain />
+        </div>
+        <div class="text">
+          <h3>Claim your GitHub project</h3>
+          <p>Enter the URL of your public GitHub repository to get started.</p>
+          <div class="claim-input">
+            <TextInput bind:value={claimProjectInput} placeholder="GitHub repository URL" />
+            <a
+              href={buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })}
+              target="_blank"
+              ><Button variant="primary" size="large" disabled={!canSubmitProjectClaim}
+                >Claim project</Button
+              ></a
+            >
+          </div>
+        </div>
+      </div>
+      <div class="text centered">
+        <h3>How to raise funds on Drips</h3>
+        <div class="how-it-works">
+          <div class="item">
+            <div class="count">1</div>
+            <h5>Enter your GitHub URL</h5>
+            <p class="typo-text-small">Select any public repository on GitHub.</p>
+          </div>
+          <div class="item">
+            <div class="count">2</div>
+            <h5>Verify ownerhsip</h5>
+            <p class="typo-text-small">
+              Create a FUNDING.json file to link your repository to Drips.
+            </p>
+          </div>
+          <div class="item">
+            <div class="count">3</div>
+            <h5>Configure Splits</h5>
+            <p class="typo-text-small">
+              Choose how much of your project's income should go to which maintainers and
+              dependencies.
+            </p>
+          </div>
+          <div class="item">
+            <div class="count">4</div>
+            <h5>Get funding</h5>
+            <p class="typo-text-small">
+              Earn income from direct supporters and projects that depend on yours.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="one-column">
     <div class="section-inner">
       <div class="text">
         <h3>Stream funds by the second</h3>
         <p>Drips enables token streams of any ERC-20 to any Ethereum address by the second.</p>
         <div class="token-streams-visuals">
           <div class="token-streams-visual">
-            <div class="token hide-on-mobile">
-              <Token
-                size="huge"
-                show="none"
-                address="0x00"
-                overrideToDisplay={{
-                  name: 'USD Coin',
-                  logoURI: '/assets/usdc-coin.webp',
-                  symbol: 'USDC',
-                }}
-              />
-              <p class="big">USD Coin</p>
+            <div class="token">
+              <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
+              <p>USD Coin</p>
             </div>
-            <p class="big">
+            <p>
               <span class="green tabular-nums">+1.037574 USDC</span><span class="muted">/sec</span>
             </p>
-            <p class="big">
+            <p>
               <span class="fat tabular-nums"
                 >{millis && getTokenStreamsVisualAmount(1.037574, 4968.3241)} USDC</span
               >
             </p>
           </div>
           <div class="token-streams-visual">
-            <div class="token hide-on-mobile">
-              <Token
-                size="huge"
-                show="none"
-                address="0x00"
-                overrideToDisplay={{
-                  name: 'Wrapped Bitcoin',
-                  logoURI: '/assets/wbtc-coin.png',
-                  symbol: 'USDC',
-                }}
-              />
-              <p class="big">Wrapped Bitcoin</p>
+            <div class="token">
+              <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
+              <p>Wrapped Bitcoin</p>
             </div>
-            <p class="big">
+            <p>
               <span class="green tabular-nums">+0.00181397 WBTC</span><span class="muted">/sec</span
               >
             </p>
-            <p class="big">
+            <p>
               <span class="fat tabular-nums"
                 >{millis && getTokenStreamsVisualAmount(0.00181397, 2.81065)} WBTC</span
               >
@@ -134,7 +182,8 @@
     </div>
   </section>
 
-  <section class="card two-column reverse">
+  <section class="card two-column">
+    <div class="anchor" id="fund-projects" />
     <div class="section-inner">
       <div class="illustration framed">
         <LpDripListIllustration />
@@ -198,7 +247,7 @@
     </div>
   </section>
 
-  <div class="section-spacer" />
+  <div class="section-spacer hide-on-mobile" />
 
   <section class="grid">
     <LpCard
@@ -314,6 +363,11 @@
     flex-direction: column;
   }
 
+  .anchor {
+    position: absolute;
+    top: -98px;
+  }
+
   /* TYPOGRAPHY */
 
   h1 {
@@ -337,10 +391,6 @@
     font-family: 'Redaction 50', Times, serif;
     font-size: 24px;
     line-height: 24px;
-  }
-
-  p.big {
-    font-size: 24px;
   }
 
   span.green {
@@ -421,6 +471,7 @@
     max-width: 80rem;
     padding: 0 1rem;
     margin: 0 auto;
+    position: relative;
   }
 
   section .section-inner {
@@ -492,6 +543,7 @@
     align-items: center;
     flex-direction: column;
     padding: 7rem 0;
+    text-align: center;
   }
 
   section.one-column .section-inner .text {
@@ -541,7 +593,10 @@
   @media (max-width: 962px) {
     section.two-column .section-inner {
       flex-direction: column-reverse;
-      gap: 2rem;
+    }
+
+    section.two-column.card .section-inner {
+      gap: 0rem;
     }
 
     section.two-column .section-inner > .illustration-background {
@@ -564,7 +619,7 @@
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      padding: 1rem;
+      padding: 1.5rem;
     }
 
     section.two-column .section-inner .illustration.framed {
@@ -575,6 +630,10 @@
 
     section.grid {
       grid-template-columns: 1fr;
+    }
+
+    section.one-column .section-inner {
+      padding: 4rem 0;
     }
   }
 
@@ -590,8 +649,13 @@
 
   .token-streams-visuals .token-streams-visual {
     display: flex;
-    gap: 2rem;
+    gap: min(2vw, 1rem);
     align-items: center;
+    white-space: nowrap;
+  }
+
+  .token-streams-visual p {
+    font-size: min(1.5rem, 2.5vw);
   }
 
   .token-streams-visuals .token-streams-visual .token {
@@ -600,18 +664,10 @@
     align-items: center;
   }
 
-  @media (max-width: 962px) {
-    p.big {
-      font-size: 18px;
-    }
-
-    .token-streams-visuals .token-streams-visual {
-      gap: 1rem;
-    }
-
-    .token-streams-visuals .token-streams-visual .token {
-      margin-bottom: 1rem;
-    }
+  .token-streams-visuals .token-streams-visual .token .token-image {
+    height: clamp(0.5rem, 6vw, 2rem);
+    width: clamp(0.5rem, 6vw, 2rem);
+    border-radius: 1rem;
   }
 
   /* FOOTER */
@@ -685,15 +741,19 @@
 
   /* TWEAKS */
 
+  .claim-input {
+    display: flex;
+    gap: 0.5rem;
+  }
+
   @media (max-width: 962px) {
     .hide-on-mobile {
       display: none;
     }
-  }
 
-  @media (min-width: 963px) {
-    .hide-on-desktop {
-      display: none;
+    .claim-input {
+      flex-direction: column;
+      align-items: flex-end;
     }
   }
 </style>
