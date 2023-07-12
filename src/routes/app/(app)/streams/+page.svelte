@@ -14,6 +14,8 @@
   import MultiToken from '$lib/components/illustrations/multi-token.svelte';
   import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import OneBalance from '$lib/components/illustrations/one-balance.svelte';
+  import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
 
   $: accountId = $wallet.dripsAccountId;
 
@@ -27,6 +29,56 @@
   }
 
   $: eduCarouselItems = [
+    makeCarouselItem({
+      id: 'create-a-drip-list',
+      component: EduCard,
+      props: {
+        id: 'create-a-drip-list',
+        title: 'Support Open-Source Software',
+        description: 'Create your Drip List now to start supporting spen-source public goods.',
+        illustration: OneBalance,
+        actions: [
+          {
+            handler: () =>
+              window
+                .open(
+                  // TODO: Docs link
+                  'https://docs.drips.network/docs/',
+                  '_blank',
+                )
+                ?.focus(),
+            label: 'Learn more',
+            primary: true,
+            icon: ArrowUp,
+          },
+        ],
+      },
+    }),
+    makeCarouselItem({
+      id: 'claim-a-project',
+      component: EduCard,
+      props: {
+        id: 'claim-a-project',
+        title: 'Raise funds for your project',
+        description: 'Claim your GitHub repository on Drips to start raising funds.',
+        illustration: MultiChain,
+        actions: [
+          {
+            handler: () =>
+              window
+                .open(
+                  // TODO: Docs link
+                  'https://docs.drips.network/docs/',
+                  '_blank',
+                )
+                ?.focus(),
+            label: 'Learn more',
+            primary: true,
+            icon: ArrowUp,
+          },
+        ],
+      },
+    }),
     makeCarouselItem({
       id: 'set-up-first-stream',
       component: EduCard,
