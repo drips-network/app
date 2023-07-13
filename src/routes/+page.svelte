@@ -197,7 +197,7 @@
         <h2>Pass it on: Support your software dependencies</h2>
         <p>
           Create your Drip List to fund the projects you depend on. Ensure their sustainable
-          development, network stability, security and continuous improvement.
+          development, stability, security and continuous improvement.
         </p>
       </div>
     </div>
@@ -245,7 +245,7 @@
           <h3>Start your Drip List</h3>
           <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
           <a href="/app/funder-onboarding" target="_blank">
-            <Button variant="primary" size="large">Create a Drip List</Button>
+            <Button variant="primary" size="large">Create your Drip List</Button>
           </a>
         </div>
       </div>

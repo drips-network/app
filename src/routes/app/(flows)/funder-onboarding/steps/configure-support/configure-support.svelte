@@ -11,10 +11,32 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../funder-onboarding-flow';
   import SupportStreamEditor from '$lib/components/support-stream-editor/support-stream-editor.svelte';
+  import DripListService from '$lib/utils/driplist/DripListService';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+
+  let hasDripList: boolean | undefined;
+
+  async function updateHasDripList() {
+    if (!$walletStore.connected) return;
+
+    const dripListService = await DripListService.new();
+
+    const dripLists = await dripListService.getByOwnerAddress($walletStore.address);
+
+    hasDripList = Boolean(dripLists[0]);
+  }
+
+  $: {
+    if ($walletStore.connected) {
+      updateHasDripList();
+    } else {
+      hasDripList = undefined;
+    }
+  }
 
   let formValid: boolean;
 </script>
@@ -32,8 +54,17 @@
   </AnnotationBox>
   <FormField type="div" title="Wallet">
     <AccountBox />
+    {#if hasDripList}
+      <div style:margin-top="16px">
+        <AnnotationBox type="warning">
+          Sorry, but you can currently only create a single Drip List. You can edit your existing
+          Drip List's entries and support stream on your dashboard.
+        </AnnotationBox>
+      </div>
+    {/if}
   </FormField>
   <SupportStreamEditor
+    disabled={hasDripList}
     bind:formValid
     bind:streamRateValueParsed={$context.supportConfig.streamRateValueParsed}
     bind:topUpAmountValueParsed={$context.supportConfig.topUpAmountValueParsed}
@@ -44,7 +75,7 @@
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
-      disabled={!formValid}
+      disabled={!formValid || hasDripList === undefined || hasDripList === true}
       icon={Check}
       variant="primary"
       on:click={() => dispatch('goForward')}>Continue</Button

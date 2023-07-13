@@ -22,7 +22,7 @@
 
 <HeadMeta title="Create Drip List" />
 
-<StandaloneFlowStepHeader title="Create a Drip List">
+<StandaloneFlowStepHeader title="Create your Drip List">
   <DripList slot="illustration" />
 </StandaloneFlowStepHeader>
 
