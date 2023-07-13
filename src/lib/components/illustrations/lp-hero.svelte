@@ -15,7 +15,7 @@
 
   function animate() {
     // If there's less than 3 current drips, add a new one
-    if (currentDrips.length < 40) {
+    if (currentDrips.length < 20) {
       currentDrips.push({
         millis: new Date().getTime(),
         pathIndex: Math.floor(Math.random() * paths.length),
