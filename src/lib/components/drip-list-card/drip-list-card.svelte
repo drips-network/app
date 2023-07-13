@@ -39,9 +39,10 @@
       .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
 
   $: supportStream = supportStreams[0];
-  $: supportStreamToken = supportStream
-    ? tokensStore.getByAddress(supportStream?.streamConfig.amountPerSecond.tokenAddress)
-    : undefined;
+  $: supportStreamToken =
+    $tokensStore && supportStream
+      ? tokensStore.getByAddress(supportStream?.streamConfig.amountPerSecond.tokenAddress)
+      : undefined;
 
   $: accountEstimate = $balancesStore.accounts[ownerAccountId];
   $: outgoingEstimate = supportStream

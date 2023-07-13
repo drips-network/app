@@ -51,6 +51,8 @@
   async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
+    if (!contentContainerElem) return;
+
     // Adding +1px to fix https://github.com/radicle-dev/drips-app-v2/issues/184
     newHeight = (newHeight ?? contentContainerElem.offsetHeight) + 1;
 

@@ -14,7 +14,7 @@
   <IdentityBadge address={data.dripList.account.owner.address} />
   <span>created a Drip List…</span>
 </div>
-<SectionSkeleton loaded>
+<SectionSkeleton loaded={Boolean(data.dripList)}>
   <DripListCard dripList={data.dripList} representationalSplits={data.representationalSplits} />
 </SectionSkeleton>
 
