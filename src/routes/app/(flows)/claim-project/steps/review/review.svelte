@@ -179,6 +179,7 @@
       </div>
       <div class="splits-component">
         <Splits
+          linkToNewTab={true}
           list={[
             {
               type: 'split-group',
@@ -254,6 +255,7 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
+    overflow-x: scroll;
   }
 
   ul {
@@ -274,5 +276,6 @@
 
   .splits-component {
     margin-left: 10px;
+    width: fit-content;
   }
 </style>

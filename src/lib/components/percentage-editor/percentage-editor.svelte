@@ -77,6 +77,10 @@
       inputElem.blur();
     }
   }
+
+  function focusInput() {
+    inputElem.focus();
+  }
 </script>
 
 <div
@@ -86,7 +90,7 @@
   class:empty
   class:disabled
   class:editable
-  on:click|stopPropagation
+  on:click|stopPropagation={focusInput}
   on:keypress|stopPropagation
 >
   <input

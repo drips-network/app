@@ -4,6 +4,11 @@ function validateUrl(url: string, allowedHosts: string[]): boolean {
       url = 'https://' + url;
     }
 
+    // if url ends with /, remove it
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+
     const parsedURL = new URL(url);
 
     if (!allowedHosts.includes(parsedURL.hostname)) {

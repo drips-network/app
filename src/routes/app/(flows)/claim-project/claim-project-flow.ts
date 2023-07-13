@@ -84,7 +84,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       component: WalletSlot,
       props: {},
     },
-    editStepIndex: state.linkedToRepo ? undefined : 0,
+    editStepIndex: state.linkedToRepo ? undefined : 1,
     rightComponent: state.linkedToRepo
       ? {
           component: LinkedProject,

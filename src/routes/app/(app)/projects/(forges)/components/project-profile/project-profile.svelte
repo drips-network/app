@@ -341,6 +341,7 @@
     grid-template-areas:
       'header'
       'content';
+    gap: 2rem;
   }
 
   .project-profile.claimed {
@@ -349,7 +350,6 @@
     grid-template-areas:
       'header sidebar'
       'content sidebar';
-    gap: 2rem;
   }
 
   .project-profile > * {
@@ -508,6 +508,10 @@
         'content';
     }
 
+    .header {
+      margin-bottom: 0;
+    }
+
     .header .project-profile-header {
       display: flex;
       justify-content: space-between;
@@ -516,7 +520,7 @@
     }
 
     aside {
-      padding: 2rem 0;
+      padding-bottom: 2rem;
     }
 
     .unclaimed-project-edu-card {

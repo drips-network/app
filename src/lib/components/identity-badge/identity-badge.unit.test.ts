@@ -42,7 +42,7 @@ describe('identity-badge.svelte', () => {
 
     await tick();
 
-    screen.getAllByText('0x12—5678');
+    screen.getAllByText('0x12–5678');
   });
 
   it('renders the ens name if one is found', async () => {

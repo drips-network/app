@@ -112,6 +112,7 @@
         items={{
           '': {
             type: 'selectable',
+            searchString: [tokenInfo.info.name, tokenInfo.info.symbol],
             label: tokenInfo.info.name ?? 'Unknown token',
             text: `${formatTokenAmount(
               {

@@ -37,7 +37,6 @@ import type {
 import relevantTokens from '../drips/relevant-tokens';
 import fetchBalancesForTokens from '../drips/fetch-balances-for-tokens';
 import seededRandomElement from '../seeded-random-element';
-import EMOJI from '$lib/utils/emoji/emoji';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
 import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
@@ -48,6 +47,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
+import possibleRandomEmoji from './possible-random-emoji';
 
 // TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
 export default class GitProjectService {
@@ -168,6 +168,11 @@ export default class GitProjectService {
   } {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'https://' + url;
+    }
+
+    // If URL ends with /, remove it
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
     }
 
     const parsedURL = new URL(url);
@@ -451,9 +456,9 @@ export default class GitProjectService {
     for (const [urlOrAddress, percentage] of dependenciesInput) {
       const isAddr = isAddress(urlOrAddress);
 
-      const weight =
-        Math.floor((Number(percentage) / 100) * 1000000) *
-        (highLevelPercentages['dependencies'] / 100);
+      const weight = Math.floor(
+        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['dependencies'] / 100),
+      );
 
       if (weight === 0) continue;
 
@@ -489,9 +494,9 @@ export default class GitProjectService {
     const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
 
     for (const [address, percentage] of maintainersInput) {
-      const weight =
-        Math.floor((Number(percentage) / 100) * 1000000) *
-        (highLevelPercentages['maintainers'] / 100);
+      const weight = Math.floor(
+        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['maintainers'] / 100),
+      );
 
       if (weight === 0) continue;
 
@@ -621,10 +626,7 @@ export default class GitProjectService {
     // That's why we need to set default values for color and emoji.
     let description: string | undefined;
     // TODO: Restrict random emojis to a few safe ones.
-    let emoji = seededRandomElement(
-      EMOJI.map((e) => e.unicode),
-      accountId,
-    );
+    let emoji = seededRandomElement(possibleRandomEmoji, accountId);
     let color = seededRandomElement(['#5555FF', '#53DB53', '#FFC555', '#FF5555'], accountId);
     let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
     let splits: z.infer<typeof repoDriverAccountSplitsSchema> = {

@@ -68,6 +68,7 @@
               {
                 type: 'selectable',
                 label: token.info.name,
+                searchString: [token.info.name, token.info.symbol],
                 text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
                 image: {
                   component: Token,
@@ -92,6 +93,7 @@
               type: 'selectable',
               label: name,
               text: symbol,
+              searchString: [token.info.name, token.info.symbol],
               image: {
                 component: Token,
                 props: {

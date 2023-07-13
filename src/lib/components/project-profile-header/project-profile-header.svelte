@@ -12,7 +12,7 @@
   </div>
   <div class="name">
     <h1>{project.source.repoName}</h1>
-    <ProjectBadge {project} forceUnclaimed tooltip={false} linkTo="external-url" />
+    <ProjectBadge urlCopyable {project} forceUnclaimed tooltip={false} linkTo="external-url" />
   </div>
 </div>
 

@@ -25,9 +25,9 @@
     </p>
     <p>Are you sure you want to continue?</p>
     <div class="actions">
-      <a href="https://drips.network/"><Button variant="normal">Back to Drips</Button></a>
-      <a href={url.href}
-        ><Button variant="destructive">Continue to <b class="typo-text-bold">{url.host}</b></Button
+      <a href={url.host ? url.href : ''}
+        ><Button variant="destructive" disabled={!url.host}
+          >Continue to <b class="typo-text-bold">{url.host}</b></Button
         ></a
       >
     </div>

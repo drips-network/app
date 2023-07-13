@@ -2,6 +2,7 @@
   import GithubIcon from 'radicle-design-system/icons/Github.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
+  import twemoji from 'twemoji';
 
   export let project: GitProject;
 
@@ -17,13 +18,9 @@
   };
   $: containerSize = CONTAINER_SIZES[size];
 
-  const EMOJI_FONT_SIZES: Record<Size, string> = {
-    small: '1.25rem',
-    medium: '1.75rem',
-    large: '2.75rem',
-    huge: '4.5rem',
-  };
-  $: emojiFontSize = EMOJI_FONT_SIZES[size];
+  $: emojiElem = project.claimed
+    ? twemoji.parse(project.emoji, { folder: 'svg', ext: '.svg' })
+    : undefined;
 </script>
 
 <PrimaryColorThemer colorHex={project.claimed ? project.color : undefined}>
@@ -34,7 +31,9 @@
   >
     {#if project.owner}
       <div class="project-avatar" style:background-color="var(--color-primary)">
-        <span class="emoji" style:font-size={emojiFontSize}>{project.emoji}</span>
+        <div class="inner">
+          {@html emojiElem}
+        </div>
       </div>
     {/if}
 
@@ -66,6 +65,16 @@
     justify-content: center;
     font-size: 95%;
     transition: background-color 0.3s;
+  }
+
+  .project-avatar .inner {
+    height: 60%;
+    width: 60%;
+  }
+
+  .project-avatar .inner * {
+    height: 100%;
+    width: 100%;
   }
 
   .with-outline {

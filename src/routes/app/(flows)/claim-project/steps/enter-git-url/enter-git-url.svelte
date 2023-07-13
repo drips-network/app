@@ -15,11 +15,11 @@
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
-  import emoji from '$lib/utils/emoji/emoji';
   import { page } from '$app/stores';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
   import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -47,6 +47,15 @@
     try {
       validationState = { type: 'pending' };
 
+      if (!$context.gitUrl.startsWith('http://') && !$context.gitUrl.startsWith('https://')) {
+        $context.gitUrl = 'https://' + $context.gitUrl;
+      }
+
+      // if url ends with /, remove it
+      if ($context.gitUrl.endsWith('/')) {
+        $context.gitUrl = $context.gitUrl.slice(0, -1);
+      }
+
       const project = await gitProjectService.getByUrl($context.gitUrl);
 
       // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
@@ -67,7 +76,7 @@
       $context.project = project as UnclaimedGitProject;
 
       $context.projectEmoji = seededRandomElement(
-        emoji.map((e) => e.unicode),
+        possibleRandomEmoji,
         project.repoDriverAccount.accountId,
       );
       $context.projectColor = seededRandomElement(
@@ -186,9 +195,9 @@
 </script>
 
 <StandaloneFlowStepLayout
-  description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration."
+  description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
-  <div class="input">
+  <div class="input" on:keydown={(e) => e.key === 'Enter' && submitInput()}>
     <TextInput
       bind:value={$context.gitUrl}
       icon={LinkIcon}
