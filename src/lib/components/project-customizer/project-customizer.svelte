@@ -15,9 +15,11 @@
 
   let searchTerm = '';
   $: filteredEmoji = emoji.filter((e) => {
-    let { tags, description } = e;
+    let { tags, description, aliases } = e;
 
-    return [...tags, description].some((a) => a.toLowerCase().startsWith(searchTerm.toLowerCase()));
+    return [...tags, ...aliases, description].some((a) =>
+      a.toLowerCase().startsWith(searchTerm.toLowerCase()),
+    );
   });
 
   let selectedColor = $project.color;
