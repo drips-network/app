@@ -59,7 +59,7 @@
             <p class="typo-text-small">All transactions will be proposed to the connected Safe.</p>
             <a
               class="typo-link"
-              href="https://docs.drips.network/docs/the-drips-app/advanced/safe"
+              href="https://docs.drips.network/docs/streaming-and-splitting/advanced/safe"
               target="_blank"
               rel="noreferrer">Learn more</a
             >

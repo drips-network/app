@@ -262,7 +262,7 @@
                       </p>
                       <!-- TODO: Docs link -->
                       <a
-                        href="https://docs.drips.network/"
+                        href="https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project"
                         class="typo-text-small learn-more-link"
                         target="_blank">Learn more</a
                       >

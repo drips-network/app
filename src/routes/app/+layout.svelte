@@ -106,7 +106,7 @@
         },
         learnMoreLink: {
           label: 'Learn more',
-          url: 'https://docs.drips.network/docs/the-drips-app/advanced/safe',
+          url: 'https://docs.drips.network/docs/streaming-and-splitting/advanced/safe',
         },
         fatal: false,
       }));

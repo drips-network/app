@@ -42,8 +42,7 @@
             handler: () =>
               window
                 .open(
-                  // TODO: Docs link
-                  'https://docs.drips.network/docs/',
+                  'https://docs.drips.network/docs/for-funders/fund-your-dependencies',
                   '_blank',
                 )
                 ?.focus(),
@@ -67,8 +66,7 @@
             handler: () =>
               window
                 .open(
-                  // TODO: Docs link
-                  'https://docs.drips.network/docs/',
+                  'https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project',
                   '_blank',
                 )
                 ?.focus(),
@@ -92,7 +90,7 @@
             handler: () =>
               window
                 .open(
-                  'https://docs.drips.network/docs/the-drips-app/streams/create-a-stream',
+                  'https://docs.drips.network/docs/streaming-and-splitting/streams/create-a-stream',
                   '_blank',
                 )
                 ?.focus(),
@@ -116,7 +114,7 @@
             handler: () =>
               window
                 .open(
-                  'https://docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings',
+                  'https://docs.drips.network/docs/streaming-and-splitting/manage-funds/collect-earnings',
                   '_blank',
                 )
                 ?.focus(),
@@ -140,7 +138,7 @@
             handler: () =>
               window
                 .open(
-                  'https://docs.drips.network/docs/the-drips-app/explore/drips-profiles',
+                  'https://docs.drips.network/docs/streaming-and-splitting/explore/drips-profiles',
                   '_blank',
                 )
                 ?.focus(),
