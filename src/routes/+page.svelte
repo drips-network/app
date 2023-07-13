@@ -23,6 +23,8 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import buildUrl from '$lib/utils/build-url';
+  import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
+  import DripList from '$lib/components/illustrations/drip-list.svelte';
 
   onMount(() => {
     // When launching within a Safe, we don't want to display the landing page.
@@ -146,7 +148,9 @@
         <div class="token-streams-visuals">
           <div class="token-streams-visual">
             <div class="token">
-              <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
+              <CoinAnimation playSound>
+                <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
+              </CoinAnimation>
               <p>USD Coin</p>
             </div>
             <p>
@@ -160,7 +164,9 @@
           </div>
           <div class="token-streams-visual">
             <div class="token">
-              <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
+              <CoinAnimation playSound>
+                <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
+              </CoinAnimation>
               <p>Wrapped Bitcoin</p>
             </div>
             <p>
@@ -233,7 +239,7 @@
       <div class="card">
         <div class="illustration-background top" />
         <div class="illustration">
-          <MultiChain />
+          <DripList />
         </div>
         <div class="text">
           <h3>Start your Drip List</h3>
