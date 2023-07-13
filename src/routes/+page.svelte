@@ -47,7 +47,7 @@
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
 </script>
 
-<HeadMeta />
+<HeadMeta title="Drips | Funding that flows" />
 
 <LpHeader />
 <div class="wrapper">
@@ -720,13 +720,14 @@
   .how-it-works {
     display: flex;
     gap: 3rem;
+    justify-content: center;
     flex-wrap: wrap;
     padding: 2rem 0;
     width: 36rem;
   }
 
   .how-it-works .item {
-    max-width: 16rem;
+    max-width: 14rem;
     display: flex;
     flex-direction: column;
     align-items: center;
