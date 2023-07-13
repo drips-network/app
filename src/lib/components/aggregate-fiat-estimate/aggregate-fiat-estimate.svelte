@@ -14,8 +14,10 @@
   type Amounts = Amount[];
 
   export let amounts: Amounts;
-  $: tokens = amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress));
-  $: includesUnknownTokens = tokens.some((token) => token === undefined);
+  $: tokens =
+    ($tokensStore &&
+      amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress.toLowerCase()))) ??
+    [];
   $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
   $: knownSymbols = knownTokens.map((token) => token.info.symbol);
 
@@ -26,28 +28,32 @@
   let fiatEstimateCents: number | 'pending' = 'pending';
   let includesUnknownPrice = false;
 
+  const connected = tokensStore.connected;
+
   $: {
-    const prices = $priceStore;
+    if ($connected) {
+      const prices = $priceStore;
 
-    includesUnknownPrice = false;
+      includesUnknownPrice = false;
 
-    if (Object.values(prices).includes('pending')) {
-      fiatEstimateCents = 'pending';
-    } else {
-      fiatEstimateCents = amounts.reduce((sum, { tokenAddress, amount }) => {
-        const res = fiatEstimates.convert({ amount, tokenAddress });
+      if (Object.values(prices).includes('pending')) {
+        fiatEstimateCents = 'pending';
+      } else {
+        fiatEstimateCents = amounts.reduce((sum, { tokenAddress, amount }) => {
+          const res = fiatEstimates.convert({ amount, tokenAddress });
 
-        if (res === 'unsupported') {
-          includesUnknownPrice = true;
-          return sum;
-        }
+          if (res === 'unsupported') {
+            includesUnknownPrice = true;
+            return sum;
+          }
 
-        if (!res || res === 'pending') {
-          return sum;
-        }
+          if (!res || res === 'pending') {
+            return sum;
+          }
 
-        return sum + res;
-      }, 0);
+          return sum + res;
+        }, 0);
+      }
     }
   }
 </script>
