@@ -782,10 +782,6 @@
   }
 
   @media (max-width: 819px) {
-    .hide-on-mobile {
-      display: none;
-    }
-
     .claim-input {
       flex-direction: column;
       align-items: flex-end;

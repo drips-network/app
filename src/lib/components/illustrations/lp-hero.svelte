@@ -295,7 +295,7 @@
     bind:this={paths[18]}
   />
   {#each currentDrips as { x, y, scale }}
-    <circle r={scale * 5} cx={x} cy={y} fill="var(--color-primary)" class="circle" />
+    <circle r={(scale ?? 0) * 5} cx={x} cy={y} fill="var(--color-primary)" class="circle" />
   {/each}
   <rect x="678" y="671.286" width="47" height="47" rx="23.5" fill="#BCE8BB" />
   <path d="M685.5 711.026H717.5V679.026H685.5V711.026Z" fill="url(#pattern15)" />
