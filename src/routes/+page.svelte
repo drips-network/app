@@ -56,8 +56,8 @@
       <h1>Funding that flows</h1>
       <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
       <div class="actions">
-        <a href="#get-funding"><Button icon={Globe}>Get support for your project</Button></a>
         <a href="#fund-projects"><Button icon={TokenStreams}>Fund your dependencies</Button></a>
+        <a href="#get-funding"><Button icon={Globe}>Get support for your project</Button></a>
       </div>
     </div>
     <div class="illustration">
