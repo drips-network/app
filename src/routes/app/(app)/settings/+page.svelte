@@ -11,6 +11,7 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { goto } from '$app/navigation';
 
   const { primaryColor } = themeStore;
 
@@ -143,9 +144,9 @@
       title="Custom tokens"
       subtitle="Select which non-default tokens you want to use with Drips."
     >
-      <a href="/app/settings/custom-tokens">
-        <Button icon={ListIcon}>Edit token list</Button>
-      </a>
+      <Button on:click={() => goto('/app/settings/custom-tokens')} icon={ListIcon}
+        >Edit token list</Button
+      >
     </Setting>
     <Setting
       title="Reset educational hints"

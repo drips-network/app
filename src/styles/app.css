@@ -6,10 +6,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-* {
-  transition: background-color 0.3s;
-}
-
 /* hide input[number] arrows */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
