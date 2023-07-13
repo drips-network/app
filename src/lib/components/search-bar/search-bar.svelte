@@ -119,7 +119,7 @@
       on:focusout={handleSearchBlur}
       autocomplete="off"
     />
-    {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
+    {#if focus}<div transition:fly|local={{ duration: 300, y: 4 }}>
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
       </div>{/if}
   </div>
@@ -139,7 +139,7 @@
     class="overlay"
     on:click={closeSearch}
     on:keydown={closeSearch}
-    transition:fade={{ duration: 200, easing: sineInOut }}
+    transition:fade|local={{ duration: 200, easing: sineInOut }}
   />{/if}
 
 <style>
