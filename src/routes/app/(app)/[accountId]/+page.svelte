@@ -103,6 +103,24 @@
   function getDripsV1Url(address: string, ensName?: string) {
     return `https://app.v1.drips.network/${ensName ?? address}`;
   }
+
+  // onMount(async () => {
+  //   const dripsClient = await getDripsClient();
+  //   const subgraph = await getSubgraphClient();
+
+  //   const splittable = await dripsClient.getSplittableBalanceForUser(
+  //     '43863568904546693877243983730629994125524278399687397341577929528094',
+  //     '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+  //   )
+
+  //   console.log({ splittable })
+
+  //   const tx = await dripsClient.split(
+  //     '43863568904546693877243983730629994125524278399687397341577929528094',
+  //     '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+  //     await subgraph.getSplitsConfigByAccountId('43863568904546693877243983730629994125524278399687397341577929528094'),
+  //   )
+  // })
 </script>
 
 <HeadMeta title={(address && $ens[address]?.name) ?? address ?? accountId} />
