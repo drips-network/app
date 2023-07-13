@@ -82,7 +82,7 @@
 
   <div class="section-spacer" />
 
-  <section class="two-column">
+  <section class="two-column" style:z-index={2}>
     <div class="section-inner">
       <div class="card">
         <div class="illustration-background top" />
@@ -110,7 +110,7 @@
           <div class="item">
             <div class="count">1</div>
             <h5>Enter your GitHub URL</h5>
-            <p class="typo-text-small">Select any public repository on GitHub.</p>
+            <p class="typo-text-small">Select any public GitHub repository.</p>
           </div>
           <div class="item">
             <div class="count">2</div>
@@ -123,8 +123,7 @@
             <div class="count">3</div>
             <h5>Configure Splits</h5>
             <p class="typo-text-small">
-              Choose how much of your project's income should go to which maintainers and
-              dependencies.
+              Decide the distribution of funds to maintainers and dependencies.
             </p>
           </div>
           <div class="item">
@@ -176,7 +175,7 @@
           </div>
         </div>
       </div>
-      <div class="background-illustration hide-on-mobile">
+      <div class="background-illustration">
         <LpInterstitialIllustration1 />
       </div>
     </div>
@@ -239,15 +238,15 @@
         <div class="text">
           <h3>Start your Drip List</h3>
           <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
-          <div class="actions">
+          <a href="/app/funder-onboarding" target="_blank">
             <Button variant="primary" size="large">Create a Drip List</Button>
-          </div>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="section-spacer hide-on-mobile" />
+  <div class="section-spacer" />
 
   <section class="grid">
     <LpCard
@@ -377,8 +376,8 @@
 
   h2 {
     font-family: 'Redaction 50', Times, serif;
-    line-height: 60px;
-    font-size: 60px;
+    line-height: min(60px, 5vw);
+    font-size: min(60px, 5vw);
   }
 
   h3 {
@@ -405,7 +404,7 @@
     font-weight: 900;
   }
 
-  @media (max-width: 962px) {
+  @media (max-width: 819px) {
     h2 {
       font-size: 36px;
       line-height: 36px;
@@ -450,7 +449,7 @@
 
     .hero .illustration {
       width: 125%;
-      margin: -10% 0 0 -30%;
+      margin: -20% 0 0 -30%;
     }
 
     .hero .text {
@@ -487,16 +486,29 @@
 
   section.two-column .section-inner {
     display: flex;
-    gap: 2rem;
+    gap: min(2rem, 2vw);
     justify-content: space-between;
     align-items: center;
   }
 
-  section .section-inner .text {
+  section .section-inner > .text {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    padding: 3rem;
+    padding: min(3rem, 3vw);
+    padding-right: 0;
+  }
+
+  section .section-inner > .text:last-child {
+    padding-left: 0;
+    padding-right: min(3rem, 3vw);
+  }
+
+  section .section-inner .card .text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: min(3rem, 3vw);
   }
 
   section .section-inner .text.centered {
@@ -511,7 +523,7 @@
   section.two-column .section-inner .illustration.padded {
     height: 32rem;
     width: 32rem;
-    padding: 4rem;
+    padding: min(4rem, 5vw);
     z-index: 1;
   }
 
@@ -521,6 +533,7 @@
     max-width: 28rem;
     z-index: 1;
     margin: 4rem 0;
+    margin-right: 1rem;
     padding: 2rem;
     padding-left: 4rem;
     border-radius: 0 0 1rem 0;
@@ -567,6 +580,8 @@
     flex-direction: column;
     align-items: center;
     position: relative;
+    z-index: 5;
+    background-color: var(--color-background);
   }
 
   section .section-inner .card .illustration {
@@ -590,7 +605,13 @@
     gap: 1.5rem;
   }
 
-  @media (max-width: 962px) {
+  @media (max-width: 1024px) {
+    section.two-column:not(.card) .section-inner {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 819px) {
     section.two-column .section-inner {
       flex-direction: column-reverse;
     }
@@ -615,11 +636,19 @@
       max-height: 24rem;
     }
 
-    section .section-inner .text {
+    section .section-inner > .text {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      padding: 1.5rem;
+      padding: 1rem;
+    }
+
+    section .section-inner > .text:last-child {
+      padding-left: 1rem;
+    }
+
+    section .section-inner .card .text {
+      padding: 1rem;
     }
 
     section.two-column .section-inner .illustration.framed {
@@ -712,7 +741,7 @@
     color: var(--color-primary);
   }
 
-  @media (max-width: 962px) {
+  @media (max-width: 819px) {
     .how-it-works {
       padding-top: 1rem;
       width: 100%;
@@ -746,7 +775,13 @@
     gap: 0.5rem;
   }
 
-  @media (max-width: 962px) {
+  @media (max-width: 1024px) {
+    .background-illustration {
+      transform: translateX(-124px);
+    }
+  }
+
+  @media (max-width: 819px) {
     .hide-on-mobile {
       display: none;
     }
