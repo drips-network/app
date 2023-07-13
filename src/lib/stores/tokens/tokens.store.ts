@@ -22,6 +22,7 @@ export type TokenInfoWrapper = DefaultTokenInfoWrapper | CustomTokenInfoWrapper;
 export default (() => {
   let chainId: number | undefined;
   const tokenList = writable<TokenInfoWrapper[] | undefined>();
+  const connected = writable(false);
 
   /**
    * Connect the store to a chain, which is required before any other
@@ -43,6 +44,8 @@ export default (() => {
       }));
 
     tokenList.set([...defaultTokens, ...customTokens]);
+
+    connected.set(true);
   }
 
   /**
@@ -52,6 +55,7 @@ export default (() => {
   function disconnect() {
     chainId = undefined;
     tokenList.set(undefined);
+    connected.set(false);
   }
 
   /**
@@ -201,6 +205,7 @@ export default (() => {
     subscribe: tokenList.subscribe,
     connect,
     disconnect,
+    connected: { subscribe: connected.subscribe },
     getByAddress,
     getBySymbol,
     getByDripsAssetId,
