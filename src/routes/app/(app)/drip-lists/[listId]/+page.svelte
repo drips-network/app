@@ -2,6 +2,7 @@
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -13,7 +14,9 @@
   <IdentityBadge address={data.dripList.account.owner.address} />
   <span>created a Drip List…</span>
 </div>
-<DripListCard dripList={data.dripList} representationalSplits={data.representationalSplits} />
+<SectionSkeleton loaded>
+  <DripListCard dripList={data.dripList} representationalSplits={data.representationalSplits} />
+</SectionSkeleton>
 
 <style>
   .owner {
