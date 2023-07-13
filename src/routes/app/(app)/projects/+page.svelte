@@ -84,13 +84,16 @@
                 <SplittingGraph />
               </div>
               <div class="content">
-                <h2>How donations reach your projects</h2>
-                <p>
-                  Donations from funders are automatically trickled down a global dependency tree
-                  every seven days.
-                </p>
-                <!-- TODO: Add link -->
-                <div><Button icon={ArrowBoxUpRight}>Learn more</Button></div>
+                <div style:display="flex" style:gap="0.5rem" style:flex-direction="column">
+                  <h2 class="pixelated">How donations reach your projects</h2>
+                  <p>
+                    Donations from funders are automatically trickled down a global dependency tree
+                    every seven days.
+                  </p>
+                </div>
+                <a href="https://docs.drips.network/" target="_blank"
+                  ><Button icon={ArrowBoxUpRight}>Learn more</Button></a
+                >
               </div>
               <button
                 class="close-button"
