@@ -628,7 +628,7 @@ export default class GitProjectService {
           accountId,
           driver: 'repo',
         },
-        verificationStatus: VerificationStatus.IN_PROGRESS, // Project is claimed here and has no metadata. We assume it's in progress.
+        verificationStatus: VerificationStatus.FINISHED,
         source: GitProjectService.populateSource(Number(onChainProject.forge), repoName, username),
       };
 
