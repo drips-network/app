@@ -56,7 +56,7 @@
       <h1>Funding that flows</h1>
       <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
       <div class="actions">
-        <a href="#get-funding"><Button icon={Globe}>Get your project funded</Button></a>
+        <a href="#get-funding"><Button icon={Globe}>Get support for your project</Button></a>
         <a href="#fund-projects"><Button icon={TokenStreams}>Fund your dependencies</Button></a>
       </div>
     </div>
@@ -69,7 +69,7 @@
     <div class="anchor" id="get-funding" />
     <div class="section-inner">
       <div class="text">
-        <h2>Get the funding you need for your project</h2>
+        <h2>Get the funds you need for your project</h2>
         <p>
           On Drips, your open-source projects earn funds from direct supporters, as well as other
           projects that depend on yours.
@@ -107,7 +107,7 @@
         </div>
       </div>
       <div class="text centered">
-        <h3>How to raise funds on Drips</h3>
+        <h3>How to receive funds on Drips</h3>
         <div class="how-it-works">
           <div class="item">
             <div class="count">1</div>
@@ -130,9 +130,9 @@
           </div>
           <div class="item">
             <div class="count">4</div>
-            <h5>Get funding</h5>
+            <h5>Get funds</h5>
             <p class="typo-text-small">
-              Earn income from direct supporters and projects that depend on yours.
+              … from direct supporters and projects that depend on yours.
             </p>
           </div>
         </div>
@@ -194,10 +194,10 @@
         <LpDripListIllustration />
       </div>
       <div class="text">
-        <h2>Pass it on: support your dependencies in a Drip List</h2>
+        <h2>Pass it on: Support your software dependencies</h2>
         <p>
-          Fund the projects you depend on to ensure the sustainable development and maintenance of
-          your software, promote network stability, security and continuous improvement.
+          Create your Drip List to fund the projects you depend on. Ensure their sustainable
+          development, network stability, security and continuous improvement.
         </p>
       </div>
     </div>
@@ -224,9 +224,9 @@
           </div>
           <div class="item">
             <div class="count">3</div>
-            <h5>Fund it</h5>
+            <h5>Support it</h5>
             <p class="typo-text-small">
-              Support your Drip List with a continuous stream of any ERC-20 token.
+              Send a continuous stream of any ERC-20 token to your Drip List.
             </p>
           </div>
           <div class="item">
