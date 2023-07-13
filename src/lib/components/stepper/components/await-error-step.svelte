@@ -20,7 +20,9 @@
     {message}
   </p>
   <Button on:click={() => dispatch('retry')}>Go back</Button>
-  <a class="typo-text-small" href="https://discord.gg/BakDKKDpHF">Ask for help on Discord ↗</a>
+  <a class="typo-text-small" target="_blank" href="https://discord.gg/BakDKKDpHF"
+    >Ask for help on Discord ↗</a
+  >
 </div>
 
 <style>
