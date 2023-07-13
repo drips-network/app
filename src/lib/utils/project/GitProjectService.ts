@@ -31,12 +31,10 @@ import type { Address } from '../common-types';
 import type { z } from 'zod';
 import type {
   addressDriverSplitReceiverSchema,
-  repoDriverAccountSplitsSchema,
   repoDriverSplitReceiverSchema,
 } from '../metadata/schemas';
 import relevantTokens from '../drips/relevant-tokens';
 import fetchBalancesForTokens from '../drips/fetch-balances-for-tokens';
-import seededRandomElement from '../seeded-random-element';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
 import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
@@ -47,7 +45,6 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
-import possibleRandomEmoji from './possible-random-emoji';
 
 // TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
 export default class GitProjectService {
@@ -622,28 +619,23 @@ export default class GitProjectService {
 
     const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
 
-    // Someone could claim a project "manually" without using the Drips app, in which case there won't be any metadata.
-    // That's why we need to set default values for color and emoji.
-    let description: string | undefined;
-    // TODO: Restrict random emojis to a few safe ones.
-    let emoji = seededRandomElement(possibleRandomEmoji, accountId);
-    let color = seededRandomElement(['#5555FF', '#53DB53', '#FFC555', '#FF5555'], accountId);
-    let source = GitProjectService.populateSource(Number(onChainProject.forge), repoName, username);
-    let splits: z.infer<typeof repoDriverAccountSplitsSchema> = {
-      maintainers: [],
-      dependencies: [],
-    };
+    // ...and hasn't metadata. Return as unclaimed project.
+    if (!projectMetadata) {
+      const unclaimedProject: UnclaimedGitProject = {
+        claimed: false,
+        owner: undefined,
+        repoDriverAccount: {
+          accountId,
+          driver: 'repo',
+        },
+        verificationStatus: VerificationStatus.IN_PROGRESS, // Project is claimed here and has no metadata. We assume it's in progress.
+        source: GitProjectService.populateSource(Number(onChainProject.forge), repoName, username),
+      };
 
-    // TODO: Pretend projects without metadata are unclaimed.
-
-    // ...and has metadata.
-    if (projectMetadata?.data) {
-      color = projectMetadata.data.color;
-      emoji = projectMetadata.data.emoji;
-      description = projectMetadata.data.description;
-      source = projectMetadata.data.source;
-      splits = projectMetadata.data.splits;
+      return unclaimedProject;
     }
+
+    // ...and has metadata. Return a claimed project.
 
     const mapAddressDriverSplitReceiver = (
       metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
@@ -668,10 +660,10 @@ export default class GitProjectService {
     });
 
     const claimedProject: ClaimedGitProject = {
-      source,
-      color,
-      emoji,
-      description,
+      source: projectMetadata.data.source,
+      color: projectMetadata.data.color,
+      emoji: projectMetadata.data.emoji,
+      description: projectMetadata.data.description,
       claimed: true,
       repoDriverAccount: {
         driver: 'repo',
@@ -685,8 +677,10 @@ export default class GitProjectService {
         ),
       },
       splits: {
-        maintainers: splits.maintainers.map((m) => mapAddressDriverSplitReceiver(m)),
-        dependencies: splits.dependencies.map((d) =>
+        maintainers: projectMetadata.data.splits.maintainers.map((m) =>
+          mapAddressDriverSplitReceiver(m),
+        ),
+        dependencies: projectMetadata.data.splits.dependencies.map((d) =>
           'source' in d ? mapRepoDriverSplitReceiver(d) : mapAddressDriverSplitReceiver(d),
         ),
       },
