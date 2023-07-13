@@ -20,6 +20,7 @@
   import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
+  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -56,6 +57,13 @@
         $context.gitUrl = $context.gitUrl.slice(0, -1);
       }
 
+      const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+      const projectName = `${username}/${repoName}`;
+
+      const repoDriverClient = await getRepoDriverClient();
+      const accountId = await repoDriverClient.getAccountId(forge, projectName);
+
+      const owner = await repoDriverClient.getOwner(accountId);
       const project = await gitProjectService.getByUrl($context.gitUrl);
 
       // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
@@ -66,8 +74,10 @@
       if (project.claimed && projectMetadata) {
         throw new Error('Project already claimed');
       }
+
       if (
-        project.owner?.address.toLowerCase() === $walletStore.address?.toLowerCase() &&
+        owner &&
+        owner.toLowerCase() === $walletStore.address?.toLowerCase() &&
         !projectMetadata
       ) {
         $context.isPartiallyClaimed = true;

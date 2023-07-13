@@ -8,6 +8,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { ethers } from 'ethers';
   import assert from '$lib/utils/assert';
+  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -27,23 +28,30 @@
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const gitProjectService = await GitProjectService.new();
-      const project = await gitProjectService.getByUrl($context.gitUrl, false);
+      const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+      const projectName = `${username}/${repoName}`;
+
+      const repoDriverClient = await getRepoDriverClient();
+      const accountId = await repoDriverClient.getAccountId(forge, projectName);
+
+      const owner = await repoDriverClient.getOwner(accountId);
 
       assert($walletStore.address);
       if (
-        project?.claimed &&
-        ethers.utils.getAddress(project.owner.address) ===
-          ethers.utils.getAddress($walletStore.address)
+        owner &&
+        ethers.utils.getAddress(owner) === ethers.utils.getAddress($walletStore.address)
       ) {
         return;
       }
+
+      const gitProjectService = await GitProjectService.new();
+      const project = await gitProjectService.getByAccountId(accountId, false);
 
       if (!project?.claimed) {
         if (Date.now() - start >= timeout) {
           throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
         }
-        if (project.verificationStatus === VerificationStatus.FAILED) {
+        if (project?.verificationStatus === VerificationStatus.FAILED) {
           throw new Error('Project verification failed');
         }
       }

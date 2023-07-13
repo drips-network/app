@@ -34,6 +34,7 @@ export enum VerificationStatus {
   NOT_STARTED = 'NOT_STARTED',
   IN_PROGRESS = 'IN_PROGRESS',
   FAILED = 'FAILED',
+  FINISHED = 'FINISHED',
 }
 
 export interface UnclaimedGitProject<ST extends Source = Source> {
