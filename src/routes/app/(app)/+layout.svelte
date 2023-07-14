@@ -31,7 +31,7 @@
   }
 </script>
 
-<div class="main" in:fly={{ duration: 300, y: 16 }}>
+<div class="main" class:disconnected={!$wallet.connected} in:fly={{ duration: 300, y: 16 }}>
   <div class="page">
     <PageTransition pathname={data.pathname}>
       <div class:loading={$navigating}><slot /></div>
@@ -97,6 +97,11 @@
     flex-direction: row-reverse;
     gap: 2rem;
     width: 100vw;
+    transition: gap 0.3s;
+  }
+
+  .main.disconnected {
+    gap: 0;
   }
 
   .header {
