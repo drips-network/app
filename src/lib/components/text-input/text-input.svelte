@@ -7,6 +7,10 @@
 
   import KeyHint from 'radicle-design-system/KeyHint.svelte';
   import Spinner from 'radicle-design-system/Spinner.svelte';
+  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import Cross from 'radicle-design-system/icons/Cross.svelte';
+
+  const dispatch = createEventDispatcher<{ clear: never }>();
 
   export let variant: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number } = {
     type: 'text',
@@ -20,6 +24,9 @@
   export let disabled = false;
   export let readonly = false;
   export let showSuccessCheck = false;
+  export let showClearButton = false;
+
+  export let icon: ComponentType | undefined = undefined;
 
   export let inputStyle: string | undefined = undefined;
   export let style: string | undefined = undefined;
@@ -53,14 +60,26 @@
     inputElement.type = variant.type;
   }
 
+  function clear() {
+    value = '';
+    dispatch('clear');
+  }
+
   let rightContainerWidth: number;
 </script>
 
-<div {style} class="wrapper">
+<div {style} class="wrapper typo-text">
+  {#if icon}
+    <div class="icon-container">
+      <svelte:component this={icon} />
+    </div>
+  {/if}
+
   <input
     style={`${inputStyle}; padding-right: ${
       rightContainerWidth ? `${rightContainerWidth}px` : 'auto'
     };`}
+    style:padding-left={icon ? '2.75rem' : 'auto'}
     class:invalid={validationState.type === 'invalid'}
     class:concealed={variant.type === 'password'}
     min={variant.type === 'number' ? variant.min : undefined}
@@ -86,9 +105,15 @@
       <KeyHint style="margin: 0 0.5rem;">{hint}</KeyHint>
     {/if}
 
+    {#if showClearButton}
+      <button style="color: var(--color-foreground); margin: 0 0.75rem;" on:click={clear}>
+        <Cross />
+      </button>
+    {/if}
+
     {#if suffix}
       <span
-        class="typo-text-mono-bold"
+        class="typo-text tabular-nums"
         style="color: var(--color-foreground-level-5); margin: 0 0.75rem;"
       >
         {suffix}
@@ -96,7 +121,7 @@
     {/if}
 
     {#if validationState.type === 'pending'}
-      <Spinner style="margin: 0 0.5rem;" />
+      <Spinner style="margin: 0 0.75rem;" />
     {:else if showSuccessCheck && validationState.type === 'valid'}
       <CheckCircleIcon style="fill: var(--color-positive); margin: 0 0.5rem;" />
     {:else if validationState.type === 'invalid'}
@@ -123,7 +148,7 @@
     background-color: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
-    height: 2.5rem;
+    height: 3rem;
     padding: 0.5rem 0.75rem;
     width: 100%;
     transition: background-color 0.3s, box-shadow 0.3s;
@@ -151,7 +176,7 @@
   .right-container {
     align-items: center;
     display: flex;
-    height: 2.5rem;
+    height: 3rem;
     position: absolute;
     right: 0;
     top: 0;
@@ -190,5 +215,11 @@
     display: flex;
     margin-top: 0.75rem;
     text-align: left;
+  }
+
+  .icon-container {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
   }
 </style>

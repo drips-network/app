@@ -1,16 +1,17 @@
 <script lang="ts">
   import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   export let type: 'warning' | 'info' = 'warning';
   export let size: 'normal' | 'small' = 'normal';
 </script>
 
 <div class="annotation-box typo-text-small {type} {size}">
   <div class="content">
-    <WarningIcon
-      style="height: 1.25rem; width: 1.25rem; fill: var({type === 'info'
-        ? '--color-primary-level-6'
-        : '--color-caution-level-6'});"
-    />
+    {#if type === 'warning'}
+      <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
+    {:else}
+      <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
+    {/if}
     <slot />
   </div>
 </div>

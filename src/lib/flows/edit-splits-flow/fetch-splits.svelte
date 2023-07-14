@@ -13,8 +13,8 @@
 
   async function getCurrentSplits() {
     const subgraphClient = getSubgraphClient();
-    const splits = await subgraphClient.getSplitsConfigByUserId(
-      $wallet.dripsUserId ?? unreachable(),
+    const splits = await subgraphClient.getSplitsConfigByAccountId(
+      $wallet.dripsAccountId ?? unreachable(),
     );
 
     context.update((c) => ({

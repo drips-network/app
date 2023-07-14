@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  type Actions = { icon: typeof SvelteComponent; handler: () => void }[];
+  type Actions = { icon: ComponentType; handler: () => void }[];
 
   export type ActionsCellProps = {
     actions: Actions;
@@ -8,7 +8,7 @@
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
 
   export let actions: Actions;
 </script>

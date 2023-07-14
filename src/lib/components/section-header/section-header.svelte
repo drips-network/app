@@ -1,13 +1,14 @@
 <script lang="ts">
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import Button from '../button/button.svelte';
 
-  export let icon: typeof SvelteComponent | undefined = undefined;
+  export let icon: ComponentType | undefined = undefined;
   export let label: string;
   export let actions: {
     handler: (event: MouseEvent) => void;
     label?: string;
-    icon?: typeof SvelteComponent;
+    icon?: ComponentType;
+    variant?: 'primary';
   }[] = [];
   export let actionsDisabled = false;
 </script>
@@ -23,8 +24,11 @@
   </div>
   <div class="actions">
     {#each actions as action}
-      <Button disabled={actionsDisabled} icon={action.icon} on:click={action.handler}
-        >{action.label}</Button
+      <Button
+        disabled={actionsDisabled}
+        variant={action.variant}
+        icon={action.icon}
+        on:click={action.handler}>{action.label}</Button
       >
     {/each}
   </div>

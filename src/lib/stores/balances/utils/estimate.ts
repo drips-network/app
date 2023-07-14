@@ -1,13 +1,14 @@
 import type {
   Account,
+  AddressDriverAccount,
   AssetConfig,
   AssetConfigHistoryItem,
+  NFTDriverAccount,
   Receiver,
   StreamId,
-  User,
 } from '$lib/stores/streams/types';
 import { unwrapIdItems } from '$lib/utils/wrap-unwrap-id-item';
-import type { SqueezedDripsEvent } from 'radicle-drips';
+import type { SqueezedStreamsEvent } from 'radicle-drips';
 
 type Millis = number;
 
@@ -16,8 +17,8 @@ export interface StreamEstimate {
   totalStreamed: bigint;
   currentAmountPerSecond: bigint;
   runsOutOfFunds?: Date;
-  receiver: User;
-  sender: User;
+  receiver: NFTDriverAccount | AddressDriverAccount;
+  sender: AddressDriverAccount;
   tokenAddress: string;
 }
 
@@ -50,7 +51,7 @@ type AccountEstimate = { [tokenAddress: string]: AssetConfigEstimates };
 export function estimateAccount(
   account: Account,
   currentCycle: Cycle,
-  excludingSqueezes: SqueezedDripsEvent[] = [],
+  excludingSqueezes: SqueezedStreamsEvent[] = [],
 ): AccountEstimate {
   return Object.fromEntries(
     account.assetConfigs.map((assetConfig) => [
@@ -63,8 +64,8 @@ export function estimateAccount(
 function buildAssetConfigEstimates(
   assetConfig: AssetConfig,
   currentCycle: Cycle,
-  user: User,
-  excludingSqueezes: SqueezedDripsEvent[],
+  user: AddressDriverAccount,
+  excludingSqueezes: SqueezedStreamsEvent[],
 ): AssetConfigEstimates {
   /*
     TODO: Avoid processing the current cycle twice by bounding totalEstimate to before the current cycle,
@@ -94,8 +95,8 @@ function buildAssetConfigEstimates(
 export function estimateAssetConfig(
   assetConfig: AssetConfig,
   window: TimeWindow,
-  user: User,
-  excludingSqueezes: SqueezedDripsEvent[] = [],
+  user: AddressDriverAccount,
+  excludingSqueezes: SqueezedStreamsEvent[] = [],
 ): AssetConfigEstimate {
   // Filter out any history items not relevant to the current time window.
   const relevantHistoryItems = assetConfig.history.filter((hi) => {
@@ -165,8 +166,8 @@ function estimateHistoryItem(
   historyItem: AssetConfigHistoryItem,
   nextHistoryItem: AssetConfigHistoryItem,
   tokenAddress: string,
-  sender: User,
-  excludingSqueezes: SqueezedDripsEvent[],
+  sender: AddressDriverAccount,
+  excludingSqueezes: SqueezedStreamsEvent[],
 ): AssetConfigEstimate {
   const streamEstimates = historyItem.streams.map((receiver) => {
     const estimate = streamedByStream(
@@ -205,16 +206,16 @@ function estimateHistoryItem(
 function streamedByStream(
   window: TimeWindow,
   receiver: Receiver,
-  sender: User,
+  sender: AddressDriverAccount,
   historyItem: AssetConfigHistoryItem,
-  excludingSqueezes: SqueezedDripsEvent[],
+  excludingSqueezes: SqueezedStreamsEvent[],
   nextHistoryItem?: AssetConfigHistoryItem,
 ): {
   streamed: bigint;
   currentAmountPerSecond: bigint;
 } {
-  // Undefined dripsConfig means the stream was paused.
-  if (!receiver.dripsConfig) {
+  // Undefined streamConfig means the stream was paused.
+  if (!receiver.streamConfig) {
     return {
       streamed: 0n,
       currentAmountPerSecond: 0n,
@@ -232,15 +233,15 @@ function streamedByStream(
     : undefined;
   const timestamp: Millis = timestampDate.getTime();
 
-  const { durationSeconds, amountPerSecond, startDate } = receiver.dripsConfig;
+  const { durationSeconds, amountPerSecond, startDate } = receiver.streamConfig;
 
   const duration: Millis | undefined = durationSeconds ? durationSeconds * 1000 : undefined;
   const start: Millis = startDate ? startDate.getTime() : timestamp;
 
   const squeezedAtBlockTimestamp = excludingSqueezes.find(
     (squeezeEvent) =>
-      squeezeEvent.senderId === sender.userId &&
-      squeezeEvent.dripsHistoryHashes.includes(historyItem.historyHash),
+      squeezeEvent.senderId === sender.accountId &&
+      squeezeEvent.streamsHistoryHashes.includes(historyItem.historyHash),
   )?.blockTimestamp;
   const squeezedAt: Millis | undefined = squeezedAtBlockTimestamp
     ? Number(squeezedAtBlockTimestamp) * 1000

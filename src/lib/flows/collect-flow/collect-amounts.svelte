@@ -26,7 +26,6 @@
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import balancesStore from '$lib/stores/balances/balances.store';
-  import type { User } from '$lib/stores/streams/types';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import getSqueezeArgs from './get-squeeze-args';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
@@ -35,6 +34,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
+  import type { AddressDriverAccount } from '$lib/stores/streams/types';
 
   export let context: Writable<CollectFlowState>;
 
@@ -59,14 +59,14 @@
   }
 
   interface StreamEstimateByReceiver {
-    sender: User;
+    sender: AddressDriverAccount;
     amount: bigint;
   }
 
   $: incomingEstimatesBySender =
     $balancesStore &&
     balancesStore
-      .getStreamEstimatesByReceiver('currentCycle', $wallet.dripsUserId ?? unreachable())
+      .getStreamEstimatesByReceiver('currentCycle', $wallet.dripsAccountId ?? unreachable())
       .reduce<StreamEstimateByReceiver[]>((acc, streamEstimate) => {
         const senderAddress = streamEstimate.sender.address;
         const existingEntry = acc.find((e) => e.sender.address === senderAddress);
@@ -92,7 +92,7 @@
       if (estimate.amount === 0n) return;
 
       return [
-        estimate.sender.userId,
+        estimate.sender.accountId,
         {
           type: 'selectable',
           label: {
@@ -117,7 +117,7 @@
     ? selectedSqueezeSenderItems.reduce<bigint>(
         (acc, sender) =>
           acc +
-          (incomingEstimatesBySender.find((e) => e.sender.userId === sender)?.amount ??
+          (incomingEstimatesBySender.find((e) => e.sender.accountId === sender)?.amount ??
             unreachable()),
         0n,
       ) / BigInt(constants.AMT_PER_SEC_MULTIPLIER)
@@ -137,12 +137,12 @@
         before: async () => {
           const callerClient = await getCallerClient();
           const addressDriverClient = await getAddressDriverClient();
-          const userId = await addressDriverClient.getUserId();
+          const accountId = await addressDriverClient.getAccountId();
 
           const { address: userAddress, signer } = $wallet;
           assert(userAddress);
 
-          const { DRIPS_HUB, ADDRESS_DRIVER } = getNetworkConfig();
+          const { DRIPS, ADDRESS_DRIVER } = getNetworkConfig();
 
           let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
           if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
@@ -153,8 +153,8 @@
             signer,
             squeezeArgs,
             driverAddress: ADDRESS_DRIVER,
-            dripsHubAddress: DRIPS_HUB,
-            userId,
+            dripsAddress: DRIPS,
+            accountId,
             tokenAddress,
             // TODO: Replace with dynamic maxCycles
             maxCycles: 1000,
@@ -165,7 +165,7 @@
           return {
             collectFlow,
             callerClient,
-            userId,
+            accountId,
           };
         },
 
@@ -188,7 +188,7 @@
           // Wait for the collect event to be indexed by the subgraph so we know how much was actually
           // collected.
           const expectation = await expect(
-            async () => subgraph.getCollectedEventsByUserId(transactContext.userId),
+            async () => subgraph.getCollectedEventsByAccountId(transactContext.accountId),
             (collectedEvents) => Boolean(findMatchingEvent(collectedEvents, timestamp)),
             15000,
             1000,
@@ -207,7 +207,7 @@
 
           // The squeeze event should be indexed by now, so this should cause the dashboard to update
           // in the background to reflect the newly reduced incoming balance.
-          if (squeezeEnabled) await balancesStore.updateSqueezeHistory(transactContext.userId);
+          if (squeezeEnabled) await balancesStore.updateSqueezeHistory(transactContext.accountId);
         },
       }),
     );
@@ -233,7 +233,7 @@
       class="typo-text-small"
       target="_blank"
       rel="noreferrer"
-      href="https://docs.drips.network/docs/the-drips-app/manage-funds/collect-earnings"
+      href="https://docs.drips.network/docs/streaming-and-splitting/manage-funds/collect-earnings"
       >Learn more</a
     >
   </div>

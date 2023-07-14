@@ -3,7 +3,6 @@ import type { Stream } from '$lib/stores/streams/types';
 import { getCallerClient, getNetworkConfig } from '$lib/utils/get-drips-clients';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { get } from 'svelte/store';
-import { generateMetadata, pinAccountMetadata, USER_DATA_KEY } from '$lib/stores/streams/metadata';
 import { AddressDriverPresets, Utils } from 'radicle-drips';
 import assert from '$lib/utils/assert';
 import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -12,6 +11,8 @@ import { goto } from '$app/navigation';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
+import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
+import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -23,19 +24,21 @@ export default function (
       before: async () => {
         const callerClient = await getCallerClient();
 
-        const { userId, address } = stream.sender;
-        const { tokenAddress } = stream.dripsConfig.amountPerSecond;
+        const { accountId, address } = stream.sender;
+        const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
         const { signer } = get(walletStore);
         assert(signer);
 
-        const assetConfig = streams.getAssetConfig(userId, tokenAddress);
+        const assetConfig = streams.getAssetConfig(accountId, tokenAddress);
         assert(assetConfig, "App hasn't yet fetched the right asset config for this stream");
 
-        const ownAccount = get(streams).accounts[userId];
+        const ownAccount = get(streams).accounts[accountId];
         assert(assetConfig, "App hasn't yet fetched user's own account");
 
-        const metadata = generateMetadata(ownAccount, address);
+        const metadataMgr = new AddressDriverMetadataManager();
+
+        const metadata = metadataMgr.buildAccountMetadata({ forAccount: ownAccount, address });
         const assetConfigIndex = metadata.assetConfigs.findIndex(
           (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
         );
@@ -49,21 +52,21 @@ export default function (
           metadata.assetConfigs.splice(assetConfigIndex, 1);
         }
 
-        const newHash = await pinAccountMetadata(metadata);
+        const newHash = await metadataMgr.pinAccountMetadata(metadata);
 
         const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
           stream.paused
             ? undefined
             : {
-                userId: stream.receiver.userId,
-                config: stream.dripsConfig.raw,
+                accountId: stream.receiver.accountId,
+                config: stream.streamConfig.raw,
               },
         );
 
         const newReceivers = currentReceivers.filter(
           (r) =>
-            Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId.toString() !==
-            stream.dripsConfig.dripId,
+            Utils.StreamConfiguration.fromUint256(r.config).dripId.toString() !==
+            stream.streamConfig.dripId,
         );
 
         const { ADDRESS_DRIVER } = getNetworkConfig();
@@ -74,9 +77,9 @@ export default function (
           tokenAddress,
           currentReceivers,
           newReceivers,
-          userMetadata: [
+          accountMetadata: [
             {
-              key: USER_DATA_KEY,
+              key: MetadataManagerBase.USER_METADATA_KEY,
               value: newHash,
             },
           ],
@@ -87,7 +90,7 @@ export default function (
         return {
           callerClient,
           createStreamBatchPreset,
-          userId,
+          accountId,
           newHash,
         };
       },
@@ -105,12 +108,13 @@ export default function (
         await expect(
           streams.refreshUserAccount,
           () =>
-            get(streams).accounts[transactContext.userId].lastIpfsHash === transactContext.newHash,
+            get(streams).accounts[transactContext.accountId].lastIpfsHash ===
+            transactContext.newHash,
           5000,
           1000,
         );
 
-        goto('/app/dashboard');
+        goto('/app/streams');
       },
     }),
   );

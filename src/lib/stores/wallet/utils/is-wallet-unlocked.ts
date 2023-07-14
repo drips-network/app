@@ -14,7 +14,7 @@ export const isWalletUnlocked = async (walletName: string): Promise<boolean> => 
   }
 
   // Only MetaMask exposes a method to check if the wallet is unlocked
-  if (walletName === 'metamask' || walletName === 'brave browser' || win.ethereum.isMetamask) {
+  if (walletName === 'metamask' || walletName === 'brave browser' || win.ethereum?.isMetamask) {
     return win.ethereum?._metamask?.isUnlocked?.() || false;
   }
 

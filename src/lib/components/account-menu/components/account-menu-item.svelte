@@ -1,9 +1,9 @@
 <script lang="ts">
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
 
   export let disabled = false;
-  export let icon: typeof SvelteComponent | undefined = undefined;
+  export let icon: ComponentType | undefined = undefined;
   export let href: string | undefined = undefined;
 </script>
 
@@ -15,7 +15,7 @@
       {#if icon}<svelte:component this={icon} style="fill: var(--color-background)" />{/if}
     </div>
   {/if}
-  <div class="description typo-text-bold">
+  <div class="description typo-text">
     <slot name="title" />
   </div>
   <slot name="right">

@@ -1,10 +1,8 @@
-<svelte:head>
-  <title>Drips • Access</title>
-  <meta
-    name="description"
-    content="Drips is a Web3 toolkit that enables developers to raise and manage funds by the second, without any platform fees."
-  />
-</svelte:head>
+<script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+</script>
+
+<HeadMeta title="Access" />
 
 <h1>Access</h1>
 <p class="typo-text-small">Last edited: 07 March 2023</p>
@@ -34,7 +32,7 @@
     href="https://docs.drips.network/docs/for-developers/smart-contract-and-subgraph-details"
     target="_blank"
     rel="noopener noreferrer">Smart Contract and Subgraph Details Page</a
-  >. For example, the DripsHub smart contract on the Rinkeby testnet can be acessed
+  >. For example, the Drips smart contract on the Rinkeby testnet can be acessed
   <a
     href="https://rinkeby.etherscan.io/address/0xfbcD6918907902c106A99058146CBdBb76a812f6"
     target="_blank"

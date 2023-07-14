@@ -39,7 +39,7 @@
 
   const restorer = $context.restorer;
 
-  const userId = $wallet.dripsUserId ?? unreachable();
+  const accountId = $wallet.dripsAccountId ?? unreachable();
 
   let streamNameValue = restorer.restore('streamNameValue');
 
@@ -57,7 +57,7 @@
   let tokenList: Items;
   $: tokenList = Object.fromEntries(
     mapFilterUndefined(
-      Object.entries($balances.accounts[userId].tokens),
+      Object.entries($balances.accounts[accountId].tokens),
       ([tokenAddress, tokenEstimate]) => {
         const remaining = tokenEstimate.total.totals.remainingBalance;
 
@@ -68,6 +68,7 @@
           token.info.address.toLowerCase(),
           {
             type: 'selectable',
+            searchString: [token.info.name, token.info.symbol],
             label: token.info.name,
             text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
             image: {
@@ -174,7 +175,7 @@
       amountPerSecond ?? unreachable(),
       recipientAddressValue ?? unreachable(),
       streamNameValue ?? unreachable(),
-      $streams.accounts[get(wallet).dripsUserId ?? unreachable()],
+      $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
       setStartAndEndDate
         ? {
             start: combinedStartDate ?? unreachable(),
@@ -201,8 +202,18 @@
 <StepLayout>
   <StreamVisual
     disableLinks
-    fromAddress={$wallet.address}
-    toAddress={recipientAddressValidationState.type === 'valid' ? recipientAddressValue : undefined}
+    from={$wallet.address
+      ? {
+          driver: 'address',
+          address: $wallet.address,
+        }
+      : undefined}
+    to={recipientAddressValidationState.type === 'valid' && recipientAddressValue
+      ? {
+          driver: 'address',
+          address: recipientAddressValue,
+        }
+      : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader

@@ -5,6 +5,7 @@ type Restorable = {
   amountValue: string;
   topUpMax: boolean;
 };
+
 export interface TopUpFlowState {
   tokenAddress?: string;
   tokenAllowance?: bigint;

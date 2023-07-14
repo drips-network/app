@@ -8,9 +8,20 @@
   import DripsAnimation from '../drips-animation/drips-animation.svelte';
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
   import IdentityCard from '../identity-card/identity-card.svelte';
+  import DripListService from '$lib/utils/driplist/DripListService';
 
-  export let fromAddress: string | undefined = undefined;
-  export let toAddress: string | undefined = undefined;
+  interface AddressDriverAccount {
+    driver: 'address';
+    address: string;
+  }
+
+  interface NFTDriverAccount {
+    driver: 'nft';
+    accountId: string;
+  }
+
+  export let from: AddressDriverAccount | undefined = undefined;
+  export let to: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
   export let disableLinks = false;
   export let amountPerSecond: bigint | undefined = undefined;
   export let halted = false;
@@ -22,7 +33,7 @@
   });
 
   $: {
-    animationSpeed.set(toAddress && amountPerSecond && !halted ? 1 : 0);
+    animationSpeed.set(to && amountPerSecond && !halted ? 1 : 0);
   }
 
   let windowWidth = (browser && window.innerWidth) || 0;
@@ -33,22 +44,44 @@
 
     return (amountPerSecond ?? 0n) * BigInt(multiplier);
   }
+
+  async function fetchDripList(accountId: string) {
+    const service = await DripListService.new();
+
+    return service.getByTokenId(accountId);
+  }
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
 
 <div class="stream-visual">
   <div class="no-shrink">
-    <IdentityCard disableLink={disableLinks} address={fromAddress} title="From" />
+    <IdentityCard disableLink={disableLinks} address={from?.address} title="From" />
   </div>
   <div class="animation">
     <DripsAnimation vertical={verticalAnimation} speedMultiplier={$animationSpeed} />
   </div>
   <div class="no-shrink">
-    <IdentityCard disableLink={disableLinks} address={toAddress} title="To" />
+    {#if to && to.driver === 'address'}
+      <IdentityCard disableLink={disableLinks} address={to.address} title="To" />
+    {:else if to && to.driver === 'nft'}
+      {#await fetchDripList(to.accountId)}
+        <IdentityCard loading />
+      {:then result}
+        {#if result}
+          <IdentityCard dripList={result} title="To" />
+        {/if}
+      {/await}
+    {:else}
+      <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
+    {/if}
   </div>
-  {#if tokenInfo}<div class="amt-per-sec typo-text-mono-bold">
-      <FormattedAmount decimals={tokenInfo.decimals} amount={getAmtPerSec()} />
+  {#if tokenInfo}<div class="amt-per-sec typo-text tabular-nums">
+      <FormattedAmount
+        preserveTrailingZeroes={false}
+        decimals={tokenInfo.decimals}
+        amount={getAmtPerSec()}
+      />
       {tokenInfo.symbol} <span class="muted">/{FRIENDLY_NAMES[$amtDeltaUnitStore]}</span>
     </div>{/if}
 </div>

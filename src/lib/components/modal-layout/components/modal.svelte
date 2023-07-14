@@ -12,8 +12,8 @@
     background: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
     box-shadow: var(--elevation-high);
-    width: 70vw;
-    max-width: 40rem;
+    width: 74vw;
+    max-width: 42rem;
     text-align: center;
   }
 

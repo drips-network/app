@@ -13,7 +13,7 @@
 
 <script lang="ts">
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { createEventDispatcher, onMount, SvelteComponent } from 'svelte';
+  import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
   import type { UpdateAwaitStepFn } from '../types';
 
   const dispatch = createEventDispatcher<{ result: Result }>();
@@ -21,9 +21,8 @@
   export let message: string;
   export let subtitle: string | undefined = undefined;
   export let link: { url: string; label: string } | undefined = undefined;
-  export let icon:
-    | { component: typeof SvelteComponent; props: Record<string, unknown> }
-    | undefined = undefined;
+  export let icon: { component: ComponentType; props: Record<string, unknown> } | undefined =
+    undefined;
   export let promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
 
   const updateFn: UpdateAwaitStepFn = (params) => {
@@ -81,6 +80,7 @@
     align-items: center;
     gap: 1rem;
     min-height: 16rem;
+    text-align: center;
   }
 
   .subtitle {

@@ -15,11 +15,6 @@
   import streams from '$lib/stores/streams';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import {
-    generateMetadata,
-    pinAccountMetadata,
-    USER_DATA_KEY,
-  } from '$lib/stores/streams/metadata';
-  import {
     getAddressDriverClient,
     getCallerClient,
     getNetworkConfig,
@@ -35,6 +30,8 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
+  import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
+  import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -44,7 +41,7 @@
   const restorer = $context.restorer;
 
   const token =
-    tokens.getByAddress(stream.dripsConfig.amountPerSecond.tokenAddress) ?? unreachable();
+    tokens.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress) ?? unreachable();
 
   let newName: string | undefined = restorer.restore('newName') ?? stream.name;
   let newSelectedMultiplier = restorer.restore('newAmountValue')
@@ -53,7 +50,7 @@
   let newAmountValue: string | undefined =
     restorer.restore('newAmountValue') ??
     formatUnits(
-      stream.dripsConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
+      stream.streamConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
       token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
     );
 
@@ -70,7 +67,7 @@
   $: amountValidationState = validateAmtPerSecInput(newAmountPerSecond);
 
   $: nameUpdated = newName !== stream.name;
-  $: amountUpdated = newAmountPerSecond !== stream.dripsConfig.amountPerSecond.amount;
+  $: amountUpdated = newAmountPerSecond !== stream.streamConfig.amountPerSecond.amount;
   $: canUpdate =
     newAmountValueParsed &&
     newName &&
@@ -84,9 +81,9 @@
         before: async () => {
           assert(newAmountPerSecond && newName);
 
-          const { dripsUserId, address, signer } = $wallet;
-          assert(dripsUserId && address);
-          const ownAccount = $streams.accounts[dripsUserId];
+          const { dripsAccountId, address, signer } = $wallet;
+          assert(dripsAccountId && address);
+          const ownAccount = $streams.accounts[dripsAccountId];
           assert(ownAccount);
           const assetConfig = ownAccount.assetConfigs.find(
             (ac) => ac.tokenAddress === token.info.address,
@@ -96,7 +93,12 @@
           let newHash = ownAccount.lastIpfsHash;
 
           if (nameUpdated) {
-            const accountMetadata = generateMetadata(ownAccount, address);
+            const metadataMgr = new AddressDriverMetadataManager();
+
+            const accountMetadata = metadataMgr.buildAccountMetadata({
+              forAccount: ownAccount,
+              address,
+            });
 
             const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
               (ac) => ac.tokenAddress === token.info.address,
@@ -116,16 +118,16 @@
 
             accountMetadata.timestamp = new Date().getTime() / 1000;
 
-            newHash = await pinAccountMetadata(accountMetadata);
+            newHash = await metadataMgr.pinAccountMetadata(accountMetadata);
           }
 
           let currentReceivers: {
-            userId: string;
+            accountId: string;
             config: bigint;
           }[] = [];
 
           let newReceivers: {
-            userId: string;
+            accountId: string;
             config: bigint;
           }[] = [];
 
@@ -134,23 +136,23 @@
               s.paused
                 ? undefined
                 : {
-                    userId: s.receiver.userId,
-                    config: s.dripsConfig.raw,
+                    accountId: s.receiver.accountId,
+                    config: s.streamConfig.raw,
                   },
             );
 
             newReceivers = structuredClone(currentReceivers);
             const currentStreamReciverIndex = newReceivers.findIndex(
               (r) =>
-                Utils.DripsReceiverConfiguration.fromUint256(r.config).dripId ===
-                BigInt(stream.dripsConfig.dripId),
+                Utils.StreamConfiguration.fromUint256(r.config).dripId ===
+                BigInt(stream.streamConfig.dripId),
             );
             newReceivers.splice(currentStreamReciverIndex, 1, {
-              userId: stream.receiver.userId,
-              config: Utils.DripsReceiverConfiguration.toUint256({
-                dripId: BigInt(stream.dripsConfig.dripId),
-                start: BigInt(stream.dripsConfig.startDate?.getTime() ?? 0 / 1000),
-                duration: BigInt(stream.dripsConfig.durationSeconds ?? 0),
+              accountId: stream.receiver.accountId,
+              config: Utils.StreamConfiguration.toUint256({
+                dripId: BigInt(stream.streamConfig.dripId),
+                start: BigInt(stream.streamConfig.startDate?.getTime() ?? 0 / 1000),
+                duration: BigInt(stream.streamConfig.durationSeconds ?? 0),
                 amountPerSec: newAmountPerSecond,
               }),
             });
@@ -171,9 +173,9 @@
               tokenAddress: token.info.address,
               currentReceivers,
               newReceivers,
-              userMetadata: [
+              accountMetadata: [
                 {
-                  key: USER_DATA_KEY,
+                  key: MetadataManagerBase.USER_METADATA_KEY,
                   value: newHash,
                 },
               ],
@@ -183,7 +185,7 @@
 
             tx = callerClient.callBatched(createStreamBatchPreset);
           } else if (amountUpdated) {
-            tx = addressDriverClient.setDrips(
+            tx = addressDriverClient.setStreams(
               token.info.address,
               currentReceivers,
               newReceivers,
@@ -193,9 +195,9 @@
           } else {
             assert(newHash);
 
-            tx = addressDriverClient.emitUserMetadata([
+            tx = addressDriverClient.emitAccountMetadata([
               {
-                key: USER_DATA_KEY,
+                key: MetadataManagerBase.USER_METADATA_KEY,
                 value: newHash,
               },
             ]);
@@ -204,7 +206,7 @@
           return {
             tx,
             newHash,
-            dripsUserId,
+            dripsAccountId,
           };
         },
 
@@ -221,9 +223,9 @@
             streams.refreshUserAccount,
             () =>
               nameUpdated
-                ? get(streams).accounts[transactContext.dripsUserId].lastIpfsHash ===
+                ? get(streams).accounts[transactContext.dripsAccountId].lastIpfsHash ===
                   transactContext.newHash
-                : streams.getStreamById(stream.id)?.dripsConfig.amountPerSecond.amount ===
+                : streams.getStreamById(stream.id)?.streamConfig.amountPerSecond.amount ===
                   newAmountPerSecond,
             5000,
             1000,

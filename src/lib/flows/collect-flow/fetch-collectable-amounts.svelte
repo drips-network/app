@@ -2,7 +2,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import {
     getAddressDriverClient,
-    getDripsHubClient,
+    getDripsClient,
     getSubgraphClient,
   } from '$lib/utils/get-drips-clients';
   import type { Writable } from 'svelte/store';
@@ -12,26 +12,27 @@
   import tuple from '$lib/utils/tuple';
   import unreachable from '$lib/utils/unreachable';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import getCycle from '$lib/utils/drips/get-cycle';
 
   export let context: Writable<CollectFlowState>;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   async function fetchBalancesAndSplits() {
-    const dripsHubClient = await getDripsHubClient();
+    const dripsClient = await getDripsClient();
     const driverClient = await getAddressDriverClient();
     const subgraphClient = getSubgraphClient();
-    const userId = await driverClient.getUserId();
+    const accountId = await driverClient.getAccountId();
 
     const calls = tuple(
-      await dripsHubClient.getReceivableBalanceForUser(
-        userId,
+      await dripsClient.getReceivableBalanceForUser(
+        accountId,
         $context.tokenAddress ?? unreachable(),
         100,
       ),
-      dripsHubClient.getSplittableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      dripsHubClient.getCollectableBalanceForUser(userId, $context.tokenAddress ?? unreachable()),
-      subgraphClient.getSplitsConfigByUserId(userId),
+      dripsClient.getSplittableBalanceForUser(accountId, $context.tokenAddress ?? unreachable()),
+      dripsClient.getCollectableBalanceForUser(accountId, $context.tokenAddress ?? unreachable()),
+      subgraphClient.getSplitsConfigByAccountId(accountId),
     );
 
     const [receivable, splittable, collectable, splitsData] = await Promise.all(calls);
@@ -46,20 +47,16 @@
   }
 
   async function updateContext() {
-    const client = await getDripsHubClient();
-
-    const cycleDurationMillis = (await client.cycleSecs()) * 1000;
-    const currentCycleMillis = new Date().getTime() % cycleDurationMillis;
-    const currentCycleStart = new Date().getTime() - currentCycleMillis;
-
     const { splittable, collectable, receivable, ownSplitsWeight, splitsConfig } =
       await fetchBalancesAndSplits();
+
+    const { start, durationMillis } = await getCycle();
 
     context.update((c) => ({
       ...c,
       currentDripsCycle: {
-        start: new Date(currentCycleStart),
-        durationMillis: cycleDurationMillis,
+        start,
+        durationMillis,
       },
       balances: {
         splittable: splittable.splittableAmount,
@@ -72,7 +69,7 @@
   }
 
   async function updateCollectable() {
-    await balances.updateBalances($wallet.dripsUserId ?? unreachable());
+    await balances.updateBalances($wallet.dripsAccountId ?? unreachable());
   }
 
   async function promise() {

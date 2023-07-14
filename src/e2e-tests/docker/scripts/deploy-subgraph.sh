@@ -14,4 +14,4 @@ cd /drips-subgraph
 cat config.json
 cat subgraph.yaml
 npx graph create drips-subgraph-local --node http://graph-node:8020
-echo -e "\n" | npx graph deploy drips-subgraph-local --node http://graph-node:8020 --ipfs http://ipfs:5001
+npx graph deploy drips-subgraph-local --node http://graph-node:8020 --ipfs http://ipfs:5001 --version-label v0.0.1

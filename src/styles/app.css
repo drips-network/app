@@ -1,5 +1,13 @@
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  transition: background-color 0.2s;
 }
 
 /* hide input[number] arrows */
@@ -49,4 +57,8 @@ h1,
   font-family: 'Redaction 50', Times, serif;
   font-weight: normal;
   font-style: normal;
+}
+
+.tabular-nums {
+  font-feature-settings: 'tnum', 'zero';
 }

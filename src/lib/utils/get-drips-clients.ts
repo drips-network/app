@@ -4,10 +4,15 @@ import {
   AddressDriverClient,
   AddressDriverTxFactory,
   CallerClient,
-  DripsHubClient,
+  DripsClient,
   DripsSubgraphClient,
   Utils,
   type NetworkConfig,
+  NFTDriverClient,
+  NFTDriverTxFactory,
+  RepoDriverClient,
+  RepoDriverTxFactory,
+  DripsTxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -21,6 +26,57 @@ export function getSubgraphClient() {
   const { network } = get(wallet);
 
   return DripsSubgraphClient.create(network.chainId, getNetworkConfig().SUBGRAPH_URL);
+}
+
+/**
+ * Get an initialized Repo Driver client.
+ * @returns An initialized Repo Driver client.
+ */
+export function getRepoDriverClient(withSigner = get(wallet).signer) {
+  const { provider } = get(wallet);
+
+  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
+
+  return RepoDriverClient.create(provider, withSigner, repoDriverAddress);
+}
+
+/**
+ * Get an initialized Repo Driver transaction factory.
+ * @returns An initialized Repo Driver transaction factory.
+ */
+export function getRepoDriverTxFactory() {
+  const { signer } = get(wallet);
+  assert(signer);
+
+  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
+
+  return RepoDriverTxFactory.create(signer, repoDriverAddress);
+}
+
+/**
+ * Get an initialized NFT Driver transaction factory.
+ * @returns An initialized NFT Driver transaction factory.
+ */
+export function getNFTDriverTxFactory() {
+  const { signer } = get(wallet);
+  assert(signer);
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+
+  return NFTDriverTxFactory.create(signer, nftDriverAddress);
+}
+
+/**
+ * Get an initialized NFT Driver client.
+ * @returns An initialized NFT Driver client.
+ */
+export function getNFTDriverClient() {
+  const { provider, signer, connected } = get(wallet);
+  assert(connected, 'Wallet must be connected to create a NFTDriverClient');
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+
+  return NFTDriverClient.create(provider, signer, nftDriverAddress);
 }
 
 /**
@@ -52,12 +108,24 @@ export function getAddressDriverTxFactory() {
  * Get an initialized Drips Hub client.
  * @returns An initialized Drips Hub client.
  */
-export function getDripsHubClient() {
+export function getDripsClient() {
   const { provider, signer } = get(wallet);
 
-  const dripsHubAddress = getNetworkConfig().DRIPS_HUB;
+  const dripsAddress = getNetworkConfig().DRIPS;
 
-  return DripsHubClient.create(provider, signer, dripsHubAddress);
+  return DripsClient.create(provider, signer, dripsAddress);
+}
+
+/**
+ * Get an initialized Drips transaction factory.
+ * @returns An initialized Drips transaction factory.
+ */
+export function getDripsTxFactory() {
+  const { provider } = get(wallet);
+
+  const dripsAddress = getNetworkConfig().DRIPS;
+
+  return DripsTxFactory.create(provider, dripsAddress);
 }
 
 /**
@@ -81,30 +149,39 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
       5: {
         CHAIN: 'goerli',
         DEPLOYMENT_TIME: 'foobar',
-        COMMIT_HASH: '3809b5fa68c81af3fe0ac9200f8c806d7aa78c88',
-        WALLET: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
-        WALLET_NONCE: '1',
-        DEPLOYER: '0xefbF81372aBC3723463746a89CEb42080563684C',
-        DRIPS_HUB_CYCLE_SECONDS: '604800',
-        DRIPS_HUB_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
-        ADDRESS_DRIVER_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
-        NFT_DRIVER_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
-        IMMUTABLE_SPLITS_DRIVER_ADMIN: '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc',
+        COMMIT_HASH: '54ecc90aa08e141d27e6a7d6d7835d0316cb200f',
+        WALLET: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
+        DRIPS_DEPLOYER: '0x84cD64825C40C23e1698f87BdA8db181BCedC7f5',
+        DRIPS_DEPLOYER_SALT: 'DripsDeployer',
+        DRIPS_CYCLE_SECONDS: '604800',
+        DRIPS_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
+        ADDRESS_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
+        NFT_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
+        IMMUTABLE_SPLITS_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
         SUBGRAPH_URL: `http://${
           env?.PUBLIC_TEST_SUBGRAPH_HOST ?? 'localhost'
         }:8000/subgraphs/name/drips-subgraph-local`,
-        CALLER: '0x97c1349650F9ab72fD46CAab8f215F8e677fdCF4',
-        DRIPS_HUB: '0xa328B55BFF30EfF12591Cdfb3dcF4c12d804f583',
-        NFT_DRIVER: '0x55329C69414e88279a21c862b8195c1C64b4da96',
+        CALLER: '0xB32DdAe2A2F98Fee768A4950559A085C7fA76Ad9',
+        DRIPS: '0x476FB1C8745AffE9B3032C58c83AEA4C05Ddf136',
+        NFT_DRIVER: '0xa16D9683E368a72F5a3ee5761298589dB129fcbc',
         NFT_DRIVER_ID: '1',
-        ADDRESS_DRIVER: '0xDDE80B7eDC6BFc55bB5f3449f016635c55C56b6e',
-        DRIPS_HUB_LOGIC: '0xb2b3204FcA749d885483E8BaDA131dBeb11501E9',
+        ADDRESS_DRIVER: '0x28AA985982fE7900cb789793c138FAB682248fb1',
+        DRIPS_LOGIC: '0xD0BBd70EA014bFEC48da174EdF908EC30a5ba9F1',
         ADDRESS_DRIVER_ID: '0',
-        NFT_DRIVER_LOGIC: '0xD2D2d4b4996ff83f9c967C3cD9d27181cD9da5DE',
-        ADDRESS_DRIVER_LOGIC: '0xB6A122d7c20b5eE6ee322db85964DA8A7825389A',
-        IMMUTABLE_SPLITS_DRIVER: '0x34466661145b6D19f32Ae0f4b2BFD3874573bdf0',
+        NFT_DRIVER_LOGIC: '0xE87874DBF1c3a1D8B4f4cB44d736C53987e0cC5e',
+        ADDRESS_DRIVER_LOGIC: '0xB1A29A3fe16eB40655e239e88B61aB84a9bf0397',
+        IMMUTABLE_SPLITS_DRIVER: '0xaD2E5BECB55D12bc6D011c70226b82E642fFCF14',
         IMMUTABLE_SPLITS_DRIVER_ID: '2',
-        IMMUTABLE_SPLITS_DRIVER_LOGIC: '0x427f7c59ED72bCf26DfFc634FEF3034e00922DD8',
+        IMMUTABLE_SPLITS_DRIVER_LOGIC: '0x8291604630CcAd6E716792350bB2301f38E5CaF5',
+        REPO_DRIVER: '0x70F397E19fBc78f1F2090C3F4137BEd4fAD5C79e',
+        REPO_DRIVER_LOGIC: '0xb6495F3c4384959ce679955DE520a5910eedcdc9',
+        REPO_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
+        REPO_DRIVER_ID: '3',
+        REPO_DRIVER_ANYAPI_OPERATOR: '0x0000000000000000000000000000000000000000',
+        REPO_DRIVER_ANYAPI_JOB_ID: '00000000000000000000000000000000',
+        REPO_DRIVER_ANYAPI_DEFAULT_FEE: '0',
+        DETERMINISTIC_DEPLOYER: '',
+        CREATE3_FACTORY: '',
       },
     }
   : {

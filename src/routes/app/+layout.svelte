@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import Header from '$lib/components/header/header.svelte';
 
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
@@ -9,19 +8,20 @@
   import streams from '$lib/stores/streams/streams.store';
   import { derived } from 'svelte/store';
   import tickStore from '$lib/stores/tick/tick.store';
-  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
-  import PageTransition from '$lib/components/page-transition/page-transition.svelte';
-  import { navigating } from '$app/stores';
+
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import globalAdvisoryStore from '$lib/stores/global-advisory/global-advisory.store';
   import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import { isSafe } from '$lib/stores/wallet/safe/is-safe';
   import themeStore from '$lib/stores/theme/theme.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
 
-  export let data: { pathname: string };
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import trackRelevantTokens from '$lib/utils/fiat-estimates/track-relevant-tokens';
+  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
 
   let walletConnected = false;
   let loaded = false;
@@ -60,7 +60,9 @@
       if (!safe) warnIfSafe(network.chainId, address);
 
       try {
-        await streams.connect((await addressDriverClient.getUserIdByAddress(address)).toString());
+        await streams.connect(
+          (await addressDriverClient.getAccountIdByAddress(address)).toString(),
+        );
       } catch (e) {
         if (e instanceof Error) {
           globalAdvisoryStore.add({
@@ -104,7 +106,7 @@
         },
         learnMoreLink: {
           label: 'Learn more',
-          url: 'https://docs.drips.network/docs/the-drips-app/advanced/safe',
+          url: 'https://docs.drips.network/docs/streaming-and-splitting/advanced/safe',
         },
         fatal: false,
       }));
@@ -127,56 +129,77 @@
     tickStore.start();
     return tickStore.stop;
   });
+
+  onMount(() => {
+    cupertinoPaneStore.attach();
+    return cupertinoPaneStore.detach;
+  });
+
+  onMount(() => {
+    breakpointsStore.attach();
+    return breakpointsStore.detach;
+  });
+
+  onMount(async () => {
+    await fiatEstimates.start();
+    trackRelevantTokens.start();
+
+    return () => {
+      trackRelevantTokens.stop();
+      fiatEstimates.stop();
+    };
+  });
 </script>
 
 <GlobalAdvisory />
 
-{#if loaded}
-  <div class="main" in:fly={{ duration: 300, y: 16 }}>
-    <ModalLayout />
-    <div class="page" class:loading={$navigating}>
-      <PageTransition pathname={data.pathname}>
-        <slot />
-      </PageTransition>
-    </div>
+<div id="cupertino-pane">
+  <div class="inner">
+    <div class="dragger" />
+    {#if $cupertinoPaneStore.component}
+      <div class="content">
+        <svelte:component this={$cupertinoPaneStore.component} {...$cupertinoPaneStore.props} />
+      </div>
+    {/if}
   </div>
-  <div class="header" in:fly={{ duration: 300, y: 16 }}>
-    <Header />
-  </div>
-{:else}
-  <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
-    <Spinner />
-  </div>
-{/if}
+</div>
+
+<ModalLayout />
+
+<div in:fade={{ duration: 300, delay: 300 }}>
+  <slot />
+</div>
 
 <style>
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
-  .page {
-    position: relative;
-    min-height: 100vh;
-    max-width: 75rem;
-    width: 100vw;
-    padding: 6rem 1rem 4rem 1rem;
-    margin: 0 auto;
-    transition: opacity 0.3s;
-  }
-
-  .loading {
-    opacity: 0.5s;
-  }
-
-  .loading-state {
-    display: fixed;
-    height: 100vh;
-    width: 100vw;
+  #cupertino-pane {
+    display: none;
     background-color: var(--color-background);
-    display: flex;
-    justify-content: center;
+    border-radius: 1rem 1rem 0 0;
+  }
+
+  #cupertino-pane > .inner {
+    padding: 0 0.5rem;
     align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  :global(.cupertino-pane-wrapper .pane) {
+    padding-bottom: 1rem;
+    background-color: var(--color-background);
+    box-shadow: var(--elevation-low);
+  }
+
+  :global(.cupertino-pane-wrapper) {
+    z-index: 200;
+  }
+
+  .dragger {
+    width: 3rem;
+    height: 0.25rem;
+    background-color: var(--color-foreground-level-3);
+    border-radius: 0.25rem;
+    margin: 0 auto;
+    margin-bottom: 0.75rem;
   }
 </style>

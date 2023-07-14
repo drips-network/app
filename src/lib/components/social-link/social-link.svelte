@@ -3,7 +3,7 @@
   import Web from 'radicle-design-system/icons/Globe.svelte';
   import Ethereum from 'radicle-design-system/icons/Ethereum.svelte';
   import Github from 'radicle-design-system/icons/Github.svelte';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import formatAddress from '$lib/utils/format-address';
 
@@ -12,7 +12,7 @@
   export let network: SocialNetwork;
   export let value: string;
 
-  const icons: { [key in SocialNetwork]: typeof SvelteComponent } = {
+  const icons: { [key in SocialNetwork]: ComponentType } = {
     ethereum: Ethereum,
     'com.twitter': Twitter,
     'com.github': Github,
@@ -36,11 +36,11 @@
 <div class="social-link">
   <svelte:component this={icon} />
   {#if prefix !== undefined}
-    <a target="_blank" rel="noreferrer" class="typo-text-bold" href={url}
+    <a target="_blank" rel="noreferrer" class="typo-text" href={url}
       >{value.replaceAll('http://', '').replaceAll('https://', '')}</a
     >
   {:else if network === 'ethereum'}
-    <p class="typo-text-bold"><Copyable {value}>{formatAddress(value)}</Copyable></p>
+    <p class="typo-text"><Copyable {value}>{formatAddress(value)}</Copyable></p>
   {/if}
 </div>
 

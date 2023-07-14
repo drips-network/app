@@ -1,8 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 const config = defineConfig({
-  plugins: [sveltekit()],
+  plugins: [sveltekit(), nodePolyfills()],
   test: {
     // Jest like globals
     globals: true,
@@ -11,7 +12,12 @@ const config = defineConfig({
     exclude: ['src/e2e-tests/.tmp/**'],
     setupFiles: ['./setup-test.js'],
     deps: {
-      inline: ['@ethersproject/signing-key', '@ethersproject/basex', '@depay/solana-web3.js'],
+      inline: [
+        '@ethersproject/signing-key',
+        '@ethersproject/basex',
+        '@depay/solana-web3.js',
+        'cupertino-pane',
+      ],
     },
   },
   build: {
@@ -24,6 +30,12 @@ const config = defineConfig({
   },
   preview: {
     host: '0.0.0.0',
+  },
+  resolve: {
+    alias: {
+      // Required for octokit.
+      'node-fetch': 'isomorphic-fetch',
+    },
   },
 });
 

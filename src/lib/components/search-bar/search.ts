@@ -8,11 +8,14 @@ import { get } from 'svelte/store';
 import ens from '$lib/stores/ens';
 import { isAddress } from 'ethers/lib/utils';
 import { AddressDriverClient } from 'radicle-drips';
+import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
+import GitProjectService from '$lib/utils/project/GitProjectService';
 
 export enum SearchItemType {
   PROFILE,
   STREAM,
   TOKEN,
+  REPO,
 }
 
 interface MatchStrings {
@@ -28,7 +31,7 @@ export type Item =
       item: {
         address?: string;
         name?: string;
-        dripsUserId?: string;
+        dripsAccountId?: string;
       };
     }
   | {
@@ -40,11 +43,21 @@ export type Item =
       type: SearchItemType.TOKEN;
       matchStrings: MatchStrings;
       item: TokenInfoWrapper;
+    }
+  | {
+      type: SearchItemType.REPO;
+      matchStrings: MatchStrings;
+      item: {
+        forge: string;
+        repoName: string;
+        username: string;
+        url: string;
+      };
     };
 
 function searchMatchStringsForStream(stream: Stream): MatchStrings {
   const { name } = stream;
-  const { dripId } = stream.dripsConfig;
+  const { dripId } = stream.streamConfig;
 
   const strings = [];
   if (name) strings.push(name);
@@ -67,29 +80,29 @@ function searchMatchStringsForToken(token: TokenInfoWrapper): MatchStrings {
 
 let searchItems: Item[] = [];
 
-interface AddressUserIdPair {
+interface AddressAccountIdPair {
   address: string;
-  userId?: string;
+  accountId?: string;
 }
 
-export function updateSearchItems(userId: string | undefined) {
+export function updateSearchItems(accountId: string | undefined) {
   const tokensVal = get(tokens);
   const ensVal = get(ens);
   const { accounts } = get(streams);
 
-  const streamsForCurrentUser = userId ? streams.getStreamsForUser(userId) : undefined;
+  const streamsForCurrentUser = accountId ? streams.getStreamsForUser(accountId) : undefined;
   const currentStreams = streamsForCurrentUser
     ? [...streamsForCurrentUser.incoming, ...streamsForCurrentUser.outgoing]
     : [];
-  const currentTokens = (userId && tokensVal) || [];
+  const currentTokens = (accountId && tokensVal) || [];
 
-  const addresses: AddressUserIdPair[] = Object.keys(accounts).map((a) => ({
+  const addresses: AddressAccountIdPair[] = Object.keys(accounts).map((a) => ({
     address: AddressDriverClient.getUserAddress(a),
-    userId: a,
+    accountId: a,
   }));
 
   addresses.push(
-    ...Object.keys(ensVal).reduce<AddressUserIdPair[]>((acc, val) => {
+    ...Object.keys(ensVal).reduce<AddressAccountIdPair[]>((acc, val) => {
       return addresses.find((v) => v.address.toLowerCase() === val.toLowerCase())
         ? acc
         : [
@@ -117,12 +130,12 @@ export function updateSearchItems(userId: string | undefined) {
       matchStrings: {
         primary: ensVal[v.address]?.name,
         secondary: v.address,
-        tertiary: v.userId,
+        tertiary: v.accountId,
       },
       item: {
         address: v.address,
         name: ensVal[v.address]?.name,
-        dripsUserId: v.userId,
+        dripsAccountId: v.accountId,
       },
     })),
   ];
@@ -130,6 +143,23 @@ export function updateSearchItems(userId: string | undefined) {
 
 export default function search(input: string | undefined) {
   if (!input) return [];
+
+  if (isValidGitUrl(input)) {
+    const { username, repoName } = GitProjectService.deconstructUrl(input);
+
+    searchItems.push({
+      type: SearchItemType.REPO,
+      matchStrings: {
+        primary: input,
+      },
+      item: {
+        forge: 'github',
+        username,
+        repoName,
+        url: input,
+      },
+    });
+  }
 
   if (
     input?.endsWith('.eth') &&
@@ -166,7 +196,7 @@ export default function search(input: string | undefined) {
   if (
     /^\d+$/.test(input) &&
     searchItems.findIndex(
-      (i) => i.type === SearchItemType.PROFILE && i.item.dripsUserId === input,
+      (i) => i.type === SearchItemType.PROFILE && i.item.dripsAccountId === input,
     ) === -1
   ) {
     searchItems.push({
@@ -175,7 +205,7 @@ export default function search(input: string | undefined) {
         primary: input,
       },
       item: {
-        dripsUserId: input,
+        dripsAccountId: input,
       },
     });
   }

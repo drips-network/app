@@ -1,9 +1,9 @@
+import type { streamMetadataSchema } from '$lib/utils/metadata/schemas';
 import { Utils } from 'radicle-drips';
 import type { z } from 'zod';
-import type { streamMetadataSchema } from '../metadata';
 
 /**
- * Given a particular dripsReceiverSeenEvent, find matching metadata from an array of metadata
+ * Given a particular streamReceiverSeenEvent, find matching metadata from an array of metadata
  * stream objects and return the first match.
  * @param receiverSeenEvent The on-chain receiverSeenEvent to find a matching metadata object for.
  * @param metadataStreams The stream metadata objects to match against the receiverSeenEvent.
@@ -12,13 +12,13 @@ import type { streamMetadataSchema } from '../metadata';
  * that should never happen.
  */
 export default function matchMetadataStreamToReceiver(
-  receiverSeenEvent: { receiverUserId: string; config: bigint },
+  receiverSeenEvent: { receiverAccountId: string; config: bigint },
   metadataStreams: z.infer<typeof streamMetadataSchema>[],
 ): z.infer<typeof streamMetadataSchema> | undefined {
   const results = metadataStreams.filter(
     (stream) =>
       stream.initialDripsConfig.dripId ===
-      Utils.DripsReceiverConfiguration.fromUint256(receiverSeenEvent.config).dripId.toString(),
+      Utils.StreamConfiguration.fromUint256(receiverSeenEvent.config).dripId.toString(),
   );
 
   if (results.length > 1) {

@@ -48,7 +48,7 @@
     // fill-in existing splits?
     $context.splits.forEach(async (s) => {
       const row = emptyRow();
-      row.receiver.value = AddressDriverClient.getUserAddress(s.userId);
+      row.receiver.value = AddressDriverClient.getUserAddress(s.accountId);
       row.receiver.type = 'valid';
       row.amount = Number(Number(getSplitPercent(s.weight)));
       splitsInputs = [...splitsInputs, row];
@@ -102,7 +102,7 @@
             splitsInputs
               .filter((s) => s.receiver && s.amount)
               .map(async (s) => ({
-                userId: await client.getUserIdByAddress(s.receiver.value),
+                accountId: await client.getAccountIdByAddress(s.receiver.value),
                 weight: BigInt(Math.floor((Number(s.amount) / 100) * 1000000)),
               })),
           );

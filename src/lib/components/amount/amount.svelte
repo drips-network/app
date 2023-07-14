@@ -18,8 +18,8 @@
   export let showSymbol = true;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
-  export let amountClasses = 'typo-text-mono-bold';
-  export let amountPerSecClasses = 'typo-text-small-mono text-foreground-level-4';
+  export let amountClasses = 'typo-text tabular-nums';
+  export let amountPerSecClasses = 'typo-text-small tabular-nums text-foreground-level-4';
 
   /** Manually set token information to display. Used on the landing page's mock dashboard. */
   export let overrideToDisplay:
@@ -34,16 +34,21 @@
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
   function format(amount: Amount, perSec = false) {
+    let amountToShow = { ...amount };
+
     const tokenDecimals =
       overrideToDisplay?.decimals ?? tokens.getByAddress(amount.tokenAddress)?.info.decimals;
-    assert(tokenDecimals, `Unable to determine decimals for tokenAddress ${amount.tokenAddress}`);
+    assert(
+      tokenDecimals,
+      `Unable to determine decimals for tokenAddress ${amountToShow.tokenAddress}`,
+    );
 
     if (perSec) {
       const perSecTimeUnitMultiplier = MULTIPLIERS[$amtDeltaUnitStore];
-      amount.amount = amount.amount * BigInt(perSecTimeUnitMultiplier);
+      amountToShow.amount = amountToShow.amount * BigInt(perSecTimeUnitMultiplier);
     }
 
-    return formatTokenAmount(amount, tokenDecimals, multiplier);
+    return formatTokenAmount(amountToShow, tokenDecimals, multiplier, !perSec);
   }
 </script>
 
@@ -74,7 +79,7 @@
           class:text-positive={amountPerSecond.amount > 0}
           class:text-negative={amountPerSecond.amount < 0}
           >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond, true)}{#if showSymbol}
-            {' ' + overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol}
+            {' ' + (overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol)}
           {/if}</span
         >/{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </div>

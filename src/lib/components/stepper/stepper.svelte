@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { createEventDispatcher, onDestroy, onMount, tick } from 'svelte';
   import type { AwaitPendingPayload, Steps, MovePayload, SidestepPayload } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
@@ -8,10 +8,14 @@
   import AwaitErrorStep from './components/await-error-step.svelte';
   import type { Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
+  import { browser } from '$app/environment';
+
+  const dispatch = createEventDispatcher<{ stepChange: never }>();
 
   export let steps: Steps;
   export let context: (() => Writable<unknown>) | undefined = undefined;
   const resolvedContext = context?.();
+  export let minHeightPx = 0;
 
   let stepElement: HTMLDivElement;
 
@@ -19,10 +23,20 @@
 
   $: resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
 
-  let currentStepIndex = 0;
+  export let currentStepIndex = 0;
   $: currentStep = resolvedSteps[currentStepIndex];
 
+  let prevStepIndex = 0;
   let direction: 'forward' | 'backward' = 'forward';
+  $: {
+    if (currentStepIndex > prevStepIndex) {
+      direction = 'forward';
+    } else if (currentStepIndex < prevStepIndex) {
+      direction = 'backward';
+    }
+
+    prevStepIndex = currentStepIndex;
+  }
 
   /**
    * Advances `by` amount of steps in the flow (or goes backwards with a negative number).
@@ -30,11 +44,11 @@
    * @param by The amount of steps to move by.
    */
   async function move(by: number) {
+    dispatch('stepChange');
+
     if (!resolvedSteps[currentStepIndex + by]) {
       return;
     }
-
-    direction = by > 0 ? 'forward' : 'backward';
 
     currentStepIndex += by;
 
@@ -66,12 +80,14 @@
     transitioning = newVal;
   }
 
-  let containerHeight = tweened(0);
+  let containerHeight = tweened(minHeightPx);
 
-  let resizeObserver = new ResizeObserver(() => updateContainerHeight());
+  let resizeObserver = browser ? new ResizeObserver(() => updateContainerHeight()) : undefined;
   let observedElement: HTMLDivElement | undefined;
 
   async function updateMutationObserver() {
+    if (!resizeObserver) return;
+
     await tick();
 
     resizeObserver.disconnect();
@@ -87,7 +103,7 @@
   async function updateContainerHeight() {
     if (!observedElement) return;
 
-    const stepHeight = observedElement.offsetHeight;
+    const stepHeight = Math.max(observedElement.offsetHeight, minHeightPx);
 
     containerHeight.set(stepHeight, {
       duration: firstHeightUpdate || !transitioning ? 0 : 300,
@@ -199,7 +215,7 @@
     return () => window.removeEventListener('resize', windowResizeListener);
   });
 
-  onDestroy(() => resizeObserver.disconnect());
+  onDestroy(() => resizeObserver?.disconnect());
 </script>
 
 <div
@@ -240,6 +256,7 @@
 <style>
   .container {
     position: relative;
+    margin: 0 auto;
   }
 
   .step-container {
@@ -248,7 +265,7 @@
   }
 
   .step {
-    padding: 2.5rem;
+    padding: 2rem;
     width: 100%;
   }
 

@@ -12,8 +12,9 @@ import buildUrl from './build-url';
  */
 export default function guardConnected(): boolean {
   const { connected } = get(wallet);
+  const { initialized } = wallet;
 
-  if (!connected) {
+  if (!connected && get(initialized)) {
     const { pathname } = get(page).url;
     goto(buildUrl('/app', { backTo: encodeURIComponent(pathname) }), { replaceState: true });
 

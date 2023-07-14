@@ -9,6 +9,7 @@ RUN apk add git
 COPY ./src/e2e-tests/docker/scripts scripts
 RUN ["chmod", "+x", "/scripts/clone-subgraph.sh"]
 
+ARG CACHEBUST=1
 RUN bash /scripts/clone-subgraph.sh
 
 CMD bash /scripts/deploy-subgraph.sh

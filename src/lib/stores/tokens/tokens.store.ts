@@ -22,6 +22,7 @@ export type TokenInfoWrapper = DefaultTokenInfoWrapper | CustomTokenInfoWrapper;
 export default (() => {
   let chainId: number | undefined;
   const tokenList = writable<TokenInfoWrapper[] | undefined>();
+  const connected = writable(false);
 
   /**
    * Connect the store to a chain, which is required before any other
@@ -43,6 +44,8 @@ export default (() => {
       }));
 
     tokenList.set([...defaultTokens, ...customTokens]);
+
+    connected.set(true);
   }
 
   /**
@@ -52,6 +55,7 @@ export default (() => {
   function disconnect() {
     chainId = undefined;
     tokenList.set(undefined);
+    connected.set(false);
   }
 
   /**
@@ -63,7 +67,7 @@ export default (() => {
    */
   function getByAddress(address: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
-    assert(tokens, 'Store must be connected first');
+    if (!tokens) return;
 
     return tokens.find((t) => {
       const addressMatch = t.info.address.toLowerCase() === address.toLowerCase();
@@ -82,7 +86,7 @@ export default (() => {
    */
   function getBySymbol(symbol: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
-    assert(tokens, 'Store must be connected first');
+    if (!tokens) return;
 
     return tokens.find((t) => {
       const symbolMatch = t.info.symbol.toLowerCase() === symbol.toLowerCase();
@@ -102,7 +106,7 @@ export default (() => {
    */
   function getByDripsAssetId(dripsAssetId: string, chain = chainId): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
-    assert(tokens, 'Store must be connected first');
+    if (!tokens) return;
 
     return tokens.find((t) => {
       const assetAddress = Utils.Asset.getAddressFromId(BigInt(dripsAssetId));
@@ -123,7 +127,7 @@ export default (() => {
    */
   function addCustomToken(tokenInfo: TokenInfo) {
     const tokens = get(tokenList);
-    assert(tokens && chainId, 'Store must be connected first');
+    if (!tokens) return;
 
     assert(
       !tokens.find((t) => t.info.address === tokenInfo.address),
@@ -152,7 +156,7 @@ export default (() => {
    */
   function removeCustomToken(address: string, chainId: number) {
     let tokens = get(tokenList);
-    assert(tokens && chainId, 'Store must be connected first');
+    if (!tokens) return;
 
     const token = getByAddress(address, chainId);
     assert(
@@ -178,7 +182,7 @@ export default (() => {
    */
   function setCustomTokenBanStatus(address: string, chainId: number, banned: boolean) {
     const tokens = get(tokenList);
-    assert(tokens && chainId, 'Store must be connected first');
+    if (!tokens) return;
 
     const token = getByAddress(address, chainId);
     assert(
@@ -201,6 +205,7 @@ export default (() => {
     subscribe: tokenList.subscribe,
     connect,
     disconnect,
+    connected: { subscribe: connected.subscribe },
     getByAddress,
     getBySymbol,
     getByDripsAssetId,

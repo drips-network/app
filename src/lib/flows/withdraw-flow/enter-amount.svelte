@@ -37,8 +37,9 @@
 
   $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
   $: estimate =
-    $balances.accounts[String($wallet.dripsUserId) ?? unreachable()].tokens[$context.tokenAddress]
-      .total.totals.remainingBalance;
+    $balances.accounts[String($wallet.dripsAccountId) ?? unreachable()].tokens[
+      $context.tokenAddress
+    ].total.totals.remainingBalance;
 
   let amount = restorer.restore('amount');
   let amountWei: bigint | undefined;
@@ -72,9 +73,9 @@
     }
   }
 
-  function getAssetConfigHistory(dripsUserId: string, tokenAddress: string) {
+  function getAssetConfigHistory(dripsAccountId: string, tokenAddress: string) {
     return (
-      get(streams).accounts[dripsUserId].assetConfigs.find(
+      get(streams).accounts[dripsAccountId].assetConfigs.find(
         (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
       ) ?? unreachable()
     ).history;
@@ -85,12 +86,12 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const { address, dripsUserId } = $wallet;
-          assert(address && dripsUserId);
+          const { address, dripsAccountId } = $wallet;
+          assert(address && dripsAccountId);
 
           const addressDriverClient = await getAddressDriverClient();
 
-          const ownAccount = $streams.accounts[dripsUserId];
+          const ownAccount = $streams.accounts[dripsAccountId];
           assert(ownAccount, "App hasn't yet fetched user's own account");
 
           const assetConfig = ownAccount.assetConfigs.find(
@@ -102,14 +103,14 @@
             stream.paused
               ? undefined
               : {
-                  userId: stream.receiver.userId,
-                  config: stream.dripsConfig.raw,
+                  accountId: stream.receiver.accountId,
+                  config: stream.streamConfig.raw,
                 },
           );
 
           assert(amountWei);
 
-          const tx = addressDriverClient.setDrips(
+          const tx = addressDriverClient.setStreams(
             $context.tokenAddress,
             currentReceivers,
             currentReceivers,
@@ -119,7 +120,7 @@
 
           return {
             tx,
-            dripsUserId,
+            dripsAccountId,
           };
         },
         transactions: (transactContext) => ({
@@ -127,7 +128,7 @@
         }),
         after: async (_, transactContext) => {
           const currentAssetConfigHistoryLength = getAssetConfigHistory(
-            transactContext.dripsUserId,
+            transactContext.dripsAccountId,
             $context.tokenAddress,
           ).length;
 
@@ -135,7 +136,7 @@
             streams.refreshUserAccount,
             () => {
               const newLength = getAssetConfigHistory(
-                transactContext.dripsUserId,
+                transactContext.dripsAccountId,
                 $context.tokenAddress,
               ).length;
 
@@ -169,6 +170,7 @@
         items={{
           '': {
             type: 'selectable',
+            searchString: [tokenInfo.info.name, tokenInfo.info.symbol],
             label: tokenInfo.info.name ?? 'Unknown token',
             text: `${formatTokenAmount(estimate, tokenInfo.info.decimals)} ${
               tokenInfo.info.symbol
@@ -195,7 +197,7 @@
       placeholder="Enter amount"
       {validationState}
     />
-    <svelte:fragment slot="toggle">
+    <svelte:fragment slot="action">
       <Toggle bind:checked={withdrawAll} label="Max" />
     </svelte:fragment>
   </FormField>

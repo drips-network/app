@@ -6,7 +6,7 @@
   import scrollStore from '$lib/stores/scroll/scroll.store';
 
   $: scrolledDown = $scrollStore.pos > 10;
-  $: showLogo = $scrollStore.pos > 200;
+  $: showLogo = true;
 </script>
 
 <header class:raised={scrolledDown}>
@@ -95,6 +95,7 @@
   @media (max-width: 577px) {
     header {
       border: none;
+      border-bottom: 1px solid var(--color-foreground);
       padding: 0;
       gap: 0.75rem;
       top: 0;
@@ -106,7 +107,7 @@
       border-radius: 0;
     }
     .logo {
-      max-width: 100%;
+      max-width: 128px;
     }
 
     nav {

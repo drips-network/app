@@ -86,7 +86,7 @@
 
 <svelte:window on:keydown={handleWindowKeydown} on:click={handleWindowClick} />
 
-<div class="wrapper typo-text-bold" bind:this={wrapperElem}>
+<div class="wrapper typo-text" bind:this={wrapperElem}>
   <div
     role="listbox"
     aria-multiselectable="false"
@@ -114,7 +114,7 @@
           {selectedOption.title}
         </span>
       {/key}
-      <span class="placeholder">
+      <span class="placeholder" aria-hidden="true">
         {selectedOption.title}
       </span>
     </div>

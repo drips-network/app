@@ -1,10 +1,10 @@
-import type { SvelteComponent } from 'svelte';
+import type { ComponentType } from 'svelte';
 
 export interface SplitsTableRow {
   subject:
     | string
     | {
-        component: typeof SvelteComponent;
+        component: ComponentType;
         props: { [propName: string]: unknown };
       };
   percent: string | boolean;

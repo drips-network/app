@@ -1,4 +1,13 @@
 const DATE_FORMAT_CONVENTIONS = {
+  onlyDay: {
+    day: 'numeric',
+    month: 'long',
+  },
+  dayAndYear: {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  },
   standard: {
     month: 'long',
     day: 'numeric',

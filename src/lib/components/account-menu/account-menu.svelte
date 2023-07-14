@@ -1,7 +1,5 @@
 <script>
   import wallet from '$lib/stores/wallet/wallet.store';
-  import SettingsIcon from 'radicle-design-system/icons/Settings.svelte';
-  import ServerIcon from 'radicle-design-system/icons/Server.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
 
   import CrossIcon from 'radicle-design-system/icons/CrossSmall.svelte';
@@ -11,6 +9,11 @@
   import Divider from '../divider/divider.svelte';
   import ens from '$lib/stores/ens';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import { navigating } from '$app/stores';
+  import LegalLinks from '../legal-links/legal-links.svelte';
+
+  $: $navigating && cupertinoPaneStore.closeSheet();
 
   $: safeAppMode = Boolean($wallet.safe);
 </script>
@@ -25,6 +28,7 @@
           address={$wallet.address}
           showIdentity={false}
           disableSelection
+          disableTooltip
         /></svelte:fragment
       >
       <svelte:fragment slot="title"
@@ -33,11 +37,17 @@
           disableLink
           address={$wallet.address}
           showAvatar={false}
+          disableTooltip
         /></svelte:fragment
       >
       <svelte:fragment slot="right"
-        ><Button disabled={safeAppMode} icon={CrossIcon} on:click={wallet.disconnect}
-          >Disconnect</Button
+        ><Button
+          disabled={safeAppMode}
+          icon={CrossIcon}
+          on:click={() => {
+            cupertinoPaneStore.closeSheet();
+            wallet.disconnect();
+          }}>Disconnect</Button
         ></svelte:fragment
       >
     </AccountMenuItem>
@@ -49,7 +59,7 @@
             <p class="typo-text-small">All transactions will be proposed to the connected Safe.</p>
             <a
               class="typo-link"
-              href="https://docs.drips.network/docs/the-drips-app/advanced/safe"
+              href="https://docs.drips.network/docs/streaming-and-splitting/advanced/safe"
               target="_blank"
               rel="noreferrer">Learn more</a
             >
@@ -58,37 +68,14 @@
       </div>
     {/if}
     <Divider sideMargin={0.5} />
-    <AccountMenuItem icon={ServerIcon} href="/app/dashboard">
-      <svelte:fragment slot="title">Dashboard</svelte:fragment>
-    </AccountMenuItem>
     <AccountMenuItem
       icon={UserIcon}
       href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
     >
       <svelte:fragment slot="title">Profile</svelte:fragment>
     </AccountMenuItem>
-    <AccountMenuItem icon={SettingsIcon} href="/app/settings">
-      <svelte:fragment slot="title">Settings</svelte:fragment>
-    </AccountMenuItem>
     <Divider sideMargin={0.5} />
-    <ul class="links typo-text-small">
-      <li>
-        <a
-          href="https://docs.drips.network/docs/the-drips-app/getting-started"
-          target="_blank"
-          rel="noreferrer">Get help</a
-        >
-      </li>
-      <li>
-        <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
-      </li>
-      <li>
-        <a href="/legal/disclaimer" target="_blank" rel="noreferrer">Disclaimer</a>
-      </li>
-      <li>
-        <a href="/legal/access" target="_blank" rel="noreferrer">Access</a>
-      </li>
-    </ul>
+    <LegalLinks />
   {/if}
 </div>
 
@@ -109,25 +96,5 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .links {
-    padding: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .links > li {
-    color: var(--color-foreground-level-6);
-  }
-
-  .links > li:not(:last-child)::after {
-    margin-left: 0.5rem;
-    content: '•';
-  }
-
-  .links a {
-    text-decoration: underline;
   }
 </style>

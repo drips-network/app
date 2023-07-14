@@ -106,11 +106,13 @@
   <FormField title="Wallet Balance">
     <div class="balance">
       <ListSelect
+        blockSelecting
         blockInteraction
         searchable={false}
         items={{
           '': {
             type: 'selectable',
+            searchString: [tokenInfo.info.name, tokenInfo.info.symbol],
             label: tokenInfo.info.name ?? 'Unknown token',
             text: `${formatTokenAmount(
               {
@@ -141,7 +143,7 @@
       suffix={tokenInfo?.info.symbol}
       disabled={topUpMax}
     />
-    <svelte:fragment slot="toggle">
+    <svelte:fragment slot="action">
       <Toggle bind:checked={topUpMax} label="Max" />
     </svelte:fragment>
   </FormField>

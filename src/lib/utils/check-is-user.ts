@@ -2,13 +2,13 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 
 /**
- * Check if the currently logged-in user's AddressDriver dripsUserId matches
- * a particular dripsUserId.
- * @param dripsUserId The dripsUserId to match against.
+ * Check if the currently logged-in user's AddressDriver dripsAccountId matches
+ * a particular dripsAccountId.
+ * @param dripsAccountId The dripsAccountId to match against.
  * @returns True if matches, false otherwise.
  */
-export default function (dripsUserId: string): boolean {
-  const { dripsUserId: currentDripsUserId } = get(wallet);
+export default function (dripsAccountId: string): boolean {
+  const { dripsAccountId: currentDripsAccountId } = get(wallet);
 
-  return dripsUserId === currentDripsUserId;
+  return dripsAccountId === currentDripsAccountId;
 }

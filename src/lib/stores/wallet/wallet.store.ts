@@ -25,6 +25,7 @@ const MAINNET_RPC_URL = 'https://mainnet.infura.io/v3/f88a1229d473471bbf94d16840
 const GOERLI_RPC_URL = 'https://goerli.infura.io/v3/f88a1229d473471bbf94d168401b9c93';
 
 const { SUPPORTED_CHAINS } = Utils.Network;
+// TODO: change this after development.
 const DEFAULT_NETWORK: Network = {
   chainId: 1,
   name: 'homestead',
@@ -81,21 +82,21 @@ type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
 export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
-  dripsUserId: string;
+  dripsAccountId: string;
   provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
   signer: ethers.providers.JsonRpcSigner;
   network: Network;
   safe?: SafeInfo;
 }
 
-interface DisconnectedWalletStoreState {
+export interface DisconnectedWalletStoreState {
   connected: false;
   network: Network;
   provider:
     | ethers.providers.Web3Provider
     | ethers.providers.InfuraProvider
     | ethers.providers.JsonRpcProvider;
-  dripsUserId?: undefined;
+  dripsAccountId?: undefined;
   address?: undefined;
   signer?: undefined;
   safe?: undefined;
@@ -113,6 +114,7 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
 
 const walletStore = () => {
   const state = writable<WalletStoreState>(INITIAL_STATE);
+  const initialized = writable(false);
 
   /**
    * Initialize the store and restore any previously-connected,
@@ -129,7 +131,10 @@ const walletStore = () => {
       if (onboard.state.get().wallets.length > 0) return;
 
       const label = get(lastConnectedWallet);
-      if (!label) return;
+      if (!label) {
+        initialized.set(true);
+        return;
+      }
 
       if (await isWalletUnlocked(label)) {
         const wallets = await onboard.connectWallet({ autoSelect: { label, disableModals: true } });
@@ -139,6 +144,8 @@ const walletStore = () => {
         _setConnectedState(provider);
       }
     }
+
+    initialized.set(true);
   }
 
   /**
@@ -195,7 +202,7 @@ const walletStore = () => {
       const clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
-        description: 'Please switch your connected wallet to Ethereum Mainnet or Goerli.',
+        description: 'Please switch your connected wallet to Ethereum Mainnet, Sepolia or Goerli.',
         emoji: '🔌',
       });
 
@@ -234,7 +241,7 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0],
-      dripsUserId: await (await AddressDriverClient.create(provider, signer)).getUserId(),
+      dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
       provider,
       signer,
       network: await provider.getNetwork(),
@@ -268,6 +275,7 @@ const walletStore = () => {
 
   return {
     subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
     initialize,
     connect,
     disconnect,
@@ -279,6 +287,7 @@ const mockWalletStore = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const address = (window as any).playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
+  const initialized = writable(false);
 
   const state = writable<WalletStoreState>({
     connected: false,
@@ -288,7 +297,8 @@ const mockWalletStore = () => {
 
   async function initialize() {
     const signer = provider.getSigner();
-    const userId = await (await getAddressDriverClient(signer)).getUserId();
+
+    const accountId = await (await getAddressDriverClient(signer)).getAccountId();
 
     state.set({
       connected: true,
@@ -296,12 +306,15 @@ const mockWalletStore = () => {
       provider,
       signer,
       network: provider.network,
-      dripsUserId: userId,
+      dripsAccountId: accountId,
     });
+
+    initialized.set(true);
   }
 
   return {
     subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
     initialize,
     connect: () => undefined,
     disconnect: () => undefined,

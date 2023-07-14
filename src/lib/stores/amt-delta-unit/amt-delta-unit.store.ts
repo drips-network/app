@@ -28,7 +28,7 @@ export const FRIENDLY_NAMES: { [key in AmtDeltaUnit]: string } = {
 };
 
 export default (() => {
-  const state = storedWritable('amt-delta-unit', schema, 'sec', !browser);
+  const state = storedWritable('amt-delta-unit', schema, '30-days', !browser);
 
   function set(unit: AmtDeltaUnit) {
     state.set(unit);

@@ -71,7 +71,7 @@
   <!-- subject -->
   <div class="flex-1 flex" class:justify-end={isIncoming}>
     {#if typeof split.subject === 'string'}
-      <div class="typo-text-bold" style="color: var(--color-foreground)">
+      <div class="typo-text" style="color: var(--color-foreground)">
         {@html split.subject}
       </div>
     {:else if split.subject}

@@ -11,7 +11,7 @@
   export let address: string;
   export let show: 'name' | 'symbol' | 'none' = 'name';
   export let size: 'small' | 'normal' | 'huge' = 'normal';
-  export let fontSize = 'typo-text-bold';
+  export let fontSize = 'typo-text';
   export let animateOnMount = false;
 
   /** Manually set token information to display. Used on the landing page's mock dashboard. */
@@ -73,7 +73,10 @@
           alt={`${tokenInfo.name} logo`}
         />
       {:else}
-        <div style="background-color: {placeholderColor}" class="unknown-logo typo-text-mono-bold">
+        <div
+          style="background-color: {placeholderColor}"
+          class="unknown-logo typo-text tabular-nums"
+        >
           {#if tokenInfo?.symbol}
             <div class="symbol-wrapper px-1 w-full">
               <FitText text={tokenInfo.symbol} />
@@ -139,7 +142,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: var(--elevation-low);
+    border: 1px solid var(--color-foreground-level-6);
   }
 
   .background {

@@ -9,6 +9,7 @@
   import { type Item, SearchItemType } from '../search';
   import wallet from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
+  import Folder from 'radicle-design-system/icons/Folder.svelte';
 
   export let item: Item;
   export let highlighted: string;
@@ -20,7 +21,7 @@
   <AccountMenuItem
     on:click
     icon={StreamIcon}
-    href={`/app/${item.item.sender.address}/tokens/${item.item.dripsConfig.amountPerSecond.tokenAddress}/streams/${item.item.dripsConfig.dripId}`}
+    href={`/app/${item.item.sender.address}/tokens/${item.item.streamConfig.amountPerSecond.tokenAddress}/streams/${item.item.streamConfig.dripId}`}
   >
     <div class="icon" slot="title">
       <div class="highlighted">
@@ -55,7 +56,7 @@
   <AccountMenuItem
     icon={item.item.address ? undefined : UserIcon}
     on:click
-    href={`/app/${item.item.name ?? item.item.address ?? item.item.dripsUserId}`}
+    href={`/app/${item.item.name ?? item.item.address ?? item.item.dripsAccountId}`}
   >
     <div class="icon" slot="left">
       {#if item.item.address}<IdentityBadge
@@ -63,13 +64,14 @@
           size="big"
           address={item.item.address}
           showIdentity={false}
+          disableTooltip
         />{/if}
       <div class="badge"><UserIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
     </div>
     <svelte:fragment slot="title">
       <div class="highlighted">
         <span style="color: var(--color-foreground)">
-          {#if !item.item.name && !item.item.address && item.item.dripsUserId}
+          {#if !item.item.name && !item.item.address && item.item.dripsAccountId}
             Jump to user ID:
           {/if}
         </span>
@@ -78,6 +80,19 @@
       {#if highlightPlainText !== item.item.name && item.item.name}<div class="typo-text-small">
           {item.item.name}
         </div>{/if}
+    </svelte:fragment>
+  </AccountMenuItem>
+{:else if item.type === SearchItemType.REPO}
+  <AccountMenuItem
+    on:click
+    href={`/app/projects/${item.item.forge}/${item.item.username}/${item.item.repoName}`}
+    icon={Folder}
+  >
+    <svelte:fragment slot="title">
+      <div class="highlighted">
+        <span style="color: var(--color-foreground)"> Jump to GitHub repo on Drips: </span>
+        {@html highlighted}
+      </div>
     </svelte:fragment>
   </AccountMenuItem>
 {/if}

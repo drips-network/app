@@ -1,24 +1,44 @@
 <script lang="ts">
-  import type { SvelteComponent } from 'svelte';
+  import getContrastColor from '$lib/utils/get-contrast-text-color';
+  import type { ComponentType } from 'svelte';
 
   export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
-  export let icon: typeof SvelteComponent | undefined = undefined;
+  export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
+  export let size: 'small' | 'normal' | 'large' = 'normal';
+
+  let buttonEl: HTMLButtonElement;
+
+  $: primaryColor = buttonEl
+    ? getComputedStyle(buttonEl).getPropertyValue('--color-primary')
+    : undefined;
+
+  $: textColor =
+    primaryColor && (variant === 'destructive' || variant === 'primary')
+      ? getContrastColor(primaryColor)
+      : 'var(--color-foreground)';
 </script>
 
-<button aria-label={ariaLabel} {disabled} on:click|stopPropagation>
+<button
+  class="size-{size}"
+  bind:this={buttonEl}
+  aria-label={ariaLabel}
+  {disabled}
+  on:click|stopPropagation
+>
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
     class:with-text={Boolean($$slots.default) && !icon}
-    class="inner typo-text-bold {variant}"
+    class="inner typo-text {variant}"
+    style:color={textColor}
   >
     {#if icon}
       <svelte:component
         this={icon}
         style={variant === 'destructive' || variant === 'primary'
-          ? 'fill: white'
-          : 'fill: var(--color-foreground)'}
+          ? `fill: ${textColor}; transition: fill 0.3s;`
+          : 'fill: var(--color-foreground); transition: fill 0.3s;'}
       />
     {/if}
     <slot />
@@ -31,6 +51,17 @@
     min-width: calc(2rem + 4px); /* so just icons are square (w=h) */
     padding: 5px 2px;
     margin: -4px 0;
+    transition: opacity 0.3s;
+  }
+
+  button.size-large {
+    height: calc(3rem + 10px);
+    min-width: calc(3rem + 4px);
+  }
+
+  button.size-small {
+    height: 2.5rem;
+    min-width: calc(3rem);
   }
 
   button .inner {
@@ -47,18 +78,24 @@
     background-color: var(--color-background);
   }
 
+  button.size-large .inner {
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+  }
+
+  button.size-small .inner {
+    font-size: 14px;
+  }
+
   button .inner:not(.ghost) {
     box-shadow: var(--elevation-low);
   }
 
   button .inner.primary {
     background-color: var(--color-primary);
-    color: #fff;
   }
 
   button .inner.destructive {
     background-color: var(--color-negative);
-    color: #fff;
   }
 
   button .inner.with-icon-text {
@@ -70,7 +107,7 @@
   }
 
   button:enabled:hover .inner,
-  button:enabled:focus .inner {
+  button:enabled:focus-visible .inner {
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
@@ -81,11 +118,11 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
   }
 
-  button:focus .inner {
+  button:focus-visible .inner {
     box-shadow: var(--elevation-low);
   }
 
-  button:focus .inner.normal {
+  button:focus-visible .inner.normal {
     background-color: var(--color-foreground-level-1);
   }
   button:disabled {

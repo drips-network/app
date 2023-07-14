@@ -29,6 +29,7 @@
         tokenAddress,
         {
           type: 'selectable',
+          searchString: [token.info.name, token.info.symbol],
           label: token.info.name,
           image: {
             component: Token,
@@ -83,7 +84,6 @@
     height: 24rem;
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
-    border-radius: 0.5rem;
     overflow: scroll;
   }
 </style>

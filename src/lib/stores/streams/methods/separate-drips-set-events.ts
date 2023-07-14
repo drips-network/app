@@ -1,27 +1,27 @@
-import { Utils, type DripsSetEvent } from 'radicle-drips';
-import sortDripsSetEvents from './sort-drips-set-events';
+import { Utils, type StreamsSetEvent } from 'radicle-drips';
+import sortStreamsSetEvents from './sort-drips-set-events';
 
 /**
- * Take an array of dripsSetEvents, and group them by their asset's token address.
- * @param dripsSetEvents The array of events to group by token address.
+ * Take an array of streamsSetEvents, and group them by their asset's token address.
+ * @param streamsSetEvents The array of events to group by token address.
  * @returns An object with keys corresponding to token addresses, and values being
- * relevant dripsSetEvents.
+ * relevant streamsSetEvents.
  */
-export default function seperateDripsSetEvents<T extends DripsSetEvent>(
-  dripsSetEvents: T[],
+export default function seperateStreamsSetEvents<T extends StreamsSetEvent>(
+  streamsSetEvents: T[],
 ): {
   [tokenAddress: string]: T[];
 } {
-  const sorted = sortDripsSetEvents(dripsSetEvents);
+  const sorted = sortStreamsSetEvents(streamsSetEvents);
 
-  const result = sorted.reduce<{ [tokenAddress: string]: T[] }>((acc, dripsSetEvent) => {
-    const { assetId } = dripsSetEvent;
+  const result = sorted.reduce<{ [tokenAddress: string]: T[] }>((acc, streamsSetEvent) => {
+    const { assetId } = streamsSetEvent;
     const tokenAddress = Utils.Asset.getAddressFromId(assetId);
 
     if (acc[tokenAddress]) {
-      acc[tokenAddress].push(dripsSetEvent);
+      acc[tokenAddress].push(streamsSetEvent);
     } else {
-      acc[tokenAddress] = [dripsSetEvent];
+      acc[tokenAddress] = [streamsSetEvent];
     }
 
     return acc;

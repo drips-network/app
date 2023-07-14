@@ -17,7 +17,7 @@
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
 
-  const initHeight = 256;
+  export let initHeight = 256;
 
   let containerHeight = tweened(initHeight, {
     duration: 300,
@@ -25,8 +25,9 @@
   });
 
   let placeholderContainerPosition = 'absolute';
-
   let contentContainerElem: HTMLDivElement;
+
+  let transitionHeight = true;
 
   let observer: ResizeObserver;
   function observeContentChanges() {
@@ -50,9 +51,21 @@
   async function updateContainerHeight(newHeight: number | void) {
     await tick();
 
+    if (!contentContainerElem) return;
+
     // Adding +1px to fix https://github.com/radicle-dev/drips-app-v2/issues/184
     newHeight = (newHeight ?? contentContainerElem.offsetHeight) + 1;
-    containerHeight.set(newHeight);
+
+    containerHeight.set(
+      newHeight,
+      transitionHeight ? { duration: 300, easing: cubicInOut } : { duration: 0 },
+    );
+
+    if (loaded) {
+      setTimeout(() => (transitionHeight = false), 300);
+    } else {
+      transitionHeight = true;
+    }
   }
 </script>
 
@@ -74,8 +87,10 @@
               Sorry, we weren't able to load this. There may be more information in the developer
               console.
             </p>
-            <a class="typo-link typo-text-small" href="https://discord.gg/BakDKKDpHF"
-              >Ask for help</a
+            <a
+              class="typo-link typo-text-small"
+              target="_blank"
+              href="https://discord.gg/BakDKKDpHF">Ask for help</a
             >
           </div>
         </div>

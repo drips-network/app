@@ -2,7 +2,7 @@ import { providers } from 'ethers';
 
 const NETWORK = {
   chainId: 5,
-  name: 'Goerli',
+  name: 'goerli',
 };
 
 class MockProvider extends providers.StaticJsonRpcProvider {

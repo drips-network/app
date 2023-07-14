@@ -5,18 +5,18 @@
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import { Utils, constants } from 'radicle-drips';
 
-  let dripsConfigValue = '';
+  let streamConfigValue = '';
   let tokenAddresssValue = '';
 
   $: token = tokensStore.getByAddress(tokenAddresssValue);
 
-  const decode = Utils.DripsReceiverConfiguration.fromUint256;
+  const decode = Utils.StreamConfiguration.fromUint256;
 
   let decoded: ReturnType<typeof decode> | undefined;
 
   $: {
     try {
-      decoded = decode(dripsConfigValue);
+      decoded = decode(streamConfigValue);
     } catch (e) {
       decoded = undefined;
     }
@@ -28,26 +28,26 @@
   <div class="section">
     <h3>Decode Drips Config</h3>
     <p>
-      The Drips Config is a string used in setDrips transactions that encodes the stream rate, start
-      date and duration, as well as the unique drips stream ID. Paste one below alongside the token
-      address that this particular stream will stream to decode it into its parts.
+      The Drips Config is a string used in setStreams transactions that encodes the stream rate,
+      start date and duration, as well as the unique drips stream ID. Paste one below alongside the
+      token address that this particular stream will stream to decode it into its parts.
     </p>
     <FormField title="Token Address">
       <TextInput placeholder="Paste token address here" bind:value={tokenAddresssValue} />
     </FormField>
     <FormField title="Drips Config">
-      <TextInput placeholder="Paste config here" bind:value={dripsConfigValue} />
+      <TextInput placeholder="Paste config here" bind:value={streamConfigValue} />
     </FormField>
     {#if decoded && token}
       <div class="result">
         <h4>Result</h4>
         <p>
           Stream Rate (wei / sec including extra {constants.AMT_PER_SEC_EXTRA_DECIMALS} decimals of precision):
-          <span class="typo-text-mono">{decoded?.amountPerSec}</span>
+          <span class="typo-text tabular-nums">{decoded?.amountPerSec}</span>
         </p>
         <p class="indented">
           Approx. Stream Rate ({token.info.symbol} / sec):
-          <span class="typo-text-mono"
+          <span class="typo-text tabular-nums"
             >{decoded
               ? formatTokenAmount(decoded.amountPerSec, token.info.decimals)
               : undefined}</span
@@ -55,15 +55,15 @@
         </p>
         <p class="indented">
           Approx. Stream Rate ({token.info.symbol} / day):
-          <span class="typo-text-mono"
+          <span class="typo-text tabular-nums"
             >{decoded
               ? formatTokenAmount(decoded.amountPerSec * 86400n, token.info.decimals)
               : undefined}</span
           >
         </p>
-        <p>Start Date: <span class="typo-text-mono">{decoded?.start}</span></p>
-        <p>Duration seconds: <span class="typo-text-mono">{decoded?.duration}</span></p>
-        <p>Stream ID: <span class="typo-text-mono">{decoded?.dripId}</span></p>
+        <p>Start Date: <span class="typo-text tabular-nums">{decoded?.start}</span></p>
+        <p>Duration seconds: <span class="typo-text tabular-nums">{decoded?.duration}</span></p>
+        <p>Stream ID: <span class="typo-text tabular-nums">{decoded?.dripId}</span></p>
       </div>
     {/if}
   </div>

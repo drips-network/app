@@ -98,7 +98,7 @@ When starting your E2E test like this, user `0xf39fd6e51aad88f6f4ce6ab8827279cff
 
 #### Interacting with the Mock ERC-20
 
-As part of E2E environment setup, a mock ERC-20 token is deployed at `0x176aA34a1a36F0A43736aBDcd3D9f011a107cdF8`, and automatically grants address `0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
+As part of E2E environment setup, a mock ERC-20 token is deployed at `0xefbF81372aBC3723463746a89CEb42080563684C`, and automatically grants address `0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc` a balance of `100000000000000000000` wei. In order to be able to use this token within the app in your tests, you can append a "custom token" to localstorage, which will be picked up by `tokens.store` upon startup.
 
 Simply run the following in a `page.addInitScript` block:
 
@@ -111,7 +111,7 @@ localStorage.setItem(
       banned: false,
       info: {
         chainId: 5,
-        address: '0x176aA34a1a36F0A43736aBDcd3D9f011a107cdF8',
+        address: '0xefbF81372aBC3723463746a89CEb42080563684C',
         name: 'Testcoin',
         decimals: 18,
         symbol: 'TEST',

@@ -2,7 +2,7 @@
   import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
   import CloseIcon from 'radicle-design-system/icons/CrossSmall.svelte';
 
-  import { tick } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { sineIn, sineInOut, sineOut } from 'svelte/easing';
   import { fade, fly } from 'svelte/transition';
   import search, { updateSearchItems } from './search';
@@ -13,43 +13,30 @@
   import Results from './components/results.svelte';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
+  const dispatch = createEventDispatcher<{ dismiss: never }>();
+
   let focus = false;
-  let mobileSearchActive = false;
 
   $: focus ? scroll.lock() : scroll.unlock();
 
   let searchTerm: string | undefined;
 
-  let desktopSearchElem: HTMLDivElement;
-  let mobileSearchElem: HTMLDivElement;
-
-  function getActiveSearchElem() {
-    return window.getComputedStyle(desktopSearchElem, null).display === 'none'
-      ? mobileSearchElem
-      : desktopSearchElem;
-  }
-
-  async function triggerSearch() {
-    mobileSearchActive = true;
-    focus = true;
-    await tick();
-
-    getActiveSearchElem().focus();
-  }
+  let searchElem: HTMLDivElement;
 
   function closeSearch() {
     searchTerm = '';
-    getActiveSearchElem().blur();
+    searchElem.blur();
     focus = false;
-    mobileSearchActive = false;
+
+    dispatch('dismiss');
   }
 
   let loading = true;
 
   $: {
-    const { dripsUserId } = $wallet;
+    const { dripsAccountId } = $wallet;
 
-    if (dripsUserId && $accountFetchStatussesStore[dripsUserId]?.all !== 'fetched') {
+    if (dripsAccountId && $accountFetchStatussesStore[dripsAccountId]?.all !== 'fetched') {
       loading = true;
     } else {
       loading = false;
@@ -63,7 +50,7 @@
     $streams;
     $tokens;
     if (!loading) {
-      updateSearchItems($wallet.dripsUserId);
+      updateSearchItems($wallet.dripsAccountId);
       results = search(searchTerm);
     }
   }
@@ -77,12 +64,6 @@
       return;
     }
 
-    if (e.metaKey === true && e.key === 'k') {
-      getActiveSearchElem().focus();
-      e.preventDefault();
-      return;
-    }
-
     if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
 
     const focussedElem = document.activeElement;
@@ -90,11 +71,10 @@
     if (!focussedElem) return;
     if (
       !(
-        focussedElem === getActiveSearchElem() ||
-        accountMenuItemElems.includes(focussedElem as HTMLDivElement)
+        focussedElem === searchElem || accountMenuItemElems.includes(focussedElem as HTMLDivElement)
       )
     ) {
-      focus = false;
+      closeSearch();
       return;
     }
 
@@ -105,7 +85,7 @@
     if (nextElem) {
       (nextElem.firstChild as HTMLElement)?.focus();
     } else if (selectedIndex === 0 && changeIndexBy === -1) {
-      getActiveSearchElem().focus();
+      searchElem.focus();
     }
 
     e.preventDefault();
@@ -114,29 +94,32 @@
   function handleSearchBlur(e: FocusEvent) {
     const focussedElem = e.relatedTarget as HTMLElement;
 
-    if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== desktopSearchElem) {
+    if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== searchElem) {
       searchTerm = undefined;
-      focus = false;
+      closeSearch();
     }
   }
+
+  onMount(() => {
+    searchElem.focus();
+  });
 </script>
 
 <svelte:window on:keydown={handleKeyboard} />
 
-<div class="search-bar desktop" class:focus>
+<div class="search-bar" class:focus>
   <div class="search-bar-input-wrapper">
     <SearchIcon style="fill: var(--color-foreground)" />
     <input
       type="text"
-      data-testid="searchbar"
       placeholder="Search addresses, accounts, streams..."
-      bind:this={desktopSearchElem}
+      bind:this={searchElem}
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
       on:focusout={handleSearchBlur}
       autocomplete="off"
     />
-    {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
+    {#if focus}<div transition:fly|local={{ duration: 300, y: 4 }}>
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
       </div>{/if}
   </div>
@@ -152,41 +135,11 @@
   {/if}
 </div>
 
-<div class="mobile">
-  {#if mobileSearchActive}
-    <div class="search-bar search-bar-overlay">
-      <div class="search-bar-input-wrapper">
-        <SearchIcon />
-        <input
-          autocomplete="off"
-          autocapitalize="off"
-          autocorrect="off"
-          bind:this={mobileSearchElem}
-          bind:value={searchTerm}
-          type="text"
-          placeholder="Search addresses, accounts, streams..."
-        />
-        {#if focus}
-          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
-        {/if}
-      </div>
-      {#if results.length > 0 && focus}
-        <div class="results">
-          <Results bind:resultElems {results} {loading} on:click={closeSearch} />
-        </div>
-      {/if}
-    </div>
-  {/if}
-  <div class="mobile-search-button">
-    <SearchIcon on:click={triggerSearch} />
-  </div>
-</div>
-
 {#if focus}<div
     class="overlay"
     on:click={closeSearch}
     on:keydown={closeSearch}
-    transition:fade={{ duration: 200, easing: sineInOut }}
+    transition:fade|local={{ duration: 200, easing: sineInOut }}
   />{/if}
 
 <style>
@@ -221,7 +174,7 @@
     width: 100%;
     border: 1px solid var(--color-foreground);
     transition: border 0.3s;
-    z-index: 2;
+    z-index: 100;
     position: relative;
     transition: border 0.3s, background-color 0.3s, box-shadow 0.3s;
   }
@@ -249,35 +202,6 @@
     z-index: 1;
   }
 
-  .search-bar-overlay {
-    height: 4rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--color-background);
-    z-index: 1;
-    padding: 0.5rem;
-  }
-
-  .mobile {
-    display: none;
-  }
-
-  .mobile .mobile-search-button {
-    height: 2rem;
-    width: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-foreground-level-1);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-  }
-
-  .mobile input {
-    display: none;
-  }
-
   .results {
     position: absolute;
     top: 4rem;
@@ -286,7 +210,7 @@
     display: flex;
     justify-content: center;
     z-index: 2;
-    max-height: calc(100vh - 5rem);
+    max-height: calc(100vh - 6rem);
     overflow: scroll;
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
@@ -296,27 +220,13 @@
   }
 
   @media (max-width: 768px) {
-    .mobile {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      z-index: 2;
+    .search-bar {
+      width: calc(100vw - 2rem);
+      left: 1rem;
     }
 
     .search-bar-input-wrapper {
       padding: 1rem;
-    }
-
-    .mobile input {
-      display: block;
-    }
-
-    .desktop {
-      display: none;
-    }
-
-    .desktop input {
-      display: none;
     }
 
     .overlay {
@@ -325,16 +235,13 @@
 
     .results {
       border: none;
-      padding: 0;
-    }
-
-    .search-bar {
-      border: none;
-    }
-
-    .results {
       box-shadow: none;
-      border: none;
+      padding: 0 0.5rem;
+      top: 3.5rem;
+      left: -1rem;
+      right: -1rem;
+      border-radius: 0;
+      min-height: 100vh;
     }
   }
 </style>

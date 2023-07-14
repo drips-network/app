@@ -1,17 +1,17 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import type { SvelteComponent } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import CrossSmall from 'radicle-design-system/icons/CrossSmall.svelte';
 
   export let id: string;
   export let title: string;
   export let description: string;
-  export let illustration: typeof SvelteComponent;
+  export let illustration: ComponentType;
   export let actions: {
     handler: () => void;
     label: string;
-    icon?: typeof SvelteComponent;
+    icon?: ComponentType;
     primary?: true;
   }[] = [];
 </script>

@@ -14,6 +14,8 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
+  const connected = writable(false);
+
   let provider: ethers.providers.BaseProvider | undefined;
 
   /**
@@ -23,6 +25,7 @@ export default (() => {
    */
   function connect(toProvider: BaseProvider) {
     provider = toProvider;
+    connected.set(true);
   }
 
   /**
@@ -89,6 +92,7 @@ export default (() => {
   return {
     subscribe: state.subscribe,
     connect,
+    connected: { subscribe: connected.subscribe },
     lookup,
     reverseLookup,
     clear,
