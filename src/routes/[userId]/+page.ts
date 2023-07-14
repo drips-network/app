@@ -1,5 +1,6 @@
-import { redirect, type Load } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
 
-export const load: Load = ({ params }) => {
-  throw redirect(308, `/app/${params.accountId}`);
+export const load: PageLoad = ({ params }) => {
+  throw redirect(308, `/app/${params.userId}`);
 };
