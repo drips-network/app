@@ -9,7 +9,7 @@
 
 <svelte:head>
   <title>{title}{title.startsWith('Drips') ? '' : ' | Drips'}</title>
-  <meta property="og:title" content="{title}{title === 'Drips' ? '' : ' | Drips'}" />
+  <meta property="og:title" content="{title}{title.startsWith('Drips') ? '' : ' | Drips'}" />
   <meta property="og:image" content="https://{$page.url.host}{image}" />
   <meta property="og:description" content={description} />
   <meta name="twitter:title" content="Drips" />
