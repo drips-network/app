@@ -24,7 +24,9 @@
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
   export let isReverse = false;
 
-  $: ensStore.lookup(address);
+  const ensConnected = ensStore.connected;
+
+  $: $ensConnected && ensStore.lookup(address);
   $: ens = $ensStore[address];
 
   $: blockyUrl =
