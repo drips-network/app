@@ -8,8 +8,13 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync

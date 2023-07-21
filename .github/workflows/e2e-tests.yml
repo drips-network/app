@@ -7,6 +7,11 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+    
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
 
       - name: Populate .env file
         uses: SpicyPizza/create-envfile@v1.3
