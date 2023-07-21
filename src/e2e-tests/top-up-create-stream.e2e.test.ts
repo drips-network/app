@@ -20,7 +20,7 @@ describe('top up, create stream, view profile, search', async () => {
     window.fetch = fetch as typeof window.fetch;
 
     server = await preview({ preview: { port: 3000, host: '0.0.0.0' } });
-    browser = await chromium.launch();
+    browser = await chromium.launch({ headless: false });
     page = await browser.newPage();
 
     page.on('console', (m) => console.log(m));
@@ -42,7 +42,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('opens up to streams tab', async () => {
       await page.goto('http://127.0.0.1:3000/app');
 
-      await expect(page.locator('text=Streams')).toHaveCount(2);
+      await expect(page).toHaveURL('http://127.0.0.1:3000/streams');
     });
 
     it('switches to the streams tab', async () => {
@@ -87,7 +87,7 @@ describe('top up, create stream, view profile, search', async () => {
 
       await page.type(
         'label:has-text("Token contract address*")',
-        '0x6BDE06d03AACb1359D4113c77E320B32C8Bd7837',
+        '0xefbF81372aBC3723463746a89CEb42080563684C',
       );
 
       await page.locator('button', { hasText: 'Add custom token' }).click();
@@ -95,15 +95,15 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('displays the custom mock erc-20 token', async () => {
-      const testcoin = page.locator('text=Test token');
+      const testcoin = page.locator('text=Testcoin');
       await testcoin.click();
 
-      const topUpButton = page.locator('text=Add Test token');
+      const topUpButton = page.locator('text=Add Testcoin');
       await topUpButton.click();
     });
 
     it('displays the amount step', async () => {
-      await page.fill('label:has-text("Amount")', '0.000000000000001');
+      await page.fill('label:has-text("Amount")', '50');
       await page.locator('data-testid=confirm-amount-button').click();
     });
 
@@ -126,13 +126,13 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('allows selecting the available outbound TEST balance', async () => {
-      await page.locator('.label:has-text("Test token")').click();
+      await page.locator('.label:has-text("Testcoin")').click();
     });
 
     it('allows submitting the create stream flow', async () => {
       await page.fill('label:has-text("Stream name*")', 'E2E Test Stream');
       await page.fill('label:has-text("Stream to*")', '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-      await page.fill('label:has-text("Stream rate*")', '0.00000000000000001');
+      await page.fill('label:has-text("Stream rate*")', '1');
 
       await page.locator('.modal button:has-text("Create stream")').click();
     });
@@ -156,7 +156,7 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('displays the incoming balance', async () => {
-      await expect(page.locator('text=Test token')).toHaveCount(1);
+      await expect(page.locator('text=Testcoin')).toHaveCount(1);
     });
   });
 
@@ -169,7 +169,7 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('displays the outgoing balance', async () => {
-      await expect(page.locator('text=Test token')).toHaveCount(1);
+      await expect(page.locator('text=Testcoin')).toHaveCount(1);
     });
 
     it('switches to another user', async () => {
@@ -189,7 +189,7 @@ describe('top up, create stream, view profile, search', async () => {
     });
 
     it('displays the incoming balance', async () => {
-      await expect(page.locator('text=Test token')).toHaveCount(1);
+      await expect(page.locator('text=Testcoin')).toHaveCount(1);
     });
   });
 
@@ -213,9 +213,9 @@ describe('top up, create stream, view profile, search', async () => {
       await page.locator('data-testid=search-button').click();
       await page.keyboard.type('Test');
 
-      await expect(
-        page.locator('.account-menu-item-wrapper', { hasText: 'Test token' }),
-      ).toHaveCount(1);
+      await expect(page.locator('.account-menu-item-wrapper', { hasText: 'Testcoin' })).toHaveCount(
+        1,
+      );
 
       await page.keyboard.press('Escape');
     });
@@ -373,7 +373,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('opens the collect flow', async () => {
       await page.goto('http://127.0.0.1:3000/app/streams');
 
-      await page.locator('text=Test token').click();
+      await page.locator('text=Testcoin').click();
       await page.locator('button', { hasText: 'Collect' }).click();
 
       await expect(page.locator('h1', { hasText: 'Collect TEST' })).toHaveCount(1);
@@ -399,7 +399,7 @@ describe('top up, create stream, view profile, search', async () => {
       await page.locator('button', { hasText: 'Got it' }).click();
     });
 
-    it('shows an incoming balance of zero for Test token after squeezing', async () => {
+    it('shows an incoming balance of zero for Testcoin after squeezing', async () => {
       await expect(page.locator('data-testid=incoming-balance')).toHaveText('0.00');
     });
   });
