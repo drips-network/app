@@ -15,7 +15,11 @@
 
   interface IncomingStreamInfo {
     name: string;
-    address: string;
+    from: {
+      address: string;
+      driver: 'address';
+      accountId: string;
+    };
     totalEarned: AmountCellData;
     amountPerSec: AmountCellData;
   }
@@ -23,7 +27,11 @@
   const defaultData: IncomingStreamInfo[] = [
     {
       name: 'Marketing Contributor',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      from: {
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        accountId: '1234',
+        driver: 'address',
+      },
       totalEarned: {
         amount: {
           amount: BigInt('1000000000000000000'),
@@ -39,7 +47,11 @@
     },
     {
       name: 'Windows support for Upstream',
-      address: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
+      from: {
+        address: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
+        accountId: '1235',
+        driver: 'address',
+      },
       totalEarned: {
         amount: {
           amount: BigInt('5000000000000000000'),
@@ -55,7 +67,11 @@
     },
     {
       name: 'RAD Contributor Vesting',
-      address: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
+      from: {
+        address: '0x71E686C1B95e8A1faA636Ea046b97eA985E248d0',
+        accountId: '1235',
+        driver: 'address',
+      },
       totalEarned: {
         amount: {
           amount: BigInt('3000000000000000000'),
@@ -78,7 +94,7 @@
       cell: (info) => info.getValue(),
     },
     {
-      accessorKey: 'address',
+      accessorKey: 'from',
       cell: () => IdentityBadgeCell,
       header: 'From',
       enableSorting: false,
