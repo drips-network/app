@@ -42,7 +42,7 @@ describe('top up, create stream, view profile, search', async () => {
     it('opens up to streams tab', async () => {
       await page.goto('http://127.0.0.1:3000/app');
 
-      await expect(page).toHaveURL('http://127.0.0.1:3000/streams');
+      await expect(page).toHaveURL('http://127.0.0.1:3000/app/streams');
     });
 
     it('switches to the streams tab', async () => {
