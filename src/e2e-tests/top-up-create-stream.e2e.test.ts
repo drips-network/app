@@ -20,7 +20,7 @@ describe('top up, create stream, view profile, search', async () => {
     window.fetch = fetch as typeof window.fetch;
 
     server = await preview({ preview: { port: 3000, host: '0.0.0.0' } });
-    browser = await chromium.launch({ headless: false });
+    browser = await chromium.launch();
     page = await browser.newPage();
 
     page.on('console', (m) => console.log(m));
