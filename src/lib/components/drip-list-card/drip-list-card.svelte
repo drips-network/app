@@ -23,6 +23,7 @@
   import StreamStateBadge from '../stream-state-badge/stream-state-badge.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import tokensStore from '$lib/stores/tokens/tokens.store';
+  import ShareButton from '../share-button/share-button.svelte';
 
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
@@ -74,6 +75,7 @@
   <div class="header">
     <h1>{dripList.name}</h1>
     <div class="actions">
+      <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
       {#if isOwnList}
         <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
       {/if}

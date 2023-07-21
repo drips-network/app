@@ -26,6 +26,7 @@
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import ShareButton from '$lib/components/share-button/share-button.svelte';
 
   // Button
   let disabled = false;
@@ -230,6 +231,10 @@
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <ShareButton url="https://wikipedia.com/" text="Check this out:" />
+</div>
 
 <div class="showcase-item">
   <h2>Visual Percentage Editor</h2>
