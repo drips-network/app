@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "@efstajas/svelte-stored-writable": "^0.2.0",
+    "@gelatonetwork/relay-sdk": "^4.0.0",
     "@octokit/rest": "^19.0.7",
     "@pinata/sdk": "^1.1.26",
     "@safe-global/safe-apps-provider": "^0.16.0",

@@ -27,8 +27,8 @@ const GOERLI_RPC_URL = 'https://goerli.infura.io/v3/f88a1229d473471bbf94d168401b
 const { SUPPORTED_CHAINS } = Utils.Network;
 // TODO: change this after development.
 const DEFAULT_NETWORK: Network = {
-  chainId: 1,
-  name: 'homestead',
+  chainId: 5,
+  name: 'goerli',
 };
 
 const injected = injectedWallets();

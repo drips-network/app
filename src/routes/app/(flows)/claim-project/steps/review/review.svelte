@@ -22,7 +22,6 @@
   } from '$lib/components/splits/splits.svelte';
   import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
@@ -102,30 +101,13 @@
     gitProjectService = await GitProjectService.new();
   });
 
-  async function requestOwnerUpdate() {
+  async function submit() {
     if ($context.isPartiallyClaimed) {
       dispatch('goForward', { by: 2 });
       return;
     }
 
-    transact(
-      dispatch,
-      makeTransactPayload({
-        before: async () => {
-          const requestOwnerUpdateTx = gitProjectService.buildRequestOwnerUpdateTx($context);
-
-          return { requestOwnerUpdateTx };
-        },
-        transactions: ({ requestOwnerUpdateTx }) => ({
-          transaction: () => requestOwnerUpdateTx,
-          waitingSignatureMessage: {
-            message: 'Waiting for you to confirm the transaction in your wallet…',
-            subtitle:
-              "The first transaction validates your project's FUNDING.json file on-chain. You'll need to send a second transaction after to finalize the claiming process.",
-          },
-        }),
-      }),
-    );
+    dispatch('goForward');
   }
 
   function customize() {
@@ -197,12 +179,6 @@
     </div>
   </FormField>
   <div class="whats-next">
-    <p>
-      {!$context.isPartiallyClaimed
-        ? "You'll need to send two transactions to claim your project. The first one validates your FUNDING.json file on-chain, and the second applies your split configuration."
-        : "You'll need to send one transaction to claim your project. The transaction will apply your splits configuration."}
-      Click "Confirm in Wallet" to get started.
-    </p>
     <div class="card">
       <h4>On transaction confirmation…</h4>
       <ul>
@@ -240,9 +216,7 @@
     >
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={requestOwnerUpdate}
-      >Confirm in wallet</Button
-    >
+    <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm in wallet</Button>
   </svelte:fragment>
 </StandaloneFlowStepLayout>
 
