@@ -39,16 +39,23 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const { forge, projectName, chainId } = payload;
 
-  assert(chainId === 5, 'Only Goerli is supported for now');
+  assert([5, 1].includes(chainId), 'Only Goerli and Sepolia are supported for now');
 
   const repoDriverAddress = getNetworkConfig(chainId)?.REPO_DRIVER ?? unreachable();
 
-  // TODO: Use our own provider
-  const contract = new ethers.Contract(
-    repoDriverAddress,
-    REPO_DRIVER_ABI,
-    ethers.getDefaultProvider({ chainId, name: 'goerli' }),
+  const provider = new ethers.providers.InfuraProvider(
+    {
+      chainId,
+      name:
+        {
+          5: 'goerli',
+          1: 'mainnet',
+        }[chainId] ?? unreachable(),
+    },
+    'f88a1229d473471bbf94d168401b9c93',
   );
+
+  const contract = new ethers.Contract(repoDriverAddress, REPO_DRIVER_ABI, provider);
 
   const tx = await contract.populateTransaction.requestUpdateOwner(
     forge,
