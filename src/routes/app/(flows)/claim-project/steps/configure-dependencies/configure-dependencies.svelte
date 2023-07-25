@@ -51,6 +51,8 @@
       console.log('💧 ~ Could not fetch project dependencies:', error);
     }
   }
+
+  $: countOfMaintainerSplits = $context.maintainerSplits.selected.length;
 </script>
 
 <StandaloneFlowStepLayout
@@ -63,7 +65,7 @@
       Object.keys($context.dependencySplits.items).length
       ? ' We’ve imported these projects from your package.json to give you a head start.'
       : ''
-    : ''} You can change this later anytime."
+    : ''} In total, you can add up to 200 maintainers and dependencies, and change this list later anytime."
 >
   <!-- TODO: Prevent splitting to the same project we're trying to claim. -->
   <ListEditor
@@ -71,6 +73,7 @@
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
+    maxItems={200 - countOfMaintainerSplits}
   />
   <svelte:fragment slot="left-actions">
     <Button

@@ -20,19 +20,22 @@
   });
 
   let formValid: boolean;
+
+  $: countOfDependencySplits = $context.dependencySplits.selected.length;
 </script>
 
 <StandaloneFlowStepLayout
   headline="Split to your maintainers"
   description="Decide how you want to divide the {$context.highLevelPercentages[
     'maintainers'
-  ]}% split to your project’s maintainers. You can change this later anytime."
+  ]}% split to your project’s maintainers. In total, you can add up to 200 maintainers and dependencies, and change this list later anytime."
 >
   <ListEditor
     bind:selected={$context.maintainerSplits.selected}
     bind:percentages={$context.maintainerSplits.percentages}
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
+    maxItems={200 - countOfDependencySplits}
     allowedItems="eth-addresses"
   />
   <svelte:fragment slot="left-actions">

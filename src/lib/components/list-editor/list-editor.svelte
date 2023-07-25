@@ -55,7 +55,7 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
 
-  export let max_items = 200;
+  export let maxItems = 200;
 
   export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
   export let percentages: Percentages = {};
@@ -94,7 +94,7 @@
       if (selected.indexOf(id) === -1) {
         items[id] = projectItem(gitProject);
 
-        if (selected.length < max_items) selected.push(id);
+        if (selected.length < maxItems) selected.push(id);
         percentages = { ...percentages, [id]: 0 };
 
         await tick();
@@ -131,7 +131,7 @@
 
       items[address] = ethAddressItem(address);
 
-      if (selected.length < max_items) selected.push(address);
+      if (selected.length < maxItems) selected.push(address);
       percentages = { ...percentages, [address]: 0 };
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -254,6 +254,7 @@
         multiselect
         {items}
         showEmptyState={false}
+        maxSelected={maxItems}
       />
     </div>
   {/if}
