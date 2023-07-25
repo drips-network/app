@@ -62,6 +62,11 @@
   export let blockInteraction = false;
   export let addOnMount: string | undefined = undefined;
 
+  /**
+   * Pass an array of keys for items which the user will not be able to add to the list.
+   */
+  export let blockedKeys: string[] = [];
+
   $: selectedPercentages = Object.fromEntries(
     Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
   );
@@ -90,6 +95,8 @@
       let gitProject = await gitProjectService.getByUrl(inputValue);
 
       const id = gitProject.source.url;
+      if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
+
       // Prevent duplicates.
       if (selected.indexOf(id) === -1) {
         items[id] = projectItem(gitProject);
@@ -123,6 +130,8 @@
         ? getAddress(inputValue)
         : await ensStore.reverseLookup(inputValue);
       assert(address);
+
+      if (blockedKeys.includes(address)) throw new Error('This address is already used');
 
       if (items[address]) {
         isAddingProject = false;

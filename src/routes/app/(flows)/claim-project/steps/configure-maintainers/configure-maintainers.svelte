@@ -37,6 +37,7 @@
     bind:valid={formValid}
     maxItems={200 - countOfDependencySplits}
     allowedItems="eth-addresses"
+    blockedKeys={$context.dependencySplits.selected}
   />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>
