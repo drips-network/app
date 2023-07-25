@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const tx = await contract.populateTransaction.requestUpdateOwner(
     forge,
-    utils.toUtf8Bytes(projectName),
+    ethers.utils.hexlify(utils.toUtf8Bytes(projectName)),
   );
 
   const relayRequest: SponsoredCallRequest = {
