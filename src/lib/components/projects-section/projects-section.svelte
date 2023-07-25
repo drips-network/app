@@ -58,7 +58,9 @@
     {error}
     emptyStateEmoji="🫙"
     emptyStateHeadline="No claimed projects"
-    emptyStateText="If you develop an open-source project, click &quot;Claim project&quot; to get started."
+    emptyStateText={isSelf
+      ? 'If you develop an open-source project, click "Claim project" to get started.'
+      : "This user hasn't claimed any software projects yet."}
   >
     {#if projects}
       <div class="projects">
