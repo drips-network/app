@@ -54,6 +54,7 @@
   import assert from '$lib/utils/assert';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
+  import { verifyRepoExists } from '$lib/utils/github/github';
 
   export let max_items = 200;
 
@@ -86,6 +87,12 @@
 
     try {
       isAddingProject = true;
+
+      const { username, repoName } = GitProjectService.deconstructUrl(inputValue);
+
+      // TODO: This only supports GitHub forge
+      const repoExists = await verifyRepoExists(username, repoName);
+      if (!repoExists) throw new Error("This project doesn't exist");
 
       let gitProject = await gitProjectService.getByUrl(inputValue);
 
