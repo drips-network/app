@@ -146,8 +146,8 @@
       },
     ];
   }
-  $: isMyBalances = accountId === $wallet.dripsAccountId;
-  $: tableColumns = buildTableColumns(isMyBalances);
+  $: isSelf = accountId === $wallet.dripsAccountId;
+  $: tableColumns = buildTableColumns(isSelf);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let options: TableOptions<any>;
@@ -195,12 +195,14 @@
     <SectionSkeleton
       emptyStateHeadline="No tokens"
       emptyStateEmoji="🫗"
-      emptyStateText="This is where any tokens balances you stream or earned show up."
+      emptyStateText={isSelf
+        ? 'Top up any ERC-20 token to stream it to your Drip List or any Ethereum address.'
+        : "This user hasn't yet topped-up or received any funds."}
       {loaded}
       {error}
       empty={tableData.length === 0}
     >
-      <Table {options} isRowClickable={isMyBalances} on:rowClick={onRowClick} />
+      <Table {options} isRowClickable={isSelf} on:rowClick={onRowClick} />
     </SectionSkeleton>
   </div>
 </div>

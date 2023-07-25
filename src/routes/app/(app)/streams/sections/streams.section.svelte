@@ -24,6 +24,7 @@
   import onClickGoto from '$lib/utils/on-click-goto';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let accountId: string | undefined;
   export let disableActions = true;
@@ -270,6 +271,8 @@
       event.detail.event,
     );
   }
+
+  $: isSelf = accountId === $walletStore.dripsAccountId;
 </script>
 
 <div class="section">
@@ -292,7 +295,9 @@
       horizontalScroll
       emptyStateEmoji="🫙"
       emptyStateHeadline="No streams"
-      emptyStateText="This is where incoming and outgoing streams for your account will appear."
+      emptyStateText={isSelf
+        ? 'Create a stream to send any ERC-20 to any Ethereum address.'
+        : "This user isn't yet streaming any funds."}
       {loaded}
       {error}
       {empty}

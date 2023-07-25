@@ -67,8 +67,10 @@
     empty={dripLists && dripLists.length === 0}
     {error}
     emptyStateEmoji="🫗"
-    emptyStateHeadline="You don't have a Drip List"
-    emptyStateText="Create your Drip List to start supporting your dependencies"
+    emptyStateHeadline={isSelf ? "You don't have a Drip List" : 'No Drip List'}
+    emptyStateText={isSelf
+      ? 'Create your Drip List to start supporting your dependencies'
+      : 'Drip Lists enable supporting a set of open-source projects.'}
   >
     {#if dripLists && representationalSplits}
       <DripListCard {representationalSplits} dripList={dripLists[0]} />
