@@ -27,6 +27,7 @@
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
+    blockedKeys={$context.maintainerSplits.selected}
   />
   <svelte:fragment slot="actions">
     <Button
