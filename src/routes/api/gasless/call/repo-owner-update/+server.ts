@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request }) => {
       name:
         {
           5: 'goerli',
-          1: 'mainnet',
+          1: 'homestead',
         }[chainId] ?? unreachable(),
     },
     'f88a1229d473471bbf94d168401b9c93',
