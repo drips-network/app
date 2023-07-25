@@ -14,6 +14,8 @@
   export let context: Writable<State>;
 
   let formValid: boolean;
+
+  $: countOfMaintainerSplits = $context.maintainerSplits.selected.length;
 </script>
 
 <StepLayout>
@@ -27,6 +29,7 @@
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
+    maxItems={200 - countOfMaintainerSplits}
   />
   <svelte:fragment slot="actions">
     <Button
