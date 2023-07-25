@@ -79,8 +79,6 @@
   let gitProjectService: GitProjectService;
 
   async function addProject() {
-    // TODO: This needs to fail if the project doesn't exist on GitHub
-
     if (!gitProjectService) gitProjectService = await GitProjectService.new();
 
     if (allowedItems === 'eth-addresses') return;
