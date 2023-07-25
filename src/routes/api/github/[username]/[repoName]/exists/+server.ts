@@ -1,6 +1,6 @@
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import { error } from '@sveltejs/kit';
-import type { RequestHandler } from '../$types';
+import type { RequestHandler } from './$types';
 import siteExists from '$lib/utils/site-exists';
 
 export const GET: RequestHandler = async ({ params }) => {
