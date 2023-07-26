@@ -12,10 +12,24 @@
 
   import { onMount } from 'svelte';
   import scroll from '$lib/stores/scroll';
+  import { afterNavigate, beforeNavigate } from '$app/navigation';
 
   onMount(() => {
     scroll.attach();
     return scroll.detach;
+  });
+
+  /*
+  Smoothscroll class adds global smooth scrolling, but we don't want it 
+  while navigating, because that's nauseating.
+  */
+
+  beforeNavigate(() => {
+    document.documentElement.classList.remove('smoothscroll');
+  });
+
+  afterNavigate(() => {
+    document.documentElement.classList.add('smoothscroll');
   });
 </script>
 
