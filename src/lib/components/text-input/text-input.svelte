@@ -145,6 +145,8 @@
   }
 
   input {
+    -webkit-appearance: none;
+    appearance: none;
     background-color: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
