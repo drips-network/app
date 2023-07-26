@@ -8,7 +8,8 @@
   import 'radicle-design-system/static/typography.css';
   import '../styles/app.css';
 
-  import themeStore from '$lib/stores/theme/theme.store';
+  import '$lib/stores/theme/theme.store';
+
   import { onMount } from 'svelte';
   import scroll from '$lib/stores/scroll';
 
@@ -16,12 +17,10 @@
     scroll.attach();
     return scroll.detach;
   });
-
-  const { primaryColor } = themeStore;
 </script>
 
-<div class="main" data-uifont="inter" data-theme={$themeStore.currentTheme}>
-  <main class="page" data-primary-color={$primaryColor}>
+<div class="main" data-uifont="inter">
+  <main class="page">
     <slot />
   </main>
 </div>

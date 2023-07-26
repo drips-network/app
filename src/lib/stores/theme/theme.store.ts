@@ -81,6 +81,14 @@ export default (() => {
     systemTheme.set(prefersDarkMode ? 'dark' : 'light');
   }
 
+  currentThemeState.subscribe((state) => {
+    if (browser) document.documentElement.setAttribute('data-theme', state.currentTheme);
+  });
+
+  storedPrimaryColor.subscribe((state) => {
+    if (browser) document.documentElement.setAttribute('data-primary-color', state);
+  });
+
   return {
     subscribe: currentThemeState.subscribe,
     primaryColor: {

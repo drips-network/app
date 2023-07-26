@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      (function() {
+        try {
+          const themePreference = localStorage.getItem('theme')?.replaceAll('"', '');
+
+          if (!themePreference || themePreference === 'auto') {
+            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const theme = darkQuery.matches ? 'dark' : 'light';
+
+            document.documentElement.setAttribute('data-theme', theme);
+          } else {
+            const theme = themePreference || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+          }
+
+          const colorPreference = localStorage.getItem('primary-color').replaceAll('"', '');
+          
+          if (colorPreference) document.documentElement.setAttribute('data-primary-color', colorPreference);
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="utf-8" />
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
