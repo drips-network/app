@@ -32,7 +32,7 @@ export default (() => {
   const storedPrimaryColor = storedWritable(
     'primary-color',
     storedPrimaryColorSchema,
-    'blue',
+    'default',
     !browser,
   );
   const storedThemePreference = storedWritable('theme', storedThemeSchema, 'auto', !browser);
