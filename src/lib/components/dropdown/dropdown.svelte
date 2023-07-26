@@ -170,16 +170,17 @@
   }
 
   .dropdown {
-    height: 2.5rem;
+    height: 3rem;
     padding: 0.5rem 2.5rem 0.5rem 0.75rem;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
-    border-radius: 1.25rem 0 1.25rem 1.25rem;
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     transition: border-radius 0.2s, box-shadow 0.3s, background-color 0.3s;
     cursor: pointer;
     outline: none;
     cursor: pointer;
     user-select: none;
     display: flex;
+    align-items: center;
     gap: 0.25rem;
   }
 
@@ -213,7 +214,7 @@
   }
 
   .dropdown.expanded {
-    border-radius: 1.25rem 0 0.25rem 0.25rem;
+    border-radius: 1.5rem 0 0.25rem 0.25rem;
   }
 
   .dropdown:hover,
@@ -232,7 +233,7 @@
 
   .chevron {
     position: absolute;
-    top: 0.5rem;
+    top: 0.75rem;
     right: 0.5rem;
     transition: transform 0.3s;
     pointer-events: none;
@@ -244,9 +245,9 @@
 
   .options {
     border: 1px solid var(--color-foreground);
-    border-radius: 1.25rem;
+    border-radius: 1.5rem;
     position: absolute;
-    top: 3rem;
+    top: 3.5rem;
     background-color: var(--color-background);
     z-index: 10;
     display: flex;
