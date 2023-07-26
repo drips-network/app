@@ -103,16 +103,16 @@
 
         if (selected.length < maxItems) selected.push(id);
         percentages = { ...percentages, [id]: 0 };
-
-        await tick();
-
-        listElem.scroll({
-          top: listElem.scrollHeight,
-        });
-
-        // It doesn't work without setTimeout for some reason 🤷‍♂️
-        setTimeout(() => inputElem.focus(), 0);
       }
+
+      await tick();
+
+      listElem.scroll({
+        top: listElem.scrollHeight,
+      });
+
+      // It doesn't work without setTimeout for some reason 🤷‍♂️
+      setTimeout(() => inputElem.focus(), 0);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -142,6 +142,9 @@
 
       if (selected.length < maxItems) selected.push(address);
       percentages = { ...percentages, [address]: 0 };
+
+      // It doesn't work without setTimeout for some reason 🤷‍♂️
+      setTimeout(() => inputElem.focus(), 0);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
