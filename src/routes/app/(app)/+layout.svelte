@@ -60,7 +60,7 @@
           bottom: [
             {
               label: 'Help',
-              href: 'https://docs.drips.network/docs/streaming-and-splitting/getting-started',
+              href: 'https://docs.drips.network/',
               icon: InfoCircle,
               external: true,
             },
