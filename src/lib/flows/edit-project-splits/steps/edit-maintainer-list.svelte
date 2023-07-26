@@ -23,6 +23,8 @@
       dispatch('goForward');
     }
   }
+
+  $: countOfDependencySplits = $context.dependencySplits.selected.length;
 </script>
 
 <StepLayout>
@@ -39,6 +41,7 @@
     bind:valid={formValid}
     allowedItems="eth-addresses"
     blockedKeys={$context.dependencySplits.selected}
+    maxItems={200 - countOfDependencySplits}
   />
   <svelte:fragment slot="actions">
     <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={nextStep}
