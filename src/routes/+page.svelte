@@ -710,6 +710,7 @@
 
   .token-streams-visuals .token-streams-visual .token {
     display: flex;
+    flex-shrink: 0;
     gap: 0.5rem;
     align-items: center;
   }
