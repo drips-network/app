@@ -47,7 +47,11 @@
               class="radio"
             />
             <label class="emoji-label" for={e.unicode}
-              >{@html twemoji.parse(e.unicode, { folder: 'svg', ext: '.svg' })}</label
+              >{@html twemoji.parse(e.unicode, {
+                folder: 'svg',
+                ext: '.svg',
+                attributes: () => ({ loading: 'lazy' }),
+              })}</label
             >
           </div>
         {/each}
