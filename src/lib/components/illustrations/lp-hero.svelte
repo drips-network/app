@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
 
   interface Drip {
-    millis: number;
+    startTimestamp: number;
     pathIndex: number;
     x: number | undefined;
     y: number | undefined;
@@ -13,11 +13,16 @@
 
   let currentDrips: Drip[] = [];
 
-  function animate() {
-    // If there's less than 3 current drips, add a new one
-    if (currentDrips.length < 20) {
+  let start: number | undefined = undefined;
+
+  function animate(timestamp: number) {
+    if (!start) {
+      start = timestamp;
+    }
+
+    if (currentDrips.length < 5) {
       currentDrips.push({
-        millis: new Date().getTime(),
+        startTimestamp: timestamp,
         pathIndex: Math.floor(Math.random() * paths.length),
         x: undefined,
         y: undefined,
@@ -39,12 +44,8 @@
         const pathLength = path.getTotalLength();
         const speed = 0.2; // pixels per millisecond
         const duration = pathLength / speed;
-        let time = new Date().getTime() - drip.millis;
+        let time = timestamp - drip.startTimestamp;
         const distance = speed * time;
-
-        // Apply easing function to time
-        const easing = (t: number) => t * t;
-        time = easing(time / duration) * duration;
 
         let dripScale = 0;
         if (time < duration / 4) {
@@ -79,7 +80,7 @@
     requestAnimationFrame(animate);
   }
 
-  onMount(animate);
+  onMount(() => requestAnimationFrame(animate));
 </script>
 
 <svg
