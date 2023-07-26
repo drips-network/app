@@ -5,19 +5,15 @@
 | 🏗️ This app is under active development, and currently available in beta at [drips.network](https://drips.network/). |
 | -------------------------------------------------------------------------------------------------------------------- |
 
-Drips 💧 is an Ethereum protocol for streaming and splitting tokens. It allows users and web3 apps to stream and split funds by the second, enabling continuous settlement for use cases like contributor payments, vesting and subscription memberships.
+Drips 💧 is a new protocol (and app), built on Ethereum, that enables organizations and individuals to directly and publicly provide funding to the free and open source software projects they depend on the most.
 
-This app enables user-friendly, simple management of token streams on the Drips network. Users can deposit any ERC-20 token to their Drips account, stream tokens to any Ethereum address, withdraw tokens earned from incoming streams, or split their incoming tokens with any Ethereum address.
+Drips also includes gas-optimized and integrated primitives for streaming and splitting tokens, allowing users and web3 apps to stream and split funds by the second with continuous settlement for use cases like contributor payments, vesting and subscription memberships.
 
-As we get closer to release, we will share further documentation on the app's features.
+This app enables user-friendly, simple management of a Drip List for funding up to 200 open-source software projects at a time with a single continuous stream of any ERC-20 token. For project maintainers, it enables a user-friendly project claim flow. Additionally, users can set up and manage any number of arbitrary streams of any ERC-20 to any Ethereum address .
 
-## 💦 Getting started on Goerli Testnet
+## 💦 Development
 
-You can either run the app locally by following the steps provided in the [Development Guide](/docs/DEVELOPMENT.md), or simply access the latest main deployment at [drips.network](https://drips.network/).
-
-Click "App" in the top-right corner and connect your wallet to access your personal dashboard.
-
-In order to top-up Goerli funds, you can use a Goerli faucet (we like [this one](https://goerli-faucet.pk910.de/)) to get some Goerli ETH, and then swap for Goerli WETH or UNI on Uniswap (make sure your wallet is connected to Goerli). After that’s done, you should be able to top up WETH or UNI within the Drips app, and test all features.
+Find instructions for running the app & tests locally in the [Development Guide](/docs/DEVELOPMENT.md).
 
 ## 📝 Submitting feedback
 

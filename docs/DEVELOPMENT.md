@@ -27,9 +27,13 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
+## ⛓️ Default Chain
+
+Currently, the app fetches project- and Drip List data server-side when visiting the project or Drip List detail routes. Because we don't yet have a mechanism for communicating the client's current chain to the server, it will always fetch from the `DEFAULT_NETWORK` specified at the top of `wallet.store.ts`. During development, you may want to temporarily change the default network to the testnet you're connected to in order to ensure that any server-initiated Subgraph queries fetch data for the expected chain.
+
 ## 🌳 Environment
 
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. You'll need access credentials for Pinata and Tenderly.
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. You'll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects.
 
 ## 🧪 Tests
 
