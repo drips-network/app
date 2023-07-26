@@ -92,7 +92,7 @@
     align-items: center;
     height: 100%;
     width: 100%;
-    justify-content: space-between;
+    justify-content: space-around;
     max-width: 512px;
     margin: 0 auto;
     position: relative;
