@@ -98,7 +98,9 @@
           <div class="claim-input">
             <TextInput bind:value={claimProjectInput} placeholder="GitHub repository URL" />
             <a
-              href={buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })}
+              href={canSubmitProjectClaim
+                ? buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })
+                : undefined}
               target="_blank"
               ><Button variant="primary" size="large" disabled={!canSubmitProjectClaim}
                 >Claim project</Button
