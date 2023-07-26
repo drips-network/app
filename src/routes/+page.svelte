@@ -25,6 +25,7 @@
   import buildUrl from '$lib/utils/build-url';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
+  import RadworksLogo from '$lib/components/illustrations/radworks-logo.svelte';
 
   onMount(() => {
     // When launching within a Safe, we don't want to display the landing page.
@@ -345,7 +346,7 @@
 
   <div class="section-spacer" />
 
-  <section class="">
+  <section>
     <div class="flex flex-col gap-4 items-center">
       <div class="legal-links typo-text-small">
         <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
@@ -354,6 +355,20 @@
         <a href="/legal/access">Access</a>
       </div>
     </div>
+  </section>
+
+  <div class="section-spacer" />
+
+  <section class="credits">
+    <span>Supported by</span>
+    <a
+      href="https://radworks.org/"
+      target="_blank"
+      style:height="1.5rem"
+      style:display="inline-block"
+    >
+      <RadworksLogo />
+    </a>
   </section>
 
   <div class="section-spacer" />
@@ -713,6 +728,19 @@
     gap: 1rem;
     align-items: center;
     padding: 0 2rem;
+  }
+
+  /* CREDITS */
+
+  .credits {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .credits > span {
+    color: var(--color-foreground-level-5);
   }
 
   /* HOW IT WORKS */
