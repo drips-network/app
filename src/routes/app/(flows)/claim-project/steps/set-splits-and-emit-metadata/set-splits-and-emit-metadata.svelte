@@ -24,19 +24,15 @@
         },
         messages: {
           duringBefore: {
-            message: $context.isPartiallyClaimed
-              ? 'Preparing...'
-              : 'Preparing the second transaction…',
+            message: 'Preparing to claim project...',
           },
         },
         transactions: ({ callerClient, setSplitsAndEmitMetadataBatch }) => ({
           transaction: () => callerClient.callBatched(setSplitsAndEmitMetadataBatch),
           waitingSignatureMessage: {
-            message: $context.isPartiallyClaimed
-              ? 'Waiting for you to confirm the transaction in your wallet…'
-              : 'Waiting for you to confirm the second transaction in your wallet… ',
+            message: 'Waiting for you to confirm the transaction in your wallet…',
             subtitle:
-              "This second transaction applies your project's splits and concludes the claiming process.",
+              "This transaction applies your project's splits, sets metadata, and concludes the claiming process.",
           },
         }),
       }),

@@ -13,6 +13,7 @@
   import SupportStreamEditor from '$lib/components/support-stream-editor/support-stream-editor.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -60,6 +61,11 @@
           Sorry, but you can currently only create a single Drip List. You can edit your existing
           Drip List's entries and support stream on your dashboard.
         </AnnotationBox>
+      </div>
+    {/if}
+    {#if Boolean($walletStore.safe)}
+      <div style:margin-top="16px">
+        <SafeAppDisclaimer disclaimerType="drips" />
       </div>
     {/if}
   </FormField>

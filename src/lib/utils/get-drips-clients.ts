@@ -192,8 +192,9 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
  * Get the networkConfig for the current network.
  * @returns The networkConfig for the current network.
  */
-export function getNetworkConfig() {
-  const { network } = get(wallet);
+export function getNetworkConfig(chainId = get(wallet).network.chainId): NetworkConfig {
+  const config = networkConfigs[chainId];
+  assert(config, `No network config found for chainId ${chainId}`);
 
-  return networkConfigs[network.chainId];
+  return config;
 }

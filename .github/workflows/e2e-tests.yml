@@ -21,6 +21,7 @@ jobs:
           envkey_TENDERLY_ACCESS_SECRET: ${{ secrets.TENDERLY_ACCESS_SECRET }}
           envkey_TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
           envkey_TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
+          envkey_GELATO_API_KEY: ${{ secrets.GELATO_API_KEY }}
 
       - name: Install dependencies
         run: npm ci

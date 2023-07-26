@@ -27,51 +27,66 @@
 
   function verify() {
     dispatch('await', {
-      promise: () =>
-        new Promise<void>((resolve, reject) => {
-          const { address } = $walletStore;
-          assert(address);
+      promise: async () => {
+        const { address } = $walletStore;
+        assert(address);
 
-          const addressInMaintainers = $context.maintainerSplits.items[address];
-          const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
+        const addressInMaintainers = $context.maintainerSplits.items[address];
+        const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
 
-          if (!addressInMaintainers && maintainersListEmpty) {
-            $context.maintainerSplits.items = {
-              [address]: ethAddressItem(address),
-            };
+        if (!addressInMaintainers && maintainersListEmpty) {
+          $context.maintainerSplits.items = {
+            [address]: ethAddressItem(address),
+          };
 
-            $context.maintainerSplits.selected = [address];
+          $context.maintainerSplits.selected = [address];
 
-            $context.maintainerSplits.percentages = {
-              [address]: 100,
-            };
-          }
+          $context.maintainerSplits.percentages = {
+            [address]: 100,
+          };
+        }
 
-          try {
-            const { username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+        const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
 
-            resolve(
-              github
-                .getFundingJson(
-                  username,
-                  repoName,
-                  dripsJsonTemplate(
-                    $walletStore.address ?? unreachable(),
-                    $walletStore.network.name
-                      ? $walletStore.network.name === 'homestead'
-                        ? 'ethereum'
-                        : $walletStore.network.name
-                      : unreachable(),
-                  ),
-                )
-                .then(() => {
-                  $context.linkedToRepo = true;
-                }),
-            );
-          } catch (error) {
-            reject('FUNDING.json not found.');
-          }
-        }),
+        try {
+          await github.getFundingJson(
+            username,
+            repoName,
+            dripsJsonTemplate(
+              $walletStore.address ?? unreachable(),
+              $walletStore.network.name
+                ? $walletStore.network.name === 'homestead'
+                  ? 'ethereum'
+                  : $walletStore.network.name
+                : unreachable(),
+            ),
+          );
+
+          $context.linkedToRepo = true;
+        } catch (error) {
+          throw new Error('FUNDING.json not found.');
+        }
+
+        try {
+          // Kick off repo owner update using gasless TX
+
+          await fetch('/api/gasless/call/repo-owner-update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              forge,
+              projectName: `${username}/${repoName}`,
+              chainId: $walletStore.network.chainId,
+            }),
+          });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+          throw new Error('Failed to gasless-call repo-owner-update');
+        }
+      },
       message: 'Verifying...',
       subtitle:
         'We’re scanning your git project’s main branch for a FUNDING.json file with your Ethereum address.',
