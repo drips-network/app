@@ -176,6 +176,12 @@
     justify-content: space-between;
   }
 
+  .card > .header > .actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .totals {
     display: flex;
     align-items: center;
