@@ -776,7 +776,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 1rem 0 1rem 1rem;
-    color: var(--color-primary);
+    color: var(--color-primary-level-6);
   }
 
   @media (max-width: 819px) {
