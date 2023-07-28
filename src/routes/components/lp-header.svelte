@@ -26,7 +26,9 @@
     <a href="https://docs.drips.network/docs/whats-a-drip.html" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Docs</Button></a
     >
-    <a class="cta" href="/app"><Button variant="primary">Open app</Button></a>
+    <a class="cta" href="/app" data-sveltekit-preload-code="eager"
+      ><Button variant="primary">Open app</Button></a
+    >
   </nav>
 </header>
 
