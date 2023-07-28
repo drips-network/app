@@ -44,15 +44,15 @@
     class:copy-success={copySuccess}
   >
     {#if copySuccess}
-      <div transition:fade|local={{ duration: 200 }}>
+      <div transition:fade={{ duration: 200 }}>
         <CheckCircle style="fill: var(--color-positive)" />
       </div>
     {:else if hovering}
-      <div transition:fade|local={{ duration: 200 }}>
+      <div transition:fade={{ duration: 200 }}>
         <CopyIcon style="fill: var(--color-primary-level-6)" />
       </div>
     {:else}
-      <div transition:fade|local={{ duration: 200 }}><LinkIcon /></div>
+      <div transition:fade={{ duration: 200 }}><LinkIcon /></div>
     {/if}
   </button>
 {/if}

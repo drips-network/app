@@ -9,7 +9,7 @@
   export let maxItems = 4;
 
   export let components: {
-    component: typeof SvelteComponent;
+    component: typeof SvelteComponent<any>;
     props: Record<string, unknown>;
   }[];
   $: displayedComponents = components.slice(0, maxItems);
@@ -25,13 +25,13 @@
     {#if !transitionedOut}
       <div
         class="item"
-        out:fly|local={{
+        out:fly={{
           y: 16,
           duration: 200,
           delay: getTransitionDelay(components.indexOf(component), 'out'),
           easing: sineIn,
         }}
-        in:fly|local={{
+        in:fly={{
           y: 16,
           duration: 200,
           delay: getTransitionDelay(components.indexOf(component), 'in'),
@@ -45,13 +45,13 @@
   {#if overflowAmount > 0 && !transitionedOut}
     <div
       class="overflow typo-text-small-bold"
-      out:fly|local={{
+      out:fly={{
         y: 16,
         duration: 200,
         delay: getTransitionDelay(components.length - 1, 'out'),
         easing: sineIn,
       }}
-      in:fly|local={{
+      in:fly={{
         y: 16,
         duration: 200,
         delay: getTransitionDelay(components.length - 1, 'in'),

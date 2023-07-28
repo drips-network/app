@@ -77,7 +77,7 @@
 
 <div class="become-supporter-card">
   {#if dripList === undefined || loadingModal}
-    <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
+    <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
   {/if}

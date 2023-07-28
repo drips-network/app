@@ -29,7 +29,7 @@
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
     <div
       class="overlay"
-      transition:fade|local={{ duration: 200 }}
+      transition:fade={{ duration: 200 }}
       on:click={clickOutside}
       on:keydown={clickOutside}
     />
@@ -47,7 +47,7 @@
           {#if store.hideable}
             <div class="close-button-wrapper">
               <button
-                transition:fly|local={{ duration: 200, y: -4, x: 4 }}
+                transition:fly={{ duration: 200, y: -4, x: 4 }}
                 class="close-button"
                 on:click={modal.hide}
               >

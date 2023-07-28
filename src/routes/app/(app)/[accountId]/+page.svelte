@@ -174,7 +174,7 @@
     <Streams accountId={dripsAccountId} />
     <TransitionedHeight>
       {#if address && !$dismissablesStore.includes('profile-drips-v1')}
-        <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
+        <div class="drips-v1-banner" out:fly={{ duration: 300, y: 16 }}>
           <Banner
             title="Looking for the old Drips?"
             description="You can still access the previous Drips app at app.v1.drips.network."

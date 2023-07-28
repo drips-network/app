@@ -79,7 +79,7 @@
       <div class="edu-card-wrapper">
         <TransitionedHeight>
           {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
-            <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
+            <div transition:fade={{ duration: 300 }} class="splitting-graph-edu card">
               <div class="illustration">
                 <SplittingGraph />
               </div>

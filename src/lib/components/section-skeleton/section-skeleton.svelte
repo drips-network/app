@@ -120,7 +120,7 @@
     {/if}
   {:else}
     <div
-      out:fade|local={{ duration: 250 }}
+      out:fade={{ duration: 250 }}
       style:position={placeholderContainerPosition}
       class="placeholder-container"
       style:height={`${$containerHeight}px`}

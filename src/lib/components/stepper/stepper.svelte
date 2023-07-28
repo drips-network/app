@@ -225,8 +225,8 @@
 >
   {#key `${awaiting}${awaitError}${currentStepIndex}`}
     <div
-      in:fly|local={(() => getTransition('in'))()}
-      out:fly|local={(() => getTransition('out'))()}
+      in:fly={(() => getTransition('in'))()}
+      out:fly={(() => getTransition('out'))()}
       on:outrostart={() => setTransitioning(true)}
       on:introend={() => setTransitioning(false)}
       class="step-container"
