@@ -3,6 +3,7 @@
 
   export let title = 'Drips';
   export let image = '/assets/social-share.png';
+  export let twitterImage = '/assets/social-share-twitter.png';
   export let description =
     'A Web3 toolkit that enables FOSS developers to raise funds, without any platform fees.';
 </script>
@@ -14,7 +15,7 @@
   <meta property="og:description" content={description} />
   <meta name="twitter:title" content="Drips" />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content="https://{$page.url.host}{image}" />
+  <meta name="twitter:image" content="https://{$page.url.host}{twitterImage}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@dripsnetwork" />
 </svelte:head>
