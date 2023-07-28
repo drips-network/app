@@ -63,7 +63,12 @@
       modal.show(
         Stepper,
         undefined,
-        editDripListSteps(dripList.account.accountId, representationalSplits, project),
+        editDripListSteps(
+          dripList.account.accountId,
+          dripList.name,
+          representationalSplits,
+          project,
+        ),
       );
       loadingModal = false;
     }
