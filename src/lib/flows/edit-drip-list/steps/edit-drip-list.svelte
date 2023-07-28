@@ -21,12 +21,15 @@
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { Utils } from 'radicle-drips';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let dripListId: string;
   export let representationalSplits: Splits;
   export let projectToAdd: GitProject | undefined = undefined;
+  export let listName: string;
 
   // TODO: Ensure these values are saved in case there's some TX error.
 
@@ -112,6 +115,7 @@
   }
 
   let listValid = false;
+  $: nameValid = listName.length > 0;
 
   // TODO: Auto-refresh UI when splits change
   function submit() {
@@ -139,6 +143,7 @@
 
           const newMetadata: z.infer<typeof nftDriverAccountMetadataSchema> = {
             ...currentMetadata.data,
+            name: listName,
             projects: projectsSplitMetadata,
           };
 
@@ -171,10 +176,15 @@
     headline="Edit your Drip List"
     description="Choose which GitHub projects and Ethereum addresses you'd like to support with this Drip List."
   />
-  <ListEditor bind:items bind:percentages bind:selected bind:valid={listValid} />
+  <FormField title="Drip List Name*">
+    <TextInput bind:value={listName} />
+  </FormField>
+  <FormField title="Recipients*">
+    <ListEditor bind:items bind:percentages bind:selected bind:valid={listValid} />
+  </FormField>
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide}>Cancel</Button>
-    <Button on:click={submit} disabled={!listValid} icon={Wallet} variant="primary"
+    <Button on:click={submit} disabled={!listValid || !nameValid} icon={Wallet} variant="primary"
       >Confirm changes in wallet</Button
     >
   </svelte:fragment>

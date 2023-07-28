@@ -6,7 +6,12 @@ import EditDripListStep from './steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import type { GitProject } from '$lib/utils/metadata/types';
 
-export default (dripListId: string, representationalSplits: Splits, projectToAdd?: GitProject) => ({
+export default (
+  dripListId: string,
+  listName: string,
+  representationalSplits: Splits,
+  projectToAdd?: GitProject,
+) => ({
   context: undefined,
   steps: [
     makeStep({
@@ -15,6 +20,7 @@ export default (dripListId: string, representationalSplits: Splits, projectToAdd
         projectToAdd,
         dripListId,
         representationalSplits,
+        listName,
       },
     }),
     makeStep({
@@ -22,7 +28,7 @@ export default (dripListId: string, representationalSplits: Splits, projectToAdd
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
         message:
-          'Your Drip List has been updated. Please note that it may take some time for your dashboard to update.',
+          'Your Drip List has been updated. Please refresh your dashboard to see the changes.',
       },
     }),
   ],

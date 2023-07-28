@@ -66,7 +66,7 @@
     modal.show(
       Stepper,
       undefined,
-      editDripListSteps(dripList.account.accountId, representationalSplits),
+      editDripListSteps(dripList.account.accountId, dripList.name, representationalSplits),
     );
   }
 </script>
