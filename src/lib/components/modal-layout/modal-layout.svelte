@@ -27,6 +27,7 @@
 {#if store.overlay !== null}
   <FocusTrap enabled={store.focusTrapped} containers={new Set([modalContainer])} />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="overlay"
       transition:fade={{ duration: 200 }}

@@ -40,6 +40,8 @@
     class="mobile-only"
     on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
     on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+    role="button"
+    tabindex="0"
   >
     <IdentityBadge
       hideAvatarOnMobile

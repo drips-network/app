@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
 
   import tokens from '$lib/stores/tokens';
@@ -143,11 +143,10 @@
   onMount(async () => {
     await fiatEstimates.start();
     trackRelevantTokens.start();
-
-    return () => {
-      trackRelevantTokens.stop();
-      fiatEstimates.stop();
-    };
+  });
+  onDestroy(() => {
+    trackRelevantTokens.stop();
+    fiatEstimates.stop();
   });
 </script>
 

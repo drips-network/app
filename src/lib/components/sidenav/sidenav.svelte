@@ -43,6 +43,7 @@
   {#each Object.values(items) as block}
     <div class="block">
       {#each block as item}
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           style="position: relative"
           bind:this={itemElems[item.href]}

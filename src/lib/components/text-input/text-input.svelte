@@ -10,7 +10,7 @@
   import { createEventDispatcher, type ComponentType } from 'svelte';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
 
-  const dispatch = createEventDispatcher<{ clear: never }>();
+  const dispatch = createEventDispatcher<{ clear: never | undefined }>();
 
   export let variant: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number } = {
     type: 'text',

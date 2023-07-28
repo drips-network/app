@@ -38,9 +38,9 @@ type Constructor<T> = new (...args: any[]) => T;
 
 export type StepComponentEvents = {
   /** Go forward one step (or a custom amount by setting `by`). */
-  goForward: MovePayload;
+  goForward: MovePayload | undefined;
   /** Go backward one step (or a custom amount by setting `by`). */
-  goBackward: MovePayload;
+  goBackward: MovePayload | undefined;
   /**
    * Await a promise while displaying a customizable spinner dialog.
    * Once the passed promise is resolved, advances in the flow. If

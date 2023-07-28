@@ -60,7 +60,7 @@
 
   const dispatch = createEventDispatcher<{
     /** Fired when the user blurs the input after selecting or hits enter to confirm. */
-    confirm: never;
+    confirm: never | undefined;
   }>();
 
   function handleBlur() {
@@ -83,6 +83,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="percentage-editor typo-text tabular-nums"
   class:focus

@@ -207,6 +207,7 @@
 <StandaloneFlowStepLayout
   description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div class="input" on:keydown={(e) => e.key === 'Enter' && submitInput()}>
     <TextInput
       bind:value={$context.gitUrl}

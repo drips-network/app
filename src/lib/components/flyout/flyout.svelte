@@ -34,6 +34,7 @@
     on:mouseenter={() => handleHover(true)}
     on:mouseleave={() => handleHover(false)}
   >
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="trigger-content"
       on:keydown={() => handleHover(true)}

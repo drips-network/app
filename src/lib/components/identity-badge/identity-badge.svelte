@@ -118,7 +118,6 @@
               transition:fade={{ duration: 300 }}
               class:foreground={size === 'gigantic'}
               class={`${currentFontClass} identity absolute overlay`}
-              data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
               class:hideOnMobile={hideAvatarOnMobile}
             >
               {toDisplay}

@@ -106,6 +106,7 @@
   });
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <span
   bind:this={tooltipElem}
   class="tooltip"
@@ -114,6 +115,7 @@
   on:mouseleave={() => !disabled && handleHover(false)}
 >
   <div class="trigger"><slot /></div>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     bind:this={contentElem}
     class="expanded-tooltip"

@@ -13,7 +13,7 @@
   import Results from './components/results.svelte';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
-  const dispatch = createEventDispatcher<{ dismiss: never }>();
+  const dispatch = createEventDispatcher<{ dismiss: never | undefined }>();
 
   let focus = false;
 
@@ -135,12 +135,15 @@
   {/if}
 </div>
 
-{#if focus}<div
+{#if focus}
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
     class="overlay"
     on:click={closeSearch}
     on:keydown={closeSearch}
     transition:fade={{ duration: 200, easing: sineInOut }}
-  />{/if}
+  />
+{/if}
 
 <style>
   .search-bar {

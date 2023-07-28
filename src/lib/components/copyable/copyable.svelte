@@ -27,6 +27,8 @@
   on:keydown={() => (visible = true)}
   on:mouseenter={() => (visible = true)}
   on:mouseleave={() => (visible = false)}
+  role="button"
+  tabindex="0"
 >
   <slot />
   <div
