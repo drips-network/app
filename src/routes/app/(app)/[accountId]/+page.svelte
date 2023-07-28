@@ -148,10 +148,8 @@
         </div>
       {/if}
     </SectionSkeleton>
-    {#if address}
-      <ProjectsSection {address} />
-      <DripListsSection {address} />
-    {/if}
+    <ProjectsSection {address} />
+    <DripListsSection {address} />
     <Balances accountId={dripsAccountId} />
     <Streams accountId={dripsAccountId} />
     <TransitionedHeight>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { DripList, RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
   import type { Splits as RepresentationalSplits } from '$lib/components/splits/splits.svelte';
-  import { onMount } from 'svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
   import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
@@ -13,13 +12,14 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
 
-  export let address: string;
+  export let address: string | undefined;
 
   let error = false;
 
   let dripLists: DripList[] | undefined;
   let representationalSplits: RepresentationalSplits | undefined;
-  onMount(async () => {
+
+  async function updateDripLists() {
     try {
       const service = await DripListService.new();
 
@@ -39,9 +39,11 @@
       console.error(e);
       error = true;
     }
-  });
+  }
 
-  $: isSelf = address.toLowerCase() === $walletStore.address?.toLowerCase();
+  $: address && updateDripLists();
+
+  $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
 <div class="section">

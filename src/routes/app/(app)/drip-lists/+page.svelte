@@ -16,6 +16,4 @@
 
 <HeadMeta title="Drip List" />
 
-{#if $walletStore.address}
-  <DripListsSection address={$walletStore.address} />
-{/if}
+<DripListsSection address={$walletStore.address} />

@@ -48,9 +48,7 @@
 
 <div class="page">
   <div class="section">
-    {#if $walletStore.address}
-      <ProjectsSection address={$walletStore.address} />
-    {/if}
+    <ProjectsSection address={$walletStore.address} />
   </div>
 
   <div class="section">

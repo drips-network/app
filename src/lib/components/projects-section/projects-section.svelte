@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ClaimedGitProject } from '$lib/utils/metadata/types';
-  import { onMount } from 'svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import ProjectCard from '../project-card/project-card.svelte';
   import SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
@@ -12,12 +11,13 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { goto } from '$app/navigation';
 
-  export let address: string;
+  export let address: string | undefined;
 
   let projects: ClaimedGitProject[] | undefined;
   let error = false;
   let loaded = false;
-  onMount(async () => {
+
+  async function updateProjects() {
     try {
       const service = await GitProjectService.new();
 
@@ -30,9 +30,11 @@
       loaded = true;
       error = true;
     }
-  });
+  }
 
-  $: isSelf = address.toLowerCase() === $walletStore.address?.toLowerCase();
+  $: address && updateProjects();
+
+  $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
 <div class="section">
