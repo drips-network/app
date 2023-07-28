@@ -264,6 +264,8 @@ export default class DripListService {
 
       const weight = Math.floor((Number(percentage) / 100) * 1000000);
 
+      if (weight <= 0) continue;
+
       if (isAddr) {
         const receiver = {
           weight,
