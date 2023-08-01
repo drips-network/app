@@ -72,9 +72,9 @@
     small: 'typo-text-small tabular-nums',
     normal: 'typo-text tabular-nums',
     medium: 'typo-text tabular-nums',
-    big: 'typo-header-4 mono',
-    huge: 'typo-header-3 mono',
-    gigantic: 'typo-header-1 mono',
+    big: 'typo-header-4 tabular-nums',
+    huge: 'typo-header-3 tabular-nums',
+    gigantic: 'typo-header-1 mono tabular-nums',
   };
   $: currentFontClassAddress = fontClassesAddress[size];
 
@@ -157,7 +157,7 @@
   }
 
   .mono {
-    font-family: var(--typeface-mono-regular);
+    font-family: var(--typeface-regular);
     white-space: nowrap;
     font-style: normal;
   }
