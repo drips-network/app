@@ -345,7 +345,7 @@
   }
 
   .project-profile.claimed {
-    grid-template-columns: 3fr minmax(auto, 18rem);
+    grid-template-columns: minmax(0, 3fr) minmax(auto, 18rem);
     grid-template-rows: auto auto;
     grid-template-areas:
       'header sidebar'

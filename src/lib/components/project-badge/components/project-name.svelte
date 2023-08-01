@@ -12,15 +12,24 @@
       {project.source.ownerName}/
     </span>
   {/if}
-  <span class="repo-name typo-text-bold">{project.source.repoName}</span>
+  <span class="repo-name typo-text-bold"
+    >iwandfiouawbfuoahjwpofhibaeuogjaeopnfbiouabfpawndioandpawnpdo</span
+  >
 </span>
 
 <style>
   .project-name {
+    flex: 1 1 0;
+    min-width: 0;
     display: inline-flex;
     width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+  }
+
+  .project-name .repo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
