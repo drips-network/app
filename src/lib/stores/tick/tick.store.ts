@@ -27,7 +27,7 @@ export default (() => {
    * to be called every 100ms.
    */
   function start() {
-    if (get(interval)) throw 'Tick already running';
+    if (get(interval)) return;
 
     interval.set(
       setInterval(_tick, get(slowMode) ? SLOW_MODE_TICK_INTERVAL_MS : DEFAULT_TICK_INTERVAL_MS),
