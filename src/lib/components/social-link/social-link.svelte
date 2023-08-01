@@ -40,7 +40,7 @@
       >{value.replaceAll('http://', '').replaceAll('https://', '')}</a
     >
   {:else if network === 'ethereum'}
-    <p class="typo-text"><Copyable {value}>{formatAddress(value)}</Copyable></p>
+    <p class="typo-text tabular-nums"><Copyable {value}>{formatAddress(value)}</Copyable></p>
   {/if}
 </div>
 
