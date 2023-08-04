@@ -75,7 +75,7 @@
   The underlying software protocols of the Drips Network (the &ldquo;Software&rdquo;) have been
   developed and published under the GPLv3, Apache 2.0, and MIT licenses, which forms an integral
   part of this Disclaimer. The full license protocol of Drips Network can be viewed in the Drips
-  codebases stored within https://github.com/radicle-dev.
+  codebases stored within https://github.com/drips-network.
 </p>
 
 <p>

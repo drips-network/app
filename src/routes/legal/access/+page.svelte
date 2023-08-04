@@ -15,10 +15,8 @@
   in any of the following alternative ways as well:
 </p>
 <p>
-  The <a
-    href="https://github.com/radicle-dev/drips-js-sdk"
-    target="_blank"
-    rel="noopener noreferrer">Drips SDK</a
+  The <a href="https://github.com/drips-network/sdk" target="_blank" rel="noopener noreferrer"
+    >Drips SDK</a
   > is a Javascript SDK that allows any application or user-created code to interact directly with the
   Drips smart contracts and utilize the full feature set of the protocol in whatever way they wish. Drips
   contracts can be freely integrated into any website, dapp or application at any time using the SDK.
