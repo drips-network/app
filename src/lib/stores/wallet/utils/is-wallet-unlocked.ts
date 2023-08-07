@@ -9,7 +9,7 @@ export const isWalletUnlocked = async (walletName: string): Promise<boolean> => 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const win = window as any;
 
-  if (win.ethereum?.isConnected?.()) {
+  if (walletName !== 'walletconnect' && win.ethereum?.isConnected?.()) {
     return true;
   }
 
@@ -20,7 +20,14 @@ export const isWalletUnlocked = async (walletName: string): Promise<boolean> => 
 
   // Wallet connect creates a localStorage entry when connected and removes it when disconnected
   if (walletName === 'walletconnect') {
-    return win.localStorage.getItem('walletconnect') !== null;
+    const session = win.localStorage.getItem('wc@2:client:0.3//session');
+
+    if (session) {
+      const parsed = JSON.parse(session);
+      const hasSession = Array.isArray(parsed) && parsed.length > 0;
+
+      return hasSession;
+    }
   }
 
   return false;
