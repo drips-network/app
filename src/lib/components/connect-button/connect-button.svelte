@@ -9,6 +9,9 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
   $: safeAppMode = Boolean($wallet.safe);
+
+  const walletInitializedStore = wallet.initialized;
+  const waitingForOnboardStore = wallet.waitingForOnboard;
 </script>
 
 {#if $wallet.connected}
@@ -50,7 +53,12 @@
     />
   </div>
 {:else}
-  <Button icon={WalletIcon} on:click={() => wallet.connect()}>Connect</Button>
+  <Button
+    disabled={$waitingForOnboardStore}
+    loading={!$walletInitializedStore}
+    icon={WalletIcon}
+    on:click={() => wallet.connect()}>Connect</Button
+  >
 {/if}
 
 <style>

@@ -115,6 +115,7 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
 const walletStore = () => {
   const state = writable<WalletStoreState>(INITIAL_STATE);
   const initialized = writable(false);
+  const waitingForOnboard = writable(false);
 
   /**
    * Initialize the store and restore any previously-connected,
@@ -184,9 +185,14 @@ const walletStore = () => {
       safeInfo = await appsSdk.safe.getInfo();
       provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
     } else {
+      waitingForOnboard.set(true);
       const wallets = await onboard.connectWallet();
+      waitingForOnboard.set(false);
 
       const wallet = wallets[0];
+
+      if (!wallet) return;
+
       const walletName = wallet.label.toLowerCase();
 
       lastConnectedWallet.set(walletName);
@@ -276,6 +282,7 @@ const walletStore = () => {
   return {
     subscribe: state.subscribe,
     initialized: { subscribe: initialized.subscribe },
+    waitingForOnboard: { subscribe: waitingForOnboard.subscribe },
     initialize,
     connect,
     disconnect,
@@ -288,6 +295,7 @@ const mockWalletStore = () => {
   const address = (window as any).playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
   const initialized = writable(false);
+  const waitingForOnboard = writable(false);
 
   const state = writable<WalletStoreState>({
     connected: false,
@@ -315,6 +323,7 @@ const mockWalletStore = () => {
   return {
     subscribe: state.subscribe,
     initialized: { subscribe: initialized.subscribe },
+    waitingForOnboard: { subscribe: waitingForOnboard.subscribe },
     initialize,
     connect: () => undefined,
     disconnect: () => undefined,

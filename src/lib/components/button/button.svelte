@@ -1,12 +1,17 @@
 <script lang="ts">
   import getContrastColor from '$lib/utils/get-contrast-text-color';
   import type { ComponentType } from 'svelte';
+  import Spinner from '../spinner/spinner.svelte';
+  import { fade } from 'svelte/transition';
 
   export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
   export let size: 'small' | 'normal' | 'large' = 'normal';
+  export let loading = false;
+
+  $: isDisabled = disabled || loading;
 
   let buttonEl: HTMLButtonElement;
 
@@ -24,7 +29,7 @@
   class="size-{size}"
   bind:this={buttonEl}
   aria-label={ariaLabel}
-  {disabled}
+  disabled={isDisabled}
   on:click|stopPropagation
 >
   <div
@@ -42,6 +47,11 @@
       />
     {/if}
     <slot />
+    {#if loading}
+      <div out:fade={{ duration: 300 }} class="loading">
+        <Spinner />
+      </div>
+    {/if}
   </div>
 </button>
 
@@ -76,6 +86,20 @@
     user-select: none;
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
     background-color: var(--color-background);
+    position: relative;
+  }
+
+  button .inner .loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem 0 1rem 1rem;
   }
 
   button.size-large .inner {
