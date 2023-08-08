@@ -325,7 +325,7 @@
               <h5 class="key">Total Streamed</h5>
             </div>
             <div class="total-streamed">
-              <div class="value-box align-right">
+              <div class="value-box" class:align-right={hasDuration}>
                 <span class="highlight large-text tabular-nums" data-testid="total-streamed">
                   <FormattedAmount
                     amount={estimate?.totalStreamed ?? unreachable()}
@@ -353,8 +353,10 @@
           </div>
           <div class="key-value">
             <div class="keys">
-              <h5 class="key">Starts</h5>
-              <h5 class="key">Ends</h5>
+              <h5 class="key">
+                {new Date().getTime() > (streamStartDate?.getTime() ?? 0) ? 'Started' : 'Starts'}
+              </h5>
+              {#if hasDuration}<h5 class="key">Ends</h5>{/if}
             </div>
             <div class="value-box">
               <div class="start-and-end medium-text">
@@ -560,7 +562,8 @@
     bottom: 0;
     border-radius: 1rem 0 1rem 1rem;
     background-color: var(--color-primary-level-1);
-    transition: width 0.3s ease-out;
+    width: 0;
+    transition: width 0.3s cubic-bezier(0, 0.55, 0.45, 1);
   }
 
   @media (max-width: 768px) {
