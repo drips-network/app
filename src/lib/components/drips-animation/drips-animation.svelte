@@ -77,18 +77,14 @@
     ctx = context;
   });
 
+  const resizeObserver = new ResizeObserver(updateContainerSize);
+
   onMount(() => {
-    let resizeTimeout: number;
+    resizeObserver.observe(container);
 
-    const resizeHandler = () => {
-      if (resizeTimeout) window.clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(() => {
-        updateContainerSize();
-      }, 50);
+    return () => {
+      resizeObserver.disconnect();
     };
-
-    window.addEventListener('resize', resizeHandler);
-    return () => window.removeEventListener('resize', resizeHandler);
   });
 
   interface Drip {
@@ -137,7 +133,7 @@
       const realSpeed = speed * speedMultiplier;
 
       ctx.filter = `saturate(${Math.floor(speedMultiplier * 100)}%) opacity(${Math.floor(
-        speedMultiplier * 100 + 50,
+        speedMultiplier * 100 + 20,
       )}%)`;
 
       ctx.drawImage(
