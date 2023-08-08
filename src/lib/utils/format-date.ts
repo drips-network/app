@@ -9,7 +9,7 @@ const DATE_FORMAT_CONVENTIONS = {
     year: 'numeric',
   },
   standard: {
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
