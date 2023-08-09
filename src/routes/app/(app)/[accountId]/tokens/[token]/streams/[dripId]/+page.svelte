@@ -38,8 +38,10 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { browser } from '$app/environment';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
 
   const walletInitialized = walletStore.initialized;
+  const tokensInitialized = tokensStore.connected;
 
   const { accountId, token: tokenAddress, dripId } = $page.params;
 
@@ -138,7 +140,9 @@
   }
 
   async function getStreamInfo() {
-    if (!browser || !$walletInitialized) return;
+    if (!browser || !$walletInitialized || !$tokensInitialized) return;
+
+    error = undefined;
 
     token = tokens.getByAddress(tokenAddress);
 
@@ -176,14 +180,54 @@
     error = undefined;
   }
 
-  onMount(getStreamInfo);
-
   $: {
-    $tokens;
-    getStreamInfo();
+    if ($tokens || $walletInitialized || $tokensInitialized) {
+      getStreamInfo();
+    }
   }
 
   $: loading = !(stream && estimate);
+
+  $: hasDuration = stream && stream.streamConfig.durationSeconds !== undefined;
+
+  // The maximum that is intended to be streamed between the start date and end date (if any)
+  $: targetAmount = hasDuration
+    ? stream &&
+      stream.streamConfig.amountPerSecond.amount *
+        BigInt(stream.streamConfig.durationSeconds ?? unreachable())
+    : undefined;
+
+  // Duration progress bar logic
+
+  let elapsedDurationPercentage: number;
+
+  function updateElapsedDurationPercentage() {
+    if (!stream || !stream.streamConfig.startDate || !streamStartDate) return;
+
+    const streamStartTimestamp = streamStartDate.getTime();
+
+    const now = new Date().getTime();
+    const endDate = streamEndDate?.getTime() ?? now;
+
+    const newValue = Math.min(
+      100,
+      ((now - streamStartTimestamp) / (endDate - streamStartTimestamp)) * 100,
+    );
+
+    elapsedDurationPercentage = Math.max(0, newValue);
+  }
+
+  let updateElapsedDurationPercentageInterval: ReturnType<typeof setInterval> | undefined;
+
+  onMount(() => {
+    updateElapsedDurationPercentageInterval = setInterval(updateElapsedDurationPercentage, 1000);
+
+    return () => {
+      if (updateElapsedDurationPercentageInterval) {
+        clearInterval(updateElapsedDurationPercentageInterval);
+      }
+    };
+  });
 </script>
 
 <HeadMeta title={stream?.name ?? 'Stream'} />
@@ -220,14 +264,6 @@
       <div class="hero">
         <div class="title-and-state">
           <h1>{streamName}</h1>
-          <StreamStateBadge
-            {streamId}
-            paused={stream.paused}
-            senderId={stream.sender.accountId}
-            durationSeconds={stream.streamConfig.durationSeconds}
-            startDate={stream.streamConfig.startDate}
-            {tokenAddress}
-          />
         </div>
         {#if checkIsUser(stream.sender.accountId) && stream.managed}
           <div class="actions">
@@ -273,35 +309,80 @@
         halted={estimate?.currentAmountPerSecond === 0n}
       />
       <div class="details">
-        <div class="key-value">
-          <h5 class="key">Total Streamed</h5>
-          <span class="value typo-text tabular-nums highlight" data-testid="total-streamed">
-            <FormattedAmount
-              amount={estimate?.totalStreamed ?? unreachable()}
-              decimals={token?.info.decimals ?? unreachable()}
-            />
-            {token?.info.symbol}
-          </span>
-        </div>
-        <div class="key-value-row">
+        <div class="key-value-group">
           <div class="key-value">
-            <h5 class="key">Scheduled start</h5>
-            <span class="value typo-text"
-              >{formatDate(streamStartDate ?? unreachable(), 'verbose')}</span
-            >
-          </div>
-          <div class="key-value align-right">
-            <h5 class="key">Scheduled end</h5>
-            {#if streamEndDate}<span class="value typo-text"
-                >{formatDate(streamEndDate, 'verbose')}</span
-              >{:else}
-              <span class="value typo-text greyed-out">∞</span>{/if}
+            <h5 class="key">State</h5>
+            <StreamStateBadge
+              size="large"
+              {streamId}
+              paused={stream.paused}
+              senderId={stream.sender.accountId}
+              durationSeconds={stream.streamConfig.durationSeconds}
+              startDate={stream.streamConfig.startDate}
+              {tokenAddress}
+            />
           </div>
         </div>
-        <div class="key-value-row">
+        <div class="key-value-group">
+          <div class="key-value">
+            <div class="keys">
+              <h5 class="key">Total Streamed</h5>
+            </div>
+            <div class="total-streamed">
+              <div class="value-box" class:align-right={hasDuration}>
+                <span class="highlight large-text tabular-nums" data-testid="total-streamed">
+                  <FormattedAmount
+                    amount={estimate?.totalStreamed ?? unreachable()}
+                    decimals={token?.info.decimals ?? unreachable()}
+                  />
+                  {#if !hasDuration}
+                    {token?.info.symbol}
+                  {/if}
+                </span>
+              </div>
+              {#if hasDuration}
+                <span class="typo-header-5 greyed-out">OF</span>
+                <div class="value-box">
+                  <span class="large-text tabular-nums">
+                    <FormattedAmount
+                      amount={targetAmount ?? unreachable()}
+                      decimals={token?.info.decimals ?? unreachable()}
+                      preserveTrailingZeroes={false}
+                    />
+                    {token?.info.symbol}
+                  </span>
+                </div>
+              {/if}
+            </div>
+          </div>
+          <div class="key-value">
+            <div class="keys">
+              <h5 class="key">
+                {new Date().getTime() > (streamStartDate?.getTime() ?? 0) ? 'Started' : 'Starts'}
+              </h5>
+              {#if hasDuration}<h5 class="key">Ends</h5>{/if}
+            </div>
+            <div class="value-box">
+              <div class="start-and-end medium-text">
+                <span class="value">
+                  {formatDate(streamStartDate ?? unreachable())}
+                </span>
+                {#if streamEndDate}
+                  <span class="value">
+                    {formatDate(streamEndDate)}
+                  </span>
+                {/if}
+              </div>
+              {#if hasDuration}
+                <div style:width="{elapsedDurationPercentage}%" class="stream-progress-indicator" />
+              {/if}
+            </div>
+          </div>
+        </div>
+        <div class="key-value-group">
           <div class="key-value">
             <div class="with-info-icon">
-              <h5 class="key">Remaining balance for token</h5>
+              <h5 class="key greyed-out">Remaining balance for token</h5>
               <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
                 <svelte:fragment slot="tooltip-content">
@@ -311,7 +392,7 @@
                 </svelte:fragment>
               </Tooltip>
             </div>
-            <span class="value typo-text tabular-nums">
+            <span class="value small-text tabular-nums">
               <FormattedAmount
                 decimals={token?.info.decimals ?? unreachable()}
                 amount={$balances.accounts[dripsAccountId ?? unreachable()].tokens[
@@ -321,9 +402,9 @@
               {token?.info.symbol}
             </span>
           </div>
-          <div class="key-value align-right">
+          <div class="key-value">
             <div class="with-info-icon">
-              <h5 class="key">
+              <h5 class="key greyed-out">
                 Token {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
               </h5>
               <Tooltip>
@@ -336,18 +417,16 @@
               </Tooltip>
             </div>
             {#if outOfFundsDate}
-              <span class="value typo-text"
+              <span class="value small-text"
                 >{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</span
               >
             {:else}
-              <span class="value typo-text greyed-out">∞</span>
+              <span class="value small-text greyed-out">∞</span>
             {/if}
           </div>
-        </div>
-        <div class="key-value-row">
           <div class="key-value">
-            <h5 class="key">Created at</h5>
-            <span class="value typo-text"
+            <h5 class="key greyed-out">Created at</h5>
+            <span class="value small-text"
               >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
             >
           </div>
@@ -360,6 +439,8 @@
 <style>
   .wrapper {
     position: relative;
+    max-width: 56rem;
+    margin: 0 auto;
   }
 
   .loading-state {
@@ -396,19 +477,16 @@
     align-items: center;
   }
 
-  .align-right .with-info-icon {
-    justify-content: flex-end;
-  }
-
   .details {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 3rem;
   }
 
-  .key-value-row {
+  .key-value-group {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   .key-value {
@@ -417,20 +495,13 @@
     flex-direction: column;
   }
 
-  .key-value > .value {
-    font-size: 1.5rem;
-    font-weight: bold;
+  .key-value > .keys {
+    display: flex;
+    justify-content: space-between;
   }
 
-  .key-value > .value.highlight {
-    margin-top: 0.25rem;
-    margin-bottom: 1rem;
-    font-size: 2.25rem;
-    color: var(--color-primary);
-  }
-
-  .key-value > .value.greyed-out {
-    color: var(--color-foreground-level-4);
+  .greyed-out {
+    color: var(--color-foreground-level-5);
   }
 
   .align-right {
@@ -440,6 +511,63 @@
   .actions {
     display: flex;
     gap: 0.5rem;
+  }
+
+  .total-streamed {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .value-box {
+    flex: 1 1 0px;
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 1rem;
+    box-shadow: var(--elevation-low);
+    display: flex;
+    overflow: hidden;
+    min-height: 4rem;
+    align-items: center;
+    position: relative;
+    width: 100%;
+  }
+
+  .value-box.align-right {
+    justify-content: right;
+  }
+
+  .small-text {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+  }
+
+  .medium-text {
+    font-size: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .large-text {
+    font-size: clamp(1rem, 5vw, 2rem);
+    line-height: 2rem;
+  }
+
+  .highlight {
+    color: var(--color-primary);
+  }
+
+  .start-and-end {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+
+  .stream-progress-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 1rem 0 1rem 1rem;
+    background-color: var(--color-primary-level-1);
+    width: 0;
+    transition: width 0.3s cubic-bezier(0, 0.55, 0.45, 1);
   }
 
   @media (max-width: 768px) {
@@ -452,22 +580,26 @@
       align-items: left;
     }
 
-    .key-value-row {
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
     .align-right {
       text-align: left;
-    }
-
-    .align-right .with-info-icon {
-      justify-content: flex-start;
     }
 
     .actions {
       display: flex;
       justify-content: space-around;
+    }
+
+    .total-streamed {
+      flex-direction: column;
+    }
+
+    .key-value {
+      gap: 0.25rem;
+    }
+
+    .value-box,
+    .value-box.align-right {
+      justify-content: center;
     }
   }
 </style>

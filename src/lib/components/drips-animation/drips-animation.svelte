@@ -37,13 +37,32 @@
     };
   }
 
+  let previouslyVertical = vertical;
+
   function updateContainerSize() {
     const containerBounds = container.getBoundingClientRect();
     containerSize = [containerBounds.width, containerBounds.height];
     canvasElem.width = containerSize[0] * RESOLUTION_RATIO;
     canvasElem.height = containerSize[1] * RESOLUTION_RATIO;
-    maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
-    drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
+
+    const orientationChanged = previouslyVertical !== vertical;
+
+    if (drips.length === 0 || orientationChanged) {
+      maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
+      drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
+    } else {
+      // Delete any drips outside of the new bounds
+
+      const newDrips: Drip[] = [];
+
+      for (const drip of drips) {
+        if (
+          (vertical ? drip.pos.y : drip.pos.x) < rr(vertical ? containerSize[1] : containerSize[0])
+        ) {
+          newDrips.push(drip);
+        }
+      }
+    }
   }
 
   onMount(() => {
@@ -58,18 +77,14 @@
     ctx = context;
   });
 
+  const resizeObserver = new ResizeObserver(updateContainerSize);
+
   onMount(() => {
-    let resizeTimeout: number;
+    resizeObserver.observe(container);
 
-    const resizeHandler = () => {
-      if (resizeTimeout) window.clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(() => {
-        updateContainerSize();
-      }, 50);
+    return () => {
+      resizeObserver.disconnect();
     };
-
-    window.addEventListener('resize', resizeHandler);
-    return () => window.removeEventListener('resize', resizeHandler);
   });
 
   interface Drip {
@@ -118,7 +133,7 @@
       const realSpeed = speed * speedMultiplier;
 
       ctx.filter = `saturate(${Math.floor(speedMultiplier * 100)}%) opacity(${Math.floor(
-        speedMultiplier * 100 + 50,
+        speedMultiplier * 100 + 20,
       )}%)`;
 
       ctx.drawImage(

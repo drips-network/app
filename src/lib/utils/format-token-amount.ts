@@ -15,6 +15,9 @@ interface Amount {
  * @param amount The amount to format.
  * @param tokenDecimals The number of decimals to apply to the amount (18 for most ERC-20 tokens).
  * @param precisionMultiplier The precision multiplier to apply, 10 ^ 8 by default.
+ * @param preserveTrailingZeroes Pad amount to `maxDecimals` with zeroes always to prevent UI jitter.
+ * @param maxDecimals The maximum number of decimal points to display. By default, up to 8, but less if
+ * the token has fewer decimals.
  * @returns The formatted value as a string.
  */
 export default function formatTokenAmount(
@@ -22,6 +25,7 @@ export default function formatTokenAmount(
   tokenDecimals: number,
   precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
   preserveTrailingZeroes = true,
+  maxDecimals = Math.min(MAX_DECIMAL_ZEROES_IN_MOTION, tokenDecimals),
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 
@@ -29,11 +33,10 @@ export default function formatTokenAmount(
 
   const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
 
-  const formatted = `${parsedAmount.toFixed(MAX_DECIMAL_ZEROES_IN_MOTION)}`;
+  const formatted = `${parsedAmount.toFixed(maxDecimals)}`;
 
   const isTiny =
-    (formatted === (0).toFixed(MAX_DECIMAL_ZEROES_IN_MOTION) ||
-      formatted === '-' + (0).toFixed(MAX_DECIMAL_ZEROES_IN_MOTION)) &&
+    (formatted === (0).toFixed(maxDecimals) || formatted === '-' + (0).toFixed(maxDecimals)) &&
     amount !== 0n;
 
   if (isTiny) return amount < 0n ? '- <0.00000001' : ' <0.00000001';

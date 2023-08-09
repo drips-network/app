@@ -3,7 +3,7 @@
   import { constants } from 'radicle-drips';
 
   export let amount = 0n;
-  export let decimals = 16;
+  export let decimals: number;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
   export let preserveTrailingZeroes = true;
 </script>
