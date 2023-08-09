@@ -38,8 +38,10 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { browser } from '$app/environment';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
 
   const walletInitialized = walletStore.initialized;
+  const tokensInitialized = tokensStore.connected;
 
   const { accountId, token: tokenAddress, dripId } = $page.params;
 
@@ -138,7 +140,9 @@
   }
 
   async function getStreamInfo() {
-    if (!browser || !$walletInitialized) return;
+    if (!browser || !$walletInitialized || !$tokensInitialized) return;
+
+    error = undefined;
 
     token = tokens.getByAddress(tokenAddress);
 
@@ -177,7 +181,7 @@
   }
 
   $: {
-    if ($tokens || $walletInitialized) {
+    if ($tokens || $walletInitialized || $tokensInitialized) {
       getStreamInfo();
     }
   }
