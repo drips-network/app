@@ -402,28 +402,26 @@
               {token?.info.symbol}
             </span>
           </div>
-          <div class="key-value">
-            <div class="with-info-icon">
-              <h5 class="key greyed-out">
-                Token {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
-              </h5>
-              <Tooltip>
-                <InfoCircleIcon style="height: 1.25rem" />
-                <svelte:fragment slot="tooltip-content">
-                  Projection of when the stream ran or will run out of funds based on the sender's
-                  remaining {token?.info.symbol} balance. This date changes if the sender adds funds,
-                  or adds / removes streams for this token.
-                </svelte:fragment>
-              </Tooltip>
-            </div>
-            {#if outOfFundsDate}
+          {#if outOfFundsDate}
+            <div class="key-value">
+              <div class="with-info-icon">
+                <h5 class="key greyed-out">
+                  Balance {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
+                </h5>
+                <Tooltip>
+                  <InfoCircleIcon style="height: 1.25rem" />
+                  <svelte:fragment slot="tooltip-content">
+                    Projection of when the stream ran or will run out of funds based on the sender's
+                    remaining {token?.info.symbol} balance. This date changes if the sender adds funds,
+                    or adds / removes streams for this token.
+                  </svelte:fragment>
+                </Tooltip>
+              </div>
               <span class="value small-text"
                 >{formatDate(outOfFundsDate ?? unreachable(), 'verbose')}</span
               >
-            {:else}
-              <span class="value small-text greyed-out">∞</span>
-            {/if}
-          </div>
+            </div>
+          {/if}
           <div class="key-value">
             <h5 class="key greyed-out">Created at</h5>
             <span class="value small-text"
