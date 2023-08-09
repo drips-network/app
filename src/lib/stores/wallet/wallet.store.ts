@@ -142,7 +142,7 @@ const walletStore = () => {
 
         const provider = new ethers.providers.Web3Provider(wallets[0].provider);
         _attachListeners(wallets[0].provider);
-        _setConnectedState(provider);
+        await _setConnectedState(provider);
       }
     }
 
