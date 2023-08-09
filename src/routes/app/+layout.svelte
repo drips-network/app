@@ -22,6 +22,8 @@
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import trackRelevantTokens from '$lib/utils/fiat-estimates/track-relevant-tokens';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
+  import { page } from '$app/stores';
 
   let walletConnected = false;
   let loaded = false;
@@ -167,6 +169,11 @@
 <ModalLayout />
 
 <div in:fade={{ duration: 300, delay: 300 }}>
+  {#if $page.data.blockWhileInitializing !== false && (!loaded || initializing)}
+    <div out:fade={{ duration: 300 }} class="loading-spinner">
+      <Spinner />
+    </div>
+  {/if}
   <slot />
 </div>
 
@@ -192,6 +199,19 @@
 
   :global(.cupertino-pane-wrapper) {
     z-index: 200;
+  }
+
+  .loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
   }
 
   .dragger {

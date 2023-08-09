@@ -46,6 +46,14 @@
           project: item.label.props.project,
           weight: percentage,
         };
+      } else if ('listName' in item.label.props) {
+        return {
+          type: 'drip-list-split',
+          listId: item.label.props.listId,
+          listName: item.label.props.listName,
+          listOwner: item.label.props.owner,
+          weight: percentage,
+        };
       } else {
         return {
           type: 'address-split',

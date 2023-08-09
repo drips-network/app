@@ -38,7 +38,7 @@
       <div class="icon">
         <Ledger style="fill: var(--color-background); height: 3rem; width: 3rem;" />
       </div>
-      <span class="typo-header-3">{dripList.name}</span>
+      <span class="typo-header-3 ellipsis">{dripList.name}</span>
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>
@@ -110,5 +110,11 @@
     align-items: center;
     background-color: var(--color-foreground);
     border-radius: 50%;
+  }
+
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

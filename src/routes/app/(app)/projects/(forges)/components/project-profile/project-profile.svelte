@@ -1,7 +1,6 @@
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Heart from 'radicle-design-system/icons/Heart.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import BecomeSupporterCard from '../become-supporter-card/become-supporter-card.svelte';
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
@@ -15,6 +14,7 @@
     Split,
     AddressSplit,
     ProjectSplit,
+    DripListSplit,
   } from '$lib/components/splits/splits.svelte';
   import SplitsComponent from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -24,8 +24,7 @@
   import Pile from '$lib/components/pile/pile.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import type getIncomingSplits from '../../methods/get-incoming-splits';
-  import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
@@ -39,6 +38,7 @@
   import buildUrl from '$lib/utils/build-url';
   import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
+  import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
 
   interface Amount {
     tokenAddress: string;
@@ -52,8 +52,8 @@
 
   export let splits:
     | Promise<{
-        maintainers: (AddressSplit | ProjectSplit)[];
-        dependencies: (AddressSplit | ProjectSplit)[];
+        maintainers: (AddressSplit | ProjectSplit | DripListSplit)[];
+        dependencies: (AddressSplit | ProjectSplit | DripListSplit)[];
       } | null>
     | undefined = undefined;
 
@@ -99,14 +99,6 @@
           return undefined;
       }
     });
-  }
-
-  function flattenIncomingSplits(incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>>) {
-    return [
-      ...incomingSplits.dripLists.map((v) => ({ type: 'dripList' as const, item: v })),
-      ...incomingSplits.projects.map((v) => ({ type: 'project' as const, item: v })),
-      ...incomingSplits.users.map((v) => ({ type: 'user' as const, item: v })),
-    ];
   }
 </script>
 
@@ -260,7 +252,6 @@
                         Claim your repository on Drips to raise funds from supporters, configure
                         your project's dependencies and help build the Drips Dependency Tree.
                       </p>
-                      <!-- TODO: Docs link -->
                       <a
                         href="https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project"
                         class="typo-text-small learn-more-link"
@@ -282,46 +273,7 @@
           {/await}
         </div>
       {/if}
-      <div class="section">
-        <SectionHeader icon={Heart} label="Supporters" />
-        {#await incomingSplits}
-          <SectionSkeleton loaded={false} />
-        {:then result}
-          <SectionSkeleton
-            loaded={true}
-            empty={flattenIncomingSplits(result).length === 0}
-            emptyStateEmoji="🫙"
-            emptyStateHeadline="No supporters"
-            emptyStateText="This project doesn't have any supporters yet."
-          >
-            <!-- TODO: Limit supporters list to some max amount, make expandable -->
-            <div class="supporters-list">
-              {#each flattenIncomingSplits(result) as incomingSplit}
-                <div class="item">
-                  {#if incomingSplit.type === 'user'}
-                    <IdentityBadge address={incomingSplit.item.value.address} />
-                  {:else if incomingSplit.type === 'dripList'}
-                    <IdentityBadge
-                      size="medium"
-                      address={incomingSplit.item.value.account.owner.address}
-                    />
-                  {:else if incomingSplit.type === 'project'}
-                    <ProjectBadge project={incomingSplit.item.value} />
-                  {/if}
-                  <span class="muted"
-                    >{getSplitPercent(incomingSplit.item.weight)}% of {incomingSplit.type ===
-                    'dripList'
-                      ? 'donations'
-                      : 'income'}</span
-                  >
-                </div>
-              {/each}
-            </div>
-          </SectionSkeleton>
-        {:catch}
-          <SectionSkeleton loaded={true} error={true} />
-        {/await}
-      </div>
+      <SupportersSection type="project" {incomingSplits} />
     </div>
     {#if project.owner}
       <aside>
@@ -428,28 +380,6 @@
     padding: 1.5rem;
   }
 
-  .supporters-list {
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
-  }
-
-  .supporters-list .item {
-    padding: 1rem 1.5rem;
-    display: flex;
-    gap: 3rem;
-    align-items: center;
-    justify-content: space-between;
-    white-space: nowrap;
-  }
-
-  .supporters-list .item:not(:last-child) {
-    border-bottom: 1px solid var(--color-foreground);
-  }
-
-  .muted {
-    color: var(--color-foreground-level-6);
-  }
-
   .unclaimed-funds-section {
     display: flex;
     flex-direction: column;
@@ -458,8 +388,8 @@
 
   .unclaimed-project-edu-card {
     padding: 1rem;
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
     display: flex;
     align-items: center;
     gap: 2rem;
@@ -497,6 +427,12 @@
     gap: 1rem;
   }
 
+  .section {
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+  }
+
   @media (max-width: 1024px) {
     .project-profile,
     .project-profile.claimed {
@@ -527,11 +463,5 @@
       flex-direction: column;
       align-items: flex-start;
     }
-  }
-
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
   }
 </style>

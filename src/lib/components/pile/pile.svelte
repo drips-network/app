@@ -11,7 +11,7 @@
   export let components: {
     component: typeof SvelteComponent;
     props: Record<string, unknown>;
-  }[];
+  }[] = [];
   $: displayedComponents = components.slice(0, maxItems);
   $: overflowAmount = components.length - maxItems;
 
@@ -20,48 +20,50 @@
   }
 </script>
 
-<div class="pile">
-  {#each displayedComponents as component}
-    {#if !transitionedOut}
+{#if components.length !== 0}
+  <div class="pile">
+    {#each displayedComponents as component}
+      {#if !transitionedOut}
+        <div
+          class="item"
+          out:fly|local={{
+            y: 16,
+            duration: 200,
+            delay: getTransitionDelay(components.indexOf(component), 'out'),
+            easing: sineIn,
+          }}
+          in:fly|local={{
+            y: 16,
+            duration: 200,
+            delay: getTransitionDelay(components.indexOf(component), 'in'),
+            easing: sineOut,
+          }}
+        >
+          <svelte:component this={component.component} {...component.props} />
+        </div>
+      {/if}
+    {/each}
+    {#if overflowAmount > 0 && !transitionedOut}
       <div
-        class="item"
+        class="overflow typo-text-small-bold"
         out:fly|local={{
           y: 16,
           duration: 200,
-          delay: getTransitionDelay(components.indexOf(component), 'out'),
+          delay: getTransitionDelay(components.length - 1, 'out'),
           easing: sineIn,
         }}
         in:fly|local={{
           y: 16,
           duration: 200,
-          delay: getTransitionDelay(components.indexOf(component), 'in'),
+          delay: getTransitionDelay(components.length - 1, 'in'),
           easing: sineOut,
         }}
       >
-        <svelte:component this={component.component} {...component.props} />
+        +{overflowAmount}
       </div>
     {/if}
-  {/each}
-  {#if overflowAmount > 0 && !transitionedOut}
-    <div
-      class="overflow typo-text-small-bold"
-      out:fly|local={{
-        y: 16,
-        duration: 200,
-        delay: getTransitionDelay(components.length - 1, 'out'),
-        easing: sineIn,
-      }}
-      in:fly|local={{
-        y: 16,
-        duration: 200,
-        delay: getTransitionDelay(components.length - 1, 'in'),
-        easing: sineOut,
-      }}
-    >
-      +{overflowAmount}
-    </div>
-  {/if}
-</div>
+  </div>
+{/if}
 
 <style>
   .pile {

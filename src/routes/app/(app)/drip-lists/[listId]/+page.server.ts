@@ -2,7 +2,7 @@ import DripListService from '$lib/utils/driplist/DripListService';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
-import type { RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
+import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
@@ -15,13 +15,15 @@ export const load = (async ({ params }) => {
   dripList?.projects;
   if (!dripList) throw error(404);
 
-  const representationalSplits = await getRepresentationalSplitsForAccount(
-    listId,
-    dripList.projects.filter((s): s is RepoDriverSplitReceiver => 'source' in s),
-  );
+  const fetches = await Promise.all([
+    getRepresentationalSplitsForAccount(listId, dripList.projects),
+    getIncomingSplits(listId),
+  ] as const);
 
   return {
     dripList,
-    representationalSplits,
+    representationalSplits: fetches[0],
+    incomingSplits: fetches[1],
+    blockWhileInitializing: false,
   };
 }) satisfies PageServerLoad;

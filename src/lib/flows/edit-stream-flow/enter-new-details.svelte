@@ -32,6 +32,7 @@
   import type { EditStreamFlowState } from './edit-stream-flow-state';
   import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
+  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -70,7 +71,7 @@
   $: amountUpdated = newAmountPerSecond !== stream.streamConfig.amountPerSecond.amount;
   $: canUpdate =
     newAmountValueParsed &&
-    newName &&
+    (!stream.managed || newName) &&
     (nameUpdated || amountUpdated) &&
     amountValidationState?.type === 'valid';
 
@@ -79,7 +80,9 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          assert(newAmountPerSecond && newName);
+          assert(newAmountPerSecond);
+
+          if (stream.managed) assert(newName);
 
           const { dripsAccountId, address, signer } = $wallet;
           assert(dripsAccountId && address);
@@ -243,10 +246,17 @@
 </script>
 
 <StepLayout>
-  <StepHeader headline="Edit stream" description="Set a new name or edit the stream rate." />
-  <FormField title="New name*">
-    <TextInput bind:value={newName} />
-  </FormField>
+  <StepHeader
+    headline="Edit stream"
+    description={stream.managed
+      ? 'Set a new name or edit the stream rate.'
+      : 'Set a new stream rate.'}
+  />
+  {#if stream.managed}
+    <FormField title="New name*">
+      <TextInput bind:value={newName} />
+    </FormField>
+  {/if}
   <div class="form-row">
     <FormField title="New stream rate*" disabled={amountLocked}>
       <TextInput
@@ -301,7 +311,9 @@
   <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide}>Cancel</Button>
-    <Button variant="primary" on:click={updateStream} disabled={!canUpdate}>Update stream</Button>
+    <Button variant="primary" icon={Wallet} on:click={updateStream} disabled={!canUpdate}
+      >Confirm changes in wallet</Button
+    >
   </svelte:fragment>
 </StepLayout>
 

@@ -75,6 +75,7 @@
     bind:valid={formValid}
     blockedKeys={$context.maintainerSplits.selected}
     maxItems={200 - countOfMaintainerSplits}
+    allowedItems={['eth-addresses', 'projects']}
   />
   <svelte:fragment slot="left-actions">
     <Button

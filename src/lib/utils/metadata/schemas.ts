@@ -22,14 +22,27 @@ const gitHubSourceSchema = z.object({
 export const sourceSchema = gitHubSourceSchema;
 
 export const addressDriverSplitReceiverSchema = z.object({
+  // Optional for backwards-compatibility.
+  type: z.literal('address').optional(),
   weight: z.number(),
   accountId: z.string(),
 });
 
 export const repoDriverSplitReceiverSchema = z.object({
+  // Optional for backwards-compatibility.
+  type: z.literal('repoDriver').optional(),
   weight: z.number(),
   accountId: z.string(),
   source: sourceSchema,
+});
+
+/**
+ * A splits entry that splits directly to a different Drip List.
+ */
+export const dripListSplitReceiverSchema = z.object({
+  type: z.literal('dripList'),
+  weight: z.number(),
+  accountId: z.string(),
 });
 
 export const splitReceiverSchema = z.object({
@@ -109,6 +122,12 @@ export const nftDriverAccountMetadataSchema = z.object({
     accountId: z.string(),
   }),
   isDripList: z.literal(true),
-  projects: z.array(z.union([repoDriverSplitReceiverSchema, addressDriverSplitReceiverSchema])),
+  projects: z.array(
+    z.union([
+      dripListSplitReceiverSchema,
+      repoDriverSplitReceiverSchema,
+      addressDriverSplitReceiverSchema,
+    ]),
+  ),
   name: z.string().optional(),
 });

@@ -3,6 +3,7 @@
     InterstitialItem,
     SelectableItem,
   } from '$lib/components/list-select/list-select.types';
+  import type DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 
   interface ProjectItem extends SelectableItem {
     label: {
@@ -23,7 +24,18 @@
     };
   }
 
-  export type ListItem = EthAddressItem | ProjectItem | InterstitialItem;
+  interface DripListItem extends SelectableItem {
+    label: {
+      component: typeof DripListBadge;
+      props: {
+        listName: string;
+        listId: string;
+        owner: string;
+      };
+    };
+  }
+
+  export type ListItem = DripListItem | EthAddressItem | ProjectItem | InterstitialItem;
   export type Items = { [slug: string]: ListItem };
 
   export type Percentages = { [slug: string]: number };
@@ -55,6 +67,9 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import { verifyRepoExists } from '$lib/utils/github/github';
+  import DripListService from '$lib/utils/driplist/DripListService';
+  import dripListItem from './item-templates/drip-list';
+  import unreachable from '$lib/utils/unreachable';
 
   export let maxItems = 200;
 
@@ -72,13 +87,18 @@
     Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
   );
 
-  export let allowedItems: 'all' | 'eth-addresses' = 'all';
+  export let allowedItems: ('eth-addresses' | 'projects' | 'drip-lists')[] = [
+    'projects',
+    'eth-addresses',
+    'drip-lists',
+  ];
+
   export let items: Items;
 
   let listElem: HTMLDivElement;
   let inputElem: HTMLInputElement;
 
-  let isAddingProject = false;
+  let isAddingItem = false;
   let inputValue = '';
 
   let gitProjectService: GitProjectService;
@@ -86,10 +106,10 @@
   async function addProject() {
     if (!gitProjectService) gitProjectService = await GitProjectService.new();
 
-    if (allowedItems === 'eth-addresses') return;
+    if (!allowedItems.includes('projects')) return;
 
     try {
-      isAddingProject = true;
+      isAddingItem = true;
 
       const { username, repoName } = GitProjectService.deconstructUrl(inputValue);
 
@@ -123,12 +143,48 @@
       console.error(e);
     } finally {
       inputValue = '';
-      isAddingProject = false;
+      isAddingItem = false;
+    }
+  }
+
+  async function addDripList() {
+    isAddingItem = true;
+
+    if (!allowedItems.includes('drip-lists')) return;
+
+    try {
+      const dripListId = inputValue.substring(inputValue.lastIndexOf('/') + 1);
+      if (!dripListId) throw new Error('Invalid drip list ID');
+
+      const dripListService = await DripListService.new();
+
+      const dripList = await dripListService.getByTokenId(dripListId);
+      if (!dripList) throw new Error('Drip list not found');
+
+      if (blockedKeys.includes(dripListId)) throw new Error('Drip List ID is already used');
+
+      // Prevent duplicates.
+      if (selected.indexOf(dripListId) === -1) {
+        items[dripListId] = dripListItem(
+          dripList.name,
+          dripList.account.accountId,
+          dripList.account.owner.address,
+        );
+
+        if (selected.length < maxItems) selected.push(dripListId);
+        percentages = { ...percentages, [dripListId]: 0 };
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    } finally {
+      inputValue = '';
+      isAddingItem = false;
     }
   }
 
   async function addEthAddress() {
-    isAddingProject = true;
+    isAddingItem = true;
 
     try {
       const address = isAddress(inputValue)
@@ -139,7 +195,7 @@
       if (blockedKeys.includes(address)) throw new Error('This address is already used');
 
       if (items[address]) {
-        isAddingProject = false;
+        isAddingItem = false;
         return;
       }
 
@@ -155,20 +211,31 @@
       console.error(e);
     } finally {
       inputValue = '';
-      isAddingProject = false;
+      isAddingItem = false;
     }
   }
 
   function handleSubmitInput() {
-    if (isSupportedGitUrl(inputValue) && allowedItems === 'all') {
+    if (isSupportedGitUrl(inputValue) && allowedItems.includes('projects')) {
       addProject();
-    } else if (isAddress(inputValue) || inputValue.endsWith('.eth')) {
+    } else if (
+      allowedItems.includes('drip-lists') &&
+      inputValue.includes('drips.network/app/drip-lists/')
+    ) {
+      addDripList();
+    } else if (
+      allowedItems.includes('eth-addresses') &&
+      (isAddress(inputValue) || inputValue.endsWith('.eth'))
+    ) {
       addEthAddress();
     }
   }
 
   $: validInput =
-    isSupportedGitUrl(inputValue) || isAddress(inputValue) || inputValue.endsWith('.eth');
+    isSupportedGitUrl(inputValue) ||
+    isAddress(inputValue) ||
+    inputValue.endsWith('.eth') ||
+    inputValue.includes('drips.network/app/drip-lists/');
 
   $: totalPercentage = Object.values(selectedPercentages ?? {}).reduce<number>(
     (acc, v) => acc + v,
@@ -221,6 +288,30 @@
       inputValue = addOnMount;
     }
   });
+
+  let inputPlaceholder: string;
+  $: {
+    const allowed = [...allowedItems];
+
+    const possibilities: Record<(typeof allowedItems)[number], string> = {
+      projects: 'GitHub URL',
+      'drip-lists': 'Drip List URL',
+      'eth-addresses': 'Ethereum address',
+    };
+
+    const possibilityName = (key: (typeof allowedItems)[number]) => possibilities[key];
+
+    if (allowed.length === 0) {
+      inputPlaceholder = '';
+    } else if (allowed.length === 1) {
+      inputPlaceholder = possibilityName(allowed[0]);
+    } else {
+      inputPlaceholder = `${allowed
+        .filter((_, i, a) => i !== a.length - 1)
+        .map(possibilityName)
+        .join(', ')} or ${possibilityName(allowed.pop() ?? unreachable())}`;
+    }
+  }
 </script>
 
 <div class="list-editor">
@@ -232,15 +323,13 @@
       <input
         bind:this={inputElem}
         bind:value={inputValue}
-        disabled={isAddingProject}
+        disabled={isAddingItem}
         on:keydown={(e) => e.key === 'Enter' && handleSubmitInput()}
         class="typo-text"
         type="text"
-        placeholder={allowedItems === 'all'
-          ? 'Paste GitHub URL or Ethereum address'
-          : 'Ethereum address or ENS name'}
+        placeholder={inputPlaceholder}
       />
-      {#if isAddingProject}
+      {#if isAddingItem}
         <div in:fly={{ duration: 300, y: -4 }} out:fly={{ duration: 300, y: 4 }}>
           <Spinner />
         </div>

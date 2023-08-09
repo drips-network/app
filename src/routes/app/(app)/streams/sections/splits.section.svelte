@@ -6,7 +6,7 @@
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-  import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import { AddressDriverClient, type SplitsEntry } from 'radicle-drips';

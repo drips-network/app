@@ -23,6 +23,7 @@
   import { Utils } from 'radicle-drips';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -73,6 +74,22 @@
             editablePercentage: true,
           },
         ];
+      } else if (rs.type === 'drip-list-split') {
+        return [
+          rs.listId,
+          {
+            type: 'selectable',
+            label: {
+              component: DripListBadge,
+              props: {
+                listId: rs.listId,
+                owner: rs.listOwner,
+                listName: rs.listName,
+              },
+            },
+            editablePercentage: true,
+          },
+        ];
       } else {
         return undefined;
       }
@@ -91,6 +108,8 @@
         return [rs.project.source.url, getSplitPercent(rs.weight)];
       } else if (rs.type === 'address-split') {
         return [rs.address, getSplitPercent(rs.weight)];
+      } else if (rs.type === 'drip-list-split') {
+        return [rs.listId, getSplitPercent(rs.weight)];
       } else {
         return undefined;
       }

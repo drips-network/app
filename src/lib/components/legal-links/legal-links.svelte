@@ -1,5 +1,8 @@
 <ul class="links typo-text-small">
   <li>
+    <a href="https://docs.drips.network" target="_blank" rel="noreferrer">Help</a>
+  </li>
+  <li>
     <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
   </li>
   <li>

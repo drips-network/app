@@ -265,36 +265,45 @@
         <div class="title-and-state">
           <h1>{streamName}</h1>
         </div>
-        {#if checkIsUser(stream.sender.accountId) && stream.managed}
+        {#if checkIsUser(stream.sender.accountId)}
           <div class="actions">
-            {#if stream && !stream.paused}<Button
-                icon={PauseIcon}
-                disabled={streamState !== 'active'}
-                on:click={() =>
-                  modal.show(Stepper, undefined, {
-                    steps: pauseFlowSteps(stream ?? unreachable()),
-                  })}>Pause</Button
-              >{/if}
-            {#if stream && stream.paused}<Button
-                icon={PlayIcon}
-                on:click={() =>
-                  modal.show(Stepper, undefined, {
-                    steps: unpauseFlowSteps(stream ?? unreachable()),
-                  })}>Unpause</Button
-              >{/if}
-            {#if stream}<Button
+            <!-- Pause & Unpause are only available for "managed" streams that appear in account metadata -->
+            {#if stream?.managed}
+              {#if !stream.paused}
+                <Button
+                  icon={PauseIcon}
+                  disabled={streamState !== 'active'}
+                  on:click={() =>
+                    modal.show(Stepper, undefined, {
+                      steps: pauseFlowSteps(stream ?? unreachable()),
+                    })}>Pause</Button
+                >
+              {:else}
+                <Button
+                  icon={PlayIcon}
+                  on:click={() =>
+                    modal.show(Stepper, undefined, {
+                      steps: unpauseFlowSteps(stream ?? unreachable()),
+                    })}>Unpause</Button
+                >
+              {/if}
+            {/if}
+            <!-- Any stream can be deleted and edited -->
+            {#if stream}
+              <Button
                 icon={DeleteIcon}
                 on:click={() =>
                   modal.show(Stepper, undefined, deleteStreamFlowSteps(stream ?? unreachable()))}
                 >Delete</Button
-              >{/if}
-            {#if stream}<Button
+              >
+              <Button
                 icon={PenIcon}
-                disabled={streamState === 'ended' || !stream.managed}
+                disabled={streamState === 'ended'}
                 on:click={() =>
                   modal.show(Stepper, undefined, editStreamFlowSteps(stream ?? unreachable()))}
                 >Edit</Button
-              >{/if}
+              >
+            {/if}
           </div>
         {/if}
       </div>

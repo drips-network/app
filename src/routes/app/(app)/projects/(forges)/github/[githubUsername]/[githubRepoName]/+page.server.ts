@@ -1,14 +1,12 @@
 import GitProjectService from '$lib/utils/project/GitProjectService';
 import { error } from '@sveltejs/kit';
-import isForge from '$lib/utils/project/is-forge';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
 import { buildProjectSplitsData } from '../../../methods/project-splits';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
-import getIncomingSplits from '../../../methods/get-incoming-splits';
 import uriDecodeParams from '$lib/utils/url-decode-params';
-import type { RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
+import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
@@ -26,13 +24,6 @@ export const load = (async ({ params }) => {
   try {
     const project = await service.getByUrl(gitHubUrl);
 
-    if (!isForge('github', project)) {
-      throw error(
-        500,
-        'Expected project to be a GitHub project, but it was a ${project.source} project',
-      );
-    }
-
     const unclaimedFunds = project.claimed
       ? undefined
       : fetchUnclaimedFunds(project.repoDriverAccount.accountId);
@@ -47,13 +38,9 @@ export const load = (async ({ params }) => {
         unclaimedFunds,
         earnedFunds,
         incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
-        splits: buildProjectSplitsData(
-          project,
-          project.claimed
-            ? project.splits.dependencies.filter((s): s is RepoDriverSplitReceiver => 'source' in s)
-            : [],
-        ),
+        splits: buildProjectSplitsData(project, project.claimed ? project.splits.dependencies : []),
       },
+      blockWhileInitializing: false,
     };
   } catch (e) {
     // eslint-disable-next-line no-console

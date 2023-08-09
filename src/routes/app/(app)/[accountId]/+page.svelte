@@ -147,10 +147,10 @@
         </div>
       {/if}
     </SectionSkeleton>
-    <ProjectsSection {address} />
-    <DripListsSection {address} />
-    <Balances accountId={dripsAccountId} />
-    <Streams accountId={dripsAccountId} />
+    <ProjectsSection collapsable {address} />
+    <DripListsSection collapsable {address} />
+    <Streams collapsable accountId={dripsAccountId} />
+    <Balances collapsable collapsed accountId={dripsAccountId} />
     {#if address && !$dismissablesStore.includes('profile-drips-v1')}
       <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
         <Banner

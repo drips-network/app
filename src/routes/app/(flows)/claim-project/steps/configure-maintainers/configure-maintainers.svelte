@@ -36,7 +36,7 @@
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
     maxItems={200 - countOfDependencySplits}
-    allowedItems="eth-addresses"
+    allowedItems={['eth-addresses']}
     blockedKeys={$context.dependencySplits.selected}
   />
   <svelte:fragment slot="left-actions">
