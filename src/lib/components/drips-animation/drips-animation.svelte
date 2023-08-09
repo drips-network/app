@@ -175,7 +175,7 @@
     />
     <img
       bind:this={dripImgVertical}
-      on:load={() => vertical && draw()}
+      on:load={() => vertical && draw(0)}
       alt="rain drop"
       src="/assets/drip-vertical.webp"
     />
