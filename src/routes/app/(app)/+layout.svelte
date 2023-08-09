@@ -174,7 +174,7 @@
     }
 
     .page {
-      padding: 6rem 1rem 8rem 1rem;
+      padding: 6rem 1rem 6rem 1rem;
     }
 
     .bottom-nav {

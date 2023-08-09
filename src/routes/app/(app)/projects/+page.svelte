@@ -14,7 +14,6 @@
   import TokenAmountsTable from '$lib/components/token-amounts-table/token-amounts-table.svelte';
   import deduplicateReadable from '$lib/utils/deduplicate-readable';
   import { derived } from 'svelte/store';
-  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
@@ -74,35 +73,34 @@
           {/if}
         </div>
       {/if}
-      <div class="edu-card-wrapper">
-        <TransitionedHeight>
-          {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
-            <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
-              <div class="illustration">
-                <SplittingGraph />
-              </div>
-              <div class="content">
-                <div style:display="flex" style:gap="0.5rem" style:flex-direction="column">
-                  <h2 class="pixelated">How donations reach your projects</h2>
-                  <p>
-                    Donations from funders are automatically trickled down a global dependency tree
-                    every seven days.
-                  </p>
-                </div>
-                <a href="https://docs.drips.network/" target="_blank"
-                  ><Button icon={ArrowBoxUpRight}>Learn more</Button></a
-                >
-              </div>
-              <button
-                class="close-button"
-                on:click={() => dismissablesStore.dismiss('splitting-graph-edu-card')}
-              >
-                <CrossIcon />
-              </button>
+
+      {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
+        <div class="edu-card-wrapper">
+          <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
+            <div class="illustration">
+              <SplittingGraph />
             </div>
-          {/if}
-        </TransitionedHeight>
-      </div>
+            <div class="content">
+              <div style:display="flex" style:gap="0.5rem" style:flex-direction="column">
+                <h2 class="pixelated">How donations reach your projects</h2>
+                <p>
+                  Donations from funders are automatically trickled down a global dependency tree
+                  every seven days.
+                </p>
+              </div>
+              <a href="https://docs.drips.network/" target="_blank"
+                ><Button icon={ArrowBoxUpRight}>Learn more</Button></a
+              >
+            </div>
+            <button
+              class="close-button"
+              on:click={() => dismissablesStore.dismiss('splitting-graph-edu-card')}
+            >
+              <CrossIcon />
+            </button>
+          </div>
+        </div>
+      {/if}
     </SectionSkeleton>
   </div>
 </div>
@@ -126,6 +124,10 @@
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
     position: relative;
+  }
+
+  .card:not(:last-child) {
+    margin-bottom: 1rem;
   }
 
   .earnings.card > .content {
@@ -175,10 +177,6 @@
 
   .splitting-graph-edu.card .close-button:focus-visible {
     background-color: var(--color-foreground-level-2);
-  }
-
-  .edu-card-wrapper {
-    margin-top: 2rem;
   }
 
   @media (max-width: 716px) {

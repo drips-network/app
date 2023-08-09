@@ -15,7 +15,6 @@
   import decodeAccountId from '$lib/utils/decode-user-id';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
-  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import Banner from '$lib/components/banner/banner.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
@@ -152,22 +151,20 @@
     <DripListsSection {address} />
     <Balances accountId={dripsAccountId} />
     <Streams accountId={dripsAccountId} />
-    <TransitionedHeight>
-      {#if address && !$dismissablesStore.includes('profile-drips-v1')}
-        <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
-          <Banner
-            title="Looking for the old Drips?"
-            description="You can still access the previous Drips app at app.v1.drips.network."
-            button={{
-              label: 'View profile on Drips V1',
-              href: getDripsV1Url(address, $ens[address]?.name),
-            }}
-            icon={DripsV1Logo}
-            on:dismiss={() => dismissablesStore.dismiss('profile-drips-v1')}
-          />
-        </div>
-      {/if}
-    </TransitionedHeight>
+    {#if address && !$dismissablesStore.includes('profile-drips-v1')}
+      <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
+        <Banner
+          title="Looking for the old Drips?"
+          description="You can still access the previous Drips app at app.v1.drips.network."
+          button={{
+            label: 'View profile on Drips V1',
+            href: getDripsV1Url(address, $ens[address]?.name),
+          }}
+          icon={DripsV1Logo}
+          on:dismiss={() => dismissablesStore.dismiss('profile-drips-v1')}
+        />
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -182,10 +179,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  .drips-v1-banner {
-    padding-bottom: 3rem;
   }
 
   .profile {
