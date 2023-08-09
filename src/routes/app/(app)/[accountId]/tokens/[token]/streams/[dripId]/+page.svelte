@@ -339,7 +339,7 @@
               {#if hasDuration}
                 <span class="typo-header-5 greyed-out">OF</span>
                 <div class="value-box">
-                  <span class="large-text tabular-nums" data-testid="total-streamed">
+                  <span class="large-text tabular-nums">
                     <FormattedAmount
                       amount={targetAmount ?? unreachable()}
                       decimals={token?.info.decimals ?? unreachable()}
