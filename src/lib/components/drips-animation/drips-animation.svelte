@@ -112,14 +112,12 @@
     };
   }
 
-  let lastDraw = new Date().getTime();
-  let paused = false;
+  let lastDraw = 0;
 
-  function draw() {
+  function draw(timer: number) {
     if (!canvasElem) return;
 
-    const currentMillis = new Date().getTime();
-    const millisecondsSinceLastDraw = currentMillis - lastDraw;
+    const millisecondsSinceLastDraw = timer - lastDraw;
 
     ctx.clearRect(0, 0, rr(containerSize[0]), rr(containerSize[1]));
 
@@ -158,8 +156,8 @@
       }
     }
 
-    lastDraw = currentMillis;
-    if (!paused) requestAnimationFrame(draw);
+    lastDraw = timer;
+    requestAnimationFrame(draw);
   }
 </script>
 
@@ -171,7 +169,7 @@
   <div style="display: none">
     <img
       bind:this={dripImg}
-      on:load={() => !vertical && draw()}
+      on:load={() => !vertical && draw(0)}
       alt="rain drop"
       src="/assets/drip.webp"
     />
