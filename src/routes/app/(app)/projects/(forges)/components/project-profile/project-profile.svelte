@@ -121,7 +121,10 @@
     <div class="header">
       {#if project.owner}
         <div class="owner">
-          <IdentityBadge address={project.owner.address} /> is raising funds for...
+          <IdentityBadge address={project.owner.address} />
+          <span class="typo-text" style:color="var(--color-foreground-level-5)"
+            >is raising funds for...</span
+          >
         </div>
       {:else}
         <div class="unclaimed-project-notice">
@@ -382,7 +385,7 @@
 
   .header .owner {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.375rem;
     align-items: center;
     margin-bottom: 1.5rem;
   }
