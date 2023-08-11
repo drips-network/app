@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 585 118"
+<svg height="100%" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 585 118"
   >{@html `
   <g clip-path="url(#a)">
     <path fill="var(--color-primary)" d="M118 59c0 32.585-26.415 59-59 59S0 91.585 0 59 26.415 0 59 0s59 26.415 59 59Z"/>
