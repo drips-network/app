@@ -10,6 +10,7 @@
 
 <svelte:head>
   <title>{title}{title.startsWith('Drips') ? '' : ' | Drips'}</title>
+  <meta name="description" content={description} />
   <meta property="og:title" content="{title}{title.startsWith('Drips') ? '' : ' | Drips'}" />
   <meta property="og:image" content="https://{$page.url.host}{image}" />
   <meta property="og:description" content={description} />
