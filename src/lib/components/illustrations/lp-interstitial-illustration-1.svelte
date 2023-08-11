@@ -4,7 +4,7 @@
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
->
+  >{@html `
   <path
     d="M288.25 670.5H329.25C342.505 670.5 353.25 681.245 353.25 694.5V754"
     stroke="var(--color-foreground)"
@@ -75,7 +75,8 @@
   <rect x="0.5" y="0.5" width="47" height="47" rx="23.5" fill="#FBE9BE" />
   <path d="M8 40.24H40V8.24H8V40.24Z" fill="url(#pattern3)" />
   <rect x="0.5" y="0.5" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
-</svg>
+`}</svg
+>
 
 <style>
   svg {

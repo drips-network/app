@@ -11,7 +11,7 @@
 
 <header class:raised={scrolledDown}>
   <div class="left">
-    <a class="logo" href="/">
+    <a class="logo" alt="Drips Homepage" href="/">
       <div class="inner" class:logoOffset={showLogo}>
         <ThreeDrips />
         <DripsLogo />
