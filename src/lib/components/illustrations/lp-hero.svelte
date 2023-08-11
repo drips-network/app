@@ -83,6 +83,8 @@
   onMount(() => requestAnimationFrame(animate));
 </script>
 
+<!-- TODO: Minify SVG -->
+
 <svg
   width="100%"
   viewBox="0 0 1297 1074"
