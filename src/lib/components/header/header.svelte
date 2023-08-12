@@ -18,7 +18,7 @@
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
-  <a href={'/'}>
+  <a aria-label="Go to homepage" href={'/'}>
     <div class="logo">
       <DripsLogo />
     </div>

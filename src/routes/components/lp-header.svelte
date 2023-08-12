@@ -11,7 +11,7 @@
 
 <header class:raised={scrolledDown}>
   <div class="left">
-    <a class="logo" href="/">
+    <a aria-label="Go to homepage" class="logo" href="/">
       <div class="inner" class:logoOffset={showLogo}>
         <ThreeDrips />
         <DripsLogo />
