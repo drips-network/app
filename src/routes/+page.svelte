@@ -368,6 +368,7 @@
       target="_blank"
       style:height="1.5rem"
       style:display="inline-block"
+      aria-label="Radworks"
     >
       <RadworksLogo />
     </a>
