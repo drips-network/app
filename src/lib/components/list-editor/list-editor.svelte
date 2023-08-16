@@ -1,8 +1,5 @@
 <script lang="ts" context="module">
-  import type {
-    InterstitialItem,
-    SelectableItem,
-  } from '$lib/components/list-select/list-select.types';
+  import type { SelectableItem } from '$lib/components/list-select/list-select.types';
 
   interface ProjectItem extends SelectableItem {
     label: {
@@ -23,7 +20,7 @@
     };
   }
 
-  export type ListItem = EthAddressItem | ProjectItem | InterstitialItem;
+  export type ListItem = EthAddressItem | ProjectItem;
   export type Items = { [slug: string]: ListItem };
 
   export type Percentages = { [slug: string]: number };
@@ -36,7 +33,6 @@
 </script>
 
 <script lang="ts">
-  import ListSelect from '$lib/components/list-select/list-select.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
@@ -55,6 +51,9 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import { verifyRepoExists } from '$lib/utils/github/github';
+  import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
+  import Trash from 'radicle-design-system/icons/Trash.svelte';
+  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
 
   export let maxItems = 200;
 
@@ -159,6 +158,11 @@
     }
   }
 
+  function removeItem(slug: string) {
+    delete items[slug];
+    items = items;
+  }
+
   function handleSubmitInput() {
     if (isSupportedGitUrl(inputValue) && allowedItems === 'all') {
       addProject();
@@ -227,7 +231,7 @@
   {#if !blockInteraction}
     <div class="add-project">
       <div class="icon">
-        <Plus style="fill: var(--color-foreground)" />
+        <Ledger style="fill: var(--color-foreground)" />
       </div>
       <input
         bind:this={inputElem}
@@ -262,17 +266,38 @@
   {/if}
   {#if Object.keys(items).length > 0}
     <div class="list" bind:this={listElem}>
-      <ListSelect
-        hideUnselected={blockInteraction}
-        {blockInteraction}
-        bind:percentages
-        bind:selected
-        searchable={false}
-        multiselect
-        {items}
-        showEmptyState={false}
-        maxSelected={maxItems}
-      />
+      <ul>
+        {#each Object.entries(items) as [slug, item], index}
+          <li class="flex items-center py-4 px-3">
+            {#if item.image}
+              <figure class="h-6 w-6 rounded-full overflow-hidden flex-shrink-0">
+                {#if typeof item.image === 'string'}
+                  <img src={item.image} alt="List item" />
+                {:else if item.image}
+                  <svelte:component this={item.image.component} {...item.image.props} />
+                {/if}
+              </figure>
+            {/if}
+            <div class="flex-1 flex gap-4 items-center justify-between">
+              {#if typeof item.label === 'string'}
+                <span class="label typo-text">{item.label}</span>
+              {:else}
+                <svelte:component this={item.label.component} {...item.label.props} />
+              {/if}
+
+              <div class="flex items-center gap-3">
+                {#if item.type === 'selectable' && item.text}<span
+                    class="text typo-text tabular-nums">{item.text}</span
+                  >{/if}
+                {#if item.type === 'selectable' && item.editablePercentage}
+                  <PercentageEditor bind:percentage={percentages[slug]} />
+                {/if}
+                <Button icon={Trash} variant="ghost" on:click={() => removeItem(slug)} />
+              </div>
+            </div>
+          </li>
+        {/each}
+      </ul>
     </div>
   {/if}
   {#if !blockInteraction && Object.keys(items).length > 0}
@@ -349,6 +374,10 @@
 
   .list:first-child {
     border-radius: 1.5rem 0 1.5rem 1.5rem;
+  }
+
+  .list ul li + li {
+    border-top: 1px solid;
   }
 
   .add-project {
