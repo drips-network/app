@@ -58,8 +58,8 @@
     {#if hasDripList}
       <div style:margin-top="16px">
         <AnnotationBox type="warning">
-          Sorry, but you can currently only create a single Drip List. You can edit your existing
-          Drip List's entries and support stream on your dashboard.
+          This wallet already has a Drip List. Connect a different wallet or edit your current Drip
+          List from your <a href="/app/drip-lists" class="underline">dashboard</a>.
         </AnnotationBox>
       </div>
     {/if}
