@@ -26,7 +26,6 @@
   export type Percentages = { [slug: string]: number };
 
   export interface ListEditorConfig {
-    selected: string[];
     items: Items;
     percentages: Percentages;
   }
@@ -57,7 +56,6 @@
 
   export let maxItems = 200;
 
-  export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
   export let percentages: Percentages = {};
   export let blockInteraction = false;
   export let addOnMount: string | undefined = undefined;
@@ -67,12 +65,10 @@
    */
   export let blockedKeys: string[] = [];
 
-  $: selectedPercentages = Object.fromEntries(
-    Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
-  );
-
   export let allowedItems: 'all' | 'eth-addresses' = 'all';
   export let items: Items;
+
+  $: itemsLength = Object.entries(items).length;
 
   let listElem: HTMLDivElement;
   let inputElem: HTMLInputElement;
@@ -102,10 +98,9 @@
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
 
       // Prevent duplicates.
-      if (selected.indexOf(id) === -1) {
+      if (!items[id]) {
         items[id] = projectItem(gitProject);
 
-        if (selected.length < maxItems) selected.push(id);
         percentages = { ...percentages, [id]: 0 };
       }
 
@@ -144,7 +139,6 @@
 
       items[address] = ethAddressItem(address);
 
-      if (selected.length < maxItems) selected.push(address);
       percentages = { ...percentages, [address]: 0 };
 
       // It doesn't work without setTimeout for some reason 🤷‍♂️
@@ -160,10 +154,15 @@
 
   function removeItem(slug: string) {
     delete items[slug];
+    delete percentages[slug];
     items = items;
+    percentages = percentages;
   }
 
   function handleSubmitInput() {
+    // TODO: show message to user
+    if (itemsLength >= maxItems) return;
+
     if (isSupportedGitUrl(inputValue) && allowedItems === 'all') {
       addProject();
     } else if (isAddress(inputValue) || inputValue.endsWith('.eth')) {
@@ -174,33 +173,32 @@
   $: validInput =
     isSupportedGitUrl(inputValue) || isAddress(inputValue) || inputValue.endsWith('.eth');
 
-  $: totalPercentage = Object.values(selectedPercentages ?? {}).reduce<number>(
-    (acc, v) => acc + v,
-    0,
-  );
+  $: totalPercentage = Object.values(percentages ?? {}).reduce<number>((acc, v) => acc + v, 0);
   export let valid = false;
-  $: valid = selected.length > 0 && Math.round(totalPercentage * 100) / 100 === 100;
+  $: valid = itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100;
   export let error = false;
   $: error = Math.round(totalPercentage * 100) / 100 > 100;
 
-  $: canDistributeEvenly = selected.length > 0;
+  $: canDistributeEvenly = itemsLength > 0;
 
-  function distributeEvenly() {
-    const percentage = 100 / selected.length;
-
-    selected.forEach((id) => {
-      percentages[id] = percentage;
+  function setAllPercentagesTo(value: number) {
+    Object.keys(percentages).forEach((key) => {
+      percentages[key] = value;
     });
   }
 
+  function distributeEvenly() {
+    setAllPercentagesTo(100 / itemsLength);
+  }
+
   $: canDistributeRemaining =
-    Object.values(selectedPercentages).filter((v) => v === 0).length > 0 &&
-    Object.values(selectedPercentages).find((v) => v !== 0);
+    Object.values(percentages).filter((v) => v === 0).length > 0 &&
+    Object.values(percentages).find((v) => v !== 0);
 
   function distributeRemaining() {
     const remaining = 100 - totalPercentage;
 
-    const remainingIds = Object.entries(selectedPercentages)
+    const remainingIds = Object.entries(percentages)
       .filter(([, v]) => v === 0)
       .map(([id]) => id);
 
@@ -211,13 +209,10 @@
     });
   }
 
-  $: canClearPercentages = Object.values(selectedPercentages).filter((v) => v !== 0).length > 0;
+  $: canClearPercentages = Object.values(percentages).filter((v) => v !== 0).length > 0;
 
-  // Clears all selected percentages
   function clearPercentages() {
-    selected.forEach((id) => {
-      percentages[id] = 0;
-    });
+    setAllPercentagesTo(0);
   }
 
   onMount(() => {
