@@ -179,6 +179,7 @@
   $: valid = itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100;
   export let error = false;
   $: error = Math.round(totalPercentage * 100) / 100 > 100;
+  // TODO: error should check if items are 0% (can currently submit with 0% but it gets excluded on tx)
 
   $: canDistributeEvenly = itemsLength > 0;
 
@@ -300,13 +301,13 @@
     <div class="distribution-tools">
       <div class="actions">
         <Button size="small" on:click={distributeEvenly} disabled={!canDistributeEvenly}
-          >Distribute evenly</Button
+          >Split evenly</Button
         >
         <Button size="small" on:click={distributeRemaining} disabled={!canDistributeRemaining}
-          >Distribute remaining</Button
+          >Split remaining</Button
         >
         <Button size="small" on:click={clearPercentages} disabled={!canClearPercentages}
-          >Clear distribution</Button
+          >Clear</Button
         >
       </div>
       <div class="remaining-percentage-indicator" class:error class:valid>
