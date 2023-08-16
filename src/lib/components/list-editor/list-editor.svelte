@@ -103,6 +103,7 @@
 
         percentages = { ...percentages, [id]: 0 };
       }
+      // TODO: break + show warning to user
 
       await tick();
 
