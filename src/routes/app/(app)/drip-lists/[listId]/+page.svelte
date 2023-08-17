@@ -11,8 +11,8 @@
 <HeadMeta title={data.dripList.name} />
 
 <div class="owner">
+  <span>Drip List owned by </span>
   <IdentityBadge address={data.dripList.account.owner.address} />
-  <span>created a Drip List…</span>
 </div>
 <SectionSkeleton loaded={Boolean(data.dripList)}>
   <DripListCard dripList={data.dripList} representationalSplits={data.representationalSplits} />
