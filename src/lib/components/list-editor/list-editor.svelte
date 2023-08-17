@@ -1,23 +1,11 @@
 <script lang="ts" context="module">
-  import type { SelectableItem } from '$lib/components/list-select/list-select.types';
-
-  interface ProjectItem extends SelectableItem {
-    label: {
-      component: typeof ProjectBadge;
-      props: {
-        project: GitProject;
-      };
-    };
+  interface ProjectItem {
+    type: 'project';
+    project: GitProject;
   }
 
-  interface EthAddressItem extends SelectableItem {
-    label: {
-      component: typeof IdentityBadge;
-      props: {
-        address: string;
-        size: 'medium';
-      };
-    };
+  interface EthAddressItem {
+    type: 'address';
   }
 
   export type ListItem = EthAddressItem | ProjectItem;
@@ -36,13 +24,9 @@
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import { fade, fly, scale } from 'svelte/transition';
-  import projectItem from './item-templates/project';
   import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
   import { onMount, tick } from 'svelte';
-  import type ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import type IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import ethAddressItem from './item-templates/eth-address';
   import { getAddress, isAddress } from 'ethers/lib/utils';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
@@ -53,6 +37,8 @@
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
   import Trash from 'radicle-design-system/icons/Trash.svelte';
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
 
   export let maxItems = 200;
 
@@ -99,7 +85,7 @@
 
       // Prevent duplicates.
       if (!items[id]) {
-        items[id] = projectItem(gitProject);
+        items[id] = { type: 'project', project: gitProject };
 
         percentages = { ...percentages, [id]: 0 };
       }
@@ -138,7 +124,7 @@
         return;
       }
 
-      items[address] = ethAddressItem(address);
+      items[address] = { type: 'address' };
 
       percentages = { ...percentages, [address]: 0 };
 
@@ -266,29 +252,15 @@
       <ul>
         {#each Object.entries(items) as [slug, item], index}
           <li class="flex items-center py-4 px-3">
-            {#if item.image}
-              <figure class="h-6 w-6 rounded-full overflow-hidden flex-shrink-0">
-                {#if typeof item.image === 'string'}
-                  <img src={item.image} alt="List item" />
-                {:else if item.image}
-                  <svelte:component this={item.image.component} {...item.image.props} />
-                {/if}
-              </figure>
-            {/if}
             <div class="flex-1 flex gap-4 items-center justify-between">
-              {#if typeof item.label === 'string'}
-                <span class="label typo-text">{item.label}</span>
-              {:else}
-                <svelte:component this={item.label.component} {...item.label.props} />
+              {#if item.type === 'address'}
+                <IdentityBadge address={slug} size="medium" disableLink={true} />
+              {:else if item.type === 'project'}
+                <ProjectBadge project={item.project} linkTo="nothing" />
               {/if}
 
               <div class="flex items-center gap-3">
-                {#if item.type === 'selectable' && item.text}<span
-                    class="text typo-text tabular-nums">{item.text}</span
-                  >{/if}
-                {#if item.type === 'selectable' && item.editablePercentage}
-                  <PercentageEditor bind:percentage={percentages[slug]} />
-                {/if}
+                <PercentageEditor bind:percentage={percentages[slug]} />
                 <Button icon={Trash} variant="ghost" on:click={() => removeItem(slug)} />
               </div>
             </div>
