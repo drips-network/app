@@ -8,7 +8,24 @@ const TABBABLE_ELEMS = ['INPUT', 'BUTTON', 'A'];
  */
 export default function setTabIndexRecursively(elem: Element, value: '-1' | '0') {
   for (const child of elem.children ?? []) {
-    if (TABBABLE_ELEMS.includes(child.tagName)) child.setAttribute('tabindex', value);
+    const currentTabIndex = child.getAttribute('tabindex');
+
+    // If the element currently has an explicit tabindex -1, doesn't have a data-previous-tabindex attribute, and we're
+    // setting to 0, skip it so that we don't override the explicit tabindex.
+    if (
+      currentTabIndex === '-1' &&
+      value === '0' &&
+      !child.hasAttribute('data-previous-tabindex')
+    ) {
+      continue;
+    }
+
+    if (TABBABLE_ELEMS.includes(child.tagName) || child.hasAttribute('tabindex')) {
+      child.setAttribute('tabindex', value);
+    }
+
+    if (currentTabIndex) child.setAttribute('data-previous-tabindex', currentTabIndex);
+
     setTabIndexRecursively(child, value);
   }
 }

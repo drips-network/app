@@ -3,14 +3,21 @@ import { makeStep } from '$lib/components/stepper/types';
 import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
-import type { AddressSplit, ProjectSplit } from '$lib/components/splits/splits.svelte';
+import type {
+  AddressSplit,
+  DripListSplit,
+  ProjectSplit,
+} from '$lib/components/splits/splits.svelte';
 import EditMaintainerList from './steps/edit-maintainer-list.svelte';
 import EditDependencyList from './steps/edit-dependency-list.svelte';
 import Review from './steps/review.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
+import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
+import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
+import projectItem from '$lib/components/list-editor/item-templates/project';
 
-type RepresentationalSplit = AddressSplit | ProjectSplit;
+type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
 export interface State {
   project: ClaimedGitProject;
@@ -26,33 +33,34 @@ function getSplitPercent(weight: number) {
 }
 
 function mapRepresentationalSplitToEditorItem(input: RepresentationalSplit): ListItem {
-  if ('address' in input) {
-    return {
-      type: 'address',
-    };
-  } else {
-    return {
-      type: 'project',
-      project: input.project,
-    };
+  switch (input.type) {
+    case 'address-split':
+      return ethAddressItem(input.address);
+    case 'drip-list-split':
+      return dripListItem(input.listName, input.listId, input.listOwner);
+    case 'project-split':
+      return projectItem(input.project);
   }
 }
 
 function mapRepresentationalSplits(input: RepresentationalSplit[]) {
+  const mapSplitSlug = (split: RepresentationalSplit) => {
+    switch (split.type) {
+      case 'address-split':
+        return split.address;
+      case 'drip-list-split':
+        return split.listId;
+      case 'project-split':
+        return split.project.source.url;
+    }
+  };
+
   return {
-    selected: input.map((v) => ('address' in v ? v.address : v.project.source.url)),
+    selected: input.map(mapSplitSlug),
     items: Object.fromEntries(
-      input.map((v) => [
-        'address' in v ? v.address : v.project.source.url,
-        mapRepresentationalSplitToEditorItem(v),
-      ]),
+      input.map((v) => [mapSplitSlug(v), mapRepresentationalSplitToEditorItem(v)]),
     ),
-    percentages: Object.fromEntries(
-      input.map((v) => [
-        'address' in v ? v.address : v.project.source.url,
-        getSplitPercent(v.weight),
-      ]),
-    ),
+    percentages: Object.fromEntries(input.map((v) => [mapSplitSlug(v), getSplitPercent(v.weight)])),
   };
 }
 

@@ -45,12 +45,20 @@ export interface UnclaimedGitProject<ST extends Source = Source> {
   source: ST;
 }
 
+export interface DripListSplitReceiver {
+  type: 'dripList';
+  weight: number;
+  account: NFTDriverAccount;
+}
+
 export interface AddressDriverSplitReceiver {
+  type: 'address';
   weight: number;
   account: AddressDriverAccount;
 }
 
 export interface RepoDriverSplitReceiver {
+  type: 'repo';
   weight: number;
   account: RepoDriverAccount;
   source: Source;
@@ -79,8 +87,5 @@ export type GitProject<ST extends Source = Source> =
 export interface DripList {
   account: NFTDriverAccount;
   name: string;
-  // Properties below are post-MVP
-  isPublic: false;
-  projects: (AddressDriverSplitReceiver | RepoDriverSplitReceiver)[];
-  description: undefined;
+  projects: (DripListSplitReceiver | AddressDriverSplitReceiver | RepoDriverSplitReceiver)[];
 }

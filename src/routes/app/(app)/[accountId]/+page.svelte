@@ -19,6 +19,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+  import Developer from '$lib/components/developer-section/developer.section.svelte';
 
   $: accountId = $page.params.accountId;
 
@@ -136,21 +137,22 @@
             </div>
           </div>
           <div class="social-links">
-            <div in:fade><SocialLink network="ethereum" value={address} /></div>
+            <div in:fade|local><SocialLink network="ethereum" value={address} /></div>
             {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
-              {#if value}<div in:fade>
+              {#if value}<div in:fade|local>
                   <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                 </div>{/if}
             {/each}
           </div>
-          {#if description}<p class="description" in:fade>{description}</p>{/if}
+          {#if description}<p class="description" in:fade|local>{description}</p>{/if}
         </div>
       {/if}
     </SectionSkeleton>
-    <ProjectsSection {address} />
-    <DripListsSection {address} />
-    <Balances accountId={dripsAccountId} />
-    <Streams accountId={dripsAccountId} />
+    <Developer accountId={dripsAccountId} />
+    <ProjectsSection collapsable {address} />
+    <DripListsSection collapsable {address} />
+    <Streams collapsable accountId={dripsAccountId} />
+    <Balances collapsable collapsed accountId={dripsAccountId} />
     {#if address && !$dismissablesStore.includes('profile-drips-v1')}
       <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
         <Banner

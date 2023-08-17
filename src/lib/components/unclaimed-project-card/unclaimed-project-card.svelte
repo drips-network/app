@@ -81,8 +81,8 @@
 
 <style>
   .project-info {
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    box-shadow: var(--elevation-low);
+    border-radius: 1rem 0 1rem 1rem;
+    border: 1px solid var(--color-foreground);
     display: flex;
     flex-direction: column;
     gap: 0.75rem;

@@ -1,12 +1,10 @@
 <script lang="ts">
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
-  import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import balances from '$lib/stores/balances/balances.store';
   import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
-  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import modal from '$lib/stores/modal';
   import assert from '$lib/utils/assert';
   import { goto } from '$app/navigation';
@@ -20,6 +18,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import tokens from '$lib/stores/tokens';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
+  import Section from '$lib/components/section/section.svelte';
 
   interface TokenTableRow {
     token: TokenCellData;
@@ -30,6 +29,9 @@
 
   export let accountId: string | undefined;
   export let disableActions = true;
+
+  export let collapsed = false;
+  export let collapsable = false;
 
   $: accountEstimate = accountId ? $balances.accounts[accountId] : undefined;
 
@@ -176,12 +178,14 @@
   }
 </script>
 
-<div class="section">
-  <SectionHeader
-    icon={TokensIcon}
-    label="Balances"
-    actionsDisabled={!accountEstimate}
-    actions={disableActions
+<Section
+  bind:collapsed
+  bind:collapsable
+  header={{
+    label: 'Balances',
+    icon: TokensIcon,
+    actionsDisabled: !accountEstimate,
+    actions: disableActions
       ? []
       : [
           {
@@ -189,28 +193,18 @@
             icon: Plus,
             label: 'Add funds',
           },
-        ]}
-  />
-  <div class="content">
-    <SectionSkeleton
-      emptyStateHeadline="No tokens"
-      emptyStateEmoji="🫗"
-      emptyStateText={isSelf
-        ? 'Top up any ERC-20 token to stream it to your Drip List or any Ethereum address.'
-        : "This user hasn't yet topped-up or received any funds."}
-      {loaded}
-      {error}
-      empty={tableData.length === 0}
-    >
-      <Table {options} isRowClickable={isSelf} on:rowClick={onRowClick} />
-    </SectionSkeleton>
-  </div>
-</div>
-
-<style>
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-</style>
+        ],
+  }}
+  skeleton={{
+    emptyStateHeadline: 'No tokens',
+    emptyStateEmoji: '🫗',
+    emptyStateText: isSelf
+      ? 'Top up any ERC-20 token to stream it to your Drip List or any Ethereum address.'
+      : "This user hasn't yet topped-up or received any funds.",
+    loaded,
+    error,
+    empty: tableData.length === 0,
+  }}
+>
+  <Table {options} isRowClickable={isSelf} on:rowClick={onRowClick} />
+</Section>

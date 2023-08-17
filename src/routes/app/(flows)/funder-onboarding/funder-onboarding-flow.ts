@@ -11,6 +11,7 @@ import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte'
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
 import Success from './steps/success/success.svelte';
+import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 
 export interface State {
   dripList: {
@@ -44,24 +45,38 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
               components: mapFilterUndefined(
                 Object.entries(state.dripList.items),
                 ([slug, item]) => {
-                  return item.type === 'project'
-                    ? {
-                        component: ProjectAvatar,
-                        props: {
-                          project: item.project,
-                          outline: true,
-                        },
-                      }
-                    : {
-                        component: IdentityBadge,
-                        props: {
-                          address: slug,
-                          showIdentity: false,
-                          size: 'medium',
-                          outline: true,
-                          disableLink: true,
-                        },
-                      };
+                  if (item.type === 'project') {
+                    return {
+                      component: ProjectAvatar,
+                      props: {
+                        project: item.project,
+                        outline: true,
+                      },
+                    };
+                  }
+
+                  if (item.type === 'drip-list') {
+                    return {
+                      component: DripListBadge,
+                      props: {
+                        listId: item.list.id,
+                        listName: item.list.name,
+                        owner: item.list.owner,
+                        showName: false,
+                      },
+                    };
+                  }
+
+                  return {
+                    component: IdentityBadge,
+                    props: {
+                      address: slug,
+                      showIdentity: false,
+                      size: 'medium',
+                      outline: true,
+                      disableLink: true,
+                    },
+                  };
                 },
               ),
               maxItems: 3,

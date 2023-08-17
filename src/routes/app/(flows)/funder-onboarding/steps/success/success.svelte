@@ -2,8 +2,10 @@
   import { goto } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
+  import { onMount } from 'svelte';
 
   let loading = false;
 
@@ -16,6 +18,11 @@
       loading = false;
     });
   }
+
+  onMount(() => {
+    // Removes the Drip List intro edu card on the Drip List page, since the user clearly knows already what a Drip List is.
+    dismissablesStore.dismiss('drip-lists-page-intro');
+  });
 </script>
 
 <div class="center-div">

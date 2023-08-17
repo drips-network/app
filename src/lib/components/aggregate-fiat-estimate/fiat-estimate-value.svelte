@@ -10,9 +10,7 @@
 <div class="wrapper">
   {#if typeof fiatEstimateCents === 'number' && formattedFiatEstimate}
     {#key formattedFiatEstimate}
-      <span transition:fade|local={{ duration: 200 }} class="amount"
-        ><span class="currency">≈$</span>{formattedFiatEstimate}</span
-      >
+      <span class="amount"><span class="currency">≈$</span>{formattedFiatEstimate}</span>
     {/key}
     <span class="amount placeholder" aria-hidden="true">≈${formattedFiatEstimate}</span>
   {:else if fiatEstimateCents === 'pending'}

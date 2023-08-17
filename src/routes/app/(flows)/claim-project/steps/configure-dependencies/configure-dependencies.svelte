@@ -72,6 +72,7 @@
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
+    allowedItems={['eth-addresses', 'projects']}
     blockedKeys={maintainerKeys}
     maxItems={200 - maintainerKeys.length}
   />

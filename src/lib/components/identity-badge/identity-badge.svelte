@@ -20,6 +20,7 @@
   export let outline = false;
   export let linkToNewTab = false;
   export let showFullAddress = false;
+  export let muted = false;
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
   export let isReverse = false;
@@ -92,6 +93,7 @@
       class:select-none={disableSelection}
       style:height={showAvatar ? `${currentSize}px` : ''}
       style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
+      class:muted
     >
       {#if showAvatar}
         <Avatar
@@ -167,11 +169,9 @@
   }
 
   .identity {
-    text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    display: inline-flex;
-    flex-direction: column;
+    text-overflow: ellipsis;
   }
 
   .full-address {
@@ -179,6 +179,10 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+  }
+
+  .muted {
+    color: var(--color-foreground-level-6);
   }
 
   @media (max-width: 768px) {

@@ -38,9 +38,9 @@
     bind:percentages={$context.maintainerSplits.percentages}
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
-    allowedItems="eth-addresses"
     blockedKeys={dependencyKeys}
     maxItems={200 - dependencyKeys.length}
+    allowedItems={['eth-addresses']}
   />
   <svelte:fragment slot="actions">
     <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={nextStep}

@@ -1,11 +1,9 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import { fade } from 'svelte/transition';
-  import { tweened } from 'svelte/motion';
-  import { cubicInOut } from 'svelte/easing';
-  import { tick, onDestroy } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
+  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
 
   export let loaded = false;
   export let empty = false;
@@ -13,127 +11,91 @@
   export let placeholderOutline = true;
   export let horizontalScroll = true;
 
+  export let collapsed = false;
+
   export let emptyStateEmoji = '👻';
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
 
-  export let initHeight = 256;
+  let placeholderContainerElem: HTMLDivElement;
 
-  let containerHeight = tweened(initHeight, {
-    duration: 300,
-    easing: cubicInOut,
-  });
-
-  let placeholderContainerPosition = 'absolute';
-  let contentContainerElem: HTMLDivElement;
-
-  let transitionHeight = true;
-
-  let observer: ResizeObserver;
-  function observeContentChanges() {
-    observer?.disconnect();
-    if (!contentContainerElem) return;
-
-    observer = new ResizeObserver(() => updateContainerHeight());
-    observer.observe(contentContainerElem);
-  }
-  onDestroy(() => observer?.disconnect());
-
-  $: {
-    contentContainerElem;
-    observeContentChanges();
-  }
-
-  $: {
-    updateContainerHeight(empty || !loaded ? initHeight : undefined);
-  }
-
-  async function updateContainerHeight(newHeight: number | void) {
-    await tick();
-
-    if (!contentContainerElem) return;
-
-    // Adding +1px to fix https://github.com/radicle-dev/drips-app-v2/issues/184
-    newHeight = (newHeight ?? contentContainerElem.offsetHeight) + 1;
-
-    containerHeight.set(
-      newHeight,
-      transitionHeight ? { duration: 300, easing: cubicInOut } : { duration: 0 },
-    );
-
-    if (loaded) {
-      setTimeout(() => (transitionHeight = false), 300);
-    } else {
-      transitionHeight = true;
-    }
-  }
+  let contentTransitonedIn = loaded;
 </script>
 
-<div class="section-skeleton" style:height={`${$containerHeight}px`}>
-  {#if loaded}
-    {#if error}
-      <div
-        in:fade={{ duration: 250 }}
-        class="placeholder-container"
-        style:height={`${$containerHeight}px`}
-        style:position={placeholderContainerPosition}
-        style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
-      >
-        <div class="empty-state">
-          <Emoji emoji="⚠️" size="huge" />
-          <div class="text-group">
-            <p class="typo-text-small-bold">Oops, something went wrong.</p>
-            <p class="typo-text-small">
-              Sorry, we weren't able to load this. There may be more information in the developer
-              console.
-            </p>
-            <a
-              class="typo-link typo-text-small"
-              target="_blank"
-              href="https://discord.gg/BakDKKDpHF">Ask for help</a
-            >
-          </div>
+<div class="section-skeleton">
+  <TransitionedHeight transitionHeightChanges={!contentTransitonedIn} bind:collapsed>
+    <div class="inner-wrapper">
+      {#if !loaded || error || empty}
+        <div
+          out:fade|local={{ duration: 250 }}
+          class="placeholder-container"
+          bind:this={placeholderContainerElem}
+          style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
+        >
+          {#if !loaded}
+            <Spinner />
+          {:else if error}
+            <div class="notice" in:fade|local={{ duration: 250 }}>
+              <Emoji emoji="⚠️" size="huge" />
+              <div class="text-group">
+                <p class="typo-text-small-bold">Oops, something went wrong.</p>
+                <p class="typo-text-small">
+                  Sorry, we weren't able to load this. There may be more information in the
+                  developer console.
+                </p>
+                <a
+                  class="typo-link typo-text-small"
+                  target="_blank"
+                  href="https://discord.gg/BakDKKDpHF">Ask for help</a
+                >
+              </div>
+            </div>
+          {:else if empty}
+            <!-- Empty state -->
+            <div class="notice" in:fade|local={{ duration: 250 }}>
+              <Emoji emoji={emptyStateEmoji} size="huge" />
+              <div class="text-group">
+                {#if emptyStateHeadline}<p class="typo-text-small-bold">
+                    {emptyStateHeadline}
+                  </p>{/if}
+                {#if emptyStateText}<p class="typo-text-small">{emptyStateText}</p>{/if}
+              </div>
+            </div>
+          {/if}
         </div>
-      </div>
-    {:else if empty}
-      <div
-        in:fade={{ duration: 250 }}
-        class="placeholder-container"
-        style:height={`${$containerHeight}px`}
-        style:position={placeholderContainerPosition}
-        style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
-      >
-        <div class="empty-state">
-          <Emoji emoji={emptyStateEmoji} size="huge" />
-          <div class="text-group">
-            {#if emptyStateHeadline}<p class="typo-text-small-bold">{emptyStateHeadline}</p>{/if}
-            {#if emptyStateText}<p class="typo-text-small">{emptyStateText}</p>{/if}
-          </div>
+      {:else}
+        <!-- Actual content -->
+        <!-- 
+          Applying a negative margin matching the height of `placeholder-container` while it's still in the DOM
+          to prevent an ugly transition glitch.
+        -->
+        <div
+          class="content-container"
+          style:margin-top={placeholderContainerElem ? '-16rem' : undefined}
+          in:fade|local={{ duration: 250 }}
+          on:transitionend={() => {
+            contentTransitonedIn = true;
+          }}
+        >
+          <PaddedHorizontalScroll enabled={horizontalScroll}>
+            <slot />
+          </PaddedHorizontalScroll>
         </div>
-      </div>
-    {:else}
-      <div bind:this={contentContainerElem} class="content-container" in:fade={{ duration: 250 }}>
-        <PaddedHorizontalScroll enabled={horizontalScroll}>
-          <slot />
-        </PaddedHorizontalScroll>
-      </div>
-    {/if}
-  {:else}
-    <div
-      out:fade|local={{ duration: 250 }}
-      style:position={placeholderContainerPosition}
-      class="placeholder-container"
-      style:height={`${$containerHeight}px`}
-      style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
-    >
-      <Spinner />
+      {/if}
     </div>
-  {/if}
+  </TransitionedHeight>
 </div>
 
 <style>
   .section-skeleton {
     position: relative;
+    /* To give the PaddedHorizontalScroll some space */
+    margin: 0 -2.5rem;
+    height: fit-content;
+  }
+
+  .section-skeleton .inner-wrapper {
+    padding: 0 2.5rem;
   }
 
   .placeholder-container {
@@ -143,9 +105,10 @@
     justify-content: center;
     align-items: center;
     color: var(--color-foreground);
+    height: 16rem;
   }
 
-  .empty-state {
+  .notice {
     display: flex;
     flex-direction: column;
     gap: 1rem;

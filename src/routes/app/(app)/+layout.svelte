@@ -6,7 +6,6 @@
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
 
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
-  import Folder from 'radicle-design-system/icons/Folder.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
@@ -14,6 +13,7 @@
   import { fly } from 'svelte/transition';
   import ens from '$lib/stores/ens';
   import User from 'radicle-design-system/icons/User.svelte';
+  import Box from 'radicle-design-system/icons/Box.svelte';
 
   export let data: { pathname: string };
 
@@ -49,7 +49,7 @@
         items={{
           top: [
             { label: 'Streams', href: '/app/streams', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Folder },
+            { label: 'Projects', href: '/app/projects', icon: Box },
             { label: 'Drip List', href: '/app/drip-lists', icon: Ledger },
             {
               label: 'Profile',
@@ -72,7 +72,7 @@
       <BottomNav
         items={[
           { label: 'Streams', href: '/app/streams', icon: TokenStreams },
-          { label: 'Projects', href: '/app/projects', icon: Folder },
+          { label: 'Projects', href: '/app/projects', icon: Box },
           { label: 'Drip List', href: '/app/drip-lists', icon: Ledger },
           {
             label: 'Profile',
@@ -109,6 +109,7 @@
     top: 0;
     left: 0;
     width: 100%;
+    z-index: 1;
   }
 
   .page {

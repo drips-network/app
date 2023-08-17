@@ -27,6 +27,8 @@
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
+  import Section from '$lib/components/section/section.svelte';
+  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
 
   // Button
   let disabled = false;
@@ -136,8 +138,10 @@
       weight: 62500,
     },
     {
-      type: 'address-split',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      type: 'drip-list-split',
+      listId: '1234',
+      listName: 'Some other Drip List',
+      listOwner: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       weight: 62500,
     },
     {
@@ -159,8 +163,10 @@
           name: 'Some nested stuff',
           list: [
             {
-              type: 'project-split',
-              project: MOCK_PROJECT_1,
+              type: 'drip-list-split',
+              listId: '1235',
+              listName: 'A different Drip List',
+              listOwner: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
@@ -226,6 +232,13 @@
   // Visual Percentage Editor
 
   const DEFAULT_PERCENTAGES = { 'option-1': 50, 'option-2': 45, 'option-3': 5 };
+
+  // Section
+  let sectionLoaded = false;
+  let sectionEmpty = false;
+  let sectionError = false;
+  let sectionCollapsable = false;
+  let sectionCollapsed = false;
 </script>
 
 <HeadMeta />
@@ -233,6 +246,58 @@
 <h1>Component showcase</h1>
 
 <div class="showcase-item">
+  <h2>Toggleable</h2>
+  <Toggleable>Toggleable content</Toggleable>
+</div>
+
+<div class="showcase-item">
+  <h2>Section</h2>
+  <div>
+    <input id="section-loaded-checkbox" type="checkbox" bind:checked={sectionLoaded} />
+    <label for="section-loaded-checkbox">Loaded</label>
+  </div>
+  <div>
+    <input id="section-empty-checkbox" type="checkbox" bind:checked={sectionEmpty} />
+    <label for="section-empty-checkbox">Empty</label>
+  </div>
+  <div>
+    <input id="section-error-checkbox" type="checkbox" bind:checked={sectionError} />
+    <label for="section-error-checkbox">Error</label>
+  </div>
+  <div>
+    <input id="section-collapsable-checkbox" type="checkbox" bind:checked={sectionCollapsable} />
+    <label for="section-collapsable-checkbox">Collapsable</label>
+  </div>
+  <div>
+    <input id="section-collapsed-checkbox" type="checkbox" bind:checked={sectionCollapsed} />
+    <label for="section-collapsed-checkbox">Collapsed</label>
+  </div>
+  <Section
+    bind:collapsable={sectionCollapsable}
+    bind:collapsed={sectionCollapsed}
+    header={{
+      icon: UserIcon,
+      label: 'Section header',
+    }}
+    skeleton={{
+      horizontalScroll: true,
+      loaded: sectionLoaded,
+      empty: sectionEmpty,
+      error: sectionError,
+    }}
+  >
+    <div style:background-color="red" style:min-height="150px">
+      <span style:white-space="nowrap"
+        >hello this is the section content! it's wiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiide so
+        that we can test the horizontal scrolling</span
+      >
+      <Button>A button for testing the tab index functionality</Button>
+    </div>
+  </Section>
+</div>
+
+<div class="showcase-item">
+  <h2>Share button</h2>
   <ShareButton url="https://wikipedia.com/" text="Check this out:" />
 </div>
 

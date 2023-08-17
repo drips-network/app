@@ -45,34 +45,6 @@
     splits: { maintainers: [], dependencies: [] },
   };
 
-  // export function getRepresentationalSplits(
-  //   items: Items,
-  //   percentages: Percentages,
-  //   groupPercentage: number
-  // ): RepresentationalSplit[] {
-  //   return mapFilterUndefined(Object.keys(items), (slug) => {
-  //     const item = items[slug];
-
-  //     const percentage = (groupPercentage / 100) * (percentages[slug] / 100) * 1000000;
-
-  //     if (!percentage) return;
-
-  //     if (item.type === 'project') {
-  //       return {
-  //         type: 'project-split',
-  //         project: item.project,
-  //         weight: percentage,
-  //       };
-  //     } else {
-  //       return {
-  //         type: 'address-split',
-  //         address: slug,
-  //         weight: percentage,
-  //       };
-  //     }
-  //   });
-  // }
-
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
     $context.dependencySplits.items,
     $context.dependencySplits.percentages,

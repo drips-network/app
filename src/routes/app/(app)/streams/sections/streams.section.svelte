@@ -1,14 +1,11 @@
 <script lang="ts">
   import TokenStreamIcon from 'radicle-design-system/icons/TokenStreams.svelte';
   import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
-
-  import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import streams from '$lib/stores/streams/streams.store';
   import UserBadgeCell from '$lib/components/table/cells/user-badge.cell.svelte';
-  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import balances from '$lib/stores/balances';
@@ -25,10 +22,25 @@
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import Section from '$lib/components/section/section.svelte';
 
   export let accountId: string | undefined;
   export let disableActions = true;
   export let tokenAddress: string | undefined = undefined;
+  export let onlyDripListStreams = false;
+
+  export let infoTooltip: string | undefined = undefined;
+
+  export let collapsed = false;
+  export let collapsable = false;
+
+  export let emptyStateHeadline = 'No streams';
+
+  $: isSelf = accountId === $walletStore.dripsAccountId;
+
+  export let emptyStateText = isSelf
+    ? 'Create a stream to send any ERC-20 to any Ethereum address.'
+    : "This user isn't yet streaming any funds.";
 
   interface OutgoingStreamTableRow {
     streamId: string;
@@ -63,6 +75,12 @@
         outgoing: ownStreams.outgoing.filter(byToken),
         incoming: ownStreams.incoming.filter(byToken),
       };
+    }
+
+    // if onlyDripListStreams, filter all streams not going to an nft receiver
+    if (onlyDripListStreams) {
+      const isNFTReceiver = (stream: Stream) => stream.receiver.driver === 'nft';
+      ownStreams.outgoing = ownStreams.outgoing.filter(isNFTReceiver);
     }
 
     outgoingTableData = mapFilterUndefined(ownStreams.outgoing, (stream) => {
@@ -256,7 +274,8 @@
   }
 
   $: error = Boolean(accountId && $accountFetchStatussesStore[accountId]?.all === 'error');
-  $: empty = ownStreams.incoming.length === 0 && ownStreams.outgoing.length === 0;
+  $: empty =
+    (onlyDripListStreams || ownStreams.incoming.length === 0) && ownStreams.outgoing.length === 0;
 
   function onRowClick(
     tableData: OutgoingStreamTableRow[] | IncomingStreamTableRow[],
@@ -271,16 +290,17 @@
       event.detail.event,
     );
   }
-
-  $: isSelf = accountId === $walletStore.dripsAccountId;
 </script>
 
-<div class="section">
-  <SectionHeader
-    icon={TokenStreamIcon}
-    label="Streams"
-    actionsDisabled={!loaded}
-    actions={disableActions
+<Section
+  bind:collapsed
+  bind:collapsable
+  header={{
+    infoTooltip,
+    icon: TokenStreamIcon,
+    label: onlyDripListStreams ? 'Streams to your Drip List' : 'Streams',
+    actionsDisabled: !loaded,
+    actions: disableActions
       ? []
       : [
           {
@@ -288,53 +308,43 @@
             icon: PlusIcon,
             label: 'Create stream',
           },
-        ]}
-  />
-  <div class="content">
-    <SectionSkeleton
-      horizontalScroll
-      emptyStateEmoji="🫙"
-      emptyStateHeadline="No streams"
-      emptyStateText={isSelf
-        ? 'Create a stream to send any ERC-20 to any Ethereum address.'
-        : "This user isn't yet streaming any funds."}
-      {loaded}
-      {error}
-      {empty}
-    >
-      {#if optionsOutgoing.data.length > 0}
-        <div class="table-container">
-          <h4 class="table-group-header">↑ Outgoing</h4>
-          <Table
-            rowHeight={76}
-            options={optionsOutgoing}
-            isRowClickable
-            on:rowClick={(e) => onRowClick(outgoingTableData, e)}
-          />
-        </div>
-      {/if}
-      {#if optionsIncoming.data.length > 0}
-        <div class="table-container">
-          <h4 class="table-group-header">↓ Incoming</h4>
-          <Table
-            rowHeight={76}
-            options={optionsIncoming}
-            isRowClickable
-            on:rowClick={(e) => onRowClick(incomingTableData, e)}
-          />
-        </div>
-      {/if}
-    </SectionSkeleton>
-  </div>
-</div>
+        ],
+  }}
+  skeleton={{
+    horizontalScroll: true,
+    emptyStateEmoji: '🫙',
+    emptyStateHeadline,
+    emptyStateText,
+    loaded,
+    error,
+    empty,
+  }}
+>
+  {#if optionsOutgoing.data.length > 0}
+    <div class="table-container">
+      {#if !onlyDripListStreams}<h4 class="table-group-header">↑ Outgoing</h4>{/if}
+      <Table
+        rowHeight={76}
+        options={optionsOutgoing}
+        isRowClickable
+        on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+      />
+    </div>
+  {/if}
+  {#if !onlyDripListStreams && optionsIncoming.data.length > 0}
+    <div class="table-container">
+      <h4 class="table-group-header">↓ Incoming</h4>
+      <Table
+        rowHeight={76}
+        options={optionsIncoming}
+        isRowClickable
+        on:rowClick={(e) => onRowClick(incomingTableData, e)}
+      />
+    </div>
+  {/if}
+</Section>
 
 <style>
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
   .table-container {
     display: flex;
     flex-direction: column;

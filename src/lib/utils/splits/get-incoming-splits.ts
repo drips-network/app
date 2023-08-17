@@ -5,14 +5,12 @@ import type { DripList, GitProject } from '$lib/utils/metadata/types';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 import { Utils, AddressDriverClient } from 'radicle-drips';
 
-// TODO: The below isn't scalable at all.
-
 export interface SplitsEntryWrapper<T> {
   value: T;
   weight: number;
 }
 
-export default async function getIncomingSplits(projectAccountId: string): Promise<{
+export default async function getIncomingSplits(accountId: string): Promise<{
   users: SplitsEntryWrapper<{
     driver: 'address';
     address: string;
@@ -25,7 +23,7 @@ export default async function getIncomingSplits(projectAccountId: string): Promi
   const dripListService = await DripListService.new();
   const gitProjectService = await GitProjectService.new();
 
-  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(projectAccountId);
+  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(accountId);
 
   const incomingAddressDriverSplits = incomingSplits.filter(
     (s) => Utils.AccountId.getDriver(s.senderId) === 'address',

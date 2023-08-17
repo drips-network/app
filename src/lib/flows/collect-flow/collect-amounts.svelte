@@ -20,7 +20,7 @@
   import assert from '$lib/utils/assert';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import formatDate from '$lib/utils/format-date';
-  import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import { AddressDriverPresets, constants, type CollectedEvent } from 'radicle-drips';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';

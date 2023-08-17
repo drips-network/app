@@ -2,6 +2,7 @@
   import { onMount, tick } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
+  import { fade } from 'svelte/transition';
 
   export let text: string | undefined = undefined;
   export let copyable = false;
@@ -28,10 +29,13 @@
     await tick();
     updatePos();
     expanded = true;
+    await tick();
     setContentFocussable(true);
   }
 
   function hide() {
+    if (!expanded) return;
+
     setContentFocussable(false);
     expanded = false;
   }
@@ -50,6 +54,8 @@
   const MAX_WIDTH = 512;
 
   async function updatePos() {
+    await tick();
+
     const triggerPos = tooltipElem.getBoundingClientRect();
     let contentPos = contentElem.getBoundingClientRect();
 
@@ -97,8 +103,6 @@
     window.addEventListener('scroll', updatePosIfExpanded);
     window.addEventListener('resize', updatePosIfExpanded);
 
-    setContentFocussable(false);
-
     return () => {
       window.removeEventListener('scroll', updatePosIfExpanded);
       window.removeEventListener('resize', updatePosIfExpanded);
@@ -114,27 +118,29 @@
   on:mouseleave={() => !disabled && handleHover(false)}
 >
   <div class="trigger"><slot /></div>
-  <div
-    bind:this={contentElem}
-    class="expanded-tooltip"
-    class:visible={expanded}
-    style:left={`${tooltipPos.left}px`}
-    style:right={`${tooltipPos.right}px`}
-    style:top={`${tooltipPos.top}px`}
-    on:click|stopPropagation
-    on:keydown|stopPropagation
-  >
-    <div class="target-buffer" />
-    <div class="tooltip-content typo-text" style:max-width={MAX_WIDTH}>
-      {#if copyable && text}
-        <Copyable alwaysVisible value={text}
-          ><div class="inner"><slot name="tooltip-content" /></div></Copyable
-        >
-      {:else}
-        <div class="inner"><slot name="tooltip-content" /></div>
-      {/if}
+  {#if expanded}
+    <div
+      transition:fade|local={{ duration: 200 }}
+      bind:this={contentElem}
+      class="expanded-tooltip"
+      style:left={`${tooltipPos.left}px`}
+      style:right={`${tooltipPos.right}px`}
+      style:top={`${tooltipPos.top}px`}
+      on:click|stopPropagation
+      on:keydown|stopPropagation
+    >
+      <div class="target-buffer" />
+      <div class="tooltip-content typo-text" style:max-width={MAX_WIDTH}>
+        {#if copyable && text}
+          <Copyable alwaysVisible value={text}
+            ><div class="inner"><slot name="tooltip-content" /></div></Copyable
+          >
+        {:else}
+          <div class="inner"><slot name="tooltip-content" /></div>
+        {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </span>
 
 <style>
@@ -151,9 +157,6 @@
 
   .expanded-tooltip {
     position: fixed;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
     border: 8px solid transparent;
     box-sizing: border-box;
     max-width: fit-content;
@@ -170,11 +173,6 @@
     text-align: left;
     max-width: fit-content;
     overflow: hidden;
-  }
-
-  .visible {
-    opacity: 1;
-    pointer-events: all;
   }
 
   .tooltip-content .inner {
