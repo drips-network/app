@@ -12,6 +12,7 @@
   import tickStore from '$lib/stores/tick/tick.store';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { goto } from '$app/navigation';
+  import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
 
   const { primaryColor } = themeStore;
 
@@ -165,6 +166,12 @@
       <a class="typo-link" target="_blank" rel="noreferrer" href="https://docs.drips.network"
         >Read the docs</a
       >
+    </Setting>
+    <Setting
+      title="Developer mode"
+      subtitle="When enabled, shows developer-focussed extra information on address profiles, project profiles and Drip Lists."
+    >
+      <Toggle bind:checked={$developerModeStore} />
     </Setting>
   </div>
   <Divider />

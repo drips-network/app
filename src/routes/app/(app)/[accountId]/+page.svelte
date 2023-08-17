@@ -19,6 +19,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+  import Developer from '$lib/components/developer-section/developer.section.svelte';
 
   $: accountId = $page.params.accountId;
 
@@ -147,6 +148,7 @@
         </div>
       {/if}
     </SectionSkeleton>
+    <Developer accountId={dripsAccountId} />
     <ProjectsSection collapsable {address} />
     <DripListsSection collapsable {address} />
     <Streams collapsable accountId={dripsAccountId} />
