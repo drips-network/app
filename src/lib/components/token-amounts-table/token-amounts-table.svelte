@@ -21,7 +21,8 @@
 
   export let amounts: Amount[];
 
-  $: tokens = amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress));
+  $: tokens =
+    ($tokensStore && amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress))) ?? [];
   $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
   $: knownSymbols = knownTokens.map((token) => token.info.symbol);
 
