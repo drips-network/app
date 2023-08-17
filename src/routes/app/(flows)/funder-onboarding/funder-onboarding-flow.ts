@@ -41,28 +41,29 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
           leftComponent: {
             component: Pile,
             props: {
-              components: mapFilterUndefined(Object.values(state.dripList.items), (item) => {
-                if (item.type !== 'selectable') return;
-
-                return 'project' in item.label.props
-                  ? {
-                      component: ProjectAvatar,
-                      props: {
-                        project: item.label.props.project,
-                        outline: true,
-                      },
-                    }
-                  : {
-                      component: IdentityBadge,
-                      props: {
-                        address: item.label.props.address,
-                        showIdentity: false,
-                        size: 'medium',
-                        outline: true,
-                        disableLink: true,
-                      },
-                    };
-              }),
+              components: mapFilterUndefined(
+                Object.entries(state.dripList.items),
+                ([slug, item]) => {
+                  return item.type === 'project'
+                    ? {
+                        component: ProjectAvatar,
+                        props: {
+                          project: item.project,
+                          outline: true,
+                        },
+                      }
+                    : {
+                        component: IdentityBadge,
+                        props: {
+                          address: slug,
+                          showIdentity: false,
+                          size: 'medium',
+                          outline: true,
+                          disableLink: true,
+                        },
+                      };
+                },
+              ),
               maxItems: 3,
             },
           },

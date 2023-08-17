@@ -4,8 +4,6 @@ import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
 import type { AddressSplit, ProjectSplit } from '$lib/components/splits/splits.svelte';
-import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 import EditMaintainerList from './steps/edit-maintainer-list.svelte';
 import EditDependencyList from './steps/edit-dependency-list.svelte';
 import Review from './steps/review.svelte';
@@ -30,26 +28,12 @@ function getSplitPercent(weight: number) {
 function mapRepresentationalSplitToEditorItem(input: RepresentationalSplit): ListItem {
   if ('address' in input) {
     return {
-      type: 'selectable',
-      label: {
-        component: IdentityBadge,
-        props: {
-          address: input.address,
-          size: 'medium',
-        },
-      },
-      editablePercentage: true,
+      type: 'address',
     };
   } else {
     return {
-      type: 'selectable',
-      label: {
-        component: ProjectBadge,
-        props: {
-          project: input.project,
-        },
-      },
-      editablePercentage: true,
+      type: 'project',
+      project: input.project,
     };
   }
 }

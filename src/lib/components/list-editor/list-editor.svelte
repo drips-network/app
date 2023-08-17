@@ -39,6 +39,8 @@
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import ethAddressItem from './item-templates/eth-address';
+  import projectItem from './item-templates/project';
 
   export let maxItems = 200;
 
@@ -85,7 +87,7 @@
 
       // Prevent duplicates.
       if (!items[id]) {
-        items[id] = { type: 'project', project: gitProject };
+        items[id] = projectItem(gitProject);
 
         percentages = { ...percentages, [id]: 0 };
       }
@@ -124,7 +126,7 @@
         return;
       }
 
-      items[address] = { type: 'address' };
+      items[address] = ethAddressItem();
 
       percentages = { ...percentages, [address]: 0 };
 

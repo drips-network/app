@@ -53,13 +53,11 @@ export const state = writable<State>({
   highLevelPercentages: { maintainers: 60, dependencies: 40 },
   maintainerSplits: {
     itemsPromise: undefined,
-    selected: [],
     items: {},
     percentages: {},
   },
   dependencySplits: {
     itemsPromise: undefined,
-    selected: [],
     items: {},
     percentages: {},
   },

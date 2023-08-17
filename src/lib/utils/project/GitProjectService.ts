@@ -441,9 +441,7 @@ export default class GitProjectService {
     const receivers: SplitsReceiverStruct[] = [];
 
     // Populate dependencies splits and metadata.
-    const dependenciesInput = Object.entries(dependencyListEditorConfig.percentages).filter((d) =>
-      dependencyListEditorConfig.selected.includes(d[0]),
-    );
+    const dependenciesInput = Object.entries(dependencyListEditorConfig.percentages);
 
     const dependenciesSplitMetadata: (
       | z.infer<typeof addressDriverSplitReceiverSchema>
@@ -484,9 +482,7 @@ export default class GitProjectService {
     }
 
     // Populate maintainers splits and metadata.
-    const maintainersInput = Object.entries(maintainerListEditorConfig.percentages).filter((d) =>
-      maintainerListEditorConfig.selected.includes(d[0]),
-    );
+    const maintainersInput = Object.entries(maintainerListEditorConfig.percentages);
 
     const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
 

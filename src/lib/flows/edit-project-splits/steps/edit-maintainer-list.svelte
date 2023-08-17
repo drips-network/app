@@ -24,7 +24,7 @@
     }
   }
 
-  $: countOfDependencySplits = $context.dependencySplits.selected.length;
+  $: dependencyKeys = Object.keys($context.dependencySplits.items);
 </script>
 
 <StepLayout>
@@ -35,13 +35,12 @@
     ]}% you assigned to your project’s maintainers."
   />
   <ListEditor
-    bind:selected={$context.maintainerSplits.selected}
     bind:percentages={$context.maintainerSplits.percentages}
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
     allowedItems="eth-addresses"
-    blockedKeys={$context.dependencySplits.selected}
-    maxItems={200 - countOfDependencySplits}
+    blockedKeys={dependencyKeys}
+    maxItems={200 - dependencyKeys.length}
   />
   <svelte:fragment slot="actions">
     <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={nextStep}

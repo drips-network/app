@@ -129,7 +129,6 @@
 
           const { receivers, projectsSplitMetadata } =
             await dripListService.getProjectsSplitMetadataAndReceivers({
-              selected,
               percentages,
               items,
             });
@@ -180,7 +179,7 @@
     <TextInput bind:value={listName} />
   </FormField>
   <FormField title="Recipients*">
-    <ListEditor bind:items bind:percentages bind:selected bind:valid={listValid} />
+    <ListEditor bind:items bind:percentages bind:valid={listValid} />
   </FormField>
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide}>Cancel</Button>

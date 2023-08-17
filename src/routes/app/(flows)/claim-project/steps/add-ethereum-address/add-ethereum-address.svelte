@@ -36,10 +36,10 @@
 
         if (!addressInMaintainers && maintainersListEmpty) {
           $context.maintainerSplits.items = {
-            [address]: ethAddressItem(address),
+            [address]: ethAddressItem(),
           };
 
-          $context.maintainerSplits.selected = [address];
+          $context.maintainerSplits.items[address] = ethAddressItem();
 
           $context.maintainerSplits.percentages = {
             [address]: 100,

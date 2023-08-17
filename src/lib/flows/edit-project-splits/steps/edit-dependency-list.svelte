@@ -15,7 +15,7 @@
 
   let formValid: boolean;
 
-  $: countOfMaintainerSplits = $context.maintainerSplits.selected.length;
+  $: maintainerKeys = Object.keys($context.maintainerSplits.items);
 </script>
 
 <StepLayout>
@@ -25,12 +25,11 @@
       .highLevelPercentages['dependencies']}% you assigned to your project’s dependencies."
   />
   <ListEditor
-    bind:selected={$context.dependencySplits.selected}
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
-    blockedKeys={$context.maintainerSplits.selected}
-    maxItems={200 - countOfMaintainerSplits}
+    blockedKeys={maintainerKeys}
+    maxItems={200 - maintainerKeys.length}
   />
   <svelte:fragment slot="actions">
     <Button
