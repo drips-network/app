@@ -95,9 +95,11 @@
   <h2 class="pixelated">Become a supporter</h2>
   <p>
     {#if isSupportingProject}
-      You're already supporting <b>{project.source.repoName}</b> with your Drip List.
+      You're already supporting <span class="typo-text-bold">{project.source.repoName}</span> with your
+      Drip List.
     {:else}
-      Add <b>{project.source.repoName}</b> to your Drip List to support this project.
+      Add <span class="typo-text-bold">{project.source.repoName}</span> to your Drip List to support
+      this project.
     {/if}
   </p>
   <Button
@@ -188,9 +190,5 @@
 
   p {
     color: var(--color-foreground-level-6);
-  }
-
-  b {
-    font-weight: bold;
   }
 </style>
