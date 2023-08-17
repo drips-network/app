@@ -63,7 +63,7 @@
 </header>
 
 {#if searchMode}
-  <div class="search-background" transition:fade={{ duration: 300 }} />
+  <div class="search-background" transition:fade|local={{ duration: 300 }} />
 {/if}
 
 <style>

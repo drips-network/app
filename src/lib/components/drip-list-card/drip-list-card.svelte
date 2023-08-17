@@ -5,61 +5,40 @@
   import Drip from '../illustrations/drip.svelte';
   import Splits, { type Splits as RepresentationalSplits } from '../splits/splits.svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import KeyValuePair from '../key-value-pair/key-value-pair.svelte';
-  import Token from '$lib/components/token/token.svelte';
-  import Amount from '../amount/amount.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
-  import Spinner from '../spinner/spinner.svelte';
-  import { fade } from 'svelte/transition';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
-  import editDripListStreamSteps from '$lib/flows/edit-drip-list-stream/edit-drip-list-stream-steps';
-  import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
-  import StreamStateBadge from '../stream-state-badge/stream-state-badge.svelte';
-  import formatTokenAmount from '$lib/utils/format-token-amount';
-  import tokensStore from '$lib/stores/tokens/tokens.store';
   import ShareButton from '../share-button/share-button.svelte';
+  import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import { constants } from 'radicle-drips';
+  import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
+  import IdentityBadge from '../identity-badge/identity-badge.svelte';
+  import ProjectAvatar from '../project-avatar/project-avatar.svelte';
+  import Pile from '../pile/pile.svelte';
+  import type { Stream } from '$lib/stores/streams/types';
+  import { fade } from 'svelte/transition';
+  import { browser } from '$app/environment';
 
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
+  export let incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>>;
+
+  export let supportStreams: Stream[] = [];
 
   // TODO: Truncate the representational splits into a splits group after 4 items.
-  // TODO: Display the monthly stream amount on top of the list.
-  // TODO: Add top up and withdraw buttons.
 
-  $: ownerAccountId = dripList.account.owner.accountId;
-  $: supportStreams =
-    $streamsStore &&
-    streamsStore
-      .getStreamsForUser(ownerAccountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
-
-  $: supportStream = supportStreams[0];
-  $: supportStreamToken =
-    $tokensStore && supportStream
-      ? tokensStore.getByAddress(supportStream?.streamConfig.amountPerSecond.tokenAddress)
-      : undefined;
-
-  $: accountEstimate = $balancesStore.accounts[ownerAccountId];
-  $: outgoingEstimate = supportStream
-    ? accountEstimate?.tokens[supportStream.streamConfig.amountPerSecond.tokenAddress.toLowerCase()]
-    : undefined;
-  $: totalStreamed = outgoingEstimate?.total.totals.totalStreamed;
+  $: listOwner = dripList.account.owner;
 
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 
-  let loadingSupportStream = true;
   onMount(async () => {
-    if (!$streamsStore.accounts[ownerAccountId]) {
-      await streamsStore.fetchAccount(ownerAccountId);
+    if (!$streamsStore.accounts[listOwner.accountId]) {
+      await streamsStore.fetchAccount(listOwner.accountId);
     }
-
-    loadingSupportStream = false;
   });
 
   function triggerEditModal() {
@@ -69,11 +48,72 @@
       editDripListSteps(dripList.account.accountId, dripList.name, representationalSplits),
     );
   }
+
+  function getSupportersPile(streams: typeof supportStreams, splits: typeof incomingSplits) {
+    if (!supportStreams || !incomingSplits) return undefined;
+
+    const result = [];
+
+    result.push(
+      splits.users.map((s) => ({
+        component: IdentityBadge,
+        props: {
+          address: s.value.address,
+          showIdentity: false,
+          outline: true,
+          size: 'medium',
+          disableLink: true,
+        },
+      })),
+    );
+
+    result.push(
+      splits.projects.map((s) => ({
+        component: ProjectAvatar,
+        props: {
+          project: s.value,
+          outline: true,
+        },
+      })),
+    );
+
+    result.push(
+      splits.dripLists.map((s) => ({
+        component: IdentityBadge,
+        props: {
+          address: s.value.account.owner.address,
+          showIdentity: false,
+          outline: true,
+          size: 'medium',
+          disableLink: true,
+        },
+      })),
+    );
+
+    // If the owner is streaming to the list, we only want to show them once in the pile.
+    if (streams.length > 0) {
+      result.push({
+        component: IdentityBadge,
+        props: {
+          address: streams[0].sender.address,
+          showIdentity: false,
+          outline: true,
+          size: 'medium',
+          disableLink: true,
+        },
+      });
+    }
+
+    return result.flat();
+  }
+  $: supportersPile = getSupportersPile(supportStreams, incomingSplits);
+
+  $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
 </script>
 
 <div class="card">
   <div class="header">
-    <h1>{dripList.name}</h1>
+    <a href={dripListUrl}><h1>{dripList.name}</h1></a>
     <div class="actions">
       <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
       {#if isOwnList}
@@ -86,78 +126,29 @@
       <div class="drip-icon">
         <Drip />
       </div>
-      {#if totalStreamed && supportStreamToken}
-        <div class="total-streamed-badge">
-          <span class="typo-text tabular-nums"
-            >{formatTokenAmount(totalStreamed, supportStreamToken.info.decimals)}
-            {supportStreamToken.info.symbol}</span
-          >
-          <span class="muted">&nbsp;total</span>
+      <div class="typo-text tabular-nums total-streamed-badge">
+        {#if browser}
+          <!-- TODO: Include incoming splits -->
+          <AggregateFiatEstimate
+            amounts={$balancesStore &&
+              balancesStore
+                .getStreamEstimatesByReceiver('total', dripList.account.accountId)
+                .map((e) => ({
+                  amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+                  tokenAddress: e.tokenAddress,
+                }))}
+          />
+        {/if}
+        <span class="muted">&nbsp;total</span>
+      </div>
+      {#if supportersPile && supportersPile.length > 0}
+        <div in:fade|local={{ duration: 300 }} class="supporters">
+          <span class="muted">Supported by</span>
+          <Pile components={supportersPile ?? []} />
         </div>
       {/if}
     </div>
     <div class="splits-component"><Splits list={representationalSplits} /></div>
-  </div>
-  <div class="support-section">
-    <div class="header">
-      <h4>Continuous support</h4>
-      {#if isOwnList}
-        {#if supportStream}
-          <Button
-            icon={TokenStreams}
-            on:click={() =>
-              modal.show(Stepper, undefined, editDripListStreamSteps(dripList.account.accountId))}
-            >Edit stream</Button
-          >
-        {:else}
-          <Button
-            icon={TokenStreams}
-            variant="primary"
-            on:click={() =>
-              modal.show(Stepper, undefined, createDripListStreamSteps(dripList.account.accountId))}
-            >Support your Drip List</Button
-          >
-        {/if}
-      {/if}
-    </div>
-    {#if loadingSupportStream}
-      <div class="loading">
-        <Spinner />
-      </div>
-    {:else if supportStream}
-      <div in:fade={{ duration: 300 }} class="support-stats">
-        <KeyValuePair size="medium" key="Status">
-          <StreamStateBadge
-            streamId={supportStream.id}
-            paused={false}
-            senderId={supportStream.sender.accountId}
-            tokenAddress={supportStream.streamConfig.amountPerSecond.tokenAddress}
-            size="small"
-          />
-        </KeyValuePair>
-        <KeyValuePair size="medium" key="Token">
-          <Token size="small" address={supportStream.streamConfig.amountPerSecond.tokenAddress} />
-        </KeyValuePair>
-        <KeyValuePair size="medium" key="Rate">
-          <Amount
-            amountPerSecClasses="typo-text tabular-nums"
-            amountPerSecond={supportStream.streamConfig.amountPerSecond}
-          />
-        </KeyValuePair>
-        <KeyValuePair size="medium" key="Remaining Balance">
-          {#if outgoingEstimate}
-            <Amount
-              amount={{
-                tokenAddress: supportStream.streamConfig.amountPerSecond.tokenAddress,
-                amount: outgoingEstimate.total.totals.remainingBalance,
-              }}
-            />
-          {/if}
-        </KeyValuePair>
-      </div>
-    {:else}
-      <span class="muted">This Drip List isn't receiving any continuous support.</span>
-    {/if}
   </div>
 </div>
 
@@ -174,6 +165,10 @@
     padding: 1.5rem 1.5rem 0 1.5rem;
     display: flex;
     justify-content: space-between;
+  }
+
+  .card > .header h1 {
+    white-space: nowrap;
   }
 
   .card > .header > .actions {
@@ -196,7 +191,7 @@
     background-color: var(--color-foreground-level-2);
     border-radius: 1rem 0 1rem 1rem;
     display: flex;
-    align-items: last baseline;
+    align-items: center;
     padding: 0.25rem 0.5rem;
   }
 
@@ -215,30 +210,10 @@
     margin-left: 10px;
   }
 
-  .support-section {
-    padding: 1.5rem;
-    border-top: 1px solid var(--color-foreground);
-  }
-
-  .support-section > .header {
+  .supporters {
     display: flex;
-    justify-content: space-between;
-    gap: 1rem;
     align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .support-section > .support-stats {
-    display: flex;
-    gap: 4rem;
-  }
-
-  .support-section > .loading {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 3rem;
+    gap: 0.5rem;
   }
 
   .muted {

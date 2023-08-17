@@ -65,8 +65,7 @@
       <Tooltip>
         <WarningIcon style="fill: var(--color-negative)" />
         <svelte:fragment slot="tooltip-content">
-          This amount includes unknown tokens, for which we cannot determine a current USD price.
-          Please refer to the detailed token breakdown.
+          This amount includes unknown tokens for which we couldn't determine a current USD value.
         </svelte:fragment>
       </Tooltip>
     </div>
@@ -77,7 +76,8 @@
   .aggregate-fiat-estimate {
     position: relative;
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   .warning {

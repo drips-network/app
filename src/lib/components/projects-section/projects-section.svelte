@@ -2,20 +2,22 @@
   import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import ProjectCard from '../project-card/project-card.svelte';
-  import SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import assert from '$lib/utils/assert';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
-  import SectionHeader from '../section-header/section-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { goto } from '$app/navigation';
+  import Section from '../section/section.svelte';
 
   export let address: string | undefined;
 
   let projects: ClaimedGitProject[] | undefined;
   let error = false;
   let loaded = false;
+
+  export let collapsed = false;
+  export let collapsable = false;
 
   async function updateProjects() {
     try {
@@ -37,11 +39,13 @@
   $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
-<div class="section">
-  <SectionHeader
-    icon={Box}
-    label="Claimed projects"
-    actions={isSelf
+<Section
+  bind:collapsed
+  bind:collapsable
+  header={{
+    icon: Box,
+    label: 'Projects',
+    actions: isSelf
       ? [
           {
             // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldn't. 😊
@@ -51,46 +55,39 @@
             variant: 'primary',
           },
         ]
-      : []}
-  />
-  <SectionSkeleton
-    horizontalScroll={false}
-    {loaded}
-    empty={projects?.length === 0}
-    {error}
-    emptyStateEmoji="🫙"
-    emptyStateHeadline="No claimed projects"
-    emptyStateText={isSelf
+      : [],
+  }}
+  skeleton={{
+    horizontalScroll: false,
+    loaded,
+    empty: projects?.length === 0,
+    error,
+    emptyStateEmoji: '🫙',
+    emptyStateHeadline: 'No claimed projects',
+    emptyStateText: isSelf
       ? 'If you develop an open-source project, click "Claim project" to get started.'
-      : "This user hasn't claimed any software projects yet."}
-  >
-    {#if projects}
-      <div class="projects">
-        {#each projects as project}
-          <div>
-            <PrimaryColorThemer colorHex={project.color}
-              ><ProjectCard {project} /></PrimaryColorThemer
-            >
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </SectionSkeleton>
-</div>
+      : "This user hasn't claimed any software projects yet.",
+  }}
+>
+  {#if projects}
+    <div class="projects">
+      {#each projects as project}
+        <div>
+          <PrimaryColorThemer colorHex={project.color}><ProjectCard {project} /></PrimaryColorThemer
+          >
+        </div>
+      {/each}
+    </div>
+  {/if}
+</Section>
 
 <style>
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
   .projects {
     display: flex;
     gap: 1rem;
     max-width: 100%;
     position: relative;
-    padding-top: 2px;
+    padding: 2px;
     flex-wrap: wrap;
   }
 

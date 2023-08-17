@@ -208,6 +208,7 @@ describe('GitProjectService', () => {
       expect(actualProject.owner.address).toBe(ownerAddress);
       expect(actualProject.splits.maintainers).toStrictEqual([
         {
+          type: 'address',
           weight: 500000,
           account: {
             address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
@@ -218,6 +219,7 @@ describe('GitProjectService', () => {
       ]);
       expect(actualProject.splits.dependencies).toStrictEqual([
         {
+          type: 'repo',
           weight: 500000,
           account: {
             driver: 'repo',

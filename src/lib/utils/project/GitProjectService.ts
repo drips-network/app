@@ -640,6 +640,7 @@ export default class GitProjectService {
     const mapAddressDriverSplitReceiver = (
       metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
     ): AddressDriverSplitReceiver => ({
+      type: 'address',
       weight: metadata.weight,
       account: {
         driver: 'address',
@@ -651,6 +652,7 @@ export default class GitProjectService {
     const mapRepoDriverSplitReceiver = (
       metadata: z.infer<typeof repoDriverSplitReceiverSchema>,
     ): RepoDriverSplitReceiver => ({
+      type: 'repo',
       weight: metadata.weight,
       account: {
         driver: 'repo',

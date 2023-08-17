@@ -1,7 +1,5 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
@@ -21,6 +19,7 @@
   import { fade } from 'svelte/transition';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import Section from '$lib/components/section/section.svelte';
 
   $: {
     $walletStore.connected;
@@ -50,68 +49,67 @@
     <ProjectsSection address={$walletStore.address} />
   </div>
 
-  <div class="section">
-    <SectionHeader icon={TokensIcon} label="Earnings" />
-    <SectionSkeleton initHeight={106} loaded={Boolean(accountId && $splittableStore && cycle)}>
-      {#if accountId && $splittableStore && cycle}
-        <div class="earnings card">
-          <div class="content">
-            <div class="values">
-              <KeyValuePair key="Collectable now" highlight>
-                <AggregateFiatEstimate amounts={$splittableStore} />
-              </KeyValuePair>
-              <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
-            </div>
-            <div />
+  <Section
+    header={{
+      icon: TokensIcon,
+      label: 'Earnings',
+    }}
+    skeleton={{
+      loaded: Boolean(accountId && $splittableStore && cycle),
+    }}
+  >
+    {#if accountId && $splittableStore && cycle}
+      <div class="earnings card">
+        <div class="content">
+          <div class="values">
+            <KeyValuePair key="Collectable now" highlight>
+              <AggregateFiatEstimate amounts={$splittableStore} />
+            </KeyValuePair>
+            <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
           </div>
-          {#if tokensAvailableToCollect}
-            <div class="token-breakdown">
-              <div class="token-amounts-table">
-                <TokenAmountsTable showCollectButtons amounts={$splittableStore} />
-              </div>
-            </div>
-          {/if}
+          <div />
         </div>
-      {/if}
+        {#if tokensAvailableToCollect}
+          <div class="token-breakdown">
+            <div class="token-amounts-table">
+              <TokenAmountsTable showCollectButtons amounts={$splittableStore} />
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
 
-      {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
-        <div class="edu-card-wrapper">
-          <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
-            <div class="illustration">
-              <SplittingGraph />
-            </div>
-            <div class="content">
-              <div style:display="flex" style:gap="0.5rem" style:flex-direction="column">
-                <h2 class="pixelated">How donations reach your projects</h2>
-                <p>
-                  Donations from funders are automatically trickled down a global dependency tree
-                  every seven days.
-                </p>
-              </div>
-              <a href="https://docs.drips.network/" target="_blank"
-                ><Button icon={ArrowBoxUpRight}>Learn more</Button></a
-              >
-            </div>
-            <button
-              class="close-button"
-              on:click={() => dismissablesStore.dismiss('splitting-graph-edu-card')}
-            >
-              <CrossIcon />
-            </button>
+    {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
+      <div class="edu-card-wrapper">
+        <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
+          <div class="illustration">
+            <SplittingGraph />
           </div>
+          <div class="content">
+            <div style:display="flex" style:gap="0.5rem" style:flex-direction="column">
+              <h2 class="pixelated">How donations reach your projects</h2>
+              <p>
+                Donations from funders are automatically trickled down a global dependency tree
+                every seven days.
+              </p>
+            </div>
+            <a tabindex="-1" href="https://docs.drips.network/" target="_blank"
+              ><Button icon={ArrowBoxUpRight}>Learn more</Button></a
+            >
+          </div>
+          <button
+            class="close-button"
+            on:click={() => dismissablesStore.dismiss('splitting-graph-edu-card')}
+          >
+            <CrossIcon />
+          </button>
         </div>
-      {/if}
-    </SectionSkeleton>
-  </div>
+      </div>
+    {/if}
+  </Section>
 </div>
 
 <style>
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
   .page {
     display: flex;
     flex-direction: column;

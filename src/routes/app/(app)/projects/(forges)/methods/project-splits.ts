@@ -1,6 +1,8 @@
 import { buildRepresentationalSplits } from '$lib/utils/drips/splits';
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import type {
+  AddressDriverSplitReceiver,
+  DripListSplitReceiver,
   GitProject,
   RepoDriverAccountSplits,
   RepoDriverSplitReceiver,
@@ -8,7 +10,11 @@ import type {
 
 export async function buildProjectSplitsData(
   project: GitProject,
-  projectSplitsMeta: RepoDriverSplitReceiver[] = [],
+  projectSplitsMeta: (
+    | RepoDriverSplitReceiver
+    | AddressDriverSplitReceiver
+    | DripListSplitReceiver
+  )[] = [],
 ) {
   const validMetadataSplits = await getValidMetadataSplits(project);
   if (!validMetadataSplits) return null;

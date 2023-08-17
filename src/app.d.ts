@@ -3,7 +3,16 @@
 // and what to do when importing types
 declare namespace App {
   // interface Locals {}
-  // interface PageData {}
+
+  interface PageData {
+    /**
+     * If true, the app layout while display a top-level spinner while
+     * app stores are initializing. Disable for fully SSR'd views with a
+     * load function.
+     */
+    blockWhileInitializing?: false;
+  }
+
   // interface PageError {}
   // interface Platform {}
 }

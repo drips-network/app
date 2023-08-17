@@ -9,7 +9,7 @@
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { AddressDriverClient, type SplitsReceiverStruct } from 'radicle-drips';

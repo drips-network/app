@@ -1,11 +1,20 @@
-import type { AddressSplit, ProjectSplit } from '$lib/components/splits/splits.svelte';
+import type {
+  AddressSplit,
+  DripListSplit,
+  ProjectSplit,
+} from '$lib/components/splits/splits.svelte';
 import GitProjectService from '../project/GitProjectService';
-import { AddressDriverClient, Utils } from 'radicle-drips';
+import { AddressDriverClient } from 'radicle-drips';
 import { getSubgraphClient } from '../get-drips-clients';
-import type { RepoDriverSplitReceiver } from '../metadata/types';
+import type {
+  AddressDriverSplitReceiver,
+  DripListSplitReceiver,
+  RepoDriverSplitReceiver,
+} from '../metadata/types';
 import assert from '$lib/utils/assert';
+import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 
-type RepresentationalSplit = AddressSplit | ProjectSplit;
+type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
 /**
  * Fetch splits for a given user ID, and map to representational splits for the `Splits` component.
@@ -14,7 +23,11 @@ type RepresentationalSplit = AddressSplit | ProjectSplit;
  */
 export async function getRepresentationalSplitsForAccount(
   accountId: string,
-  projectSplitsMeta: RepoDriverSplitReceiver[] = [],
+  projectSplitsMeta: (
+    | RepoDriverSplitReceiver
+    | AddressDriverSplitReceiver
+    | DripListSplitReceiver
+  )[] = [],
 ) {
   const subgraph = getSubgraphClient();
 
@@ -38,19 +51,17 @@ export async function getRepresentationalSplitsForAccount(
  */
 export async function buildRepresentationalSplits(
   splits: { account: { accountId: string }; weight: number }[],
-  projectSplitsMeta: RepoDriverSplitReceiver[] = [],
+  splitsMeta: (RepoDriverSplitReceiver | AddressDriverSplitReceiver | DripListSplitReceiver)[] = [],
 ): Promise<RepresentationalSplit[]> {
   const gitProjectService = await GitProjectService.new();
+  const nftDriverMetadata = new NftDriverMetadataManager();
+  const subgraph = getSubgraphClient();
 
   const promises = splits.map((s) =>
     (async () => {
-      const splitType = Utils.AccountId.getDriver(s.account.accountId);
+      const matchingMetadata = splitsMeta.find((v) => v.account.accountId === s.account.accountId);
 
-      if (splitType === 'repo') {
-        const matchingMetadata = projectSplitsMeta.find(
-          (v) => v.account.accountId === s.account.accountId,
-        );
-
+      if (matchingMetadata?.type === 'repo') {
         const project = await gitProjectService.getByAccountId(
           s.account.accountId,
           true,
@@ -62,6 +73,23 @@ export async function buildRepresentationalSplits(
         return {
           type: 'project-split' as const,
           project,
+          weight: s.weight,
+        };
+      } else if (matchingMetadata?.type === 'dripList') {
+        const dripListMetadata = await nftDriverMetadata.fetchAccountMetadata(s.account.accountId);
+
+        if (!dripListMetadata) {
+          throw new Error(`No NFT Driver metadata found for splits entry ${s.account.accountId}`);
+        }
+
+        const owner = await subgraph.getNftSubAccountOwnerByTokenId(s.account.accountId);
+        assert(owner);
+
+        return {
+          type: 'drip-list-split' as const,
+          listId: matchingMetadata.account.accountId,
+          listName: dripListMetadata.data.name ?? 'Unnamed Drip List',
+          listOwner: owner.ownerAddress,
           weight: s.weight,
         };
       } else {

@@ -5,7 +5,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
-  import EduCard from '$lib/components/carousel/items/edu-card.svelte';
+  import EduCard from '$lib/components/carousel/items/carousel-edu-card.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import ArrowUp from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';

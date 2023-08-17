@@ -3,7 +3,7 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import getContrastColor from '$lib/utils/get-contrast-text-color';
-  import { getSplitPercent } from '$lib/utils/get-split-percent';
+  import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import { fade } from 'svelte/transition';
   import SplitsListComponent, { type Splits } from '../../splits.svelte';
   import type { Split, SplitGroup } from '../../splits.svelte';
@@ -15,10 +15,16 @@
   import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 
   export let split: Split | SplitGroup;
   export let linkToNewTab = false;
   export let isNested = false;
+
+  /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
+  export let isLast = false;
+  /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
+  export let isFirst = false;
 
   let element: HTMLDivElement;
 
@@ -58,24 +64,35 @@
     return mapFilterUndefined(containedSplits, (s) => {
       if (s.type === 'drips-donation-split') return;
 
-      if (s.type === 'address-split') {
-        return {
-          component: IdentityBadge,
-          props: {
-            showIdentity: false,
-            address: s.address,
-            size: 'medium',
-            outline: true,
-          },
-        } as ComponentAndProps;
-      } else {
-        return {
-          component: ProjectAvatar,
-          props: {
-            project: s.project,
-            outline: true,
-          },
-        } as ComponentAndProps;
+      switch (s.type) {
+        case 'address-split':
+          return {
+            component: IdentityBadge,
+            props: {
+              showIdentity: false,
+              address: s.address,
+              size: 'medium',
+              outline: true,
+              disableLink: true,
+            },
+          } as ComponentAndProps;
+        case 'drip-list-split':
+          return {
+            component: DripListBadge,
+            props: {
+              listId: s.listId,
+              listName: s.listName,
+              showName: false,
+            },
+          } as ComponentAndProps;
+        case 'project-split':
+          return {
+            component: ProjectAvatar,
+            props: {
+              project: s.project,
+              outline: true,
+            },
+          } as ComponentAndProps;
       }
     });
   }
@@ -140,10 +157,18 @@
           'pretty',
         )}
       </div>
+      {#if isFirst}
+        <div class="intro-line" />
+      {/if}
+      {#if !isLast}
+        <div class="line" />
+      {/if}
     </div>
     <div class="receiver">
       {#if split.type === 'address-split'}
         <IdentityBadge {linkToNewTab} address={split.address} size="medium" />
+      {:else if split.type === 'drip-list-split'}
+        <DripListBadge owner={split.listOwner} listId={split.listId} listName={split.listName} />
       {:else if split.type === 'drips-donation-split'}
         <div class="drips-logo">
           <DripsLogo />
@@ -206,6 +231,24 @@
 
   .arrow {
     position: relative;
+  }
+
+  .arrow .line {
+    position: absolute;
+    top: 0;
+    left: 0.5px;
+    width: 1px;
+    height: calc(100% + 1px);
+    background-color: var(--color-foreground);
+  }
+
+  .arrow .intro-line {
+    position: absolute;
+    top: -1rem;
+    left: 0.5px;
+    background: linear-gradient(to bottom, transparent, var(--color-foreground));
+    height: calc(1rem + 1px);
+    width: 1px;
   }
 
   .arrow .percentage {
