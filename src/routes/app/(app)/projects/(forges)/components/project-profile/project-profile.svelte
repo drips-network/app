@@ -39,6 +39,7 @@
   import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
+  import Developer from '$lib/components/developer-section/developer.section.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -173,6 +174,7 @@
       {/if}
     </div>
     <div class="content">
+      <Developer accountId={project.repoDriverAccount.accountId} />
       {#if project.owner}
         <div class="section">
           {#if splits}

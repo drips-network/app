@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Developer from '$lib/components/developer-section/developer.section.svelte';
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -37,6 +38,7 @@
       representationalSplits={data.representationalSplits}
     />
   </SectionSkeleton>
+  <Developer accountId={dripList.account.accountId} />
   <Supporters
     headline="Support"
     infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists to support it."
