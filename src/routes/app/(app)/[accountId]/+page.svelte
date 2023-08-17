@@ -136,14 +136,14 @@
             </div>
           </div>
           <div class="social-links">
-            <div in:fade><SocialLink network="ethereum" value={address} /></div>
+            <div in:fade|local><SocialLink network="ethereum" value={address} /></div>
             {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
-              {#if value}<div in:fade>
+              {#if value}<div in:fade|local>
                   <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                 </div>{/if}
             {/each}
           </div>
-          {#if description}<p class="description" in:fade>{description}</p>{/if}
+          {#if description}<p class="description" in:fade|local>{description}</p>{/if}
         </div>
       {/if}
     </SectionSkeleton>

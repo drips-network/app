@@ -120,7 +120,7 @@
   <div class="trigger"><slot /></div>
   {#if expanded}
     <div
-      transition:fade={{ duration: 200 }}
+      transition:fade|local={{ duration: 200 }}
       bind:this={contentElem}
       class="expanded-tooltip"
       style:left={`${tooltipPos.left}px`}

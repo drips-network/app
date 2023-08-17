@@ -35,7 +35,7 @@
           {#if !loaded}
             <Spinner />
           {:else if error}
-            <div class="notice" in:fade={{ duration: 250 }}>
+            <div class="notice" in:fade|local={{ duration: 250 }}>
               <Emoji emoji="⚠️" size="huge" />
               <div class="text-group">
                 <p class="typo-text-small-bold">Oops, something went wrong.</p>
@@ -52,7 +52,7 @@
             </div>
           {:else if empty}
             <!-- Empty state -->
-            <div class="notice" in:fade={{ duration: 250 }}>
+            <div class="notice" in:fade|local={{ duration: 250 }}>
               <Emoji emoji={emptyStateEmoji} size="huge" />
               <div class="text-group">
                 {#if emptyStateHeadline}<p class="typo-text-small-bold">

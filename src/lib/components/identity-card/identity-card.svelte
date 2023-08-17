@@ -22,7 +22,7 @@
 <a href={disableLink || loading ? undefined : getLink()} class="identity-card">
   {#if title}<p class="title typo-all-caps">{title}</p>{/if}
   {#if address}
-    <div class="content-container" in:fade>
+    <div class="content-container" in:fade|local>
       <IdentityBadge
         {disableLink}
         size="huge"
@@ -34,7 +34,7 @@
       <IdentityBadge {disableLink} size="huge" {address} showAvatar={false} disableTooltip />
     </div>
   {:else if dripList}
-    <div class="content-container" in:fade>
+    <div class="content-container" in:fade|local>
       <div class="icon">
         <Ledger style="fill: var(--color-background); height: 3rem; width: 3rem;" />
       </div>
