@@ -103,7 +103,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    transition: transform 0.3s;
+    transition: transform 0.3s, background-color 0.3s;
   }
 
   .collapsed .expand-button {
@@ -111,6 +111,10 @@
   }
 
   .expand-button:focus-visible {
+    background-color: var(--color-foreground-level-2);
+  }
+
+  .expand-button:hover {
     background-color: var(--color-foreground-level-3);
   }
 
