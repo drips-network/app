@@ -8,7 +8,7 @@
 
 <span class="project-name">
   {#if showSource}
-    <span style:color="var(--color-foreground-level-5)" class="typo-text">
+    <span style:color="var(--color-foreground-level-5)" class="owner-name typo-text">
       {project.source.ownerName}/
     </span>
   {/if}
@@ -22,5 +22,12 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+  }
+
+  .project-name .repo-name,
+  .project-name .owner-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>
