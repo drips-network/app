@@ -1,22 +1,16 @@
 import RepoDriverUtils from '../RepoDriverUtils';
 import { getRepoDriverClient } from '../get-drips-clients';
 import MetadataManagerBase from './MetadataManagerBase';
-import {
-  addressDriverSplitReceiverSchema,
-  repoDriverAccountMetadataSchema,
-  repoDriverSplitReceiverSchema,
-  splitReceiverSchema,
-} from './schemas';
+import { repoDriverAccountMetadataParser } from './schemas';
 import type { ClaimedGitProject, RepoDriverAccount, AccountId } from './types';
-
-import type { z } from 'zod';
+import type { AnyVersion, LatestVersion } from './versioned-metadata';
 
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
-  typeof repoDriverAccountMetadataSchema,
-  RepoDriverAccount
+  RepoDriverAccount,
+  typeof repoDriverAccountMetadataParser
 > {
   constructor() {
-    super(repoDriverAccountMetadataSchema);
+    super(repoDriverAccountMetadataParser);
   }
 
   /**
@@ -27,7 +21,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
    */
   public override async fetchAccountMetadata(
     accountId: AccountId,
-  ): Promise<{ hash: string; data: z.infer<typeof repoDriverAccountMetadataSchema> } | null> {
+  ): Promise<{ hash: string; data: AnyVersion<typeof repoDriverAccountMetadataParser> } | null> {
     const metadata = await super.fetchAccountMetadata(accountId);
 
     if (!metadata) {
@@ -74,15 +68,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
   public buildAccountMetadata(context: {
     forProject: ClaimedGitProject;
-    forSplits: {
-      maintainers: z.infer<typeof addressDriverSplitReceiverSchema>[];
-      dependencies: (
-        | z.infer<typeof addressDriverSplitReceiverSchema>
-        | z.infer<typeof repoDriverSplitReceiverSchema>
-      )[];
-      dripsDonation?: z.infer<typeof splitReceiverSchema>;
-    };
-  }): z.infer<typeof repoDriverAccountMetadataSchema> {
+    forSplits: LatestVersion<typeof repoDriverAccountMetadataParser>['splits'];
+  }): LatestVersion<typeof repoDriverAccountMetadataParser> {
     const { forProject, forSplits } = context;
 
     return {

@@ -11,7 +11,6 @@ import { AddressDriverPresets, Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
-import type { z } from 'zod';
 import expect from '$lib/utils/expect';
 import streams from '$lib/stores/streams';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -19,8 +18,8 @@ import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import type { createEventDispatcher } from 'svelte';
 import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
-import type { streamMetadataSchema } from '$lib/utils/metadata/schemas';
 import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
+import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -84,7 +83,9 @@ export default function (
 
         const metadataMgr = new AddressDriverMetadataManager();
 
-        const newStreamMetadata: z.infer<typeof streamMetadataSchema> = {
+        const newStreamMetadata: ReturnType<
+          typeof addressDriverAccountMetadataParser.parseLatest
+        >['assetConfigs'][number]['streams'][number] = {
           id: makeStreamId(ownAccountId, tokenAddress, dripId.toString()),
           initialDripsConfig: {
             dripId: dripId.toString(),

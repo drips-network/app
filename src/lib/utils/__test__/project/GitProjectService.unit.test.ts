@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as getClient from '$lib/utils/get-drips-clients';
 import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
-import type { repoDriverAccountMetadataSchema } from '$lib/utils/metadata/schemas';
+import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 import {
   VerificationStatus,
   type UnclaimedGitProject,
   type ClaimedGitProject,
 } from '$lib/utils/metadata/types';
 import type { GitProject } from '$lib/utils/metadata/types';
+import type { LatestVersion } from '$lib/utils/metadata/versioned-metadata';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 import { Wallet } from 'ethers';
 import { AddressDriverClient, RepoDriverClient, type RepoAccount } from 'radicle-drips';
-import type { z } from 'zod';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -121,7 +121,7 @@ describe('GitProjectService', () => {
         description: 'description',
         emoji: 'emoji',
         source: {},
-      } as unknown as z.infer<typeof repoDriverAccountMetadataSchema>;
+      } as unknown as LatestVersion<typeof repoDriverAccountMetadataParser>;
 
       repoDriverMetadataManagerMock.fetchAccountMetadata.mockResolvedValueOnce({
         data: projectMetadata,
@@ -185,7 +185,7 @@ describe('GitProjectService', () => {
             },
           ],
         },
-      } as unknown as z.infer<typeof repoDriverAccountMetadataSchema>;
+      } as unknown as LatestVersion<typeof repoDriverAccountMetadataParser>;
 
       repoDriverMetadataManagerMock.fetchAccountMetadata.mockResolvedValueOnce({
         data: projectMetadata,

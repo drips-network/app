@@ -4,17 +4,17 @@ import {
   type StreamsSetEventWithFullReceivers,
   AddressDriverClient,
 } from 'radicle-drips';
-import type { addressDriverAccountMetadataSchema } from '../schemas';
 import * as getDripsClients from '$lib/utils/get-drips-clients';
 import * as reconcileStreamsSetReceivers from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import type { Mock } from 'vitest';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import AddressDriverMetadataManager from '../AddressDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
-import type { z } from 'zod';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 import type { Account } from '$lib/stores/streams/types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import type { LatestVersion } from '../versioned-metadata';
+import type { addressDriverAccountMetadataParser } from '../schemas';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -77,7 +77,10 @@ describe('AddressDriverMetadataManager', () => {
           writtenByAddress: '0x123',
         },
         hash: 'QmX',
-      } as unknown as { hash: string; data: z.infer<typeof addressDriverAccountMetadataSchema> };
+      } as unknown as {
+        hash: string;
+        data: LatestVersion<typeof addressDriverAccountMetadataParser>;
+      };
 
       MetadataManagerBase.prototype.fetchAccountMetadata = vi
         .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
@@ -172,6 +175,7 @@ describe('AddressDriverMetadataManager', () => {
                 description: 'A test stream',
               },
             ],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         ],
         lastUpdated: new Date(),

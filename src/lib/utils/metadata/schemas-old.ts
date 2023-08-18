@@ -114,20 +114,3 @@ export const repoDriverAccountMetadataSchema = z.object({
   description: z.string().optional(),
   splits: repoDriverAccountSplitsSchema,
 });
-
-export const nftDriverAccountMetadataSchema = z.object({
-  driver: z.literal('nft'),
-  describes: z.object({
-    driver: z.literal('nft'),
-    accountId: z.string(),
-  }),
-  isDripList: z.literal(true),
-  projects: z.array(
-    z.union([
-      dripListSplitReceiverSchema,
-      repoDriverSplitReceiverSchema,
-      addressDriverSplitReceiverSchema,
-    ]),
-  ),
-  name: z.string().optional(),
-});

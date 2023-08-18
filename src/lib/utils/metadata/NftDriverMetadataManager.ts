@@ -1,20 +1,16 @@
-import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
-import {
-  addressDriverSplitReceiverSchema,
-  dripListSplitReceiverSchema,
-  nftDriverAccountMetadataSchema,
-  repoDriverSplitReceiverSchema,
-} from './schemas';
 import type { NFTDriverAccount, AccountId } from './types';
 import { getAddressDriverClient } from '../get-drips-clients';
+import { nftDriverAccountMetadataParser } from './schemas';
+import type { NFTDriverClient } from 'radicle-drips';
+import type { LatestVersion } from './versioned-metadata';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
-  typeof nftDriverAccountMetadataSchema,
-  NFTDriverAccount
+  NFTDriverAccount,
+  typeof nftDriverAccountMetadataParser
 > {
-  constructor() {
-    super(nftDriverAccountMetadataSchema);
+  constructor(nftDriverClient?: NFTDriverClient) {
+    super(nftDriverAccountMetadataParser, nftDriverClient?.emitAccountMetadata);
   }
 
   public async fetchAccount(accountId: AccountId): Promise<NFTDriverAccount | null> {
@@ -45,13 +41,9 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
   public buildAccountMetadata(context: {
     forAccount: NFTDriverAccount;
-    projects: z.infer<
-      | typeof repoDriverSplitReceiverSchema
-      | typeof addressDriverSplitReceiverSchema
-      | typeof dripListSplitReceiverSchema
-    >[];
+    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'];
     name?: string;
-  }): z.infer<typeof nftDriverAccountMetadataSchema> {
+  }): LatestVersion<typeof nftDriverAccountMetadataParser> {
     const { forAccount, projects, name } = context;
 
     return {

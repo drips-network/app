@@ -1,20 +1,21 @@
 import { AddressDriverClient } from 'radicle-drips';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
-import { addressDriverAccountMetadataSchema } from './schemas';
+import { addressDriverAccountMetadataParser } from './schemas';
 import type { Account } from '$lib/stores/streams/types';
 import type { AccountId } from './types';
 import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 
+type LatestSchema = ReturnType<typeof addressDriverAccountMetadataParser.parseLatest>;
+
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
-  typeof addressDriverAccountMetadataSchema,
-  Account
+  Account,
+  typeof addressDriverAccountMetadataParser
 > {
   constructor() {
-    super(addressDriverAccountMetadataSchema);
+    super(addressDriverAccountMetadataParser);
   }
 
   public async fetchAccount(accountId: AccountId): Promise<Account> {
@@ -30,7 +31,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
 
     const assetConfigs = buildAssetConfigs(
       accountId,
-      data as z.infer<typeof addressDriverAccountMetadataSchema>,
+      data as LatestSchema,
       streamsSetEventsByTokenAddress,
     );
 
@@ -53,7 +54,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
   public buildAccountMetadata(context: {
     forAccount: Account;
     address: string;
-  }): z.infer<typeof addressDriverAccountMetadataSchema> {
+  }): ReturnType<typeof addressDriverAccountMetadataParser.parseLatest> {
     const { forAccount, address } = context;
 
     return {
