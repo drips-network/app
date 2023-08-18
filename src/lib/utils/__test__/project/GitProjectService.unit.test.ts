@@ -8,7 +8,7 @@ import {
   type ClaimedGitProject,
 } from '$lib/utils/metadata/types';
 import type { GitProject } from '$lib/utils/metadata/types';
-import type { LatestVersion } from '$lib/utils/metadata/versioned-metadata';
+import type { LatestVersion } from '$lib/utils/versioned-parser';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 import { Wallet } from 'ethers';
 import { AddressDriverClient, RepoDriverClient, type RepoAccount } from 'radicle-drips';

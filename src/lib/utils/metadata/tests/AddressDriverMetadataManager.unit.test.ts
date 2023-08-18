@@ -13,7 +13,7 @@ import MetadataManagerBase from '../MetadataManagerBase';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 import type { Account } from '$lib/stores/streams/types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { LatestVersion } from '../versioned-metadata';
+import type { LatestVersion } from '../../versioned-parser';
 import type { addressDriverAccountMetadataParser } from '../schemas';
 
 vi.mock('$env/dynamic/public', () => ({

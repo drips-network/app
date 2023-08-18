@@ -5,7 +5,7 @@ import type { DripsSubgraphClient, AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import type { AccountId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
-import type { AnyVersion, LatestVersion, Parser } from './versioned-metadata';
+import type { AnyVersion, LatestVersion, Parser } from '../versioned-parser';
 import assert from '$lib/utils/assert';
 
 type IpfsHash = string;

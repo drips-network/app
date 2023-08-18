@@ -17,13 +17,14 @@ export type LatestVersionSchema<PT extends Parser> = ReturnType<PT['getLatestSch
 export type AllVersionSchema<PT extends Parser> = ReturnType<PT['getAllSchemas']>;
 
 /**
- * Create a versioned metadata parser. Use `parseLatest` to parse using the
- * latest version of the schema (first arg), or `parseAnyVersion` to parse using
- * any version of the schema (all args). The schemas should be ordered from
- * latest to oldest.
- * @param versions
+ * Create a versioned parser. Create it with any amount of versions of the same schema.
+ * Call `parseLatest` to parse using the latest version of the schema, or `parseAnyVersion`
+ * to parse using any version of the schema. `parseAnyVersion` will attempt to parse using
+ * the latest version first, then the second-latest, and so on. The versions are ordered newest
+ * to oldest.
+ * @param ...args The versions of the schema to include in the parser. Must be ordered newest to oldest.
  */
-export const versionedMetadata = <ZT extends ZodSchema[]>(
+export const createVersionedParser = <ZT extends ZodSchema[]>(
   ...args: [...ZT]
 ): Parser<typeof args> => {
   /**

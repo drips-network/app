@@ -12,7 +12,7 @@ import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
 import type { StreamsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
 import buildStreamReceiver from './build-stream-receiver';
-import type { AnyVersion } from '$lib/utils/metadata/versioned-metadata';
+import type { AnyVersion } from '$lib/utils/versioned-parser';
 import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 
 type AccountMetadata = AnyVersion<typeof addressDriverAccountMetadataParser>;
