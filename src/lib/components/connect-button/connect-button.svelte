@@ -14,54 +14,63 @@
   const waitingForOnboardStore = wallet.waitingForOnboard;
 </script>
 
-{#if $wallet.connected}
-  <div class="desktop-only">
-    <Flyout>
-      <div class="trigger" slot="trigger">
-        {#if $wallet.network.chainId !== 1}
-          <div class="network-badge">
-            <p>{$wallet.network.name}</p>
-          </div>
-        {/if}
-        {#if safeAppMode}<div class="safe-logo">
-            <SafeLogo />
-          </div>{/if}
-        <IdentityBadge
-          disableTooltip
-          hideAvatarOnMobile
-          disableLink
-          size="medium"
-          address={$wallet.address}
-        />
-      </div>
-      <div slot="content">
-        <AccountMenu />
-      </div>
-    </Flyout>
-  </div>
-  <div
-    class="mobile-only"
-    on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
-    on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
-  >
-    <IdentityBadge
-      hideAvatarOnMobile
-      disableLink
-      size="medium"
-      address={$wallet.address}
-      disableTooltip
-    />
-  </div>
-{:else}
-  <Button
-    disabled={$waitingForOnboardStore}
-    loading={!$walletInitializedStore}
-    icon={WalletIcon}
-    on:click={() => wallet.connect()}>Connect</Button
-  >
-{/if}
+<div class="wrapper">
+  {#if $wallet.network.chainId !== 1}
+    <div class="network-badge">
+      <p>{$wallet.network.name}</p>
+    </div>
+  {/if}
+  {#if $wallet.connected}
+    <div class="desktop-only">
+      <Flyout>
+        <div class="trigger" slot="trigger">
+          {#if safeAppMode}<div class="safe-logo">
+              <SafeLogo />
+            </div>{/if}
+          <IdentityBadge
+            disableTooltip
+            hideAvatarOnMobile
+            disableLink
+            size="medium"
+            address={$wallet.address}
+          />
+        </div>
+        <div slot="content">
+          <AccountMenu />
+        </div>
+      </Flyout>
+    </div>
+    <div
+      class="mobile-only"
+      on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+      on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+    >
+      <IdentityBadge
+        hideAvatarOnMobile
+        disableLink
+        size="medium"
+        address={$wallet.address}
+        disableTooltip
+      />
+    </div>
+  {:else}
+    <Button
+      disabled={$waitingForOnboardStore}
+      loading={!$walletInitializedStore}
+      icon={WalletIcon}
+      on:click={() => wallet.connect()}>Connect</Button
+    >
+  {/if}
+</div>
 
 <style>
+  .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0rem;
+  }
+
   .trigger {
     display: flex;
   }
