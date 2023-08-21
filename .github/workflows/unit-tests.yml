@@ -13,6 +13,11 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      - name: Populate .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_PUBLIC_NETWORK: 5
+
       - name: Install dependencies
         run: npm ci
 

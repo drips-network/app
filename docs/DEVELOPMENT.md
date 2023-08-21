@@ -1,4 +1,6 @@
-## 🤓 Development
+# 🤓 Development Instructions
+
+## 👋 Setup
 
 Setup dependencies:
 
@@ -15,7 +17,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-Please note that two environment variables are required for pinning account metadata to IPFS, according to [.env.template](/.env.template). Without these values populated, creating a new stream might fail. You can sign up for a free Pinata account and populate these values for yourself.
+Please note that a number of environment variables are required to run the app (see "Environment" below).
 
 ## 🏗️ Building
 
@@ -27,13 +29,20 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-## ⛓️ Default Chain
-
-Currently, the app fetches project- and Drip List data server-side when visiting the project or Drip List detail routes. Because we don't yet have a mechanism for communicating the client's current chain to the server, it will always fetch from the `DEFAULT_NETWORK` specified at the top of `wallet.store.ts`. During development, you may want to temporarily change the default network to the testnet you're connected to in order to ensure that any server-initiated Subgraph queries fetch data for the expected chain.
-
 ## 🌳 Environment
 
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. You'll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects.
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. You'll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. You'll also need to set up `PUBLIC_NETWORK`, as described right below.
+
+## 🔗 Chain Config
+
+To run the app, you'll need to configure the `PUBLIC_NETWORK` environment variable. This should be the chainId of the chain you want to run the app for, and can currently be either 1, 5 or 11155111. The app will only allow connecting wallets that are set to this network, and all server-side requests will be made for this network's subgraph.
+
+For your convenience, we've deployed production mirrors of the app set to allow testnet connections:
+
+```sh
+https://goerli.drips.network/ # PUBLIC_NETWORK set to 5
+https://sepolia.drips.network/ # PUBLIC_NETWORK set to 11155111
+```
 
 ## 🧪 Tests
 
