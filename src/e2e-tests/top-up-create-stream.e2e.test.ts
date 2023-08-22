@@ -431,7 +431,9 @@ describe('app', async () => {
     });
 
     it('adds items', async () => {
-      const input = page.locator('input.list-editor__input');
+      const input = page.locator(
+        'input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]',
+      );
       await expect(input).toHaveCount(1);
       await input.click();
 
@@ -497,14 +499,16 @@ describe('app', async () => {
       await page.locator('button', { hasText: 'Edit list' }).click();
     });
 
-    it('deselects an item', async () => {
-      await page.locator('#trashbtn-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
+    it('removes an item', async () => {
+      await page.getByTestId('remove-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
 
       await expect(page.locator('text=50% allocated')).toHaveCount(1);
     });
 
     it('adds a new item', async () => {
-      await page.locator('input.list-editor__input').click();
+      await page
+        .locator('input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]')
+        .click();
 
       await page.keyboard.type('github.com/efstajas/drips-test-repo-11');
       await page.keyboard.press('Enter');

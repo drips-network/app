@@ -312,7 +312,7 @@
         bind:value={inputValue}
         disabled={isAddingItem}
         on:keydown={(e) => e.key === 'Enter' && handleSubmitInput()}
-        class="list-editor__input typo-text"
+        class="typo-text"
         type="text"
         placeholder={inputPlaceholder}
       />
@@ -360,11 +360,11 @@
                 {:else}
                   <PercentageEditor bind:percentage={percentages[slug]} />
                   <Button
-                    id={`trashbtn-${slug}`}
                     icon={Trash}
                     variant="ghost"
                     on:click={() => removeItem(slug)}
                     ariaLabel="Remove from list"
+                    dataTestId={`remove-${slug}`}
                   />
                 {/if}
               </div>
