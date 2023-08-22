@@ -1,6 +1,5 @@
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
-import assert from '$lib/utils/assert';
 import { browser } from '$app/environment';
 
 const LOCAL_STORAGE_KEY = 'dismissables';
@@ -29,7 +28,7 @@ export default (() => {
    */
   function dismiss(id: string) {
     state.update((s) => {
-      assert(!s.includes(id), 'This dismissable ID has already been dismissed.');
+      if (s.includes(id)) return s;
 
       const newState = [...s, id];
 
