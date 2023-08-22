@@ -364,6 +364,7 @@
                     icon={Trash}
                     variant="ghost"
                     on:click={() => removeItem(slug)}
+                    ariaLabel="Remove from list"
                   />
                 {/if}
               </div>
