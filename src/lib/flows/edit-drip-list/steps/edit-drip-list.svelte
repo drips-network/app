@@ -11,19 +11,22 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { getCallerClient, getNFTDriverTxFactory } from '$lib/utils/get-drips-clients';
+  import {
+    getCallerClient,
+    getNFTDriverClient,
+    getNFTDriverTxFactory,
+  } from '$lib/utils/get-drips-clients';
   import type { GitProject } from '$lib/utils/metadata/types';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
-  import type { z } from 'zod';
-  import type { nftDriverAccountMetadataSchema } from '$lib/utils/metadata/schemas';
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { Utils } from 'radicle-drips';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -155,12 +158,13 @@
 
           const setSplitsTx = await nftDriverTxFactory.setSplits(dripListId, receivers);
 
-          const metadataManager = new NftDriverMetadataManager();
+          const nftDriverClient = await getNFTDriverClient();
+          const metadataManager = new NftDriverMetadataManager(nftDriverClient);
 
           const currentMetadata = await metadataManager.fetchAccountMetadata(dripListId);
           assert(currentMetadata);
 
-          const newMetadata: z.infer<typeof nftDriverAccountMetadataSchema> = {
+          const newMetadata: ReturnType<typeof nftDriverAccountMetadataParser.parseLatest> = {
             ...currentMetadata.data,
             name: listName,
             projects: projectsSplitMetadata,

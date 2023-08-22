@@ -1,20 +1,16 @@
-import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
-import {
-  addressDriverSplitReceiverSchema,
-  dripListSplitReceiverSchema,
-  nftDriverAccountMetadataSchema,
-  repoDriverSplitReceiverSchema,
-} from './schemas';
 import type { NFTDriverAccount, AccountId } from './types';
 import { getAddressDriverClient } from '../get-drips-clients';
+import { nftDriverAccountMetadataParser } from './schemas';
+import type { NFTDriverClient } from 'radicle-drips';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
-  typeof nftDriverAccountMetadataSchema,
-  NFTDriverAccount
+  NFTDriverAccount,
+  typeof nftDriverAccountMetadataParser
 > {
-  constructor() {
-    super(nftDriverAccountMetadataSchema);
+  constructor(nftDriverClient?: NFTDriverClient) {
+    super(nftDriverAccountMetadataParser, nftDriverClient?.emitAccountMetadata);
   }
 
   public async fetchAccount(accountId: AccountId): Promise<NFTDriverAccount | null> {
@@ -45,13 +41,9 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
   public buildAccountMetadata(context: {
     forAccount: NFTDriverAccount;
-    projects: z.infer<
-      | typeof repoDriverSplitReceiverSchema
-      | typeof addressDriverSplitReceiverSchema
-      | typeof dripListSplitReceiverSchema
-    >[];
+    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'];
     name?: string;
-  }): z.infer<typeof nftDriverAccountMetadataSchema> {
+  }): LatestVersion<typeof nftDriverAccountMetadataParser> {
     const { forAccount, projects, name } = context;
 
     return {
@@ -64,5 +56,35 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       projects,
       name,
     };
+  }
+
+  public upgradeAccountMetadata(
+    currentMetadata: AnyVersion<typeof nftDriverAccountMetadataParser>,
+  ): LatestVersion<typeof nftDriverAccountMetadataParser> {
+    const result = currentMetadata;
+
+    type Projects = AnyVersion<typeof nftDriverAccountMetadataParser>['projects'][number];
+
+    const upgradeSplit = (split: Projects) => {
+      if ('type' in split) return split;
+
+      if ('source' in split) {
+        return {
+          type: 'repoDriver' as const,
+          ...split,
+        };
+      } else {
+        return {
+          type: 'address' as const,
+          ...split,
+        };
+      }
+    };
+
+    result.projects = result.projects.map(upgradeSplit);
+
+    const parsed = nftDriverAccountMetadataParser.parseLatest(result);
+
+    return parsed;
   }
 }

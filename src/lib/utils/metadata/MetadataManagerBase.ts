@@ -1,36 +1,23 @@
-import {
-  getAddressDriverClient,
-  getRepoDriverClient,
-  getNFTDriverClient,
-  getSubgraphClient,
-} from '$lib/utils/get-drips-clients';
+import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import isTest from '$lib/utils/is-test';
 import type { ContractTransaction } from 'ethers';
-import type {
-  AddressDriverClient,
-  DripsSubgraphClient,
-  RepoDriverClient,
-  NFTDriverClient,
-} from 'radicle-drips';
+import type { DripsSubgraphClient, AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
-import {
-  addressDriverAccountMetadataSchema,
-  repoDriverAccountMetadataSchema,
-  nftDriverAccountMetadataSchema,
-} from './schemas';
 import type { AccountId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
+import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser/lib/types';
+import assert from '$lib/utils/assert';
 
 type IpfsHash = string;
 
-export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAccount> {
+export interface IMetadataManager<TAccount, TParser extends Parser> {
   fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null>;
 
   fetchAccountMetadata(
     accountId: AccountId,
-  ): Promise<{ hash: IpfsHash; data: z.infer<TAccountMetadataSchema> } | null>;
+  ): Promise<{ hash: IpfsHash; data: AnyVersion<TParser> } | null>;
 
-  pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<string>;
+  pinAccountMetadata(data: LatestVersion<TParser>): Promise<string>;
 
   updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
@@ -40,21 +27,26 @@ export interface IMetadataManager<TAccountMetadataSchema extends z.ZodType, TAcc
 
   fetchAccount(accountId: AccountId): Promise<TAccount | null>;
 
-  buildAccountMetadata(context: unknown): z.infer<TAccountMetadataSchema>;
+  buildAccountMetadata(context: unknown): LatestVersion<TParser>;
 }
 
-export default abstract class MetadataManagerBase<
-  TAccountMetadataSchema extends z.ZodType,
-  TAccount,
-> implements IMetadataManager<TAccountMetadataSchema, TAccount>
+export type EmitMetadataFunc = (
+  accountId: string,
+  accountMetadata: AccountMetadata[],
+) => Promise<ContractTransaction>;
+
+export default abstract class MetadataManagerBase<TAccount, TParser extends Parser>
+  implements IMetadataManager<TAccount, TParser>
 {
   public static readonly USER_METADATA_KEY = 'ipfs';
 
-  private readonly _metadataSchema: TAccountMetadataSchema;
+  private readonly _parser: TParser;
+  private readonly _emitMetadataFunc: EmitMetadataFunc | undefined;
   protected readonly subgraphClient: DripsSubgraphClient;
 
-  protected constructor(metadataSchema: TAccountMetadataSchema) {
-    this._metadataSchema = metadataSchema;
+  protected constructor(parser: TParser, emitMetadataFunc?: EmitMetadataFunc) {
+    this._parser = parser;
+    this._emitMetadataFunc = emitMetadataFunc;
     this.subgraphClient = getSubgraphClient();
   }
 
@@ -70,7 +62,18 @@ export default abstract class MetadataManagerBase<
    * @param context The context to build the account metadata from.
    * @returns The built account metadata.
    */
-  public abstract buildAccountMetadata(context: unknown): z.infer<TAccountMetadataSchema>;
+  public abstract buildAccountMetadata(context: unknown): LatestVersion<TParser>;
+
+  /**
+   * Upgrades metadata in a format matching any version to the latest version. This is used to
+   * ensure that metadata is in the latest format when updating an account that had previously
+   * written metadata in an older format.
+   * @param currentMetadata The current metadata to upgrade.
+   * @returns The upgraded metadata.
+   */
+  public abstract upgradeAccountMetadata(
+    currentMetadata: AnyVersion<TParser>,
+  ): LatestVersion<TParser>;
 
   /**
    * Fetches the latest metadata hash for a given user ID.
@@ -102,7 +105,7 @@ export default abstract class MetadataManagerBase<
    */
   public async fetchAccountMetadata(
     accountId: AccountId,
-  ): Promise<{ hash: IpfsHash; data: z.infer<TAccountMetadataSchema> } | null> {
+  ): Promise<{ hash: IpfsHash; data: AnyVersion<TParser> } | null> {
     const metadataHash = await this.fetchMetadataHashByAccountId(accountId);
     if (!metadataHash) return null;
 
@@ -116,7 +119,7 @@ export default abstract class MetadataManagerBase<
 
     return {
       hash: metadataHash,
-      data: this._metadataSchema.parse(accountMetadataRes),
+      data: this._parser.parseAny(accountMetadataRes) as AnyVersion<TParser>,
     };
   }
 
@@ -126,7 +129,7 @@ export default abstract class MetadataManagerBase<
    * @returns The IPFS hash of the pinned metadata.
    * @throws If the pinning fails.
    */
-  public async pinAccountMetadata(data: z.infer<TAccountMetadataSchema>): Promise<IpfsHash> {
+  public async pinAccountMetadata(data: LatestVersion<TParser>): Promise<IpfsHash> {
     if (isTest()) {
       const mockHash = (Math.random() + 1).toString(36).substring(7);
       const mockData = JSON.stringify(data, (_, value) =>
@@ -137,6 +140,9 @@ export default abstract class MetadataManagerBase<
 
       return mockHash;
     }
+
+    // Ensure the data follows the correct schema at runtime
+    this._parser.parseLatest(data);
 
     const res = await fetch('/api/ipfs/pin', {
       method: 'POST',
@@ -185,6 +191,8 @@ export default abstract class MetadataManagerBase<
   }
 
   private async emitAccountMetadata(newHash: IpfsHash, accountId: AccountId) {
+    assert(this._emitMetadataFunc, 'emitAccountMetadata called without emitMetadataFunc');
+
     const accountMetadata = [
       {
         key: MetadataManagerBase.USER_METADATA_KEY,
@@ -192,33 +200,8 @@ export default abstract class MetadataManagerBase<
       },
     ];
 
-    const client = await this.getClient(this._metadataSchema);
-
-    let tx: ContractTransaction;
-    if ('safeCreateAccount' in client) {
-      tx = await (client as NFTDriverClient).emitAccountMetadata(accountId, accountMetadata);
-    } else if ('getAccountId' in client) {
-      tx = await (client as AddressDriverClient).emitAccountMetadata(accountMetadata);
-    } else if ('requestOwnerUpdate' in client) {
-      tx = await (client as RepoDriverClient).emitAccountMetadata(accountId, accountMetadata);
-    } else {
-      throw new Error('Unsupported client');
-    }
+    const tx = await this._emitMetadataFunc(accountId, accountMetadata);
 
     return tx;
-  }
-
-  private async getClient(
-    schema: z.ZodType,
-  ): Promise<AddressDriverClient | NFTDriverClient | RepoDriverClient> {
-    if (schema === addressDriverAccountMetadataSchema) {
-      return await getAddressDriverClient();
-    } else if (schema === nftDriverAccountMetadataSchema) {
-      return await getNFTDriverClient();
-    } else if (schema === repoDriverAccountMetadataSchema) {
-      return await getRepoDriverClient();
-    } else {
-      throw new Error('Unsupported schema');
-    }
   }
 }

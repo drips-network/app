@@ -2,8 +2,9 @@ import { AddressDriverClient, DripsSubgraphClient } from 'radicle-drips';
 import NftDriverMetadataManager from '../NftDriverMetadataManager';
 import type { NFTDriverAccount } from '../types';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { z } from 'zod';
-import type { sourceSchema } from '../schemas';
+import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { nftDriverAccountMetadataParser } from '../schemas';
+import unreachable from '$lib/utils/unreachable';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -137,9 +138,9 @@ describe('NftDriverMetadataManager', () => {
               forge: 'github',
               repoName: 'repo',
               url: 'repo.com',
-            } as z.infer<typeof sourceSchema>,
+            },
           },
-        ],
+        ] as LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
       };
 
       // Act
@@ -157,7 +158,7 @@ describe('NftDriverMetadataManager', () => {
         projects: mapFilterUndefined(context.projects, (listProj) => ({
           accountId: context.forAccount.accountId,
           weight: listProj.weight,
-          source: listProj.source,
+          source: 'source' in listProj ? listProj.source : unreachable(),
         })),
       });
     });

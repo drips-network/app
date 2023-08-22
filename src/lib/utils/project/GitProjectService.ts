@@ -23,16 +23,9 @@ import {
   type UnclaimedGitProject,
   type AccountId,
   type Source,
-  type AddressDriverSplitReceiver,
-  type RepoDriverSplitReceiver,
 } from '../metadata/types';
 import type { RepoAccountStatus } from './types';
 import type { Address } from '../common-types';
-import type { z } from 'zod';
-import type {
-  addressDriverSplitReceiverSchema,
-  repoDriverSplitReceiverSchema,
-} from '../metadata/schemas';
 import relevantTokens from '../drips/relevant-tokens';
 import fetchBalancesForTokens from '../drips/fetch-balances-for-tokens';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
@@ -45,6 +38,8 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
+import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 
 // TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
 export default class GitProjectService {
@@ -445,10 +440,9 @@ export default class GitProjectService {
       dependencyListEditorConfig.selected.includes(d[0]),
     );
 
-    const dependenciesSplitMetadata: (
-      | z.infer<typeof addressDriverSplitReceiverSchema>
-      | z.infer<typeof repoDriverSplitReceiverSchema>
-    )[] = [];
+    const dependenciesSplitMetadata: LatestVersion<
+      typeof repoDriverAccountMetadataParser
+    >['splits']['dependencies'] = [];
 
     for (const [urlOrAddress, percentage] of dependenciesInput) {
       const isAddr = isAddress(urlOrAddress);
@@ -461,6 +455,7 @@ export default class GitProjectService {
 
       if (isAddr) {
         const receiver = {
+          type: 'address' as const,
           weight,
           accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
         };
@@ -471,6 +466,7 @@ export default class GitProjectService {
         const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
 
         const receiver = {
+          type: 'repoDriver' as const,
           weight,
           accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
         };
@@ -488,7 +484,9 @@ export default class GitProjectService {
       maintainerListEditorConfig.selected.includes(d[0]),
     );
 
-    const maintainersSplitsMetadata: z.infer<typeof addressDriverSplitReceiverSchema>[] = [];
+    const maintainersSplitsMetadata: LatestVersion<
+      typeof repoDriverAccountMetadataParser
+    >['splits']['maintainers'] = [];
 
     for (const [address, percentage] of maintainersInput) {
       const weight = Math.floor(
@@ -498,6 +496,7 @@ export default class GitProjectService {
       if (weight === 0) continue;
 
       const receiver = {
+        type: 'address' as const,
         weight,
         accountId: await this._addressDriverClient.getAccountIdByAddress(address),
       };
@@ -637,30 +636,6 @@ export default class GitProjectService {
 
     // ...and has metadata. Return a claimed project.
 
-    const mapAddressDriverSplitReceiver = (
-      metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
-    ): AddressDriverSplitReceiver => ({
-      type: 'address',
-      weight: metadata.weight,
-      account: {
-        driver: 'address',
-        accountId: metadata.accountId,
-        address: AddressDriverClient.getUserAddress(metadata.accountId),
-      },
-    });
-
-    const mapRepoDriverSplitReceiver = (
-      metadata: z.infer<typeof repoDriverSplitReceiverSchema>,
-    ): RepoDriverSplitReceiver => ({
-      type: 'repo',
-      weight: metadata.weight,
-      account: {
-        driver: 'repo',
-        accountId: metadata.accountId,
-      },
-      source: metadata.source,
-    });
-
     const claimedProject: ClaimedGitProject = {
       source: projectMetadata.data.source,
       color: projectMetadata.data.color,
@@ -679,11 +654,35 @@ export default class GitProjectService {
         ),
       },
       splits: {
-        maintainers: projectMetadata.data.splits.maintainers.map((m) =>
-          mapAddressDriverSplitReceiver(m),
-        ),
+        maintainers: projectMetadata.data.splits.maintainers.map((m) => ({
+          type: 'address',
+          weight: m.weight,
+          account: {
+            driver: 'address',
+            accountId: m.accountId,
+            address: AddressDriverClient.getUserAddress(m.accountId),
+          },
+        })),
         dependencies: projectMetadata.data.splits.dependencies.map((d) =>
-          'source' in d ? mapRepoDriverSplitReceiver(d) : mapAddressDriverSplitReceiver(d),
+          'source' in d
+            ? {
+                type: 'repo',
+                weight: d.weight,
+                account: {
+                  driver: 'repo',
+                  accountId: d.accountId,
+                },
+                source: d.source,
+              }
+            : {
+                type: 'address',
+                weight: d.weight,
+                account: {
+                  driver: 'address',
+                  accountId: d.accountId,
+                  address: AddressDriverClient.getUserAddress(d.accountId),
+                },
+              },
         ),
       },
     };

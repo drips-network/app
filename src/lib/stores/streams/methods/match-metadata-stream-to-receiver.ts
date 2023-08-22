@@ -1,6 +1,10 @@
-import type { streamMetadataSchema } from '$lib/utils/metadata/schemas';
+import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
+import type { AnyVersion } from '@efstajas/versioned-parser/lib/types';
 import { Utils } from 'radicle-drips';
-import type { z } from 'zod';
+
+type StreamMetadata = AnyVersion<
+  typeof addressDriverAccountMetadataParser
+>['assetConfigs'][number]['streams'][number];
 
 /**
  * Given a particular streamReceiverSeenEvent, find matching metadata from an array of metadata
@@ -13,8 +17,8 @@ import type { z } from 'zod';
  */
 export default function matchMetadataStreamToReceiver(
   receiverSeenEvent: { receiverAccountId: string; config: bigint },
-  metadataStreams: z.infer<typeof streamMetadataSchema>[],
-): z.infer<typeof streamMetadataSchema> | undefined {
+  metadataStreams: StreamMetadata[],
+): StreamMetadata | undefined {
   const results = metadataStreams.filter(
     (stream) =>
       stream.initialDripsConfig.dripId ===
