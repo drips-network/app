@@ -30,10 +30,9 @@
 </script>
 
 <script lang="ts">
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
-  import { fade, fly, scale } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
   import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
   import { onMount, tick } from 'svelte';
@@ -303,7 +302,7 @@
 
 <div class="list-editor">
   {#if isEditable}
-    <div class="add-project">
+    <div class="add-project flex items-center">
       <div class="icon">
         <Ledger style="fill: var(--color-foreground)" />
       </div>
@@ -316,58 +315,54 @@
         type="text"
         placeholder={inputPlaceholder}
       />
-      {#if isAddingItem}
-        <div in:fly={{ duration: 300, y: -4 }} out:fly={{ duration: 300, y: 4 }}>
-          <Spinner />
-        </div>
-      {:else}
-        <div
-          in:fly={{ duration: 300, y: -4 }}
-          out:fly={{ duration: 300, y: 4 }}
-          class="submit-button"
+      <div class="flex-shrink-0">
+        <Button
+          icon={Plus}
+          disabled={!validInput}
+          variant={validInput ? 'primary' : undefined}
+          on:click={handleSubmitInput}
+          loading={isAddingItem}>Add</Button
         >
-          <Button
-            icon={Plus}
-            disabled={!validInput}
-            variant={validInput ? 'primary' : undefined}
-            on:click={handleSubmitInput}>Add</Button
-          >
-        </div>
-      {/if}
+      </div>
     </div>
   {/if}
   {#if Object.keys(items).length > 0}
     <div class="list" bind:this={listElem}>
       <ul>
         {#each Object.entries(items) as [slug, item]}
-          <li class="flex items-center py-4 px-3" data-testid={`item-${slug}`}>
-            <div class="flex-1 flex gap-4 items-center justify-between">
-              {#if item.type === 'address'}
-                <IdentityBadge address={item.address} size="medium" disableLink={true} />
-              {:else if item.type === 'project'}
-                <ProjectBadge project={item.project} linkTo="nothing" />
-              {:else if item.type === 'drip-list'}
-                <DripListBadge
-                  listName={item.list.name}
-                  listId={item.list.id}
-                  owner={item.list.owner}
-                />
-              {/if}
-
-              <div class="flex items-center gap-3">
-                {#if !isEditable}
-                  <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
-                {:else}
-                  <PercentageEditor bind:percentage={percentages[slug]} />
-                  <Button
-                    icon={Trash}
-                    variant="ghost"
-                    on:click={() => removeItem(slug)}
-                    ariaLabel="Remove from list"
-                    dataTestId={`remove-${slug}`}
+          <li
+            class="flex flex-wrap items-center py-4 gap-1 items-center justify-between"
+            data-testid={`item-${slug}`}
+          >
+            <div class="flex-1 max-w-full">
+              <div class="w-full overflow-x-scroll px-3">
+                {#if item.type === 'address'}
+                  <IdentityBadge address={item.address} size="medium" disableLink={true} />
+                {:else if item.type === 'project'}
+                  <ProjectBadge project={item.project} linkTo="nothing" />
+                {:else if item.type === 'drip-list'}
+                  <DripListBadge
+                    listName={item.list.name}
+                    listId={item.list.id}
+                    owner={item.list.owner}
                   />
                 {/if}
               </div>
+            </div>
+
+            <div class="flex flex-1 flex-shrink-0 justify-end items-center gap-3 pr-3">
+              {#if !isEditable}
+                <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
+              {:else}
+                <PercentageEditor bind:percentage={percentages[slug]} />
+                <Button
+                  icon={Trash}
+                  variant="ghost"
+                  on:click={() => removeItem(slug)}
+                  ariaLabel="Remove from list"
+                  dataTestId={`remove-${slug}`}
+                />
+              {/if}
             </div>
           </li>
         {/each}
@@ -375,8 +370,10 @@
     </div>
   {/if}
   {#if isEditable && Object.keys(items).length > 0}
-    <div class="distribution-tools">
-      <div class="actions">
+    <div
+      class="distribution-tools flex flex-col flex-wrap justify-center items-center sm:flex-row sm:justify-between gap-3 mt-4 select-none"
+    >
+      <div class="flex flex-wrap gap-0.5 flex-shrink-0 justify-center">
         <Button size="small" on:click={distributeEvenly} disabled={!canDistributeEvenly}
           >Split evenly</Button
         >
@@ -479,25 +476,6 @@
 
   .add-project input:focus {
     outline: none;
-  }
-
-  .add-project .submit-button {
-    position: absolute;
-    right: 0.75rem;
-  }
-
-  .distribution-tools {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-    user-select: none;
-  }
-
-  .distribution-tools .actions {
-    display: flex;
-    gap: 0.125rem;
-    flex-wrap: wrap;
   }
 
   .remaining-percentage-indicator {
