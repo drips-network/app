@@ -22,6 +22,7 @@ jobs:
           envkey_TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
           envkey_TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
           envkey_GELATO_API_KEY: ${{ secrets.GELATO_API_KEY }}
+          envkey_PUBLIC_NETWORK: 5
 
       - name: Install dependencies
         run: npm ci
