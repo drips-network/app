@@ -7,8 +7,7 @@ import type { AccountId } from './types';
 import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
-
-type LatestSchema = ReturnType<typeof addressDriverAccountMetadataParser.parseLatest>;
+import type { AnyVersion, LatestVersion } from '../versioned-parser';
 
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
   Account,
@@ -29,11 +28,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
       streamsSetEventsWithFullReceivers,
     );
 
-    const assetConfigs = buildAssetConfigs(
-      accountId,
-      data as LatestSchema,
-      streamsSetEventsByTokenAddress,
-    );
+    const assetConfigs = buildAssetConfigs(accountId, data, streamsSetEventsByTokenAddress);
 
     return {
       user: {
@@ -48,7 +43,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
       lastUpdated: data ? new Date(data.timestamp * 1000) : undefined,
       lastUpdatedByAddress: data?.writtenByAddress,
       lastIpfsHash: hash,
-    } as Account;
+    };
   }
 
   public buildAccountMetadata(context: {
@@ -86,5 +81,12 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
         }),
       })),
     };
+  }
+
+  public upgradeAccountMetadata(
+    currentMetadata: AnyVersion<typeof addressDriverAccountMetadataParser>,
+  ): LatestVersion<typeof addressDriverAccountMetadataParser> {
+    // There's only one version of address driver metadata.
+    return currentMetadata;
   }
 }

@@ -85,4 +85,44 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       splits: forSplits,
     };
   }
+
+  public upgradeAccountMetadata(
+    currentMetadata: AnyVersion<typeof repoDriverAccountMetadataParser>,
+  ): LatestVersion<typeof repoDriverAccountMetadataParser> {
+    const result = currentMetadata;
+
+    type AnyVersionSplits = AnyVersion<typeof repoDriverAccountMetadataParser>['splits'];
+
+    const upgradeSplit = (
+      split: AnyVersionSplits['dependencies'][number] | AnyVersionSplits['maintainers'][number],
+    ) => {
+      if ('type' in split) return split;
+
+      const type = 'source' in split ? ('repoDriver' as const) : ('address' as const);
+
+      if (type === 'address') {
+        return {
+          type,
+          weight: split.weight,
+          accountId: split.accountId,
+        };
+      } else {
+        if (!('source' in split)) throw new Error('Invalid split');
+
+        return {
+          type,
+          weight: split.weight,
+          accountId: split.accountId,
+          source: split.source,
+        };
+      }
+    };
+
+    result.splits.dependencies = result.splits.dependencies.map(upgradeSplit);
+    result.splits.maintainers = result.splits.maintainers.map(upgradeSplit);
+
+    const parsed = repoDriverAccountMetadataParser.parseLatest(result);
+
+    return parsed;
+  }
 }

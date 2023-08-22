@@ -65,6 +65,17 @@ export default abstract class MetadataManagerBase<TAccount, TParser extends Pars
   public abstract buildAccountMetadata(context: unknown): LatestVersion<TParser>;
 
   /**
+   * Upgrades metadata in a format matching any version to the latest version. This is used to
+   * ensure that metadata is in the latest format when updating an account that had previously
+   * written metadata in an older format.
+   * @param currentMetadata The current metadata to upgrade.
+   * @returns The upgraded metadata.
+   */
+  public abstract upgradeAccountMetadata(
+    currentMetadata: AnyVersion<TParser>,
+  ): LatestVersion<TParser>;
+
+  /**
    * Fetches the latest metadata hash for a given user ID.
    * @param accountId The user ID to fetch the metadata hash for.
    * @returns The latest metadata hash for the given user ID, or null if no metadata hash exists.

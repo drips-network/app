@@ -40,7 +40,9 @@
             color: $projectWritable.color,
           };
 
-          const ipfsHash = await metadataManager.pinAccountMetadata(newMetadata);
+          const upgradedMetadata = metadataManager.upgradeAccountMetadata(newMetadata);
+
+          const ipfsHash = await metadataManager.pinAccountMetadata(upgradedMetadata);
 
           const accountMetadataAsBytes = [
             {
