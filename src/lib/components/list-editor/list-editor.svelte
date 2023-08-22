@@ -312,7 +312,7 @@
         bind:value={inputValue}
         disabled={isAddingItem}
         on:keydown={(e) => e.key === 'Enter' && handleSubmitInput()}
-        class="typo-text"
+        class="list-editor__input typo-text"
         type="text"
         placeholder={inputPlaceholder}
       />
@@ -340,7 +340,7 @@
     <div class="list" bind:this={listElem}>
       <ul>
         {#each Object.entries(items) as [slug, item], index}
-          <li class="flex items-center py-4 px-3">
+          <li class="flex items-center py-4 px-3" data-testid={`item-${slug}`}>
             <div class="flex-1 flex gap-4 items-center justify-between">
               {#if item.type === 'address'}
                 <IdentityBadge address={item.address} size="medium" disableLink={true} />
@@ -356,7 +356,12 @@
 
               <div class="flex items-center gap-3">
                 <PercentageEditor bind:percentage={percentages[slug]} />
-                <Button icon={Trash} variant="ghost" on:click={() => removeItem(slug)} />
+                <Button
+                  id={`trashbtn-${slug}`}
+                  icon={Trash}
+                  variant="ghost"
+                  on:click={() => removeItem(slug)}
+                />
               </div>
             </div>
           </li>

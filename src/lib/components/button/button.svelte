@@ -4,6 +4,7 @@
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
+  export let id: string | undefined = undefined;
   export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
@@ -26,6 +27,7 @@
 </script>
 
 <button
+  {id}
   class="size-{size}"
   bind:this={buttonEl}
   aria-label={ariaLabel}

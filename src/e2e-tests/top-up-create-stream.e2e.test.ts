@@ -431,12 +431,9 @@ describe('app', async () => {
     });
 
     it('adds items', async () => {
-      await expect(
-        page.locator('input[placeholder="GitHub URL, Ethereum address or Drip List URL"]'),
-      ).toHaveCount(1);
-      await page
-        .locator('input[placeholder="GitHub URL, Ethereum address or Drip List URL"]')
-        .click();
+      const input = page.locator('input.list-editor__input');
+      await expect(input).toHaveCount(1);
+      await input.click();
 
       await page.keyboard.type('github.com/efstajas/drips-test-repo-10');
       await page.keyboard.press('Enter');
@@ -454,7 +451,7 @@ describe('app', async () => {
     });
 
     it('assigns equal percentages', async () => {
-      await page.locator('button', { hasText: 'Distribute evenly' }).click();
+      await page.locator('button', { hasText: 'Split evenly' }).click();
     });
 
     it('renames the drip list', async () => {
@@ -501,22 +498,20 @@ describe('app', async () => {
     });
 
     it('deselects an item', async () => {
-      await page.locator('data-testid=item-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
+      await page.locator('#trashbtn-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
 
       await expect(page.locator('text=50% allocated')).toHaveCount(1);
     });
 
     it('adds a new item', async () => {
-      await page
-        .locator('input[placeholder="GitHub URL, Ethereum address or Drip List URL"]')
-        .click();
+      await page.locator('input.list-editor__input').click();
 
       await page.keyboard.type('github.com/efstajas/drips-test-repo-11');
       await page.keyboard.press('Enter');
     });
 
     it('assigns equal percentages', async () => {
-      await page.locator('button', { hasText: 'Distribute evenly' }).click();
+      await page.locator('button', { hasText: 'Split evenly' }).click();
     });
 
     it('advances the flow', async () => {
