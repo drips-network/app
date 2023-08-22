@@ -9,7 +9,7 @@ const ethAddressSchema = z.preprocess((v) => {
   return v;
 }, z.string());
 
-const bigintSchema = z.preprocess((v) => typeof v === 'string' && BigInt(v), z.bigint());
+const bigintSchema = z.preprocess((v) => (typeof v === 'string' ? BigInt(v) : v), z.bigint());
 
 const streamConfigSchema = z.object({
   raw: z.string(),
