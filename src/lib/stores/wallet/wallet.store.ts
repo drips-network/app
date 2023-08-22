@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import type { Network } from '@ethersproject/networks';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { AddressDriverClient, Utils } from 'radicle-drips';
+import { AddressDriverClient } from 'radicle-drips';
 import Onboard, { type EIP1193Provider } from '@web3-onboard/core';
 import injectedWallets from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
@@ -18,17 +18,13 @@ import isRunningInSafe from '$lib/utils/is-running-in-safe';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
+import network, { isConfiguredChainId } from './network';
 
 const appsSdk = new SafeAppsSDK();
 
-const MAINNET_RPC_URL = 'https://mainnet.infura.io/v3/f88a1229d473471bbf94d168401b9c93';
-const GOERLI_RPC_URL = 'https://goerli.infura.io/v3/f88a1229d473471bbf94d168401b9c93';
-
-const { SUPPORTED_CHAINS } = Utils.Network;
-
 const DEFAULT_NETWORK: Network = {
-  chainId: 1,
-  name: 'homestead',
+  chainId: network.chainId,
+  name: network.name,
 };
 
 const injected = injectedWallets();
@@ -39,21 +35,15 @@ const onboard = Onboard({
     walletConnectModule({
       version: 2,
       projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
-      requiredChains: [1],
+      requiredChains: [network.chainId],
     }),
   ],
   chains: [
     {
-      id: '0x1',
-      token: 'ETH',
-      label: 'Ethereum Mainnet',
-      rpcUrl: MAINNET_RPC_URL,
-    },
-    {
-      id: '0x5',
-      token: 'ETH',
-      label: 'Ethereum Goerli',
-      rpcUrl: GOERLI_RPC_URL,
+      id: network.id,
+      token: network.token,
+      label: network.label,
+      rpcUrl: network.rpcUrl,
     },
   ],
   accountCenter: {
@@ -138,11 +128,7 @@ const walletStore = () => {
       }
 
       if (await isWalletUnlocked(label)) {
-        const wallets = await onboard.connectWallet({ autoSelect: { label, disableModals: true } });
-
-        const provider = new ethers.providers.Web3Provider(wallets[0].provider);
-        _attachListeners(wallets[0].provider);
-        await _setConnectedState(provider);
+        await connect(true, isSafeApp, { autoSelect: { label, disableModals: true } });
       }
     }
 
@@ -154,7 +140,11 @@ const walletStore = () => {
    * @param initializing If true, the function will trigger a global advisory
    * while waiting for the user's wallet to be unlocked.
    */
-  async function connect(initializing = false, isSafeApp = false): Promise<void> {
+  async function connect(
+    initializing = false,
+    isSafeApp = false,
+    onboardOptions?: Parameters<typeof onboard.connectWallet>[0],
+  ): Promise<void> {
     if (!browser) throw new Error('Can only connect client-side');
 
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
@@ -176,7 +166,7 @@ const walletStore = () => {
           },
         },
       });
-    }, 250);
+    }, 2000);
 
     let provider: ethers.providers.Web3Provider;
     let safeInfo: SafeInfo | undefined;
@@ -186,7 +176,7 @@ const walletStore = () => {
       provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
     } else {
       waitingForOnboard.set(true);
-      const wallets = await onboard.connectWallet();
+      const wallets = await onboard.connectWallet(onboardOptions);
       waitingForOnboard.set(false);
 
       const wallet = wallets[0];
@@ -204,11 +194,13 @@ const walletStore = () => {
     connected = true;
     clearAdvisory?.();
 
-    if (!_isNetworkSupported(await provider.getNetwork())) {
+    const connectedToNetwork = await provider.getNetwork();
+
+    if (!isConfiguredChainId(connectedToNetwork.chainId)) {
       const clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
-        description: 'Please switch your connected wallet to Ethereum Mainnet, Sepolia or Goerli.',
+        description: `Please switch your connected wallet to ${network.label}.`,
         emoji: '🔌',
       });
 
@@ -231,10 +223,6 @@ const walletStore = () => {
     });
 
     _clear();
-  }
-
-  function _isNetworkSupported(network: Network): boolean {
-    return SUPPORTED_CHAINS.includes(network.chainId);
   }
 
   async function _setConnectedState(
@@ -292,7 +280,8 @@ const walletStore = () => {
 
 const mockWalletStore = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const address = (window as any).playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
+  const address =
+    (browser && (window as any))?.playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
   const initialized = writable(false);
   const waitingForOnboard = writable(false);

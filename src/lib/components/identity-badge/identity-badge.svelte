@@ -5,7 +5,6 @@
   import { createIcon } from 'radicle-design-system/lib/blockies';
   import Avatar from '$lib/components/user-avatar/user-avatar.svelte';
   import { browser } from '$app/environment';
-  import wallet from '$lib/stores/wallet/wallet.store';
   import formatAddress from '$lib/utils/format-address';
   import Tooltip from '../tooltip/tooltip.svelte';
 
@@ -41,7 +40,6 @@
 
   function getLink() {
     if (disableLink) return undefined;
-    if (address === $wallet.address) return '/app/streams';
 
     return `/app/${ens?.name ?? address}`;
   }

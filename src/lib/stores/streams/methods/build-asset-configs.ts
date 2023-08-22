@@ -1,5 +1,4 @@
 import { AddressDriverClient, constants, Utils } from 'radicle-drips';
-import type { z } from 'zod';
 import type {
   AddressDriverAccount,
   AssetConfig,
@@ -12,17 +11,18 @@ import makeStreamId from './make-stream-id';
 import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
 import type { StreamsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
-import type {
-  addressDriverAccountMetadataSchema,
-  assetConfigMetadataSchema,
-} from '$lib/utils/metadata/schemas';
 import buildStreamReceiver from './build-stream-receiver';
+import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
+import type { AnyVersion } from '@efstajas/versioned-parser/lib/types';
+
+type AccountMetadata = AnyVersion<typeof addressDriverAccountMetadataParser>;
+type AssetConfigMetadata = AccountMetadata['assetConfigs'][number];
 
 function mapReceiverToStream(
   receiver: Receiver,
   senderAccountId: string,
   tokenAddress: string,
-  assetConfigMetadata?: z.infer<typeof assetConfigMetadataSchema>,
+  assetConfigMetadata?: AssetConfigMetadata,
 ): Stream {
   const streamMetadata = assetConfigMetadata?.streams.find(
     (streamMetadata) => streamMetadata.id === receiver.streamId,
@@ -82,7 +82,7 @@ function mapReceiverToStream(
  */
 export default function buildAssetConfigs(
   accountId: string,
-  accountMetadata: z.infer<typeof addressDriverAccountMetadataSchema> | undefined,
+  accountMetadata: AccountMetadata | undefined,
   streamsSetEvents: { [tokenAddress: string]: StreamsSetEventWithFullReceivers[] },
 ) {
   return Object.entries(streamsSetEvents).reduce<AssetConfig[]>(

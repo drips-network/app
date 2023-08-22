@@ -1,20 +1,20 @@
 import { AddressDriverClient } from 'radicle-drips';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { z } from 'zod';
 import MetadataManagerBase from './MetadataManagerBase';
-import { addressDriverAccountMetadataSchema } from './schemas';
+import { addressDriverAccountMetadataParser } from './schemas';
 import type { Account } from '$lib/stores/streams/types';
 import type { AccountId } from './types';
 import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
-  typeof addressDriverAccountMetadataSchema,
-  Account
+  Account,
+  typeof addressDriverAccountMetadataParser
 > {
   constructor() {
-    super(addressDriverAccountMetadataSchema);
+    super(addressDriverAccountMetadataParser);
   }
 
   public async fetchAccount(accountId: AccountId): Promise<Account> {
@@ -28,11 +28,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
       streamsSetEventsWithFullReceivers,
     );
 
-    const assetConfigs = buildAssetConfigs(
-      accountId,
-      data as z.infer<typeof addressDriverAccountMetadataSchema>,
-      streamsSetEventsByTokenAddress,
-    );
+    const assetConfigs = buildAssetConfigs(accountId, data, streamsSetEventsByTokenAddress);
 
     return {
       user: {
@@ -47,13 +43,13 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
       lastUpdated: data ? new Date(data.timestamp * 1000) : undefined,
       lastUpdatedByAddress: data?.writtenByAddress,
       lastIpfsHash: hash,
-    } as Account;
+    };
   }
 
   public buildAccountMetadata(context: {
     forAccount: Account;
     address: string;
-  }): z.infer<typeof addressDriverAccountMetadataSchema> {
+  }): ReturnType<typeof addressDriverAccountMetadataParser.parseLatest> {
     const { forAccount, address } = context;
 
     return {
@@ -85,5 +81,12 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
         }),
       })),
     };
+  }
+
+  public upgradeAccountMetadata(
+    currentMetadata: AnyVersion<typeof addressDriverAccountMetadataParser>,
+  ): LatestVersion<typeof addressDriverAccountMetadataParser> {
+    // There's only one version of address driver metadata.
+    return currentMetadata;
   }
 }

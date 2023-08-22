@@ -13,8 +13,7 @@ import {
 import DripListService from '../driplist/DripListService';
 import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder-onboarding-flow';
 import { BigNumber, type PopulatedTransaction } from 'ethers';
-import type { z } from 'zod';
-import type { nftDriverAccountMetadataSchema } from '../metadata/schemas';
+import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -182,7 +181,7 @@ describe('DripListService', () => {
 
       const nftSubAccountMetadata: {
         hash: string;
-        data: z.infer<typeof nftDriverAccountMetadataSchema>;
+        data: ReturnType<typeof nftDriverAccountMetadataParser.parseAny>;
       }[] = [
         {
           data: {
@@ -197,7 +196,7 @@ describe('DripListService', () => {
         },
       ] as unknown as {
         hash: string;
-        data: z.infer<typeof nftDriverAccountMetadataSchema>;
+        data: ReturnType<typeof nftDriverAccountMetadataParser.parseAny>;
       }[];
 
       nftDriverMetadataManagerMock.fetchAccountMetadata.mockResolvedValueOnce(

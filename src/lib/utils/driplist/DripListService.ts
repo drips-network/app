@@ -8,12 +8,7 @@ import {
   getSubgraphClient,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import type {
-  AddressDriverSplitReceiver,
-  DripList,
-  DripListSplitReceiver,
-  RepoDriverSplitReceiver,
-} from '../metadata/types';
+import type { DripList } from '../metadata/types';
 import {
   NFTDriverTxFactory,
   AddressDriverClient,
@@ -36,16 +31,12 @@ import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
-import type {
-  addressDriverSplitReceiverSchema,
-  dripListSplitReceiverSchema,
-  repoDriverSplitReceiverSchema,
-} from '../metadata/schemas';
 import { isAddress } from 'ethers/lib/utils';
-import type { z } from 'zod';
 import mapFilterUndefined from '../map-filter-undefined';
 import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 import { isValidGitUrl } from '../is-valid-git-url';
+import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -71,8 +62,8 @@ export default class DripListService {
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
+  private _nftDriverMetadataManager!: NftDriverMetadataManager;
   private readonly _dripsSubgraphClient = getSubgraphClient();
-  private readonly _nftDriverMetadataManager = new NftDriverMetadataManager();
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
@@ -99,6 +90,10 @@ export default class DripListService {
       dripListService._owner = signer;
       dripListService._ownerAddress = await signer.getAddress();
     }
+
+    dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(
+      dripListService._nftDriverClient,
+    );
 
     return dripListService;
   }
@@ -246,11 +241,9 @@ export default class DripListService {
 
     const receivers: SplitsReceiverStruct[] = [];
 
-    const projectsSplitMetadata: (
-      | z.infer<typeof addressDriverSplitReceiverSchema>
-      | z.infer<typeof repoDriverSplitReceiverSchema>
-      | z.infer<typeof dripListSplitReceiverSchema>
-    )[] = [];
+    const projectsSplitMetadata: ReturnType<
+      typeof nftDriverAccountMetadataParser.parseLatest
+    >['projects'] = [];
 
     for (const [urlOrAddress, percentage] of projectsInput) {
       const isAddr = isAddress(urlOrAddress);
@@ -304,85 +297,88 @@ export default class DripListService {
   }
 
   private async _getDripListProjects(
-    projects: z.infer<
-      | typeof dripListSplitReceiverSchema
-      | typeof repoDriverSplitReceiverSchema
-      | typeof addressDriverSplitReceiverSchema
-    >[],
-  ) {
+    projects: AnyVersion<typeof nftDriverAccountMetadataParser>['projects'],
+  ): Promise<DripList['projects']> {
     const projectPromises = await Promise.all(
       projects.map(async (listProjMetadata) => {
-        const mapRepoDriverSplitReceiver = (
-          metadata: z.infer<typeof repoDriverSplitReceiverSchema>,
-        ): RepoDriverSplitReceiver => ({
-          type: 'repo',
-          weight: metadata.weight,
-          account: {
-            driver: 'repo',
-            accountId: metadata.accountId,
-          },
-          source: metadata.source,
-        });
-
-        const mapAddressDriverSplitReceiver = (
-          metadata: z.infer<typeof addressDriverSplitReceiverSchema>,
-        ): AddressDriverSplitReceiver => ({
-          type: 'address',
-          weight: metadata.weight,
-          account: {
-            driver: 'address',
-            accountId: metadata.accountId,
-            address: AddressDriverClient.getUserAddress(metadata.accountId),
-          },
-        });
-
-        const mapDripListSplitReceiver = async (
-          metadata: z.infer<typeof dripListSplitReceiverSchema>,
-        ): Promise<DripListSplitReceiver> => {
-          const owner = await getSubgraphClient().getNftSubAccountOwnerByTokenId(
-            metadata.accountId,
-          );
-          if (!owner) throw new Error(`Unable to find owner for drip list ${metadata.accountId}}`);
-
-          const addressDriverClient = await getAddressDriverClient();
-
-          return {
-            type: 'dripList',
-            weight: metadata.weight,
-            account: {
-              driver: 'nft',
-              accountId: metadata.accountId,
-              owner: {
-                driver: 'address',
-                accountId: await addressDriverClient.getAccountIdByAddress(owner.ownerAddress),
-                address: owner.ownerAddress,
-              },
-            },
-          };
-        };
-
-        switch (listProjMetadata.type) {
-          case 'address':
-            return mapAddressDriverSplitReceiver(listProjMetadata);
-
-          case 'repoDriver':
-            return mapRepoDriverSplitReceiver(listProjMetadata);
-
-          case 'dripList':
-            return mapDripListSplitReceiver(listProjMetadata);
-
-          case undefined:
-            /*
+        if (!('type' in listProjMetadata)) {
+          /*
               If the type is undefined, it may be an old Drip List that only
               supported either address or repo splits recipients. If there's a
               `source` property, it's a repo split recipient, otherwise it's an
               address split recipient.
             */
-            if ('source' in listProjMetadata) {
-              return mapRepoDriverSplitReceiver(listProjMetadata);
-            } else {
-              return mapAddressDriverSplitReceiver(listProjMetadata);
+          if ('source' in listProjMetadata) {
+            return {
+              type: 'repo' as const,
+              weight: listProjMetadata.weight,
+              account: {
+                driver: 'repo' as const,
+                accountId: listProjMetadata.accountId,
+              },
+              source: listProjMetadata.source,
+            };
+          } else {
+            return {
+              type: 'address' as const,
+              weight: listProjMetadata.weight,
+              account: {
+                driver: 'address' as const,
+                accountId: listProjMetadata.accountId,
+                address: AddressDriverClient.getUserAddress(listProjMetadata.accountId),
+              },
+            };
+          }
+        }
+
+        switch (listProjMetadata.type) {
+          case 'address':
+            return {
+              type: 'address' as const,
+              weight: listProjMetadata.weight,
+              account: {
+                driver: 'address' as const,
+                accountId: listProjMetadata.accountId,
+                address: AddressDriverClient.getUserAddress(listProjMetadata.accountId),
+              },
+            };
+
+          case 'repoDriver':
+            return {
+              type: 'repo' as const,
+              weight: listProjMetadata.weight,
+              account: {
+                driver: 'repo' as const,
+                accountId: listProjMetadata.accountId,
+              },
+              source: listProjMetadata.source,
+            };
+
+          case 'dripList': {
+            const owner = await getSubgraphClient().getNftSubAccountOwnerByTokenId(
+              listProjMetadata.accountId,
+            );
+
+            if (!owner) {
+              throw new Error(`Unable to find owner for drip list ${listProjMetadata.accountId}}`);
             }
+
+            const addressDriverClient = await getAddressDriverClient();
+
+            return {
+              type: 'dripList' as const,
+              weight: listProjMetadata.weight,
+              account: {
+                driver: 'nft' as const,
+                accountId: listProjMetadata.accountId,
+                owner: {
+                  driver: 'address' as const,
+                  accountId: await addressDriverClient.getAccountIdByAddress(owner.ownerAddress),
+                  address: owner.ownerAddress,
+                },
+              },
+            };
+          }
         }
       }),
     );
@@ -485,11 +481,7 @@ export default class DripListService {
 
   private async _publishMetadataToIpfs(
     dripListId: string,
-    projects: z.infer<
-      | typeof repoDriverSplitReceiverSchema
-      | typeof addressDriverSplitReceiverSchema
-      | typeof dripListSplitReceiverSchema
-    >[],
+    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
     name?: string,
   ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
