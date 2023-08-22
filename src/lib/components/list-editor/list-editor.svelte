@@ -59,7 +59,7 @@
   export let maxItems = 200;
 
   export let percentages: Percentages = {};
-  export let blockInteraction = false;
+  export let isEditable = true;
   export let addOnMount: string | undefined = undefined;
 
   /**
@@ -302,7 +302,7 @@
 </script>
 
 <div class="list-editor">
-  {#if !blockInteraction}
+  {#if isEditable}
     <div class="add-project">
       <div class="icon">
         <Ledger style="fill: var(--color-foreground)" />
@@ -339,7 +339,7 @@
   {#if Object.keys(items).length > 0}
     <div class="list" bind:this={listElem}>
       <ul>
-        {#each Object.entries(items) as [slug, item], index}
+        {#each Object.entries(items) as [slug, item]}
           <li class="flex items-center py-4 px-3" data-testid={`item-${slug}`}>
             <div class="flex-1 flex gap-4 items-center justify-between">
               {#if item.type === 'address'}
@@ -355,13 +355,17 @@
               {/if}
 
               <div class="flex items-center gap-3">
-                <PercentageEditor bind:percentage={percentages[slug]} />
-                <Button
-                  id={`trashbtn-${slug}`}
-                  icon={Trash}
-                  variant="ghost"
-                  on:click={() => removeItem(slug)}
-                />
+                {#if !isEditable}
+                  <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
+                {:else}
+                  <PercentageEditor bind:percentage={percentages[slug]} />
+                  <Button
+                    id={`trashbtn-${slug}`}
+                    icon={Trash}
+                    variant="ghost"
+                    on:click={() => removeItem(slug)}
+                  />
+                {/if}
               </div>
             </div>
           </li>
@@ -369,7 +373,7 @@
       </ul>
     </div>
   {/if}
-  {#if !blockInteraction && Object.keys(items).length > 0}
+  {#if isEditable && Object.keys(items).length > 0}
     <div class="distribution-tools">
       <div class="actions">
         <Button size="small" on:click={distributeEvenly} disabled={!canDistributeEvenly}

@@ -111,7 +111,7 @@
     <ListEditor
       bind:percentages={$context.dripList.percentages}
       bind:items={$context.dripList.items}
-      blockInteraction
+      isEditable={false}
     />
   </FormField>
   <FormField type="div" title="Your support">
