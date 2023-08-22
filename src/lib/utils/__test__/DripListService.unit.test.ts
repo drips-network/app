@@ -181,7 +181,7 @@ describe('DripListService', () => {
 
       const nftSubAccountMetadata: {
         hash: string;
-        data: ReturnType<typeof nftDriverAccountMetadataParser.parseAnyVersion>;
+        data: ReturnType<typeof nftDriverAccountMetadataParser.parseAny>;
       }[] = [
         {
           data: {
@@ -196,7 +196,7 @@ describe('DripListService', () => {
         },
       ] as unknown as {
         hash: string;
-        data: ReturnType<typeof nftDriverAccountMetadataParser.parseAnyVersion>;
+        data: ReturnType<typeof nftDriverAccountMetadataParser.parseAny>;
       }[];
 
       nftDriverMetadataManagerMock.fetchAccountMetadata.mockResolvedValueOnce(

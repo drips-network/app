@@ -36,9 +36,7 @@ import mapFilterUndefined from '../map-filter-undefined';
 import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
-
-type LatestMetadataSchema = ReturnType<typeof nftDriverAccountMetadataParser.parseLatest>;
-type AnyMetadataSchema = ReturnType<typeof nftDriverAccountMetadataParser.parseAnyVersion>;
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -301,7 +299,7 @@ export default class DripListService {
   }
 
   private async _getDripListProjects(
-    projects: AnyMetadataSchema['projects'],
+    projects: AnyVersion<typeof nftDriverAccountMetadataParser>['projects'],
   ): Promise<DripList['projects']> {
     const projectPromises = await Promise.all(
       projects.map(async (listProjMetadata) => {
@@ -485,7 +483,7 @@ export default class DripListService {
 
   private async _publishMetadataToIpfs(
     dripListId: string,
-    projects: LatestMetadataSchema['projects'],
+    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
     name?: string,
   ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);

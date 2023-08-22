@@ -5,7 +5,7 @@ import type { DripsSubgraphClient, AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import type { AccountId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
-import type { AnyVersion, LatestVersion, Parser } from '../versioned-parser';
+import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser/lib/types';
 import assert from '$lib/utils/assert';
 
 type IpfsHash = string;
@@ -30,7 +30,7 @@ export interface IMetadataManager<TAccount, TParser extends Parser> {
   buildAccountMetadata(context: unknown): LatestVersion<TParser>;
 }
 
-type EmitMetadataFunc = (
+export type EmitMetadataFunc = (
   accountId: string,
   accountMetadata: AccountMetadata[],
 ) => Promise<ContractTransaction>;
@@ -119,7 +119,7 @@ export default abstract class MetadataManagerBase<TAccount, TParser extends Pars
 
     return {
       hash: metadataHash,
-      data: this._parser.parseAnyVersion(accountMetadataRes),
+      data: this._parser.parseAny(accountMetadataRes) as AnyVersion<TParser>,
     };
   }
 

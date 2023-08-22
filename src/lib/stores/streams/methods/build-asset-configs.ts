@@ -12,8 +12,8 @@ import assert from '$lib/utils/assert';
 import matchMetadataStreamToReceiver from './match-metadata-stream-to-receiver';
 import type { StreamsSetEventWithFullReceivers } from './reconcile-drips-set-receivers';
 import buildStreamReceiver from './build-stream-receiver';
-import type { AnyVersion } from '$lib/utils/versioned-parser';
 import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
+import type { AnyVersion } from '@efstajas/versioned-parser/lib/types';
 
 type AccountMetadata = AnyVersion<typeof addressDriverAccountMetadataParser>;
 type AssetConfigMetadata = AccountMetadata['assetConfigs'][number];

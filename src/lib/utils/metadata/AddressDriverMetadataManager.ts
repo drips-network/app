@@ -7,7 +7,7 @@ import type { AccountId } from './types';
 import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
-import type { AnyVersion, LatestVersion } from '../versioned-parser';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
   Account,

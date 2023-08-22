@@ -3,7 +3,7 @@ import { getRepoDriverClient } from '../get-drips-clients';
 import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverAccountMetadataParser } from './schemas';
 import type { ClaimedGitProject, RepoDriverAccount, AccountId } from './types';
-import type { AnyVersion, LatestVersion } from '../versioned-parser';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
   RepoDriverAccount,

@@ -38,7 +38,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
-import type { LatestVersion } from '../versioned-parser';
+import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 
 // TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.

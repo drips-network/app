@@ -3,7 +3,7 @@ import type { NFTDriverAccount, AccountId } from './types';
 import { getAddressDriverClient } from '../get-drips-clients';
 import { nftDriverAccountMetadataParser } from './schemas';
 import type { NFTDriverClient } from 'radicle-drips';
-import type { AnyVersion, LatestVersion } from '../versioned-parser';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   NFTDriverAccount,

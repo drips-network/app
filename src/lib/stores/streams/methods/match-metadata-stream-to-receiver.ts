@@ -1,5 +1,5 @@
 import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
-import type { AnyVersion } from '$lib/utils/versioned-parser';
+import type { AnyVersion } from '@efstajas/versioned-parser/lib/types';
 import { Utils } from 'radicle-drips';
 
 type StreamMetadata = AnyVersion<
