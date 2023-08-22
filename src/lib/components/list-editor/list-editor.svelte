@@ -315,15 +315,13 @@
         type="text"
         placeholder={inputPlaceholder}
       />
-      <div class="flex-shrink-0">
-        <Button
-          icon={Plus}
-          disabled={!validInput}
-          variant={validInput ? 'primary' : undefined}
-          on:click={handleSubmitInput}
-          loading={isAddingItem}>Add</Button
-        >
-      </div>
+      <Button
+        icon={Plus}
+        disabled={!validInput}
+        variant={validInput ? 'primary' : undefined}
+        on:click={handleSubmitInput}
+        loading={isAddingItem}>Add</Button
+      >
     </div>
   {/if}
   {#if Object.keys(items).length > 0}

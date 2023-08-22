@@ -64,6 +64,7 @@
     padding: 5px 2px;
     margin: -4px 0;
     transition: opacity 0.3s;
+    flex-shrink: 0;
   }
 
   button.size-large {

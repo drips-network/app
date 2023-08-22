@@ -44,12 +44,14 @@
     justify-content: center;
     align-items: center;
     border-radius: 1rem;
+    flex-shrink: 0;
   }
 
   .name {
     display: flex;
     gap: 0;
     align-items: last-baseline;
+    white-space: nowrap;
   }
 
   .name a:focus {
