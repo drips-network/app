@@ -80,7 +80,7 @@
     transitioning = newVal;
   }
 
-  let containerHeight = tweened(minHeightPx);
+  let wrapperHeight = tweened(minHeightPx);
 
   let resizeObserver = browser ? new ResizeObserver(() => updateContainerHeight()) : undefined;
   let observedElement: HTMLDivElement | undefined;
@@ -105,7 +105,7 @@
 
     const stepHeight = Math.max(observedElement.offsetHeight, minHeightPx);
 
-    containerHeight.set(stepHeight, {
+    wrapperHeight.set(stepHeight, {
       duration: firstHeightUpdate || !transitioning ? 0 : 300,
       easing: cubicInOut,
     });
@@ -219,8 +219,8 @@
 </script>
 
 <div
-  class="container"
-  style:height={`${$containerHeight}px`}
+  class="wrapper w-full"
+  style:height={`${$wrapperHeight}px`}
   style:overflow={transitioning ? 'hidden' : 'visible'}
 >
   {#key `${awaiting}${awaitError}${currentStepIndex}`}
@@ -229,7 +229,7 @@
       out:fly|local={(() => getTransition('out'))()}
       on:outrostart={() => setTransitioning(true)}
       on:introend={() => setTransitioning(false)}
-      class="step-container"
+      class="step-wrapper"
     >
       <div class="step" bind:this={stepElement}>
         {#if awaiting}
@@ -254,12 +254,12 @@
 </div>
 
 <style>
-  .container {
+  .wrapper {
     position: relative;
     margin: 0 auto;
   }
 
-  .step-container {
+  .step-wrapper {
     position: absolute;
     width: 100%;
   }
