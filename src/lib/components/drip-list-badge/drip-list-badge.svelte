@@ -19,7 +19,7 @@
 <a href="/app/drip-lists/{listId}" tabindex="-1" class="drip-list-badge flex gap-2 items-center">
   {#if showAvatar}
     <div class="drip-list-icon">
-      <Ledger style="fill: var(--color-background)" />
+      <Ledger style="fill: var(--color-primary)" />
     </div>
   {/if}
   {#if showName}
@@ -33,7 +33,7 @@
 
 <style>
   .drip-list-icon {
-    background-color: var(--color-primary);
+    background-color: var(--color-primary-level-1);
     height: 2rem;
     width: 2rem;
     display: flex;
