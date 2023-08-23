@@ -220,7 +220,7 @@
     },
     {
       type: 'address-split',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      address: '0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19',
       weight: 62500,
     },
     {

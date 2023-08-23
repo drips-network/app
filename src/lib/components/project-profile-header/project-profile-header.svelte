@@ -2,6 +2,7 @@
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import type { GitProject } from '$lib/utils/metadata/types';
+  import Copyable from '../copyable/copyable.svelte';
 
   export let project: GitProject;
 </script>
@@ -12,7 +13,9 @@
   </div>
   <div class="name">
     <h1>{project.source.repoName}</h1>
-    <ProjectBadge urlCopyable {project} forceUnclaimed tooltip={false} linkTo="external-url" />
+    <Copyable alwaysVisible={true} value={project.source.url}>
+      <ProjectBadge {project} forceUnclaimed tooltip={false} linkTo="external-url" />
+    </Copyable>
   </div>
 </div>
 

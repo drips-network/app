@@ -82,6 +82,7 @@
             props: {
               listId: s.listId,
               listName: s.listName,
+              owner: s.listOwner,
               showName: false,
             },
           } as ComponentAndProps;

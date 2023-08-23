@@ -6,28 +6,8 @@
   export let project: GitProject;
 </script>
 
-<span class="project-name">
-  {#if showSource}
-    <span style:color="var(--color-foreground-level-5)" class="owner-name typo-text">
-      {project.source.ownerName}/
-    </span>
-  {/if}
-  <span class="repo-name typo-text-bold">{project.source.repoName}</span>
-</span>
-
-<style>
-  .project-name {
-    display: inline-flex;
-    width: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .project-name .repo-name,
-  .project-name .owner-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-</style>
+<span class="text-foreground-level-5 typo-text"
+  >{#if showSource}{project.source.ownerName}/{/if}<span class="text-foreground"
+    >{project.source.repoName}</span
+  ></span
+>

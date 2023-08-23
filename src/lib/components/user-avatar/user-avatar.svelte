@@ -34,6 +34,7 @@
   .avatar {
     position: relative;
     margin: 1px;
+    flex-shrink: 0;
   }
 
   img,

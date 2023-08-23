@@ -67,82 +67,78 @@
   $: currentFontClassEns = fontClassesEns[size];
 
   const fontClassesAddress = {
-    tiny: 'typo-text-small tabular-nums',
-    small: 'typo-text-small tabular-nums',
-    normal: 'typo-text tabular-nums',
-    medium: 'typo-text tabular-nums',
-    big: 'typo-header-4 tabular-nums',
-    huge: 'typo-header-3 tabular-nums',
-    gigantic: 'typo-header-1 mono tabular-nums',
+    tiny: 'typo-text-small',
+    small: 'typo-text-small',
+    normal: 'typo-text',
+    medium: 'typo-text',
+    big: 'typo-header-4',
+    huge: 'typo-header-3',
+    gigantic: 'typo-header-1',
   };
   $: currentFontClassAddress = fontClassesAddress[size];
 
   $: currentFontClass = ens?.name ? currentFontClassEns : currentFontClassAddress;
 </script>
 
-<div class="wrapper">
-  <Tooltip text={address} copyable disabled={disableTooltip}>
-    <svelte:element
-      this={getLink() ? 'a' : 'span'}
-      href={getLink()}
-      target={linkToNewTab ? '_blank' : undefined}
-      class="identity-badge flex items-center relative text-left text-foreground"
-      class:flex-row-reverse={isReverse}
-      class:select-none={disableSelection}
-      style:height={showAvatar ? `${currentSize}px` : ''}
-      style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
-      class:muted
-    >
-      {#if showAvatar}
-        <Avatar
-          size={currentSize}
-          bind:imgElem={avatarImgElem}
-          src={ens?.avatarUrl}
-          placeholderSrc={blockyUrl}
-          {outline}
-        />
-      {/if}
-      {#if showIdentity}
-        <div class="identity relative flex-1 max-w-full">
+<Tooltip text={address} copyable disabled={disableTooltip}>
+  <svelte:element
+    this={getLink() ? 'a' : 'span'}
+    href={getLink()}
+    target={linkToNewTab ? '_blank' : undefined}
+    class="identity-badge flex items-center relative text-left text-foreground tabular-nums"
+    class:flex-row-reverse={isReverse}
+    class:select-none={disableSelection}
+    style:height={showAvatar ? `${currentSize}px` : ''}
+    style:gap={showAvatar && showIdentity ? `${currentSize / 4}px` : ''}
+    class:muted
+  >
+    {#if showAvatar}
+      <Avatar
+        size={currentSize}
+        bind:imgElem={avatarImgElem}
+        src={ens?.avatarUrl}
+        placeholderSrc={blockyUrl}
+        {outline}
+      />
+    {/if}
+    {#if showIdentity}
+      <div class="identity relative flex-1 min-w-0">
+        <div
+          class={`${currentFontClass} identity opacity-0 pointer-events-none flex items-center`}
+          class:hideOnMobile={hideAvatarOnMobile}
+        >
+          {toDisplay}
+          {#if ens?.name && showFullAddress}
+            <div class="typo-text-small leading-none truncate">{address}</div>
+          {/if}
+        </div>
+        {#key toDisplay}
           <div
-            class={`${currentFontClass} identity opacity-0 pointer-events-none`}
+            transition:fade|local={{ duration: 300 }}
+            class:text-foreground={size === 'gigantic'}
+            class={`${currentFontClass} identity absolute overlay flex items-center`}
+            data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
             class:hideOnMobile={hideAvatarOnMobile}
           >
-            {toDisplay}
-            {#if ens?.name && showFullAddress}<span class="typo-text-small-mono full-address"
-                >{address}</span
-              >{/if}
-          </div>
-          {#key toDisplay}
-            <div
-              transition:fade|local={{ duration: 300 }}
-              class:foreground={size === 'gigantic'}
-              class={`${currentFontClass} identity absolute overlay`}
-              data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
-              class:hideOnMobile={hideAvatarOnMobile}
-            >
-              {toDisplay}
-              {#if ens?.name && showFullAddress}<span class="typo-text-small-mono full-address"
-                  >{address}</span
-                >{/if}
+            <div class="flex-1 min-w-0">
+              <div class="truncate">{toDisplay}</div>
+              {#if ens?.name && showFullAddress}
+                <div class="typo-text-small leading-none truncate text-foreground-level-5">
+                  {address}
+                </div>
+              {/if}
             </div>
-          {/key}
-        </div>
-      {/if}
-    </svelte:element>
-    <svelte:fragment slot="tooltip-content">
-      {address}
-    </svelte:fragment>
-  </Tooltip>
-</div>
+          </div>
+        {/key}
+      </div>
+    {/if}
+  </svelte:element>
+  <svelte:fragment slot="tooltip-content">
+    {address}
+  </svelte:fragment>
+</Tooltip>
 
 <style>
-  .wrapper {
-    width: fit-content;
-    max-width: 100%;
-    overflow: hidden;
-  }
-
   .identity-badge:focus {
     outline: none;
   }
@@ -160,23 +156,6 @@
     font-family: var(--typeface-regular);
     white-space: nowrap;
     font-style: normal;
-  }
-
-  .foreground {
-    color: var(--color-foreground);
-  }
-
-  .identity {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .full-address {
-    color: var(--color-foreground-level-5);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 
   .muted {
