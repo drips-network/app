@@ -19,7 +19,7 @@
 
 <svelte:element
   this={isLinked ? 'a' : 'div'}
-  href={isLinked ? `/app/drip-lists/{listId}` : undefined}
+  href={isLinked ? `/app/drip-lists/${listId}` : undefined}
   tabindex={isLinked ? 0 : -1}
   class="drip-list-badge flex gap-2 items-center"
 >
