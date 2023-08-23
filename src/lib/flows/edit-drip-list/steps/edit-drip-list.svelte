@@ -1,9 +1,7 @@
 <script lang="ts">
   import type { Splits, Split } from '$lib/components/splits/splits.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -25,7 +23,9 @@
   import { Utils } from 'radicle-drips';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import projectItem from '$lib/components/list-editor/item-templates/project';
+  import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
+  import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -49,50 +49,11 @@
   let items = Object.fromEntries(
     mapFilterUndefined(flattenRepresentationalSplits(representationalSplits), (rs) => {
       if (rs.type === 'project-split') {
-        return [
-          rs.project.source.url,
-          {
-            type: 'selectable',
-            label: {
-              component: ProjectBadge,
-              props: {
-                project: rs.project,
-              },
-            },
-            editablePercentage: true,
-          },
-        ];
+        return [rs.project.source.url, projectItem(rs.project)];
       } else if (rs.type === 'address-split') {
-        return [
-          rs.address,
-          {
-            type: 'selectable',
-            label: {
-              component: IdentityBadge,
-              props: {
-                address: rs.address,
-                size: 'medium',
-              },
-            },
-            editablePercentage: true,
-          },
-        ];
+        return [rs.address, ethAddressItem(rs.address)];
       } else if (rs.type === 'drip-list-split') {
-        return [
-          rs.listId,
-          {
-            type: 'selectable',
-            label: {
-              component: DripListBadge,
-              props: {
-                listId: rs.listId,
-                owner: rs.listOwner,
-                listName: rs.listName,
-              },
-            },
-            editablePercentage: true,
-          },
-        ];
+        return [rs.listId, dripListItem(rs.listName, rs.listId, rs.listOwner)];
       } else {
         return undefined;
       }
@@ -119,21 +80,8 @@
     }),
   );
 
-  let selected = Object.keys(percentages);
-
   if (projectToAdd) {
-    items[projectToAdd.source.url] = {
-      type: 'selectable',
-      label: {
-        component: ProjectBadge,
-        props: {
-          project: projectToAdd,
-        },
-      },
-      editablePercentage: true,
-    };
-
-    selected.push(projectToAdd.source.url);
+    items[projectToAdd.source.url] = projectItem(projectToAdd);
   }
 
   let listValid = false;
@@ -151,7 +99,6 @@
 
           const { receivers, projectsSplitMetadata } =
             await dripListService.getProjectsSplitMetadataAndReceivers({
-              selected,
               percentages,
               items,
             });
@@ -203,7 +150,7 @@
     <TextInput bind:value={listName} />
   </FormField>
   <FormField title="Recipients*">
-    <ListEditor bind:items bind:percentages bind:selected bind:valid={listValid} />
+    <ListEditor bind:items bind:percentages bind:valid={listValid} />
   </FormField>
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide}>Cancel</Button>

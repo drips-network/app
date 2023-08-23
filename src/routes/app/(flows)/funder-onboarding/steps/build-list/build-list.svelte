@@ -31,7 +31,6 @@
       <!-- TODO: This crashes when entering some non-valid github url -->
       <ListEditor
         bind:percentages={$context.dripList.percentages}
-        bind:selected={$context.dripList.selected}
         bind:items={$context.dripList.items}
         bind:valid={listValid}
         addOnMount={projectUrlToAdd}

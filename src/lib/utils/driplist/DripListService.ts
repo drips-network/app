@@ -237,9 +237,7 @@ export default class DripListService {
   }
 
   public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {
-    const projectsInput = Object.entries(listEditorConfig.percentages).filter((d) =>
-      listEditorConfig.selected.includes(d[0]),
-    );
+    const projectsInput = Object.entries(listEditorConfig.percentages);
 
     const receivers: SplitsReceiverStruct[] = [];
 

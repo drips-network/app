@@ -1,65 +1,41 @@
 <script lang="ts" context="module">
-  import type {
-    InterstitialItem,
-    SelectableItem,
-  } from '$lib/components/list-select/list-select.types';
-  import type DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  interface ProjectItem {
+    type: 'project';
+    project: GitProject;
+  }
 
-  interface ProjectItem extends SelectableItem {
-    label: {
-      component: typeof ProjectBadge;
-      props: {
-        project: GitProject;
-      };
+  interface EthAddressItem {
+    type: 'address';
+    address: string;
+  }
+
+  interface DripListItem {
+    type: 'drip-list';
+    list: {
+      id: string;
+      name: string;
+      owner: string;
     };
   }
 
-  interface EthAddressItem extends SelectableItem {
-    label: {
-      component: typeof IdentityBadge;
-      props: {
-        address: string;
-        size: 'medium';
-      };
-    };
-  }
-
-  interface DripListItem extends SelectableItem {
-    label: {
-      component: typeof DripListBadge;
-      props: {
-        listName: string;
-        listId: string;
-        owner: string;
-      };
-    };
-  }
-
-  export type ListItem = DripListItem | EthAddressItem | ProjectItem | InterstitialItem;
+  export type ListItem = DripListItem | EthAddressItem | ProjectItem;
   export type Items = { [slug: string]: ListItem };
 
   export type Percentages = { [slug: string]: number };
 
   export interface ListEditorConfig {
-    selected: string[];
     items: Items;
     percentages: Percentages;
   }
 </script>
 
 <script lang="ts">
-  import ListSelect from '$lib/components/list-select/list-select.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
-  import { fade, fly, scale } from 'svelte/transition';
-  import projectItem from './item-templates/project';
+  import { fade, scale } from 'svelte/transition';
   import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
   import { onMount, tick } from 'svelte';
-  import type ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import type IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import ethAddressItem from './item-templates/eth-address';
   import { getAddress, isAddress } from 'ethers/lib/utils';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
@@ -67,25 +43,28 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import { verifyRepoExists } from '$lib/utils/github/github';
+  import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
+  import Trash from 'radicle-design-system/icons/Trash.svelte';
+  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import ethAddressItem from './item-templates/eth-address';
+  import projectItem from './item-templates/project';
   import DripListService from '$lib/utils/driplist/DripListService';
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
+  import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
 
   export let maxItems = 200;
 
-  export let selected: string[] = ['svelte-stepper', 'svelte-stored-writable', 'foo-bar'];
   export let percentages: Percentages = {};
-  export let blockInteraction = false;
+  export let isEditable = true;
   export let addOnMount: string | undefined = undefined;
 
   /**
    * Pass an array of keys for items which the user will not be able to add to the list.
    */
   export let blockedKeys: string[] = [];
-
-  $: selectedPercentages = Object.fromEntries(
-    Object.entries(percentages).filter(([slug]) => selected.includes(slug)),
-  );
 
   export let allowedItems: ('eth-addresses' | 'projects' | 'drip-lists')[] = [
     'projects',
@@ -94,6 +73,8 @@
   ];
 
   export let items: Items;
+
+  $: itemsLength = Object.entries(items).length;
 
   let listElem: HTMLDivElement;
   let inputElem: HTMLInputElement;
@@ -123,12 +104,12 @@
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
 
       // Prevent duplicates.
-      if (selected.indexOf(id) === -1) {
+      if (!items[id]) {
         items[id] = projectItem(gitProject);
 
-        if (selected.length < maxItems) selected.push(id);
         percentages = { ...percentages, [id]: 0 };
       }
+      // TODO: break + show warning to user
 
       await tick();
 
@@ -164,14 +145,13 @@
       if (blockedKeys.includes(dripListId)) throw new Error('Drip List ID is already used');
 
       // Prevent duplicates.
-      if (selected.indexOf(dripListId) === -1) {
+      if (!items[dripListId]) {
         items[dripListId] = dripListItem(
           dripList.name,
           dripList.account.accountId,
           dripList.account.owner.address,
         );
 
-        if (selected.length < maxItems) selected.push(dripListId);
         percentages = { ...percentages, [dripListId]: 0 };
       }
     } catch (e) {
@@ -201,7 +181,6 @@
 
       items[address] = ethAddressItem(address);
 
-      if (selected.length < maxItems) selected.push(address);
       percentages = { ...percentages, [address]: 0 };
 
       // It doesn't work without setTimeout for some reason 🤷‍♂️
@@ -215,7 +194,17 @@
     }
   }
 
+  function removeItem(slug: string) {
+    delete items[slug];
+    delete percentages[slug];
+    items = items;
+    percentages = percentages;
+  }
+
   function handleSubmitInput() {
+    // TODO: show message to user
+    if (itemsLength >= maxItems) return;
+
     if (isSupportedGitUrl(inputValue) && allowedItems.includes('projects')) {
       addProject();
     } else if (
@@ -237,33 +226,33 @@
     inputValue.endsWith('.eth') ||
     inputValue.includes('drips.network/app/drip-lists/');
 
-  $: totalPercentage = Object.values(selectedPercentages ?? {}).reduce<number>(
-    (acc, v) => acc + v,
-    0,
-  );
+  $: totalPercentage = Object.values(percentages ?? {}).reduce<number>((acc, v) => acc + v, 0);
   export let valid = false;
-  $: valid = selected.length > 0 && Math.round(totalPercentage * 100) / 100 === 100;
+  $: valid = itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100;
   export let error = false;
   $: error = Math.round(totalPercentage * 100) / 100 > 100;
+  // TODO: error should check if items are 0% (can currently submit with 0% but it gets excluded on tx)
 
-  $: canDistributeEvenly = selected.length > 0;
+  $: canDistributeEvenly = itemsLength > 0;
 
-  function distributeEvenly() {
-    const percentage = 100 / selected.length;
-
-    selected.forEach((id) => {
-      percentages[id] = percentage;
+  function setAllPercentagesTo(value: number) {
+    Object.keys(percentages).forEach((key) => {
+      percentages[key] = value;
     });
   }
 
+  function distributeEvenly() {
+    setAllPercentagesTo(100 / itemsLength);
+  }
+
   $: canDistributeRemaining =
-    Object.values(selectedPercentages).filter((v) => v === 0).length > 0 &&
-    Object.values(selectedPercentages).find((v) => v !== 0);
+    Object.values(percentages).filter((v) => v === 0).length > 0 &&
+    Object.values(percentages).find((v) => v !== 0);
 
   function distributeRemaining() {
     const remaining = 100 - totalPercentage;
 
-    const remainingIds = Object.entries(selectedPercentages)
+    const remainingIds = Object.entries(percentages)
       .filter(([, v]) => v === 0)
       .map(([id]) => id);
 
@@ -274,13 +263,10 @@
     });
   }
 
-  $: canClearPercentages = Object.values(selectedPercentages).filter((v) => v !== 0).length > 0;
+  $: canClearPercentages = Object.values(percentages).filter((v) => v !== 0).length > 0;
 
-  // Clears all selected percentages
   function clearPercentages() {
-    selected.forEach((id) => {
-      percentages[id] = 0;
-    });
+    setAllPercentagesTo(0);
   }
 
   onMount(() => {
@@ -309,16 +295,16 @@
       inputPlaceholder = `${allowed
         .filter((_, i, a) => i !== a.length - 1)
         .map(possibilityName)
-        .join(', ')} or ${possibilityName(allowed.pop() ?? unreachable())}`;
+        .join(', ')}, or ${possibilityName(allowed.pop() ?? unreachable())}`;
     }
   }
 </script>
 
 <div class="list-editor">
-  {#if !blockInteraction}
-    <div class="add-project">
+  {#if isEditable}
+    <div class="add-project flex items-center">
       <div class="icon">
-        <Plus style="fill: var(--color-foreground)" />
+        <Ledger style="fill: var(--color-foreground)" />
       </div>
       <input
         bind:this={inputElem}
@@ -329,52 +315,71 @@
         type="text"
         placeholder={inputPlaceholder}
       />
-      {#if isAddingItem}
-        <div in:fly={{ duration: 300, y: -4 }} out:fly={{ duration: 300, y: 4 }}>
-          <Spinner />
-        </div>
-      {:else}
-        <div
-          in:fly={{ duration: 300, y: -4 }}
-          out:fly={{ duration: 300, y: 4 }}
-          class="submit-button"
-        >
-          <Button
-            icon={Plus}
-            disabled={!validInput}
-            variant={validInput ? 'primary' : undefined}
-            on:click={handleSubmitInput}>Add</Button
-          >
-        </div>
-      {/if}
+      <Button
+        icon={Plus}
+        disabled={!validInput}
+        variant={validInput ? 'primary' : undefined}
+        on:click={handleSubmitInput}
+        loading={isAddingItem}>Add</Button
+      >
     </div>
   {/if}
   {#if Object.keys(items).length > 0}
     <div class="list" bind:this={listElem}>
-      <ListSelect
-        hideUnselected={blockInteraction}
-        {blockInteraction}
-        bind:percentages
-        bind:selected
-        searchable={false}
-        multiselect
-        {items}
-        showEmptyState={false}
-        maxSelected={maxItems}
-      />
+      <ul>
+        {#each Object.entries(items) as [slug, item]}
+          <li
+            class="flex flex-wrap items-center py-4 gap-1 items-center justify-between"
+            data-testid={`item-${slug}`}
+          >
+            <div class="flex-1 max-w-full">
+              <div class="w-full overflow-x-scroll px-3">
+                {#if item.type === 'address'}
+                  <IdentityBadge address={item.address} size="medium" disableLink={true} />
+                {:else if item.type === 'project'}
+                  <ProjectBadge project={item.project} linkTo="nothing" />
+                {:else if item.type === 'drip-list'}
+                  <DripListBadge
+                    listName={item.list.name}
+                    listId={item.list.id}
+                    owner={item.list.owner}
+                  />
+                {/if}
+              </div>
+            </div>
+
+            <div class="flex flex-1 flex-shrink-0 justify-end items-center gap-3 pr-3">
+              {#if !isEditable}
+                <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
+              {:else}
+                <PercentageEditor bind:percentage={percentages[slug]} />
+                <Button
+                  icon={Trash}
+                  variant="ghost"
+                  on:click={() => removeItem(slug)}
+                  ariaLabel="Remove from list"
+                  dataTestId={`remove-${slug}`}
+                />
+              {/if}
+            </div>
+          </li>
+        {/each}
+      </ul>
     </div>
   {/if}
-  {#if !blockInteraction && Object.keys(items).length > 0}
-    <div class="distribution-tools">
-      <div class="actions">
+  {#if isEditable && Object.keys(items).length > 0}
+    <div
+      class="distribution-tools flex flex-col flex-wrap justify-center items-center sm:flex-row sm:justify-between gap-3 mt-4 select-none"
+    >
+      <div class="flex flex-wrap gap-0.5 flex-shrink-0 justify-center">
         <Button size="small" on:click={distributeEvenly} disabled={!canDistributeEvenly}
-          >Distribute evenly</Button
+          >Split evenly</Button
         >
         <Button size="small" on:click={distributeRemaining} disabled={!canDistributeRemaining}
-          >Distribute remaining</Button
+          >Split remaining</Button
         >
         <Button size="small" on:click={clearPercentages} disabled={!canClearPercentages}
-          >Clear distribution</Button
+          >Clear</Button
         >
       </div>
       <div class="remaining-percentage-indicator" class:error class:valid>
@@ -440,6 +445,10 @@
     border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
+  .list ul li + li {
+    border-top: 1px solid;
+  }
+
   .add-project {
     display: flex;
     align-items: center;
@@ -465,25 +474,6 @@
 
   .add-project input:focus {
     outline: none;
-  }
-
-  .add-project .submit-button {
-    position: absolute;
-    right: 0.75rem;
-  }
-
-  .distribution-tools {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-    user-select: none;
-  }
-
-  .distribution-tools .actions {
-    display: flex;
-    gap: 0.125rem;
-    flex-wrap: wrap;
   }
 
   .remaining-percentage-indicator {

@@ -21,7 +21,7 @@
 
   let formValid: boolean;
 
-  $: countOfDependencySplits = $context.dependencySplits.selected.length;
+  $: dependencyKeys = Object.keys($context.dependencySplits.items);
 </script>
 
 <StandaloneFlowStepLayout
@@ -31,13 +31,12 @@
   ]}% split to your project’s maintainers. In total, you can add up to 200 maintainers and dependencies, and change this list later anytime."
 >
   <ListEditor
-    bind:selected={$context.maintainerSplits.selected}
     bind:percentages={$context.maintainerSplits.percentages}
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
-    maxItems={200 - countOfDependencySplits}
+    maxItems={200 - dependencyKeys.length}
     allowedItems={['eth-addresses']}
-    blockedKeys={$context.dependencySplits.selected}
+    blockedKeys={dependencyKeys}
   />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>

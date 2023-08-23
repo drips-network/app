@@ -10,6 +10,7 @@
   export let ariaLabel: string | undefined = undefined;
   export let size: 'small' | 'normal' | 'large' = 'normal';
   export let loading = false;
+  export let dataTestId: string | undefined = undefined;
 
   $: isDisabled = disabled || loading;
 
@@ -31,6 +32,7 @@
   aria-label={ariaLabel}
   disabled={isDisabled}
   on:click|stopPropagation
+  data-testid={dataTestId}
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
@@ -62,6 +64,7 @@
     padding: 5px 2px;
     margin: -4px 0;
     transition: opacity 0.3s;
+    flex-shrink: 0;
   }
 
   button.size-large {

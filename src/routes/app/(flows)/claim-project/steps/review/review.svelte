@@ -17,11 +17,7 @@
   import { get, writable, type Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import Splits, {
-    type Split as RepresentationalSplit,
-  } from '$lib/components/splits/splits.svelte';
-  import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
@@ -49,58 +45,16 @@
     splits: { maintainers: [], dependencies: [] },
   };
 
-  function getRepresentationalSplits(
-    selected: string[],
-    items: Items,
-    percentages: Percentages,
-    group: 'dependencies' | 'maintainers',
-  ): RepresentationalSplit[] {
-    return mapFilterUndefined(selected, (slug) => {
-      const item = items[slug];
-      const groupPercentage = $context.highLevelPercentages[group];
-
-      const percentage = (groupPercentage / 100) * (percentages[slug] / 100) * 1000000;
-
-      if (!percentage) return;
-
-      if (item.type === 'interstitial') return;
-
-      if ('project' in item.label.props) {
-        return {
-          type: 'project-split',
-          project: item.label.props.project,
-          weight: percentage,
-        };
-      } else if ('listName' in item.label.props) {
-        return {
-          type: 'drip-list-split',
-          listId: item.label.props.listId,
-          listName: item.label.props.listName,
-          listOwner: item.label.props.owner,
-          weight: percentage,
-        };
-      } else {
-        return {
-          type: 'address-split',
-          address: item.label.props.address,
-          weight: percentage,
-        };
-      }
-    });
-  }
-
-  $: dependencyRepresentationalSplits = getRepresentationalSplits(
-    $context.dependencySplits.selected,
+  $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
     $context.dependencySplits.items,
     $context.dependencySplits.percentages,
-    'dependencies',
+    $context.highLevelPercentages['dependencies'],
   );
 
-  $: maintainerRepresentationalSplits = getRepresentationalSplits(
-    $context.maintainerSplits.selected,
+  $: maintainerRepresentationalSplits = mapSplitsFromListEditorData(
     $context.maintainerSplits.items,
     $context.maintainerSplits.percentages,
-    'maintainers',
+    $context.highLevelPercentages['maintainers'],
   );
 
   let gitProjectService: GitProjectService;

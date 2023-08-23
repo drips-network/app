@@ -1,5 +1,7 @@
 <script lang="ts" context="module">
   import type { GitProject } from '$lib/utils/metadata/types';
+  import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export interface ProjectSplit {
     type: 'project-split';
@@ -38,6 +40,42 @@
   }
 
   export type Splits = (SplitGroup | Split)[];
+
+  export function mapSplitsFromListEditorData(
+    items: Items,
+    percentages: Percentages,
+    groupPercentage: number,
+  ): Split[] {
+    return mapFilterUndefined(Object.keys(items), (slug) => {
+      const item = items[slug];
+
+      const percentage = (groupPercentage / 100) * (percentages[slug] / 100) * 1000000;
+
+      if (!percentage) return;
+
+      if (item.type === 'project') {
+        return {
+          type: 'project-split',
+          project: item.project,
+          weight: percentage,
+        };
+      } else if (item.type === 'drip-list') {
+        return {
+          type: 'drip-list-split',
+          listId: item.list.id,
+          listName: item.list.name,
+          listOwner: item.list.owner,
+          weight: percentage,
+        };
+      } else {
+        return {
+          type: 'address-split',
+          address: slug,
+          weight: percentage,
+        };
+      }
+    });
+  }
 </script>
 
 <script lang="ts">

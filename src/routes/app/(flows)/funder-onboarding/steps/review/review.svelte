@@ -110,9 +110,8 @@
     <h2 class="pixelated drip-list-title">{$context.dripList.title}</h2>
     <ListEditor
       bind:percentages={$context.dripList.percentages}
-      bind:selected={$context.dripList.selected}
       bind:items={$context.dripList.items}
-      blockInteraction
+      isEditable={false}
     />
   </FormField>
   <FormField type="div" title="Your support">

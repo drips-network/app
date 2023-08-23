@@ -52,7 +52,7 @@
     }
   }
 
-  $: countOfMaintainerSplits = $context.maintainerSplits.selected.length;
+  $: maintainerKeys = Object.keys($context.maintainerSplits.items);
 </script>
 
 <StandaloneFlowStepLayout
@@ -69,13 +69,12 @@
 >
   <!-- TODO: Prevent splitting to the same project we're trying to claim. -->
   <ListEditor
-    bind:selected={$context.dependencySplits.selected}
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
-    blockedKeys={$context.maintainerSplits.selected}
-    maxItems={200 - countOfMaintainerSplits}
     allowedItems={['eth-addresses', 'projects']}
+    blockedKeys={maintainerKeys}
+    maxItems={200 - maintainerKeys.length}
   />
   <svelte:fragment slot="left-actions">
     <Button

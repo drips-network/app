@@ -39,7 +39,7 @@
             [address]: ethAddressItem(address),
           };
 
-          $context.maintainerSplits.selected = [address];
+          $context.maintainerSplits.items[address] = ethAddressItem(address);
 
           $context.maintainerSplits.percentages = {
             [address]: 100,

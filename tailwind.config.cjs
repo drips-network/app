@@ -4,6 +4,7 @@ module.exports = {
   theme: {
     extend: {
       screens: {
+        'sm': '540px',
         'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
       },
       colors: {

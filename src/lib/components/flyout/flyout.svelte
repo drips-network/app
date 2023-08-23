@@ -44,7 +44,7 @@
     {#if visible}
       <div transition:fly|local={{ y: 8 }} class="content" class:left={direction === 'left'}>
         <div class="margin" />
-        <div class="container">
+        <div class="wrapper">
           <slot name="content" />
         </div>
       </div>
@@ -78,7 +78,7 @@
     right: 0;
   }
 
-  .container {
+  .wrapper {
     background-color: var(--color-background);
     box-shadow: var(--elevation-medium);
     border-radius: 1.25rem 0 1.25rem 1.25rem;

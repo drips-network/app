@@ -15,7 +15,6 @@ import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelt
 
 export interface State {
   dripList: {
-    selected: string[];
     items: Items;
     percentages: Percentages;
     title: string;
@@ -28,7 +27,7 @@ export interface State {
 }
 
 export const state = writable<State>({
-  dripList: { title: 'My Drip List', percentages: {}, items: {}, selected: [] },
+  dripList: { title: 'My Drip List', percentages: {}, items: {} },
   supportConfig: { listSelected: [] },
 });
 
@@ -46,24 +45,23 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
               components: mapFilterUndefined(
                 Object.entries(state.dripList.items),
                 ([slug, item]) => {
-                  if (item.type !== 'selectable') return;
-                  if (!state.dripList.selected.includes(slug)) return;
-
-                  if ('project' in item.label.props) {
+                  if (item.type === 'project') {
                     return {
                       component: ProjectAvatar,
                       props: {
-                        project: item.label.props.project,
+                        project: item.project,
                         outline: true,
                       },
                     };
                   }
 
-                  if ('listId' in item.label.props) {
+                  if (item.type === 'drip-list') {
                     return {
                       component: DripListBadge,
                       props: {
-                        ...item.label.props,
+                        listId: item.list.id,
+                        listName: item.list.name,
+                        owner: item.list.owner,
                         showName: false,
                       },
                     };
@@ -72,7 +70,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
                   return {
                     component: IdentityBadge,
                     props: {
-                      address: item.label.props.address,
+                      address: slug,
                       showIdentity: false,
                       size: 'medium',
                       outline: true,
