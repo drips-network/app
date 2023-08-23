@@ -11,20 +11,3 @@
     >{project.source.repoName}</span
   ></span
 >
-
-<style>
-  /* .project-name {
-    display: inline-flex;
-    width: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .project-name .repo-name,
-  .project-name .owner-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  } */
-</style>

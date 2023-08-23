@@ -77,11 +77,6 @@
     border-radius: 0.25rem;
   }
 
-  /* .name {
-    display: flex;
-    min-width: 0;
-  } */
-
   .avatar-and-forge {
     display: flex;
     flex-direction: row;
