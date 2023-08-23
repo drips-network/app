@@ -9,6 +9,7 @@
 
   export let showAvatar = true;
   export let showName = true;
+  export let isLinked = true;
 
   $: ensStore.connected && ensStore.lookup(owner);
   $: ens = $ensStore[owner];
@@ -16,7 +17,12 @@
   $: username = ens?.name ? ens.name : formatAddress(owner);
 </script>
 
-<a href="/app/drip-lists/{listId}" tabindex="-1" class="drip-list-badge flex gap-2 items-center">
+<svelte:element
+  this={isLinked ? 'a' : 'div'}
+  href={isLinked ? `/app/drip-lists/{listId}` : undefined}
+  tabindex={isLinked ? 0 : -1}
+  class="drip-list-badge flex gap-2 items-center"
+>
   {#if showAvatar}
     <div class="drip-list-icon">
       <Ledger style="fill: var(--color-primary)" />
@@ -24,12 +30,10 @@
   {/if}
   {#if showName}
     <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
-      <span class="text-foreground-level-5">{username}/</span><a href="/app/drip-lists/{listId}"
-        >{listName}</a
-      >
+      <span><span class="text-foreground-level-5">{username}/</span>{listName}</span>
     </div>
   {/if}
-</a>
+</svelte:element>
 
 <style>
   .drip-list-icon {
@@ -43,12 +47,11 @@
     flex-shrink: 0;
   }
 
-  .name a:focus {
+  a.drip-list-badge {
     outline: none;
   }
-
-  .name a:focus-visible {
-    background-color: var(--color-primary-level-1);
+  a.drip-list-badge:focus-visible .name > span {
+    background: var(--color-primary-level-1);
     border-radius: 0.25rem;
   }
 </style>
