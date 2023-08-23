@@ -333,9 +333,14 @@
             data-testid={`item-${slug}`}
           >
             <div class="flex-1 max-w-full">
-              <div class="w-full overflow-x-scroll px-3">
+              <div class="w-full px-3">
                 {#if item.type === 'address'}
-                  <IdentityBadge address={item.address} size="medium" disableLink={true} />
+                  <IdentityBadge
+                    address={item.address}
+                    size="medium"
+                    disableLink={true}
+                    showFullAddress={true}
+                  />
                 {:else if item.type === 'project'}
                   <ProjectBadge project={item.project} linkTo="nothing" />
                 {:else if item.type === 'drip-list'}
@@ -343,6 +348,7 @@
                     listName={item.list.name}
                     listId={item.list.id}
                     owner={item.list.owner}
+                    isLinked={false}
                   />
                 {/if}
               </div>
