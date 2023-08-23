@@ -1,43 +1,39 @@
 <script lang="ts">
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import ensStore from '$lib/stores/ens';
+  import formatAddress from '$lib/utils/format-address';
 
   export let listName: string;
   export let listId: string;
-  export let owner: string | undefined = undefined;
+  export let owner: string;
 
   export let showAvatar = true;
   export let showName = true;
+
+  $: ensStore.connected && ensStore.lookup(owner);
+  $: ens = $ensStore[owner];
+
+  $: username = ens?.name ? ens.name : formatAddress(owner);
 </script>
 
-<a href="/app/drip-lists/{listId}" tabindex="-1" class="drip-list-badge">
+<a href="/app/drip-lists/{listId}" tabindex="-1" class="drip-list-badge flex gap-2 items-center">
   {#if showAvatar}
     <div class="drip-list-icon">
       <Ledger style="fill: var(--color-background)" />
     </div>
   {/if}
   {#if showName}
-    <div class="name">
-      {#if owner}
-        <span>
-          <IdentityBadge muted showAvatar={false} address={owner} />
-        </span>
-      {/if}
-      <span class="typo-text">/</span>
-      <a class="typo-text-bold" href="/app/drip-lists/{listId}">{listName}</a>
+    <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
+      <span class="text-foreground-level-5">{username}/</span><a href="/app/drip-lists/{listId}"
+        >{listName}</a
+      >
     </div>
   {/if}
 </a>
 
 <style>
-  .drip-list-badge {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
   .drip-list-icon {
-    background-color: var(--color-foreground);
+    background-color: var(--color-primary);
     height: 2rem;
     width: 2rem;
     display: flex;
@@ -47,13 +43,6 @@
     flex-shrink: 0;
   }
 
-  .name {
-    display: flex;
-    gap: 0;
-    align-items: last-baseline;
-    white-space: nowrap;
-  }
-
   .name a:focus {
     outline: none;
   }
@@ -61,9 +50,5 @@
   .name a:focus-visible {
     background-color: var(--color-primary-level-1);
     border-radius: 0.25rem;
-  }
-
-  .name > span {
-    display: inline-block;
   }
 </style>
