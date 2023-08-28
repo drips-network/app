@@ -1,5 +1,4 @@
 import { makeStep } from '$lib/components/stepper/types';
-import { writable } from 'svelte/store';
 import BuildListStep from './steps/build-list/build-list.svelte';
 import ConfigureSupportStep from './steps/configure-support/configure-support.svelte';
 import ReviewStep from './steps/review/review.svelte';
@@ -12,6 +11,9 @@ import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte'
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
 import Success from './steps/success/success.svelte';
 import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+import storedWritable from '@efstajas/svelte-stored-writable';
+import { browser } from '$app/environment';
+import { z } from 'zod';
 
 export interface State {
   dripList: {
@@ -26,10 +28,47 @@ export interface State {
   };
 }
 
-export const state = writable<State>({
-  dripList: { title: 'My Drip List', percentages: {}, items: {} },
-  supportConfig: { listSelected: [] },
-});
+const storageKey = 'new-drip-list';
+const savedStateSchema = z.any();
+
+// cheaply check if saved state is "valid"
+// TODO - use zod
+function isValidSavedState(saved: any) {
+  return (
+    typeof saved === 'object' &&
+    typeof saved.dripList === 'object' &&
+    typeof saved.supportConfig === 'object'
+  );
+}
+
+function clearStoredState() {
+  // TODO - show message to user that saved storage failed
+  localStorage.removeItem(storageKey);
+}
+
+// check if valid saved data, otherwise clear it
+if (browser) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) ?? '');
+
+    if (!isValidSavedState(saved)) {
+      clearStoredState();
+    }
+  } catch (e) {
+    // invalid JSON
+    clearStoredState();
+  }
+}
+
+export const state = storedWritable(
+  storageKey,
+  savedStateSchema,
+  {
+    dripList: { title: 'My Drip List', percentages: {}, items: {} },
+    supportConfig: { listSelected: [] },
+  },
+  !browser,
+);
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
   switch (stepIndex) {
