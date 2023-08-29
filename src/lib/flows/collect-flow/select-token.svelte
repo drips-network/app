@@ -68,7 +68,7 @@
   />
   <FormField title="Token">
     <div class="list-container">
-      <ListSelect bind:selected items={tokenList} />
+      <ListSelect bind:selected items={tokenList} type="tokens" />
     </div>
   </FormField>
   <svelte:fragment slot="actions">

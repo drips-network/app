@@ -236,6 +236,7 @@
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
         emptyStateText={'No tokens available to stream. Add one first by clicking "Add funds" on your Dashboard.'}
+        type="tokens"
       />
     </div>
   </FormField>

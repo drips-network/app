@@ -6,7 +6,7 @@
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
 
   export let items: Items;
-
+  export let type: 'tokens' | 'generic' = 'generic';
   export let searchable = true;
   export let multiselect = false;
   export let blockInteraction = false;
@@ -178,7 +178,7 @@
         class="typo-text"
         bind:this={searchBarElem}
         bind:value={searchString}
-        placeholder="Search…"
+        placeholder={type === 'tokens' ? 'Search tokens' : 'Search'}
       />
     </div>
   {/if}

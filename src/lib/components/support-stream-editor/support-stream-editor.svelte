@@ -255,6 +255,7 @@
   <FormField type="div" disabled={currentStage < 1} title="Select a token to stream">
     <div class="list-container">
       <ListSelect
+        type="tokens"
         blockInteraction={currentStage < 1}
         bind:selected={tokenListSelected}
         items={tokenList}
