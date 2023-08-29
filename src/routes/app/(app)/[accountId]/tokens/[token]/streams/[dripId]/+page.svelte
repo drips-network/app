@@ -260,10 +260,19 @@
       <Spinner />
     </div>
   {:else if streamId && stream}
-    <div class="stream-page" in:fly={{ duration: 300, y: 16 }}>
-      <div class="hero">
-        <div class="title-and-state">
+    <article class="stream-page" in:fly={{ duration: 300, y: 16 }}>
+      <header class="hero">
+        <div class="flex flex-col-reverse gap-4 md:flex-row items-center">
           <h1>{streamName}</h1>
+          <StreamStateBadge
+            size="normal"
+            {streamId}
+            paused={stream.paused}
+            senderId={stream.sender.accountId}
+            durationSeconds={stream.streamConfig.durationSeconds}
+            startDate={stream.streamConfig.startDate}
+            {tokenAddress}
+          />
         </div>
         {#if checkIsUser(stream.sender.accountId)}
           <div class="actions">
@@ -306,7 +315,7 @@
             {/if}
           </div>
         {/if}
-      </div>
+      </header>
       <StreamVisual
         from={stream.sender}
         to={stream.receiver}
@@ -318,20 +327,6 @@
         halted={estimate?.currentAmountPerSecond === 0n}
       />
       <div class="details">
-        <div class="key-value-group">
-          <div class="key-value">
-            <h5 class="key">State</h5>
-            <StreamStateBadge
-              size="large"
-              {streamId}
-              paused={stream.paused}
-              senderId={stream.sender.accountId}
-              durationSeconds={stream.streamConfig.durationSeconds}
-              startDate={stream.streamConfig.startDate}
-              {tokenAddress}
-            />
-          </div>
-        </div>
         <div class="key-value-group">
           <div class="key-value">
             <div class="keys">
@@ -439,7 +434,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </article>
   {/if}
 </div>
 
@@ -470,12 +465,6 @@
     flex-direction: column;
     gap: 1rem;
     text-align: center;
-  }
-
-  .title-and-state {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
   }
 
   .with-info-icon {
@@ -580,11 +569,6 @@
   @media (max-width: 768px) {
     .hero {
       align-items: center;
-    }
-
-    .title-and-state {
-      flex-direction: column;
-      align-items: left;
     }
 
     .align-right {
