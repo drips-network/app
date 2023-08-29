@@ -118,7 +118,7 @@
         {selectedOption.title}
       </span>
     </div>
-    <div class="chevron" class:expanded><ChevronDown /></div>
+    <div class="chevron" class:expanded><ChevronDown style="fill: var(--foreground)" /></div>
   </div>
 
   {#if expanded}
