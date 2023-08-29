@@ -97,7 +97,7 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button variant="primary" disabled={selected.length !== 1} on:click={submit}
       >Add {selectedToken?.info.name ?? ''}</Button
     >
