@@ -155,8 +155,9 @@
           restorer.clear();
           dispatch('goBackward');
         }}
+        variant="ghost"
       >
-        Go back
+        Back
       </Button>
     {/if}
     <span data-testid="confirm-amount-button">

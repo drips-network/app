@@ -77,7 +77,7 @@
     bind:selectedTokenAddress={$context.supportConfig.listSelected[0]}
   />
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button

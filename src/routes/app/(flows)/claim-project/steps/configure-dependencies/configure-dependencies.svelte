@@ -82,7 +82,7 @@
       on:click={() =>
         dispatch('goForward', {
           by: $context.highLevelPercentages['maintainers'] === 0 ? -2 : -1,
-        })}>Go back</Button
+        })}>Back</Button
     >
   </svelte:fragment>
   <svelte:fragment slot="actions">

@@ -116,7 +116,7 @@
   />
   <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" on:click={verify}
