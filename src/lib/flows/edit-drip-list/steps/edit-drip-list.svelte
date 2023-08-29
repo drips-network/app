@@ -153,7 +153,7 @@
     <ListEditor bind:items bind:percentages bind:valid={listValid} />
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={modal.hide}>Cancel</Button>
+    <Button on:click={modal.hide} variant="ghost">Cancel</Button>
     <Button on:click={submit} disabled={!listValid || !nameValid} icon={Wallet} variant="primary"
       >Confirm changes in wallet</Button
     >
