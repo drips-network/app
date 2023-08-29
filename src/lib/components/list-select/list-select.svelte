@@ -279,7 +279,7 @@
     border-bottom: 1px solid var(--color-foreground);
     display: flex;
     gap: 0.5rem;
-    color: var(--color-foreground);
+    /* color: var(--color-foreground); */
   }
 
   .item:last-child {
@@ -358,7 +358,7 @@
   }
 
   .item .content .text {
-    color: var(--color-foreground);
+    color: var(--color-foreground-level-4);
     flex-shrink: 0;
   }
 
