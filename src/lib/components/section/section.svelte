@@ -32,6 +32,6 @@
   }
 
   .content {
-    padding-top: 2rem;
+    padding-top: 1.5rem;
   }
 </style>
