@@ -322,7 +322,9 @@
 >
   {#if optionsOutgoing.data.length > 0}
     <div class="table-container">
-      {#if !onlyDripListStreams}<h4 class="table-group-header">↑ Outgoing</h4>{/if}
+      {#if !onlyDripListStreams && optionsIncoming.data.length > 0}<h4 class="table-group-header">
+          ↑ Outgoing
+        </h4>{/if}
       <Table
         rowHeight={76}
         options={optionsOutgoing}
