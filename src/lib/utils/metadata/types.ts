@@ -87,5 +87,6 @@ export type GitProject<ST extends Source = Source> =
 export interface DripList {
   account: NFTDriverAccount;
   name: string;
+  description: string;
   projects: (DripListSplitReceiver | AddressDriverSplitReceiver | RepoDriverSplitReceiver)[];
 }

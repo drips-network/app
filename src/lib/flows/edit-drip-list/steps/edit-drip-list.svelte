@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Splits, Split } from '$lib/components/splits/splits.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -21,12 +20,13 @@
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { Utils } from 'radicle-drips';
-  import FormField from '$lib/components/form-field/form-field.svelte';
-  import TextInput from '$lib/components/text-input/text-input.svelte';
   import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
   import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
   import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
+  import DripListEditor, {
+    type DripListConfig,
+  } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -34,6 +34,7 @@
   export let representationalSplits: Splits;
   export let projectToAdd: GitProject | undefined = undefined;
   export let listName: string;
+  export let listDescription: string;
 
   // TODO: Ensure these values are saved in case there's some TX error.
 
@@ -84,8 +85,14 @@
     items[projectToAdd.source.url] = projectItem(projectToAdd);
   }
 
-  let listValid = false;
-  $: nameValid = listName.length > 0;
+  let dripList: DripListConfig = {
+    items,
+    percentages,
+    title: listName,
+    description: listDescription,
+  };
+
+  let isValid = false;
 
   // TODO: Auto-refresh UI when splits change
   function submit() {
@@ -113,7 +120,8 @@
 
           const newMetadata: ReturnType<typeof nftDriverAccountMetadataParser.parseLatest> = {
             ...currentMetadata.data,
-            name: listName,
+            name: dripList.title,
+            description: dripList.description,
             projects: projectsSplitMetadata,
           };
 
@@ -146,15 +154,10 @@
     headline="Edit your Drip List"
     description="Choose which GitHub projects and Ethereum addresses you'd like to support with this Drip List."
   />
-  <FormField title="Drip List Name*">
-    <TextInput bind:value={listName} />
-  </FormField>
-  <FormField title="Recipients*">
-    <ListEditor bind:items bind:percentages bind:valid={listValid} />
-  </FormField>
+  <DripListEditor bind:isValid bind:dripList />
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide}>Cancel</Button>
-    <Button on:click={submit} disabled={!listValid || !nameValid} icon={Wallet} variant="primary"
+    <Button on:click={submit} disabled={!isValid} icon={Wallet} variant="primary"
       >Confirm changes in wallet</Button
     >
   </svelte:fragment>
