@@ -22,6 +22,7 @@
   import type { Stream } from '$lib/stores/streams/types';
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
+  import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
 
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
@@ -135,7 +136,9 @@
       </div>
     </div>
     {#if (dripList.description ?? '').length > 0}
-      <p>{dripList.description}</p>
+      <TextExpandable>
+        {dripList.description}
+      </TextExpandable>
     {/if}
   </header>
 
