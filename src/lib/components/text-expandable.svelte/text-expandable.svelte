@@ -40,7 +40,7 @@
     >{/if}
   {#if isClamped && isExpandable}
     <button
-      class="absolute overlay hover:bg-primary-level-1 focus-visible:bg-primary-level-1 rounded"
+      class="absolute overlay focus-visible:bg-primary-level-1 rounded"
       on:click={() => {
         expanded = true;
       }}
