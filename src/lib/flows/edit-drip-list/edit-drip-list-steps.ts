@@ -9,7 +9,7 @@ import type { GitProject } from '$lib/utils/metadata/types';
 export default (
   dripListId: string,
   listName: string,
-  listDescription: string,
+  listDescription: string | undefined,
   representationalSplits: Splits,
   projectToAdd?: GitProject,
 ) => ({

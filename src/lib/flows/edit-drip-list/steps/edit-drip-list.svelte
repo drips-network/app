@@ -34,7 +34,7 @@
   export let representationalSplits: Splits;
   export let projectToAdd: GitProject | undefined = undefined;
   export let listName: string;
-  export let listDescription: string;
+  export let listDescription: string | undefined;
 
   // TODO: Ensure these values are saved in case there's some TX error.
 

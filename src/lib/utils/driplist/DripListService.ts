@@ -158,7 +158,10 @@ export default class DripListService {
         accountId: nftSubAccount.tokenId,
       },
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
-      description: nftSubAccountMetadata.data.description,
+      description:
+        'description' in nftSubAccountMetadata.data
+          ? nftSubAccountMetadata.data.description
+          : undefined,
       projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
     };
 
