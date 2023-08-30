@@ -457,7 +457,7 @@ describe('app', async () => {
     });
 
     it('renames the drip list', async () => {
-      const titleField = page.locator('label:has-text("List Title*")');
+      const titleField = page.locator('label:has-text("Title*")');
       await titleField.clear();
       await titleField.fill('This is a Test Drip List');
     });

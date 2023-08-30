@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Splits, Split } from '$lib/components/splits/splits.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -23,9 +23,9 @@
   import { Utils } from 'radicle-drips';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import projectItem from '$lib/components/list-editor/item-templates/project';
-  import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
-  import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
+  import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
+  import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
+  import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
