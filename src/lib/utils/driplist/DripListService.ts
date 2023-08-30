@@ -176,6 +176,7 @@ export default class DripListService {
     amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
+    const dripListDescription = context.dripList.description;
 
     const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
       context.dripList,
@@ -193,6 +194,7 @@ export default class DripListService {
       dripListId,
       projectsSplitMetadata,
       dripListName,
+      dripListDescription,
     );
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
@@ -484,6 +486,7 @@ export default class DripListService {
     dripListId: string,
     projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
     name?: string,
+    description?: string,
   ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
@@ -499,6 +502,7 @@ export default class DripListService {
       },
       projects,
       name,
+      description,
     });
 
     const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);
