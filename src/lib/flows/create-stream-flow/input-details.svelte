@@ -286,7 +286,7 @@
       />
     </FormField>
   </div>
-  <Toggleable bind:toggled={setStartAndEndDate} label="Specify start- and end dates">
+  <Toggleable bind:toggled={setStartAndEndDate} label="Specify start and end dates">
     <div class="start-end-date">
       <p>
         Be aware that if your transaction is confirmed after the configured start date, your stream
