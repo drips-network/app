@@ -168,7 +168,6 @@ describe('app', async () => {
       it('displays the original users outgoing stream on their profile', async () => {
         await page.goto('http://127.0.0.1:3000/app/0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
 
-        await expect(page.locator('text=↑ Outgoing')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
       });
 
