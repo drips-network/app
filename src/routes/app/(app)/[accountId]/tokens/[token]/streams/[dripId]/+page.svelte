@@ -345,7 +345,7 @@
                 </span>
               </div>
               {#if hasDuration}
-                <span class="typo-header-5 greyed-out">OF</span>
+                <span class="typo-header-5">OF</span>
                 <div class="value-box">
                   <span class="large-text tabular-nums">
                     <FormattedAmount
@@ -386,7 +386,7 @@
         <div class="key-value-group">
           <div class="key-value">
             <div class="with-info-icon">
-              <h5 class="key greyed-out">Remaining balance for token</h5>
+              <h5 class="key">Remaining balance for token</h5>
               <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
                 <svelte:fragment slot="tooltip-content">
@@ -409,7 +409,7 @@
           {#if outOfFundsDate}
             <div class="key-value">
               <div class="with-info-icon">
-                <h5 class="key greyed-out">
+                <h5 class="key">
                   Balance {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
                 </h5>
                 <Tooltip>
@@ -427,7 +427,7 @@
             </div>
           {/if}
           <div class="key-value">
-            <h5 class="key greyed-out">Created at</h5>
+            <h5 class="key">Created at</h5>
             <span class="value small-text"
               >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
             >
@@ -494,10 +494,6 @@
   .key-value > .keys {
     display: flex;
     justify-content: space-between;
-  }
-
-  .greyed-out {
-    color: var(--color-foreground-level-5);
   }
 
   .align-right {
