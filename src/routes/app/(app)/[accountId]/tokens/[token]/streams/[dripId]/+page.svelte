@@ -427,7 +427,7 @@
             </div>
           {/if}
           <div class="key-value">
-            <h5 class="key">Created at</h5>
+            <h5 class="key">Created on</h5>
             <span class="value small-text"
               >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
             >
