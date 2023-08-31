@@ -38,7 +38,7 @@ describe('list-select.svelte', async () => {
       },
     });
 
-    screen.getByPlaceholderText('Search…');
+    screen.getByPlaceholderText('Search');
   });
 
   it("doesn't show a searchbar if searchable is false", () => {
@@ -49,7 +49,7 @@ describe('list-select.svelte', async () => {
       },
     });
 
-    const searchBar = screen.queryByPlaceholderText('Search…');
+    const searchBar = screen.queryByPlaceholderText('Search');
     expect(searchBar).not.toBeInTheDocument();
   });
 
@@ -60,7 +60,7 @@ describe('list-select.svelte', async () => {
       },
     });
 
-    const searchBar = screen.getByPlaceholderText('Search…');
+    const searchBar = screen.getByPlaceholderText('Search');
 
     await userEvent.type(searchBar, 'test-item-1');
 
@@ -98,7 +98,7 @@ describe('list-select.svelte', async () => {
 
     await userEvent.tab();
 
-    const searchBar = screen.getByPlaceholderText('Search…');
+    const searchBar = screen.getByPlaceholderText('Search');
     expect(searchBar).toHaveFocus();
 
     await userEvent.tab();
