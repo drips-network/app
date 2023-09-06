@@ -66,6 +66,7 @@
         editDripListSteps(
           dripList.account.accountId,
           dripList.name,
+          dripList.description,
           representationalSplits,
           project,
         ),

@@ -457,9 +457,13 @@ describe('app', async () => {
     });
 
     it('renames the drip list', async () => {
-      const titleField = page.locator('label:has-text("List Title*")');
+      const titleField = page.locator('label:has-text("Title*")');
       await titleField.clear();
       await titleField.fill('This is a Test Drip List');
+    });
+
+    it('gives a description', async () => {
+      await page.locator('label:has-text("Description")').fill('This is my list description.');
     });
 
     it('advances the flow', async () => {
@@ -493,6 +497,7 @@ describe('app', async () => {
     it('navigates to the Drip List screen', async () => {
       await page.locator('button', { hasText: 'View your Drip List' }).click();
       await expect(page.locator('text=This is a Test Drip List')).toHaveCount(1);
+      await expect(page.locator('text=This is my list description.')).toHaveCount(1);
     });
 
     it('opens the drip list editor', async () => {
@@ -518,6 +523,18 @@ describe('app', async () => {
       await page.locator('button', { hasText: 'Split evenly' }).click();
     });
 
+    it('edits the title', async () => {
+      const titleField = page.locator('label:has-text("Title*")');
+      await titleField.clear();
+      await titleField.fill('This is an EDITED title');
+    });
+
+    it('edits the description', async () => {
+      const titleField = page.locator('label:has-text("Description")');
+      await titleField.clear();
+      await titleField.fill('This is an EDITED description.');
+    });
+
     it('advances the flow', async () => {
       await page.locator('button', { hasText: 'Confirm changes in wallet' }).click();
       await page.locator('button', { hasText: 'Got it' }).click();
@@ -528,7 +545,8 @@ describe('app', async () => {
 
       await page.reload();
 
-      await expect(page.locator('text=This is a Test Drip List')).toHaveCount(1);
+      await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
+      await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
       await expect(page.locator('text=0x43')).toHaveCount(0);
     });
 

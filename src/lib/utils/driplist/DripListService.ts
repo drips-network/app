@@ -33,7 +33,7 @@ import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import { isAddress } from 'ethers/lib/utils';
 import mapFilterUndefined from '../map-filter-undefined';
-import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
+import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
@@ -158,6 +158,10 @@ export default class DripListService {
         accountId: nftSubAccount.tokenId,
       },
       name: nftSubAccountMetadata.data.name || 'Unnamed Drip List',
+      description:
+        'description' in nftSubAccountMetadata.data
+          ? nftSubAccountMetadata.data.description
+          : undefined,
       projects: await this._getDripListProjects(nftSubAccountMetadata.data.projects),
     };
 
@@ -175,6 +179,7 @@ export default class DripListService {
     amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
     const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
+    const dripListDescription = context.dripList.description;
 
     const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
       context.dripList,
@@ -192,6 +197,7 @@ export default class DripListService {
       dripListId,
       projectsSplitMetadata,
       dripListName,
+      dripListDescription,
     );
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
@@ -483,6 +489,7 @@ export default class DripListService {
     dripListId: string,
     projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
     name?: string,
+    description?: string,
   ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
@@ -498,6 +505,7 @@ export default class DripListService {
       },
       projects,
       name,
+      description,
     });
 
     const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);
