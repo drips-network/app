@@ -22,7 +22,7 @@
   import DripListService from '$lib/utils/driplist/DripListService';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../funder-onboarding-flow';
-  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import expect from '$lib/utils/expect';
   import { constants, type DripsSubgraphClient } from 'radicle-drips';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
@@ -108,6 +108,9 @@
       >
     </svelte:fragment>
     <h2 class="pixelated drip-list-title">{$context.dripList.title}</h2>
+    {#if ($context.dripList.description ?? '').length > 0}
+      <p class="my-4">{$context.dripList.description}</p>
+    {/if}
     <ListEditor
       bind:percentages={$context.dripList.percentages}
       bind:items={$context.dripList.items}

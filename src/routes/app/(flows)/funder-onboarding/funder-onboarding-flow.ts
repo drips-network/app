@@ -9,16 +9,12 @@ import Pile from '$lib/components/pile/pile.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
 import Success from './steps/success/success.svelte';
 import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
 
 export interface State {
-  dripList: {
-    items: Items;
-    percentages: Percentages;
-    title: string;
-  };
+  dripList: DripListConfig;
   supportConfig: {
     listSelected: string[];
     streamRateValueParsed?: bigint | undefined;
@@ -27,7 +23,7 @@ export interface State {
 }
 
 export const state = writable<State>({
-  dripList: { title: 'My Drip List', percentages: {}, items: {} },
+  dripList: { title: 'My Drip List', percentages: {}, items: {}, description: undefined },
   supportConfig: { listSelected: [] },
 });
 

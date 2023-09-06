@@ -25,20 +25,25 @@
 
 <HeadMeta title={data.dripList.name} />
 
-<div class="drip-list-page">
-  <div class="owner">
-    <span>Drip List owned by </span>
-    <IdentityBadge address={data.dripList.account.owner.address} />
-  </div>
-  <SectionSkeleton loaded={Boolean(data.dripList)}>
-    <DripListCard
-      {supportStreams}
-      incomingSplits={data.incomingSplits}
-      dripList={data.dripList}
-      representationalSplits={data.representationalSplits}
-    />
-  </SectionSkeleton>
+<article class="drip-list-page">
+  <section class="flex flex-col gap-6">
+    <div class="owner">
+      <span>Drip List owned by </span>
+      <IdentityBadge address={data.dripList.account.owner.address} />
+    </div>
+
+    <SectionSkeleton loaded={Boolean(data.dripList)}>
+      <DripListCard
+        {supportStreams}
+        incomingSplits={data.incomingSplits}
+        dripList={data.dripList}
+        representationalSplits={data.representationalSplits}
+      />
+    </SectionSkeleton>
+  </section>
+
   <Developer accountId={dripList.account.accountId} />
+
   <Supporters
     headline="Support"
     infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists to support it."
@@ -47,7 +52,7 @@
     type="dripList"
     incomingSplits={data.incomingSplits}
   />
-</div>
+</article>
 
 <style>
   .drip-list-page {

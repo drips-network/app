@@ -1,4 +1,4 @@
-import type { ListItem } from '../list-editor.svelte';
+import type { ListItem } from '../drip-list-members-editor.svelte';
 
 const dripListItem = (listName: string, listId: string, owner: string): ListItem => ({
   type: 'drip-list',

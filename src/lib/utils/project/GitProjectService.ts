@@ -37,7 +37,7 @@ import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import { isValidGitUrl } from '../is-valid-git-url';
-import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
+import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 

@@ -22,6 +22,7 @@
   import type { Stream } from '$lib/stores/streams/types';
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
+  import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
 
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
@@ -45,7 +46,12 @@
     modal.show(
       Stepper,
       undefined,
-      editDripListSteps(dripList.account.accountId, dripList.name, representationalSplits),
+      editDripListSteps(
+        dripList.account.accountId,
+        dripList.name,
+        dripList.description,
+        representationalSplits,
+      ),
     );
   }
 
@@ -111,16 +117,31 @@
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
 </script>
 
-<div class="card">
-  <div class="header">
-    <a href={dripListUrl}><h1>{dripList.name}</h1></a>
-    <div class="actions">
-      <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
-      {#if isOwnList}
-        <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
-      {/if}
+<section class="card">
+  <header class="px-6 pt-6 flex flex-col gap-4">
+    <div class="flex flex-wrap justify-between">
+      <h1 class="flex-1 min-w-0 truncate">
+        <a
+          href={dripListUrl}
+          class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
+        >
+          {dripList.name}
+        </a>
+      </h1>
+      <div class="flex items-center gap-4">
+        <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
+        {#if isOwnList}
+          <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+        {/if}
+      </div>
     </div>
-  </div>
+    {#if (dripList.description ?? '').length > 0}
+      <TextExpandable>
+        {dripList.description}
+      </TextExpandable>
+    {/if}
+  </header>
+
   <div class="list">
     <div class="totals">
       <div class="drip-icon">
@@ -150,7 +171,7 @@
     </div>
     <div class="splits-component"><Splits list={representationalSplits} /></div>
   </div>
-</div>
+</section>
 
 <style>
   .card {
@@ -159,22 +180,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  .card > .header {
-    padding: 1.5rem 1.5rem 0 1.5rem;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .card > .header h1 {
-    white-space: nowrap;
-  }
-
-  .card > .header > .actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
   }
 
   .totals {

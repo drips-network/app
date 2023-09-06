@@ -12,7 +12,7 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import assert from '$lib/utils/assert';
-  import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
+  import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import github from '$lib/utils/github/github';
   import GitProjectService from '$lib/utils/project/GitProjectService';
