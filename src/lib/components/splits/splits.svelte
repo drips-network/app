@@ -1,6 +1,9 @@
 <script lang="ts" context="module">
   import type { GitProject } from '$lib/utils/metadata/types';
-  import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+  import type {
+    Items,
+    Percentages,
+  } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export interface ProjectSplit {
