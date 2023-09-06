@@ -118,7 +118,7 @@
         size: (100 / 24) * 5,
         meta: {
           tooltipMessage:
-            "Your incoming balance is a real-time estimate of what you've earned up until this moment, minus any prior withdrawals.",
+            'Your incoming balance is a real-time estimate of what youʼve earned up until this moment, minus any prior withdrawals.',
         },
       },
       {

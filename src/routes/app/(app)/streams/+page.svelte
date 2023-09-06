@@ -107,7 +107,7 @@
       props: {
         id: 'collect-earnings',
         title: 'Collect earnings',
-        description: "Learn how to collect funds you've earned from incoming streams or splits.",
+        description: 'Learn how to collect funds youʼve earned from incoming streams or splits.',
         illustration: NoWrappedTokens,
         actions: [
           {

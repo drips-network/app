@@ -39,7 +39,7 @@
     </a>
   {:else}
     <h4>Congratulations!</h4>
-    <p>You've successfully created your Drip List.</p>
+    <p>Youʼve successfully created your Drip List.</p>
     <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewDripList}
       >View your Drip List</Button
     >

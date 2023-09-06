@@ -37,7 +37,7 @@ There are a few environment variables required for the app to function. You can 
 
 To run the app, you'll need to configure the `PUBLIC_NETWORK` environment variable. This should be the chainId of the chain you want to run the app for, and can currently be either 1, 5 or 11155111. The app will only allow connecting wallets that are set to this network, and all server-side requests will be made for this network's subgraph.
 
-For your convenience, we've deployed production mirrors of the app set to allow testnet connections:
+For your convenience, weʼve deployed production mirrors of the app set to allow testnet connections:
 
 ```sh
 https://goerli.drips.network/ # PUBLIC_NETWORK set to 5
