@@ -14,7 +14,7 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import { constants } from 'radicle-drips';
+  import { Utils, constants } from 'radicle-drips';
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
@@ -22,14 +22,15 @@
   import type { Stream } from '$lib/stores/streams/types';
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
+  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+  import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
   export let dripList: DripList;
   export let representationalSplits: RepresentationalSplits;
   export let incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>>;
 
   export let supportStreams: Stream[] = [];
-
-  // TODO: Truncate the representational splits into a splits group after 4 items.
 
   $: listOwner = dripList.account.owner;
 
@@ -109,6 +110,58 @@
   $: supportersPile = getSupportersPile(supportStreams, incomingSplits);
 
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
+
+  async function fetchIncomingSplitTotal(dripListId: string) {
+    const subgraph = getSubgraphClient();
+
+    const incomingSplitEvents = await subgraph.getSplitEventsByReceiverAccountId(dripListId);
+
+    return incomingSplitEvents.reduce<
+      {
+        tokenAddress: string;
+        amount: bigint;
+      }[]
+    >((acc, curr) => {
+      const currTokenAddress = Utils.Asset.getAddressFromId(curr.assetId);
+      const existing = acc.find((e) => e.tokenAddress === currTokenAddress);
+
+      if (existing) {
+        existing.amount += curr.amount;
+      } else {
+        acc.push({
+          tokenAddress: currTokenAddress,
+          amount: curr.amount,
+        });
+      }
+
+      return acc;
+    }, []);
+  }
+  let incomingSplitTotal: Awaited<ReturnType<typeof fetchIncomingSplitTotal>> | undefined =
+    undefined;
+  onMount(async () => {
+    incomingSplitTotal = await fetchIncomingSplitTotal(dripList.account.accountId);
+  });
+
+  $: streamEstimates =
+    $balancesStore &&
+    balancesStore.getStreamEstimatesByReceiver('total', dripList.account.accountId).map((e) => ({
+      amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      tokenAddress: e.tokenAddress,
+    }));
+
+  /*
+    Only the list owner can set support streams to the list, so we can consider the stream estimate to the list loaded when
+    the owner account is loaded.
+  */
+  $: streamEstimateLoaded =
+    $accountFetchStatusses[dripList.account.owner.accountId]?.all === 'fetched';
+
+  let totalIncomingAmounts: ReturnType<typeof mergeAmounts> | undefined = undefined;
+  $: totalIncomingAmounts =
+    incomingSplitTotal && streamEstimateLoaded
+      ? mergeAmounts(streamEstimates, incomingSplitTotal)
+      : undefined;
 </script>
 
 <div class="card">
@@ -129,15 +182,7 @@
       <div class="typo-text tabular-nums total-streamed-badge">
         {#if browser}
           <!-- TODO: Include incoming splits -->
-          <AggregateFiatEstimate
-            amounts={$balancesStore &&
-              balancesStore
-                .getStreamEstimatesByReceiver('total', dripList.account.accountId)
-                .map((e) => ({
-                  amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-                  tokenAddress: e.tokenAddress,
-                }))}
-          />
+          <AggregateFiatEstimate amounts={totalIncomingAmounts} />
         {/if}
         <span class="muted">&nbsp;total</span>
       </div>
