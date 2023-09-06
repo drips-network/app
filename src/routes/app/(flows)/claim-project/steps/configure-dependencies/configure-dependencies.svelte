@@ -7,8 +7,10 @@
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import ListEditor, { type ListItem } from '$lib/components/list-editor/list-editor.svelte';
-  import projectItem from '$lib/components/list-editor/item-templates/project';
+  import ListEditor, {
+    type ListItem,
+  } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
   import type { GitProject } from '$lib/utils/metadata/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
