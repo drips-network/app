@@ -320,27 +320,29 @@
     empty,
   }}
 >
-  {#if optionsOutgoing.data.length > 0}
+  {#if optionsIncoming.data.length > 0 && !onlyDripListStreams}
     <div class="table-container">
-      {#if !onlyDripListStreams && optionsIncoming.data.length > 0}<h4 class="table-group-header">
-          ↑ Outgoing
-        </h4>{/if}
-      <Table
-        rowHeight={76}
-        options={optionsOutgoing}
-        isRowClickable
-        on:rowClick={(e) => onRowClick(outgoingTableData, e)}
-      />
-    </div>
-  {/if}
-  {#if !onlyDripListStreams && optionsIncoming.data.length > 0}
-    <div class="table-container">
-      <h4 class="table-group-header">↓ Incoming</h4>
+      {#if optionsOutgoing.data.length > 0}
+        <h4 class="table-group-header">↓ Incoming</h4>
+      {/if}
       <Table
         rowHeight={76}
         options={optionsIncoming}
         isRowClickable
         on:rowClick={(e) => onRowClick(incomingTableData, e)}
+      />
+    </div>
+  {/if}
+  {#if optionsOutgoing.data.length > 0}
+    <div class="table-container">
+      {#if !onlyDripListStreams && optionsIncoming.data.length > 0}
+        <h4 class="table-group-header">↑ Outgoing</h4>
+      {/if}
+      <Table
+        rowHeight={76}
+        options={optionsOutgoing}
+        isRowClickable
+        on:rowClick={(e) => onRowClick(outgoingTableData, e)}
       />
     </div>
   {/if}
