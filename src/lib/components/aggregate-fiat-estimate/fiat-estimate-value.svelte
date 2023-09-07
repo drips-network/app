@@ -1,4 +1,5 @@
 <script lang="ts">
+  export let forceLoading = false;
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
 
   $: formattedFiatEstimate =
@@ -8,7 +9,7 @@
 </script>
 
 <div class="tabular-nums">
-  {#if fiatEstimateCents === 'pending'}
+  {#if forceLoading || fiatEstimateCents === 'pending'}
     <span class="animate-pulse">$...</span>
   {:else if formattedFiatEstimate}
     <span class="text-foreground-level-5">≈</span>{formattedFiatEstimate}
