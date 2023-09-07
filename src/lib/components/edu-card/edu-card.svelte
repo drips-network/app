@@ -54,24 +54,6 @@
     align-items: center;
   }
 
-  .edu-card button {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    right: 1rem;
-    top: 1rem;
-    border-radius: 50%;
-    height: 2rem;
-    width: 2rem;
-    z-index: 1;
-    background-color: var(--color-background);
-  }
-
-  .edu-card button:focus-visible {
-    background-color: var(--color-foreground-level-2);
-  }
-
   @media (max-width: 768px) {
     .edu-card {
       flex-direction: column-reverse;

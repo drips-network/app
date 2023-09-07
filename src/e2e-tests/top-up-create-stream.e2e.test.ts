@@ -419,7 +419,7 @@ describe('app', async () => {
       await page.locator('div[data-testid="sidenav"] a:text("Drip List")').click();
 
       await expect(
-        page.locator('text=Fund your dependencies by creating your Drip List'),
+        page.locator('text=Fund all your dependencies at once with a Drip List'),
       ).toHaveCount(1);
     });
 
