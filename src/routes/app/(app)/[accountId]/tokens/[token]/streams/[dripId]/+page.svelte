@@ -364,34 +364,57 @@
               {/if}
             </div>
           </div>
-          <div class="key-value">
-            <div class="keys">
-              <h5 class="key">
-                {new Date().getTime() > (streamStartDate?.getTime() ?? 0) ? 'Started' : 'Starts'}
-              </h5>
-              {#if hasDuration}<h5 class="key">Ends</h5>{/if}
-            </div>
-            <div class="value-box">
-              <div class="start-and-end medium-text">
-                <span class="value">
-                  {formatDate(streamStartDate ?? unreachable())}
-                </span>
-                {#if streamEndDate}
-                  <span class="value">
-                    {formatDate(streamEndDate)}
-                  </span>
-                {/if}
+          {#if streamStartDate && streamEndDate}
+            <div class="key-value">
+              <div class="keys">
+                <h5 class="key">
+                  {new Date().getTime() > streamStartDate.getTime() ? 'Progress' : 'Scheduled'}
+                </h5>
               </div>
-              {#if hasDuration}
-                <div style:width="{elapsedDurationPercentage}%" class="stream-progress-indicator" />
-              {/if}
+              <div class="rounded-drip-lg shadow-low pt-3 px-4 pb-4 relative overflow-hidden">
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8 relative z-10"
+                >
+                  <div>
+                    <div class="typo-header-5">
+                      {new Date().getTime() > (streamStartDate?.getTime() ?? 0)
+                        ? 'Started'
+                        : 'Starts'}
+                    </div>
+                    <div class="small-text">
+                      {formatDate(streamStartDate ?? unreachable(), 'verbose')}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="typo-header-5">
+                      {new Date().getTime() > (streamEndDate?.getTime() ?? 0) ? 'Ended' : 'Ends'}
+                    </div>
+                    <div class="small-text">{formatDate(streamEndDate, 'verbose')}</div>
+                  </div>
+                </div>
+                <div class="absolute overlay flex flex-col sm:flex-row">
+                  <div style:flex-basis="{elapsedDurationPercentage}%" class="bg-primary-level-1" />
+                </div>
+              </div>
             </div>
+          {/if}
+          <div class="key-value" class:order-last={streamStartDate && streamEndDate}>
+            <h5 class="key greyed-out">
+              {#if streamStartDate && streamEndDate}
+                Stream created
+              {:else}
+                {new Date().getTime() > ((streamStartDate || streamCreated)?.getTime() ?? 0)
+                  ? 'Started'
+                  : 'Starts'}
+              {/if}
+            </h5>
+            <span class="value small-text"
+              >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
+            >
           </div>
-        </div>
-        <div class="key-value-group">
           <div class="key-value">
             <div class="with-info-icon">
-              <h5 class="key greyed-out">Remaining balance for token</h5>
+              <h5 class="key greyed-out">Senderʼs balance</h5>
               <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
                 <svelte:fragment slot="tooltip-content">
@@ -415,7 +438,7 @@
             <div class="key-value">
               <div class="with-info-icon">
                 <h5 class="key greyed-out">
-                  Balance {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
+                  Senderʼs balance {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
                 </h5>
                 <Tooltip>
                   <InfoCircleIcon style="height: 1.25rem" />
@@ -431,12 +454,6 @@
               >
             </div>
           {/if}
-          <div class="key-value">
-            <h5 class="key greyed-out">Created at</h5>
-            <span class="value small-text"
-              >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
-            >
-          </div>
         </div>
       </div>
     </div>
@@ -447,7 +464,7 @@
   .wrapper {
     position: relative;
     max-width: 56rem;
-    margin: 0 auto;
+    margin: 0 auto 1.5rem;
   }
 
   .loading-state {
@@ -547,10 +564,6 @@
     font-size: clamp(1rem, 3vw, 1.25rem);
   }
 
-  .medium-text {
-    font-size: clamp(1rem, 4vw, 1.5rem);
-  }
-
   .large-text {
     font-size: clamp(1rem, 5vw, 2rem);
     line-height: 2rem;
@@ -558,23 +571,6 @@
 
   .highlight {
     color: var(--color-primary);
-  }
-
-  .start-and-end {
-    display: flex;
-    justify-content: space-between;
-    flex-grow: 1;
-  }
-
-  .stream-progress-indicator {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    border-radius: 1rem 0 1rem 1rem;
-    background-color: var(--color-primary-level-1);
-    width: 0;
-    transition: width 0.3s cubic-bezier(0, 0.55, 0.45, 1);
   }
 
   @media (max-width: 768px) {
