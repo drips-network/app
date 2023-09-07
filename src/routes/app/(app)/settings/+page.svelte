@@ -169,7 +169,7 @@
     </Setting>
     <Setting
       title="Developer mode"
-      subtitle="When enabled, shows developer-focussed extra information on address profiles, project profiles and Drip Lists."
+      subtitle="When enabled, shows developer-focused extra information on address profiles, project profiles and Drip Lists."
     >
       <Toggle bind:checked={$developerModeStore} />
     </Setting>
