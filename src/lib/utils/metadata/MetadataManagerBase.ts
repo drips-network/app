@@ -163,7 +163,7 @@ export default abstract class MetadataManagerBase<TAccount, TParser extends Pars
    * @param newData The new account metadata.
    * @param lastKnownHash The last known IPFS hash of the account metadata.
    * @returns The new IPFS hash of the account metadata, and the transaction that emitted the new metadata.
-   * @throws If the last known hash doesn't match the on-chain value.
+   * @throws If the last known hash doesnʼt match the on-chain value.
    * @throws If the update fails.
    */
   public async updateAccountMetadata<T extends z.ZodType>(
@@ -175,7 +175,7 @@ export default abstract class MetadataManagerBase<TAccount, TParser extends Pars
 
     if (currentOnChainHash !== lastKnownHash) {
       throw new Error(
-        "Current metadata hash doesn't match on-chain value." +
+        'Current metadata hash doesnʼt match on-chain value.' +
           'If your account was edited elsewhere previously, please refresh the page before making further changes.',
       );
     }

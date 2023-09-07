@@ -138,7 +138,7 @@ After doing this, the app will display the token within all token pickers. Alter
 
 #### `PUBLIC_TEST_MODE` and `playwrightAddress`
 
-Unfortunately, two major differences in app logic for E2E tests couldn't be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for an env variable `PUBLIC_TEST_MODE` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
+Unfortunately, two major differences in app logic for E2E tests couldnʼt be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for an env variable `PUBLIC_TEST_MODE` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
 
 ## 😱 Advanced
 

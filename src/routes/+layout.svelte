@@ -20,7 +20,7 @@
   });
 
   /*
-  Smoothscroll class adds global smooth scrolling, but we don't want it 
+  Smoothscroll class adds global smooth scrolling, but we donʼt want it 
   while navigating, because that's nauseating.
   */
 

@@ -131,7 +131,7 @@ export default function (
 
         /*
         We wait up to five seconds for `refreshUserAccount` to include a history item
-        matching our transaction's block timestamp, checking once a second. If it doesn't
+        matching our transaction's block timestamp, checking once a second. If it doesnʼt
         after five tries, we move forward anyway, but the user will be made aware that they
         may need to wait for a while for their dashboard to refresh.
         */

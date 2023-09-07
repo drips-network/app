@@ -54,7 +54,7 @@ export const hide = (): void => {
 /**
  * If value is true, the modal can be closed by the user either by clicking
  * the X icon in the top right, or the modal background. If false, the X button
- * is hidden and clicking on the background doesn't exit the modal.
+ * is hidden and clicking on the background doesnʼt exit the modal.
  * @param value The value to set hideable to.
  */
 export const setHideable = (value: boolean): void => {

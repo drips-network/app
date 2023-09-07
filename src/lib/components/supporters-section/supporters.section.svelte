@@ -21,7 +21,7 @@
   export let emptyStateHeadline = 'No supporters';
   export let emptyStateText = `This ${
     type === 'dripList' ? 'Drip List' : 'project'
-  } doesn't have any supporters yet.`;
+  } doesnʼt have any supporters yet.`;
   export let isDripListOwner = false;
   export let dripListId: string | undefined = undefined;
 

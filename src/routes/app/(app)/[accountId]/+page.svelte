@@ -111,7 +111,7 @@
   <LargeEmptyState
     emoji="🕸️"
     headline="Unable to show profile"
-    description="We weren't able to find that profile."
+    description="We werenʼt able to find that profile."
   />
 {:else}
   <div class="profile">
