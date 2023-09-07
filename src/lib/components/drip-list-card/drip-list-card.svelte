@@ -69,7 +69,7 @@
           showIdentity: false,
           outline: true,
           size: 'medium',
-          disableLink: true,
+          disableTooltip: true,
         },
       })),
     );
@@ -92,7 +92,7 @@
           showIdentity: false,
           outline: true,
           size: 'medium',
-          disableLink: true,
+          disableTooltip: true,
         },
       })),
     );
@@ -106,7 +106,7 @@
           showIdentity: false,
           outline: true,
           size: 'medium',
-          disableLink: true,
+          disableTooltip: true,
         },
       });
     }
@@ -210,7 +210,7 @@
       {#if supportersPile && supportersPile.length > 0}
         <div in:fade|local={{ duration: 300 }} class="supporters">
           <span class="muted">Supported by</span>
-          <Pile components={supportersPile ?? []} />
+          <Pile components={supportersPile ?? []} itemsClickable={true} />
         </div>
       {/if}
     </div>
