@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
+  export let forceLoading = false;
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
 
   $: formattedFiatEstimate =
@@ -8,12 +9,12 @@
 </script>
 
 <div class="wrapper">
-  {#if typeof fiatEstimateCents === 'number' && formattedFiatEstimate}
+  {#if !forceLoading && typeof fiatEstimateCents === 'number' && formattedFiatEstimate}
     {#key formattedFiatEstimate}
       <span class="amount"><span class="currency">≈$</span>{formattedFiatEstimate}</span>
     {/key}
     <span class="amount placeholder" aria-hidden="true">≈${formattedFiatEstimate}</span>
-  {:else if fiatEstimateCents === 'pending'}
+  {:else if fiatEstimateCents === 'pending' || forceLoading}
     <span transition:fade|local={{ duration: 100 }} class="pending"
       ><span class="currency">≈$</span>...</span
     >
