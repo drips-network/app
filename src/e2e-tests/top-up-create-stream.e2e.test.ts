@@ -550,9 +550,9 @@ describe('app', async () => {
     });
 
     /* 
-      The tests below are a bit tricky to implement because i wasn't able to find a way to get
+      The tests below are a bit tricky to implement because i wasnʼt able to find a way to get
       the vite preview server to pay attention to the PUBLIC_TEST_MODE env var. Without this being true,
-      it won't load the single drip list view, because that fetches data server-side, and without that env
+      it wonʼt load the single drip list view, because that fetches data server-side, and without that env
       var being set in the server just returns a 404.
 
       TODO: Figure out how to set PUBLIC_TEST_MODE to true in the vite `preview` server, then implement the

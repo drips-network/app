@@ -40,7 +40,7 @@
               <div class="text-group">
                 <p class="typo-text-small-bold">Oops, something went wrong.</p>
                 <p class="typo-text-small">
-                  Sorry, we weren't able to load this. There may be more information in the
+                  Sorry, we werenʼt able to load this. There may be more information in the
                   developer console.
                 </p>
                 <a

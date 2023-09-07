@@ -28,7 +28,7 @@
   import RadworksLogo from '$lib/components/illustrations/radworks-logo.svelte';
 
   onMount(() => {
-    // When launching within a Safe, we don't want to display the landing page.
+    // When launching within a Safe, we donʼt want to display the landing page.
     if (isRunningInSafe()) goto('/app', { replaceState: true });
   });
 
@@ -264,7 +264,7 @@
         <div slot="caption" class="text-container">
           <h4>No platform fees</h4>
           <p>
-            Drips is entirely open-source, and doesn't charge anything extra on top of network gas
+            Drips is entirely open-source, and doesnʼt charge anything extra on top of network gas
             fees.
           </p>
         </div>

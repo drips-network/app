@@ -118,7 +118,7 @@
         size: (100 / 24) * 5,
         meta: {
           tooltipMessage:
-            "Your incoming balance is a real-time estimate of what you've earned up until this moment, minus any prior withdrawals.",
+            'Your incoming balance is a real-time estimate of what youʼve earned up until this moment, minus any prior withdrawals.',
         },
       },
       {
@@ -200,7 +200,7 @@
     emptyStateEmoji: '🫗',
     emptyStateText: isSelf
       ? 'Top up any ERC-20 token to stream it to your Drip List or any Ethereum address.'
-      : "This user hasn't yet topped-up or received any funds.",
+      : 'This user hasnʼt yet topped-up or received any funds.',
     loaded,
     error,
     empty: tableData.length === 0,

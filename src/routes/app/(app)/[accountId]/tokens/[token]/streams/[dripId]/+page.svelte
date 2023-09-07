@@ -129,7 +129,7 @@
         const reverseHistory = streamHistory;
         reverseHistory.reverse();
 
-        // Find the latest history item which wasn't already out-of-funds when it was created.
+        // Find the latest history item which wasnʼt already out-of-funds when it was created.
         outOfFundsDate = reverseHistory.find(
           (hi) => hi.runsOutOfFunds && hi.runsOutOfFunds.getTime() !== hi.timestamp.getTime(),
         )?.runsOutOfFunds;
@@ -253,7 +253,7 @@
     <LargeEmptyState
       emoji="🧐"
       headline="Stream not found"
-      description="We weren't able to find a stream with this ID."
+      description="We werenʼt able to find a stream with this ID."
     />
   {:else if loading || !walletInitialized}
     <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>

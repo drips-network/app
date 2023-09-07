@@ -99,7 +99,7 @@
     empty: dripLists && dripLists.length === 0,
     error,
     emptyStateEmoji: '🫗',
-    emptyStateHeadline: isSelf ? "You don't have a Drip List" : 'No Drip List',
+    emptyStateHeadline: isSelf ? 'You donʼt have a Drip List' : 'No Drip List',
     emptyStateText: isSelf
       ? 'Create your Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects.',

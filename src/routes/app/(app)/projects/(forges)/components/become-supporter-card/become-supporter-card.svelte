@@ -111,7 +111,7 @@
     variant="primary">{dripList === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
   >
   <div class="benefits typo-text-small">
-    {#if isSupportingProject}You're getting…{:else}You'll get…{/if}
+    {#if isSupportingProject}You're getting…{:else}Youʼll get…{/if}
     <div class="benefit">
       <Heart />
       <span>…to feel good about yourself, because you're helping fund open-source software.</span>

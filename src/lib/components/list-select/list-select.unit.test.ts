@@ -41,7 +41,7 @@ describe('list-select.svelte', async () => {
     screen.getByPlaceholderText('Search');
   });
 
-  it("doesn't show a searchbar if searchable is false", () => {
+  it('doesnʼt show a searchbar if searchable is false', () => {
     render(ListSelect, {
       props: {
         items: testItems,
