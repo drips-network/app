@@ -115,7 +115,7 @@
   {/if}
 </Section>
 
-{#if showSupportersSection}
+{#if showSupportersSection && dripLists?.length}
   <Supporters
     type="dripList"
     headline="Support"
