@@ -13,9 +13,11 @@
 
   type Amounts = Amount[];
 
-  export let amounts: Amounts;
+  /** If undefined, component will display a loading state. */
+  export let amounts: Amounts | undefined;
   $: tokens =
-    ($tokensStore &&
+    (amounts &&
+      $tokensStore &&
       amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress.toLowerCase()))) ??
     [];
   $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
@@ -31,7 +33,7 @@
   const connected = tokensStore.connected;
 
   $: {
-    if ($connected) {
+    if ($connected && amounts) {
       const prices = $priceStore;
 
       includesUnknownPrice = false;
@@ -59,7 +61,7 @@
 </script>
 
 <div class="aggregate-fiat-estimate">
-  <FiatEstimateValue {fiatEstimateCents} />
+  <FiatEstimateValue forceLoading={amounts === undefined} {fiatEstimateCents} />
   {#if includesUnknownPrice && fiatEstimateCents !== 'pending'}
     <div class="warning" transition:fade|local={{ duration: 100 }}>
       <Tooltip>
