@@ -6,9 +6,9 @@ import buildUrl from './build-url';
 
 /**
  * Check if the user currently has their wallet connected. If they do, returns true and
- * doesn't do anything. If they don't, sends the user to /app, with a backTo query string so
+ * doesnʼt do anything. If they donʼt, sends the user to /app, with a backTo query string so
  * they get back to where they wanted to go after connecting.
- * @returns True if the user is connected, false if the user isn't (and being re-routed to /app).
+ * @returns True if the user is connected, false if the user isnʼt (and being re-routed to /app).
  */
 export default function guardConnected(): boolean {
   const { connected } = get(wallet);

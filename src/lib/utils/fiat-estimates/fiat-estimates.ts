@@ -13,7 +13,7 @@ interface Amount {
   tokenAddress: string;
 }
 
-/** Price value is this if Binance doesn't provide a price for the given asset. */
+/** Price value is this if Binance doesnʼt provide a price for the given asset. */
 type Unsupported = 'unsupported';
 
 /** Price value is this if we're waiting for Binance to provide a price for the first time. */
@@ -179,8 +179,8 @@ export async function untrack(symbols: string[]) {
  * Convert the given amount to USD.
  * @param amount The amount to convert.
  * @returns A float representing the amount in USD, `undefined` if the asset
- * isn't currently tracked, `pending` if we're waiting for Binance to report
- * the price for the first time, or `unsupported` if Binance doesn't provide
+ * isnʼt currently tracked, `pending` if we're waiting for Binance to report
+ * the price for the first time, or `unsupported` if Binance doesnʼt provide
  * a price for the given asset.
  */
 export function convert(amount: Amount) {

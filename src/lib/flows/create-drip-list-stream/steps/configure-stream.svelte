@@ -44,7 +44,7 @@
               ac.tokenAddress.toLowerCase() ===
               (selectedTokenAddress ?? unreachable()).toLowerCase(),
           );
-          assert(assetConfig, "App hasn't yet fetched the right asset config");
+          assert(assetConfig, 'App hasnʼt yet fetched the right asset config');
 
           const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
             stream.paused

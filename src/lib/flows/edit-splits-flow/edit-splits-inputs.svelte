@@ -153,7 +153,7 @@
               },
               {
                 addresses: [$wallet.address],
-                msg: "You can't split to yourself.",
+                msg: 'You canʼt split to yourself.',
               },
             ]}
           />

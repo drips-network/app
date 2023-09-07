@@ -307,7 +307,7 @@ describe('MetadataManagerBase', () => {
       const instance = new TestMetadataManager(addressDriverAccountMetadataParser.parseAny);
 
       await expect(instance.updateAccountMetadata(newData, lastKnownHash)).rejects.toThrow(
-        "Current metadata hash doesn't match on-chain value." +
+        'Current metadata hash doesnʼt match on-chain value.' +
           'If your account was edited elsewhere previously, please refresh the page before making further changes.',
       );
 

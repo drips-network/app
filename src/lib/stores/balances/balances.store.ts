@@ -134,7 +134,7 @@ export default (() => {
   /**
    * Find the estimate for a stream across all fetched accounts by its ID.
    * @param id The ID to find.
-   * @returns The estimate for the stream, or undefined if it hasn't been estimated.
+   * @returns The estimate for the stream, or undefined if it hasnʼt been estimated.
    */
   function getEstimateByStreamId(
     id: StreamId,
@@ -181,7 +181,7 @@ export default (() => {
    * @param tokenAddress The token address of the balance to fetch estimates for.
    * @param accountId The user ID of the user to get balances for.
    * @returns The incoming balance total and current amount per second, or undefined
-   * if the receivable & splittable balances for the account haven't yet been fetched.
+   * if the receivable & splittable balances for the account havenʼt yet been fetched.
    */
   function getIncomingBalanceForUser(tokenAddress: string, accountId: string) {
     const accountBalances = get(state).accounts[accountId];

@@ -20,6 +20,6 @@ export const POST: RequestHandler = async ({ request }: RequestEvent) => {
     // eslint-disable-next-line no-console
     console.log('💧 ~ Failed to pin on Pinata:', e);
 
-    throw error(500, "This doesn't seem to be valid account metadata 🤨");
+    throw error(500, 'This doesnʼt seem to be valid account metadata 🤨');
   }
 };

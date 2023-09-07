@@ -92,12 +92,12 @@
           const addressDriverClient = await getAddressDriverClient();
 
           const ownAccount = $streams.accounts[dripsAccountId];
-          assert(ownAccount, "App hasn't yet fetched user's own account");
+          assert(ownAccount, "App hasnʼt yet fetched user's own account");
 
           const assetConfig = ownAccount.assetConfigs.find(
             (ac) => ac.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
           );
-          assert(assetConfig, "App hasn't yet fetched the right asset config");
+          assert(assetConfig, 'App hasnʼt yet fetched the right asset config');
 
           const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
             stream.paused
