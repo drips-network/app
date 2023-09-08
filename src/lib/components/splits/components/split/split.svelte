@@ -180,7 +180,7 @@
             <ProjectBadge {linkToNewTab} project={split.project} />
           </PrimaryColorThemer>
         {:else}
-          <!-- This happens when the subgraph doesn't immediately update after adding an unclaimed project to a list. -->
+          <!-- This happens when the subgraph doesnʼt immediately update after adding an unclaimed project to a list. -->
           <span class="muted">Error loading this project</span>
         {/if}
       {:else if split.type === 'split-group'}

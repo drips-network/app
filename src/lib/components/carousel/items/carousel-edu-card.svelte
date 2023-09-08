@@ -2,7 +2,6 @@
   import Button from '$lib/components/button/button.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import type { ComponentType } from 'svelte';
-  import CrossSmall from 'radicle-design-system/icons/CrossSmall.svelte';
 
   export let id: string;
   export let title: string;
@@ -17,9 +16,6 @@
 </script>
 
 <div class="edu-card">
-  <button class="close-button" on:click={() => dismissablesStore.dismiss(id)}>
-    <CrossSmall />
-  </button>
   <div class="illustration-outer">
     <div class="illustration">
       <svelte:component this={illustration} />
@@ -30,7 +26,8 @@
       <h3 class="pixelated">{title}</h3>
       <p>{description}</p>
     </div>
-    <div class="actions">
+    <div class="actions gap-1">
+      <Button variant="ghost" on:click={() => dismissablesStore.dismiss(id)}>Dismiss</Button>
       {#each actions as action}
         <Button
           icon={action.icon}
@@ -90,22 +87,6 @@
   h3 {
     margin-bottom: 0.5rem;
     margin-right: 1.5rem;
-  }
-
-  .close-button {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    transition: background-color 0.3s;
-    border-radius: 1rem;
-  }
-
-  .close-button:hover {
-    background-color: var(--color-foreground-level-1);
-  }
-
-  .close-button:focus {
-    background-color: var(--color-foreground-level-2);
   }
 
   @media (max-width: 768px) {

@@ -24,7 +24,7 @@
   {#if customEmoji}
     <svelte:component this={customEmoji} size={sizePx} />
   {:else}
-    <!-- Design System Emoji doesn't support "massive" size, so we fall back to "huge". -->
+    <!-- Design System Emoji doesnʼt support "massive" size, so we fall back to "huge". -->
     <DesignSystemEmoji {emoji} size={size === 'massive' ? 'huge' : size} />
   {/if}
 </div>

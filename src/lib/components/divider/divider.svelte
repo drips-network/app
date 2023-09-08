@@ -8,6 +8,6 @@
   .divider {
     height: 1px;
     border-radius: 0.25rem;
-    background-color: var(--color-foreground-level-3);
+    background-color: var(--color-foreground);
   }
 </style>

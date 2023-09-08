@@ -26,7 +26,7 @@
     <AccountBox />
   </FormField>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={verifyProject}
