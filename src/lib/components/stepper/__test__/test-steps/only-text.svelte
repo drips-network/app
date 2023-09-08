@@ -10,4 +10,4 @@
 
 {text}
 <Button on:click={() => dispatch('goForward')}>Continue</Button>
-<Button on:click={() => dispatch('goBackward')}>Go back</Button>
+<Button on:click={() => dispatch('goBackward')}>Back</Button>

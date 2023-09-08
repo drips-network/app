@@ -7,7 +7,7 @@
 </script>
 
 Step 2
-<Button on:click={() => dispatch('goBackward')}>Go back</Button>
+<Button on:click={() => dispatch('goBackward')}>Back</Button>
 <Button
   on:click={() =>
     dispatch('await', {

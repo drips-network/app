@@ -260,10 +260,19 @@
       <Spinner />
     </div>
   {:else if streamId && stream}
-    <div class="stream-page" in:fly={{ duration: 300, y: 16 }}>
-      <div class="hero">
-        <div class="title-and-state">
+    <article class="stream-page" in:fly={{ duration: 300, y: 16 }}>
+      <header class="hero">
+        <div class="flex flex-col-reverse gap-4 md:flex-row items-center">
           <h1>{streamName}</h1>
+          <StreamStateBadge
+            size="normal"
+            {streamId}
+            paused={stream.paused}
+            senderId={stream.sender.accountId}
+            durationSeconds={stream.streamConfig.durationSeconds}
+            startDate={stream.streamConfig.startDate}
+            {tokenAddress}
+          />
         </div>
         {#if checkIsUser(stream.sender.accountId)}
           <div class="actions">
@@ -306,7 +315,7 @@
             {/if}
           </div>
         {/if}
-      </div>
+      </header>
       <StreamVisual
         from={stream.sender}
         to={stream.receiver}
@@ -318,20 +327,6 @@
         halted={estimate?.currentAmountPerSecond === 0n}
       />
       <div class="details">
-        <div class="key-value-group">
-          <div class="key-value">
-            <h5 class="key">State</h5>
-            <StreamStateBadge
-              size="large"
-              {streamId}
-              paused={stream.paused}
-              senderId={stream.sender.accountId}
-              durationSeconds={stream.streamConfig.durationSeconds}
-              startDate={stream.streamConfig.startDate}
-              {tokenAddress}
-            />
-          </div>
-        </div>
         <div class="key-value-group">
           <div class="key-value">
             <div class="keys">
@@ -350,7 +345,7 @@
                 </span>
               </div>
               {#if hasDuration}
-                <span class="typo-header-5 greyed-out">OF</span>
+                <span class="typo-header-5">OF</span>
                 <div class="value-box">
                   <span class="large-text tabular-nums">
                     <FormattedAmount
@@ -391,7 +386,7 @@
         <div class="key-value-group">
           <div class="key-value">
             <div class="with-info-icon">
-              <h5 class="key greyed-out">Remaining balance for token</h5>
+              <h5 class="key">Remaining balance for token</h5>
               <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
                 <svelte:fragment slot="tooltip-content">
@@ -414,7 +409,7 @@
           {#if outOfFundsDate}
             <div class="key-value">
               <div class="with-info-icon">
-                <h5 class="key greyed-out">
+                <h5 class="key">
                   Balance {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
                 </h5>
                 <Tooltip>
@@ -432,14 +427,14 @@
             </div>
           {/if}
           <div class="key-value">
-            <h5 class="key greyed-out">Created at</h5>
+            <h5 class="key">Created on</h5>
             <span class="value small-text"
               >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
             >
           </div>
         </div>
       </div>
-    </div>
+    </article>
   {/if}
 </div>
 
@@ -472,12 +467,6 @@
     text-align: center;
   }
 
-  .title-and-state {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-
   .with-info-icon {
     display: flex;
     gap: 0.25rem;
@@ -505,10 +494,6 @@
   .key-value > .keys {
     display: flex;
     justify-content: space-between;
-  }
-
-  .greyed-out {
-    color: var(--color-foreground-level-5);
   }
 
   .align-right {
@@ -580,11 +565,6 @@
   @media (max-width: 768px) {
     .hero {
       align-items: center;
-    }
-
-    .title-and-state {
-      flex-direction: column;
-      align-items: left;
     }
 
     .align-right {

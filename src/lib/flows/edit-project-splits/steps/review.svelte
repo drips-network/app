@@ -86,7 +86,9 @@
     </div>
   </FormField>
   <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm changes in wallet</Button>
+    <Button icon={WalletIcon} variant="primary" on:click={submit}
+      >Confirm changes in your wallet</Button
+    >
   </svelte:fragment>
 </StepLayout>
 

@@ -5,7 +5,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
-  import EduCard from '$lib/components/carousel/items/carousel-edu-card.svelte';
+  import CarouselEduCard from '$lib/components/carousel/items/carousel-edu-card.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import ArrowUp from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
@@ -31,7 +31,7 @@
   $: eduCarouselItems = [
     makeCarouselItem({
       id: 'create-a-drip-list',
-      component: EduCard,
+      component: CarouselEduCard,
       props: {
         id: 'create-a-drip-list',
         title: 'Support Open-Source Software',
@@ -55,7 +55,7 @@
     }),
     makeCarouselItem({
       id: 'claim-a-project',
-      component: EduCard,
+      component: CarouselEduCard,
       props: {
         id: 'claim-a-project',
         title: 'Raise funds for your project',
@@ -79,7 +79,7 @@
     }),
     makeCarouselItem({
       id: 'set-up-first-stream',
-      component: EduCard,
+      component: CarouselEduCard,
       props: {
         id: 'set-up-first-stream',
         title: 'Create your first stream',
@@ -103,7 +103,7 @@
     }),
     makeCarouselItem({
       id: 'collect-earnings',
-      component: EduCard,
+      component: CarouselEduCard,
       props: {
         id: 'collect-earnings',
         title: 'Collect earnings',
@@ -127,11 +127,11 @@
     }),
     makeCarouselItem({
       id: 'explore-the-network',
-      component: EduCard,
+      component: CarouselEduCard,
       props: {
         id: 'explore-the-network',
         title: 'Explore the network',
-        description: "You can view other people's activity on Drips and share your profile.",
+        description: 'You can view other peopleʼs activity on Drips and share your profile.',
         illustration: OneContract,
         actions: [
           {

@@ -103,7 +103,7 @@
     headline={`Add ${tokenInfo?.info.symbol ?? ''} funds`}
     description="Add funds to your Drips account's outgoing balance."
   />
-  <FormField title="Wallet Balance">
+  <FormField title="Wallet balance">
     <div class="balance">
       <ListSelect
         blockSelecting
@@ -155,8 +155,9 @@
           restorer.clear();
           dispatch('goBackward');
         }}
+        variant="ghost"
       >
-        Go back
+        Back
       </Button>
     {/if}
     <span data-testid="confirm-amount-button">
