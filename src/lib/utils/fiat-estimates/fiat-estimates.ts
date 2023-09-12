@@ -54,6 +54,7 @@ function _validateSymbol(symbol: string): asserts symbol is SupportedSymbol {
 let connection:
   | ReturnType<typeof createSocket<typeof BinanceMessage, typeof BinanceCommand>>
   | undefined;
+const started = writable(false);
 const socketOpen = writable(false);
 
 /** Establish a websocket connection and allow tracking prices. */
@@ -64,6 +65,8 @@ export function start() {
       BinanceCommand,
       'wss://stream.binance.com:9443/ws/radusdt@ticker',
     );
+
+    started.set(true);
 
     const { send, subscribe } = connection;
 
@@ -95,6 +98,7 @@ export function start() {
 export function stop() {
   connection?.destroy();
   socketOpen.set(false);
+  started.set(false);
   connection = undefined;
 }
 
@@ -225,6 +229,7 @@ const price = (symbols: string[]) =>
 export default {
   start,
   stop,
+  started: { subscribe: started.subscribe },
   track,
   untrack,
   price,
