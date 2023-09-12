@@ -218,7 +218,7 @@ const price = (symbols: string[]) =>
       symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
 
       // Return an object of all the prices for the given symbols.
-      return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol]]));
+      return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol] || 'pending']));
     }),
   );
 
