@@ -219,7 +219,7 @@
     </div>
   </div>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button icon={WalletIcon} variant="primary" on:click={createDripList}>Confirm in wallet</Button>

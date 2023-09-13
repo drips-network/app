@@ -93,11 +93,11 @@
   />
   <FormField title="Select token">
     <div class="list-container">
-      <ListSelect bind:selected items={tokenList} />
+      <ListSelect bind:selected items={tokenList} type="tokens" />
     </div>
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button variant="primary" disabled={selected.length !== 1} on:click={submit}
       >Add {selectedToken?.info.name ?? ''}</Button
     >

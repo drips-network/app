@@ -23,7 +23,12 @@
   $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
   $: knownSymbols = knownTokens.map((token) => token.info.symbol);
 
-  $: fiatEstimates.track(knownSymbols);
+  const fiatEstimatesStarted = fiatEstimates.started;
+  $: {
+    if ($fiatEstimatesStarted) {
+      fiatEstimates.track(knownSymbols);
+    }
+  }
 
   $: priceStore = fiatEstimates.price(knownSymbols);
 

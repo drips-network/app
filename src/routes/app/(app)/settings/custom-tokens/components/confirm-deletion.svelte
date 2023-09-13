@@ -25,7 +25,7 @@
       description={`"${tokenName}" will be removed from your custom tokens. Any streams streaming this token will show up as "Unknown token".`}
     />
     <svelte:fragment slot="actions">
-      <Button on:click={() => modal.hide()}>Cancel</Button>
+      <Button on:click={() => modal.hide()} variant="ghost">Cancel</Button>
       <Button variant="destructive" on:click={deleteToken}>Delete token</Button>
     </svelte:fragment>
   </StepLayout>
