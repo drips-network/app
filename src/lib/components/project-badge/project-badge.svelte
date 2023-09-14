@@ -37,7 +37,7 @@
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
-      class="project-badge flex gap-2 items-center typo-text"
+      class="project-badge flex gap-2 items-center typo-text max-w-[320px]"
       href={linkTo === 'project-page'
         ? buildProjectUrl(project.source)
         : buildExternalUrl(processedProject.source.url)}

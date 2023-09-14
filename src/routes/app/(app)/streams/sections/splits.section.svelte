@@ -144,7 +144,7 @@
   }
 </script>
 
-<div class="section">
+<div class="app-section">
   <SectionHeader
     icon={MergeIcon}
     label="Splits"
@@ -174,11 +174,3 @@
     </SectionSkeleton>
   </div>
 </div>
-
-<style>
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-</style>

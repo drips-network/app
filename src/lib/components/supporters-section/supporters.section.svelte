@@ -44,7 +44,7 @@
   }
 </script>
 
-<div class="section">
+<section class="app-section">
   <SectionHeader
     {infoTooltip}
     icon={Heart}
@@ -145,15 +145,9 @@
       <SectionSkeleton loaded={true} error={true} />
     {/await}
   {/if}
-</div>
+</section>
 
 <style>
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
   .lists {
     display: flex;
     flex-direction: column;
