@@ -31,10 +31,10 @@ export default function (
         assert(signer);
 
         const assetConfig = streams.getAssetConfig(accountId, tokenAddress);
-        assert(assetConfig, "App hasn't yet fetched the right asset config for this stream");
+        assert(assetConfig, 'App hasnʼt yet fetched the right asset config for this stream');
 
         const ownAccount = get(streams).accounts[accountId];
-        assert(assetConfig, "App hasn't yet fetched user's own account");
+        assert(assetConfig, "App hasnʼt yet fetched user's own account");
 
         const metadataMgr = new AddressDriverMetadataManager();
 

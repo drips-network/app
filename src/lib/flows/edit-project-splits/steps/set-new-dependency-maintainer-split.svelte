@@ -28,7 +28,7 @@
 <StepLayout>
   <StepHeader
     headline="Split your funds"
-    description="Decide how much of your funds you’d like to split with your maintainers and dependencies from now on. You'll be able to edit your maintainer
+    description="Decide how much of your funds you’d like to split with your maintainers and dependencies from now on. Youʼll be able to edit your maintainer
     and dependency lists in the next step."
   />
   <VisualPercentageEditor

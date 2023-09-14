@@ -13,7 +13,7 @@ interface Amount {
   tokenAddress: string;
 }
 
-/** Price value is this if Binance doesn't provide a price for the given asset. */
+/** Price value is this if Binance doesnʼt provide a price for the given asset. */
 type Unsupported = 'unsupported';
 
 /** Price value is this if we're waiting for Binance to provide a price for the first time. */
@@ -54,6 +54,7 @@ function _validateSymbol(symbol: string): asserts symbol is SupportedSymbol {
 let connection:
   | ReturnType<typeof createSocket<typeof BinanceMessage, typeof BinanceCommand>>
   | undefined;
+const started = writable(false);
 const socketOpen = writable(false);
 
 /** Establish a websocket connection and allow tracking prices. */
@@ -64,6 +65,8 @@ export function start() {
       BinanceCommand,
       'wss://stream.binance.com:9443/ws/radusdt@ticker',
     );
+
+    started.set(true);
 
     const { send, subscribe } = connection;
 
@@ -95,6 +98,7 @@ export function start() {
 export function stop() {
   connection?.destroy();
   socketOpen.set(false);
+  started.set(false);
   connection = undefined;
 }
 
@@ -179,8 +183,8 @@ export async function untrack(symbols: string[]) {
  * Convert the given amount to USD.
  * @param amount The amount to convert.
  * @returns A float representing the amount in USD, `undefined` if the asset
- * isn't currently tracked, `pending` if we're waiting for Binance to report
- * the price for the first time, or `unsupported` if Binance doesn't provide
+ * isnʼt currently tracked, `pending` if we're waiting for Binance to report
+ * the price for the first time, or `unsupported` if Binance doesnʼt provide
  * a price for the given asset.
  */
 export function convert(amount: Amount) {
@@ -218,13 +222,14 @@ const price = (symbols: string[]) =>
       symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
 
       // Return an object of all the prices for the given symbols.
-      return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol]]));
+      return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol] || 'pending']));
     }),
   );
 
 export default {
   start,
   stop,
+  started: { subscribe: started.subscribe },
   track,
   untrack,
   price,

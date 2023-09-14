@@ -40,7 +40,7 @@
 
   export let emptyStateText = isSelf
     ? 'Create a stream to send any ERC-20 to any Ethereum address.'
-    : "This user isn't yet streaming any funds.";
+    : 'This user isnʼt yet streaming any funds.';
 
   interface OutgoingStreamTableRow {
     streamId: string;
@@ -89,7 +89,7 @@
 
       const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
-      // TODO: Don't presume that any stream to an NFT subaccount is going to a Drip List.
+      // TODO: Donʼt presume that any stream to an NFT subaccount is going to a Drip List.
       const streamName =
         stream.receiver.driver === 'nft'
           ? 'Drip List Support Stream'

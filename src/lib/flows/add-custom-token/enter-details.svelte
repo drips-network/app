@@ -114,7 +114,7 @@
     <TextInput placeholder="https://foo.com/token.png" bind:value={tokenLogoUrl} />
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button variant="primary" disabled={!formValid} on:click={submit}>Add custom token</Button>
   </svelte:fragment>
 </StepLayout>

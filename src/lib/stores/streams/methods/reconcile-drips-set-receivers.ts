@@ -15,7 +15,7 @@ export type StreamsSetEventWithFullReceivers = {
 type ReceiversHash = string;
 
 /**
- * Currently, `streamsSetEvents` as queried from our subgraph don't include the historic state of receivers
+ * Currently, `streamsSetEvents` as queried from our subgraph donʼt include the historic state of receivers
  * at the time of update. This function takes all historically seen drips receivers, and enriches a set of
  * `streamsSetEvents` with a new `currentReceivers` key that includes the full state of receivers at the time
  * of update.

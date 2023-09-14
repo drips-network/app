@@ -141,7 +141,7 @@ export default function buildAssetConfigs(
         }
 
         /*
-        If a particular stream doesn't appear within streamReceiverSeenEvents of a given
+        If a particular stream doesnʼt appear within streamReceiverSeenEvents of a given
         streamsSet event, but did at least once before, we can assume it is paused.
         */
         for (const remainingStreamId of remainingStreamIds) {

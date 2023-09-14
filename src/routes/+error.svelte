@@ -7,7 +7,7 @@
   $: {
     switch ($page.status) {
       case 404: {
-        description = "We weren't able to find that page.";
+        description = 'We werenʼt able to find that page.';
         break;
       }
       case 500: {

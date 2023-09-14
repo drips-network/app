@@ -43,7 +43,7 @@
     <p class="typo-text-small">You’ll list your maintainers and dependencies in the next step.</p>
   </div>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Go back</Button>
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button

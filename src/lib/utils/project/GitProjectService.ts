@@ -91,7 +91,7 @@ export default class GitProjectService {
 
     const onChainProject = await this.getByAccountId(accountId, shouldVerifyState);
 
-    // If the project doesn't exist on-chain yet, return an unclaimed project.
+    // If the project doesnʼt exist on-chain yet, return an unclaimed project.
     if (!onChainProject) {
       const unclaimedProject = {
         claimed: false,
@@ -203,11 +203,11 @@ export default class GitProjectService {
     const onChainProject: RepoAccount | null =
       await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(accountId);
 
-    // If the project doesn't exist on-chain yet, return an unclaimed project.
+    // If the project doesnʼt exist on-chain yet, return an unclaimed project.
     if (!onChainProject) {
       if (!source) return null;
 
-      // TODO: Don't hardcode Forge.GitHub
+      // TODO: Donʼt hardcode Forge.GitHub
       const { forge, username, repoName } = GitProjectService.deconstructUrl(source.url);
 
       const accountIdForSource = await this._repoDriverClient.getAccountId(
@@ -576,7 +576,7 @@ export default class GitProjectService {
     onChainProject: RepoAccount,
     shouldVerifyState = true,
   ): Promise<GitProject | null> {
-    // The project doesn't exist on-chain.
+    // The project doesnʼt exist on-chain.
     if (!onChainProject) {
       return null;
     }
@@ -614,7 +614,7 @@ export default class GitProjectService {
 
     const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
 
-    // ...and hasn't metadata. Return as unclaimed project.
+    // ...and hasnʼt metadata. Return as unclaimed project.
     if (!projectMetadata) {
       const unclaimedProject: UnclaimedGitProject = {
         claimed: false,
