@@ -19,7 +19,7 @@
       <ProjectAvatar {project} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
-      <h1 class="truncate">{project.source.repoName}</h1>
+      <h1>{project.source.repoName}</h1>
       <Copyable alwaysVisible={true} value={project.source.url}>
         <ProjectBadge {project} forceUnclaimed tooltip={false} linkTo="external-url" />
       </Copyable>
