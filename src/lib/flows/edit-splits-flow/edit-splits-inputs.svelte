@@ -153,7 +153,7 @@
               },
               {
                 addresses: [$wallet.address],
-                msg: "You can't split to yourself.",
+                msg: 'You canʼt split to yourself.',
               },
             ]}
           />
@@ -235,7 +235,7 @@
   <SafeAppDisclaimer disclaimerType="splits" />
 
   <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button variant="primary" disabled={!isValidForm} on:click={submit}>Confirm</Button>
   </svelte:fragment>
 </StepLayout>

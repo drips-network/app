@@ -206,7 +206,7 @@
                   : false}
                 emptyStateHeadline="No splits"
                 emptyStateEmoji="🫧"
-                emptyStateText="This project isn't sharing incoming funds with any maintainers or dependencies."
+                emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
               >
                 {#if result}
                   <div class="card">

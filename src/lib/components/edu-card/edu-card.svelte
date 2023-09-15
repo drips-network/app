@@ -1,8 +1,8 @@
 <script lang="ts">
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import { fade } from 'svelte/transition';
-  import Cross from 'radicle-design-system/icons/Cross.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
+  import Button from '../button/button.svelte';
 
   export let dimissableId: string;
   export let negativeMarginWhileCollapsed: string | undefined = undefined;
@@ -13,13 +13,16 @@
     <div out:fade|local={{ duration: 300 }} class="edu-card">
       <div class="text">
         <slot name="text" />
+        <div class="flex gap-1">
+          <slot name="buttons" />
+          <Button variant="ghost" on:click={() => dismissablesStore.dismiss(dimissableId)}
+            >Dismiss</Button
+          >
+        </div>
       </div>
       <div class="illustration">
         <slot name="illustration" />
       </div>
-      <button on:click={() => dismissablesStore.dismiss(dimissableId)} class="close-button">
-        <Cross />
-      </button>
     </div>
   {/if}
 </TransitionedHeight>
@@ -49,24 +52,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  .edu-card button {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    right: 1rem;
-    top: 1rem;
-    border-radius: 50%;
-    height: 2rem;
-    width: 2rem;
-    z-index: 1;
-    background-color: var(--color-background);
-  }
-
-  .edu-card button:focus-visible {
-    background-color: var(--color-foreground-level-2);
   }
 
   @media (max-width: 768px) {

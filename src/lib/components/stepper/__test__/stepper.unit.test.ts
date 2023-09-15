@@ -44,7 +44,7 @@ describe('stepper.svelte', () => {
 
     screen.getByText('Step 1');
     screen.getByText('Continue');
-    screen.getByText('Go back');
+    screen.getByText('Back');
   });
 
   it('allows moving forward and backward', async () => {
@@ -76,7 +76,7 @@ describe('stepper.svelte', () => {
     screen.getByText('Step 1');
 
     const forwardButton = screen.getByText('Continue');
-    const backwardButton = screen.getByText('Go back');
+    const backwardButton = screen.getByText('Back');
 
     userEvent.click(forwardButton);
 
@@ -138,7 +138,7 @@ describe('stepper.svelte', () => {
     // Ensure the success step is displayed
     await screen.findByText('Await successful');
 
-    const backwardButton = screen.getByText('Go back');
+    const backwardButton = screen.getByText('Back');
 
     userEvent.click(backwardButton);
 

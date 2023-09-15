@@ -96,7 +96,7 @@
 
       // TODO: This only supports GitHub forge
       const repoExists = await verifyRepoExists(username, repoName);
-      if (!repoExists) throw new Error("This project doesn't exist");
+      if (!repoExists) throw new Error('This project doesnʼt exist');
 
       let gitProject = await gitProjectService.getByUrl(inputValue);
 
@@ -117,7 +117,7 @@
         top: listElem.scrollHeight,
       });
 
-      // It doesn't work without setTimeout for some reason 🤷‍♂️
+      // It doesnʼt work without setTimeout for some reason 🤷‍♂️
       setTimeout(() => inputElem.focus(), 0);
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -183,7 +183,7 @@
 
       percentages = { ...percentages, [address]: 0 };
 
-      // It doesn't work without setTimeout for some reason 🤷‍♂️
+      // It doesnʼt work without setTimeout for some reason 🤷‍♂️
       setTimeout(() => inputElem.focus(), 0);
     } catch (e) {
       // eslint-disable-next-line no-console

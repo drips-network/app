@@ -236,6 +236,7 @@
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
         emptyStateText={'No tokens available to stream. Add one first by clicking "Add funds" on your Dashboard.'}
+        type="tokens"
       />
     </div>
   </FormField>
@@ -285,7 +286,7 @@
       />
     </FormField>
   </div>
-  <Toggleable bind:toggled={setStartAndEndDate} label="Specify start- and end dates">
+  <Toggleable bind:toggled={setStartAndEndDate} label="Specify start and end dates">
     <div class="start-end-date">
       <p>
         Be aware that if your transaction is confirmed after the configured start date, your stream
@@ -327,7 +328,7 @@
   </Toggleable>
   <SafeAppDisclaimer disclaimerType="drips" />
   <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')}>Cancel</Button>
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>
   </svelte:fragment>
 </StepLayout>

@@ -34,7 +34,7 @@
 </script>
 
 <div class="social-link">
-  <svelte:component this={icon} />
+  <svelte:component this={icon} style="fill: var(--foreground)" />
   {#if prefix !== undefined}
     <a target="_blank" rel="noreferrer" class="typo-text" href={url}
       >{value.replaceAll('http://', '').replaceAll('https://', '')}</a

@@ -40,7 +40,7 @@
     </a>
   {:else}
     <h4>Congratulations!</h4>
-    <p>You've successfully claimed your project.</p>
+    <p>Youʼve successfully claimed your project.</p>
     <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}
       >View project profile</Button
     >

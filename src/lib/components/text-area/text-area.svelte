@@ -2,6 +2,7 @@
 <script lang="ts">
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import { onMount } from 'svelte';
 
   export let resizable = false;
 
@@ -30,6 +31,12 @@
 
     textareaElement.style.height = `${textareaElement.scrollHeight}px`;
   }
+
+  onMount(() => {
+    if (textareaElement && resizable && value?.length) {
+      textareaElement.style.height = `${Math.min(textareaElement.scrollHeight, 200)}px`;
+    }
+  });
 </script>
 
 <div class="container">
