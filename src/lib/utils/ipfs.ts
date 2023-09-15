@@ -12,7 +12,7 @@ export async function fetchIpfs(hash: string) {
 
 /**
  * Convert `ipfs://` protocol URIs to a Pinata gateway link. Returns the
- * original URI if it isn't an ipfs URI.
+ * original URI if it isnʼt an ipfs URI.
  * @param uri The URI to convert.
  * @returns The converted URI, or the original URI if it's not an IPFS URI.
  */

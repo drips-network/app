@@ -47,7 +47,7 @@
 
   let inputElement: HTMLInputElement | undefined = undefined;
 
-  // Can't use normal `autofocus` attribute on the `inputElement`: "Autofocus
+  // Canʼt use normal `autofocus` attribute on the `inputElement`: "Autofocus
   // processing was blocked because a document's URL has a fragment".
   // preventScroll is necessary for onboarding animations to work.
   $: if (autofocus) {

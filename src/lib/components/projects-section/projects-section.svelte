@@ -48,7 +48,7 @@
     actions: isSelf
       ? [
           {
-            // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldn't. 😊
+            // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt. 😊
             handler: () => goto(`/app/claim-project`),
             label: 'Claim project',
             icon: Plus,
@@ -66,7 +66,7 @@
     emptyStateHeadline: 'No claimed projects',
     emptyStateText: isSelf
       ? 'If you develop an open-source project, click "Claim project" to get started.'
-      : "This user hasn't claimed any software projects yet.",
+      : 'This user hasnʼt claimed any software projects yet.',
   }}
 >
   {#if projects}

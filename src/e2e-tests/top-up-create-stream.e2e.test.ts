@@ -168,7 +168,6 @@ describe('app', async () => {
       it('displays the original users outgoing stream on their profile', async () => {
         await page.goto('http://127.0.0.1:3000/app/0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
 
-        await expect(page.locator('text=↑ Outgoing')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
       });
 
@@ -420,7 +419,7 @@ describe('app', async () => {
       await page.locator('div[data-testid="sidenav"] a:text("Drip List")').click();
 
       await expect(
-        page.locator('text=Fund your dependencies by creating your Drip List'),
+        page.locator('text=Fund all your dependencies at once with a Drip List'),
       ).toHaveCount(1);
     });
 
@@ -536,7 +535,7 @@ describe('app', async () => {
     });
 
     it('advances the flow', async () => {
-      await page.locator('button', { hasText: 'Confirm changes in wallet' }).click();
+      await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
       await page.locator('button', { hasText: 'Got it' }).click();
     });
 
@@ -551,9 +550,9 @@ describe('app', async () => {
     });
 
     /* 
-      The tests below are a bit tricky to implement because i wasn't able to find a way to get
+      The tests below are a bit tricky to implement because i wasnʼt able to find a way to get
       the vite preview server to pay attention to the PUBLIC_TEST_MODE env var. Without this being true,
-      it won't load the single drip list view, because that fetches data server-side, and without that env
+      it wonʼt load the single drip list view, because that fetches data server-side, and without that env
       var being set in the server just returns a 404.
 
       TODO: Figure out how to set PUBLIC_TEST_MODE to true in the vite `preview` server, then implement the

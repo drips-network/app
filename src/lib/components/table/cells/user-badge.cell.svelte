@@ -30,7 +30,7 @@
 {#if user.driver === 'address'}
   <IdentityBadge address={user.address} />
 {:else}
-  <!-- TODO: Don't presume any NFT account is a Drip List. -->
+  <!-- TODO: Donʼt presume any NFT account is a Drip List. -->
   <div class="drip-list-badge">
     <div class="icon">
       <Ledger style="fill: var(--color-background); height: 1.25rem;" />

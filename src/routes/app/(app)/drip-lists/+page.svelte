@@ -5,8 +5,9 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
+  import { goto } from '$app/navigation';
+  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
 
   const walletInitialized = walletStore.initialized;
 
@@ -25,18 +26,20 @@
 <div class="page">
   <EduCard dimissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
     <svelte:fragment slot="text">
-      <h2 class="pixelated">Fund your dependencies by creating your Drip List</h2>
+      <h2 class="pixelated">Fund all your dependencies at once with a&nbsp;Drip&nbsp;List</h2>
       <p>
-        Your Drip List is a list of projects and individuals that you can flexibly support by
-        streaming any ERC-20.
+        Stream any ERC-20 token to a list of individuals, Git projects, or other Drip
+        Lists&mdash;weighted by their importance to you. <a
+          href="https://docs.drips.network/docs/for-funders/fund-your-dependencies"
+          class="text-foreground-level-5 hover:text-foreground hover:underline transition duration-150 focus-visible:bg-primary-level-1 focus-visible:text-foreground focus-visible:underline px-1 py-0.5 -mx-1 rounded focus:outline-none"
+          >Learn&nbsp;more</a
+        >
       </p>
-      <a
-        tabindex="-1"
-        style:width="fit-content"
-        href="https://docs.drips.network/docs/for-funders/fund-your-dependencies"
+    </svelte:fragment>
+    <svelte:fragment slot="buttons">
+      <Button icon={Ledger} variant="primary" on:click={() => goto('/app/funder-onboarding')}
+        >Create a Drip List</Button
       >
-        <Button icon={ArrowBoxUpRight}>Learn more</Button>
-      </a>
     </svelte:fragment>
     <svelte:fragment slot="illustration">
       <div class="edu-card-illustration-bg" />

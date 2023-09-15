@@ -1,8 +1,6 @@
 <script>
   import wallet from '$lib/stores/wallet/wallet.store';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
-
-  import CrossIcon from 'radicle-design-system/icons/CrossSmall.svelte';
   import Button from '../button/button.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenuItem from './components/account-menu-item.svelte';
@@ -43,7 +41,7 @@
       <svelte:fragment slot="right"
         ><Button
           disabled={safeAppMode}
-          icon={CrossIcon}
+          variant="ghost"
           on:click={() => {
             cupertinoPaneStore.closeSheet();
             wallet.disconnect();

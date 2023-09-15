@@ -23,7 +23,12 @@
   $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
   $: knownSymbols = knownTokens.map((token) => token.info.symbol);
 
-  $: fiatEstimates.track(knownSymbols);
+  const fiatEstimatesStarted = fiatEstimates.started;
+  $: {
+    if ($fiatEstimatesStarted) {
+      fiatEstimates.track(knownSymbols);
+    }
+  }
 
   $: priceStore = fiatEstimates.price(knownSymbols);
 
@@ -67,7 +72,7 @@
       <Tooltip>
         <WarningIcon style="fill: var(--color-negative)" />
         <svelte:fragment slot="tooltip-content">
-          This amount includes unknown tokens for which we couldn't determine a current USD value.
+          This amount includes unknown tokens for which we couldnʼt determine a current USD value.
         </svelte:fragment>
       </Tooltip>
     </div>

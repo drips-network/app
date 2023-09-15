@@ -18,7 +18,7 @@
     dispatch('await', {
       promise: pollSubgraph,
       message: 'Waiting for the verification to finalize…',
-      subtitle: "This might take a few minutes. Please don't close this window.",
+      subtitle: 'This might take a few minutes. Please donʼt close this window.',
     }),
   );
 
