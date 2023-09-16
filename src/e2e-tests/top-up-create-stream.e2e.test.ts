@@ -10,6 +10,9 @@ import fetch from 'node-fetch';
 import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
 import environment from './helpers/environment';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 describe('app', async () => {
   let server: PreviewServer;
@@ -22,7 +25,7 @@ describe('app', async () => {
     server = await preview({
       preview: { port: 3000, host: '0.0.0.0' },
     });
-    browser = await chromium.launch();
+    browser = await chromium.launch({ headless: process.env.E2E_HEADLESS === '0' ? false : true });
     page = await browser.newPage();
 
     await configureAppForTest(page);
@@ -146,7 +149,7 @@ describe('app', async () => {
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
       });
 
-      it('switches to another user', async () => {
+      it('switches to recipient', async () => {
         await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
 
         await page.reload();
@@ -155,7 +158,7 @@ describe('app', async () => {
       });
 
       it('displays the incoming stream', async () => {
-        await expect(page.locator('text=↓ Incoming')).toHaveCount(1);
+        await expect(page.locator('text=From')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
       });
 
@@ -165,9 +168,10 @@ describe('app', async () => {
     });
 
     describe('profile view', () => {
-      it('displays the original users outgoing stream on their profile', async () => {
+      it('displays the senders outgoing stream on their profile', async () => {
         await page.goto('http://127.0.0.1:3000/app/0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
 
+        await expect(page.locator('text=Total streamed')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
       });
 
@@ -175,7 +179,7 @@ describe('app', async () => {
         await expect(page.locator('text=Testcoin')).toHaveCount(1);
       });
 
-      it('switches to another user', async () => {
+      it('switches to recipient streams dashboard', async () => {
         await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
         await page.goto('http://127.0.0.1:3000/app/streams');
 
@@ -184,10 +188,10 @@ describe('app', async () => {
         await expect(page.locator('text=Balances')).toHaveCount(1);
       });
 
-      it('displays the recipient users incoming stream on their profile', async () => {
+      it('displays the recipients incoming stream on their profile', async () => {
         await page.goto('http://127.0.0.1:3000/app/0xAa90c43123ACEc193A35D33db5D71011B019779D');
 
-        await expect(page.locator('text=↓ Incoming')).toHaveCount(1);
+        await expect(page.locator('text=From')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
       });
 
