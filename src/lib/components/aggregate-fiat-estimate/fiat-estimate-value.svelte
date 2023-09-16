@@ -20,7 +20,7 @@
     >
     <span class="pending placeholder" aria-hidden="true"><span class="currency">≈$</span>...</span>
   {:else}
-    Unknown amount
+    Unknown value
   {/if}
 </div>
 
