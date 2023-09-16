@@ -8,6 +8,28 @@ interface Amount {
   tokenAddress: string;
 }
 
+interface LocalDecimalOptions {
+  min?: number | undefined;
+  max?: number | undefined;
+}
+
+/**
+ * Format number into local number string with decimal options
+ * @param value The amount to format.
+ * @param decimals The decimal options.
+ * @returns The formatted value as a string.
+ */
+export function localDecimal(
+  value: number,
+  decimals: LocalDecimalOptions,
+  locale: string | undefined = 'en-US',
+) {
+  return value.toLocaleString(locale, {
+    minimumFractionDigits: decimals?.min,
+    maximumFractionDigits: decimals?.max,
+  });
+}
+
 /**
  * Format `amount` into a human-friendly format given a `tokenDecimals` diminisher and
  * `precisionMultiplier`. The latter is 10 ^ 9 by default, given that that is the amount
@@ -29,18 +51,19 @@ export default function formatTokenAmount(
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 
-  if (amount === 0n) return '0.00';
+  if (amount === 0n) return localDecimal(0, { min: 2 });
 
   const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
 
-  const formatted = `${parsedAmount.toFixed(maxDecimals)}`;
+  const paddedAmount = localDecimal(parsedAmount, { min: maxDecimals });
 
-  const isTiny =
-    (formatted === (0).toFixed(maxDecimals) || formatted === '-' + (0).toFixed(maxDecimals)) &&
-    amount !== 0n;
+  const isTinyAmount =
+    amount !== 0n &&
+    (paddedAmount === localDecimal(0, { min: maxDecimals }) ||
+      paddedAmount === '-' + localDecimal(0, { min: maxDecimals }));
 
-  if (isTiny) return amount < 0n ? '- <0.00000001' : ' <0.00000001';
-  if (!preserveTrailingZeroes) return Number(formatted).toString();
+  if (isTinyAmount) return amount < 0n ? '- <0.00000001' : ' <0.00000001';
+  if (preserveTrailingZeroes) return paddedAmount;
 
-  return formatted;
+  return localDecimal(parsedAmount, { max: maxDecimals });
 }
