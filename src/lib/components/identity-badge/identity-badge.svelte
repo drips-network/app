@@ -85,7 +85,10 @@
     this={getLink() ? 'a' : 'span'}
     href={getLink()}
     target={linkToNewTab ? '_blank' : undefined}
-    class="identity-badge flex items-center relative text-left text-foreground tabular-nums"
+    class="identity-badge flex items-center relative text-left text-foreground tabular-nums {showAvatar &&
+    !showIdentity
+      ? 'focus-visible:ring-8 focus-visible:ring-primary-level-1 rounded-full'
+      : ''}"
     class:flex-row-reverse={isReverse}
     class:select-none={disableSelection}
     style:height={showAvatar ? `${currentSize}px` : ''}

@@ -49,8 +49,12 @@ module.exports = {
         // 'typo-all-caps': 13px;
       },
       borderRadius: {
-        'lg': '1rem 0 1rem 1rem',
-        'xl': '1.5rem 0 1.5rem 1.5rem',
+        'drip-lg': '1rem 0 1rem 1rem',
+        'drip-xl': '1.5rem 0 1.5rem 1.5rem',
+      },
+      boxShadow: {
+        'low': 'var(--elevation-low)',
+        'md': 'var(--elevation-medium)',
       }
     },
   },

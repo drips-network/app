@@ -51,7 +51,7 @@ describe('amount.svelte', () => {
       },
     });
 
-    screen.getByText('1000000000.00000000');
+    screen.getByText('1,000,000,000.00000000');
     screen.getByText('RLC');
   });
 

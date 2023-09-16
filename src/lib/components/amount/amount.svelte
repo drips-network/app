@@ -16,6 +16,7 @@
   export let amount: Amount | undefined = undefined;
   export let amountPerSecond: Amount | undefined = undefined;
   export let showSymbol = true;
+  export let showPlusMinus = true;
   export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
 
   export let amountClasses = 'typo-text tabular-nums';
@@ -78,7 +79,10 @@
           class="amount"
           class:text-positive={amountPerSecond.amount > 0}
           class:text-negative={amountPerSecond.amount < 0}
-          >{amountPerSecond.amount > 0 ? '+' : ''}{format(amountPerSecond, true)}{#if showSymbol}
+          >{#if showPlusMinus}{amountPerSecond.amount > 0 ? '+' : ''}{/if}{format(
+            amountPerSecond,
+            true,
+          )}{#if showSymbol}
             {' ' + (overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol)}
           {/if}</span
         >/{FRIENDLY_NAMES[$amtDeltaUnitStore]}
