@@ -7,6 +7,7 @@
   export let transitionedOut = false;
 
   export let maxItems = 4;
+  export let itemsClickable = false;
 
   export let components: {
     component: typeof SvelteComponent;
@@ -26,6 +27,7 @@
       {#if !transitionedOut}
         <div
           class="item"
+          class:pointer-events-none={!itemsClickable}
           out:fly|local={{
             y: 16,
             duration: 200,
@@ -69,10 +71,6 @@
   .pile {
     display: flex;
     align-items: center;
-  }
-
-  .pile .item {
-    pointer-events: none;
   }
 
   .pile .item:not(:first-child) {
