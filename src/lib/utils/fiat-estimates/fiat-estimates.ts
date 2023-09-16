@@ -4,7 +4,7 @@ import deduplicateReadable from '../deduplicate-readable';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import { z } from 'zod';
 import { formatUnits } from 'ethers/lib/utils';
-import { ethers, utils } from 'ethers';
+import { utils } from 'ethers';
 
 type TokenAddress = string;
 type DataProviderTokenId = number;
@@ -58,7 +58,7 @@ export async function track(addresses: TokenAddress[]) {
 
   // If we're already tracking any of the given addresses, remove them from the list.
   addresses = addresses.filter(
-    (address) => !Object.keys(pricesValue).includes(ethers.utils.getAddress(address)),
+    (address) => !Object.keys(pricesValue).includes(utils.getAddress(address)),
   );
 
   // Make all the addresses lowercase
@@ -71,30 +71,40 @@ export async function track(addresses: TokenAddress[]) {
   addresses.forEach((address) => {
     prices.set({
       ...pricesValue,
-      [ethers.utils.getAddress(address)]: 'pending',
+      [utils.getAddress(address)]: 'pending',
     });
   });
 
-  // Ensure all addresses are known to the ID map and build a list of IDs.
-  // If the address isn't known, assign it a value of `unsupported`.
-  const ids: DataProviderTokenId[] = [];
+  // Ensure all addresses are known to the ID map and build a list of address <> ID pairs.
+  // If the address isn't known, assign it an ID of `undefined`.
+  const ids: [TokenAddress, DataProviderTokenId | undefined][] = [];
   addresses.forEach((address) => {
-    const id = idMap?.[address];
+    assert(idMap);
 
-    if (id) {
-      ids.push(id);
-    } else {
-      prices.update(($prices) => {
-        return {
-          ...$prices,
-          [ethers.utils.getAddress(address)]: 'unsupported',
-        };
-      });
+    const id: number | undefined = idMap[address];
+
+    ids.push([address, id]);
+  });
+
+  // Set the price for all token addresses with unknown IDs to `unsupported`.
+  ids.forEach((i) => {
+    if (i[1] === undefined) {
+      prices.update(($prices) => ({
+        ...$prices,
+        [utils.getAddress(i[0])]: 'unsupported',
+      }));
     }
   });
 
+  const knownIds: [TokenAddress, DataProviderTokenId][] = ids.filter(
+    (i): i is [string, number] => i[1] !== undefined,
+  );
+
+  // Build a string of all known IDs
+  const idString = knownIds.map((i) => i[1]).join(',');
+
   // Request the current prices for all tracked assets from /api/fiat-estimates/price/tokenId1,tokenId2,...
-  const priceRes = await fetch(`/api/fiat-estimates/price/${ids.join(',')}`);
+  const priceRes = await fetch(`/api/fiat-estimates/price/${idString}`);
 
   const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
@@ -103,10 +113,7 @@ export async function track(addresses: TokenAddress[]) {
     return {
       ...$prices,
       ...Object.fromEntries(
-        Object.entries(parsedRes).map(([id, price]) => [
-          utils.getAddress(addresses[ids.indexOf(parseInt(id))].toLowerCase()),
-          price,
-        ]),
+        Object.values(knownIds).map(([address, id]) => [utils.getAddress(address), parsedRes[id]]),
       ),
     };
   });
