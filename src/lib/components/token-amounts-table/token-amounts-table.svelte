@@ -21,7 +21,7 @@
 
   export let amounts: Amount[];
   $: tokenAddresses = amounts.map((a) => a.tokenAddress);
-  $: tokens = tokenAddresses.map((a) => tokensStore.getByAddress(a));
+  $: tokens = $tokensStore && tokenAddresses.map((a) => tokensStore.getByAddress(a));
 
   $: priceStore = fiatEstimatesStore.price(tokenAddresses ?? []);
 
@@ -66,7 +66,7 @@
 <div class="token-amounts-dropdown">
   {#each amounts as { tokenAddress, amount }, i}
     <div class="token-amount">
-      {#if tokens[i]}
+      {#if tokens && tokens[i]}
         <div class="token">
           <Token address={tokenAddress} />
         </div>
@@ -86,7 +86,7 @@
             </div>
           {/if}
         </div>
-      {:else}
+      {:else if $connected}
         <button
           on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
           >Unknown token</button
