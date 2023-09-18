@@ -1,7 +1,6 @@
 import { derived, writable, get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import deduplicateReadable from '../deduplicate-readable';
-import tokensStore from '$lib/stores/tokens/tokens.store';
 import { z } from 'zod';
 import { formatUnits } from 'ethers/lib/utils';
 import { utils } from 'ethers';
@@ -122,23 +121,22 @@ export async function track(addresses: TokenAddress[]) {
 /**
  * Convert the given amount to USD.
  * @param amount The amount to convert.
+ * @param tokenDecimals The amount of decimals for the token the amount is in.
  * @returns A float representing the amount in USD, `undefined` if the asset
- * isnʼt currently tracked, `pending` if we're waiting for Binance to report
- * the price for the first time, or `unsupported` if Binance doesnʼt provide
+ * isnʼt currently tracked, `pending` if we're waiting for the data provider to
+ * report the price for the first time, or `unsupported` if it can't provide
  * a price for the given asset.
  */
-export function convert(amount: Amount) {
-  const { tokenAddress } = amount;
+export function convert(amount: Amount, tokenDecimals: number) {
+  let { tokenAddress } = amount;
+  tokenAddress = utils.getAddress(tokenAddress);
 
   const price = get(prices)[tokenAddress];
 
   if (!price) return undefined;
   if (typeof price === 'string') return price;
 
-  const token = tokensStore.getByAddress(tokenAddress);
-  assert(token, 'Token info not found for tracked token');
-
-  const tokenAmount = parseFloat(formatUnits(amount.amount, token.info.decimals));
+  const tokenAmount = parseFloat(formatUnits(amount.amount, tokenDecimals));
 
   return tokenAmount * price;
 }
@@ -148,8 +146,10 @@ export function convert(amount: Amount) {
  * tokenAddresses changes.
  * @param tokenAddresses The tokens to subscribe to.
  */
-const price = (tokenAddresses: TokenAddress[]) =>
-  deduplicateReadable(
+const price = (tokenAddresses: TokenAddress[]) => {
+  tokenAddresses = tokenAddresses.map((address) => utils.getAddress(address));
+
+  return deduplicateReadable(
     derived(prices, ($prices) => {
       // Return an object of all the prices for the given symbols.
       return Object.fromEntries(
@@ -157,6 +157,7 @@ const price = (tokenAddresses: TokenAddress[]) =>
       );
     }),
   );
+};
 
 export default {
   start,

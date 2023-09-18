@@ -32,7 +32,7 @@
   const connected = tokensStore.connected;
 
   $: {
-    if ($connected && amounts) {
+    if ($connected && amounts && $connected) {
       const prices = $priceStore;
 
       includesUnknownPrice = false;
@@ -41,7 +41,14 @@
         fiatEstimateCents = 'pending';
       } else {
         fiatEstimateCents = amounts.reduce((sum, { tokenAddress, amount }) => {
-          const res = fiatEstimates.convert({ amount, tokenAddress });
+          const token = tokensStore.getByAddress(tokenAddress);
+
+          if (!token) {
+            includesUnknownPrice = true;
+            return sum;
+          }
+
+          const res = fiatEstimates.convert({ amount, tokenAddress }, token.info.decimals);
 
           if (res === 'unsupported') {
             includesUnknownPrice = true;
