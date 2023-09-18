@@ -1,7 +1,7 @@
 <script lang="ts">
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import modal from '$lib/stores/modal';
-  import tokensStore, { type TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
   import fiatEstimatesStore from '$lib/utils/fiat-estimates/fiat-estimates';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
@@ -20,22 +20,40 @@
   }
 
   export let amounts: Amount[];
+  $: tokenAddresses = amounts.map((a) => a.tokenAddress);
+  $: tokens = tokenAddresses.map((a) => tokensStore.getByAddress(a));
 
-  $: tokens =
-    ($tokensStore && amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress))) ?? [];
-  $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
-  $: knownSymbols = knownTokens.map((token) => token.info.symbol);
+  $: priceStore = fiatEstimatesStore.price(tokenAddresses ?? []);
 
-  $: priceStore = fiatEstimatesStore.price(knownSymbols);
+  const fiatEstimatesStarted = fiatEstimatesStore.started;
+  $: {
+    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
+      fiatEstimatesStore.track(tokenAddresses);
+    }
+  }
 
   let fiatEstimates: (number | 'pending' | 'unsupported' | undefined)[] = [];
+
+  const connected = tokensStore.connected;
 
   $: {
     $priceStore;
 
-    amounts.forEach(({ tokenAddress, amount }, index) => {
-      fiatEstimates[index] = fiatEstimatesStore.convert({ amount, tokenAddress });
-    });
+    if ($connected) {
+      amounts.forEach(({ tokenAddress, amount }, index) => {
+        const token = tokensStore.getByAddress(tokenAddress);
+
+        if (!token) {
+          fiatEstimates[index] = 'unsupported';
+          return;
+        }
+
+        fiatEstimates[index] = fiatEstimatesStore.convert(
+          { amount, tokenAddress },
+          token.info.decimals,
+        );
+      });
+    }
 
     fiatEstimates = fiatEstimates;
   }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import tokensStore, { type TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import { fade } from 'svelte/transition';
   import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
@@ -15,22 +15,16 @@
 
   /** If undefined, component will display a loading state. */
   export let amounts: Amounts | undefined;
-  $: tokens =
-    (amounts &&
-      $tokensStore &&
-      amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress.toLowerCase()))) ??
-    [];
-  $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
-  $: knownSymbols = knownTokens.map((token) => token.info.symbol);
+  $: tokenAddresses = amounts?.map((a) => a.tokenAddress);
 
   const fiatEstimatesStarted = fiatEstimates.started;
   $: {
-    if ($fiatEstimatesStarted) {
-      fiatEstimates.track(knownSymbols);
+    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
+      fiatEstimates.track(tokenAddresses);
     }
   }
 
-  $: priceStore = fiatEstimates.price(knownSymbols);
+  $: priceStore = fiatEstimates.price(tokenAddresses ?? []);
 
   let fiatEstimateCents: number | 'pending' = 'pending';
   let includesUnknownPrice = false;
@@ -38,7 +32,7 @@
   const connected = tokensStore.connected;
 
   $: {
-    if ($connected && amounts) {
+    if ($connected && amounts && $connected) {
       const prices = $priceStore;
 
       includesUnknownPrice = false;
@@ -47,7 +41,14 @@
         fiatEstimateCents = 'pending';
       } else {
         fiatEstimateCents = amounts.reduce((sum, { tokenAddress, amount }) => {
-          const res = fiatEstimates.convert({ amount, tokenAddress });
+          const token = tokensStore.getByAddress(tokenAddress);
+
+          if (!token) {
+            includesUnknownPrice = true;
+            return sum;
+          }
+
+          const res = fiatEstimates.convert({ amount, tokenAddress }, token.info.decimals);
 
           if (res === 'unsupported') {
             includesUnknownPrice = true;

@@ -20,7 +20,6 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
-  import trackRelevantTokens from '$lib/utils/fiat-estimates/track-relevant-tokens';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { page } from '$app/stores';
@@ -144,12 +143,6 @@
 
   onMount(async () => {
     await fiatEstimates.start();
-    trackRelevantTokens.start();
-
-    return () => {
-      trackRelevantTokens.stop();
-      fiatEstimates.stop();
-    };
   });
 </script>
 
