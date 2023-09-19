@@ -40,6 +40,7 @@
   import { fade } from 'svelte/transition';
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
+  import { goto } from '$app/navigation';
 
   interface Amount {
     tokenAddress: string;
@@ -121,9 +122,17 @@
         </div>
       {:else}
         <div class="unclaimed-project-notice">
-          <AnnotationBox>
-            This project is unclaimed. Know the owner? Share it with them to collect claimable funds
-            and start fundraising on Drips.
+          <AnnotationBox type="info">
+            {#await unclaimedFunds}
+              <span />
+            {:then result}
+              {#if result?.length}This project has claimable funds!{:else}This project is unclaimed.{/if}
+            {:catch}
+              This project is unclaimed.
+            {/await}
+            <span class="hidden sm:inline"
+              >Know the owner? Share it with them so they can collect funds or start fundraising.</span
+            >
           </AnnotationBox>
         </div>
       {/if}
@@ -245,30 +254,40 @@
             <SectionSkeleton loaded={true}>
               <div class="unclaimed-funds-section">
                 <UnclaimedProjectCard
-                  unclaimedTokensExpanded={result.length > 0}
                   unclaimedFunds={result}
+                  unclaimedTokensExpandable={false}
+                  unclaimedTokensExpanded={result.length > 0}
+                  showClaimButton
+                  on:claimButtonClick={() =>
+                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
                 />
                 <div class="unclaimed-project-edu-card">
                   <div class="illustration"><OneContract /></div>
-                  <div class="edu-card-content">
-                    <div class="text">
-                      <h3>Are you a maintainer of {project.source.repoName}?</h3>
-                      <p>
-                        Claim your repository on Drips to raise funds from supporters, configure
-                        your project's dependencies and help build the Drips Dependency Tree.
-                      </p>
+                  <div class="flex-1 flex flex-col gap-2">
+                    <div class="flex-1 flex items-center">
+                      <div class="flex flex-col gap-4">
+                        <h3>Are you a maintainer of {project.source.repoName}?</h3>
+                        <p>
+                          Claim the project on Drips to start collecting funds from supporters and
+                          split to your dependencies.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex justify-end gap-1">
                       <a
                         href="https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project"
                         class="typo-text-small learn-more-link"
-                        target="_blank">Learn more</a
+                        target="_blank"
                       >
+                        <Button variant="ghost">Learn more</Button>
+                      </a>
+                      <a
+                        href={buildUrl('/app/claim-project', { projectToAdd: project.source.url })}
+                        class="claim-button"
+                      >
+                        <Button icon={Registered} variant="primary">Claim project</Button>
+                      </a>
                     </div>
-                    <a
-                      href={buildUrl('/app/claim-project', { projectToAdd: project.source.url })}
-                      class="claim-button"
-                    >
-                      <Button icon={Registered} variant="primary">Claim project</Button>
-                    </a>
                   </div>
                 </div>
               </div>
@@ -298,7 +317,7 @@
     grid-template-areas:
       'header'
       'content';
-    gap: 2rem;
+    gap: 4rem;
   }
 
   .project-profile.claimed {
@@ -327,7 +346,6 @@
 
   .header {
     grid-area: header;
-    margin-bottom: 2rem;
   }
 
   .header .project-profile-header {
@@ -396,7 +414,6 @@
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     display: flex;
-    align-items: center;
     gap: 2rem;
   }
 
@@ -408,13 +425,6 @@
     border-radius: 1rem 0 1rem 1rem;
   }
 
-  .unclaimed-project-edu-card .edu-card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    justify-content: space-between;
-  }
-
   .unclaimed-project-edu-card .learn-more-link {
     color: var(--color-foreground-level-6);
     text-decoration: underline;
@@ -423,13 +433,6 @@
   .unclaimed-project-edu-card .claim-button {
     display: flex;
     justify-content: flex-end;
-  }
-
-  .unclaimed-project-edu-card .edu-card-content .text {
-    display: flex;
-    padding-right: 1rem;
-    flex-direction: column;
-    gap: 1rem;
   }
 
   .section {
@@ -443,6 +446,9 @@
     .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
+    }
+
+    .project-profile.claimed {
       grid-template-areas:
         'header'
         'sidebar'
@@ -458,10 +464,6 @@
       justify-content: space-between;
       align-items: baseline;
       flex-direction: column;
-    }
-
-    aside {
-      padding-bottom: 2rem;
     }
 
     .unclaimed-project-edu-card {

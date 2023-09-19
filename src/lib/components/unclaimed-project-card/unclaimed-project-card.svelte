@@ -9,6 +9,11 @@
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import Toggleable from '../toggleable/toggleable.svelte';
   import TokenAmountsTable from '../token-amounts-table/token-amounts-table.svelte';
+  import Button from '../button/button.svelte';
+  import { createEventDispatcher } from 'svelte';
+  import Registered from 'radicle-design-system/icons/Registered.svelte';
+
+  const dispatch = createEventDispatcher();
 
   export let project: UnclaimedGitProject | undefined = undefined;
   export let projectMetadata:
@@ -33,7 +38,10 @@
     },
   }));
 
+  export let unclaimedTokensExpandable = true;
   export let unclaimedTokensExpanded = false;
+  export let showClaimButton = false;
+  export let claimableTokensKey = 'Tokens';
 </script>
 
 <div class="project-info" transition:fly|local={{ y: 8, duration: 300 }}>
@@ -49,28 +57,44 @@
   {/if}
   {#if unclaimedFunds}
     <div class="unclaimed-funds">
-      <div class="row">
-        {#if unclaimedTokenPile}
-          <KeyValuePair key="Claimable tokens">
-            {#if unclaimedFunds.length > 0}
-              <Pile maxItems={4} components={unclaimedTokenPile} />
-              <button
-                class="expand-chevron"
-                on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
-                style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
-              >
-                <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
-              </button>
-            {:else}
-              <span class="muted">None</span>
-            {/if}
+      <div class="flex flex-col gap-6 p-4 sm:flex-row">
+        <div class="flex flex-wrap items-start gap-6 sm:gap-12">
+          {#if unclaimedTokenPile}
+            <KeyValuePair key={claimableTokensKey}>
+              {#if unclaimedFunds.length > 0}
+                <Pile maxItems={4} components={unclaimedTokenPile} />
+                {#if unclaimedTokensExpandable}
+                  <button
+                    class="expand-chevron"
+                    on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                    style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
+                  >
+                    <ChevronDown
+                      style="fill: var(--color-foreground); width: 2rem; height: 2rem;"
+                    />
+                  </button>
+                {/if}
+              {:else}
+                <span class="muted">None</span>
+              {/if}
+            </KeyValuePair>
+          {/if}
+          <KeyValuePair highlight key="Estimated value">
+            <span style="color: var(--color-primary)"
+              ><AggregateFiatEstimate amounts={unclaimedFunds} /></span
+            >
           </KeyValuePair>
+        </div>
+
+        {#if unclaimedFunds.length > 0 && showClaimButton}
+          <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              icon={Registered}
+              variant="primary"
+              on:click={() => dispatch('claimButtonClick')}>Claim project</Button
+            >
+          </div>
         {/if}
-        <KeyValuePair highlight key="Total est. claimable funds">
-          <span style="color: var(--color-primary)"
-            ><AggregateFiatEstimate amounts={unclaimedFunds} /></span
-          >
-        </KeyValuePair>
       </div>
       <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
         <div class="token-amounts-table"><TokenAmountsTable amounts={unclaimedFunds} /></div>
@@ -100,16 +124,6 @@
     flex-direction: column;
   }
 
-  .unclaimed-funds {
-    padding-top: 1rem;
-  }
-
-  .unclaimed-funds .row {
-    padding: 0 1rem 1rem 1rem;
-    display: flex;
-    gap: 3rem;
-  }
-
   .expand-chevron {
     transition: transform 0.3s, background-color 0.3s;
     border-radius: 50%;
@@ -121,12 +135,5 @@
 
   .muted {
     color: var(--color-foreground-level-5);
-  }
-
-  @media (max-width: 514px) {
-    .unclaimed-funds .row {
-      flex-direction: column;
-      gap: 2rem;
-    }
   }
 </style>

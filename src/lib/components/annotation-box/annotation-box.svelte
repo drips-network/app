@@ -12,9 +12,9 @@
     {:else}
       <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
     {/if}
-    <p>
+    <div>
       <slot />
-    </p>
+    </div>
   </div>
 </div>
 
