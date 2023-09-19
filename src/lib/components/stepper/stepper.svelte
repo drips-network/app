@@ -10,7 +10,7 @@
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
 
-  const dispatch = createEventDispatcher<{ stepChange: never }>();
+  const dispatch = createEventDispatcher<{ stepChange: never; conclude: never }>();
 
   export let steps: Steps;
   export let context: (() => Writable<unknown>) | undefined = undefined;
@@ -198,6 +198,8 @@
       disableTransitions = false;
     } else {
       modal.hide();
+      // dispatch in case Stepper is being used in a standalone page (like /funder-onboarding)
+      dispatch('conclude');
     }
   }
 
