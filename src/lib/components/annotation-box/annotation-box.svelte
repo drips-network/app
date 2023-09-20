@@ -5,16 +5,21 @@
   export let size: 'normal' | 'small' = 'normal';
 </script>
 
-<div class="annotation-box typo-text-small {type} {size}">
-  <div class="content">
+<div
+  class="annotation-box typo-text-small {type} {size} flex flex-wrap items-center justify-between gap-3"
+>
+  <div class="flex gap-2 items-start">
     {#if type === 'warning'}
       <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
     {:else}
       <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
     {/if}
-    <div>
+    <div class="flex-1 pt-px">
       <slot />
     </div>
+  </div>
+  <div class="flex-1 flex justify-end">
+    <slot name="actions" />
   </div>
 </div>
 
@@ -33,7 +38,6 @@
   .annotation-box.small {
     border-radius: 0.75rem 0 0.75rem 0.75rem;
     padding: 0.5rem;
-    background-color: red;
     border-color: none;
   }
 

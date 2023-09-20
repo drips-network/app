@@ -41,6 +41,9 @@
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
+  import Link from 'radicle-design-system/icons/Link.svelte';
+  import Copyable from '$lib/components/copyable/copyable.svelte';
+  import { browser } from '$app/environment';
 
   interface Amount {
     tokenAddress: string;
@@ -126,13 +129,25 @@
             {#await unclaimedFunds}
               <span />
             {:then result}
-              {#if result?.length}This project has claimable funds!{:else}This project is unclaimed.{/if}
+              {#if result?.length}This project has <span class="typo-text-small-bold"
+                  ><AggregateFiatEstimate amounts={result} /></span
+                > in available funds! Project owners can collect by claiming their project.{:else}This
+                project has not been claimed yet but can still receive funds that the owner can
+                collect later.{/if}
             {:catch}
               This project is unclaimed.
             {/await}
-            <span class="hidden sm:inline"
-              >Know the owner? Share it with them so they can collect funds or start fundraising.</span
-            >
+            <svelte:fragment slot="actions">
+              <div class="flex gap-3">
+                <Copyable value={browser ? window.location.href : ''}>
+                  <div class="flex gap-1 items-center">
+                    <Link style="fill:currentColor" />
+                    <div class="whitespace-nowrap">Copy URL</div>
+                  </div>
+                </Copyable>
+                <Button size="small" icon={Registered} variant="primary">Claim project</Button>
+              </div>
+            </svelte:fragment>
           </AnnotationBox>
         </div>
       {/if}
@@ -317,7 +332,7 @@
     grid-template-areas:
       'header'
       'content';
-    gap: 4rem;
+    gap: 3rem;
   }
 
   .project-profile.claimed {
