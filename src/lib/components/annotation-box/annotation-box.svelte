@@ -30,11 +30,6 @@
     text-align: left;
   }
 
-  .annotation-box > .content {
-    display: flex;
-    gap: 0.5rem;
-  }
-
   .annotation-box.small {
     border-radius: 0.75rem 0 0.75rem 0.75rem;
     padding: 0.5rem;
