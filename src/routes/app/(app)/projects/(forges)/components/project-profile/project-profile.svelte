@@ -144,7 +144,14 @@
                     <div class="whitespace-nowrap">Copy URL</div>
                   </div>
                 </Copyable>
-                <Button size="small" icon={Registered} variant="primary">Claim project</Button>
+                <Button
+                  size="small"
+                  icon={Registered}
+                  variant="primary"
+                  on:click={() =>
+                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                  >Claim project</Button
+                >
               </div>
             </svelte:fragment>
           </AnnotationBox>
