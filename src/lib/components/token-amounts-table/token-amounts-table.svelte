@@ -1,7 +1,7 @@
 <script lang="ts">
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import modal from '$lib/stores/modal';
-  import tokensStore, { type TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
   import fiatEstimatesStore from '$lib/utils/fiat-estimates/fiat-estimates';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
@@ -20,22 +20,40 @@
   }
 
   export let amounts: Amount[];
+  $: tokenAddresses = amounts.map((a) => a.tokenAddress);
+  $: tokens = $tokensStore && tokenAddresses.map((a) => tokensStore.getByAddress(a));
 
-  $: tokens =
-    ($tokensStore && amounts.map((amount) => tokensStore.getByAddress(amount.tokenAddress))) ?? [];
-  $: knownTokens = tokens.filter((token): token is TokenInfoWrapper => token !== undefined);
-  $: knownSymbols = knownTokens.map((token) => token.info.symbol);
+  $: priceStore = fiatEstimatesStore.price(tokenAddresses ?? []);
 
-  $: priceStore = fiatEstimatesStore.price(knownSymbols);
+  const fiatEstimatesStarted = fiatEstimatesStore.started;
+  $: {
+    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
+      fiatEstimatesStore.track(tokenAddresses);
+    }
+  }
 
   let fiatEstimates: (number | 'pending' | 'unsupported' | undefined)[] = [];
+
+  const connected = tokensStore.connected;
 
   $: {
     $priceStore;
 
-    amounts.forEach(({ tokenAddress, amount }, index) => {
-      fiatEstimates[index] = fiatEstimatesStore.convert({ amount, tokenAddress });
-    });
+    if ($connected) {
+      amounts.forEach(({ tokenAddress, amount }, index) => {
+        const token = tokensStore.getByAddress(tokenAddress);
+
+        if (!token) {
+          fiatEstimates[index] = 'unsupported';
+          return;
+        }
+
+        fiatEstimates[index] = fiatEstimatesStore.convert(
+          { amount, tokenAddress },
+          token.info.decimals,
+        );
+      });
+    }
 
     fiatEstimates = fiatEstimates;
   }
@@ -45,82 +63,42 @@
   }
 </script>
 
-<div class="token-amounts-dropdown">
+<ul class="token-amounts-dropdown">
   {#each amounts as { tokenAddress, amount }, i}
-    <div class="token-amount">
-      {#if tokens[i]}
-        <div class="token">
+    <li class="flex flex-wrap items-center justify-between px-4 py-4 sm:py-0 sm:h-14 sm:gap-6">
+      {#if tokens && tokens[i]}
+        <div class="-ml-1">
           <Token address={tokenAddress} />
         </div>
-        <div class="amounts typo-text tabular-nums">
-          <div class="token amount muted">
-            {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
-            {tokens[i]?.info.symbol}
-          </div>
-          <div class="fiat amount">
-            <FiatEstimateValue fiatEstimateCents={fiatEstimates[i]} />
-          </div>
-          {#if showCollectButtons}
-            <div class="collect-button">
-              <Button icon={Download} on:click={() => openCollectModal(tokenAddress)}
-                >Collect</Button
-              >
-            </div>
-          {/if}
+        <div class="sm:order-last">
+          <FiatEstimateValue fiatEstimateCents={fiatEstimates[i]} />
         </div>
-      {:else}
+        <div class="w-full my-1 sm:hidden" />
+        <div class="muted sm:flex-1 sm:text-right">
+          {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
+          {tokens[i]?.info.symbol}
+        </div>
+        {#if showCollectButtons}
+          <div class="-mr-1 sm:order-last">
+            <Button icon={Download} on:click={() => openCollectModal(tokenAddress)}>Collect</Button>
+          </div>
+        {/if}
+      {:else if $connected}
         <button
           on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
           >Unknown token</button
         >
       {/if}
-    </div>
+    </li>
   {/each}
-</div>
+</ul>
 
 <style>
-  .token-amounts-dropdown {
-    background-color: var(--color-foreground-level-1);
-  }
-
-  .token-amount {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    height: 3rem;
-    padding: 0 1rem;
-  }
-
-  .token-amount:not(:last-child) {
-    border-bottom: 1px solid var(--color-foreground);
-  }
-
-  .token {
-    flex: 1.25;
-    white-space: nowrap;
-  }
-
-  .amounts {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex: 1;
-  }
-
-  .amounts .amount {
-    flex: 1;
-  }
-
-  .amount {
-    white-space: nowrap;
-  }
-
-  .fiat.amount {
-    display: flex;
-    justify-content: flex-end;
+  li + li {
+    border-top: 1px solid var(--color-foreground);
   }
 
   .muted {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground-level-5);
   }
 </style>

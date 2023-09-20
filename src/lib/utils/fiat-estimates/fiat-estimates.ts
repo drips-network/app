@@ -1,232 +1,168 @@
 import { derived, writable, get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import deduplicateReadable from '../deduplicate-readable';
-import tokensStore from '$lib/stores/tokens/tokens.store';
-import createSocket from './sockets';
-import { BinanceCommand, BinanceMessage } from './binance-ws-api/types';
-import { SUPPORTED_SYMBOLS, type SupportedSymbol } from './binance-ws-api/supported-symbols';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { formatUnits } from 'ethers/lib/utils';
+import { utils } from 'ethers';
+
+type TokenAddress = string;
+type DataProviderTokenId = number;
 
 interface Amount {
   amount: bigint;
-  tokenAddress: string;
+  tokenAddress: TokenAddress;
 }
 
-/** Price value is this if Binance doesnʼt provide a price for the given asset. */
+/** Price value is this if the data provider doesnʼt provide a price for the given asset. */
 type Unsupported = 'unsupported';
 
-/** Price value is this if we're waiting for Binance to provide a price for the first time. */
+/** Price value is this if we're waiting for the data provider to post a price for the first time. */
 type Pending = 'pending';
 
-/** All prices relative to USDT */
+/** All prices relative to USD */
 type Prices = {
-  [symbol: string]: number | Unsupported | Pending;
-};
-
-/** Some ERC-20s not directly traded on Binance are pegged to the value of another currency. */
-const TOKEN_SUBSTITUTIONS: { [symbol: string]: SupportedSymbol } = {
-  WETH: 'ETH',
-  WEENUS: 'ETH',
-  WBTC: 'BTC',
+  [tokenAddress: TokenAddress]: number | Unsupported | Pending;
 };
 
 const prices = writable<Prices>({});
 
-function _handleMessage(e: MessageEvent<z.infer<typeof BinanceMessage>>) {
-  const { data } = e;
+let idMap: { [tokenAddress: TokenAddress]: DataProviderTokenId } | undefined = undefined;
 
-  if ('e' in data && data.e === '24hrTicker') {
-    const symbol = data.s.replace('USDT', '');
-    const price = parseFloat(data.c);
+const started = writable(false);
 
-    prices.update((prices) => ({
-      ...prices,
-      [symbol]: price,
-    }));
-  }
+/** Establish a connection to the data provider. */
+export async function start() {
+  const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
+
+  idMap = z.record(z.string(), z.number()).parse(idMapRes);
+
+  started.set(true);
+
+  return;
 }
 
-function _validateSymbol(symbol: string): asserts symbol is SupportedSymbol {
-  assert(SUPPORTED_SYMBOLS.includes(symbol as SupportedSymbol), `Unsupported symbol: ${symbol}`);
-}
+/** Start tracking the provided addresses. */
+export async function track(addresses: TokenAddress[]) {
+  assert(
+    idMap,
+    'Store not started, ensure `start` is called and wait for `started` to be true first.',
+  );
 
-let connection:
-  | ReturnType<typeof createSocket<typeof BinanceMessage, typeof BinanceCommand>>
-  | undefined;
-const socketOpen = writable(false);
+  const pricesValue = get(prices);
 
-/** Establish a websocket connection and allow tracking prices. */
-export function start() {
-  return new Promise<void>((resolve) => {
-    connection = createSocket(
-      BinanceMessage,
-      BinanceCommand,
-      'wss://stream.binance.com:9443/ws/radusdt@ticker',
-    );
-
-    const { send, subscribe } = connection;
-
-    /*
-    Establishing a socket connection requires subscribing to some random symbol,
-    but we immediately unsubscribe on open and resolve the start promise.
-    */
-    connection.socket.addEventListener(
-      'open',
-      () => {
-        send({
-          method: 'UNSUBSCRIBE',
-          params: ['radusdt@ticker'],
-          id: 1,
-        });
-
-        socketOpen.set(true);
-
-        resolve();
-      },
-      { once: true },
-    );
-
-    subscribe(_handleMessage);
+  // Validate all the addresses are valid ETH addresses
+  addresses.forEach((address) => {
+    assert(utils.isAddress(address), `Invalid address: ${address}`);
   });
-}
 
-/** Destroy any previously-started websocket connection. */
-export function stop() {
-  connection?.destroy();
-  socketOpen.set(false);
-  connection = undefined;
-}
+  // If we're already tracking any of the given addresses, remove them from the list.
+  addresses = addresses.filter(
+    (address) => !Object.keys(pricesValue).includes(utils.getAddress(address)),
+  );
 
-/** Start tracking the provided symbols. */
-export async function track(symbols: string[]) {
-  assert(connection, 'Socket not initialized');
+  // Make all the addresses lowercase
+  addresses = addresses.map((address) => address.toLowerCase());
 
-  // If socketOpen is false, wait for it to open
-  if (!get(socketOpen)) {
-    await new Promise<void>((resolve) => {
-      const unsubscribe = socketOpen.subscribe((open) => {
-        if (open) {
-          unsubscribe();
-          resolve();
-        }
-      });
+  // If the list is empty, we're done.
+  if (addresses.length === 0) return;
+
+  // Update all the tracked addresses to have a price of `pending`.
+  addresses.forEach((address) => {
+    prices.set({
+      ...pricesValue,
+      [utils.getAddress(address)]: 'pending',
     });
-  }
+  });
 
-  const pv = get(prices);
+  // Ensure all addresses are known to the ID map and build a list of address <> ID pairs.
+  // If the address isn't known, assign it an ID of `undefined`.
+  const ids: [TokenAddress, DataProviderTokenId | undefined][] = [];
+  addresses.forEach((address) => {
+    assert(idMap);
 
-  symbols = symbols
-    .map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol)
-    .filter((symbol) => !pv[symbol]);
+    const id: number | undefined = idMap[address];
 
-  // Set values for all unsupported symbols in prices store to unsupported.
-  prices.update((prices) => {
-    const newPrices: Prices = {};
+    ids.push([address, id]);
+  });
 
-    for (const symbol of symbols) {
-      if (!SUPPORTED_SYMBOLS.includes(symbol as SupportedSymbol)) {
-        newPrices[symbol] = 'unsupported';
-      }
+  // Set the price for all token addresses with unknown IDs to `unsupported`.
+  ids.forEach((i) => {
+    if (i[1] === undefined) {
+      prices.update(($prices) => ({
+        ...$prices,
+        [utils.getAddress(i[0])]: 'unsupported',
+      }));
     }
+  });
 
+  const knownIds: [TokenAddress, DataProviderTokenId][] = ids.filter(
+    (i): i is [string, number] => i[1] !== undefined,
+  );
+
+  // Build a string of all known IDs
+  const idString = knownIds.map((i) => i[1]).join(',');
+
+  // Request the current prices for all tracked assets from /api/fiat-estimates/price/tokenId1,tokenId2,...
+  const priceRes = await fetch(`/api/fiat-estimates/price/${idString}`);
+
+  const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+
+  // Update the prices store with the new prices
+  prices.update(($prices) => {
     return {
-      ...prices,
-      ...newPrices,
+      ...$prices,
+      ...Object.fromEntries(
+        Object.values(knownIds).map(([address, id]) => [utils.getAddress(address), parsedRes[id]]),
+      ),
     };
-  });
-
-  // Filter out all unsupported symbols.
-  symbols = symbols.filter((symbol) => SUPPORTED_SYMBOLS.includes(symbol as SupportedSymbol));
-
-  // Set values for all the supported symbols in prices store to pending.
-  prices.update((prices) => {
-    const newPrices: Prices = {};
-
-    for (const symbol of symbols) {
-      newPrices[symbol] = 'pending';
-    }
-
-    return {
-      ...prices,
-      ...newPrices,
-    };
-  });
-
-  if (symbols.length === 0) return;
-
-  connection.send({
-    method: 'SUBSCRIBE',
-    params: symbols.map((symbol) => `${symbol.toLowerCase()}usdt@ticker`),
-    id: 1,
-  });
-}
-
-/** Stop tracking the provided symbols. */
-export async function untrack(symbols: string[]) {
-  assert(connection, 'Socket not initialized');
-
-  symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
-
-  connection.send({
-    method: 'UNSUBSCRIBE',
-    params: symbols.map((symbol) => `${symbol.toLowerCase()}usdt@ticker`),
-    id: 1,
   });
 }
 
 /**
  * Convert the given amount to USD.
  * @param amount The amount to convert.
+ * @param tokenDecimals The amount of decimals for the token the amount is in.
  * @returns A float representing the amount in USD, `undefined` if the asset
- * isnʼt currently tracked, `pending` if we're waiting for Binance to report
- * the price for the first time, or `unsupported` if Binance doesnʼt provide
+ * isnʼt currently tracked, `pending` if we're waiting for the data provider to
+ * report the price for the first time, or `unsupported` if it can't provide
  * a price for the given asset.
  */
-export function convert(amount: Amount) {
-  const token = tokensStore.getByAddress(amount.tokenAddress);
+export function convert(amount: Amount, tokenDecimals: number) {
+  let { tokenAddress } = amount;
+  tokenAddress = utils.getAddress(tokenAddress);
 
-  if (!token) return 'unsupported';
-
-  let symbol = token.info.symbol;
-  symbol = TOKEN_SUBSTITUTIONS[symbol] || symbol;
-
-  try {
-    _validateSymbol(symbol);
-  } catch {
-    return 'unsupported';
-  }
-
-  const price = get(prices)[symbol];
+  const price = get(prices)[tokenAddress];
 
   if (!price) return undefined;
   if (typeof price === 'string') return price;
 
-  const tokenAmount = parseFloat(formatUnits(amount.amount, token.info.decimals));
+  const tokenAmount = parseFloat(formatUnits(amount.amount, tokenDecimals));
 
   return tokenAmount * price;
 }
 
 /**
  * Create a deduplicated readable that notifies whenever the price for any of the given
- * symbols changes.
- * @param symbols The symbols to subscribe to.
+ * tokenAddresses changes.
+ * @param tokenAddresses The tokens to subscribe to.
  */
-const price = (symbols: string[]) =>
-  deduplicateReadable(
-    derived(prices, ($prices) => {
-      symbols = symbols.map((symbol) => TOKEN_SUBSTITUTIONS[symbol] || symbol);
+const price = (tokenAddresses: TokenAddress[]) => {
+  tokenAddresses = tokenAddresses.map((address) => utils.getAddress(address));
 
+  return deduplicateReadable(
+    derived(prices, ($prices) => {
       // Return an object of all the prices for the given symbols.
-      return Object.fromEntries(symbols.map((symbol) => [symbol, $prices[symbol]]));
+      return Object.fromEntries(
+        tokenAddresses.map((tokenAddress) => [tokenAddress, $prices[tokenAddress] || 'pending']),
+      );
     }),
   );
+};
 
 export default {
   start,
-  stop,
+  started: { subscribe: started.subscribe },
   track,
-  untrack,
   price,
   convert,
 };

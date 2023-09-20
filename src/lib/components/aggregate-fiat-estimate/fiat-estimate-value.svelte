@@ -1,68 +1,19 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-
   export let forceLoading = false;
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
 
   $: formattedFiatEstimate =
-    typeof fiatEstimateCents === 'number' ? fiatEstimateCents.toFixed(2) : undefined;
+    typeof fiatEstimateCents === 'number'
+      ? fiatEstimateCents.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      : undefined;
 </script>
 
-<div class="wrapper">
-  {#if !forceLoading && typeof fiatEstimateCents === 'number' && formattedFiatEstimate}
-    {#key formattedFiatEstimate}
-      <span class="amount"><span class="currency">≈$</span>{formattedFiatEstimate}</span>
-    {/key}
-    <span class="amount placeholder" aria-hidden="true">≈${formattedFiatEstimate}</span>
-  {:else if fiatEstimateCents === 'pending' || forceLoading}
-    <span transition:fade|local={{ duration: 100 }} class="pending"
-      ><span class="currency">≈$</span>...</span
-    >
-    <span class="pending placeholder" aria-hidden="true"><span class="currency">≈$</span>...</span>
+<div class="tabular-nums">
+  {#if forceLoading || fiatEstimateCents === 'pending'}
+    <span class="animate-pulse">$...</span>
+  {:else if formattedFiatEstimate}
+    <span class="text-foreground-level-4">≈</span>{formattedFiatEstimate}
   {:else}
-    Unknown amount
+    <span aria-label="Unknown amount">??</span>
   {/if}
 </div>
-
-<style>
-  .wrapper {
-    display: flex;
-    position: relative;
-  }
-
-  .amount {
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-feature-settings: 'tnum';
-  }
-
-  .pending {
-    top: 0;
-    left: 0;
-    position: absolute;
-    animation: loading 2s infinite;
-  }
-
-  .placeholder {
-    position: relative;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .currency {
-    opacity: 0.5;
-  }
-
-  @keyframes loading {
-    0% {
-      opacity: 0.25;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.25;
-    }
-  }
-</style>

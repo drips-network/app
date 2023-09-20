@@ -36,7 +36,7 @@
 
 <section
   bind:this={containerEl}
-  class="splits-table-full relative border rounded-lg py-8 lg:py-12 min-w-[1200px]"
+  class="splits-table-full relative border rounded-drip-lg py-8 lg:py-12 min-w-[1200px]"
 >
   <div class="py-px">
     <!-- incoming -->

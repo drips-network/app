@@ -1,12 +1,13 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import type { SvelteComponent } from 'svelte';
+  import { createEventDispatcher, type SvelteComponent } from 'svelte';
   import { sineIn, sineOut } from 'svelte/easing';
 
   export let transitionedOut = false;
 
   export let maxItems = 4;
+  export let itemsClickable = false;
 
   export let components: {
     component: typeof SvelteComponent;
@@ -18,6 +19,9 @@
   function getTransitionDelay(index: number, direction: 'in' | 'out') {
     return ((direction === 'in' ? components.length : 0) - index) * 15;
   }
+
+  export let overflowCounterClickable = false;
+  const dispatch = createEventDispatcher();
 </script>
 
 {#if components.length !== 0}
@@ -26,6 +30,7 @@
       {#if !transitionedOut}
         <div
           class="item"
+          class:pointer-events-none={!itemsClickable}
           out:fly|local={{
             y: 16,
             duration: 200,
@@ -44,8 +49,9 @@
       {/if}
     {/each}
     {#if overflowAmount > 0 && !transitionedOut}
-      <div
-        class="overflow typo-text-small-bold"
+      <svelte:element
+        this={overflowCounterClickable ? 'button' : 'div'}
+        class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1 "
         out:fly|local={{
           y: 16,
           duration: 200,
@@ -58,9 +64,10 @@
           delay: getTransitionDelay(components.length - 1, 'in'),
           easing: sineOut,
         }}
+        on:click={() => dispatch('overflowCounterClick')}
       >
         +{overflowAmount}
-      </div>
+      </svelte:element>
     {/if}
   </div>
 {/if}
@@ -71,16 +78,12 @@
     align-items: center;
   }
 
-  .pile .item {
-    pointer-events: none;
-  }
-
   .pile .item:not(:first-child) {
     margin-left: -0.5rem;
   }
 
   .overflow {
-    height: 1.5rem;
+    height: 1.25rem;
     background-color: var(--color-foreground);
     color: var(--color-background);
     padding: 0 0.5rem;
@@ -88,6 +91,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 0.25rem;
+    margin-left: 0.5rem;
   }
 </style>

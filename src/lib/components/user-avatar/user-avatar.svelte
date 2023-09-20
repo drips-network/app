@@ -14,7 +14,7 @@
 <div class="avatar" style:height={currentSize} style:width={currentSize}>
   {#if src}
     <img
-      class:with-outline={outline}
+      class:outlined={outline}
       bind:this={imgElem}
       alt="user avatar"
       {src}
@@ -22,7 +22,7 @@
     />
   {/if}
   <img
-    class:with-outline={outline}
+    class:outlined={outline}
     class="placeholder"
     src={placeholderSrc}
     alt="user avatar placeholder"
@@ -33,7 +33,6 @@
 <style>
   .avatar {
     position: relative;
-    margin: 1px;
     flex-shrink: 0;
   }
 
@@ -48,8 +47,8 @@
     box-sizing: border-box;
   }
 
-  img.with-outline {
-    border: 1px solid var(--color-foreground);
+  img.outlined {
+    box-shadow: var(--elevation-low);
   }
 
   .placeholder {

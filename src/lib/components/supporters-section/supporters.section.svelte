@@ -100,6 +100,7 @@
                       ><Amount
                         amountPerSecond={stream.streamConfig.amountPerSecond}
                         amountPerSecClasses="text-foreground-level-5 tabular-nums"
+                        showPlusMinus={false}
                       /></span
                     >
                     <ChevronRight />

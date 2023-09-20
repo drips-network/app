@@ -31,7 +31,7 @@ You can preview the production build with `npm run preview`.
 
 ## 🌳 Environment
 
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below.
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var.
 
 ## 🔗 Chain Config
 
