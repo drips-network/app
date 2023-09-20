@@ -8,6 +8,7 @@
   import type { State } from '../../funder-onboarding-flow';
   import { page } from '$app/stores';
   import DripListEditor from '$lib/components/drip-list-editor/drip-list-editor.svelte';
+  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -28,6 +29,9 @@
     showListFirst={true}
     {projectUrlToAdd}
   />
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('conclude')}>Back</Button>
+  </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
       disabled={!isValid}
