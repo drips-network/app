@@ -11,7 +11,7 @@
   import TokenAmountsTable from '../token-amounts-table/token-amounts-table.svelte';
   import Button from '../button/button.svelte';
   import { createEventDispatcher } from 'svelte';
-  import Registered from 'radicle-design-system/icons/Registered.svelte';
+  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -88,10 +88,8 @@
 
         {#if unclaimedFunds.length > 0 && showClaimButton}
           <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
-            <Button
-              icon={Registered}
-              variant="primary"
-              on:click={() => dispatch('claimButtonClick')}>Claim project</Button
+            <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
+              >Claim funds</Button
             >
           </div>
         {/if}
