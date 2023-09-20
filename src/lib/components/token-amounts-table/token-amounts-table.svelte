@@ -63,82 +63,42 @@
   }
 </script>
 
-<div class="token-amounts-dropdown">
+<ul class="token-amounts-dropdown">
   {#each amounts as { tokenAddress, amount }, i}
-    <div class="token-amount">
+    <li class="flex flex-wrap items-center justify-between px-4 py-4 sm:py-0 sm:h-14 sm:gap-6">
       {#if tokens && tokens[i]}
-        <div class="token">
+        <div class="-ml-1">
           <Token address={tokenAddress} />
         </div>
-        <div class="amounts typo-text tabular-nums">
-          <div class="token amount muted">
-            {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
-            {tokens[i]?.info.symbol}
-          </div>
-          <div class="fiat amount">
-            <FiatEstimateValue fiatEstimateCents={fiatEstimates[i]} />
-          </div>
-          {#if showCollectButtons}
-            <div class="collect-button">
-              <Button icon={Download} on:click={() => openCollectModal(tokenAddress)}
-                >Collect</Button
-              >
-            </div>
-          {/if}
+        <div class="sm:order-last">
+          <FiatEstimateValue fiatEstimateCents={fiatEstimates[i]} />
         </div>
+        <div class="w-full my-1 sm:hidden" />
+        <div class="muted sm:flex-1 sm:text-right">
+          {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
+          {tokens[i]?.info.symbol}
+        </div>
+        {#if showCollectButtons}
+          <div class="-mr-1 sm:order-last">
+            <Button icon={Download} on:click={() => openCollectModal(tokenAddress)}>Collect</Button>
+          </div>
+        {/if}
       {:else if $connected}
         <button
           on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
           >Unknown token</button
         >
       {/if}
-    </div>
+    </li>
   {/each}
-</div>
+</ul>
 
 <style>
-  .token-amounts-dropdown {
-    background-color: var(--color-foreground-level-1);
-  }
-
-  .token-amount {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    height: 3rem;
-    padding: 0 1rem;
-  }
-
-  .token-amount:not(:last-child) {
-    border-bottom: 1px solid var(--color-foreground);
-  }
-
-  .token {
-    flex: 1.25;
-    white-space: nowrap;
-  }
-
-  .amounts {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex: 1;
-  }
-
-  .amounts .amount {
-    flex: 1;
-  }
-
-  .amount {
-    white-space: nowrap;
-  }
-
-  .fiat.amount {
-    display: flex;
-    justify-content: flex-end;
+  li + li {
+    border-top: 1px solid var(--color-foreground);
   }
 
   .muted {
-    color: var(--color-foreground-level-6);
+    color: var(--color-foreground-level-5);
   }
 </style>
