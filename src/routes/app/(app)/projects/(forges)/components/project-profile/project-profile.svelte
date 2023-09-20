@@ -34,7 +34,6 @@
   import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Registered from 'radicle-design-system/icons/Registered.svelte';
-  import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import buildUrl from '$lib/utils/build-url';
   import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
@@ -276,35 +275,6 @@
                   on:claimButtonClick={() =>
                     goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
                 />
-                <div class="unclaimed-project-edu-card">
-                  <div class="illustration"><OneContract /></div>
-                  <div class="flex-1 flex flex-col gap-2">
-                    <div class="flex-1 flex items-center">
-                      <div class="flex flex-col gap-4">
-                        <h3>Are you a maintainer of {project.source.repoName}?</h3>
-                        <p>
-                          Claim the project on Drips to start collecting funds from supporters and
-                          split to your dependencies.
-                        </p>
-                      </div>
-                    </div>
-                    <div class="flex justify-end gap-1">
-                      <a
-                        href="https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project"
-                        class="typo-text-small learn-more-link"
-                        target="_blank"
-                      >
-                        <Button variant="ghost">Learn more</Button>
-                      </a>
-                      <a
-                        href={buildUrl('/app/claim-project', { projectToAdd: project.source.url })}
-                        class="claim-button"
-                      >
-                        <Button icon={Registered} variant="primary">Claim project</Button>
-                      </a>
-                    </div>
-                  </div>
-                </div>
               </div>
             </SectionSkeleton>
           {:catch}
@@ -424,32 +394,6 @@
     gap: 1rem;
   }
 
-  .unclaimed-project-edu-card {
-    padding: 1rem;
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
-    display: flex;
-    gap: 2rem;
-  }
-
-  .unclaimed-project-edu-card .illustration {
-    height: 12rem;
-    width: 12rem;
-    flex-shrink: 0;
-    background-color: var(--color-primary-level-1);
-    border-radius: 1rem 0 1rem 1rem;
-  }
-
-  .unclaimed-project-edu-card .learn-more-link {
-    color: var(--color-foreground-level-6);
-    text-decoration: underline;
-  }
-
-  .unclaimed-project-edu-card .claim-button {
-    display: flex;
-    justify-content: flex-end;
-  }
-
   .section {
     display: flex;
     gap: 2rem;
@@ -479,11 +423,6 @@
       justify-content: space-between;
       align-items: baseline;
       flex-direction: column;
-    }
-
-    .unclaimed-project-edu-card {
-      flex-direction: column;
-      align-items: flex-start;
     }
   }
 </style>
