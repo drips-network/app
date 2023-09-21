@@ -34,12 +34,15 @@
   import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Registered from 'radicle-design-system/icons/Registered.svelte';
-  import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import buildUrl from '$lib/utils/build-url';
   import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
+  import { goto } from '$app/navigation';
+  import Link from 'radicle-design-system/icons/Link.svelte';
+  import Copyable from '$lib/components/copyable/copyable.svelte';
+  import { browser } from '$app/environment';
 
   interface Amount {
     tokenAddress: string;
@@ -121,9 +124,36 @@
         </div>
       {:else}
         <div class="unclaimed-project-notice">
-          <AnnotationBox>
-            This project is unclaimed. Know the owner? Share it with them to collect claimable funds
-            and start fundraising on Drips.
+          <AnnotationBox type="info">
+            {#await unclaimedFunds}
+              <span />
+            {:then result}
+              {#if result?.length}This project has <span class="typo-text-small-bold"
+                  ><AggregateFiatEstimate amounts={result} /></span
+                > in available funds! Project owners can collect by claiming their project.{:else}This
+                project has not been claimed yet but can still receive funds that the owner can
+                collect later.{/if}
+            {:catch}
+              This project is unclaimed.
+            {/await}
+            <svelte:fragment slot="actions">
+              <div class="flex gap-3">
+                <Copyable value={browser ? window.location.href : ''}>
+                  <div class="flex gap-1 items-center">
+                    <Link style="fill:currentColor" />
+                    <div class="whitespace-nowrap">Copy URL</div>
+                  </div>
+                </Copyable>
+                <Button
+                  size="small"
+                  icon={Registered}
+                  variant="primary"
+                  on:click={() =>
+                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                  >Claim project</Button
+                >
+              </div>
+            </svelte:fragment>
           </AnnotationBox>
         </div>
       {/if}
@@ -245,32 +275,13 @@
             <SectionSkeleton loaded={true}>
               <div class="unclaimed-funds-section">
                 <UnclaimedProjectCard
-                  unclaimedTokensExpanded={result.length > 0}
                   unclaimedFunds={result}
+                  unclaimedTokensExpandable={false}
+                  unclaimedTokensExpanded={result.length > 0}
+                  showClaimButton
+                  on:claimButtonClick={() =>
+                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
                 />
-                <div class="unclaimed-project-edu-card">
-                  <div class="illustration"><OneContract /></div>
-                  <div class="edu-card-content">
-                    <div class="text">
-                      <h3>Are you a maintainer of {project.source.repoName}?</h3>
-                      <p>
-                        Claim your repository on Drips to raise funds from supporters, configure
-                        your project's dependencies and help build the Drips Dependency Tree.
-                      </p>
-                      <a
-                        href="https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project"
-                        class="typo-text-small learn-more-link"
-                        target="_blank">Learn more</a
-                      >
-                    </div>
-                    <a
-                      href={buildUrl('/app/claim-project', { projectToAdd: project.source.url })}
-                      class="claim-button"
-                    >
-                      <Button icon={Registered} variant="primary">Claim project</Button>
-                    </a>
-                  </div>
-                </div>
               </div>
             </SectionSkeleton>
           {:catch}
@@ -298,7 +309,7 @@
     grid-template-areas:
       'header'
       'content';
-    gap: 2rem;
+    gap: 3rem;
   }
 
   .project-profile.claimed {
@@ -327,7 +338,6 @@
 
   .header {
     grid-area: header;
-    margin-bottom: 2rem;
   }
 
   .header .project-profile-header {
@@ -391,47 +401,6 @@
     gap: 1rem;
   }
 
-  .unclaimed-project-edu-card {
-    padding: 1rem;
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
-
-  .unclaimed-project-edu-card .illustration {
-    height: 12rem;
-    width: 12rem;
-    flex-shrink: 0;
-    background-color: var(--color-primary-level-1);
-    border-radius: 1rem 0 1rem 1rem;
-  }
-
-  .unclaimed-project-edu-card .edu-card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    justify-content: space-between;
-  }
-
-  .unclaimed-project-edu-card .learn-more-link {
-    color: var(--color-foreground-level-6);
-    text-decoration: underline;
-  }
-
-  .unclaimed-project-edu-card .claim-button {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .unclaimed-project-edu-card .edu-card-content .text {
-    display: flex;
-    padding-right: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .section {
     display: flex;
     gap: 2rem;
@@ -443,6 +412,9 @@
     .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
+    }
+
+    .project-profile.claimed {
       grid-template-areas:
         'header'
         'sidebar'
@@ -458,15 +430,6 @@
       justify-content: space-between;
       align-items: baseline;
       flex-direction: column;
-    }
-
-    aside {
-      padding-bottom: 2rem;
-    }
-
-    .unclaimed-project-edu-card {
-      flex-direction: column;
-      align-items: flex-start;
     }
   }
 </style>

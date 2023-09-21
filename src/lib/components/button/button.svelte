@@ -88,7 +88,6 @@
     color: var(--color-foreground);
     user-select: none;
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    background-color: var(--color-background);
     position: relative;
   }
 
@@ -98,7 +97,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--color-background);
     display: flex;
     justify-content: center;
     align-items: center;

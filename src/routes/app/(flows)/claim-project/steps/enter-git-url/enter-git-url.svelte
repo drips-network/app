@@ -230,6 +230,7 @@
       project={$context.project}
       projectMetadata={$context.projectMetadata}
       unclaimedFunds={$context.unclaimedFunds}
+      claimableTokensKey="Claimable tokens"
     />
   {/if}
   <svelte:fragment slot="actions">

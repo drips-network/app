@@ -83,7 +83,7 @@
 <style>
   .aggregate-fiat-estimate {
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.25rem;
   }
