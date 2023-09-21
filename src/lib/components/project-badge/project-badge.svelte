@@ -18,6 +18,7 @@
   export let hideAvatar = false;
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
+  export let maxWidth: number | false = 320;
 
   let unclaimedProject: UnclaimedGitProject;
   $: unclaimedProject = {
@@ -37,7 +38,8 @@
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
-      class="project-badge flex gap-2 items-center typo-text max-w-[320px]"
+      class="project-badge flex gap-2 items-center typo-text"
+      style:max-width={maxWidth ? maxWidth + 'px' : 'none'}
       href={linkTo === 'project-page'
         ? buildProjectUrl(project.source)
         : buildExternalUrl(processedProject.source.url)}

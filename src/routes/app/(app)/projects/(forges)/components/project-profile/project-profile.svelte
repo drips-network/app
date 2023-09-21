@@ -113,8 +113,8 @@
 />
 
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
-  <div class="project-profile" class:claimed={project.claimed}>
-    <div class="header">
+  <article class="project-profile" class:claimed={project.claimed}>
+    <header class="header">
       {#if project.owner}
         <div class="owner">
           <IdentityBadge address={project.owner.address} />
@@ -150,16 +150,13 @@
           </AnnotationBox>
         </div>
       {/if}
-      <div class="project-profile-header">
-        <ProjectProfileHeader {project} />
-        {#if project.claimed && isOwnProject}
-          <Button
-            icon={Pen}
-            on:click={() =>
-              project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
-            >Edit</Button
-          >
-        {/if}
+      <div>
+        <ProjectProfileHeader
+          {project}
+          editButton={project.claimed && isOwnProject ? 'Edit' : undefined}
+          on:editButtonClick={() =>
+            project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
+        />
       </div>
       {#if project.claimed}
         {#await Promise.all([earnedFunds, splits])}
@@ -195,11 +192,11 @@
           </div>
         {/await}
       {/if}
-    </div>
+    </header>
     <div class="content">
       <Developer accountId={project.repoDriverAccount.accountId} />
       {#if project.owner}
-        <div class="section">
+        <section class="app-section">
           {#if splits}
             {#await splits}
               <SectionHeader icon={SplitsIcon} label="Splits" />
@@ -258,9 +255,9 @@
               <SectionSkeleton loaded={true} error={true} />
             {/await}
           {/if}
-        </div>
+        </section>
       {:else if unclaimedFunds}
-        <div class="section">
+        <section class="app-section">
           <SectionHeader icon={Wallet} label="Claimable funds" />
           {#await unclaimedFunds}
             <SectionSkeleton loaded={false} />
@@ -280,7 +277,7 @@
           {:catch}
             <SectionSkeleton loaded={true} error={true} />
           {/await}
-        </div>
+        </section>
       {/if}
       <SupportersSection type="project" {incomingSplits} />
     </div>
@@ -291,7 +288,7 @@
         </div>
       </aside>
     {/if}
-  </div>
+  </article>
 </PrimaryColorThemer>
 
 <style>
@@ -313,6 +310,11 @@
       'content sidebar';
   }
 
+  aside {
+    grid-area: sidebar;
+    height: 0; /* so it's height doesnt influence .header's height and mess up main column gaps */
+  }
+
   .project-profile > * {
     max-width: 100%;
   }
@@ -322,7 +324,7 @@
     align-self: top;
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 3rem;
   }
 
   .unclaimed-project-notice {
@@ -331,21 +333,16 @@
 
   .header {
     grid-area: header;
-    margin-bottom: 2rem;
-  }
-
-  .header .project-profile-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .header .owner {
     display: flex;
     gap: 0.375rem;
     align-items: center;
-    margin-bottom: 1.5rem;
   }
 
   .stats {
@@ -390,17 +387,12 @@
     gap: 1rem;
   }
 
-  .section {
-    display: flex;
-    gap: 2rem;
-    flex-direction: column;
-  }
-
   @media (max-width: 1024px) {
     .project-profile,
     .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
+      gap: 3rem;
     }
 
     .project-profile.claimed {
@@ -414,11 +406,8 @@
       margin-bottom: 0;
     }
 
-    .header .project-profile-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-direction: column;
+    aside {
+      height: auto;
     }
   }
 </style>
