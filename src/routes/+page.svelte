@@ -263,18 +263,8 @@
         <div slot="caption" class="text-container">
           <h4>No platform fees</h4>
           <p>
-            Drips is entirely open-source, and doesnʼt charge anything extra on top of network gas
-            fees.
+            Free to use beyond covering the cost of gas.
           </p>
-        </div>
-      </ImageAndCaption></LpCard
-    >
-    <LpCard
-      ><ImageAndCaption background>
-        <OneBalance slot="image" />
-        <div slot="caption" class="text-container">
-          <h4>One balance for all your streams</h4>
-          <p>Fund multiple streams using one account balance in a single transaction.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -282,11 +272,8 @@
       ><ImageAndCaption background>
         <GasOptimized slot="image" />
         <div slot="caption" class="text-container">
-          <h4>You're in control</h4>
-          <p>
-            Your data and funds are yours forever. Drips runs fully on sovereign user-controlled
-            infrastructure.
-          </p>
+          <h4>User controlled data</h4>
+          <p>Fully sovereign infrastructure for maximum data security.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -295,9 +282,7 @@
         <NoWrappedTokens slot="image" />
         <div slot="caption" class="text-container">
           <h4>No need to wrap tokens</h4>
-          <p>
-            Use ERC-20 tokens “as is”. No need to wrap them or trust a third party with your tokens.
-          </p>
+          <p>Stream native tokens. No need to trust third-parties with funds.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -305,22 +290,8 @@
       ><ImageAndCaption background>
         <OneContract slot="image" />
         <div slot="caption" class="text-container">
-          <h4>One contract. One payment graph.</h4>
-          <p>
-            Drips uses one smart contract for streaming and splitting, enabling effortless and
-            flexible token routing.
-          </p>
-        </div>
-      </ImageAndCaption></LpCard
-    >
-    <LpCard
-      ><ImageAndCaption background>
-        <div slot="image" class="illustration-container">
-          <div class="illustration"><MultiChain /></div>
-        </div>
-        <div slot="caption" class="text-container">
-          <h4>Coming soon: Multi-Chain</h4>
-          <p>Available on the most popular EVM networks: Ethereum, Mainnet, Polygon, Optimism.</p>
+          <h4>One contract</h4>
+          <p>Drips uses one smart contract for streaming and splitting.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -624,7 +595,7 @@
 
   section.grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 1.5rem;
   }
 
@@ -796,14 +767,6 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-
-  .illustration-container {
-    height: 100%;
-  }
-
-  .illustration-container .illustration {
-    height: 100%;
   }
 
   /* TWEAKS */
