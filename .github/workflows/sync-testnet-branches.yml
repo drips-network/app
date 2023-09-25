@@ -16,7 +16,7 @@ jobs:
         with:
           branch: goerli
           token: ${{ secrets.SYNC_BRANCH_GITHUB_TOKEN }}
-          force: false
+          force: true
   sync-sepolia-branch:
     name: Update Sepolia testnet branch
     runs-on: ubuntu-latest
@@ -27,4 +27,4 @@ jobs:
         with:
           branch: sepolia
           token: ${{ secrets.SYNC_BRANCH_GITHUB_TOKEN }}
-          force: false
+          force: true
