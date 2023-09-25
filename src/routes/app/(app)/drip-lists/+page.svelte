@@ -26,7 +26,7 @@
 <div class="page">
   <EduCard dimissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
     <svelte:fragment slot="text">
-      <h2 class="pixelated">Fund all your dependencies at once with a&nbsp;Drip&nbsp;List</h2>
+      <h2 class="pixelated">Support all your dependencies at once with a&nbsp;Drip&nbsp;List</h2>
       <p>
         Stream any ERC-20 token to a list of individuals, Git projects, or other Drip
         Lists&mdash;weighted by their importance to you. <a

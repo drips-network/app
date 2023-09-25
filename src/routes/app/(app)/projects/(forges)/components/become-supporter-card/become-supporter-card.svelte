@@ -114,7 +114,7 @@
     {#if isSupportingProject}You're getting…{:else}Youʼll get…{/if}
     <div class="benefit">
       <Heart />
-      <span>…to feel good about yourself, because you're helping fund open-source software.</span>
+      <span>…to feel good about yourself, because you're supporting open-source software.</span>
     </div>
   </div>
 </div>
