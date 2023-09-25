@@ -1,6 +1,6 @@
 <script lang="ts">
   import Developer from '$lib/components/developer-section/developer.section.svelte';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import DripListCardRepresentational from '$lib/components/drip-list-card/drip-list-card-representational.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -33,7 +33,8 @@
     </div>
 
     <SectionSkeleton loaded={Boolean(data.dripList)}>
-      <DripListCard
+      <DripListCardRepresentational
+        incomingSplitTotal={data.incomingSplitsTotal}
         {supportStreams}
         incomingSplits={data.incomingSplits}
         dripList={data.dripList}

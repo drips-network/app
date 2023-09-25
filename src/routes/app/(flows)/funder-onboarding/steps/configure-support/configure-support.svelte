@@ -11,33 +11,12 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../funder-onboarding-flow';
   import SupportStreamEditor from '$lib/components/support-stream-editor/support-stream-editor.svelte';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-
-  let hasDripList: boolean | undefined;
-
-  async function updateHasDripList() {
-    if (!$walletStore.connected) return;
-
-    const dripListService = await DripListService.new();
-
-    const dripLists = await dripListService.getByOwnerAddress($walletStore.address);
-
-    hasDripList = Boolean(dripLists[0]);
-  }
-
-  $: {
-    if ($walletStore.connected) {
-      updateHasDripList();
-    } else {
-      hasDripList = undefined;
-    }
-  }
 
   let formValid: boolean;
 </script>
@@ -55,14 +34,6 @@
   </AnnotationBox>
   <FormField type="div" title="Wallet">
     <AccountBox />
-    {#if hasDripList}
-      <div style:margin-top="16px">
-        <AnnotationBox type="warning">
-          This wallet already has a Drip List. Connect a different wallet or edit your current Drip
-          List from your <a href="/app/drip-lists" class="underline">dashboard</a>.
-        </AnnotationBox>
-      </div>
-    {/if}
     {#if Boolean($walletStore.safe)}
       <div style:margin-top="16px">
         <SafeAppDisclaimer disclaimerType="drips" />
@@ -70,7 +41,6 @@
     {/if}
   </FormField>
   <SupportStreamEditor
-    disabled={hasDripList}
     bind:formValid
     bind:streamRateValueParsed={$context.supportConfig.streamRateValueParsed}
     bind:topUpAmountValueParsed={$context.supportConfig.topUpAmountValueParsed}
@@ -81,7 +51,7 @@
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
-      disabled={!formValid || hasDripList === undefined || hasDripList === true}
+      disabled={!formValid}
       icon={Check}
       variant="primary"
       on:click={() => dispatch('goForward')}>Continue</Button

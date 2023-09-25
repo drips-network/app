@@ -150,7 +150,7 @@
     </SectionSkeleton>
     <Developer accountId={dripsAccountId} />
     <ProjectsSection collapsable {address} />
-    <DripListsSection collapsable {address} />
+    <DripListsSection collapsable {accountId} />
     <Streams collapsable accountId={dripsAccountId} />
     <Balances collapsable collapsed accountId={dripsAccountId} />
     {#if address && !$dismissablesStore.includes('profile-drips-v1')}

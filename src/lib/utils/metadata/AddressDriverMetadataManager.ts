@@ -43,6 +43,8 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
       lastUpdated: data ? new Date(data.timestamp * 1000) : undefined,
       lastUpdatedByAddress: data?.writtenByAddress,
       lastIpfsHash: hash,
+      visibleDripListAccountIds:
+        data && 'visibleDripListAccountIds' in data ? data.visibleDripListAccountIds : undefined,
     };
   }
 
@@ -59,6 +61,7 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
       emoji: forAccount.emoji,
       timestamp: Math.floor(new Date().getTime() / 1000),
       writtenByAddress: address,
+      visibleDripListAccountIds: forAccount.visibleDripListAccountIds ?? [],
       assetConfigs: mapFilterUndefined(forAccount.assetConfigs, (assetConfig) => ({
         tokenAddress: assetConfig.tokenAddress,
         streams: mapFilterUndefined(assetConfig.streams, (stream) => {
@@ -86,7 +89,6 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
   public upgradeAccountMetadata(
     currentMetadata: AnyVersion<typeof addressDriverAccountMetadataParser>,
   ): LatestVersion<typeof addressDriverAccountMetadataParser> {
-    // There's only one version of address driver metadata.
     return currentMetadata;
   }
 }

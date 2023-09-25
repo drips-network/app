@@ -1,73 +1,108 @@
 <script lang="ts">
   import type { DripList } from '$lib/utils/metadata/types';
-  import type { Splits as RepresentationalSplits } from '$lib/components/splits/splits.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
-  import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
   import Ledger from 'radicle-design-system/icons/Ledger.svelte';
   import { goto } from '$app/navigation';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Section from '../section/section.svelte';
-  import streamsStore from '$lib/stores/streams/streams.store';
-  import Supporters from '../supporters-section/supporters.section.svelte';
+  import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
+  import { AddressDriverClient } from 'radicle-drips';
 
-  export let address: string | undefined;
+  export let accountId: string | undefined;
   export let collapsed = false;
   export let collapsable = false;
-  export let showSupportersSection = false;
+
+  /** Set to true if the `visibleDripListAccountIds` setting from metadata should be ignored. */
+  export let showHiddenDripLists = false;
 
   let error = false;
 
   let dripLists: DripList[] | undefined;
-  let representationalSplits: RepresentationalSplits | undefined;
-  let incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>> | undefined;
-
-  $: ownerAccountId = dripLists && dripLists[0]?.account.owner.accountId;
-  $: supportStreams =
-    ownerAccountId &&
-    $streamsStore &&
-    streamsStore
-      .getStreamsForUser(ownerAccountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripLists?.[0].account.accountId);
-
   async function updateDripLists() {
     try {
-      const service = await DripListService.new();
+      const dripListService = await DripListService.new();
 
-      assert(address);
-      dripLists = await service.getByOwnerAddress(address);
-
-      // We only support a single Drip List right now. The user should have no way to create more than one.
-      const canonicalDripList = dripLists[0];
-      if (!canonicalDripList) {
-        representationalSplits = [];
-        incomingSplits = { users: [], projects: [], dripLists: [] };
-        return;
-      }
-
-      const fetches = await Promise.all([
-        getRepresentationalSplitsForAccount(
-          canonicalDripList.account.accountId,
-          canonicalDripList.projects,
-        ),
-        getIncomingSplits(canonicalDripList.account.accountId),
-      ] as const);
-
-      representationalSplits = fetches[0];
-      incomingSplits = fetches[1];
+      assert(accountId);
+      const address = AddressDriverClient.getUserAddress(accountId);
+      dripLists = await dripListService.getByOwnerAddress(address);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       error = true;
     }
   }
+  $: accountId && updateDripLists();
 
-  $: address && updateDripLists();
+  /*
+  In V2 of AddressDriver account metadata, users can specify a list Drip List account IDs that they want
+  to have appear on their profile. We should generally only show any Drip Lists on the user's profile that
+    However:
+  
+  - The user may have created their Drip List on an earlier version of the app, and not have this setting. In
+    this case, we should display only Drip Lists that they created themselves
+  - The user may have created a Drip List before publishing any metadata for their address driver account at all.
+    In this case, we should also only display Drip Lists that they created themselves.
+  
+  The variable below stores the value of the setting in metadata, or `null` if there's no metadata or it doesn't
+  include this key. Before it's loaded, it's `undefined`.
+  After this, we reactively compute the actual Drip Lists that should be displayed considering the logic outlined
+  above, based on `dripLists` and `visibleDripListAccountIdsSetting`.
+  */
 
-  $: isSelf = Boolean(address && address.toLowerCase() === $walletStore.address?.toLowerCase());
+  let visibleDripListAccountIdsSetting: string[] | null | undefined = undefined;
+  async function updateVisibleDripListAccountIds() {
+    try {
+      const addressDriverMetadataManager = new AddressDriverMetadataManager();
+
+      assert(accountId);
+
+      /*
+      TODO: Having to fetch the entire account metadata here again is pretty dumb. Once drips-event-processor is in
+      prod, we can get rid of the `streams` store, and just fetch the `account` on profiles. Then, we can simply pass
+      `account.visibleDripListAccountIds` to this component as a prop.
+      */
+      const accountMetadata = await addressDriverMetadataManager.fetchAccountMetadata(accountId);
+
+      if (!accountMetadata) {
+        visibleDripListAccountIdsSetting = null;
+      } else if ('visibleDripListAccountIds' in accountMetadata.data) {
+        visibleDripListAccountIdsSetting = accountMetadata.data.visibleDripListAccountIds;
+      } else {
+        visibleDripListAccountIdsSetting = null;
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      error = true;
+    }
+  }
+  $: accountId && !showHiddenDripLists && updateVisibleDripListAccountIds();
+
+  let visibleDripLists: DripList[] | undefined;
+  $: {
+    if (showHiddenDripLists) {
+      // We should just show all Drip Lists.
+      visibleDripLists = dripLists;
+    } else if (dripLists !== undefined && visibleDripListAccountIdsSetting !== undefined) {
+      // If the visibleDripList setting exists, display only those in the array, otherwise any created by the user themselves.
+      if (visibleDripListAccountIdsSetting === null) {
+        // TODO: Figure out which Drip Lists were created by someone else initially, and filter those out.
+        visibleDripLists = dripLists;
+      } else {
+        visibleDripLists = dripLists.filter((d) => {
+          assert(visibleDripListAccountIdsSetting);
+          return visibleDripListAccountIdsSetting.includes(d.account.accountId);
+        });
+      }
+    } else {
+      visibleDripLists = undefined;
+    }
+  }
+
+  $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
 </script>
 
 <Section
@@ -75,54 +110,33 @@
   bind:collapsable
   header={{
     icon: Ledger,
-    label: 'Drip List',
-    actionsDisabled: !dripLists || dripLists.length > 0,
+    label: 'Drip Lists',
+    actionsDisabled: !dripLists,
     actions: isSelf
       ? [
           {
             label: 'Create Drip List',
             icon: Plus,
-            variant: !dripLists || dripLists.length > 0 ? undefined : 'primary',
+            variant: 'primary',
             handler: () => goto('/app/funder-onboarding'),
           },
         ]
       : [],
   }}
   skeleton={{
-    loaded:
-      error ||
-      dripLists?.length === 0 ||
-      (dripLists !== undefined &&
-        incomingSplits !== undefined &&
-        supportStreams !== undefined &&
-        representationalSplits !== undefined),
+    loaded: error || dripLists !== undefined,
     empty: dripLists && dripLists.length === 0,
     error,
     emptyStateEmoji: '🫗',
-    emptyStateHeadline: isSelf ? 'You donʼt have a Drip List' : 'No Drip List',
+    emptyStateHeadline: isSelf ? 'You donʼt have any Drip Lists' : 'No Drip Lists',
     emptyStateText: isSelf
-      ? 'Create your Drip List to start supporting your dependencies'
-      : 'Drip Lists enable supporting a set of open-source projects.',
+      ? 'Create a Drip List to start supporting your dependencies'
+      : 'Drip Lists enable supporting a set of open-source projects',
   }}
 >
-  {#if dripLists && supportStreams && representationalSplits && incomingSplits}
-    <DripListCard
-      {supportStreams}
-      {incomingSplits}
-      {representationalSplits}
-      dripList={dripLists[0]}
-    />
+  {#if visibleDripLists}
+    {#each visibleDripLists as dripList}
+      <DripListCard {dripList} />
+    {/each}
   {/if}
 </Section>
-
-{#if showSupportersSection && dripLists?.length}
-  <Supporters
-    type="dripList"
-    headline="Support"
-    {incomingSplits}
-    infoTooltip="You can support your Drip List with one or more support streams. Others can also add your Drip List to their Drip Lists to support it."
-    isDripListOwner={isSelf}
-    supportStreams={supportStreams || []}
-    dripListId={dripLists?.[0]?.account.accountId}
-  />
-{/if}
