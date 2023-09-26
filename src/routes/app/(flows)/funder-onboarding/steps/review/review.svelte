@@ -7,7 +7,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
-  import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
+  import ListIcon from 'radicle-design-system/icons/DripList.svelte';
   import TransactionsIcon from 'radicle-design-system/icons/Transactions.svelte';
   import type { Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
@@ -27,6 +27,7 @@
   import { constants, type DripsSubgraphClient } from 'radicle-drips';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import streamsStore from '$lib/stores/streams/streams.store';
+  import Pause from 'radicle-design-system/icons/Pause.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -209,7 +210,7 @@
           ><span class="typo-text-bold">Add funds</span> (or withdraw any unstreamed funds) from your
           Drips dashboard.</UlIconLi
         >
-        <UlIconLi icon={ListIcon}
+        <UlIconLi icon={Pause}
           ><span class="typo-text-bold">Pause or cancel</span> your support anytime.</UlIconLi
         >
         <UlIconLi icon={PenIcon}
