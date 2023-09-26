@@ -293,6 +293,12 @@
                 disabled: balances.splittable === 0n,
               }
             : undefined,
+          /*
+          It used to be possible to set splits for your own AddressDriver account in the Drips App.
+          Even though it's no longer possible to do so, maybe some old account still has splits set,
+          or maybe the user manually configured splits outside the app. For this reason, we display
+          the splitting percentage while collecting, but only if it's more than 0%.
+          */
           ownSplitsWeight < 1000000n
             ? {
                 title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
