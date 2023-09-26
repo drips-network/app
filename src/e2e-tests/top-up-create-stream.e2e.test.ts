@@ -550,6 +550,7 @@ describe('app', async () => {
 
       await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
       await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
+      await expect(page.locator('text=drips-test-repo-11')).toHaveCount(1);
       await expect(page.locator('text=0x43')).toHaveCount(0);
     });
 
