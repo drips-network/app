@@ -387,7 +387,7 @@ describe('app', async () => {
       });
 
       it('expands the squeezing section', async () => {
-        await page.locator('label:has-text("Include funds from current cycle")').click();
+        await page.locator('label:has-text("Include funds streamed in current cycle")').click();
 
         await page
           .locator(`data-testid=item-383620263794848526656662033323214000554911775452`)
