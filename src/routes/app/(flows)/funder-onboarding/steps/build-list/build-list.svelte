@@ -21,7 +21,7 @@
 </script>
 
 <StandaloneFlowStepLayout
-  description="What projects, individuals, or organizations would you like to fund with your Drip List?"
+  description="What projects, individuals, or organizations would you like to support with your Drip List?"
 >
   <DripListEditor
     bind:isValid

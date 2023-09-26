@@ -117,10 +117,10 @@
     <header class="header">
       {#if project.owner}
         <div class="owner">
-          <IdentityBadge address={project.owner.address} />
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
-            >is raising funds for...</span
+            >Project claimed by</span
           >
+          <IdentityBadge address={project.owner.address} />
         </div>
       {:else}
         <div class="unclaimed-project-notice">
