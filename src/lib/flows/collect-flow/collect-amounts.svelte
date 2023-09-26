@@ -293,19 +293,22 @@
                 disabled: balances.splittable === 0n,
               }
             : undefined,
-          {
-            title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
-            value:
-              (squeezeEnabled ? '≈ ' : '') +
-              formatTokenAmount(
-                makeAmount(collectableAfterSplit - splittableAfterReceive),
-                selectedToken.decimals,
-                1n,
-              ),
-            disabled:
-              ownSplitsWeight === 1000000n || collectableAfterSplit - splittableAfterReceive === 0n,
-            symbol: selectedToken.symbol,
-          },
+          ownSplitsWeight < 1000000n
+            ? {
+                title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
+                value:
+                  (squeezeEnabled ? '≈ ' : '') +
+                  formatTokenAmount(
+                    makeAmount(collectableAfterSplit - splittableAfterReceive),
+                    selectedToken.decimals,
+                    1n,
+                  ),
+                disabled:
+                  ownSplitsWeight === 1000000n ||
+                  collectableAfterSplit - splittableAfterReceive === 0n,
+                symbol: selectedToken.symbol,
+              }
+            : undefined,
           balances.collectable !== 0n
             ? {
                 title: `Previously-split funds`,
