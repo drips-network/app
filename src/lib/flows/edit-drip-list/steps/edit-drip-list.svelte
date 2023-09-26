@@ -105,10 +105,7 @@
           const callerClient = await getCallerClient();
 
           const { receivers, projectsSplitMetadata } =
-            await dripListService.getProjectsSplitMetadataAndReceivers({
-              percentages,
-              items,
-            });
+            await dripListService.getProjectsSplitMetadataAndReceivers(dripList);
 
           const setSplitsTx = await nftDriverTxFactory.setSplits(dripListId, receivers);
 

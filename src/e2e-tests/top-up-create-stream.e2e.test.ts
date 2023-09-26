@@ -423,7 +423,7 @@ describe('app', async () => {
       await page.locator('div[data-testid="sidenav"] a:text("Drip List")').click();
 
       await expect(
-        page.locator('text=Fund all your dependencies at once with a Drip List'),
+        page.locator('text=Support all your dependencies at once with a Drip List'),
       ).toHaveCount(1);
     });
 
@@ -550,6 +550,7 @@ describe('app', async () => {
 
       await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
       await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
+      await expect(page.locator('text=drips-test-repo-11')).toHaveCount(1);
       await expect(page.locator('text=0x43')).toHaveCount(0);
     });
 

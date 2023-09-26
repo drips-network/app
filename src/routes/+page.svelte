@@ -215,7 +215,7 @@
           <div class="item">
             <div class="count">1</div>
             <h5>Make a list</h5>
-            <p class="typo-text-small">Find and fund any GitHub project or Ethereum address.</p>
+            <p class="typo-text-small">Find and support any GitHub project or Ethereum address.</p>
           </div>
           <div class="item">
             <div class="count">2</div>
