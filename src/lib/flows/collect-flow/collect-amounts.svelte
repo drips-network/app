@@ -224,9 +224,9 @@
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
   <div>
     <p>
-      Tokens streamed to your account automatically become receivable on a weekly cycle. Your
-      receivable balance updates next on <span class="typo-text-bold"
-        >{formatDate(currentCycleEnd)}</span
+      Income from Projects, Drip Lists and streams can be collected on a weekly cycle. Your
+      collectable balance updates next on <span class="typo-text-bold"
+        >{formatDate(currentCycleEnd, 'onlyDay')}</span
       >.
     </p>
     <a
@@ -237,34 +237,37 @@
       >Learn more</a
     >
   </div>
-  <div class="squeeze-section">
-    <Toggleable label="Include funds from current cycle" bind:toggled={squeezeEnabled}>
-      <p>
-        Select which senders from the current cycle you would like to collect from. The network fee
-        for collecting increases with each selected sender.
-      </p>
-      <AnnotationBox type="warning">
-        The amounts shown below are estimated based on your system time so the value you collect may
-        slightly differ.
-      </AnnotationBox>
-      <div class="list-wrapper">
-        <ListSelect
-          items={currentCycleSenders}
-          multiselect
-          bind:selected={selectedSqueezeSenderItems}
-          searchable={false}
-        />
-      </div>
-    </Toggleable>
-  </div>
+  {#if incomingEstimatesBySender.length > 0}
+    <div class="squeeze-section">
+      <Toggleable label="Include funds streamed in current cycle" bind:toggled={squeezeEnabled}>
+        <p>
+          You may collect stream income from specific senders already before the current cycle
+          concludes, but the network fee for collecting increases with each selected sender.
+        </p>
+        <AnnotationBox type="warning">
+          The amounts shown below are estimated based on your system time so the value you collect
+          may slightly differ.
+        </AnnotationBox>
+        <div class="list-wrapper">
+          <ListSelect
+            items={currentCycleSenders}
+            multiselect
+            bind:selected={selectedSqueezeSenderItems}
+            searchable={false}
+            emptyStateText="No funds were streamed to you during the current cycle."
+          />
+        </div>
+      </Toggleable>
+    </div>
+  {/if}
   <FormField title="Review">
     <LineItems
       lineItems={mapFilterUndefined(
         [
           squeezeEnabled
             ? {
-                title: `${selectedToken.symbol} from current cycle`,
-                subtitle: 'Earned from incoming streams',
+                title: `${selectedToken.symbol} streamed in current cycle`,
+                subtitle: 'From incoming streams',
                 value:
                   '≈ ' +
                   formatTokenAmount(
@@ -275,17 +278,22 @@
                 symbol: selectedToken.symbol,
               }
             : undefined,
-          {
-            title: `${selectedToken.symbol} from concluded cycles`,
-            subtitle: 'Earned from incoming streams',
-            value: formatTokenAmount(makeAmount(balances.receivable), selectedToken.decimals, 1n),
-            symbol: selectedToken.symbol,
-            disabled: balances.receivable === 0n,
-          },
+          balances.receivable > 0n
+            ? {
+                title: `${selectedToken.symbol} streamed in concluded cycles`,
+                subtitle: 'From incoming streams',
+                value: formatTokenAmount(
+                  makeAmount(balances.receivable),
+                  selectedToken.decimals,
+                  1n,
+                ),
+                symbol: selectedToken.symbol,
+              }
+            : undefined,
           balances.splittable > 0n
             ? {
-                title: `Splittable ${selectedToken.symbol}`,
-                subtitle: 'Earned from already-received streams or incoming splits & gives',
+                title: `Earned ${selectedToken.symbol}`,
+                subtitle: 'From Projects or Drip Lists',
                 value:
                   '+' +
                   formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
