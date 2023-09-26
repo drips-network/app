@@ -294,9 +294,11 @@
             ? {
                 title: `Earned ${selectedToken.symbol}`,
                 subtitle: 'From Projects or Drip Lists',
-                value:
-                  '+' +
-                  formatTokenAmount(makeAmount(balances.splittable), selectedToken.decimals, 1n),
+                value: formatTokenAmount(
+                  makeAmount(balances.splittable),
+                  selectedToken.decimals,
+                  1n,
+                ),
                 symbol: selectedToken.symbol,
                 disabled: balances.splittable === 0n,
               }
@@ -326,9 +328,11 @@
           balances.collectable !== 0n
             ? {
                 title: `Previously-split funds`,
-                value:
-                  '+' +
-                  formatTokenAmount(makeAmount(balances.collectable), selectedToken.decimals, 1n),
+                value: formatTokenAmount(
+                  makeAmount(balances.collectable),
+                  selectedToken.decimals,
+                  1n,
+                ),
                 symbol: selectedToken.symbol,
               }
             : undefined,
