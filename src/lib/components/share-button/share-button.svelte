@@ -32,7 +32,8 @@
 
 {#if shareSupported}
   <button on:click={handleClick}>
-    <ShareIcon />
+    <ShareIcon style="fill:currentColor" />
+    Share
   </button>
 {:else}
   <button
@@ -43,22 +44,33 @@
     on:click={handleClick}
     class:copy-success={copySuccess}
   >
-    {#if copySuccess}
-      <div transition:fade|local={{ duration: 200 }}>
-        <CheckCircle style="fill: var(--color-positive)" />
-      </div>
-    {:else if hovering}
-      <div transition:fade|local={{ duration: 200 }}>
-        <CopyIcon style="fill: var(--color-primary-level-6)" />
-      </div>
-    {:else}
-      <div transition:fade|local={{ duration: 200 }}><LinkIcon /></div>
-    {/if}
+    <div class="icon">
+      {#if copySuccess}
+        <span transition:fade|local={{ duration: 200 }}>
+          <CheckCircle style="fill: var(--color-positive)" />
+        </span>
+      {:else if hovering}
+        <span transition:fade|local={{ duration: 200 }}>
+          <CopyIcon style="fill: var(--color-primary-level-6)" />
+        </span>
+      {:else}
+        <span transition:fade|local={{ duration: 200 }}
+          ><LinkIcon style="fill: currentColor" /></span
+        >
+      {/if}
+    </div>
+    Copy link
   </button>
 {/if}
 
 <style>
   button {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  button .icon {
     height: 2rem;
     width: 2rem;
     display: inline-flex;
@@ -68,12 +80,12 @@
     border-radius: 1rem;
   }
 
-  button > * {
+  button .icon > * {
     position: absolute;
   }
 
-  button:hover:not(.copy-success),
-  button:focus-visible:not(.copy-success) {
+  button:hover:not(.copy-success) .icon,
+  button:focus-visible:not(.copy-success) .icon {
     background-color: var(--color-primary-level-1);
   }
 </style>

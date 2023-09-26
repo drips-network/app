@@ -45,7 +45,7 @@
   import { verifyRepoExists } from '$lib/utils/github/github';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
   import Trash from 'radicle-design-system/icons/Trash.svelte';
-  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import ethAddressItem from './item-templates/eth-address';
@@ -304,7 +304,7 @@
   {#if isEditable}
     <div class="add-project flex items-center">
       <div class="icon">
-        <Ledger style="fill: var(--color-foreground)" />
+        <DripListIcon style="fill: var(--color-foreground)" />
       </div>
       <input
         bind:this={inputElem}

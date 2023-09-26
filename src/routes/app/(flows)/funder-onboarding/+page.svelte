@@ -31,7 +31,6 @@
 <Stepper
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
-  on:conclude={() => window.history.back()}
   context={() => state}
   steps={steps()}
   minHeightPx={512}
