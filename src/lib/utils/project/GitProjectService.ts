@@ -394,7 +394,9 @@ export default class GitProjectService {
 
     const splitTxs: Promise<PopulatedTransaction>[] = [];
     context.unclaimedFunds?.map(({ tokenAddress }) => {
-      splitTxs.push(this._dripsTxFactory.split(accountId, tokenAddress, receivers));
+      splitTxs.push(
+        this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
+      );
     });
 
     return [setSplitsTx, emitAccountMetadataTx, ...(await Promise.all(splitTxs))];
