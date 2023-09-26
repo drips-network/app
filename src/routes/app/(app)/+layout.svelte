@@ -5,7 +5,7 @@
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
 
-  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
@@ -50,7 +50,7 @@
           top: [
             { label: 'Streams', href: '/app/streams', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip List', href: '/app/drip-lists', icon: Ledger },
+            { label: 'Drip List', href: '/app/drip-lists', icon: DripListIcon },
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
@@ -73,7 +73,7 @@
         items={[
           { label: 'Streams', href: '/app/streams', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Drip List', href: '/app/drip-lists', icon: Ledger },
+          { label: 'Drip List', href: '/app/drip-lists', icon: DripListIcon },
           {
             label: 'Profile',
             href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,

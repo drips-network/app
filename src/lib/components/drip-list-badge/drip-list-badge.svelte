@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import ensStore from '$lib/stores/ens';
   import formatAddress from '$lib/utils/format-address';
 
@@ -25,7 +25,7 @@
 >
   {#if showAvatar}
     <div class="drip-list-icon">
-      <Ledger style="fill: var(--color-primary)" />
+      <DripListIcon style="fill: var(--color-primary)" />
     </div>
   {/if}
   {#if showName}

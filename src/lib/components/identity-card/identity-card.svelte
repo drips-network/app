@@ -3,7 +3,7 @@
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import type { DripList } from '$lib/utils/metadata/types';
-  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
 
   // Either pass address or dripList. If neither, it'll say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
@@ -36,7 +36,7 @@
   {:else if dripList}
     <div class="content-container" in:fade|local>
       <div class="icon">
-        <Ledger style="fill: var(--color-background); height: 3rem; width: 3rem;" />
+        <DripListIcon style="fill: var(--color-background); height: 3rem; width: 3rem;" />
       </div>
       <span class="typo-header-3 ellipsis">{dripList.name}</span>
     </div>
