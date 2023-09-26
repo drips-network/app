@@ -101,6 +101,7 @@
               href={canSubmitProjectClaim
                 ? buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })
                 : undefined}
+              target="_blank"
               ><Button variant="primary" size="large" disabled={!canSubmitProjectClaim}
                 >Claim project</Button
               ></a
@@ -246,7 +247,7 @@
         <div class="text">
           <h3>Start your Drip List</h3>
           <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
-          <a href="/app/funder-onboarding">
+          <a href="/app/funder-onboarding" target="_blank">
             <Button variant="primary" size="large">Create your Drip List</Button>
           </a>
         </div>
