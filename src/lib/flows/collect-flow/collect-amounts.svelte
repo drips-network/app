@@ -224,7 +224,7 @@
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
   <div>
     <p>
-      Income from Projects, Drip Lists and streams can be collected on a weekly cycle. Your
+      Income from Drip Lists, projects, and streams becomes collectable on a weekly cycle. Your
       collectable balance updates next on <span class="typo-text-bold"
         >{formatDate(currentCycleEnd, 'onlyDay')}</span
       >.
