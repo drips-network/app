@@ -149,11 +149,11 @@
   <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
     <header class="px-6 pt-6 flex flex-col gap-4">
       <div
-        class="flex gap-4 items-center {format === 'full'
-          ? 'flex-col sm:flex-row sm:justify-between'
-          : ''}"
+        class="flex gap-4 {format === 'full'
+          ? 'flex-col sm:flex-row justify-left sm:justify-between sm:items-center'
+          : 'items-center justify-between'}"
       >
-        <h1 class="flex-1 min-w-0 truncate">
+        <h1 class="flex-1 min-w-0 text-left" class:truncate={format === 'thumblink'}>
           <a
             href={dripListUrl}
             class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
