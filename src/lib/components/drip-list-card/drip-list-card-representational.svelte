@@ -29,6 +29,7 @@
 
   export let dripList: DripList;
   export let format: 'thumblink' | 'full' = 'full';
+  export let maxSplitsRows: number | undefined = undefined;
 
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
@@ -141,7 +142,9 @@
 <svelte:element
   this={format === 'thumblink' ? 'a' : 'section'}
   href={format === 'thumblink' ? dripListUrl : undefined}
-  class="rounded-drip-lg shadow-low group transform transition duration-200 mouse:hover:shadow-md mouse:hover:-translate-y-2px focus-visible:shadow-md focus-visible:-translate-y-2px"
+  class="rounded-drip-lg shadow-low group transform {format === 'thumblink'
+    ? 'transition duration-200 mouse:hover:shadow-md mouse:hover:-translate-y-2px focus-visible:shadow-md focus-visible:-translate-y-2px'
+    : ''}"
 >
   <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
     <header class="px-6 pt-6 flex flex-col gap-4">
@@ -154,20 +157,16 @@
             {dripList.name}
           </a>
         </h1>
-        <div class="flex items-center gap-4">
-          {#if format === 'thumblink'}
-            <div
-              class="h-8 w-8 rounded-full flex items-center justify-center mouse:group-hover:bg-primary-level-1"
-            >
-              <ChevronRight />
-            </div>
-          {:else}
+        {#if format === 'thumblink'}
+          <ChevronRight />
+        {:else}
+          <div class="flex items-center gap-4">
             <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
             {/if}
-          {/if}
-        </div>
+          </div>
+        {/if}
       </div>
       {#if (dripList.description ?? '').length > 0}
         <TextExpandable>
@@ -196,7 +195,9 @@
         {/if}
       </div>
       {#if representationalSplits}
-        <div class="splits-component"><Splits list={representationalSplits} /></div>
+        <div class="splits-component">
+          <Splits list={representationalSplits} maxRows={maxSplitsRows} />
+        </div>
       {:else}
         Loading...
       {/if}

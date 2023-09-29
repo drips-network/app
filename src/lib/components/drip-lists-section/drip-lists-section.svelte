@@ -138,7 +138,7 @@
   {#if visibleDripLists}
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       {#each visibleDripLists as dripList}
-        <DripListCard {dripList} format="thumblink" />
+        <DripListCard {dripList} format="thumblink" maxSplitsRows={4} />
       {/each}
     </div>
   {/if}

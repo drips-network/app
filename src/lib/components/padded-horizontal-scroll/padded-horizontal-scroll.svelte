@@ -19,7 +19,7 @@
 
   .padded-horizontal-scroll > .content {
     min-width: 100%;
-    padding: 0 2.5rem;
+    padding: 1px 2.5rem; /* 1px so box-shadow outlined content is not clipped */
     width: fit-content;
   }
 
