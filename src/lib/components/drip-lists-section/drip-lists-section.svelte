@@ -103,6 +103,7 @@
   }
 
   $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
+  $: isGridFormat = (visibleDripLists?.length ?? 0) > 1;
 </script>
 
 <Section
@@ -110,8 +111,8 @@
   bind:collapsable
   header={{
     icon: DripListIcon,
-    label: 'Drip List',
-    actionsDisabled: !dripLists || dripLists.length > 0,
+    label: 'Drip Lists',
+    actionsDisabled: !dripLists,
     actions: isSelf
       ? [
           {
@@ -136,7 +137,7 @@
   }}
 >
   {#if visibleDripLists}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div class="grid gap-6 grid-cols-1 {visibleDripLists.length > 0 ? 'sm:grid-cols-2' : '1'}">
       {#each visibleDripLists as dripList}
         <DripListCard {dripList} format="thumblink" maxSplitsRows={4} />
       {/each}
