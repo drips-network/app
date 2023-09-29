@@ -32,7 +32,7 @@
       <IdentityBadge address={data.dripList.account.owner.address} />
     </div>
 
-    <SectionSkeleton loaded={Boolean(data.dripList)}>
+    <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
       <DripListCardRepresentational
         incomingSplitTotal={data.incomingSplitsTotal}
         {supportStreams}

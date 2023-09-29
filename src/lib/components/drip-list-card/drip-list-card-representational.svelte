@@ -148,7 +148,7 @@
 >
   <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
     <header class="px-6 pt-6 flex flex-col gap-4">
-      <div class="flex flex-wrap justify-between">
+      <div class="flex flex-col gap-4 sm:flex-row sm:justify-between">
         <h1 class="flex-1 min-w-0 truncate">
           <a
             href={dripListUrl}
