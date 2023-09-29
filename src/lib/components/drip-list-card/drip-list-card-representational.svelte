@@ -148,7 +148,11 @@
 >
   <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
     <header class="px-6 pt-6 flex flex-col gap-4">
-      <div class="flex flex-col gap-4 sm:flex-row sm:justify-between">
+      <div
+        class="flex gap-4 items-center {format === 'full'
+          ? 'flex-col sm:flex-row sm:justify-between'
+          : ''}"
+      >
         <h1 class="flex-1 min-w-0 truncate">
           <a
             href={dripListUrl}
@@ -177,7 +181,7 @@
 
     <div class="list">
       <div class="totals">
-        <div class="drip-icon">
+        <div class="drip-icon flex-shrink-0">
           <Drip />
         </div>
         <div class="typo-text tabular-nums total-streamed-badge">
@@ -188,8 +192,8 @@
           <span class="muted">&nbsp;total</span>
         </div>
         {#if supportersPile && supportersPile.length > 0}
-          <div in:fade|local={{ duration: 300 }} class="supporters">
-            <span class="muted">Supported by</span>
+          <div in:fade|local={{ duration: 300 }} class="supporters min-w-0">
+            <span class="truncate muted">Supported by</span>
             <Pile components={supportersPile ?? []} itemsClickable={true} />
           </div>
         {/if}

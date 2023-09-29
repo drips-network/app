@@ -140,7 +140,7 @@
   }}
 >
   {#if visibleDripLists}
-    <div class="grid gap-6 grid-cols-1 {visibleDripLists.length > 0 ? 'sm:grid-cols-2' : '1'}">
+    <div class="grid gap-6 grid-cols-1 {visibleDripLists.length > 0 ? 'lg:grid-cols-2' : ''}">
       {#each visibleDripLists as dripList}
         <DripListCard {dripList} format="thumblink" maxSplitsRows={4} />
       {/each}
