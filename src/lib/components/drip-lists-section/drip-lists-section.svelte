@@ -132,11 +132,14 @@
     emptyStateText: isSelf
       ? 'Create a Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects',
+    horizontalScroll: false,
   }}
 >
   {#if visibleDripLists}
-    {#each visibleDripLists as dripList}
-      <DripListCard {dripList} />
-    {/each}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {#each visibleDripLists as dripList}
+        <DripListCard {dripList} format="thumblink" />
+      {/each}
+    </div>
   {/if}
 </Section>

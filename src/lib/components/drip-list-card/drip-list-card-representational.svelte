@@ -25,10 +25,12 @@
   import type { Stream } from '$lib/stores/streams/types';
   import type getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import type { DripList } from '$lib/utils/metadata/types';
+  import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
 
   export let dripList: DripList;
-  $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
+  export let format: 'thumblink' | 'full' = 'full';
 
+  $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 
   export let representationalSplits:
@@ -136,67 +138,73 @@
   }
 </script>
 
-<section class="card">
-  <header class="px-6 pt-6 flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between">
-      <h1 class="flex-1 min-w-0 truncate">
-        <a
-          href={dripListUrl}
-          class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
-        >
-          {dripList.name}
-        </a>
-      </h1>
-      <div class="flex items-center gap-4">
-        <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
-        {#if isOwnList}
-          <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
-        {/if}
-      </div>
-    </div>
-    {#if (dripList.description ?? '').length > 0}
-      <TextExpandable>
-        {dripList.description}
-      </TextExpandable>
-    {/if}
-  </header>
-
-  <div class="list">
-    <div class="totals">
-      <div class="drip-icon">
-        <Drip />
-      </div>
-      <div class="typo-text tabular-nums total-streamed-badge">
-        {#if browser}
-          <!-- TODO: Include incoming splits -->
-          <AggregateFiatEstimate amounts={totalIncomingAmounts} />
-        {/if}
-        <span class="muted">&nbsp;total</span>
-      </div>
-      {#if supportersPile && supportersPile.length > 0}
-        <div in:fade|local={{ duration: 300 }} class="supporters">
-          <span class="muted">Supported by</span>
-          <Pile components={supportersPile ?? []} itemsClickable={true} />
+<svelte:element
+  this={format === 'thumblink' ? 'a' : 'section'}
+  href={format === 'thumblink' ? dripListUrl : undefined}
+  class="rounded-drip-lg shadow-low group transform transition duration-200 mouse:hover:shadow-md mouse:hover:-translate-y-2px focus-visible:shadow-md focus-visible:-translate-y-2px"
+>
+  <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
+    <header class="px-6 pt-6 flex flex-col gap-4">
+      <div class="flex flex-wrap justify-between">
+        <h1 class="flex-1 min-w-0 truncate">
+          <a
+            href={dripListUrl}
+            class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
+          >
+            {dripList.name}
+          </a>
+        </h1>
+        <div class="flex items-center gap-4">
+          {#if format === 'thumblink'}
+            <div
+              class="h-8 w-8 rounded-full flex items-center justify-center mouse:group-hover:bg-primary-level-1"
+            >
+              <ChevronRight />
+            </div>
+          {:else}
+            <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
+            {#if isOwnList}
+              <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+            {/if}
+          {/if}
         </div>
+      </div>
+      {#if (dripList.description ?? '').length > 0}
+        <TextExpandable>
+          {dripList.description}
+        </TextExpandable>
+      {/if}
+    </header>
+
+    <div class="list">
+      <div class="totals">
+        <div class="drip-icon">
+          <Drip />
+        </div>
+        <div class="typo-text tabular-nums total-streamed-badge">
+          {#if browser}
+            <!-- TODO: Include incoming splits -->
+            <AggregateFiatEstimate amounts={totalIncomingAmounts} />
+          {/if}
+          <span class="muted">&nbsp;total</span>
+        </div>
+        {#if supportersPile && supportersPile.length > 0}
+          <div in:fade|local={{ duration: 300 }} class="supporters">
+            <span class="muted">Supported by</span>
+            <Pile components={supportersPile ?? []} itemsClickable={true} />
+          </div>
+        {/if}
+      </div>
+      {#if representationalSplits}
+        <div class="splits-component"><Splits list={representationalSplits} /></div>
+      {:else}
+        Loading...
       {/if}
     </div>
-    {#if representationalSplits}
-      <div class="splits-component"><Splits list={representationalSplits} /></div>
-    {:else}
-      Loading...
-    {/if}
   </div>
-</section>
+</svelte:element>
 
 <style>
-  .card {
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
   .totals {
     display: flex;
     align-items: center;
