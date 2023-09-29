@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Twitter from 'radicle-design-system/icons/Twitter.svelte';
+  import X from 'radicle-design-system/icons/X.svelte';
   import Web from 'radicle-design-system/icons/Globe.svelte';
   import Ethereum from 'radicle-design-system/icons/Ethereum.svelte';
   import Github from 'radicle-design-system/icons/Github.svelte';
@@ -14,7 +14,7 @@
 
   const icons: { [key in SocialNetwork]: ComponentType } = {
     ethereum: Ethereum,
-    'com.twitter': Twitter,
+    'com.twitter': X,
     'com.github': Github,
     url: Web,
   };
@@ -30,32 +30,38 @@
   };
 
   $: prefix = prefixes[network];
-  $: url = `${prefix}${value}`;
+
+  // handle people putting full URLs in their 'com.twitter' ENS records
+  function parseURL(url: string) {
+    try {
+      const validURL = new URL(url);
+      return validURL.href;
+    } catch {
+      // assume they just put their handle
+      return `${prefix}${value}`;
+    }
+  }
+
+  function formatValue(input: string) {
+    try {
+      const url = new URL(input);
+      return url.host + (url.pathname !== '/' ? url.pathname : '');
+    } catch {
+      return input.replaceAll('http://', '').replaceAll('https://', '');
+    }
+  }
 </script>
 
-<div class="social-link">
-  <svelte:component this={icon} style="fill: var(--foreground)" />
+<div class="social-link flex gap-[0.375rem] text-foreground">
+  <svelte:component this={icon} style="fill: currentColor" />
   {#if prefix !== undefined}
-    <a target="_blank" rel="noreferrer" class="typo-text" href={url}
-      >{value.replaceAll('http://', '').replaceAll('https://', '')}</a
+    <a
+      target="_blank"
+      rel="noreferrer"
+      class="typo-text mouse:hover:underline"
+      href={parseURL(value)}>{formatValue(value)}</a
     >
   {:else if network === 'ethereum'}
-    <p class="typo-text tabular-nums"><Copyable {value}>{formatAddress(value)}</Copyable></p>
+    <div class="typo-text tabular-nums"><Copyable {value}>{formatAddress(value)}</Copyable></div>
   {/if}
 </div>
-
-<style>
-  .social-link {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  a,
-  p {
-    color: var(--color-foreground);
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-</style>

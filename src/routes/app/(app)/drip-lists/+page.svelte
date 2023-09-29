@@ -7,7 +7,7 @@
   import Button from '$lib/components/button/button.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import { goto } from '$app/navigation';
-  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
 
   const walletInitialized = walletStore.initialized;
 
@@ -37,7 +37,7 @@
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
-      <Button icon={Ledger} variant="primary" on:click={() => goto('/app/funder-onboarding')}
+      <Button icon={DripListIcon} variant="primary" on:click={() => goto('/app/funder-onboarding')}
         >Create a Drip List</Button
       >
     </svelte:fragment>

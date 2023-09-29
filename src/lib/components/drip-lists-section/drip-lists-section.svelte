@@ -2,7 +2,7 @@
   import type { DripList } from '$lib/utils/metadata/types';
   import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
-  import Ledger from 'radicle-design-system/icons/Ledger.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import { goto } from '$app/navigation';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
@@ -109,9 +109,9 @@
   bind:collapsed
   bind:collapsable
   header={{
-    icon: Ledger,
-    label: 'Drip Lists',
-    actionsDisabled: !dripLists,
+    icon: DripListIcon,
+    label: 'Drip List',
+    actionsDisabled: !dripLists || dripLists.length > 0,
     actions: isSelf
       ? [
           {

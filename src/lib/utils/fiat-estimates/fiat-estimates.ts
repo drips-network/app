@@ -99,6 +99,9 @@ export async function track(addresses: TokenAddress[]) {
     (i): i is [string, number] => i[1] !== undefined,
   );
 
+  // If knownIds is empty, we're done.
+  if (knownIds.length === 0) return;
+
   // Build a string of all known IDs
   const idString = knownIds.map((i) => i[1]).join(',');
 
