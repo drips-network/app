@@ -18,9 +18,11 @@
       <slot />
     </div>
   </div>
-  <div class="flex-1 flex justify-end">
-    <slot name="actions" />
-  </div>
+  {#if $$slots.actions}
+    <div class="flex-1 flex justify-end">
+      <slot name="actions" />
+    </div>
+  {/if}
 </div>
 
 <style>
