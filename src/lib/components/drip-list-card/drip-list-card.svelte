@@ -8,6 +8,8 @@
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
 
   export let dripList: DripList;
+  export let format: 'thumblink' | 'full' = 'full';
+  export let maxSplitsRows: number | undefined = undefined;
 
   /*
     On mount, ensure the streams store has fetched the owner's account so that we can be sure that
@@ -58,9 +60,11 @@
 </script>
 
 <DripListCardRepresentational
+  {format}
   {dripList}
   {representationalSplits}
   {incomingSplits}
   {supportStreams}
   {incomingSplitTotal}
+  {maxSplitsRows}
 />

@@ -48,6 +48,7 @@
   }
 
   img.outlined {
+    margin: 1px;
     box-shadow: var(--elevation-low);
   }
 
