@@ -85,23 +85,40 @@
   import SplitComponent from './components/split/split.svelte';
 
   export let list: Splits;
+  export let maxRows: number | undefined = undefined;
 
   // Sort splits by highest percentage first, with groups at the bottom always.
-  $: sortedList = list.sort((a, b) => {
-    if (a.type === 'split-group' && b.type === 'split-group') return 0;
-    if (a.type === 'split-group') return 1;
-    if (b.type === 'split-group') return -1;
+  const sortList = (list: Splits) =>
+    list.sort((a, b) => {
+      if (a.type === 'split-group' && b.type === 'split-group') return 0;
+      if (a.type === 'split-group') return 1;
+      if (b.type === 'split-group') return -1;
 
-    return b.weight - a.weight;
-  });
+      return b.weight - a.weight;
+    });
+
+  function truncateList(list: Splits) {
+    if (!maxRows || list.length === maxRows) {
+      return list;
+    }
+    const clipIndex = maxRows - 1;
+    const truncatedGroup: SplitGroup = {
+      type: 'split-group',
+      list: list.slice(clipIndex, list.length),
+      name: '',
+    };
+    return list.slice(0, clipIndex).concat(truncatedGroup);
+  }
+
+  $: sortedList = truncateList(sortList(list));
 
   export let linkToNewTab = false;
   export let isGroup = false;
 </script>
 
-<div class="splits-list" class:group={isGroup}>
+<ul class="splits-list" class:group={isGroup}>
   {#each sortedList as listItem, index}
-    <div class="split">
+    <li class="split">
       <SplitComponent
         isFirst={index === 0}
         isLast={index === sortedList.length - 1}
@@ -109,9 +126,9 @@
         isNested={isGroup}
         split={listItem}
       />
-    </div>
+    </li>
   {/each}
-</div>
+</ul>
 
 <style>
   .splits-list {

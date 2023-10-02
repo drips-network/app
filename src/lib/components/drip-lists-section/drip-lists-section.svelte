@@ -10,10 +10,13 @@
   import Section from '../section/section.svelte';
   import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
   import { AddressDriverClient } from 'radicle-drips';
+  import Button from '../button/button.svelte';
+  import Illustration from '../icons/✏️.svelte';
 
   export let accountId: string | undefined;
   export let collapsed = false;
   export let collapsable = false;
+  export let showCreateNewListCard = false;
 
   /** Set to true if the `visibleDripListAccountIds` setting from metadata should be ignored. */
   export let showHiddenDripLists = false;
@@ -103,6 +106,7 @@
   }
 
   $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
+  $: isGridFormat = (visibleDripLists?.length ?? 0) > 1;
 </script>
 
 <Section
@@ -110,8 +114,8 @@
   bind:collapsable
   header={{
     icon: DripListIcon,
-    label: 'Drip List',
-    actionsDisabled: !dripLists || dripLists.length > 0,
+    label: 'Drip Lists',
+    actionsDisabled: !dripLists,
     actions: isSelf
       ? [
           {
@@ -132,11 +136,31 @@
     emptyStateText: isSelf
       ? 'Create a Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects',
+    horizontalScroll: false,
   }}
 >
   {#if visibleDripLists}
-    {#each visibleDripLists as dripList}
-      <DripListCard {dripList} />
-    {/each}
+    <div class="grid gap-6 grid-cols-1 {visibleDripLists.length > 0 ? 'lg:grid-cols-2' : ''}">
+      {#each visibleDripLists as dripList}
+        <DripListCard {dripList} format="thumblink" maxSplitsRows={4} />
+      {/each}
+      {#if showCreateNewListCard}
+        <div
+          class="shadow-low rounded-drip-lg flex items-center justify-center p-1"
+          style:min-height="452px"
+        >
+          <div class="flex flex-col items-center gap-2 text-center">
+            <Illustration size={48} />
+            <h6 class="typo-text-bold">Got a new idea?</h6>
+            <p>You can create as many Drip Lists as you like.</p>
+            <div class="mt-2">
+              <Button icon={Plus} on:click={() => goto('/app/funder-onboarding')}
+                >Create a new Drip List</Button
+              >
+            </div>
+          </div>
+        </div>
+      {/if}
+    </div>
   {/if}
 </Section>
