@@ -224,10 +224,8 @@
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
   <div>
     <p>
-      Income from Drip Lists, projects, and streams becomes collectable on a weekly cycle. Your
-      collectable balance updates next on <span class="typo-text-bold"
-        >{formatDate(currentCycleEnd, 'onlyDay')}</span
-      >.
+      Income from Drip Lists, projects, and streams settles once per week. Your collectable balance
+      updates next on <span class="typo-text-bold">{formatDate(currentCycleEnd, 'onlyDay')}</span>.
     </p>
     <a
       class="typo-text-small"
@@ -239,10 +237,10 @@
   </div>
   {#if incomingEstimatesBySender.length > 0}
     <div class="squeeze-section">
-      <Toggleable label="Include funds streamed in current cycle" bind:toggled={squeezeEnabled}>
+      <Toggleable label="Include unsettled stream income" bind:toggled={squeezeEnabled}>
         <p>
-          You may collect stream income from specific senders already before the current cycle
-          concludes, but the network fee for collecting increases with each selected sender.
+          You may collect stream income from specific senders already before it settles, but the
+          network fee for collecting increases with each selected sender.
         </p>
         <AnnotationBox type="warning">
           The amounts shown below are estimated based on your system time so the value you collect
@@ -254,7 +252,7 @@
             multiselect
             bind:selected={selectedSqueezeSenderItems}
             searchable={false}
-            emptyStateText="No funds were streamed to you during the current cycle."
+            emptyStateText="You don't have any unsettled income from streams."
           />
         </div>
       </Toggleable>
@@ -266,7 +264,7 @@
         [
           squeezeEnabled
             ? {
-                title: `${selectedToken.symbol} streamed in current cycle`,
+                title: `Unsettled ${selectedToken.symbol}`,
                 subtitle: 'From incoming streams',
                 value:
                   '≈ ' +
@@ -280,7 +278,7 @@
             : undefined,
           balances.receivable > 0n
             ? {
-                title: `${selectedToken.symbol} streamed in concluded cycles`,
+                title: `Settled ${selectedToken.symbol}`,
                 subtitle: 'From incoming streams',
                 value: formatTokenAmount(
                   makeAmount(balances.receivable),
@@ -292,8 +290,8 @@
             : undefined,
           balances.splittable > 0n
             ? {
-                title: `Earned ${selectedToken.symbol}`,
-                subtitle: 'From Projects or Drip Lists',
+                title: `Settled ${selectedToken.symbol}`,
+                subtitle: 'From Drip Lists and projects',
                 value: formatTokenAmount(
                   makeAmount(balances.splittable),
                   selectedToken.decimals,
