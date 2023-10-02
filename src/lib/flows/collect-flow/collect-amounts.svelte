@@ -32,13 +32,11 @@
   import expect from '$lib/utils/expect';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { AddressDriverAccount } from '$lib/stores/streams/types';
 
   export let context: Writable<CollectFlowState>;
-
-  const restorer = $context.restorer;
 
   $: cycle = $context.currentDripsCycle ?? unreachable();
   $: currentCycleEnd = new Date(cycle.start.getTime() + cycle.durationMillis);
@@ -86,6 +84,15 @@
         return acc;
       }, []);
 
+  // Initially select all incoming squeeze senders by default, unless there's prior state.
+  onMount(() => {
+    if ($context.selectedSqueezeSenderItems?.length === 0 && !$context.squeezeEnabled) {
+      $context.selectedSqueezeSenderItems = incomingEstimatesBySender.map(
+        (e) => e.sender.accountId,
+      );
+    }
+  });
+
   let currentCycleSenders: Items;
   $: currentCycleSenders = Object.fromEntries(
     mapFilterUndefined(incomingEstimatesBySender, (estimate) => {
@@ -110,11 +117,8 @@
     }),
   );
 
-  let squeezeEnabled = restorer.restore('squeezeEnabled');
-  let selectedSqueezeSenderItems: string[] = restorer.restore('selectedSqueezeSenderItems');
-
-  $: totalSelectedSqueezeAmount = squeezeEnabled
-    ? selectedSqueezeSenderItems.reduce<bigint>(
+  $: totalSelectedSqueezeAmount = $context.squeezeEnabled
+    ? $context.selectedSqueezeSenderItems.reduce<bigint>(
         (acc, sender) =>
           acc +
           (incomingEstimatesBySender.find((e) => e.sender.accountId === sender)?.amount ??
@@ -145,8 +149,8 @@
           const { DRIPS, ADDRESS_DRIVER } = getNetworkConfig();
 
           let squeezeArgs: Awaited<ReturnType<typeof getSqueezeArgs>> | undefined;
-          if (squeezeEnabled && selectedSqueezeSenderItems.length > 0) {
-            squeezeArgs = await getSqueezeArgs(selectedSqueezeSenderItems, tokenAddress);
+          if ($context.squeezeEnabled && $context.selectedSqueezeSenderItems.length > 0) {
+            squeezeArgs = await getSqueezeArgs($context.selectedSqueezeSenderItems, tokenAddress);
           }
 
           const collectFlow = await AddressDriverPresets.Presets.createCollectFlow({
@@ -201,22 +205,18 @@
           context.update((c) => ({
             ...c,
             amountCollected,
-            squeezeEnabled,
             receipt,
           }));
 
           // The squeeze event should be indexed by now, so this should cause the dashboard to update
           // in the background to reflect the newly reduced incoming balance.
-          if (squeezeEnabled) await balancesStore.updateSqueezeHistory(transactContext.accountId);
+          if ($context.squeezeEnabled) {
+            await balancesStore.updateSqueezeHistory(transactContext.accountId);
+          }
         },
       }),
     );
   }
-
-  $: restorer.saveAll({
-    squeezeEnabled,
-    selectedSqueezeSenderItems,
-  });
 </script>
 
 <StepLayout>
@@ -224,35 +224,25 @@
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
   <div>
     <p>
-      Income from Drip Lists, projects, and streams settles once per week. Your collectable balance
-      updates next on <span class="typo-text-bold">{formatDate(currentCycleEnd, 'onlyDay')}</span>.
+      Earnings settle once per week. The next settlement date is <span class="typo-text-bold"
+        >{formatDate(currentCycleEnd, 'onlyDay')}</span
+      >.
     </p>
-    <a
-      class="typo-text-small"
-      target="_blank"
-      rel="noreferrer"
-      href="https://docs.drips.network/docs/streaming-and-splitting/manage-funds/collect-earnings"
-      >Learn more</a
-    >
   </div>
   {#if incomingEstimatesBySender.length > 0}
     <div class="squeeze-section">
-      <Toggleable label="Include unsettled stream income" bind:toggled={squeezeEnabled}>
-        <p>
-          You may collect stream income from specific senders already before it settles, but the
-          network fee for collecting increases with each selected sender.
-        </p>
+      <Toggleable label="Include unsettled stream earnings" bind:toggled={$context.squeezeEnabled}>
         <AnnotationBox type="warning">
-          The amounts shown below are estimated based on your system time so the value you collect
-          may slightly differ.
+          The network fee for collecting increases with each selected sender. Unsettled earnings are
+          estimates, so you may collect less than expected.
         </AnnotationBox>
         <div class="list-wrapper">
           <ListSelect
             items={currentCycleSenders}
             multiselect
-            bind:selected={selectedSqueezeSenderItems}
+            bind:selected={$context.selectedSqueezeSenderItems}
             searchable={false}
-            emptyStateText="You don't have any unsettled income from streams."
+            emptyStateText="You don't have any unsettled earnings from streams."
           />
         </div>
       </Toggleable>
@@ -262,36 +252,29 @@
     <LineItems
       lineItems={mapFilterUndefined(
         [
-          squeezeEnabled
-            ? {
-                title: `Unsettled ${selectedToken.symbol}`,
-                subtitle: 'From incoming streams',
-                value:
-                  '≈ ' +
-                  formatTokenAmount(
-                    makeAmount(totalSelectedSqueezeAmount ?? 0n),
-                    selectedToken.decimals,
-                    1n,
-                  ),
-                symbol: selectedToken.symbol,
-              }
-            : undefined,
           balances.receivable > 0n
             ? {
-                title: `Settled ${selectedToken.symbol}`,
-                subtitle: 'From incoming streams',
-                value: formatTokenAmount(
-                  makeAmount(balances.receivable),
-                  selectedToken.decimals,
-                  1n,
-                ),
+                title: `Streams`,
+                subtitle: $context.squeezeEnabled ? 'Including unsettled earnings' : undefined,
+                value:
+                  $context.squeezeEnabled && totalSelectedSqueezeAmount > 0n
+                    ? '≈ ' +
+                      formatTokenAmount(
+                        makeAmount(balances.receivable + (totalSelectedSqueezeAmount ?? 0n)),
+                        selectedToken.decimals,
+                        1n,
+                      )
+                    : formatTokenAmount(
+                        makeAmount(balances.receivable),
+                        selectedToken.decimals,
+                        1n,
+                      ),
                 symbol: selectedToken.symbol,
               }
             : undefined,
           balances.splittable > 0n
             ? {
-                title: `Settled ${selectedToken.symbol}`,
-                subtitle: 'From Drip Lists and projects',
+                title: 'Drip Lists and projects',
                 value: formatTokenAmount(
                   makeAmount(balances.splittable),
                   selectedToken.decimals,
@@ -311,7 +294,7 @@
             ? {
                 title: `Splitting ${getSplitPercent(1000000n - ownSplitsWeight, 'pretty')}`,
                 value:
-                  (squeezeEnabled ? '≈ ' : '') +
+                  ($context.squeezeEnabled ? '≈ ' : '') +
                   formatTokenAmount(
                     makeAmount(collectableAfterSplit - splittableAfterReceive),
                     selectedToken.decimals,
@@ -338,7 +321,7 @@
             title: 'You collect',
             subtitle: 'These funds will be sent to your wallet.',
             value:
-              (squeezeEnabled ? '≈ ' : '') +
+              ($context.squeezeEnabled && totalSelectedSqueezeAmount > 0n ? '≈ ' : '') +
               formatTokenAmount(makeAmount(collectableAfterSplit), selectedToken.decimals, 1n),
             symbol: selectedToken.symbol,
             disabled: collectableAfterSplit === 0n,
@@ -362,18 +345,6 @@
 <style>
   p {
     color: var(--color-foreground-level-6);
-    text-align: left;
-  }
-
-  .squeeze-section p {
-    margin-bottom: 1rem;
-  }
-
-  a {
-    color: var(--color-foreground-level-6);
-    text-decoration: underline;
-    display: block;
-    margin-top: 0.5rem;
     text-align: left;
   }
 
