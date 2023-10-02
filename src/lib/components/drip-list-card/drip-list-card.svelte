@@ -172,8 +172,8 @@
 
 <section class="card">
   <header class="px-6 pt-6 flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between">
-      <h1 class="flex-1 min-w-0 truncate">
+    <div class="flex flex-wrap gap-3 justify-between">
+      <h1 class="w-full sm:w-auto sm:flex-1 min-w-0 truncate">
         <a
           href={dripListUrl}
           class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"

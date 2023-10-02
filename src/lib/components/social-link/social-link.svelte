@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Twitter from 'radicle-design-system/icons/Twitter.svelte';
+  import X from 'radicle-design-system/icons/X.svelte';
   import Web from 'radicle-design-system/icons/Globe.svelte';
   import Ethereum from 'radicle-design-system/icons/Ethereum.svelte';
   import Github from 'radicle-design-system/icons/Github.svelte';
@@ -14,7 +14,7 @@
 
   const icons: { [key in SocialNetwork]: ComponentType } = {
     ethereum: Ethereum,
-    'com.twitter': Twitter,
+    'com.twitter': X,
     'com.github': Github,
     url: Web,
   };
