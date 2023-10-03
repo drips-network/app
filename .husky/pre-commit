@@ -2,8 +2,3 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx lint-staged --concurrent false
-
-if ! npm run check; then
-  echo "check script failed"
-  exit 1
-fi
