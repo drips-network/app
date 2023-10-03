@@ -7,7 +7,6 @@
     DripList,
     RepoDriverSplitReceiver,
   } from '$lib/utils/metadata/types';
-  import { onMount } from 'svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -36,8 +35,9 @@
   );
 
   $: isOwner =
-    $walletStore.dripsAccountId === project?.owner.accountId ||
-    $walletStore.dripsAccountId === dripList?.account.owner.accountId;
+    $walletStore.connected &&
+    ($walletStore.dripsAccountId === project?.owner.accountId ||
+      $walletStore.dripsAccountId === dripList?.account.owner.accountId);
 
   let supportUrl: string;
   $: {
@@ -50,10 +50,28 @@
     }
   }
 
-  onMount(async () => {
+  const { initialized } = walletStore;
+
+  let updating = true;
+  async function updateState() {
+    updating = true;
+
+    if (!$initialized) {
+      // Wait for wallet to be initialized before proceeding
+      await new Promise<void>((resolve) => {
+        const unsubscribe = initialized.subscribe((v) => {
+          if (v) {
+            unsubscribe();
+            resolve();
+          }
+        });
+      });
+    }
+
     const { address } = $walletStore;
     if (!address) {
       ownDripList = null;
+      updating = false;
       return;
     }
 
@@ -67,7 +85,13 @@
     } else {
       ownDripList = null;
     }
-  });
+
+    updating = false;
+  }
+  $: {
+    $walletStore.connected;
+    updateState();
+  }
 
   let loadingModal = false;
   async function handleSupportButton() {
@@ -99,7 +123,7 @@
 </script>
 
 <div class="become-supporter-card" class:is-owner={isOwner}>
-  {#if ownDripList === undefined || loadingModal}
+  {#if ownDripList === undefined || loadingModal || updating}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
