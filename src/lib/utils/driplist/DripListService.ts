@@ -37,6 +37,8 @@ import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import AddressDriverMetadataManager from '../metadata/AddressDriverMetadataManager';
+import type { Account } from '$lib/stores/streams/types';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -58,11 +60,11 @@ export default class DripListService {
   private _ownerAddress!: Address | undefined;
   private _nftDriverClient!: NFTDriverClient | undefined;
   private _repoDriverClient!: RepoDriverClient;
-  private _gitProjectService!: GitProjectService;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
+  private _addressDriverMetadataManager!: AddressDriverMetadataManager;
   private readonly _dripsSubgraphClient = getSubgraphClient();
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -76,7 +78,6 @@ export default class DripListService {
     const dripListService = new DripListService();
 
     dripListService._repoDriverClient = await getRepoDriverClient();
-    dripListService._gitProjectService = await GitProjectService.new();
     dripListService._addressDriverClient = await getAddressDriverClient();
 
     const { connected, signer } = get(wallet);
@@ -94,6 +95,7 @@ export default class DripListService {
     dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(
       dripListService._nftDriverClient,
     );
+    dripListService._addressDriverMetadataManager = new AddressDriverMetadataManager();
 
     return dripListService;
   }
@@ -240,6 +242,72 @@ export default class DripListService {
       approvalFlowTxs,
       normalFlowTxs,
     };
+  }
+
+  public async hideDripList(dripListAccountId: AccountId, ownerAccount: Account) {
+    const currentMetadata = this._addressDriverMetadataManager.buildAccountMetadata({
+      forAccount: ownerAccount,
+      address: ownerAccount.user.address,
+    });
+
+    let visibleDripListAccountIds: AccountId[] = [];
+    if (currentMetadata.visibleDripListAccountIds) {
+      // The user already specified visible drip lists, so we need to just remove the specific account ID.
+      visibleDripListAccountIds = currentMetadata.visibleDripListAccountIds.filter(
+        (id) => id !== dripListAccountId,
+      );
+    } else {
+      // The user hasn't specified visible drip lists yet, so we need to fetch all their owned drip lists
+      // and then remove the specific account ID.
+      const dripLists = await this.getByOwnerAddress(ownerAccount.user.address);
+
+      visibleDripListAccountIds = dripLists
+        .map((d) => d.account.accountId)
+        .filter((id) => {
+          return id !== dripListAccountId;
+        });
+    }
+
+    const newMetadata = {
+      ...currentMetadata,
+      visibleDripListAccountIds,
+    };
+
+    return await this._addressDriverMetadataManager.updateAccountMetadata(
+      newMetadata,
+      ownerAccount.lastIpfsHash,
+    );
+  }
+
+  public async showDripList(dripListAccountId: AccountId, ownerAccount: Account) {
+    const currentMetadata = this._addressDriverMetadataManager.buildAccountMetadata({
+      forAccount: ownerAccount,
+      address: ownerAccount.user.address,
+    });
+
+    let visibleDripListAccountIds: AccountId[] = [];
+    if (currentMetadata.visibleDripListAccountIds) {
+      // The user already specified visible drip lists, so we need to just append the specific account ID.
+      visibleDripListAccountIds = [...currentMetadata.visibleDripListAccountIds, dripListAccountId];
+    } else {
+      // The user hasn't specified visible drip lists yet, so we need to fetch all their owned drip lists
+      // and append the specific account ID.
+      // TODO: We don't need to fetch the entire lists here. Once we have drips-event-processor in production,
+      // we can only fetch the list IDs via GQL.
+      const dripLists = await this.getByOwnerAddress(ownerAccount.user.address);
+
+      visibleDripListAccountIds = [...dripLists.map((d) => d.account.accountId), dripListAccountId];
+    }
+
+    const newMetadata = {
+      ...currentMetadata,
+      visibleDripListAccountIds,
+    };
+
+    return await this._addressDriverMetadataManager.updateAccountMetadata(
+      newMetadata,
+      ownerAccount.lastIpfsHash,
+    );
   }
 
   public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {

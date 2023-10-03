@@ -26,6 +26,7 @@
   import type getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import type { DripList } from '$lib/utils/metadata/types';
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
+  import EyeClosed from 'radicle-design-system/icons/EyeClosed.svelte';
 
   export let dripList: DripList;
   export let format: 'thumblink' | 'full' = 'full';
@@ -165,6 +166,7 @@
           <ChevronRight />
         {:else}
           <div class="flex items-center gap-4">
+            <Button icon={EyeClosed} variant="ghost">Hide on profile</Button>
             <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
