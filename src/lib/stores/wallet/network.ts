@@ -41,7 +41,10 @@ function isSupportedChainId(chainId: number): chainId is ChainId {
 }
 
 const configuredChainId = Number(PUBLIC_NETWORK);
-assert(isSupportedChainId(configuredChainId));
+assert(
+  isSupportedChainId(configuredChainId),
+  'Missing or invalid PUBLIC_NETWORK env variable. See DEVELOPMENT.md for more information.',
+);
 
 export function isConfiguredChainId(chainId: number): boolean {
   return chainId === configuredChainId;
