@@ -4,7 +4,7 @@
   import formatAddress from '$lib/utils/format-address';
 
   export let listId: string;
-  export let listName: string | undefined = undefined;
+  export let listName: string | '##loading##' | undefined = undefined;
   export let owner: string | undefined = undefined;
 
   export let isLinked = true;
@@ -41,7 +41,8 @@
     <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
       <span
         >{#if username}<span class="text-foreground-level-5">{username}/</span
-          >{/if}{@html listName}</span
+          >{/if}{#if listName === '##loading##'}<span class="animate-pulse">...</span
+          >{:else}{listName}{/if}</span
       >
     </div>
   {/if}

@@ -46,7 +46,7 @@
 {:else}
   <!-- TODO: Donʼt presume any NFT account is a Drip List. -->
   <DripListBadge
-    listName={dripList ? dripList.name : '<span class="animate-pulse">...</span>'}
+    listName={dripList ? dripList.name : '##loading##'}
     listId={user.accountId}
     avatarSize="small"
     isLinked={false}
