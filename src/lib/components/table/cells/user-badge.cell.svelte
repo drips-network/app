@@ -7,7 +7,6 @@
   import DripListService from '$lib/utils/driplist/DripListService';
   import type { AccountId } from '$lib/utils/common-types';
   import type { DripList } from '$lib/utils/metadata/types';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
 
   export let context: CellContext<unknown, unknown>;
 
@@ -46,15 +45,10 @@
   <IdentityBadge address={user.address} />
 {:else}
   <!-- TODO: Donʼt presume any NFT account is a Drip List. -->
-  {#if dripList}
-    <DripListBadge
-      listName={dripList.name}
-      listId={user.accountId}
-      owner={dripList.account.owner.address}
-    />
-  {:else}
-    <div class="flex items-center gap-2">
-      <DripListIcon /> <span class="animate-pulse">...</span>
-    </div>
-  {/if}
+  <DripListBadge
+    listName={dripList ? dripList.name : '<span class="animate-pulse">...</span>'}
+    listId={user.accountId}
+    avatarSize="small"
+    isLinked={false}
+  />
 {/if}

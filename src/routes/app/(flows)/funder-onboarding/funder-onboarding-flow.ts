@@ -56,9 +56,6 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
                       component: DripListBadge,
                       props: {
                         listId: item.list.id,
-                        listName: item.list.name,
-                        owner: item.list.owner,
-                        showName: false,
                       },
                     };
                   }
