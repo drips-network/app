@@ -2,27 +2,27 @@
 
 @font-face {
   font-family: 'Inter Bold';
-  src: url('fonts/inter-bold-webfont.woff2');
+  src: url('/fonts/inter-bold-webfont.woff2');
 }
 
 @font-face {
   font-family: 'Inter SemiBold';
-  src: url('fonts/inter-semibold-webfont.woff2');
+  src: url('/fonts/inter-semibold-webfont.woff2');
 }
 
 @font-face {
   font-family: 'Inter Regular';
-  src: url('fonts/inter-regular-webfont.woff2');
+  src: url('/fonts/inter-regular-webfont.woff2');
 }
 
 @font-face {
   font-family: 'SourceCodePro Bold';
-  src: url('fonts/SourceCodePro-Bold.otf');
+  src: url('/fonts/SourceCodePro-Bold.otf');
 }
 
 @font-face {
   font-family: 'SourceCodePro Regular';
-  src: url('fonts/SourceCodePro-Regular.otf');
+  src: url('/fonts/SourceCodePro-Regular.otf');
 }
 
 :root {

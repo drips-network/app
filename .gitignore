@@ -9,6 +9,7 @@ node_modules
 static/fonts/*
 !static/fonts/.gitkeep
 !static/fonts/redaction
+!static/fonts/inter*
 static/twemoji/*
 !static/twemoji/.gitkeep
 /coverage
