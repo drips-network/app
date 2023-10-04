@@ -13,7 +13,7 @@
     getNFTDriverClient,
     getNFTDriverTxFactory,
   } from '$lib/utils/get-drips-clients';
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import type { DripList, GitProject } from '$lib/utils/metadata/types';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -33,10 +33,9 @@
   export let dripListId: string;
   export let representationalSplits: Splits;
   export let projectToAdd: GitProject | undefined = undefined;
+  export let dripListToAdd: DripList | undefined = undefined;
   export let listName: string;
   export let listDescription: string | undefined;
-
-  // TODO: Ensure these values are saved in case there's some TX error.
 
   function flattenRepresentationalSplits(list: Splits): Split[] {
     return list.reduce<Split[]>((acc, i) => {
@@ -83,6 +82,14 @@
 
   if (projectToAdd) {
     items[projectToAdd.source.url] = projectItem(projectToAdd);
+  }
+
+  if (dripListToAdd) {
+    items[dripListToAdd.account.accountId] = dripListItem(
+      dripListToAdd.name,
+      dripListToAdd.account.accountId,
+      dripListToAdd.account.owner.accountId,
+    );
   }
 
   let dripList: DripListConfig = {

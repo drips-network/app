@@ -7,7 +7,6 @@
     DripList,
     RepoDriverSplitReceiver,
   } from '$lib/utils/metadata/types';
-  import { onMount } from 'svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -20,15 +19,59 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import buildUrl from '$lib/utils/build-url';
+  import type { SplitsEntry } from 'radicle-drips';
 
-  export let project: ClaimedGitProject;
+  export let project: ClaimedGitProject | undefined = undefined;
+  export let dripList: DripList | undefined = undefined;
 
-  let dripList: DripList | null | undefined = undefined;
-  let isSupportingProject: boolean | undefined = undefined;
-  onMount(async () => {
+  let ownDripList: DripList | null | undefined = undefined;
+  let ownDripListSplits: SplitsEntry[] | undefined = undefined;
+
+  let isSupporting: boolean | undefined;
+  $: isSupporting = ownDripListSplits?.some(
+    (s) =>
+      s.accountId === project?.repoDriverAccount.accountId ||
+      s.accountId === dripList?.account.accountId,
+  );
+
+  $: isOwner =
+    $walletStore.connected &&
+    ($walletStore.dripsAccountId === project?.owner.accountId ||
+      $walletStore.dripsAccountId === dripList?.account.owner.accountId);
+
+  let supportUrl: string;
+  $: {
+    if (project) {
+      supportUrl = project.source.url;
+    } else if (dripList) {
+      supportUrl = `https://drips.network/app/drip-lists/${dripList.account.accountId}`;
+    } else {
+      throw new Error('You must populate either the `project` or `dripList` prop.');
+    }
+  }
+
+  const { initialized } = walletStore;
+
+  let updating = true;
+  async function updateState() {
+    updating = true;
+
+    if (!$initialized) {
+      // Wait for wallet to be initialized before proceeding
+      await new Promise<void>((resolve) => {
+        const unsubscribe = initialized.subscribe((v) => {
+          if (v) {
+            unsubscribe();
+            resolve();
+          }
+        });
+      });
+    }
+
     const { address } = $walletStore;
     if (!address) {
-      dripList = null;
+      ownDripList = null;
+      updating = false;
       return;
     }
 
@@ -37,38 +80,41 @@
 
     if (result[0]) {
       const subgraph = getSubgraphClient();
-      const dripListSplits = await subgraph.getSplitsConfigByAccountId(result[0].account.accountId);
-
-      isSupportingProject = Boolean(
-        dripListSplits.find((s) => s.accountId === project.repoDriverAccount.accountId),
-      );
-      dripList = result[0];
+      ownDripListSplits = await subgraph.getSplitsConfigByAccountId(result[0].account.accountId);
+      ownDripList = result[0];
     } else {
-      dripList = null;
+      ownDripList = null;
     }
-  });
+
+    updating = false;
+  }
+  $: {
+    $walletStore.connected;
+    updateState();
+  }
 
   let loadingModal = false;
   async function handleSupportButton() {
-    if (!dripList) {
-      goto(buildUrl('/app/funder-onboarding', { projectToAdd: project.source.url }));
+    if (!ownDripList) {
+      goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
     } else {
       // TODO: Refresh profile state after becoming a supporter
       loadingModal = true;
       const representationalSplits = await getRepresentationalSplitsForAccount(
-        dripList.account.accountId,
-        dripList.projects.filter((s): s is RepoDriverSplitReceiver => 'source' in s),
+        ownDripList.account.accountId,
+        ownDripList.projects.filter((s): s is RepoDriverSplitReceiver => 'source' in s),
       );
 
       modal.show(
         Stepper,
         undefined,
         editDripListSteps(
-          dripList.account.accountId,
-          dripList.name,
-          dripList.description,
+          ownDripList.account.accountId,
+          ownDripList.name,
+          ownDripList.description,
           representationalSplits,
           project,
+          dripList,
         ),
       );
       loadingModal = false;
@@ -76,8 +122,8 @@
   }
 </script>
 
-<div class="become-supporter-card">
-  {#if dripList === undefined || loadingModal}
+<div class="become-supporter-card" class:is-owner={isOwner}>
+  {#if ownDripList === undefined || loadingModal || updating}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
@@ -88,35 +134,28 @@
       <div class="circle">
         <Heart style="height: 3rem; width: 3rem; fill: var(--color-primary)" />
       </div>
-      <div>
-        <ProjectAvatar {project} size="large" outline />
-      </div>
+      {#if project}
+        <div>
+          <ProjectAvatar {project} size="large" outline />
+        </div>
+      {/if}
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    {#if isSupportingProject}
-      You're already supporting <span class="typo-text-bold">{project.source.repoName}</span> with your
-      Drip List.
+    {#if isSupporting}
+      You're already supporting this with your Drip List.
     {:else}
-      Add <span class="typo-text-bold">{project.source.repoName}</span> to your Drip List to support
-      this project.
+      Add this {project ? 'project' : ''} to your Drip List to flexibly support it with an ongoing contribution.
     {/if}
   </p>
   <Button
     on:click={handleSupportButton}
-    disabled={isSupportingProject}
+    disabled={isSupporting || isOwner}
     size="large"
     icon={Plus}
-    variant="primary">{dripList === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
+    variant="primary">{ownDripList === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
   >
-  <div class="benefits typo-text-small">
-    {#if isSupportingProject}You're getting…{:else}Youʼll get…{/if}
-    <div class="benefit">
-      <Heart />
-      <span>…to feel good about yourself, because you're supporting open-source software.</span>
-    </div>
-  </div>
 </div>
 
 <style>
@@ -177,16 +216,9 @@
     box-shadow: var(--elevation-low);
   }
 
-  .benefits {
-    color: var(--color-foreground-level-5);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .benefits > .benefit {
-    display: flex;
-    gap: 0.5rem;
+  .is-owner {
+    opacity: 0.75;
+    pointer-events: none;
   }
 
   p {
