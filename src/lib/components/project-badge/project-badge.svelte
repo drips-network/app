@@ -3,14 +3,11 @@
   import Tooltip from '../tooltip/tooltip.svelte';
   import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
-  import buildProjectUrlFromSource from '$lib/utils/build-project-url';
+  import { buildProjectUrl } from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import {
-    VerificationStatus,
-    type GitProject,
-    type UnclaimedGitProject,
-  } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
+  import type { GitProject, UnclaimedGitProject } from '$lib/utils/git-project/types';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   export let project: GitProject;
   export let tooltip = true;
@@ -22,30 +19,29 @@
   let unclaimedProject: UnclaimedGitProject;
   $: unclaimedProject = {
     ...project,
-    owner: undefined,
-    color: undefined,
-    description: undefined,
-    emoji: undefined,
-    claimed: false,
-    verificationStatus: VerificationStatus.NOT_STARTED,
+    verificationStatus: ProjectVerificationStatus.Unclaimed,
   };
 
   $: processedProject = forceUnclaimed ? unclaimedProject : project;
 </script>
 
-<PrimaryColorThemer colorHex={processedProject.claimed ? processedProject.color : undefined}>
+<PrimaryColorThemer
+  colorHex={processedProject.verificationStatus === ProjectVerificationStatus.Claimed
+    ? processedProject.color
+    : undefined}
+>
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="project-badge flex gap-2 items-center typo-text"
       href={linkTo === 'project-page'
-        ? buildProjectUrlFromSource(project.source)
-        : buildExternalUrl(processedProject.source.url)}
+        ? buildProjectUrl(project.forge, project.ownerName, project.repoName)
+        : buildExternalUrl(processedProject.url)}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}
         <div class="avatar-and-forge">
-          {#if !forceUnclaimed && project.claimed}
+          {#if !forceUnclaimed && project.verificationStatus === ProjectVerificationStatus.Claimed}
             <div>
               <ProjectAvatar project={unclaimedProject} />
             </div>

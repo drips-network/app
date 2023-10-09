@@ -7,7 +7,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
-  import { ProjectService } from '$lib/utils/git-project/ProjectService';
+  import { GitProjectService } from '$lib/utils/project/GitProjectService';
   import type { ClaimedGitProject } from '$lib/utils/git-project/types';
 
   export let address: string | undefined;
@@ -21,7 +21,7 @@
 
   async function updateProjects() {
     try {
-      const service = ProjectService.new();
+      const service = await GitProjectService.new();
 
       assert(address);
       projects = await service.getProjectsByOwner(address);

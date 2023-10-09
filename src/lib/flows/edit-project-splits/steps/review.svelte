@@ -11,7 +11,7 @@
   import type { State } from '../edit-project-splits-steps';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import GitProjectTxBuilder from '$lib/utils/project/GitProjectTxBuilder';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -35,10 +35,10 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const gitProjectService = await GitProjectService.new();
+          const gitProjectTxBuilder = await GitProjectTxBuilder.new();
 
-          const batch = await gitProjectService.buildUpdateSplitsBatchTx(
-            $context.project.repoDriverAccount.accountId,
+          const batch = await gitProjectTxBuilder.buildUpdateSplitsBatchTx(
+            $context.project.id,
             $context.highLevelPercentages,
             $context.maintainerSplits,
             $context.dependencySplits,

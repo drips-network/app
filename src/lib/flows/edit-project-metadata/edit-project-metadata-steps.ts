@@ -2,8 +2,8 @@ import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { get } from 'svelte/store';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import SetNewMetadata from './steps/set-new-metadata.svelte';
+import type { ClaimedGitProject } from '$lib/utils/git-project/types';
 
 export default (project: ClaimedGitProject) => ({
   context: undefined,

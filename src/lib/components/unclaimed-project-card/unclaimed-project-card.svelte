@@ -1,7 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
   import ProjectBadge from '../project-badge/project-badge.svelte';
-  import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
   import Token from '../token/token.svelte';
   import KeyValuePair from '../key-value-pair/key-value-pair.svelte';
   import Pile from '../pile/pile.svelte';
@@ -12,6 +11,7 @@
   import Button from '../button/button.svelte';
   import { createEventDispatcher } from 'svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import type { UnclaimedGitProject } from '$lib/utils/git-project/types';
 
   const dispatch = createEventDispatcher();
 

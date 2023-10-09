@@ -3,7 +3,6 @@ import type {
   DripListSplit,
   ProjectSplit,
 } from '$lib/components/splits/splits.svelte';
-import GitProjectService from '../project/GitProjectService';
 import { AddressDriverClient } from 'radicle-drips';
 import { getSubgraphClient } from '../get-drips-clients';
 import type {
@@ -13,6 +12,7 @@ import type {
 } from '../metadata/types';
 import assert from '$lib/utils/assert';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
+import { GitProjectService } from '../project/GitProjectService';
 
 type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
@@ -53,7 +53,7 @@ export async function buildRepresentationalSplits(
   splits: { account: { accountId: string }; weight: number }[],
   splitsMeta: (RepoDriverSplitReceiver | AddressDriverSplitReceiver | DripListSplitReceiver)[] = [],
 ): Promise<RepresentationalSplit[]> {
-  const gitProjectService = await GitProjectService.new();
+  const gitProjectTxBuilder = await GitProjectService.new();
   const nftDriverMetadata = new NftDriverMetadataManager();
   const subgraph = getSubgraphClient();
 
@@ -62,11 +62,7 @@ export async function buildRepresentationalSplits(
       const matchingMetadata = splitsMeta.find((v) => v.account.accountId === s.account.accountId);
 
       if (matchingMetadata?.type === 'repo') {
-        const project = await gitProjectService.getByAccountId(
-          s.account.accountId,
-          true,
-          matchingMetadata?.source,
-        );
+        const project = await gitProjectTxBuilder.getProjectById(s.account.accountId);
 
         assert(project);
 

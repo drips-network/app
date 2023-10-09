@@ -4,7 +4,6 @@
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -13,8 +12,8 @@
     Splits,
     Split,
     AddressSplit,
-    ProjectSplit,
     DripListSplit,
+    ProjectSplit,
   } from '$lib/components/splits/splits.svelte';
   import SplitsComponent from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -43,13 +42,15 @@
   import Link from 'radicle-design-system/icons/Link.svelte';
   import Copyable from '$lib/components/copyable/copyable.svelte';
   import { browser } from '$app/environment';
+  import type { ClaimedGitProject, GitProject as Project } from '$lib/utils/git-project/types';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   interface Amount {
     tokenAddress: string;
     amount: bigint;
   }
 
-  export let project: GitProject;
+  export let project: Project;
 
   export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
@@ -64,7 +65,7 @@
   export let incomingSplits: ReturnType<typeof getIncomingSplits>;
 
   $: ownAccountId = $walletStore.dripsAccountId;
-  $: isOwnProject = ownAccountId === project.owner?.accountId;
+  $: isOwnProject = ownAccountId === (project as ClaimedGitProject).ownerAccountId ?? undefined;
 
   function flattenSplits(list: Splits): Split[] {
     return list.reduce<Split[]>((acc, i) => {
@@ -107,20 +108,26 @@
 </script>
 
 <HeadMeta
-  title="{project.source.ownerName}/{project.source.repoName}"
-  description="Support {project.source
-    .repoName} on Drips and help make Open-Source Software sustainable."
+  title="{project.ownerName}/{project.repoName}"
+  description="Support {project.repoName} on Drips and help make Open-Source Software sustainable."
 />
 
-<PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
-  <div class="project-profile" class:claimed={project.claimed}>
+<PrimaryColorThemer
+  colorHex={project.verificationStatus === ProjectVerificationStatus.Claimed
+    ? project.color
+    : undefined}
+>
+  <div
+    class="project-profile"
+    class:claimed={project.verificationStatus === ProjectVerificationStatus.Claimed}
+  >
     <div class="header">
-      {#if project.owner}
+      {#if project.verificationStatus === ProjectVerificationStatus.Claimed}
         <div class="owner">
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
             >Project claimed by</span
           >
-          <IdentityBadge address={project.owner.address} />
+          <IdentityBadge address={project.ownerAddress} />
         </div>
       {:else}
         <div class="unclaimed-project-notice">
@@ -149,7 +156,7 @@
                   icon={Registered}
                   variant="primary"
                   on:click={() =>
-                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                    goto(buildUrl('/app/claim-project', { projectToAdd: project.url }))}
                   >Claim project</Button
                 >
               </div>
@@ -159,16 +166,16 @@
       {/if}
       <div class="project-profile-header">
         <ProjectProfileHeader {project} />
-        {#if project.claimed && isOwnProject}
+        {#if project.verificationStatus === ProjectVerificationStatus.Claimed && isOwnProject}
           <Button
             icon={Pen}
             on:click={() =>
-              project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
-            >Edit</Button
+              project.verificationStatus === ProjectVerificationStatus.Claimed &&
+              modal.show(Stepper, undefined, editProjectMetadataSteps(project))}>Edit</Button
           >
         {/if}
       </div>
-      {#if project.claimed}
+      {#if project.verificationStatus === ProjectVerificationStatus.Claimed}
         {#await Promise.all([earnedFunds, splits])}
           <div class="stats loading">
             <Spinner />
@@ -204,8 +211,8 @@
       {/if}
     </div>
     <div class="content">
-      <Developer accountId={project.repoDriverAccount.accountId} />
-      {#if project.owner}
+      <Developer accountId={project.id} />
+      {#if project.verificationStatus === ProjectVerificationStatus.Claimed}
         <div class="section">
           {#if splits}
             {#await splits}
@@ -219,7 +226,7 @@
                   ? [
                       {
                         handler: () =>
-                          project.claimed &&
+                          project.verificationStatus === ProjectVerificationStatus.Claimed &&
                           result &&
                           modal.show(Stepper, undefined, editProjectSplitsSteps(project, result)),
                         label: 'Edit',
@@ -280,7 +287,7 @@
                   unclaimedTokensExpanded={result.length > 0}
                   showClaimButton
                   on:claimButtonClick={() =>
-                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                    goto(buildUrl('/app/claim-project', { projectToAdd: project.url }))}
                 />
               </div>
             </SectionSkeleton>
@@ -291,7 +298,7 @@
       {/if}
       <SupportersSection type="project" {incomingSplits} />
     </div>
-    {#if project.owner}
+    {#if project.verificationStatus === ProjectVerificationStatus.Claimed}
       <aside>
         <div class="become-supporter-card">
           <SupportCard {project} />

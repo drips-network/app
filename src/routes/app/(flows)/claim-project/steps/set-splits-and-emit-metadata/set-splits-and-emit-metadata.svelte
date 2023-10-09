@@ -4,7 +4,7 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import GitProjectTxBuilder from '$lib/utils/project/GitProjectTxBuilder';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -16,9 +16,9 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const gitProjectService = await GitProjectService.new();
+          const gitProjectTxBuilder = await GitProjectTxBuilder.new();
 
-          const setSplitsAndEmitMetadataBatch = await gitProjectService.buildBatchTx($context);
+          const setSplitsAndEmitMetadataBatch = await gitProjectTxBuilder.buildBatchTx($context);
 
           return { callerClient: await getCallerClient(), setSplitsAndEmitMetadataBatch };
         },

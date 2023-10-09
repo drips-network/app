@@ -9,7 +9,7 @@ import ens from '$lib/stores/ens';
 import { isAddress } from 'ethers/lib/utils';
 import { AddressDriverClient } from 'radicle-drips';
 import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
-import GitProjectService from '$lib/utils/project/GitProjectService';
+import { GitProjectService } from '$lib/utils/project/GitProjectService';
 
 export enum SearchItemType {
   PROFILE,

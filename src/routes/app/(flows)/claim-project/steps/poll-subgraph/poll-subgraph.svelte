@@ -3,12 +3,12 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
-  import { VerificationStatus } from '$lib/utils/metadata/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { ethers } from 'ethers';
   import assert from '$lib/utils/assert';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
+  import { GitProjectService } from '$lib/utils/project/GitProjectService';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -44,15 +44,12 @@
         return;
       }
 
-      const gitProjectService = await GitProjectService.new();
-      const project = await gitProjectService.getByAccountId(accountId, false);
+      const gitProjectTxBuilder = await GitProjectService.new();
+      const project = await gitProjectTxBuilder.getProjectById(accountId);
 
-      if (!project?.claimed) {
+      if (project?.verificationStatus !== ProjectVerificationStatus.Claimed) {
         if (Date.now() - start >= timeout) {
-          throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
-        }
-        if (project?.verificationStatus === VerificationStatus.FAILED) {
-          throw new Error('Project verification failed');
+          throw new Error('Project verification failed after 5 minutes');
         }
       }
 

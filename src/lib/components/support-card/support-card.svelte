@@ -2,11 +2,7 @@
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type {
-    ClaimedGitProject,
-    DripList,
-    RepoDriverSplitReceiver,
-  } from '$lib/utils/metadata/types';
+  import type { DripList, RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -20,6 +16,7 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import buildUrl from '$lib/utils/build-url';
   import type { SplitsEntry } from 'radicle-drips';
+  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
 
   export let project: ClaimedGitProject | undefined = undefined;
   export let dripList: DripList | undefined = undefined;
@@ -29,20 +26,18 @@
 
   let isSupporting: boolean | undefined;
   $: isSupporting = ownDripListSplits?.some(
-    (s) =>
-      s.accountId === project?.repoDriverAccount.accountId ||
-      s.accountId === dripList?.account.accountId,
+    (s) => s.accountId === project?.id || s.accountId === dripList?.account.accountId,
   );
 
   $: isOwner =
     $walletStore.connected &&
-    ($walletStore.dripsAccountId === project?.owner.accountId ||
+    ($walletStore.dripsAccountId === project?.ownerAccountId ||
       $walletStore.dripsAccountId === dripList?.account.owner.accountId);
 
   let supportUrl: string;
   $: {
     if (project) {
-      supportUrl = project.source.url;
+      supportUrl = project.url;
     } else if (dripList) {
       supportUrl = `https://drips.network/app/drip-lists/${dripList.account.accountId}`;
     } else {

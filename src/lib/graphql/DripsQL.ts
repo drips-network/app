@@ -6,7 +6,7 @@ import {
   type DocumentNode,
 } from '@apollo/client';
 import type { GitProject, ProjectWhereInput } from './generated/graphql';
-import type { ProjectId } from '$lib/utils/common-types';
+import type { ProjectId } from '$lib/utils/project/types';
 
 export default class DripsQL {
   private DRIPS_GRAPHQL_URL = 'https://drips-api.ey.r.appspot.com/';
@@ -32,6 +32,7 @@ export default class DripsQL {
           name
           ownerAddress
           ownerName
+          ownerAccountId
           repoName
           url
           verificationStatus
@@ -64,6 +65,7 @@ export default class DripsQL {
                   name
                   ownerAddress
                   ownerName
+                  repoName
                   url
                   verificationStatus
                 }
@@ -100,6 +102,7 @@ export default class DripsQL {
           name
           ownerAddress
           ownerName
+          ownerAccountId
           repoName
           url
           verificationStatus
@@ -132,6 +135,7 @@ export default class DripsQL {
                   name
                   ownerAddress
                   ownerName
+                  repoName
                   url
                   verificationStatus
                 }

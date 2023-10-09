@@ -3,7 +3,6 @@ import type {
   ListItem,
 } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import { makeStep } from '$lib/components/stepper/types';
-import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
 import type {
@@ -19,6 +18,7 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
 import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
 import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
+import type { ClaimedGitProject } from '$lib/utils/git-project/types';
 
 type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
@@ -54,7 +54,7 @@ function mapRepresentationalSplits(input: RepresentationalSplit[]) {
       case 'drip-list-split':
         return split.listId;
       case 'project-split':
-        return split.project.source.url;
+        return split.project.url;
     }
   };
 
@@ -144,7 +144,7 @@ export default (
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
         message:
-          'Your Project Splits have been updated sucessfully. Please refresh your dashboard to see the changes.',
+          'Your Project Splits have been updated successfully. Please refresh your dashboard to see the changes.',
       },
     }),
   ],

@@ -1,160 +1,35 @@
-import {
-  Forge,
-  AddressDriverClient,
-  type RepoAccount,
-  type RepoDriverClient,
-  RepoDriverTxFactory,
-  Utils,
-  type SplitsReceiverStruct,
-  DripsTxFactory,
-} from 'radicle-drips';
-import {
-  getAddressDriverClient,
-  getDripsTxFactory,
-  getRepoDriverClient,
-  getRepoDriverTxFactory,
-  getSubgraphClient,
-} from '../get-drips-clients';
-import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
-import {
-  VerificationStatus,
-  type ClaimedGitProject,
-  type GitProject,
-  type UnclaimedGitProject,
-  type AccountId,
-  type Source,
-} from '../metadata/types';
-import type { RepoAccountStatus } from './types';
+import type DripsQL from '$lib/graphql/DripsQL';
+import { Forge as ApiForge, ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 import type { Address } from '../common-types';
-import relevantTokens from '../drips/relevant-tokens';
-import fetchBalancesForTokens from '../drips/fetch-balances-for-tokens';
-import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import { isAddress } from 'ethers/lib/utils';
-import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
-import { BigNumber, type ContractTransaction, type PopulatedTransaction } from 'ethers';
-import { getRepoByUrl as getGithubRepoByUrl } from '../github/github';
-import { get } from 'svelte/store';
-import wallet from '$lib/stores/wallet/wallet.store';
-import assert from '$lib/utils/assert';
+import { getDripsGraphQlClient, getRepoDriverClient } from '../get-drips-clients';
+import singleOrDefault from '../linq';
 import { isValidGitUrl } from '../is-valid-git-url';
-import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
-import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
-import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
+import { Forge as ContractForge, type RepoDriverClient } from 'radicle-drips';
+import { getRepoByUrl as getGithubRepoByUrl } from '../github/github';
+import { toContractForge } from './git-project-utils';
+import type { ClaimedGitProject, GitProject, ProjectId, UnclaimedGitProject } from './types';
 
-// TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
-export default class GitProjectService {
-  private _dripsTxFactory!: DripsTxFactory;
-  private _repoDriverClient!: RepoDriverClient;
-  private _repoDriverTxFactory!: RepoDriverTxFactory;
-  private _addressDriverClient!: AddressDriverClient;
-  private readonly _dripsSubgraphClient = getSubgraphClient();
-  private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
+export class GitProjectService {
+  private readonly _dripsQL: DripsQL;
+  private readonly _repoDriverClient: RepoDriverClient;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
-
-  public static async new(): Promise<GitProjectService> {
-    const gitProjectService = new GitProjectService();
-
-    gitProjectService._repoDriverClient = await getRepoDriverClient();
-    gitProjectService._addressDriverClient = await getAddressDriverClient();
-    gitProjectService._dripsTxFactory = await getDripsTxFactory();
-
-    const { connected, signer } = get(wallet);
-
-    if (connected) {
-      assert(signer, 'Signer address is undefined.');
-
-      gitProjectService._repoDriverTxFactory = await getRepoDriverTxFactory();
-    }
-
-    return gitProjectService;
+  private constructor(dripsQL: DripsQL, repoDriverClient: RepoDriverClient) {
+    this._dripsQL = dripsQL;
+    this._repoDriverClient = repoDriverClient;
   }
 
-  /**
-   * Returns the `GitProject` for the given URL.
-   * @param url The git URL.
-   * @param shouldVerifyState Whether to verify the state of the project on-chain and the subgraph is in sync.
-   * If you just created the project, you should set this to `false` as it takes a while for the subgraph to index.
-   * @returns The on-chain `GitProject`. If the project does not exist on-chain, it returns an `UnclaimedGitProject`.
-   * @throws if the URL is invalid.
-   */
-  public async getByUrl(url: string, shouldVerifyState = true): Promise<GitProject> {
-    if (!isValidGitUrl(url)) {
-      throw new Error(`Invalid git URL: ${url}`);
-    }
+  public static async new(
+    dripsQL?: DripsQL,
+    repoDriverClient?: RepoDriverClient,
+  ): Promise<GitProjectService> {
+    dripsQL = dripsQL ?? getDripsGraphQlClient();
+    repoDriverClient = repoDriverClient ?? (await getRepoDriverClient());
 
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
-    const projectName = `${username}/${repoName}`;
-
-    const accountId = await this._repoDriverClient.getAccountId(forge, projectName);
-
-    const onChainProject = await this.getByAccountId(accountId, shouldVerifyState);
-
-    // If the project doesnʼt exist on-chain yet, return an unclaimed project.
-    if (!onChainProject) {
-      const unclaimedProject = {
-        claimed: false,
-        owner: undefined,
-        repoDriverAccount: {
-          accountId,
-          driver: 'repo',
-        },
-        verificationStatus: 'NOT_STARTED',
-        source: GitProjectService.populateSource(forge, repoName, username),
-      } as UnclaimedGitProject;
-
-      return unclaimedProject;
-    }
-
-    return onChainProject;
-  }
-
-  public async getAccountIdByUrl(url: string): Promise<AccountId> {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
-    const projectName = `${username}/${repoName}`;
-
-    return this._repoDriverClient.getAccountId(forge, projectName);
-  }
-
-  public async getAllByOwner(address: Address): Promise<ClaimedGitProject[]> {
-    const res = await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountsOwnedByAddress(
-      address,
-    );
-
-    const promises = res.map((r) => this._mapRepoAccountToGitProject(r));
-
-    return (await Promise.all(promises)).filter(
-      (a): a is ClaimedGitProject => a !== null && Boolean(a.owner),
-    );
-  }
-
-  // TODO: use `unclaimed-funds.ts` when merged.
-  public async getUnclaimedFunds(url: string): Promise<
-    {
-      tokenAddress: string;
-      amount: bigint;
-    }[]
-  > {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
-    const projectName = `${username}/${repoName}`;
-
-    const accountId = await this._repoDriverClient.getAccountId(forge, projectName);
-
-    const tokenAddresses = await Promise.all([relevantTokens('splittable', accountId)]);
-
-    const balances = await Promise.all([
-      fetchBalancesForTokens('splittable', tokenAddresses[0], accountId),
-    ]);
-
-    return balances[0].map((b) => ({
-      tokenAddress: b.tokenAddress,
-      amount: b.splittableAmount,
-    }));
+    return new GitProjectService(dripsQL, repoDriverClient);
   }
 
   public static deconstructUrl(url: string): {
-    forge: Forge;
+    forge: ContractForge;
     username: string;
     repoName: string;
   } {
@@ -170,10 +45,10 @@ export default class GitProjectService {
     const parsedURL = new URL(url);
 
     // TODO: support more forges.
-    let forge: Forge;
-    switch (parsedURL.hostname) {
+    let forge: ApiForge;
+    switch (parsedURL.hostname.toLowerCase()) {
       case 'github.com':
-        forge = Forge.GitHub;
+        forge = ApiForge.GitHub;
         break;
       default:
         throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
@@ -184,81 +59,48 @@ export default class GitProjectService {
       : parsedURL.pathname;
     const [username, repoName] = name.split('/');
 
-    return { forge, username, repoName };
+    return { forge: toContractForge(forge), username, repoName };
   }
 
-  /**
-   * Returns the `GitProject` for the given user ID.
-   * @param accountId The user ID.
-   * @param shouldVerifyState Whether to verify the state of the project on-chain and the subgraph is in sync.
-   * If you just created the project, you should set this to `false` as it takes a while for the subgraph to index.
-   * @returns The on-chain `GitProject`. If the project does not exist on-chain, it returns `null`.
-   * @throws if the user ID is invalid.
-   */
-  public async getByAccountId(
-    accountId: AccountId,
-    shouldVerifyState = true,
-    source: Source | null = null,
-  ): Promise<GitProject | null> {
-    const onChainProject: RepoAccount | null =
-      await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountById(accountId);
+  public async getProjectsByOwner(ownerAddress: Address): Promise<ClaimedGitProject[]> {
+    return await this._dripsQL.getProjects({
+      ownerAddress,
+      verificationStatus: ProjectVerificationStatus.Claimed,
+    });
+  }
 
-    // If the project doesnʼt exist on-chain yet, return an unclaimed project.
-    if (!onChainProject) {
-      if (!source) return null;
+  public async getProjectByUrl(url: string): Promise<GitProject> {
+    if (!isValidGitUrl(url)) {
+      throw new Error(`Invalid git URL: ${url}`);
+    }
 
-      // TODO: Donʼt hardcode Forge.GitHub
-      const { forge, username, repoName } = GitProjectService.deconstructUrl(source.url);
+    const projects = await this._dripsQL.getProjects({ url });
+    const project = singleOrDefault(projects);
 
-      const accountIdForSource = await this._repoDriverClient.getAccountId(
+    const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
+    const projectName = `${username}/${repoName}`;
+
+    const id = await this._repoDriverClient.getAccountId(forge, projectName);
+
+    if (!project) {
+      const unclaimedProject: UnclaimedGitProject = {
+        id,
+        url,
         forge,
-        `${username}/${repoName}`,
-      );
-      assert(
-        accountId === accountIdForSource,
-        `The account ID ${accountId} does not match the account ID ${accountIdForSource} for the source ${source}.`,
-      );
-
-      const unclaimedProject = {
-        claimed: false,
-        owner: undefined,
-        repoDriverAccount: {
-          accountId,
-          driver: 'repo',
-        },
-        verificationStatus: 'NOT_STARTED',
-        source,
-      } as UnclaimedGitProject;
+        repoName,
+        name: projectName,
+        ownerName: username,
+        verificationStatus: ProjectVerificationStatus.Unclaimed,
+      };
 
       return unclaimedProject;
     }
 
-    return await this._mapRepoAccountToGitProject(onChainProject, shouldVerifyState);
+    return project;
   }
 
-  public static populateSource(forge: Forge, repoName: string, username: string): Source {
-    let url: string;
-
-    switch (forge) {
-      case Forge.GitHub:
-        url = `https://github.com/${username}/${repoName}`;
-        break;
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
-
-    // TODO: support more forges.
-    switch (forge) {
-      case Forge.GitHub:
-        return {
-          url,
-          repoName,
-          forge: 'github',
-          ownerName: username,
-        };
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
+  public async getProjectById(id: ProjectId): Promise<GitProject> {
+    return await this._dripsQL.getProjectById(id);
   }
 
   public async getProjectInfo(url: string): Promise<{
@@ -267,9 +109,9 @@ export default class GitProjectService {
     starsCount: number;
     forksCount: number;
   }> {
-    const forge = this._getForge(url);
+    const { forge } = GitProjectService.deconstructUrl(url);
 
-    if (forge === Forge.GitHub) {
+    if (forge === ContractForge.GitHub) {
       const {
         description,
         forks_count: forksCount,
@@ -286,405 +128,5 @@ export default class GitProjectService {
     } else {
       throw new Error(`Cannot get project info: unsupported forge: ${forge}`);
     }
-  }
-
-  public async buildRequestOwnerUpdateTx(context: State): Promise<ContractTransaction> {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const projectName = `${username}/${repoName}`;
-
-    const requestOwnerUpdateTx = await this._repoDriverClient.requestOwnerUpdate(
-      forge,
-      projectName,
-    );
-
-    return requestOwnerUpdateTx;
-  }
-
-  public async buildUpdateSplitsBatchTx(
-    accountId: string,
-    highLevelPercentages: { [slug: string]: number },
-    maintainers: ListEditorConfig,
-    dependencies: ListEditorConfig,
-  ): Promise<PopulatedTransaction[]> {
-    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
-
-    const {
-      tx: setSplitsTx,
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
-    } = await this._buildSetSplitsTxAndMetadata(
-      accountId,
-      highLevelPercentages,
-      maintainers,
-      dependencies,
-    );
-
-    const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
-    assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
-
-    const newMetadata = {
-      ...currentMetadata.data,
-      splits: {
-        dependencies: dependenciesSplitMetadata,
-        maintainers: maintainersSplitsMetadata,
-      },
-    };
-
-    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(newMetadata);
-
-    const accountMetadataAsBytes = [
-      {
-        key: MetadataManagerBase.USER_METADATA_KEY,
-        value: ipfsHash,
-      },
-    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
-
-    const emitAccountMetadataTx = await this._repoDriverTxFactory.emitAccountMetadata(
-      accountId,
-      accountMetadataAsBytes,
-    );
-
-    return [setSplitsTx, emitAccountMetadataTx];
-  }
-
-  public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {
-    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
-
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const accountId = await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`);
-
-    const {
-      tx: setSplitsTx,
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
-      receivers,
-    } = await this._buildSetSplitsTxAndMetadata(
-      accountId,
-      context.highLevelPercentages,
-      context.maintainerSplits,
-      context.dependencySplits,
-    );
-
-    const project = (await this.getByUrl(context.gitUrl, false)) as ClaimedGitProject;
-
-    project.emoji = context.projectEmoji;
-    project.color = context.projectColor;
-
-    const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
-      forProject: project,
-      forSplits: {
-        dependencies: dependenciesSplitMetadata,
-        maintainers: maintainersSplitsMetadata,
-      },
-    });
-
-    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
-
-    const accountMetadataAsBytes = [
-      {
-        key: MetadataManagerBase.USER_METADATA_KEY,
-        value: ipfsHash,
-      },
-    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
-
-    const emitAccountMetadataTx = await this._repoDriverTxFactory.emitAccountMetadata(
-      accountId,
-      accountMetadataAsBytes,
-    );
-
-    const splitTxs: Promise<PopulatedTransaction>[] = [];
-    context.unclaimedFunds?.map(({ tokenAddress }) => {
-      splitTxs.push(
-        this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
-      );
-    });
-
-    return [setSplitsTx, emitAccountMetadataTx, ...(await Promise.all(splitTxs))];
-  }
-
-  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
-  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
-
-    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
-      if (
-        !unique.some(
-          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
-        )
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    const sortedReceivers = uniqueReceivers.sort((a, b) =>
-      // Sort by user ID.
-      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
-        ? 1
-        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-        ? -1
-        : 0,
-    );
-
-    return sortedReceivers;
-  }
-
-  private async _buildSetSplitsTxAndMetadata(
-    accountId: string,
-    highLevelPercentages: { [slug: string]: number },
-    maintainerListEditorConfig: ListEditorConfig,
-    dependencyListEditorConfig: ListEditorConfig,
-  ) {
-    const receivers: SplitsReceiverStruct[] = [];
-
-    // Populate dependencies splits and metadata.
-    const dependenciesInput = Object.entries(dependencyListEditorConfig.percentages);
-
-    const dependenciesSplitMetadata: LatestVersion<
-      typeof repoDriverAccountMetadataParser
-    >['splits']['dependencies'] = [];
-
-    for (const [urlOrAddress, percentage] of dependenciesInput) {
-      const isAddr = isAddress(urlOrAddress);
-
-      const weight = Math.floor(
-        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['dependencies'] / 100),
-      );
-
-      if (weight === 0) continue;
-
-      if (isAddr) {
-        const receiver = {
-          type: 'address' as const,
-          weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
-        };
-
-        dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
-      } else {
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
-
-        const receiver = {
-          type: 'repoDriver' as const,
-          weight,
-          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
-        };
-
-        dependenciesSplitMetadata.push({
-          ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
-        });
-        receivers.push(receiver);
-      }
-    }
-
-    // Populate maintainers splits and metadata.
-    const maintainersInput = Object.entries(maintainerListEditorConfig.percentages);
-
-    const maintainersSplitsMetadata: LatestVersion<
-      typeof repoDriverAccountMetadataParser
-    >['splits']['maintainers'] = [];
-
-    for (const [address, percentage] of maintainersInput) {
-      const weight = Math.floor(
-        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['maintainers'] / 100),
-      );
-
-      if (weight === 0) continue;
-
-      const receiver = {
-        type: 'address' as const,
-        weight,
-        accountId: await this._addressDriverClient.getAccountIdByAddress(address),
-      };
-
-      maintainersSplitsMetadata.push(receiver);
-      receivers.push(receiver);
-    }
-
-    return {
-      tx: await this._repoDriverTxFactory.setSplits(
-        accountId,
-        this._formatSplitReceivers(receivers),
-      ),
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
-      receivers,
-    };
-  }
-
-  private _getForge(url: string): Forge {
-    const parsedURL = new URL(url);
-
-    switch (parsedURL.hostname) {
-      case 'github.com':
-        return Forge.GitHub;
-      default:
-        throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
-    }
-  }
-
-  private _calculateVerificationStatus(repoAccount: RepoAccount): VerificationStatus {
-    if (!repoAccount.status) {
-      return VerificationStatus.NOT_STARTED;
-    }
-
-    const haveFiveMinutesPassed = (utcTimestamp: bigint): boolean => {
-      const FIVE_MINUTES_IN_MS = BigInt(5n * 60n * 1000n);
-      const now = BigInt(Date.now());
-
-      return now - BigInt(utcTimestamp * 1000n) >= FIVE_MINUTES_IN_MS;
-    };
-
-    let verificationStatus: VerificationStatus;
-
-    if ((repoAccount.status as RepoAccountStatus) === 'claimed') {
-      throw new Error('Repo account status should not be claimed at this point.');
-    } else if ((repoAccount.status as RepoAccountStatus) === 'not-started') {
-      verificationStatus = VerificationStatus.NOT_STARTED;
-    } else {
-      if (haveFiveMinutesPassed(repoAccount.lastUpdatedBlockTimestamp)) {
-        verificationStatus = VerificationStatus.FAILED;
-      } else {
-        verificationStatus = VerificationStatus.IN_PROGRESS;
-      }
-    }
-
-    return verificationStatus;
-  }
-
-  private _verifySubgraphAndOnChainStateIsInSync(
-    isClaimed: boolean,
-    repoAccount: RepoAccount,
-    accountId: string,
-  ): void {
-    if (!isClaimed && repoAccount.status === 'CLAIMED') {
-      throw new Error(
-        `The repo account with user ID ${accountId} is not claimed on-chain (has no owner address set) but has a status of ${repoAccount.status} in the subgraph.
-        This means the subgraph is out of sync with the on-chain state.`,
-      );
-    }
-
-    if (isClaimed && repoAccount.status !== 'CLAIMED') {
-      throw new Error(
-        `The repo account with user ID ${accountId} is claimed on-chain (has an owner address set) but has a status of ${repoAccount.status} in the subgraph. 
-        This means the subgraph is out of sync with the on-chain state.`,
-      );
-    }
-  }
-
-  private async _mapRepoAccountToGitProject(
-    onChainProject: RepoAccount,
-    shouldVerifyState = true,
-  ): Promise<GitProject | null> {
-    // The project doesnʼt exist on-chain.
-    if (!onChainProject) {
-      return null;
-    }
-
-    // The project exists on-chain...
-
-    const { accountId } = onChainProject;
-    const ownerAddress = await this._repoDriverClient.getOwner(accountId);
-    const isClaimed = Boolean(ownerAddress);
-
-    if (shouldVerifyState) {
-      this._verifySubgraphAndOnChainStateIsInSync(isClaimed, onChainProject, accountId);
-    }
-
-    const username = onChainProject.name.split('/')[0];
-    const repoName = onChainProject.name.split('/')[1];
-
-    // ... and is unclaimed.
-    if (!isClaimed) {
-      const unclaimedProject: UnclaimedGitProject = {
-        claimed: false,
-        owner: undefined,
-        repoDriverAccount: {
-          accountId,
-          driver: 'repo',
-        },
-        verificationStatus: this._calculateVerificationStatus(onChainProject),
-        source: GitProjectService.populateSource(Number(onChainProject.forge), repoName, username),
-      };
-
-      return unclaimedProject;
-    }
-
-    // The project exists on-chain and is claimed...
-
-    const projectMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
-
-    // ...and hasnʼt metadata. Return as unclaimed project.
-    if (!projectMetadata) {
-      const unclaimedProject: UnclaimedGitProject = {
-        claimed: false,
-        owner: undefined,
-        repoDriverAccount: {
-          accountId,
-          driver: 'repo',
-        },
-        verificationStatus: VerificationStatus.FINISHED,
-        source: GitProjectService.populateSource(Number(onChainProject.forge), repoName, username),
-      };
-
-      return unclaimedProject;
-    }
-
-    // ...and has metadata. Return a claimed project.
-
-    const claimedProject: ClaimedGitProject = {
-      source: projectMetadata.data.source,
-      color: projectMetadata.data.color,
-      emoji: projectMetadata.data.emoji,
-      description: projectMetadata.data.description,
-      claimed: true,
-      repoDriverAccount: {
-        driver: 'repo',
-        accountId: accountId,
-      },
-      owner: {
-        driver: 'address',
-        address: onChainProject.ownerAddress as Address,
-        accountId: await this._addressDriverClient.getAccountIdByAddress(
-          onChainProject.ownerAddress as Address,
-        ),
-      },
-      splits: {
-        maintainers: projectMetadata.data.splits.maintainers.map((m) => ({
-          type: 'address',
-          weight: m.weight,
-          account: {
-            driver: 'address',
-            accountId: m.accountId,
-            address: AddressDriverClient.getUserAddress(m.accountId),
-          },
-        })),
-        dependencies: projectMetadata.data.splits.dependencies.map((d) =>
-          'source' in d
-            ? {
-                type: 'repo',
-                weight: d.weight,
-                account: {
-                  driver: 'repo',
-                  accountId: d.accountId,
-                },
-                source: d.source,
-              }
-            : {
-                type: 'address',
-                weight: d.weight,
-                account: {
-                  driver: 'address',
-                  accountId: d.accountId,
-                  address: AddressDriverClient.getUserAddress(d.accountId),
-                },
-              },
-        ),
-      },
-    };
-
-    return claimedProject;
   }
 }

@@ -18,7 +18,7 @@
   import type { State } from '../../claim-project-flow';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import GitProjectTxBuilder from '$lib/utils/project/GitProjectTxBuilder';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
   import Pen from 'radicle-design-system/icons/Pen.svelte';
@@ -57,10 +57,10 @@
     $context.highLevelPercentages['maintainers'],
   );
 
-  let gitProjectService: GitProjectService;
+  let gitProjectTxBuilder: GitProjectTxBuilder;
 
   onMount(async () => {
-    gitProjectService = await GitProjectService.new();
+    gitProjectTxBuilder = await GitProjectTxBuilder.new();
   });
 
   async function submit() {

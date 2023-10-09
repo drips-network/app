@@ -23,7 +23,6 @@ import type { AccountId } from '../metadata/types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { CallerClient, SplitsReceiverStruct, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
-import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import unreachable from '../unreachable';
 import type { Address, IpfsHash } from '../common-types';
@@ -37,6 +36,8 @@ import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import { GitProjectService } from '../project/GitProjectService';
+import { populateSource } from '../project/git-project-utils';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -58,7 +59,6 @@ export default class DripListService {
   private _ownerAddress!: Address | undefined;
   private _nftDriverClient!: NFTDriverClient | undefined;
   private _repoDriverClient!: RepoDriverClient;
-  private _gitProjectService!: GitProjectService;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
@@ -76,7 +76,6 @@ export default class DripListService {
     const dripListService = new DripListService();
 
     dripListService._repoDriverClient = await getRepoDriverClient();
-    dripListService._gitProjectService = await GitProjectService.new();
     dripListService._addressDriverClient = await getAddressDriverClient();
 
     const { connected, signer } = get(wallet);
@@ -280,7 +279,7 @@ export default class DripListService {
 
         projectsSplitMetadata.push({
           ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
+          source: populateSource(forge, repoName, username),
         });
         receivers.push(receiver);
       } else {

@@ -1,19 +1,20 @@
-import GitProjectService from '$lib/utils/project/GitProjectService';
 import { error } from '@sveltejs/kit';
-import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
 import { buildProjectSplitsData } from '../../../methods/project-splits';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
+import { GitProjectService } from '$lib/utils/project/GitProjectService';
+import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
+import { fetchUnclaimedFunds } from '$lib/utils/project/git-project-utils';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
 export const load = (async ({ params }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
-  const service = await GitProjectService.new();
+  const gitProjectService = await GitProjectService.new();
 
   const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
@@ -22,23 +23,25 @@ export const load = (async ({ params }) => {
   }
 
   try {
-    const project = await service.getByUrl(gitHubUrl);
+    const project = await gitProjectService.getProjectByUrl(gitHubUrl);
 
-    const unclaimedFunds = project.claimed
-      ? undefined
-      : fetchUnclaimedFunds(project.repoDriverAccount.accountId);
+    const unclaimedFunds =
+      project.verificationStatus === ProjectVerificationStatus.Claimed
+        ? undefined
+        : fetchUnclaimedFunds(project.id);
 
-    const earnedFunds = project.claimed
-      ? fetchEarnedFunds(project.repoDriverAccount.accountId)
-      : undefined;
+    const earnedFunds =
+      project.verificationStatus === ProjectVerificationStatus.Claimed
+        ? fetchEarnedFunds(project.id)
+        : undefined;
 
     return {
       project,
       streamed: {
         unclaimedFunds,
         earnedFunds,
-        incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
-        splits: buildProjectSplitsData(project, project.claimed ? project.splits.dependencies : []),
+        incomingSplits: getIncomingSplits(project.id),
+        splits: await buildProjectSplitsData(project),
       },
       blockWhileInitializing: false,
     };

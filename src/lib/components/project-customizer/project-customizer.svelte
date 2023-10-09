@@ -1,12 +1,12 @@
 <script lang="ts">
   import emoji from '$lib/utils/emoji/emoji';
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import possibleColors from '$lib/utils/project/possible-colors';
   import type { Writable } from 'svelte/store';
   import FormField from '../form-field/form-field.svelte';
   import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import twemoji from 'twemoji';
+  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
 
   export let project: Writable<ClaimedGitProject>;
 

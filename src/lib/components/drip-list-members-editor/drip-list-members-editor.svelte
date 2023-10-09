@@ -33,14 +33,12 @@
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import { fade, scale } from 'svelte/transition';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
   import { onMount, tick } from 'svelte';
   import { getAddress, isAddress } from 'ethers/lib/utils';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
   import assert from '$lib/utils/assert';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import { verifyRepoExists } from '$lib/utils/github/github';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
@@ -54,6 +52,8 @@
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
   import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
+  import type { GitProject } from '$lib/utils/git-project/types';
+  import { GitProjectService } from '$lib/utils/project/GitProjectService';
 
   export let maxItems = 200;
 
@@ -82,10 +82,10 @@
   let isAddingItem = false;
   let inputValue = '';
 
-  let gitProjectService: GitProjectService;
+  let gitProjectTxBuilder: GitProjectService;
 
   async function addProject() {
-    if (!gitProjectService) gitProjectService = await GitProjectService.new();
+    if (!gitProjectTxBuilder) gitProjectTxBuilder = await GitProjectService.new();
 
     if (!allowedItems.includes('projects')) return;
 
@@ -98,9 +98,9 @@
       const repoExists = await verifyRepoExists(username, repoName);
       if (!repoExists) throw new Error('This project doesnʼt exist');
 
-      let gitProject = await gitProjectService.getByUrl(inputValue);
+      let gitProject = await gitProjectTxBuilder.getProjectByUrl(inputValue);
 
-      const id = gitProject.source.url;
+      const id = gitProject.url;
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
 
       // Prevent duplicates.

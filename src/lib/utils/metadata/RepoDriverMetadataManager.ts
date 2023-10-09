@@ -1,8 +1,9 @@
 import RepoDriverUtils from '../RepoDriverUtils';
 import { getRepoDriverClient } from '../get-drips-clients';
+import type { ClaimedGitProject } from '../git-project/types';
 import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverAccountMetadataParser } from './schemas';
-import type { ClaimedGitProject, RepoDriverAccount, AccountId } from './types';
+import type { RepoDriverAccount, AccountId } from './types';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
@@ -76,12 +77,17 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       driver: 'repo',
       describes: {
         driver: 'repo',
-        accountId: forProject.repoDriverAccount.accountId,
+        accountId: forProject.id,
       },
-      source: forProject.source,
+      source: {
+        forge: 'github',
+        repoName: forProject.repoName,
+        ownerName: forProject.ownerName,
+        url: forProject.url,
+      },
       emoji: forProject.emoji,
       color: forProject.color,
-      description: forProject.description,
+      description: forProject.description || undefined,
       splits: forSplits,
     };
   }

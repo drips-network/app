@@ -13,9 +13,9 @@ import ConfigureDependencies from './steps/configure-dependencies/configure-depe
 import Review from './steps/review/review.svelte';
 import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
-import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
+import type { GitProject, UnclaimedGitProject } from '$lib/utils/git-project/types';
 
 interface SplitsConfig extends ListEditorConfig {
   itemsPromise: Promise<GitProject>[] | undefined;

@@ -261,6 +261,10 @@ describe('RepoDriverMetadataManager', () => {
           emoji: '👍',
           color: 'red',
           description: 'description',
+          repoName: 'repo',
+          ownerName: 'owner',
+          url: 'https://url.com',
+          id: '1',
         },
         forSplits: {
           maintainers: [
@@ -293,8 +297,10 @@ describe('RepoDriverMetadataManager', () => {
           driver: 'repo',
         },
         source: {
-          url: 'repo',
+          forge: 'github',
           repoName: 'repo',
+          ownerName: 'owner',
+          url: 'https://url.com',
         },
         emoji: '👍',
         color: 'red',
