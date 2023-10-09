@@ -23,7 +23,7 @@
     <a href="https://github.com/drips-network" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Code</Button></a
     >
-    <a href="https://docs.drips.network/docs/whats-a-drip.html" target="_blank" rel="noreferrer"
+    <a href="https://docs.drips.network" target="_blank" rel="noreferrer"
       ><Button variant="ghost">Docs</Button></a
     >
     <a class="cta" href="/app" data-sveltekit-preload-code="eager"

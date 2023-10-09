@@ -1,12 +1,6 @@
-import { newRestorer, type Restorer } from '$lib/utils/restorer';
 import type { ContractReceipt } from 'ethers';
 import type { SplitsEntry } from 'radicle-drips';
 import { writable } from 'svelte/store';
-
-type Restorable = {
-  squeezeEnabled: boolean;
-  selectedSqueezeSenderItems: string[];
-};
 
 export interface CollectFlowState {
   tokenAddress?: string;
@@ -23,13 +17,14 @@ export interface CollectFlowState {
     durationMillis: number;
   };
   amountCollected?: bigint;
-  squeezeEnabled?: boolean;
+  squeezeEnabled: boolean;
+  selectedSqueezeSenderItems: string[];
   receipt?: ContractReceipt;
-  restorer: Restorer<Restorable>;
 }
 
 export default (tokenAddress?: string) =>
   writable<CollectFlowState>({
     tokenAddress,
-    restorer: newRestorer<Restorable>({ squeezeEnabled: false, selectedSqueezeSenderItems: [] }),
+    squeezeEnabled: false,
+    selectedSqueezeSenderItems: [],
   });

@@ -23,6 +23,20 @@ const DATE_FORMAT_CONVENTIONS = {
   },
 } as const;
 
+function suffixNumber(n: number) {
+  if (n > 3 && n < 21) return 'th';
+  switch (n % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+
 /**
  * Format a date with a reusable, pre-configured date format convention.
  * @param date The date to format.
@@ -33,5 +47,8 @@ export default function (
   date: Date,
   convention: keyof typeof DATE_FORMAT_CONVENTIONS = 'standard',
 ): string {
-  return Intl.DateTimeFormat('en-US', DATE_FORMAT_CONVENTIONS[convention]).format(date);
+  return (
+    Intl.DateTimeFormat('en-US', DATE_FORMAT_CONVENTIONS[convention]).format(date) +
+    (convention === 'onlyDay' ? suffixNumber(date.getDate()) : '')
+  );
 }

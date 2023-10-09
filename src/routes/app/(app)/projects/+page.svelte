@@ -62,10 +62,10 @@
       <div class="earnings card">
         <div class="content">
           <div class="values">
-            <KeyValuePair key="Collectable now" highlight>
+            <KeyValuePair key="Settled earnings" highlight>
               <AggregateFiatEstimate amounts={$splittableStore} />
             </KeyValuePair>
-            <KeyValuePair key="Next payout">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
+            <KeyValuePair key="Next settlement">{formatDate(cycle.end, 'onlyDay')}</KeyValuePair>
           </div>
           <div />
         </div>

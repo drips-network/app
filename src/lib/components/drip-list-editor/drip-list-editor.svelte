@@ -25,7 +25,7 @@
     description: undefined,
   };
   export let showListFirst = false;
-  export let projectUrlToAdd: string | undefined = undefined;
+  export let urlToAdd: string | undefined = undefined;
 
   // validation
   let listValid = false;
@@ -65,7 +65,7 @@
         bind:percentages={dripList.percentages}
         bind:items={dripList.items}
         bind:valid={listValid}
-        addOnMount={projectUrlToAdd}
+        addOnMount={urlToAdd}
       />
     </FormField>
   </div>

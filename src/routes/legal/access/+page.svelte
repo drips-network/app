@@ -27,7 +27,7 @@
   also operated by Etherscan. The Drips contracts can be accessed using these block explorers at the
   addresses specified on the
   <a
-    href="https://docs.drips.network/docs/for-developers/smart-contract-and-subgraph-details"
+    href="https://docs.drips.network/the-protocol/smart-contract-details"
     target="_blank"
     rel="noopener noreferrer">Smart Contract and Subgraph Details Page</a
   >. For example, the Drips smart contract on the Rinkeby testnet can be acessed

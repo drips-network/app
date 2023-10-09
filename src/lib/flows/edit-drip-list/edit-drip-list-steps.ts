@@ -4,7 +4,7 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { get } from 'svelte/store';
 import EditDripListStep from './steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import type { GitProject } from '$lib/utils/metadata/types';
+import type { DripList, GitProject } from '$lib/utils/metadata/types';
 
 export default (
   dripListId: string,
@@ -12,6 +12,7 @@ export default (
   listDescription: string | undefined,
   representationalSplits: Splits,
   projectToAdd?: GitProject,
+  dripListToAdd?: DripList,
 ) => ({
   context: undefined,
   steps: [
@@ -19,6 +20,7 @@ export default (
       component: EditDripListStep,
       props: {
         projectToAdd,
+        dripListToAdd,
         dripListId,
         representationalSplits,
         listName,

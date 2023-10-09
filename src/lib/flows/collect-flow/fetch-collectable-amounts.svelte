@@ -80,7 +80,7 @@
   onMount(() =>
     dispatch('await', {
       promise,
-      message: 'Fetching collectable amounts…',
+      message: 'Getting ready…',
     }),
   );
 </script>
