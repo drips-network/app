@@ -17,6 +17,15 @@ import {
 import { get } from 'svelte/store';
 import isTest from './is-test';
 import { env } from '$env/dynamic/public';
+import DripsQL from '$lib/graphql/DripsQL';
+
+/**
+ * Get an initialized Drips GraphQl client.
+ * @returns An initialized Drips GraphQl client.
+ */
+export function getDripsGraphQlClient() {
+  return new DripsQL();
+}
 
 /**
  * Get an initialized Drips Subgraph client.

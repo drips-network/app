@@ -3,7 +3,7 @@
   import Tooltip from '../tooltip/tooltip.svelte';
   import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
-  import buildProjectUrl from '$lib/utils/build-project-url';
+  import buildProjectUrlFromSource from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import {
     VerificationStatus,
@@ -39,7 +39,7 @@
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="project-badge flex gap-2 items-center typo-text"
       href={linkTo === 'project-page'
-        ? buildProjectUrl(project.source)
+        ? buildProjectUrlFromSource(project.source)
         : buildExternalUrl(processedProject.source.url)}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >

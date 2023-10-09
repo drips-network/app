@@ -1,19 +1,20 @@
 <script lang="ts">
-  import buildProjectUrl from '$lib/utils/build-project-url';
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import Github from 'radicle-design-system/icons/Github.svelte';
 
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';
+  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
+  import { buildProjectUrl } from '$lib/utils/build-project-url';
 
   export let project: ClaimedGitProject;
 </script>
 
-<a class="wrapper" href={buildProjectUrl(project.source)}>
+<a class="wrapper" href={buildProjectUrl(project.forge, project.ownerName, project.repoName)}>
   <div class="project-card">
     <div
       class="background"
-      style:background-color={project.owner
+      style:background-color={project.verificationStatus === ProjectVerificationStatus.Claimed
         ? 'var(--color-primary-level-2)'
         : 'var(--color-foreground-level-1)'}
     />
@@ -25,7 +26,7 @@
         <div class="icon">
           <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
         </div>
-        <span class="owner-name">{project.source.ownerName}</span>
+        <span class="owner-name">{project.ownerName}</span>
       </div>
       <h4 class="name"><ProjectName showSource={false} {project} /></h4>
       {#if project.description}<p class="description">{project.description}</p>{/if}

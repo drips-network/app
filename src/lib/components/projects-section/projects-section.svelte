@@ -1,14 +1,14 @@
 <script lang="ts">
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import ProjectCard from '../project-card/project-card.svelte';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import assert from '$lib/utils/assert';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
+  import { ProjectService } from '$lib/utils/git-project/ProjectService';
+  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
 
   export let address: string | undefined;
 
@@ -21,10 +21,10 @@
 
   async function updateProjects() {
     try {
-      const service = await GitProjectService.new();
+      const service = ProjectService.new();
 
       assert(address);
-      projects = await service.getAllByOwner(address.toLowerCase());
+      projects = await service.getProjectsByOwner(address);
       loaded = true;
     } catch (e) {
       // eslint-disable-next-line no-console

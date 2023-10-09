@@ -1,8 +1,9 @@
 <script lang="ts">
   import GithubIcon from 'radicle-design-system/icons/Github.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import twemoji from 'twemoji';
+  import type { GitProject } from '$lib/utils/git-project/types';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   export let project: GitProject;
 
@@ -18,18 +19,23 @@
   };
   $: containerSize = CONTAINER_SIZES[size];
 
-  $: emojiElem = project.claimed
-    ? twemoji.parse(project.emoji, { folder: 'svg', ext: '.svg' })
-    : undefined;
+  $: emojiElem =
+    project.verificationStatus === ProjectVerificationStatus.Claimed
+      ? twemoji.parse(project.emoji, { folder: 'svg', ext: '.svg' })
+      : undefined;
 </script>
 
-<PrimaryColorThemer colorHex={project.claimed ? project.color : undefined}>
+<PrimaryColorThemer
+  colorHex={project.verificationStatus === ProjectVerificationStatus.Claimed
+    ? project.color
+    : undefined}
+>
   <div
     class="wrapper"
     style="width: {containerSize}; height: {containerSize}"
     class:with-outline={outline}
   >
-    {#if project.owner}
+    {#if project.verificationStatus === ProjectVerificationStatus.Claimed}
       <div class="project-avatar" style:background-color="var(--color-primary)">
         <div class="inner">
           {@html emojiElem}
@@ -37,7 +43,7 @@
       </div>
     {/if}
 
-    {#if !project.owner}
+    {#if project.verificationStatus !== ProjectVerificationStatus.Claimed}
       <div class="project-avatar">
         <GithubIcon />
       </div>

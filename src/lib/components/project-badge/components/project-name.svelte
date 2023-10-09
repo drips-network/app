@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import type { GitProject } from '$lib/utils/git-project/types';
 
   export let showSource = true;
 
@@ -7,7 +7,6 @@
 </script>
 
 <span class="text-foreground-level-5 typo-text"
-  >{#if showSource}{project.source.ownerName}/{/if}<span class="text-foreground"
-    >{project.source.repoName}</span
+  >{#if showSource}{project.ownerName}/{/if}<span class="text-foreground">{project.repoName}</span
   ></span
 >
