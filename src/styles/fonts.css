@@ -2,15 +2,15 @@
 
 @font-face {
   font-family: 'Inter Bold';
-  src: url('/fonts/inter-bold-webfont.woff2');
+  src: url('/fonts/Inter-Bold.woff2');
 }
 
 @font-face {
   font-family: 'Inter SemiBold';
-  src: url('/fonts/inter-semibold-webfont.woff2');
+  src: url('/fonts/Inter-Semibold.woff2');
 }
 
 @font-face {
   font-family: 'Inter Regular';
-  src: url('/fonts/inter-regular-webfont.woff2');
+  src: url('/fonts/Inter-Regular.woff2');
 }
