@@ -26,6 +26,7 @@
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import RadworksLogo from '$lib/components/illustrations/radworks-logo.svelte';
+  import NetworkTotalDrippedBadge from '$lib/components/network-total-dripped-badge/NetworkTotalDrippedBadge.svelte';
 
   onMount(() => {
     // When launching within a Safe, we donʼt want to display the landing page.
@@ -54,6 +55,9 @@
 <div class="wrapper">
   <div class="hero">
     <div class="text">
+      <div class="flex">
+        <NetworkTotalDrippedBadge />
+      </div>
       <h1>Funding that flows</h1>
       <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
       <div class="actions">
@@ -263,9 +267,7 @@
         <MultiToken slot="image" />
         <div slot="caption" class="text-container">
           <h4>No platform fees</h4>
-          <p>
-            Free to use beyond covering the cost of gas.
-          </p>
+          <p>Free to use beyond covering the cost of gas.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -274,9 +276,7 @@
         <GasOptimized slot="image" />
         <div slot="caption" class="text-container">
           <h4>User controlled data</h4>
-          <p>
-            Fully sovereign infrastructure for maximum data security.
-          </p>
+          <p>Fully sovereign infrastructure for maximum data security.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -285,9 +285,7 @@
         <NoWrappedTokens slot="image" />
         <div slot="caption" class="text-container">
           <h4>No need to wrap tokens</h4>
-          <p>
-            Stream native tokens. No need to trust third-parties with funds.
-          </p>
+          <p>Stream native tokens. No need to trust third-parties with funds.</p>
         </div>
       </ImageAndCaption></LpCard
     >
@@ -296,9 +294,7 @@
         <OneContract slot="image" />
         <div slot="caption" class="text-container">
           <h4>One contract</h4>
-          <p>
-            Drips uses one smart contract for streaming and splitting.
-          </p>
+          <p>Drips uses one smart contract for streaming and splitting.</p>
         </div>
       </ImageAndCaption></LpCard
     >
