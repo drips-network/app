@@ -4,12 +4,13 @@
   import formatAddress from '$lib/utils/format-address';
 
   export let listId: string;
-  export let listName: string | '##loading##' | undefined = undefined;
+  export let listName: string | null | undefined = undefined;
   export let owner: string | undefined = undefined;
 
   export let isLinked = true;
   export let showAvatar = true;
   export let avatarSize: 'small' | 'default' = 'default';
+  export let listLoading = false;
 
   // lookup ens name if owner is provided
   $: owner && ensStore.connected && ensStore.lookup(owner);
@@ -37,12 +38,12 @@
       />
     </div>
   {/if}
-  {#if listName}
+  {#if listName !== undefined}
     <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
       <span
         >{#if username}<span class="text-foreground-level-5">{username}/</span
-          >{/if}{#if listName === '##loading##'}<span class="animate-pulse">...</span
-          >{:else}{listName}{/if}</span
+          >{/if}{#if listLoading}<span class="animate-pulse">...</span
+          >{:else if listName === null}Unknown list{:else}{listName}{/if}</span
       >
     </div>
   {/if}
