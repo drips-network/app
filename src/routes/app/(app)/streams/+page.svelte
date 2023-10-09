@@ -8,11 +8,8 @@
   import CarouselEduCard from '$lib/components/carousel/items/carousel-edu-card.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import ArrowUp from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
-  import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fly } from 'svelte/transition';
-  import MultiToken from '$lib/components/illustrations/multi-token.svelte';
-  import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
@@ -40,12 +37,7 @@
         actions: [
           {
             handler: () =>
-              window
-                .open(
-                  'https://docs.drips.network/docs/for-funders/fund-your-dependencies',
-                  '_blank',
-                )
-                ?.focus(),
+              window.open('https://docs.drips.network/fund-your-dependencies', '_blank')?.focus(),
             label: 'Learn more',
             primary: true,
             icon: ArrowUp,
@@ -64,84 +56,7 @@
         actions: [
           {
             handler: () =>
-              window
-                .open(
-                  'https://docs.drips.network/docs/for-fundraisers/how-to-claim-a-project',
-                  '_blank',
-                )
-                ?.focus(),
-            label: 'Learn more',
-            primary: true,
-            icon: ArrowUp,
-          },
-        ],
-      },
-    }),
-    makeCarouselItem({
-      id: 'set-up-first-stream',
-      component: CarouselEduCard,
-      props: {
-        id: 'set-up-first-stream',
-        title: 'Create your first stream',
-        description: 'Stream any ERC-20 token to anyone. All you need is an Ethereum address.',
-        illustration: MultiToken,
-        actions: [
-          {
-            handler: () =>
-              window
-                .open(
-                  'https://docs.drips.network/docs/streaming-and-splitting/streams/create-a-stream',
-                  '_blank',
-                )
-                ?.focus(),
-            label: 'Create a stream',
-            primary: true,
-            icon: ArrowUp,
-          },
-        ],
-      },
-    }),
-    makeCarouselItem({
-      id: 'collect-earnings',
-      component: CarouselEduCard,
-      props: {
-        id: 'collect-earnings',
-        title: 'Collect earnings',
-        description: 'Learn how to collect funds youʼve earned from incoming streams or splits.',
-        illustration: NoWrappedTokens,
-        actions: [
-          {
-            handler: () =>
-              window
-                .open(
-                  'https://docs.drips.network/docs/streaming-and-splitting/manage-funds/collect-earnings',
-                  '_blank',
-                )
-                ?.focus(),
-            label: 'Learn more',
-            primary: true,
-            icon: ArrowUp,
-          },
-        ],
-      },
-    }),
-    makeCarouselItem({
-      id: 'explore-the-network',
-      component: CarouselEduCard,
-      props: {
-        id: 'explore-the-network',
-        title: 'Explore the network',
-        description: 'You can view other peopleʼs activity on Drips and share your profile.',
-        illustration: OneContract,
-        actions: [
-          {
-            handler: () =>
-              window
-                .open(
-                  'https://docs.drips.network/docs/streaming-and-splitting/explore/drips-profiles',
-                  '_blank',
-                )
-                ?.focus(),
+              window.open('https://docs.drips.network/claim-your-repository', '_blank')?.focus(),
             label: 'Learn more',
             primary: true,
             icon: ArrowUp,
@@ -156,7 +71,7 @@
 
 <div class="dashboard">
   <div class="edu-carousel">
-    <TransitionedHeight>
+    <TransitionedHeight negativeMarginWhileCollapsed="-64px">
       {#if eduCarouselItems.length > 0}
         <div out:fly|local={{ y: -10, duration: 300 }} class="edu-carousel-inner">
           <h4 class="typo-all-caps">Getting started</h4>
