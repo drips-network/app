@@ -73,7 +73,7 @@
     if (stream) {
       streamName =
         stream.receiver.driver === 'nft'
-          ? 'Drip List Support Stream'
+          ? 'Drip List support stream'
           : stream.name ?? 'Unnamed stream';
     }
   }
