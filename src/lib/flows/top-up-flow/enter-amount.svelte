@@ -100,7 +100,7 @@
 <StepLayout>
   <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
   <StepHeader
-    headline={`Add ${tokenInfo?.info.symbol ?? ''} funds`}
+    headline={`Add ${tokenInfo?.info.symbol}`}
     description="Add funds to your Drips account's outgoing balance."
   />
   <FormField title="Wallet balance">
