@@ -51,7 +51,7 @@
     "jsdom": "^20.0.0",
     "node-fetch": "^3.2.10",
     "playwright": "^1.32.3",
-    "postcss": "^8.4.16",
+    "postcss": "^8.4.31",
     "prettier": "^2.8.7",
     "prettier-plugin-svelte": "^2.7.0",
     "svelte": "^3.58.0",
@@ -90,7 +90,7 @@
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
     "twemoji": "^14.0.2",
     "web3modal": "^1.9.9",
-    "zod": "^3.19.1"
+    "zod": "^3.22.3"
   },
   "type": "module"
 }
