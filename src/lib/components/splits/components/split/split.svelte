@@ -16,6 +16,7 @@
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   export let split: Split | SplitGroup;
   export let linkToNewTab = false;
@@ -173,7 +174,11 @@
         </div>
       {:else if split.type === 'project-split'}
         {#if split.project}
-          <PrimaryColorThemer colorHex={split.project.claimed ? split.project.color : undefined}>
+          <PrimaryColorThemer
+            colorHex={split.project.verificationStatus === ProjectVerificationStatus.Claimed
+              ? split.project.color
+              : undefined}
+          >
             <ProjectBadge {linkToNewTab} project={split.project} />
           </PrimaryColorThemer>
         {:else}

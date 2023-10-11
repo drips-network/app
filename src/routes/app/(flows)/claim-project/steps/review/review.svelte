@@ -24,6 +24,7 @@
   import Pen from 'radicle-design-system/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
+  import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -34,15 +35,18 @@
   // For previewing what the project will look like after claiming
   $: fakeClaimedProject = {
     ...project,
-    claimed: true as const,
-    owner: {
-      driver: 'address' as const,
-      address: $walletStore.address ?? unreachable(),
-      accountId: $walletStore.dripsAccountId ?? unreachable(),
-    },
+    verificationStatus: ProjectVerificationStatus.Claimed,
+    ownerAddress: $walletStore.address ?? unreachable(),
+    ownerAccountId: $walletStore.dripsAccountId ?? unreachable(),
     color: $context.projectColor,
     emoji: $context.projectEmoji,
-    splits: { maintainers: [], dependencies: [] },
+    splits: {
+      maintainers: [],
+      dependencies: {
+        ofTypeAddress: [],
+        ofTypeProject: [],
+      },
+    },
   };
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(

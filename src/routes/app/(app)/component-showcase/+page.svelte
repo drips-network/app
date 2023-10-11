@@ -21,7 +21,7 @@
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
-  import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
+  import type { Source } from '$lib/utils/metadata/types';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
@@ -29,6 +29,8 @@
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import type { GitProject } from '$lib/utils/project/types';
+  import { Forge, ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   // Button
   let disabled = false;
@@ -88,47 +90,45 @@
   // Splits
 
   const MOCK_PROJECT_1: GitProject = {
-    claimed: true,
-    repoDriverAccount: {
-      accountId: '0',
-      driver: 'repo',
-    },
-    owner: {
-      driver: 'address',
-      accountId: '0',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-    },
-    source: {
-      forge: 'github',
-      repoName: 'svelte-stepper',
-      ownerName: 'efstajas',
-      url: 'https://github.com/efstajas/svelte-stepper.git',
-    },
+    verificationStatus: ProjectVerificationStatus.Claimed,
+    id: '0',
+    ownerAccountId: '1',
+    ownerAddress: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+    forge: Forge.GitHub,
+    repoName: 'svelte-stepper',
+    ownerName: 'efstajas',
+    name: 'efstajas/svelte-stepper',
+    url: 'https://github.com/efstajas/svelte-stepper.git',
     emoji: '🚶',
     color: '#fcc842',
-    splits: { maintainers: [], dependencies: [] },
+    splits: {
+      maintainers: [],
+      dependencies: {
+        ofTypeAddress: [],
+        ofTypeProject: [],
+      },
+    },
   };
 
   const MOCK_PROJECT_2: GitProject = {
-    claimed: true,
-    repoDriverAccount: {
-      accountId: '0',
-      driver: 'repo',
-    },
-    owner: {
-      driver: 'address',
-      accountId: '0',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-    },
-    source: {
-      forge: 'github',
-      repoName: 'svelte-stored-writable',
-      ownerName: 'efstajas',
-      url: 'https://github.com/efstajas/svelte-stepper.git',
-    },
+    verificationStatus: ProjectVerificationStatus.Claimed,
+    id: '0',
+    ownerAccountId: '0',
+    ownerAddress: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+    forge: Forge.GitHub,
+    repoName: 'svelte-stored-writable',
+    name: 'efstajas/svelte-stepper',
+    ownerName: 'efstajas',
+    url: 'https://github.com/efstajas/svelte-stepper.git',
     emoji: '💾',
     color: '#FF0000',
-    splits: { maintainers: [], dependencies: [] },
+    splits: {
+      maintainers: [],
+      dependencies: {
+        ofTypeAddress: [],
+        ofTypeProject: [],
+      },
+    },
   };
 
   const mockSplits: Splits = [
@@ -335,21 +335,25 @@
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
       project={{
-        claimed: true,
-        repoDriverAccount: {
-          accountId: '0',
-          driver: 'repo',
-        },
-        owner: {
-          driver: 'address',
-          accountId: '0',
-          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-        },
-        source: SOURCE_CONFIGS.github,
+        verificationStatus: ProjectVerificationStatus.Claimed,
+        id: '0',
+        ownerAccountId: '0',
+        ownerAddress: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        forge: Forge.GitHub,
+        url: SOURCE_CONFIGS.github.url,
+        repoName: SOURCE_CONFIGS.github.repoName,
+        ownerName: SOURCE_CONFIGS.github.ownerName,
+        name: 'efstajas/svelte-stepper',
         emoji: '🚶',
         color: '#fcc842',
         description: 'A versatile component for building stepped flows with beautiful transitions.',
-        splits: { maintainers: [], dependencies: [] },
+        splits: {
+          maintainers: [],
+          dependencies: {
+            ofTypeAddress: [],
+            ofTypeProject: [],
+          },
+        },
       }}
     />
   </PrimaryColorThemer>
@@ -377,30 +381,33 @@
     <ProjectBadge
       project={projectVerified
         ? {
-            claimed: true,
-            repoDriverAccount: {
-              accountId: '0',
-              driver: 'repo',
-            },
-            owner: {
-              driver: 'address',
-              accountId: '0',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-            },
-            source: SOURCE_CONFIGS[sourceType],
+            verificationStatus: ProjectVerificationStatus.Claimed,
+            id: '0',
+            ownerAccountId: '0',
+            ownerAddress: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+            forge: Forge.GitHub,
+            url: SOURCE_CONFIGS.github.url,
+            repoName: SOURCE_CONFIGS.github.repoName,
+            ownerName: SOURCE_CONFIGS.github.ownerName,
+            name: 'efstajas/svelte-stepper',
             emoji: '🚶',
             color: '#fcc842',
-            splits: { maintainers: [], dependencies: [] },
+            splits: {
+              maintainers: [],
+              dependencies: {
+                ofTypeAddress: [],
+                ofTypeProject: [],
+              },
+            },
           }
         : {
-            claimed: false,
-            repoDriverAccount: {
-              accountId: '0',
-              driver: 'repo',
-            },
-            source: SOURCE_CONFIGS[sourceType],
-            owner: undefined,
-            verificationStatus: VerificationStatus.NOT_STARTED,
+            verificationStatus: ProjectVerificationStatus.Unclaimed,
+            id: '0',
+            forge: Forge.GitHub,
+            url: SOURCE_CONFIGS.github.url,
+            repoName: SOURCE_CONFIGS.github.repoName,
+            ownerName: SOURCE_CONFIGS.github.ownerName,
+            name: 'efstajas/svelte-stepper',
           }}
     />
   </PrimaryColorThemer>

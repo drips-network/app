@@ -11,8 +11,8 @@
     type ListItem,
   } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { GitProject } from '$lib/utils/project/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -43,7 +43,7 @@
 
         let dependencySplits: { [key: string]: ListItem } = {};
         depsGitProjects.forEach((d) => {
-          dependencySplits[d.source.url] = projectItem(d);
+          dependencySplits[d.url] = projectItem(d);
         });
 
         $context.dependencySplits.items = dependencySplits;

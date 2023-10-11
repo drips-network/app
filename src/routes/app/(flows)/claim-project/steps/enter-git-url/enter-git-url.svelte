@@ -26,7 +26,7 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  let gitProjectTxBuilder: GitProjectService;
+  let gitProjectService: GitProjectService;
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
   $: formValid = validationState.type === 'valid';
@@ -41,7 +41,7 @@
   async function fetchProject() {
     $context.linkedToRepo = false;
 
-    gitProjectTxBuilder = await GitProjectService.new();
+    gitProjectService = await GitProjectService.new();
 
     try {
       validationState = { type: 'pending' };
@@ -54,7 +54,7 @@
       if ($context.gitUrl.endsWith('/')) {
         $context.gitUrl = $context.gitUrl.slice(0, -1);
       }
-      const project = await gitProjectTxBuilder.getProjectByUrl($context.gitUrl);
+      const project = await gitProjectService.getProjectByUrl($context.gitUrl);
 
       if (project.verificationStatus === ProjectVerificationStatus.Claimed) {
         throw new Error('Project already claimed');
@@ -85,7 +85,7 @@
 
   async function fetchProjectMetadata() {
     const { defaultBranch, description, forksCount, starsCount } =
-      await gitProjectTxBuilder.getProjectInfo($context.gitUrl);
+      await gitProjectService.getProjectInfo($context.gitUrl);
 
     $context.projectMetadata = {
       starCount: starsCount,

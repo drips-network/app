@@ -44,8 +44,8 @@
         return;
       }
 
-      const gitProjectTxBuilder = await GitProjectService.new();
-      const project = await gitProjectTxBuilder.getProjectById(accountId);
+      const gitProjectService = await GitProjectService.new();
+      const project = await gitProjectService.getProjectById(accountId);
 
       if (project?.verificationStatus !== ProjectVerificationStatus.Claimed) {
         if (Date.now() - start >= timeout) {

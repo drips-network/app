@@ -28,11 +28,11 @@ export const load = (async ({ params }) => {
     const unclaimedFunds =
       project.verificationStatus === ProjectVerificationStatus.Claimed
         ? undefined
-        : await fetchUnclaimedFunds(project.id);
+        : fetchUnclaimedFunds(project.id);
 
     const earnedFunds =
       project.verificationStatus === ProjectVerificationStatus.Claimed
-        ? await fetchEarnedFunds(project.id)
+        ? fetchEarnedFunds(project.id)
         : undefined;
 
     return {
@@ -41,7 +41,7 @@ export const load = (async ({ params }) => {
         unclaimedFunds,
         earnedFunds,
         incomingSplits: getIncomingSplits(project.id),
-        splits: await buildProjectSplitsData(project),
+        splits: buildProjectSplitsData(project),
       },
       blockWhileInitializing: false,
     };

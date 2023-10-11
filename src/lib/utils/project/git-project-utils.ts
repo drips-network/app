@@ -57,3 +57,12 @@ export function toContractForge(forge: ApiForge): ContractForge {
       throw new Error(`Unknown forge: ${forge}`);
   }
 }
+
+export function forgeFromString(forgeStr: string): ApiForge {
+  switch (forgeStr.toLowerCase()) {
+    case 'github':
+      return ApiForge.GitHub;
+    default:
+      throw new Error(`Unknown forge: ${forgeStr}`);
+  }
+}
