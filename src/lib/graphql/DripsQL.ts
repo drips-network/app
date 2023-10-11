@@ -1,17 +1,11 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  gql,
-  type OperationVariables,
-  type DocumentNode,
-} from '@apollo/client';
 import type { GitProject, ProjectWhereInput } from './generated/graphql';
 import type { ProjectId } from '$lib/utils/project/types';
+import * as Appolo from '@apollo/client';
 
 export default class DripsQL {
   private DRIPS_GRAPHQL_URL = 'https://drips-api.ey.r.appspot.com/';
 
-  private readonly _apolloClient: ApolloClient<any>;
+  private readonly _apolloClient: Appolo.ApolloClient<any>;
 
   constructor(url?: string) {
     this._apolloClient = new ApolloClient({
