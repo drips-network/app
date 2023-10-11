@@ -85,9 +85,10 @@
     this={getLink() ? 'a' : 'span'}
     href={getLink()}
     target={linkToNewTab ? '_blank' : undefined}
-    class="identity-badge flex items-center relative text-left text-foreground tabular-nums {showAvatar &&
+    class="identity-badge flex items-center relative text-left text-foreground tabular-nums {getLink() &&
+    showAvatar &&
     !showIdentity
-      ? 'focus-visible:ring-8 focus-visible:ring-primary-level-1 rounded-full'
+      ? 'focus-visible:ring-8 focus-visible:ring-primary-level-1 rounded-full mouse:hover:ring-4 mouse:hover:ring-primary-level-1'
       : ''}"
     class:flex-row-reverse={isReverse}
     class:select-none={disableSelection}
