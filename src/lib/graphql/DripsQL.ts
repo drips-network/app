@@ -1,23 +1,14 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  gql,
-  type OperationVariables,
-  type DocumentNode,
-} from '@apollo/client/core';
 import type { GitProject, ProjectWhereInput } from './generated/graphql';
 import type { ProjectId } from '$lib/utils/project/types';
+import { GraphQLClient, gql, type Variables, type RequestDocument } from 'graphql-request';
 
 export default class DripsQL {
   private DRIPS_GRAPHQL_URL = 'https://drips-api.ey.r.appspot.com/';
 
-  private readonly _apolloClient: ApolloClient<any>;
+  private readonly _graphQlClient: GraphQLClient;
 
   constructor(url?: string) {
-    this._apolloClient = new ApolloClient({
-      uri: url || this.DRIPS_GRAPHQL_URL,
-      cache: new InMemoryCache(),
-    });
+    this._graphQlClient = new GraphQLClient(url ?? this.DRIPS_GRAPHQL_URL);
   }
 
   public async getProjectById(id: ProjectId): Promise<GitProject> {
@@ -80,12 +71,7 @@ export default class DripsQL {
       }
     `;
 
-    const {
-      data: { gitProjectById },
-    } = await this._apolloClient.query<{ gitProjectById: GitProject }>({
-      query,
-      variables: { id },
-    });
+    const { gitProjectById } = await this.query<{ gitProjectById: GitProject }>(query, { id });
 
     return gitProjectById;
   }
@@ -150,22 +136,12 @@ export default class DripsQL {
       }
     `;
 
-    const {
-      data: { gitProjects },
-    } = await this._apolloClient.query<{ gitProjects: GitProject[] }>({
-      query,
-      variables: { where },
-    });
+    const { gitProjects } = await this.query<{ gitProjects: GitProject[] }>(query, { where });
 
     return gitProjects;
   }
 
-  public async query<T>(query: DocumentNode, variables?: OperationVariables): Promise<T> {
-    const { data } = await this._apolloClient.query({
-      query: query,
-      variables,
-    });
-
-    return data;
+  public async query<T>(query: RequestDocument, variables?: Variables): Promise<T> {
+    return await this._graphQlClient.request<T>(query, variables);
   }
 }
