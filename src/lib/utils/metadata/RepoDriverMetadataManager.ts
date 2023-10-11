@@ -1,6 +1,6 @@
 import RepoDriverUtils from '../RepoDriverUtils';
 import { getRepoDriverClient } from '../get-drips-clients';
-import type { ClaimedGitProject } from '../git-project/types';
+import type { ClaimedGitProject } from '../project/types';
 import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverAccountMetadataParser } from './schemas';
 import type { RepoDriverAccount, AccountId } from './types';

@@ -3,9 +3,9 @@
 
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';
-  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+  import type { ClaimedGitProject } from '$lib/utils/project/types';
   import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
-  import { buildProjectUrl } from '$lib/utils/build-project-url';
+  import { buildProjectUrl } from '$lib/utils/project/git-project-utils';
 
   export let project: ClaimedGitProject;
 </script>

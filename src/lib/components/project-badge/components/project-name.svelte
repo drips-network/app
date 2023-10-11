@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { GitProject } from '$lib/utils/git-project/types';
+  import type { GitProject } from '$lib/utils/project/types';
 
   export let showSource = true;
 

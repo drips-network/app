@@ -11,7 +11,7 @@
   import Button from '../button/button.svelte';
   import { createEventDispatcher } from 'svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
-  import type { UnclaimedGitProject } from '$lib/utils/git-project/types';
+  import type { UnclaimedGitProject } from '$lib/utils/project/types';
 
   const dispatch = createEventDispatcher();
 

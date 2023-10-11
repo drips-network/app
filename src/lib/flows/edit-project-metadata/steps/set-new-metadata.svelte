@@ -11,7 +11,7 @@
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+  import type { ClaimedGitProject } from '$lib/utils/project/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

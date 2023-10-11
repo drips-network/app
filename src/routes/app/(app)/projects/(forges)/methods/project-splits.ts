@@ -1,6 +1,6 @@
 import type { AddressSplit, ProjectSplit } from '$lib/components/splits/splits.svelte';
 import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
-import type { ClaimedGitProject, GitProject } from '$lib/utils/git-project/types';
+import type { ClaimedGitProject, GitProject } from '$lib/utils/project/types';
 import { AddressDriverClient } from 'radicle-drips';
 
 export async function buildProjectSplitsData(project: GitProject) {

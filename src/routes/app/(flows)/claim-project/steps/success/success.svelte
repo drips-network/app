@@ -16,9 +16,9 @@
   async function viewProject() {
     loading = true;
 
-    const forge = $context.project?.source.forge;
-    const username = $context.project?.source.ownerName;
-    const repoName = $context.project?.source.repoName;
+    const forge = $context.project?.forge;
+    const username = $context.project?.ownerName;
+    const repoName = $context.project?.repoName;
 
     await goto(`/app/projects/${forge}/${username}/${repoName}`).then(() => {
       loading = false;

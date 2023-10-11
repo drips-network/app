@@ -28,11 +28,11 @@ export const load = (async ({ params }) => {
     const unclaimedFunds =
       project.verificationStatus === ProjectVerificationStatus.Claimed
         ? undefined
-        : fetchUnclaimedFunds(project.id);
+        : await fetchUnclaimedFunds(project.id);
 
     const earnedFunds =
       project.verificationStatus === ProjectVerificationStatus.Claimed
-        ? fetchEarnedFunds(project.id)
+        ? await fetchEarnedFunds(project.id)
         : undefined;
 
     return {

@@ -15,3 +15,4 @@ static/twemoji/*
 /src/e2e-tests/.tmp/*
 !/src/e2e-tests/.tmp/.gitkeep
 .netlify/
+.vscode/settings.json

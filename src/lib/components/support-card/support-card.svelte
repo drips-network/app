@@ -16,7 +16,7 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import buildUrl from '$lib/utils/build-url';
   import type { SplitsEntry } from 'radicle-drips';
-  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+  import type { ClaimedGitProject } from '$lib/utils/project/types';
 
   export let project: ClaimedGitProject | undefined = undefined;
   export let dripList: DripList | undefined = undefined;

@@ -5,7 +5,7 @@ import { get } from 'svelte/store';
 import EditDripListStep from './steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import type { DripList } from '$lib/utils/metadata/types';
-import type { GitProject } from '$lib/utils/git-project/types';
+import type { GitProject } from '$lib/utils/project/types';
 
 export default (
   dripListId: string,

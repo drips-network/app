@@ -3,8 +3,8 @@
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import { buildProjectUrl } from '$lib/utils/build-project-url';
-  import type { GitProject } from '$lib/utils/git-project/types';
+  import { buildProjectUrl } from '$lib/utils/project/git-project-utils';
+  import type { GitProject } from '$lib/utils/project/types';
   import ProjectName from './project-name.svelte';
 
   export let project: GitProject;

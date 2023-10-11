@@ -8,7 +8,7 @@
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
   import { GitProjectService } from '$lib/utils/project/GitProjectService';
-  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+  import type { ClaimedGitProject } from '$lib/utils/project/types';
 
   export let address: string | undefined;
 

@@ -6,7 +6,7 @@
   import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import twemoji from 'twemoji';
-  import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+  import type { ClaimedGitProject } from '$lib/utils/project/types';
 
   export let project: Writable<ClaimedGitProject>;
 

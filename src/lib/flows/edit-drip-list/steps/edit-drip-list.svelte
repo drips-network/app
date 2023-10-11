@@ -27,7 +27,7 @@
   import DripListEditor, {
     type DripListConfig,
   } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
-  import type { GitProject } from '$lib/utils/git-project/types';
+  import type { GitProject } from '$lib/utils/project/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -50,7 +50,7 @@
   let items = Object.fromEntries(
     mapFilterUndefined(flattenRepresentationalSplits(representationalSplits), (rs) => {
       if (rs.type === 'project-split') {
-        return [rs.project.source.url, projectItem(rs.project)];
+        return [rs.project.url, projectItem(rs.project)];
       } else if (rs.type === 'address-split') {
         return [rs.address, ethAddressItem(rs.address)];
       } else if (rs.type === 'drip-list-split') {
@@ -70,7 +70,7 @@
   let percentages = Object.fromEntries(
     mapFilterUndefined(flattenRepresentationalSplits(representationalSplits), (rs) => {
       if (rs.type === 'project-split') {
-        return [rs.project.source.url, getSplitPercent(rs.weight)];
+        return [rs.project.url, getSplitPercent(rs.weight)];
       } else if (rs.type === 'address-split') {
         return [rs.address, getSplitPercent(rs.weight)];
       } else if (rs.type === 'drip-list-split') {

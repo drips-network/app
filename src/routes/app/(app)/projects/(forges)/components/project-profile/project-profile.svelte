@@ -42,7 +42,7 @@
   import Link from 'radicle-design-system/icons/Link.svelte';
   import Copyable from '$lib/components/copyable/copyable.svelte';
   import { browser } from '$app/environment';
-  import type { ClaimedGitProject, GitProject as Project } from '$lib/utils/git-project/types';
+  import type { ClaimedGitProject, GitProject as Project } from '$lib/utils/project/types';
   import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   interface Amount {

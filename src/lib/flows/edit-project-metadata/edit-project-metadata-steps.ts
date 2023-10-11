@@ -3,7 +3,7 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { get } from 'svelte/store';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import SetNewMetadata from './steps/set-new-metadata.svelte';
-import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+import type { ClaimedGitProject } from '$lib/utils/project/types';
 
 export default (project: ClaimedGitProject) => ({
   context: undefined,

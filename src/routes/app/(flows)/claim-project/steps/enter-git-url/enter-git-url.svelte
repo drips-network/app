@@ -17,7 +17,7 @@
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   import { GitProjectService } from '$lib/utils/project/GitProjectService';
   import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
-  import type { UnclaimedGitProject } from '$lib/utils/git-project/types';
+  import type { UnclaimedGitProject } from '$lib/utils/project/types';
   import { fetchUnclaimedFunds } from '$lib/utils/project/git-project-utils';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';

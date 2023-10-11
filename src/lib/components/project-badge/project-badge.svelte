@@ -3,11 +3,11 @@
   import Tooltip from '../tooltip/tooltip.svelte';
   import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
-  import { buildProjectUrl } from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
-  import type { GitProject, UnclaimedGitProject } from '$lib/utils/git-project/types';
+  import type { GitProject, UnclaimedGitProject } from '$lib/utils/project/types';
   import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
+  import { buildProjectUrl } from '$lib/utils/project/git-project-utils';
 
   export let project: GitProject;
   export let tooltip = true;

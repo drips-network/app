@@ -82,7 +82,7 @@
 
 <script lang="ts">
   import SplitComponent from './components/split/split.svelte';
-  import type { GitProject as ApiGitProject } from '$lib/utils/git-project/types';
+  import type { GitProject as ApiGitProject } from '$lib/utils/project/types';
 
   export let list: Splits;
 

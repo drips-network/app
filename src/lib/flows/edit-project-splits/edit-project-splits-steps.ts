@@ -18,7 +18,7 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
 import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
 import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
-import type { ClaimedGitProject } from '$lib/utils/git-project/types';
+import type { ClaimedGitProject } from '$lib/utils/project/types';
 
 type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 

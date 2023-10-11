@@ -52,7 +52,7 @@
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
   import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
-  import type { GitProject } from '$lib/utils/git-project/types';
+  import type { GitProject } from '$lib/utils/project/types';
   import { GitProjectService } from '$lib/utils/project/GitProjectService';
 
   export let maxItems = 200;

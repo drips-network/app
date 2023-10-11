@@ -2,7 +2,7 @@
   import GithubIcon from 'radicle-design-system/icons/Github.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import twemoji from 'twemoji';
-  import type { GitProject } from '$lib/utils/git-project/types';
+  import type { GitProject } from '$lib/utils/project/types';
   import { ProjectVerificationStatus } from '$lib/graphql/generated/graphql';
 
   export let project: GitProject;

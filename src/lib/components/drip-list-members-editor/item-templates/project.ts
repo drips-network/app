@@ -1,4 +1,4 @@
-import type { GitProject } from '$lib/utils/git-project/types';
+import type { GitProject } from '$lib/utils/project/types';
 import type { ListItem } from '../drip-list-members-editor.svelte';
 
 const projectItem: (project: GitProject) => ListItem = (project: GitProject) => ({
