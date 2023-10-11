@@ -82,10 +82,10 @@
   let isAddingItem = false;
   let inputValue = '';
 
-  let gitProjectTxBuilder: GitProjectService;
+  let gitProjectService: GitProjectService;
 
   async function addProject() {
-    if (!gitProjectTxBuilder) gitProjectTxBuilder = await GitProjectService.new();
+    if (!gitProjectService) gitProjectService = await GitProjectService.new();
 
     if (!allowedItems.includes('projects')) return;
 
@@ -98,7 +98,7 @@
       const repoExists = await verifyRepoExists(username, repoName);
       if (!repoExists) throw new Error('This project doesnʼt exist');
 
-      let gitProject = await gitProjectTxBuilder.getProjectByUrl(inputValue);
+      let gitProject = await gitProjectService.getProjectByUrl(inputValue);
 
       const id = gitProject.url;
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');

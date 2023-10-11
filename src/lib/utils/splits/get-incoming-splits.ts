@@ -4,7 +4,7 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { DripList } from '$lib/utils/metadata/types';
 import { Utils, AddressDriverClient } from 'radicle-drips';
 import { GitProjectService } from '../project/GitProjectService';
-import type { GitProject } from '../git-project/types';
+import type { GitProject } from '../project/types';
 
 export interface SplitsEntryWrapper<T> {
   value: T;
@@ -22,7 +22,7 @@ export default async function getIncomingSplits(accountId: string): Promise<{
 }> {
   const subgraph = getSubgraphClient();
   const dripListService = await DripListService.new();
-  const gitProjectTxBuilder = await GitProjectService.new();
+  const gitProjectService = await GitProjectService.new();
 
   const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(accountId);
 
@@ -45,7 +45,7 @@ export default async function getIncomingSplits(accountId: string): Promise<{
   );
 
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
-    const gitProject = await gitProjectTxBuilder.getProjectById(s.senderId);
+    const gitProject = await gitProjectService.getProjectById(s.senderId);
     if (!gitProject) return undefined;
 
     return { value: gitProject, weight: Number(s.weight) };

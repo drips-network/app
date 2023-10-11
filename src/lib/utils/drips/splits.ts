@@ -53,7 +53,7 @@ export async function buildRepresentationalSplits(
   splits: { account: { accountId: string }; weight: number }[],
   splitsMeta: (RepoDriverSplitReceiver | AddressDriverSplitReceiver | DripListSplitReceiver)[] = [],
 ): Promise<RepresentationalSplit[]> {
-  const gitProjectTxBuilder = await GitProjectService.new();
+  const gitProjectService = await GitProjectService.new();
   const nftDriverMetadata = new NftDriverMetadataManager();
   const subgraph = getSubgraphClient();
 
@@ -62,7 +62,7 @@ export async function buildRepresentationalSplits(
       const matchingMetadata = splitsMeta.find((v) => v.account.accountId === s.account.accountId);
 
       if (matchingMetadata?.type === 'repo') {
-        const project = await gitProjectTxBuilder.getProjectById(s.account.accountId);
+        const project = await gitProjectService.getProjectById(s.account.accountId);
 
         assert(project);
 
