@@ -15,7 +15,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import checkIsUser from '$lib/utils/check-is-user';
-  import decodeAccountId from '$lib/utils/decode-user-id';
+  import decodeAccountId from '$lib/utils/decode-universal-account-id';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
   import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
