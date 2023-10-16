@@ -24,7 +24,9 @@
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
 </script>
 
-<HeadMeta title={data.dripList.name} />
+{#if data.dripList.name}
+  <HeadMeta title={data.dripList.name} />
+{/if}
 
 <article class="drip-list-page">
   <section class="flex flex-col gap-6">
