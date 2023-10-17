@@ -185,7 +185,7 @@
         {/if}
         {#if $context.selectedSupportOption === 2}
           <UlIconLi icon={TokenStreams}>
-            You can <span class="typo-text-bold">start supporting</span> your Drip List anytime yourself.
+            You can <span class="typo-text-bold">start supporting</span> your Drip List anytime.
           </UlIconLi>
         {/if}
         <UlIconLi icon={PenIcon}
