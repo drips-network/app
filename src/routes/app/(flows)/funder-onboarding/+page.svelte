@@ -33,5 +33,5 @@
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
   steps={steps()}
-  minHeightPx={512}
+  minHeightPx={128}
 />
