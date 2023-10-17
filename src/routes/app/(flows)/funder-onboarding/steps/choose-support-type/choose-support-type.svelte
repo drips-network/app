@@ -73,11 +73,11 @@
           text: 'Publish the list.',
         },
         {
-          icon: Coin,
+          icon: Sharrow,
           text: 'Share for public funding.',
         },
         {
-          icon: Sharrow,
+          icon: Coin,
           text: 'Stream funds to your list anytime.',
         },
       ],
