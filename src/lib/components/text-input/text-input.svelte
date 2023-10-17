@@ -114,7 +114,7 @@
     {#if suffix}
       <span
         class="typo-text tabular-nums"
-        style="color: var(--color-foreground-level-5); margin: 0 0.75rem;"
+        style="color: var(--color-foreground-level-4); margin: 0 0.75rem;"
       >
         {suffix}
       </span>
@@ -188,7 +188,7 @@
   }
 
   input::placeholder {
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground-level-4);
   }
 
   input:focus,
