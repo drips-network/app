@@ -12,7 +12,7 @@
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade, fly } from 'svelte/transition';
-  import decodeAccountId from '$lib/utils/decode-user-id';
+  import decodeUniversalAccountId from '$lib/utils/decode-universal-account-id';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
   import Banner from '$lib/components/banner/banner.svelte';
@@ -20,12 +20,13 @@
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
+  import { goto } from '$app/navigation';
 
   $: accountId = $page.params.accountId;
 
   let dripsAccountId: string | undefined;
   let address: string | undefined;
-  let error: Error | undefined;
+  let error: 'is-repo-driver-account-id' | true | undefined;
 
   const ensRecords = ['description', 'url', 'com.twitter', 'com.github'] as const;
   const socialLinks = ['com.twitter', 'com.github', 'url'] as const;
@@ -70,12 +71,27 @@
 
   onMount(async () => {
     try {
-      const decodedAccountId = await decodeAccountId(accountId);
+      const decodedAccountId = await decodeUniversalAccountId(accountId);
 
-      address = decodedAccountId.address;
-      dripsAccountId = decodedAccountId.dripsAccountId;
+      switch (decodedAccountId.driver) {
+        case 'address': {
+          address = decodedAccountId.address;
+          dripsAccountId = decodedAccountId.dripsAccountId;
+          break;
+        }
+        case 'nft': {
+          goto(`/app/drip-lists/${decodedAccountId.dripsAccountId}`);
+          break;
+        }
+        case 'repo': {
+          error = 'is-repo-driver-account-id';
+          break;
+        }
+      }
     } catch (e) {
-      error = e instanceof Error ? e : new Error();
+      // eslint-disable-next-line no-console
+      console.error(e);
+      error = true;
     }
   });
 
@@ -94,7 +110,7 @@
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      error = e instanceof Error ? e : new Error('Unable to fetch account');
+      error = true;
     }
   }
 
@@ -107,11 +123,17 @@
 
 <HeadMeta title={(address && $ens[address]?.name) ?? address ?? accountId} />
 
-{#if error}
+{#if error === 'is-repo-driver-account-id'}
   <LargeEmptyState
     emoji="🕸️"
-    headline="Unable to show profile"
-    description="We werenʼt able to find that profile."
+    headline="Unable to jump to projects by account ID"
+    description="Sorry, but jumping to a Drips Project by its account ID is currently not supported."
+  />
+{:else if error}
+  <LargeEmptyState
+    emoji="🕸️"
+    headline="Something went wrong"
+    description="There may be more information in the developer console."
   />
 {:else}
   <div class="profile">
