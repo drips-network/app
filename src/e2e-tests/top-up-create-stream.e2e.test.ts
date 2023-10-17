@@ -473,6 +473,35 @@ describe('app', async () => {
       await page.locator('button', { hasText: 'Continue' }).click();
     });
 
+    it('connects the wallet and continues', async () => {
+      await page.waitForTimeout(1000); // Wait for previous step to be unmounted
+
+      await expect(page.locator('text=Connect your wallet')).toHaveCount(1);
+      await page.locator('button', { hasText: 'Continue' }).click();
+      console.log('bar');
+    });
+
+    it('selects the no support option', async () => {
+      await page.locator('button', { hasText: 'Support later' }).click();
+      await page.locator('button', { hasText: 'Continue' }).click();
+    });
+
+    it('opens the review step', async () => {
+      await expect(page.locator('text=Review')).toHaveCount(1);
+    });
+
+    it('goes back to the support options', async () => {
+      await page.waitForTimeout(1000); // Wait for previous step to be unmounted
+
+      await page.locator('button', { hasText: 'Back' }).click();
+      await expect(page.locator('text=Support your Drip List')).toHaveCount(1);
+    });
+
+    it('selects the continuous support option', async () => {
+      await page.locator('button', { hasText: 'Continuous support' }).click();
+      await page.locator('button', { hasText: 'Continue' }).click();
+    });
+
     it('selects the test token to stream', async () => {
       await page.locator('data-testid=item-0xefbF81372aBC3723463746a89CEb42080563684C').click();
     });
