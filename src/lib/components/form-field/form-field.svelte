@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let title: string;
+  export let title: string | undefined = undefined;
   export let description: string | undefined = undefined;
   export let disabled = false;
   export let type: 'label' | 'div' = 'label';
@@ -8,12 +8,14 @@
 <svelte:element this={type} class="wrapper typo-text-bold" class:disabled>
   <div class="content"><slot /></div>
   {#if description}<p>{description}</p>{/if}
-  <div class="title">
-    {title}
-    <span class="slot">
-      <slot name="action" />
-    </span>
-  </div>
+  {#if title}
+    <div class="title">
+      {title}
+      <span class="slot">
+        <slot name="action" />
+      </span>
+    </div>
+  {/if}
 </svelte:element>
 
 <style>
