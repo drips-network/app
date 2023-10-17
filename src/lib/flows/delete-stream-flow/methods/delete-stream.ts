@@ -37,19 +37,22 @@ export default function (
         assert(assetConfig, "App hasnʼt yet fetched user's own account");
 
         const metadataMgr = new AddressDriverMetadataManager();
-
         const metadata = metadataMgr.buildAccountMetadata({ forAccount: ownAccount, address });
-        const assetConfigIndex = metadata.assetConfigs.findIndex(
-          (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
-        );
-        const streamIndex = metadata.assetConfigs[assetConfigIndex].streams.findIndex(
-          (ms) => ms.id === stream.id,
-        );
 
-        metadata.assetConfigs[assetConfigIndex].streams.splice(streamIndex, 1);
+        // If the stream isn't managed, it didn't have any metadata, so we don't need to make any changes to it.
+        if (stream.managed) {
+          const assetConfigIndex = metadata.assetConfigs.findIndex(
+            (mac) => mac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+          );
+          const streamIndex = metadata.assetConfigs[assetConfigIndex].streams.findIndex(
+            (ms) => ms.id === stream.id,
+          );
 
-        if (metadata.assetConfigs[assetConfigIndex].streams.length === 0) {
-          metadata.assetConfigs.splice(assetConfigIndex, 1);
+          metadata.assetConfigs[assetConfigIndex].streams.splice(streamIndex, 1);
+
+          if (metadata.assetConfigs[assetConfigIndex].streams.length === 0) {
+            metadata.assetConfigs.splice(assetConfigIndex, 1);
+          }
         }
 
         const newHash = await metadataMgr.pinAccountMetadata(metadata);
@@ -71,6 +74,10 @@ export default function (
 
         const { ADDRESS_DRIVER } = getNetworkConfig();
 
+        /*
+        Pretty confusing that this is a "createStream" preset, but all it is does is 1) call setStreams, and
+        2) update metadata. Since we need to do exactly this also for deleting streams, we can use it here.
+        */
         const createStreamBatchPreset = await AddressDriverPresets.Presets.createNewStreamFlow({
           signer,
           driverAddress: ADDRESS_DRIVER,
@@ -102,9 +109,9 @@ export default function (
 
       after: async (_, transactContext) => {
         /*
-      We wait up to five seconds for `refreshUserAccount` to update the user's own
-      account's `lastIpfsHash` to the new hash we just published.
-      */
+        We wait up to five seconds for `refreshUserAccount` to update the user's own
+        account's `lastIpfsHash` to the new hash we just published.
+        */
         await expect(
           streams.refreshUserAccount,
           () =>

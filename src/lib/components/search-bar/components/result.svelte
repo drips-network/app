@@ -72,7 +72,7 @@
       <div class="highlighted">
         <span style="color: var(--color-foreground)">
           {#if !item.item.name && !item.item.address && item.item.dripsAccountId}
-            Jump to user ID:
+            Jump to account ID:
           {/if}
         </span>
         {@html highlighted}

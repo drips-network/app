@@ -4,6 +4,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
+  import SupportCard from '$lib/components/support-card/support-card.svelte';
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
@@ -23,7 +24,9 @@
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
 </script>
 
-<HeadMeta title={data.dripList.name} />
+{#if data.dripList.name}
+  <HeadMeta title={data.dripList.name} />
+{/if}
 
 <article class="drip-list-page">
   <section class="flex flex-col gap-6">
@@ -33,12 +36,19 @@
     </div>
 
     <SectionSkeleton loaded={Boolean(data.dripList)}>
-      <DripListCard
-        {supportStreams}
-        incomingSplits={data.incomingSplits}
-        dripList={data.dripList}
-        representationalSplits={data.representationalSplits}
-      />
+      <div class="list-and-support">
+        <div class="list">
+          <DripListCard
+            {supportStreams}
+            incomingSplits={data.incomingSplits}
+            dripList={data.dripList}
+            representationalSplits={data.representationalSplits}
+          />
+        </div>
+        <div class="support">
+          <SupportCard {dripList} />
+        </div>
+      </div>
     </SectionSkeleton>
   </section>
 
@@ -61,6 +71,23 @@
     gap: 3rem;
   }
 
+  .list-and-support {
+    padding: 2px 0 8px 0;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .list-and-support .list {
+    flex-grow: 1;
+    width: 100%;
+  }
+
+  .list-and-support .support {
+    flex-grow: 0;
+    max-width: 18rem;
+    align-self: top;
+  }
+
   .owner {
     display: flex;
     gap: 0.25rem;
@@ -68,5 +95,11 @@
 
   .owner span {
     color: var(--color-foreground-level-6);
+  }
+
+  @media (max-width: 1252px) {
+    .list-and-support {
+      flex-direction: column;
+    }
   }
 </style>

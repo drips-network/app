@@ -14,7 +14,7 @@
   export let context: Writable<State>;
 
   const { searchParams } = $page.url;
-  const projectUrlToAdd = searchParams.get('projectToAdd') ?? undefined;
+  const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
 
   let isValid = false;
 </script>
@@ -22,12 +22,7 @@
 <StandaloneFlowStepLayout
   description="What projects, individuals, or organizations would you like to support with your Drip List?"
 >
-  <DripListEditor
-    bind:isValid
-    bind:dripList={$context.dripList}
-    showListFirst={true}
-    {projectUrlToAdd}
-  />
+  <DripListEditor bind:isValid bind:dripList={$context.dripList} showListFirst={true} {urlToAdd} />
   <svelte:fragment slot="actions">
     <Button
       disabled={!isValid}
