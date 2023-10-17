@@ -72,6 +72,7 @@
     opacity: 0;
     transition: transform 0.3s, opacity 0.3s;
     pointer-events: none;
+    z-index: 0;
   }
 
   .selector.desktop {
