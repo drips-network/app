@@ -49,7 +49,7 @@
   }
 
   .option:hover {
-    background-color: var(--color-primary-level-1);
+    box-shadow: 0px 0px 0px 2px var(--color-foreground-level-2);
   }
 
   .option:focus-visible {
@@ -57,6 +57,7 @@
   }
 
   .attributes {
+    padding-top: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
