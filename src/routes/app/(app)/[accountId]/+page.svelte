@@ -26,7 +26,7 @@
 
   let dripsAccountId: string | undefined;
   let address: string | undefined;
-  let error: 'is-repo-driver-account-id' | true | undefined;
+  let error: 'is-repo-driver-account-id' | 'ens-not-resolved' | true | undefined;
 
   const ensRecords = ['description', 'url', 'com.twitter', 'com.github'] as const;
   const socialLinks = ['com.twitter', 'com.github', 'url'] as const;
@@ -89,9 +89,14 @@
         }
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      error = true;
+      if (typeof e === 'object' && e && 'message' in e && e.message === 'Not found') {
+        error = 'ens-not-resolved';
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(e);
+
+        error = true;
+      }
     }
   });
 
@@ -128,6 +133,12 @@
     emoji="🕸️"
     headline="Unable to jump to projects by account ID"
     description="Sorry, but jumping to a Drips Project by its account ID is currently not supported."
+  />
+{:else if error === 'ens-not-resolved'}
+  <LargeEmptyState
+    emoji="🕸️"
+    headline="Not found"
+    description="Sorry, but we couldn't find that ENS name."
   />
 {:else if error}
   <LargeEmptyState
