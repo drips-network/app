@@ -1,0 +1,16 @@
+/* cloned from radicle-design-system so we can swap in optimized fonts */
+
+@font-face {
+  font-family: 'Inter Bold';
+  src: url('/fonts/Inter-Bold.woff2');
+}
+
+@font-face {
+  font-family: 'Inter SemiBold';
+  src: url('/fonts/Inter-Semibold.woff2');
+}
+
+@font-face {
+  font-family: 'Inter Regular';
+  src: url('/fonts/Inter-Regular.woff2');
+}
