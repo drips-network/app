@@ -444,8 +444,8 @@ export default class GitProjectService {
       typeof repoDriverAccountMetadataParser
     >['splits']['dependencies'] = [];
 
-    for (const [urlOrAddress, percentage] of dependenciesInput) {
-      const isAddr = isAddress(urlOrAddress);
+    for (const [itemId, percentage] of dependenciesInput) {
+      const isAddr = isAddress(itemId);
 
       const weight = Math.floor(
         (Number(percentage) / 100) * 1000000 * (highLevelPercentages['dependencies'] / 100),
@@ -457,13 +457,13 @@ export default class GitProjectService {
         const receiver = {
           type: 'address' as const,
           weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(itemId as Address),
         };
 
         dependenciesSplitMetadata.push(receiver);
         receivers.push(receiver);
-      } else if (isValidGitUrl(urlOrAddress)) {
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
+      } else if (isValidGitUrl(itemId)) {
+        const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
 
         const receiver = {
           type: 'repoDriver' as const,
@@ -481,7 +481,7 @@ export default class GitProjectService {
         const receiver = {
           type: 'dripList' as const,
           weight,
-          accountId: urlOrAddress,
+          accountId: itemId,
         };
 
         dependenciesSplitMetadata.push(receiver);
