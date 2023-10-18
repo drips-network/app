@@ -63,3 +63,9 @@ h1,
 .tabular-nums {
   font-feature-settings: 'tnum', 'zero';
 }
+
+.app-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}

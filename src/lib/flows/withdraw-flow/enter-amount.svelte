@@ -2,7 +2,6 @@
   import Button from '$lib/components/button/button.svelte';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import ListSelect from '$lib/components/list-select/list-select.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import Token from '$lib/components/token/token.svelte';
@@ -163,29 +162,17 @@
     description="Withdraw funds from your outgoing streaming balance."
   />
   <FormField title="Balance">
-    <div class="balance">
-      <ListSelect
-        blockInteraction
-        searchable={false}
-        items={{
-          '': {
-            type: 'selectable',
-            searchString: [tokenInfo.info.name, tokenInfo.info.symbol],
-            label: tokenInfo.info.name ?? 'Unknown token',
-            text: `${formatTokenAmount(estimate, tokenInfo.info.decimals)} ${
-              tokenInfo.info.symbol
-            }`,
-            image: {
-              component: Token,
-              props: {
-                address: $context.tokenAddress,
-                show: 'none',
-                size: 'small',
-              },
-            },
-          },
-        }}
-      />
+    <div class="flex border rounded-drip-xl p-3 typo-text gap-2 items-center">
+      <Token address={$context.tokenAddress} show="none" size="small" />
+      <div class="flex-1 min-w-0 truncate">
+        {tokenInfo.info.name ?? 'Unknown token'}
+      </div>
+      <div class="flex-1 min-w-0 truncate text-right text-foreground-level-4">
+        {formatTokenAmount(estimate, tokenInfo.info.decimals)}
+      </div>
+      <div class="text-foreground-level-4">
+        {tokenInfo.info.symbol}
+      </div>
     </div>
   </FormField>
   <FormField title="Amount to withdraw">
@@ -209,11 +196,3 @@
     >
   </svelte:fragment>
 </StepLayout>
-
-<style>
-  .balance {
-    border: 1px solid var(--color-foreground);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    overflow: hidden;
-  }
-</style>
