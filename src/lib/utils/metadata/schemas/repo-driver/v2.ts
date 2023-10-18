@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { sourceSchema } from '../common/sources';
 
-const addressDriverSplitReceiverSchema = z.object({
+export const addressDriverSplitReceiverSchema = z.object({
   type: z.literal('address'),
   weight: z.number(),
   accountId: z.string(),
 });
 
-const repoDriverSplitReceiverSchema = z.object({
+export const repoDriverSplitReceiverSchema = z.object({
   type: z.literal('repoDriver'),
   weight: z.number(),
   accountId: z.string(),

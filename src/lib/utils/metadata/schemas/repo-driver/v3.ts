@@ -1,23 +1,14 @@
 import { z } from 'zod';
-import { sourceSchema } from '../common/sources';
+import {
+  addressDriverSplitReceiverSchema,
+  repoDriverAccountMetadataSchemaV2,
+  repoDriverSplitReceiverSchema,
+} from './v2';
 
 const dripListSplitReceiverSchema = z.object({
   type: z.literal('dripList'),
   weight: z.number(),
   accountId: z.string(),
-});
-
-const addressDriverSplitReceiverSchema = z.object({
-  type: z.literal('address'),
-  weight: z.number(),
-  accountId: z.string(),
-});
-
-const repoDriverSplitReceiverSchema = z.object({
-  type: z.literal('repoDriver'),
-  weight: z.number(),
-  accountId: z.string(),
-  source: sourceSchema,
 });
 
 const repoDriverAccountSplitsSchema = z.object({
@@ -31,15 +22,6 @@ const repoDriverAccountSplitsSchema = z.object({
   ),
 });
 
-export const repoDriverAccountMetadataSchemaV3 = z.object({
-  driver: z.literal('repo'),
-  describes: z.object({
-    driver: z.literal('repo'),
-    accountId: z.string(),
-  }),
-  source: sourceSchema,
-  emoji: z.string(),
-  color: z.string(),
-  description: z.string().optional(),
+export const repoDriverAccountMetadataSchemaV3 = repoDriverAccountMetadataSchemaV2.extend({
   splits: repoDriverAccountSplitsSchema,
 });
