@@ -113,8 +113,8 @@
 />
 
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
-  <div class="project-profile" class:claimed={project.claimed}>
-    <div class="header">
+  <article class="project-profile" class:claimed={project.claimed}>
+    <header class="header">
       {#if project.owner}
         <div class="owner">
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
@@ -157,16 +157,13 @@
           </AnnotationBox>
         </div>
       {/if}
-      <div class="project-profile-header">
-        <ProjectProfileHeader {project} />
-        {#if project.claimed && isOwnProject}
-          <Button
-            icon={Pen}
-            on:click={() =>
-              project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
-            >Edit</Button
-          >
-        {/if}
+      <div>
+        <ProjectProfileHeader
+          {project}
+          editButton={project.claimed && isOwnProject ? 'Edit' : undefined}
+          on:editButtonClick={() =>
+            project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
+        />
       </div>
       {#if project.claimed}
         {#await Promise.all([earnedFunds, splits])}
@@ -202,11 +199,11 @@
           </div>
         {/await}
       {/if}
-    </div>
+    </header>
     <div class="content">
       <Developer accountId={project.repoDriverAccount.accountId} />
       {#if project.owner}
-        <div class="section">
+        <section class="app-section">
           {#if splits}
             {#await splits}
               <SectionHeader icon={SplitsIcon} label="Splits" />
@@ -265,9 +262,9 @@
               <SectionSkeleton loaded={true} error={true} />
             {/await}
           {/if}
-        </div>
+        </section>
       {:else if unclaimedFunds}
-        <div class="section">
+        <section class="app-section">
           <SectionHeader icon={Wallet} label="Claimable funds" />
           {#await unclaimedFunds}
             <SectionSkeleton loaded={false} />
@@ -287,7 +284,7 @@
           {:catch}
             <SectionSkeleton loaded={true} error={true} />
           {/await}
-        </div>
+        </section>
       {/if}
       <SupportersSection type="project" {incomingSplits} />
     </div>
@@ -298,7 +295,7 @@
         </div>
       </aside>
     {/if}
-  </div>
+  </article>
 </PrimaryColorThemer>
 
 <style>
@@ -309,7 +306,7 @@
     grid-template-areas:
       'header'
       'content';
-    gap: 3rem;
+    gap: 2rem;
   }
 
   .project-profile.claimed {
@@ -318,6 +315,11 @@
     grid-template-areas:
       'header sidebar'
       'content sidebar';
+  }
+
+  aside {
+    grid-area: sidebar;
+    height: 0; /* so it's height doesnt influence .header's height and mess up main column gaps */
   }
 
   .project-profile > * {
@@ -329,7 +331,7 @@
     align-self: top;
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 3rem;
   }
 
   .unclaimed-project-notice {
@@ -338,27 +340,22 @@
 
   .header {
     grid-area: header;
-  }
-
-  .header .project-profile-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .header .owner {
     display: flex;
     gap: 0.375rem;
     align-items: center;
-    margin-bottom: 1.5rem;
   }
 
   .stats {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    margin-top: 2rem;
   }
 
   .stats.loading {
@@ -374,10 +371,6 @@
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     min-height: 6.125rem;
-  }
-
-  aside {
-    grid-area: sidebar;
   }
 
   .become-supporter-card {
@@ -401,17 +394,12 @@
     gap: 1rem;
   }
 
-  .section {
-    display: flex;
-    gap: 2rem;
-    flex-direction: column;
-  }
-
   @media (max-width: 1024px) {
     .project-profile,
     .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
+      gap: 3rem;
     }
 
     .project-profile.claimed {
@@ -425,11 +413,8 @@
       margin-bottom: 0;
     }
 
-    .header .project-profile-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-direction: column;
+    aside {
+      height: auto;
     }
   }
 </style>

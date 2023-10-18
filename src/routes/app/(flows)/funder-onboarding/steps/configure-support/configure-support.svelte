@@ -1,18 +1,14 @@
 <script lang="ts">
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import FormField from '$lib/components/form-field/form-field.svelte';
   import Check from 'radicle-design-system/icons/Check.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import AccountBox from '$lib/components/account-box/account-box.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../funder-onboarding-flow';
   import SupportStreamEditor from '$lib/components/support-stream-editor/support-stream-editor.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -21,10 +17,13 @@
   let formValid: boolean;
 </script>
 
-<StandaloneFlowStepLayout description="Set up a stream to support the projects on your Drip List.">
+<StandaloneFlowStepLayout
+  headline="Continuous Support"
+  description="Set up a stream to support the projects on your Drip List."
+>
   <AnnotationBox type="info">
     <div class="support-type-explainer">
-      <h4 class="typo-text-small-bold">Support monthly with token streaming</h4>
+      <h4 class="typo-text-small-bold">Supporting with a stream</h4>
       <ul>
         <li>Stream a custom amount of any ERC-20 token</li>
         <li>Cancel, pause or edit the stream rate anytime</li>
@@ -32,19 +31,11 @@
       </ul>
     </div>
   </AnnotationBox>
-  <FormField type="div" title="Wallet">
-    <AccountBox />
-    {#if Boolean($walletStore.safe)}
-      <div style:margin-top="16px">
-        <SafeAppDisclaimer disclaimerType="drips" />
-      </div>
-    {/if}
-  </FormField>
   <SupportStreamEditor
     bind:formValid
-    bind:streamRateValueParsed={$context.supportConfig.streamRateValueParsed}
-    bind:topUpAmountValueParsed={$context.supportConfig.topUpAmountValueParsed}
-    bind:selectedTokenAddress={$context.supportConfig.listSelected[0]}
+    bind:streamRateValueParsed={$context.continuousSupportConfig.streamRateValueParsed}
+    bind:topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed}
+    bind:selectedTokenAddress={$context.continuousSupportConfig.listSelected[0]}
   />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>

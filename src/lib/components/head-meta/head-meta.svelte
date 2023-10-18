@@ -9,9 +9,11 @@
 </script>
 
 <svelte:head>
-  <title>{title}{title.startsWith('Drips') ? '' : ' | Drips'}</title>
+  {#if title}
+    <title>{title}{title.startsWith('Drips') ? '' : ' | Drips'}</title>
+    <meta property="og:title" content="{title}{title.startsWith('Drips') ? '' : ' | Drips'}" />
+  {/if}
   <meta name="description" content={description} />
-  <meta property="og:title" content="{title}{title.startsWith('Drips') ? '' : ' | Drips'}" />
   <meta property="og:image" content="https://{$page.url.host}{image}" />
   <meta property="og:description" content={description} />
   <meta name="twitter:title" content="Drips" />

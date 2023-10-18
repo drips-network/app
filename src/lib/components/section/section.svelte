@@ -10,14 +10,14 @@
   export let collapsed = false;
 </script>
 
-<section style:margin-bottom={collapsed ? '-2rem' : 0}>
+<section class="app-section" style:margin-bottom={collapsed ? '-2rem' : 0}>
   <SectionHeader
     bind:collapsable
     bind:collapsed
     {...header}
     actionsDisabled={collapsed || header.actionsDisabled}
   />
-  <div class="content">
+  <div>
     <SectionSkeleton bind:collapsed {...skeleton}>
       <slot />
     </SectionSkeleton>
@@ -26,12 +26,6 @@
 
 <style>
   section {
-    display: flex;
-    flex-direction: column;
     transition: margin-bottom 0.3s ease;
-  }
-
-  .content {
-    padding-top: 1.5rem;
   }
 </style>

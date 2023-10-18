@@ -28,7 +28,10 @@
   on:mouseenter={() => (visible = true)}
   on:mouseleave={() => (visible = false)}
 >
-  <slot />
+  <!-- needs a .min-w-0 wrapper so slotted content that truncates can still truncate ("...") -->
+  <div class="min-w-0">
+    <slot />
+  </div>
   <div
     class="copy-icon"
     class:visible={!disabled && (visible || success || alwaysVisible)}
@@ -48,7 +51,6 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    justify-content: space-between;
   }
 
   .copy-icon {

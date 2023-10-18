@@ -1,5 +1,4 @@
 <script lang="ts">
-  import StandaloneFlowStepHeader from '../components/standalone-flow-step-header/standalone-flow-step-header.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { slotsTemplate, state, steps } from './funder-onboarding-flow';
   import { onDestroy, onMount } from 'svelte';
@@ -22,16 +21,24 @@
 
 <HeadMeta title="Create Drip List" />
 
-<StandaloneFlowStepHeader title="Create your Drip List">
-  <DripList slot="illustration" />
-</StandaloneFlowStepHeader>
-
 <StandaloneFlowSlots on:edit={handleSlotEdit} {slots} />
+
+<div class="icon">
+  <DripList strokeWidth={6} />
+</div>
 
 <Stepper
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
   steps={steps()}
-  minHeightPx={512}
+  minHeightPx={128}
 />
+
+<style>
+  .icon {
+    margin: 1.5rem auto 0 auto;
+    height: 5rem;
+    width: 5rem;
+  }
+</style>

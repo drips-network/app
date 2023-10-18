@@ -438,6 +438,10 @@
 </div>
 
 <style>
+  .list-editor {
+    text-align: left;
+  }
+
   .list {
     background-color: var(--color-background);
     box-shadow: var(--elevation-low);

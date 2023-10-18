@@ -9,7 +9,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
   import balances from '$lib/stores/balances';
-  import decodeAccountId from '$lib/utils/decode-user-id';
+  import decodeAccountId from '$lib/utils/decode-universal-account-id';
   import unreachable from '$lib/utils/unreachable';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
   import tokens from '$lib/stores/tokens';
