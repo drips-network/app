@@ -28,7 +28,7 @@
     padding: 0.5rem;
     align-items: stretch;
     position: relative;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .divider {

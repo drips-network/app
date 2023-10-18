@@ -33,7 +33,7 @@
 
 <style>
   .option {
-    padding: 1rem;
+    padding: 2rem 1rem;
     flex-shrink: 0;
     flex-grow: 1;
     flex-basis: 0px;
