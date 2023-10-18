@@ -21,7 +21,7 @@
 <StepLayout>
   <StepHeader
     headline="Edit your dependency list"
-    description="Decide which GitHub projects and Ethereum addresses should receive the {$context
+    description="Decide which GitHub projects, Ethereum addresses, and other Drip Lists should receive the {$context
       .highLevelPercentages['dependencies']}% you assigned to your project’s dependencies."
   />
   <ListEditor
