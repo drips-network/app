@@ -462,7 +462,7 @@ export default class GitProjectService {
 
         dependenciesSplitMetadata.push(receiver);
         receivers.push(receiver);
-      } else {
+      } else if (isValidGitUrl(urlOrAddress)) {
         const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
 
         const receiver = {
@@ -475,6 +475,16 @@ export default class GitProjectService {
           ...receiver,
           source: GitProjectService.populateSource(forge, repoName, username),
         });
+        receivers.push(receiver);
+      } else {
+        // It's the account ID for another Drip List
+        const receiver = {
+          type: 'dripList' as const,
+          weight,
+          accountId: urlOrAddress,
+        };
+
+        dependenciesSplitMetadata.push(receiver);
         receivers.push(receiver);
       }
     }
@@ -661,26 +671,82 @@ export default class GitProjectService {
             address: AddressDriverClient.getUserAddress(m.accountId),
           },
         })),
-        dependencies: projectMetadata.data.splits.dependencies.map((d) =>
-          'source' in d
-            ? {
-                type: 'repo',
-                weight: d.weight,
-                account: {
-                  driver: 'repo',
-                  accountId: d.accountId,
-                },
-                source: d.source,
+        dependencies: await Promise.all(
+          projectMetadata.data.splits.dependencies.map(async (d) => {
+            if ('type' in d) {
+              // Metadata V2 and up. We can rely on the type param
+              switch (d.type) {
+                case 'address':
+                  return {
+                    type: 'address',
+                    weight: d.weight,
+                    account: {
+                      driver: 'address',
+                      accountId: d.accountId,
+                      address: AddressDriverClient.getUserAddress(d.accountId),
+                    },
+                  };
+                case 'repoDriver':
+                  return {
+                    type: 'repo',
+                    weight: d.weight,
+                    account: {
+                      driver: 'repo',
+                      accountId: d.accountId,
+                    },
+                    source: d.source,
+                  };
+                case 'dripList': {
+                  const owner = await getSubgraphClient().getNftSubAccountOwnerByTokenId(
+                    d.accountId,
+                  );
+
+                  if (!owner) {
+                    throw new Error(`Unable to find owner for drip list ${d.accountId}}`);
+                  }
+
+                  const addressDriverClient = await getAddressDriverClient();
+
+                  return {
+                    type: 'dripList',
+                    weight: d.weight,
+                    account: {
+                      driver: 'nft',
+                      accountId: d.accountId,
+                      owner: {
+                        driver: 'address' as const,
+                        accountId: await addressDriverClient.getAccountIdByAddress(
+                          owner.ownerAddress,
+                        ),
+                        address: owner.ownerAddress,
+                      },
+                    },
+                  };
+                }
               }
-            : {
-                type: 'address',
-                weight: d.weight,
-                account: {
-                  driver: 'address',
-                  accountId: d.accountId,
-                  address: AddressDriverClient.getUserAddress(d.accountId),
-                },
-              },
+            } else {
+              // Metadata V1. We don't have a type parameter, but there can't be any DripList receivers.
+              return 'source' in d
+                ? {
+                    type: 'repo',
+                    weight: d.weight,
+                    account: {
+                      driver: 'repo',
+                      accountId: d.accountId,
+                    },
+                    source: d.source,
+                  }
+                : {
+                    type: 'address',
+                    weight: d.weight,
+                    account: {
+                      driver: 'address',
+                      accountId: d.accountId,
+                      address: AddressDriverClient.getUserAddress(d.accountId),
+                    },
+                  };
+            }
+          }),
         ),
       },
     };

@@ -30,7 +30,7 @@
     bind:valid={formValid}
     blockedKeys={maintainerKeys}
     maxItems={200 - maintainerKeys.length}
-    allowedItems={['eth-addresses', 'projects']}
+    allowedItems={['eth-addresses', 'projects', 'drip-lists']}
   />
   <svelte:fragment slot="actions">
     <Button
