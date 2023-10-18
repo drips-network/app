@@ -24,7 +24,7 @@
 <StandaloneFlowSlots on:edit={handleSlotEdit} {slots} />
 
 <div class="icon">
-  <MultiChain strokeWidth={4} />
+  <MultiChain strokeWidth={6} />
 </div>
 
 <Stepper
@@ -38,7 +38,7 @@
 <style>
   .icon {
     margin: 1rem auto 0 auto;
-    height: 6rem;
-    width: 6rem;
+    height: 5rem;
+    width: 5rem;
   }
 </style>

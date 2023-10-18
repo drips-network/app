@@ -37,8 +37,8 @@
 
 <style>
   .icon {
-    margin: 1rem auto 0 auto;
-    height: 6rem;
-    width: 6rem;
+    margin: 1.5rem auto 0 auto;
+    height: 5rem;
+    width: 5rem;
   }
 </style>
