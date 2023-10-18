@@ -251,8 +251,8 @@ export default class DripListService {
       typeof nftDriverAccountMetadataParser.parseLatest
     >['projects'] = [];
 
-    for (const [urlOrAddress, percentage] of projectsInput) {
-      const isAddr = isAddress(urlOrAddress);
+    for (const [itemId, percentage] of projectsInput) {
+      const isAddr = isAddress(itemId);
 
       const weight = Math.floor((Number(percentage) / 100) * 1000000);
 
@@ -263,14 +263,14 @@ export default class DripListService {
         const receiver = {
           type: 'address' as const,
           weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(urlOrAddress as Address),
+          accountId: await this._addressDriverClient.getAccountIdByAddress(itemId as Address),
         };
 
         projectsSplitMetadata.push(receiver);
         receivers.push(receiver);
-      } else if (isValidGitUrl(urlOrAddress)) {
+      } else if (isValidGitUrl(itemId)) {
         // RepoDriver recipient
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(urlOrAddress);
+        const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
 
         const receiver = {
           type: 'repoDriver' as const,
@@ -288,7 +288,7 @@ export default class DripListService {
         const receiver = {
           type: 'dripList' as const,
           weight,
-          accountId: urlOrAddress,
+          accountId: itemId,
         };
 
         projectsSplitMetadata.push(receiver);
