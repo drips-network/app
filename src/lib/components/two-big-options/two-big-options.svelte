@@ -16,7 +16,7 @@
 
 <div class="options" role="radiogroup">
   <Option on:click={() => (selected = 1)} selected={selected === 1} {...option1} />
-  <div class="divider" class:not-visible={selected !== undefined} />
+  <div class="divider" />
   <Option on:click={() => (selected = 2)} selected={selected === 2} {...option2} />
 </div>
 
@@ -35,10 +35,6 @@
     width: 1px;
     background-color: var(--color-foreground);
     transition: opacity 0.3s;
-  }
-
-  .divider.not-visible {
-    opacity: 0;
   }
 
   @media (max-width: 577px) {
