@@ -1,12 +1,20 @@
 <script lang="ts">
+  import type { ComponentType } from 'svelte';
+
   export let headline: string | undefined = undefined;
   export let description: string | undefined = undefined;
+  export let icon: ComponentType | undefined = undefined;
 </script>
 
 <div class="step-layout">
   <div class="top">
+    {#if icon}
+      <div class="icon">
+        <svelte:component this={icon} />
+      </div>
+    {/if}
     {#if headline}
-      <h2 class="pixelated">{headline}</h2>
+      <h1 class="pixelated">{headline}</h1>
     {/if}
     {#if description}
       <div class="header">
@@ -15,8 +23,8 @@
         {/if}
       </div>
     {/if}
-    <slot />
   </div>
+  <slot />
   <div class="actions">
     <div class="left">
       <slot name="left-actions" />
@@ -35,12 +43,22 @@
     justify-content: space-between;
     height: 100%;
     min-height: 8rem;
+    width: 100%;
   }
 
   .top {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+    max-width: 38rem;
+    margin: 0 auto;
+  }
+
+  .top .icon {
+    height: 6rem;
+    width: 6rem;
   }
 
   .actions {

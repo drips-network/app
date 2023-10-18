@@ -8,7 +8,7 @@
   export let attributes: { icon: ComponentType; text: string }[] = [];
 </script>
 
-<button on:click class="option" role="radio" aria-checked={selected}>
+<button on:click class="option" class:selected role="radio" aria-checked={selected}>
   <div class="icon">
     <Emoji {emoji} size="huge" />
   </div>
@@ -48,8 +48,12 @@
     z-index: 1;
   }
 
-  .option:hover {
-    box-shadow: 0px 0px 0px 2px var(--color-foreground-level-2);
+  .option.selected {
+    background-color: var(--color-primary-level-1);
+  }
+
+  .option:hover:not(.selected) {
+    background-color: var(--color-foreground-level-1);
   }
 
   .option:focus-visible {

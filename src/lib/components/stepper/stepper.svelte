@@ -265,7 +265,7 @@
   }
 
   .step {
-    padding: 2rem;
+    padding: 1.5rem;
     width: 100%;
   }
 

@@ -4,7 +4,7 @@
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import Pause from 'radicle-design-system/icons/Pause.svelte';
   import Transactions from 'radicle-design-system/icons/Transactions.svelte';
-  import DripList from 'radicle-design-system/icons/DripList.svelte';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import Coin from 'radicle-design-system/icons/Coin.svelte';
   import Sharrow from 'radicle-design-system/icons/Sharrow.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
@@ -69,7 +69,7 @@
       title: 'Support later',
       attributes: [
         {
-          icon: DripList,
+          icon: DripListIcon,
           text: 'Publish the list.',
         },
         {
