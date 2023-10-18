@@ -12,6 +12,7 @@ import MonocleIcon from '$lib/components/icons/🧐.svelte';
 import PourIcon from '$lib/components/icons/🫗.svelte';
 import JarIcon from '$lib/components/icons/🫙.svelte';
 import PenIcon from '$lib/components/icons/✏️.svelte';
+import ForwardIcon from '$lib/components/icons/⏩.svelte';
 import BubblesIcon from '$lib/components/icons/🫧.svelte';
 import HourglassIcon from '$lib/components/icons/⏳.svelte';
 import type { ComponentType } from 'svelte';
@@ -33,4 +34,5 @@ export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
   ['🫧']: BubblesIcon,
   ['⏳']: HourglassIcon,
   ['✏️']: PenIcon,
+  ['⏩']: ForwardIcon,
 };

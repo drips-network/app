@@ -49,7 +49,7 @@
   .slot {
     background-color: var(--color-background);
     box-shadow: var(--elevation-low);
-    border-radius: 2rem 0 2rem 2rem;
+    border-radius: 1rem 0 1rem 1rem;
     display: flex;
     justify-content: space-between;
     height: 3.5rem;

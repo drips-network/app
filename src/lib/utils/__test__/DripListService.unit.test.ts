@@ -219,7 +219,8 @@ describe('DripListService', () => {
     it('should return the expected context', async () => {
       // Arrange
       const state = {
-        supportConfig: {
+        selectedSupportOption: 1,
+        continuousSupportConfig: {
           listSelected: ['0x0000000'],
           streamRateValueParsed: BigInt(1000),
           topUpAmountValueParsed: BigInt(2000),

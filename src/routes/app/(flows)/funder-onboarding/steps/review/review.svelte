@@ -11,49 +11,27 @@
   import TransactionsIcon from 'radicle-design-system/icons/Transactions.svelte';
   import type { Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
-  import Token from '$lib/components/token/token.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
   import CoinIcon from 'radicle-design-system/icons/Coin.svelte';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
-  import assert from '$lib/utils/assert';
-  import formatDate from '$lib/utils/format-date';
   import DripListService from '$lib/utils/driplist/DripListService';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../funder-onboarding-flow';
   import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import expect from '$lib/utils/expect';
-  import { constants, type DripsSubgraphClient } from 'radicle-drips';
+  import type { DripsSubgraphClient } from 'radicle-drips';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import streamsStore from '$lib/stores/streams/streams.store';
   import Pause from 'radicle-design-system/icons/Pause.svelte';
+  import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
+  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import assert from '$lib/utils/assert';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-
-  let streamRateValueParsed: bigint | undefined, topUpAmountValueParsed: bigint | undefined;
-  $: ({ streamRateValueParsed, topUpAmountValueParsed } = $context.supportConfig);
-
-  $: tokenAddress = $context.supportConfig.listSelected[0] ?? unreachable();
-  $: token = tokensStore.getByAddress(tokenAddress) ?? unreachable();
-
-  let lastsUntil: string | undefined;
-  $: {
-    assert(streamRateValueParsed !== undefined && topUpAmountValueParsed !== undefined);
-
-    const durationSeconds =
-      (topUpAmountValueParsed /
-        (streamRateValueParsed / BigInt(constants.AMT_PER_SEC_MULTIPLIER))) *
-      86400n *
-      30n;
-
-    const timestamp = new Date(Date.now() + Number(durationSeconds) * 1000);
-
-    lastsUntil =
-      topUpAmountValueParsed > 0 ? `≈ ${formatDate(timestamp, 'dayAndYear')}` : undefined;
-  }
 
   let dripListService: DripListService;
   let subgraphClient: DripsSubgraphClient;
@@ -74,6 +52,10 @@
         },
         transactions: ({ callerClient, approvalFlowTxs, normalFlowTxs, needsApproval }) => {
           if (needsApproval) {
+            assert(
+              approvalFlowTxs,
+              "needsApproval is true, but dripListService didn't build `approvalFlowTxs`",
+            );
             return approvalFlowTxs;
           } else {
             return {
@@ -97,14 +79,29 @@
       }),
     );
   }
+
+  function goBack() {
+    switch ($context.selectedSupportOption) {
+      case 1: {
+        dispatch('goBackward');
+        break;
+      }
+      case 2: {
+        // Skip the support type selection step
+        dispatch('goForward', { by: -2 });
+        break;
+      }
+      case undefined: {
+        unreachable();
+      }
+    }
+  }
 </script>
 
-<StandaloneFlowStepLayout
-  description="Review your new Drip List, monthly support, and initial top-up amount."
->
+<StandaloneFlowStepLayout headline="Review" description="Here's everything you set up.">
   <FormField type="div" title="Your Drip List">
     <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -2 })} icon={PenIcon}
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
         >Edit</Button
       >
     </svelte:fragment>
@@ -118,55 +115,21 @@
       isEditable={false}
     />
   </FormField>
-  <FormField type="div" title="Your support">
-    <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -1 })} icon={PenIcon}
-        >Edit</Button
-      >
-    </svelte:fragment>
-    <div class="card">
-      <div class="key-value-row">
-        <div class="key-value-pair">
-          <h5 class="key">Token</h5>
-          <span class="value"><Token address={tokenAddress} size="small" /></span>
-        </div>
-        <div class="key-value-pair">
-          <h5 class="key">Stream rate</h5>
-          <span class="value typo-text tabular-nums"
-            >{formatTokenAmount(
-              streamRateValueParsed ?? unreachable(),
-              token.info.decimals,
-              undefined,
-              false,
-            )}
-            <span class="muted">{token.info.symbol}/mo</span></span
-          >
-        </div>
+  {#if $context.selectedSupportOption === 1}
+    <FormField type="div" title="Your support">
+      <svelte:fragment slot="action">
+        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -1 })} icon={PenIcon}
+          >Edit</Button
+        >
+      </svelte:fragment>
+      <div class="card">
+        <ContinuousSupportReviewCard {context} />
       </div>
-      <div class="key-value-row">
-        <div class="key-value-pair">
-          <h5 class="key">Initial top-up</h5>
-          <span class="value typo-text tabular-nums"
-            >{formatTokenAmount(
-              topUpAmountValueParsed ?? unreachable(),
-              token.info.decimals,
-              1n,
-              false,
-            )} <span class="muted">{token.info.symbol}</span></span
-          >
-        </div>
-        {#if lastsUntil}
-          <div class="key-value-pair">
-            <h5 class="key">Lasts until</h5>
-            <span class="value typo-text">{lastsUntil}</span>
-          </div>
-        {/if}
-      </div>
-    </div>
-  </FormField>
+    </FormField>
+  {/if}
   <FormField type="div" title="Your connected wallet">
     <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -1 })} icon={PenIcon}
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
         >Edit</Button
       >
     </svelte:fragment>
@@ -176,27 +139,32 @@
     <div class="card">
       <h4>On transaction confirmation…</h4>
       <ul>
-        <UlIconLi icon={TransactionsIcon}
-          ><span class="typo-text-bold"
-            >{formatTokenAmount(
-              topUpAmountValueParsed ?? unreachable(),
-              token.info.decimals,
-              1n,
-              false,
-            )}
-            {token.info.symbol} will be transferred from your wallet into your Drips account</span
-          >
-          and immediately begin streaming to your Drip List recipients at a rate of
-          <span class="typo-text-bold"
-            >{formatTokenAmount(
-              streamRateValueParsed ?? unreachable(),
-              token.info.decimals,
-              undefined,
-              false,
-            )}
-            {token.info.symbol} per month</span
-          >.</UlIconLi
-        >
+        {#if $context.continuousSupportConfig.topUpAmountValueParsed && $context.continuousSupportConfig.streamRateValueParsed && $context.continuousSupportConfig.listSelected[0]}
+          {@const token =
+            tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0]) ??
+            unreachable()}
+          <UlIconLi icon={TransactionsIcon}>
+            <span class="typo-text-bold">
+              {formatTokenAmount(
+                $context.continuousSupportConfig.topUpAmountValueParsed,
+                token.info.decimals,
+                1n,
+                false,
+              )}
+              {token.info.symbol} will be transferred from your wallet into your Drips account</span
+            >
+            and immediately begin streaming to your Drip List recipients at a rate of
+            <span class="typo-text-bold">
+              {formatTokenAmount(
+                $context.continuousSupportConfig.streamRateValueParsed,
+                token.info.decimals,
+                undefined,
+                false,
+              )}
+              {token.info.symbol} per month</span
+            >.
+          </UlIconLi>
+        {/if}
         <UlIconLi icon={ListIcon}
           >Your new Drip List will appear on your <span class="typo-text-bold">public profile</span
           >.</UlIconLi
@@ -206,13 +174,20 @@
     <div class="card">
       <h4>After transaction confirmation…</h4>
       <ul>
-        <UlIconLi icon={CoinIcon}
-          ><span class="typo-text-bold">Add funds</span> (or withdraw any unstreamed funds) from your
-          Drips dashboard.</UlIconLi
-        >
-        <UlIconLi icon={Pause}
-          ><span class="typo-text-bold">Pause or cancel</span> your support anytime.</UlIconLi
-        >
+        {#if $context.selectedSupportOption === 1}
+          <UlIconLi icon={CoinIcon}>
+            <span class="typo-text-bold">Add funds</span> (or withdraw any unstreamed funds) from your
+            Drips dashboard.
+          </UlIconLi>
+          <UlIconLi icon={Pause}>
+            <span class="typo-text-bold">Pause or cancel</span> your support anytime.
+          </UlIconLi>
+        {/if}
+        {#if $context.selectedSupportOption === 2}
+          <UlIconLi icon={TokenStreams}>
+            You can <span class="typo-text-bold">start supporting</span> your Drip List anytime.
+          </UlIconLi>
+        {/if}
         <UlIconLi icon={PenIcon}
           ><span class="typo-text-bold">Edit</span> your Drip List anytime.</UlIconLi
         >
@@ -220,7 +195,7 @@
     </div>
   </div>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeft} on:click={goBack}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button icon={WalletIcon} variant="primary" on:click={createDripList}>Confirm in wallet</Button>
@@ -242,26 +217,6 @@
     margin-bottom: 1rem;
   }
 
-  .key-value-row {
-    display: flex;
-    gap: 1rem;
-  }
-
-  .key-value-row:not(:last-child) {
-    margin-bottom: 1rem;
-  }
-
-  .key-value-pair {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 50%;
-  }
-
-  .key-value-pair h5 {
-    color: var(--color-foreground-level-6);
-  }
-
   ul {
     display: flex;
     flex-direction: column;
@@ -272,9 +227,5 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
-  }
-
-  .muted {
-    color: var(--color-foreground-level-6);
   }
 </style>

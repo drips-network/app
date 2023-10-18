@@ -174,10 +174,6 @@ export default class DripListService {
       `This function requires an active wallet connection.`,
     );
 
-    const token = context.supportConfig.listSelected[0] ?? unreachable();
-    let amountPerSec = context.supportConfig.streamRateValueParsed ?? unreachable();
-    amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
-    const topUpAmount = context.supportConfig.topUpAmountValueParsed ?? unreachable();
     const dripListName = context.dripList.title;
     const dripListDescription = context.dripList.description;
 
@@ -207,39 +203,64 @@ export default class DripListService {
       this._formatSplitReceivers(receivers),
     );
 
-    const tokenApprovalTx = await this._buildTokenApprovalTx(token);
-
-    const setStreamTx = await this._buildSetStreamListStreamTxs(
-      salt,
-      token,
-      dripListId,
-      topUpAmount,
-      0n,
-      0n,
-      amountPerSec,
-    );
-
-    const allowance = await this._addressDriverClient.getAllowance(token);
-    const needsApproval = allowance < topUpAmount;
-
-    const txs: { [name: string]: PopulatedTransaction } = {
-      tokenApprovalTx,
-      createDripListTx,
-      setStreamListProjectsTx: setDripListSplitsTx,
-      setStreamTx,
-    };
-
     const callerClient = await getCallerClient();
-    const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
-    const normalFlowTxs = await this._getNormalFlowTxs(txs, needsApproval, callerClient);
 
-    return {
-      dripListId,
-      needsApproval,
-      callerClient,
-      approvalFlowTxs,
-      normalFlowTxs,
-    };
+    // If `selectedSupportOption` is 2, the user doesn't want to support their Drip List for now
+    const creatingSupportStream = context.selectedSupportOption === 1;
+
+    if (creatingSupportStream) {
+      const token = context.continuousSupportConfig.listSelected[0] ?? unreachable();
+      let amountPerSec = context.continuousSupportConfig.streamRateValueParsed ?? unreachable();
+      amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
+      const topUpAmount = context.continuousSupportConfig.topUpAmountValueParsed ?? unreachable();
+
+      const allowance = await this._addressDriverClient.getAllowance(token);
+      const needsApproval = allowance < topUpAmount;
+
+      const tokenApprovalTx = await this._buildTokenApprovalTx(token);
+
+      const setStreamTx = await this._buildSetStreamListStreamTxs(
+        salt,
+        token,
+        dripListId,
+        topUpAmount,
+        0n,
+        0n,
+        amountPerSec,
+      );
+
+      const txs: { [name: string]: PopulatedTransaction } = {
+        tokenApprovalTx,
+        createDripListTx,
+        setStreamListProjectsTx: setDripListSplitsTx,
+        setStreamTx,
+      };
+
+      const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
+      const normalFlowTxs = await this._getNormalFlowTxs(txs, needsApproval, callerClient);
+
+      return {
+        dripListId,
+        needsApproval,
+        callerClient,
+        approvalFlowTxs,
+        normalFlowTxs,
+      };
+    } else {
+      const txs: { [name: string]: PopulatedTransaction } = {
+        createDripListTx,
+        setStreamListProjectsTx: setDripListSplitsTx,
+      };
+
+      const normalFlowTxs = await this._getNormalFlowTxs(txs, false, callerClient);
+
+      return {
+        dripListId,
+        needsApproval: false,
+        callerClient,
+        normalFlowTxs,
+      };
+    }
   }
 
   public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {
@@ -465,17 +486,17 @@ export default class DripListService {
     const { createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
 
     if (!needsApproval) {
-      const batchTx = await callerClient.populateCallBatchedTx([
-        createDripListTx,
-        setStreamListProjectsTx,
-        setStreamTx,
-      ]);
+      const requiredTxs = [createDripListTx, setStreamListProjectsTx, setStreamTx].filter(
+        (tx) => tx !== undefined,
+      );
+
+      const batchTx = await callerClient.populateCallBatchedTx(requiredTxs);
 
       const estimatedGasLimit = await callerClient.signer.estimateGas(batchTx);
       const gasLimitWithBuffer = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
 
       return {
-        txs: [createDripListTx, setStreamListProjectsTx, setStreamTx],
+        txs: requiredTxs,
         gasLimitWithBuffer,
       };
     }
