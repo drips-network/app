@@ -41,6 +41,7 @@
       promise: async () => {
         const representationalSplits = await getRepresentationalSplitsForAccount(
           selectedDripList.account.accountId,
+          selectedDripList.projects,
         );
 
         $selectedDripListState = {
