@@ -54,6 +54,7 @@
 
 <StepLayout>
   <StepHeader
+    emoji="🫗"
     headline="Add to a Drip List"
     description="Choose which of your Drip Lists you'd like to add this to."
   />
