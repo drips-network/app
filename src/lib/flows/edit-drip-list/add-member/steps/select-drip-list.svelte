@@ -89,6 +89,7 @@
                   listId: dl.account.accountId,
                   listName: dl.name,
                   owner: undefined,
+                  disabled: isAlreadyInList(dl),
                 },
               },
             },
