@@ -234,7 +234,6 @@
     top: 0;
     right: 0;
     bottom: 0;
-    /* gradient from transparent to var(--color-background), left to right */
     background: linear-gradient(to right, transparent, var(--color-background) 75%);
   }
 
