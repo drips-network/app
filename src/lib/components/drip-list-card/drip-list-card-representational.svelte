@@ -8,7 +8,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
-  import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
+  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { constants } from 'radicle-drips';
@@ -126,16 +126,7 @@
   function triggerEditModal() {
     if (!representationalSplits) return;
 
-    modal.show(
-      Stepper,
-      undefined,
-      editDripListSteps(
-        dripList.account.accountId,
-        dripList.name,
-        dripList.description,
-        representationalSplits,
-      ),
-    );
+    modal.show(Stepper, undefined, editDripListSteps(dripList, representationalSplits));
   }
 </script>
 

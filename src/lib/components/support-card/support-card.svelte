@@ -2,11 +2,7 @@
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type {
-    ClaimedGitProject,
-    DripList,
-    RepoDriverSplitReceiver,
-  } from '$lib/utils/metadata/types';
+  import type { ClaimedGitProject, DripList } from '$lib/utils/metadata/types';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -14,17 +10,16 @@
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import { goto } from '$app/navigation';
-  import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import buildUrl from '$lib/utils/build-url';
   import type { SplitsEntry } from 'radicle-drips';
+  import addDripListMemberSteps from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
 
   export let project: ClaimedGitProject | undefined = undefined;
   export let dripList: DripList | undefined = undefined;
 
-  let ownDripList: DripList | null | undefined = undefined;
+  let ownDripLists: DripList[] | null | undefined = undefined;
   let ownDripListSplits: SplitsEntry[] | undefined = undefined;
 
   let isSupporting: boolean | undefined;
@@ -70,7 +65,7 @@
 
     const { address } = $walletStore;
     if (!address) {
-      ownDripList = null;
+      ownDripLists = null;
       updating = false;
       return;
     }
@@ -78,12 +73,12 @@
     const dripListService = await DripListService.new();
     const result = await dripListService.getByOwnerAddress(address);
 
-    if (result[0]) {
+    if (result.length > 0) {
       const subgraph = getSubgraphClient();
       ownDripListSplits = await subgraph.getSplitsConfigByAccountId(result[0].account.accountId);
-      ownDripList = result[0];
+      ownDripLists = result;
     } else {
-      ownDripList = null;
+      ownDripLists = null;
     }
 
     updating = false;
@@ -95,35 +90,18 @@
 
   let loadingModal = false;
   async function handleSupportButton() {
-    if (!ownDripList) {
+    if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
     } else {
       // TODO: Refresh profile state after becoming a supporter
-      loadingModal = true;
-      const representationalSplits = await getRepresentationalSplitsForAccount(
-        ownDripList.account.accountId,
-        ownDripList.projects.filter((s): s is RepoDriverSplitReceiver => 'source' in s),
-      );
 
-      modal.show(
-        Stepper,
-        undefined,
-        editDripListSteps(
-          ownDripList.account.accountId,
-          ownDripList.name,
-          ownDripList.description,
-          representationalSplits,
-          project,
-          dripList,
-        ),
-      );
-      loadingModal = false;
+      modal.show(Stepper, undefined, addDripListMemberSteps(ownDripLists, project, dripList));
     }
   }
 </script>
 
 <div class="become-supporter-card" class:is-owner={isOwner}>
-  {#if ownDripList === undefined || loadingModal || updating}
+  {#if ownDripLists === undefined || loadingModal || updating}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
@@ -154,7 +132,7 @@
     disabled={isSupporting || isOwner}
     size="large"
     icon={Plus}
-    variant="primary">{ownDripList === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
+    variant="primary">{ownDripLists === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
   >
 </div>
 
