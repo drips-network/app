@@ -5,14 +5,15 @@
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import {
-    VerificationStatus,
-    type GitProject,
-    type UnclaimedGitProject,
-  } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
+  import {
+    ProjectVerificationStatus,
+    type Project,
+    type UnclaimedProject,
+  } from '$lib/graphql/generated/graphql';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
-  export let project: GitProject;
+  export let project: Project;
   export let tooltip = true;
   export let forceUnclaimed = false;
   export let hideAvatar = false;
@@ -20,21 +21,17 @@
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let maxWidth: number | false = 320;
 
-  let unclaimedProject: UnclaimedGitProject;
+  let unclaimedProject: UnclaimedProject;
   $: unclaimedProject = {
-    ...project,
-    owner: undefined,
-    color: undefined,
-    description: undefined,
-    emoji: undefined,
-    claimed: false,
-    verificationStatus: VerificationStatus.NOT_STARTED,
+    source: { ...project.source },
+    account: { ...project.account },
+    verificationStatus: ProjectVerificationStatus.Unclaimed,
   };
 
   $: processedProject = forceUnclaimed ? unclaimedProject : project;
 </script>
 
-<PrimaryColorThemer colorHex={processedProject.claimed ? processedProject.color : undefined}>
+<PrimaryColorThemer colorHex={isClaimed(processedProject) ? processedProject.color : undefined}>
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
@@ -47,7 +44,7 @@
     >
       {#if !hideAvatar}
         <div class="avatar-and-forge">
-          {#if !forceUnclaimed && project.claimed}
+          {#if !forceUnclaimed && isClaimed(project)}
             <div>
               <ProjectAvatar project={unclaimedProject} />
             </div>

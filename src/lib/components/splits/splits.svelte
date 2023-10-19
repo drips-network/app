@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-  import type { GitProject } from '$lib/utils/metadata/types';
   import type {
     Items,
     Percentages,
@@ -8,7 +7,7 @@
 
   export interface ProjectSplit {
     type: 'project-split';
-    project: GitProject;
+    project: Project;
     weight: number;
   }
 
@@ -83,6 +82,7 @@
 
 <script lang="ts">
   import SplitComponent from './components/split/split.svelte';
+  import type { Project } from '$lib/graphql/generated/graphql';
 
   export let list: Splits;
 

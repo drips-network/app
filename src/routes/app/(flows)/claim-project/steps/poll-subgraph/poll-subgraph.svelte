@@ -4,11 +4,14 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import GitProjectService from '$lib/utils/project/GitProjectService';
-  import { VerificationStatus } from '$lib/utils/metadata/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { ethers } from 'ethers';
   import assert from '$lib/utils/assert';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
+  import query from '$lib/graphql/dripsQL';
+  import type { Project } from '$lib/graphql/generated/graphql';
+  import isClaimed from '$lib/utils/project/is-claimed';
+  import { gql } from '@apollo/client';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -44,15 +47,130 @@
         return;
       }
 
-      const gitProjectService = await GitProjectService.new();
-      const project = await gitProjectService.getByAccountId(accountId, false);
+      const getProjectByIdQuery = gql`
+        query Project($projectId: ID!) {
+          project(id: $projectId) {
+            ... on ClaimedProject {
+              account {
+                accountId
+                driver
+              }
+              color
+              description
+              emoji
+              owner {
+                accountId
+                address
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+              splits {
+                maintainers {
+                  accountId
+                  address
+                  driver
+                  type
+                  weight
+                }
+                dependencies {
+                  ... on AddressReceiver {
+                    accountId
+                    address
+                    driver
+                    type
+                    weight
+                  }
+                  ... on ProjectReceiver {
+                    driver
+                    type
+                    weight
+                    project {
+                      ... on ClaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        color
+                        description
+                        emoji
+                        owner {
+                          accountId
+                          address
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                      ... on UnclaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                    }
+                  }
+                  ... on DripListReceiver {
+                    driver
+                    type
+                    weight
+                    dripList {
+                      id
+                      isPublic
+                      owner {
+                        accountId
+                        address
+                        driver
+                      }
+                      previousOwnerAddress
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ... on UnclaimedProject {
+            account {
+              accountId
+              driver
+            }
+            source {
+              forge
+              ownerName
+              repoName
+              url
+            }
+            verificationStatus
+          }
+        }
+      `;
 
-      if (!project?.claimed) {
+      const response = await query<{ project: Project | null }>(getProjectByIdQuery, {
+        projectId: accountId,
+      });
+
+      const project = response.project;
+      if (project && !isClaimed(project)) {
         if (Date.now() - start >= timeout) {
           throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
-        }
-        if (project?.verificationStatus === VerificationStatus.FAILED) {
-          throw new Error('Project verification failed');
         }
       }
 

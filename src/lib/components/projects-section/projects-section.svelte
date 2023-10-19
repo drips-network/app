@@ -1,18 +1,19 @@
 <script lang="ts">
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import ProjectCard from '../project-card/project-card.svelte';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import assert from '$lib/utils/assert';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
+  import query from '$lib/graphql/dripsQL';
+  import { gql } from '@apollo/client';
+  import type { ClaimedProject, ProjectWhereInput } from '$lib/graphql/generated/graphql';
 
   export let address: string | undefined;
 
-  let projects: ClaimedGitProject[] | undefined;
+  let projects: ClaimedProject[] | undefined;
   let error = false;
   let loaded = false;
 
@@ -21,10 +22,126 @@
 
   async function updateProjects() {
     try {
-      const service = await GitProjectService.new();
-
       assert(address);
-      projects = await service.getAllByOwner(address.toLowerCase());
+
+      const getProjectsQuery = gql`
+        query Projects($where: ProjectWhereInput) {
+          projects(where: $where) {
+            ... on ClaimedProject {
+              account {
+                accountId
+                driver
+              }
+              color
+              description
+              emoji
+              owner {
+                accountId
+                address
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+              splits {
+                maintainers {
+                  accountId
+                  address
+                  driver
+                  type
+                  weight
+                }
+                dependencies {
+                  ... on AddressReceiver {
+                    accountId
+                    address
+                    driver
+                    type
+                    weight
+                  }
+                  ... on ProjectReceiver {
+                    driver
+                    type
+                    weight
+                    project {
+                      ... on ClaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        color
+                        description
+                        emoji
+                        owner {
+                          accountId
+                          address
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                      ... on UnclaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                    }
+                  }
+                  ... on DripListReceiver {
+                    weight
+                    type
+                    driver
+                    dripList {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+            ... on UnclaimedProject {
+              account {
+                accountId
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+            }
+          }
+        }
+      `;
+
+      const response = await query<{ projects: ClaimedProject[] }, { where: ProjectWhereInput }>(
+        getProjectsQuery,
+        {
+          where: {
+            ownerAddress: address,
+          },
+        },
+      );
+      projects = response.projects;
+
       loaded = true;
     } catch (e) {
       // eslint-disable-next-line no-console

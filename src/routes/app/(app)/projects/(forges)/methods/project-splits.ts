@@ -1,82 +1,55 @@
-import { buildRepresentationalSplits } from '$lib/utils/drips/splits';
-import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-import type {
-  AddressDriverSplitReceiver,
-  DripListSplitReceiver,
-  GitProject,
-  RepoDriverAccountSplits,
-  RepoDriverSplitReceiver,
-} from '$lib/utils/metadata/types';
+import {
+  ReceiverType,
+  type Project,
+  type AddressReceiver,
+  type ProjectReceiver,
+  type DripListReceiver,
+} from '$lib/graphql/generated/graphql';
+import type { RepresentationalSplit } from '$lib/utils/drips/splits';
+import isClaimed from '$lib/utils/project/is-claimed';
 
-export async function buildProjectSplitsData(
-  project: GitProject,
-  projectSplitsMeta: (
-    | RepoDriverSplitReceiver
-    | AddressDriverSplitReceiver
-    | DripListSplitReceiver
-  )[] = [],
-) {
-  const validMetadataSplits = await getValidMetadataSplits(project);
-  if (!validMetadataSplits) return null;
+export function buildProjectSplitsData(project: Project) {
+  if (!isClaimed(project)) {
+    return null;
+  }
 
-  const representationalSplits = await Promise.all([
-    buildRepresentationalSplits(validMetadataSplits.dependencies, projectSplitsMeta),
-    buildRepresentationalSplits(validMetadataSplits.maintainers),
-  ]);
+  const maintainers: RepresentationalSplit[] = [];
+  for (const addressReceiver of project.splits?.maintainers || []) {
+    maintainers.push({
+      type: 'address-split' as const,
+      address: addressReceiver.address,
+      weight: addressReceiver.weight,
+    });
+  }
+
+  const dependencies: RepresentationalSplit[] = [];
+  for (const splitsReceiver of project.splits?.dependencies || []) {
+    if (splitsReceiver.type === ReceiverType.ADDRESS) {
+      dependencies.push({
+        type: 'address-split' as const,
+        address: (splitsReceiver as AddressReceiver).address,
+        weight: splitsReceiver.weight,
+      });
+    } else if (splitsReceiver.type === ReceiverType.PROJECT) {
+      dependencies.push({
+        type: 'project-split' as const,
+        project: (splitsReceiver as ProjectReceiver).project,
+        weight: splitsReceiver.weight,
+      });
+    } else {
+      const dripListReceiver = splitsReceiver as DripListReceiver;
+      dependencies.push({
+        type: 'drip-list-split' as const,
+        listId: dripListReceiver.dripList.id,
+        listName: dripListReceiver.dripList.name ?? 'Unnamed Drip List',
+        listOwner: dripListReceiver.dripList.owner.address,
+        weight: dripListReceiver.weight,
+      });
+    }
+  }
 
   return {
-    dependencies: representationalSplits[0],
-    maintainers: representationalSplits[1],
+    dependencies,
+    maintainers,
   };
-}
-
-async function getValidMetadataSplits(
-  project: GitProject,
-): Promise<RepoDriverAccountSplits | null> {
-  if (!project.claimed) return null;
-
-  const subgraphClient = getSubgraphClient();
-
-  const onChainSplitsConfig = await subgraphClient.getSplitsConfigByAccountId(
-    project.repoDriverAccount.accountId,
-  );
-
-  const result: RepoDriverAccountSplits = { maintainers: [], dependencies: [] };
-  const usedOnChainSplitEntryIds: string[] = [];
-
-  for (const maintainerMetadataSplit of project.splits.maintainers) {
-    const matchingOnChainSplit = onChainSplitsConfig.find(
-      (v) =>
-        v.accountId === maintainerMetadataSplit.account.accountId &&
-        !usedOnChainSplitEntryIds.includes(v.id),
-    );
-
-    if (!matchingOnChainSplit) continue;
-
-    result.maintainers.push({
-      ...maintainerMetadataSplit,
-      weight: Number(matchingOnChainSplit.weight),
-    });
-
-    usedOnChainSplitEntryIds.push(matchingOnChainSplit.id);
-  }
-
-  for (const dependencyMetadataSplit of project.splits.dependencies) {
-    const matchingOnChainSplit = onChainSplitsConfig.find(
-      (v) =>
-        v.accountId === dependencyMetadataSplit.account.accountId &&
-        !usedOnChainSplitEntryIds.includes(v.id),
-    );
-
-    if (!matchingOnChainSplit) continue;
-
-    result.dependencies.push({
-      ...dependencyMetadataSplit,
-      weight: Number(matchingOnChainSplit.weight),
-    });
-
-    usedOnChainSplitEntryIds.push(matchingOnChainSplit.id);
-  }
-
-  return result;
 }

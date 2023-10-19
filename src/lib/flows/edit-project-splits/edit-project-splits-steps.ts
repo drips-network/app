@@ -3,7 +3,6 @@ import type {
   ListItem,
 } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import { makeStep } from '$lib/components/stepper/types';
-import type { ClaimedGitProject } from '$lib/utils/metadata/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
 import type {
@@ -19,11 +18,12 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
 import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
 import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
+import type { ClaimedProject } from '$lib/graphql/generated/graphql';
 
 type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
 export interface State {
-  project: ClaimedGitProject;
+  project: ClaimedProject;
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: ListEditorConfig;
   dependencySplits: ListEditorConfig;
@@ -68,7 +68,7 @@ function mapRepresentationalSplits(input: RepresentationalSplit[]) {
 }
 
 const state = (
-  project: ClaimedGitProject,
+  project: ClaimedProject,
   representationalSplits: {
     maintainers: RepresentationalSplit[];
     dependencies: RepresentationalSplit[];
@@ -115,7 +115,7 @@ const state = (
 };
 
 export default (
-  project: ClaimedGitProject,
+  project: ClaimedProject,
   representationalSplits: {
     maintainers: RepresentationalSplit[];
     dependencies: RepresentationalSplit[];

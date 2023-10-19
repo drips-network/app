@@ -2,11 +2,7 @@
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type {
-    ClaimedGitProject,
-    DripList,
-    RepoDriverSplitReceiver,
-  } from '$lib/utils/metadata/types';
+  import type { DripList, RepoDriverSplitReceiver } from '$lib/utils/metadata/types';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -20,8 +16,9 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-drip-list-steps';
   import buildUrl from '$lib/utils/build-url';
   import type { SplitsEntry } from 'radicle-drips';
+  import type { ClaimedProject } from '$lib/graphql/generated/graphql';
 
-  export let project: ClaimedGitProject | undefined = undefined;
+  export let project: ClaimedProject | undefined = undefined;
   export let dripList: DripList | undefined = undefined;
 
   let ownDripList: DripList | null | undefined = undefined;
@@ -30,8 +27,7 @@
   let isSupporting: boolean | undefined;
   $: isSupporting = ownDripListSplits?.some(
     (s) =>
-      s.accountId === project?.repoDriverAccount.accountId ||
-      s.accountId === dripList?.account.accountId,
+      s.accountId === project?.account.accountId || s.accountId === dripList?.account.accountId,
   );
 
   $: isOwner =

@@ -3,7 +3,6 @@ import type {
   DripListSplit,
   ProjectSplit,
 } from '$lib/components/splits/splits.svelte';
-import GitProjectService from '../project/GitProjectService';
 import { AddressDriverClient } from 'radicle-drips';
 import { getSubgraphClient } from '../get-drips-clients';
 import type {
@@ -13,8 +12,11 @@ import type {
 } from '../metadata/types';
 import assert from '$lib/utils/assert';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
+import query from '$lib/graphql/dripsQL';
+import type { Project } from '$lib/graphql/generated/graphql';
+import { gql } from '@apollo/client';
 
-type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
+export type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
 /**
  * Fetch splits for a given user ID, and map to representational splits for the `Splits` component.
@@ -53,7 +55,6 @@ export async function buildRepresentationalSplits(
   splits: { account: { accountId: string }; weight: number }[],
   splitsMeta: (RepoDriverSplitReceiver | AddressDriverSplitReceiver | DripListSplitReceiver)[] = [],
 ): Promise<RepresentationalSplit[]> {
-  const gitProjectService = await GitProjectService.new();
   const nftDriverMetadata = new NftDriverMetadataManager();
   const subgraph = getSubgraphClient();
 
@@ -62,12 +63,127 @@ export async function buildRepresentationalSplits(
       const matchingMetadata = splitsMeta.find((v) => v.account.accountId === s.account.accountId);
 
       if (matchingMetadata?.type === 'repo') {
-        const project = await gitProjectService.getByAccountId(
-          s.account.accountId,
-          true,
-          matchingMetadata?.source,
-        );
+        const getProjectByIdQuery = gql`
+          query Project($projectId: ID!) {
+            project(id: $projectId) {
+              ... on ClaimedProject {
+                account {
+                  accountId
+                  driver
+                }
+                color
+                description
+                emoji
+                owner {
+                  accountId
+                  address
+                  driver
+                }
+                source {
+                  forge
+                  ownerName
+                  repoName
+                  url
+                }
+                verificationStatus
+                splits {
+                  maintainers {
+                    accountId
+                    address
+                    driver
+                    type
+                    weight
+                  }
+                  dependencies {
+                    ... on AddressReceiver {
+                      accountId
+                      address
+                      driver
+                      type
+                      weight
+                    }
+                    ... on ProjectReceiver {
+                      driver
+                      type
+                      weight
+                      project {
+                        ... on ClaimedProject {
+                          account {
+                            accountId
+                            driver
+                          }
+                          color
+                          description
+                          emoji
+                          owner {
+                            accountId
+                            address
+                            driver
+                          }
+                          source {
+                            forge
+                            ownerName
+                            repoName
+                            url
+                          }
+                          verificationStatus
+                        }
+                        ... on UnclaimedProject {
+                          account {
+                            accountId
+                            driver
+                          }
+                          source {
+                            forge
+                            ownerName
+                            repoName
+                            url
+                          }
+                          verificationStatus
+                        }
+                      }
+                    }
+                    ... on DripListReceiver {
+                      driver
+                      type
+                      weight
+                      dripList {
+                        id
+                        isPublic
+                        owner {
+                          accountId
+                          address
+                          driver
+                        }
+                        previousOwnerAddress
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+              ... on UnclaimedProject {
+                account {
+                  accountId
+                  driver
+                }
+                source {
+                  forge
+                  ownerName
+                  repoName
+                  url
+                }
+                verificationStatus
+              }
+            }
+          }
+        `;
 
+        const response = await query<{ project: Project | null }>(getProjectByIdQuery, {
+          projectId: s.account.accountId,
+        });
+
+        const project = response.project;
         assert(project);
 
         return {

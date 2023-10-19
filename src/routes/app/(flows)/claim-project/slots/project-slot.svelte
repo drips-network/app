@@ -1,8 +1,8 @@
 <script lang="ts">
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import type { Project } from '$lib/graphql/generated/graphql';
 
-  export let project: GitProject;
+  export let project: Project;
 </script>
 
 <ProjectBadge linkToNewTab {project} />

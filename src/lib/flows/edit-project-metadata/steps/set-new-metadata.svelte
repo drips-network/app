@@ -4,7 +4,6 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
@@ -12,10 +11,11 @@
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import type { ClaimedProject } from '$lib/graphql/generated/graphql';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let project: ClaimedGitProject;
+  export let project: ClaimedProject;
 
   let projectWritable = writable(structuredClone(project));
 
@@ -30,7 +30,7 @@
       makeTransactPayload({
         before: async () => {
           const currentMetadata = (
-            await metadataManager.fetchAccountMetadata(project.repoDriverAccount.accountId)
+            await metadataManager.fetchAccountMetadata(project.account.accountId)
           )?.data;
           assert(currentMetadata, 'No metadata found for account');
 
@@ -54,7 +54,7 @@
           const repoDriverClient = await getRepoDriverClient();
 
           const emitAccountMetadataTx = repoDriverClient.emitAccountMetadata(
-            project.repoDriverAccount.accountId,
+            project.account.accountId,
             accountMetadataAsBytes,
           );
 

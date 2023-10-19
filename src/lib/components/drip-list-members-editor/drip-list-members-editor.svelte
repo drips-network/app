@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   interface ProjectItem {
     type: 'project';
-    project: GitProject;
+    project: Project;
   }
 
   interface EthAddressItem {
@@ -33,7 +33,6 @@
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import { fade, scale } from 'svelte/transition';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
   import { onMount, tick } from 'svelte';
   import { getAddress, isAddress } from 'ethers/lib/utils';
@@ -54,6 +53,10 @@
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
   import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
+  import type { Project, ProjectWhereInput } from '$lib/graphql/generated/graphql';
+  import query from '$lib/graphql/dripsQL';
+  import { gql } from '@apollo/client';
+  import { single } from '$lib/utils/linq';
 
   export let maxItems = 200;
 
@@ -82,11 +85,7 @@
   let isAddingItem = false;
   let inputValue = '';
 
-  let gitProjectService: GitProjectService;
-
   async function addProject() {
-    if (!gitProjectService) gitProjectService = await GitProjectService.new();
-
     if (!allowedItems.includes('projects')) return;
 
     try {
@@ -98,14 +97,131 @@
       const repoExists = await verifyRepoExists(username, repoName);
       if (!repoExists) throw new Error('This project doesnʼt exist');
 
-      let gitProject = await gitProjectService.getByUrl(inputValue);
+      const getProjectsQuery = gql`
+        query Projects($where: ProjectWhereInput) {
+          projects(where: $where) {
+            ... on ClaimedProject {
+              account {
+                accountId
+                driver
+              }
+              color
+              description
+              emoji
+              owner {
+                accountId
+                address
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+              splits {
+                maintainers {
+                  accountId
+                  address
+                  driver
+                  type
+                  weight
+                }
+                dependencies {
+                  ... on AddressReceiver {
+                    accountId
+                    address
+                    driver
+                    type
+                    weight
+                  }
+                  ... on ProjectReceiver {
+                    driver
+                    type
+                    weight
+                    project {
+                      ... on ClaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        color
+                        description
+                        emoji
+                        owner {
+                          accountId
+                          address
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                      ... on UnclaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                    }
+                  }
+                  ... on DripListReceiver {
+                    weight
+                    type
+                    driver
+                    dripList {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+            ... on UnclaimedProject {
+              account {
+                accountId
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+            }
+          }
+        }
+      `;
 
-      const id = gitProject.source.url;
+      const { projects } = await query<{ projects: Project[] }, { where: ProjectWhereInput }>(
+        getProjectsQuery,
+        {
+          where: {
+            url: inputValue,
+          },
+        },
+      );
+
+      const project = single(projects);
+
+      const id = project.source.url;
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
 
       // Prevent duplicates.
       if (!items[id]) {
-        items[id] = projectItem(gitProject);
+        items[id] = projectItem(project);
 
         percentages = { ...percentages, [id]: 0 };
       }

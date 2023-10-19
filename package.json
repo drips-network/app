@@ -18,11 +18,15 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "postinstall": "./scripts/install-twemoji-assets.sh && ./scripts/install-design-system-static-assets.sh"
+    "postinstall": "./scripts/install-twemoji-assets.sh && ./scripts/install-design-system-static-assets.sh",
+    "build:graphql": "graphql-codegen"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
     "@playwright/test": "^1.32.3",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/adapter-auto": "^1.0.2",
@@ -61,6 +65,7 @@
     "vitest": "^0.25.3"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.5",
     "@efstajas/svelte-stored-writable": "^0.2.0",
     "@efstajas/versioned-parser": "^0.1.0",
     "@gelatonetwork/relay-sdk": "^4.0.0",
@@ -79,6 +84,7 @@
     "ethers": "^5.7.0",
     "fuzzysort": "^2.0.3",
     "git-dep-url": "github:jtourkos/git-dep-url",
+    "graphql": "16.6.0",
     "isomorphic-fetch": "^3.0.0",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",

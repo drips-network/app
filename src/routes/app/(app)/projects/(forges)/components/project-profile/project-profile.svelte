@@ -4,7 +4,6 @@
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -43,28 +42,31 @@
   import Link from 'radicle-design-system/icons/Link.svelte';
   import Copyable from '$lib/components/copyable/copyable.svelte';
   import { browser } from '$app/environment';
+  import type { Project } from '$lib/graphql/generated/graphql';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   interface Amount {
     tokenAddress: string;
     amount: bigint;
   }
 
-  export let project: GitProject;
+  export let project: Project;
 
   export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
   export let splits:
-    | Promise<{
+    | {
         maintainers: (AddressSplit | ProjectSplit | DripListSplit)[];
         dependencies: (AddressSplit | ProjectSplit | DripListSplit)[];
-      } | null>
+      }
+    | null
     | undefined = undefined;
 
   export let incomingSplits: ReturnType<typeof getIncomingSplits>;
 
   $: ownAccountId = $walletStore.dripsAccountId;
-  $: isOwnProject = ownAccountId === project.owner?.accountId;
+  $: isOwnProject = ownAccountId === (isClaimed(project) ? project.owner.accountId : undefined);
 
   function flattenSplits(list: Splits): Split[] {
     return list.reduce<Split[]>((acc, i) => {
@@ -112,10 +114,10 @@
     .repoName} on Drips and help make Open-Source Software sustainable."
 />
 
-<PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
-  <article class="project-profile" class:claimed={project.claimed}>
+<PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
+  <article class="project-profile" class:claimed={isClaimed(project)}>
     <header class="header">
-      {#if project.owner}
+      {#if isClaimed(project)}
         <div class="owner">
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
             >Project claimed by</span
@@ -160,12 +162,12 @@
       <div>
         <ProjectProfileHeader
           {project}
-          editButton={project.claimed && isOwnProject ? 'Edit' : undefined}
+          editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
           on:editButtonClick={() =>
-            project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
+            isClaimed(project) && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
         />
       </div>
-      {#if project.claimed}
+      {#if isClaimed(project)}
         {#await Promise.all([earnedFunds, splits])}
           <div class="stats loading">
             <Spinner />
@@ -201,8 +203,8 @@
       {/if}
     </header>
     <div class="content">
-      <Developer accountId={project.repoDriverAccount.accountId} />
-      {#if project.owner}
+      <Developer accountId={project.account.accountId} />
+      {#if isClaimed(project)}
         <section class="app-section">
           {#if splits}
             {#await splits}
@@ -216,7 +218,7 @@
                   ? [
                       {
                         handler: () =>
-                          project.claimed &&
+                          isClaimed(project) &&
                           result &&
                           modal.show(Stepper, undefined, editProjectSplitsSteps(project, result)),
                         label: 'Edit',
@@ -288,7 +290,7 @@
       {/if}
       <SupportersSection type="project" {incomingSplits} />
     </div>
-    {#if project.owner}
+    {#if isClaimed(project)}
       <aside>
         <div class="become-supporter-card">
           <SupportCard {project} />

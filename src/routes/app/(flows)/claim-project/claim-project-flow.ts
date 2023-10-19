@@ -12,20 +12,20 @@ import ConfigureDependencies from './steps/configure-dependencies/configure-depe
 import Review from './steps/review/review.svelte';
 import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
-import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '../shared/slots/wallet-slot.svelte';
+import type { Project, UnclaimedProject } from '$lib/graphql/generated/graphql';
 
 interface SplitsConfig extends ListEditorConfig {
-  itemsPromise: Promise<GitProject>[] | undefined;
+  itemsPromise: Promise<Project>[] | undefined;
 }
 
 export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
   isPartiallyClaimed: boolean;
-  project: UnclaimedGitProject | undefined;
+  project: UnclaimedProject | undefined;
   projectMetadata:
     | {
         starCount: number;

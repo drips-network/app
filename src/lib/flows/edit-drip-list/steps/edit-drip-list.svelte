@@ -13,7 +13,7 @@
     getNFTDriverClient,
     getNFTDriverTxFactory,
   } from '$lib/utils/get-drips-clients';
-  import type { DripList, GitProject } from '$lib/utils/metadata/types';
+  import type { DripList } from '$lib/utils/metadata/types';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -27,12 +27,13 @@
   import DripListEditor, {
     type DripListConfig,
   } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
+  import type { Project } from '$lib/graphql/generated/graphql';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let dripListId: string;
   export let representationalSplits: Splits;
-  export let projectToAdd: GitProject | undefined = undefined;
+  export let projectToAdd: Project | undefined = undefined;
   export let dripListToAdd: DripList | undefined = undefined;
   export let listName: string;
   export let listDescription: string | undefined;

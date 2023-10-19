@@ -1,13 +1,13 @@
 <script lang="ts">
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
   import Copyable from '../copyable/copyable.svelte';
   import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import type { Project } from '$lib/graphql/generated/graphql';
 
-  export let project: GitProject;
+  export let project: Project;
   export let editButton: string | undefined = undefined;
 
   const dispatch = createEventDispatcher<{ editButtonClick: never }>();

@@ -1,4 +1,4 @@
-import type { Source } from './metadata/types';
+import { Forge, type Source } from '$lib/graphql/generated/graphql';
 
 /**
  * Builds a project profile URL from a project source object.
@@ -7,7 +7,7 @@ import type { Source } from './metadata/types';
  */
 export default function (source: Source) {
   switch (source.forge) {
-    case 'github':
+    case Forge.GITHUB:
       return `/app/projects/github/${encodeURIComponent(source.ownerName)}/${encodeURIComponent(
         source.repoName,
       )}`;

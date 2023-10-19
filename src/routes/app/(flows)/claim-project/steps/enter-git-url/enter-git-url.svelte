@@ -17,10 +17,18 @@
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
-  import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
+  import type {
+    Project,
+    ProjectWhereInput,
+    UnclaimedProject,
+  } from '$lib/graphql/generated/graphql';
+  import { gql } from '@apollo/client';
+  import assert from '$lib/utils/assert';
+  import query from '$lib/graphql/dripsQL';
+  import isClaimed from '$lib/utils/project/is-claimed';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 
@@ -64,14 +72,141 @@
       const accountId = await repoDriverClient.getAccountId(forge, projectName);
 
       const owner = await repoDriverClient.getOwner(accountId);
-      const project = await gitProjectService.getByUrl($context.gitUrl);
+
+      const getProjectByUrlQuery = gql`
+        query Projects($where: ProjectWhereInput!) {
+          projects(where: $where) {
+            ... on ClaimedProject {
+              account {
+                accountId
+                driver
+              }
+              color
+              description
+              emoji
+              owner {
+                accountId
+                address
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+              splits {
+                maintainers {
+                  accountId
+                  address
+                  driver
+                  type
+                  weight
+                }
+                dependencies {
+                  ... on AddressReceiver {
+                    accountId
+                    address
+                    driver
+                    type
+                    weight
+                  }
+                  ... on ProjectReceiver {
+                    driver
+                    type
+                    weight
+                    project {
+                      ... on ClaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        color
+                        description
+                        emoji
+                        owner {
+                          accountId
+                          address
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                      ... on UnclaimedProject {
+                        account {
+                          accountId
+                          driver
+                        }
+                        source {
+                          forge
+                          ownerName
+                          repoName
+                          url
+                        }
+                        verificationStatus
+                      }
+                    }
+                  }
+                  ... on DripListReceiver {
+                    driver
+                    type
+                    weight
+                    dripList {
+                      id
+                      isPublic
+                      owner {
+                        accountId
+                        address
+                        driver
+                      }
+                      previousOwnerAddress
+                      name
+                    }
+                  }
+                }
+              }
+            }
+            ... on UnclaimedProject {
+              account {
+                accountId
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
+            }
+          }
+        }
+      `;
+
+      const response = await query<{ project: Project | null }, { where: ProjectWhereInput }>(
+        getProjectByUrlQuery,
+        {
+          where: {
+            id: $context.gitUrl,
+          },
+        },
+      );
+
+      const project = response.project;
+      assert(project);
 
       // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
       const repoDriverMetadataManager = new RepoDriverMetadataManager();
       const projectMetadata = await repoDriverMetadataManager.fetchAccountMetadata(
-        project.repoDriverAccount.accountId,
+        project?.account.accountId,
       );
-      if (project.claimed && projectMetadata) {
+      if (isClaimed(project) && projectMetadata) {
         throw new Error('Project already claimed');
       }
 
@@ -83,22 +218,19 @@
         $context.isPartiallyClaimed = true;
       }
 
-      $context.project = project as UnclaimedGitProject;
+      $context.project = project as UnclaimedProject;
 
-      $context.projectEmoji = seededRandomElement(
-        possibleRandomEmoji,
-        project.repoDriverAccount.accountId,
-      );
+      $context.projectEmoji = seededRandomElement(possibleRandomEmoji, project.account.accountId);
       $context.projectColor = seededRandomElement(
         ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
-        project.repoDriverAccount.accountId,
+        project.account.accountId,
       );
 
       // TODO: enable pre-population of dependencies.
       // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId), prePopulateDependencies()]);
       await Promise.all([
         fetchProjectMetadata(),
-        fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId),
+        fetchUnclaimedProjectFunds(project.account.accountId),
       ]);
 
       validationState = { type: 'valid' };

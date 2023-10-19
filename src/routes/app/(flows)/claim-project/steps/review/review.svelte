@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -18,11 +18,15 @@
   import type { State } from '../../claim-project-flow';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
+  import {
+    ProjectVerificationStatus,
+    type ClaimedProject,
+    Driver,
+  } from '$lib/graphql/generated/graphql';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -32,17 +36,18 @@
 
   // For previewing what the project will look like after claiming
   $: fakeClaimedProject = {
-    ...project,
-    claimed: true as const,
+    verificationStatus: ProjectVerificationStatus.Claimed,
+    account: { ...project.account },
+    source: { ...project.source },
     owner: {
-      driver: 'address' as const,
+      driver: Driver.ADDRESS,
       address: $walletStore.address ?? unreachable(),
       accountId: $walletStore.dripsAccountId ?? unreachable(),
     },
     color: $context.projectColor,
     emoji: $context.projectEmoji,
     splits: { maintainers: [], dependencies: [] },
-  };
+  } as ClaimedProject;
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
     $context.dependencySplits.items,
@@ -55,12 +60,6 @@
     $context.maintainerSplits.percentages,
     $context.highLevelPercentages['maintainers'],
   );
-
-  let gitProjectService: GitProjectService;
-
-  onMount(async () => {
-    gitProjectService = await GitProjectService.new();
-  });
 
   async function submit() {
     if ($context.isPartiallyClaimed) {

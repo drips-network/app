@@ -21,7 +21,6 @@
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
-  import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
@@ -29,6 +28,13 @@
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import {
+    Forge,
+    ProjectVerificationStatus,
+    type Project,
+    type Source,
+    Driver,
+  } from '$lib/graphql/generated/graphql';
 
   // Button
   let disabled = false;
@@ -78,7 +84,7 @@
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
     github: {
-      forge: 'github',
+      forge: Forge.GITHUB,
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
@@ -87,19 +93,19 @@
 
   // Splits
 
-  const MOCK_PROJECT_1: GitProject = {
-    claimed: true,
-    repoDriverAccount: {
+  const MOCK_PROJECT_1: Project = {
+    verificationStatus: ProjectVerificationStatus.Claimed,
+    account: {
       accountId: '0',
-      driver: 'repo',
+      driver: Driver.REPO,
     },
     owner: {
-      driver: 'address',
+      driver: Driver.ADDRESS,
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      forge: 'github',
+      forge: Forge.GITHUB,
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
@@ -109,19 +115,19 @@
     splits: { maintainers: [], dependencies: [] },
   };
 
-  const MOCK_PROJECT_2: GitProject = {
-    claimed: true,
-    repoDriverAccount: {
+  const MOCK_PROJECT_2: Project = {
+    verificationStatus: ProjectVerificationStatus.Claimed,
+    account: {
       accountId: '0',
-      driver: 'repo',
+      driver: Driver.REPO,
     },
     owner: {
-      driver: 'address',
+      driver: Driver.ADDRESS,
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      forge: 'github',
+      forge: Forge.GITHUB,
       repoName: 'svelte-stored-writable',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
@@ -335,13 +341,13 @@
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
       project={{
-        claimed: true,
-        repoDriverAccount: {
+        verificationStatus: ProjectVerificationStatus.Claimed,
+        account: {
           accountId: '0',
-          driver: 'repo',
+          driver: Driver.REPO,
         },
         owner: {
-          driver: 'address',
+          driver: Driver.ADDRESS,
           accountId: '0',
           address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
         },
@@ -377,13 +383,13 @@
     <ProjectBadge
       project={projectVerified
         ? {
-            claimed: true,
-            repoDriverAccount: {
+            verificationStatus: ProjectVerificationStatus.Claimed,
+            account: {
               accountId: '0',
-              driver: 'repo',
+              driver: Driver.REPO,
             },
             owner: {
-              driver: 'address',
+              driver: Driver.ADDRESS,
               accountId: '0',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
@@ -393,14 +399,12 @@
             splits: { maintainers: [], dependencies: [] },
           }
         : {
-            claimed: false,
-            repoDriverAccount: {
+            verificationStatus: ProjectVerificationStatus.Unclaimed,
+            account: {
               accountId: '0',
-              driver: 'repo',
+              driver: Driver.REPO,
             },
             source: SOURCE_CONFIGS[sourceType],
-            owner: undefined,
-            verificationStatus: VerificationStatus.NOT_STARTED,
           }}
     />
   </PrimaryColorThemer>

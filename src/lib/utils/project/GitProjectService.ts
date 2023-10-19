@@ -117,18 +117,6 @@ export default class GitProjectService {
     return this._repoDriverClient.getAccountId(forge, projectName);
   }
 
-  public async getAllByOwner(address: Address): Promise<ClaimedGitProject[]> {
-    const res = await this._dripsSubgraphClient.repoDriverQueries.getRepoAccountsOwnedByAddress(
-      address,
-    );
-
-    const promises = res.map((r) => this._mapRepoAccountToGitProject(r));
-
-    return (await Promise.all(promises)).filter(
-      (a): a is ClaimedGitProject => a !== null && Boolean(a.owner),
-    );
-  }
-
   // TODO: use `unclaimed-funds.ts` when merged.
   public async getUnclaimedFunds(url: string): Promise<
     {

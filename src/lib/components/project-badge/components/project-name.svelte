@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import type { Project } from '$lib/graphql/generated/graphql';
 
   export let showSource = true;
 
-  export let project: GitProject;
+  export let project: Project;
 </script>
 
 <span class="text-foreground-level-5 typo-text"

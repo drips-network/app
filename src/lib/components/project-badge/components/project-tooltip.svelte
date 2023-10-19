@@ -1,22 +1,24 @@
 <script lang="ts">
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import type { Forge, Project } from '$lib/graphql/generated/graphql';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import buildProjectUrl from '$lib/utils/build-project-url';
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import isClaimed from '$lib/utils/project/is-claimed';
   import ProjectName from './project-name.svelte';
 
-  export let project: GitProject;
+  export let project: Project;
 
-  const SOURCE_TYPE_STRINGS = {
-    github: 'on GitHub',
+  const SOURCE_TYPE_STRINGS: { [K in Forge]: string } = {
+    GITHUB: 'on GitHub',
+    GITLAB: 'on GitLab',
   };
 </script>
 
 <div class="project-tooltip">
   <div
     class="background"
-    style:background-color={project.owner
+    style:background-color={isClaimed(project)
       ? 'var(--color-primary-level-2)'
       : 'var(--color-foreground-level-1)'}
   />
@@ -25,7 +27,7 @@
     <a class="name typo-header-4" href={buildProjectUrl(project.source)}
       ><ProjectName {project} /></a
     >
-    {#if project.owner}
+    {#if isClaimed(project)}
       <div class="owner typo-text-small">
         <span>Owned by </span>
         <IdentityBadge linkToNewTab address={project.owner.address} disableTooltip size="small" />

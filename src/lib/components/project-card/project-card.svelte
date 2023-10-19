@@ -1,12 +1,12 @@
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
-  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import Github from 'radicle-design-system/icons/Github.svelte';
 
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import ProjectName from '../project-badge/components/project-name.svelte';
+  import type { ClaimedProject } from '$lib/graphql/generated/graphql';
 
-  export let project: ClaimedGitProject;
+  export let project: ClaimedProject;
 </script>
 
 <a class="wrapper" href={buildProjectUrl(project.source)}>
