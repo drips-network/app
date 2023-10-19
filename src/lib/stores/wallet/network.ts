@@ -25,6 +25,12 @@ const NETWORK_ID = {
   [11155111]: '0xaa36a7',
 };
 
+const INFURA_KEYS = {
+  [1]: 'f88a1229d473471bbf94d168401b9c93',
+  [5]: 'f88a1229d473471bbf94d168401b9c93',
+  [11155111]: 'f88a1229d473471bbf94d168401b9c93',
+};
+
 const RPC_URLS = {
   [1]: 'https://mainnet.infura.io/v3/f88a1229d473471bbf94d168401b9c93',
   [5]: 'https://goerli.infura.io/v3/f88a1229d473471bbf94d168401b9c93',
@@ -57,4 +63,5 @@ export default {
   token: NETWORK_TOKENS[configuredChainId],
   id: NETWORK_ID[configuredChainId],
   rpcUrl: RPC_URLS[configuredChainId],
+  infuraKey: INFURA_KEYS[configuredChainId],
 };
