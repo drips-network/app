@@ -10,7 +10,7 @@
   import modal from '$lib/stores/modal';
   import buildUrl from '$lib/utils/build-url';
   import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
-  import type { DripList } from '$lib/utils/metadata/types';
+  import type { DripList, GitProject } from '$lib/utils/metadata/types';
   import unreachable from '$lib/utils/unreachable';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
@@ -27,10 +27,23 @@
       | undefined;
   }>;
 
-  /** URL of the Drip List or Project we want to add to an existing or new Drip List */
-  export let urlToAdd: string;
+  export let projectOrDripListToAdd: GitProject | DripList;
+
+  $: urlToAdd =
+    'source' in projectOrDripListToAdd
+      ? projectOrDripListToAdd.source.url
+      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`;
 
   let selected: string[] = [];
+
+  function isAlreadyInList(list: DripList) {
+    const accountIdToAdd =
+      'source' in projectOrDripListToAdd
+        ? projectOrDripListToAdd.repoDriverAccount.accountId
+        : projectOrDripListToAdd.account.accountId;
+
+    return list.projects.some((p) => p.account.accountId === accountIdToAdd);
+  }
 
   function submit() {
     const selectedDripList =
@@ -69,6 +82,7 @@
             dl.account.accountId,
             {
               type: 'selectable',
+              disabled: isAlreadyInList(dl),
               label: {
                 component: DripListBadge,
                 props: {

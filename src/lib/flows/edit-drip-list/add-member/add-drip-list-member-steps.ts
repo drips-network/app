@@ -7,6 +7,7 @@ import type { DripList, GitProject } from '$lib/utils/metadata/types';
 import SelectDripList from './steps/select-drip-list.svelte';
 import type { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
 import assert from '$lib/utils/assert';
+import unreachable from '$lib/utils/unreachable';
 
 export default (
   /** The current user's Drip Lists. */
@@ -26,10 +27,6 @@ export default (
     'Must provide either a project or a drip list to add to the drip list.',
   );
 
-  const urlToAdd =
-    projectToAdd?.source.url ??
-    `https://drips.network/app/drip-lists/${dripListToAdd?.account.accountId}`;
-
   return {
     context: undefined,
     steps: [
@@ -38,7 +35,7 @@ export default (
         props: {
           dripLists,
           selectedDripListState,
-          urlToAdd,
+          projectOrDripListToAdd: projectToAdd ?? dripListToAdd ?? unreachable(),
         },
       }),
       makeStep({
