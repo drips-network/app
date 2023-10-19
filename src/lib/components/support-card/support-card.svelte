@@ -22,13 +22,6 @@
   let ownDripLists: DripList[] | null | undefined = undefined;
   let ownDripListSplits: SplitsEntry[] | undefined = undefined;
 
-  let isSupporting: boolean | undefined;
-  $: isSupporting = ownDripListSplits?.some(
-    (s) =>
-      s.accountId === project?.repoDriverAccount.accountId ||
-      s.accountId === dripList?.account.accountId,
-  );
-
   $: isOwner =
     $walletStore.connected &&
     ($walletStore.dripsAccountId === project?.owner.accountId ||
@@ -121,15 +114,11 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    {#if isSupporting}
-      You're already supporting this with your Drip List.
-    {:else}
-      Add this {project ? 'project' : ''} to your Drip List to flexibly support it with an ongoing contribution.
-    {/if}
+    Add this {project ? 'project' : ''} to your Drip List to flexibly support it with an ongoing contribution.
   </p>
   <Button
     on:click={handleSupportButton}
-    disabled={isSupporting || isOwner}
+    disabled={isOwner}
     size="large"
     icon={Plus}
     variant="primary">{ownDripLists === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
