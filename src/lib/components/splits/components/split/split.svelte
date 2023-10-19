@@ -21,6 +21,9 @@
   export let linkToNewTab = false;
   export let isNested = false;
 
+  /** Set to false to hide the chevron next to split groups. */
+  export let groupsExpandable = true;
+
   /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
   export let isLast = false;
   /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
@@ -192,7 +195,7 @@
             </div>
             <div class="label" style:transform="translateX({$groupNameOffset}px)">
               <div class="typo-header-4">{split.name}</div>
-              {#if split.list.length > 0}
+              {#if split.list.length > 0 && groupsExpandable}
                 <div
                   class="chevron"
                   style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 90deg)' : ''}

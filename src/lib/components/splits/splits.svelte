@@ -87,6 +87,9 @@
   export let list: Splits;
   export let maxRows: number | undefined = undefined;
 
+  /** Set to false to hide the chevron next to split groups. */
+  export let groupsExpandable = true;
+
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
     list.sort((a, b) => {
@@ -98,7 +101,7 @@
     });
 
   function truncateList(list: Splits) {
-    if (!maxRows || list.length === maxRows) {
+    if (!maxRows || list.length <= maxRows) {
       return list;
     }
     const clipIndex = maxRows - 1;
@@ -120,6 +123,7 @@
   {#each sortedList as listItem, index}
     <li class="split">
       <SplitComponent
+        {groupsExpandable}
         isFirst={index === 0}
         isLast={index === sortedList.length - 1}
         {linkToNewTab}
