@@ -121,7 +121,7 @@
     border: 1px solid var(--color-foreground);
     overflow-x: scroll;
     border-radius: 1rem 0 1rem 1rem;
-    max-height: 12rem;
+    max-height: 16rem;
     margin-bottom: 1rem;
   }
 </style>
