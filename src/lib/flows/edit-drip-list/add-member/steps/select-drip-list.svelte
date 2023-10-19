@@ -86,6 +86,7 @@
               label: {
                 component: DripListBadge,
                 props: {
+                  isLinked: false,
                   listId: dl.account.accountId,
                   listName: dl.name,
                   owner: undefined,
