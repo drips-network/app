@@ -11,7 +11,7 @@
   import query from '$lib/graphql/dripsQL';
   import type { Project } from '$lib/graphql/generated/graphql';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import { gql } from '@apollo/client';
+  import { gql } from 'graphql-request';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

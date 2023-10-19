@@ -65,7 +65,6 @@
     "vitest": "^0.25.3"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.5",
     "@efstajas/svelte-stored-writable": "^0.2.0",
     "@efstajas/versioned-parser": "^0.1.0",
     "@gelatonetwork/relay-sdk": "^4.0.0",
@@ -85,6 +84,7 @@
     "fuzzysort": "^2.0.3",
     "git-dep-url": "github:jtourkos/git-dep-url",
     "graphql": "16.6.0",
+    "graphql-request": "^6.1.0",
     "isomorphic-fetch": "^3.0.0",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",

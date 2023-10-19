@@ -4,7 +4,7 @@ import DripListService from '$lib/utils/driplist/DripListService';
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { DripList } from '$lib/utils/metadata/types';
-import { gql } from '@apollo/client';
+import { gql } from 'graphql-request';
 import { Utils, AddressDriverClient } from 'radicle-drips';
 
 export interface SplitsEntryWrapper<T> {

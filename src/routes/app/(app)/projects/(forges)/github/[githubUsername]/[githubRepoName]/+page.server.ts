@@ -6,11 +6,11 @@ import { buildProjectSplitsData } from '../../../methods/project-splits';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
-import { gql } from '@apollo/client';
 import query from '$lib/graphql/dripsQL';
 import type { Project, ProjectWhereInput } from '$lib/graphql/generated/graphql';
 import { single } from '$lib/utils/linq';
 import isClaimed from '$lib/utils/project/is-claimed';
+import { gql } from 'graphql-request';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
 

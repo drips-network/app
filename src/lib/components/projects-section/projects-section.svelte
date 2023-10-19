@@ -8,8 +8,8 @@
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
   import query from '$lib/graphql/dripsQL';
-  import { gql } from '@apollo/client';
   import type { ClaimedProject, ProjectWhereInput } from '$lib/graphql/generated/graphql';
+  import { gql } from 'graphql-request';
 
   export let address: string | undefined;
 

@@ -1,22 +1,12 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  type DocumentNode,
-  type OperationVariables,
-} from '@apollo/client';
+import { GraphQLClient, type RequestDocument, type Variables } from 'graphql-request';
 
-const DRIPS_GRAPHQL_URL = 'https://drips-api.ey.r.appspot.com/';
-const client = new ApolloClient({
-  uri: DRIPS_GRAPHQL_URL,
-  cache: new InMemoryCache(),
-});
-export default async function query<
-  TResponse,
-  TOperationVariables extends OperationVariables = OperationVariables,
->(query: DocumentNode, variables?: TOperationVariables): Promise<TResponse> {
-  const { data } = await client.query<TResponse>({
-    query,
-    variables,
-  });
+const client = new GraphQLClient('https://drips-api.ey.r.appspot.com/');
+
+export default async function query<TResponse, TVariables extends Variables = Variables>(
+  query: RequestDocument,
+  variables?: TVariables,
+): Promise<TResponse> {
+  const data = await client.request<TResponse>(query, variables);
+
   return data;
 }

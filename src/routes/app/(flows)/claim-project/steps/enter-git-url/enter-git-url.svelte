@@ -25,10 +25,10 @@
     ProjectWhereInput,
     UnclaimedProject,
   } from '$lib/graphql/generated/graphql';
-  import { gql } from '@apollo/client';
   import assert from '$lib/utils/assert';
   import query from '$lib/graphql/dripsQL';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import { gql } from 'graphql-request';
   // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
   // import type { GitProject } from '$lib/utils/metadata/types';
 

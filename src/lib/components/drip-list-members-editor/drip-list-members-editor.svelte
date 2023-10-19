@@ -55,8 +55,8 @@
   import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
   import type { Project, ProjectWhereInput } from '$lib/graphql/generated/graphql';
   import query from '$lib/graphql/dripsQL';
-  import { gql } from '@apollo/client';
   import { single } from '$lib/utils/linq';
+  import { gql } from 'graphql-request';
 
   export let maxItems = 200;
 

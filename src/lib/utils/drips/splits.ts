@@ -14,7 +14,7 @@ import assert from '$lib/utils/assert';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import query from '$lib/graphql/dripsQL';
 import type { Project } from '$lib/graphql/generated/graphql';
-import { gql } from '@apollo/client';
+import { gql } from 'graphql-request';
 
 export type RepresentationalSplit = AddressSplit | ProjectSplit | DripListSplit;
 
