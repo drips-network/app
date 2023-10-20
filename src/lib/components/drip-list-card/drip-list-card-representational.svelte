@@ -186,7 +186,7 @@
       </div>
       {#if (dripList.description ?? '').length > 0}
         <div class="description">
-          <TextExpandable isExpandable={format === 'full'} lines={format === 'full' ? 2 : 1}>
+          <TextExpandable isExpandable={format === 'full'}>
             {dripList.description}
           </TextExpandable>
         </div>
