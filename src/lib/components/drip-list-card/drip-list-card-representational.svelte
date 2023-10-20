@@ -26,10 +26,11 @@
   import type getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import type { DripList } from '$lib/utils/metadata/types';
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
+  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
+  import Spinner from '../spinner/spinner.svelte';
 
   export let dripList: DripList;
   export let format: 'thumblink' | 'full' = 'full';
-  export let maxSplitsRows: number | undefined = undefined;
 
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
@@ -128,12 +129,23 @@
 
     modal.show(Stepper, undefined, editDripListSteps(dripList, representationalSplits));
   }
+
+  let maxRows: number | undefined;
+  $: {
+    if (format === 'full') {
+      maxRows = undefined;
+    } else {
+      maxRows = dripList.description ? 3 : 4;
+    }
+  }
 </script>
 
 <svelte:element
   this={format === 'thumblink' ? 'a' : 'section'}
+  class:has-description={dripList.description}
   href={format === 'thumblink' ? dripListUrl : undefined}
-  class="rounded-drip-lg shadow-low group transform {format === 'thumblink'
+  class="drip-list-card {format} rounded-drip-lg overflow-hidden shadow-low group transform {format ===
+  'thumblink'
     ? 'transition duration-200 mouse:hover:shadow-md mouse:hover:-translate-y-2px focus-visible:shadow-md focus-visible:-translate-y-2px'
     : ''}"
 >
@@ -164,9 +176,11 @@
         {/if}
       </div>
       {#if (dripList.description ?? '').length > 0}
-        <TextExpandable>
-          {dripList.description}
-        </TextExpandable>
+        <div class="description">
+          <TextExpandable isExpandable={format === 'full'}>
+            {dripList.description}
+          </TextExpandable>
+        </div>
       {/if}
     </header>
 
@@ -177,27 +191,31 @@
         </div>
         <div class="typo-text tabular-nums total-streamed-badge">
           {#if browser}
-            <!-- TODO: Include incoming splits -->
             <AggregateFiatEstimate amounts={totalIncomingAmounts} />
           {/if}
           <span class="muted">&nbsp;total</span>
         </div>
-        {#if supportersPile && supportersPile.length > 0}
+        {#if supportersPile && supportersPile.length > 0 && format === 'full'}
           <div in:fade|local={{ duration: 300 }} class="supporters min-w-0">
             <span class="truncate muted">Supported by</span>
             <Pile components={supportersPile ?? []} itemsClickable={true} />
           </div>
         {/if}
       </div>
-      {#if representationalSplits}
-        <div class="splits-component">
-          <Splits list={representationalSplits} maxRows={maxSplitsRows} />
-        </div>
-      {:else}
-        Loading...
-      {/if}
+      <TransitionedHeight transitionHeightChanges={true}>
+        {#if representationalSplits}
+          <div in:fade class="splits-component">
+            <Splits groupsExpandable={format === 'full'} list={representationalSplits} {maxRows} />
+          </div>
+        {:else}
+          <div class="loading-state">
+            <Spinner />
+          </div>
+        {/if}
+      </TransitionedHeight>
     </div>
   </div>
+  <div class="overflow-gradient" />
 </svelte:element>
 
 <style>
@@ -205,6 +223,17 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    position: relative;
+  }
+
+  .overflow-gradient {
+    position: absolute;
+    z-index: 1;
+    width: 2rem;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, transparent, var(--color-background) 75%);
   }
 
   .totals .drip-icon {
@@ -238,6 +267,26 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  .drip-list-card .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .drip-list-card:not(.has-description) .loading-state {
+    /** Height of exactly 3 splits rows. */
+    height: 212px;
+  }
+
+  .drip-list-card.has-description .loading-state {
+    /** Height of exactly 4 splits rows. */
+    height: 163px;
+  }
+
+  .thumblink .description {
+    height: 2rem;
   }
 
   .muted {

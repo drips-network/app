@@ -2,10 +2,12 @@
   import { browser } from '$app/environment';
   import { onDestroy, onMount } from 'svelte';
 
+  export let isExpandable = true;
+  export let lines = 2;
+
   let element: HTMLElement | undefined = undefined;
   let isClamped = false;
   let expanded: boolean | undefined = undefined;
-  export let isExpandable = true;
 
   function setIsClamped() {
     isClamped = element ? element.scrollHeight > element.clientHeight : false;
@@ -28,7 +30,7 @@
   bind:this={element}
   class="
     expandable-text relative
-    {!expanded ? 'line-clamp-2' : ''}
+    {!expanded ? `line-clamp-${lines}` : ''}
     "
 >
   <slot />

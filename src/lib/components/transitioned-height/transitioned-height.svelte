@@ -2,7 +2,7 @@
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
   import { onMount } from 'svelte';
   import { cubicInOut } from 'svelte/easing';
-  import { tweened } from 'svelte/motion';
+  import { tweened, type Tweened } from 'svelte/motion';
 
   // ___________
   // PROPS
@@ -45,7 +45,7 @@
   */
   let fitContent = !collapsed;
 
-  let containerHeight = tweened(0);
+  let containerHeight: Tweened<number> | undefined;
 
   let animating = false;
 
@@ -67,6 +67,11 @@
     if (shouldTransition) {
       fitContent = false;
       animating = true;
+    }
+
+    if (!containerHeight) {
+      // Set initially to the current height value of the container
+      containerHeight = tweened(contentContainerElem.getBoundingClientRect().height);
     }
 
     containerHeight.set(

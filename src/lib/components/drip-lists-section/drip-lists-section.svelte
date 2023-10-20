@@ -140,14 +140,18 @@
   }}
 >
   {#if visibleDripLists}
-    <div class="grid gap-6 grid-cols-1 {visibleDripLists.length > 0 ? 'lg:grid-cols-2' : ''}">
+    <div
+      class="grid gap-6 grid-cols-1 padding pt-px {visibleDripLists.length > 0
+        ? 'lg:grid-cols-2'
+        : ''}"
+    >
       {#each visibleDripLists as dripList}
-        <DripListCard {dripList} format="thumblink" maxSplitsRows={4} />
+        <DripListCard {dripList} format="thumblink" />
       {/each}
       {#if showCreateNewListCard}
         <div
           class="shadow-low rounded-drip-lg flex items-center justify-center p-1"
-          style:min-height="452px"
+          style:min-height="398px"
         >
           <div class="flex flex-col items-center gap-2 text-center">
             <Illustration size={48} />
