@@ -146,12 +146,12 @@
         : ''}"
     >
       {#each visibleDripLists as dripList}
-        <DripListCard {dripList} format="thumblink" maxSplitsRows={4} />
+        <DripListCard {dripList} format="thumblink" />
       {/each}
       {#if showCreateNewListCard}
         <div
           class="shadow-low rounded-drip-lg flex items-center justify-center p-1"
-          style:min-height="452px"
+          style:min-height="398px"
         >
           <div class="flex flex-col items-center gap-2 text-center">
             <Illustration size={48} />

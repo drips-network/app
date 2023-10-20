@@ -31,7 +31,6 @@
 
   export let dripList: DripList;
   export let format: 'thumblink' | 'full' = 'full';
-  export let maxSplitsRows: number | undefined = undefined;
 
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
@@ -139,12 +138,23 @@
       ),
     );
   }
+
+  let maxRows: number | undefined;
+  $: {
+    if (format === 'full') {
+      maxRows = undefined;
+    } else {
+      maxRows = dripList.description ? 3 : 4;
+    }
+  }
 </script>
 
 <svelte:element
   this={format === 'thumblink' ? 'a' : 'section'}
+  class:has-description={dripList.description}
   href={format === 'thumblink' ? dripListUrl : undefined}
-  class="rounded-drip-lg overflow-hidden shadow-low group transform {format === 'thumblink'
+  class="drip-list-card {format} rounded-drip-lg overflow-hidden shadow-low group transform {format ===
+  'thumblink'
     ? 'transition duration-200 mouse:hover:shadow-md mouse:hover:-translate-y-2px focus-visible:shadow-md focus-visible:-translate-y-2px'
     : ''}"
 >
@@ -174,10 +184,12 @@
           </div>
         {/if}
       </div>
-      {#if format === 'full' && (dripList.description ?? '').length > 0}
-        <TextExpandable>
-          {dripList.description}
-        </TextExpandable>
+      {#if (dripList.description ?? '').length > 0}
+        <div class="description">
+          <TextExpandable isExpandable={format === 'full'} lines={format === 'full' ? 2 : 1}>
+            {dripList.description}
+          </TextExpandable>
+        </div>
       {/if}
     </header>
 
@@ -202,11 +214,7 @@
       <TransitionedHeight transitionHeightChanges={true}>
         {#if representationalSplits}
           <div in:fade class="splits-component">
-            <Splits
-              groupsExpandable={format === 'full'}
-              list={representationalSplits}
-              maxRows={maxSplitsRows}
-            />
+            <Splits groupsExpandable={format === 'full'} list={representationalSplits} {maxRows} />
           </div>
         {:else}
           <div class="loading-state">
@@ -270,11 +278,24 @@
     gap: 0.5rem;
   }
 
-  .loading-state {
-    min-height: 212px;
+  .drip-list-card .loading-state {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .drip-list-card:not(.has-description) .loading-state {
+    /** Height of exactly 3 splits rows. */
+    height: 212px;
+  }
+
+  .drip-list-card.has-description .loading-state {
+    /** Height of exactly 4 splits rows. */
+    height: 163px;
+  }
+
+  .thumblink .description {
+    height: 2rem;
   }
 
   .muted {
