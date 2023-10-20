@@ -77,7 +77,7 @@
           address: s.value.address,
           showIdentity: false,
           outline: true,
-          size: 'medium',
+          size: 'normal',
           disableTooltip: true,
         },
       })),
@@ -89,6 +89,7 @@
         props: {
           project: s.value,
           outline: true,
+          size: 'tiny',
         },
       })),
     );
@@ -100,7 +101,7 @@
           address: s.value.account.owner.address,
           showIdentity: false,
           outline: true,
-          size: 'medium',
+          size: 'normal',
           disableTooltip: true,
         },
       })),
@@ -114,7 +115,7 @@
           address: streams[0].sender.address,
           showIdentity: false,
           outline: true,
-          size: 'medium',
+          size: 'normal',
           disableTooltip: true,
         },
       });
@@ -146,8 +147,11 @@
   href={format === 'thumblink' ? dripListUrl : undefined}
   class="drip-list-card {format} rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
-    <header class="px-6 pt-6 flex flex-col gap-4">
+  <div
+    class="flex flex-col gap-{dripList.description ? '4' : '6'}"
+    class:pointer-events-none={format === 'thumblink'}
+  >
+    <header class="px-6 pt-6 flex flex-col gap-2">
       <div
         class="flex gap-4 {format === 'full'
           ? 'flex-col sm:flex-row justify-left sm:justify-between sm:items-center'
@@ -192,10 +196,10 @@
           {/if}
           <span class="muted">&nbsp;total</span>
         </div>
-        {#if supportersPile && supportersPile.length > 0 && format === 'full'}
+        {#if supportersPile && supportersPile.length > 0}
           <div in:fade|local={{ duration: 300 }} class="supporters min-w-0">
-            <span class="truncate muted">Supported by</span>
-            <Pile components={supportersPile ?? []} itemsClickable={true} />
+            <span class="typo-text-small truncate muted">Supported by</span>
+            <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
           </div>
         {/if}
       </div>
@@ -219,6 +223,7 @@
   .drip-list-card {
     box-shadow: var(--elevation-low);
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
   }
 
   .drip-list-card.thumblink:hover {
@@ -293,7 +298,7 @@
   }
 
   .thumblink .description {
-    height: 2rem;
+    height: 3rem;
   }
 
   .muted {
