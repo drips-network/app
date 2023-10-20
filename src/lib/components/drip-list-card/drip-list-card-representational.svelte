@@ -144,10 +144,7 @@
   this={format === 'thumblink' ? 'a' : 'section'}
   class:has-description={dripList.description}
   href={format === 'thumblink' ? dripListUrl : undefined}
-  class="drip-list-card {format} rounded-drip-lg overflow-hidden shadow-low group transform {format ===
-  'thumblink'
-    ? 'transition duration-200 mouse:hover:shadow-md mouse:hover:-translate-y-2px focus-visible:shadow-md focus-visible:-translate-y-2px'
-    : ''}"
+  class="drip-list-card {format} rounded-drip-lg overflow-hidden shadow-low group"
 >
   <div class="flex flex-col gap-8" class:pointer-events-none={format === 'thumblink'}>
     <header class="px-6 pt-6 flex flex-col gap-4">
@@ -219,6 +216,16 @@
 </svelte:element>
 
 <style>
+  .drip-list-card {
+    box-shadow: var(--elevation-low);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .drip-list-card.thumblink:hover {
+    box-shadow: var(--elevation-medium);
+    transform: translateY(-0.125rem);
+  }
+
   .totals {
     display: flex;
     align-items: center;
