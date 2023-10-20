@@ -13,6 +13,8 @@
   let user: AddressDriverAccount | NFTDriverAccount;
   let dripList: DripList | null | undefined;
 
+  let dripListRequested = false;
+
   $: {
     const value = context.getValue();
 
@@ -30,12 +32,13 @@
 
     user = userSchema.parse(value);
 
-    if (user.driver === 'nft' && dripList === undefined) {
+    if (user.driver === 'nft' && dripList === undefined && !dripListRequested) {
       getDripList(user.accountId);
     }
   }
 
   async function getDripList(listId: AccountId) {
+    dripListRequested = true;
     const dripListService = await DripListService.new();
     dripList = await dripListService.getByTokenId(listId);
   }
