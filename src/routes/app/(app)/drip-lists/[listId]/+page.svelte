@@ -56,7 +56,7 @@
 
   <Supporters
     headline="Support"
-    infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists to support it."
+    infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies to support it."
     forceLoading={!streamsFetched}
     {supportStreams}
     type="dripList"
