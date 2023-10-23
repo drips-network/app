@@ -3,7 +3,6 @@
   import { onDestroy, onMount } from 'svelte';
 
   export let isExpandable = true;
-  export let lines = 2;
 
   let element: HTMLElement | undefined = undefined;
   let isClamped = false;
@@ -30,7 +29,7 @@
   bind:this={element}
   class="
     expandable-text relative
-    {!expanded ? `line-clamp-${lines}` : ''}
+    {!expanded ? 'line-clamp-2' : ''}
     "
 >
   <slot />
