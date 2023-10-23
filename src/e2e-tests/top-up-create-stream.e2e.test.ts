@@ -11,6 +11,7 @@ import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
 import environment from './helpers/environment';
 import dotenv from 'dotenv';
+import takeScreenshot from './helpers/take-screenshot';
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ describe('app', async () => {
     window.fetch = fetch as typeof window.fetch;
 
     server = await preview({
-      preview: { port: 3000, host: '0.0.0.0' },
+      preview: { port: 3001, host: '0.0.0.0' },
     });
     browser = await chromium.launch({ headless: process.env.E2E_HEADLESS === '0' ? false : true });
     page = await browser.newPage();
@@ -44,9 +45,9 @@ describe('app', async () => {
   describe('streams and balances', () => {
     describe('global nav', () => {
       it('opens up to streams tab', async () => {
-        await page.goto('http://127.0.0.1:3000/app');
+        await page.goto('http://127.0.0.1:3001/app');
 
-        await expect(page).toHaveURL('http://127.0.0.1:3000/app/streams');
+        await expect(page).toHaveURL('http://127.0.0.1:3001/app/streams');
       });
 
       it('switches to the streams tab', async () => {
@@ -117,6 +118,8 @@ describe('app', async () => {
 
       it('shows the topped-up amount on the streams page', async () => {
         await page.locator('text=Got it').click({ timeout: 10000 });
+        await page.waitForTimeout(2000);
+        await page.reload();
       }, 10000);
     });
 
@@ -169,7 +172,7 @@ describe('app', async () => {
 
     describe('profile view', () => {
       it('displays the senders outgoing stream on their profile', async () => {
-        await page.goto('http://127.0.0.1:3000/app/0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
+        await page.goto('http://127.0.0.1:3001/app/0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
 
         await expect(page.locator('text=Total streamed')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
@@ -181,7 +184,7 @@ describe('app', async () => {
 
       it('switches to recipient streams dashboard', async () => {
         await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-        await page.goto('http://127.0.0.1:3000/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/streams');
 
         await page.reload();
 
@@ -189,7 +192,7 @@ describe('app', async () => {
       });
 
       it('displays the recipients incoming stream on their profile', async () => {
-        await page.goto('http://127.0.0.1:3000/app/0xAa90c43123ACEc193A35D33db5D71011B019779D');
+        await page.goto('http://127.0.0.1:3001/app/0xAa90c43123ACEc193A35D33db5D71011B019779D');
 
         await expect(page.locator('text=From')).toHaveCount(1);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
@@ -240,14 +243,14 @@ describe('app', async () => {
         await page.waitForTimeout(1000);
 
         expect(page.url().toLowerCase()).toBe(
-          'http://127.0.0.1:3000/app/0x433220a86126efe2b8c98a723e73ebad2d0cbadc',
+          'http://127.0.0.1:3001/app/0x433220a86126efe2b8c98a723e73ebad2d0cbadc',
         );
       });
     });
 
     describe('stream detail view', () => {
       it('opens the stream detail view', async () => {
-        await page.goto('http://127.0.0.1:3000/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/streams');
         await page.locator('text=E2E Test Stream').click();
 
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
@@ -292,7 +295,7 @@ describe('app', async () => {
 
       it('switches back to the user receiving the stream', async () => {
         await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-        await page.goto('http://127.0.0.1:3000/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/streams');
 
         await page.reload();
 
@@ -321,7 +324,7 @@ describe('app', async () => {
     describe('delete stream', () => {
       it('switches back to the original user', async () => {
         await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-        await page.goto('http://127.0.0.1:3000/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/streams');
 
         await page.reload();
 
@@ -345,7 +348,7 @@ describe('app', async () => {
         await page.locator('button', { hasText: 'Delete stream' }).click();
         await page.locator('button', { hasText: 'Got it' }).click();
 
-        expect(page.url().toLowerCase()).toBe('http://127.0.0.1:3000/app/streams');
+        expect(page.url().toLowerCase()).toBe('http://127.0.0.1:3001/app/streams');
       }, 20000);
 
       it('shows the streams empty state', async () => {
@@ -359,7 +362,7 @@ describe('app', async () => {
 
       it('switches back to the recipient', async () => {
         await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-        await page.goto('http://127.0.0.1:3000/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/streams');
 
         await page.reload();
 
@@ -378,7 +381,7 @@ describe('app', async () => {
 
     describe('squeezing', () => {
       it('opens the collect flow', async () => {
-        await page.goto('http://127.0.0.1:3000/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/streams');
 
         await page.locator('text=Testcoin').click();
         await page.locator('button', { hasText: 'Collect' }).click();
@@ -414,13 +417,13 @@ describe('app', async () => {
 
   describe('drip lists', () => {
     it('opens up to streams tab', async () => {
-      await page.goto('http://127.0.0.1:3000/app');
+      await page.goto('http://127.0.0.1:3001/app');
 
-      await expect(page).toHaveURL('http://127.0.0.1:3000/app/streams');
+      await expect(page).toHaveURL('http://127.0.0.1:3001/app/streams');
     });
 
     it('switches to the Drip List tab', async () => {
-      await page.locator('div[data-testid="sidenav"] a:text("Drip List")').click();
+      await page.locator('div[data-testid="sidenav"] a:text("Drip Lists")').click();
 
       await expect(
         page.locator('text=Support all your dependencies at once with a Drip List'),
@@ -430,7 +433,7 @@ describe('app', async () => {
     it('opens the drip list creation flow', async () => {
       await page.locator('text=Create Drip List').click();
 
-      await expect(page.locator('text=Create your Drip List')).toHaveCount(1);
+      await expect(page.locator('text=Create a Drip List')).toHaveCount(1);
     });
 
     it('adds items', async () => {
@@ -528,7 +531,10 @@ describe('app', async () => {
 
     it('navigates to the Drip List screen', async () => {
       await page.locator('button', { hasText: 'View your Drip List' }).click();
-      await expect(page.locator('text=This is a Test Drip List')).toHaveCount(1);
+
+      await page.waitForTimeout(1000);
+
+      await expect(page.locator('text=This is a Test Drip List')).toHaveCount(2);
       await expect(page.locator('text=This is my list description.')).toHaveCount(1);
     });
 
@@ -552,6 +558,8 @@ describe('app', async () => {
     });
 
     it('assigns equal percentages', async () => {
+      await page.waitForTimeout(1000); // Wait for new item to be added
+
       await page.locator('button', { hasText: 'Split evenly' }).click();
     });
 
@@ -568,6 +576,7 @@ describe('app', async () => {
     });
 
     it('advances the flow', async () => {
+      await takeScreenshot(page, 1);
       await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
       await page.locator('button', { hasText: 'Got it' }).click();
     });
@@ -577,21 +586,13 @@ describe('app', async () => {
 
       await page.reload();
 
+      await takeScreenshot(page, 2);
+
       await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
       await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
       await expect(page.locator('text=drips-test-repo-11')).toHaveCount(1);
       await expect(page.locator('text=0x43')).toHaveCount(0);
     });
-
-    /* 
-      The tests below are a bit tricky to implement because i wasnʼt able to find a way to get
-      the vite preview server to pay attention to the PUBLIC_TEST_MODE env var. Without this being true,
-      it wonʼt load the single drip list view, because that fetches data server-side, and without that env
-      var being set in the server just returns a 404.
-
-      TODO: Figure out how to set PUBLIC_TEST_MODE to true in the vite `preview` server, then implement the
-      below tests.
-     */
 
     it.todo('opens the single drip list view');
     it.todo('copies the URL');

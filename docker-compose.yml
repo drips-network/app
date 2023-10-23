@@ -50,3 +50,10 @@ services:
     depends_on:
       - testnet
       - graph-node
+
+  fake-pinata:
+    build:
+      dockerfile: ./src/e2e-tests/docker/fake-pinata/Dockerfile
+      context: .
+    ports:
+      - '3000:3000'
