@@ -139,6 +139,21 @@
       maxRows = dripList.description ? 3 : 4;
     }
   }
+
+  function getLoadingPlaceholderHeight() {
+    const BASE_HEIGHT = 16;
+    const ONE_SPLIT_HEIGHT = 49;
+
+    const amountOfMembers = dripList.projects.length;
+
+    if (format === 'full') {
+      return BASE_HEIGHT + ONE_SPLIT_HEIGHT * amountOfMembers;
+    } else {
+      return dripList.description
+        ? BASE_HEIGHT + ONE_SPLIT_HEIGHT * Math.min(3, amountOfMembers)
+        : BASE_HEIGHT + ONE_SPLIT_HEIGHT * Math.min(4, amountOfMembers);
+    }
+  }
 </script>
 
 <svelte:element
@@ -209,7 +224,7 @@
             <Splits groupsExpandable={format === 'full'} list={representationalSplits} {maxRows} />
           </div>
         {:else}
-          <div class="loading-state">
+          <div class="loading-state" style:height="{getLoadingPlaceholderHeight()}px">
             <Spinner />
           </div>
         {/if}
@@ -285,16 +300,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  .drip-list-card:not(.has-description) .loading-state {
-    /** Height of exactly 3 splits rows. */
-    height: 212px;
-  }
-
-  .drip-list-card.has-description .loading-state {
-    /** Height of exactly 4 splits rows. */
-    height: 163px;
   }
 
   .thumblink .description {
