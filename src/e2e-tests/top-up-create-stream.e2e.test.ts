@@ -481,7 +481,6 @@ describe('app', async () => {
 
       await expect(page.locator('text=Connect your wallet')).toHaveCount(1);
       await page.locator('button', { hasText: 'Continue' }).click();
-      console.log('bar');
     });
 
     it('selects the no support option', async () => {
