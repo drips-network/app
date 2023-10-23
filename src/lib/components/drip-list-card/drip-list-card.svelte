@@ -9,7 +9,6 @@
 
   export let dripList: DripList;
   export let format: 'thumblink' | 'full' = 'full';
-  export let maxSplitsRows: number | undefined = undefined;
 
   /*
     On mount, ensure the streams store has fetched the owner's account so that we can be sure that
@@ -66,5 +65,4 @@
   {incomingSplits}
   {supportStreams}
   {incomingSplitTotal}
-  {maxSplitsRows}
 />
