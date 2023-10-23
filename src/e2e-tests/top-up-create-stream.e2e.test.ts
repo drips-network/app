@@ -416,191 +416,189 @@ describe('app', async () => {
   });
 
   describe('drip lists', () => {
-    it('opens up to streams tab', async () => {
-      await page.goto('http://127.0.0.1:3001/app');
+    describe('create drip list flow', () => {
+      it('opens up to streams tab', async () => {
+        await page.goto('http://127.0.0.1:3001/app');
 
-      await expect(page).toHaveURL('http://127.0.0.1:3001/app/streams');
+        await expect(page).toHaveURL('http://127.0.0.1:3001/app/streams');
+      });
+
+      it('switches to the Drip List tab', async () => {
+        await page.locator('div[data-testid="sidenav"] a:text("Drip Lists")').click();
+
+        await expect(
+          page.locator('text=Support all your dependencies at once with a Drip List'),
+        ).toHaveCount(1);
+      });
+
+      it('opens the drip list creation flow', async () => {
+        await page.locator('text=Create Drip List').click();
+
+        await expect(page.locator('text=Create a Drip List')).toHaveCount(1);
+      });
+
+      it('adds items', async () => {
+        const input = page.locator(
+          'input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]',
+        );
+        await expect(input).toHaveCount(1);
+        await input.click();
+
+        await page.keyboard.type('github.com/efstajas/drips-test-repo-10');
+        await page.keyboard.press('Enter');
+
+        await expect(
+          page.locator('data-testid=item-https://github.com/efstajas/drips-test-repo-10'),
+        ).toHaveCount(1);
+
+        await page.keyboard.type('0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
+        await page.keyboard.press('Enter');
+
+        await expect(
+          page.locator('data-testid=item-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc'),
+        ).toHaveCount(1);
+      });
+
+      it('assigns equal percentages', async () => {
+        await page.locator('button', { hasText: 'Split evenly' }).click();
+      });
+
+      it('renames the drip list', async () => {
+        const titleField = page.locator('label:has-text("Title*")');
+        await titleField.clear();
+        await titleField.fill('This is a Test Drip List');
+      });
+
+      it('gives a description', async () => {
+        await page.locator('label:has-text("Description")').fill('This is my list description.');
+      });
+
+      it('advances the flow', async () => {
+        await page.locator('button', { hasText: 'Continue' }).click();
+      });
+
+      it('connects the wallet and continues', async () => {
+        await page.waitForTimeout(1000); // Wait for previous step to be unmounted
+
+        await expect(page.locator('text=Connect your wallet')).toHaveCount(1);
+        await page.locator('button', { hasText: 'Continue' }).click();
+      });
+
+      it('selects the no support option', async () => {
+        await page.locator('button', { hasText: 'Support later' }).click();
+        await page.locator('button', { hasText: 'Continue' }).click();
+      });
+
+      it('opens the review step', async () => {
+        await expect(page.locator('text=Review')).toHaveCount(1);
+      });
+
+      it('goes back to the support options', async () => {
+        await page.waitForTimeout(1000); // Wait for previous step to be unmounted
+
+        await page.locator('button', { hasText: 'Back' }).click();
+        await expect(page.locator('text=Support your Drip List')).toHaveCount(1);
+      });
+
+      it('selects the continuous support option', async () => {
+        await page.locator('button', { hasText: 'Continuous support' }).click();
+        await page.locator('button', { hasText: 'Continue' }).click();
+      });
+
+      it('selects the test token to stream', async () => {
+        await page.locator('data-testid=item-0xefbF81372aBC3723463746a89CEb42080563684C').click();
+      });
+
+      it('enters a monthly stream rate', async () => {
+        await page.locator('label:has-text("Set a monthly stream rate")').fill('3');
+      });
+
+      it('enters a top up amount', async () => {
+        await page.locator('button', { hasText: '3 months' }).click();
+      });
+
+      it('advances the flow', async () => {
+        await page.locator('button', { hasText: 'Continue' }).click();
+      });
+
+      it.todo('shows the success screen with correct values');
+
+      it('creates the drip list', async () => {
+        await page.locator('button', { hasText: 'Confirm in wallet' }).click();
+
+        await expect(page.locator('text=Congratulations!')).toHaveCount(1);
+      });
     });
 
-    it('switches to the Drip List tab', async () => {
-      await page.locator('div[data-testid="sidenav"] a:text("Drip Lists")').click();
+    describe('edit drip list', () => {
+      it('navigates to the Drip List screen', async () => {
+        await page.locator('button', { hasText: 'View your Drip List' }).click();
 
-      await expect(
-        page.locator('text=Support all your dependencies at once with a Drip List'),
-      ).toHaveCount(1);
+        await page.waitForTimeout(1000);
+
+        await expect(page.locator('text=This is a Test Drip List')).toHaveCount(2);
+        await expect(page.locator('text=This is my list description.')).toHaveCount(1);
+      });
+
+      it('opens the drip list editor', async () => {
+        await page.locator('button', { hasText: 'Edit list' }).click();
+      });
+
+      it('removes an item', async () => {
+        await page.getByTestId('remove-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
+
+        await expect(page.locator('text=50% allocated')).toHaveCount(1);
+      });
+
+      it('adds a new item', async () => {
+        await page
+          .locator('input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]')
+          .click();
+
+        await page.keyboard.type('github.com/efstajas/drips-test-repo-11');
+        await page.keyboard.press('Enter');
+      });
+
+      it('assigns equal percentages', async () => {
+        await page.waitForTimeout(1000); // Wait for new item to be added
+
+        await page.locator('button', { hasText: 'Split evenly' }).click();
+      });
+
+      it('edits the title', async () => {
+        const titleField = page.locator('label:has-text("Title*")');
+        await titleField.clear();
+        await titleField.fill('This is an EDITED title');
+      });
+
+      it('edits the description', async () => {
+        const titleField = page.locator('label:has-text("Description")');
+        await titleField.clear();
+        await titleField.fill('This is an EDITED description.');
+      });
+
+      it('advances the flow', async () => {
+        await takeScreenshot(page, 1);
+        await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
+        await page.locator('button', { hasText: 'Got it' }).click();
+      });
+
+      it('displays the changes', async () => {
+        await page.waitForTimeout(1000);
+
+        await page.reload();
+
+        await takeScreenshot(page, 2);
+
+        await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
+        await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
+        await expect(page.locator('text=drips-test-repo-11')).toHaveCount(1);
+        await expect(page.locator('text=0x43')).toHaveCount(0);
+      });
     });
 
-    it('opens the drip list creation flow', async () => {
-      await page.locator('text=Create Drip List').click();
-
-      await expect(page.locator('text=Create a Drip List')).toHaveCount(1);
-    });
-
-    it('adds items', async () => {
-      const input = page.locator(
-        'input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]',
-      );
-      await expect(input).toHaveCount(1);
-      await input.click();
-
-      await page.keyboard.type('github.com/efstajas/drips-test-repo-10');
-      await page.keyboard.press('Enter');
-
-      await expect(
-        page.locator('data-testid=item-https://github.com/efstajas/drips-test-repo-10'),
-      ).toHaveCount(1);
-
-      await page.keyboard.type('0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-      await page.keyboard.press('Enter');
-
-      await expect(
-        page.locator('data-testid=item-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc'),
-      ).toHaveCount(1);
-    });
-
-    it('assigns equal percentages', async () => {
-      await page.locator('button', { hasText: 'Split evenly' }).click();
-    });
-
-    it('renames the drip list', async () => {
-      const titleField = page.locator('label:has-text("Title*")');
-      await titleField.clear();
-      await titleField.fill('This is a Test Drip List');
-    });
-
-    it('gives a description', async () => {
-      await page.locator('label:has-text("Description")').fill('This is my list description.');
-    });
-
-    it('advances the flow', async () => {
-      await page.locator('button', { hasText: 'Continue' }).click();
-    });
-
-    it('connects the wallet and continues', async () => {
-      await page.waitForTimeout(1000); // Wait for previous step to be unmounted
-
-      await expect(page.locator('text=Connect your wallet')).toHaveCount(1);
-      await page.locator('button', { hasText: 'Continue' }).click();
-    });
-
-    it('selects the no support option', async () => {
-      await page.locator('button', { hasText: 'Support later' }).click();
-      await page.locator('button', { hasText: 'Continue' }).click();
-    });
-
-    it('opens the review step', async () => {
-      await expect(page.locator('text=Review')).toHaveCount(1);
-    });
-
-    it('goes back to the support options', async () => {
-      await page.waitForTimeout(1000); // Wait for previous step to be unmounted
-
-      await page.locator('button', { hasText: 'Back' }).click();
-      await expect(page.locator('text=Support your Drip List')).toHaveCount(1);
-    });
-
-    it('selects the continuous support option', async () => {
-      await page.locator('button', { hasText: 'Continuous support' }).click();
-      await page.locator('button', { hasText: 'Continue' }).click();
-    });
-
-    it('selects the test token to stream', async () => {
-      await page.locator('data-testid=item-0xefbF81372aBC3723463746a89CEb42080563684C').click();
-    });
-
-    it('enters a monthly stream rate', async () => {
-      await page.locator('label:has-text("Set a monthly stream rate")').fill('3');
-    });
-
-    it('enters a top up amount', async () => {
-      await page.locator('button', { hasText: '3 months' }).click();
-    });
-
-    it('advances the flow', async () => {
-      await page.locator('button', { hasText: 'Continue' }).click();
-    });
-
-    it.todo('shows the success screen with correct values');
-
-    it('creates the drip list', async () => {
-      await page.locator('button', { hasText: 'Confirm in wallet' }).click();
-
-      await expect(page.locator('text=Congratulations!')).toHaveCount(1);
-    });
-
-    it('navigates to the Drip List screen', async () => {
-      await page.locator('button', { hasText: 'View your Drip List' }).click();
-
-      await page.waitForTimeout(1000);
-
-      await expect(page.locator('text=This is a Test Drip List')).toHaveCount(2);
-      await expect(page.locator('text=This is my list description.')).toHaveCount(1);
-    });
-
-    it('opens the drip list editor', async () => {
-      await page.locator('button', { hasText: 'Edit list' }).click();
-    });
-
-    it('removes an item', async () => {
-      await page.getByTestId('remove-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
-
-      await expect(page.locator('text=50% allocated')).toHaveCount(1);
-    });
-
-    it('adds a new item', async () => {
-      await page
-        .locator('input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]')
-        .click();
-
-      await page.keyboard.type('github.com/efstajas/drips-test-repo-11');
-      await page.keyboard.press('Enter');
-    });
-
-    it('assigns equal percentages', async () => {
-      await page.waitForTimeout(1000); // Wait for new item to be added
-
-      await page.locator('button', { hasText: 'Split evenly' }).click();
-    });
-
-    it('edits the title', async () => {
-      const titleField = page.locator('label:has-text("Title*")');
-      await titleField.clear();
-      await titleField.fill('This is an EDITED title');
-    });
-
-    it('edits the description', async () => {
-      const titleField = page.locator('label:has-text("Description")');
-      await titleField.clear();
-      await titleField.fill('This is an EDITED description.');
-    });
-
-    it('advances the flow', async () => {
-      await takeScreenshot(page, 1);
-      await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
-      await page.locator('button', { hasText: 'Got it' }).click();
-    });
-
-    it('displays the changes', async () => {
-      await page.waitForTimeout(1000);
-
-      await page.reload();
-
-      await takeScreenshot(page, 2);
-
-      await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
-      await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
-      await expect(page.locator('text=drips-test-repo-11')).toHaveCount(1);
-      await expect(page.locator('text=0x43')).toHaveCount(0);
-    });
-
-    it.todo('opens the single drip list view');
-    it.todo('copies the URL');
-    it.todo(
-      'switches to another user and allows creating a new drip list with the first drip list on it',
-    );
-    it.todo('navigates to the drip list support stream view');
-    it.todo('allows editing the support stream rate');
-    it.todo('allows deleting the support stream');
-    it.todo('allows creating another support stream with a different token');
+    describe.todo('create another drip list');
+    describe.todo('displays drip lists on profile');
+    describe.todo('nest drip lists');
   });
 }, 3600000);
