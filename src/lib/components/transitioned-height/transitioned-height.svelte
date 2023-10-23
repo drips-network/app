@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
   import { onMount } from 'svelte';
   import { cubicInOut } from 'svelte/easing';
@@ -46,6 +47,13 @@
   let fitContent = !collapsed;
 
   let containerHeight: Tweened<number> | undefined;
+  onMount(() => {
+    if (collapsed) {
+      containerHeight = tweened(0);
+    } else {
+      containerHeight = tweened(contentContainerElem.getBoundingClientRect().height);
+    }
+  });
 
   let animating = false;
 
@@ -56,7 +64,11 @@
 
   let previouslyCollapsed = collapsed;
 
-  async function updateHeight(newHeightValue: number) {
+  async function updateHeight() {
+    if (!containerHeight) return;
+
+    const newHeight = collapsed ? 0 : contentContainerElem.getBoundingClientRect().height;
+
     const collapsedChanged = previouslyCollapsed !== collapsed;
 
     const shouldTransition = transitionHeightChanges || collapsedChanged;
@@ -69,13 +81,8 @@
       animating = true;
     }
 
-    if (!containerHeight) {
-      // Set initially to the current height value of the container
-      containerHeight = tweened(contentContainerElem.getBoundingClientRect().height);
-    }
-
     containerHeight.set(
-      newHeightValue,
+      newHeight,
       shouldTransition ? { duration: 300, easing: cubicInOut } : undefined,
     );
 
@@ -87,29 +94,22 @@
       }, 300);
     }
 
-    zeroHeight = newHeightValue === 0;
+    zeroHeight = newHeight === 0;
 
     previouslyCollapsed = collapsed;
+  }
+  $: {
+    collapsed;
+    if (browser) updateHeight();
   }
 
   let sizeObserver: ResizeObserver | undefined;
   onMount(() => {
-    sizeObserver = new ResizeObserver((v) => updateHeight(v[0].contentRect.height));
+    sizeObserver = new ResizeObserver(updateHeight);
     sizeObserver.observe(contentContainerElem);
 
     return () => sizeObserver?.disconnect();
   });
-
-  $: {
-    if (!firstRender) {
-      if (collapsed) {
-        updateHeight(0);
-      } else {
-        updateHeight(contentContainerElem.getBoundingClientRect().height);
-        setTabIndexRecursively(contentContainerElem, '0');
-      }
-    }
-  }
 
   $: {
     if (contentContainerElem && removeFromTabIndexWhileCollapsed) {
