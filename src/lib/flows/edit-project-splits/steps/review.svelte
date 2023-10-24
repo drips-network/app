@@ -101,6 +101,7 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
+    overflow: scroll;
   }
 
   .drip-icon {

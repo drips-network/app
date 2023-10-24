@@ -6,12 +6,10 @@
 
   export let imgElem: HTMLImageElement | undefined = undefined;
 
-  $: currentSize = `${size}px`;
-
   let loaded = false;
 </script>
 
-<div class="avatar" style:height={currentSize} style:width={currentSize}>
+<div class="avatar" style:height={size + 'px'} style:width={size + 'px'}>
   {#if src}
     <img
       class:outlined={outline}
@@ -48,7 +46,7 @@
   }
 
   img.outlined {
-    box-shadow: var(--elevation-low);
+    border: 1px solid var(--color-foreground);
   }
 
   .placeholder {

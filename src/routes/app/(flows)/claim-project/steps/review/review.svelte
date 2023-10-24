@@ -21,7 +21,6 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
-  import Pen from 'radicle-design-system/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
 
@@ -94,8 +93,11 @@
 >
   <FormField type="div" title="Git project">
     <div class="card">
-      <ProjectProfileHeader project={fakeClaimedProject} />
-      <Button icon={Pen} on:click={customize}>Customize</Button>
+      <ProjectProfileHeader
+        project={fakeClaimedProject}
+        editButton="Customize"
+        on:editButtonClick={customize}
+      />
     </div>
   </FormField>
   <FormField type="div" title="Owned by">

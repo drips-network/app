@@ -66,7 +66,7 @@ export interface RepoDriverSplitReceiver {
 
 export interface RepoDriverAccountSplits {
   maintainers: AddressDriverSplitReceiver[];
-  dependencies: (AddressDriverSplitReceiver | RepoDriverSplitReceiver)[];
+  dependencies: (AddressDriverSplitReceiver | RepoDriverSplitReceiver | DripListSplitReceiver)[];
 }
 
 export interface ClaimedGitProject<ST extends Source = Source> {

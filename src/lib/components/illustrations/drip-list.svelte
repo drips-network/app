@@ -1,14 +1,18 @@
+<script lang="ts">
+  export let strokeWidth = 2;
+</script>
+
 <svg xmlns="http://www.w3.org/2000/svg" width="503" height="502" fill="none" viewBox="0 0 503 502"
   >{@html `
-  <path fill="var(--color-primary)" stroke="var(--color-foreground)" stroke-width="2" d="M375.069 359.879H112.745c21.95 0 39.744 17.794 39.744 39.744s-17.794 39.744-39.744 39.744h262.324c21.95 0 39.744-17.794 39.744-39.744s-17.794-39.744-39.744-39.744Z"/>
+  <path fill="var(--color-primary)" stroke="var(--color-foreground)" stroke-width="${strokeWidth}" d="M375.069 359.879H112.745c21.95 0 39.744 17.794 39.744 39.744s-17.794 39.744-39.744 39.744h262.324c21.95 0 39.744-17.794 39.744-39.744s-17.794-39.744-39.744-39.744Z"/>
   <path fill="var(--color-background)" d="M380.721 63.388H72.98v336.238c0 21.95 17.794 39.741 39.744 39.741s39.744-17.794 39.744-39.744c0-21.942-17.781-39.731-39.72-39.744l267.973.079V63.388Z"/>
-  <path stroke="var(--color-foreground)" stroke-width="2" d="M72.98 63.388h307.741v296.57l-267.997-.079c21.95 0 39.744 17.794 39.744 39.744s-17.794 39.744-39.744 39.744-39.744-17.791-39.744-39.741V63.388Z"/>
-  <path fill="var(--color-primary)" stroke="var(--color-foreground)" stroke-linejoin="round" stroke-width="2" d="M58.584 375.467c0-31.792-25.773-57.565-57.565-57.565 31.792 0 57.565-25.773 57.565-57.565 0 31.792 25.773 57.565 57.565 57.565-31.792 0-57.565 25.773-57.565 57.565Z"/>
-  <path stroke="var(--color-foreground)" stroke-width="2" d="M140.355 63.39v65.634c0 24.084 19.524 43.607 43.607 43.607h33.037"/>
-  <path stroke="var(--color-foreground)" stroke-width="2" d="M140.355 133.143v56.517c0 24.083 19.524 43.607 43.607 43.607h33.037"/>
-  <path stroke="var(--color-foreground)" stroke-width="2" d="M140.355 193.779v56.516c0 24.084 19.524 43.607 43.607 43.607h33.037"/>
+  <path stroke="var(--color-foreground)" stroke-width="${strokeWidth}" d="M72.98 63.388h307.741v296.57l-267.997-.079c21.95 0 39.744 17.794 39.744 39.744s-17.794 39.744-39.744 39.744-39.744-17.791-39.744-39.741V63.388Z"/>
+  <path fill="var(--color-primary)" stroke="var(--color-foreground)" stroke-linejoin="round" stroke-width="${strokeWidth}" d="M58.584 375.467c0-31.792-25.773-57.565-57.565-57.565 31.792 0 57.565-25.773 57.565-57.565 0 31.792 25.773 57.565 57.565 57.565-31.792 0-57.565 25.773-57.565 57.565Z"/>
+  <path stroke="var(--color-foreground)" stroke-width="${strokeWidth}" d="M140.355 63.39v65.634c0 24.084 19.524 43.607 43.607 43.607h33.037"/>
+  <path stroke="var(--color-foreground)" stroke-width="${strokeWidth}" d="M140.355 133.143v56.517c0 24.083 19.524 43.607 43.607 43.607h33.037"/>
+  <path stroke="var(--color-foreground)" stroke-width="${strokeWidth}" d="M140.355 193.779v56.516c0 24.084 19.524 43.607 43.607 43.607h33.037"/>
   <path fill="var(--color-primary)" d="M216.999 172.631c0 13.255 10.745 24.17 24 24.17h48.346c13.255 0 24-10.745 24-24v-24.34h-72.346c-13.255 0-24 10.915-24 24.17ZM216.999 233.267c0 13.254 10.745 24.169 24 24.169h48.346c13.255 0 24-10.745 24-24v-24.339h-72.346c-13.255 0-24 10.915-24 24.17ZM216.999 293.902c0 13.255 10.745 24.17 24 24.17h48.346c13.255 0 24-10.745 24-24v-24.34h-72.346c-13.255 0-24 10.915-24 24.17Z"/>
-  <path fill="var(--color-background)" stroke="var(--color-foreground)" stroke-linejoin="round" stroke-width="2" d="M399.866 203.682c0-55.865-45.287-101.152-101.152-101.152 55.865 0 101.153-45.288 101.153-101.152 0 55.864 45.287 101.152 101.152 101.152-55.865 0-101.153 45.287-101.153 101.152Z"/>
+  <path fill="var(--color-background)" stroke="var(--color-foreground)" stroke-linejoin="round" stroke-width="${strokeWidth}" d="M399.866 203.682c0-55.865-45.287-101.152-101.152-101.152 55.865 0 101.153-45.288 101.153-101.152 0 55.864 45.287 101.152 101.152 101.152-55.865 0-101.153 45.287-101.153 101.152Z"/>
 `}</svg
 >
 

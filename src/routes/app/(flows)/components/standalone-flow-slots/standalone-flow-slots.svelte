@@ -67,9 +67,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding: 1rem 2rem;
-    background-color: var(--color-foreground-level-1);
-    border-bottom: 1px solid var(--color-foreground);
+    padding: 2rem 2rem 0.5rem 2rem;
   }
 
   .wrapper {

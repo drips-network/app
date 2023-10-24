@@ -1,30 +1,24 @@
-import type { Splits } from '$lib/components/splits/splits.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
-import { get } from 'svelte/store';
-import EditDripListStep from './steps/edit-drip-list.svelte';
+import { get, writable } from 'svelte/store';
+import EditDripListStep from '../shared/steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import type { DripList, GitProject } from '$lib/utils/metadata/types';
+import type { DripList } from '$lib/utils/metadata/types';
+import type { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
 
 export default (
-  dripListId: string,
-  listName: string,
-  listDescription: string | undefined,
-  representationalSplits: Splits,
-  projectToAdd?: GitProject,
-  dripListToAdd?: DripList,
+  dripList: DripList,
+  representationalSplits: Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>,
 ) => ({
   context: undefined,
   steps: [
     makeStep({
       component: EditDripListStep,
       props: {
-        projectToAdd,
-        dripListToAdd,
-        dripListId,
-        representationalSplits,
-        listName,
-        listDescription,
+        selectedDripListState: writable({
+          dripList,
+          representationalSplits,
+        }),
       },
     }),
     makeStep({

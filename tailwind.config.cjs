@@ -55,6 +55,9 @@ module.exports = {
       boxShadow: {
         'low': 'var(--elevation-low)',
         'md': 'var(--elevation-medium)',
+      },
+      translate: {
+        '2px': '2px'
       }
     },
   },

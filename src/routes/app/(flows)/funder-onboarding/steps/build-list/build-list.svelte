@@ -20,7 +20,8 @@
 </script>
 
 <StandaloneFlowStepLayout
-  description="What projects, individuals, or organizations would you like to support with your Drip List?"
+  headline="Create a Drip List"
+  description="What projects, individuals, organizations, or other Drip Lists would you like to support with your Drip List?"
 >
   <DripListEditor bind:isValid bind:dripList={$context.dripList} showListFirst={true} {urlToAdd} />
   <svelte:fragment slot="actions">

@@ -99,7 +99,7 @@ const initNetwork = DEFAULT_NETWORK;
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
   network: initNetwork,
-  provider: new ethers.providers.InfuraProvider(initNetwork),
+  provider: new ethers.providers.InfuraProvider(initNetwork, network.infuraKey),
 };
 
 const walletStore = () => {

@@ -49,7 +49,7 @@
 </script>
 
 <div class="segmented-control" bind:this={containerElem}>
-  <div class="options">
+  <div class="options" role="radiogroup">
     {#each options as option}
       <div
         role="radio"

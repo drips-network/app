@@ -13,6 +13,13 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
       - name: Populate .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:

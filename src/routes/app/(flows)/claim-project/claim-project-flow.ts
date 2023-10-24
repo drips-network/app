@@ -6,7 +6,6 @@ import EnterGitUrl from './steps/enter-git-url/enter-git-url.svelte';
 import AddEthereumAddress from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
-import WalletSlot from './slots/wallet-slot.svelte';
 import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
@@ -16,6 +15,7 @@ import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-s
 import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
+import WalletSlot from '../shared/slots/wallet-slot.svelte';
 
 interface SplitsConfig extends ListEditorConfig {
   itemsPromise: Promise<GitProject>[] | undefined;
