@@ -28,6 +28,8 @@
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import Spinner from '../spinner/spinner.svelte';
+  import OverflowButton from '../overflow-button/overflow-button.svelte';
+  import User from 'radicle-design-system/icons/User.svelte';
 
   export let dripList: DripList;
   export let format: 'thumblink' | 'full' = 'full';
@@ -187,6 +189,22 @@
             <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+              <OverflowButton
+                options={[
+                  {
+                    type: 'action',
+                    handler: triggerEditModal,
+                    label: 'Edit list',
+                    icon: Pen,
+                  },
+                  {
+                    type: 'action',
+                    handler: triggerEditModal,
+                    label: 'Do something else',
+                    icon: User,
+                  },
+                ]}
+              />
             {/if}
           </div>
         {/if}
