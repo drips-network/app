@@ -8,6 +8,8 @@
   import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import checkIsUser from '$lib/utils/check-is-user';
 
   export let data: PageData;
 
@@ -22,6 +24,8 @@
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
+
+  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 </script>
 
 {#if data.dripList.name}
@@ -56,6 +60,8 @@
     {supportStreams}
     type="dripList"
     incomingSplits={data.incomingSplits}
+    dripListId={dripList.account.accountId}
+    isDripListOwner={isOwnList}
   />
 </article>
 
