@@ -181,6 +181,7 @@ describe('AddressDriverMetadataManager', () => {
         lastUpdated: new Date(),
         lastUpdatedByAddress: '0x123',
         lastIpfsHash: 'QmX',
+        visibleDripListAccountIds: undefined,
       };
       const address = '0x123';
 

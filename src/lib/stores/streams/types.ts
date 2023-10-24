@@ -94,4 +94,12 @@ export interface Account {
   lastUpdated?: Date;
   lastUpdatedByAddress?: string;
   lastIpfsHash?: string;
+  /**
+   * Drip Lists are NFTs, meaning that they can be transferred to any address without the receiving party's consent.
+   * The app only displays Drip Lists that are included in this array on their profile, so that users are always
+   * in control of what appears on their profiles.
+   *
+   * If undefined, there is no setting for this account, meaning it either has old metadata or no metadata at all.
+   */
+  visibleDripListAccountIds: string[] | undefined;
 }
