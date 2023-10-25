@@ -397,7 +397,7 @@
     gap: 1rem;
   }
 
-  @media (max-width: 1252px) {
+  @media (max-width: 1080px) {
     .project-profile,
     .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);

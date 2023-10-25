@@ -76,6 +76,10 @@
     gap: 3rem;
   }
 
+  .drip-list-page > * {
+    min-width: 0;
+  }
+
   .list {
     grid-area: list;
     display: flex;
@@ -110,7 +114,7 @@
     color: var(--color-foreground-level-6);
   }
 
-  @media (max-width: 1252px) {
+  @media (max-width: 1080px) {
     .drip-list-page {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
