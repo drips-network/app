@@ -2,7 +2,7 @@
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { ClaimedGitProject, DripList } from '$lib/utils/metadata/types';
+  import type { ClaimedGitProject, DripList, UnclaimedGitProject } from '$lib/utils/metadata/types';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -19,7 +19,7 @@
   import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
-  export let project: ClaimedGitProject | undefined = undefined;
+  export let project: UnclaimedGitProject | ClaimedGitProject | undefined = undefined;
   export let dripList: DripList | undefined = undefined;
 
   let ownDripLists: DripList[] | null | undefined = undefined;
@@ -27,7 +27,7 @@
 
   $: isOwner =
     $walletStore.connected &&
-    ($walletStore.dripsAccountId === project?.owner.accountId ||
+    ($walletStore.dripsAccountId === project?.owner?.accountId ||
       $walletStore.dripsAccountId === dripList?.account.owner.accountId);
 
   let supportUrl: string;
