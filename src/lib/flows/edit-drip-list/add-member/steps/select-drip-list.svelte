@@ -64,13 +64,16 @@
       },
     });
   }
+
+  $: subjectName =
+    'account' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project';
 </script>
 
 <StepLayout>
   <StepHeader
     emoji="🫗"
     headline="Add to a Drip List"
-    description="Choose which of your Drip Lists you'd like to add this to."
+    description={`Choose which Drip List to add ${subjectName} to.`}
   />
   <FormField title="Your Drip Lists" type="div">
     <div class="card">
@@ -78,23 +81,30 @@
         searchable={false}
         bind:selected
         items={Object.fromEntries(
-          dripLists.map((dl) => [
-            dl.account.accountId,
-            {
-              type: 'selectable',
-              disabled: isAlreadyInList(dl),
-              label: {
-                component: DripListBadge,
-                props: {
-                  isLinked: false,
-                  listId: dl.account.accountId,
-                  listName: dl.name,
-                  owner: undefined,
-                  disabled: isAlreadyInList(dl),
+          dripLists
+            .filter((dl) => {
+              // prevent adding Drip List to self (owner adding their own list to another)
+              return 'account' in projectOrDripListToAdd
+                ? dl.account.accountId !== projectOrDripListToAdd.account.accountId
+                : true;
+            })
+            .map((dl) => [
+              dl.account.accountId,
+              {
+                type: 'selectable',
+                disabled: isAlreadyInList(dl),
+                label: {
+                  component: DripListBadge,
+                  props: {
+                    isLinked: false,
+                    listId: dl.account.accountId,
+                    listName: dl.name,
+                    owner: undefined,
+                    disabled: isAlreadyInList(dl),
+                  },
                 },
               },
-            },
-          ]),
+            ]),
         )}
       />
     </div>

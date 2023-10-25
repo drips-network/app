@@ -60,8 +60,6 @@
     {supportStreams}
     type="dripList"
     incomingSplits={data.incomingSplits}
-    dripListId={dripList.account.accountId}
-    isDripListOwner={isOwnList}
   />
 </article>
 
