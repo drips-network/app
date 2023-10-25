@@ -33,60 +33,72 @@
 {/if}
 
 <article class="drip-list-page">
-  <section class="flex flex-col gap-6">
+  <main class="list">
     <div class="owner">
       <span>Drip List owned by </span>
       <IdentityBadge address={data.dripList.account.owner.address} />
     </div>
-
     <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
-      <div class="list-and-support">
-        <div class="list">
-          <DripListCard dripList={data.dripList} />
-        </div>
-        <div class="support">
-          <SupportCard {dripList} />
-        </div>
-      </div>
+      <DripListCard dripList={data.dripList} />
     </SectionSkeleton>
-  </section>
+  </main>
 
-  <Developer accountId={dripList.account.accountId} />
+  <aside class="support">
+    <div>
+      <SupportCard {dripList} />
+    </div>
+  </aside>
 
-  <Supporters
-    headline="Support"
-    infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies to support it."
-    forceLoading={!streamsFetched}
-    {supportStreams}
-    type="dripList"
-    incomingSplits={data.incomingSplits}
-    dripListId={dripList.account.accountId}
-    isDripListOwner={isOwnList}
-  />
+  <div class="sections">
+    <Developer accountId={dripList.account.accountId} />
+
+    <Supporters
+      headline="Support"
+      infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies to support it."
+      forceLoading={!streamsFetched}
+      {supportStreams}
+      type="dripList"
+      incomingSplits={data.incomingSplits}
+      dripListId={dripList.account.accountId}
+      isDripListOwner={isOwnList}
+    />
+  </div>
 </article>
 
 <style>
   .drip-list-page {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr minmax(auto, 18rem);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'list support'
+      'sections support';
     gap: 3rem;
   }
 
-  .list-and-support {
-    padding: 2px 0 8px 0;
+  .list {
+    grid-area: list;
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 2rem;
   }
 
-  .list-and-support .list {
-    flex-grow: 1;
-    width: 100%;
+  .support {
+    grid-area: support;
+    grid-row: 1 / span 2;
   }
 
-  .list-and-support .support {
-    flex-grow: 0;
-    max-width: 18rem;
-    align-self: top;
+  .support > div {
+    margin-top: 3.5rem;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .sections {
+    grid-area: sections;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
   }
 
   .owner {
@@ -99,8 +111,28 @@
   }
 
   @media (max-width: 1252px) {
-    .list-and-support {
-      flex-direction: column;
+    .drip-list-page {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        'list'
+        'support'
+        'sections';
+      min-width: 0;
+    }
+
+    .support > div {
+      margin-top: 0;
+      position: relative;
+      top: 0;
+    }
+
+    .drip-list-page > * {
+      min-width: 0;
+    }
+
+    .support {
+      grid-row: auto;
     }
   }
 </style>
