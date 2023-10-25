@@ -95,7 +95,6 @@
   .main {
     display: flex;
     flex-direction: row-reverse;
-    gap: 0rem;
     width: 100vw;
     transition: gap 0.3s;
   }
