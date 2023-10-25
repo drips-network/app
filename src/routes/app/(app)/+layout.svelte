@@ -95,7 +95,6 @@
   .main {
     display: flex;
     flex-direction: row-reverse;
-    gap: 2rem;
     width: 100vw;
     transition: gap 0.3s;
   }
@@ -166,6 +165,7 @@
 
   @media (max-width: 768px) {
     .main {
+      overflow-x: hidden;
       gap: 0;
     }
 

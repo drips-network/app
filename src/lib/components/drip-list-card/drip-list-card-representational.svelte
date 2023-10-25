@@ -167,12 +167,8 @@
     class:pointer-events-none={format === 'thumblink'}
   >
     <header class="px-6 pt-6 flex flex-col gap-2">
-      <div
-        class="flex gap-4 {format === 'full'
-          ? 'flex-col sm:flex-row justify-left sm:justify-between sm:items-center'
-          : 'items-center justify-between'}"
-      >
-        <h1 class="flex-1 min-w-0 text-left" class:truncate={format === 'thumblink'}>
+      <div class="title-and-actions">
+        <h1 class="title" class:truncate={format === 'thumblink'}>
           <a
             href={dripListUrl}
             class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
@@ -244,6 +240,20 @@
   .drip-list-card.thumblink:hover {
     box-shadow: var(--elevation-medium);
     transform: translateY(-0.125rem);
+  }
+
+  .drip-list-card .title-and-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .drip-list-card.full .title-and-actions {
+    flex-wrap: wrap;
+  }
+
+  .drip-list-card.full .title-and-actions h1 {
+    min-width: fit-content;
   }
 
   .totals {

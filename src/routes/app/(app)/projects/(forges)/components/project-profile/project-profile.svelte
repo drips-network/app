@@ -306,7 +306,11 @@
     grid-template-areas:
       'header'
       'content';
-    gap: 2rem;
+    gap: 3rem;
+  }
+
+  .project-profile > * {
+    min-width: 0;
   }
 
   .project-profile.claimed {
@@ -319,7 +323,6 @@
 
   aside {
     grid-area: sidebar;
-    height: 0; /* so it's height doesnt influence .header's height and mess up main column gaps */
   }
 
   .project-profile > * {
@@ -375,7 +378,7 @@
 
   .become-supporter-card {
     position: sticky;
-    top: 0;
+    top: 6rem;
   }
 
   .card {
@@ -394,7 +397,7 @@
     gap: 1rem;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1080px) {
     .project-profile,
     .project-profile.claimed {
       grid-template-columns: minmax(0, 1fr);

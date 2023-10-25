@@ -162,8 +162,8 @@
     overflow: scroll;
     scroll-snap-type: x mandatory;
     gap: 1rem;
-    padding: 0 4rem;
-    scroll-padding: 4rem;
+    padding: 0 2.5rem;
+    scroll-padding: 2.5rem;
   }
 
   .item {
@@ -175,19 +175,19 @@
     flex: 0 0 calc(50% - 0.5rem);
   }
 
-  .has-overflow .overflow-gradient {
+  .overflow-gradient {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 4rem;
+    width: 2.5rem;
   }
 
-  .has-overflow .overflow-gradient.left {
+  .overflow-gradient.left {
     left: 0rem;
     background: linear-gradient(-90deg, rgba(0, 0, 0, 0), var(--color-background));
   }
 
-  .has-overflow .overflow-gradient.right {
+  .overflow-gradient.right {
     right: 0rem;
     background: linear-gradient(90deg, rgba(0, 0, 0, 0), var(--color-background));
   }
