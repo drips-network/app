@@ -6,6 +6,10 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import { onMount } from 'svelte';
+  import type { Writable } from 'svelte/store';
+  import type { State } from '../../funder-onboarding-flow';
+
+  export let context: Writable<State>;
 
   let loading = false;
 
@@ -14,7 +18,7 @@
   async function viewDripList() {
     loading = true;
 
-    await goto(`/app/drip-lists`).then(() => {
+    await goto(`/app/drip-lists/${$context.dripListId}`).then(() => {
       loading = false;
     });
   }

@@ -92,11 +92,11 @@
   }
 
   .edu-carousel {
-    margin: 0 -4rem;
+    margin: 0 -2.5rem;
   }
 
   .edu-carousel h4 {
-    margin-left: 4rem;
+    margin-left: 2.5rem;
   }
 
   .sections {

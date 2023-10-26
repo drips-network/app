@@ -113,6 +113,42 @@
 />
 
 <PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
+  {#if !project.owner}
+    <div class="unclaimed-project-notice">
+      <AnnotationBox type="info">
+        {#await unclaimedFunds}
+          <span />
+        {:then result}
+          {#if result?.length}This project has <span class="typo-text-small-bold"
+              ><AggregateFiatEstimate amounts={result} /></span
+            > in claimable funds! Project owners can collect by claiming their project.{:else}This
+            project has not been claimed yet but can still receive funds that the owner can collect
+            later.{/if}
+        {:catch}
+          This project is unclaimed.
+        {/await}
+        <svelte:fragment slot="actions">
+          <div class="flex gap-3">
+            <Copyable value={browser ? window.location.href : ''}>
+              <div class="flex gap-1 items-center">
+                <Link style="fill:currentColor" />
+                <div class="whitespace-nowrap">Copy URL</div>
+              </div>
+            </Copyable>
+            <Button
+              size="small"
+              icon={Registered}
+              variant="primary"
+              on:click={() =>
+                goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+              >Claim project</Button
+            >
+          </div>
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
+
   <article class="project-profile" class:claimed={project.claimed}>
     <header class="header">
       {#if project.owner}
@@ -121,40 +157,6 @@
             >Project claimed by</span
           >
           <IdentityBadge address={project.owner.address} />
-        </div>
-      {:else}
-        <div class="unclaimed-project-notice">
-          <AnnotationBox type="info">
-            {#await unclaimedFunds}
-              <span />
-            {:then result}
-              {#if result?.length}This project has <span class="typo-text-small-bold"
-                  ><AggregateFiatEstimate amounts={result} /></span
-                > in available funds! Project owners can collect by claiming their project.{:else}This
-                project has not been claimed yet but can still receive funds that the owner can
-                collect later.{/if}
-            {:catch}
-              This project is unclaimed.
-            {/await}
-            <svelte:fragment slot="actions">
-              <div class="flex gap-3">
-                <Copyable value={browser ? window.location.href : ''}>
-                  <div class="flex gap-1 items-center">
-                    <Link style="fill:currentColor" />
-                    <div class="whitespace-nowrap">Copy URL</div>
-                  </div>
-                </Copyable>
-                <Button
-                  size="small"
-                  icon={Registered}
-                  variant="primary"
-                  on:click={() =>
-                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
-                  >Claim project</Button
-                >
-              </div>
-            </svelte:fragment>
-          </AnnotationBox>
         </div>
       {/if}
       <div>
@@ -288,13 +290,11 @@
       {/if}
       <SupportersSection type="project" {incomingSplits} />
     </div>
-    {#if project.owner}
-      <aside>
-        <div class="become-supporter-card">
-          <SupportCard {project} />
-        </div>
-      </aside>
-    {/if}
+    <aside>
+      <div class="become-supporter-card">
+        <SupportCard {project} />
+      </div>
+    </aside>
   </article>
 </PrimaryColorThemer>
 
@@ -306,12 +306,16 @@
     grid-template-areas:
       'header'
       'content';
-    gap: 2rem;
+    gap: 3rem;
   }
 
-  .project-profile.claimed {
+  .project-profile > * {
+    min-width: 0;
+  }
+
+  .project-profile {
     grid-template-columns: 3fr minmax(auto, 18rem);
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     grid-template-areas:
       'header sidebar'
       'content sidebar';
@@ -319,7 +323,6 @@
 
   aside {
     grid-area: sidebar;
-    height: 0; /* so it's height doesnt influence .header's height and mess up main column gaps */
   }
 
   .project-profile > * {
@@ -375,7 +378,7 @@
 
   .become-supporter-card {
     position: sticky;
-    top: 0;
+    top: 6rem;
   }
 
   .card {
@@ -394,15 +397,11 @@
     gap: 1rem;
   }
 
-  @media (max-width: 1024px) {
-    .project-profile,
-    .project-profile.claimed {
+  @media (max-width: 1080px) {
+    .project-profile {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto;
       gap: 3rem;
-    }
-
-    .project-profile.claimed {
       grid-template-areas:
         'header'
         'sidebar'

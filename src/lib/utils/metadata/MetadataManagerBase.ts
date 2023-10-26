@@ -1,5 +1,4 @@
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-import isTest from '$lib/utils/is-test';
 import type { ContractTransaction } from 'ethers';
 import type { DripsSubgraphClient, AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
@@ -90,11 +89,6 @@ export default abstract class MetadataManagerBase<TAccount, TParser extends Pars
   }
 
   private async fetchIpfs(hash: IpfsHash) {
-    if (isTest()) {
-      const val = JSON.parse(localStorage.getItem(`mock_ipfs_${hash}`) ?? '');
-      return val;
-    }
-
     return await (await ipfsFetch(hash)).json();
   }
 
@@ -130,17 +124,6 @@ export default abstract class MetadataManagerBase<TAccount, TParser extends Pars
    * @throws If the pinning fails.
    */
   public async pinAccountMetadata(data: LatestVersion<TParser>): Promise<IpfsHash> {
-    if (isTest()) {
-      const mockHash = (Math.random() + 1).toString(36).substring(7);
-      const mockData = JSON.stringify(data, (_, value) =>
-        typeof value === 'bigint' ? value.toString() : value,
-      );
-
-      localStorage.setItem(`mock_ipfs_${mockHash}`, mockData);
-
-      return mockHash;
-    }
-
     // Ensure the data follows the correct schema at runtime
     this._parser.parseLatest(data);
 

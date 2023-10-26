@@ -1,3 +1,5 @@
+import isTest from './is-test';
+
 const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
 
 /**
@@ -7,6 +9,11 @@ const IPFS_GATEWAY_DOMAIN = 'drips.mypinata.cloud';
  * gateway.
  */
 export async function fetchIpfs(hash: string) {
+  if (isTest()) {
+    // During E2E tests, the "fake pinata" service runs at localhost:3000.
+    return fetch(`http://localhost:3000/ipfs/${hash}`);
+  }
+
   return fetch(`https://${IPFS_GATEWAY_DOMAIN}/ipfs/${hash}`);
 }
 

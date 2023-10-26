@@ -1,6 +1,5 @@
 <script lang="ts">
   import Developer from '$lib/components/developer-section/developer.section.svelte';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -8,6 +7,9 @@
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
+  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import checkIsUser from '$lib/utils/check-is-user';
 
   export let data: PageData;
 
@@ -22,6 +24,8 @@
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
+
+  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 </script>
 
 {#if data.dripList.name}
@@ -29,63 +33,74 @@
 {/if}
 
 <article class="drip-list-page">
-  <section class="flex flex-col gap-6">
+  <main class="list">
     <div class="owner">
       <span>Drip List owned by </span>
       <IdentityBadge address={data.dripList.account.owner.address} />
     </div>
-
-    <SectionSkeleton loaded={Boolean(data.dripList)}>
-      <div class="list-and-support">
-        <div class="list">
-          <DripListCard
-            {supportStreams}
-            incomingSplits={data.incomingSplits}
-            dripList={data.dripList}
-            representationalSplits={data.representationalSplits}
-          />
-        </div>
-        <div class="support">
-          <SupportCard {dripList} />
-        </div>
-      </div>
+    <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
+      <DripListCard dripList={data.dripList} />
     </SectionSkeleton>
-  </section>
+  </main>
 
-  <Developer accountId={dripList.account.accountId} />
+  <aside class="support">
+    <div>
+      <SupportCard {dripList} />
+    </div>
+  </aside>
 
-  <Supporters
-    headline="Support"
-    infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies to support it."
-    forceLoading={!streamsFetched}
-    {supportStreams}
-    type="dripList"
-    incomingSplits={data.incomingSplits}
-  />
+  <div class="sections">
+    <Developer accountId={dripList.account.accountId} />
+
+    <Supporters
+      headline="Support"
+      infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies to support it."
+      forceLoading={!streamsFetched}
+      {supportStreams}
+      type="dripList"
+      incomingSplits={data.incomingSplits}
+    />
+  </div>
 </article>
 
 <style>
   .drip-list-page {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr minmax(auto, 18rem);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'list support'
+      'sections support';
     gap: 3rem;
   }
 
-  .list-and-support {
-    padding: 2px 0 8px 0;
+  .drip-list-page > * {
+    min-width: 0;
+  }
+
+  .list {
+    grid-area: list;
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 2rem;
   }
 
-  .list-and-support .list {
-    flex-grow: 1;
-    width: 100%;
+  .support {
+    grid-area: support;
+    grid-row: 1 / span 2;
   }
 
-  .list-and-support .support {
-    flex-grow: 0;
-    max-width: 18rem;
-    align-self: top;
+  .support > div {
+    margin-top: 3.5rem;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .sections {
+    grid-area: sections;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
   }
 
   .owner {
@@ -97,9 +112,29 @@
     color: var(--color-foreground-level-6);
   }
 
-  @media (max-width: 1252px) {
-    .list-and-support {
-      flex-direction: column;
+  @media (max-width: 1080px) {
+    .drip-list-page {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        'list'
+        'support'
+        'sections';
+      min-width: 0;
+    }
+
+    .support > div {
+      margin-top: 0;
+      position: relative;
+      top: 0;
+    }
+
+    .drip-list-page > * {
+      min-width: 0;
+    }
+
+    .support {
+      grid-row: auto;
     }
   }
 </style>
