@@ -2,21 +2,24 @@
   import Heart from 'radicle-design-system/icons/Heart.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { ClaimedGitProject, DripList } from '$lib/utils/metadata/types';
+  import type { ClaimedGitProject, DripList, UnclaimedGitProject } from '$lib/utils/metadata/types';
   import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
   import { goto } from '$app/navigation';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import buildUrl from '$lib/utils/build-url';
   import type { SplitsEntry } from 'radicle-drips';
   import addDripListMemberSteps from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
+  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
+  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
-  export let project: ClaimedGitProject | undefined = undefined;
+  export let project: UnclaimedGitProject | ClaimedGitProject | undefined = undefined;
   export let dripList: DripList | undefined = undefined;
 
   let ownDripLists: DripList[] | null | undefined = undefined;
@@ -24,7 +27,7 @@
 
   $: isOwner =
     $walletStore.connected &&
-    ($walletStore.dripsAccountId === project?.owner.accountId ||
+    ($walletStore.dripsAccountId === project?.owner?.accountId ||
       $walletStore.dripsAccountId === dripList?.account.owner.accountId);
 
   let supportUrl: string;
@@ -39,6 +42,7 @@
   }
 
   const { initialized } = walletStore;
+  $: isWalletConnected = $walletStore.connected;
 
   let updating = true;
   async function updateState() {
@@ -81,20 +85,23 @@
     updateState();
   }
 
-  let loadingModal = false;
-  async function handleSupportButton() {
+  function handleNewStreamButton() {
+    const dripListId = dripList?.account.accountId;
+    return dripListId && modal.show(Stepper, undefined, createDripListStreamSteps(dripListId));
+  }
+
+  async function handleAddtoDripListButton() {
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
     } else {
       // TODO: Refresh profile state after becoming a supporter
-
       modal.show(Stepper, undefined, addDripListMemberSteps(ownDripLists, project, dripList));
     }
   }
 </script>
 
-<div class="become-supporter-card" class:is-owner={isOwner}>
-  {#if ownDripLists === undefined || loadingModal || updating}
+<div class="become-supporter-card">
+  {#if ownDripLists === undefined || updating}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
@@ -114,15 +121,33 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    Add this {project ? 'project' : ''} to your Drip List to flexibly support it with an ongoing contribution.
+    {#if !isWalletConnected}
+      Connect your Ethereum wallet to see your support options.
+    {:else if dripList && isOwner}
+      Support everyone on your list with a single token stream or add it to another Drip List.
+    {:else}
+      Add this {project ? 'project' : ''} to a Drip List to flexibly support it with an ongoing contribution.
+    {/if}
   </p>
-  <Button
-    on:click={handleSupportButton}
-    disabled={isOwner}
-    size="large"
-    icon={Plus}
-    variant="primary">{ownDripLists === null ? 'Create your Drip List' : 'Add to Drip List'}</Button
-  >
+  <div class="flex flex-col gap-2">
+    {#if !isWalletConnected}
+      <Button on:click={() => walletStore.connect()} size="large" icon={Wallet} variant="primary"
+        >Connect wallet</Button
+      >
+    {:else}
+      {#if isOwner}
+        <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams} variant="primary"
+          >Stream tokens</Button
+        >
+      {/if}
+      <Button
+        on:click={handleAddtoDripListButton}
+        size="large"
+        icon={DripListIcon}
+        variant="primary">Add to a Drip List</Button
+      >
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -181,11 +206,6 @@
     align-items: center;
     justify-content: center;
     box-shadow: var(--elevation-low);
-  }
-
-  .is-owner {
-    opacity: 0.75;
-    pointer-events: none;
   }
 
   p {

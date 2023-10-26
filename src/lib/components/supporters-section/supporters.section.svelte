@@ -11,10 +11,6 @@
   import StreamStateBadge from '../stream-state-badge/stream-state-badge.svelte';
   import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
-  import modal from '$lib/stores/modal';
-  import Stepper from '../stepper/stepper.svelte';
-  import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
 
   export let type: 'project' | 'dripList';
   export let headline = 'Supporters';
@@ -22,8 +18,6 @@
   export let emptyStateText = `This ${
     type === 'dripList' ? 'Drip List' : 'project'
   } doesnʼt have any supporters yet.`;
-  export let isDripListOwner = false;
-  export let dripListId: string | undefined = undefined;
 
   export let infoTooltip: string | undefined = undefined;
 
@@ -45,22 +39,7 @@
 </script>
 
 <section class="app-section">
-  <SectionHeader
-    {infoTooltip}
-    icon={Heart}
-    label={headline}
-    actions={type === 'dripList' && isDripListOwner && dripListId
-      ? [
-          {
-            label: 'New support stream',
-            icon: Plus,
-            handler: () =>
-              dripListId && modal.show(Stepper, undefined, createDripListStreamSteps(dripListId)),
-            variant: 'primary',
-          },
-        ]
-      : []}
-  />
+  <SectionHeader {infoTooltip} icon={Heart} label={headline} />
   {#if forceLoading}
     <SectionSkeleton loaded={false} />
   {:else if incomingSplits === undefined}
