@@ -12,15 +12,18 @@
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import { tweened } from 'svelte/motion';
   import { sineInOut } from 'svelte/easing';
-  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
 
   export let split: Split | SplitGroup;
   export let linkToNewTab = false;
   export let isNested = false;
+
+  /** Set to false to hide the chevron next to split groups. */
+  export let groupsExpandable = true;
 
   /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
   export let isLast = false;
@@ -192,18 +195,18 @@
               <Pile transitionedOut={groupExpanded} components={getPileComponents(split.list)} />
             </div>
             <div class="label" style:transform="translateX({$groupNameOffset}px)">
-              <h4>{split.name}</h4>
-              {#if split.list.length > 0}
+              <div class="typo-header-4">{split.name}</div>
+              {#if split.list.length > 0 && groupsExpandable}
                 <div
                   class="chevron"
-                  style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 180deg)' : ''}
+                  style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 90deg)' : ''}
                 >
-                  <ChevronDown />
+                  <ChevronRight />
                 </div>
               {/if}
             </div>
             <div class="label placeholder" aria-hidden="true">
-              <h4>{split.name}</h4>
+              <div class="typo-header-4">{split.name}</div>
             </div>
           </button>
           {#if groupExpanded}

@@ -13,7 +13,7 @@
     getNFTDriverClient,
     getNFTDriverTxFactory,
   } from '$lib/utils/get-drips-clients';
-  import type { DripList } from '$lib/utils/metadata/types';
+  import type { DripList, GitProject } from '$lib/utils/metadata/types';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -27,16 +27,22 @@
   import DripListEditor, {
     type DripListConfig,
   } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
-  import type { Project } from '$lib/graphql/generated/graphql';
+  import type { Writable } from 'svelte/store';
+  import unreachable from '$lib/utils/unreachable';
+  import type { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let dripListId: string;
-  export let representationalSplits: Splits;
-  export let projectToAdd: Project | undefined = undefined;
+  /** selectedDripListState must be fully populated before mounting this component */
+  export let selectedDripListState: Writable<{
+    dripList: DripList | undefined;
+    representationalSplits:
+      | Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>
+      | undefined;
+  }>;
+
+  export let projectToAdd: GitProject | undefined = undefined;
   export let dripListToAdd: DripList | undefined = undefined;
-  export let listName: string;
-  export let listDescription: string | undefined;
 
   function flattenRepresentationalSplits(list: Splits): Split[] {
     return list.reduce<Split[]>((acc, i) => {
@@ -48,17 +54,20 @@
   }
 
   let items = Object.fromEntries(
-    mapFilterUndefined(flattenRepresentationalSplits(representationalSplits), (rs) => {
-      if (rs.type === 'project-split') {
-        return [rs.project.source.url, projectItem(rs.project)];
-      } else if (rs.type === 'address-split') {
-        return [rs.address, ethAddressItem(rs.address)];
-      } else if (rs.type === 'drip-list-split') {
-        return [rs.listId, dripListItem(rs.listName, rs.listId, rs.listOwner)];
-      } else {
-        return undefined;
-      }
-    }),
+    mapFilterUndefined(
+      flattenRepresentationalSplits($selectedDripListState.representationalSplits ?? unreachable()),
+      (rs) => {
+        if (rs.type === 'project-split') {
+          return [rs.project.source.url, projectItem(rs.project)];
+        } else if (rs.type === 'address-split') {
+          return [rs.address, ethAddressItem(rs.address)];
+        } else if (rs.type === 'drip-list-split') {
+          return [rs.listId, dripListItem(rs.listName, rs.listId, rs.listOwner)];
+        } else {
+          return undefined;
+        }
+      },
+    ),
   );
 
   const MAX_SPLITS_WEIGHT = 1000000;
@@ -68,17 +77,20 @@
   }
 
   let percentages = Object.fromEntries(
-    mapFilterUndefined(flattenRepresentationalSplits(representationalSplits), (rs) => {
-      if (rs.type === 'project-split') {
-        return [rs.project.source.url, getSplitPercent(rs.weight)];
-      } else if (rs.type === 'address-split') {
-        return [rs.address, getSplitPercent(rs.weight)];
-      } else if (rs.type === 'drip-list-split') {
-        return [rs.listId, getSplitPercent(rs.weight)];
-      } else {
-        return undefined;
-      }
-    }),
+    mapFilterUndefined(
+      flattenRepresentationalSplits($selectedDripListState.representationalSplits ?? unreachable()),
+      (rs) => {
+        if (rs.type === 'project-split') {
+          return [rs.project.source.url, getSplitPercent(rs.weight)];
+        } else if (rs.type === 'address-split') {
+          return [rs.address, getSplitPercent(rs.weight)];
+        } else if (rs.type === 'drip-list-split') {
+          return [rs.listId, getSplitPercent(rs.weight)];
+        } else {
+          return undefined;
+        }
+      },
+    ),
   );
 
   if (projectToAdd) {
@@ -96,8 +108,8 @@
   let dripList: DripListConfig = {
     items,
     percentages,
-    title: listName,
-    description: listDescription,
+    title: $selectedDripListState.dripList?.name ?? unreachable(),
+    description: $selectedDripListState.dripList?.description,
   };
 
   let isValid = false;
@@ -115,12 +127,14 @@
           const { receivers, projectsSplitMetadata } =
             await dripListService.getProjectsSplitMetadataAndReceivers(dripList);
 
-          const setSplitsTx = await nftDriverTxFactory.setSplits(dripListId, receivers);
+          const listId = $selectedDripListState.dripList?.account.accountId ?? unreachable();
+
+          const setSplitsTx = await nftDriverTxFactory.setSplits(listId, receivers);
 
           const nftDriverClient = await getNFTDriverClient();
           const metadataManager = new NftDriverMetadataManager(nftDriverClient);
 
-          const currentMetadata = await metadataManager.fetchAccountMetadata(dripListId);
+          const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
           assert(currentMetadata);
 
           const newMetadata: ReturnType<typeof nftDriverAccountMetadataParser.parseLatest> = {
@@ -133,7 +147,7 @@
           const hash = await metadataManager.pinAccountMetadata(newMetadata);
 
           const metadataTx = await nftDriverTxFactory.emitAccountMetadata(
-            dripListId,
+            listId,
             [
               {
                 key: MetadataManagerBase.USER_METADATA_KEY,

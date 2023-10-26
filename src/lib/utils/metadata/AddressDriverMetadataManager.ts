@@ -86,7 +86,6 @@ export default class AddressDriverMetadataManager extends MetadataManagerBase<
   public upgradeAccountMetadata(
     currentMetadata: AnyVersion<typeof addressDriverAccountMetadataParser>,
   ): LatestVersion<typeof addressDriverAccountMetadataParser> {
-    // There's only one version of address driver metadata.
     return currentMetadata;
   }
 }

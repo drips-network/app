@@ -48,7 +48,7 @@
       </div>
     </svelte:fragment>
   </EduCard>
-  <DripListsSection showSupportersSection address={$walletStore.address} />
+  <DripListsSection accountId={$walletStore.dripsAccountId} showCreateNewListCard={true} />
 </div>
 
 <style>

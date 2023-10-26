@@ -75,6 +75,8 @@
             1000,
           );
           await streamsStore.refreshUserAccount();
+
+          $context.dripListId = dripListId;
         },
       }),
     );

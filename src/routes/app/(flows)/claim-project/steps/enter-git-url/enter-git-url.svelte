@@ -29,8 +29,6 @@
   import query from '$lib/graphql/dripsQL';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
-  // import type { PackageManagerDependencies } from 'git-dep-url/dist/types';
-  // import type { GitProject } from '$lib/utils/metadata/types';
 
   export let context: Writable<State>;
 
@@ -255,63 +253,6 @@
   async function fetchUnclaimedProjectFunds(accountId: AccountId) {
     $context.unclaimedFunds = await fetchUnclaimedFunds(accountId);
   }
-
-  // async function prePopulateDependencies() {
-  //   if (Object.keys($context.dependencySplits.items).length > 0) return;
-
-  //   const response = await fetch(`/api/project-deps?projectUrl=${$context.gitUrl}`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'content-type': 'application/json',
-  //     },
-  //   });
-
-  //   const deps: PackageManagerDependencies = await response.json();
-
-  //   const depsPromises: Promise<GitProject>[] = [];
-
-  //   Object.keys(deps).forEach((packageManager) => {
-  //     if (dependenciesFound(deps)) {
-  //       deps[packageManager].forEach((dependency) => {
-  //         if (dependency.urls.repo) {
-  //           const task = gitProjectService.getByUrl(dependency.urls.repo);
-
-  //           depsPromises.push(task);
-  //           return;
-  //         }
-  //       });
-
-  //       $context.dependencySplits.itemsPromise = depsPromises;
-  //     } else {
-  //       // eslint-disable-next-line no-console
-  //       console.log('💧 ~ Could not pre-populate dependencies:', deps);
-  //     }
-  //   });
-
-  //   $context.dependenciesAutoImported = true;
-  // }
-
-  // function dependenciesFound(obj: any): obj is PackageManagerDependencies {
-  //   if (typeof obj !== 'object' || obj === null) {
-  //     return false;
-  //   }
-
-  //   for (const key in obj) {
-  //     const dependenciesArray = obj[key];
-
-  //     if (!Array.isArray(dependenciesArray)) {
-  //       return false;
-  //     }
-
-  //     for (const dependency of dependenciesArray) {
-  //       if (typeof dependency.name !== 'string' || typeof dependency.urls.package !== 'string') {
-  //         return false;
-  //       }
-  //     }
-  //   }
-
-  //   return true;
-  // }
 
   function clearProject() {
     $context.project = undefined;

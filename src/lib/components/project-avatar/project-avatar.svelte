@@ -7,11 +7,12 @@
 
   export let project: Project;
 
-  type Size = 'small' | 'medium' | 'large' | 'huge';
+  type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
   export let outline = false;
 
   const CONTAINER_SIZES: Record<Size, string> = {
+    tiny: '1.5rem',
     small: '2rem',
     medium: '3rem',
     large: '4rem',
