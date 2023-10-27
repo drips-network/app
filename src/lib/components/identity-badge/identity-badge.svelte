@@ -118,7 +118,7 @@
         </div>
         {#key toDisplay}
           <div
-            transition:fade|local={{ duration: 300 }}
+            transition:fade={{ duration: 300 }}
             class:text-foreground={size === 'gigantic'}
             class={`${currentFontClass} identity absolute overlay flex items-center`}
             data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}

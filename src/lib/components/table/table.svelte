@@ -114,8 +114,7 @@
           >
             <div>
               <svelte:component
-                this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-                context={cell.getContext()}
+                this={flexRender(cell.column.columnDef.cell, { context: cell.getContext() })}
               />
             </div>
           </td>

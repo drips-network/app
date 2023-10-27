@@ -4,7 +4,7 @@
   import { fly } from 'svelte/transition';
 </script>
 
-<div class="flow-base-layout" in:fly={{ duration: 300, y: 16 }}>
+<div class="flow-base-layout" in:fly|global={{ duration: 300, y: 16 }}>
   <div class="logo">
     <DripsLogo />
   </div>

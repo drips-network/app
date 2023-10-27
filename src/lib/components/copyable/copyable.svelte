@@ -38,10 +38,10 @@
     class:animate={!alwaysVisible}
   >
     {#if success}
-      <div transition:fly|local={{ duration: 300, y: 8 }}>
+      <div transition:fly={{ duration: 300, y: 8 }}>
         <SuccessIcon style="fill: var(--color-positive)" />
       </div>
-    {:else}<div transition:fly|local={{ duration: 300, y: -8 }}><CopyIcon /></div>{/if}
+    {:else}<div transition:fly={{ duration: 300, y: -8 }}><CopyIcon /></div>{/if}
   </div>
 </div>
 

@@ -208,7 +208,7 @@
           <span class="muted">&nbsp;total</span>
         </div>
         {#if supportersPile && supportersPile.length > 0}
-          <div in:fade|local={{ duration: 300 }} class="supporters min-w-0">
+          <div in:fade={{ duration: 300 }} class="supporters min-w-0">
             <span class="typo-text-small truncate muted">Supported by</span>
             <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
           </div>

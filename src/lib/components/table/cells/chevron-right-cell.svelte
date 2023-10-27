@@ -1,4 +1,7 @@
 <script lang="ts">
+  // Suppress rid of excessive "unknown prop" warnings in console
+  $$restProps;
+
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
 </script>
 

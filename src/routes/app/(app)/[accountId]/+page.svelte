@@ -170,14 +170,14 @@
             </div>
           </div>
           <div class="social-links">
-            <div in:fade|local><SocialLink network="ethereum" value={address} /></div>
+            <div in:fade><SocialLink network="ethereum" value={address} /></div>
             {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
-              {#if value}<div in:fade|local>
+              {#if value}<div in:fade>
                   <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                 </div>{/if}
             {/each}
           </div>
-          {#if description}<p class="description" in:fade|local>{description}</p>{/if}
+          {#if description}<p class="description" in:fade>{description}</p>{/if}
         </div>
       {/if}
     </SectionSkeleton>
@@ -187,7 +187,7 @@
     <Streams collapsable accountId={dripsAccountId} />
     <Balances collapsable collapsed accountId={dripsAccountId} />
     {#if address && !$dismissablesStore.includes('profile-drips-v1')}
-      <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
+      <div class="drips-v1-banner" out:fly={{ duration: 300, y: 16 }}>
         <Banner
           title="Looking for the old Drips?"
           description="You can still access the previous Drips app at app.v1.drips.network."

@@ -73,7 +73,7 @@
   <div class="edu-carousel">
     <TransitionedHeight negativeMarginWhileCollapsed="-64px">
       {#if eduCarouselItems.length > 0}
-        <div out:fly|local={{ y: -10, duration: 300 }} class="edu-carousel-inner">
+        <div out:fly={{ y: -10, duration: 300 }} class="edu-carousel-inner">
           <h4 class="typo-all-caps">Getting started</h4>
           <Carousel items={eduCarouselItems} />
         </div>

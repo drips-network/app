@@ -1,4 +1,4 @@
-import type { ComponentType, SvelteComponent, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponent } from 'svelte';
 
 export interface UpdateAwaitStepParams {
   message?: string;
@@ -38,9 +38,9 @@ type Constructor<T> = new (...args: any[]) => T;
 
 export type StepComponentEvents = {
   /** Go forward one step (or a custom amount by setting `by`). */
-  goForward: MovePayload;
+  goForward: MovePayload | undefined;
   /** Go backward one step (or a custom amount by setting `by`). */
-  goBackward: MovePayload;
+  goBackward: MovePayload | undefined;
   /**
    * Await a promise while displaying a customizable spinner dialog.
    * Once the passed promise is resolved, advances in the flow. If
@@ -63,7 +63,7 @@ export type StepComponentEvents = {
 
 type OmitContext<T> = Omit<T, 'context'>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Props<T> = T extends SvelteComponentTyped<infer P, any, any> ? OmitContext<P> : never;
+export type Props<T> = T extends SvelteComponent<infer P, any, any> ? OmitContext<P> : never;
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
 export type Step<T extends SvelteComponent> = {

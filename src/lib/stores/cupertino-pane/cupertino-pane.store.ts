@@ -1,12 +1,12 @@
 import * as CupertinoPane from 'cupertino-pane';
 
-import type { ComponentType, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponent } from 'svelte';
 import { get, writable } from 'svelte/store';
 
 import scroll from '$lib/stores/scroll';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Props<T> = T extends SvelteComponentTyped<infer P, any, any> ? P : never;
+export type Props<T> = T extends SvelteComponent<infer P, any, any> ? P : never;
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
 interface CupertinoSheetStore {

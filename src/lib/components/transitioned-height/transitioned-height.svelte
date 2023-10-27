@@ -34,9 +34,6 @@
 
   let contentContainerElem: HTMLDivElement;
 
-  let firstRender = true;
-  onMount(() => (firstRender = false));
-
   /*
     During SSR, the server cannot determine the actual DOM node height of the content, so
     if the content is not collapsed, we set the height to `fit-content`.

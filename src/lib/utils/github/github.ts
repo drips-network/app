@@ -30,6 +30,7 @@ export async function getRepoByUrl(repoUrl: string) {
   return getRepoByOwnerAndName(owner, repo);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getFundingJson(owner: string, repo: string, template: string): Promise<any> {
   const { data } = await octokit.repos
     .getContent({

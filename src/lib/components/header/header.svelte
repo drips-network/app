@@ -36,7 +36,7 @@
     {/if}
   </a>
   {#if searchMode}
-    <div class="search-bar" transition:fly|local={{ duration: 300, x: 64, easing: sineInOut }}>
+    <div class="search-bar" transition:fly={{ duration: 300, x: 64, easing: sineInOut }}>
       <SearchBar on:dismiss={() => (searchMode = false)} />
     </div>
   {/if}
@@ -46,7 +46,7 @@
         <button
           class="header-button"
           on:click={() => (searchMode = true)}
-          transition:fly|local={{ duration: 300, x: -64, easing: quadInOut }}
+          transition:fly={{ duration: 300, x: -64, easing: quadInOut }}
           data-testid="search-button"
         >
           <SearchIcon style="fill: var(--color-foreground)" />
@@ -63,7 +63,7 @@
 </header>
 
 {#if searchMode}
-  <div class="search-background" transition:fade|local={{ duration: 300 }} />
+  <div class="search-background" transition:fade={{ duration: 300 }} />
 {/if}
 
 <style>

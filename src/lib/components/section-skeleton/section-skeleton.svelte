@@ -27,7 +27,7 @@
     <div class="inner-wrapper">
       {#if !loaded || error || empty}
         <div
-          out:fade|local={{ duration: 250 }}
+          out:fade={{ duration: 250 }}
           class="placeholder-container"
           bind:this={placeholderContainerElem}
           style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
@@ -35,7 +35,7 @@
           {#if !loaded}
             <Spinner />
           {:else if error}
-            <div class="notice" in:fade|local={{ duration: 250 }}>
+            <div class="notice" in:fade={{ duration: 250 }}>
               <Emoji emoji="⚠️" size="huge" />
               <div class="text-group">
                 <p class="typo-text-small-bold">Oops, something went wrong.</p>
@@ -52,7 +52,7 @@
             </div>
           {:else if empty}
             <!-- Empty state -->
-            <div class="notice" in:fade|local={{ duration: 250 }}>
+            <div class="notice" in:fade={{ duration: 250 }}>
               <Emoji emoji={emptyStateEmoji} size="huge" />
               <div class="text-group">
                 {#if emptyStateHeadline}<p class="typo-text-small-bold">
@@ -72,7 +72,7 @@
         <div
           class="content-container"
           style:margin-top={placeholderContainerElem ? '-16rem' : undefined}
-          in:fade|local={{ duration: 250 }}
+          in:fade={{ duration: 250 }}
           on:transitionend={() => {
             contentTransitonedIn = true;
           }}

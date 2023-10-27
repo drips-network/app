@@ -54,7 +54,7 @@
 
 <div class="wrapper" style:height="{$wrapperHeight}px">
   {#if slots.length > 0}
-    <div transition:fade|local class="slots" bind:this={slotsElem}>
+    <div transition:fade class="slots" bind:this={slotsElem}>
       {#each slots as slot}
         <StandaloneFlowSlot on:edit {...slot} />
       {/each}

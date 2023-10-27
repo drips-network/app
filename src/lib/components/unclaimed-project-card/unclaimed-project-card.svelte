@@ -44,7 +44,7 @@
   export let claimableTokensKey = 'Tokens';
 </script>
 
-<div class="project-info" transition:fly|local={{ y: 8, duration: 300 }}>
+<div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
   {#if project}
     <div class="basic-info">
       <ProjectBadge linkToNewTab {project} maxWidth={false} />

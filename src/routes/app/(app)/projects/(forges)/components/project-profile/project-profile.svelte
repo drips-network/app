@@ -173,7 +173,7 @@
             <Spinner />
           </div>
         {:then [earnedFundsResult, splitsResult]}
-          <div class="stats" in:fade|local={{ duration: 300 }}>
+          <div class="stats" in:fade={{ duration: 300 }}>
             {#if earnedFundsResult}
               <div class="stat">
                 <KeyValuePair key="Total income">

@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import { onMount, tick, type SvelteComponent, type SvelteComponentTyped } from 'svelte';
+  import { onMount, tick, type SvelteComponent } from 'svelte';
   import { flip } from 'svelte/animate';
   import { quintInOut } from 'svelte/easing';
   import { crossfade, fade, fly } from 'svelte/transition';
@@ -8,7 +8,7 @@
   type Constructor<T> = new (...args: any[]) => T;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  type Props<T> = T extends SvelteComponentTyped<infer P, any, any> ? P : never;
+  type Props<T> = T extends SvelteComponent<infer P, any, any> ? P : never;
   type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
   interface CarouselItem<T extends SvelteComponent> {
@@ -117,7 +117,7 @@
       <div
         class="item"
         bind:this={itemElems[index]}
-        out:send|local={{ key: item.id }}
+        out:send={{ key: item.id }}
         animate:flip={{ duration: 300 }}
         on:outroend={updateScrollPos}
       >
@@ -127,24 +127,24 @@
   </div>
 
   {#if overflowLeft}
-    <div transition:fade|local={{ duration: 100 }} class="overflow-gradient left" />
+    <div transition:fade={{ duration: 100 }} class="overflow-gradient left" />
     <button
       on:click={() => navigate('backward')}
       tabindex="-1"
-      in:fly|local={{ x: 20, duration: 300 }}
-      out:fly|local={{ x: -20, duration: 300 }}
+      in:fly={{ x: 20, duration: 300 }}
+      out:fly={{ x: -20, duration: 300 }}
       class="nav-button left"
     >
       <div><ArrowUp style="fill: var(--color-foreground)" /></div>
     </button>
   {/if}
   {#if overflowRight}
-    <div transition:fade|local={{ duration: 100 }} class="overflow-gradient right" />
+    <div transition:fade={{ duration: 100 }} class="overflow-gradient right" />
     <button
       on:click={() => navigate('forward')}
       tabindex="-1"
-      in:fly|local={{ x: -20, duration: 300 }}
-      out:fly|local={{ x: 20, duration: 300 }}
+      in:fly={{ x: -20, duration: 300 }}
+      out:fly={{ x: 20, duration: 300 }}
       class="nav-button right"
     >
       <div><ArrowUp style="fill: var(--color-foreground)" /></div>

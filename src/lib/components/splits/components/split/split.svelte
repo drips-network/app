@@ -209,7 +209,7 @@
             </div>
           </button>
           {#if groupExpanded}
-            <div transition:fade|local={{ duration: GROUP_EXPAND_DURATION }} class="members">
+            <div transition:fade={{ duration: GROUP_EXPAND_DURATION }} class="members">
               <SplitsListComponent {linkToNewTab} isGroup list={split.list} />
             </div>
           {/if}

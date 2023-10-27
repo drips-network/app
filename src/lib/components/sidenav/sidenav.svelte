@@ -53,7 +53,7 @@
         >
           <SidenavItem {...item} active={$page.url.pathname === item.href} />
           {#if shouldShowTooltips && hoveringOver === item.href}
-            <div class="tooltip" transition:fly|local={{ duration: 300, x: -8 }}>
+            <div class="tooltip" transition:fly={{ duration: 300, x: -8 }}>
               {item.label}
             </div>
           {/if}
@@ -62,11 +62,7 @@
     </div>
   {/each}
   {#if selectorPos !== undefined}
-    <div
-      transition:fade|local={{ duration: 200 }}
-      class="selector"
-      style={`top: ${selectorPos}px`}
-    />
+    <div transition:fade={{ duration: 200 }} class="selector" style={`top: ${selectorPos}px`} />
   {/if}
 </nav>
 

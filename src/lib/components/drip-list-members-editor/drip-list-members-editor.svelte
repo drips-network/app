@@ -396,7 +396,7 @@
           <svg height="32" width="32" viewBox="0 0 32 32">
             {#if !error && !valid}
               <circle
-                transition:fade|local={{ duration: 200 }}
+                transition:fade={{ duration: 200 }}
                 r="12"
                 cx="16"
                 cy="16"
@@ -417,16 +417,16 @@
           {#if error}
             <div
               class="icon"
-              in:scale={{ duration: 300, start: 1.5 }}
-              out:scale={{ duration: 300, start: 0.8 }}
+              in:scale|global={{ duration: 300, start: 1.5 }}
+              out:scale|global={{ duration: 300, start: 0.8 }}
             >
               <ExclamationIcon style="fill: var(--color-background);" />
             </div>
           {:else if valid}
             <div
               class="icon"
-              in:scale={{ duration: 300, start: 1.5 }}
-              out:scale={{ duration: 300, start: 0.8 }}
+              in:scale|global={{ duration: 300, start: 1.5 }}
+              out:scale|global={{ duration: 300, start: 0.8 }}
             >
               <CheckIcon style="fill: var(--color-background);" />
             </div>

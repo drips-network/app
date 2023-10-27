@@ -50,7 +50,7 @@
     {/if}
     <slot />
     {#if loading}
-      <div out:fade|local={{ duration: 300 }} class="loading">
+      <div out:fade={{ duration: 300 }} class="loading">
         <Spinner />
       </div>
     {/if}

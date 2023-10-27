@@ -7,12 +7,10 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
-  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { goto } from '$app/navigation';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import buildUrl from '$lib/utils/build-url';
-  import type { SplitsEntry } from 'radicle-drips';
   import addDripListMemberSteps from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
@@ -23,7 +21,6 @@
   export let dripList: DripList | undefined = undefined;
 
   let ownDripLists: DripList[] | null | undefined = undefined;
-  let ownDripListSplits: SplitsEntry[] | undefined = undefined;
 
   $: isOwner =
     $walletStore.connected &&
@@ -71,8 +68,6 @@
     const result = await dripListService.getByOwnerAddress(address);
 
     if (result.length > 0) {
-      const subgraph = getSubgraphClient();
-      ownDripListSplits = await subgraph.getSplitsConfigByAccountId(result[0].account.accountId);
       ownDripLists = result;
     } else {
       ownDripLists = null;
@@ -102,7 +97,7 @@
 
 <div class="become-supporter-card">
   {#if ownDripLists === undefined || updating}
-    <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
+    <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
   {/if}

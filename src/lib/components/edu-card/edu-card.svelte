@@ -10,7 +10,7 @@
 
 <TransitionedHeight removeFromTabIndexWhileCollapsed={false} {negativeMarginWhileCollapsed}>
   {#if !$dismissablesStore.includes(dimissableId)}
-    <div out:fade|local={{ duration: 300 }} class="edu-card">
+    <div out:fade={{ duration: 300 }} class="edu-card">
       <div class="text">
         <slot name="text" />
         <div class="flex gap-1">

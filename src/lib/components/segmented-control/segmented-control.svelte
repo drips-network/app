@@ -2,6 +2,8 @@
   import { browser } from '$app/environment';
   import { createEventDispatcher, onMount, tick } from 'svelte';
 
+  // TODO: REMOVE WHEN https://github.com/sveltejs/svelte-eslint-parser/issues/306 IS FIXED
+  // eslint-disable-next-line no-undef
   type T = $$Generic;
   type Option<V extends keyof T> = { title: string; value: V }[];
 

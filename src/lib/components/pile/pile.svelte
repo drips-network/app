@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { createEventDispatcher, type SvelteComponent } from 'svelte';
+  import { createEventDispatcher, type ComponentType } from 'svelte';
   import { sineIn, sineOut } from 'svelte/easing';
 
   export let transitionedOut = false;
@@ -10,7 +10,7 @@
   export let itemsClickable = false;
 
   export let components: {
-    component: typeof SvelteComponent;
+    component: ComponentType;
     props: Record<string, unknown>;
   }[] = [];
   $: displayedComponents = components.slice(0, maxItems);
@@ -31,13 +31,13 @@
         <div
           class="item"
           class:pointer-events-none={!itemsClickable}
-          out:fly|local={{
+          out:fly={{
             y: 16,
             duration: 200,
             delay: getTransitionDelay(components.indexOf(component), 'out'),
             easing: sineIn,
           }}
-          in:fly|local={{
+          in:fly={{
             y: 16,
             duration: 200,
             delay: getTransitionDelay(components.indexOf(component), 'in'),
@@ -51,14 +51,14 @@
     {#if overflowAmount > 0 && !transitionedOut}
       <svelte:element
         this={overflowCounterClickable ? 'button' : 'div'}
-        class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1 "
-        out:fly|local={{
+        class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1"
+        out:fly={{
           y: 16,
           duration: 200,
           delay: getTransitionDelay(components.length - 1, 'out'),
           easing: sineIn,
         }}
-        in:fly|local={{
+        in:fly={{
           y: 16,
           duration: 200,
           delay: getTransitionDelay(components.length - 1, 'in'),

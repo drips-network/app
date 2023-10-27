@@ -5,8 +5,6 @@ import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
 import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
 import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
 
-// TODO: This fails if the network is not the default one. We need to support other networks.
-
 export const load = (async ({ params }) => {
   const { listId } = params;
 
