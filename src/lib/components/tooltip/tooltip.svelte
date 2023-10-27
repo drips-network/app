@@ -110,6 +110,7 @@
   });
 </script>
 
+<!--svelte-ignore a11y-no-static-element-interactions -->
 <span
   bind:this={tooltipElem}
   class="tooltip"

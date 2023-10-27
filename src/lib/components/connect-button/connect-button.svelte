@@ -40,6 +40,7 @@
         </div>
       </Flyout>
     </div>
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="mobile-only"
       on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}

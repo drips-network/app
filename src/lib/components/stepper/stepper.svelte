@@ -10,7 +10,7 @@
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
 
-  const dispatch = createEventDispatcher<{ stepChange: never }>();
+  const dispatch = createEventDispatcher<{ stepChange: undefined }>();
 
   export let steps: Steps;
   export let context: (() => Writable<unknown>) | undefined = undefined;

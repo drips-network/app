@@ -21,7 +21,7 @@
   export let collapsable = false;
 </script>
 
-<!--svelte-ignore a11y-click-events-have-key-events -->
+<!--svelte-ignore a11y-no-static-element-interactions a11y-click-events-have-key-events -->
 <div
   class="section-header"
   on:click={() => (collapsable ? (collapsed = !collapsed) : undefined)}
@@ -111,11 +111,11 @@
   }
 
   .expand-button:focus-visible {
-    background-color: var(--color-foreground-level-2);
+    background-color: var(--color-primary-level-2);
   }
 
   .expand-button:hover {
-    background-color: var(--color-foreground-level-3);
+    background-color: var(--color-primary-level-2);
   }
 
   .actions,

@@ -51,6 +51,7 @@
     {#if overflowAmount > 0 && !transitionedOut}
       <svelte:element
         this={overflowCounterClickable ? 'button' : 'div'}
+        role={overflowCounterClickable ? 'button' : undefined}
         class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1"
         out:fly={{
           y: 16,

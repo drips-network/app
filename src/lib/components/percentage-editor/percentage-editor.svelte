@@ -60,7 +60,7 @@
 
   const dispatch = createEventDispatcher<{
     /** Fired when the user blurs the input after selecting or hits enter to confirm. */
-    confirm: never;
+    confirm: undefined;
   }>();
 
   function handleBlur() {
@@ -90,8 +90,6 @@
   class:empty
   class:disabled
   class:editable
-  on:click|stopPropagation={focusInput}
-  on:keypress|stopPropagation
 >
   <input
     bind:this={inputElem}
@@ -103,6 +101,8 @@
     }}
     on:blur={handleBlur}
     on:keydown={handleKeydown}
+    on:click|stopPropagation={focusInput}
+    on:keypress|stopPropagation
     step="0.01"
     style:width={inputWidth}
     bind:value={percentageValue}

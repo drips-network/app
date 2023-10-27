@@ -7,7 +7,7 @@
 
   export let message: string;
 
-  const dispatch = createEventDispatcher<{ retry: never }>();
+  const dispatch = createEventDispatcher<{ retry: undefined }>();
 
   onMount(() => modal.setHideable(true));
 </script>

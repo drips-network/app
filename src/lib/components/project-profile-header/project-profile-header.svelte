@@ -10,7 +10,7 @@
   export let project: GitProject;
   export let editButton: string | undefined = undefined;
 
-  const dispatch = createEventDispatcher<{ editButtonClick: never }>();
+  const dispatch = createEventDispatcher<{ editButtonClick: undefined }>();
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">

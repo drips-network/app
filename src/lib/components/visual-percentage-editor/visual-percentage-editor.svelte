@@ -215,7 +215,13 @@
             {/if}
           </div>
           {#if index !== Object.keys(percentageElems).length - 1}
-            <div class="knob" on:mousedown={(e) => startDragging(index, e)}>
+            <!--svelte-ignore a11y-no-static-element-interactions -->
+            <div
+              class="knob"
+              aria-grabbed={draggingIndex === index}
+              aria-dropeffect="move"
+              on:mousedown={(e) => startDragging(index, e)}
+            >
               <Knob dragging={draggingIndex === index} />
             </div>
             <div class="percentage-input">

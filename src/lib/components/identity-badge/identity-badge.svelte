@@ -121,7 +121,6 @@
             transition:fade={{ duration: 300 }}
             class:text-foreground={size === 'gigantic'}
             class={`${currentFontClass} identity absolute overlay flex items-center`}
-            data-style:left={showAvatar ? `${currentSize + currentSize / 3}px` : '0'}
             class:hideOnMobile={hideAvatarOnMobile}
           >
             <div class="flex-1 min-w-0">

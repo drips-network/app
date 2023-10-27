@@ -17,7 +17,7 @@
   }
 </script>
 
-<div
+<button
   class="copyable"
   on:click={(e) => {
     if (disabled) return;
@@ -43,7 +43,7 @@
       </div>
     {:else}<div transition:fly={{ duration: 300, y: -8 }}><CopyIcon /></div>{/if}
   </div>
-</div>
+</button>
 
 <style>
   .copyable {
@@ -53,10 +53,16 @@
     cursor: pointer;
   }
 
+  .copyable:focus-visible .copy-icon,
+  .copyable:hover .copy-icon {
+    background-color: var(--color-primary-level-1);
+  }
+
   .copy-icon {
     width: 0px;
     height: 24px;
     position: relative;
+    border-radius: 1rem;
   }
 
   .copy-icon > div {

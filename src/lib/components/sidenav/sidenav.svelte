@@ -43,6 +43,7 @@
   {#each Object.values(items) as block}
     <div class="block">
       {#each block as item}
+        <!--svelte-ignore a11y-no-static-element-interactions -->
         <div
           style="position: relative"
           bind:this={itemElems[item.href]}
@@ -50,10 +51,16 @@
           on:focusin={() => (hoveringOver = item.href)}
           on:mouseleave={() => (hoveringOver = undefined)}
           on:focusout={() => (hoveringOver = undefined)}
+          aria-describedby="tooltip-{item.label}"
         >
           <SidenavItem {...item} active={$page.url.pathname === item.href} />
           {#if shouldShowTooltips && hoveringOver === item.href}
-            <div class="tooltip" transition:fly={{ duration: 300, x: -8 }}>
+            <div
+              id="tooltip-{item.label}"
+              role="tooltip"
+              class="tooltip"
+              transition:fly={{ duration: 300, x: -8 }}
+            >
               {item.label}
             </div>
           {/if}

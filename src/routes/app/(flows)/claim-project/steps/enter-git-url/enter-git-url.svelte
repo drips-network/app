@@ -149,7 +149,7 @@
   headline="Claim your project"
   description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
-  <div class="input" on:keydown={(e) => e.key === 'Enter' && submitInput()}>
+  <div class="input">
     <TextInput
       bind:value={$context.gitUrl}
       icon={LinkIcon}
@@ -158,6 +158,7 @@
       {validationState}
       showClearButton={validationState.type === 'valid' || validationState.type === 'invalid'}
       on:clear={clearProject}
+      on:keydown={(e) => e.key === 'Enter' && submitInput()}
     />
     <div class="submit-button">
       <Button
