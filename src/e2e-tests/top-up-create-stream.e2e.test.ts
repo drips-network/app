@@ -11,7 +11,6 @@ import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
 import environment from './helpers/environment';
 import dotenv from 'dotenv';
-import takeScreenshot from './helpers/take-screenshot';
 
 dotenv.config();
 
@@ -578,7 +577,6 @@ describe('app', async () => {
       });
 
       it('advances the flow', async () => {
-        await takeScreenshot(page, 1);
         await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
         await page.locator('button', { hasText: 'Got it' }).click();
       });
@@ -587,8 +585,6 @@ describe('app', async () => {
         await page.waitForTimeout(1000);
 
         await page.reload();
-
-        await takeScreenshot(page, 2);
 
         await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
         await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
