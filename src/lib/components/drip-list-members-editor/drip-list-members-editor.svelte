@@ -35,7 +35,7 @@
   import { fade, scale } from 'svelte/transition';
   import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import { getAddress, isAddress } from 'ethers/lib/utils';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
@@ -54,6 +54,8 @@
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
   import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
+  import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
 
   export let maxItems = 200;
 
@@ -81,6 +83,7 @@
 
   let isAddingItem = false;
   let inputValue = '';
+  let inputMessage: { type: 'caution' | 'success'; message: string } | undefined = undefined;
 
   let gitProjectService: GitProjectService;
 
@@ -96,34 +99,29 @@
 
       // TODO: This only supports GitHub forge
       const repoExists = await verifyRepoExists(username, repoName);
-      if (!repoExists) throw new Error('This project doesnʼt exist');
+      if (!repoExists) throw new Error('Git project not found (is it private?)');
 
       let gitProject = await gitProjectService.getByUrl(inputValue);
 
       const id = gitProject.source.url;
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
 
-      // Prevent duplicates.
-      if (!items[id]) {
-        items[id] = projectItem(gitProject);
-
-        percentages = { ...percentages, [id]: 0 };
+      if (items[id]) {
+        inputMessage = { type: 'success', message: 'Already added' };
+        setTimeout(() => inputElem.select());
+        return;
       }
-      // TODO: break + show warning to user
 
-      await tick();
+      items[id] = projectItem(gitProject);
+      percentages = { ...percentages, [id]: 0 };
 
-      listElem.scroll({
-        top: listElem.scrollHeight,
-      });
-
-      // It doesnʼt work without setTimeout for some reason 🤷‍♂️
-      setTimeout(() => inputElem.focus(), 0);
+      afterInputAdded();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
+      const message = e instanceof Error ? e.message : 'Error adding project';
+      inputMessage = { type: 'caution', message };
     } finally {
-      inputValue = '';
       isAddingItem = false;
     }
   }
@@ -144,21 +142,27 @@
 
       if (blockedKeys.includes(dripListId)) throw new Error('Drip List ID is already used');
 
-      // Prevent duplicates.
-      if (!items[dripListId]) {
-        items[dripListId] = dripListItem(
-          dripList.name,
-          dripList.account.accountId,
-          dripList.account.owner.address,
-        );
-
-        percentages = { ...percentages, [dripListId]: 0 };
+      if (items[dripListId]) {
+        inputMessage = { type: 'success', message: 'Already added' };
+        setTimeout(() => inputElem.select());
+        return;
       }
+
+      items[dripListId] = dripListItem(
+        dripList.name,
+        dripList.account.accountId,
+        dripList.account.owner.address,
+      );
+
+      percentages = { ...percentages, [dripListId]: 0 };
+
+      afterInputAdded();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
+      const message = e instanceof Error ? e.message : 'Error adding Drip List';
+      inputMessage = { type: 'caution', message };
     } finally {
-      inputValue = '';
       isAddingItem = false;
     }
   }
@@ -170,12 +174,19 @@
       const address = isAddress(inputValue)
         ? getAddress(inputValue)
         : await ensStore.reverseLookup(inputValue);
-      assert(address);
+
+      assert(
+        address,
+        inputValue.endsWith('.eth')
+          ? `Couldn't resolve an Ethereum address for "${inputValue}"`
+          : 'Invalid Ethereum address',
+      );
 
       if (blockedKeys.includes(address)) throw new Error('This address is already used');
 
       if (items[address]) {
-        isAddingItem = false;
+        inputMessage = { type: 'success', message: 'Already added' };
+        setTimeout(() => inputElem.select());
         return;
       }
 
@@ -183,13 +194,13 @@
 
       percentages = { ...percentages, [address]: 0 };
 
-      // It doesnʼt work without setTimeout for some reason 🤷‍♂️
-      setTimeout(() => inputElem.focus(), 0);
+      afterInputAdded();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
+      const message = e instanceof Error ? e.message : 'Error adding Ethereum address';
+      inputMessage = { type: 'caution', message };
     } finally {
-      inputValue = '';
       isAddingItem = false;
     }
   }
@@ -202,8 +213,10 @@
   }
 
   function handleSubmitInput() {
-    // TODO: show message to user
-    if (itemsLength >= maxItems) return;
+    if (itemsLength >= maxItems) {
+      inputMessage = { type: 'caution', message: `You can't add anymore items to this list` };
+      return;
+    }
 
     if (isSupportedGitUrl(inputValue) && allowedItems.includes('projects')) {
       addProject();
@@ -217,6 +230,8 @@
       (isAddress(inputValue) || inputValue.endsWith('.eth'))
     ) {
       addEthAddress();
+    } else {
+      inputMessage = { type: 'caution', message: "You can't add that to this list." };
     }
   }
 
@@ -269,6 +284,32 @@
     setAllPercentagesTo(0);
   }
 
+  let highlightLastItemAdded = false;
+
+  function afterInputAdded() {
+    // It doesnʼt work without setTimeout for some reason 🤷‍♂️
+    setTimeout(() => {
+      // clear input
+      inputValue = '';
+      inputElem.focus();
+      // highlight item added
+      highlightLastItemAdded = true;
+      setTimeout(() => {
+        highlightLastItemAdded = false;
+      }, 5000);
+      // scroll to bottom of list
+      listElem.scroll({ top: 999999, behavior: 'smooth' });
+      // scroll window top to input if bottom is out of view
+      const listBox = listElem.getBoundingClientRect();
+      if (listBox.bottom > window.innerHeight) {
+        window.scroll({
+          top: window.scrollY + inputElem.getBoundingClientRect().top - 24,
+          behavior: 'smooth',
+        });
+      }
+    });
+  }
+
   onMount(() => {
     if (addOnMount) {
       inputValue = addOnMount;
@@ -298,6 +339,10 @@
         .join(', ')}, or ${possibilityName(allowed.pop() ?? unreachable())}`;
     }
   }
+
+  $: {
+    inputValue, (inputMessage = undefined);
+  }
 </script>
 
 <div class="list-editor">
@@ -311,6 +356,7 @@
         bind:value={inputValue}
         disabled={isAddingItem}
         on:keydown={(e) => e.key === 'Enter' && handleSubmitInput()}
+        on:paste={() => setTimeout(() => handleSubmitInput())}
         class="typo-text"
         type="text"
         placeholder={inputPlaceholder}
@@ -324,13 +370,34 @@
       >
     </div>
   {/if}
-  {#if Object.keys(items).length > 0}
+  {#if Object.keys(items).length > 0 || inputMessage}
     <div class="list" bind:this={listElem}>
+      {#if inputMessage}
+        <div
+          class="sticky top-0 left-0 w-full z-10 border-t border-foreground flex flex-wrap py-4 gap-1 items-start justify-between {inputMessage.type ===
+          'success'
+            ? 'bg-primary-level-1 text-primary'
+            : 'bg-caution-level-1 text-caution'}"
+        >
+          <div class="pl-4 pr-2">
+            {#if inputMessage.type === 'success'}
+              <CheckCircle style="fill:currentColor" />
+            {:else}
+              <ExclamationCircle style="fill: currentColor" />
+            {/if}
+          </div>
+          <div class="flex-1 typo-text">
+            {inputMessage.message}
+          </div>
+        </div>
+      {/if}
       <ul>
-        {#each Object.entries(items) as [slug, item]}
+        {#each Object.entries(items) as [slug, item], index}
           <li
             class="flex flex-wrap items-center py-4 gap-1 items-center justify-between"
             data-testid={`item-${slug}`}
+            class:bg-primary-level-1={index === Object.entries(items).length - 1 &&
+              highlightLastItemAdded}
           >
             <div class="flex-1 max-w-full">
               <div class="w-full px-3">
@@ -447,7 +514,7 @@
     box-shadow: var(--elevation-low);
     border-radius: 0 0 1.5rem 1.5rem;
     overflow: hidden;
-    max-height: 32rem;
+    max-height: 24rem;
     overflow-y: scroll;
   }
 
