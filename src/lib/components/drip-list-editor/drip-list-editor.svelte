@@ -24,7 +24,6 @@
     items: {},
     description: undefined,
   };
-  export let showListFirst = false;
   export let urlToAdd: string | undefined = undefined;
 
   // validation
@@ -58,15 +57,13 @@
     />
   </FormField>
 
-  <div class:order-first={showListFirst}>
-    <FormField title="Members*">
-      <!-- TODO: This crashes when entering some non-valid github url -->
-      <ListEditor
-        bind:percentages={dripList.percentages}
-        bind:items={dripList.items}
-        bind:valid={listValid}
-        addOnMount={urlToAdd}
-      />
-    </FormField>
-  </div>
+  <FormField title="Members*">
+    <!-- TODO: This crashes when entering some non-valid github url -->
+    <ListEditor
+      bind:percentages={dripList.percentages}
+      bind:items={dripList.items}
+      bind:valid={listValid}
+      addOnMount={urlToAdd}
+    />
+  </FormField>
 </section>

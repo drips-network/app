@@ -23,7 +23,7 @@
   headline="Create a Drip List"
   description="What projects, individuals, organizations, or other Drip Lists would you like to support with your Drip List?"
 >
-  <DripListEditor bind:isValid bind:dripList={$context.dripList} showListFirst={true} {urlToAdd} />
+  <DripListEditor bind:isValid bind:dripList={$context.dripList} {urlToAdd} />
   <svelte:fragment slot="actions">
     <Button
       disabled={!isValid}
