@@ -99,7 +99,7 @@
 
       // TODO: This only supports GitHub forge
       const repoExists = await verifyRepoExists(username, repoName);
-      if (!repoExists) throw new Error('Git project not found (is it private?)');
+      if (!repoExists) throw new Error("Couldn't find that Git project. Is it private?");
 
       let gitProject = await gitProjectService.getByUrl(inputValue);
 
@@ -113,7 +113,8 @@
       }
 
       items[id] = projectItem(gitProject);
-      percentages = { ...percentages, [id]: 0 };
+
+      addItemToPercentages(id);
 
       afterInputAdded();
     } catch (e) {
@@ -138,7 +139,7 @@
       const dripListService = await DripListService.new();
 
       const dripList = await dripListService.getByTokenId(dripListId);
-      if (!dripList) throw new Error('Drip list not found');
+      if (!dripList) throw new Error('Drip List not found');
 
       if (blockedKeys.includes(dripListId)) throw new Error('Drip List ID is already used');
 
@@ -154,7 +155,7 @@
         dripList.account.owner.address,
       );
 
-      percentages = { ...percentages, [dripListId]: 0 };
+      addItemToPercentages(dripListId);
 
       afterInputAdded();
     } catch (e) {
@@ -192,7 +193,7 @@
 
       items[address] = ethAddressItem(address);
 
-      percentages = { ...percentages, [address]: 0 };
+      addItemToPercentages(address);
 
       afterInputAdded();
     } catch (e) {
@@ -203,6 +204,18 @@
     } finally {
       isAddingItem = false;
     }
+  }
+
+  let autoSplitEnabled = true;
+
+  function addItemToPercentages(key: string) {
+    let pcts = { ...percentages, [key]: 0 };
+    // auto split new entries unless they've manually edited percents
+    if (autoSplitEnabled) {
+      const amounts = Object.entries(pcts);
+      pcts = Object.fromEntries(amounts.map(([key]) => [key, 100 / amounts.length]));
+    }
+    percentages = pcts;
   }
 
   function removeItem(slug: string) {
@@ -242,10 +255,12 @@
     inputValue.includes('drips.network/app/drip-lists/');
 
   $: totalPercentage = Object.values(percentages ?? {}).reduce<number>((acc, v) => acc + v, 0);
+  $: hasEmptyPercents = Object.values(percentages).filter((v) => v === 0).length > 0;
   export let valid = false;
-  $: valid = itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100;
+  $: valid =
+    itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100 && !hasEmptyPercents;
   export let error = false;
-  $: error = Math.round(totalPercentage * 100) / 100 > 100;
+  $: error = Math.round(totalPercentage * 100) / 100 > 100 || hasEmptyPercents;
   // TODO: error should check if items are 0% (can currently submit with 0% but it gets excluded on tx)
 
   $: canDistributeEvenly = itemsLength > 0;
@@ -261,8 +276,9 @@
   }
 
   $: canDistributeRemaining =
-    Object.values(percentages).filter((v) => v === 0).length > 0 &&
-    Object.values(percentages).find((v) => v !== 0);
+    hasEmptyPercents &&
+    Object.values(percentages).find((v) => v !== 0) &&
+    Object.values(percentages).reduce((acc, cur) => acc + cur, 0) < 100;
 
   function distributeRemaining() {
     const remaining = 100 - totalPercentage;
@@ -425,7 +441,12 @@
               {#if !isEditable}
                 <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
               {:else}
-                <PercentageEditor bind:percentage={percentages[slug]} />
+                <PercentageEditor
+                  bind:percentage={percentages[slug]}
+                  on:confirm={() => {
+                    autoSplitEnabled = false;
+                  }}
+                />
                 <Button
                   icon={Trash}
                   variant="ghost"
@@ -455,10 +476,12 @@
           >Clear</Button
         >
       </div>
-      <div class="remaining-percentage-indicator" class:error class:valid>
-        <div class="typo-text-small-bold">
-          {Math.round(totalPercentage * 100) / 100}% allocated
-        </div>
+      <div class="remaining-percentage-indicator typo-text-small-bold" class:error class:valid>
+        {#if hasEmptyPercents}
+          Empty inputs
+        {:else}
+          {Math.round(totalPercentage * 100) / 100}% split
+        {/if}
         <div class="pie">
           <svg height="32" width="32" viewBox="0 0 32 32">
             {#if !error && !valid}
@@ -477,7 +500,9 @@
               cy="16"
               fill="transparent"
               stroke-width="12"
-              stroke-dasharray="calc({totalPercentage} * 37.6991118431 / 100) 37.6991118431"
+              stroke-dasharray="calc({hasEmptyPercents
+                ? 100
+                : totalPercentage} * 37.6991118431 / 100) 37.6991118431"
               transform="rotate(-90) translate(-32)"
             /></svg
           >
@@ -566,7 +591,7 @@
   }
 
   .remaining-percentage-indicator.valid {
-    color: var(--color-positive-level-6);
+    color: var(--color-positive);
   }
 
   .remaining-percentage-indicator .pie {
@@ -593,6 +618,6 @@
   }
 
   .remaining-percentage-indicator.valid .pie .pie-piece {
-    stroke: var(--color-positive-level-6);
+    stroke: var(--color-positive);
   }
 </style>
