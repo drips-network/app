@@ -38,7 +38,7 @@ const incomingDripListSplitQuery = gql`
   }
 `
 
-export default async function getIncomingSplits(forAccountId: string): Promise<{
+export default async function getIncomingSplits(forAccountId: string, fetchFunction: typeof fetch = fetch): Promise<{
   users: SplitsEntryWrapper<{
     driver: 'address';
     address: string;
@@ -61,7 +61,7 @@ export default async function getIncomingSplits(forAccountId: string): Promise<{
   const dripListFetches = incomingNFTDriverSplits.map(async (s) => {
     const response = await query<IncomingDripListSplitDripListQuery, IncomingDripListSplitDripListQueryVariables>(incomingDripListSplitQuery, {
       dripListId: s.senderId,
-    });
+    }, fetchFunction);
 
     const { dripList } = response;
     if (!dripList) return undefined;
@@ -76,7 +76,7 @@ export default async function getIncomingSplits(forAccountId: string): Promise<{
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
     const response = await query<IncomingProjectSplitProjectQuery, IncomingProjectSplitProjectQueryVariables>(incomingProjectSplitQuery, {
       projectId: s.senderId,
-    });
+    }, fetchFunction);
 
     const { project }= response;
     if (!project) return undefined;

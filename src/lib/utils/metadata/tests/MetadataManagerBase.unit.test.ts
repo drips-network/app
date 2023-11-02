@@ -12,12 +12,8 @@ vi.mock('$env/dynamic/public', () => ({
 }));
 
 class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends MetadataManagerBase<
-  NFTDriverAccount,
   Parser
 > {
-  public fetchAccount<TAccount>(): Promise<TAccount | null> {
-    throw new Error('Method not implemented.');
-  }
   public buildAccountMetadata(): z.TypeOf<TAccountMetadataSchema> {
     throw new Error('Method not implemented.');
   }

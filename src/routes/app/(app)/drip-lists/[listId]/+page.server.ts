@@ -4,8 +4,8 @@ import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
 import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
-import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
+import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
 import { SUPPORT_CARD_DRIP_LIST_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
@@ -30,7 +30,7 @@ export const load = (async ({ params, fetch }) => {
     getIncomingSplitTotal(listId),
   ] as const);
 
-  if (!fetches[0]?.dripList) throw error(404);  
+  if (!fetches[0]?.dripList) throw error(404);
 
   return {
     dripList: fetches[0].dripList,

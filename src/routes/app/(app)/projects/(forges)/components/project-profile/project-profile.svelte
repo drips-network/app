@@ -204,7 +204,6 @@
   <article class="project-profile" class:claimed={isClaimed(project)}>
     <header class="header">
       {#if isClaimed(project)}
-        {console.log(JSON.stringify(project))}
         <div class="owner">
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
             >Project claimed by</span

@@ -82,6 +82,8 @@
             component: DripListBadge,
             props: {
               dripList: s.dripList,
+              showOwner: false,
+              showName: false,
             },
           } as ComponentAndProps;
         case 'ProjectReceiver':

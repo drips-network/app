@@ -148,9 +148,8 @@
                   component: DripListBadge,
                   props: {
                     isLinked: false,
-                    listId: dl.account.accountId,
-                    listName: dl.name,
-                    owner: undefined,
+                    dripList: dl,
+                    showOwner: false,
                     disabled: isAlreadyInList(dl.splits),
                   },
                 },

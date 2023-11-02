@@ -38,8 +38,6 @@
       .getStreamsForUser(listOwner.accountId)
       .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
 
-      $: console.log(listOwner)
-
   /*
   Fetch any incoming splits so that we can display which other Drip Lists are currently supporting
   the given list.

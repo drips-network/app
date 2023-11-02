@@ -22,6 +22,7 @@
   export let dripList: DripListBadgeFragment | undefined;
 
   export let showOwner = true;
+  export let showName = true;
   export let isLinked = true;
   export let showAvatar = true;
   export let avatarSize: 'small' | 'default' = 'default';
@@ -58,12 +59,15 @@
       />
     </div>
   {/if}
-  <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
-    <span
-      >{#if username}<span class="text-foreground-level-5">{username}/</span
-        >{/if}{#if !dripList}<span class="animate-pulse">...</span>{:else}{dripList.name}{/if}</span
-    >
-  </div>
+  {#if showName}
+    <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
+      <span
+        >{#if username}<span class="text-foreground-level-5">{username}/</span
+          >{/if}{#if !dripList}<span class="animate-pulse">...</span
+          >{:else}{dripList.name}{/if}</span
+      >
+    </div>
+  {/if}
 </svelte:element>
 
 <style>

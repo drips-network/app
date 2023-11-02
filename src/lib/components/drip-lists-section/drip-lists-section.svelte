@@ -73,7 +73,7 @@
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
-    empty: dripLists && dripLists.length === 0,
+    empty: (dripLists && dripLists.length === 0) ?? undefined,
     error,
     emptyStateEmoji: '🫗',
     emptyStateHeadline: isSelf ? 'You donʼt have any Drip Lists' : 'No Drip Lists',

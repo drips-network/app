@@ -21,7 +21,7 @@ describe('app', async () => {
   let page: Page;
 
   beforeAll(async () => {
-    window.fetch = fetch as typeof window.fetch;
+    window.fetch = fetch as unknown as typeof window.fetch;
 
     server = await preview({
       preview: { port: 3001, host: '0.0.0.0' },

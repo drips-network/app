@@ -64,7 +64,7 @@ export const load = (async ({ params, fetch }) => {
       streamed: {
         unclaimedFunds,
         earnedFunds,
-        incomingSplits: getIncomingSplits(project.account.accountId),
+        incomingSplits: getIncomingSplits(project.account.accountId, fetch),
       },
       blockWhileInitializing: false,
     };

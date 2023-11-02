@@ -98,12 +98,12 @@
     __typename: 'ClaimedProject',
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
-      __typename: 'ProjectAccount',
+      __typename: 'RepoDriverAccount',
       accountId: '0',
       driver: Driver.Repo,
     },
     owner: {
-      __typename: 'ProjectOwner',
+      __typename: 'AddressDriverAccount',
       driver: Driver.Address,
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
@@ -124,12 +124,12 @@
     __typename: 'ClaimedProject',
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
-      __typename: 'ProjectAccount',
+      __typename: 'RepoDriverAccount',
       accountId: '0',
       driver: Driver.Repo,
     },
     owner: {
-      __typename: 'ProjectOwner',
+      __typename: 'AddressDriverAccount',
       driver: Driver.Address,
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
@@ -155,9 +155,14 @@
     {
       __typename: 'DripListReceiver',
       dripList: {
-        id: '1234',
+        __typename: 'DripList',
+        account: {
+          __typename: 'NftDriverAccount',
+          accountId: '1234',
+        },
         name: 'Some other Drip List',
         owner: {
+          __typename: 'AddressDriverAccount',
           address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
         },
       },
@@ -165,7 +170,10 @@
     },
     {
       __typename: 'AddressReceiver',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      account: {
+        __typename: 'AddressDriverAccount',
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      },
       weight: 62500,
     },
     {
@@ -178,14 +186,23 @@
           weight: 62500,
         },
         {
-          type: 'split-group',
+          __typename: 'SplitGroup',
           name: 'Some nested stuff',
           list: [
             {
-              type: 'drip-list-split',
-              listId: '1235',
-              listName: 'A different Drip List',
-              listOwner: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              __typename: 'DripListReceiver',
+              dripList: {
+                __typename: 'DripList',
+                name: 'A different Drip List',
+                owner: {
+                  __typename: 'AddressDriverAccount',
+                  address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+                },
+                account: {
+                  __typename: 'NftDriverAccount',
+                  accountId: '1235',
+                },
+              },
               weight: 62500,
             },
             {
@@ -195,12 +212,18 @@
             },
             {
               __typename: 'AddressReceiver',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              account: {
+                __typename: 'AddressDriverAccount',
+                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              },
               weight: 62500,
             },
             {
               __typename: 'AddressReceiver',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              account: {
+                __typename: 'AddressDriverAccount',
+                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              },
               weight: 62500,
             },
             {
@@ -215,19 +238,28 @@
             },
             {
               __typename: 'AddressReceiver',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              account: {
+                __typename: 'AddressDriverAccount',
+                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              },
               weight: 62500,
             },
             {
               __typename: 'AddressReceiver',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              account: {
+                __typename: 'AddressDriverAccount',
+                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+              },
               weight: 62500,
             },
           ],
         },
         {
           __typename: 'AddressReceiver',
-          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+          account: {
+            __typename: 'AddressDriverAccount',
+            address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+          },
           weight: 62500,
         },
         {
@@ -239,7 +271,10 @@
     },
     {
       __typename: 'AddressReceiver',
-      address: '0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19',
+      account: {
+        __typename: 'AddressDriverAccount',
+        address: '0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19',
+      },
       weight: 62500,
     },
   ];
@@ -349,16 +384,12 @@
   <h2>Project Card</h2>
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
-      source={SOURCE_CONFIGS.github}
-      description="A versatile component for building stepped flows with beautiful transitions."
-      owner={{
-        __typename: 'ProjectOwner',
-        driver: Driver.Address,
-        accountId: '0',
-        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      project={{
+        __typename: 'ClaimedProject',
+        source: SOURCE_CONFIGS.github,
+        emoji: '🚶',
+        color: '#fcc842',
       }}
-      emoji="🚶"
-      color="#fcc842"
     />
   </PrimaryColorThemer>
 </div>
@@ -386,15 +417,8 @@
       project={projectVerified
         ? {
             __typename: 'ClaimedProject',
-            account: {
-              __typename: 'ProjectAccount',
-              accountId: '0',
-              driver: Driver.Repo,
-            },
             owner: {
-              __typename: 'ProjectOwner',
-              driver: Driver.Address,
-              accountId: '0',
+              __typename: 'AddressDriverAccount',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
             source: SOURCE_CONFIGS[sourceType],
@@ -403,11 +427,6 @@
           }
         : {
             __typename: 'UnclaimedProject',
-            account: {
-              __typename: 'ProjectAccount',
-              accountId: '0',
-              driver: Driver.Repo,
-            },
             source: SOURCE_CONFIGS[sourceType],
           }}
     />
