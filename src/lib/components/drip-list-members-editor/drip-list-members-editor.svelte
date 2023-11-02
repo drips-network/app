@@ -1,7 +1,21 @@
 <script lang="ts" context="module">
+  export const DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT = gql`
+    ${PROJECT_BADGE_FRAGMENT}
+    fragment DripListMembersEditorProject on Project {
+      ...ProjectBadge
+    }
+  `
+
+  export const DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT = gql`
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    fragment DripListMembersEditorDripList on DripList {
+      ...DripListBadge
+    }
+  `
+
   interface ProjectItem {
     type: 'project';
-    project: Project;
+    project: DripListMembersEditorProjectFragment;
   }
 
   interface EthAddressItem {
@@ -11,11 +25,7 @@
 
   interface DripListItem {
     type: 'drip-list';
-    list: {
-      id: string;
-      name: string;
-      owner: string;
-    };
+    list: DripListMembersEditorDripListFragment;
   }
 
   export type ListItem = DripListItem | EthAddressItem | ProjectItem;
@@ -39,24 +49,20 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
   import assert from '$lib/utils/assert';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
-  import { verifyRepoExists } from '$lib/utils/github/github';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
   import Trash from 'radicle-design-system/icons/Trash.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import ethAddressItem from './item-templates/eth-address';
   import projectItem from './item-templates/project';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
-  import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
-  import type { Project, ProjectWhereInput } from '$lib/graphql/generated/graphql';
+  import DripListBadge, { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import query from '$lib/graphql/dripsQL';
-  import { single } from '$lib/utils/linq';
   import { gql } from 'graphql-request';
+  import type { DripListMembersEditorDripListFragment, DripListMembersEditorProjectFragment, DripListToAddQuery, DripListToAddQueryVariables, ProjectToAddQuery, ProjectToAddQueryVariables } from './__generated__/gql.generated';
 
   export let maxItems = 200;
 
@@ -91,130 +97,23 @@
     try {
       isAddingItem = true;
 
-      const { username, repoName } = GitProjectService.deconstructUrl(inputValue);
-
-      // TODO: This only supports GitHub forge
-      const repoExists = await verifyRepoExists(username, repoName);
-      if (!repoExists) throw new Error('This project doesnʼt exist');
-
-      const getProjectsQuery = gql`
-        query Projects($where: ProjectWhereInput) {
-          projects(where: $where) {
-            ... on ClaimedProject {
-              account {
-                accountId
-                driver
-              }
-              color
-              description
-              emoji
-              owner {
-                accountId
-                address
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-              splits {
-                maintainers {
-                  accountId
-                  address
-                  driver
-                  type
-                  weight
-                }
-                dependencies {
-                  ... on AddressReceiver {
-                    accountId
-                    address
-                    driver
-                    type
-                    weight
-                  }
-                  ... on ProjectReceiver {
-                    driver
-                    type
-                    weight
-                    project {
-                      ... on ClaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        color
-                        description
-                        emoji
-                        owner {
-                          accountId
-                          address
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                      ... on UnclaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                    }
-                  }
-                  ... on DripListReceiver {
-                    weight
-                    type
-                    driver
-                    dripList {
-                      id
-                    }
-                  }
-                }
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-            }
+      const projectToAddQuery = gql`
+        ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+        query ProjectToAdd($url: String!) {
+          projectByUrl(url: $url) {
+            ...DripListMembersEditorProject
           }
         }
       `;
 
-      const { projects } = await query<{ projects: Project[] }, { where: ProjectWhereInput }>(
-        getProjectsQuery,
+      const { projectByUrl: project } = await query<ProjectToAddQuery, ProjectToAddQueryVariables>(
+        projectToAddQuery,
         {
-          where: {
-            url: inputValue,
-          },
+          url: inputValue,
         },
       );
 
-      const project = single(projects);
+      if (!project) throw new Error('This project doesnʼt exist');
 
       const id = project.source.url;
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
@@ -253,19 +152,35 @@
       const dripListId = inputValue.substring(inputValue.lastIndexOf('/') + 1);
       if (!dripListId) throw new Error('Invalid drip list ID');
 
-      const dripListService = await DripListService.new();
+      const dripListToAddQuery = gql`
+      query DripListToAdd($id: ID!) {
+        dripList(id: $id) {
+          name
+          owner {
+            address
+          }
+          account {
+            accountId
+          }
+        }
+      }
+      `;
 
-      const dripList = await dripListService.getByTokenId(dripListId);
-      if (!dripList) throw new Error('Drip list not found');
+      const { dripList: dripListToAdd } = await query<DripListToAddQuery, DripListToAddQueryVariables>(
+        dripListToAddQuery,
+        {
+          id: dripListId,
+        },
+      );
+      
+      if (!dripListToAdd) throw new Error('Drip list not found');
 
-      if (blockedKeys.includes(dripListId)) throw new Error('Drip List ID is already used');
+      if (blockedKeys.includes(dripListToAdd.account.accountId)) throw new Error('Drip List ID is already used');
 
       // Prevent duplicates.
       if (!items[dripListId]) {
         items[dripListId] = dripListItem(
-          dripList.name,
-          dripList.account.accountId,
-          dripList.account.owner.address,
+          dripListToAdd
         );
 
         percentages = { ...percentages, [dripListId]: 0 };
@@ -445,7 +360,7 @@
       <ul>
         {#each Object.entries(items) as [slug, item]}
           <li
-            class="flex flex-wrap items-center py-4 gap-1 items-center justify-between"
+            class="flex flex-wrap items-center py-4 gap-1 justify-between"
             data-testid={`item-${slug}`}
           >
             <div class="flex-1 max-w-full">
@@ -461,9 +376,7 @@
                   <ProjectBadge project={item.project} linkTo="nothing" />
                 {:else if item.type === 'drip-list'}
                   <DripListBadge
-                    listName={item.list.name}
-                    listId={item.list.id}
-                    owner={item.list.owner}
+                    dripList={item.list}
                     isLinked={false}
                   />
                 {/if}

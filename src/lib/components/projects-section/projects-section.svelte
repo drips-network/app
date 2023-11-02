@@ -1,6 +1,6 @@
 <script lang="ts">
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
-  import ProjectCard from '../project-card/project-card.svelte';
+  import ProjectCard, { PROJECT_CARD_FRAGMENT } from '../project-card/project-card.svelte';
   import assert from '$lib/utils/assert';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
@@ -8,12 +8,13 @@
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
   import query from '$lib/graphql/dripsQL';
-  import type { ClaimedProject, ProjectWhereInput } from '$lib/graphql/generated/graphql';
   import { gql } from 'graphql-request';
+  import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   export let address: string | undefined;
 
-  let projects: ClaimedProject[] | undefined;
+  let projects: ProjectsQuery['projects'] | undefined;
   let error = false;
   let loaded = false;
 
@@ -25,121 +26,19 @@
       assert(address);
 
       const getProjectsQuery = gql`
+        ${PROJECT_CARD_FRAGMENT}
         query Projects($where: ProjectWhereInput) {
           projects(where: $where) {
-            ... on ClaimedProject {
-              account {
-                accountId
-                driver
-              }
-              color
-              description
-              emoji
-              owner {
-                accountId
-                address
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-              splits {
-                maintainers {
-                  accountId
-                  address
-                  driver
-                  type
-                  weight
-                }
-                dependencies {
-                  ... on AddressReceiver {
-                    accountId
-                    address
-                    driver
-                    type
-                    weight
-                  }
-                  ... on ProjectReceiver {
-                    driver
-                    type
-                    weight
-                    project {
-                      ... on ClaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        color
-                        description
-                        emoji
-                        owner {
-                          accountId
-                          address
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                      ... on UnclaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                    }
-                  }
-                  ... on DripListReceiver {
-                    weight
-                    type
-                    driver
-                    dripList {
-                      id
-                    }
-                  }
-                }
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-            }
+            ...ProjectCard
           }
         }
       `;
 
-      const response = await query<{ projects: ClaimedProject[] }, { where: ProjectWhereInput }>(
-        getProjectsQuery,
-        {
-          where: {
-            ownerAddress: address,
-          },
+      const response = await query<ProjectsQuery, ProjectsQueryVariables>(getProjectsQuery, {
+        where: {
+          ownerAddress: address,
         },
-      );
+      });
       projects = response.projects;
 
       loaded = true;
@@ -189,10 +88,13 @@
   {#if projects}
     <div class="projects">
       {#each projects as project}
-        <div>
-          <PrimaryColorThemer colorHex={project.color}><ProjectCard {project} /></PrimaryColorThemer
-          >
-        </div>
+        {#if isClaimed(project)}
+          <div>
+            <PrimaryColorThemer colorHex={project.color}>
+              <ProjectCard {project} />
+            </PrimaryColorThemer>
+          </div>
+        {/if}
       {/each}
     </div>
   {/if}

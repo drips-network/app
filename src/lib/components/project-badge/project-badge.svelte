@@ -1,19 +1,49 @@
+<script lang="ts" context="module">
+  import type { ProjectBadgeFragment, ProjectBadge_UnclaimedProject_Fragment } from './__generated__/gql.generated';
+  import { gql } from 'graphql-request';
+
+  export const PROJECT_BADGE_FRAGMENT = gql`
+    ${PROJECT_AVATAR_FRAGMENT}
+    ${PROJECT_TOOLTIP_FRAGMENT}
+    fragment ProjectBadge on Project {
+      ...ProjectAvatar
+      ...ProjectTooltip
+      ... on ClaimedProject {
+        owner {
+          address
+        }
+        source {
+          url
+          forge
+          ownerName
+          repoName
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          url
+          ownerName
+          repoName
+          forge
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
-  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
-  import ProjectTooltip from './components/project-tooltip.svelte';
+  import ProjectTooltip, { PROJECT_TOOLTIP_FRAGMENT } from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
-  import {
-    ProjectVerificationStatus,
-    type Project,
-    type UnclaimedProject,
-  } from '$lib/graphql/generated/graphql';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
 
-  export let project: Project;
+  export let project: ProjectBadgeFragment;
+
   export let tooltip = true;
   export let forceUnclaimed = false;
   export let hideAvatar = false;
@@ -21,10 +51,10 @@
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let maxWidth: number | false = 320;
 
-  let unclaimedProject: UnclaimedProject;
+  let unclaimedProject: ProjectBadge_UnclaimedProject_Fragment;
   $: unclaimedProject = {
+    __typename: 'UnclaimedProject',
     source: { ...project.source },
-    account: { ...project.account },
     verificationStatus: ProjectVerificationStatus.Unclaimed,
   };
 
@@ -38,13 +68,17 @@
       class="project-badge flex gap-2 items-center typo-text"
       style:max-width={maxWidth ? maxWidth + 'px' : 'none'}
       href={linkTo === 'project-page'
-        ? buildProjectUrl(project.source)
+        ? buildProjectUrl(
+            processedProject.source.forge,
+            processedProject.source.ownerName,
+            processedProject.source.repoName,
+          )
         : buildExternalUrl(processedProject.source.url)}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}
         <div class="avatar-and-forge">
-          {#if !forceUnclaimed && isClaimed(project)}
+          {#if !forceUnclaimed && isClaimed(processedProject)}
             <div>
               <ProjectAvatar project={unclaimedProject} />
             </div>

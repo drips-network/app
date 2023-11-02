@@ -34,7 +34,7 @@
     type Project,
     type Source,
     Driver,
-  } from '$lib/graphql/generated/graphql';
+  } from '$lib/graphql/__generated__/base-types';
 
   // Button
   let disabled = false;
@@ -84,7 +84,8 @@
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
     github: {
-      forge: Forge.GITHUB,
+      __typename: 'Source',
+      forge: Forge.GitHub,
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
@@ -94,73 +95,85 @@
   // Splits
 
   const MOCK_PROJECT_1: Project = {
+    __typename: 'ClaimedProject',
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
+      __typename: 'ProjectAccount',
       accountId: '0',
-      driver: Driver.REPO,
+      driver: Driver.Repo,
     },
     owner: {
-      driver: Driver.ADDRESS,
+      __typename: 'ProjectOwner',
+      driver: Driver.Address,
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      forge: Forge.GITHUB,
+      __typename: 'Source',
+      forge: Forge.GitHub,
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
     emoji: '🚶',
     color: '#fcc842',
-    splits: { maintainers: [], dependencies: [] },
+    splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
   };
 
   const MOCK_PROJECT_2: Project = {
+    __typename: 'ClaimedProject',
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
+      __typename: 'ProjectAccount',
       accountId: '0',
-      driver: Driver.REPO,
+      driver: Driver.Repo,
     },
     owner: {
-      driver: Driver.ADDRESS,
+      __typename: 'ProjectOwner',
+      driver: Driver.Address,
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      forge: Forge.GITHUB,
+      __typename: 'Source',
+      forge: Forge.GitHub,
       repoName: 'svelte-stored-writable',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
     emoji: '💾',
     color: '#FF0000',
-    splits: { maintainers: [], dependencies: [] },
+    splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
   };
 
   const mockSplits: Splits = [
     {
-      type: 'project-split',
+      __typename: 'ProjectReceiver',
       project: MOCK_PROJECT_1,
       weight: 62500,
     },
     {
-      type: 'drip-list-split',
-      listId: '1234',
-      listName: 'Some other Drip List',
-      listOwner: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+      __typename: 'DripListReceiver',
+      dripList: {
+        id: '1234',
+        name: 'Some other Drip List',
+        owner: {
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        },
+      },
       weight: 62500,
     },
     {
-      type: 'address-split',
+      __typename: 'AddressReceiver',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       weight: 62500,
     },
     {
-      type: 'split-group',
+      __typename: 'SplitGroup',
       name: 'Dependencies',
       list: [
         {
-          type: 'project-split',
+          __typename: 'ProjectReceiver',
           project: MOCK_PROJECT_2,
           weight: 62500,
         },
@@ -176,61 +189,57 @@
               weight: 62500,
             },
             {
-              type: 'project-split',
+              __typename: 'ProjectReceiver',
               project: MOCK_PROJECT_1,
               weight: 62500,
             },
             {
-              type: 'address-split',
+              __typename: 'AddressReceiver',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              type: 'address-split',
+              __typename: 'AddressReceiver',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              type: 'project-split',
+              __typename: 'ProjectReceiver',
               project: MOCK_PROJECT_2,
               weight: 62500,
             },
             {
-              type: 'project-split',
+              __typename: 'ProjectReceiver',
               project: MOCK_PROJECT_1,
               weight: 62500,
             },
             {
-              type: 'address-split',
+              __typename: 'AddressReceiver',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              type: 'address-split',
+              __typename: 'AddressReceiver',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
           ],
         },
         {
-          type: 'address-split',
+          __typename: 'AddressReceiver',
           address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
           weight: 62500,
         },
         {
-          type: 'project-split',
+          __typename: 'ProjectReceiver',
           project: MOCK_PROJECT_2,
           weight: 62500,
         },
       ],
     },
     {
-      type: 'address-split',
+      __typename: 'AddressReceiver',
       address: '0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19',
-      weight: 62500,
-    },
-    {
-      type: 'drips-donation-split',
       weight: 62500,
     },
   ];
@@ -340,23 +349,16 @@
   <h2>Project Card</h2>
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
-      project={{
-        verificationStatus: ProjectVerificationStatus.Claimed,
-        account: {
-          accountId: '0',
-          driver: Driver.REPO,
-        },
-        owner: {
-          driver: Driver.ADDRESS,
-          accountId: '0',
-          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-        },
-        source: SOURCE_CONFIGS.github,
-        emoji: '🚶',
-        color: '#fcc842',
-        description: 'A versatile component for building stepped flows with beautiful transitions.',
-        splits: { maintainers: [], dependencies: [] },
+      source={SOURCE_CONFIGS.github}
+      description="A versatile component for building stepped flows with beautiful transitions."
+      owner={{
+        __typename: 'ProjectOwner',
+        driver: Driver.Address,
+        accountId: '0',
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       }}
+      emoji="🚶"
+      color="#fcc842"
     />
   </PrimaryColorThemer>
 </div>
@@ -383,26 +385,28 @@
     <ProjectBadge
       project={projectVerified
         ? {
-            verificationStatus: ProjectVerificationStatus.Claimed,
+            __typename: 'ClaimedProject',
             account: {
+              __typename: 'ProjectAccount',
               accountId: '0',
-              driver: Driver.REPO,
+              driver: Driver.Repo,
             },
             owner: {
-              driver: Driver.ADDRESS,
+              __typename: 'ProjectOwner',
+              driver: Driver.Address,
               accountId: '0',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
             source: SOURCE_CONFIGS[sourceType],
             emoji: '🚶',
             color: '#fcc842',
-            splits: { maintainers: [], dependencies: [] },
           }
         : {
-            verificationStatus: ProjectVerificationStatus.Unclaimed,
+            __typename: 'UnclaimedProject',
             account: {
+              __typename: 'ProjectAccount',
               accountId: '0',
-              driver: Driver.REPO,
+              driver: Driver.Repo,
             },
             source: SOURCE_CONFIGS[sourceType],
           }}

@@ -1,30 +1,55 @@
 import query from '$lib/graphql/dripsQL';
-import type { Project } from '$lib/graphql/generated/graphql';
-import DripListService from '$lib/utils/driplist/DripListService';
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { DripList } from '$lib/utils/metadata/types';
 import { gql } from 'graphql-request';
 import { Utils, AddressDriverClient } from 'radicle-drips';
+import type { IncomingDripListSplitDripListQuery, IncomingDripListSplitDripListQueryVariables, IncomingProjectSplitProjectQuery, IncomingProjectSplitProjectQueryVariables } from './__generated__/gql.generated';
 
 export interface SplitsEntryWrapper<T> {
   value: T;
   weight: number;
 }
 
-export default async function getIncomingSplits(accountId: string): Promise<{
+const incomingProjectSplitQuery = gql`
+  query IncomingProjectSplitProject($projectId: ID!) {
+    project(id: $projectId) {
+      ... on ClaimedProject {
+        source {
+          ownerName
+          repoName
+          url
+        }
+      }
+    }
+  }
+`
+
+const incomingDripListSplitQuery = gql`
+  query IncomingDripListSplitDripList($dripListId: ID!) {
+    dripList(id: $dripListId) {
+      name
+      account {
+        accountId
+      }
+      owner {
+        address
+      }
+    }
+  }
+`
+
+export default async function getIncomingSplits(forAccountId: string): Promise<{
   users: SplitsEntryWrapper<{
     driver: 'address';
     address: string;
     accountId: string;
   }>[];
-  projects: SplitsEntryWrapper<Project>[];
-  dripLists: SplitsEntryWrapper<DripList>[];
+  projects: SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>[]
+  dripLists: SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>[];
 }> {
   const subgraph = getSubgraphClient();
-  const dripListService = await DripListService.new();
 
-  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(accountId);
+  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(forAccountId);
 
   const incomingAddressDriverSplits = incomingSplits.filter(
     (s) => Utils.AccountId.getDriver(s.senderId) === 'address',
@@ -34,7 +59,11 @@ export default async function getIncomingSplits(accountId: string): Promise<{
     (s) => Utils.AccountId.getDriver(s.senderId) === 'nft',
   );
   const dripListFetches = incomingNFTDriverSplits.map(async (s) => {
-    const dripList = await dripListService.getByTokenId(s.senderId);
+    const response = await query<IncomingDripListSplitDripListQuery, IncomingDripListSplitDripListQueryVariables>(incomingDripListSplitQuery, {
+      dripListId: s.senderId,
+    });
+
+    const { dripList } = response;
     if (!dripList) return undefined;
 
     return { value: dripList, weight: Number(s.weight) };
@@ -45,127 +74,11 @@ export default async function getIncomingSplits(accountId: string): Promise<{
   );
 
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
-    const getProjectByIdQuery = gql`
-      query Project($projectId: ID!) {
-        project(id: $projectId) {
-          ... on ClaimedProject {
-            account {
-              accountId
-              driver
-            }
-            color
-            description
-            emoji
-            owner {
-              accountId
-              address
-              driver
-            }
-            source {
-              forge
-              ownerName
-              repoName
-              url
-            }
-            verificationStatus
-            splits {
-              maintainers {
-                accountId
-                address
-                driver
-                type
-                weight
-              }
-              dependencies {
-                ... on AddressReceiver {
-                  accountId
-                  address
-                  driver
-                  type
-                  weight
-                }
-                ... on ProjectReceiver {
-                  driver
-                  type
-                  weight
-                  project {
-                    ... on ClaimedProject {
-                      account {
-                        accountId
-                        driver
-                      }
-                      color
-                      description
-                      emoji
-                      owner {
-                        accountId
-                        address
-                        driver
-                      }
-                      source {
-                        forge
-                        ownerName
-                        repoName
-                        url
-                      }
-                      verificationStatus
-                    }
-                    ... on UnclaimedProject {
-                      account {
-                        accountId
-                        driver
-                      }
-                      source {
-                        forge
-                        ownerName
-                        repoName
-                        url
-                      }
-                      verificationStatus
-                    }
-                  }
-                }
-                ... on DripListReceiver {
-                  driver
-                  type
-                  weight
-                  dripList {
-                    id
-                    isPublic
-                    owner {
-                      accountId
-                      address
-                      driver
-                    }
-                    previousOwnerAddress
-                    name
-                  }
-                }
-              }
-            }
-          }
-          ... on UnclaimedProject {
-            account {
-              accountId
-              driver
-            }
-            source {
-              forge
-              ownerName
-              repoName
-              url
-            }
-            verificationStatus
-          }
-        }
-      }
-    `;
-
-    const response = await query<{ project: Project | null }>(getProjectByIdQuery, {
+    const response = await query<IncomingProjectSplitProjectQuery, IncomingProjectSplitProjectQueryVariables>(incomingProjectSplitQuery, {
       projectId: s.senderId,
     });
 
-    const project = response.project;
+    const { project }= response;
     if (!project) return undefined;
 
     return { value: project, weight: Number(s.weight) };
@@ -185,7 +98,7 @@ export default async function getIncomingSplits(accountId: string): Promise<{
         accountId: s.senderId,
       },
     })),
-    projects: mapFilterUndefined(fetchResults[1], (v) => v as SplitsEntryWrapper<Project>),
-    dripLists: mapFilterUndefined(fetchResults[0], (v) => v as SplitsEntryWrapper<DripList>),
+    projects: mapFilterUndefined(fetchResults[1], (v) => v as SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>),
+    dripLists: mapFilterUndefined(fetchResults[0], (v) => v as SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>),
   };
 }

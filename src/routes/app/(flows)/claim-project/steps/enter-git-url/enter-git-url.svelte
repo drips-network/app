@@ -20,15 +20,11 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
-  import type {
-    Project,
-    ProjectWhereInput,
-    UnclaimedProject,
-  } from '$lib/graphql/generated/graphql';
   import assert from '$lib/utils/assert';
   import query from '$lib/graphql/dripsQL';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
+  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
+  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
 
   export let context: Writable<State>;
 
@@ -71,9 +67,9 @@
 
       const owner = await repoDriverClient.getOwner(accountId);
 
-      const getProjectByUrlQuery = gql`
-        query Projects($where: ProjectWhereInput!) {
-          projects(where: $where) {
+      const projectQuery = gql`
+        query Project($url: String!) {
+          projectByUrl(url: $url) {
             ... on ClaimedProject {
               account {
                 accountId
@@ -96,23 +92,24 @@
               verificationStatus
               splits {
                 maintainers {
-                  accountId
-                  address
+                  account {
+                      accountId
+                      address
+                    }
                   driver
-                  type
                   weight
                 }
                 dependencies {
                   ... on AddressReceiver {
-                    accountId
-                    address
+                    account {
+                      accountId
+                      address
+                    }
                     driver
-                    type
                     weight
                   }
                   ... on ProjectReceiver {
                     driver
-                    type
                     weight
                     project {
                       ... on ClaimedProject {
@@ -153,17 +150,16 @@
                   }
                   ... on DripListReceiver {
                     driver
-                    type
                     weight
                     dripList {
-                      id
-                      isPublic
+                      account {
+                        accountId
+                      }
                       owner {
                         accountId
                         address
                         driver
                       }
-                      previousOwnerAddress
                       name
                     }
                   }
@@ -187,36 +183,31 @@
         }
       `;
 
-      const response = await query<{ project: Project | null }, { where: ProjectWhereInput }>(
-        getProjectByUrlQuery,
+      const response = await query<ProjectQuery, ProjectQueryVariables>(
+        projectQuery,
         {
-          where: {
-            id: $context.gitUrl,
-          },
+          url: $context.gitUrl,
         },
       );
 
-      const project = response.project;
+      const project = response.projectByUrl;
       assert(project);
 
-      // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
-      const repoDriverMetadataManager = new RepoDriverMetadataManager();
-      const projectMetadata = await repoDriverMetadataManager.fetchAccountMetadata(
-        project?.account.accountId,
-      );
-      if (isClaimed(project) && projectMetadata) {
+      if (!project) {
+        throw new Error('Project not found');
+      }
+  
+      if (project.__typename === 'ClaimedProject') {
         throw new Error('Project already claimed');
       }
 
       if (
-        owner &&
-        owner.toLowerCase() === $walletStore.address?.toLowerCase() &&
-        !projectMetadata
+        project.__typename === 'UnclaimedProject' && project.verificationStatus === ProjectVerificationStatus.PendingMetadata
       ) {
         $context.isPartiallyClaimed = true;
       }
 
-      $context.project = project as UnclaimedProject;
+      $context.project = project;
 
       $context.projectEmoji = seededRandomElement(possibleRandomEmoji, project.account.accountId);
       $context.projectColor = seededRandomElement(

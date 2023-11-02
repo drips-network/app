@@ -15,10 +15,10 @@ import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-s
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '../shared/slots/wallet-slot.svelte';
-import type { Project, UnclaimedProject } from '$lib/graphql/generated/graphql';
+import type { UnclaimedProject } from '$lib/graphql/__generated__/base-types';
 
 interface SplitsConfig extends ListEditorConfig {
-  itemsPromise: Promise<Project>[] | undefined;
+  itemsPromise: Promise<UnclaimedProject>[] | undefined;
 }
 
 export interface State {

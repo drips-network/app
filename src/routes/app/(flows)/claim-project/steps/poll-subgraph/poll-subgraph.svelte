@@ -72,23 +72,24 @@
               verificationStatus
               splits {
                 maintainers {
-                  accountId
-                  address
+                  account {
+                      accountId
+                      address
+                    }
                   driver
-                  type
                   weight
                 }
                 dependencies {
                   ... on AddressReceiver {
-                    accountId
-                    address
+                    account {
+                      accountId
+                      address
+                    }
                     driver
-                    type
                     weight
                   }
                   ... on ProjectReceiver {
                     driver
-                    type
                     weight
                     project {
                       ... on ClaimedProject {
@@ -129,11 +130,11 @@
                   }
                   ... on DripListReceiver {
                     driver
-                    type
                     weight
                     dripList {
-                      id
-                      isPublic
+                      account {
+                        accountId
+                      }
                       owner {
                         accountId
                         address
@@ -146,19 +147,19 @@
                 }
               }
             }
-          }
-          ... on UnclaimedProject {
-            account {
-              accountId
-              driver
+            ... on UnclaimedProject {
+              account {
+                accountId
+                driver
+              }
+              source {
+                forge
+                ownerName
+                repoName
+                url
+              }
+              verificationStatus
             }
-            source {
-              forge
-              ownerName
-              repoName
-              url
-            }
-            verificationStatus
           }
         }
       `;

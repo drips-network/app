@@ -1,12 +1,14 @@
+import type { ClaimedProject } from '$lib/graphql/__generated__/base-types';
+import type { PickGQLF } from '$lib/graphql/utils/pick-gql-fields';
 import RepoDriverUtils from '../RepoDriverUtils';
 import { getRepoDriverClient } from '../get-drips-clients';
 import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverAccountMetadataParser } from './schemas';
-import type { ClaimedGitProject, RepoDriverAccount, AccountId } from './types';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
+type AccountId = string;
+
 export default class RepoDriverMetadataManager extends MetadataManagerBase<
-  RepoDriverAccount,
   typeof repoDriverAccountMetadataParser
 > {
   constructor() {
@@ -51,23 +53,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
     return metadata;
   }
 
-  public async fetchAccount(accountId: AccountId): Promise<RepoDriverAccount | null> {
-    const metadata = await super.fetchAccountMetadata(accountId);
-
-    if (!metadata) {
-      return null;
-    }
-
-    const { data } = metadata;
-
-    return {
-      accountId: data.describes.accountId,
-      driver: data.describes.driver,
-    } as RepoDriverAccount;
-  }
-
   public buildAccountMetadata(context: {
-    forProject: ClaimedGitProject;
+    forProject: PickGQLF<ClaimedProject, 'account' | 'source' | 'emoji' | 'color' | 'description'>;
     forSplits: LatestVersion<typeof repoDriverAccountMetadataParser>['splits'];
   }): LatestVersion<typeof repoDriverAccountMetadataParser> {
     const { forProject, forSplits } = context;
@@ -76,12 +63,17 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       driver: 'repo',
       describes: {
         driver: 'repo',
-        accountId: forProject.repoDriverAccount.accountId,
+        accountId: forProject.account.accountId,
       },
-      source: forProject.source,
+      source: {
+        forge: 'github',
+        repoName: forProject.source.repoName,
+        ownerName: forProject.source.ownerName,
+        url: forProject.source.url,
+      },
       emoji: forProject.emoji,
       color: forProject.color,
-      description: forProject.description,
+      description: forProject.description ?? undefined,
       splits: forSplits,
     };
   }

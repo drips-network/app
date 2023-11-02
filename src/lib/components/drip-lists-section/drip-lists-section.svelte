@@ -1,16 +1,17 @@
 <script lang="ts">
-  import type { DripList } from '$lib/utils/metadata/types';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import { goto } from '$app/navigation';
-  import DripListCard from '../drip-list-card/drip-list-card.svelte';
+  import DripListCard, { DRIP_LIST_CARD_FRAGMENT } from '../drip-list-card/drip-list-card.svelte';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '../section/section.svelte';
   import { AddressDriverClient } from 'radicle-drips';
   import Button from '../button/button.svelte';
   import Illustration from '../icons/✏️.svelte';
+  import { gql } from 'graphql-request';
+  import type { DripListsQuery, DripListsQueryVariables } from './__generated__/gql.generated';
+  import query from '$lib/graphql/dripsQL';
 
   export let accountId: string | undefined;
   export let collapsed = false;
@@ -19,14 +20,28 @@
 
   let error = false;
 
-  let dripLists: DripList[] | undefined;
+  let dripLists: DripListsQuery['dripLists'] | undefined;
   async function updateDripLists() {
     try {
-      const dripListService = await DripListService.new();
-
       assert(accountId);
       const address = AddressDriverClient.getUserAddress(accountId);
-      dripLists = await dripListService.getByOwnerAddress(address);
+
+      const dripListsQuery = gql`
+        ${DRIP_LIST_CARD_FRAGMENT}
+        query DripLists($where: DripListWhereInput) {  
+          dripLists(where: $where) {
+            ...DripListCard
+          }
+        }
+      `;
+      
+      const result = await query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {
+        where: {
+          ownerAddress: address,
+        },
+      });
+
+      dripLists = result.dripLists;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);

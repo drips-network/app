@@ -3,7 +3,6 @@ import * as fetchIpfs from '$lib/utils/ipfs';
 import { AddressDriverClient, DripsSubgraphClient, type AccountMetadata } from 'radicle-drips';
 import MetadataManagerBase, { type EmitMetadataFunc } from '../MetadataManagerBase';
 import type { ContractTransaction } from 'ethers';
-import type { NFTDriverAccount } from '../types';
 import type { ParseFn, Parser } from '@efstajas/versioned-parser/lib/types';
 import { createVersionedParser } from '@efstajas/versioned-parser';
 import { addressDriverAccountMetadataParser } from '../schemas';

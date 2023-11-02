@@ -1,9 +1,11 @@
-import type { Project } from '$lib/graphql/generated/graphql';
 import type { ListItem } from '../drip-list-members-editor.svelte';
+import type { DripListMembersEditorProjectFragment } from '../__generated__/gql.generated';
 
-const projectItem: (project: Project) => ListItem = (project: Project) => ({
-  type: 'project',
-  project,
-});
+function projectItem(project: DripListMembersEditorProjectFragment): ListItem {
+  return {
+    type: 'project',
+    project,
+  }
+};
 
 export default projectItem;

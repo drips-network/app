@@ -11,11 +11,12 @@
   import Button from '../button/button.svelte';
   import { createEventDispatcher } from 'svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
-  import type { UnclaimedProject } from '$lib/graphql/generated/graphql';
+  import type { UnclaimedProject } from '$lib/graphql/__generated__/base-types';
+  import type { PickGQLF } from '$lib/graphql/utils/pick-gql-fields';
 
   const dispatch = createEventDispatcher();
 
-  export let project: UnclaimedProject | undefined = undefined;
+  export let project: PickGQLF<UnclaimedProject, 'source' | 'account'> | undefined = undefined;
   export let projectMetadata:
     | {
         description?: string | undefined;

@@ -6,19 +6,18 @@
   import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import { fade } from 'svelte/transition';
   import SplitsListComponent, { type Splits } from '../../splits.svelte';
-  import type { Split, SplitGroup } from '../../splits.svelte';
+  import type { SplitsComponentSplitsReceiver, SplitGroup } from '../../splits.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import { tick, type SvelteComponent, onMount } from 'svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import { tweened } from 'svelte/motion';
   import { sineInOut } from 'svelte/easing';
-  import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
 
-  export let split: Split | SplitGroup;
+  export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let linkToNewTab = false;
   export let isNested = false;
 
@@ -43,14 +42,14 @@
   function calcGroupWeight(group: SplitGroup): number {
     return group.list.reduce(
       (acc, split) =>
-        split.type === 'split-group' ? acc + calcGroupWeight(split) : acc + split.weight,
+        split.__typename === 'SplitGroup' ? acc + calcGroupWeight(split) : acc + split.weight,
       0,
     );
   }
 
-  function flattenList(list: Splits): Split[] {
-    return list.reduce<Split[]>((acc, i) => {
-      if (i.type === 'split-group') {
+  function flattenList(list: Splits): SplitsComponentSplitsReceiver[] {
+    return list.reduce<SplitsComponentSplitsReceiver[]>((acc, i) => {
+      if (i.__typename === 'SplitGroup') {
         return [...acc, ...flattenList(i.list)];
       }
       return [...acc, i];
@@ -66,28 +65,26 @@
     const containedSplits = flattenList(list);
 
     return mapFilterUndefined(containedSplits, (s) => {
-      if (s.type === 'drips-donation-split') return;
-
-      switch (s.type) {
-        case 'address-split':
+      switch (s.__typename) {
+        case 'AddressReceiver':
           return {
             component: IdentityBadge,
             props: {
               showIdentity: false,
-              address: s.address,
+              address: s.account.address,
               size: 'medium',
               outline: true,
               disableLink: true,
             },
           } as ComponentAndProps;
-        case 'drip-list-split':
+        case 'DripListReceiver':
           return {
             component: DripListBadge,
             props: {
-              listId: s.listId,
+              dripList: s.dripList,
             },
           } as ComponentAndProps;
-        case 'project-split':
+        case 'ProjectReceiver':
           return {
             component: ProjectAvatar,
             props: {
@@ -113,7 +110,7 @@
 
   async function toggleGroup() {
     if (!groupElem) return;
-    if (split.type !== 'split-group' || split.list.length === 0) return;
+    if (split.__typename !== 'SplitGroup' || split.list.length === 0) return;
 
     groupExpanded = !groupExpanded;
 
@@ -155,7 +152,7 @@
         style:color={isNested ? 'var(--color-foreground)' : percentageTextColor}
       >
         {getSplitPercent(
-          split.type === 'split-group' ? calcGroupWeight(split) : split.weight,
+          split.__typename === 'SplitGroup' ? calcGroupWeight(split) : split.weight,
           'pretty',
         )}
       </div>
@@ -167,24 +164,17 @@
       {/if}
     </div>
     <div class="receiver">
-      {#if split.type === 'address-split'}
-        <IdentityBadge {linkToNewTab} address={split.address} size="medium" />
-      {:else if split.type === 'drip-list-split'}
-        <DripListBadge owner={split.listOwner} listId={split.listId} listName={split.listName} />
-      {:else if split.type === 'drips-donation-split'}
-        <div class="drips-logo">
-          <DripsLogo />
-        </div>
-      {:else if split.type === 'project-split'}
-        {#if split.project}
-          <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
-            <ProjectBadge {linkToNewTab} project={split.project} />
-          </PrimaryColorThemer>
-        {:else}
-          <!-- This happens when the subgraph doesnʼt immediately update after adding an unclaimed project to a list. -->
-          <span class="muted">Error loading this project</span>
-        {/if}
-      {:else if split.type === 'split-group'}
+      {#if split.__typename === 'AddressReceiver'}
+        <IdentityBadge {linkToNewTab} address={split.account.address} size="medium" />
+      {:else if split.__typename === 'DripListReceiver'}
+        <DripListBadge
+          dripList={split.dripList}
+        />
+      {:else if split.__typename === 'ProjectReceiver'}
+        <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
+          <ProjectBadge {linkToNewTab} project={split.project} />
+        </PrimaryColorThemer>
+      {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"
           bind:this={groupElem}
@@ -314,14 +304,6 @@
 
   .name .chevron {
     transition: transform 0.4s;
-  }
-
-  .drips-logo {
-    height: 1.25rem;
-  }
-
-  .muted {
-    color: var(--color-foreground-level-5);
   }
 
   .name .label.placeholder {
