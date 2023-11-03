@@ -4,14 +4,14 @@
     fragment DripListMembersEditorProject on Project {
       ...ProjectBadge
     }
-  `
+  `;
 
   export const DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT = gql`
     ${DRIP_LIST_BADGE_FRAGMENT}
     fragment DripListMembersEditorDripList on DripList {
       ...DripListBadge
     }
-  `
+  `;
 
   interface ProjectItem {
     type: 'project';
@@ -54,15 +54,26 @@
   import Trash from 'radicle-design-system/icons/Trash.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge, {
+    PROJECT_BADGE_FRAGMENT,
+  } from '$lib/components/project-badge/project-badge.svelte';
   import ethAddressItem from './item-templates/eth-address';
   import projectItem from './item-templates/project';
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
-  import DripListBadge, { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge, {
+    DRIP_LIST_BADGE_FRAGMENT,
+  } from '../drip-list-badge/drip-list-badge.svelte';
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
-  import type { DripListMembersEditorDripListFragment, DripListMembersEditorProjectFragment, DripListToAddQuery, DripListToAddQueryVariables, ProjectToAddQuery, ProjectToAddQueryVariables } from './__generated__/gql.generated';
+  import type {
+    DripListMembersEditorDripListFragment,
+    DripListMembersEditorProjectFragment,
+    DripListToAddQuery,
+    DripListToAddQueryVariables,
+    ProjectToAddQuery,
+    ProjectToAddQueryVariables,
+  } from './__generated__/gql.generated';
 
   export let maxItems = 200;
 
@@ -97,6 +108,17 @@
     try {
       isAddingItem = true;
 
+      let url = inputValue;
+
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      // If URL ends with /, remove it
+      if (url.endsWith('/')) {
+        url = url.slice(0, -1);
+      }
+
       const projectToAddQuery = gql`
         ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
         query ProjectToAdd($url: String!) {
@@ -109,7 +131,7 @@
       const { projectByUrl: project } = await query<ProjectToAddQuery, ProjectToAddQueryVariables>(
         projectToAddQuery,
         {
-          url: inputValue,
+          url,
         },
       );
 
@@ -153,35 +175,34 @@
       if (!dripListId) throw new Error('Invalid drip list ID');
 
       const dripListToAddQuery = gql`
-      query DripListToAdd($id: ID!) {
-        dripList(id: $id) {
-          name
-          owner {
-            address
-          }
-          account {
-            accountId
+        query DripListToAdd($id: ID!) {
+          dripList(id: $id) {
+            name
+            owner {
+              address
+            }
+            account {
+              accountId
+            }
           }
         }
-      }
       `;
 
-      const { dripList: dripListToAdd } = await query<DripListToAddQuery, DripListToAddQueryVariables>(
-        dripListToAddQuery,
-        {
-          id: dripListId,
-        },
-      );
-      
+      const { dripList: dripListToAdd } = await query<
+        DripListToAddQuery,
+        DripListToAddQueryVariables
+      >(dripListToAddQuery, {
+        id: dripListId,
+      });
+
       if (!dripListToAdd) throw new Error('Drip list not found');
 
-      if (blockedKeys.includes(dripListToAdd.account.accountId)) throw new Error('Drip List ID is already used');
+      if (blockedKeys.includes(dripListToAdd.account.accountId))
+        throw new Error('Drip List ID is already used');
 
       // Prevent duplicates.
       if (!items[dripListId]) {
-        items[dripListId] = dripListItem(
-          dripListToAdd
-        );
+        items[dripListId] = dripListItem(dripListToAdd);
 
         percentages = { ...percentages, [dripListId]: 0 };
       }
@@ -375,10 +396,7 @@
                 {:else if item.type === 'project'}
                   <ProjectBadge project={item.project} linkTo="nothing" />
                 {:else if item.type === 'drip-list'}
-                  <DripListBadge
-                    dripList={item.list}
-                    isLinked={false}
-                  />
+                  <DripListBadge dripList={item.list} isLinked={false} />
                 {/if}
               </div>
             </div>

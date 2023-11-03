@@ -10,16 +10,13 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import type GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
-  import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
-  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import assert from '$lib/utils/assert';
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
@@ -45,8 +42,6 @@
   async function fetchProject() {
     $context.linkedToRepo = false;
 
-    gitProjectService = await GitProjectService.new();
-
     try {
       validationState = { type: 'pending' };
 
@@ -58,14 +53,6 @@
       if ($context.gitUrl.endsWith('/')) {
         $context.gitUrl = $context.gitUrl.slice(0, -1);
       }
-
-      const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
-      const projectName = `${username}/${repoName}`;
-
-      const repoDriverClient = await getRepoDriverClient();
-      const accountId = await repoDriverClient.getAccountId(forge, projectName);
-
-      const owner = await repoDriverClient.getOwner(accountId);
 
       const projectQuery = gql`
         query Project($url: String!) {
@@ -93,9 +80,9 @@
               splits {
                 maintainers {
                   account {
-                      accountId
-                      address
-                    }
+                    accountId
+                    address
+                  }
                   driver
                   weight
                 }
@@ -183,12 +170,9 @@
         }
       `;
 
-      const response = await query<ProjectQuery, ProjectQueryVariables>(
-        projectQuery,
-        {
-          url: $context.gitUrl,
-        },
-      );
+      const response = await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
+        url: $context.gitUrl,
+      });
 
       const project = response.projectByUrl;
       assert(project);
@@ -196,13 +180,14 @@
       if (!project) {
         throw new Error('Project not found');
       }
-  
+
       if (project.__typename === 'ClaimedProject') {
         throw new Error('Project already claimed');
       }
 
       if (
-        project.__typename === 'UnclaimedProject' && project.verificationStatus === ProjectVerificationStatus.PendingMetadata
+        project.__typename === 'UnclaimedProject' &&
+        project.verificationStatus === ProjectVerificationStatus.PendingMetadata
       ) {
         $context.isPartiallyClaimed = true;
       }
