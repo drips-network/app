@@ -9,9 +9,9 @@
   import assert from '$lib/utils/assert';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import query from '$lib/graphql/dripsQL';
-  import type { Project } from '$lib/graphql/generated/graphql';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
+  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -53,118 +53,13 @@
             ... on ClaimedProject {
               account {
                 accountId
-                driver
               }
-              color
-              description
-              emoji
-              owner {
-                accountId
-                address
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-              splits {
-                maintainers {
-                  account {
-                      accountId
-                      address
-                    }
-                  driver
-                  weight
-                }
-                dependencies {
-                  ... on AddressReceiver {
-                    account {
-                      accountId
-                      address
-                    }
-                    driver
-                    weight
-                  }
-                  ... on ProjectReceiver {
-                    driver
-                    weight
-                    project {
-                      ... on ClaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        color
-                        description
-                        emoji
-                        owner {
-                          accountId
-                          address
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                      ... on UnclaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                    }
-                  }
-                  ... on DripListReceiver {
-                    driver
-                    weight
-                    dripList {
-                      account {
-                        accountId
-                      }
-                      owner {
-                        accountId
-                        address
-                        driver
-                      }
-                      previousOwnerAddress
-                      name
-                    }
-                  }
-                }
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
             }
           }
         }
       `;
 
-      const response = await query<{ project: Project | null }>(getProjectByIdQuery, {
+      const response = await query<ProjectQuery, ProjectQueryVariables>(getProjectByIdQuery, {
         projectId: accountId,
       });
 

@@ -12,7 +12,6 @@
   } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import type { Project } from '$lib/graphql/generated/graphql';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -30,7 +29,7 @@
   async function fetchProjectDeps() {
     try {
       if ($context.dependencySplits.itemsPromise) {
-        const promises = ($context.dependencySplits.itemsPromise as Promise<Project>[]).map((p) =>
+        const promises = $context.dependencySplits.itemsPromise.map((p) =>
           p.catch((error) => {
             // eslint-disable-next-line no-console
             console.log('💧 ~ Could not fetch project:', error);

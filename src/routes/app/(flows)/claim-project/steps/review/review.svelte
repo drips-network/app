@@ -22,11 +22,7 @@
   import Drip from '$lib/components/illustrations/drip.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
-  import {
-    ProjectVerificationStatus,
-    type ClaimedProject,
-    Driver,
-  } from '$lib/graphql/generated/graphql';
+  import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,19 +31,17 @@
   $: project = $context.project ?? unreachable();
 
   // For previewing what the project will look like after claiming
+  let fakeClaimedProject: ProjectProfileHeader_ClaimedProject_Fragment;
   $: fakeClaimedProject = {
-    verificationStatus: ProjectVerificationStatus.Claimed,
-    account: { ...project.account },
+    __typename: 'ClaimedProject',
     source: { ...project.source },
     owner: {
-      driver: Driver.ADDRESS,
+      __typename: 'AddressDriverAccount',
       address: $walletStore.address ?? unreachable(),
-      accountId: $walletStore.dripsAccountId ?? unreachable(),
     },
     color: $context.projectColor,
     emoji: $context.projectEmoji,
-    splits: { maintainers: [], dependencies: [] },
-  } as ClaimedProject;
+  };
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
     $context.dependencySplits.items,
@@ -127,12 +121,12 @@
           linkToNewTab={true}
           list={[
             {
-              type: 'split-group',
+              __typename: 'SplitGroup',
               name: 'Dependencies',
               list: dependencyRepresentationalSplits,
             },
             {
-              type: 'split-group',
+              __typename: 'SplitGroup',
               name: 'Maintainers',
               list: maintainerRepresentationalSplits,
             },
