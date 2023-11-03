@@ -188,6 +188,9 @@ describe('RepoDriverMetadataManager', () => {
       const metadataMgr = new RepoDriverMetadataManager();
       const context = {
         forProject: {
+          account: {
+            accountId: '5',
+          },
           owner: {
             driver: 'address',
             accountId: '2',
@@ -200,6 +203,7 @@ describe('RepoDriverMetadataManager', () => {
           source: {
             url: 'repo',
             repoName: 'repo',
+            ownerName: 'owner',
           },
           emoji: '👍',
           color: 'red',
@@ -232,12 +236,14 @@ describe('RepoDriverMetadataManager', () => {
       expect(metadata).toEqual({
         driver: 'repo',
         describes: {
-          accountId: '1',
+          accountId: '5',
           driver: 'repo',
         },
         source: {
+          forge: 'github',
           url: 'repo',
           repoName: 'repo',
+          ownerName: 'owner',
         },
         emoji: '👍',
         color: 'red',
