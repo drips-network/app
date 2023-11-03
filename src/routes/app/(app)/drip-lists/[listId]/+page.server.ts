@@ -26,7 +26,7 @@ export const load = (async ({ params, fetch }) => {
 
   const fetches = await Promise.all([
     query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch),
-    getIncomingSplits(listId),
+    getIncomingSplits(listId, fetch),
     getIncomingSplitTotal(listId),
   ] as const);
 

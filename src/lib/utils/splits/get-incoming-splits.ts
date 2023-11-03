@@ -3,7 +3,13 @@ import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { gql } from 'graphql-request';
 import { Utils, AddressDriverClient } from 'radicle-drips';
-import type { IncomingDripListSplitDripListQuery, IncomingDripListSplitDripListQueryVariables, IncomingProjectSplitProjectQuery, IncomingProjectSplitProjectQueryVariables } from './__generated__/gql.generated';
+import type {
+  IncomingDripListSplitDripListQuery,
+  IncomingDripListSplitDripListQueryVariables,
+  IncomingProjectSplitProjectQuery,
+  IncomingProjectSplitProjectQueryVariables,
+} from './__generated__/gql.generated';
+import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
 
 export interface SplitsEntryWrapper<T> {
   value: T;
@@ -11,8 +17,10 @@ export interface SplitsEntryWrapper<T> {
 }
 
 const incomingProjectSplitQuery = gql`
+  ${PROJECT_BADGE_FRAGMENT}
   query IncomingProjectSplitProject($projectId: ID!) {
     project(id: $projectId) {
+      ...ProjectBadge
       ... on ClaimedProject {
         source {
           ownerName
@@ -22,7 +30,7 @@ const incomingProjectSplitQuery = gql`
       }
     }
   }
-`
+`;
 
 const incomingDripListSplitQuery = gql`
   query IncomingDripListSplitDripList($dripListId: ID!) {
@@ -36,15 +44,18 @@ const incomingDripListSplitQuery = gql`
       }
     }
   }
-`
+`;
 
-export default async function getIncomingSplits(forAccountId: string, fetchFunction: typeof fetch = fetch): Promise<{
+export default async function getIncomingSplits(
+  forAccountId: string,
+  fetchFunction: typeof fetch = fetch,
+): Promise<{
   users: SplitsEntryWrapper<{
     driver: 'address';
     address: string;
     accountId: string;
   }>[];
-  projects: SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>[]
+  projects: SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>[];
   dripLists: SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>[];
 }> {
   const subgraph = getSubgraphClient();
@@ -59,9 +70,16 @@ export default async function getIncomingSplits(forAccountId: string, fetchFunct
     (s) => Utils.AccountId.getDriver(s.senderId) === 'nft',
   );
   const dripListFetches = incomingNFTDriverSplits.map(async (s) => {
-    const response = await query<IncomingDripListSplitDripListQuery, IncomingDripListSplitDripListQueryVariables>(incomingDripListSplitQuery, {
-      dripListId: s.senderId,
-    }, fetchFunction);
+    const response = await query<
+      IncomingDripListSplitDripListQuery,
+      IncomingDripListSplitDripListQueryVariables
+    >(
+      incomingDripListSplitQuery,
+      {
+        dripListId: s.senderId,
+      },
+      fetchFunction,
+    );
 
     const { dripList } = response;
     if (!dripList) return undefined;
@@ -74,11 +92,18 @@ export default async function getIncomingSplits(forAccountId: string, fetchFunct
   );
 
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
-    const response = await query<IncomingProjectSplitProjectQuery, IncomingProjectSplitProjectQueryVariables>(incomingProjectSplitQuery, {
-      projectId: s.senderId,
-    }, fetchFunction);
+    const response = await query<
+      IncomingProjectSplitProjectQuery,
+      IncomingProjectSplitProjectQueryVariables
+    >(
+      incomingProjectSplitQuery,
+      {
+        projectId: s.senderId,
+      },
+      fetchFunction,
+    );
 
-    const { project }= response;
+    const { project } = response;
     if (!project) return undefined;
 
     return { value: project, weight: Number(s.weight) };
@@ -98,7 +123,13 @@ export default async function getIncomingSplits(forAccountId: string, fetchFunct
         accountId: s.senderId,
       },
     })),
-    projects: mapFilterUndefined(fetchResults[1], (v) => v as SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>),
-    dripLists: mapFilterUndefined(fetchResults[0], (v) => v as SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>),
+    projects: mapFilterUndefined(
+      fetchResults[1],
+      (v) => v as SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>,
+    ),
+    dripLists: mapFilterUndefined(
+      fetchResults[0],
+      (v) => v as SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>,
+    ),
   };
 }
