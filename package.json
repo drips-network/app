@@ -7,7 +7,7 @@
     "dev:local-env:start-app": "PUBLIC_TEST_MODE=true VITE_TEST_MODE=true vite dev",
     "dev:local-env:start-env": "docker compose up",
     "dev:local-env:stop-env": "docker compose down",
-    "build": "vite build",
+    "build": "npm run build:graphql && vite build",
     "preview": "vite preview",
     "test:e2e": "PUBLIC_TEST_MODE=true vitest run e2e",
     "test:unit": "vitest run unit",
