@@ -392,8 +392,8 @@
         <div
           class="sticky top-0 left-0 w-full z-10 border-t border-foreground flex flex-wrap py-4 gap-1 items-start justify-between {inputMessage.type ===
           'success'
-            ? 'bg-primary-level-1 text-primary'
-            : 'bg-caution-level-1 text-caution'}"
+            ? 'bg-primary-level-1 text-primary-level-6'
+            : 'bg-caution-level-1 text-caution-level-6'}"
         >
           <div class="pl-4 pr-2">
             {#if inputMessage.type === 'success'}
