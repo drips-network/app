@@ -1,15 +1,32 @@
+<script lang="ts" context="module">
+  export const ENTER_GIT_URL_STEP_PROJECT_FRAGMENT = gql`
+    ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
+    fragment EnterGitUrlStepProject on Project {
+      ...UnclaimedProjectCard
+      ... on UnclaimedProject {
+        verificationStatus
+        account {
+          accountId
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { Writable } from 'svelte/store';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import type { State } from '../../claim-project-flow';
+  import { CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT, type State } from '../../claim-project-flow';
   import LinkIcon from 'radicle-design-system/icons/Link.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import UnclaimedProjectCard, {
+    UNCLAIMED_PROJECT_CARD_FRAGMENT,
+  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import type GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
@@ -55,117 +72,10 @@
       }
 
       const projectQuery = gql`
+        ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
         query Project($url: String!) {
           projectByUrl(url: $url) {
-            ... on ClaimedProject {
-              account {
-                accountId
-                driver
-              }
-              color
-              description
-              emoji
-              owner {
-                accountId
-                address
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-              splits {
-                maintainers {
-                  account {
-                    accountId
-                    address
-                  }
-                  driver
-                  weight
-                }
-                dependencies {
-                  ... on AddressReceiver {
-                    account {
-                      accountId
-                      address
-                    }
-                    driver
-                    weight
-                  }
-                  ... on ProjectReceiver {
-                    driver
-                    weight
-                    project {
-                      ... on ClaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        color
-                        description
-                        emoji
-                        owner {
-                          accountId
-                          address
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                      ... on UnclaimedProject {
-                        account {
-                          accountId
-                          driver
-                        }
-                        source {
-                          forge
-                          ownerName
-                          repoName
-                          url
-                        }
-                        verificationStatus
-                      }
-                    }
-                  }
-                  ... on DripListReceiver {
-                    driver
-                    weight
-                    dripList {
-                      account {
-                        accountId
-                      }
-                      owner {
-                        accountId
-                        address
-                        driver
-                      }
-                      name
-                    }
-                  }
-                }
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-                driver
-              }
-              source {
-                forge
-                ownerName
-                repoName
-                url
-              }
-              verificationStatus
-            }
+            ...ClaimProjectFlowProject
           }
         }
       `;

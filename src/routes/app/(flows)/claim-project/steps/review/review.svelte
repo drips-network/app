@@ -1,3 +1,14 @@
+<script lang="ts" context="module">
+  export const REVIEW_STEP_PROJECT_FRAGMENT = gql`
+    ${PROJECT_PROFILE_HEADER_FRAGMENT}
+    fragment ReviewStepProject on Project {
+      ... on ClaimedProject {
+        ...ProjectProfileHeader
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
@@ -11,7 +22,9 @@
   import EyeOpenIcon from 'radicle-design-system/icons/EyeOpen.svelte';
   import TokenStreamsIcon from 'radicle-design-system/icons/TokenStreams.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
+  import ProjectProfileHeader, {
+    PROJECT_PROFILE_HEADER_FRAGMENT,
+  } from '$lib/components/project-profile-header/project-profile-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
   import { get, writable, type Writable } from 'svelte/store';
@@ -23,6 +36,7 @@
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
   import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
+  import { gql } from 'graphql-request';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

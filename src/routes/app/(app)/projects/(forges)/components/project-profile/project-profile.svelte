@@ -7,7 +7,9 @@
     ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
+    ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     fragment ProjectProfile on Project {
+      ...UnclaimedProjectCard
       ...ProjectProfileHeader
       ...SupportCardProject
       ... on UnclaimedProject {
@@ -62,11 +64,15 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
-  import SupportCard, { SUPPORT_CARD_PROJECT_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
+  import SupportCard, {
+    SUPPORT_CARD_PROJECT_FRAGMENT,
+  } from '$lib/components/support-card/support-card.svelte';
   import ProjectProfileHeader, {
     PROJECT_PROFILE_HEADER_FRAGMENT,
   } from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import UnclaimedProjectCard, {
+    UNCLAIMED_PROJECT_CARD_FRAGMENT,
+  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -91,7 +97,11 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Registered from 'radicle-design-system/icons/Registered.svelte';
   import buildUrl from '$lib/utils/build-url';
-  import editProjectSplitsSteps, { EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT, EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT, EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import editProjectSplitsSteps, {
+    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
@@ -269,7 +279,9 @@
                       modal.show(
                         Stepper,
                         undefined,
-                        isClaimed(project) ? editProjectSplitsSteps(project.account.accountId, project.splits) : unreachable(),
+                        isClaimed(project)
+                          ? editProjectSplitsSteps(project.account.accountId, project.splits)
+                          : unreachable(),
                       ),
                     label: 'Edit',
                     icon: Pen,
@@ -279,30 +291,31 @@
           />
           <SectionSkeleton
             loaded={true}
-            empty={project.splits.maintainers.length === 0 && project.splits.dependencies.length === 0}
+            empty={project.splits.maintainers.length === 0 &&
+              project.splits.dependencies.length === 0}
             emptyStateHeadline="No splits"
             emptyStateEmoji="🫧"
             emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
           >
-              <div class="card">
-                <div class="outgoing-splits">
-                  <ProjectBadge {project} />
-                  <SplitsComponent
-                    list={[
-                      {
-                        __typename: 'SplitGroup',
-                        name: 'Maintainers',
-                        list: project.splits.maintainers,
-                      },
-                      {
-                        __typename: 'SplitGroup',
-                        name: 'Dependencies',
-                        list: project.splits.dependencies,
-                      },
-                    ]}
-                  />
-                </div>
+            <div class="card">
+              <div class="outgoing-splits">
+                <ProjectBadge {project} />
+                <SplitsComponent
+                  list={[
+                    {
+                      __typename: 'SplitGroup',
+                      name: 'Maintainers',
+                      list: project.splits.maintainers,
+                    },
+                    {
+                      __typename: 'SplitGroup',
+                      name: 'Dependencies',
+                      list: project.splits.dependencies,
+                    },
+                  ]}
+                />
               </div>
+            </div>
           </SectionSkeleton>
         </section>
       {:else if unclaimedFunds}

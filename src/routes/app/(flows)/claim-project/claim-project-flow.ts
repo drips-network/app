@@ -2,30 +2,46 @@ import { writable } from 'svelte/store';
 import type { Slots } from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
-import EnterGitUrl from './steps/enter-git-url/enter-git-url.svelte';
-import AddEthereumAddress from './steps/add-ethereum-address/add-ethereum-address.svelte';
+import EnterGitUrl, {
+  ENTER_GIT_URL_STEP_PROJECT_FRAGMENT,
+} from './steps/enter-git-url/enter-git-url.svelte';
+import AddEthereumAddress, {
+  ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT,
+} from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
-import Review from './steps/review/review.svelte';
+import Review, { REVIEW_STEP_PROJECT_FRAGMENT } from './steps/review/review.svelte';
 import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '../shared/slots/wallet-slot.svelte';
-import type { UnclaimedProject } from '$lib/graphql/__generated__/base-types';
+import { gql } from 'graphql-request';
+import type { ClaimProjectFlowProject_UnclaimedProject_Fragment } from './__generated__/gql.generated';
+
+export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
+  ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
+  ${ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT}
+  ${REVIEW_STEP_PROJECT_FRAGMENT}
+  fragment ClaimProjectFlowProject on Project {
+    ...EnterGitUrlStepProject
+    ...AddEthereumAddressStepProject
+    ...ReviewStepProject
+  }
+`;
 
 interface SplitsConfig extends ListEditorConfig {
-  itemsPromise: Promise<UnclaimedProject>[] | undefined;
+  itemsPromise: Promise<ClaimProjectFlowProject_UnclaimedProject_Fragment>[] | undefined;
 }
 
 export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
   isPartiallyClaimed: boolean;
-  project: UnclaimedProject | undefined;
+  project: ClaimProjectFlowProject_UnclaimedProject_Fragment | undefined;
   projectMetadata:
     | {
         starCount: number;

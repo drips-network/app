@@ -19,7 +19,7 @@ export interface SplitsEntryWrapper<T> {
 const incomingProjectSplitQuery = gql`
   ${PROJECT_BADGE_FRAGMENT}
   query IncomingProjectSplitProject($projectId: ID!) {
-    project(id: $projectId) {
+    projectById(id: $projectId) {
       ...ProjectBadge
       ... on ClaimedProject {
         source {
@@ -55,7 +55,7 @@ export default async function getIncomingSplits(
     address: string;
     accountId: string;
   }>[];
-  projects: SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>[];
+  projects: SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['projectById']>>[];
   dripLists: SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>[];
 }> {
   const subgraph = getSubgraphClient();
@@ -103,7 +103,7 @@ export default async function getIncomingSplits(
       fetchFunction,
     );
 
-    const { project } = response;
+    const { projectById: project } = response;
     if (!project) return undefined;
 
     return { value: project, weight: Number(s.weight) };
@@ -125,7 +125,7 @@ export default async function getIncomingSplits(
     })),
     projects: mapFilterUndefined(
       fetchResults[1],
-      (v) => v as SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['project']>>,
+      (v) => v as SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['projectById']>>,
     ),
     dripLists: mapFilterUndefined(
       fetchResults[0],

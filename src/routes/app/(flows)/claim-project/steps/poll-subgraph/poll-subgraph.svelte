@@ -49,7 +49,7 @@
 
       const getProjectByIdQuery = gql`
         query Project($projectId: ID!) {
-          project(id: $projectId) {
+          projectById(id: $projectId) {
             ... on ClaimedProject {
               account {
                 accountId
@@ -63,7 +63,7 @@
         projectId: accountId,
       });
 
-      const project = response.project;
+      const project = response.projectById;
       if (project && !isClaimed(project)) {
         if (Date.now() - start >= timeout) {
           throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
