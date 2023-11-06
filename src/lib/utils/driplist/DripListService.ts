@@ -34,6 +34,7 @@ import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import { Forge } from '$lib/graphql/__generated__/base-types';
 
 type AccountId = string;
 
@@ -220,10 +221,15 @@ export default class DripListService {
         // RepoDriver recipient
         const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
 
+        const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
+
         const receiver = {
           type: 'repoDriver' as const,
           weight,
-          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
+          accountId: await this._repoDriverClient.getAccountId(
+            numericForgeValue,
+            `${username}/${repoName}`,
+          ),
         };
 
         projectsSplitMetadata.push({
