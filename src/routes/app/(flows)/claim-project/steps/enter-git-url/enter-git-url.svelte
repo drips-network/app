@@ -163,7 +163,7 @@
       <Button
         disabled={!inputSubmittable}
         variant={inputSubmittable ? 'primary' : undefined}
-        on:click={submitInput}>Submit</Button
+        on:click={submitInput}>Search</Button
       >
     </div>
   </div>
