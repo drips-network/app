@@ -60,7 +60,7 @@ export const load = (async ({ params, fetch }) => {
 
     return {
       project,
-      splits: isClaimed(project) ? (project.splits ?? unreachable()) : undefined,
+      splits: isClaimed(project) ? project.splits ?? unreachable() : undefined,
       streamed: {
         unclaimedFunds,
         earnedFunds,
@@ -71,6 +71,6 @@ export const load = (async ({ params, fetch }) => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    throw error(500);
+    throw e;
   }
 }) satisfies PageServerLoad;
