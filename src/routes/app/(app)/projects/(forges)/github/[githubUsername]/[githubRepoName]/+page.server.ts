@@ -10,7 +10,6 @@ import { gql } from 'graphql-request';
 import type { ProjectByUrlQuery } from './__generated__/gql.generated';
 import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-types';
 import isClaimed from '$lib/utils/project/is-claimed';
-import unreachable from '$lib/utils/unreachable';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
@@ -60,7 +59,6 @@ export const load = (async ({ params, fetch }) => {
 
     return {
       project,
-      splits: isClaimed(project) ? project.splits ?? unreachable() : undefined,
       streamed: {
         unclaimedFunds,
         earnedFunds,

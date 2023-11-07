@@ -6,6 +6,43 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { gql } from 'graphql-request';
 
+  export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
+    fragment SplitsComponentProjectSplits on Project {
+      ... on ClaimedProject {
+        splits {
+          dependencies {
+            ... on AddressReceiver {
+              ...EditProjectSplitsFlowAddressReceiver
+              account {
+                address
+              }
+            }
+            ... on ProjectReceiver {
+              ...EditProjectSplitsFlowProjectReceiver
+              project {
+                ...ProjectAvatar
+              }
+            }
+            ... on DripListReceiver {
+              ...EditProjectSplitsFlowDripListReceiver
+              dripList {
+                ...DripListBadge
+              }
+            }
+          }
+          maintainers {
+            ... on AddressReceiver {
+              ...EditProjectSplitsFlowAddressReceiver
+              account {
+                address
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
   export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     fragment SplitsComponentProjectReceiver on ProjectReceiver {
@@ -57,12 +94,15 @@
     }
   `;
 
-  export type SplitsComponentSplitsReceiver = SplitsComponentAddressReceiverFragment | SplitsComponentDripListReceiverFragment | SplitsComponentProjectReceiverFragment;
+  export type SplitsComponentSplitsReceiver =
+    | SplitsComponentAddressReceiverFragment
+    | SplitsComponentDripListReceiverFragment
+    | SplitsComponentProjectReceiverFragment;
 
   export type Splits = (SplitGroup | SplitsComponentSplitsReceiver)[];
 
   export interface SplitGroup {
-    __typename: 'SplitGroup',
+    __typename: 'SplitGroup';
     list: Splits;
     name?: string;
   }
@@ -107,7 +147,11 @@
 
 <script lang="ts">
   import SplitComponent from './components/split/split.svelte';
-  import type { SplitsComponentAddressReceiverFragment, SplitsComponentDripListReceiverFragment, SplitsComponentProjectReceiverFragment } from './__generated__/gql.generated';
+  import type {
+    SplitsComponentAddressReceiverFragment,
+    SplitsComponentDripListReceiverFragment,
+    SplitsComponentProjectReceiverFragment,
+  } from './__generated__/gql.generated';
   import { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
 
   export let list: Splits;

@@ -8,10 +8,12 @@
     ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
+    ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
     fragment ProjectProfile on Project {
       ...UnclaimedProjectCard
       ...ProjectProfileHeader
       ...SupportCardProject
+      ...SplitsComponentProjectSplits
       ... on UnclaimedProject {
         account {
           accountId
@@ -24,36 +26,6 @@
         }
         owner {
           accountId
-        }
-        splits {
-          dependencies {
-            ... on AddressReceiver {
-              ...EditProjectSplitsFlowAddressReceiver
-              account {
-                address
-              }
-            }
-            ... on ProjectReceiver {
-              ...EditProjectSplitsFlowProjectReceiver
-              project {
-                ...ProjectAvatar
-              }
-            }
-            ... on DripListReceiver {
-              ...EditProjectSplitsFlowDripListReceiver
-              dripList {
-                ...DripListBadge
-              }
-            }
-          }
-          maintainers {
-            ... on AddressReceiver {
-              ...EditProjectSplitsFlowAddressReceiver
-              account {
-                address
-              }
-            }
-          }
         }
       }
     }
@@ -76,7 +48,9 @@
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import SplitsComponent from '$lib/components/splits/splits.svelte';
+  import SplitsComponent, {
+    SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT,
+  } from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
