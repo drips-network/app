@@ -1,6 +1,5 @@
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
-  import BetaBadge from '../beta-badge/beta-badge.svelte';
   import ConnectButton from '../connect-button/connect-button.svelte';
   import SearchBar from '../search-bar/search-bar.svelte';
   import DripsLogo from '././drips-logo.svelte';
@@ -21,9 +20,6 @@
   <a aria-label="Go to homepage" href={'/'}>
     <div class="logo">
       <DripsLogo />
-    </div>
-    <div class="beta-badge">
-      <BetaBadge />
     </div>
     {#if showLoadingIndicator}
       <div
@@ -151,10 +147,6 @@
   }
 
   @media (max-width: 577px) {
-    .beta-badge {
-      display: none;
-    }
-
     header {
       padding: 1rem;
     }
