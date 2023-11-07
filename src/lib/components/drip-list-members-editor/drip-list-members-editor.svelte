@@ -206,7 +206,7 @@
     }
   }
 
-  let autoSplitEnabled = true;
+  let autoSplitEnabled = Object.keys(items).length === 0;
 
   function addItemToPercentages(key: string) {
     let pcts = { ...percentages, [key]: 0 };
