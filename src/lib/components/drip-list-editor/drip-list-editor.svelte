@@ -58,7 +58,6 @@
   </FormField>
 
   <FormField title="Recipients*">
-    <!-- TODO: This crashes when entering some non-valid github url -->
     <ListEditor
       bind:percentages={dripList.percentages}
       bind:items={dripList.items}
