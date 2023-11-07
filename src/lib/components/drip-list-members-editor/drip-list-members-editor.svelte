@@ -415,7 +415,7 @@
             class:bg-primary-level-1={index === Object.entries(items).length - 1 &&
               highlightLastItemAdded}
           >
-            <div class="flex-1 max-w-full">
+            <div class="flex-1 min-w-0">
               <div class="w-full px-3">
                 {#if item.type === 'address'}
                   <IdentityBadge
@@ -437,7 +437,7 @@
               </div>
             </div>
 
-            <div class="flex flex-1 flex-shrink-0 justify-end items-center gap-3 pr-3">
+            <div class="flex flex-shrink-0 justify-end items-center gap-3 pr-3">
               {#if !isEditable}
                 <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
               {:else}
