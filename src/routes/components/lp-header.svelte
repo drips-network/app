@@ -1,5 +1,4 @@
 <script lang="ts">
-  import BetaBadge from '$lib/components/beta-badge/beta-badge.svelte';
   import Button from '$lib/components/button/button.svelte';
   import DripsLogo from '$lib/components/illustrations/logo.svelte';
   import ThreeDrips from '$lib/components/illustrations/three-drips.svelte';
@@ -17,7 +16,6 @@
         <DripsLogo />
       </div>
     </a>
-    <div class="beta-notice" class:offset={showLogo}><BetaBadge /></div>
   </div>
   <nav>
     <a href="https://github.com/drips-network" target="_blank" rel="noreferrer"
@@ -80,15 +78,6 @@
     gap: 28px;
   }
 
-  .beta-notice {
-    transform: translateX(-40px);
-    transition: transform 0.3s;
-  }
-
-  .beta-notice.offset {
-    transform: translateX(0);
-  }
-
   nav {
     display: flex;
     gap: 0.5rem;
@@ -114,10 +103,6 @@
 
     nav {
       gap: 0;
-    }
-
-    .beta-notice {
-      display: none;
     }
   }
 </style>
