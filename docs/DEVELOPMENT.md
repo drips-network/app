@@ -35,7 +35,7 @@ https://sepolia.drips.network/ # PUBLIC_NETWORK set to 11155111
 
 Before you run the dev server or build the app, you're going to need to build TypeScript types for GraphQL fragments and queries within the app. These auto-generated files, which are all situated in folders called `__generated__` adjacent to the `.ts` or `.svelte` files that define the GQL operation, are deliberately **not** tracked in Git to ensure the app's GQL types are always up-to-date with the GQL endpoint it is connected to.
 
-To build GraphQL types, ensure you've configured the GraphQL endpoint as described above, and run `npm run build:graphql`. This command scans the entire repo for GQL definitions tagged with `gql`, and generates typings in adjacent `__generated__` folders. 
+To build GraphQL types, ensure you've configured the GraphQL endpoint as described above, and run `npm run build:graphql`. This command scans the entire repo for GQL definitions tagged with `gql`, and generates typings in adjacent `__generated__` folders.
 
 Whenever you make a change to a GraphQL definition, like fragments or queries, ensure to run `npm run build:graphql` to make sure all definitions are valid and the typings are up-to-date.
 

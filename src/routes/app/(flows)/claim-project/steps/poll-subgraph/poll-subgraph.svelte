@@ -3,15 +3,14 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import { ethers } from 'ethers';
-  import assert from '$lib/utils/assert';
-  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import query from '$lib/graphql/dripsQL';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
-  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
+  import expect from '$lib/utils/expect';
+  import unreachable from '$lib/utils/unreachable';
+  import type {
+    CheckProjectVerificationStatusQuery,
+    CheckProjectVerificationStatusQueryVariables,
+  } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -21,56 +20,34 @@
     dispatch('await', {
       promise: pollSubgraph,
       message: 'Waiting for the verification to finalize…',
-      subtitle: 'This might take a few minutes. Please donʼt close this window.',
+      subtitle: 'This might take a while. Please donʼt close this window.',
     }),
   );
 
   async function pollSubgraph() {
-    let start = Date.now();
-    let timeout = 5 * 60 * 1000; // Timeout after 5 minutes
+    const projectAccountId = $context.project?.account.accountId ?? unreachable();
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
-      const projectName = `${username}/${repoName}`;
-
-      const repoDriverClient = await getRepoDriverClient();
-      const accountId = await repoDriverClient.getAccountId(forge, projectName);
-
-      const owner = await repoDriverClient.getOwner(accountId);
-
-      assert($walletStore.address);
-      if (
-        owner &&
-        ethers.utils.getAddress(owner) === ethers.utils.getAddress($walletStore.address)
-      ) {
-        return;
-      }
-
-      const getProjectByIdQuery = gql`
-        query Project($projectId: ID!) {
-          projectById(id: $projectId) {
-            ... on ClaimedProject {
-              account {
-                accountId
-              }
-            }
+    const checkProjectVerificationStatusQuery = gql`
+      query CheckProjectVerificationStatus($projectId: ID!) {
+        projectById(id: $projectId) {
+          ... on UnclaimedProject {
+            verificationStatus
           }
         }
-      `;
-
-      const response = await query<ProjectQuery, ProjectQueryVariables>(getProjectByIdQuery, {
-        projectId: accountId,
-      });
-
-      const project = response.projectById;
-      if (project && !isClaimed(project)) {
-        if (Date.now() - start >= timeout) {
-          throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
-        }
       }
+    `;
 
-      await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 5 seconds before the next request
-    }
+    await expect(
+      () =>
+        query<CheckProjectVerificationStatusQuery, CheckProjectVerificationStatusQueryVariables>(
+          checkProjectVerificationStatusQuery,
+          {
+            projectId: projectAccountId,
+          },
+        ),
+      (response) => response.projectById?.__typename === 'UnclaimedProject',
+      60000,
+      2000,
+    );
   }
 </script>

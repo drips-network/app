@@ -18,7 +18,7 @@ import type { Address } from '../common-types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
 import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
-import { BigNumber, type ContractTransaction, type PopulatedTransaction } from 'ethers';
+import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { getRepoByUrl as getGithubRepoByUrl } from '../github/github';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
@@ -63,7 +63,9 @@ export default class GitProjectService {
     const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
     const projectName = `${username}/${repoName}`;
 
-    return this._repoDriverClient.getAccountId(forge, projectName);
+    const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
+
+    return this._repoDriverClient.getAccountId(numericForgeValue, projectName);
   }
 
   public static deconstructUrl(url: string): {
@@ -100,7 +102,11 @@ export default class GitProjectService {
     return { forge, username, repoName };
   }
 
-  public static populateSource(forge: Forge, repoName: string, username: string): LatestVersion<typeof repoDriverAccountMetadataParser>['source'] {
+  public static populateSource(
+    forge: Forge,
+    repoName: string,
+    username: string,
+  ): LatestVersion<typeof repoDriverAccountMetadataParser>['source'] {
     let url: string;
 
     switch (forge) {
@@ -149,18 +155,6 @@ export default class GitProjectService {
     } else {
       throw new Error(`Cannot get project info: unsupported forge: ${forge}`);
     }
-  }
-
-  public async buildRequestOwnerUpdateTx(context: State): Promise<ContractTransaction> {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const projectName = `${username}/${repoName}`;
-
-    const requestOwnerUpdateTx = await this._repoDriverClient.requestOwnerUpdate(
-      forge,
-      projectName,
-    );
-
-    return requestOwnerUpdateTx;
   }
 
   public async buildUpdateSplitsBatchTx(
@@ -214,7 +208,11 @@ export default class GitProjectService {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
     const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const accountId = await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`);
+    const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
+    const accountId = await this._repoDriverClient.getAccountId(
+      numericForgeValue,
+      `${username}/${repoName}`,
+    );
 
     const {
       tx: setSplitsTx,
@@ -244,7 +242,7 @@ export default class GitProjectService {
         repoName: repoName,
         url: context.gitUrl,
       },
-    }
+    };
 
     project.emoji = context.projectEmoji;
     project.color = context.projectColor;
@@ -254,7 +252,7 @@ export default class GitProjectService {
       forSplits: {
         dependencies: dependenciesSplitMetadata,
         maintainers: maintainersSplitsMetadata,
-      }
+      },
     });
 
     const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
@@ -344,10 +342,15 @@ export default class GitProjectService {
       } else if (isValidGitUrl(itemId)) {
         const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
 
+        const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
+
         const receiver = {
           type: 'repoDriver' as const,
           weight,
-          accountId: await this._repoDriverClient.getAccountId(forge, `${username}/${repoName}`),
+          accountId: await this._repoDriverClient.getAccountId(
+            numericForgeValue,
+            `${username}/${repoName}`,
+          ),
         };
 
         dependenciesSplitMetadata.push({

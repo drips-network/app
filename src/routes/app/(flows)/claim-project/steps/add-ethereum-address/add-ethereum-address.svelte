@@ -88,6 +88,8 @@
           throw new Error('FUNDING.json not found.');
         }
 
+        const numericForgeValue = forge === 'GitHub' ? 0 : 1;
+
         try {
           // Kick off repo owner update using gasless TX
 
@@ -97,7 +99,7 @@
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              forge,
+              forge: numericForgeValue,
               projectName: `${ownerName}/${repoName}`,
               chainId: $walletStore.network.chainId,
             }),

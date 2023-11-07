@@ -27,14 +27,13 @@
   import UnclaimedProjectCard, {
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import type GitProjectService from '$lib/utils/project/GitProjectService';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
-  import assert from '$lib/utils/assert';
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
   import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
@@ -44,7 +43,6 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  let gitProjectService: GitProjectService;
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
   $: formValid = validationState.type === 'valid';
@@ -85,7 +83,6 @@
       });
 
       const project = response.projectByUrl;
-      assert(project);
 
       if (!project) {
         throw new Error('Project not found');
@@ -125,6 +122,7 @@
   }
 
   async function fetchProjectMetadata() {
+    const gitProjectService = await GitProjectService.new();
     const { defaultBranch, description, forksCount, starsCount } =
       await gitProjectService.getProjectInfo($context.gitUrl);
 

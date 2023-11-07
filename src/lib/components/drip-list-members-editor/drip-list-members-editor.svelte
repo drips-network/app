@@ -197,8 +197,9 @@
 
       if (!dripListToAdd) throw new Error('Drip list not found');
 
-      if (blockedKeys.includes(dripListToAdd.account.accountId))
+      if (blockedKeys.includes(dripListToAdd.account.accountId)) {
         throw new Error('Drip List ID is already used');
+      }
 
       // Prevent duplicates.
       if (!items[dripListId]) {
