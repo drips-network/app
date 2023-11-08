@@ -2,13 +2,46 @@
 
 ## 👋 Setup
 
-Setup dependencies:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-To run a local development server:
+## 🌳 Environment
+
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var.
+
+### 📈 GraphQL API
+
+The Drips App depends on the custom [Drips GraphQL API](https://github.com/drips-network/graphql-api). You need to set `GQL_URL` to a URL of the API's `graphql` endpoint, and `GQL_ACCESS_TOKEN` for the `Authorization: Bearer` token that should be used.
+
+For most development tasks, you may use our Goerli deployment of the API, hosted at [https://drips-api-goerli.up.railway.app/](https://drips-api-goerli.up.railway.app/). To use this API deployment, set `GQL_URL` to `https://drips-api-goerli.up.railway.app/graphql`, and `GQL_ACCESS_TOKEN` to `1234`. Ensure `PUBLIC_NETWORK` is set to `5`, so that both the app and API are talking to the Goerli testnet.
+
+You can also use the local E2E env to easily spin up a fully-fledged deployment of the Drips GraphQL API, complete with event processing and a local, blank testnet to transact against. To do so, set `GQL_URL` to `http://localhost:8080/graphql`, `GQL_ACCESS_TOKEN` to `afdb8b7e-8fa7-4de9-bd95-b650b839e745`, and `PUBLIC_NETWORK` to `5`. Then, follow the instructions below under "🌐 Run app locally with a local testnet".
+
+### 🔗 Chain Config
+
+To run the app, youʼll need to configure the `PUBLIC_NETWORK` environment variable. This should be the chainId of the chain you want to run the app for, and can currently be either 1, 5 or 11155111. The app will only allow connecting wallets that are set to this network, and all server-side requests will be made for this network's subgraph.
+
+For your convenience, weʼve deployed production mirrors of the app set to allow testnet connections:
+
+```sh
+https://goerli.drips.network/ # PUBLIC_NETWORK set to 5
+https://sepolia.drips.network/ # PUBLIC_NETWORK set to 11155111
+```
+
+## 👷 Building GraphQL types
+
+Before you run the dev server or build the app, you're going to need to build TypeScript types for GraphQL fragments and queries within the app. These auto-generated files, which are all situated in folders called `__generated__` adjacent to the `.ts` or `.svelte` files that define the GQL operation, are deliberately **not** tracked in Git to ensure the app's GQL types are always up-to-date with the GQL endpoint it is connected to.
+
+To build GraphQL types, ensure you've configured the GraphQL endpoint as described above, and run `npm run build:graphql`. This command scans the entire repo for GQL definitions tagged with `gql`, and generates typings in adjacent `__generated__` folders.
+
+Whenever you make a change to a GraphQL definition, like fragments or queries, ensure to run `npm run build:graphql` to make sure all definitions are valid and the typings are up-to-date.
+
+## 🧑‍💻 Starting the local dev server
+
+Assuming you've fully configured your local environment and built GraphQL types as described above, you can run a local development server as follows:
 
 ```bash
 npm run dev
@@ -16,8 +49,6 @@ npm run dev
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
-
-Please note that a number of environment variables are required to run the app (see "Environment" below).
 
 ## 🏗️ Building
 
@@ -28,21 +59,6 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
-
-## 🌳 Environment
-
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var.
-
-## 🔗 Chain Config
-
-To run the app, youʼll need to configure the `PUBLIC_NETWORK` environment variable. This should be the chainId of the chain you want to run the app for, and can currently be either 1, 5 or 11155111. The app will only allow connecting wallets that are set to this network, and all server-side requests will be made for this network's subgraph.
-
-For your convenience, weʼve deployed production mirrors of the app set to allow testnet connections:
-
-```sh
-https://goerli.drips.network/ # PUBLIC_NETWORK set to 5
-https://sepolia.drips.network/ # PUBLIC_NETWORK set to 11155111
-```
 
 ## 🧪 Tests
 

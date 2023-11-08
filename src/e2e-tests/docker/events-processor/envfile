@@ -1,0 +1,11 @@
+PROVIDER_TYPE=RPC
+
+RPC_URL=http://testnet:8545
+
+IPFS_GATEWAY_URL=http://fake-pinata:3000
+NETWORK=localtestnet
+PROCESS_PAST_EVENTS=true
+REDIS_CONNECTION_STRING=redis://redis:6379
+POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres-event-processor:5432/dripsdb
+LOG_LEVEL=debug
+QUEUE_UI_PORT=3001

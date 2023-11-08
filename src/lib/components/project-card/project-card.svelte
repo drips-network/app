@@ -1,19 +1,46 @@
+<script lang="ts" context="module">
+  export const PROJECT_CARD_FRAGMENT = gql`
+    ${PROJECT_AVATAR_FRAGMENT}
+    ${PROJECT_NAME_FRAGMENT}
+    fragment ProjectCard on Project {
+      ...ProjectAvatar
+      ...ProjectName
+      ... on ClaimedProject {
+        source {
+          forge
+          ownerName
+          repoName
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          forge
+          ownerName
+          repoName
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
   import Github from 'radicle-design-system/icons/Github.svelte';
 
-  import ProjectAvatar from '../project-avatar/project-avatar.svelte';
-  import ProjectName from '../project-badge/components/project-name.svelte';
-  import type { ClaimedProject } from '$lib/graphql/generated/graphql';
+  import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
+  import ProjectName, { PROJECT_NAME_FRAGMENT } from '../project-badge/components/project-name.svelte';
+  import { gql } from 'graphql-request';
+  import type { ProjectCardFragment } from './__generated__/gql.generated';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
-  export let project: ClaimedProject;
+  export let project: ProjectCardFragment;
 </script>
 
-<a class="wrapper" href={buildProjectUrl(project.source)}>
+<a class="wrapper" href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}>
   <div class="project-card">
     <div
       class="background"
-      style:background-color={project.owner
+      style:background-color={isClaimed(project)
         ? 'var(--color-primary-level-2)'
         : 'var(--color-foreground-level-1)'}
     />
@@ -28,7 +55,6 @@
         <span class="owner-name">{project.source.ownerName}</span>
       </div>
       <h4 class="name"><ProjectName showSource={false} {project} /></h4>
-      {#if project.description}<p class="description">{project.description}</p>{/if}
     </div>
   </div>
 </a>
@@ -75,16 +101,6 @@
     flex-direction: column;
     gap: 0.25rem;
     justify-content: center;
-  }
-
-  .description {
-    color: var(--color-foreground-level-6);
-    line-clamp: 2;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .source {

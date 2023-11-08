@@ -1,11 +1,8 @@
 import { z } from 'zod';
 import * as fetchIpfs from '$lib/utils/ipfs';
-import isTest from '$lib/utils/is-test';
-import type { Mock } from 'vitest';
 import { AddressDriverClient, DripsSubgraphClient, type AccountMetadata } from 'radicle-drips';
 import MetadataManagerBase, { type EmitMetadataFunc } from '../MetadataManagerBase';
 import type { ContractTransaction } from 'ethers';
-import type { NFTDriverAccount } from '../types';
 import type { ParseFn, Parser } from '@efstajas/versioned-parser/lib/types';
 import { createVersionedParser } from '@efstajas/versioned-parser';
 import { addressDriverAccountMetadataParser } from '../schemas';
@@ -15,12 +12,8 @@ vi.mock('$env/dynamic/public', () => ({
 }));
 
 class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends MetadataManagerBase<
-  NFTDriverAccount,
   Parser
 > {
-  public fetchAccount<TAccount>(): Promise<TAccount | null> {
-    throw new Error('Method not implemented.');
-  }
   public buildAccountMetadata(): z.TypeOf<TAccountMetadataSchema> {
     throw new Error('Method not implemented.');
   }
@@ -76,44 +69,6 @@ describe('MetadataManagerBase', () => {
   });
 
   describe('fetchAccountMetadata', () => {
-    it('should return the mocked metadata from localStorage when running in test mode', async () => {
-      // Arrange
-      const accountId = '1';
-      const metadataHash = 'QmX';
-
-      const fetchMetadataHashByAccountIdMock = vi
-        .fn(MetadataManagerBase.prototype.fetchMetadataHashByAccountId)
-        .mockResolvedValue(metadataHash);
-      MetadataManagerBase.prototype.fetchMetadataHashByAccountId = fetchMetadataHashByAccountIdMock;
-
-      const isTestMock = vi.fn(isTest).mockReturnValue(true);
-      vi.mock('$lib/utils/is-test', () => ({
-        default: vi.fn(),
-      }));
-      (isTest as Mock).mockImplementation(isTestMock);
-
-      const expectedMetadata = {
-        name: 'John Doe',
-        description: 'An account description',
-        emoji: '🚀',
-      };
-
-      localStorage.setItem(`mock_ipfs_${metadataHash}`, JSON.stringify(expectedMetadata));
-
-      // Act
-      const result = await new TestMetadataManager(
-        z.object({
-          name: z.string().optional(),
-          description: z.string().optional(),
-          emoji: z.string().optional(),
-        }).parse,
-      ).fetchAccountMetadata(accountId);
-
-      // Assert
-      expect(result).toEqual({ hash: metadataHash, data: expectedMetadata });
-      expect(fetchMetadataHashByAccountIdMock).toHaveBeenCalledWith(accountId);
-    });
-
     it('should return metadata when metadata hash is found and IPFS fetch is successful', async () => {
       // Arrange
       const accountId = '1';
@@ -192,25 +147,6 @@ describe('MetadataManagerBase', () => {
   });
 
   describe('pinAccountMetadata', () => {
-    it('should return a mock hash when running in test mode', async () => {
-      // Arrange
-      const isTestMock = vi.fn(isTest).mockReturnValue(true);
-      vi.mock('$lib/utils/is-test', () => ({
-        default: vi.fn(),
-      }));
-      (isTest as Mock).mockImplementation(isTestMock);
-
-      const data = 'Sample data';
-      const metadataSchema = z.string();
-
-      // Act
-      const result = await new TestMetadataManager(metadataSchema.parse).pinAccountMetadata(data);
-
-      // Assert
-      expect(result).toBeDefined();
-      expect(isTestMock).toHaveBeenCalled();
-    });
-
     it('should return a real hash when running in non-test mode', async () => {
       // Arrange
       const data = 'Sample data';

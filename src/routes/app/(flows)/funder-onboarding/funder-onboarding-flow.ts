@@ -25,6 +25,7 @@ export interface State {
     streamRateValueParsed?: bigint | undefined;
     topUpAmountValueParsed?: bigint | undefined;
   };
+  dripListId: string | undefined;
 }
 
 export const state = writable<State>({
@@ -33,6 +34,7 @@ export const state = writable<State>({
   continuousSupportConfig: {
     listSelected: [],
   },
+  dripListId: undefined,
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
@@ -58,7 +60,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
             return {
               component: DripListBadge,
               props: {
-                listId: item.list.id,
+                listId: item.list.account.accountId,
               },
             };
           }

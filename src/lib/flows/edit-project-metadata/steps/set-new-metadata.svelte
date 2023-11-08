@@ -1,6 +1,22 @@
+<script lang="ts" context="module">
+  export const SET_NEW_METADATA_STEP_FRAGMENT = gql`
+    ${PROJECT_CUSTOMIZER_FRAGMENT}
+    fragment SetNewMetadataStep on ClaimedProject {
+      ...ProjectCustomizer
+      emoji
+      color
+      account {
+        accountId
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
+  import ProjectCustomizer, {
+    PROJECT_CUSTOMIZER_FRAGMENT,
+  } from '$lib/components/project-customizer/project-customizer.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
@@ -11,11 +27,12 @@
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import type { ClaimedProject } from '$lib/graphql/generated/graphql';
+  import { gql } from 'graphql-request';
+  import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let project: ClaimedProject;
+  export let project: SetNewMetadataStepFragment;
 
   let projectWritable = writable(structuredClone(project));
 

@@ -1,3 +1,24 @@
+<script lang="ts" context="module">
+  export const ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT = gql`
+    fragment AddEthereumAddressStepProject on Project {
+      ... on ClaimedProject {
+        source {
+          forge
+          ownerName
+          repoName
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          forge
+          ownerName
+          repoName
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import CodeBox from '$lib/components/code-box/code-box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -15,7 +36,7 @@
   import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import github from '$lib/utils/github/github';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import { gql } from 'graphql-request';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -46,11 +67,11 @@
           };
         }
 
-        const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+        const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
 
         try {
           await github.getFundingJson(
-            username,
+            ownerName,
             repoName,
             dripsJsonTemplate(
               $walletStore.address ?? unreachable(),
@@ -67,6 +88,8 @@
           throw new Error('FUNDING.json not found.');
         }
 
+        const numericForgeValue = forge === 'GitHub' ? 0 : 1;
+
         try {
           // Kick off repo owner update using gasless TX
 
@@ -76,8 +99,8 @@
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              forge,
-              projectName: `${username}/${repoName}`,
+              forge: numericForgeValue,
+              projectName: `${ownerName}/${repoName}`,
               chainId: $walletStore.network.chainId,
             }),
           });

@@ -50,7 +50,7 @@
           top: [
             { label: 'Streams', href: '/app/streams', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip List', href: '/app/drip-lists', icon: DripListIcon },
+            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
@@ -73,7 +73,7 @@
         items={[
           { label: 'Streams', href: '/app/streams', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Drip List', href: '/app/drip-lists', icon: DripListIcon },
+          { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
           {
             label: 'Profile',
             href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
@@ -95,7 +95,6 @@
   .main {
     display: flex;
     flex-direction: row-reverse;
-    gap: 2rem;
     width: 100vw;
     transition: gap 0.3s;
   }
@@ -166,6 +165,7 @@
 
   @media (max-width: 768px) {
     .main {
+      overflow-x: hidden;
       gap: 0;
     }
 

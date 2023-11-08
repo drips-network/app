@@ -24,9 +24,15 @@ jobs:
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_PUBLIC_NETWORK: 5
+          enkey_GQL_URL: https://drips-api-goerli.up.railway.app
+          envkey_GQL_URL: https://drips-api-mainnet.up.railway.app
+          envkey_GQL_ACCESS_TOKEN: ${{ secrets.GQL_ACCESS_TOKEN }}
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Build GQL types
+        run: npm run build:graphql
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync
