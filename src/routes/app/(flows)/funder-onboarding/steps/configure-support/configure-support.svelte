@@ -25,9 +25,9 @@
     <div class="support-type-explainer">
       <h4 class="typo-text-small-bold">Supporting with a stream</h4>
       <ul>
-        <li>Stream a custom amount of any ERC-20 token</li>
-        <li>Cancel, pause or edit the stream rate anytime</li>
-        <li>Top up or withdraw tokens from your stream balance anytime</li>
+        <li>Stream a custom amount of any ERC-20 token.</li>
+        <li>Cancel, pause or edit the stream rate anytime.</li>
+        <li>Top up or withdraw tokens from your stream balance anytime.</li>
       </ul>
     </div>
   </AnnotationBox>

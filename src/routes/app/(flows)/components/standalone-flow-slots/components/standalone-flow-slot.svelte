@@ -50,15 +50,3 @@
       >{/if}
   </div>
 </li>
-
-<style>
-  .icon {
-    height: 2rem;
-    width: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-primary-level-1);
-    border-radius: 1rem;
-  }
-</style>
