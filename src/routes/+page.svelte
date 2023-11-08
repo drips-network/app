@@ -312,6 +312,9 @@
             <a href="https://twitter.com/dripsnetwork" target="_blank" rel="noreferrer"
               ><Button variant="primary">Twitter</Button></a
             >
+            <a href="https://mirror.xyz/dripsdev.eth" target="_blank" rel="noreferrer"
+              ><Button variant="primary">Mirror</Button></a
+            >
             <a href="https://discord.gg/BakDKKDpHF" target="_blank" rel="noreferrer"
               ><Button variant="primary">Discord</Button></a
             >
