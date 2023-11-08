@@ -130,7 +130,6 @@
     pointer-events: none;
   }
 
-  .percentage-editor.empty,
   .percentage-editor.disabled {
     color: var(--color-foreground-level-5);
   }
@@ -139,12 +138,13 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-5);
   }
 
-  .percentage-editor:not(.disabled).error {
+  .percentage-editor:not(.disabled).error,
+  .percentage-editor:not(.disabled).empty {
     box-shadow: 0px 0px 0px 2px var(--color-negative);
     color: var(--color-negative);
   }
 
-  .percentage-editor:not(.error).focus {
+  .percentage-editor:not(.error):not(.empty).focus {
     box-shadow: 0px 0px 0px 2px var(--color-primary);
   }
 
