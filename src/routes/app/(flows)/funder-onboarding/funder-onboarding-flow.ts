@@ -4,7 +4,6 @@ import BuildListStep from './steps/build-list/build-list.svelte';
 import ConfigureSupportStreamStep from './steps/configure-support/configure-support.svelte';
 import ReviewStep from './steps/review/review.svelte';
 import type { Slots } from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
-import ListIcon from 'radicle-design-system/icons/List.svelte';
 import Pile from '$lib/components/pile/pile.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
@@ -15,6 +14,7 @@ import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-
 import ConnectWalletStep from './steps/connect-wallet/connect-wallet.svelte';
 import ChooseSupportTypeStep from './steps/choose-support-type/choose-support-type.svelte';
 import WalletSlot from '../shared/slots/wallet-slot.svelte';
+import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
 
 export interface State {
   dripList: DripListConfig;
@@ -40,7 +40,7 @@ export const state = writable<State>({
 export function slotsTemplate(state: State, stepIndex: number): Slots {
   const dripListSlot = {
     title: state.dripList.title,
-    icon: ListIcon,
+    icon: DripListIcon,
     editStepIndex: 0,
     leftComponent: {
       component: Pile,

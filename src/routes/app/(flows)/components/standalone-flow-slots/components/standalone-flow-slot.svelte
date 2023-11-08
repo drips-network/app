@@ -17,21 +17,27 @@
   export let editStepIndex: number | undefined = undefined;
 </script>
 
-<div class="slot">
-  <div class="left">
+<li
+  class="slot h-12 rounded-drip-xl flex items-center justify-between gap-8 shadow-low bg-background px-4"
+>
+  <div class="flex items-center gap-2 min-w-0">
     {#if icon}
-      <div class="icon">
-        <svelte:component this={icon} style="fill: var(--color-background);" />
+      <div
+        role="img"
+        aria-label="Icon"
+        class="h-8 w-8 bg-primary-level-1 flex items-center justify-center rounded-full"
+      >
+        <svelte:component this={icon} style="fill: var(--color-primary);" />
       </div>
     {/if}
     {#if title}
-      <h4>{title}</h4>
+      <div class="flex-1 min-w-0 truncate">{title}</div>
     {/if}
     {#if leftComponent}
       <svelte:component this={leftComponent.component} {...leftComponent.props} />
     {/if}
   </div>
-  <div class="right">
+  <div class="flex items-center gap-2">
     {#if rightComponent}
       <svelte:component this={rightComponent.component} {...rightComponent.props} />
     {/if}
@@ -43,38 +49,16 @@
         >Edit</Button
       >{/if}
   </div>
-</div>
+</li>
 
 <style>
-  .slot {
-    background-color: var(--color-background);
-    box-shadow: var(--elevation-low);
-    border-radius: 1rem 0 1rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    height: 3.5rem;
-    align-items: center;
-    padding: 0 0.75rem;
-  }
-
-  .slot > .left,
-  .slot > .right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .slot > .left {
-    min-width: 0;
-  }
-
   .icon {
     height: 2rem;
     width: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-foreground);
+    background-color: var(--color-primary-level-1);
     border-radius: 1rem;
   }
 </style>
