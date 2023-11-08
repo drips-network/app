@@ -51,302 +51,316 @@
 <HeadMeta title="Drips | Funding that flows" />
 
 <LpHeader />
-<div class="wrapper">
-  <div class="hero">
-    <div class="text">
-      <h1>Funding that flows</h1>
-      <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
-      <div class="actions">
-        <a href="#fund-projects"><Button icon={TokenStreams}>Fund your dependencies</Button></a>
-        <a href="#get-funding"><Button icon={Globe}>Get support for your project</Button></a>
-      </div>
-    </div>
-    <div class="illustration">
-      <LpHero />
-    </div>
-  </div>
-
-  <section class="card two-column">
-    <div class="anchor" id="get-funding" />
-    <div class="section-inner">
+<div class="page">
+  <div class="wrapper">
+    <div class="hero">
       <div class="text">
-        <h2>Get the funds you need for your project</h2>
-        <p>
-          On Drips, your open-source projects earn funds from direct supporters, as well as other
-          projects that depend on yours.
-        </p>
+        <h1>Funding that flows</h1>
+        <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
+        <div class="actions">
+          <a href="#fund-projects"><Button icon={TokenStreams}>Fund your dependencies</Button></a>
+          <a href="#get-funding"><Button icon={Globe}>Get support for your project</Button></a>
+        </div>
       </div>
-      <div class="illustration padded">
-        <OneBalance />
+      <div class="illustration">
+        <LpHero />
       </div>
-      <div class="illustration-background" />
     </div>
-  </section>
 
-  <div class="section-spacer" />
+    <section class="card two-column">
+      <div class="anchor" id="get-funding" />
+      <div class="section-inner">
+        <div class="text">
+          <h2>Get the funds you need for your project</h2>
+          <p>
+            On Drips, your open-source projects earn funds from direct supporters, as well as other
+            projects that depend on yours.
+          </p>
+        </div>
+        <div class="illustration padded">
+          <OneBalance />
+        </div>
+        <div class="illustration-background" />
+      </div>
+    </section>
 
-  <section class="two-column" style:z-index={2}>
-    <div class="section-inner">
-      <div class="card">
-        <div class="illustration-background top" />
-        <div class="illustration">
-          <MultiChain />
+    <div class="section-spacer" />
+
+    <section class="two-column" style:z-index={2}>
+      <div class="section-inner">
+        <div class="card">
+          <div class="illustration-background top" />
+          <div class="illustration">
+            <MultiChain />
+          </div>
+          <div class="text">
+            <h3>Claim your GitHub project</h3>
+            <p>Enter the URL of your public GitHub repository to get started.</p>
+            <div class="claim-input">
+              <TextInput bind:value={claimProjectInput} placeholder="GitHub repository URL" />
+              <a
+                href={canSubmitProjectClaim
+                  ? buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })
+                  : undefined}
+                target="_blank"
+                ><Button variant="primary" size="large" disabled={!canSubmitProjectClaim}
+                  >Claim project</Button
+                ></a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="text centered">
+          <h3>How to receive funds on Drips</h3>
+          <div class="how-it-works">
+            <div class="item">
+              <div class="count">1</div>
+              <h5>Enter your GitHub URL</h5>
+              <p class="typo-text-small">Select any public GitHub repository.</p>
+            </div>
+            <div class="item">
+              <div class="count">2</div>
+              <h5>Verify ownerhsip</h5>
+              <p class="typo-text-small">
+                Create a FUNDING.json file to link your repository to Drips.
+              </p>
+            </div>
+            <div class="item">
+              <div class="count">3</div>
+              <h5>Configure Splits</h5>
+              <p class="typo-text-small">
+                Decide the distribution of funds to maintainers and dependencies.
+              </p>
+            </div>
+            <div class="item">
+              <div class="count">4</div>
+              <h5>Get funds</h5>
+              <p class="typo-text-small">
+                … from direct supporters and projects that depend on yours.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="one-column">
+      <div class="section-inner">
+        <div class="text">
+          <h3>Stream funds by the second</h3>
+          <p>Drips enables token streams of any ERC-20 to any Ethereum address by the second.</p>
+          <div class="token-streams-visuals">
+            <div class="token-streams-visual">
+              <div class="token">
+                <CoinAnimation playSound>
+                  <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
+                </CoinAnimation>
+                <p>USD Coin</p>
+              </div>
+              <p>
+                <span class="green tabular-nums">+1.037574 USDC</span><span class="muted">/sec</span
+                >
+              </p>
+              <p>
+                <span class="fat tabular-nums"
+                  >{millis && getTokenStreamsVisualAmount(1.037574, 4968.3241)} USDC</span
+                >
+              </p>
+            </div>
+            <div class="token-streams-visual">
+              <div class="token">
+                <CoinAnimation playSound>
+                  <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
+                </CoinAnimation>
+                <p>Wrapped Bitcoin</p>
+              </div>
+              <p>
+                <span class="green tabular-nums">+0.00181397 WBTC</span><span class="muted"
+                  >/sec</span
+                >
+              </p>
+              <p>
+                <span class="fat tabular-nums"
+                  >{millis && getTokenStreamsVisualAmount(0.00181397, 2.81065)} WBTC</span
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="background-illustration">
+          <LpInterstitialIllustration1 />
+        </div>
+      </div>
+    </section>
+
+    <section class="card two-column">
+      <div class="anchor" id="fund-projects" />
+      <div class="section-inner">
+        <div class="illustration framed">
+          <LpDripListIllustration />
         </div>
         <div class="text">
-          <h3>Claim your GitHub project</h3>
-          <p>Enter the URL of your public GitHub repository to get started.</p>
-          <div class="claim-input">
-            <TextInput bind:value={claimProjectInput} placeholder="GitHub repository URL" />
-            <a
-              href={canSubmitProjectClaim
-                ? buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })
-                : undefined}
-              target="_blank"
-              ><Button variant="primary" size="large" disabled={!canSubmitProjectClaim}
-                >Claim project</Button
-              ></a
+          <h2>Pass it on: Support your software dependencies</h2>
+          <p>
+            Create your Drip List to fund the projects you depend on. Ensure their sustainable
+            development, stability, security and continuous improvement.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-spacer" />
+
+    <section class="two-column">
+      <div class="section-inner">
+        <div class="text centered">
+          <h3>How Drip Lists work</h3>
+          <div class="how-it-works">
+            <div class="item">
+              <div class="count">1</div>
+              <h5>Make a list</h5>
+              <p class="typo-text-small">
+                Find and support any GitHub project or Ethereum address.
+              </p>
+            </div>
+            <div class="item">
+              <div class="count">2</div>
+              <h5>Set your splits</h5>
+              <p class="typo-text-small">
+                Decide on what projects receive what percentage of your budget.
+              </p>
+            </div>
+            <div class="item">
+              <div class="count">3</div>
+              <h5>Support it</h5>
+              <p class="typo-text-small">
+                Send a continuous stream of any ERC-20 token to your Drip List.
+              </p>
+            </div>
+            <div class="item">
+              <div class="count">4</div>
+              <h5>Show it off</h5>
+              <p class="typo-text-small">Drip Lists are public on your profile. Be proud!</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="illustration-background top" />
+          <div class="illustration">
+            <DripList />
+          </div>
+          <div class="text">
+            <h3>Start your Drip List</h3>
+            <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
+            <a href="/app/funder-onboarding" target="_blank">
+              <Button variant="primary" size="large">Create your Drip List</Button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-spacer" />
+
+    <section class="grid">
+      <LpCard
+        ><ImageAndCaption background>
+          <MultiToken slot="image" />
+          <div slot="caption" class="text-container">
+            <h4>No platform fees</h4>
+            <p>Free to use beyond covering the cost of gas.</p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <GasOptimized slot="image" />
+          <div slot="caption" class="text-container">
+            <h4>User controlled data</h4>
+            <p>Fully sovereign infrastructure for maximum data security.</p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <NoWrappedTokens slot="image" />
+          <div slot="caption" class="text-container">
+            <h4>No need to wrap tokens</h4>
+            <p>Stream native tokens. No need to trust third-parties with funds.</p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+      <LpCard
+        ><ImageAndCaption background>
+          <OneContract slot="image" />
+          <div slot="caption" class="text-container">
+            <h4>One contract</h4>
+            <p>Drips uses one smart contract for streaming and splitting.</p>
+          </div>
+        </ImageAndCaption></LpCard
+      >
+    </section>
+
+    <div class="section-spacer" />
+    <div class="section-spacer" />
+
+    <section>
+      <LpSectionHeader>
+        <div class="socials">
+          <h2>Stay up to date</h2>
+          <div class="flex gap-4">
+            <a href="https://twitter.com/dripsnetwork" target="_blank" rel="noreferrer"
+              ><Button variant="primary">Twitter</Button></a
+            >
+            <a href="https://mirror.xyz/dripsdev.eth" target="_blank" rel="noreferrer"
+              ><Button variant="primary">Mirror</Button></a
+            >
+            <a href="https://discord.gg/BakDKKDpHF" target="_blank" rel="noreferrer"
+              ><Button variant="primary">Discord</Button></a
             >
           </div>
         </div>
-      </div>
-      <div class="text centered">
-        <h3>How to receive funds on Drips</h3>
-        <div class="how-it-works">
-          <div class="item">
-            <div class="count">1</div>
-            <h5>Enter your GitHub URL</h5>
-            <p class="typo-text-small">Select any public GitHub repository.</p>
-          </div>
-          <div class="item">
-            <div class="count">2</div>
-            <h5>Verify ownerhsip</h5>
-            <p class="typo-text-small">
-              Create a FUNDING.json file to link your repository to Drips.
-            </p>
-          </div>
-          <div class="item">
-            <div class="count">3</div>
-            <h5>Configure Splits</h5>
-            <p class="typo-text-small">
-              Decide the distribution of funds to maintainers and dependencies.
-            </p>
-          </div>
-          <div class="item">
-            <div class="count">4</div>
-            <h5>Get funds</h5>
-            <p class="typo-text-small">
-              … from direct supporters and projects that depend on yours.
-            </p>
-          </div>
+      </LpSectionHeader>
+    </section>
+
+    <div class="section-spacer" />
+
+    <section>
+      <div class="flex flex-col gap-4 items-center">
+        <div class="legal-links typo-text-small">
+          <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
+          <a href="/legal/privacy">Privacy Policy</a> •
+          <a href="/legal/disclaimer">Disclaimer</a> •
+          <a href="/legal/access">Access</a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="one-column">
-    <div class="section-inner">
-      <div class="text">
-        <h3>Stream funds by the second</h3>
-        <p>Drips enables token streams of any ERC-20 to any Ethereum address by the second.</p>
-        <div class="token-streams-visuals">
-          <div class="token-streams-visual">
-            <div class="token">
-              <CoinAnimation playSound>
-                <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
-              </CoinAnimation>
-              <p>USD Coin</p>
-            </div>
-            <p>
-              <span class="green tabular-nums">+1.037574 USDC</span><span class="muted">/sec</span>
-            </p>
-            <p>
-              <span class="fat tabular-nums"
-                >{millis && getTokenStreamsVisualAmount(1.037574, 4968.3241)} USDC</span
-              >
-            </p>
-          </div>
-          <div class="token-streams-visual">
-            <div class="token">
-              <CoinAnimation playSound>
-                <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
-              </CoinAnimation>
-              <p>Wrapped Bitcoin</p>
-            </div>
-            <p>
-              <span class="green tabular-nums">+0.00181397 WBTC</span><span class="muted">/sec</span
-              >
-            </p>
-            <p>
-              <span class="fat tabular-nums"
-                >{millis && getTokenStreamsVisualAmount(0.00181397, 2.81065)} WBTC</span
-              >
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="background-illustration">
-        <LpInterstitialIllustration1 />
-      </div>
-    </div>
-  </section>
+    <div class="section-spacer" />
 
-  <section class="card two-column">
-    <div class="anchor" id="fund-projects" />
-    <div class="section-inner">
-      <div class="illustration framed">
-        <LpDripListIllustration />
-      </div>
-      <div class="text">
-        <h2>Pass it on: Support your software dependencies</h2>
-        <p>
-          Create your Drip List to fund the projects you depend on. Ensure their sustainable
-          development, stability, security and continuous improvement.
-        </p>
-      </div>
-    </div>
-  </section>
+    <section class="credits">
+      <span>Supported by</span>
+      <a
+        href="https://radworks.org/"
+        target="_blank"
+        style:height="1.5rem"
+        style:display="inline-block"
+        aria-label="Radworks"
+      >
+        <RadworksLogo />
+      </a>
+    </section>
 
-  <div class="section-spacer" />
-
-  <section class="two-column">
-    <div class="section-inner">
-      <div class="text centered">
-        <h3>How Drip Lists work</h3>
-        <div class="how-it-works">
-          <div class="item">
-            <div class="count">1</div>
-            <h5>Make a list</h5>
-            <p class="typo-text-small">Find and support any GitHub project or Ethereum address.</p>
-          </div>
-          <div class="item">
-            <div class="count">2</div>
-            <h5>Set your splits</h5>
-            <p class="typo-text-small">
-              Decide on what projects receive what percentage of your budget.
-            </p>
-          </div>
-          <div class="item">
-            <div class="count">3</div>
-            <h5>Support it</h5>
-            <p class="typo-text-small">
-              Send a continuous stream of any ERC-20 token to your Drip List.
-            </p>
-          </div>
-          <div class="item">
-            <div class="count">4</div>
-            <h5>Show it off</h5>
-            <p class="typo-text-small">Drip Lists are public on your profile. Be proud!</p>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="illustration-background top" />
-        <div class="illustration">
-          <DripList />
-        </div>
-        <div class="text">
-          <h3>Start your Drip List</h3>
-          <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
-          <a href="/app/funder-onboarding" target="_blank">
-            <Button variant="primary" size="large">Create your Drip List</Button>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="section-spacer" />
-
-  <section class="grid">
-    <LpCard
-      ><ImageAndCaption background>
-        <MultiToken slot="image" />
-        <div slot="caption" class="text-container">
-          <h4>No platform fees</h4>
-          <p>Free to use beyond covering the cost of gas.</p>
-        </div>
-      </ImageAndCaption></LpCard
-    >
-    <LpCard
-      ><ImageAndCaption background>
-        <GasOptimized slot="image" />
-        <div slot="caption" class="text-container">
-          <h4>User controlled data</h4>
-          <p>Fully sovereign infrastructure for maximum data security.</p>
-        </div>
-      </ImageAndCaption></LpCard
-    >
-    <LpCard
-      ><ImageAndCaption background>
-        <NoWrappedTokens slot="image" />
-        <div slot="caption" class="text-container">
-          <h4>No need to wrap tokens</h4>
-          <p>Stream native tokens. No need to trust third-parties with funds.</p>
-        </div>
-      </ImageAndCaption></LpCard
-    >
-    <LpCard
-      ><ImageAndCaption background>
-        <OneContract slot="image" />
-        <div slot="caption" class="text-container">
-          <h4>One contract</h4>
-          <p>Drips uses one smart contract for streaming and splitting.</p>
-        </div>
-      </ImageAndCaption></LpCard
-    >
-  </section>
-
-  <div class="section-spacer" />
-  <div class="section-spacer" />
-
-  <section>
-    <LpSectionHeader>
-      <div class="socials">
-        <h2>Stay up to date</h2>
-        <div class="flex gap-4">
-          <a href="https://twitter.com/dripsnetwork" target="_blank" rel="noreferrer"
-            ><Button variant="primary">Twitter</Button></a
-          >
-          <a href="https://discord.gg/BakDKKDpHF" target="_blank" rel="noreferrer"
-            ><Button variant="primary">Discord</Button></a
-          >
-        </div>
-      </div>
-    </LpSectionHeader>
-  </section>
-
-  <div class="section-spacer" />
-
-  <section>
-    <div class="flex flex-col gap-4 items-center">
-      <div class="legal-links typo-text-small">
-        <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
-        <a href="/legal/privacy">Privacy Policy</a> •
-        <a href="/legal/disclaimer">Disclaimer</a> •
-        <a href="/legal/access">Access</a>
-      </div>
-    </div>
-  </section>
-
-  <div class="section-spacer" />
-
-  <section class="credits">
-    <span>Supported by</span>
-    <a
-      href="https://radworks.org/"
-      target="_blank"
-      style:height="1.5rem"
-      style:display="inline-block"
-      aria-label="Radworks"
-    >
-      <RadworksLogo />
-    </a>
-  </section>
-
-  <div class="section-spacer" />
+    <div class="section-spacer" />
+  </div>
 </div>
 
 <style>
+  .page {
+    width: 100vw;
+    overflow: hidden;
+  }
+
   .wrapper {
     max-width: 90rem;
     width: 100vw;

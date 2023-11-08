@@ -169,9 +169,7 @@
       {#if split.__typename === 'AddressReceiver'}
         <IdentityBadge {linkToNewTab} address={split.account.address} size="medium" />
       {:else if split.__typename === 'DripListReceiver'}
-        <DripListBadge
-          dripList={split.dripList}
-        />
+        <DripListBadge dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
         <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
           <ProjectBadge {linkToNewTab} project={split.project} />
