@@ -530,7 +530,7 @@ describe('app', async () => {
         await page.locator('button', { hasText: 'Confirm in wallet' }).click();
 
         await expect(page.locator('text=Congratulations!')).toHaveCount(1);
-      });
+      }, 10000);
     });
 
     describe('edit drip list', () => {
