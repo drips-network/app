@@ -305,17 +305,16 @@
   function afterInputAdded() {
     // It doesnʼt work without setTimeout for some reason 🤷‍♂️
     setTimeout(() => {
-      // clear input
       inputValue = '';
       inputElem.focus();
-      // highlight item added
+
       highlightLastItemAdded = true;
       setTimeout(() => {
         highlightLastItemAdded = false;
       }, 5000);
-      // scroll to bottom of list
+
       listElem.scroll({ top: 999999, behavior: 'smooth' });
-      // scroll window top to input if bottom is out of view
+
       const listBox = listElem.getBoundingClientRect();
       if (listBox.bottom > window.innerHeight) {
         window.scroll({
