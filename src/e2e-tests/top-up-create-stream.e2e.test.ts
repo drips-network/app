@@ -550,7 +550,7 @@ describe('app', async () => {
       it('removes an item', async () => {
         await page.getByTestId('remove-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
 
-        await expect(page.locator('text=50% allocated')).toHaveCount(1);
+        await expect(page.locator('text=50% split')).toHaveCount(1);
       });
 
       it('adds a new item', async () => {
