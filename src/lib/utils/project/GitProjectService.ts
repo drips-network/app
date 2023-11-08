@@ -59,15 +59,6 @@ export default class GitProjectService {
     return gitProjectService;
   }
 
-  public async getAccountIdByUrl(url: string): Promise<string> {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(url);
-    const projectName = `${username}/${repoName}`;
-
-    const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
-
-    return this._repoDriverClient.getAccountId(numericForgeValue, projectName);
-  }
-
   public static deconstructUrl(url: string): {
     forge: Forge;
     username: string;
