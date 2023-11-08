@@ -177,7 +177,7 @@
       {:else if split.type === 'project-split'}
         {#if split.project}
           <PrimaryColorThemer colorHex={split.project.claimed ? split.project.color : undefined}>
-            <ProjectBadge {linkToNewTab} project={split.project} />
+            <ProjectBadge {linkToNewTab} project={split.project} maxWidth={false} />
           </PrimaryColorThemer>
         {:else}
           <!-- This happens when the subgraph doesnʼt immediately update after adding an unclaimed project to a list. -->
