@@ -31,7 +31,11 @@ describe('app', async () => {
     await configureAppForTest(page);
   });
 
-  beforeAll(environment.start, 14400000);
+  beforeAll(async () => {
+    await environment.start();
+
+    console.log('🌳 Environment is up. Running tests...');
+  }, 14400000);
   afterAll(environment.stop, 14400000);
 
   afterAll(async () => {

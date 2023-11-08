@@ -50,4 +50,4 @@ jobs:
         run: npx svelte-kit sync
 
       - name: Run E2E tests
-        run: npm run e2e
+        run: GQL_URL=http://localhost:8080 npm run e2e
