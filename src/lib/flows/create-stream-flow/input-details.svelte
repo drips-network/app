@@ -229,13 +229,13 @@
       on:validationChange={onAddressValidationChange}
     />
   </FormField>
-  <FormField title="Token*">
+  <FormField title="Token*" description="Select a token to stream from your Drips account.">
     <div class="list-container">
       <ListSelect
         bind:selected={selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
-        emptyStateText={'No tokens available to stream. Add one first by clicking "Add funds" on your Dashboard.'}
+        emptyStateText={`No tokens available to stream. Add one first by clicking "Add funds" from your Account page.`}
         type="tokens"
       />
     </div>
