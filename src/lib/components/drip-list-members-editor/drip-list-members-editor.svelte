@@ -314,8 +314,6 @@
     itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100 && !hasEmptyPercents;
   export let error = false;
   $: error = Math.round(totalPercentage * 100) / 100 > 100 || hasEmptyPercents;
-  // TODO: error should check if items are 0% (can currently submit with 0% but it gets excluded on tx)
-
   $: canDistributeEvenly = itemsLength > 0;
 
   function setAllPercentagesTo(value: number) {

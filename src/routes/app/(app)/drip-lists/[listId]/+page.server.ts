@@ -8,8 +8,6 @@ import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.
 import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
 import { SUPPORT_CARD_DRIP_LIST_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
 
-// TODO: This fails if the network is not the default one. We need to support other networks.
-
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;
 

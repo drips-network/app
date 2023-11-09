@@ -29,7 +29,6 @@ import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 
-// TODO: there is some duplication between this class and `DripListService` for mapping splits. To refactor.
 export default class GitProjectService {
   private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;
