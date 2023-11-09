@@ -6,6 +6,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import buildUrl from '$lib/utils/build-url';
 
   export let context: Writable<State>;
 
@@ -20,7 +21,14 @@
     const username = $context.project?.source.ownerName;
     const repoName = $context.project?.source.repoName;
 
-    await goto(`/app/projects/${forge}/${username}/${repoName}`).then(() => {
+    const collectedFunds = ($context.unclaimedFunds?.length ?? 0) > 0;
+
+    await goto(
+      buildUrl(
+        `/app/projects/${forge}/${username}/${repoName}`,
+        collectedFunds ? { collectHint: 'true' } : {},
+      ),
+    ).then(() => {
       loading = false;
     });
   }

@@ -8,7 +8,13 @@
   export let external = false;
 </script>
 
-<a class="sidenav-item typo-text" class:active {href} target={external ? '_blank' : undefined}>
+<a
+  data-highlightid="sidenav-{href}"
+  class="sidenav-item typo-text"
+  class:active
+  {href}
+  target={external ? '_blank' : undefined}
+>
   <svelte:component
     this={icon}
     style="fill: {active

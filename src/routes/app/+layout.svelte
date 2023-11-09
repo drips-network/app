@@ -23,6 +23,7 @@
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { page } from '$app/stores';
+  import Highlight from '$lib/components/highlight/highlight.svelte';
 
   let walletConnected = false;
   let loaded = false;
@@ -145,6 +146,8 @@
     await fiatEstimates.start();
   });
 </script>
+
+<Highlight />
 
 <GlobalAdvisory />
 
