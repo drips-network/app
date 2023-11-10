@@ -44,6 +44,7 @@
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
 
   interface Amount {
     tokenAddress: string;
@@ -134,10 +135,15 @@
   $: {
     if (browser && !collectHintTriggered && $walletInitialized) {
       let url = new URL(window.location.href);
+
       if (url.searchParams.get('collectHint') === 'true') {
         url.searchParams.delete('collectHint');
         window.history.replaceState({}, '', url.toString());
-        triggerCollectHint();
+
+        if (!dismissablesStore.isDismissed('project-claim-collect-hint')) {
+          triggerCollectHint();
+          dismissablesStore.dismiss('project-claim-collect-hint');
+        }
       }
     }
   }
