@@ -283,6 +283,7 @@
     position: fixed;
     z-index: 103;
     cursor: pointer;
+    transition: background-color 0.2s;
   }
 
   .click-catcher:focus-visible,
