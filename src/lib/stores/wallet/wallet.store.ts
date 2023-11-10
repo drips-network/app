@@ -33,6 +33,7 @@ const onboard = Onboard({
   wallets: [
     injected,
     walletConnectModule({
+      dappUrl: 'https://drips.network/',
       version: 2,
       projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
       requiredChains: [network.chainId],
