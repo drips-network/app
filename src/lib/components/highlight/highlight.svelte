@@ -44,21 +44,23 @@
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const remainingSpaceFromRight = highlightBB.right;
-    const remainingSpaceFromLeft = windowWidth - highlightBB.left;
+    const horizontalCenter = highlightBB.left + highlightBB.width / 2;
+
+    const remainingSpaceFromRight = windowWidth - horizontalCenter;
+    const remainingSpaceFromLeft = horizontalCenter;
     const remainingSpaceFromTop = highlightBB.top;
     const remainingSpaceFromBottom = windowHeight - highlightBB.bottom;
 
-    const textAlignment = remainingSpaceFromRight > remainingSpaceFromLeft ? 'right' : 'left';
+    const textAlignment = remainingSpaceFromRight > remainingSpaceFromLeft ? 'left' : 'right';
 
     let highlightWidth: number;
     switch (textAlignment) {
       case 'left': {
-        highlightWidth = Math.min(remainingSpaceFromLeft, 384);
+        highlightWidth = Math.min(remainingSpaceFromRight, 384);
         break;
       }
       case 'right': {
-        highlightWidth = Math.min(remainingSpaceFromRight, 384);
+        highlightWidth = Math.min(remainingSpaceFromLeft, 384);
         break;
       }
     }
@@ -75,9 +77,9 @@
     let x: number;
     if (alignment === 'top' || alignment === 'bottom') {
       if (textAlignment === 'right') {
-        x = highlightBB.right - highlightWidth;
+        x = horizontalCenter - highlightWidth + 8;
       } else {
-        x = highlightBB.left;
+        x = horizontalCenter - 8;
       }
     } else if (alignment === 'left') {
       x = highlightBB.right + 24;
