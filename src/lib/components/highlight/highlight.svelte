@@ -284,12 +284,13 @@
     z-index: 103;
     cursor: pointer;
     transition: background-color 0.2s;
+    opacity: 0.2;
   }
 
   .click-catcher:focus-visible,
   .click-catcher:hover {
     outline: none;
-    background-color: var(--color-primary-level-1);
+    background-color: var(--color-primary);
   }
 
   .background {
