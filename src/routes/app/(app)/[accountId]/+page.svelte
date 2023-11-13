@@ -147,38 +147,40 @@
     description="There may be more information in the developer console."
   />
 {:else}
-  <div class="profile">
+  <article class="flex flex-col gap-16">
     <SectionSkeleton placeholderOutline={false} loaded={Boolean(address)}>
       {#if address}
-        <div class="identity">
-          <div class="avatar-and-name">
-            <IdentityBadge
-              disableLink
-              {address}
-              size="gigantic"
-              showIdentity={false}
-              disableTooltip
-            />
-            <div class="w-full">
-              <IdentityBadge
-                disableLink
-                {address}
-                size="gigantic"
-                showAvatar={false}
-                disableTooltip
-              />
+        <header class="flex flex-wrap sm:flex-nowrap gap-4">
+          <IdentityBadge
+            disableLink
+            {address}
+            size="gigantic"
+            showIdentity={false}
+            disableTooltip
+          />
+          <div class="flex items-center sm:py-4">
+            <div class="flex flex-col gap-4">
+              <h1 class="w-full -mb-2">
+                <IdentityBadge
+                  disableLink
+                  {address}
+                  size="gigantic"
+                  showAvatar={false}
+                  disableTooltip
+                />
+              </h1>
+              <ul class="social-links">
+                <div in:fade|local><SocialLink network="ethereum" value={address} /></div>
+                {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
+                  {#if value}<li in:fade|local>
+                      <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
+                    </li>{/if}
+                {/each}
+              </ul>
+              {#if description}<p in:fade|local>{description}</p>{/if}
             </div>
           </div>
-          <div class="social-links">
-            <div in:fade|local><SocialLink network="ethereum" value={address} /></div>
-            {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
-              {#if value}<div in:fade|local>
-                  <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
-                </div>{/if}
-            {/each}
-          </div>
-          {#if description}<p class="description" in:fade|local>{description}</p>{/if}
-        </div>
+        </header>
       {/if}
     </SectionSkeleton>
     <Developer accountId={dripsAccountId} />
@@ -200,47 +202,18 @@
         />
       </div>
     {/if}
-  </div>
+  </article>
 {/if}
 
 <style>
-  .identity {
-    display: flex;
-    gap: 1.5rem;
-    flex-direction: column;
-  }
-
-  .identity > .avatar-and-name {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .profile {
-    display: flex;
-    flex-direction: column;
-    gap: 4rem;
-  }
-
   .social-links {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
   }
 
   .social-links * {
     display: flex;
-    gap: 0.5rem;
-  }
-  .social-links *:not(:last-child)::after {
-    content: '•';
-  }
-
-  .description {
-    max-width: 40rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    gap: 0.375rem;
   }
 </style>
