@@ -12,7 +12,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { quintOut } from 'svelte/easing';
-  import scalePercentage from '$lib/utils/scale-percentage';
+  import scale from '$lib/utils/scale';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -68,9 +68,13 @@
       type: 'address',
       address: DRIPS_DONATION_ADDRESS,
     };
+
+    const dripsDependencyPercentage = scale(DEFAULT_DONATION_PERCENTAGE, 0, $context.highLevelPercentages.dependencies, 0, 100);
+    $context.dependencySplits.percentages[DRIPS_DONATION_ADDRESS] = dripsDependencyPercentage;
+
     $context.dependencySplits.percentages = Object.fromEntries(Object.entries($context.dependencySplits.percentages).map((p) => [
       p[0],
-      scalePercentage(p[1], 0, 100 - DEFAULT_DONATION_PERCENTAGE),
+      scale(p[1], 0, 100, 0, 100 - dripsDependencyPercentage),
     ]));
 
     console.log($context)
