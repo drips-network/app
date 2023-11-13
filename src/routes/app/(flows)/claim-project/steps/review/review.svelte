@@ -85,6 +85,30 @@
       { project: projectWritable },
     );
   }
+
+  // Address of Drips multisig
+  const DRIPS_DONATION_ADDRESS = '0xcC7d34C76A9d08aa0109F7Bae35f29C1CE35355A';
+
+  $: isDonatingToDrips = Boolean(Object.values($context.dependencySplits.items).find(
+        (v) =>
+          v.type === 'address' && v.address.toLowerCase() === DRIPS_DONATION_ADDRESS.toLowerCase(),
+      ));
+
+  function goBack() {
+    if ($context.highLevelPercentages.dependencies > 0 && isDonatingToDrips) {
+      // Go back to dependencies config step
+      dispatch('goForward', { by: -2 });
+      return;
+    } else if ($context.highLevelPercentages.dependencies > 0 && !isDonatingToDrips) {
+      // Go back to drips donation step
+      dispatch('goForward', { by: -1 });
+      return;
+    } else if ($context.highLevelPercentages.dependencies === 0) {
+      // Go back to maintainer config step
+      dispatch('goForward', { by: -3 });
+      return;
+    }
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -102,7 +126,7 @@
   </FormField>
   <FormField type="div" title="Owned by">
     <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -6 })} icon={PenIcon}
         >Edit</Button
       >
     </svelte:fragment>
@@ -114,7 +138,7 @@
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">
     <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
         >Edit</Button
       >
     </svelte:fragment>
@@ -173,10 +197,7 @@
   <svelte:fragment slot="left-actions">
     <Button
       icon={ArrowLeft}
-      on:click={() =>
-        dispatch('goForward', {
-          by: $context.highLevelPercentages['dependencies'] === 0 ? -2 : -1,
-        })}>Back</Button
+      on:click={goBack}>Back</Button
     >
   </svelte:fragment>
   <svelte:fragment slot="actions">
