@@ -16,6 +16,7 @@ import type { GitProject, UnclaimedGitProject } from '$lib/utils/metadata/types'
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '../shared/slots/wallet-slot.svelte';
+import DonateToDrips from './steps/donate-to-drips/donate-to-drips.svelte';
 
 interface SplitsConfig extends ListEditorConfig {
   itemsPromise: Promise<GitProject>[] | undefined;
@@ -103,6 +104,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     case 5:
       return [projectSlot, walletSlot];
     case 6:
+      return [projectSlot, walletSlot];
+    case 7:
       return [];
     default:
       return [];
@@ -132,6 +135,10 @@ export const steps = () => [
   }),
   makeStep({
     component: ConfigureDependencies,
+    props: undefined,
+  }),
+  makeStep({
+    component: DonateToDrips,
     props: undefined,
   }),
   makeStep({

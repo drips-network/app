@@ -2,8 +2,7 @@
   import { onMount, type ComponentType } from 'svelte';
   import Knob from './components/knob.svelte';
   import PercentageEditor from '../percentage-editor/percentage-editor.svelte';
-
-  const MIN_ITEM_WIDTH_PX = 48;
+  import { fade } from 'svelte/transition';
 
   export let items: { id: string; label: string; overflowIcon: ComponentType }[];
 
@@ -11,22 +10,29 @@
   $: remainderItem = items[items.length - 1];
 
   export let percentages: { [id: string]: number };
+  export let highlightId: string | undefined = undefined;
+  export let showPercentages = true;
+
+  export let editable = true;
 
   let blocksElem: HTMLDivElement;
   let blocksElemWidth: number;
 
   let percentageElems: { [id: string]: number } | undefined = undefined;
 
+  $: minItemWidthPx = editable ? 48 : 0;
+
   function updatePercentageElemsBasedOnPercentages() {
     percentageElems = Object.fromEntries(
       Object.entries(percentages).map(([item, percentage], _, array) => {
         const totalCount = array.length;
-        const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
+        const maxWidth = blocksElemWidth - totalCount * minItemWidthPx - (totalCount - 1) * 8;
 
-        return [item, Math.round(MIN_ITEM_WIDTH_PX + maxWidth * (percentage / 100))];
+        return [item, Math.round(minItemWidthPx + maxWidth * (percentage / 100))];
       }),
     );
   }
+  $: percentages && updatePercentageElemsBasedOnPercentages();
 
   onMount(() => {
     const resizeObserver = new ResizeObserver(() => {
@@ -84,20 +90,20 @@
     const nextItemWidth = percentageElems[nextItemId];
 
     const newDraggingItemWidth = Math.round(
-      Math.max(draggingItemWidth + deltaX, MIN_ITEM_WIDTH_PX),
+      Math.max(draggingItemWidth + deltaX, minItemWidthPx),
     );
-    const newNextItemWidth = Math.round(Math.max(nextItemWidth - deltaX, MIN_ITEM_WIDTH_PX));
+    const newNextItemWidth = Math.round(Math.max(nextItemWidth - deltaX, minItemWidthPx));
 
     const itemThatHitMin = [
       [draggingItemId, newDraggingItemWidth],
       [nextItemId, newNextItemWidth],
-    ].find(([, width]) => width === MIN_ITEM_WIDTH_PX);
+    ].find(([, width]) => width === minItemWidthPx);
 
     const updatedItems = itemThatHitMin
       ? {
-          [itemThatHitMin[0]]: MIN_ITEM_WIDTH_PX,
+          [itemThatHitMin[0]]: minItemWidthPx,
           [itemThatHitMin[0] === draggingItemId ? nextItemId : draggingItemId]:
-            draggingItemWidth + nextItemWidth - MIN_ITEM_WIDTH_PX,
+            draggingItemWidth + nextItemWidth - minItemWidthPx,
         }
       : {
           [draggingItemId]: newDraggingItemWidth,
@@ -114,15 +120,15 @@
     };
 
     const totalCount = items.length;
-    const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
+    const maxWidth = blocksElemWidth - totalCount * minItemWidthPx - (totalCount - 1) * 8;
 
     percentages[draggingItemId] = Math.round(
-      ((percentageElems[draggingItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100,
+      ((percentageElems[draggingItemId] - minItemWidthPx) / maxWidth) * 100,
     );
 
     if (nextItemId !== remainderItem.id) {
       percentages[nextItemId] = Math.round(
-        ((percentageElems[nextItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100,
+        ((percentageElems[nextItemId] - minItemWidthPx) / maxWidth) * 100,
       );
 
       percentages[remainderItem.id] = 100 - percentages[draggingItemId] - percentages[nextItemId];
@@ -188,14 +194,21 @@
     }
 
     updatePercentageElemsBasedOnPercentages();
-  }
+}
+
+function getIconFillColor(percentage: number, highlit: boolean) {
+  if (percentage === 0) return 'var(--color-foreground-level-5)';
+  if (highlit) return 'white';
+  return 'var(--color-foreground-level-5)';
+}
 </script>
 
 <div class="visual-percentage-editor">
   <div class="blocks" bind:this={blocksElem}>
     {#if percentageElems}
       {#each Object.entries(percentageElems) as [id, width], index}
-        <div class="block-wrapper" style="width: {width}px">
+        {@const highlit = highlightId === id}
+        <div class="block-wrapper" class:highlit={highlit} class:other-item-highlit={highlightId && !highlit} style="width: {width}px">
           <div class="block" bind:this={blockDivs[id]} class:zero-percent={percentages[id] === 0}>
             <h4
               class="typo-text label"
@@ -207,31 +220,34 @@
               <div class="overflown-icon">
                 <svelte:component
                   this={items[index].overflowIcon}
-                  style="fill: {percentages[id] === 0
-                    ? 'var(--color-foreground-level-5)'
-                    : 'var(--color-foreground)'}"
+                  style="fill: {getIconFillColor(percentages[id], highlit)}; transition: fill 0.3s;"
                 />
               </div>
             {/if}
           </div>
-          {#if index !== Object.keys(percentageElems).length - 1}
-            <div class="knob" on:mousedown={(e) => startDragging(index, e)}>
-              <Knob dragging={draggingIndex === index} />
-            </div>
-            <div class="percentage-input">
-              <PercentageEditor
-                bind:percentage={percentageInputValues[id]}
-                on:confirm={() => handleConfirmPercentageInput(id)}
-              />
-            </div>
-          {:else}
-            <div class="percentage-input">
-              <PercentageEditor
-                editable={false}
-                bind:percentage={percentageInputValues[id]}
-                on:confirm={() => handleConfirmPercentageInput(id)}
-              />
-            </div>
+          {#if showPercentages}
+            {#if index !== Object.keys(percentageElems).length - 1}
+              {#if editable}
+                <div class="knob" on:mousedown={(e) => startDragging(index, e)}>
+                  <Knob dragging={draggingIndex === index} />
+                </div>
+              {/if}
+              <div class="percentage-input" in:fade>
+                <PercentageEditor
+                  {editable}
+                  bind:percentage={percentageInputValues[id]}
+                  on:confirm={() => handleConfirmPercentageInput(id)}
+                />
+              </div>
+            {:else}
+              <div class="percentage-input" in:fade>
+                <PercentageEditor
+                  editable={false}
+                  bind:percentage={percentageInputValues[id]}
+                  on:confirm={() => handleConfirmPercentageInput(id)}
+                />
+              </div>
+            {/if}
           {/if}
         </div>
       {/each}
@@ -278,6 +294,14 @@
     border-radius: 0.25rem;
   }
 
+  .block-wrapper.other-item-highlit .block {
+    background-color: var(--color-foreground-level-2);
+  }
+
+  .block-wrapper.highlit .block {
+    background-color: var(--color-primary);
+  }
+
   .block-wrapper:first-child .block {
     border-radius: 1rem 0.25rem 0.25rem 1rem;
   }
@@ -302,7 +326,11 @@
     white-space: nowrap;
     width: fit-content;
     color: var(--color-primary-level-4);
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, color 0.3s;
+  }
+
+  .block-wrapper.other-item-highlit .label {
+    color: var(--color-foreground-level-5);
   }
 
   .overflown-icon {
@@ -328,5 +356,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.3s;
+  }
+
+  .block-wrapper.other-item-highlit .percentage-input {
+    opacity: 0.5;
   }
 </style>
