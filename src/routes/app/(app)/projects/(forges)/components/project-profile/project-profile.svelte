@@ -40,9 +40,8 @@
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
-  import Link from 'radicle-design-system/icons/Link.svelte';
-  import Copyable from '$lib/components/copyable/copyable.svelte';
   import { browser } from '$app/environment';
+  import ShareButton from '$lib/components/share-button/share-button.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -129,12 +128,7 @@
         {/await}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <Copyable value={browser ? window.location.href : ''}>
-              <div class="flex gap-1 items-center">
-                <Link style="fill:currentColor" />
-                <div class="whitespace-nowrap">Copy URL</div>
-              </div>
-            </Copyable>
+            <ShareButton url={browser ? window.location.href : ''} />
             <Button
               size="small"
               icon={Registered}

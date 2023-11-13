@@ -1,11 +1,11 @@
 ![Drips Logo illustration](/docs/assets/drips-logo-illustration.png)
 
-# Drips V2 App
+# Drips App
 
-| 🏗️ This app is under active development, and currently available in beta at [drips.network](https://drips.network/). |
+| 🏗️ This app is under active development, and currently available at [drips.network](https://drips.network/). |
 | -------------------------------------------------------------------------------------------------------------------- |
 
-Drips 💧 is a new protocol (and app), built on Ethereum, that enables organizations and individuals to directly and publicly provide funding to the free and open source software projects they depend on the most.
+Drips 💧 is a protocol (and app), built on Ethereum, that enables organizations and individuals to directly and publicly provide funding to the free and open source software projects they depend on the most.
 
 Drips also includes gas-optimized and integrated primitives for streaming and splitting tokens, allowing users and web3 apps to stream and split funds by the second with continuous settlement for use cases like contributor payments, vesting and subscription memberships.
 
@@ -22,5 +22,7 @@ Please first search this repo if your issue already exists. If so, feel free to 
 If you’re suggesting copy changes, please create a single issue for all your suggestions and ideally group them sensibly (by page, section, flow, etc.)
 
 If your feedback is about the landing page, please also tag it with `landing page`.
+
+You can also reach out to us on our [Discord](https://discord.gg/t8XBXZAEs5), we're always there.
 
 Thank you for your feedback! ✌️
