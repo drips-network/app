@@ -18,7 +18,7 @@
 </script>
 
 <li
-  class="slot h-12 rounded-drip-xl flex items-center justify-between gap-8 shadow-low bg-background px-4"
+  class="slot h-12 rounded-drip-xl flex items-center justify-between gap-8 shadow-low bg-background px-2"
 >
   <div class="flex items-center gap-2 min-w-0">
     {#if icon}
