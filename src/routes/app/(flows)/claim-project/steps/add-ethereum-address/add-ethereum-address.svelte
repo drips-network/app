@@ -48,24 +48,20 @@
 
         const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
 
-        try {
-          await github.getFundingJson(
-            username,
-            repoName,
-            dripsJsonTemplate(
-              $walletStore.address ?? unreachable(),
-              $walletStore.network.name
-                ? $walletStore.network.name === 'homestead'
-                  ? 'ethereum'
-                  : $walletStore.network.name
-                : unreachable(),
-            ),
-          );
+        await github.getFundingJson(
+          username,
+          repoName,
+          dripsJsonTemplate(
+            $walletStore.address ?? unreachable(),
+            $walletStore.network.name
+              ? $walletStore.network.name === 'homestead'
+                ? 'ethereum'
+                : $walletStore.network.name
+              : unreachable(),
+          ),
+        );
 
-          $context.linkedToRepo = true;
-        } catch (error) {
-          throw new Error('FUNDING.json not found.');
-        }
+        $context.linkedToRepo = true;
 
         try {
           // Kick off repo owner update using gasless TX
