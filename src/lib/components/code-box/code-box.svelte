@@ -3,13 +3,14 @@
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
   import CopyIcon from 'radicle-design-system/icons/Copy.svelte';
+  import Button from '../button/button.svelte';
 
   export let path: string;
   export let code: string;
   export let repoUrl: string;
   export let defaultBranch = 'main';
 
-  let headerElem: HTMLDivElement | undefined;
+  let headerElem: HTMLElement | undefined;
 
   $: primaryColor = headerElem
     ? getComputedStyle(headerElem).getPropertyValue('--color-primary')
@@ -31,15 +32,10 @@
   )}`;
 </script>
 
-<div class="codebox">
-  <div class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
+<section class="codebox relative">
+  <header class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
     {path}
     <div class="actions">
-      {#if repoUrl.includes('github')}
-        <a href={gitHubProposalUrl} target="_blank">
-          <ArrowBoxUpRight style="fill: {textColor}" />
-        </a>
-      {/if}
       <button on:click={() => copyClipboard(code)}>
         {#if copySuccess}
           <CheckIcon style="fill: {textColor}" />
@@ -48,13 +44,20 @@
         {/if}
       </button>
     </div>
-  </div>
+  </header>
   <div class="code-wrapper">
     <code class="typo-text-mono">
       {@html code}
     </code>
   </div>
-</div>
+  {#if repoUrl.includes('github')}
+    <footer class="absolute bottom-4 right-4">
+      <Button variant="primary" icon={ArrowBoxUpRight} href={gitHubProposalUrl} target="_blank">
+        Add to your repo</Button
+      >
+    </footer>
+  {/if}
+</section>
 
 <style>
   .codebox {
