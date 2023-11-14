@@ -27,7 +27,7 @@
 
   export let slots: Slots;
 
-  let slotsElem: HTMLDivElement;
+  let slotsElem: HTMLUListElement;
 
   let wrapperHeight = tweened(0, {
     duration: 300,
@@ -52,26 +52,19 @@
   }
 </script>
 
-<div class="wrapper" style:height="{$wrapperHeight}px">
+<div class="overflow-hidden" style:height="{$wrapperHeight}px">
   {#if slots.length > 0}
-    <div transition:fade|local class="slots" bind:this={slotsElem}>
+    <ul transition:fade|local class="slots flex flex-col gap-4" bind:this={slotsElem}>
       {#each slots as slot}
         <StandaloneFlowSlot on:edit {...slot} />
       {/each}
-    </div>
+    </ul>
   {/if}
 </div>
 
 <style>
   .slots {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
     padding: 2rem 2rem 0.5rem 2rem;
-  }
-
-  .wrapper {
-    overflow: hidden;
   }
 
   @media (max-width: 514px) {
