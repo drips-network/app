@@ -13,6 +13,7 @@
   export let dataTestId: string | undefined = undefined;
   export let href: string | undefined = undefined;
   export let target: string | undefined = undefined;
+  export let rel: string | undefined = undefined;
 
   $: isDisabled = disabled || loading;
 
@@ -32,9 +33,11 @@
   aria-label={ariaLabel}
   {href}
   {target}
+  {rel}
   class="button size-{size}"
+  class:disabled={isDisabled}
   disabled={isDisabled}
-  class:pointer-events-none={isDisabled}
+  aria-disabled={isDisabled}
   on:click|stopPropagation
   data-testid={dataTestId}
 >
@@ -63,7 +66,7 @@
 
 <style>
   .button {
-    display: inline-block;
+    display: flex;
     height: calc(2rem + 10px);
     min-width: calc(2rem + 4px); /* so just icons are square (w=h) */
     padding: 5px 2px;
@@ -136,14 +139,14 @@
     padding: 0 0.75rem;
   }
 
-  .button:not(:disabled):hover .inner,
-  .button:not(:disabled):focus-visible .inner {
+  .button:not(.disabled):hover .inner,
+  .button:not(.disabled):focus-visible .inner {
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
   }
 
-  .button:not(:disabled):active .inner {
+  .button:not(.disabled):active .inner {
     transform: translateY(0px);
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
   }
@@ -159,7 +162,8 @@
   .button:focus-visible .inner.normal {
     background-color: var(--color-foreground-level-1);
   }
-  .button:disabled {
+  .button.disabled {
     opacity: 0.5;
+    pointer-events: none;
   }
 </style>
