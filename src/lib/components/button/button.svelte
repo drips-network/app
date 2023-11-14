@@ -28,12 +28,13 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
+  bind:this={el}
+  aria-label={ariaLabel}
   {href}
   {target}
   class="button size-{size}"
-  bind:this={el}
-  aria-label={ariaLabel}
   disabled={isDisabled}
+  class:pointer-events-none={isDisabled}
   on:click|stopPropagation
   data-testid={dataTestId}
 >

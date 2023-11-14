@@ -18,15 +18,15 @@
     </a>
   </div>
   <nav>
-    <a href="https://github.com/drips-network" target="_blank" rel="noreferrer"
-      ><Button variant="ghost">Code</Button></a
+    <Button variant="ghost" href="https://github.com/drips-network" target="_blank" rel="noreferrer"
+      >Code</Button
     >
-    <a href="https://docs.drips.network" target="_blank" rel="noreferrer"
-      ><Button variant="ghost">Docs</Button></a
+    <Button variant="ghost" href="https://docs.drips.network" target="_blank" rel="noreferrer"
+      >Docs</Button
     >
-    <a class="cta" href="/app" data-sveltekit-preload-code="eager"
-      ><Button variant="primary">Open app</Button></a
-    >
+    <div data-sveltekit-preload-code="eager">
+      <Button variant="primary" href="/app">Open app</Button>
+    </div>
   </nav>
 </header>
 
