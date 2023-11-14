@@ -460,7 +460,7 @@
       <ul>
         {#each Object.entries(items) as [slug, item], index}
           <li
-            class="flex flex-wrap items-center py-4 gap-1 justify-between"
+            class="flex flex-wrap py-4 gap-1 items-center justify-between"
             data-testid={`item-${slug}`}
             class:bg-primary-level-1={index === Object.entries(items).length - 1 &&
               highlightLastItemAdded}

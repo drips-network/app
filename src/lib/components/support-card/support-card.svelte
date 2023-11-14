@@ -210,7 +210,7 @@
         >Connect wallet</Button
       >
     {:else}
-      {#if isOwner}
+      {#if isOwner && dripList}
         <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams} variant="primary"
           >Stream tokens</Button
         >

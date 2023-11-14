@@ -69,24 +69,20 @@
 
         const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
 
-        try {
-          await github.getFundingJson(
-            ownerName,
-            repoName,
-            dripsJsonTemplate(
-              $walletStore.address ?? unreachable(),
-              $walletStore.network.name
-                ? $walletStore.network.name === 'homestead'
-                  ? 'ethereum'
-                  : $walletStore.network.name
-                : unreachable(),
-            ),
-          );
+        await github.getFundingJson(
+          ownerName,
+          repoName,
+          dripsJsonTemplate(
+            $walletStore.address ?? unreachable(),
+            $walletStore.network.name
+              ? $walletStore.network.name === 'homestead'
+                ? 'ethereum'
+                : $walletStore.network.name
+              : unreachable(),
+          ),
+        );
 
-          $context.linkedToRepo = true;
-        } catch (error) {
-          throw new Error('FUNDING.json not found.');
-        }
+        $context.linkedToRepo = true;
 
         const numericForgeValue = forge === 'GitHub' ? 0 : 1;
 
