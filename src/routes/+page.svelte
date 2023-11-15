@@ -328,7 +328,6 @@
     <section>
       <div class="flex flex-col gap-4 items-center">
         <div class="legal-links typo-text-small">
-          <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
           <a href="/legal/privacy">Privacy Policy</a> •
           <a href="/legal/disclaimer">Disclaimer</a> •
           <a href="/legal/access">Access</a>

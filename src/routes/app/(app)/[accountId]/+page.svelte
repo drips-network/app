@@ -11,11 +11,8 @@
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import decodeUniversalAccountId from '$lib/utils/decode-universal-account-id';
-  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import DripsV1Logo from '$lib/components/illustrations/drips-v1-logo.svelte';
-  import Banner from '$lib/components/banner/banner.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
@@ -120,10 +117,6 @@
   }
 
   $: dripsAccountId && fetchRequestedAccount(dripsAccountId);
-
-  function getDripsV1Url(address: string, ensName?: string) {
-    return `https://app.v1.drips.network/${ensName ?? address}`;
-  }
 </script>
 
 <HeadMeta title={(address && $ens[address]?.name) ?? address ?? accountId} />
@@ -188,20 +181,6 @@
     <DripListsSection collapsable accountId={dripsAccountId} />
     <Streams collapsable accountId={dripsAccountId} />
     <Balances collapsable collapsed accountId={dripsAccountId} />
-    {#if address && !$dismissablesStore.includes('profile-drips-v1')}
-      <div class="drips-v1-banner" out:fly|local={{ duration: 300, y: 16 }}>
-        <Banner
-          title="Looking for the old Drips?"
-          description="You can still access the previous Drips app at app.v1.drips.network."
-          button={{
-            label: 'View profile on Drips V1',
-            href: getDripsV1Url(address, $ens[address]?.name),
-          }}
-          icon={DripsV1Logo}
-          on:dismiss={() => dismissablesStore.dismiss('profile-drips-v1')}
-        />
-      </div>
-    {/if}
   </article>
 {/if}
 
