@@ -161,6 +161,7 @@
   .splitting-graph-edu.card .content {
     display: flex;
     flex-direction: column;
+    align-items: start;
     max-width: 40rem;
     gap: 1rem;
   }
