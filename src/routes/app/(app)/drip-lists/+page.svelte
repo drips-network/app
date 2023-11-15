@@ -17,8 +17,6 @@
 
     guardConnected();
   }
-
-  $: address = $walletStore.address;
 </script>
 
 <HeadMeta title="Drip List" />

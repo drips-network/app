@@ -44,6 +44,7 @@
           on:click={() => (searchMode = true)}
           transition:fly|local={{ duration: 300, x: -64, easing: quadInOut }}
           data-testid="search-button"
+          data-highlightid="search"
         >
           <SearchIcon style="fill: var(--color-foreground)" />
         </button>

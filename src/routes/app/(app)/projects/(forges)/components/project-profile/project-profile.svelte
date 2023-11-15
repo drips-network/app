@@ -42,6 +42,9 @@
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
+  import highlightStore from '$lib/stores/highlight/highlight.store';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
 
   interface Amount {
     tokenAddress: string;
@@ -102,6 +105,47 @@
           return undefined;
       }
     });
+  }
+
+  $: mobileView =
+    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
+
+  let collectHintTriggered = false;
+
+  function triggerCollectHint() {
+    collectHintTriggered = true;
+
+    setTimeout(() => {
+      highlightStore.highlight({
+        title: 'Collect your earnings',
+        description: 'You can collect earnings to your wallet on the Projects screen.',
+        element: document.querySelectorAll(
+          mobileView
+            ? "[data-highlightid='bottomnav-/app/projects']"
+            : "[data-highlightid='sidenav-/app/projects']",
+        )[0],
+        borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
+        paddingPx: mobileView ? 8 : 0,
+      });
+    }, 2000);
+  }
+
+  const walletInitialized = walletStore.initialized;
+
+  $: {
+    if (browser && !collectHintTriggered && $walletInitialized) {
+      let url = new URL(window.location.href);
+
+      if (url.searchParams.get('collectHint') === 'true') {
+        url.searchParams.delete('collectHint');
+        window.history.replaceState({}, '', url.toString());
+
+        if (!dismissablesStore.isDismissed('project-claim-collect-hint')) {
+          triggerCollectHint();
+          dismissablesStore.dismiss('project-claim-collect-hint');
+        }
+      }
+    }
   }
 </script>
 
