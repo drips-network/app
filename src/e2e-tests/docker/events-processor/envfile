@@ -1,5 +1,4 @@
 RPC_URL=http://testnet:8545
-
 IPFS_GATEWAY_URL=http://fake-pinata:3000
 NETWORK=localtestnet
 SHOULD_PROCESS_PAST_EVENTS=true
