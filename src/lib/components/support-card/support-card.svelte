@@ -81,10 +81,8 @@
 
   $: isOwner =
     $walletStore.connected &&
-    project &&
-    isClaimed(project) &&
-    ($walletStore.dripsAccountId === project?.owner?.accountId ||
-      $walletStore.dripsAccountId === dripList?.owner.accountId);
+    (dripList?.owner.accountId === $walletStore.dripsAccountId ||
+      (project && isClaimed(project) && $walletStore.dripsAccountId === project?.owner?.accountId));
 
   let supportUrl: string;
   $: {
