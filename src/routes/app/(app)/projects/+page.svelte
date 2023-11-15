@@ -93,9 +93,9 @@
                 every seven days.
               </p>
             </div>
-            <a tabindex="-1" href="https://docs.drips.network/" target="_blank"
-              ><Button icon={ArrowBoxUpRight}>Learn more</Button></a
-            >
+            <Button href="https://docs.drips.network/" target="_blank" icon={ArrowBoxUpRight}>
+              Learn more
+            </Button>
           </div>
           <button
             class="close-button"

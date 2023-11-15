@@ -11,14 +11,15 @@
   export let size: 'small' | 'normal' | 'large' = 'normal';
   export let loading = false;
   export let dataTestId: string | undefined = undefined;
+  export let href: string | undefined = undefined;
+  export let target: string | undefined = undefined;
+  export let rel: string | undefined = undefined;
 
   $: isDisabled = disabled || loading;
 
-  let buttonEl: HTMLButtonElement;
+  let el: HTMLButtonElement | HTMLAnchorElement;
 
-  $: primaryColor = buttonEl
-    ? getComputedStyle(buttonEl).getPropertyValue('--color-primary')
-    : undefined;
+  $: primaryColor = el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined;
 
   $: textColor =
     primaryColor && (variant === 'destructive' || variant === 'primary')
@@ -26,11 +27,17 @@
       : 'var(--color-foreground)';
 </script>
 
-<button
-  class="size-{size}"
-  bind:this={buttonEl}
+<svelte:element
+  this={href ? 'a' : 'button'}
+  bind:this={el}
   aria-label={ariaLabel}
+  {href}
+  {target}
+  {rel}
+  class="button size-{size}"
+  class:disabled={isDisabled}
   disabled={isDisabled}
+  aria-disabled={isDisabled}
   on:click|stopPropagation
   data-testid={dataTestId}
 >
@@ -55,10 +62,11 @@
       </div>
     {/if}
   </div>
-</button>
+</svelte:element>
 
 <style>
-  button {
+  .button {
+    display: flex;
     height: calc(2rem + 10px);
     min-width: calc(2rem + 4px); /* so just icons are square (w=h) */
     padding: 5px 2px;
@@ -67,17 +75,17 @@
     flex-shrink: 0;
   }
 
-  button.size-large {
+  .button.size-large {
     height: calc(3rem + 10px);
     min-width: calc(3rem + 4px);
   }
 
-  button.size-small {
+  .button.size-small {
     height: 2.5rem;
     min-width: calc(3rem);
   }
 
-  button .inner {
+  .button .inner {
     height: 100%;
     border-radius: 1rem 0 1rem 1rem;
     display: flex;
@@ -91,7 +99,7 @@
     position: relative;
   }
 
-  button .inner .loading {
+  .button .inner .loading {
     position: absolute;
     top: 0;
     left: 0;
@@ -103,54 +111,59 @@
     border-radius: 1rem 0 1rem 1rem;
   }
 
-  button.size-large .inner {
+  .button.size-large .inner {
     border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
-  button.size-small .inner {
+  .button.size-small .inner {
     font-size: 14px;
   }
 
-  button .inner:not(.ghost) {
+  .button .inner:not(.ghost) {
     box-shadow: var(--elevation-low);
   }
 
-  button .inner.primary {
+  .button .inner.primary {
     background-color: var(--color-primary);
   }
 
-  button .inner.destructive {
+  .button .inner.destructive {
     background-color: var(--color-negative);
   }
 
-  button .inner.with-icon-text {
+  .button .inner.with-icon-text {
     padding: 0 0.75rem 0 0.5rem;
   }
 
-  button .inner.with-text {
+  .button .inner.with-text {
     padding: 0 0.75rem;
   }
 
-  button:enabled:hover .inner,
-  button:enabled:focus-visible .inner {
+  .button:not(.disabled):hover .inner,
+  .button:not(.disabled):focus-visible .inner {
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
   }
 
-  button:enabled:active .inner {
+  .button:not(.disabled):active .inner {
     transform: translateY(0px);
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
   }
 
-  button:focus-visible .inner {
+  .button:focus {
+    outline: none;
+  }
+
+  .button:focus-visible .inner {
     box-shadow: var(--elevation-low);
   }
 
-  button:focus-visible .inner.normal {
+  .button:focus-visible .inner.normal {
     background-color: var(--color-foreground-level-1);
   }
-  button:disabled {
+  .button.disabled {
     opacity: 0.5;
+    pointer-events: none;
   }
 </style>
