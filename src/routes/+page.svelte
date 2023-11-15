@@ -58,8 +58,8 @@
         <h1>Funding that flows</h1>
         <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
         <div class="actions">
-          <a href="#fund-projects"><Button icon={TokenStreams}>Fund your dependencies</Button></a>
-          <a href="#get-funding"><Button icon={Globe}>Get support for your project</Button></a>
+          <Button href="#fund-projects" icon={TokenStreams}>Fund your dependencies</Button>
+          <Button href="#get-funding" icon={Globe}>Get support for your project</Button>
         </div>
       </div>
       <div class="illustration">
@@ -98,14 +98,12 @@
             <p>Enter the URL of your public GitHub repository to get started.</p>
             <div class="claim-input">
               <TextInput bind:value={claimProjectInput} placeholder="GitHub repository URL" />
-              <a
-                href={canSubmitProjectClaim
-                  ? buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })
-                  : undefined}
+              <Button
+                href={buildUrl('/app/claim-project', { projectToAdd: claimProjectInput })}
                 target="_blank"
-                ><Button variant="primary" size="large" disabled={!canSubmitProjectClaim}
-                  >Claim project</Button
-                ></a
+                variant="primary"
+                size="large"
+                disabled={!canSubmitProjectClaim}>Claim project</Button
               >
             </div>
           </div>
@@ -252,9 +250,9 @@
           <div class="text">
             <h3>Start your Drip List</h3>
             <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
-            <a href="/app/funder-onboarding" target="_blank">
-              <Button variant="primary" size="large">Create your Drip List</Button>
-            </a>
+            <Button variant="primary" size="large" href="/app/funder-onboarding" target="_blank"
+              >Create your Drip List</Button
+            >
           </div>
         </div>
       </div>
@@ -309,14 +307,23 @@
         <div class="socials">
           <h2>Stay up to date</h2>
           <div class="flex gap-4">
-            <a href="https://twitter.com/dripsnetwork" target="_blank" rel="noreferrer"
-              ><Button variant="primary">Twitter</Button></a
+            <Button
+              variant="primary"
+              href="https://twitter.com/dripsnetwork"
+              target="_blank"
+              rel="noreferrer">Twitter</Button
             >
-            <a href="https://mirror.xyz/dripsdev.eth" target="_blank" rel="noreferrer"
-              ><Button variant="primary">Mirror</Button></a
+            <Button
+              variant="primary"
+              href="https://mirror.xyz/dripsdev.eth"
+              target="_blank"
+              rel="noreferrer">Mirror</Button
             >
-            <a href="https://discord.gg/BakDKKDpHF" target="_blank" rel="noreferrer"
-              ><Button variant="primary">Discord</Button></a
+            <Button
+              variant="primary"
+              href="https://discord.gg/BakDKKDpHF"
+              target="_blank"
+              rel="noreferrer">Discord</Button
             >
           </div>
         </div>
@@ -328,7 +335,6 @@
     <section>
       <div class="flex flex-col gap-4 items-center">
         <div class="legal-links typo-text-small">
-          <a href="https://v1.drips.network/" class="highlight">Back to Drips V1</a> •
           <a href="/legal/privacy">Privacy Policy</a> •
           <a href="/legal/disclaimer">Disclaimer</a> •
           <a href="/legal/access">Access</a>
