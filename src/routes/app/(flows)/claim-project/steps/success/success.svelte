@@ -7,6 +7,8 @@
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import buildUrl from '$lib/utils/build-url';
+  import balancesStore from '$lib/stores/balances/balances.store';
+  import assert from '$lib/utils/assert';
 
   export let context: Writable<State>;
 
@@ -22,6 +24,11 @@
     const repoName = $context.project?.source.repoName;
 
     const collectedFunds = ($context.unclaimedFunds?.length ?? 0) > 0;
+
+    const ownAccountId = $walletStore.dripsAccountId;
+    assert(ownAccountId);
+
+    await balancesStore.updateBalances($walletStore.dripsAccountId);
 
     await goto(
       buildUrl(
