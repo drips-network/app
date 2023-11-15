@@ -28,6 +28,9 @@
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import highlightStore from '$lib/stores/highlight/highlight.store';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
   import {
     Forge,
     ProjectVerificationStatus,
@@ -289,11 +292,43 @@
   let sectionError = false;
   let sectionCollapsable = false;
   let sectionCollapsed = false;
+
+  $: mobileView =
+    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
 </script>
 
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Highlight</h2>
+  <Button
+    on:click={() =>
+      highlightStore.highlight({
+        title: 'Highlight title',
+        description: 'Description here',
+        element: document.querySelectorAll("[data-highlightid='search']")[0],
+        borderRadius: '2rem',
+        paddingPx: 0,
+      })}>Attach highlight to search button</Button
+  >
+  <Button
+    on:click={() =>
+      highlightStore.highlight({
+        title: 'Collect your earnings',
+        description: 'You can collect earnings to your wallet on the Projects screen.',
+        element: document.querySelectorAll(
+          mobileView
+            ? "[data-highlightid='bottomnav-/app/projects']"
+            : "[data-highlightid='sidenav-/app/projects']",
+        )[0],
+        borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
+        paddingPx: mobileView ? 8 : 0,
+      })}
+    disabled={!$walletStore.connected}>Attach highlight to projects button</Button
+  >
+</div>
 
 <div class="showcase-item">
   <h2>Toggleable</h2>
