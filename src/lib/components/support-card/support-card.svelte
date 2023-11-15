@@ -43,6 +43,7 @@
 
 <script lang="ts">
   import Heart from 'radicle-design-system/icons/Heart.svelte';
+  import Droplet from 'radicle-design-system/icons/Droplet.svelte';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
@@ -78,6 +79,7 @@
   export let dripList: SupportCardDripListFragment | undefined = undefined;
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
+  let supportMenuOpen = false;
 
   $: isOwner =
     $walletStore.connected &&
@@ -171,6 +173,11 @@
       modal.show(Stepper, undefined, addDripListMemberSteps(ownDripLists, project, dripList));
     }
   }
+
+  async function connectWallet() {
+    await walletStore.connect();
+    supportMenuOpen = true;
+  }
 </script>
 
 <div class="become-supporter-card">
@@ -194,30 +201,31 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    {#if !isWalletConnected}
-      Connect your Ethereum wallet to see your support options.
-    {:else if dripList && isOwner}
-      Support everyone on your list with a single token stream or add it to another Drip List.
-    {:else}
-      Add this {project ? 'project' : ''} to a Drip List to flexibly support it with an ongoing contribution.
-    {/if}
+    Make a single donation{#if isOwner && dripList}, stream tokens,{/if} or add them to a Drip List.
   </p>
   <div class="flex flex-col gap-2">
     {#if !isWalletConnected}
-      <Button on:click={() => walletStore.connect()} size="large" icon={Wallet} variant="primary"
-        >Connect wallet</Button
+      <Button on:click={connectWallet} size="large" icon={Wallet} variant="primary"
+        >Connect your wallet</Button
+      >
+    {:else if !supportMenuOpen}
+      <Button
+        variant="primary"
+        on:click={() => {
+          supportMenuOpen = true;
+        }}
+        icon={Heart}
+        size="large">Support</Button
       >
     {:else}
+      <Button size="large" icon={Droplet}>Send a single donation</Button>
       {#if isOwner && dripList}
-        <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams} variant="primary"
+        <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams}
           >Stream tokens</Button
         >
       {/if}
-      <Button
-        on:click={handleAddtoDripListButton}
-        size="large"
-        icon={DripListIcon}
-        variant="primary">Add to a Drip List</Button
+      <Button on:click={handleAddtoDripListButton} size="large" icon={DripListIcon}
+        >Add to a Drip List</Button
       >
     {/if}
   </div>
