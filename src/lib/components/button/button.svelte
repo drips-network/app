@@ -66,7 +66,7 @@
 
 <style>
   .button {
-    display: flex;
+    display: inline-block;
     height: calc(2rem + 10px);
     min-width: calc(2rem + 4px); /* so just icons are square (w=h) */
     padding: 5px 2px;

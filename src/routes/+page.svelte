@@ -451,6 +451,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    align-items: start;
   }
 
   @media (max-width: 1155px) {
@@ -521,6 +522,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    align-items: start;
     padding: min(3rem, 3vw);
   }
 
