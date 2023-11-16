@@ -88,6 +88,8 @@
     "graphql-request": "^6.1.0",
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.21",
+    "node-font2base64": "^0.9.2",
+    "node-html-to-image": "^4.0.0",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
     "twemoji": "^14.0.2",
