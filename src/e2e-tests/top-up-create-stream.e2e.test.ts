@@ -130,7 +130,7 @@ describe('app', async () => {
         await page.locator('text=Create stream').click();
 
         await expect(
-          page.locator('text=Stream any ERC-20 token to anyone with an Ethereum address.'),
+          page.locator('text=Stream any ERC-20 token from your Drips account.'),
         ).toHaveCount(1);
       });
 
