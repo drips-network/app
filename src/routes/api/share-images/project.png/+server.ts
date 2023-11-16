@@ -35,7 +35,7 @@ export const GET: RequestHandler = async ({ url }) => {
     html: `
     <html>
       <head>
-        ${baseStyles(height, bgColor)}
+        ${await baseStyles(height, bgColor)}
       </head>
       <body>
         <div style="font-family: Redaction; color: ${textColor};">

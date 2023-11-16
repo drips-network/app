@@ -1,10 +1,10 @@
-import font2base64 from 'node-font2base64';
+import { encodeToDataUrl } from './fontsToBase64';
 
-export default function () {
-  const redactionFontData = font2base64.encodeToDataUrlSync(
+export default async function () {
+  const redactionFontData = await encodeToDataUrl(
     './static/fonts/redaction/Redaction_50-Italic.woff2',
   );
-  const interFontData = font2base64.encodeToDataUrlSync('./static/fonts/Inter-Regular.woff2');
+  const interFontData = await encodeToDataUrl('./static/fonts/Inter-Regular.woff2');
 
   return `
   @font-face {

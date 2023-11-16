@@ -1,6 +1,6 @@
 import loadFonts from './loadFonts';
 
-export default (height: number, bgColor: string) => `
+export default async (height: number, bgColor: string) => `
   <style>
     body {
       width: 1200px;
@@ -8,6 +8,6 @@ export default (height: number, bgColor: string) => `
       background-color: ${bgColor};
     }
 
-    ${loadFonts()}
+    ${await loadFonts()}
   </style>
 `;
