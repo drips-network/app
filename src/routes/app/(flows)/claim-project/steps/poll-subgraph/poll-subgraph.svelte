@@ -49,7 +49,7 @@
           },
         ),
       (response) => response.projectById?.verificationStatus === 'OwnerUpdated',
-      60000,
+      300000,
       2000,
     );
   }
