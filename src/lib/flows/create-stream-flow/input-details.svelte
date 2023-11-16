@@ -31,11 +31,13 @@
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { CreateStreamFlowState } from './create-stream-flow-state';
+  import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<CreateStreamFlowState>;
   export let tokenAddress: string | undefined = undefined;
+  export let receiver: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
 
   const restorer = $context.restorer;
 
@@ -45,11 +47,11 @@
 
   // Recipient Address
 
-  let recipientAddressValue = restorer.restore('recipientAddressValue');
-  let recipientAddressValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let recipientInputValue = receiver?.accountId ?? restorer.restore('recipientInputValue');
+  let recipientInputValidationState: TextInputValidationState = { type: 'unvalidated' };
 
-  function onAddressValidationChange(event: CustomEvent) {
-    recipientAddressValidationState = event.detail ?? { type: 'unvalidated' };
+  function onRecipientInputValidationChange(event: CustomEvent) {
+    recipientInputValidationState = event.detail ?? { type: 'unvalidated' };
   }
 
   // Token dropdown
@@ -163,7 +165,7 @@
 
   $: formValid =
     streamEndDateValidationState.type !== 'invalid' &&
-    recipientAddressValidationState.type === 'valid' &&
+    (receiver || recipientInputValidationState.type === 'valid') &&
     amountValidationState?.type === 'valid' &&
     streamNameValue &&
     timeRangeValid;
@@ -173,7 +175,7 @@
       dispatch,
       selectedToken ?? unreachable(),
       amountPerSecond ?? unreachable(),
-      recipientAddressValue ?? unreachable(),
+      recipientInputValue ?? unreachable(),
       streamNameValue ?? unreachable(),
       $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
       setStartAndEndDate
@@ -190,7 +192,7 @@
     amountValue,
     selectedTokenAddress,
     selectedMultiplier,
-    recipientAddressValue,
+    recipientInputValue,
     streamStartDateValue,
     streamStartTimeValue,
     streamEndDateValue,
@@ -208,27 +210,31 @@
           address: $wallet.address,
         }
       : undefined}
-    to={recipientAddressValidationState.type === 'valid' && recipientAddressValue
+    to={receiver
+      ? receiver
+      : recipientInputValidationState.type === 'valid' && recipientInputValue
       ? {
           driver: 'address',
-          address: recipientAddressValue,
+          address: recipientInputValue,
         }
       : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
-    headline="Create stream"
-    description="Stream any ERC-20 token to anyone with an Ethereum address."
+    headline={receiver ? 'Create a Support Stream' : 'Create stream'}
+    description="Stream any ERC-20 token from your Drips account."
   />
   <FormField title="Stream name*">
     <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
   </FormField>
-  <FormField title="Stream to*">
-    <InputAddress
-      bind:value={recipientAddressValue}
-      on:validationChange={onAddressValidationChange}
-    />
-  </FormField>
+  {#if !receiver}
+    <FormField title="Stream to*">
+      <InputAddress
+        bind:value={recipientInputValue}
+        on:validationChange={onRecipientInputValidationChange}
+      />
+    </FormField>
+  {/if}
   <FormField title="Token*" description="Select a token to stream from your Drips account.">
     <div class="list-container">
       <ListSelect
