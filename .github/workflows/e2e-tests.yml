@@ -41,7 +41,7 @@ jobs:
         run: npm ci
 
       - name: Build GQL types
-        run: GQL_URL=https://drips-api-mainnet.up.railway.app npm run build:graphql
+        run: GQL_URL=https://drips-api-goerli-s1.up.railway.app/ npm run build:graphql
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
