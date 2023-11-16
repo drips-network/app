@@ -62,7 +62,8 @@
   } from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
+  // import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
+  import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
@@ -161,8 +162,11 @@
   }
 
   function handleNewStreamButton() {
-    const dripListId = dripList?.account.accountId;
-    return dripListId && modal.show(Stepper, undefined, createDripListStreamSteps(dripListId));
+    const accountId = dripList?.account.accountId;
+    return (
+      accountId &&
+      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, { driver: 'nft', accountId }))
+    );
   }
 
   async function handleAddtoDripListButton() {

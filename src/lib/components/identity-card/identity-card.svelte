@@ -6,8 +6,7 @@
       }
       name
     }
-  `
-
+  `;
 </script>
 
 <script lang="ts">
@@ -49,7 +48,7 @@
   {:else if dripList}
     <div class="content-container" in:fade|local>
       <div class="icon">
-        <DripListIcon style="fill: var(--color-background); height: 3rem; width: 3rem;" />
+        <DripListIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
       </div>
       <span class="typo-header-3 ellipsis">{dripList.name}</span>
     </div>
@@ -121,7 +120,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-foreground);
+    background-color: var(--color-primary-level-1);
     border-radius: 50%;
   }
 
