@@ -10,14 +10,6 @@ export async function getRepoByOwnerAndName(owner: string, repo: string) {
   return data;
 }
 
-export async function verifyRepoExists(username: string, repoName: string) {
-  const res = await fetch(
-    `/api/github/${encodeURIComponent(username)}/${encodeURIComponent(repoName)}/exists`,
-  );
-
-  return res.status === 200;
-}
-
 export async function getRepoByUrl(repoUrl: string) {
   const url = new URL(repoUrl);
 

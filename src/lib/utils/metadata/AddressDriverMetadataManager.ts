@@ -3,14 +3,14 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import MetadataManagerBase from './MetadataManagerBase';
 import { addressDriverAccountMetadataParser } from './schemas';
 import type { Account } from '$lib/stores/streams/types';
-import type { AccountId } from './types';
 import { reconcileStreamsSetReceivers } from '$lib/stores/streams/methods/reconcile-drips-set-receivers';
 import seperateStreamsSetEvents from '$lib/stores/streams/methods/separate-drips-set-events';
 import buildAssetConfigs from '$lib/stores/streams/methods/build-asset-configs';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
 
+type AccountId = string;
+
 export default class AddressDriverMetadataManager extends MetadataManagerBase<
-  Account,
   typeof addressDriverAccountMetadataParser
 > {
   constructor() {

@@ -37,7 +37,9 @@
         actions: [
           {
             handler: () =>
-              window.open('https://docs.drips.network/support-your-dependencies', '_blank')?.focus(),
+              window
+                .open('https://docs.drips.network/support-your-dependencies', '_blank')
+                ?.focus(),
             label: 'Learn more',
             primary: true,
             icon: ArrowUp,

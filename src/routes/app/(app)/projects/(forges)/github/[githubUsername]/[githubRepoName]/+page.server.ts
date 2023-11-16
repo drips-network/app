@@ -1,19 +1,21 @@
-import GitProjectService from '$lib/utils/project/GitProjectService';
 import { error } from '@sveltejs/kit';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
-import { buildProjectSplitsData } from '../../../methods/project-splits';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
+import query from '$lib/graphql/dripsQL';
+import { gql } from 'graphql-request';
+import type { ProjectByUrlQuery } from './__generated__/gql.generated';
+import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-types';
+import isClaimed from '$lib/utils/project/is-claimed';
+import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 
 // TODO: This fails if the network is not the default one. We need to support other networks.
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, fetch }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
-
-  const service = await GitProjectService.new();
 
   const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
@@ -22,29 +24,51 @@ export const load = (async ({ params }) => {
   }
 
   try {
-    const project = await service.getByUrl(gitHubUrl);
+    const getProjectsQuery = gql`
+      ${PROJECT_PROFILE_FRAGMENT}
+      query ProjectByUrl($url: String!) {
+        projectByUrl(url: $url) {
+          ...ProjectProfile
+        }
+      }
+    `;
 
-    const unclaimedFunds = project.claimed
-      ? undefined
-      : fetchUnclaimedFunds(project.repoDriverAccount.accountId);
+    const { projectByUrl: project } = await query<ProjectByUrlQuery, QueryProjectByUrlArgs>(
+      getProjectsQuery,
+      {
+        url: gitHubUrl,
+      },
+      fetch,
+    );
 
-    const earnedFunds = project.claimed
-      ? fetchEarnedFunds(project.repoDriverAccount.accountId)
+    if (!project) {
+      throw error(404);
+    }
+
+    const unclaimedFunds = !isClaimed(project)
+      ? fetchUnclaimedFunds(project.account.accountId)
       : undefined;
+
+    const earnedFunds = isClaimed(project)
+      ? fetchEarnedFunds(project.account.accountId)
+      : undefined;
+
+    if (isClaimed(project) && !project.splits) {
+      throw new Error('Claimed project somehow does not have splits');
+    }
 
     return {
       project,
       streamed: {
         unclaimedFunds,
         earnedFunds,
-        incomingSplits: getIncomingSplits(project.repoDriverAccount.accountId),
-        splits: buildProjectSplitsData(project, project.claimed ? project.splits.dependencies : []),
+        incomingSplits: getIncomingSplits(project.account.accountId, fetch),
       },
       blockWhileInitializing: false,
     };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    throw error(500);
+    throw e;
   }
 }) satisfies PageServerLoad;

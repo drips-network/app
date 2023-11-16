@@ -7,15 +7,14 @@
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import checkIsUser from '$lib/utils/check-is-user';
+  import DripListCard, {
+  } from '$lib/components/drip-list-card/drip-list-card.svelte';
 
   export let data: PageData;
 
   $: dripList = data.dripList;
 
-  $: ownerAccountId = dripList.account.owner.accountId;
+  $: ownerAccountId = dripList.owner.accountId;
   $: supportStreams =
     $streamsStore &&
     streamsStore
@@ -24,8 +23,6 @@
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
-
-  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
 </script>
 
 {#if data.dripList.name}
@@ -36,7 +33,7 @@
   <main class="list">
     <div class="owner">
       <span>Drip List owned by </span>
-      <IdentityBadge address={data.dripList.account.owner.address} />
+      <IdentityBadge address={data.dripList.owner.address} />
     </div>
     <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
       <DripListCard dripList={data.dripList} />

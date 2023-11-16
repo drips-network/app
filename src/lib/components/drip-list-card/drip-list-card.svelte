@@ -1,13 +1,22 @@
+<script lang="ts" context="module">
+  export const DRIP_LIST_CARD_FRAGMENT = gql`
+    ${DRIP_LIST_CARD_REPRESENTATIONAL_LIST_FRAGMENT}
+    fragment DripListCard on DripList {
+      ...DripListCardRepresentationalList
+    }
+  `;
+</script>
+
 <script lang="ts">
-  import type { DripList } from '$lib/utils/metadata/types';
   import streamsStore from '$lib/stores/streams/streams.store';
   import { onMount } from 'svelte';
   import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
-  import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
-  import DripListCardRepresentational from './drip-list-card-representational.svelte';
+  import DripListCardRepresentational, { DRIP_LIST_CARD_REPRESENTATIONAL_LIST_FRAGMENT } from './drip-list-card-representational.svelte';
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
+  import { gql } from 'graphql-request';
+  import type { DripListCardFragment } from './__generated__/gql.generated';
 
-  export let dripList: DripList;
+  export let dripList: DripListCardFragment;
   export let format: 'thumblink' | 'full' = 'full';
 
   /*
@@ -21,27 +30,13 @@
     }
   });
 
-  $: listOwner = dripList.account.owner;
+  $: listOwner = dripList.owner;
   $: supportStreams =
     listOwner &&
     $streamsStore &&
     streamsStore
       .getStreamsForUser(listOwner.accountId)
       .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
-
-  /*
-  Fetch the representational splits for the Drip List so we can display them in the card.
-  */
-  let representationalSplits:
-    | Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>
-    | undefined = undefined;
-
-  onMount(async () => {
-    representationalSplits = await getRepresentationalSplitsForAccount(
-      dripList.account.accountId,
-      dripList.projects,
-    );
-  });
 
   /*
   Fetch any incoming splits so that we can display which other Drip Lists are currently supporting
@@ -61,7 +56,6 @@
 <DripListCardRepresentational
   {format}
   {dripList}
-  {representationalSplits}
   {incomingSplits}
   {supportStreams}
   {incomingSplitTotal}

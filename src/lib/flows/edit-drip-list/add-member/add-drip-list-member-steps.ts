@@ -1,25 +1,48 @@
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { get, writable } from 'svelte/store';
-import EditDripListStep from '../shared/steps/edit-drip-list.svelte';
+import EditDripListStep, { EDIT_DRIP_LIST_STEP_DRIP_LIST_TO_ADD_FRAGMENT, EDIT_DRIP_LIST_STEP_PROJECT_TO_ADD_FRAGMENT } from '../shared/steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import type { DripList, GitProject } from '$lib/utils/metadata/types';
-import SelectDripList from './steps/select-drip-list.svelte';
-import type { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
+import SelectDripList, { SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT, SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT, SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT } from './steps/select-drip-list.svelte';
 import assert from '$lib/utils/assert';
 import unreachable from '$lib/utils/unreachable';
+import type { EditDripListStepSelectedDripListFragment } from '../shared/steps/__generated__/gql.generated';
+import { gql } from 'graphql-request';
+import type { AddDripListMemberFlowDripListToAddFragment, AddDripListMemberFlowListsFragment, AddDripListMemberFlowProjectToAddFragment } from './__generated__/gql.generated';
+
+export const ADD_DRIP_LIST_MEMBER_FLOW_LISTS_FRAGMENT = gql`
+  ${SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT}
+  fragment AddDripListMemberFlowLists on DripList {
+    ...SelectDripListStepLists
+  }
+`;
+
+export const ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT = gql`
+  ${SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT}
+  ${EDIT_DRIP_LIST_STEP_PROJECT_TO_ADD_FRAGMENT}
+  fragment AddDripListMemberFlowProjectToAdd on Project {
+    ...SelectDripListProjectToAdd
+    ...EditDripListStepProjectToAdd
+  }
+`
+
+export const ADD_DRIP_LIST_MEMBER_FLOW_DRIP_LIST_TO_ADD_FRAGMENT = gql`
+  ${SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT}
+  ${EDIT_DRIP_LIST_STEP_DRIP_LIST_TO_ADD_FRAGMENT}
+  fragment AddDripListMemberFlowDripListToAdd on DripList {
+    ...SelectDripListDripListToAdd
+    ...EditDripListStepDripListToAdd
+  }
+`;
 
 export default (
   /** The current user's Drip Lists. */
-  dripLists: DripList[],
-  projectToAdd?: GitProject,
-  dripListToAdd?: DripList,
+  dripLists: AddDripListMemberFlowListsFragment[],
+  projectToAdd?: AddDripListMemberFlowProjectToAddFragment,
+  dripListToAdd?: AddDripListMemberFlowDripListToAddFragment,
 ) => {
   const selectedDripListState = writable<{
-    dripList: DripList | undefined;
-    representationalSplits:
-      | Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>
-      | undefined;
+    dripList: EditDripListStepSelectedDripListFragment
   }>(undefined);
 
   assert(
