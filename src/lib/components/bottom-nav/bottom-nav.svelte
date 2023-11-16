@@ -45,6 +45,7 @@
   <div class="items">
     {#each items as item}
       <a
+        data-highlightid="bottomnav-{item.href}"
         class="item typo-text-small-bold"
         class:active={$page.url.pathname === item.href}
         bind:this={itemElems[item.href]}
