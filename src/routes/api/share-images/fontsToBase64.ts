@@ -1,6 +1,6 @@
 // Adjusted from https://github.com/junminahn/node-font2base64/tree/main
 
-import fs from 'fs';
+import { readFileSync } from 'fs';
 import { fileTypeFromBuffer } from 'file-type';
 import assert from '$lib/utils/assert';
 
@@ -27,7 +27,7 @@ const readBuffer = async (buff: Buffer) => {
 };
 
 export const encodeToDataUrl = async (fpath: string) => {
-  const buff = fs.readFileSync(fpath);
+  const buff = readFileSync(fpath);
   const data = await readBuffer(buff);
 
   return toDataUrl(fpath, data);
