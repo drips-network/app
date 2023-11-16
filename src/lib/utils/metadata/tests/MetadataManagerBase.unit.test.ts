@@ -3,6 +3,7 @@ import * as fetchIpfs from '$lib/utils/ipfs';
 import { AddressDriverClient, DripsSubgraphClient, type AccountMetadata } from 'radicle-drips';
 import MetadataManagerBase, { type EmitMetadataFunc } from '../MetadataManagerBase';
 import type { ContractTransaction } from 'ethers';
+import type { NFTDriverAccount } from '../types';
 import type { ParseFn, Parser } from '@efstajas/versioned-parser/lib/types';
 import { createVersionedParser } from '@efstajas/versioned-parser';
 import { addressDriverAccountMetadataParser } from '../schemas';
@@ -12,8 +13,12 @@ vi.mock('$env/dynamic/public', () => ({
 }));
 
 class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends MetadataManagerBase<
+  NFTDriverAccount,
   Parser
 > {
+  public fetchAccount<TAccount>(): Promise<TAccount | null> {
+    throw new Error('Method not implemented.');
+  }
   public buildAccountMetadata(): z.TypeOf<TAccountMetadataSchema> {
     throw new Error('Method not implemented.');
   }

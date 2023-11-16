@@ -1,24 +1,3 @@
-<script lang="ts" context="module">
-  export const ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT = gql`
-    fragment AddEthereumAddressStepProject on Project {
-      ... on ClaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
-      }
-      ... on UnclaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
   import CodeBox from '$lib/components/code-box/code-box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -36,7 +15,7 @@
   import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import github from '$lib/utils/github/github';
-  import { gql } from 'graphql-request';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -67,10 +46,10 @@
           };
         }
 
-        const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
+        const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
 
         await github.getFundingJson(
-          ownerName,
+          username,
           repoName,
           dripsJsonTemplate(
             $walletStore.address ?? unreachable(),
@@ -84,8 +63,6 @@
 
         $context.linkedToRepo = true;
 
-        const numericForgeValue = forge === 'GitHub' ? 0 : 1;
-
         try {
           // Kick off repo owner update using gasless TX
 
@@ -95,8 +72,8 @@
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              forge: numericForgeValue,
-              projectName: `${ownerName}/${repoName}`,
+              forge,
+              projectName: `${username}/${repoName}`,
               chainId: $walletStore.network.chainId,
             }),
           });

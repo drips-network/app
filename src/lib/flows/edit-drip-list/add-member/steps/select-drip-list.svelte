@@ -1,64 +1,7 @@
-<script context="module">
-  export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
-    ${DRIP_LIST_BADGE_FRAGMENT}
-    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
-    fragment SelectDripListStepLists on DripList {
-      ...DripListBadge
-      ...EditDripListStepSelectedDripList
-      splits {
-        ... on AddressReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on ProjectReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on DripListReceiver {
-          account {
-            accountId
-          }
-        }
-      }
-    }
-  `;
-
-  export const SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT = gql`
-    fragment SelectDripListProjectToAdd on Project {
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-        source {
-          url
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
-        source {
-          url
-        }
-      }
-    }
-  `;
-
-  export const SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT = gql`
-    fragment SelectDripListDripListToAdd on DripList {
-      account {
-        accountId
-      }
-    }
-  `;
-</script>
-  
 <script lang="ts">
   import { goto } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
-  import DripListBadge, { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -66,28 +9,25 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import modal from '$lib/stores/modal';
   import buildUrl from '$lib/utils/build-url';
+  import { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
+  import type { DripList, GitProject } from '$lib/utils/metadata/types';
   import unreachable from '$lib/utils/unreachable';
-  import { gql } from 'graphql-request';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
-  import type { SelectDripListDripListToAddFragment, SelectDripListProjectToAddFragment, SelectDripListStepListsFragment } from './__generated__/gql.generated';
-  import type { EditDripListStepSelectedDripListFragment } from '../../shared/steps/__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '../../shared/steps/edit-drip-list.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let dripLists: SelectDripListStepListsFragment[];
-
+  export let dripLists: DripList[];
   export let selectedDripListState: Writable<{
-    dripList: EditDripListStepSelectedDripListFragment
+    dripList: DripList | undefined;
+    representationalSplits:
+      | Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>
       | undefined;
   }>;
 
-  export let projectOrDripListToAdd:
-    | SelectDripListDripListToAddFragment
-    | SelectDripListProjectToAddFragment
+  export let projectOrDripListToAdd: GitProject | DripList;
 
   $: urlToAdd =
     'source' in projectOrDripListToAdd
@@ -96,10 +36,13 @@
 
   let selected: string[] = [];
 
-  function isAlreadyInList(listSplits: SelectDripListStepListsFragment["splits"]) {
-    const accountIdToAdd = projectOrDripListToAdd.account.accountId;
+  function isAlreadyInList(list: DripList) {
+    const accountIdToAdd =
+      'source' in projectOrDripListToAdd
+        ? projectOrDripListToAdd.repoDriverAccount.accountId
+        : projectOrDripListToAdd.account.accountId;
 
-    return listSplits.some((s) => s.account.accountId === accountIdToAdd);
+    return list.projects.some((p) => p.account.accountId === accountIdToAdd);
   }
 
   function submit() {
@@ -109,15 +52,21 @@
     dispatch('await', {
       message: 'Getting ready…',
       promise: async () => {
+        const representationalSplits = await getRepresentationalSplitsForAccount(
+          selectedDripList.account.accountId,
+          selectedDripList.projects,
+        );
+
         $selectedDripListState = {
           dripList: selectedDripList,
+          representationalSplits,
         };
       },
     });
   }
 
   $: subjectName =
-    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project';
+    'account' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project';
 </script>
 
 <StepLayout>
@@ -143,14 +92,15 @@
               dl.account.accountId,
               {
                 type: 'selectable',
-                disabled: isAlreadyInList(dl.splits),
+                disabled: isAlreadyInList(dl),
                 label: {
                   component: DripListBadge,
                   props: {
                     isLinked: false,
-                    dripList: dl,
-                    showOwner: false,
-                    disabled: isAlreadyInList(dl.splits),
+                    listId: dl.account.accountId,
+                    listName: dl.name,
+                    owner: undefined,
+                    disabled: isAlreadyInList(dl),
                   },
                 },
               },

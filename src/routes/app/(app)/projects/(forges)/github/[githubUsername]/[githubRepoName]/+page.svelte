@@ -10,4 +10,5 @@
   unclaimedFunds={data.streamed.unclaimedFunds}
   incomingSplits={data.streamed.incomingSplits}
   earnedFunds={data.streamed.earnedFunds}
+  splits={data.streamed.splits}
 />

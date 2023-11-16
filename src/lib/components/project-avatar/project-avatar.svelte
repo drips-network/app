@@ -1,24 +1,10 @@
-<script lang="ts" context="module">
-  import { gql } from 'graphql-request';
-  import type { ProjectAvatarFragment } from './__generated__/gql.generated';
-
-  export const PROJECT_AVATAR_FRAGMENT = gql`
-    fragment ProjectAvatar on Project {
-      ... on ClaimedProject {
-        color
-        emoji
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
   import GithubIcon from 'radicle-design-system/icons/Github.svelte';
+  import type { GitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import twemoji from 'twemoji';
-  import isClaimed from '$lib/utils/project/is-claimed';
 
-  export let project: ProjectAvatarFragment;
+  export let project: GitProject;
 
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
@@ -33,25 +19,26 @@
   };
   $: containerSize = CONTAINER_SIZES[size];
 
-  $: emojiElem =
-    isClaimed(project) && project.emoji
-      ? twemoji.parse(project.emoji, { folder: 'svg', ext: '.svg' })
-      : undefined;
+  $: emojiElem = project.claimed
+    ? twemoji.parse(project.emoji, { folder: 'svg', ext: '.svg' })
+    : undefined;
 </script>
 
-<PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
+<PrimaryColorThemer colorHex={project.claimed ? project.color : undefined}>
   <div
     class="wrapper"
     style="width: {containerSize}; height: {containerSize}"
     class:with-outline={outline}
   >
-    {#if isClaimed(project)}
+    {#if project.owner}
       <div class="project-avatar" style:background-color="var(--color-primary)">
         <div class="inner">
           {@html emojiElem}
         </div>
       </div>
-    {:else}
+    {/if}
+
+    {#if !project.owner}
       <div class="project-avatar">
         <GithubIcon />
       </div>

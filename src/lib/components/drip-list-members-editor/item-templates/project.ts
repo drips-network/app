@@ -1,11 +1,9 @@
+import type { GitProject } from '$lib/utils/metadata/types';
 import type { ListItem } from '../drip-list-members-editor.svelte';
-import type { DripListMembersEditorProjectFragment } from '../__generated__/gql.generated';
 
-function projectItem(project: DripListMembersEditorProjectFragment): ListItem {
-  return {
-    type: 'project',
-    project,
-  }
-};
+const projectItem: (project: GitProject) => ListItem = (project: GitProject) => ({
+  type: 'project',
+  project,
+});
 
 export default projectItem;

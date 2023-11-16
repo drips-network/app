@@ -1,117 +1,54 @@
 <script lang="ts" context="module">
+  import type { GitProject } from '$lib/utils/metadata/types';
   import type {
     Items,
     Percentages,
   } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import { gql } from 'graphql-request';
 
-  export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
-    fragment SplitsComponentProjectSplits on Project {
-      ... on ClaimedProject {
-        splits {
-          dependencies {
-            ... on AddressReceiver {
-              ...EditProjectSplitsFlowAddressReceiver
-              account {
-                address
-              }
-            }
-            ... on ProjectReceiver {
-              ...EditProjectSplitsFlowProjectReceiver
-              project {
-                ...ProjectAvatar
-              }
-            }
-            ... on DripListReceiver {
-              ...EditProjectSplitsFlowDripListReceiver
-              dripList {
-                ...DripListBadge
-              }
-            }
-          }
-          maintainers {
-            ... on AddressReceiver {
-              ...EditProjectSplitsFlowAddressReceiver
-              account {
-                address
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
+  export interface ProjectSplit {
+    type: 'project-split';
+    project: GitProject;
+    weight: number;
+  }
 
-  export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
-    ${PROJECT_BADGE_FRAGMENT}
-    fragment SplitsComponentProjectReceiver on ProjectReceiver {
-      weight
-      project {
-        ...ProjectBadge
-        ... on UnclaimedProject {
-          source {
-            repoName
-            ownerName
-          }
-        }
-        ... on ClaimedProject {
-          owner {
-            address
-          }
-          source {
-            repoName
-            ownerName
-          }
-          color
-          emoji
-        }
-      }
-    }
-  `;
+  export interface AddressSplit {
+    type: 'address-split';
+    address: string;
+    weight: number;
+  }
 
-  export const SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT = gql`
-    fragment SplitsComponentDripListReceiver on DripListReceiver {
-      weight
-      dripList {
-        account {
-          accountId
-        }
-        name
-        owner {
-          address
-        }
-      }
-    }
-  `;
+  /**
+   * A split to a different Drip List.
+   */
+  export interface DripListSplit {
+    type: 'drip-list-split';
+    listId: string;
+    listName: string;
+    listOwner: string;
+    weight: number;
+  }
 
-  export const SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT = gql`
-    fragment SplitsComponentAddressReceiver on AddressReceiver {
-      weight
-      account {
-        address
-      }
-    }
-  `;
+  interface DripsDonationSplit {
+    type: 'drips-donation-split';
+    weight: number;
+  }
 
-  export type SplitsComponentSplitsReceiver =
-    | SplitsComponentAddressReceiverFragment
-    | SplitsComponentDripListReceiverFragment
-    | SplitsComponentProjectReceiverFragment;
-
-  export type Splits = (SplitGroup | SplitsComponentSplitsReceiver)[];
+  export type Split = DripListSplit | ProjectSplit | AddressSplit | DripsDonationSplit;
 
   export interface SplitGroup {
-    __typename: 'SplitGroup';
+    type: 'split-group';
     list: Splits;
     name?: string;
   }
+
+  export type Splits = (SplitGroup | Split)[];
 
   export function mapSplitsFromListEditorData(
     items: Items,
     percentages: Percentages,
     groupPercentage: number,
-  ): SplitsComponentSplitsReceiver[] {
+  ): Split[] {
     return mapFilterUndefined(Object.keys(items), (slug) => {
       const item = items[slug];
 
@@ -121,23 +58,22 @@
 
       if (item.type === 'project') {
         return {
-          __typename: 'ProjectReceiver',
+          type: 'project-split',
           project: item.project,
           weight: percentage,
         };
       } else if (item.type === 'drip-list') {
         return {
-          __typename: 'DripListReceiver',
-          dripList: item.list,
+          type: 'drip-list-split',
+          listId: item.list.id,
+          listName: item.list.name,
+          listOwner: item.list.owner,
           weight: percentage,
         };
       } else {
         return {
-          __typename: 'AddressReceiver',
-          account: {
-            __typename: 'AddressDriverAccount',
-            address: slug,
-          },
+          type: 'address-split',
+          address: slug,
           weight: percentage,
         };
       }
@@ -147,12 +83,6 @@
 
 <script lang="ts">
   import SplitComponent from './components/split/split.svelte';
-  import type {
-    SplitsComponentAddressReceiverFragment,
-    SplitsComponentDripListReceiverFragment,
-    SplitsComponentProjectReceiverFragment,
-  } from './__generated__/gql.generated';
-  import { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
 
   export let list: Splits;
   export let maxRows: number | undefined = undefined;
@@ -163,9 +93,9 @@
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
     list.sort((a, b) => {
-      if (a.__typename === 'SplitGroup' && b.__typename === 'SplitGroup') return 0;
-      if (a.__typename === 'SplitGroup') return 1;
-      if (b.__typename === 'SplitGroup') return -1;
+      if (a.type === 'split-group' && b.type === 'split-group') return 0;
+      if (a.type === 'split-group') return 1;
+      if (b.type === 'split-group') return -1;
 
       return b.weight - a.weight;
     });
@@ -176,7 +106,7 @@
     }
     const clipIndex = maxRows - 1;
     const truncatedGroup: SplitGroup = {
-      __typename: 'SplitGroup',
+      type: 'split-group',
       list: list.slice(clipIndex, list.length),
       name: '',
     };

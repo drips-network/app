@@ -1,48 +1,32 @@
-<script lang="ts" context="module">
-  export const ENTER_GIT_URL_STEP_PROJECT_FRAGMENT = gql`
-    ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
-    fragment EnterGitUrlStepProject on Project {
-      ...UnclaimedProjectCard
-      ... on UnclaimedProject {
-        verificationStatus
-        account {
-          accountId
-        }
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { Writable } from 'svelte/store';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import { CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT, type State } from '../../claim-project-flow';
+  import type { State } from '../../claim-project-flow';
   import LinkIcon from 'radicle-design-system/icons/Link.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
-  import UnclaimedProjectCard, {
-    UNCLAIMED_PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
+  import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
+  import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
+  import walletStore from '$lib/stores/wallet/wallet.store';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
-  import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
-  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
-  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
+  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 
   export let context: Writable<State>;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
+  let gitProjectService: GitProjectService;
   let validationState: TextInputValidationState = { type: 'unvalidated' };
 
   $: formValid = validationState.type === 'valid';
@@ -57,6 +41,8 @@
   async function fetchProject() {
     $context.linkedToRepo = false;
 
+    gitProjectService = await GitProjectService.new();
+
     try {
       validationState = { type: 'pending' };
 
@@ -69,49 +55,48 @@
         $context.gitUrl = $context.gitUrl.slice(0, -1);
       }
 
-      const projectQuery = gql`
-        ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
-        query Project($url: String!) {
-          projectByUrl(url: $url) {
-            ...ClaimProjectFlowProject
-          }
-        }
-      `;
+      const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+      const projectName = `${username}/${repoName}`;
 
-      const response = await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
-        url: $context.gitUrl,
-      });
+      const repoDriverClient = await getRepoDriverClient();
+      const accountId = await repoDriverClient.getAccountId(forge, projectName);
 
-      const project = response.projectByUrl;
+      const owner = await repoDriverClient.getOwner(accountId);
+      const project = await gitProjectService.getByUrl($context.gitUrl);
 
-      if (!project) {
-        throw new Error('Project not found');
-      }
-
-      if (project.__typename === 'ClaimedProject') {
+      // TODO: inefficient to fetch metadata twice - `getByUrl` already does that.
+      const repoDriverMetadataManager = new RepoDriverMetadataManager();
+      const projectMetadata = await repoDriverMetadataManager.fetchAccountMetadata(
+        project.repoDriverAccount.accountId,
+      );
+      if (project.claimed && projectMetadata) {
         throw new Error('Project already claimed');
       }
 
       if (
-        project.__typename === 'UnclaimedProject' &&
-        project.verificationStatus === ProjectVerificationStatus.PendingMetadata
+        owner &&
+        owner.toLowerCase() === $walletStore.address?.toLowerCase() &&
+        !projectMetadata
       ) {
         $context.isPartiallyClaimed = true;
       }
 
-      $context.project = project;
+      $context.project = project as UnclaimedGitProject;
 
-      $context.projectEmoji = seededRandomElement(possibleRandomEmoji, project.account.accountId);
+      $context.projectEmoji = seededRandomElement(
+        possibleRandomEmoji,
+        project.repoDriverAccount.accountId,
+      );
       $context.projectColor = seededRandomElement(
         ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
-        project.account.accountId,
+        project.repoDriverAccount.accountId,
       );
 
       // TODO: enable pre-population of dependencies.
       // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId), prePopulateDependencies()]);
       await Promise.all([
         fetchProjectMetadata(),
-        fetchUnclaimedProjectFunds(project.account.accountId),
+        fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId),
       ]);
 
       validationState = { type: 'valid' };
@@ -122,7 +107,6 @@
   }
 
   async function fetchProjectMetadata() {
-    const gitProjectService = await GitProjectService.new();
     const { defaultBranch, description, forksCount, starsCount } =
       await gitProjectService.getProjectInfo($context.gitUrl);
 

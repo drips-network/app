@@ -1,9 +1,12 @@
-import type { DripListMembersEditorDripListFragment } from '../__generated__/gql.generated';
 import type { ListItem } from '../drip-list-members-editor.svelte';
 
-const dripListItem = (dripList: DripListMembersEditorDripListFragment): ListItem => ({
+const dripListItem = (listName: string, listId: string, owner: string): ListItem => ({
   type: 'drip-list',
-  list: dripList,
+  list: {
+    id: listId,
+    name: listName,
+    owner,
+  },
 });
 
 export default dripListItem;

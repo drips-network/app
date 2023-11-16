@@ -21,6 +21,7 @@
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
+  import { VerificationStatus, type GitProject, type Source } from '$lib/utils/metadata/types';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
@@ -31,13 +32,6 @@
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import {
-    Forge,
-    ProjectVerificationStatus,
-    type Project,
-    type Source,
-    Driver,
-  } from '$lib/graphql/__generated__/base-types';
 
   // Button
   let disabled = false;
@@ -87,8 +81,7 @@
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
     github: {
-      __typename: 'Source',
-      forge: Forge.GitHub,
+      forge: 'github',
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
@@ -97,187 +90,144 @@
 
   // Splits
 
-  const MOCK_PROJECT_1: Project = {
-    __typename: 'ClaimedProject',
-    verificationStatus: ProjectVerificationStatus.Claimed,
-    account: {
-      __typename: 'RepoDriverAccount',
+  const MOCK_PROJECT_1: GitProject = {
+    claimed: true,
+    repoDriverAccount: {
       accountId: '0',
-      driver: Driver.Repo,
+      driver: 'repo',
     },
     owner: {
-      __typename: 'AddressDriverAccount',
-      driver: Driver.Address,
+      driver: 'address',
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      __typename: 'Source',
-      forge: Forge.GitHub,
+      forge: 'github',
       repoName: 'svelte-stepper',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
     emoji: '🚶',
     color: '#fcc842',
-    splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
+    splits: { maintainers: [], dependencies: [] },
   };
 
-  const MOCK_PROJECT_2: Project = {
-    __typename: 'ClaimedProject',
-    verificationStatus: ProjectVerificationStatus.Claimed,
-    account: {
-      __typename: 'RepoDriverAccount',
+  const MOCK_PROJECT_2: GitProject = {
+    claimed: true,
+    repoDriverAccount: {
       accountId: '0',
-      driver: Driver.Repo,
+      driver: 'repo',
     },
     owner: {
-      __typename: 'AddressDriverAccount',
-      driver: Driver.Address,
+      driver: 'address',
       accountId: '0',
       address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
-      __typename: 'Source',
-      forge: Forge.GitHub,
+      forge: 'github',
       repoName: 'svelte-stored-writable',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
     emoji: '💾',
     color: '#FF0000',
-    splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
+    splits: { maintainers: [], dependencies: [] },
   };
 
   const mockSplits: Splits = [
     {
-      __typename: 'ProjectReceiver',
+      type: 'project-split',
       project: MOCK_PROJECT_1,
       weight: 62500,
     },
     {
-      __typename: 'DripListReceiver',
-      dripList: {
-        __typename: 'DripList',
-        account: {
-          __typename: 'NftDriverAccount',
-          accountId: '1234',
-        },
-        name: 'Some other Drip List',
-        owner: {
-          __typename: 'AddressDriverAccount',
-          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-        },
-      },
+      type: 'drip-list-split',
+      listId: '1234',
+      listName: 'Some other Drip List',
+      listOwner: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       weight: 62500,
     },
     {
-      __typename: 'AddressReceiver',
-      account: {
-        __typename: 'AddressDriverAccount',
-        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-      },
+      type: 'address-split',
+      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
       weight: 62500,
     },
     {
-      __typename: 'SplitGroup',
+      type: 'split-group',
       name: 'Dependencies',
       list: [
         {
-          __typename: 'ProjectReceiver',
+          type: 'project-split',
           project: MOCK_PROJECT_2,
           weight: 62500,
         },
         {
-          __typename: 'SplitGroup',
+          type: 'split-group',
           name: 'Some nested stuff',
           list: [
             {
-              __typename: 'DripListReceiver',
-              dripList: {
-                __typename: 'DripList',
-                name: 'A different Drip List',
-                owner: {
-                  __typename: 'AddressDriverAccount',
-                  address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-                },
-                account: {
-                  __typename: 'NftDriverAccount',
-                  accountId: '1235',
-                },
-              },
+              type: 'drip-list-split',
+              listId: '1235',
+              listName: 'A different Drip List',
+              listOwner: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              __typename: 'ProjectReceiver',
+              type: 'project-split',
               project: MOCK_PROJECT_1,
               weight: 62500,
             },
             {
-              __typename: 'AddressReceiver',
-              account: {
-                __typename: 'AddressDriverAccount',
-                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-              },
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              __typename: 'AddressReceiver',
-              account: {
-                __typename: 'AddressDriverAccount',
-                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-              },
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              __typename: 'ProjectReceiver',
+              type: 'project-split',
               project: MOCK_PROJECT_2,
               weight: 62500,
             },
             {
-              __typename: 'ProjectReceiver',
+              type: 'project-split',
               project: MOCK_PROJECT_1,
               weight: 62500,
             },
             {
-              __typename: 'AddressReceiver',
-              account: {
-                __typename: 'AddressDriverAccount',
-                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-              },
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
             {
-              __typename: 'AddressReceiver',
-              account: {
-                __typename: 'AddressDriverAccount',
-                address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-              },
+              type: 'address-split',
+              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
               weight: 62500,
             },
           ],
         },
         {
-          __typename: 'AddressReceiver',
-          account: {
-            __typename: 'AddressDriverAccount',
-            address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-          },
+          type: 'address-split',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
           weight: 62500,
         },
         {
-          __typename: 'ProjectReceiver',
+          type: 'project-split',
           project: MOCK_PROJECT_2,
           weight: 62500,
         },
       ],
     },
     {
-      __typename: 'AddressReceiver',
-      account: {
-        __typename: 'AddressDriverAccount',
-        address: '0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19',
-      },
+      type: 'address-split',
+      address: '0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19',
+      weight: 62500,
+    },
+    {
+      type: 'drips-donation-split',
       weight: 62500,
     },
   ];
@@ -420,10 +370,21 @@
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
       project={{
-        __typename: 'ClaimedProject',
+        claimed: true,
+        repoDriverAccount: {
+          accountId: '0',
+          driver: 'repo',
+        },
+        owner: {
+          driver: 'address',
+          accountId: '0',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        },
         source: SOURCE_CONFIGS.github,
         emoji: '🚶',
         color: '#fcc842',
+        description: 'A versatile component for building stepped flows with beautiful transitions.',
+        splits: { maintainers: [], dependencies: [] },
       }}
     />
   </PrimaryColorThemer>
@@ -451,18 +412,30 @@
     <ProjectBadge
       project={projectVerified
         ? {
-            __typename: 'ClaimedProject',
+            claimed: true,
+            repoDriverAccount: {
+              accountId: '0',
+              driver: 'repo',
+            },
             owner: {
-              __typename: 'AddressDriverAccount',
+              driver: 'address',
+              accountId: '0',
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
             source: SOURCE_CONFIGS[sourceType],
             emoji: '🚶',
             color: '#fcc842',
+            splits: { maintainers: [], dependencies: [] },
           }
         : {
-            __typename: 'UnclaimedProject',
+            claimed: false,
+            repoDriverAccount: {
+              accountId: '0',
+              driver: 'repo',
+            },
             source: SOURCE_CONFIGS[sourceType],
+            owner: undefined,
+            verificationStatus: VerificationStatus.NOT_STARTED,
           }}
     />
   </PrimaryColorThemer>

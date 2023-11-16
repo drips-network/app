@@ -1,19 +1,8 @@
-<script lang="ts" context="module">
-  export const REVIEW_STEP_PROJECT_FRAGMENT = gql`
-    ${PROJECT_PROFILE_HEADER_FRAGMENT}
-    fragment ReviewStepProject on Project {
-      ... on ClaimedProject {
-        ...ProjectProfileHeader
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -22,21 +11,18 @@
   import EyeOpenIcon from 'radicle-design-system/icons/EyeOpen.svelte';
   import TokenStreamsIcon from 'radicle-design-system/icons/TokenStreams.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import ProjectProfileHeader, {
-    PROJECT_PROFILE_HEADER_FRAGMENT,
-  } from '$lib/components/project-profile-header/project-profile-header.svelte';
+  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
   import { get, writable, type Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
-  import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
-  import { gql } from 'graphql-request';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -45,16 +31,17 @@
   $: project = $context.project ?? unreachable();
 
   // For previewing what the project will look like after claiming
-  let fakeClaimedProject: ProjectProfileHeader_ClaimedProject_Fragment;
   $: fakeClaimedProject = {
-    __typename: 'ClaimedProject',
-    source: { ...project.source },
+    ...project,
+    claimed: true as const,
     owner: {
-      __typename: 'AddressDriverAccount',
+      driver: 'address' as const,
       address: $walletStore.address ?? unreachable(),
+      accountId: $walletStore.dripsAccountId ?? unreachable(),
     },
     color: $context.projectColor,
     emoji: $context.projectEmoji,
+    splits: { maintainers: [], dependencies: [] },
   };
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
@@ -68,6 +55,12 @@
     $context.maintainerSplits.percentages,
     $context.highLevelPercentages['maintainers'],
   );
+
+  let gitProjectService: GitProjectService;
+
+  onMount(async () => {
+    gitProjectService = await GitProjectService.new();
+  });
 
   async function submit() {
     if ($context.isPartiallyClaimed) {
@@ -135,12 +128,12 @@
           linkToNewTab={true}
           list={[
             {
-              __typename: 'SplitGroup',
+              type: 'split-group',
               name: 'Dependencies',
               list: dependencyRepresentationalSplits,
             },
             {
-              __typename: 'SplitGroup',
+              type: 'split-group',
               name: 'Maintainers',
               list: maintainerRepresentationalSplits,
             },

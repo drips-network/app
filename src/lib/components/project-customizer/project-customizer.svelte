@@ -1,26 +1,14 @@
-<script lang="ts" context="module">
-  export const PROJECT_CUSTOMIZER_FRAGMENT = gql`
-    ${PROJECT_PROFILE_HEADER_FRAGMENT}
-    fragment ProjectCustomizer on ClaimedProject {
-      ...ProjectProfileHeader
-      emoji
-      color
-    }
-  `;
-</script>
-
 <script lang="ts">
   import emoji from '$lib/utils/emoji/emoji';
+  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import possibleColors from '$lib/utils/project/possible-colors';
   import type { Writable } from 'svelte/store';
   import FormField from '../form-field/form-field.svelte';
-  import ProjectProfileHeader, { PROJECT_PROFILE_HEADER_FRAGMENT } from '../project-profile-header/project-profile-header.svelte';
+  import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import twemoji from 'twemoji';
-  import { gql } from 'graphql-request';
-  import type { ProjectCustomizerFragment } from './__generated__/gql.generated';
 
-  export let project: Writable<ProjectCustomizerFragment>;
+  export let project: Writable<ClaimedGitProject>;
 
   let selectedEmoji = $project.emoji;
   $: $project.emoji = selectedEmoji;

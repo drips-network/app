@@ -1,20 +1,18 @@
 <script lang="ts">
+  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
-  import ProjectCard, { PROJECT_CARD_FRAGMENT } from '../project-card/project-card.svelte';
+  import ProjectCard from '../project-card/project-card.svelte';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
   import assert from '$lib/utils/assert';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
-  import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
-  import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
-  import isClaimed from '$lib/utils/project/is-claimed';
 
   export let address: string | undefined;
 
-  let projects: ProjectsQuery['projects'] | undefined;
+  let projects: ClaimedGitProject[] | undefined;
   let error = false;
   let loaded = false;
 
@@ -23,24 +21,10 @@
 
   async function updateProjects() {
     try {
+      const service = await GitProjectService.new();
+
       assert(address);
-
-      const getProjectsQuery = gql`
-        ${PROJECT_CARD_FRAGMENT}
-        query Projects($where: ProjectWhereInput) {
-          projects(where: $where) {
-            ...ProjectCard
-          }
-        }
-      `;
-
-      const response = await query<ProjectsQuery, ProjectsQueryVariables>(getProjectsQuery, {
-        where: {
-          ownerAddress: address,
-        },
-      });
-      projects = response.projects;
-
+      projects = await service.getAllByOwner(address.toLowerCase());
       loaded = true;
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -88,13 +72,10 @@
   {#if projects}
     <div class="projects">
       {#each projects as project}
-        {#if isClaimed(project)}
-          <div>
-            <PrimaryColorThemer colorHex={project.color}>
-              <ProjectCard {project} />
-            </PrimaryColorThemer>
-          </div>
-        {/if}
+        <div>
+          <PrimaryColorThemer colorHex={project.color}><ProjectCard {project} /></PrimaryColorThemer
+          >
+        </div>
       {/each}
     </div>
   {/if}

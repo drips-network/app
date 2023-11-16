@@ -1,12 +1,12 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import type { ProjectCustomizerFragment } from '$lib/components/project-customizer/__generated__/gql.generated';
   import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
   import modal from '$lib/stores/modal';
+  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
   import type { Writable } from 'svelte/store';
 
-  export let project: Writable<ProjectCustomizerFragment>;
+  export let project: Writable<ClaimedGitProject>;
 </script>
 
 <div class="project-customizer-modal">

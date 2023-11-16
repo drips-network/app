@@ -3,14 +3,12 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
-  import expect from '$lib/utils/expect';
-  import unreachable from '$lib/utils/unreachable';
-  import type {
-    CheckProjectVerificationStatusQuery,
-    CheckProjectVerificationStatusQueryVariables,
-  } from './__generated__/gql.generated';
+  import GitProjectService from '$lib/utils/project/GitProjectService';
+  import { VerificationStatus } from '$lib/utils/metadata/types';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import { ethers } from 'ethers';
+  import assert from '$lib/utils/assert';
+  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -20,37 +18,45 @@
     dispatch('await', {
       promise: pollSubgraph,
       message: 'Waiting for the verification to finalize…',
-      subtitle: 'This might take a while. Please donʼt close this window.',
+      subtitle: 'This might take a few minutes. Please donʼt close this window.',
     }),
   );
 
   async function pollSubgraph() {
-    const projectAccountId = $context.project?.account.accountId ?? unreachable();
+    let start = Date.now();
+    let timeout = 5 * 60 * 1000; // Timeout after 5 minutes
 
-    const checkProjectVerificationStatusQuery = gql`
-      query CheckProjectVerificationStatus($projectId: ID!) {
-        projectById(id: $projectId) {
-          ... on UnclaimedProject {
-            verificationStatus
-          }
-          ... on ClaimedProject {
-            verificationStatus
-          }
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { forge, username, repoName } = GitProjectService.deconstructUrl($context.gitUrl);
+      const projectName = `${username}/${repoName}`;
+
+      const repoDriverClient = await getRepoDriverClient();
+      const accountId = await repoDriverClient.getAccountId(forge, projectName);
+
+      const owner = await repoDriverClient.getOwner(accountId);
+
+      assert($walletStore.address);
+      if (
+        owner &&
+        ethers.utils.getAddress(owner) === ethers.utils.getAddress($walletStore.address)
+      ) {
+        return;
+      }
+
+      const gitProjectService = await GitProjectService.new();
+      const project = await gitProjectService.getByAccountId(accountId, false);
+
+      if (!project?.claimed) {
+        if (Date.now() - start >= timeout) {
+          throw new Error('Project verification failed after 5 minutes'); // Throw error after timeout
+        }
+        if (project?.verificationStatus === VerificationStatus.FAILED) {
+          throw new Error('Project verification failed');
         }
       }
-    `;
 
-    await expect(
-      () =>
-        query<CheckProjectVerificationStatusQuery, CheckProjectVerificationStatusQueryVariables>(
-          checkProjectVerificationStatusQuery,
-          {
-            projectId: projectAccountId,
-          },
-        ),
-      (response) => response.projectById?.verificationStatus === 'OwnerUpdated',
-      60000,
-      2000,
-    );
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 5 seconds before the next request
+    }
   }
 </script>
