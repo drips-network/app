@@ -3,18 +3,17 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import { z } from 'zod';
   import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
-  import DripListBadge, { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListService from '$lib/utils/driplist/DripListService';
   import type { AccountId } from '$lib/utils/common-types';
-  import { gql } from 'graphql-request';
-  import query from '$lib/graphql/dripsQL';
-  import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
+  import type { DripList } from '$lib/utils/metadata/types';
 
   export let context: CellContext<unknown, unknown>;
 
   let user: AddressDriverAccount | NFTDriverAccount;
-  let dripList: DripListQuery['dripList'] | null | undefined;
+  let dripList: DripList | null | undefined;
 
-  let dripListNameRequested = false;
+  let dripListRequested = false;
 
   $: {
     const value = context.getValue();
@@ -33,28 +32,15 @@
 
     user = userSchema.parse(value);
 
-    if (user.driver === 'nft' && dripList === undefined && !dripListNameRequested) {
+    if (user.driver === 'nft' && dripList === undefined && !dripListRequested) {
       getDripList(user.accountId);
     }
   }
 
   async function getDripList(listId: AccountId) {
-    dripListNameRequested = true;
-
-    const dripListQuery = gql`
-      ${DRIP_LIST_BADGE_FRAGMENT}
-      query DripList($id: ID!) {
-        dripList(id: $id) {
-          ...DripListBadge
-        }
-      }
-    `;
-
-    const result = await query<DripListQuery, DripListQueryVariables>(dripListQuery, {
-      id: listId,
-    });
-
-    dripList = result.dripList;
+    dripListRequested = true;
+    const dripListService = await DripListService.new();
+    dripList = await dripListService.getByTokenId(listId);
   }
 </script>
 
@@ -63,9 +49,10 @@
 {:else}
   <!-- TODO: Donʼt presume any NFT account is a Drip List. -->
   <DripListBadge
-    dripList={dripList ?? undefined}
+    listLoading={dripList === undefined}
+    listName={dripList ? dripList.name : null}
+    listId={user.accountId}
     avatarSize="small"
     isLinked={false}
-    showOwner={false}
   />
 {/if}

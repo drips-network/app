@@ -1,15 +1,7 @@
-<script lang="ts" context="module">
-  export const UNCLAIMED_PROJECT_CARD_FRAGMENT = gql`
-    ${PROJECT_BADGE_FRAGMENT}
-    fragment UnclaimedProjectCard on UnclaimedProject {
-      ...ProjectBadge
-    }
-  `;
-</script>
-
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
+  import ProjectBadge from '../project-badge/project-badge.svelte';
+  import type { UnclaimedGitProject } from '$lib/utils/metadata/types';
   import Token from '../token/token.svelte';
   import KeyValuePair from '../key-value-pair/key-value-pair.svelte';
   import Pile from '../pile/pile.svelte';
@@ -20,12 +12,10 @@
   import Button from '../button/button.svelte';
   import { createEventDispatcher } from 'svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
-  import { gql } from 'graphql-request';
-  import type { UnclaimedProjectCardFragment } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher();
 
-  export let project: UnclaimedProjectCardFragment | undefined = undefined;
+  export let project: UnclaimedGitProject | undefined = undefined;
   export let projectMetadata:
     | {
         description?: string | undefined;

@@ -60,7 +60,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
             return {
               component: DripListBadge,
               props: {
-                listId: item.list.account.accountId,
+                listId: item.list.id,
               },
             };
           }

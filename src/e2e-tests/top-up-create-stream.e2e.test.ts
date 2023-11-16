@@ -11,6 +11,7 @@ import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
 import environment from './helpers/environment';
 import dotenv from 'dotenv';
+import takeScreenshot from './helpers/take-screenshot';
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ describe('app', async () => {
   let page: Page;
 
   beforeAll(async () => {
-    window.fetch = fetch as unknown as typeof window.fetch;
+    window.fetch = fetch as typeof window.fetch;
 
     server = await preview({
       preview: { port: 3001, host: '0.0.0.0' },
@@ -31,11 +32,7 @@ describe('app', async () => {
     await configureAppForTest(page);
   });
 
-  beforeAll(async () => {
-    await environment.start();
-
-    console.log('🌳 Environment is up. Running tests...');
-  }, 14400000);
+  beforeAll(environment.start, 14400000);
   afterAll(environment.stop, 14400000);
 
   afterAll(async () => {
@@ -530,7 +527,7 @@ describe('app', async () => {
         await page.locator('button', { hasText: 'Confirm in wallet' }).click();
 
         await expect(page.locator('text=Congratulations!')).toHaveCount(1);
-      }, 10000);
+      });
     });
 
     describe('edit drip list', () => {
@@ -563,7 +560,7 @@ describe('app', async () => {
       });
 
       it('assigns equal percentages', async () => {
-        await page.waitForTimeout(2000); // Wait for new item to be added
+        await page.waitForTimeout(1000); // Wait for new item to be added
 
         await page.locator('button', { hasText: 'Split evenly' }).click();
       });
@@ -581,20 +578,23 @@ describe('app', async () => {
       });
 
       it('advances the flow', async () => {
+        await takeScreenshot(page, 1);
         await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
         await page.locator('button', { hasText: 'Got it' }).click();
       });
 
       it('displays the changes', async () => {
-        await page.waitForTimeout(6000);
+        await page.waitForTimeout(1000);
 
         await page.reload();
+
+        await takeScreenshot(page, 2);
 
         await expect(page.locator('text=This is an EDITED title')).toHaveCount(1);
         await expect(page.locator('text=This is an EDITED description.')).toHaveCount(1);
         await expect(page.locator('text=drips-test-repo-11')).toHaveCount(1);
         await expect(page.locator('text=0x43')).toHaveCount(0);
-      }, 10000);
+      });
     });
 
     describe.todo('create another drip list');

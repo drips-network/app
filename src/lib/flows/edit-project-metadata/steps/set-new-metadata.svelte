@@ -1,25 +1,10 @@
-<script lang="ts" context="module">
-  export const SET_NEW_METADATA_STEP_FRAGMENT = gql`
-    ${PROJECT_CUSTOMIZER_FRAGMENT}
-    fragment SetNewMetadataStep on ClaimedProject {
-      ...ProjectCustomizer
-      emoji
-      color
-      account {
-        accountId
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import ProjectCustomizer, {
-    PROJECT_CUSTOMIZER_FRAGMENT,
-  } from '$lib/components/project-customizer/project-customizer.svelte';
+  import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
+  import type { ClaimedGitProject } from '$lib/utils/metadata/types';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
@@ -27,12 +12,10 @@
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { gql } from 'graphql-request';
-  import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let project: SetNewMetadataStepFragment;
+  export let project: ClaimedGitProject;
 
   let projectWritable = writable(structuredClone(project));
 
@@ -47,7 +30,7 @@
       makeTransactPayload({
         before: async () => {
           const currentMetadata = (
-            await metadataManager.fetchAccountMetadata(project.account.accountId)
+            await metadataManager.fetchAccountMetadata(project.repoDriverAccount.accountId)
           )?.data;
           assert(currentMetadata, 'No metadata found for account');
 
@@ -71,7 +54,7 @@
           const repoDriverClient = await getRepoDriverClient();
 
           const emitAccountMetadataTx = repoDriverClient.emitAccountMetadata(
-            project.account.accountId,
+            project.repoDriverAccount.accountId,
             accountMetadataAsBytes,
           );
 

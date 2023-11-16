@@ -5,21 +5,21 @@
 <HeadMeta title="Data & Privacy Policy" />
 
 <h1>Data & Privacy Policy</h1>
-<p class="typo-text-small">Last edited: November 15th, 2023</p>
+<p class="typo-text-small">Last edited: June 20th, 2023</p>
 <p>
   Drips websites (including drips.network, docs.drips.network, v1.drips.network,
-  docs.v1.drips.network, app.drips.network - hereinafter referred to as “Drips Websites”) are
-  maintained on a voluntary basis by the Public Goods Association (the “Association”). The
-  Association is a Swiss Association whose purpose is to build digital coordination infrastructure
-  that enables the development of public goods, including the Drips project. While the
-  Switzerland-based Radicle Foundation (the “Foundation”) previously assisted in the development and
-  deployment of the Drips Network, the Radicle Foundation and the Public Goods Association do not
-  own, manage, or control or act as an administrator or operator of the Drips Network. The Drips
-  Network presently operates in a fully decentralized and autonomous manner and is fully integrated
-  with the Ethereum protocol. Neither the Association nor the Foundation is involved in nor in any
-  way responsible for the ongoing operation, running, or functioning of the Drips Network and/or any
-  of the interactions, collaborations or contractual relationships between Users on the Drips
-  Network.
+  docs.v1.drips.network, app.drips.network - hereinafter referred to as &ldquo;Drips
+  Websites&rdquo;) are maintained on a voluntary basis by the Public Goods Association (the
+  &ldquo;Association&rdquo;). The Association is a Swiss Association whose purpose is to build
+  digital coordination infrastructure that enables the development of public goods, including the
+  Drips project. While the Switzerland-based Radicle Foundation (the &ldquo;Foundation&rdquo;)
+  previously assisted in the development and deployment of the Drips Network, the Radicle Foundation
+  and the Public Goods Association do not own, manage, or control or act as an administrator or
+  operator of the Drips Network. The Drips Network presently operates in a fully decentralized and
+  autonomous manner and is fully integrated with the Ethereum protocol. Neither the Association nor
+  the Foundation is involved in nor in any way responsible for the ongoing operation, running, or
+  functioning of the Drips Network and/or any of the interactions, collaborations or contractual
+  relationships between Users on the Drips Network.
 </p>
 <p>
   The Association voluntarily supports the growth and development of the Drips project, including
@@ -166,36 +166,31 @@
 </p>
 <h4>When using the Drips Protocol and Drips App:</h4>
 <p>
-  When You/a User sets up a token stream or transfer via the Drips Protocol (which can be done - but
-  is not required - via the Drips App, app.drips.network), You/they will need to connect the token
-  sender’s Ethereum address (likely Your/their own Ethereum address, i.e. Your/their public key).
-  You/They will also need to indicate the Ethereum address that should be able to access and receive
-  the sent tokens. This use of Ethereum addresses (public keys) is critical to ensure tokens
-  streamed, shared, or transferred are accessed by the correct recipient. The use of Your Ethereum
-  address - including via your interaction with the Drips Protocol - publishes data about your
-  interaction to the Ethereum Network.
+  When You/a User sets up a token stream or transfer via the Drips Protocol (which can be done via
+  the Drips App, app.drips.network), You/they will need to connect the token sender&rsquo;s Ethereum
+  address (likely Your/their own Ethereum address, i.e. Your/their public key). You/They will also
+  need to indicate the Ethereum address that should be able to access and receive the sent tokens.
+  This use of Ethereum addresses (public keys) is critical to ensure tokens streamed, shared, or
+  transferred are accessed by the correct recipient.&nbsp;
 </p>
 <p>
-  When using the Drips App, there are many ways for You to generate public data, including but not
-  limited to: topping up funds; collecting funds; creating streams (transfers); editing or deleting
-  streams; creating a Drip List; editing or transferring a Drip List; claiming a Project; and
-  editing a Project. For example, when using the Drips App to create a token stream, the metadata a
-  User gives the token stream or transfer - including the Ethereum addresses of the sender and
-  recipient(s) You indicate, the name You give to the stream or transfer, the amount of tokens You
-  transfer, and the time and frequency parameters You set for the token transfer - are published to
-  and stored in the InterPlanetary File System (IPFS). Each piece of data stored in the IPFS network
-  gets its own unique content identifier (CID), a hash of the metadata sent to IPFS, which is
-  created by IPFS. The Drips App retrieves the CID of the published IPFS document (i.e. the User’s
-  metadata), and then writes this CID on-chain (via the Drips Protocol) in association with the
-  User’s Drips account. By design, details of any activity initiated and made by You via the Drips
-  App are public information and are stored on the blockchain and anyone is able to download, access
-  and view Your metadata (and any personal data embedded therein) stored in the IPFS if they have
-  the CID.
+  When using the Drips App, the metadata a User gives the token stream or transfer - including the
+  Ethereum addresses of the sender and recipient(s) You indicate, the name You give to the stream or
+  transfer, the amount of tokens You transfer, and the time and frequency parameters You set for the
+  token transfer - are published to and stored in the InterPlanetary File System (IPFS). Each piece
+  of data stored in the IPFS network gets its own unique content identifier (CID), a hash of the
+  metadata sent to IPFS, which is created by IPFS.&nbsp;The Drips App retrieves the CID of the
+  published IPFS document (i.e. the User&rsquo;s metadata), and then writes this CID on-chain (via
+  the Drips Protocol) in association with the User&rsquo;s Drips account. By design, details of any
+  transfer initiated and made by You are public information and are stored on the blockchain and
+  anyone is able to download, access and view Your metadata (and any personal data embedded therein)
+  stored in the IPFS if they have the CID.
 </p>
 <p>
-  For more information about the lifecycle of data and information in IPFS, please visit <a
-    href="https://docs.ipfs.tech/concepts/lifecycle/">this site</a
-  >. &nbsp; &nbsp;&nbsp;
+  The Association does not collect, store, or process the information and/or data sent to IPFS based
+  on the User inputs. For more information about the lifecycle of data and information in IPFS,
+  please visit <a href="https://docs.ipfs.tech/concepts/lifecycle/">this site</a>. &nbsp;
+  &nbsp;&nbsp;
 </p>
 <p>
   To use Drips App, You must use a third-party wallet (e.g., MetaMask, WalletConnect) which allows
@@ -204,43 +199,16 @@
   terms of use and data privacy policy of that third party.&nbsp;
 </p>
 <p>
-  When a User generates public data via the Drips App, the User first sends the metadata of their
-  Drips App interaction to the IPFS network (via Pinata) and their transaction data to the Ethereum
-  Network, as described above, before the Drips App uses a custom server to read the transaction
-  data from IPFS and Ethereum (via Pinata). The custom server is set up so that when there is a new
-  transaction on the Ethereum Network - specifically, when there is an interaction with the Drips
-  Protocol - the custom server is notified and creates a cache of this public transaction data on
-  Ethereum and, if applicable, the metadata (stored on IPFS) associated with the CID listed as part
-  of the Ethereum transaction. This transaction data on the custom server is then used by the Drips
-  App to present the user with public data about the token streams, Drip Lists, Projects and other
-  entities in the Drips Network. The custom server is similar to <a
-    href="https://etherscan.io/"
-    target="_blank"
-    rel="noreferrer">Etherscan’s</a
-  >
-  indexing and presenting of Ethereum on-chain, public activity; the custom server enables the Drips
-  App to bring together multiple public datasets to serve users with all Drips Network data in a quicker
-  and more efficient way. This custom server is hosted on Railway Corporation (“Railway”). This means
-  that the publicly published data created and provided by Drips Protocol users will be made accessible
-  in another location, on a custom server hosted on Railway. The custom server’s code is open source:
-  the code for the server’s Event Processor can be found
-  <a href="https://github.com/drips-network/events-processor" target="_blank" rel="noreferrer"
-    >here</a
-  >
-  and the code for the GraphQL API can be found
-  <a href="https://github.com/drips-network/graphql-api" target="_blank" rel="noreferrer">here</a>.
-</p>
-<p>
   By using Drips Network and/or Drips App You acknowledge that Your personal data, including Your
-  wallet address (and/or any third-party recipient’s wallet address), is/are stored on the Ethereum
-  Network and neither Public Goods Association nor Radicle Foundation, nor any third party, has any
-  power to delete such data published by You or other/its users to the blockchain. Any details of
-  any transfer initiated and made by You are public information and are stored on the blockchain.
-  You hereby release and indemnify Public Goods Association and/or Radicle Foundation of any data
-  privacy liabilities associated with personal data that You (and/or third parties) publish to the
-  Ethereum Network by using Drips Network and/ or Drips App. Neither Public Goods Association nor
-  Radicle Foundation is acting as a data controller in this regard within the meaning of the data
-  protection legislation.
+  wallet address (and/or any third-party recipient&rsquo;s wallet address), is/are stored on the
+  Ethereum Network and neither Public Goods Association nor Radicle Foundation, nor any third party,
+  has any power to delete such data published by You or other/its users to the blockchain. Any
+  details of any transfer initiated and made by You are public information and are stored on the
+  blockchain. You hereby release and indemnify Public Goods Association and/or Radicle Foundation of
+  any data privacy liabilities associated with personal data that You (and/or third parties) publish
+  to the Ethereum Network by using Drips Network and/ or Drips App. Neither Public Goods Association
+  nor Radicle Foundation is acting as a data controller in this regard within the meaning of the
+  data protection legislation.
 </p>
 <h3>How Third Party Applications are Used</h3>
 <p>
@@ -301,17 +269,6 @@
     href="https://www.pinata.cloud/privacy-policy">this site</a
   >.
 </p>
-<h4>Railway Corporation (Railway):</h4>
-<p>
-  When You interact with the Drips Network to publish information, the data (and any personal data
-  embedded therein) You create is published to Pinata, IPFS, Ethereum, and further indexed by a
-  custom server hosted by Railway Corporation, 80 Rossi Avenue, San Francisco, CA 94118 (“Railway”).
-  The Drips App accesses the custom server for reading Your public data from an IPFS node provided
-  by Pinata and Your public data from the Ethereum Network. Railway can use this public data for
-  their own purposes. The Association has no control over what happens with Your data and does not
-  process this data. For further information and the applicable data privacy provisions of Railway,
-  visit <a href="https://railway.app/legal/privacy" target="_blank" rel="noreferrer">this site</a>.
-</p>
 <h4>Links to Social Media:</h4>
 <p>
   The Drips Websites may link to social media profiles and may contain icons of social media
@@ -344,13 +301,13 @@
 <p>
   The Association does not process or retain the metadata (and any personal data embedded therein)
   that the User creates when the User sets up a token transfer or stream in the Drips App; this
-  metadata (and any personal data embedded therein) is sent to IPFS [see “How Third Party
-  Applications are Used” under “IPFS” above] where it becomes an immutable stored object and then
-  replicated on an Railway server.
+  metadata (and any personal data embedded therein) is sent to IPFS [see &ldquo;How Third Party
+  Applications are Used&rdquo; under &ldquo;IPFS&rdquo; above] where it becomes an immutable stored
+  object.
 </p>
 <p>
   By using Drips Network and/or Drips App You acknowledge that your personal data, including Your
-  wallet address (and/or any third-party recipient’s wallet address), is/are stored on public
+  wallet address (and/or any third-party recipient&rsquo;s wallet address), is/are stored on public
   searchable blockchains and neither Public Goods Association nor Radicle Foundation, nor any third
   party, has any power to delete such data published by You or other/its users to the blockchain.
 </p>

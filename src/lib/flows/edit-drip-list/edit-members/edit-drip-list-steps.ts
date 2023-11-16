@@ -3,10 +3,12 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { get, writable } from 'svelte/store';
 import EditDripListStep from '../shared/steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import type { EditDripListStepSelectedDripListFragment } from '../shared/steps/__generated__/gql.generated';
+import type { DripList } from '$lib/utils/metadata/types';
+import type { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
 
 export default (
-  dripList: EditDripListStepSelectedDripListFragment,
+  dripList: DripList,
+  representationalSplits: Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>,
 ) => ({
   context: undefined,
   steps: [
@@ -15,6 +17,7 @@ export default (
       props: {
         selectedDripListState: writable({
           dripList,
+          representationalSplits,
         }),
       },
     }),

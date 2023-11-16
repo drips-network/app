@@ -171,6 +171,63 @@ describe('RepoDriverMetadataManager', () => {
     });
   });
 
+  describe('fetchAccount', () => {
+    it('should return null when the account metadata is not found', async () => {
+      // Arrange
+      const fetchAccountMetadataMock = vi
+        .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
+        .mockResolvedValue(undefined as any);
+      MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
+
+      const repoDriverClientMock = {
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue('2'),
+      } as unknown as RepoDriverClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
+
+      const metadataMgr = new RepoDriverMetadataManager();
+
+      // Act
+      const account = await metadataMgr.fetchAccount('1');
+
+      // Assert
+      expect(account).toBeNull();
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith('1');
+    });
+
+    it('should return the account when the account metadata is found', async () => {
+      const fetchAccountMetadataMock = vi
+        .fn(MetadataManagerBase.prototype.fetchAccountMetadata)
+        .mockResolvedValue({
+          data: {
+            describes: {
+              accountId: '1',
+              driver: 'repo',
+            },
+          },
+        } as any);
+      MetadataManagerBase.prototype.fetchAccountMetadata = fetchAccountMetadataMock;
+
+      const repoDriverClientMock = {
+        getAccountId: vi.fn(RepoDriverClient.prototype.getAccountId).mockResolvedValue('2'),
+      } as unknown as RepoDriverClient;
+      const getClient = await import('$lib/utils/get-drips-clients');
+      getClient.getRepoDriverClient = vi.fn().mockImplementation(() => repoDriverClientMock);
+
+      const metadataMgr = new RepoDriverMetadataManager();
+
+      // Act
+      const account = await metadataMgr.fetchAccount('1');
+
+      // Assert
+      expect(account).toEqual({
+        accountId: '1',
+        driver: 'repo',
+      });
+      expect(fetchAccountMetadataMock).toHaveBeenCalledWith('1');
+    });
+  });
+
   describe('buildAccountMetadata', () => {
     it('should return the account metadata', async () => {
       // Arrange
@@ -188,9 +245,6 @@ describe('RepoDriverMetadataManager', () => {
       const metadataMgr = new RepoDriverMetadataManager();
       const context = {
         forProject: {
-          account: {
-            accountId: '5',
-          },
           owner: {
             driver: 'address',
             accountId: '2',
@@ -203,7 +257,6 @@ describe('RepoDriverMetadataManager', () => {
           source: {
             url: 'repo',
             repoName: 'repo',
-            ownerName: 'owner',
           },
           emoji: '👍',
           color: 'red',
@@ -236,14 +289,12 @@ describe('RepoDriverMetadataManager', () => {
       expect(metadata).toEqual({
         driver: 'repo',
         describes: {
-          accountId: '5',
+          accountId: '1',
           driver: 'repo',
         },
         source: {
-          forge: 'github',
           url: 'repo',
           repoName: 'repo',
-          ownerName: 'owner',
         },
         emoji: '👍',
         color: 'red',

@@ -7,10 +7,8 @@
   import { tweened } from 'svelte/motion';
   import DripsAnimation from '../drips-animation/drips-animation.svelte';
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
-  import IdentityCard, { IDENTITY_CARD_DRIP_LIST_FRAGMENT } from '../identity-card/identity-card.svelte';
-  import { gql } from 'graphql-request';
-  import query from '$lib/graphql/dripsQL';
-  import type { DripListNameQuery, DripListNameQueryVariables } from './__generated__/gql.generated';
+  import IdentityCard from '../identity-card/identity-card.svelte';
+  import DripListService from '$lib/utils/driplist/DripListService';
 
   interface AddressDriverAccount {
     driver: 'address';
@@ -48,20 +46,9 @@
   }
 
   async function fetchDripList(accountId: string) {
-    const dripListNameQuery = gql`
-      ${IDENTITY_CARD_DRIP_LIST_FRAGMENT}
-      query DripListName($id: ID!) {
-        dripList(id: $id) {
-          ...IdentityCardDripList
-        }
-      }
-    `;
+    const service = await DripListService.new();
 
-    const result = await query<DripListNameQuery, DripListNameQueryVariables>(dripListNameQuery, {
-      id: accountId,
-    });
-
-    return result.dripList;
+    return service.getByTokenId(accountId);
   }
 </script>
 

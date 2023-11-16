@@ -38,7 +38,7 @@
           const gitProjectService = await GitProjectService.new();
 
           const batch = await gitProjectService.buildUpdateSplitsBatchTx(
-            $context.projectAccountId,
+            $context.project.repoDriverAccount.accountId,
             $context.highLevelPercentages,
             $context.maintainerSplits,
             $context.dependencySplits,
@@ -71,12 +71,12 @@
         <Splits
           list={[
             {
-              __typename: "SplitGroup",
+              type: 'split-group',
               name: 'Dependencies',
               list: dependencyRepresentationalSplits,
             },
             {
-              __typename: "SplitGroup",
+              type: 'split-group',
               name: 'Maintainers',
               list: maintainerRepresentationalSplits,
             },

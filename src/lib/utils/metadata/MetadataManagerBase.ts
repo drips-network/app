@@ -2,14 +2,14 @@ import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import type { ContractTransaction } from 'ethers';
 import type { DripsSubgraphClient, AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
+import type { AccountId } from './types';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser/lib/types';
 import assert from '$lib/utils/assert';
 
 type IpfsHash = string;
-type AccountId = string;
 
-export interface IMetadataManager<TParser extends Parser> {
+export interface IMetadataManager<TAccount, TParser extends Parser> {
   fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null>;
 
   fetchAccountMetadata(
@@ -24,6 +24,8 @@ export interface IMetadataManager<TParser extends Parser> {
     schema: T,
   ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }>;
 
+  fetchAccount(accountId: AccountId): Promise<TAccount | null>;
+
   buildAccountMetadata(context: unknown): LatestVersion<TParser>;
 }
 
@@ -32,8 +34,8 @@ export type EmitMetadataFunc = (
   accountMetadata: AccountMetadata[],
 ) => Promise<ContractTransaction>;
 
-export default abstract class MetadataManagerBase<TParser extends Parser>
-  implements IMetadataManager<TParser>
+export default abstract class MetadataManagerBase<TAccount, TParser extends Parser>
+  implements IMetadataManager<TAccount, TParser>
 {
   public static readonly USER_METADATA_KEY = 'ipfs';
 
@@ -46,6 +48,13 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
     this._emitMetadataFunc = emitMetadataFunc;
     this.subgraphClient = getSubgraphClient();
   }
+
+  /**
+   * Fetches the account for a given user ID.
+   * @param accountId The user ID to fetch the account for.
+   * @returns The account for the given user ID, or null if no account exists.
+   */
+  public abstract fetchAccount(accountId: AccountId): Promise<TAccount | null>;
 
   /**
    * Builds account metadata.

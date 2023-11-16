@@ -28,12 +28,6 @@
   import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import assert from '$lib/utils/assert';
-  import { gql } from 'graphql-request';
-  import query from '$lib/graphql/dripsQL';
-  import type {
-    DripListExistsQuery,
-    DripListExistsQueryVariables,
-  } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -72,37 +66,14 @@
             };
           }
         },
-        after: async (_, { dripListId }) => {
-          const dripListExistsQuery = gql`
-            query DripListExists($id: ID!) {
-              dripList(id: $id) {
-                account {
-                  accountId
-                }
-              }
-            }
-          `;
-
-          const tryFetchList = async (listId: string) => {
-            try {
-              return await query<DripListExistsQuery, DripListExistsQueryVariables>(
-                dripListExistsQuery,
-                {
-                  id: listId,
-                },
-              );
-            } catch {
-              return false;
-            }
-          };
-
+        after: async (_, { callerClient, dripListId }) => {
           await expect(
-            () => tryFetchList(dripListId),
-            (result) => (typeof result === 'boolean' ? result : Boolean(result.dripList)),
+            async () =>
+              subgraphClient.getNftSubAccountsByOwner(await callerClient.signer.getAddress()),
+            (subAccounts) => subAccounts.filter((s) => s.tokenId === dripListId).length === 1,
             10000,
             1000,
           );
-
           await streamsStore.refreshUserAccount();
 
           $context.dripListId = dripListId;
