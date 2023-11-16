@@ -12,6 +12,10 @@
 [context.production]
     command = "mv robots-allow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && npm run build"
 
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@sparticuz/chromium"]
+
 [[redirects]]
   from = "https://beta.drips.network/*"
   to = "https://drips.network/:splat"
