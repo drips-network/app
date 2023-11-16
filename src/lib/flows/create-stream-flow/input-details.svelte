@@ -38,6 +38,7 @@
   export let context: Writable<CreateStreamFlowState>;
   export let tokenAddress: string | undefined = undefined;
   export let receiver: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
+  export let nameInputHidden: boolean | undefined = false;
 
   const restorer = $context.restorer;
 
@@ -167,7 +168,7 @@
     streamEndDateValidationState.type !== 'invalid' &&
     (receiver || recipientInputValidationState.type === 'valid') &&
     amountValidationState?.type === 'valid' &&
-    streamNameValue &&
+    (nameInputHidden || streamNameValue) &&
     timeRangeValid;
 
   function submit() {
@@ -176,7 +177,7 @@
       selectedToken ?? unreachable(),
       amountPerSecond ?? unreachable(),
       recipientInputValue ?? unreachable(),
-      streamNameValue ?? unreachable(),
+      streamNameValue,
       $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
       setStartAndEndDate
         ? {
@@ -224,9 +225,11 @@
     headline={receiver ? 'Create a Support Stream' : 'Create stream'}
     description="Stream any ERC-20 token from your Drips account."
   />
-  <FormField title="Stream name*">
-    <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
-  </FormField>
+  {#if !nameInputHidden}
+    <FormField title="Stream name*">
+      <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
+    </FormField>
+  {/if}
   {#if !receiver}
     <FormField title="Stream to*">
       <InputAddress

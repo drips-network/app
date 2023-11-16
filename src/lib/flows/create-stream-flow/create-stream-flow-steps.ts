@@ -14,6 +14,7 @@ export default (tokenAddress?: string, receiver?: NFTDriverAccount | AddressDriv
       props: {
         tokenAddress,
         receiver,
+        nameInputHidden: receiver !== undefined,
       },
     }),
     makeStep({

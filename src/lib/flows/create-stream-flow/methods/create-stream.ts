@@ -27,7 +27,7 @@ export default function (
   selectedToken: TokenInfoWrapper,
   amountPerSecond: bigint,
   recipient: string,
-  streamName: string,
+  streamName: string | undefined,
   ownAccount: Account,
   schedule?: {
     start: Date;
@@ -101,7 +101,7 @@ export default function (
             driver: 'address',
           },
           archived: false,
-          name: streamName,
+          name: streamName ?? 'Unnamed stream',
         };
 
         const accountMetadata = metadataMgr.buildAccountMetadata({
