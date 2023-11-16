@@ -201,7 +201,8 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    Make a single donation{#if isOwner && dripList}, stream tokens,{/if} or add them to a Drip List.
+    Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add them to your Drip
+    List.
   </p>
   <div class="flex flex-col gap-2">
     {#if !isWalletConnected}
@@ -218,15 +219,15 @@
         size="large">Support</Button
       >
     {:else}
-      <Button size="large" icon={Droplet}>Send a single donation</Button>
       {#if isOwner && dripList}
-        <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams}
-          >Stream tokens</Button
+        <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams}>
+          Support stream</Button
         >
       {/if}
-      <Button on:click={handleAddtoDripListButton} size="large" icon={DripListIcon}
-        >Add to a Drip List</Button
+      <Button on:click={handleAddtoDripListButton} size="large" icon={DripListIcon}>
+        Add to a Drip List</Button
       >
+      <Button size="large" icon={Droplet}>Single donation</Button>
     {/if}
   </div>
 </div>
