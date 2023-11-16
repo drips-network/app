@@ -99,9 +99,7 @@
                     <IdentityBadge size="medium" address={incomingSplit.item.value.address} />
                   {:else if incomingSplit.type === 'dripList'}
                     <DripListBadge
-                      listId={incomingSplit.item.value.account.accountId}
-                      listName={incomingSplit.item.value.name}
-                      owner={incomingSplit.item.value.account.owner.address}
+                      dripList={incomingSplit.item.value}
                     />
                   {:else if incomingSplit.type === 'project'}
                     <ProjectBadge project={incomingSplit.item.value} />

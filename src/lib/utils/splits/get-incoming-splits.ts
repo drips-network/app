@@ -1,29 +1,66 @@
-import DripListService from '$lib/utils/driplist/DripListService';
+import query from '$lib/graphql/dripsQL';
 import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { DripList, GitProject } from '$lib/utils/metadata/types';
-import GitProjectService from '$lib/utils/project/GitProjectService';
+import { gql } from 'graphql-request';
 import { Utils, AddressDriverClient } from 'radicle-drips';
+import type {
+  IncomingDripListSplitDripListQuery,
+  IncomingDripListSplitDripListQueryVariables,
+  IncomingProjectSplitProjectQuery,
+  IncomingProjectSplitProjectQueryVariables,
+} from './__generated__/gql.generated';
+import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
 
 export interface SplitsEntryWrapper<T> {
   value: T;
   weight: number;
 }
 
-export default async function getIncomingSplits(accountId: string): Promise<{
+const incomingProjectSplitQuery = gql`
+  ${PROJECT_BADGE_FRAGMENT}
+  query IncomingProjectSplitProject($projectId: ID!) {
+    projectById(id: $projectId) {
+      ...ProjectBadge
+      ... on ClaimedProject {
+        source {
+          ownerName
+          repoName
+          url
+        }
+      }
+    }
+  }
+`;
+
+const incomingDripListSplitQuery = gql`
+  query IncomingDripListSplitDripList($dripListId: ID!) {
+    dripList(id: $dripListId) {
+      name
+      account {
+        accountId
+      }
+      owner {
+        address
+      }
+    }
+  }
+`;
+
+export default async function getIncomingSplits(
+  forAccountId: string,
+  fetchFunction: typeof fetch = fetch,
+): Promise<{
   users: SplitsEntryWrapper<{
     driver: 'address';
     address: string;
     accountId: string;
   }>[];
-  projects: SplitsEntryWrapper<GitProject>[];
-  dripLists: SplitsEntryWrapper<DripList>[];
+  projects: SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['projectById']>>[];
+  dripLists: SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>[];
 }> {
   const subgraph = getSubgraphClient();
-  const dripListService = await DripListService.new();
-  const gitProjectService = await GitProjectService.new();
 
-  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(accountId);
+  const incomingSplits = await subgraph.getSplitEntriesByReceiverAccountId(forAccountId);
 
   const incomingAddressDriverSplits = incomingSplits.filter(
     (s) => Utils.AccountId.getDriver(s.senderId) === 'address',
@@ -33,7 +70,18 @@ export default async function getIncomingSplits(accountId: string): Promise<{
     (s) => Utils.AccountId.getDriver(s.senderId) === 'nft',
   );
   const dripListFetches = incomingNFTDriverSplits.map(async (s) => {
-    const dripList = await dripListService.getByTokenId(s.senderId);
+    const response = await query<
+      IncomingDripListSplitDripListQuery,
+      IncomingDripListSplitDripListQueryVariables
+    >(
+      incomingDripListSplitQuery,
+      {
+        dripListId: s.senderId,
+      },
+      fetchFunction,
+    );
+
+    const { dripList } = response;
     if (!dripList) return undefined;
 
     return { value: dripList, weight: Number(s.weight) };
@@ -44,10 +92,21 @@ export default async function getIncomingSplits(accountId: string): Promise<{
   );
 
   const projectFetches = incomingRepoDriverSplits.map(async (s) => {
-    const gitProject = await gitProjectService.getByAccountId(s.senderId);
-    if (!gitProject) return undefined;
+    const response = await query<
+      IncomingProjectSplitProjectQuery,
+      IncomingProjectSplitProjectQueryVariables
+    >(
+      incomingProjectSplitQuery,
+      {
+        projectId: s.senderId,
+      },
+      fetchFunction,
+    );
 
-    return { value: gitProject, weight: Number(s.weight) };
+    const { projectById: project } = response;
+    if (!project) return undefined;
+
+    return { value: project, weight: Number(s.weight) };
   });
 
   const fetchResults = await Promise.all([
@@ -64,7 +123,13 @@ export default async function getIncomingSplits(accountId: string): Promise<{
         accountId: s.senderId,
       },
     })),
-    projects: mapFilterUndefined(fetchResults[1], (v) => v as SplitsEntryWrapper<GitProject>),
-    dripLists: mapFilterUndefined(fetchResults[0], (v) => v as SplitsEntryWrapper<DripList>),
+    projects: mapFilterUndefined(
+      fetchResults[1],
+      (v) => v as SplitsEntryWrapper<NonNullable<IncomingProjectSplitProjectQuery['projectById']>>,
+    ),
+    dripLists: mapFilterUndefined(
+      fetchResults[0],
+      (v) => v as SplitsEntryWrapper<NonNullable<IncomingDripListSplitDripListQuery['dripList']>>,
+    ),
   };
 }

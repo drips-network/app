@@ -31,9 +31,17 @@ jobs:
           envkey_GELATO_API_KEY: ${{ secrets.GELATO_API_KEY }}
           envkey_COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
           envkey_PUBLIC_NETWORK: 5
+          # GQL URL is localhost, where the GQL API will run in Docker, but we generate GQL types
+          # later from the production GQL API in order to ensure this PR is aligned with the currently-deployed
+          # GQL schema once merged.
+          envkey_GQL_URL: http://localhost:8080
+          envkey_GQL_ACCESS_TOKEN: ${{ secrets.GQL_ACCESS_TOKEN }}
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Build GQL types
+        run: GQL_URL=https://drips-api-goerli-s1.up.railway.app/ npm run build:graphql
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
@@ -42,4 +50,4 @@ jobs:
         run: npx svelte-kit sync
 
       - name: Run E2E tests
-        run: npm run e2e
+        run: GQL_URL=http://localhost:8080 npm run e2e

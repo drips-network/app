@@ -11,7 +11,6 @@
     type ListItem,
   } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -30,13 +29,12 @@
   async function fetchProjectDeps() {
     try {
       if ($context.dependencySplits.itemsPromise) {
-        const promises = ($context.dependencySplits.itemsPromise as Promise<GitProject>[]).map(
-          (p) =>
-            p.catch((error) => {
-              // eslint-disable-next-line no-console
-              console.log('💧 ~ Could not fetch project:', error);
-              return undefined;
-            }),
+        const promises = $context.dependencySplits.itemsPromise.map((p) =>
+          p.catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log('💧 ~ Could not fetch project:', error);
+            return undefined;
+          }),
         );
 
         const depsGitProjects = mapFilterUndefined(await Promise.all(promises), (v) => v);

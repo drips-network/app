@@ -1,22 +1,56 @@
+<script lang="ts" context="module">
+  export const PROJECT_PROFILE_FRAGMENT = gql`
+    ${PROJECT_PROFILE_HEADER_FRAGMENT}
+    ${EDIT_PROJECT_METADATA_FLOW_FRAGMENT}
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    ${SUPPORT_CARD_PROJECT_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
+    ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
+    ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
+    fragment ProjectProfile on Project {
+      ...UnclaimedProjectCard
+      ...ProjectProfileHeader
+      ...SupportCardProject
+      ...SplitsComponentProjectSplits
+      ... on UnclaimedProject {
+        account {
+          accountId
+        }
+      }
+      ... on ClaimedProject {
+        ...EditProjectMetadataFlow
+        account {
+          accountId
+        }
+        owner {
+          accountId
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
-  import SupportCard from '$lib/components/support-card/support-card.svelte';
-  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
-  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import SupportCard, {
+    SUPPORT_CARD_PROJECT_FRAGMENT,
+  } from '$lib/components/support-card/support-card.svelte';
+  import ProjectProfileHeader, {
+    PROJECT_PROFILE_HEADER_FRAGMENT,
+  } from '$lib/components/project-profile-header/project-profile-header.svelte';
+  import UnclaimedProjectCard, {
+    UNCLAIMED_PROJECT_CARD_FRAGMENT,
+  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import type {
-    Splits,
-    Split,
-    AddressSplit,
-    ProjectSplit,
-    DripListSplit,
+  import SplitsComponent, {
+    SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT,
   } from '$lib/components/splits/splits.svelte';
-  import SplitsComponent from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
@@ -31,16 +65,30 @@
   import Pen from 'radicle-design-system/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
+  import editProjectMetadataSteps, {
+    EDIT_PROJECT_METADATA_FLOW_FRAGMENT,
+  } from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Registered from 'radicle-design-system/icons/Registered.svelte';
   import buildUrl from '$lib/utils/build-url';
-  import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import editProjectSplitsSteps, {
+    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
   import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
+  import isClaimed from '$lib/utils/project/is-claimed';
+  import { gql } from 'graphql-request';
+  import type {
+    ProjectProfileFragment,
+    ProjectProfile_ClaimedProject_Fragment,
+  } from './__generated__/gql.generated';
+  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import unreachable from '$lib/utils/unreachable';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
@@ -51,49 +99,37 @@
     amount: bigint;
   }
 
-  export let project: GitProject;
+  export let project: ProjectProfileFragment;
 
   export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
-  export let splits:
-    | Promise<{
-        maintainers: (AddressSplit | ProjectSplit | DripListSplit)[];
-        dependencies: (AddressSplit | ProjectSplit | DripListSplit)[];
-      } | null>
-    | undefined = undefined;
-
   export let incomingSplits: ReturnType<typeof getIncomingSplits>;
 
   $: ownAccountId = $walletStore.dripsAccountId;
-  $: isOwnProject = ownAccountId === project.owner?.accountId;
+  $: isOwnProject = ownAccountId === (isClaimed(project) ? project.owner.accountId : undefined);
 
-  function flattenSplits(list: Splits): Split[] {
-    return list.reduce<Split[]>((acc, i) => {
-      if (i.type === 'split-group') {
-        return [...acc, ...flattenSplits(i.list)];
-      }
-      return [...acc, i];
-    }, []);
-  }
-
-  function getSplitsPile(splitCollections: Splits[]) {
+  function getSplitsPile(
+    splitCollections: (
+      | ProjectProfile_ClaimedProject_Fragment['splits']['maintainers']
+      | ProjectProfile_ClaimedProject_Fragment['splits']['dependencies']
+    )[],
+  ) {
     const splits = splitCollections.flat();
-    const flattened = flattenSplits(splits);
 
-    return mapFilterUndefined(flattened, (v) => {
-      switch (v.type) {
-        case 'address-split':
+    return mapFilterUndefined(splits, (v) => {
+      switch (v.__typename) {
+        case 'AddressReceiver':
           return {
             component: IdentityBadge,
             props: {
-              address: v.address,
+              address: v.account.address,
               showIdentity: false,
               outline: true,
               size: 'medium',
             },
           };
-        case 'project-split':
+        case 'ProjectReceiver':
           return {
             component: ProjectAvatar,
             props: {
@@ -155,8 +191,8 @@
     .repoName} on Drips and help make Open-Source Software sustainable."
 />
 
-<PrimaryColorThemer colorHex={project.owner ? project.color : undefined}>
-  {#if !project.owner}
+<PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
+  {#if !isClaimed(project)}
     <div class="unclaimed-project-notice">
       <AnnotationBox type="info">
         {#await unclaimedFunds}
@@ -187,9 +223,9 @@
     </div>
   {/if}
 
-  <article class="project-profile" class:claimed={project.claimed}>
+  <article class="project-profile" class:claimed={isClaimed(project)}>
     <header class="header">
-      {#if project.owner}
+      {#if isClaimed(project)}
         <div class="owner">
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
             >Project claimed by</span
@@ -200,17 +236,17 @@
       <div>
         <ProjectProfileHeader
           {project}
-          editButton={project.claimed && isOwnProject ? 'Edit' : undefined}
+          editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
           on:editButtonClick={() =>
-            project.claimed && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
+            isClaimed(project) && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
         />
       </div>
-      {#if project.claimed}
-        {#await Promise.all([earnedFunds, splits])}
+      {#if isClaimed(project)}
+        {#await earnedFunds}
           <div class="stats loading">
             <Spinner />
           </div>
-        {:then [earnedFundsResult, splitsResult]}
+        {:then earnedFundsResult}
           <div class="stats" in:fade|local={{ duration: 300 }}>
             {#if earnedFundsResult}
               <div class="stat">
@@ -219,15 +255,15 @@
                 </KeyValuePair>
               </div>
             {/if}
-            {#if splitsResult}
+            {#if isClaimed(project)}
               <div class="stat">
                 <KeyValuePair key="Splits with">
-                  {#if splitsResult && [splitsResult.maintainers, splitsResult.dependencies].flat().length > 0}
+                  {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
                     <Pile
                       maxItems={5}
                       components={getSplitsPile([
-                        splitsResult.maintainers,
-                        splitsResult.dependencies,
+                        project.splits.maintainers ?? [],
+                        project.splits.dependencies ?? [],
                       ])}
                     />
                   {:else}
@@ -241,67 +277,58 @@
       {/if}
     </header>
     <div class="content">
-      <Developer accountId={project.repoDriverAccount.accountId} />
-      {#if project.owner}
+      <Developer accountId={project.account.accountId} />
+      {#if isClaimed(project)}
         <section class="app-section">
-          {#if splits}
-            {#await splits}
-              <SectionHeader icon={SplitsIcon} label="Splits" />
-              <SectionSkeleton loaded={false} />
-            {:then result}
-              <SectionHeader
-                icon={SplitsIcon}
-                label="Splits"
-                actions={isOwnProject
-                  ? [
-                      {
-                        handler: () =>
-                          project.claimed &&
-                          result &&
-                          modal.show(Stepper, undefined, editProjectSplitsSteps(project, result)),
-                        label: 'Edit',
-                        icon: Pen,
-                      },
-                    ]
-                  : []}
-              />
-              <SectionSkeleton
-                loaded={true}
-                error={result === null}
-                empty={result
-                  ? result.maintainers.length === 0 && result.dependencies.length === 0
-                  : false}
-                emptyStateHeadline="No splits"
-                emptyStateEmoji="🫧"
-                emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
-              >
-                {#if result}
-                  <div class="card">
-                    <div class="outgoing-splits">
-                      <ProjectBadge {project} />
-                      <SplitsComponent
-                        list={[
-                          {
-                            type: 'split-group',
-                            name: 'Maintainers',
-                            list: result.maintainers,
-                          },
-                          {
-                            type: 'split-group',
-                            name: 'Dependencies',
-                            list: result.dependencies,
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                {/if}
-              </SectionSkeleton>
-            {:catch}
-              <SectionHeader icon={SplitsIcon} label="Splits" />
-              <SectionSkeleton loaded={true} error={true} />
-            {/await}
-          {/if}
+          <SectionHeader
+            icon={SplitsIcon}
+            label="Splits"
+            actions={isOwnProject
+              ? [
+                  {
+                    handler: () =>
+                      isClaimed(project) &&
+                      modal.show(
+                        Stepper,
+                        undefined,
+                        isClaimed(project)
+                          ? editProjectSplitsSteps(project.account.accountId, project.splits)
+                          : unreachable(),
+                      ),
+                    label: 'Edit',
+                    icon: Pen,
+                  },
+                ]
+              : []}
+          />
+          <SectionSkeleton
+            loaded={true}
+            empty={project.splits.maintainers.length === 0 &&
+              project.splits.dependencies.length === 0}
+            emptyStateHeadline="No splits"
+            emptyStateEmoji="🫧"
+            emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
+          >
+            <div class="card">
+              <div class="outgoing-splits">
+                <ProjectBadge {project} />
+                <SplitsComponent
+                  list={[
+                    {
+                      __typename: 'SplitGroup',
+                      name: 'Maintainers',
+                      list: project.splits.maintainers,
+                    },
+                    {
+                      __typename: 'SplitGroup',
+                      name: 'Dependencies',
+                      list: project.splits.dependencies,
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+          </SectionSkeleton>
         </section>
       {:else if unclaimedFunds}
         <section class="app-section">

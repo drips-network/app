@@ -1,13 +1,26 @@
+<script lang="ts" context="module">
+  export const IDENTITY_CARD_DRIP_LIST_FRAGMENT = gql`
+    fragment IdentityCardDripList on DripList {
+      account {
+        accountId
+      }
+      name
+    }
+  `
+
+</script>
+
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import type { DripList } from '$lib/utils/metadata/types';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import { gql } from 'graphql-request';
+  import type { IdentityCardDripListFragment } from './__generated__/gql.generated';
 
   // Either pass address or dripList. If neither, it'll say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
-  export let dripList: DripList | undefined = undefined;
+  export let dripList: IdentityCardDripListFragment | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
   export let disableLink = false;

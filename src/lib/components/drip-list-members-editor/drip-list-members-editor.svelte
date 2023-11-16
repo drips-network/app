@@ -1,7 +1,21 @@
 <script lang="ts" context="module">
+  export const DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT = gql`
+    ${PROJECT_BADGE_FRAGMENT}
+    fragment DripListMembersEditorProject on Project {
+      ...ProjectBadge
+    }
+  `;
+
+  export const DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT = gql`
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    fragment DripListMembersEditorDripList on DripList {
+      ...DripListBadge
+    }
+  `;
+
   interface ProjectItem {
     type: 'project';
-    project: GitProject;
+    project: DripListMembersEditorProjectFragment;
   }
 
   interface EthAddressItem {
@@ -11,11 +25,7 @@
 
   interface DripListItem {
     type: 'drip-list';
-    list: {
-      id: string;
-      name: string;
-      owner: string;
-    };
+    list: DripListMembersEditorDripListFragment;
   }
 
   export type ListItem = DripListItem | EthAddressItem | ProjectItem;
@@ -33,27 +43,37 @@
   import CheckIcon from 'radicle-design-system/icons/Check.svelte';
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import { fade, scale } from 'svelte/transition';
-  import type { GitProject } from '$lib/utils/metadata/types';
   import Button from '$lib/components/button/button.svelte';
   import { onMount } from 'svelte';
   import { getAddress, isAddress } from 'ethers/lib/utils';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
   import assert from '$lib/utils/assert';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
-  import { verifyRepoExists } from '$lib/utils/github/github';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
   import Trash from 'radicle-design-system/icons/Trash.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge, {
+    PROJECT_BADGE_FRAGMENT,
+  } from '$lib/components/project-badge/project-badge.svelte';
   import ethAddressItem from './item-templates/eth-address';
   import projectItem from './item-templates/project';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import dripListItem from './item-templates/drip-list';
   import unreachable from '$lib/utils/unreachable';
-  import DripListBadge from '../drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge, {
+    DRIP_LIST_BADGE_FRAGMENT,
+  } from '../drip-list-badge/drip-list-badge.svelte';
+  import query from '$lib/graphql/dripsQL';
+  import { gql } from 'graphql-request';
+  import type {
+    DripListMembersEditorDripListFragment,
+    DripListMembersEditorProjectFragment,
+    DripListToAddQuery,
+    DripListToAddQueryVariables,
+    ProjectToAddQuery,
+    ProjectToAddQueryVariables,
+  } from './__generated__/gql.generated';
   import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
 
@@ -85,25 +105,42 @@
   let inputValue = '';
   let inputMessage: { type: 'caution' | 'success'; message: string } | undefined = undefined;
 
-  let gitProjectService: GitProjectService;
-
   async function addProject() {
-    if (!gitProjectService) gitProjectService = await GitProjectService.new();
-
     if (!allowedItems.includes('projects')) return;
 
     try {
       isAddingItem = true;
 
-      const { username, repoName } = GitProjectService.deconstructUrl(inputValue);
+      let url = inputValue;
 
-      // TODO: This only supports GitHub forge
-      const repoExists = await verifyRepoExists(username, repoName);
-      if (!repoExists) throw new Error("Couldn't find that Git project. Is it private?");
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
 
-      let gitProject = await gitProjectService.getByUrl(inputValue);
+      // If URL ends with /, remove it
+      if (url.endsWith('/')) {
+        url = url.slice(0, -1);
+      }
 
-      const id = gitProject.source.url;
+      const projectToAddQuery = gql`
+        ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+        query ProjectToAdd($url: String!) {
+          projectByUrl(url: $url) {
+            ...DripListMembersEditorProject
+          }
+        }
+      `;
+
+      const { projectByUrl: project } = await query<ProjectToAddQuery, ProjectToAddQueryVariables>(
+        projectToAddQuery,
+        {
+          url,
+        },
+      );
+
+      if (!project) throw new Error("Couldn't find that Git project. Is it private?");
+
+      const id = project.source.url;
       if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
 
       if (items[id]) {
@@ -112,7 +149,7 @@
         return;
       }
 
-      items[id] = projectItem(gitProject);
+      items[id] = projectItem(project);
 
       addItemToPercentages(id);
 
@@ -136,12 +173,32 @@
       const dripListId = inputValue.substring(inputValue.lastIndexOf('/') + 1);
       if (!dripListId) throw new Error('Invalid drip list ID');
 
-      const dripListService = await DripListService.new();
+      const dripListToAddQuery = gql`
+        query DripListToAdd($id: ID!) {
+          dripList(id: $id) {
+            name
+            owner {
+              address
+            }
+            account {
+              accountId
+            }
+          }
+        }
+      `;
 
-      const dripList = await dripListService.getByTokenId(dripListId);
-      if (!dripList) throw new Error('Drip List not found');
+      const { dripList: dripListToAdd } = await query<
+        DripListToAddQuery,
+        DripListToAddQueryVariables
+      >(dripListToAddQuery, {
+        id: dripListId,
+      });
 
-      if (blockedKeys.includes(dripListId)) throw new Error('Drip List ID is already used');
+      if (!dripListToAdd) throw new Error('Drip list not found');
+
+      if (blockedKeys.includes(dripListToAdd.account.accountId)) {
+        throw new Error('Drip List ID is already used');
+      }
 
       if (items[dripListId]) {
         inputMessage = { type: 'success', message: 'Already added' };
@@ -149,11 +206,7 @@
         return;
       }
 
-      items[dripListId] = dripListItem(
-        dripList.name,
-        dripList.account.accountId,
-        dripList.account.owner.address,
-      );
+      items[dripListId] = dripListItem(dripListToAdd);
 
       addItemToPercentages(dripListId);
 
@@ -261,8 +314,6 @@
     itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100 && !hasEmptyPercents;
   export let error = false;
   $: error = Math.round(totalPercentage * 100) / 100 > 100 || hasEmptyPercents;
-  // TODO: error should check if items are 0% (can currently submit with 0% but it gets excluded on tx)
-
   $: canDistributeEvenly = itemsLength > 0;
 
   function setAllPercentagesTo(value: number) {
@@ -426,12 +477,7 @@
                 {:else if item.type === 'project'}
                   <ProjectBadge project={item.project} linkTo="nothing" />
                 {:else if item.type === 'drip-list'}
-                  <DripListBadge
-                    listName={item.list.name}
-                    listId={item.list.id}
-                    owner={item.list.owner}
-                    isLinked={false}
-                  />
+                  <DripListBadge dripList={item.list} isLinked={false} />
                 {/if}
               </div>
             </div>

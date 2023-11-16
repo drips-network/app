@@ -15,6 +15,40 @@ services:
       POSTGRES_DB: graph-node
       POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
 
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  postgres-event-processor:
+    image: postgres
+    ports:
+      - '5433:5432'
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: dripsdb
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+
+  events-processor:
+    build:
+      dockerfile: ./src/e2e-tests/docker/events-processor/Dockerfile
+      context: .
+    depends_on:
+      - postgres-event-processor
+
+  drips-gql-api:
+    build:
+      dockerfile: ./src/e2e-tests/docker/drips-gql-api/Dockerfile
+      context: .
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres-event-processor
+      - events-processor
+
   testnet:
     build:
       dockerfile: ./src/e2e-tests/docker/testnet/Dockerfile

@@ -1,13 +1,35 @@
+<script lang="ts" context="module">
+  export const PROJECT_PROFILE_HEADER_FRAGMENT = gql`
+    ${PROJECT_BADGE_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
+    fragment ProjectProfileHeader on Project {
+      ...ProjectBadge
+      ...ProjectAvatar
+      ... on ClaimedProject {
+        source {
+          url
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          url
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
-  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import type { GitProject } from '$lib/utils/metadata/types';
+  import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
   import Copyable from '../copyable/copyable.svelte';
   import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import { gql } from 'graphql-request';
+  import type { ProjectProfileHeaderFragment } from './__generated__/gql.generated';
 
-  export let project: GitProject;
+  export let project: ProjectProfileHeaderFragment;
   export let editButton: string | undefined = undefined;
 
   const dispatch = createEventDispatcher<{ editButtonClick: never }>();
