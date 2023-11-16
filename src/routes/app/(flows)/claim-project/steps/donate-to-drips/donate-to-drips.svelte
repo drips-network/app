@@ -48,15 +48,16 @@
       dispatch('goForward');
     }
 
-    if (Object.keys($context.dependencySplits.items).length + Object.keys($context.maintainerSplits.items).length >= 200) {
+    if (
+      Object.keys($context.dependencySplits.items).length +
+        Object.keys($context.maintainerSplits.items).length >=
+      200
+    ) {
       // Too many dependencies and maintainers, so we have to skip the step
       dispatch('goForward');
     }
 
-    repPercentages.set(
-      suggestedHighLevelPercentages,
-      { duration: 2000, easing: quintOut },
-    );
+    repPercentages.set(suggestedHighLevelPercentages, { duration: 2000, easing: quintOut });
 
     setTimeout(() => {
       highlightId = 'drips';
@@ -69,15 +70,19 @@
       address: DRIPS_DONATION_ADDRESS,
     };
 
-    const dripsDependencyPercentage = scale(DEFAULT_DONATION_PERCENTAGE, 0, $context.highLevelPercentages.dependencies, 0, 100);
+    const dripsDependencyPercentage = scale(
+      DEFAULT_DONATION_PERCENTAGE,
+      [0, $context.highLevelPercentages.dependencies],
+      [0, 100],
+    );
     $context.dependencySplits.percentages[DRIPS_DONATION_ADDRESS] = dripsDependencyPercentage;
 
-    $context.dependencySplits.percentages = Object.fromEntries(Object.entries($context.dependencySplits.percentages).map((p) => [
-      p[0],
-      scale(p[1], 0, 100, 0, 100 - dripsDependencyPercentage),
-    ]));
-
-    console.log($context)
+    $context.dependencySplits.percentages = Object.fromEntries(
+      Object.entries($context.dependencySplits.percentages).map((p) => [
+        p[0],
+        scale(p[1], [0, 100], [0, 100 - dripsDependencyPercentage]),
+      ]),
+    );
 
     dispatch('goForward');
   }

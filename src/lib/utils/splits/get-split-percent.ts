@@ -7,7 +7,7 @@ export function getSplitPercent(weight: number | bigint = BigInt('0'), format = 
 
   switch (format) {
     case 'pretty': {
-      const integer = Math.floor(percent);
+      const integer = Math.round((percent + Number.EPSILON) * 100) / 100;
 
       return !integer && percent > 0
         ? '<1%'
