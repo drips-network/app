@@ -238,7 +238,7 @@
       />
     </FormField>
   {/if}
-  <FormField title="Token*" description="Select a token to stream from your Drips account.">
+  <FormField title="Token*">
     <div class="list-container">
       <ListSelect
         bind:selected={selectedTokenAddress}
