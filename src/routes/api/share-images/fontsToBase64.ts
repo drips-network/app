@@ -1,7 +1,7 @@
 // Adjusted from https://github.com/junminahn/node-font2base64/tree/main
 
 import fs from 'fs';
-import fileType from 'file-type';
+import { fileTypeFromBuffer } from 'file-type';
 import assert from '$lib/utils/assert';
 
 const _toDataUrl = (mediaType: string, base64: string) =>
@@ -20,7 +20,7 @@ const toDataUrl = (fpath: string, base64: string) => {
 const readBuffer = async (buff: Buffer) => {
   const base64 = buff.toString('base64');
 
-  const data = await fileType.fromBuffer(buff);
+  const data = await fileTypeFromBuffer(buff);
   assert(data);
 
   return base64;
