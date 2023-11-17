@@ -60,7 +60,9 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
           }
           <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${projectNameParam}</span>
         </div>
-        <div style="display: flex; gap: 24px; align-items: center">
+        <div style="display: flex; gap: 24px; align-items: center; opacity: ${
+          dependenciesCountParam === '0' ? '0' : '1'
+        }">
           <img src="${boxIconDataURI}" height="64px" width="64px" />
           <span style="font-family: Inter; font-size: 40px">${dependenciesCountParam} ${dependenciesString}</span>
         </div>
