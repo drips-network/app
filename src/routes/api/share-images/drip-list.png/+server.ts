@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const svg = await satori(
     toReactElement(`<div style="display: flex; background-color: #5555FF;">
-      <!--<img src="${bgDataURI}" />-->
+      <img src="${bgDataURI}" />
       <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: white; gap: 24px;">
          <span style="font-family: Inter; font-size: 40px">Drip List</span>
          <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${listName}</span>
