@@ -24,6 +24,21 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const recipientsString = recipientsCount === '1' ? 'Recipient' : 'Recipients';
 
+  const puppeteerArgs = {
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--headless',
+      '--no-zygote',
+      '--disable-gpu',
+    ],
+    headless: true,
+    ignoreHTTPSErrors: true,
+  };
+
   const image = await nodeHtmlToImage({
     html: `
     <html>
@@ -44,6 +59,7 @@ export const GET: RequestHandler = async ({ url }) => {
         </div>
       </body>
     </html>`,
+    puppeteerArgs,
   });
 
   let item: Buffer | string;
