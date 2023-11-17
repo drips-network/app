@@ -1,11 +1,14 @@
 import type { RequestHandler } from './$types';
 import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
-import nodeHtmlToImage from 'node-html-to-image';
 import loadImage from '../loadImage';
-import baseStyles from '../baseStyles';
 import getContrastColor from '$lib/utils/get-contrast-text-color';
-import chromium from '@sparticuz/chromium';
+import satori from 'satori';
+import { html as toReactElement } from 'satori-html';
+import loadFonts from '../loadFonts';
+import { Resvg } from '@resvg/resvg-js';
+import getBackgroundImage from '../getBackgroundImage';
+import twemoji from 'twemoji';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
   const projectNameParam = url.searchParams.get('projectName');
@@ -34,63 +37,50 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const dependenciesString = dependenciesCountParam === '1' ? 'Dependency' : 'Dependencies';
 
-  const puppeteerArgs = {
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--headless',
-      '--no-zygote',
-      '--disable-gpu',
-    ],
-    headless: true,
-    ignoreHTTPSErrors: true,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath('/var/task/node_modules/@sparticuz/chromium/bin'),
-  };
+  const twemojiElem = twemoji.parse(projectEmojiParam);
+  const twemojiSrc = /<img[^>]+src="(https:\/\/[^">]+)"/g.exec(twemojiElem)?.[1];
 
-  const image = await nodeHtmlToImage({
-    html: `
-    <html>
-      <head>
-        ${await baseStyles(height, bgColor, fetch)}
-      </head>
-      <body>
-        <div style="font-family: Redaction; color: ${textColor};">
-          <img src="${bgDataURI}">
-          <div style="position: fixed; width: 80%; left: 36px; bottom: 36px; display: flex; flex-direction: column; gap: 24px">
-            <span style="font-family: Inter; font-size: 40px">Project</span>
-            <span style="font-size: 90px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${projectNameParam}</span>
-            <div style="display: flex; gap: 24px; align-items: center; opacity: ${
-              dependenciesCountParam === '0' ? '0' : '1'
-            }">
-              <img src="${boxIconDataURI}" />
-              <span style="font-family: Inter; font-size: 40px;">${dependenciesCountParam} ${dependenciesString}</span>
-            </div>
+  assert(twemojiSrc);
+
+  const twemojiImg = await loadImage(twemojiSrc, fetch);
+
+  const svg = await satori(
+    toReactElement(`<div style="display: flex; background-color: ${bgColor}">
+      <!--<img src="${bgDataURI}" />-->
+      ${getBackgroundImage(bgColor, textColor, target)}
+      <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: ${textColor}; gap: 24px;">
+        <span style="font-family: Inter; font-size: 40px">Project</span>
+        <div style="display: flex; gap: 32px;">
+          <div style="display: flex; margin-top: 16px; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
+            <img height="64px" width="64px" src="${twemojiImg}" />
           </div>
+          <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${projectNameParam}</span>
         </div>
-      </body>
-    </html>`,
-    puppeteerArgs,
+        <div style="display: flex; gap: 24px; align-items: center">
+          <img src="${boxIconDataURI}" height="64px" width="64px" />
+          <span style="font-family: Inter; font-size: 40px">${dependenciesCountParam} ${dependenciesString}</span>
+        </div>
+      </div>
+    </div>`),
+    {
+      width: 1200,
+      height: height,
+      fonts: await loadFonts(fetch),
+    },
+  );
+
+  const resvg = new Resvg(svg, {
+    fitTo: {
+      mode: 'width',
+      value: 1200,
+    },
   });
 
-  let item: Buffer | string;
-  if (Array.isArray(image)) {
-    item = image[0];
-  } else {
-    item = image;
-  }
+  const image = resvg.render();
 
-  let imgRes: Buffer;
-  if (Buffer.isBuffer(item)) {
-    imgRes = item;
-  } else {
-    imgRes = Buffer.from(item);
-  }
-
-  return new Response(imgRes, {
-    headers: { 'Content-Type': 'image/png' },
+  return new Response(image.asPng(), {
+    headers: {
+      'content-type': 'image/png',
+    },
   });
 };

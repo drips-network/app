@@ -1,12 +1,13 @@
 import type { RequestHandler } from './$types';
 import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
-import nodeHtmlToImage from 'node-html-to-image';
 import loadImage from '../loadImage';
-import baseStyles from '../baseStyles';
-import chromium from '@sparticuz/chromium';
+import satori from 'satori';
+import { Resvg } from '@resvg/resvg-js';
+import { html as toReactElement } from 'satori-html';
+import loadFonts from '../loadFonts';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, fetch }) => {
   const listName = url.searchParams.get('listName');
   const recipientsCount = url.searchParams.get('recipientsCount');
   const target = url.searchParams.get('target');
@@ -25,61 +26,37 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const recipientsString = recipientsCount === '1' ? 'Recipient' : 'Recipients';
 
-  const puppeteerArgs = {
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--headless',
-      '--no-zygote',
-      '--disable-gpu',
-    ],
-    headless: true,
-    ignoreHTTPSErrors: true,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath('/var/task/node_modules/@sparticuz/chromium/bin'),
-  };
+  const svg = await satori(
+    toReactElement(`<div style="display: flex; background-color: #5555FF;">
+      <!--<img src="${bgDataURI}" />-->
+      <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: white; gap: 24px;">
+         <span style="font-family: Inter; font-size: 40px">Drip List</span>
+         <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${listName}</span>
+         <div style="display: flex; gap: 24px; align-items: center">
+           <img src="${dripListIconDataURI}" height="64px" width="64px" />
+           <span style="font-family: Inter; font-size: 40px">${recipientsCount} ${recipientsString}</span>
+         </div>
+       </div>
+    </div>`),
+    {
+      width: 1200,
+      height: height,
+      fonts: await loadFonts(fetch),
+    },
+  );
 
-  const image = await nodeHtmlToImage({
-    html: `
-    <html>
-      <head>
-        ${await baseStyles(height, '#5555FF', fetch)}
-      </head>
-      <body>
-        <div style="font-family: Redaction; color: white;">
-          <img src="${bgDataURI}">
-          <div style="position: fixed; width: 80%; left: 36px; bottom: 36px; display: flex; flex-direction: column; gap: 24px">
-            <span style="font-family: Inter; font-size: 40px">Drip List</span>
-            <span style="font-size: 90px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${listName}</span>
-            <div style="display: flex; gap: 24px; align-items: center">
-              <img src="${dripListIconDataURI}" />
-              <span style="font-family: Inter; font-size: 40px">${recipientsCount} ${recipientsString}</span>
-            </div>
-          </div>
-        </div>
-      </body>
-    </html>`,
-    puppeteerArgs,
+  const resvg = new Resvg(svg, {
+    fitTo: {
+      mode: 'width',
+      value: 1200,
+    },
   });
 
-  let item: Buffer | string;
-  if (Array.isArray(image)) {
-    item = image[0];
-  } else {
-    item = image;
-  }
+  const image = resvg.render();
 
-  let imgRes: Buffer;
-  if (Buffer.isBuffer(item)) {
-    imgRes = item;
-  } else {
-    imgRes = Buffer.from(item);
-  }
-
-  return new Response(imgRes, {
-    headers: { 'Content-Type': 'image/png' },
+  return new Response(image.asPng(), {
+    headers: {
+      'content-type': 'image/png',
+    },
   });
 };
