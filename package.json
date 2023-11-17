@@ -83,7 +83,6 @@
     "apollo-utilities": "^1.3.4",
     "cupertino-pane": "^1.3.2",
     "ethers": "^5.7.0",
-    "file-type": "^18.7.0",
     "fuzzysort": "^2.0.3",
     "git-dep-url": "github:jtourkos/git-dep-url",
     "graphql": "^15.8.0",
