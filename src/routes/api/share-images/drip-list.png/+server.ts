@@ -4,6 +4,7 @@ import { error } from '@sveltejs/kit';
 import nodeHtmlToImage from 'node-html-to-image';
 import loadImage from '../loadImage';
 import baseStyles from '../baseStyles';
+import chromium from '@sparticuz/chromium';
 
 export const GET: RequestHandler = async ({ url }) => {
   const listName = url.searchParams.get('listName');
@@ -37,6 +38,8 @@ export const GET: RequestHandler = async ({ url }) => {
     ],
     headless: true,
     ignoreHTTPSErrors: true,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath('/var/task/node_modules/@sparticuz/chromium/bin'),
   };
 
   const image = await nodeHtmlToImage({

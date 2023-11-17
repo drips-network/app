@@ -5,6 +5,7 @@ import nodeHtmlToImage from 'node-html-to-image';
 import loadImage from '../loadImage';
 import baseStyles from '../baseStyles';
 import getContrastColor from '$lib/utils/get-contrast-text-color';
+import chromium from '@sparticuz/chromium';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
   const projectNameParam = url.searchParams.get('projectName');
@@ -46,6 +47,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     ],
     headless: true,
     ignoreHTTPSErrors: true,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath('/var/task/node_modules/@sparticuz/chromium/bin'),
   };
 
   const image = await nodeHtmlToImage({

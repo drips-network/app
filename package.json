@@ -72,6 +72,7 @@
     "@pinata/sdk": "^1.1.26",
     "@safe-global/safe-apps-provider": "^0.16.0",
     "@safe-global/safe-apps-sdk": "^7.10.0",
+    "@sparticuz/chromium": "^115.0.0",
     "@sveltejs/adapter-netlify": "^2.0.6",
     "@tanstack/svelte-table": "^8.5.15",
     "@uniswap/default-token-list": "^10.0.0",
