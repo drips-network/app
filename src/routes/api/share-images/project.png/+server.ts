@@ -30,7 +30,6 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   const contrastColor = getContrastColor(bgColor);
 
   const bgTheme = contrastColor === 'black' ? 'dark' : 'light';
-  const bgDataURI = await loadImage(`/assets/share/bg-${target}-${bgTheme}.png`, fetch);
   const boxIconDataURI = await loadImage(`/assets/share/box-${bgTheme}.png`, fetch);
 
   const textColor = contrastColor === 'black' ? '#333333' : '#FFFFFF';
@@ -46,7 +45,6 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const svg = await satori(
     toReactElement(`<div style="display: flex; background-color: ${bgColor}">
-      <!--<img src="${bgDataURI}" />-->
       ${getBackgroundImage(bgColor, textColor, target)}
       <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: ${textColor}; gap: 24px;">
         <span style="font-family: Inter; font-size: 40px">Project</span>

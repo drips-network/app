@@ -6,6 +6,7 @@ import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { html as toReactElement } from 'satori-html';
 import loadFonts from '../loadFonts';
+import getBackgroundImage from '../getBackgroundImage';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
   const listName = url.searchParams.get('listName');
@@ -21,14 +22,13 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const height = target === 'twitter' ? 600 : 675;
 
-  const bgDataURI = await loadImage(`/assets/share/bg-${target}-light.png`, fetch);
   const dripListIconDataURI = await loadImage('/assets/share/dripList.png', fetch);
 
   const recipientsString = recipientsCount === '1' ? 'Recipient' : 'Recipients';
 
   const svg = await satori(
     toReactElement(`<div style="display: flex; background-color: #5555FF;">
-      <img src="${bgDataURI}" />
+      ${getBackgroundImage('#5555FF', 'white', target)}
       <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: white; gap: 24px;">
          <span style="font-family: Inter; font-size: 40px">Drip List</span>
          <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${listName}</span>
