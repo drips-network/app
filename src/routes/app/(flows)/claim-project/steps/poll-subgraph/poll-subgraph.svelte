@@ -48,7 +48,9 @@
             projectId: projectAccountId,
           },
         ),
-      (response) => response.projectById?.verificationStatus === 'PendingMetadata',
+      (response) =>
+        response.projectById?.verificationStatus === 'PendingMetadata' ||
+        response.projectById?.verificationStatus === 'OwnerUpdated',
       300000,
       2000,
     );
