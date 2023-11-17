@@ -37,12 +37,12 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const dependenciesString = dependenciesCountParam === '1' ? 'Dependency' : 'Dependencies';
 
-  const twemojiElem = twemoji.parse(projectEmojiParam);
-  const twemojiSrc = /<img[^>]+src="(https:\/\/[^">]+)"/g.exec(twemojiElem)?.[1];
+  const twemojiElem =
+    (projectEmojiParam !== 'none' && twemoji.parse(projectEmojiParam)) ?? undefined;
+  const twemojiSrc =
+    (twemojiElem && /<img[^>]+src="(https:\/\/[^">]+)"/g.exec(twemojiElem)?.[1]) ?? undefined;
 
-  assert(twemojiSrc);
-
-  const twemojiImg = await loadImage(twemojiSrc, fetch);
+  const twemojiImg = (twemojiSrc && (await loadImage(twemojiSrc, fetch))) ?? undefined;
 
   const svg = await satori(
     toReactElement(`<div style="display: flex; background-color: ${bgColor}">
@@ -51,9 +51,13 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: ${textColor}; gap: 24px;">
         <span style="font-family: Inter; font-size: 40px">Project</span>
         <div style="display: flex; gap: 32px;">
-          <div style="display: flex; margin-top: 16px; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
+          ${
+            twemojiImg
+              ? `<div style="display: flex; margin-top: 16px; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
             <img height="64px" width="64px" src="${twemojiImg}" />
-          </div>
+          </div>`
+              : ''
+          }
           <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${projectNameParam}</span>
         </div>
         <div style="display: flex; gap: 24px; align-items: center">
