@@ -25,13 +25,11 @@
 </script>
 
 {#if data.dripList.name}
-  {@const imageBaseUrl = `/api/share-images/drip-list.png?listName=${encodeURIComponent(
-    dripList.name,
-  )}&recipientsCount=${encodeURIComponent(dripList.splits.length)}`}
+  {@const imageBaseUrl = `/api/share-images/drip-list/${dripList.account.accountId}.png`}
   <HeadMeta
     title={data.dripList.name}
-    image="{imageBaseUrl}&target=og"
-    twitterImage="{imageBaseUrl}&target=twitter"
+    image="{imageBaseUrl}?target=og"
+    twitterImage="{imageBaseUrl}?target=twitter"
   />
 {/if}
 

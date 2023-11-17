@@ -186,19 +186,13 @@
 </script>
 
 {#if true}
-  {@const imageBaseUrl = `/api/share-images/project.png?projectName=${encodeURIComponent(
-    `${project.source.ownerName}/${project.source.repoName}`,
-  )}&dependenciesCount=${encodeURIComponent(
-    isClaimed(project) ? project.splits.dependencies.length : 0,
-  )}&emoji=${isClaimed(project) ? project.emoji : 'none'}&bgColor=${
-    isClaimed(project) ? encodeURIComponent(project.color) : 'none'
-  }`}
+  {@const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`}
   <HeadMeta
     title="{project.source.ownerName}/{project.source.repoName}"
     description="Support {project.source
       .repoName} on Drips and help make Open-Source Software sustainable."
-    image="{imageBaseUrl}&target=og"
-    twitterImage="{imageBaseUrl}&target=twitter"
+    image="{imageBaseUrl}?target=og"
+    twitterImage="{imageBaseUrl}?target=twitter"
   />
 {/if}
 

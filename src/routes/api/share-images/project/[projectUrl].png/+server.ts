@@ -1,24 +1,71 @@
 import type { RequestHandler } from './$types';
 import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
-import loadImage from '../loadImage';
+import loadImage from '../../loadImage';
 import getContrastColor from '$lib/utils/get-contrast-text-color';
 import satori from 'satori';
 import { html as toReactElement } from 'satori-html';
-import loadFonts from '../loadFonts';
+import loadFonts from '../../loadFonts';
 import { Resvg } from '@resvg/resvg-js';
-import getBackgroundImage from '../getBackgroundImage';
+import getBackgroundImage from '../../getBackgroundImage';
 import twemoji from 'twemoji';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import isClaimed from '$lib/utils/project/is-claimed';
+import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
-  const projectNameParam = url.searchParams.get('projectName');
-  const projectEmojiParam = url.searchParams.get('emoji');
-  const dependenciesCountParam = url.searchParams.get('dependenciesCount');
-  const bgColorParam = url.searchParams.get('bgColor');
+export const GET: RequestHandler = async ({ url, fetch, params }) => {
+  const { projectUrl } = params;
+  assert(projectUrl, 'Missing projectUrl param');
+
+  const projectQuery = gql`
+    query Project($url: String!) {
+      projectByUrl(url: $url) {
+        ... on ClaimedProject {
+          source {
+            ownerName
+            repoName
+          }
+          emoji
+          color
+          splits {
+            dependencies {
+              __typename
+            }
+          }
+        }
+        ... on UnclaimedProject {
+          source {
+            ownerName
+            repoName
+          }
+        }
+      }
+    }
+  `;
+
+  const res = await query<ProjectQuery, ProjectQueryVariables>(
+    projectQuery,
+    { url: projectUrl },
+    fetch,
+  );
+  const { projectByUrl: project } = res;
+  try {
+    assert(project);
+  } catch {
+    throw error(404);
+  }
+
+  const projectName = `${project.source.ownerName}/${project.source.repoName}`;
+  const emoji = isClaimed(project) ? project.emoji : 'none';
+  const dependenciesCount = isClaimed(project)
+    ? project.splits.dependencies.length.toString()
+    : '0';
+
+  const color = isClaimed(project) ? project.color : 'none';
   const target = url.searchParams.get('target');
 
   try {
-    assert(projectNameParam && projectEmojiParam && dependenciesCountParam && bgColorParam);
     assert(target === 'twitter' || target === 'og');
   } catch (e) {
     throw error(400, 'Invalid or missing query params');
@@ -26,7 +73,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const height = target === 'twitter' ? 600 : 675;
 
-  const bgColor = bgColorParam === 'none' ? '#5555FF' : bgColorParam;
+  const bgColor = color === 'none' ? '#5555FF' : color;
   const contrastColor = getContrastColor(bgColor);
 
   const bgTheme = contrastColor === 'black' ? 'dark' : 'light';
@@ -34,10 +81,9 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
   const textColor = contrastColor === 'black' ? '#333333' : '#FFFFFF';
 
-  const dependenciesString = dependenciesCountParam === '1' ? 'Dependency' : 'Dependencies';
+  const dependenciesString = dependenciesCount === '1' ? 'Dependency' : 'Dependencies';
 
-  const twemojiElem =
-    (projectEmojiParam !== 'none' && twemoji.parse(projectEmojiParam)) ?? undefined;
+  const twemojiElem = (emoji !== 'none' && twemoji.parse(emoji)) ?? undefined;
   const twemojiSrc =
     (twemojiElem && /<img[^>]+src="(https:\/\/[^">]+)"/g.exec(twemojiElem)?.[1]) ?? undefined;
 
@@ -56,13 +102,13 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
           </div>`
               : ''
           }
-          <span style="font-family: Redaction; width: 1000px; font-size: 90px; display: block; line-clamp: 2;">${projectNameParam}</span>
+          <span style="font-family: Redaction; width: 1000px; font-size: 90px; display: block; line-clamp: 2;">${projectName}</span>
         </div>
         <div style="display: flex; gap: 24px; align-items: center; opacity: ${
-          dependenciesCountParam === '0' ? '0' : '1'
+          dependenciesCount === '0' ? '0' : '1'
         }">
           <img src="${boxIconDataURI}" height="64px" width="64px" />
-          <span style="font-family: Inter; font-size: 40px">${dependenciesCountParam} ${dependenciesString}</span>
+          <span style="font-family: Inter; font-size: 40px">${dependenciesCount} ${dependenciesString}</span>
         </div>
       </div>
     </div>`),

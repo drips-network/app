@@ -1,23 +1,47 @@
 import type { RequestHandler } from './$types';
 import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
-import loadImage from '../loadImage';
+import loadImage from '../../loadImage';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { html as toReactElement } from 'satori-html';
-import loadFonts from '../loadFonts';
-import getBackgroundImage from '../getBackgroundImage';
+import loadFonts from '../../loadFonts';
+import getBackgroundImage from '../../getBackgroundImage';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
-  const listName = url.searchParams.get('listName');
-  const recipientsCount = url.searchParams.get('recipientsCount');
+export const GET: RequestHandler = async ({ url, fetch, params }) => {
+  const listId = params.listId;
+  assert(listId, 'Missing listId param');
+
+  const dripListQuery = gql`
+    query DripList($listId: ID!) {
+      dripList(id: $listId) {
+        name
+        splits {
+          __typename
+        }
+      }
+    }
+  `;
+
+  const res = await query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch);
+  const { dripList } = res;
+  try {
+    assert(dripList);
+  } catch {
+    throw error(404);
+  }
+
+  const listName = dripList.name;
+  const recipientsCount = dripList.splits.length.toString();
   const target = url.searchParams.get('target');
 
   try {
-    assert(listName && recipientsCount);
     assert(target === 'twitter' || target === 'og');
   } catch (e) {
-    throw error(400, 'Invalid or missing query params');
+    throw error(400, 'Invalid or missing target param');
   }
 
   const height = target === 'twitter' ? 600 : 675;
