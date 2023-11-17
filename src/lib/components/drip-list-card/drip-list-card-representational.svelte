@@ -1,8 +1,53 @@
+<script lang="ts" context="module">
+  import { gql } from "graphql-request";
+
+  export const DRIP_LIST_CARD_REPRESENTATIONAL_LIST_FRAGMENT = gql`
+    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
+    ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
+    ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
+    ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
+    fragment DripListCardRepresentationalList on DripList {
+      ...EditDripListStepSelectedDripList
+      name
+      account {
+        accountId
+      }
+      owner {
+        accountId
+      }
+      splits {
+        ... on AddressReceiver {
+          ...SplitsComponentAddressReceiver
+        }
+        ... on ProjectReceiver {
+          ...SplitsComponentProjectReceiver
+        }
+        ... on DripListReceiver {
+          ...SplitsComponentDripListReceiver
+        }
+      }
+    }
+  `;
+
+  export const DRIP_LIST_CARD_REPRESENTATIONAL_PROJECT_SUPPORTER_FRAGMENT = gql`
+    fragment DripListCardRepresentationalProjectSupporter on Project {
+      ... on ClaimedProject {
+        account {
+          accountId
+        }
+        owner {
+          address
+        }
+      }
+    }
+  `;
+</script>
+  
 <script lang="ts">
   import Pen from 'radicle-design-system/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
-  import Splits from '../splits/splits.svelte';
+  import Splits, { SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT, SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT, SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT } from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -21,26 +66,19 @@
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
-  import type { getRepresentationalSplitsForAccount } from '$lib/utils/drips/splits';
   import type { Stream } from '$lib/stores/streams/types';
   import type getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
-  import type { DripList } from '$lib/utils/metadata/types';
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
-  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
-  import Spinner from '../spinner/spinner.svelte';
+  import type { DripListCardRepresentationalListFragment } from "./__generated__/gql.generated";
+  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from "$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte";
 
-  export let dripList: DripList;
+  export let dripList: DripListCardRepresentationalListFragment;
   export let format: 'thumblink' | 'full' = 'full';
 
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
-  $: isOwnList = $walletStore && checkIsUser(dripList.account.owner.accountId);
-
-  export let representationalSplits:
-    | Awaited<ReturnType<typeof getRepresentationalSplitsForAccount>>
-    | undefined;
+  $: isOwnList = $walletStore && checkIsUser(dripList.owner.accountId);
 
   export let incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>> | undefined;
-
   export let supportStreams: Stream[];
 
   $: streamEstimates =
@@ -55,7 +93,7 @@
     the owner account is loaded.
   */
   $: streamEstimateLoaded =
-    $accountFetchStatusses[dripList.account.owner.accountId]?.all === 'fetched';
+    $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
 
   export let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined;
 
@@ -98,7 +136,7 @@
       splits.dripLists.map((s) => ({
         component: IdentityBadge,
         props: {
-          address: s.value.account.owner.address,
+          address: s.value.owner.address,
           showIdentity: false,
           outline: true,
           size: 'normal',
@@ -126,9 +164,7 @@
   $: supportersPile = getSupportersPile(supportStreams, incomingSplits);
 
   function triggerEditModal() {
-    if (!representationalSplits) return;
-
-    modal.show(Stepper, undefined, editDripListSteps(dripList, representationalSplits));
+    modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
   let maxRows: number | undefined;
@@ -137,21 +173,6 @@
       maxRows = undefined;
     } else {
       maxRows = dripList.description ? 3 : 4;
-    }
-  }
-
-  function getLoadingPlaceholderHeight() {
-    const BASE_HEIGHT = 16;
-    const ONE_SPLIT_HEIGHT = 49;
-
-    const amountOfMembers = dripList.projects.length;
-
-    if (format === 'full') {
-      return BASE_HEIGHT + ONE_SPLIT_HEIGHT * amountOfMembers;
-    } else {
-      return dripList.description
-        ? BASE_HEIGHT + ONE_SPLIT_HEIGHT * Math.min(3, amountOfMembers)
-        : BASE_HEIGHT + ONE_SPLIT_HEIGHT * Math.min(4, amountOfMembers);
     }
   }
 </script>
@@ -214,17 +235,9 @@
           </div>
         {/if}
       </div>
-      <TransitionedHeight transitionHeightChanges={true}>
-        {#if representationalSplits}
-          <div in:fade class="splits-component">
-            <Splits groupsExpandable={format === 'full'} list={representationalSplits} {maxRows} />
-          </div>
-        {:else}
-          <div class="loading-state" style:height="{getLoadingPlaceholderHeight()}px">
-            <Spinner />
-          </div>
-        {/if}
-      </TransitionedHeight>
+        <div class="splits-component">
+          <Splits groupsExpandable={format === 'full'} list={dripList.splits} {maxRows} />
+        </div>
     </div>
   </div>
   <div class="overflow-gradient" />
@@ -304,16 +317,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-
-  .drip-list-card .loading-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .thumblink .description {
-    height: 3rem;
   }
 
   .muted {

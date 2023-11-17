@@ -1,34 +1,90 @@
+<script lang="ts" context="module">
+  export const SUPPORT_CARD_DRIP_LIST_FRAGMENT = gql`
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    ${ADD_DRIP_LIST_MEMBER_FLOW_DRIP_LIST_TO_ADD_FRAGMENT}
+    fragment SupportCardDripList on DripList {
+      ...DripListBadge
+      ...AddDripListMemberFlowDripListToAdd
+      account {
+        accountId
+        driver
+      }
+      owner {
+        accountId
+      }
+    }
+  `;
+
+  export const SUPPORT_CARD_PROJECT_FRAGMENT = gql`
+    ${PROJECT_AVATAR_FRAGMENT}
+    ${ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT}
+    fragment SupportCardProject on Project {
+      ...AddDripListMemberFlowProjectToAdd
+      ...ProjectAvatar
+      ... on ClaimedProject {
+        owner {
+          accountId
+        }
+        account {
+          accountId
+        }
+        source {
+          url
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          url
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Heart from 'radicle-design-system/icons/Heart.svelte';
-  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectAvatar, {
+    PROJECT_AVATAR_FRAGMENT,
+  } from '$lib/components/project-avatar/project-avatar.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { ClaimedGitProject, DripList, UnclaimedGitProject } from '$lib/utils/metadata/types';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
-  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { goto } from '$app/navigation';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import buildUrl from '$lib/utils/build-url';
-  import type { SplitsEntry } from 'radicle-drips';
-  import addDripListMemberSteps from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
+  import addDripListMemberSteps, {
+    ADD_DRIP_LIST_MEMBER_FLOW_DRIP_LIST_TO_ADD_FRAGMENT,
+    ADD_DRIP_LIST_MEMBER_FLOW_LISTS_FRAGMENT,
+    ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT,
+  } from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import isClaimed from '$lib/utils/project/is-claimed';
+  import { gql } from 'graphql-request';
+  import query from '$lib/graphql/dripsQL';
+  import type {
+    OwnDripListsQuery,
+    OwnDripListsQueryVariables,
+    SupportCardDripListFragment,
+    SupportCardProjectFragment,
+  } from './__generated__/gql.generated';
+  import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
 
-  export let project: UnclaimedGitProject | ClaimedGitProject | undefined = undefined;
-  export let dripList: DripList | undefined = undefined;
+  export let project: SupportCardProjectFragment | undefined = undefined;
+  export let dripList: SupportCardDripListFragment | undefined = undefined;
 
-  let ownDripLists: DripList[] | null | undefined = undefined;
-  let ownDripListSplits: SplitsEntry[] | undefined = undefined;
+  let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
   $: isOwner =
     $walletStore.connected &&
+    project &&
+    isClaimed(project) &&
     ($walletStore.dripsAccountId === project?.owner?.accountId ||
-      $walletStore.dripsAccountId === dripList?.account.owner.accountId);
+      $walletStore.dripsAccountId === dripList?.owner.accountId);
 
   let supportUrl: string;
   $: {
@@ -67,12 +123,31 @@
       return;
     }
 
-    const dripListService = await DripListService.new();
-    const result = await dripListService.getByOwnerAddress(address);
+    const ownDripListsQuery = gql`
+      ${ADD_DRIP_LIST_MEMBER_FLOW_LISTS_FRAGMENT}
+      query OwnDripLists($ownerAddress: String!) {
+        dripLists(where: { ownerAddress: $ownerAddress }) {
+          ...AddDripListMemberFlowLists
+          account {
+            accountId
+            driver
+          }
+        }
+      }
+    `;
+
+    const { dripLists: result } = await query<OwnDripListsQuery, OwnDripListsQueryVariables>(
+      ownDripListsQuery,
+      {
+        ownerAddress: address,
+      },
+    );
+
+    if (!result) {
+      throw new Error('Failed to fetch own drip lists');
+    }
 
     if (result.length > 0) {
-      const subgraph = getSubgraphClient();
-      ownDripListSplits = await subgraph.getSplitsConfigByAccountId(result[0].account.accountId);
       ownDripLists = result;
     } else {
       ownDripLists = null;
