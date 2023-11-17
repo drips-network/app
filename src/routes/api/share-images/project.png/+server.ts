@@ -58,7 +58,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
           </div>`
               : ''
           }
-          <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${projectNameParam}</span>
+          <span style="font-family: Redaction; width: 1000px; font-size: 90px; display: block; line-clamp: 2;">${projectNameParam}</span>
         </div>
         <div style="display: flex; gap: 24px; align-items: center; opacity: ${
           dependenciesCountParam === '0' ? '0' : '1'
