@@ -22,6 +22,8 @@ export const GET: RequestHandler = async ({ url }) => {
   const bgDataURI = await loadImage(`/assets/share/bg-${target}-light.png`, fetch);
   const dripListIconDataURI = await loadImage('/assets/share/dripList.png', fetch);
 
+  const recipientsString = recipientsCount === '1' ? 'Recipient' : 'Recipients';
+
   const image = await nodeHtmlToImage({
     html: `
     <html>
@@ -36,7 +38,7 @@ export const GET: RequestHandler = async ({ url }) => {
             <span style="font-size: 90px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${listName}</span>
             <div style="display: flex; gap: 24px; align-items: center">
               <img src="${dripListIconDataURI}" />
-              <span style="font-family: Inter; font-size: 40px">${recipientsCount} Recipients</span>
+              <span style="font-family: Inter; font-size: 40px">${recipientsCount} ${recipientsString}</span>
             </div>
           </div>
         </div>
