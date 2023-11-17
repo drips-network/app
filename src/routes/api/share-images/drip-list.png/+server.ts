@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     assert(listName && recipientsCount);
     assert(target === 'twitter' || target === 'og');
   } catch (e) {
-    throw error(400, 'Invalid query params missing');
+    throw error(400, 'Invalid or missing query params');
   }
 
   const height = target === 'twitter' ? 600 : 675;
