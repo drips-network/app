@@ -6,7 +6,7 @@ import loadImage from '../loadImage';
 import baseStyles from '../baseStyles';
 import getContrastColor from '$lib/utils/get-contrast-text-color';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, fetch }) => {
   const projectNameParam = url.searchParams.get('projectName');
   const projectEmojiParam = url.searchParams.get('emoji');
   const dependenciesCountParam = url.searchParams.get('dependenciesCount');
@@ -31,11 +31,13 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const textColor = contrastColor === 'black' ? '#333333' : '#FFFFFF';
 
+  const dependenciesString = dependenciesCountParam === '1' ? 'Dependency' : 'Dependencies';
+
   const image = await nodeHtmlToImage({
     html: `
     <html>
       <head>
-        ${await baseStyles(height, bgColor)}
+        ${await baseStyles(height, bgColor, fetch)}
       </head>
       <body>
         <div style="font-family: Redaction; color: ${textColor};">
@@ -47,7 +49,7 @@ export const GET: RequestHandler = async ({ url }) => {
               dependenciesCountParam === '0' ? '0' : '1'
             }">
               <img src="${boxIconDataURI}" />
-              <span style="font-family: Inter; font-size: 40px;>${dependenciesCountParam} Dependencies</span>
+              <span style="font-family: Inter; font-size: 40px;">${dependenciesCountParam} ${dependenciesString}</span>
             </div>
           </div>
         </div>
