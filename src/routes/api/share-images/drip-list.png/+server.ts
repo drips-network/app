@@ -19,8 +19,8 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const height = target === 'twitter' ? 600 : 675;
 
-  const bgDataURI = loadImage(`./static/assets/share/bg-${target}-light.png`);
-  const dripListIconDataURI = loadImage('./static/assets/share/dripList.png');
+  const bgDataURI = await loadImage(`/assets/share/bg-${target}-light.png`, fetch);
+  const dripListIconDataURI = await loadImage('/assets/share/dripList.png', fetch);
 
   const image = await nodeHtmlToImage({
     html: `

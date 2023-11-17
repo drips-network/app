@@ -26,8 +26,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   const contrastColor = getContrastColor(bgColor);
 
   const bgTheme = contrastColor === 'black' ? 'dark' : 'light';
-  const bgDataURI = loadImage(`./static/assets/share/bg-${target}-${bgTheme}.png`);
-  const boxIconDataURI = loadImage(`./static/assets/share/box-${bgTheme}.png`);
+  const bgDataURI = await loadImage(`/assets/share/bg-${target}-${bgTheme}.png`, fetch);
+  const boxIconDataURI = await loadImage(`/assets/share/box-${bgTheme}.png`, fetch);
 
   const textColor = contrastColor === 'black' ? '#333333' : '#FFFFFF';
 
