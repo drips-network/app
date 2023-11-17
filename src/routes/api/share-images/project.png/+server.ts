@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
         <div style="display: flex; gap: 32px;">
           ${
             twemojiImg
-              ? `<div style="display: flex; margin-top: 16px; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
+              ? `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
             <img height="64px" width="64px" src="${twemojiImg}" />
           </div>`
               : ''
