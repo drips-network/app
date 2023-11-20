@@ -32,11 +32,10 @@ describe('app', async () => {
   });
 
   beforeAll(async () => {
-    await environment.start();
+    await environment.wait();
 
     console.log('🌳 Environment is up. Running tests...');
   }, 14400000);
-  afterAll(environment.stop, 14400000);
 
   afterAll(async () => {
     await browser.close();
