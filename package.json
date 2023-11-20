@@ -70,6 +70,7 @@
     "@gelatonetwork/relay-sdk": "^4.0.0",
     "@octokit/rest": "^19.0.7",
     "@pinata/sdk": "^1.1.26",
+    "@resvg/resvg-js": "^2.6.0",
     "@safe-global/safe-apps-provider": "^0.16.0",
     "@safe-global/safe-apps-sdk": "^7.10.0",
     "@sveltejs/adapter-netlify": "^2.0.6",
@@ -90,6 +91,8 @@
     "lodash": "^4.17.21",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
+    "satori": "^0.10.9",
+    "satori-html": "^0.3.2",
     "twemoji": "^14.0.2",
     "web3modal": "^1.9.9",
     "zod": "^3.22.3"

@@ -7,8 +7,7 @@
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
-  import DripListCard, {
-  } from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
 
   export let data: PageData;
 
@@ -26,7 +25,12 @@
 </script>
 
 {#if data.dripList.name}
-  <HeadMeta title={data.dripList.name} />
+  {@const imageBaseUrl = `/api/share-images/drip-list/${dripList.account.accountId}.png`}
+  <HeadMeta
+    title={data.dripList.name}
+    image="{imageBaseUrl}?target=og"
+    twitterImage="{imageBaseUrl}?target=twitter"
+  />
 {/if}
 
 <article class="drip-list-page">
