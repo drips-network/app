@@ -1,13 +1,6 @@
 /* eslint-disable no-console */
-import { execa } from 'execa';
 
-export async function start() {
-  // For good measure
-  await stop();
-
-  console.log('Starting E2E env...');
-  await execa('docker', ['compose', 'up', '--detach']);
-
+export async function wait() {
   console.log('Waiting for Graph Node…');
 
   // Ping port 8000 until the graph node responds
@@ -34,9 +27,4 @@ export async function start() {
   console.log('Ready.');
 }
 
-export async function stop() {
-  console.log('Stopping E2E env…');
-  await execa('docker', ['compose', 'down']);
-}
-
-export default { start, stop };
+export default { wait };
