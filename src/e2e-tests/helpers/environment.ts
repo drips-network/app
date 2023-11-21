@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 
 export async function wait() {
-  console.log('Waiting for Graph Node…');
+  console.log('Waiting for Graph Node…', {
+    host: process.env?.PUBLIC_TEST_SUBGRAPH_HOST ?? '127.0.0.1',
+  });
 
   // Ping port 8000 until the graph node responds
   await new Promise((resolve) => {
