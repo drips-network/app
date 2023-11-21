@@ -20,6 +20,9 @@
   import InputWalletAmount from '$lib/components/input-wallet-amount/input-wallet-amount.svelte';
   import { fetchBalance } from '$lib/utils/erc20';
   import assert from '$lib/utils/assert';
+  import createDonation from './methods/create-donation';
+  import unreachable from '$lib/utils/unreachable';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -69,6 +72,7 @@
     restorer.restore('selectedTokenAddress') ?? (tokenAddress ? [tokenAddress.toLowerCase()] : []);
 
   let selectedTokenBalance: bigint | undefined;
+  let selectedTokenAllowance: bigint | undefined;
 
   let loadingToken = false;
 
@@ -81,6 +85,7 @@
     const { address, provider } = $wallet;
     assert(address && tokenAddress);
 
+    selectedTokenAllowance = await (await getAddressDriverClient()).getAllowance(tokenAddress);
     selectedTokenBalance = await fetchBalance(tokenAddress, address, provider);
     loadingToken = false;
   }
@@ -106,20 +111,13 @@
     amountValidationState.type === 'valid';
 
   function submit() {
-    // createStream(
-    //   dispatch,
-    //   selectedToken ?? unreachable(),
-    //   amountPerSecond ?? unreachable(),
-    //   recipientInputValue ?? unreachable(),
-    //   streamNameValue,
-    //   $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
-    //   setStartAndEndDate
-    //     ? {
-    //         start: combinedStartDate ?? unreachable(),
-    //         end: combinedEndDate ?? unreachable(),
-    //       }
-    //     : undefined,
-    // );
+    createDonation(
+      dispatch,
+      recipientInputValue ?? unreachable(),
+      selectedTokenAddress[0] ?? unreachable(),
+      amount ?? unreachable(),
+      selectedTokenAllowance ?? unreachable(),
+    );
   }
 
   $: restorer.saveAll({
