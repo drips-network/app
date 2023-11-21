@@ -7,12 +7,15 @@ export async function wait() {
   await new Promise((resolve) => {
     const interval = setInterval(async () => {
       try {
-        console.log('Pinging Graph Node…');
-
-        const res = await fetch('http://127.0.0.1:8000/subgraphs/name/drips-subgraph-local', {
-          method: 'POST',
-          body: '{ "operationName": "introspectionQuery", "query": "query { __schema }" }',
-        });
+        const res = await fetch(
+          `http://${
+            process.env?.PUBLIC_TEST_SUBGRAPH_HOST ?? '127.0.0.1'
+          }:8000/subgraphs/name/drips-subgraph-local`,
+          {
+            method: 'POST',
+            body: '{ "operationName": "introspectionQuery", "query": "query { __schema }" }',
+          },
+        );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (!res.ok || ((await res.json()) as any).errors?.length > 0) throw new Error();
 
