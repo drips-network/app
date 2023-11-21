@@ -7,7 +7,7 @@
   import assert from '$lib/utils/assert';
   import type { Stream } from '$lib/stores/streams/types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
+  import DripVisual from '$lib/components/drip-visual/drip-visual.svelte';
   import balances from '$lib/stores/balances';
   import decodeAccountId from '$lib/utils/decode-universal-account-id';
   import unreachable from '$lib/utils/unreachable';
@@ -316,7 +316,7 @@
           </div>
         {/if}
       </header>
-      <StreamVisual
+      <DripVisual
         from={stream.sender}
         to={stream.receiver}
         amountPerSecond={stream.streamConfig.amountPerSecond.amount}
