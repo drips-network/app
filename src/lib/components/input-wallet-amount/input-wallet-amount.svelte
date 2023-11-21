@@ -61,7 +61,9 @@
 </script>
 
 <FormField title="Wallet balance">
-  <div class="rounded-drip-xl bg-foreground-level-1 flex items-center h-12 gap-2 px-3 typo-text">
+  <div
+    class="rounded-drip-xl shadow-low bg-foreground-level-1 flex items-center h-12 gap-2 px-3 typo-text"
+  >
     {#if tokenAddress && tokenInfo && tokenBalance !== undefined}
       <Token address={tokenAddress} show="none" size="small" />
       <div class="flex-1">
