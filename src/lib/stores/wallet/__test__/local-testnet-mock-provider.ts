@@ -1,4 +1,5 @@
 import { providers } from 'ethers';
+import { env } from '$env/dynamic/public';
 
 const NETWORK = {
   chainId: 5,
@@ -24,7 +25,7 @@ class MockProvider extends providers.StaticJsonRpcProvider {
   getSigner(): providers.JsonRpcSigner {
     const tempProvider = new providers.StaticJsonRpcProvider(
       {
-        url: 'http://127.0.0.1:8545',
+        url: `http://${env?.PUBLIC_TESTNET_MOCK_PROVIDER_HOST ?? '127.0.0.1'}:8545`,
         skipFetchSetup: true,
       },
       NETWORK,
@@ -37,9 +38,15 @@ class MockProvider extends providers.StaticJsonRpcProvider {
 }
 
 export default (address: string) => {
+  // eslint-disable-next-line no-console
+  console.log(
+    'Using mock provider',
+    `http://${env?.PUBLIC_TESTNET_MOCK_PROVIDER_HOST ?? '127.0.0.1'}:8545`,
+  );
+
   const provider = new MockProvider(
     {
-      url: 'http://127.0.0.1:8545',
+      url: `http://${env?.PUBLIC_TESTNET_MOCK_PROVIDER_HOST ?? '127.0.0.1'}:8545`,
       skipFetchSetup: true,
     },
     NETWORK,
