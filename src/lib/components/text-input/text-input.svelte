@@ -82,6 +82,7 @@
     style:padding-left={icon ? '2.75rem' : 'auto'}
     class:invalid={validationState.type === 'invalid'}
     class:concealed={variant.type === 'password'}
+    class:tabular-nums={variant.type === 'number'}
     min={variant.type === 'number' ? variant.min : undefined}
     {placeholder}
     {disabled}
