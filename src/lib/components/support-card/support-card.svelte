@@ -62,7 +62,6 @@
   } from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  // import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
@@ -75,6 +74,7 @@
     SupportCardProjectFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
+  import createDonationFlowSteps from '$lib/flows/create-donation/create-donation-flow-steps';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -178,6 +178,18 @@
     }
   }
 
+  function handleNewDonationButton() {
+    const accountId = dripList?.account.accountId;
+    return (
+      accountId &&
+      modal.show(
+        Stepper,
+        undefined,
+        createDonationFlowSteps(undefined, { driver: 'nft', accountId }),
+      )
+    );
+  }
+
   async function connectWallet() {
     await walletStore.connect();
     supportMenuOpen = true;
@@ -231,7 +243,8 @@
       <Button on:click={handleAddtoDripListButton} size="large" icon={DripListIcon}>
         Add to a Drip List</Button
       >
-      <Button size="large" icon={Droplet}>Single donation</Button>
+      <Button size="large" icon={Droplet} on:click={handleNewDonationButton}>Single donation</Button
+      >
     {/if}
   </div>
 </div>
