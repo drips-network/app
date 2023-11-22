@@ -33,6 +33,9 @@
           ... on UnclaimedProject {
             verificationStatus
           }
+          ... on ClaimedProject {
+            verificationStatus
+          }
         }
       }
     `;
@@ -45,8 +48,10 @@
             projectId: projectAccountId,
           },
         ),
-      (response) => response.projectById?.__typename === 'UnclaimedProject',
-      60000,
+      (response) =>
+        response.projectById?.verificationStatus === 'PendingMetadata' ||
+        response.projectById?.verificationStatus === 'OwnerUpdated',
+      300000,
       2000,
     );
   }

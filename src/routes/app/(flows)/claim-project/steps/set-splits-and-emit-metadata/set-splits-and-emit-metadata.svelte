@@ -59,27 +59,14 @@
             }
           `;
 
-          const tryFetchProject = async (projectId: string) => {
-            try {
-              return await query<ProjectIsClaimedQuery, ProjectIsClaimedQueryVariables>(
-                projectClaimedQuery,
-                {
-                  id: projectId,
-                },
-              );
-            } catch {
-              return false;
-            }
-          };
-
           await expect(
-            () => tryFetchProject(projectId),
-            (result) =>
-              typeof result === 'boolean'
-                ? result
-                : Boolean(result.projectById && isClaimed(result.projectById)),
-            10000,
-            1000,
+            () =>
+              query<ProjectIsClaimedQuery, ProjectIsClaimedQueryVariables>(projectClaimedQuery, {
+                id: projectId,
+              }),
+            (result) => Boolean(result.projectById && isClaimed(result.projectById)),
+            300000,
+            2000,
           );
         },
       }),

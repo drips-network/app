@@ -32,7 +32,7 @@
 
     await goto(
       buildUrl(
-        `/app/projects/${forge}/${username}/${repoName}`,
+        `/app/projects/${forge?.toLowerCase()}/${username}/${repoName}`,
         collectedFunds ? { collectHint: 'true' } : {},
       ),
     ).then(() => {

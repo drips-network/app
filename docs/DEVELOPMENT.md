@@ -10,13 +10,13 @@ npm install
 
 ## 🌳 Environment
 
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var.
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var. Lastly, set `PUBLIC_PINATA_GATEWAY_URL` to the URL of the IPFS/Pinata gateway to use. You may use Drips' public IPFS gateway at `https://drips.mypinata.cloud`.
 
 ### 📈 GraphQL API
 
 The Drips App depends on the custom [Drips GraphQL API](https://github.com/drips-network/graphql-api). You need to set `GQL_URL` to a URL of the API's `graphql` endpoint, and `GQL_ACCESS_TOKEN` for the `Authorization: Bearer` token that should be used.
 
-For most development tasks, you may use our Goerli deployment of the API, hosted at [https://drips-api-goerli.up.railway.app/](https://drips-api-goerli.up.railway.app/). To use this API deployment, set `GQL_URL` to `https://drips-api-goerli.up.railway.app/graphql`, and `GQL_ACCESS_TOKEN` to `1234`. Ensure `PUBLIC_NETWORK` is set to `5`, so that both the app and API are talking to the Goerli testnet.
+For most development tasks, you may use our Goerli deployment of the API, hosted at [https://drips-api-goerli-s1.up.railway.app/](https://drips-api-goerli-s1.up.railway.app/). To use this API deployment, set `GQL_URL` to `https://drips-api-goerli-s1.up.railway.app/`, and `GQL_ACCESS_TOKEN` to `1234`. Ensure `PUBLIC_NETWORK` is set to `5`, so that both the app and API are talking to the Goerli testnet.
 
 You can also use the local E2E env to easily spin up a fully-fledged deployment of the Drips GraphQL API, complete with event processing and a local, blank testnet to transact against. To do so, set `GQL_URL` to `http://localhost:8080/graphql`, `GQL_ACCESS_TOKEN` to `afdb8b7e-8fa7-4de9-bd95-b650b839e745`, and `PUBLIC_NETWORK` to `5`. Then, follow the instructions below under "🌐 Run app locally with a local testnet".
 

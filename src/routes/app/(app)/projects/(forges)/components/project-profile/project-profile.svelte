@@ -185,11 +185,16 @@
   }
 </script>
 
-<HeadMeta
-  title="{project.source.ownerName}/{project.source.repoName}"
-  description="Support {project.source
-    .repoName} on Drips and help make Open-Source Software sustainable."
-/>
+{#if true}
+  {@const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`}
+  <HeadMeta
+    title="{project.source.ownerName}/{project.source.repoName}"
+    description="Support {project.source
+      .repoName} on Drips and help make Open-Source Software sustainable."
+    image="{imageBaseUrl}?target=og"
+    twitterImage="{imageBaseUrl}?target=twitter"
+  />
+{/if}
 
 <PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
   {#if !isClaimed(project)}
