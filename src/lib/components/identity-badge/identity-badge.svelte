@@ -38,11 +38,7 @@
       }).toDataURL()) ||
     undefined;
 
-  function getLink() {
-    if (disableLink) return undefined;
-
-    return `/app/${ens?.name ?? address}`;
-  }
+  $: link = disableLink ? undefined : `/app/${ens?.name ?? address}`;
 
   $: toDisplay = ens?.name ?? (showFullAddress ? address : formatAddress(address));
 
@@ -82,10 +78,10 @@
 
 <Tooltip text={address} copyable disabled={disableTooltip}>
   <svelte:element
-    this={getLink() ? 'a' : 'span'}
-    href={getLink()}
+    this={link ? 'a' : 'span'}
+    href={link}
     target={linkToNewTab ? '_blank' : undefined}
-    class="identity-badge flex items-center relative text-left text-foreground tabular-nums {getLink() &&
+    class="identity-badge flex items-center relative text-left text-foreground tabular-nums {link &&
     showAvatar &&
     !showIdentity
       ? 'focus-visible:ring-8 focus-visible:ring-primary-level-1 rounded-full mouse:hover:ring-4 mouse:hover:ring-primary-level-1'

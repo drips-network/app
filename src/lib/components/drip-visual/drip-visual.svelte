@@ -123,7 +123,7 @@
         {/if}
       {/await}
     {:else if to && to.driver === 'repo'}
-      <IdentityCard project={to.project} title="To" />
+      <IdentityCard disableLink={disableLinks} project={to.project} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

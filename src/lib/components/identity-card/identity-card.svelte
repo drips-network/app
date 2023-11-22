@@ -15,18 +15,15 @@
       ...ProjectAvatar
       ... on ClaimedProject {
         owner {
-          accountId
-        }
-        account {
-          accountId
+          address
         }
         source {
-          url
+          repoName
         }
       }
       ... on UnclaimedProject {
         source {
-          url
+          repoName
         }
       }
     }
@@ -46,9 +43,8 @@
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
-  import ProjectBadge, {
-    PROJECT_BADGE_FRAGMENT,
-  } from '$lib/components/project-badge/project-badge.svelte';
+  import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
+  import Github from 'radicle-design-system/icons/Github.svelte';
 
   // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
@@ -60,24 +56,30 @@
 
   let avatarImgElem: HTMLImageElement | undefined;
 
-  function getLink() {
-    return dripList ? `/app/drip-lists/${dripList.account.accountId}` : `/app/${address}`;
-  }
+  $: link = disableLink
+    ? undefined
+    : dripList
+    ? `/app/drip-lists/${dripList.account.accountId}`
+    : `/app/${address}`;
 </script>
 
-<a href={disableLink || loading ? undefined : getLink()} class="identity-card">
+<svelte:element
+  this={!link || loading ? 'div' : 'a'}
+  href={link ? link : undefined}
+  class="identity-card"
+>
   {#if title}<p class="title typo-all-caps">{title}</p>{/if}
   {#if address}
     <div class="content-container" in:fade|local>
       <IdentityBadge
-        {disableLink}
+        disableLink={true}
         size="huge"
         bind:avatarImgElem
         {address}
         showIdentity={false}
         disableTooltip
       />
-      <IdentityBadge {disableLink} size="huge" {address} showAvatar={false} disableTooltip />
+      <IdentityBadge disableLink={true} size="huge" {address} showAvatar={false} disableTooltip />
     </div>
   {:else if dripList}
     <div class="content-container" in:fade|local>
@@ -88,8 +90,17 @@
     </div>
   {:else if project}
     <div class="content-container" in:fade|local>
-      <ProjectAvatar {project} size="large" />
-      <ProjectBadge {project} forceUnclaimed tooltip={false} hideAvatar={true} />
+      <div class="flex">
+        {#if 'owner' in project}
+          <div class="-mr-[5%]">
+            <ProjectAvatar {project} size="large" />
+          </div>
+        {/if}
+        <div class="h-16 w-16 bg-foreground-level-1 flex items-center justify-center rounded-full">
+          <Github style="width:60%;height:60%" />
+        </div>
+      </div>
+      <span class="typo-header-3 ellipsis">{project.source.repoName}</span>
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>
@@ -97,7 +108,7 @@
     <div class="avatar-placeholder" />
     <h3 class="name-placeholder">TBD</h3>
   {/if}
-</a>
+</svelte:element>
 
 <style>
   .identity-card {
