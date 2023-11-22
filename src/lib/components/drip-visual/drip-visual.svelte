@@ -1,3 +1,21 @@
+<script lang="ts" context="module">
+  export interface AddressDriverAccount {
+    driver: 'address';
+    address: string;
+  }
+
+  export interface NFTDriverAccount {
+    driver: 'nft';
+    accountId: string;
+  }
+
+  export interface RepoDriverAccount {
+    driver: 'repo';
+    accountId: string;
+    project: IdentityCardProjectFragment;
+  }
+</script>
+
 <script lang="ts">
   import { browser } from '$app/environment';
   import amtDeltaUnitStore, {
@@ -16,19 +34,11 @@
     DripListNameQuery,
     DripListNameQueryVariables,
   } from './__generated__/gql.generated';
-
-  interface AddressDriverAccount {
-    driver: 'address';
-    address: string;
-  }
-
-  interface NFTDriverAccount {
-    driver: 'nft';
-    accountId: string;
-  }
+  import type { IdentityCardProjectFragment } from '../identity-card/__generated__/gql.generated';
 
   export let from: AddressDriverAccount | undefined = undefined;
-  export let to: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
+  export let to: NFTDriverAccount | AddressDriverAccount | RepoDriverAccount | undefined =
+    undefined;
   export let visual: 'stream' | 'donation' = 'stream';
   export let disableLinks = false;
   export let amountPerSecond: bigint | undefined = undefined;
@@ -112,6 +122,8 @@
           <IdentityCard dripList={result} title="To" />
         {/if}
       {/await}
+    {:else if to && to.driver === 'repo'}
+      <IdentityCard project={to.project} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

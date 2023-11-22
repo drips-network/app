@@ -75,6 +75,10 @@
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import createDonationFlowSteps from '$lib/flows/create-donation/create-donation-flow-steps';
+  import type {
+    NFTDriverAccount,
+    RepoDriverAccount,
+  } from '$lib/components/drip-visual/drip-visual.svelte';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -179,15 +183,17 @@
   }
 
   function handleNewDonationButton() {
-    const accountId = dripList?.account.accountId;
-    return (
-      accountId &&
-      modal.show(
-        Stepper,
-        undefined,
-        createDonationFlowSteps(undefined, { driver: 'nft', accountId }),
-      )
-    );
+    if (dripList) {
+      const account: NFTDriverAccount = { driver: 'nft', accountId: dripList.account.accountId };
+      return modal.show(Stepper, undefined, createDonationFlowSteps(account));
+    } else if (project) {
+      const account: RepoDriverAccount = {
+        driver: 'repo',
+        accountId: project.account.accountId,
+        project,
+      };
+      return modal.show(Stepper, undefined, createDonationFlowSteps(account));
+    }
   }
 
   async function connectWallet() {

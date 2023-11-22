@@ -7,6 +7,30 @@
       name
     }
   `;
+  export const IDENTITY_CARD_PROJECT_FRAGMENT = gql`
+    ${PROJECT_BADGE_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
+    fragment IdentityCardProject on Project {
+      ...ProjectBadge
+      ...ProjectAvatar
+      ... on ClaimedProject {
+        owner {
+          accountId
+        }
+        account {
+          accountId
+        }
+        source {
+          url
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          url
+        }
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -15,11 +39,21 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import { gql } from 'graphql-request';
-  import type { IdentityCardDripListFragment } from './__generated__/gql.generated';
+  import type {
+    IdentityCardDripListFragment,
+    IdentityCardProjectFragment,
+  } from './__generated__/gql.generated';
+  import ProjectAvatar, {
+    PROJECT_AVATAR_FRAGMENT,
+  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectBadge, {
+    PROJECT_BADGE_FRAGMENT,
+  } from '$lib/components/project-badge/project-badge.svelte';
 
-  // Either pass address or dripList. If neither, it'll say "TBD" as a placeholder.
+  // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
   export let dripList: IdentityCardDripListFragment | undefined = undefined;
+  export let project: IdentityCardProjectFragment | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
   export let disableLink = false;
@@ -51,6 +85,11 @@
         <DripListIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
       </div>
       <span class="typo-header-3 ellipsis">{dripList.name}</span>
+    </div>
+  {:else if project}
+    <div class="content-container" in:fade|local>
+      <ProjectAvatar {project} size="large" />
+      <ProjectBadge {project} forceUnclaimed tooltip={false} hideAvatar={true} />
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>

@@ -4,9 +4,13 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import createDonationFlowState from './create-donation-flow-state';
 import InputDetails from './input-details.svelte';
-import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
+import type {
+  NFTDriverAccount,
+  RepoDriverAccount,
+} from '$lib/components/drip-visual/drip-visual.svelte';
+import type { AddressDriverAccount } from '$lib/stores/streams/types';
 
-export default (tokenAddress?: string, receiver?: NFTDriverAccount | AddressDriverAccount) => ({
+export default (receiver?: NFTDriverAccount | AddressDriverAccount | RepoDriverAccount) => ({
   context: createDonationFlowState,
   steps: [
     makeStep({

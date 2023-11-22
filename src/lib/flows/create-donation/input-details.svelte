@@ -16,18 +16,23 @@
   import type { Writable } from 'svelte/store';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { CreateDonationFlowState } from './create-donation-flow-state';
-  import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
+  import type {
+    NFTDriverAccount,
+    RepoDriverAccount,
+  } from '$lib/components/drip-visual/drip-visual.svelte';
   import InputWalletAmount from '$lib/components/input-wallet-amount/input-wallet-amount.svelte';
   import { fetchBalance } from '$lib/utils/erc20';
   import assert from '$lib/utils/assert';
   import createDonation from './methods/create-donation';
   import unreachable from '$lib/utils/unreachable';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import type { AddressDriverAccount } from '$lib/stores/streams/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<CreateDonationFlowState>;
-  export let receiver: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
+  export let receiver: NFTDriverAccount | AddressDriverAccount | RepoDriverAccount | undefined =
+    undefined;
   export let tokenAddress: string | undefined = undefined;
 
   const restorer = $context.restorer;
