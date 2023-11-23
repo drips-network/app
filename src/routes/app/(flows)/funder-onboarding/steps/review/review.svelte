@@ -34,6 +34,8 @@
     DripListExistsQuery,
     DripListExistsQueryVariables,
   } from './__generated__/gql.generated';
+  import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
+  import Heart from 'radicle-design-system/icons/Heart.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -112,20 +114,7 @@
   }
 
   function goBack() {
-    switch ($context.selectedSupportOption) {
-      case 1: {
-        dispatch('goBackward');
-        break;
-      }
-      case 2: {
-        // Skip the support type selection step
-        dispatch('goForward', { by: -2 });
-        break;
-      }
-      case undefined: {
-        unreachable();
-      }
-    }
+    dispatch('goBackward');
   }
 </script>
 
@@ -146,18 +135,35 @@
       isEditable={false}
     />
   </FormField>
-  {#if $context.selectedSupportOption === 1}
+
+  {#if $context.selectedSupportOption !== undefined}
     <FormField type="div" title="Your support">
       <svelte:fragment slot="action">
-        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -1 })} icon={PenIcon}
+        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
           >Edit</Button
         >
       </svelte:fragment>
-      <div class="card">
-        <ContinuousSupportReviewCard {context} />
-      </div>
+      {#if $context.selectedSupportOption === 1}
+        <div class="card">
+          <ContinuousSupportReviewCard
+            topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed ??
+              unreachable()}
+            tokenAddress={$context.continuousSupportConfig.listSelected[0] ?? unreachable()}
+            streamRateValueParsed={$context.continuousSupportConfig.streamRateValueParsed ??
+              unreachable()}
+          />
+        </div>
+      {:else if $context.selectedSupportOption === 2}
+        <div class="card">
+          <OneTimeDonationReviewCard
+            amount={$context.oneTimeDonationConfig.amount ?? unreachable()}
+            tokenAddress={$context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable()}
+          />
+        </div>
+      {/if}
     </FormField>
   {/if}
+
   <FormField type="div" title="Your connected wallet">
     <svelte:fragment slot="action">
       <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
@@ -166,34 +172,55 @@
     </svelte:fragment>
     <AccountBox hideDisconnect />
   </FormField>
+
   <div class="whats-next">
     <div class="card">
       <h4>On transaction confirmation…</h4>
       <ul>
-        {#if $context.continuousSupportConfig.topUpAmountValueParsed && $context.continuousSupportConfig.streamRateValueParsed && $context.continuousSupportConfig.listSelected[0]}
+        {#if $context.selectedSupportOption === 1}
+          {#if $context.continuousSupportConfig.topUpAmountValueParsed && $context.continuousSupportConfig.streamRateValueParsed && $context.continuousSupportConfig.listSelected[0]}
+            {@const token =
+              tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0]) ??
+              unreachable()}
+            <UlIconLi icon={TransactionsIcon}>
+              <span class="typo-text-bold">
+                {formatTokenAmount(
+                  $context.continuousSupportConfig.topUpAmountValueParsed,
+                  token.info.decimals,
+                  1n,
+                  false,
+                )}
+                {token.info.symbol} will be transferred from your wallet into your Drips account</span
+              >
+              and immediately begin streaming to your Drip List recipients at a rate of
+              <span class="typo-text-bold">
+                {formatTokenAmount(
+                  $context.continuousSupportConfig.streamRateValueParsed,
+                  token.info.decimals,
+                  undefined,
+                  false,
+                )}
+                {token.info.symbol} per month</span
+              >.
+            </UlIconLi>
+          {/if}
+        {/if}
+        {#if $context.selectedSupportOption === 2}
           {@const token =
-            tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0]) ??
-            unreachable()}
+            tokensStore.getByAddress(
+              $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
+            ) ?? unreachable()}
           <UlIconLi icon={TransactionsIcon}>
             <span class="typo-text-bold">
               {formatTokenAmount(
-                $context.continuousSupportConfig.topUpAmountValueParsed,
+                $context.oneTimeDonationConfig.amount ?? unreachable(),
                 token.info.decimals,
                 1n,
                 false,
               )}
               {token.info.symbol} will be transferred from your wallet into your Drips account</span
             >
-            and immediately begin streaming to your Drip List recipients at a rate of
-            <span class="typo-text-bold">
-              {formatTokenAmount(
-                $context.continuousSupportConfig.streamRateValueParsed,
-                token.info.decimals,
-                undefined,
-                false,
-              )}
-              {token.info.symbol} per month</span
-            >.
+            and immediately distributed to your list.
           </UlIconLi>
         {/if}
         <UlIconLi icon={ListIcon}
@@ -213,8 +240,18 @@
           <UlIconLi icon={Pause}>
             <span class="typo-text-bold">Pause or cancel</span> your support anytime.
           </UlIconLi>
+          <UlIconLi icon={Heart}>
+            <span class="typo-text-bold">Create additional support streams</span> or make one-time donations
+            anytime.
+          </UlIconLi>
         {/if}
         {#if $context.selectedSupportOption === 2}
+          <UlIconLi icon={Heart}>
+            <span class="typo-text-bold">Make more one-time donations</span> or start a continuous support
+            stream anytime.
+          </UlIconLi>
+        {/if}
+        {#if $context.selectedSupportOption === undefined}
           <UlIconLi icon={TokenStreams}>
             You can <span class="typo-text-bold">start supporting</span> your Drip List anytime.
           </UlIconLi>
@@ -225,9 +262,11 @@
       </ul>
     </div>
   </div>
+
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={goBack}>Back</Button>
   </svelte:fragment>
+
   <svelte:fragment slot="actions">
     <Button icon={WalletIcon} variant="primary" on:click={createDripList}>Confirm in wallet</Button>
   </svelte:fragment>

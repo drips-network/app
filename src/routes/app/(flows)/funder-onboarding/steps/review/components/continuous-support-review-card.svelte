@@ -1,22 +1,15 @@
 <script lang="ts">
   import Token from '$lib/components/token/token.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import type { Writable } from 'svelte/store';
-  import type { State } from '../../../funder-onboarding-flow';
   import unreachable from '$lib/utils/unreachable';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import { constants } from 'radicle-drips';
   import formatDate from '$lib/utils/format-date';
 
-  export let context: Writable<State>;
+  export let streamRateValueParsed: bigint, topUpAmountValueParsed: bigint;
+  export let tokenAddress: string;
 
-  let streamRateValueParsed: bigint | undefined, topUpAmountValueParsed: bigint | undefined;
-  $: ({ streamRateValueParsed, topUpAmountValueParsed } = $context.continuousSupportConfig);
-
-  $: token =
-    $context.selectedSupportOption === 1
-      ? tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0])
-      : undefined;
+  $: token = tokensStore.getByAddress(tokenAddress);
 
   let lastsUntil: string | undefined;
   $: {
@@ -35,12 +28,11 @@
   }
 </script>
 
+<h4>Continuous Support</h4>
 <div class="key-value-row">
   <div class="key-value-pair">
     <h5 class="key">Token</h5>
-    <span class="value"
-      ><Token address={$context.continuousSupportConfig.listSelected[0]} size="small" /></span
-    >
+    <span class="value"><Token address={tokenAddress} size="small" /></span>
   </div>
   <div class="key-value-pair">
     <h5 class="key">Stream rate</h5>
@@ -78,6 +70,10 @@
 {/if}
 
 <style>
+  h4 {
+    margin-bottom: 1rem;
+  }
+
   .key-value-row {
     display: flex;
     gap: 1rem;

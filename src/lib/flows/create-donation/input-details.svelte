@@ -42,7 +42,7 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet/wallet.store';
   import DripVisual from '$lib/components/drip-visual/drip-visual.svelte';
@@ -68,23 +68,6 @@
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment;
 
-  let receiverAccountId: string | undefined;
-  onMount(() => {
-    if (receiver) {
-      switch (receiver.__typename) {
-        case 'AddressDriverAccount':
-        case 'NftDriverAccount':
-          receiverAccountId = receiver.accountId;
-          break;
-        case 'ClaimedProject':
-        case 'UnclaimedProject':
-          receiverAccountId = receiver.account.accountId;
-          break;
-      }
-    }
-  });
-
-  let selectedTokenBalance: bigint | undefined;
   let selectedTokenAllowance: bigint | undefined;
 
   let formValid: boolean;
@@ -137,7 +120,6 @@
     bind:amountInputValue={$context.amountInputValue}
     bind:topUpMax={$context.topUpMax}
     bind:selectedTokenAddress={$context.selectedTokenAddress}
-    bind:selectedTokenBalance
     bind:amount
     bind:selectedTokenAllowance
   />

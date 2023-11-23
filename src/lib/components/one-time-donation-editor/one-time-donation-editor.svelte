@@ -48,8 +48,8 @@
     type: 'unvalidated',
   };
 
-  export let selectedTokenBalance: bigint | undefined;
-  export let selectedTokenAllowance: bigint | undefined;
+  export let selectedTokenBalance: bigint | undefined = undefined;
+  export let selectedTokenAllowance: bigint | undefined = undefined;
 
   let loadingToken = false;
 
