@@ -1,19 +1,36 @@
 <script lang="ts" context="module">
-  export interface AddressDriverAccount {
-    driver: 'address';
-    address: string;
-  }
+  export const DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
+    fragment DripVisualAddressDriverAccount on AddressDriverAccount {
+      driver
+      address
+    }
+  `;
 
-  export interface NFTDriverAccount {
-    driver: 'nft';
-    accountId: string;
-  }
+  export const DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT = gql`
+    fragment DripVisualNftDriverAccount on NftDriverAccount {
+      driver
+      accountId
+    }
+  `;
 
-  export interface RepoDriverAccount {
-    driver: 'repo';
-    accountId: string;
-    project: IdentityCardProjectFragment;
-  }
+  export const DRIP_VISUAL_PROJECT_FRAGMENT = gql`
+    ${IDENTITY_CARD_PROJECT_FRAGMENT}
+    fragment DripVisualProject on Project {
+      ...IdentityCardProject
+      ... on UnclaimedProject {
+        account {
+          driver
+          accountId
+        }
+      }
+      ... on ClaimedProject {
+        account {
+          driver
+          accountId
+        }
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -27,18 +44,24 @@
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
   import IdentityCard, {
     IDENTITY_CARD_DRIP_LIST_FRAGMENT,
+    IDENTITY_CARD_PROJECT_FRAGMENT,
   } from '../identity-card/identity-card.svelte';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
   import type {
     DripListNameQuery,
     DripListNameQueryVariables,
+    DripVisualAddressDriverAccountFragment,
+    DripVisualNftDriverAccountFragment,
+    DripVisualProjectFragment,
   } from './__generated__/gql.generated';
-  import type { IdentityCardProjectFragment } from '../identity-card/__generated__/gql.generated';
 
-  export let from: AddressDriverAccount | undefined = undefined;
-  export let to: NFTDriverAccount | AddressDriverAccount | RepoDriverAccount | undefined =
-    undefined;
+  export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
+  export let to:
+    | DripVisualNftDriverAccountFragment
+    | DripVisualAddressDriverAccountFragment
+    | DripVisualProjectFragment
+    | undefined = undefined;
   export let visual: 'stream' | 'donation' = 'stream';
   export let disableLinks = false;
   export let amountPerSecond: bigint | undefined = undefined;
@@ -112,9 +135,9 @@
     {/if}
   </div>
   <div class="no-shrink">
-    {#if to && to.driver === 'address'}
+    {#if to && to.__typename === 'AddressDriverAccount'}
       <IdentityCard disableLink={disableLinks} address={to.address} title="To" />
-    {:else if to && to.driver === 'nft'}
+    {:else if to && to.__typename === 'NftDriverAccount'}
       {#await fetchDripList(to.accountId)}
         <IdentityCard loading />
       {:then result}
@@ -122,8 +145,8 @@
           <IdentityCard dripList={result} title="To" />
         {/if}
       {/await}
-    {:else if to && to.driver === 'repo'}
-      <IdentityCard disableLink={disableLinks} project={to.project} title="To" />
+    {:else if (to && to.__typename === 'ClaimedProject') || (to && to.__typename === 'UnclaimedProject')}
+      <IdentityCard disableLink={disableLinks} project={to} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

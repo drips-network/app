@@ -1,8 +1,10 @@
 <script lang="ts" context="module">
   export const SUPPORT_CARD_DRIP_LIST_FRAGMENT = gql`
+    ${CREATE_DONATION_FLOW_DRIP_LIST_FRAGMENT}
     ${DRIP_LIST_BADGE_FRAGMENT}
     ${ADD_DRIP_LIST_MEMBER_FLOW_DRIP_LIST_TO_ADD_FRAGMENT}
     fragment SupportCardDripList on DripList {
+      ...CreateDonationFlowDripList
       ...DripListBadge
       ...AddDripListMemberFlowDripListToAdd
       account {
@@ -16,9 +18,11 @@
   `;
 
   export const SUPPORT_CARD_PROJECT_FRAGMENT = gql`
+    ${CREATE_DONATION_FLOW_PROJECT_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
     ${ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT}
     fragment SupportCardProject on Project {
+      ...CreateDonationFlowProject
       ...AddDripListMemberFlowProjectToAdd
       ...ProjectAvatar
       ... on ClaimedProject {
@@ -74,11 +78,11 @@
     SupportCardProjectFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
-  import createDonationFlowSteps from '$lib/flows/create-donation/create-donation-flow-steps';
-  import type {
-    NFTDriverAccount,
-    RepoDriverAccount,
-  } from '$lib/components/drip-visual/drip-visual.svelte';
+  import createDonationFlowSteps, {
+    CREATE_DONATION_FLOW_DRIP_LIST_FRAGMENT,
+    CREATE_DONATION_FLOW_PROJECT_FRAGMENT,
+  } from '$lib/flows/create-donation/create-donation-flow-steps';
+  import unreachable from '$lib/utils/unreachable';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -183,17 +187,11 @@
   }
 
   function handleNewDonationButton() {
-    if (dripList) {
-      const account: NFTDriverAccount = { driver: 'nft', accountId: dripList.account.accountId };
-      return modal.show(Stepper, undefined, createDonationFlowSteps(account));
-    } else if (project) {
-      const account: RepoDriverAccount = {
-        driver: 'repo',
-        accountId: project.account.accountId,
-        project,
-      };
-      return modal.show(Stepper, undefined, createDonationFlowSteps(account));
-    }
+    return modal.show(
+      Stepper,
+      undefined,
+      createDonationFlowSteps(dripList?.account ?? project ?? unreachable()),
+    );
   }
 
   async function connectWallet() {

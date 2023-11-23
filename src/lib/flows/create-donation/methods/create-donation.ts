@@ -5,7 +5,7 @@ import streams from '$lib/stores/streams';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import expect from '$lib/utils/expect';
 import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-import { constants, utils } from 'ethers';
+import { constants } from 'ethers';
 import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
@@ -21,7 +21,7 @@ const WAITING_WALLET_ICON = {
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
-  recipient: string,
+  recipientAccountId: string,
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
@@ -40,11 +40,6 @@ export default function (
           tokenAddress && amountToGive && tokenAllowance !== undefined,
           'TriggerGiveTransaction step is missing required context',
         );
-
-        const recipientAccountId = utils.isAddress(recipient)
-          ? await client.getAccountIdByAddress(recipient)
-          : recipient;
-        assert(recipientAccountId);
 
         const needApproval = tokenAllowance < amountToGive;
 
