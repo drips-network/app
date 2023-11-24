@@ -30,11 +30,24 @@ let idMap: { [tokenAddress: TokenAddress]: DataProviderTokenId } | undefined = u
 
 const started = writable(false);
 
+const SUBSTITUTIONS = {
+  // Map "WEENUS" testnet token to WETH mainnet
+  ['0xaff4481d10270f50f203e0763e2597776068cbc5']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  // Map WETH goerli token to WETH mainnet
+  ['0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+};
+
 /** Establish a connection to the data provider. */
 export async function start() {
   const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
 
   idMap = z.record(z.string(), z.number()).parse(idMapRes);
+
+  // Apply substitutions
+  Object.entries(SUBSTITUTIONS).forEach(([key, value]) => {
+    assert(idMap);
+    idMap[key] = idMap[value];
+  });
 
   started.set(true);
 
