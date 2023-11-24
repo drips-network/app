@@ -53,7 +53,7 @@
       </div>
     {:else}
       <div class="project-avatar">
-        <GithubIcon />
+        <GithubIcon style="width: min(80%, 3rem); height: min(80%, 3rem)" />
       </div>
     {/if}
   </div>

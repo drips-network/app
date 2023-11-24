@@ -5,6 +5,7 @@
   import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import FiatEstimateValue from './fiat-estimate-value.svelte';
+  import aggregateFiatEstimate from './aggregate-fiat-estimate';
 
   interface Amount {
     tokenAddress: string;
@@ -33,35 +34,11 @@
 
   $: {
     if ($connected && amounts && $connected) {
-      const prices = $priceStore;
+      $priceStore;
+      const result = aggregateFiatEstimate(priceStore, amounts);
 
-      includesUnknownPrice = false;
-
-      if (Object.values(prices).includes('pending')) {
-        fiatEstimateCents = 'pending';
-      } else {
-        fiatEstimateCents = amounts.reduce((sum, { tokenAddress, amount }) => {
-          const token = tokensStore.getByAddress(tokenAddress);
-
-          if (!token) {
-            includesUnknownPrice = true;
-            return sum;
-          }
-
-          const res = fiatEstimates.convert({ amount, tokenAddress }, token.info.decimals);
-
-          if (res === 'unsupported') {
-            includesUnknownPrice = true;
-            return sum;
-          }
-
-          if (!res || res === 'pending') {
-            return sum;
-          }
-
-          return sum + res;
-        }, 0);
-      }
+      includesUnknownPrice = result.includesUnknownPrice;
+      fiatEstimateCents = result.fiatEstimateCents;
     }
   }
 </script>

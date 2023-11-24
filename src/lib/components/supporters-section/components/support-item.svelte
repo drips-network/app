@@ -8,7 +8,7 @@
     props: Record<string, unknown>;
   };
 
-  export let subtitle: string;
+  export let subtitle: string | undefined = undefined;
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
   export let subAmount: string;
 </script>
@@ -22,12 +22,12 @@
       <div class="title">
         <svelte:component this={title.component} {...title.props} />
       </div>
-      <div class="subtitle muted">{subtitle}</div>
+      {#if subtitle}<div class="subtitle muted">{subtitle}</div>{/if}
     </div>
   </div>
   <div class="amount">
     <FiatEstimateValue {fiatEstimateCents} />
-    <div class="amount-sub muted">{subAmount}</div>
+    <div class="amount-sub muted tabular-nums">{subAmount}</div>
   </div>
 </div>
 

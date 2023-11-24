@@ -23,6 +23,7 @@
 
   export let avatarImgElem: HTMLImageElement | undefined = undefined;
   export let isReverse = false;
+  export let tag: string | undefined = undefined;
 
   const ensConnected = ensStore.connected;
 
@@ -131,6 +132,11 @@
           </div>
         {/key}
       </div>
+      {#if tag}
+        <div class="tag typo-text-small">
+          {tag}
+        </div>
+      {/if}
     {/if}
   </svelte:element>
   <svelte:fragment slot="tooltip-content">
@@ -160,6 +166,13 @@
 
   .muted {
     color: var(--color-foreground-level-6);
+  }
+
+  .tag {
+    background-color: var(--color-primary-level-1);
+    color: var(--color-primary-level-6);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0.125rem 0.25rem;
   }
 
   @media (max-width: 768px) {

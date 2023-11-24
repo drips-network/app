@@ -1,10 +1,17 @@
 <script lang="ts" context="module">
   export const SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT = gql`
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    ${PROJECT_BADGE_FRAGMENT}
     fragment SupportersSectionSupportItem on SupportItem {
       ... on DripListSupport {
         account {
           accountId
         }
+        date
+        dripList {
+          ...DripListBadge
+        }
+        weight
       }
       ... on OneTimeDonationSupport {
         account {
@@ -14,12 +21,18 @@
           amount
           tokenAddress
         }
+        date
       }
       ... on ProjectSupport {
         account {
           accountId
           driver
         }
+        date
+        project {
+          ...ProjectBadge
+        }
+        weight
       }
     }
   `;
@@ -37,15 +50,27 @@
   import balancesStore from '$lib/stores/balances/balances.store';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
-  import assert from '$lib/utils/assert';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import Droplet from 'radicle-design-system/icons/Droplet.svelte';
-  import { AddressDriverClient } from 'radicle-drips';
+  import { AddressDriverClient, constants } from 'radicle-drips';
   import formatTokenAmount from '$lib/utils/format-token-amount';
+  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import formatDate from '$lib/utils/format-date';
+  import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
+  import aggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
+  import DripList from 'radicle-design-system/icons/DripList.svelte';
+  import DripListBadge, {
+    DRIP_LIST_BADGE_FRAGMENT,
+  } from '../drip-list-badge/drip-list-badge.svelte';
+  import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
+  import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
+  import formatAmtPerSec from '$lib/stores/amt-delta-unit/utils/format-amt-per-sec';
+  import unreachable from '$lib/utils/unreachable';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
 
+  export let forceLoading = false;
   export let type: 'project' | 'dripList';
   export let headline = 'Support';
   export let emptyStateHeadline = 'No supporters';
@@ -76,29 +101,66 @@
     })),
   ];
 
+  // Our API currently doesn't track split amounts yet, so we need to aggregate them manually here.
+  let projectAndDripListSupportAmounts: {
+    [accountId: string]: { tokenAddress: string; amount: bigint }[] | 'pending';
+  } = {};
+  $: {
+    allItems.forEach(async (i) => {
+      if (i.__typename === 'ProjectSupport' || i.__typename === 'DripListSupport') {
+        if (projectAndDripListSupportAmounts[i.account.accountId] === undefined) {
+          projectAndDripListSupportAmounts[i.account.accountId] = 'pending';
+
+          projectAndDripListSupportAmounts[i.account.accountId] = await getIncomingSplitTotal(
+            i.account.accountId,
+          );
+        }
+      }
+    });
+  }
+
   $: allItemsWithAmount = mapFilterUndefined(allItems, (i) => {
     if (i.__typename === 'StreamSupport') {
       $balancesStore;
 
       const estimate = balancesStore.getEstimateByStreamId(i.stream.id);
-      assert(estimate);
 
       return {
         ...i,
-        amount: {
-          __typename: 'Amount',
-          tokenAddress: estimate.tokenAddress,
-          amount: estimate.totalStreamed,
-        },
+        amounts: estimate
+          ? [
+              {
+                __typename: 'Amount',
+                tokenAddress: i.stream.streamConfig.amountPerSecond.tokenAddress,
+                amount: estimate.totalStreamed,
+              },
+            ]
+          : undefined,
       };
     } else if (i.__typename === 'OneTimeDonationSupport') {
       return {
         ...i,
-        amount: {
-          __typename: 'Amount',
-          tokenAddress: i.amount.tokenAddress,
-          amount: BigInt(i.amount.amount),
-        },
+        amounts: [
+          {
+            __typename: 'Amount',
+            tokenAddress: i.amount.tokenAddress,
+            amount: BigInt(i.amount.amount),
+          },
+        ],
+      };
+    } else if (i.__typename === 'ProjectSupport' || i.__typename === 'DripListSupport') {
+      const incomingSplitTotal = projectAndDripListSupportAmounts[i.account.accountId];
+
+      return {
+        ...i,
+        amounts:
+          incomingSplitTotal === 'pending'
+            ? undefined
+            : incomingSplitTotal.map((ist) => ({
+                __typename: 'Amount',
+                tokenAddress: ist.tokenAddress,
+                amount: ist.amount,
+              })),
       };
     } else {
       return undefined;
@@ -106,62 +168,98 @@
   });
 
   const tokensStoreConnectedReadable = tokensStore.connected;
-  $: $tokensStoreConnectedReadable &&
-    fiatEstimates.track(allItemsWithAmount.map((i) => i.amount.tokenAddress));
+  const fiatEstimatesStartedReadable = fiatEstimates.started;
 
-  $: allItemsWithFiatEstimate = allItemsWithAmount.map((i) => {
-    if (!$tokensStoreConnectedReadable) {
+  $: allTokenAddresses = allItemsWithAmount.reduce<string[]>((acc, i) => {
+    if (!i.amounts) return acc;
+
+    return [...acc, ...i.amounts.map((a) => a.tokenAddress)];
+  }, []);
+
+  $: $fiatEstimatesStartedReadable &&
+    $tokensStoreConnectedReadable &&
+    fiatEstimates.track(allTokenAddresses);
+
+  $: priceReadable = fiatEstimates.price(allTokenAddresses);
+
+  $: allItemsWithFiatEstimate =
+    $priceReadable &&
+    allItemsWithAmount.map((i) => {
+      if (!$tokensStoreConnectedReadable) {
+        return {
+          ...i,
+          fiatEstimate: {
+            fiatEstimateCents: 'pending' as const,
+            includesUnknownPrice: false,
+          },
+        };
+      }
+
+      const { amounts } = i;
+
+      if (!amounts) {
+        return {
+          ...i,
+          fiatEstimate: {
+            fiatEstimateCents: 'pending' as const,
+            includesUnknownPrice: false,
+          },
+        };
+      }
+
+      if (i.__typename === 'StreamSupport') {
+        amounts[0].amount = amounts[0].amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+      }
+
+      const aggregateEstimate = aggregateFiatEstimate(priceReadable, amounts);
+
       return {
         ...i,
-        fiatEstimateUsd: 'pending' as const,
+        fiatEstimate: aggregateEstimate,
       };
-    }
-
-    const { amount } = i;
-    const token = tokensStore.getByAddress(amount.tokenAddress);
-
-    if (!token) {
-      return {
-        ...i,
-        fiatEstimateUsd: undefined,
-      };
-    }
-
-    const converted = fiatEstimates.convert(amount, token.info.decimals);
-
-    return {
-      ...i,
-      fiatEstimateUsd: converted ?? ('unsupported' as const),
-    };
-  });
+    });
 
   let sortBy = 'amount';
 
   $: sorted = allItemsWithFiatEstimate.sort((a, b) => {
     if (sortBy === 'amount') {
-      return Number(b.fiatEstimateUsd) - Number(a.fiatEstimateUsd);
+      return Number(b.fiatEstimate.fiatEstimateCents) - Number(a.fiatEstimate.fiatEstimateCents);
     } else {
       return 0;
     }
   });
 
   function getSubAmount(item: (typeof sorted)[number]) {
-    if (!$tokensStoreConnectedReadable) {
+    if (item.__typename === 'ProjectSupport' || item.__typename === 'DripListSupport') {
       return '...';
     }
 
-    const token = tokensStore.getByAddress(item.amount.tokenAddress);
+    if (!$tokensStoreConnectedReadable || !item.amounts) {
+      return '...';
+    }
+
+    const token = tokensStore.getByAddress(item.amounts[0].tokenAddress);
 
     if (!token) return 'Unknown token';
 
-    return `${formatTokenAmount(item.amount, token.info.decimals, 1n, false)} ${token.info.symbol}`;
+    const precisionMultiplier = item.__typename === 'StreamSupport' ? undefined : 1n;
+    const preserveTrailingZeroes = item.__typename === 'StreamSupport';
+
+    return `${formatTokenAmount(
+      item.amounts[0],
+      token.info.decimals,
+      precisionMultiplier,
+      preserveTrailingZeroes,
+    )} ${token.info.symbol}`;
   }
 </script>
 
 <section class="app-section">
   <SectionHeader {infoTooltip} icon={Heart} label={headline} />
   <SectionSkeleton
-    loaded={true}
+    loaded={!forceLoading &&
+      $tokensStoreConnectedReadable &&
+      !allItemsWithFiatEstimate.find((i) => i.fiatEstimate.fiatEstimateCents === 'pending')}
     empty={false}
     emptyStateEmoji="🫧"
     {emptyStateHeadline}
@@ -178,9 +276,62 @@
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
             }}
-            subtitle="Date goes here"
-            fiatEstimateCents={item.fiatEstimateUsd}
+            subtitle={formatDate(item.date)}
+            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
             subAmount={getSubAmount(item)}
+          />
+        {/if}
+        {#if item.__typename === 'StreamSupport'}
+          {@const token =
+            ($tokensStore &&
+              tokensStore.getByAddress(item.stream.streamConfig.amountPerSecond.tokenAddress)) ??
+            unreachable()}
+          <SupportItem
+            icon={TokenStreams}
+            title={{
+              component: IdentityBadge,
+              props: {
+                // Currently only owners can send stream support
+                tag: 'Owner',
+                address: AddressDriverClient.getUserAddress(item.account.accountId),
+              },
+            }}
+            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
+            subAmount={formatAmtPerSec(
+              item.stream.streamConfig.amountPerSecond.amount,
+              token.info.decimals,
+              token.info.symbol,
+            )}
+          />
+        {/if}
+        {#if item.__typename === 'DripListSupport'}
+          <SupportItem
+            icon={DripList}
+            title={{
+              component: DripListBadge,
+              props: {
+                avatarSize: 'small',
+                dripList: item.dripList,
+              },
+            }}
+            subtitle={formatDate(item.date)}
+            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
+            subAmount={`${getSplitPercent(item.weight)}% of incoming funds`}
+          />
+        {/if}
+        {#if item.__typename === 'ProjectSupport'}
+          <SupportItem
+            icon={DripList}
+            title={{
+              component: ProjectBadge,
+              props: {
+                size: 'tiny',
+                project: item.project,
+              },
+            }}
+            subtitle={formatDate(item.date)}
+            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
+            subAmount={`${getSplitPercent(item.weight)}% of incoming funds`}
           />
         {/if}
       {/each}
