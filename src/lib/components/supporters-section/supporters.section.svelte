@@ -66,6 +66,7 @@
   import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import formatAmtPerSec from '$lib/stores/amt-delta-unit/utils/format-amt-per-sec';
   import unreachable from '$lib/utils/unreachable';
+  import { browser } from '$app/environment';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
@@ -105,8 +106,9 @@
   let projectAndDripListSupportAmounts: {
     [accountId: string]: { tokenAddress: string; amount: bigint }[] | 'pending';
   } = {};
-  $: {
-    allItems.forEach(async (i) => {
+
+  function updateProjectAndDripListSupportAmounts(items: typeof allItems) {
+    items.forEach(async (i) => {
       if (i.__typename === 'ProjectSupport' || i.__typename === 'DripListSupport') {
         if (projectAndDripListSupportAmounts[i.account.accountId] === undefined) {
           projectAndDripListSupportAmounts[i.account.accountId] = 'pending';
@@ -118,6 +120,7 @@
       }
     });
   }
+  $: browser && updateProjectAndDripListSupportAmounts(allItems);
 
   $: allItemsWithAmount = mapFilterUndefined(allItems, (i) => {
     if (i.__typename === 'StreamSupport') {
@@ -154,7 +157,7 @@
       return {
         ...i,
         amounts:
-          incomingSplitTotal === 'pending'
+          incomingSplitTotal === 'pending' || incomingSplitTotal === undefined
             ? undefined
             : incomingSplitTotal.map((ist) => ({
                 __typename: 'Amount',

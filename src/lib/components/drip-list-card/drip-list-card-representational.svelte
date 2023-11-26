@@ -1,11 +1,12 @@
 <script lang="ts" context="module">
-  import { gql } from "graphql-request";
+  import { gql } from 'graphql-request';
 
   export const DRIP_LIST_CARD_REPRESENTATIONAL_LIST_FRAGMENT = gql`
     ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
     ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
     fragment DripListCardRepresentationalList on DripList {
       ...EditDripListStepSelectedDripList
       name
@@ -26,6 +27,25 @@
           ...SplitsComponentDripListReceiver
         }
       }
+      support {
+        ... on DripListSupport {
+          dripList {
+            owner {
+              address
+            }
+          }
+        }
+        ... on ProjectSupport {
+          project {
+            ...ProjectAvatar
+          }
+        }
+        ... on OneTimeDonationSupport {
+          account {
+            address
+          }
+        }
+      }
     }
   `;
 
@@ -42,12 +62,16 @@
     }
   `;
 </script>
-  
+
 <script lang="ts">
   import Pen from 'radicle-design-system/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
-  import Splits, { SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT, SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT, SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT } from '../splits/splits.svelte';
+  import Splits, {
+    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
+  } from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -57,9 +81,8 @@
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { constants } from 'radicle-drips';
-  import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
-  import ProjectAvatar from '../project-avatar/project-avatar.svelte';
+  import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   import Pile from '../pile/pile.svelte';
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
@@ -69,8 +92,8 @@
   import type { Stream } from '$lib/stores/streams/types';
   import type getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
-  import type { DripListCardRepresentationalListFragment } from "./__generated__/gql.generated";
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from "$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte";
+  import type { DripListCardRepresentationalListFragment } from './__generated__/gql.generated';
+  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
 
   export let dripList: DripListCardRepresentationalListFragment;
   export let format: 'thumblink' | 'full' = 'full';
@@ -78,7 +101,6 @@
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = $walletStore && checkIsUser(dripList.owner.accountId);
 
-  export let incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>> | undefined;
   export let supportStreams: Stream[];
 
   $: streamEstimates =
@@ -92,8 +114,7 @@
     Only the list owner can set support streams to the list, so we can consider the stream estimate to the list loaded when
     the owner account is loaded.
   */
-  $: streamEstimateLoaded =
-    $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
+  $: streamEstimateLoaded = $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
 
   export let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined;
 
@@ -103,46 +124,48 @@
       ? mergeAmounts(streamEstimates, incomingSplitTotal)
       : undefined;
 
-  function getSupportersPile(streams: typeof supportStreams, splits: typeof incomingSplits) {
-    if (!supportStreams || !splits) return undefined;
-
-    const result = [];
-
-    result.push(
-      splits.users.map((s) => ({
-        component: IdentityBadge,
-        props: {
-          address: s.value.address,
-          showIdentity: false,
-          outline: true,
-          size: 'normal',
-          disableTooltip: true,
-        },
-      })),
-    );
+  function getSupportersPile(
+    streams: typeof supportStreams,
+    support: DripListCardRepresentationalListFragment['support'],
+  ) {
+    let result = [];
 
     result.push(
-      splits.projects.map((s) => ({
-        component: ProjectAvatar,
-        props: {
-          project: s.value,
-          outline: true,
-          size: 'tiny',
-        },
-      })),
-    );
-
-    result.push(
-      splits.dripLists.map((s) => ({
-        component: IdentityBadge,
-        props: {
-          address: s.value.owner.address,
-          showIdentity: false,
-          outline: true,
-          size: 'normal',
-          disableTooltip: true,
-        },
-      })),
+      ...support.map((s) => {
+        switch (s.__typename) {
+          case 'DripListSupport':
+            return {
+              component: IdentityBadge,
+              props: {
+                address: s.dripList.owner.address,
+                showIdentity: false,
+                outline: true,
+                size: 'normal',
+                disableTooltip: true,
+              },
+            };
+          case 'ProjectSupport':
+            return {
+              component: ProjectAvatar,
+              props: {
+                project: s.project,
+                outline: true,
+                size: 'tiny',
+              },
+            };
+          case 'OneTimeDonationSupport':
+            return {
+              component: IdentityBadge,
+              props: {
+                address: s.account.address,
+                showIdentity: false,
+                outline: true,
+                size: 'normal',
+                disableTooltip: true,
+              },
+            };
+        }
+      }),
     );
 
     // If the owner is streaming to the list, we only want to show them once in the pile.
@@ -159,9 +182,15 @@
       });
     }
 
+    // Dedupe identity badges based on address prop
+    result = result.filter(
+      (item, index, self) =>
+        self.findIndex((i) => i && item && i.props.address === item.props.address) === index,
+    );
+
     return result.flat();
   }
-  $: supportersPile = getSupportersPile(supportStreams, incomingSplits);
+  $: supportersPile = getSupportersPile(supportStreams, dripList.support);
 
   function triggerEditModal() {
     modal.show(Stepper, undefined, editDripListSteps(dripList));
@@ -235,9 +264,9 @@
           </div>
         {/if}
       </div>
-        <div class="splits-component">
-          <Splits groupsExpandable={format === 'full'} list={dripList.splits} {maxRows} />
-        </div>
+      <div class="splits-component">
+        <Splits groupsExpandable={format === 'full'} list={dripList.splits} {maxRows} />
+      </div>
     </div>
   </div>
   <div class="overflow-gradient" />
