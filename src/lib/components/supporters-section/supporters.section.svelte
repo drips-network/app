@@ -69,6 +69,9 @@
   import Box from 'radicle-design-system/icons/Box.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildStreamUrl from '$lib/utils/build-stream-url';
+  import streamState, { STREAM_STATE_LABELS } from '$lib/utils/stream-state';
+  import unreachable from '$lib/utils/unreachable';
+  import streamsStore from '$lib/stores/streams/streams.store';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
@@ -235,28 +238,53 @@
     }
   });
 
-  function getSubAmount(item: (typeof sorted)[number]) {
-    if (item.__typename === 'ProjectSupport' || item.__typename === 'DripListSupport') {
-      return '...';
-    }
-
-    if (!$tokensStoreConnectedReadable || !item.amounts) {
-      return '...';
+  function getOneTimeDonationSubAmountLabel(item: (typeof sorted)[number]) {
+    if (item.__typename !== 'OneTimeDonationSupport') {
+      throw new Error(
+        'getOneTimeDonationSubAmountLabel only works for OneTimeDonationSupport items',
+      );
     }
 
     const token = tokensStore.getByAddress(item.amounts[0].tokenAddress);
 
     if (!token) return 'Unknown token';
 
-    const precisionMultiplier = item.__typename === 'StreamSupport' ? undefined : 1n;
-    const preserveTrailingZeroes = item.__typename === 'StreamSupport';
+    return `${formatTokenAmount(item.amounts[0], token.info.decimals, 1n, false)} ${
+      token.info.symbol
+    }`;
+  }
 
-    return `${formatTokenAmount(
-      item.amounts[0],
+  function getStreamSupportSubAmountLabel(item: (typeof sorted)[number]) {
+    if (item.__typename !== 'StreamSupport') {
+      throw new Error(
+        'getOneTimeDonationSubAmountLabel only works for OneTimeDonationSupport items',
+      );
+    }
+
+    const token =
+      (item.amounts && tokensStore.getByAddress(item.amounts[0].tokenAddress)) ?? undefined;
+
+    if (!token) return 'Unknown token';
+
+    const { stream } = item;
+
+    return `${
+      STREAM_STATE_LABELS[
+        streamState(
+          item.stream.id,
+          item.stream.streamConfig.startDate,
+          stream.streamConfig.durationSeconds,
+          stream.paused,
+          balancesStore.getEstimateByStreamId(item.stream.id) ?? unreachable(),
+          streamsStore.getAssetConfig(stream.sender.accountId, token?.info.address) ??
+            unreachable(),
+        )
+      ]
+    } · ${formatAmtPerSec(
+      item.stream.streamConfig.amountPerSecond.amount,
       token.info.decimals,
-      precisionMultiplier,
-      preserveTrailingZeroes,
-    )} ${token.info.symbol}`;
+      token.info.symbol,
+    )}`;
   }
 </script>
 
@@ -285,14 +313,11 @@
             }}
             subtitle={formatDate(item.date)}
             fiatEstimate={item.fiatEstimate}
-            subAmount={getSubAmount(item)}
+            subAmount={getOneTimeDonationSubAmountLabel(item)}
           />
         {/if}
         {#if item.__typename === 'StreamSupport'}
           {@const stream = item.stream}
-          {@const token =
-            $tokensStore &&
-            tokensStore.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress)}
           <SupportItem
             href={buildStreamUrl(
               stream.sender.accountId,
@@ -309,13 +334,7 @@
               },
             }}
             fiatEstimate={item.fiatEstimate}
-            subAmount={token
-              ? formatAmtPerSec(
-                  item.stream.streamConfig.amountPerSecond.amount,
-                  token.info.decimals,
-                  token.info.symbol,
-                )
-              : 'Unknown token'}
+            subAmount={getStreamSupportSubAmountLabel(item)}
           />
         {/if}
         {#if item.__typename === 'DripListSupport'}

@@ -15,9 +15,7 @@
   import tokens from '$lib/stores/tokens';
   import formatDate from '$lib/utils/format-date';
   import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
-  import StreamStateBadge, {
-    type StreamState,
-  } from '$lib/components/stream-state-badge/stream-state-badge.svelte';
+  import StreamStateBadge from '$lib/components/stream-state-badge/stream-state-badge.svelte';
   import { fly } from 'svelte/transition';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircleIcon from 'radicle-design-system/icons/InfoCircle.svelte';
@@ -40,6 +38,8 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import { Driver } from '$lib/graphql/__generated__/base-types';
+  import streamState from '$lib/utils/stream-state';
+  import streamsStore from '$lib/stores/streams/streams.store';
 
   const walletInitialized = walletStore.initialized;
   const tokensInitialized = tokensStore.connected;
@@ -90,26 +90,19 @@
     streamStartDate && stream?.streamConfig.durationSeconds
       ? new Date(streamStartDate.getTime() + stream?.streamConfig.durationSeconds * 1000)
       : undefined;
+  $: assetConfig = stream && streamsStore.getAssetConfig(stream?.sender.accountId, tokenAddress);
 
-  let streamState: StreamState | undefined;
-  $: {
-    if (estimate && stream) {
-      if (stream?.paused) {
-        streamState = 'paused';
-      } else if (stream && streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
-        streamState = 'ended';
-      } else if (
-        stream?.streamConfig.startDate &&
-        stream.streamConfig.startDate.getTime() > new Date().getTime()
-      ) {
-        streamState = 'scheduled';
-      } else if (stream && estimate.currentAmountPerSecond === 0n) {
-        streamState = 'out-of-funds';
-      } else if (stream && estimate.currentAmountPerSecond > 0n) {
-        streamState = 'active';
-      }
-    }
-  }
+  $: state =
+    stream && estimate && assetConfig
+      ? streamState(
+          stream.id,
+          streamScheduledStart,
+          stream?.streamConfig.durationSeconds,
+          stream.paused,
+          estimate,
+          assetConfig,
+        )
+      : undefined;
 
   let streamHistory: ReturnType<typeof getStreamHistory> | undefined;
 
@@ -125,7 +118,7 @@
       if (
         latestStreamHistoryItem.runsOutOfFunds?.getTime() ===
           latestStreamHistoryItem.timestamp.getTime() &&
-        streamState === 'out-of-funds'
+        state === 'out-of-funds'
       ) {
         const reverseHistory = streamHistory;
         reverseHistory.reverse();
@@ -268,11 +261,11 @@
           <StreamStateBadge
             size="normal"
             {streamId}
-            paused={stream.paused}
-            senderId={stream.sender.accountId}
-            durationSeconds={stream.streamConfig.durationSeconds}
-            startDate={stream.streamConfig.startDate}
-            {tokenAddress}
+            streamPaused={stream.paused}
+            streamSenderAccountId={stream.sender.accountId}
+            streamDurationSeconds={stream.streamConfig.durationSeconds}
+            streamScheduledStart={stream.streamConfig.startDate}
+            streamTokenAddress={tokenAddress}
           />
         </div>
         {#if checkIsUser(stream.sender.accountId)}
@@ -282,7 +275,7 @@
               {#if !stream.paused}
                 <Button
                   icon={PauseIcon}
-                  disabled={streamState !== 'active'}
+                  disabled={state !== 'active'}
                   on:click={() =>
                     modal.show(Stepper, undefined, {
                       steps: pauseFlowSteps(stream ?? unreachable()),
@@ -308,7 +301,7 @@
               >
               <Button
                 icon={PenIcon}
-                disabled={streamState === 'ended'}
+                disabled={state === 'ended'}
                 on:click={() =>
                   modal.show(Stepper, undefined, editStreamFlowSteps(stream ?? unreachable()))}
                 >Edit</Button
@@ -448,7 +441,7 @@
             <div class="key-value">
               <div class="with-info-icon">
                 <h5 class="key greyed-out">
-                  Senderʼs balance {streamState === 'out-of-funds' ? 'ran' : 'runs'} out of funds
+                  Senderʼs balance {state === 'out-of-funds' ? 'ran' : 'runs'} out of funds
                 </h5>
                 <Tooltip>
                   <InfoCircleIcon style="height: 1.25rem" />
