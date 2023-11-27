@@ -80,8 +80,8 @@
     height: 2rem;
     background-image: linear-gradient(
         to right,
-        var(--color-primary-level-2),
-        var(--color-primary-level-2)
+        var(--color-primary-level-1),
+        var(--color-primary-level-1)
       ),
       linear-gradient(to right, var(--color-background), var(--color-background));
   }
