@@ -171,7 +171,7 @@
     const accountId = dripList?.account.accountId;
     return (
       accountId &&
-      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, { driver: 'nft', accountId }))
+      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, dripList?.account))
     );
   }
 

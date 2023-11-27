@@ -94,6 +94,7 @@
   import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
   import type { DripListCardRepresentationalListFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let dripList: DripListCardRepresentationalListFragment;
   export let format: 'thumblink' | 'full' = 'full';
@@ -131,7 +132,7 @@
     let result = [];
 
     result.push(
-      ...support.map((s) => {
+      ...mapFilterUndefined(support, (s) => {
         switch (s.__typename) {
           case 'DripListSupport':
             return {
