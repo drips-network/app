@@ -266,7 +266,7 @@
     loaded={!forceLoading &&
       $tokensStoreConnectedReadable &&
       !allItemsWithFiatEstimate.find((i) => i.fiatEstimate.fiatEstimateCents === 'pending')}
-    empty={false}
+    empty={sorted.length === 0}
     emptyStateEmoji="🫧"
     {emptyStateHeadline}
     {emptyStateText}
