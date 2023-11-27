@@ -1,6 +1,8 @@
 <script lang="ts">
   import FiatEstimateValue from '$lib/components/aggregate-fiat-estimate/fiat-estimate-value.svelte';
   import type { ComponentType } from 'svelte';
+  import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
 
   export let icon: ComponentType;
   export let title: {
@@ -10,7 +12,13 @@
   export let href: string | undefined = undefined;
 
   export let subtitle: string | undefined = undefined;
-  export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
+  export let fiatEstimate: {
+    fiatEstimateCents: number | 'pending' | 'unsupported' | undefined;
+    includesUnknownPrice: boolean;
+  } = {
+    fiatEstimateCents: 'pending',
+    includesUnknownPrice: false,
+  };
   export let subAmount: string;
 </script>
 
@@ -27,7 +35,17 @@
     </div>
   </div>
   <div class="amount">
-    <FiatEstimateValue {fiatEstimateCents} />
+    <div class="value">
+      <FiatEstimateValue fiatEstimateCents={fiatEstimate.fiatEstimateCents} />
+      {#if fiatEstimate.includesUnknownPrice}
+        <Tooltip>
+          <svelte:fragment slot="tooltip-content">
+            This amount includes unknown tokens for which we couldnʼt determine a current USD value.
+          </svelte:fragment>
+          <WarningIcon style="fill: var(--color-negative)" />
+        </Tooltip>
+      {/if}
+    </div>
     <div class="amount-sub muted tabular-nums">{subAmount}</div>
   </div>
 </a>
@@ -59,6 +77,12 @@
   .amount {
     text-align: right;
     white-space: nowrap;
+  }
+
+  .amount .value {
+    display: flex;
+    gap: 0.125rem;
+    justify-content: flex-end;
   }
 
   .icon {

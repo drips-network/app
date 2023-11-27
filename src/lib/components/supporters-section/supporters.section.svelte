@@ -65,7 +65,6 @@
   import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
   import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import formatAmtPerSec from '$lib/stores/amt-delta-unit/utils/format-amt-per-sec';
-  import unreachable from '$lib/utils/unreachable';
   import { browser } from '$app/environment';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
@@ -285,20 +284,19 @@
               },
             }}
             subtitle={formatDate(item.date)}
-            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
+            fiatEstimate={item.fiatEstimate}
             subAmount={getSubAmount(item)}
           />
         {/if}
         {#if item.__typename === 'StreamSupport'}
           {@const stream = item.stream}
           {@const token =
-            ($tokensStore &&
-              tokensStore.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress)) ??
-            unreachable()}
+            $tokensStore &&
+            tokensStore.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress)}
           <SupportItem
             href={buildStreamUrl(
               stream.sender.address,
-              token.info.address,
+              stream.streamConfig.amountPerSecond.tokenAddress,
               stream.streamConfig.dripId,
             )}
             icon={TokenStreams}
@@ -310,12 +308,14 @@
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
             }}
-            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
-            subAmount={formatAmtPerSec(
-              item.stream.streamConfig.amountPerSecond.amount,
-              token.info.decimals,
-              token.info.symbol,
-            )}
+            fiatEstimate={item.fiatEstimate}
+            subAmount={token
+              ? formatAmtPerSec(
+                  item.stream.streamConfig.amountPerSecond.amount,
+                  token.info.decimals,
+                  token.info.symbol,
+                )
+              : 'Unknown token'}
           />
         {/if}
         {#if item.__typename === 'DripListSupport'}
@@ -331,7 +331,7 @@
               },
             }}
             subtitle={formatDate(item.date)}
-            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
+            fiatEstimate={item.fiatEstimate}
             subAmount={`${getSplitPercent(item.weight)}% of incoming funds`}
           />
         {/if}
@@ -350,7 +350,7 @@
               },
             }}
             subtitle={formatDate(item.date)}
-            fiatEstimateCents={item.fiatEstimate.fiatEstimateCents}
+            fiatEstimate={item.fiatEstimate}
             subAmount={`${getSplitPercent(item.weight)}% of incoming funds`}
           />
         {/if}
