@@ -68,9 +68,12 @@
   import unreachable from '$lib/utils/unreachable';
   import { browser } from '$app/environment';
   import Box from 'radicle-design-system/icons/Box.svelte';
+  import buildProjectUrl from '$lib/utils/build-project-url';
+  import buildStreamUrl from '$lib/utils/build-stream-url';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
+  export let ownerAccountId: string | undefined = undefined;
 
   export let forceLoading = false;
   export let type: 'project' | 'dripList';
@@ -277,6 +280,7 @@
             title={{
               component: IdentityBadge,
               props: {
+                disableTooltip: true,
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
             }}
@@ -286,17 +290,23 @@
           />
         {/if}
         {#if item.__typename === 'StreamSupport'}
+          {@const stream = item.stream}
           {@const token =
             ($tokensStore &&
-              tokensStore.getByAddress(item.stream.streamConfig.amountPerSecond.tokenAddress)) ??
+              tokensStore.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress)) ??
             unreachable()}
           <SupportItem
+            href={buildStreamUrl(
+              stream.sender.address,
+              token.info.address,
+              stream.streamConfig.dripId,
+            )}
             icon={TokenStreams}
             title={{
               component: IdentityBadge,
               props: {
-                // Currently only owners can send stream support
-                tag: 'Owner',
+                disableTooltip: true,
+                tag: stream.sender.accountId === ownerAccountId ? 'Owner' : undefined,
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
             }}
@@ -310,10 +320,12 @@
         {/if}
         {#if item.__typename === 'DripListSupport'}
           <SupportItem
+            href="/app/drip-lists/{item.dripList.account.accountId}"
             icon={DripList}
             title={{
               component: DripListBadge,
               props: {
+                isLinked: false,
                 avatarSize: 'small',
                 dripList: item.dripList,
               },
@@ -324,11 +336,15 @@
           />
         {/if}
         {#if item.__typename === 'ProjectSupport'}
+          {@const source = item.project.source}
           <SupportItem
+            href={buildProjectUrl(source.forge, source.ownerName, source.repoName)}
             icon={Box}
             title={{
               component: ProjectBadge,
               props: {
+                linkTo: 'nothing',
+                tooltip: false,
                 size: 'tiny',
                 project: item.project,
               },
@@ -347,5 +363,6 @@
   .items {
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
   }
 </style>

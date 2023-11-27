@@ -7,13 +7,14 @@
     component: ComponentType;
     props: Record<string, unknown>;
   };
+  export let href: string | undefined = undefined;
 
   export let subtitle: string | undefined = undefined;
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
   export let subAmount: string;
 </script>
 
-<div class="support-item">
+<a class="support-item" {href}>
   <div class="left">
     <div class="icon">
       <svelte:component this={icon} style="fill: var(--color-foreground)" />
@@ -29,13 +30,19 @@
     <FiatEstimateValue {fiatEstimateCents} />
     <div class="amount-sub muted tabular-nums">{subAmount}</div>
   </div>
-</div>
+</a>
 
 <style>
   .support-item {
     display: flex;
     justify-content: space-between;
     padding: 1rem;
+  }
+
+  .support-item:hover,
+  .support-item:focus-visible {
+    background-color: var(--color-primary-level-1);
+    outline: none;
   }
 
   .support-item:not(:last-child) {
