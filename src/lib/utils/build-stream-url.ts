@@ -1,2 +1,2 @@
-export default (senderAddress: string, tokenAddress: string, streamId: string) =>
-  `/app/${senderAddress}/tokens/${tokenAddress}/streams/${streamId}`;
+export default (senderAccountId: string, tokenAddress: string, streamId: string) =>
+  `/app/${senderAccountId}/tokens/${tokenAddress}/streams/${streamId}`;

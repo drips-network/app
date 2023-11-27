@@ -295,7 +295,7 @@
             tokensStore.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress)}
           <SupportItem
             href={buildStreamUrl(
-              stream.sender.address,
+              stream.sender.accountId,
               stream.streamConfig.amountPerSecond.tokenAddress,
               stream.streamConfig.dripId,
             )}
