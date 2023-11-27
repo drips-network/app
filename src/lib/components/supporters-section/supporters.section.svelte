@@ -67,6 +67,7 @@
   import formatAmtPerSec from '$lib/stores/amt-delta-unit/utils/format-amt-per-sec';
   import unreachable from '$lib/utils/unreachable';
   import { browser } from '$app/environment';
+  import Box from 'radicle-design-system/icons/Box.svelte';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
@@ -324,7 +325,7 @@
         {/if}
         {#if item.__typename === 'ProjectSupport'}
           <SupportItem
-            icon={DripList}
+            icon={Box}
             title={{
               component: ProjectBadge,
               props: {
