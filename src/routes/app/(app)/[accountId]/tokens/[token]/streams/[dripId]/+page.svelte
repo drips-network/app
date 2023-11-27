@@ -39,6 +39,7 @@
   import { browser } from '$app/environment';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import tokensStore from '$lib/stores/tokens/tokens.store';
+  import { Driver } from '$lib/graphql/__generated__/base-types';
 
   const walletInitialized = walletStore.initialized;
   const tokensInitialized = tokensStore.connected;
@@ -317,8 +318,22 @@
         {/if}
       </header>
       <DripVisual
-        from={stream.sender}
-        to={stream.receiver}
+        from={{
+          address: stream.sender.address,
+          driver: Driver.Address,
+          __typename: 'AddressDriverAccount',
+        }}
+        to={stream.receiver.driver === 'nft'
+          ? {
+              __typename: 'NftDriverAccount',
+              driver: Driver.Nft,
+              accountId: stream.receiver.accountId,
+            }
+          : {
+              __typename: 'AddressDriverAccount',
+              driver: Driver.Address,
+              address: stream.receiver.address,
+            }}
         amountPerSecond={stream.streamConfig.amountPerSecond.amount}
         tokenInfo={{
           symbol: token?.info.symbol ?? unreachable(),
