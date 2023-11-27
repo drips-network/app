@@ -22,7 +22,7 @@
   export let subAmount: string;
 </script>
 
-<a class="support-item" {href}>
+<a class="support-item" {href} class:has-href={href}>
   <div class="left">
     <div class="icon">
       <svelte:component this={icon} style="fill: var(--color-foreground)" />
@@ -58,8 +58,8 @@
     gap: 2rem;
   }
 
-  .support-item:hover,
-  .support-item:focus-visible {
+  .support-item.has-href:hover,
+  .support-item.has-href:focus-visible {
     background-color: var(--color-primary-level-1);
     outline: none;
   }
