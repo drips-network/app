@@ -90,4 +90,13 @@
     width: 1.5rem;
     height: 1.5rem;
   }
+
+  .avatar.disabled {
+    background-image: linear-gradient(
+        to right,
+        var(--color-foreground-level-2),
+        var(--color-foreground-level-2)
+      ),
+      linear-gradient(to right, var(--color-background), var(--color-background));
+  }
 </style>
