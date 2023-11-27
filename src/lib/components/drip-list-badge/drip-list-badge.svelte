@@ -45,13 +45,7 @@
   class:disabled
 >
   {#if showAvatar}
-    <div
-      class:bg-primary-level-1={!disabled}
-      class:bg-foreground-level-2={disabled}
-      class="flex items-center justify-center rounded-full flex-shrink-0  {avatarSize === 'small'
-        ? 'w-6 h-6'
-        : 'w-8 h-8'}"
-    >
+    <div class="avatar {avatarSize}" class:disabled>
       <DripListIcon
         style="fill: {disabled
           ? 'var(--color-foreground-level-6)'
@@ -74,5 +68,26 @@
   a.drip-list-badge:focus-visible .name > span {
     background: var(--color-primary-level-1);
     border-radius: 0.25rem;
+  }
+
+  .avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    background-image: linear-gradient(
+        to right,
+        var(--color-primary-level-2),
+        var(--color-primary-level-2)
+      ),
+      linear-gradient(to right, var(--color-background), var(--color-background));
+  }
+
+  .avatar.small {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 </style>
