@@ -172,7 +172,7 @@
     background-color: var(--color-primary-level-1);
     color: var(--color-primary-level-6);
     border-radius: 1rem 0 1rem 1rem;
-    padding: 0.125rem 0.25rem;
+    padding: 0.125rem 0.5rem;
   }
 
   @media (max-width: 768px) {
