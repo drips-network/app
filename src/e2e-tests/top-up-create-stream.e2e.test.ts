@@ -488,7 +488,6 @@ describe('app', async () => {
 
       it('selects the no support option', async () => {
         await page.locator('button', { hasText: 'Support later' }).click();
-        await page.locator('button', { hasText: 'Continue' }).click();
       });
 
       it('opens the review step', async () => {
@@ -595,6 +594,8 @@ describe('app', async () => {
         await expect(page.locator('text=0x43')).toHaveCount(0);
       }, 10000);
     });
+
+    describe.todo('makes a one-time donation');
 
     describe.todo('create another drip list');
     describe.todo('displays drip lists on profile');
