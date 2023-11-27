@@ -37,6 +37,7 @@
     display: flex;
     justify-content: space-between;
     padding: 1rem;
+    gap: 2rem;
   }
 
   .support-item:hover,
@@ -57,6 +58,7 @@
 
   .amount {
     text-align: right;
+    white-space: nowrap;
   }
 
   .icon {
