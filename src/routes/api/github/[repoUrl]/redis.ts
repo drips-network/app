@@ -1,6 +1,7 @@
 import redis from 'redis';
+import { env } from '$env/dynamic/private';
 
-const client = redis.createClient();
+const client = redis.createClient({ url: env.CACHE_REDIS_CONNECTION_STRING });
 client.on('error', function (err) {
   // eslint-disable-next-line no-console
   console.error('Redis error:', err);
