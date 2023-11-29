@@ -14,8 +14,6 @@ import { Octokit } from '@octokit/rest';
 import { GITHUB_PERSONAL_ACCESS_TOKEN } from '$env/static/private';
 import GitHub from '$lib/utils/github/github';
 
-// TODO: This fails if the network is not the default one. We need to support other networks.
-
 const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
 
