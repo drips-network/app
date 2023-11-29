@@ -20,10 +20,10 @@ const github = new GitHub(octokit);
 export const load = (async ({ params, fetch }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
-  const repo = await github.getRepoByOwnerAndName(githubUsername, githubRepoName);
-  const { html_url: gitHubUrl } = repo;
-
   try {
+    const repo = await github.getRepoByOwnerAndName(githubUsername, githubRepoName);
+    const { html_url: gitHubUrl } = repo;
+
     const getProjectsQuery = gql`
       ${PROJECT_PROFILE_FRAGMENT}
       query ProjectByUrl($url: String!) {
@@ -67,8 +67,11 @@ export const load = (async ({ params, fetch }) => {
       blockWhileInitializing: false,
     };
   } catch (e) {
+    const status =
+      typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;
+
     // eslint-disable-next-line no-console
     console.error(e);
-    throw e;
+    throw error(status);
   }
 }) satisfies PageServerLoad;
