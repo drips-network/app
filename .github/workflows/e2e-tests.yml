@@ -37,6 +37,7 @@ jobs:
           envkey_GQL_URL: http://localhost:8080
           envkey_GQL_ACCESS_TOKEN: ${{ secrets.GQL_ACCESS_TOKEN }}
           envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
+          envkey_GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}
 
       - name: Install dependencies
         run: npm ci

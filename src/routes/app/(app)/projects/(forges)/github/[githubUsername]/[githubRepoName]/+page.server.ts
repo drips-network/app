@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
-import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
@@ -11,19 +10,20 @@ import type { ProjectByUrlQuery } from './__generated__/gql.generated';
 import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-types';
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
+import { Octokit } from '@octokit/rest';
+import { GITHUB_PERSONAL_ACCESS_TOKEN } from '$env/static/private';
+import GitHub from '$lib/utils/github/GitHub';
 
-// TODO: This fails if the network is not the default one. We need to support other networks.
+const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
+const github = new GitHub(octokit);
 
 export const load = (async ({ params, fetch }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
-  const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
-
-  if (!(await siteExists(gitHubUrl))) {
-    throw error(404);
-  }
-
   try {
+    const repo = await github.getRepoByOwnerAndName(githubUsername, githubRepoName);
+    const { html_url: gitHubUrl } = repo;
+
     const getProjectsQuery = gql`
       ${PROJECT_PROFILE_FRAGMENT}
       query ProjectByUrl($url: String!) {
@@ -67,8 +67,11 @@ export const load = (async ({ params, fetch }) => {
       blockWhileInitializing: false,
     };
   } catch (e) {
+    const status =
+      typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;
+
     // eslint-disable-next-line no-console
     console.error(e);
-    throw e;
+    throw error(status);
   }
 }) satisfies PageServerLoad;

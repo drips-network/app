@@ -19,7 +19,6 @@ import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
 import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
 import { BigNumber, type PopulatedTransaction } from 'ethers';
-import { getRepoByUrl as getGithubRepoByUrl } from '../github/github';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
@@ -28,8 +27,11 @@ import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
+import GitHub from '../github/GitHub';
+import { Octokit } from '@octokit/rest';
 
 export default class GitProjectService {
+  private _github!: GitHub;
   private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
@@ -42,6 +44,9 @@ export default class GitProjectService {
 
   public static async new(): Promise<GitProjectService> {
     const gitProjectService = new GitProjectService();
+
+    const octokit = new Octokit();
+    gitProjectService._github = new GitHub(octokit);
 
     gitProjectService._repoDriverClient = await getRepoDriverClient();
     gitProjectService._addressDriverClient = await getAddressDriverClient();
@@ -134,7 +139,7 @@ export default class GitProjectService {
         forks_count: forksCount,
         stargazers_count: starsCount,
         default_branch: defaultBranch,
-      } = await getGithubRepoByUrl(url);
+      } = await this._github.getRepoByUrl(url);
 
       return {
         forksCount,

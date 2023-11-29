@@ -27,10 +27,8 @@
   import UnclaimedProjectCard, {
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
-  import type { AccountId } from '$lib/utils/common-types';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
@@ -68,6 +66,19 @@
       if ($context.gitUrl.endsWith('/')) {
         $context.gitUrl = $context.gitUrl.slice(0, -1);
       }
+
+      const repoInfoRes = await fetch(`/api/github/${encodeURIComponent($context.gitUrl)}`);
+      const repoInfo = await repoInfoRes.json();
+      const normalizedUrl = repoInfo.url;
+
+      $context.gitUrl = normalizedUrl;
+
+      $context.projectMetadata = {
+        starCount: repoInfo.stargazersCount,
+        forkCount: repoInfo.forksCount,
+        description: repoInfo.description ?? undefined,
+        defaultBranch: repoInfo.defaultBranch ?? undefined,
+      };
 
       const projectQuery = gql`
         ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
@@ -107,35 +118,13 @@
         project.account.accountId,
       );
 
-      // TODO: enable pre-population of dependencies.
-      // await Promise.all([fetchProjectMetadata(), fetchUnclaimedProjectFunds(project.repoDriverAccount.accountId), prePopulateDependencies()]);
-      await Promise.all([
-        fetchProjectMetadata(),
-        fetchUnclaimedProjectFunds(project.account.accountId),
-      ]);
+      $context.unclaimedFunds = await fetchUnclaimedFunds(project.account.accountId);
 
       validationState = { type: 'valid' };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       validationState = { type: 'invalid', message: error.message };
     }
-  }
-
-  async function fetchProjectMetadata() {
-    const gitProjectService = await GitProjectService.new();
-    const { defaultBranch, description, forksCount, starsCount } =
-      await gitProjectService.getProjectInfo($context.gitUrl);
-
-    $context.projectMetadata = {
-      starCount: starsCount,
-      forkCount: forksCount,
-      description: description ?? undefined,
-      defaultBranch: defaultBranch ?? undefined,
-    };
-  }
-
-  async function fetchUnclaimedProjectFunds(accountId: AccountId) {
-    $context.unclaimedFunds = await fetchUnclaimedFunds(accountId);
   }
 
   function clearProject() {
