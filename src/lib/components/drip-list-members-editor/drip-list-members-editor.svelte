@@ -122,6 +122,10 @@
         url = url.slice(0, -1);
       }
 
+      const repoInfoRes = await fetch(`/api/github/${encodeURIComponent(url)}`);
+      const repoInfo = await repoInfoRes.json();
+      const normalizedUrl = repoInfo.url;
+
       const projectToAddQuery = gql`
         ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
         query ProjectToAdd($url: String!) {
@@ -134,7 +138,7 @@
       const { projectByUrl: project } = await query<ProjectToAddQuery, ProjectToAddQueryVariables>(
         projectToAddQuery,
         {
-          url,
+          url: normalizedUrl,
         },
       );
 

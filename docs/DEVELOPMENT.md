@@ -10,7 +10,7 @@ npm install
 
 ## 🌳 Environment
 
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var. Lastly, set `PUBLIC_PINATA_GATEWAY_URL` to the URL of the IPFS/Pinata gateway to use. You may use Drips' public IPFS gateway at `https://drips.mypinata.cloud`.
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for GitHub, Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var. Lastly, set `PUBLIC_PINATA_GATEWAY_URL` to the URL of the IPFS/Pinata gateway to use. You may use Drips' public IPFS gateway at `https://drips.mypinata.cloud`.
 
 ### 📈 GraphQL API
 

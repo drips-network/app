@@ -35,8 +35,12 @@
   import assert from '$lib/utils/assert';
   import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
-  import github from '$lib/utils/github/github';
+  import GitHub from '$lib/utils/github/github';
   import { gql } from 'graphql-request';
+  import { Octokit } from '@octokit/rest';
+
+  const octokit = new Octokit();
+  const github = new GitHub(octokit);
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
