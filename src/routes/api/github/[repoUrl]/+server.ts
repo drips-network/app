@@ -1,7 +1,7 @@
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import GitHub from '$lib/utils/github/github';
+import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
 import { GITHUB_PERSONAL_ACCESS_TOKEN } from '$env/static/private';
 

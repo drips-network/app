@@ -12,7 +12,7 @@ import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { Octokit } from '@octokit/rest';
 import { GITHUB_PERSONAL_ACCESS_TOKEN } from '$env/static/private';
-import GitHub from '$lib/utils/github/github';
+import GitHub from '$lib/utils/github/GitHub';
 
 const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);

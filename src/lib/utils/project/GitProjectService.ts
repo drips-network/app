@@ -27,7 +27,7 @@ import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
-import GitHub from '../github/github';
+import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 
 export default class GitProjectService {
