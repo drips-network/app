@@ -17,6 +17,7 @@ export const GET: RequestHandler = async ({ params }) => {
     return new Response(
       JSON.stringify({
         url: repo.html_url,
+        description: repo.description,
         repoName: repo.name,
         ownerName: repo.owner.login,
         forksCount: repo.forks_count,

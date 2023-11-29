@@ -29,6 +29,7 @@ export default class GitHub {
     return this.getRepoByOwnerAndName(owner, repo);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async getFundingJson(owner: string, repo: string, template: string): Promise<any> {
     const { data } = await this.octokit.repos
       .getContent({
