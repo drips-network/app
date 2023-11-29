@@ -126,6 +126,10 @@
       const repoInfo = await repoInfoRes.json();
       const normalizedUrl = repoInfo.url;
 
+      if (!normalizedUrl) {
+        throw new Error("Couldn't find that Git project. Is it private?");
+      }
+
       const projectToAddQuery = gql`
         ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
         query ProjectToAdd($url: String!) {
