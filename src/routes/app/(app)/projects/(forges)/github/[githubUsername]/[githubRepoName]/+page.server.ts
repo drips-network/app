@@ -10,19 +10,17 @@ import type { ProjectByUrlQuery } from './__generated__/gql.generated';
 import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-types';
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
-import { Octokit } from '@octokit/rest';
-import { GITHUB_PERSONAL_ACCESS_TOKEN } from '$env/static/private';
-import GitHub from '$lib/utils/github/GitHub';
-
-const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
-const github = new GitHub(octokit);
 
 export const load = (async ({ params, fetch }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
   try {
-    const repo = await github.getRepoByOwnerAndName(githubUsername, githubRepoName);
-    const { html_url: gitHubUrl } = repo;
+    const url = `https://github.com/${githubUsername}/${githubRepoName}`;
+
+    const repoRes = await fetch(`/api/github/${encodeURIComponent(url)}`);
+    const repo = await repoRes.json();
+
+    const { url: gitHubUrl } = repo;
 
     const getProjectsQuery = gql`
       ${PROJECT_PROFILE_FRAGMENT}
