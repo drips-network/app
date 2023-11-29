@@ -93,6 +93,7 @@
     "lodash": "^4.17.21",
     "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
+    "redis": "^4.6.11",
     "satori": "^0.10.9",
     "satori-html": "^0.3.2",
     "twemoji": "^14.0.2",
