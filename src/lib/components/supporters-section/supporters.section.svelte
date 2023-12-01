@@ -351,7 +351,7 @@
             }}
             subtitle={formatDate(item.date)}
             fiatEstimate={item.fiatEstimate}
-            subAmount={`${getSplitPercent(item.weight)}% of incoming funds`}
+            subAmount={`${getSplitPercent(item.weight, 'pretty')} of incoming funds`}
           />
         {/if}
         {#if item.__typename === 'ProjectSupport'}
@@ -366,11 +366,12 @@
                 tooltip: false,
                 size: 'tiny',
                 project: item.project,
+                maxWidth: false,
               },
             }}
             subtitle={formatDate(item.date)}
             fiatEstimate={item.fiatEstimate}
-            subAmount={`${getSplitPercent(item.weight)}% of incoming funds`}
+            subAmount={`${getSplitPercent(item.weight, 'pretty')} of incoming funds`}
           />
         {/if}
       {/each}
