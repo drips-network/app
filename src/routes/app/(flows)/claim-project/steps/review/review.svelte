@@ -116,7 +116,10 @@
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
-    <UnclaimedProjectCard unclaimedFunds={$context.unclaimedFunds} />
+    <UnclaimedProjectCard unclaimedFunds={[
+      ...$context.unclaimedFunds?.collectable ?? [],
+      ...$context.unclaimedFunds?.splittable ?? [],
+    ]} />
   </FormField>
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">

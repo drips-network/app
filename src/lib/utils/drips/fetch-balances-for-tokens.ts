@@ -1,26 +1,53 @@
 import { getDripsClient } from '$lib/utils/get-drips-clients';
-import type { ReceivableBalance, SplittableBalance } from 'radicle-drips';
 
-type BalanceType = 'receivable' | 'splittable';
+interface Amount {
+  tokenAddress: string;
+  amount: bigint;
+}
 
-type BalanceReturnType<T> = T extends 'receivable'
-  ? ReceivableBalance
-  : T extends 'splittable'
-  ? SplittableBalance
-  : never;
-
-export default async function fetchBalancesForTokens<T extends BalanceType>(
-  balance: T,
+export default async function fetchBalancesForTokens(
+  balance: 'splittable' | 'receivable' | 'collectable',
   tokens: Set<string>,
   accountId: string,
-): Promise<BalanceReturnType<T>[]> {
+): Promise<Amount[]> {
   const client = await getDripsClient();
 
-  const promises = Array.from(tokens).map((ta) =>
-    balance === 'receivable'
-      ? client.getReceivableBalanceForUser(accountId, ta, 1000)
-      : client.getSplittableBalanceForUser(accountId, ta),
-  );
+  let promises: Promise<Amount>[];
+  switch (balance) {
+    case 'splittable': {
+      promises = Array.from(tokens).map(async (ta) => {
+        const balance = await client.getSplittableBalanceForUser(accountId, ta);
 
-  return (await Promise.all(promises)) as BalanceReturnType<T>[];
+        return {
+          amount: balance.splittableAmount,
+          tokenAddress: balance.tokenAddress,
+        };
+      });
+      break;
+    }
+    case 'receivable': {
+      promises = Array.from(tokens).map(async (ta) => {
+        const balance = await client.getReceivableBalanceForUser(accountId, ta, 1000);
+
+        return {
+          amount: balance.receivableAmount,
+          tokenAddress: balance.tokenAddress,
+        };
+      });
+      break;
+    }
+    case 'collectable': {
+      promises = Array.from(tokens).map(async (ta) => {
+        const balance = await client.getCollectableBalanceForUser(accountId, ta);
+
+        return {
+          amount: balance.collectableAmount,
+          tokenAddress: balance.tokenAddress,
+        };
+      });
+      break;
+    }
+  }
+
+  return Promise.all(promises);
 }

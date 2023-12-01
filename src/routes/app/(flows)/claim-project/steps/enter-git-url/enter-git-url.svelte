@@ -176,7 +176,10 @@
     <UnclaimedProjectCard
       project={$context.project}
       projectMetadata={$context.projectMetadata}
-      unclaimedFunds={$context.unclaimedFunds}
+      unclaimedFunds={[
+        ...$context.unclaimedFunds?.collectable ?? [],
+        ...$context.unclaimedFunds?.splittable ?? [],
+      ]}
       claimableTokensKey="Claimable tokens"
     />
   {/if}
