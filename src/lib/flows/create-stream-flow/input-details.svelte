@@ -1,3 +1,22 @@
+<script lang="ts" context="module">
+  export const CREATE_STREAM_FLOW_DETAILS_NFT_DRIVER_ACCOUNT_FRAGMENT = gql`
+    ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
+    fragment CreateStreamFlowDetailsNftDriverAccount on NftDriverAccount {
+      ...DripVisualNftDriverAccount
+      accountId
+    }
+  `;
+
+  export const CREATE_STREAM_FLOW_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
+    ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
+    fragment CreateStreamFlowAddressDriverAccount on AddressDriverAccount {
+      ...DripVisualAddressDriverAccount
+      address
+      accountId
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -13,7 +32,10 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import DripVisual from '$lib/components/drip-visual/drip-visual.svelte';
+  import DripVisual, {
+    DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
+  } from '$lib/components/drip-visual/drip-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import Token from '$lib/components/token/token.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
@@ -31,13 +53,21 @@
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { CreateStreamFlowState } from './create-stream-flow-state';
-  import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
+  import { Driver } from '$lib/graphql/__generated__/base-types';
+  import { gql } from 'graphql-request';
+  import type {
+    CreateStreamFlowAddressDriverAccountFragment,
+    CreateStreamFlowDetailsNftDriverAccountFragment,
+  } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<CreateStreamFlowState>;
   export let tokenAddress: string | undefined = undefined;
-  export let receiver: NFTDriverAccount | AddressDriverAccount | undefined = undefined;
+  export let receiver:
+    | CreateStreamFlowDetailsNftDriverAccountFragment
+    | CreateStreamFlowAddressDriverAccountFragment
+    | undefined = undefined;
   export let nameInputHidden: boolean | undefined = false;
 
   const restorer = $context.restorer;
@@ -207,7 +237,8 @@
     disableLinks
     from={$wallet.address
       ? {
-          driver: 'address',
+          __typename: 'AddressDriverAccount',
+          driver: Driver.Address,
           address: $wallet.address,
         }
       : undefined}
@@ -215,7 +246,8 @@
       ? receiver
       : recipientInputValidationState.type === 'valid' && recipientInputValue
       ? {
-          driver: 'address',
+          __typename: 'AddressDriverAccount',
+          driver: Driver.Address,
           address: recipientInputValue,
         }
       : undefined}

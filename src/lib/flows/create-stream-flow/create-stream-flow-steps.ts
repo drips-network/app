@@ -4,9 +4,17 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import createStreamFlowState from './create-stream-flow-state';
 import InputDetails from './input-details.svelte';
-import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
+import type {
+  CreateStreamFlowAddressDriverAccountFragment,
+  CreateStreamFlowDetailsNftDriverAccountFragment,
+} from './__generated__/gql.generated';
 
-export default (tokenAddress?: string, receiver?: NFTDriverAccount | AddressDriverAccount) => ({
+export default (
+  tokenAddress?: string,
+  receiver?:
+    | CreateStreamFlowDetailsNftDriverAccountFragment
+    | CreateStreamFlowAddressDriverAccountFragment,
+) => ({
   context: createStreamFlowState,
   steps: [
     makeStep({

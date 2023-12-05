@@ -38,13 +38,6 @@
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import {
-    Forge,
-    ProjectVerificationStatus,
-    type Project,
-    type Source,
-    Driver,
-  } from '$lib/graphql/__generated__/base-types';
 
   // Button
   let disabled = false;

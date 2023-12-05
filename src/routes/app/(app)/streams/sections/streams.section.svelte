@@ -100,11 +100,11 @@
         name: {
           name: streamName,
           streamId: stream.id,
-          paused: stream.paused,
-          durationSeconds: stream.streamConfig.durationSeconds,
-          startDate: stream.streamConfig.startDate,
-          senderId: stream.sender.accountId,
-          tokenAddress: tokenAddress,
+          streamPaused: stream.paused,
+          streamDurationSeconds: stream.streamConfig.durationSeconds,
+          streamScheduledStart: stream.streamConfig.startDate,
+          streamSenderAccountId: stream.sender.accountId,
+          streamTokenAddress: tokenAddress,
         },
         to: stream.receiver,
         amount: {
@@ -137,11 +137,11 @@
         name: {
           name: stream.name ?? 'Unnamed stream',
           streamId: stream.id,
-          paused: stream.paused,
-          durationSeconds: stream.streamConfig.durationSeconds,
-          startDate: stream.streamConfig.startDate,
-          senderId: stream.sender.accountId,
-          tokenAddress: tokenAddress,
+          streamPaused: stream.paused,
+          streamDurationSeconds: stream.streamConfig.durationSeconds,
+          streamScheduledStart: stream.streamConfig.startDate,
+          streamSenderAccountId: stream.sender.accountId,
+          streamTokenAddress: tokenAddress,
         },
         from: stream.sender,
         amount: {

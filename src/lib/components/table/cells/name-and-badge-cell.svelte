@@ -1,16 +1,15 @@
 <script context="module" lang="ts">
-  import type { StreamId } from '$lib/stores/streams/types';
   import type { CellContext } from '@tanstack/svelte-table';
   import { z } from 'zod';
 
   export interface NameAndBadgeCellProps {
     name: string;
-    streamId: StreamId;
-    paused: boolean;
-    senderId: string;
-    tokenAddress: string;
-    startDate?: Date;
-    durationSeconds?: number;
+    streamId: string;
+    streamPaused: boolean;
+    streamSenderAccountId: string;
+    streamTokenAddress: string;
+    streamScheduledStart?: Date | undefined;
+    streamDurationSeconds?: number | undefined;
   }
 </script>
 
@@ -25,11 +24,11 @@
     const propsSchema = z.object({
       name: z.string(),
       streamId: z.string(),
-      paused: z.boolean(),
-      senderId: z.string(),
-      tokenAddress: z.string(),
-      startDate: z.date().optional(),
-      durationSeconds: z.number().optional(),
+      streamPaused: z.boolean(),
+      streamSenderAccountId: z.string(),
+      streamTokenAddress: z.string(),
+      streamScheduledStart: z.date().optional(),
+      streamDurationSeconds: z.number().optional(),
     });
 
     props = propsSchema.parse(context.getValue());

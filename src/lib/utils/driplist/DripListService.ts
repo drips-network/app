@@ -156,11 +156,12 @@ export default class DripListService {
         amountPerSec,
       );
 
-      const txs: { [name: string]: PopulatedTransaction } = {
+      const txs = {
         tokenApprovalTx,
         createDripListTx,
         setDripListSplitsTx,
         setStreamTx,
+        giveTx: undefined,
       };
 
       const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
@@ -197,11 +198,12 @@ export default class DripListService {
         { gasLimit: 1 },
       );
 
-      const txs: { [name: string]: PopulatedTransaction } = {
+      const txs = {
         tokenApprovalTx,
         createDripListTx,
         setDripListSplitsTx,
         giveTx,
+        setStreamTx: undefined,
       };
 
       const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
@@ -215,9 +217,12 @@ export default class DripListService {
         normalFlowTxs,
       };
     } else {
-      const txs: { [name: string]: PopulatedTransaction } = {
+      // No support
+      const txs = {
         createDripListTx,
         setDripListSplitsTx,
+        setStreamTx: undefined,
+        giveTx: undefined,
       };
 
       const normalFlowTxs = await this._getNormalFlowTxs(txs, false, callerClient);
@@ -324,14 +329,20 @@ export default class DripListService {
   }
 
   private async _getApprovalFlowTxs(
-    txs: { [name: string]: PopulatedTransaction | undefined },
+    txs: {
+      tokenApprovalTx: PopulatedTransaction | undefined;
+      createDripListTx: PopulatedTransaction | undefined;
+      setDripListSplitsTx: PopulatedTransaction | undefined;
+      setStreamTx: PopulatedTransaction | undefined;
+      giveTx: PopulatedTransaction | undefined;
+    },
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { tokenApprovalTx, createDripListTx, setDripListProjectsTx, setStreamTx, giveTx } = txs;
+    const { tokenApprovalTx, createDripListTx, setDripListSplitsTx, setStreamTx, giveTx } = txs;
 
     const batchTx = await callerClient.populateCallBatchedTx(
-      mapFilterUndefined([createDripListTx, setDripListProjectsTx, setStreamTx, giveTx], (v) => v),
+      mapFilterUndefined([createDripListTx, setDripListSplitsTx, setStreamTx, giveTx], (v) => v),
     );
 
     if (!needsApproval) {
@@ -362,15 +373,20 @@ export default class DripListService {
   }
 
   private async _getNormalFlowTxs(
-    txs: { [name: string]: PopulatedTransaction | undefined },
+    txs: {
+      createDripListTx: PopulatedTransaction | undefined;
+      setDripListSplitsTx: PopulatedTransaction | undefined;
+      setStreamTx: PopulatedTransaction | undefined;
+      giveTx: PopulatedTransaction | undefined;
+    },
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { createDripListTx, setDripListProjectsTx, setStreamTx, giveTx } = txs;
+    const { createDripListTx, setDripListSplitsTx, setStreamTx, giveTx } = txs;
 
     if (!needsApproval) {
       const requiredTxs = mapFilterUndefined(
-        [createDripListTx, setDripListProjectsTx, setStreamTx, giveTx],
+        [createDripListTx, setDripListSplitsTx, setStreamTx, giveTx],
         (v) => v,
       );
 
@@ -387,7 +403,7 @@ export default class DripListService {
 
     return {
       txs: mapFilterUndefined(
-        [createDripListTx, setDripListProjectsTx, setStreamTx, giveTx],
+        [createDripListTx, setDripListSplitsTx, setStreamTx, giveTx],
         (v) => v,
       ),
     };
