@@ -6,6 +6,7 @@
   import type { ComponentType } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import formatAddress from '$lib/utils/format-address';
+  import buildExternalUrl from '$lib/utils/build-external-url';
 
   type SocialNetwork = 'com.twitter' | 'com.github' | 'url' | 'ethereum';
 
@@ -35,7 +36,7 @@
   function parseURL(url: string) {
     try {
       const validURL = new URL(url);
-      return validURL.href;
+      return buildExternalUrl(validURL.href);
     } catch {
       // assume they just put their handle
       return `${prefix}${value}`;

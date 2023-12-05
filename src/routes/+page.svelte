@@ -118,7 +118,7 @@
             </div>
             <div class="item">
               <div class="count">2</div>
-              <h5>Verify ownerhsip</h5>
+              <h5>Verify ownership</h5>
               <p class="typo-text-small">
                 Create a FUNDING.json file to link your repository to Drips.
               </p>
