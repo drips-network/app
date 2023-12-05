@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
-import siteExists from '$lib/utils/site-exists';
 import type { PageServerLoad } from './$types';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
@@ -11,18 +10,17 @@ import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-type
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 
-// TODO: This fails if the network is not the default one. We need to support other networks.
-
 export const load = (async ({ params, fetch }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
 
-  const gitHubUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
-
-  if (!(await siteExists(gitHubUrl))) {
-    throw error(404);
-  }
-
   try {
+    const url = `https://github.com/${githubUsername}/${githubRepoName}`;
+
+    const repoRes = await fetch(`/api/github/${encodeURIComponent(url)}`);
+    const repo = await repoRes.json();
+
+    const { url: gitHubUrl } = repo;
+
     const getProjectsQuery = gql`
       ${PROJECT_PROFILE_FRAGMENT}
       query ProjectByUrl($url: String!) {
@@ -65,8 +63,11 @@ export const load = (async ({ params, fetch }) => {
       blockWhileInitializing: false,
     };
   } catch (e) {
+    const status =
+      typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;
+
     // eslint-disable-next-line no-console
     console.error(e);
-    throw e;
+    throw error(status);
   }
 }) satisfies PageServerLoad;

@@ -99,6 +99,7 @@
 
   const MOCK_PROJECT_1: Project = {
     __typename: 'ClaimedProject',
+    support: [],
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
       __typename: 'RepoDriverAccount',
@@ -125,6 +126,7 @@
 
   const MOCK_PROJECT_2: Project = {
     __typename: 'ClaimedProject',
+    support: [],
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
       __typename: 'RepoDriverAccount',

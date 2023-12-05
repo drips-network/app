@@ -10,7 +10,7 @@ npm install
 
 ## 🌳 Environment
 
-There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var. Lastly, set `PUBLIC_PINATA_GATEWAY_URL` to the URL of the IPFS/Pinata gateway to use. You may use Drips' public IPFS gateway at `https://drips.mypinata.cloud`.
+There are a few environment variables required for the app to function. You can find an overview under `.env.template`. Youʼll need access credentials for GitHub, Pinata, Tenderly and a Gelato Relay API key for claiming projects. Youʼll also need to set up `PUBLIC_NETWORK`, as described right below. Lastly, you'll need to sign up for a free Coinmarketcap API developer account and populate the `COINMARKETCAP_API_KEY` var. Lastly, set `PUBLIC_PINATA_GATEWAY_URL` to the URL of the IPFS/Pinata gateway to use. You may use Drips' public IPFS gateway at `https://drips.mypinata.cloud`.
 
 ### 📈 GraphQL API
 
@@ -161,3 +161,7 @@ Unfortunately, two major differences in app logic for E2E tests couldnʼt be avo
 ### 🌐 Run app locally with a local testnet
 
 It's possible to connect the app running locally to the local E2E test environment described above. This allows simple and quick development locally, as all transactions will resolve instantly, and network requests are a lot faster. To do so, run `npm run dev:local-env:start-env` to up the local development environment, then run `dev:local-env:start-app` to start the dev server and connect it to the local services. Once done, run `npm run dev:local-env:stop-env` to stop the local development environment.
+
+### Redis cache for GitHub API responses
+
+When a project profile is loaded, a project is added to a Splits editor, or a GitHub repo URL is entered into the Project Claim Flow, a request for the repo's details to the GitHub API is made. To avoid excessive requests, the responses can be cached. To enable caching, set the `CACHE_REDIS_CONNECTION_STRING` env variable to a valid Redis connection string.

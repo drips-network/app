@@ -101,7 +101,7 @@
           await expect(
             () => tryFetchList(dripListId),
             (result) => (typeof result === 'boolean' ? result : Boolean(result.dripList)),
-            10000,
+            120000,
             1000,
           );
 
