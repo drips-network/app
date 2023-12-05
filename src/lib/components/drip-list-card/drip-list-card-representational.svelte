@@ -95,6 +95,7 @@
   import type { DripListCardRepresentationalListFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
 
   export let dripList: DripListCardRepresentationalListFragment;
   export let format: 'thumblink' | 'full' = 'full';
@@ -118,11 +119,12 @@
   $: streamEstimateLoaded = $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
 
   export let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined;
+  export let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined;
 
   let totalIncomingAmounts: ReturnType<typeof mergeAmounts> | undefined = undefined;
   $: totalIncomingAmounts =
-    incomingSplitTotal && streamEstimateLoaded
-      ? mergeAmounts(streamEstimates, incomingSplitTotal)
+    incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
+      ? mergeAmounts(streamEstimates, incomingSplitTotal, incomingGivesTotal)
       : undefined;
 
   function getSupportersPile(

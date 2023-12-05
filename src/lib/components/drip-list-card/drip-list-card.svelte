@@ -16,6 +16,7 @@
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import { gql } from 'graphql-request';
   import type { DripListCardFragment } from './__generated__/gql.generated';
+  import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
 
   export let dripList: DripListCardFragment;
   export let format: 'thumblink' | 'full' = 'full';
@@ -43,6 +44,17 @@
   onMount(async () => {
     incomingSplitTotal = await getIncomingSplitTotal(dripList.account.accountId);
   });
+
+  let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined = undefined;
+  onMount(async () => {
+    incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
+  });
 </script>
 
-<DripListCardRepresentational {format} {dripList} {supportStreams} {incomingSplitTotal} />
+<DripListCardRepresentational
+  {format}
+  {dripList}
+  {supportStreams}
+  {incomingSplitTotal}
+  {incomingGivesTotal}
+/>
