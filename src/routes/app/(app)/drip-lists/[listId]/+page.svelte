@@ -66,7 +66,7 @@
   <main class="list">
     <div class="owner">
       <span>Drip List owned by </span>
-      <IdentityBadge address={data.dripList.owner.address} />
+      <IdentityBadge address={data.dripList.owner.address} disableTooltip />
     </div>
     <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
       <DripListCard dripList={data.dripList} />

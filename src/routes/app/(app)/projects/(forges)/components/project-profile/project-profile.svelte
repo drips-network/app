@@ -241,7 +241,7 @@
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
             >Project claimed by</span
           >
-          <IdentityBadge address={project.owner.address} />
+          <IdentityBadge address={project.owner.address} disableTooltip />
         </div>
       {/if}
       <div>
