@@ -42,10 +42,12 @@
     class="button-container"
   >
     {#if isOwner && type === 'dripList'}
-      <Button on:click={onClickNewStream} size="large" icon={TokenStreams}>Support stream</Button>
+      <Button on:click={onClickNewStream} size="large" icon={TokenStreams}
+        >Continuous donation</Button
+      >
     {/if}
+    <Button size="large" icon={Droplet} on:click={onClickNewDonation}>One-time donation</Button>
     <Button on:click={onClickAddToDripList} size="large" icon={DripList}>Add to a Drip List</Button>
-    <Button size="large" icon={Droplet} on:click={onClickNewDonation}>Single donation</Button>
   </div>
 {/if}
 
