@@ -218,7 +218,7 @@
                 1n,
                 false,
               )}
-              {token.info.symbol} will be transferred from your wallet into your Drips account</span
+              {token.info.symbol} will be transferred from your wallet</span
             >
             and immediately distributed to your list.
           </UlIconLi>

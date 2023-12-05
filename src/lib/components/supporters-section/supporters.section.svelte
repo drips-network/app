@@ -351,7 +351,7 @@
             }}
             subtitle={formatDate(item.date)}
             fiatEstimate={item.fiatEstimate}
-            subAmount={`drips ${getSplitPercent(item.weight, 'pretty')} of funds`}
+            subAmount={`splits ${getSplitPercent(item.weight, 'pretty')} of funds`}
           />
         {/if}
         {#if item.__typename === 'ProjectSupport'}
@@ -371,7 +371,7 @@
             }}
             subtitle={formatDate(item.date)}
             fiatEstimate={item.fiatEstimate}
-            subAmount={`drips ${getSplitPercent(item.weight, 'pretty')} of funds`}
+            subAmount={`splits ${getSplitPercent(item.weight, 'pretty')} of funds`}
           />
         {/if}
       {/each}
