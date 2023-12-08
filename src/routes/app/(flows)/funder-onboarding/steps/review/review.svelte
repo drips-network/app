@@ -220,7 +220,7 @@
               )}
               {token.info.symbol} will be transferred from your wallet</span
             >
-            and immediately distributed to your list.
+            and distributed to your list.
           </UlIconLi>
         {/if}
         <UlIconLi icon={ListIcon}
