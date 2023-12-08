@@ -111,7 +111,7 @@
   }
 
   .expand-button:focus-visible {
-    background-color: var(--color-foreground-level-2);
+    background-color: var(--color-foreground-level-3);
   }
 
   .expand-button:hover {

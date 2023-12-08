@@ -10,11 +10,13 @@
 <script lang="ts">
   import streamsStore from '$lib/stores/streams/streams.store';
   import { onMount } from 'svelte';
-  import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
-  import DripListCardRepresentational, { DRIP_LIST_CARD_REPRESENTATIONAL_LIST_FRAGMENT } from './drip-list-card-representational.svelte';
+  import DripListCardRepresentational, {
+    DRIP_LIST_CARD_REPRESENTATIONAL_LIST_FRAGMENT,
+  } from './drip-list-card-representational.svelte';
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import { gql } from 'graphql-request';
   import type { DripListCardFragment } from './__generated__/gql.generated';
+  import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
 
   export let dripList: DripListCardFragment;
   export let format: 'thumblink' | 'full' = 'full';
@@ -38,25 +40,21 @@
       .getStreamsForUser(listOwner.accountId)
       .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
 
-  /*
-  Fetch any incoming splits so that we can display which other Drip Lists are currently supporting
-  the given list.
-  */
-  let incomingSplits: Awaited<ReturnType<typeof getIncomingSplits>> | undefined;
-  onMount(async () => {
-    incomingSplits = await getIncomingSplits(dripList.account.accountId);
-  });
-
   let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined = undefined;
   onMount(async () => {
     incomingSplitTotal = await getIncomingSplitTotal(dripList.account.accountId);
+  });
+
+  let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined = undefined;
+  onMount(async () => {
+    incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
   });
 </script>
 
 <DripListCardRepresentational
   {format}
   {dripList}
-  {incomingSplits}
   {supportStreams}
   {incomingSplitTotal}
+  {incomingGivesTotal}
 />

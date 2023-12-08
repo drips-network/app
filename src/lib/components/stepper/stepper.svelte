@@ -38,6 +38,29 @@
     prevStepIndex = currentStepIndex;
   }
 
+  function nextValidStepIndex(startIndex: number, direction: 'forward' | 'backward') {
+    let index = startIndex;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      if (index < 0 || index >= resolvedSteps.length) {
+        return startIndex;
+      }
+
+      const condition = resolvedSteps[index].condition?.();
+
+      if (condition === undefined || condition === true) {
+        return index;
+      }
+
+      if (direction === 'forward') {
+        index++;
+      } else {
+        index--;
+      }
+    }
+  }
+
   /**
    * Advances `by` amount of steps in the flow (or goes backwards with a negative number).
    * Resolves when the step transition has concluded fully.
@@ -46,11 +69,9 @@
   async function move(by: number) {
     dispatch('stepChange');
 
-    if (!resolvedSteps[currentStepIndex + by]) {
-      return;
-    }
+    const direction = by > 0 ? 'forward' : 'backward';
 
-    currentStepIndex += by;
+    currentStepIndex = nextValidStepIndex(currentStepIndex + by, direction);
 
     // Wait for the old step to be fully out of view and unmounted.
     return new Promise<void>((resolve) => (transitionEndListener = resolve));

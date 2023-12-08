@@ -3,7 +3,6 @@ import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import type { PageServerLoad } from './$types';
 import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
-import getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import type { ProjectByUrlQuery } from './__generated__/gql.generated';
@@ -60,7 +59,6 @@ export const load = (async ({ params, fetch }) => {
       streamed: {
         unclaimedFunds,
         earnedFunds,
-        incomingSplits: getIncomingSplits(project.account.accountId, fetch),
       },
       blockWhileInitializing: false,
     };

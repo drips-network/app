@@ -1,5 +1,8 @@
 <script lang="ts" context="module">
-  import type { ProjectBadgeFragment, ProjectBadge_UnclaimedProject_Fragment } from './__generated__/gql.generated';
+  import type {
+    ProjectBadgeFragment,
+    ProjectBadge_UnclaimedProject_Fragment,
+  } from './__generated__/gql.generated';
   import { gql } from 'graphql-request';
 
   export const PROJECT_BADGE_FRAGMENT = gql`
@@ -32,7 +35,9 @@
 </script>
 
 <script lang="ts">
-  import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectAvatar, {
+    PROJECT_AVATAR_FRAGMENT,
+  } from '$lib/components/project-avatar/project-avatar.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import ProjectTooltip, { PROJECT_TOOLTIP_FRAGMENT } from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
@@ -50,6 +55,7 @@
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let maxWidth: number | false = 320;
+  export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
 
   let unclaimedProject: ProjectBadge_UnclaimedProject_Fragment;
   $: unclaimedProject = {
@@ -80,10 +86,10 @@
         <div class="avatar-and-forge">
           {#if !forceUnclaimed && isClaimed(processedProject)}
             <div>
-              <ProjectAvatar project={unclaimedProject} />
+              <ProjectAvatar {size} project={unclaimedProject} />
             </div>
           {/if}
-          <div><ProjectAvatar project={processedProject} /></div>
+          <div><ProjectAvatar {size} project={processedProject} /></div>
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">

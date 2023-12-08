@@ -6,7 +6,7 @@ type Restorable = {
   amountValue: string | undefined;
   selectedTokenAddress: string[] | undefined;
   selectedMultiplier: string;
-  recipientAddressValue: string | undefined;
+  recipientInputValue: string | undefined;
   streamStartDateValue: string | undefined;
   streamStartTimeValue: string | undefined;
   streamEndDateValue: string | undefined;

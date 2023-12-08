@@ -1,7 +1,7 @@
 import { makeStep } from '$lib/components/stepper/types';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import BuildListStep from './steps/build-list/build-list.svelte';
-import ConfigureSupportStreamStep from './steps/configure-support/configure-support.svelte';
+import ConfigureContinuousSupportStep from './steps/configure-continuous-support/configure-continuous-support.svelte';
 import ReviewStep from './steps/review/review.svelte';
 import type { Slots } from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import Pile from '$lib/components/pile/pile.svelte';
@@ -15,15 +15,22 @@ import ConnectWalletStep from './steps/connect-wallet/connect-wallet.svelte';
 import ChooseSupportTypeStep from './steps/choose-support-type/choose-support-type.svelte';
 import WalletSlot from '../shared/slots/wallet-slot.svelte';
 import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+import ConfigureOneTimeDonation from './steps/configure-one-time-donation/configure-one-time-donation.svelte';
 
 export interface State {
   dripList: DripListConfig;
-  /** 1 is Continuous Support, 2 is no support */
+  /** 1 is Continuous Support, 2 is one-time donation */
   selectedSupportOption: 1 | 2 | undefined;
   continuousSupportConfig: {
     listSelected: string[];
     streamRateValueParsed?: bigint | undefined;
     topUpAmountValueParsed?: bigint | undefined;
+  };
+  oneTimeDonationConfig: {
+    selectedTokenAddress: string[] | undefined;
+    amountInputValue: string;
+    topUpMax: boolean;
+    amount: bigint | undefined;
   };
   dripListId: string | undefined;
 }
@@ -33,6 +40,12 @@ export const state = writable<State>({
   selectedSupportOption: undefined,
   continuousSupportConfig: {
     listSelected: [],
+  },
+  oneTimeDonationConfig: {
+    selectedTokenAddress: undefined,
+    amountInputValue: '0',
+    topUpMax: false,
+    amount: undefined,
   },
   dripListId: undefined,
 });
@@ -97,6 +110,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       return [dripListSlot, walletSlot];
     case 3:
       return [dripListSlot, walletSlot];
+    case 4:
+      return [dripListSlot, walletSlot];
     default:
       return [];
   }
@@ -115,10 +130,19 @@ export const steps = () => [
     component: ChooseSupportTypeStep,
     props: undefined,
   }),
-  // Skipped if user chooses not to set up support stream in prev. step
   makeStep({
-    component: ConfigureSupportStreamStep,
+    component: ConfigureContinuousSupportStep,
     props: undefined,
+    condition: () => {
+      return get(state).selectedSupportOption === 1;
+    },
+  }),
+  makeStep({
+    component: ConfigureOneTimeDonation,
+    props: undefined,
+    condition: () => {
+      return get(state).selectedSupportOption === 2;
+    },
   }),
   makeStep({
     component: ReviewStep,

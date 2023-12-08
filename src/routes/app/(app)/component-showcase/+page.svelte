@@ -28,9 +28,6 @@
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
-  import highlightStore from '$lib/stores/highlight/highlight.store';
-  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import {
     Forge,
     ProjectVerificationStatus,
@@ -38,6 +35,9 @@
     type Source,
     Driver,
   } from '$lib/graphql/__generated__/base-types';
+  import highlightStore from '$lib/stores/highlight/highlight.store';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   // Button
   let disabled = false;

@@ -6,8 +6,28 @@
       }
       name
     }
-  `
-
+  `;
+  export const IDENTITY_CARD_PROJECT_FRAGMENT = gql`
+    ${PROJECT_BADGE_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
+    fragment IdentityCardProject on Project {
+      ...ProjectBadge
+      ...ProjectAvatar
+      ... on ClaimedProject {
+        owner {
+          address
+        }
+        source {
+          repoName
+        }
+      }
+      ... on UnclaimedProject {
+        source {
+          repoName
+        }
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -16,42 +36,71 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import { gql } from 'graphql-request';
-  import type { IdentityCardDripListFragment } from './__generated__/gql.generated';
+  import type {
+    IdentityCardDripListFragment,
+    IdentityCardProjectFragment,
+  } from './__generated__/gql.generated';
+  import ProjectAvatar, {
+    PROJECT_AVATAR_FRAGMENT,
+  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
+  import Github from 'radicle-design-system/icons/Github.svelte';
 
-  // Either pass address or dripList. If neither, it'll say "TBD" as a placeholder.
+  // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
   export let dripList: IdentityCardDripListFragment | undefined = undefined;
+  export let project: IdentityCardProjectFragment | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
   export let disableLink = false;
 
   let avatarImgElem: HTMLImageElement | undefined;
 
-  function getLink() {
-    return dripList ? `/app/drip-lists/${dripList.account.accountId}` : `/app/${address}`;
-  }
+  $: link = disableLink
+    ? undefined
+    : dripList
+    ? `/app/drip-lists/${dripList.account.accountId}`
+    : `/app/${address}`;
 </script>
 
-<a href={disableLink || loading ? undefined : getLink()} class="identity-card">
+<svelte:element
+  this={!link || loading ? 'div' : 'a'}
+  href={link ? link : undefined}
+  class="identity-card"
+>
   {#if title}<p class="title typo-all-caps">{title}</p>{/if}
   {#if address}
     <div class="content-container" in:fade|local>
       <IdentityBadge
-        {disableLink}
+        disableLink={true}
         size="huge"
         bind:avatarImgElem
         {address}
         showIdentity={false}
         disableTooltip
       />
-      <IdentityBadge {disableLink} size="huge" {address} showAvatar={false} disableTooltip />
+      <IdentityBadge disableLink={true} size="huge" {address} showAvatar={false} disableTooltip />
     </div>
   {:else if dripList}
     <div class="content-container" in:fade|local>
       <div class="icon">
-        <DripListIcon style="fill: var(--color-background); height: 3rem; width: 3rem;" />
+        <DripListIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
       </div>
       <span class="typo-header-3 ellipsis">{dripList.name}</span>
+    </div>
+  {:else if project}
+    <div class="content-container" in:fade|local>
+      <div class="flex">
+        {#if 'owner' in project}
+          <div class="-mr-[5%]">
+            <ProjectAvatar {project} size="large" />
+          </div>
+        {/if}
+        <div class="h-16 w-16 bg-foreground-level-1 flex items-center justify-center rounded-full">
+          <Github style="width:60%;height:60%" />
+        </div>
+      </div>
+      <span class="typo-header-3 ellipsis">{project.source.repoName}</span>
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>
@@ -59,7 +108,7 @@
     <div class="avatar-placeholder" />
     <h3 class="name-placeholder">TBD</h3>
   {/if}
-</a>
+</svelte:element>
 
 <style>
   .identity-card {
@@ -121,7 +170,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-foreground);
+    background-color: var(--color-primary-level-1);
     border-radius: 50%;
   }
 

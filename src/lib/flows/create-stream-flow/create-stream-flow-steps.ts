@@ -4,14 +4,25 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import createStreamFlowState from './create-stream-flow-state';
 import InputDetails from './input-details.svelte';
+import type {
+  CreateStreamFlowAddressDriverAccountFragment,
+  CreateStreamFlowDetailsNftDriverAccountFragment,
+} from './__generated__/gql.generated';
 
-export default (tokenAddress?: string) => ({
+export default (
+  tokenAddress?: string,
+  receiver?:
+    | CreateStreamFlowDetailsNftDriverAccountFragment
+    | CreateStreamFlowAddressDriverAccountFragment,
+) => ({
   context: createStreamFlowState,
   steps: [
     makeStep({
       component: InputDetails,
       props: {
         tokenAddress,
+        receiver,
+        nameInputHidden: receiver !== undefined,
       },
     }),
     makeStep({

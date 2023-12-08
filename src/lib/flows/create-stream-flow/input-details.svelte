@@ -1,3 +1,22 @@
+<script lang="ts" context="module">
+  export const CREATE_STREAM_FLOW_DETAILS_NFT_DRIVER_ACCOUNT_FRAGMENT = gql`
+    ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
+    fragment CreateStreamFlowDetailsNftDriverAccount on NftDriverAccount {
+      ...DripVisualNftDriverAccount
+      accountId
+    }
+  `;
+
+  export const CREATE_STREAM_FLOW_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
+    ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
+    fragment CreateStreamFlowAddressDriverAccount on AddressDriverAccount {
+      ...DripVisualAddressDriverAccount
+      address
+      accountId
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -13,7 +32,10 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import StreamVisual from '$lib/components/stream-visual/stream-visual.svelte';
+  import DripVisual, {
+    DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
+  } from '$lib/components/drip-visual/drip-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import Token from '$lib/components/token/token.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
@@ -31,11 +53,22 @@
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { CreateStreamFlowState } from './create-stream-flow-state';
+  import { Driver } from '$lib/graphql/__generated__/base-types';
+  import { gql } from 'graphql-request';
+  import type {
+    CreateStreamFlowAddressDriverAccountFragment,
+    CreateStreamFlowDetailsNftDriverAccountFragment,
+  } from './__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<CreateStreamFlowState>;
   export let tokenAddress: string | undefined = undefined;
+  export let receiver:
+    | CreateStreamFlowDetailsNftDriverAccountFragment
+    | CreateStreamFlowAddressDriverAccountFragment
+    | undefined = undefined;
+  export let nameInputHidden: boolean | undefined = false;
 
   const restorer = $context.restorer;
 
@@ -45,11 +78,11 @@
 
   // Recipient Address
 
-  let recipientAddressValue = restorer.restore('recipientAddressValue');
-  let recipientAddressValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let recipientInputValue = receiver?.accountId ?? restorer.restore('recipientInputValue');
+  let recipientInputValidationState: TextInputValidationState = { type: 'unvalidated' };
 
-  function onAddressValidationChange(event: CustomEvent) {
-    recipientAddressValidationState = event.detail ?? { type: 'unvalidated' };
+  function onRecipientInputValidationChange(event: CustomEvent) {
+    recipientInputValidationState = event.detail ?? { type: 'unvalidated' };
   }
 
   // Token dropdown
@@ -163,9 +196,9 @@
 
   $: formValid =
     streamEndDateValidationState.type !== 'invalid' &&
-    recipientAddressValidationState.type === 'valid' &&
+    (receiver || recipientInputValidationState.type === 'valid') &&
     amountValidationState?.type === 'valid' &&
-    streamNameValue &&
+    (nameInputHidden || streamNameValue) &&
     timeRangeValid;
 
   function submit() {
@@ -173,8 +206,8 @@
       dispatch,
       selectedToken ?? unreachable(),
       amountPerSecond ?? unreachable(),
-      recipientAddressValue ?? unreachable(),
-      streamNameValue ?? unreachable(),
+      recipientInputValue ?? unreachable(),
+      streamNameValue,
       $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
       setStartAndEndDate
         ? {
@@ -190,7 +223,7 @@
     amountValue,
     selectedTokenAddress,
     selectedMultiplier,
-    recipientAddressValue,
+    recipientInputValue,
     streamStartDateValue,
     streamStartTimeValue,
     streamEndDateValue,
@@ -200,36 +233,44 @@
 </script>
 
 <StepLayout>
-  <StreamVisual
+  <DripVisual
     disableLinks
     from={$wallet.address
       ? {
-          driver: 'address',
+          __typename: 'AddressDriverAccount',
+          driver: Driver.Address,
           address: $wallet.address,
         }
       : undefined}
-    to={recipientAddressValidationState.type === 'valid' && recipientAddressValue
+    to={receiver
+      ? receiver
+      : recipientInputValidationState.type === 'valid' && recipientInputValue
       ? {
-          driver: 'address',
-          address: recipientAddressValue,
+          __typename: 'AddressDriverAccount',
+          driver: Driver.Address,
+          address: recipientInputValue,
         }
       : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
-    headline="Create stream"
-    description="Stream any ERC-20 token to anyone with an Ethereum address."
+    headline={receiver ? 'Create a Support Stream' : 'Create stream'}
+    description="Stream any ERC-20 token from your Drips account."
   />
-  <FormField title="Stream name*">
-    <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
-  </FormField>
-  <FormField title="Stream to*">
-    <InputAddress
-      bind:value={recipientAddressValue}
-      on:validationChange={onAddressValidationChange}
-    />
-  </FormField>
-  <FormField title="Token*" description="Select a token to stream from your Drips account.">
+  {#if !nameInputHidden}
+    <FormField title="Stream name*">
+      <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
+    </FormField>
+  {/if}
+  {#if !receiver}
+    <FormField title="Stream to*">
+      <InputAddress
+        bind:value={recipientInputValue}
+        on:validationChange={onRecipientInputValidationChange}
+      />
+    </FormField>
+  {/if}
+  <FormField title="Token*">
     <div class="list-container">
       <ListSelect
         bind:selected={selectedTokenAddress}

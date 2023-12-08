@@ -70,6 +70,8 @@
 
   .actions > .right {
     margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
   }
 
   .header {

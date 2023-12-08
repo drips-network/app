@@ -1,8 +1,10 @@
 <script lang="ts" context="module">
   export const SUPPORT_CARD_DRIP_LIST_FRAGMENT = gql`
+    ${CREATE_DONATION_FLOW_DRIP_LIST_FRAGMENT}
     ${DRIP_LIST_BADGE_FRAGMENT}
     ${ADD_DRIP_LIST_MEMBER_FLOW_DRIP_LIST_TO_ADD_FRAGMENT}
     fragment SupportCardDripList on DripList {
+      ...CreateDonationFlowDripList
       ...DripListBadge
       ...AddDripListMemberFlowDripListToAdd
       account {
@@ -16,9 +18,11 @@
   `;
 
   export const SUPPORT_CARD_PROJECT_FRAGMENT = gql`
+    ${CREATE_DONATION_FLOW_PROJECT_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
     ${ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT}
     fragment SupportCardProject on Project {
+      ...CreateDonationFlowProject
       ...AddDripListMemberFlowProjectToAdd
       ...ProjectAvatar
       ... on ClaimedProject {
@@ -46,7 +50,6 @@
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
-  import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
@@ -59,10 +62,7 @@
     ADD_DRIP_LIST_MEMBER_FLOW_LISTS_FRAGMENT,
     ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT,
   } from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import createDripListStreamSteps from '$lib/flows/create-drip-list-stream/create-drip-list-stream-steps';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
@@ -73,18 +73,25 @@
     SupportCardProjectFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
+  import createDonationFlowSteps, {
+    CREATE_DONATION_FLOW_DRIP_LIST_FRAGMENT,
+    CREATE_DONATION_FLOW_PROJECT_FRAGMENT,
+  } from '$lib/flows/create-donation/create-donation-flow-steps';
+  import unreachable from '$lib/utils/unreachable';
+  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
+  import SupportButtons from './components/support-buttons.svelte';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
+
+  $: type = project ? ('project' as const) : ('dripList' as const);
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
   $: isOwner =
     $walletStore.connected &&
-    project &&
-    isClaimed(project) &&
-    ($walletStore.dripsAccountId === project?.owner?.accountId ||
-      $walletStore.dripsAccountId === dripList?.owner.accountId);
+    (dripList?.owner.accountId === $walletStore.dripsAccountId ||
+      (project && isClaimed(project) && $walletStore.dripsAccountId === project?.owner?.accountId));
 
   let supportUrl: string;
   $: {
@@ -160,18 +167,35 @@
     updateState();
   }
 
-  function handleNewStreamButton() {
-    const dripListId = dripList?.account.accountId;
-    return dripListId && modal.show(Stepper, undefined, createDripListStreamSteps(dripListId));
+  function onClickNewStream() {
+    const accountId = dripList?.account.accountId;
+    return (
+      accountId &&
+      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, dripList?.account))
+    );
   }
 
-  async function handleAddtoDripListButton() {
+  async function onClickAddToDripList() {
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
     } else {
       // TODO: Refresh profile state after becoming a supporter
       modal.show(Stepper, undefined, addDripListMemberSteps(ownDripLists, project, dripList));
     }
+  }
+
+  function onClickNewDonation() {
+    return modal.show(
+      Stepper,
+      undefined,
+      createDonationFlowSteps(dripList?.account ?? project ?? unreachable()),
+    );
+  }
+
+  let supportMenuOpen = false;
+  async function onClickConnectWallet() {
+    await walletStore.connect();
+    supportMenuOpen = true;
   }
 </script>
 
@@ -196,32 +220,27 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    {#if !isWalletConnected}
-      Connect your Ethereum wallet to see your support options.
-    {:else if dripList && isOwner}
-      Support everyone on your list with a single token stream or add it to another Drip List.
-    {:else}
-      Add this {project ? 'project' : ''} to a Drip List to flexibly support it with an ongoing contribution.
-    {/if}
+    Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add them to your Drip
+    List.
   </p>
-  <div class="flex flex-col gap-2">
-    {#if !isWalletConnected}
-      <Button on:click={() => walletStore.connect()} size="large" icon={Wallet} variant="primary"
-        >Connect wallet</Button
-      >
-    {:else}
-      {#if isOwner && dripList}
-        <Button on:click={handleNewStreamButton} size="large" icon={TokenStreams} variant="primary"
-          >Stream tokens</Button
-        >
-      {/if}
-      <Button
-        on:click={handleAddtoDripListButton}
-        size="large"
-        icon={DripListIcon}
-        variant="primary">Add to a Drip List</Button
-      >
-    {/if}
+  <div class="support-buttons-wrapper">
+    <div class="support-buttons">
+      <SupportButtons
+        {isOwner}
+        {type}
+        {onClickConnectWallet}
+        {onClickNewStream}
+        {onClickAddToDripList}
+        {onClickNewDonation}
+        bind:supportMenuOpen
+      />
+    </div>
+    <!-- Invisible duplicate of support buttons for smooth transition -->
+    <div class="support-buttons-placeholder">
+      <TransitionedHeight transitionHeightChanges={true}>
+        <SupportButtons transitions={false} {isOwner} {type} bind:supportMenuOpen />
+      </TransitionedHeight>
+    </div>
   </div>
 </div>
 
@@ -285,5 +304,21 @@
 
   p {
     color: var(--color-foreground-level-6);
+  }
+
+  .support-buttons-wrapper {
+    position: relative;
+  }
+
+  .support-buttons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .support-buttons-placeholder {
+    opacity: 0;
+    pointer-events: none;
   }
 </style>
