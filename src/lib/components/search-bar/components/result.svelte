@@ -1,6 +1,7 @@
 <script lang="ts">
   import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
+  import sanitize from 'sanitize-html';
 
   import AccountMenuItem from '$lib/components/account-menu/components/account-menu-item.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -29,7 +30,10 @@
           {#if highlightPlainText !== item.item.name}
             Stream ID:
           {/if}
-        </span>{@html highlighted}
+        </span>{@html sanitize(highlighted, {
+          allowedTags: [],
+          allowedAttributes: {},
+        })}
       </div>
       {#if highlightPlainText !== item.item.name && item.item.name}<div class="typo-text-small">
           {item.item.name}
@@ -91,7 +95,10 @@
     <svelte:fragment slot="title">
       <div class="highlighted">
         <span style="color: var(--color-foreground)"> Jump to GitHub repo on Drips: </span>
-        {@html highlighted}
+        {@html sanitize(highlighted, {
+          allowedTags: [],
+          allowedAttributes: {},
+        })}
       </div>
     </svelte:fragment>
   </AccountMenuItem>
