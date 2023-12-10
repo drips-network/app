@@ -5,12 +5,10 @@ import {
   Utils,
   type SplitsReceiverStruct,
   DripsTxFactory,
-  ERC20TxFactory,
 } from 'radicle-drips';
 import {
   getAddressDriverClient,
   getDripsTxFactory,
-  getNetworkConfig,
   getRepoDriverClient,
   getRepoDriverTxFactory,
   getSubgraphClient,
@@ -31,7 +29,6 @@ import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
-import unreachable from '../unreachable';
 
 export default class GitProjectService {
   private _github!: GitHub;
@@ -41,6 +38,7 @@ export default class GitProjectService {
   private _addressDriverClient!: AddressDriverClient;
   private readonly _dripsSubgraphClient = getSubgraphClient();
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
+  private _connectedAddress: string;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
@@ -55,12 +53,14 @@ export default class GitProjectService {
     gitProjectService._addressDriverClient = await getAddressDriverClient();
     gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
-    const { connected, signer } = get(wallet);
+    const { connected, signer, address } = get(wallet);
 
     if (connected) {
       assert(signer, 'Signer address is undefined.');
 
       gitProjectService._repoDriverTxFactory = await getRepoDriverTxFactory();
+
+      gitProjectService._connectedAddress = address;
     }
 
     return gitProjectService;
@@ -267,76 +267,23 @@ export default class GitProjectService {
       accountMetadataAsBytes,
     );
 
-    const collectableTokenAddresses =
-      context.unclaimedFunds?.collectable?.map(({ tokenAddress }) => tokenAddress) ?? [];
-
-    const callerAddress = getNetworkConfig().CALLER;
-
-    /*
-      If the user has COLLECTABLE funds, it means `split` was called before the project was claimed for some reason.
-      In this case, we employ a trick where we first `collect` funds to `Caller's` address, and then immediately `give` them
-      back to the project.
-    */
-    const collectTxs: Promise<PopulatedTransaction>[] = [];
-    collectableTokenAddresses.map((tokenAddress) => {
-      collectTxs.push(this._repoDriverTxFactory.collect(accountId, tokenAddress, callerAddress));
-    });
-
-    // Build approve transactions for caller to approve taking back the collectable funds.
-    const callerErc20ApproveTxs: Promise<PopulatedTransaction>[] = [];
-    const collectableTokenAddressesPromises = collectableTokenAddresses.map(
-      async (tokenAddress) => {
-        const erc20TxFactory = await ERC20TxFactory.create(
-          get(wallet).signer ?? unreachable(),
-          tokenAddress,
-        );
-
-        callerErc20ApproveTxs.push(erc20TxFactory.approve(tokenAddress, accountId));
-      },
-    );
-    await Promise.all(collectableTokenAddressesPromises);
-
-    const callerAddressDriverAccountId = await this._addressDriverClient.getAccountIdByAddress(
-      callerAddress,
-    );
-
-    const callerGiveTxs: Promise<PopulatedTransaction>[] = [];
-    collectableTokenAddresses.map((tokenAddress) => {
-      const amount = context.unclaimedFunds?.collectable?.find(
-        ({ tokenAddress: addr }) => addr === tokenAddress,
-      )?.amount;
-      assert(amount, `Collectable amount for token address ${tokenAddress} is undefined.`);
-
-      callerGiveTxs.push(
-        this._repoDriverTxFactory.give(
-          callerAddressDriverAccountId,
-          accountId,
-          tokenAddress,
-          amount,
-        ),
-      );
-    });
-
-    const tokenAddressesToSplit = [
-      ...(context.unclaimedFunds?.splittable?.map(({ tokenAddress }) => tokenAddress) ?? []),
-      ...collectableTokenAddresses,
-    ];
-
     const splitTxs: Promise<PopulatedTransaction>[] = [];
-    tokenAddressesToSplit.map((tokenAddress) => {
+    context.unclaimedFunds?.splittable.map(({ tokenAddress }) => {
       splitTxs.push(
         this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
       );
     });
 
-    return Promise.all([
-      setSplitsTx,
-      emitAccountMetadataTx,
-      ...collectTxs,
-      ...callerErc20ApproveTxs,
-      ...callerGiveTxs,
-      ...splitTxs
-    ]);
+    const collectTxs: Promise<PopulatedTransaction>[] = [];
+    context.unclaimedFunds?.collectable.map(({ tokenAddress }) => {
+      assert(this._connectedAddress);
+
+      collectTxs.push(
+        this._repoDriverTxFactory.collect(accountId, tokenAddress, this._connectedAddress),
+      );
+    });
+
+    return Promise.all([setSplitsTx, emitAccountMetadataTx, ...splitTxs, ...collectTxs]);
   }
 
   // TODO: Copied from the SDK. Replace this when the SDK makes this function public.

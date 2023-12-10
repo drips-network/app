@@ -1,4 +1,5 @@
 import { getDripsClient } from '$lib/utils/get-drips-clients';
+import mapFilterUndefined from '../map-filter-undefined';
 
 interface Amount {
   tokenAddress: string;
@@ -12,11 +13,13 @@ export default async function fetchBalancesForTokens(
 ): Promise<Amount[]> {
   const client = await getDripsClient();
 
-  let promises: Promise<Amount>[];
+  let promises: Promise<Amount | undefined>[];
   switch (balance) {
     case 'splittable': {
       promises = Array.from(tokens).map(async (ta) => {
         const balance = await client.getSplittableBalanceForUser(accountId, ta);
+
+        if (balance.splittableAmount === 0n) return undefined;
 
         return {
           amount: balance.splittableAmount,
@@ -28,6 +31,7 @@ export default async function fetchBalancesForTokens(
     case 'receivable': {
       promises = Array.from(tokens).map(async (ta) => {
         const balance = await client.getReceivableBalanceForUser(accountId, ta, 1000);
+        if (balance.receivableAmount === 0n) return undefined;
 
         return {
           amount: balance.receivableAmount,
@@ -39,6 +43,7 @@ export default async function fetchBalancesForTokens(
     case 'collectable': {
       promises = Array.from(tokens).map(async (ta) => {
         const balance = await client.getCollectableBalanceForUser(accountId, ta);
+        if (balance.collectableAmount === 0n) return undefined;
 
         return {
           amount: balance.collectableAmount,
@@ -49,5 +54,5 @@ export default async function fetchBalancesForTokens(
     }
   }
 
-  return Promise.all(promises);
+  return mapFilterUndefined(await Promise.all(promises), (v) => v);
 }
