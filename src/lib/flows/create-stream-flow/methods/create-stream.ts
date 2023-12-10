@@ -20,13 +20,14 @@ import type { createEventDispatcher } from 'svelte';
 import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
 import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
 import type { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
+import { utils } from 'ethers';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   selectedToken: TokenInfoWrapper,
   amountPerSecond: bigint,
-  recipientAddress: string,
-  streamName: string,
+  recipient: string,
+  streamName: string | undefined,
   ownAccount: Account,
   schedule?: {
     start: Date;
@@ -75,9 +76,10 @@ export default function (
           amountPerSec: amountPerSecond,
         });
 
-        const recipientAccountId = await addressDriverClient.getAccountIdByAddress(
-          recipientAddress,
-        );
+        const recipientAccountId = utils.isAddress(recipient)
+          ? await addressDriverClient.getAccountIdByAddress(recipient)
+          : recipient;
+
         const { address, signer } = get(wallet);
         assert(address);
 
@@ -99,7 +101,7 @@ export default function (
             driver: 'address',
           },
           archived: false,
-          name: streamName,
+          name: streamName ?? 'Unnamed stream',
         };
 
         const accountMetadata = metadataMgr.buildAccountMetadata({

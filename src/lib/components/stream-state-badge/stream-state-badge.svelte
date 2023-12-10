@@ -1,51 +1,32 @@
-<script context="module" lang="ts">
-  export type StreamState = 'scheduled' | 'paused' | 'active' | 'ended' | 'out-of-funds';
-</script>
-
 <script lang="ts">
   import balances from '$lib/stores/balances/balances.store';
   import streams from '$lib/stores/streams';
-  import type { StreamId } from '$lib/stores/streams/types';
-  import getStreamHistory from '$lib/utils/stream-history';
-  import unreachable from '$lib/utils/unreachable';
+  import streamState, { STREAM_STATE_LABELS } from '$lib/utils/stream-state';
 
-  export let streamId: StreamId;
-  export let paused: boolean;
-  export let durationSeconds: number | undefined = undefined;
-  export let startDate: Date | undefined = undefined;
-  export let senderId: string;
-  export let tokenAddress: string;
+  export let streamId: string;
+  export let streamScheduledStart: Date | undefined = undefined;
+  export let streamDurationSeconds: number | undefined = undefined;
+  export let streamPaused: boolean;
+  export let streamTokenAddress: string;
+  export let streamSenderAccountId: string;
 
   export let hideActive = false;
   export let size: 'small' | 'normal' | 'large' = 'normal';
 
-  $: assetConfig = $streams && streams.getAssetConfig(senderId, tokenAddress);
-  $: streamHistory = assetConfig ? getStreamHistory(assetConfig, streamId) : undefined;
-
+  $: assetConfig = $streams && streams.getAssetConfig(streamSenderAccountId, streamTokenAddress);
   $: estimate = $balances && balances.getEstimateByStreamId(streamId);
-  $: streamScheduledStart = startDate;
-  $: streamCreated = streamHistory?.[0].timestamp;
-  $: streamStartDate = new Date(streamScheduledStart ?? streamCreated ?? unreachable());
-  $: streamEndDate = durationSeconds
-    ? new Date(streamStartDate.getTime() + durationSeconds * 1000)
-    : undefined;
 
-  let state: StreamState | undefined;
-  $: {
-    if (estimate) {
-      if (paused) {
-        state = 'paused';
-      } else if (streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
-        state = 'ended';
-      } else if (startDate && startDate.getTime() > new Date().getTime()) {
-        state = 'scheduled';
-      } else if (estimate.currentAmountPerSecond === 0n) {
-        state = 'out-of-funds';
-      } else if (estimate.currentAmountPerSecond > 0n) {
-        state = 'active';
-      }
-    }
-  }
+  $: state =
+    estimate &&
+    assetConfig &&
+    streamState(
+      streamId,
+      streamScheduledStart,
+      streamDurationSeconds,
+      streamPaused,
+      estimate,
+      assetConfig,
+    );
 
   const colorMap = {
     paused: 'color-caution',
@@ -56,14 +37,7 @@
   } as const;
   $: stateColor = state ? colorMap[state] : undefined;
 
-  const stateLabels = {
-    paused: 'Paused',
-    active: 'Active',
-    ended: 'Ended',
-    scheduled: 'Scheduled',
-    'out-of-funds': 'Out of funds',
-  } as const;
-  $: stateLabel = state ? stateLabels[state] : undefined;
+  $: stateLabel = state ? STREAM_STATE_LABELS[state] : undefined;
 
   const textClasses = {
     small: 'typo-text-small',

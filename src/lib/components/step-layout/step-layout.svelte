@@ -5,18 +5,23 @@
 <div class="step-layout" class:center>
   <div class="content">
     <slot />
-    <div class="actions">
-      <slot name="actions" />
-    </div>
+  </div>
+  <div class="actions">
+    <slot name="actions" />
   </div>
 </div>
 
 <style>
+  .step-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
   .content {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
   .center > .content {

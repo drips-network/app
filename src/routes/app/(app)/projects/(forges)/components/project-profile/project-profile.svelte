@@ -9,6 +9,7 @@
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
+    ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
     fragment ProjectProfile on Project {
       ...UnclaimedProjectCard
       ...ProjectProfileHeader
@@ -18,6 +19,9 @@
         account {
           accountId
         }
+        support {
+          ...SupportersSectionSupportItem
+        }
       }
       ... on ClaimedProject {
         ...EditProjectMetadataFlow
@@ -26,6 +30,9 @@
         }
         owner {
           accountId
+        }
+        support {
+          ...SupportersSectionSupportItem
         }
       }
     }
@@ -58,7 +65,9 @@
   import Pile from '$lib/components/pile/pile.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
+  import SupportersSection, {
+    SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT,
+  } from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
@@ -77,7 +86,6 @@
     EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
   } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
-  import type getIncomingSplits from '$lib/utils/splits/get-incoming-splits';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
@@ -103,8 +111,6 @@
 
   export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
-
-  export let incomingSplits: ReturnType<typeof getIncomingSplits>;
 
   $: ownAccountId = $walletStore.dripsAccountId;
   $: isOwnProject = ownAccountId === (isClaimed(project) ? project.owner.accountId : undefined);
@@ -235,7 +241,7 @@
           <span class="typo-text" style:color="var(--color-foreground-level-5)"
             >Project claimed by</span
           >
-          <IdentityBadge address={project.owner.address} />
+          <IdentityBadge address={project.owner.address} disableTooltip />
         </div>
       {/if}
       <div>
@@ -358,7 +364,7 @@
           {/await}
         </section>
       {/if}
-      <SupportersSection type="project" {incomingSplits} />
+      <SupportersSection type="project" supportItems={project.support} />
     </div>
     <aside>
       <div class="become-supporter-card">

@@ -9,7 +9,7 @@
 <div class="step-header">
   {#if emoji}<Emoji {emoji} size="huge" />{/if}
   <h1>{headline}</h1>
-  {#if description}<p>{@html description}</p>{/if}
+  {#if description}<p>{description}</p>{/if}
 </div>
 
 <style>

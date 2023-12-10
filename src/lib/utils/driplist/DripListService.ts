@@ -35,6 +35,7 @@ import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import { Forge } from '$lib/graphql/__generated__/base-types';
+import mapFilterUndefined from '../map-filter-undefined';
 
 type AccountId = string;
 
@@ -133,10 +134,8 @@ export default class DripListService {
 
     const callerClient = await getCallerClient();
 
-    // If `selectedSupportOption` is 2, the user doesn't want to support their Drip List for now
-    const creatingSupportStream = context.selectedSupportOption === 1;
-
-    if (creatingSupportStream) {
+    if (context.selectedSupportOption === 1) {
+      // User wants to create a support stream to the list
       const token = context.continuousSupportConfig.listSelected[0] ?? unreachable();
       let amountPerSec = context.continuousSupportConfig.streamRateValueParsed ?? unreachable();
       amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
@@ -147,7 +146,7 @@ export default class DripListService {
 
       const tokenApprovalTx = await this._buildTokenApprovalTx(token);
 
-      const setStreamTx = await this._buildSetStreamListStreamTxs(
+      const setStreamTx = await this._buildSetDripListStreamTxs(
         salt,
         token,
         dripListId,
@@ -157,11 +156,54 @@ export default class DripListService {
         amountPerSec,
       );
 
-      const txs: { [name: string]: PopulatedTransaction } = {
+      const txs = {
         tokenApprovalTx,
         createDripListTx,
-        setStreamListProjectsTx: setDripListSplitsTx,
+        setDripListSplitsTx,
         setStreamTx,
+        giveTx: undefined,
+      };
+
+      const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
+      const normalFlowTxs = await this._getNormalFlowTxs(txs, needsApproval, callerClient);
+
+      return {
+        dripListId,
+        needsApproval,
+        callerClient,
+        approvalFlowTxs,
+        normalFlowTxs,
+      };
+    } else if (context.selectedSupportOption === 2) {
+      // User wants to make a one-time donation to the list
+
+      const token = context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable();
+      const donationAmount = context.oneTimeDonationConfig.amount ?? unreachable();
+
+      const allowance = await this._addressDriverClient.getAllowance(token);
+      const needsApproval = allowance < donationAmount;
+      const tokenApprovalTx = await this._buildTokenApprovalTx(token);
+
+      const txFactory = await getAddressDriverTxFactory();
+      const giveTx = await txFactory.give(
+        dripListId,
+        token,
+        donationAmount,
+        /*
+        Dirty hack to disable the SDK's built-in gas estimation, because
+        it would fail if there's no token approval yet.
+
+        TODO: Introduce a more graceful method of disabling gas estimation.
+        */
+        { gasLimit: 1 },
+      );
+
+      const txs = {
+        tokenApprovalTx,
+        createDripListTx,
+        setDripListSplitsTx,
+        giveTx,
+        setStreamTx: undefined,
       };
 
       const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
@@ -175,9 +217,12 @@ export default class DripListService {
         normalFlowTxs,
       };
     } else {
-      const txs: { [name: string]: PopulatedTransaction } = {
+      // No support
+      const txs = {
         createDripListTx,
-        setStreamListProjectsTx: setDripListSplitsTx,
+        setDripListSplitsTx,
+        setStreamTx: undefined,
+        giveTx: undefined,
       };
 
       const normalFlowTxs = await this._getNormalFlowTxs(txs, false, callerClient);
@@ -284,17 +329,21 @@ export default class DripListService {
   }
 
   private async _getApprovalFlowTxs(
-    txs: { [name: string]: PopulatedTransaction },
+    txs: {
+      tokenApprovalTx: PopulatedTransaction | undefined;
+      createDripListTx: PopulatedTransaction | undefined;
+      setDripListSplitsTx: PopulatedTransaction | undefined;
+      setStreamTx: PopulatedTransaction | undefined;
+      giveTx: PopulatedTransaction | undefined;
+    },
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { tokenApprovalTx, createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
+    const { tokenApprovalTx, createDripListTx, setDripListSplitsTx, setStreamTx, giveTx } = txs;
 
-    const batchTx = await callerClient.populateCallBatchedTx([
-      createDripListTx,
-      setStreamListProjectsTx,
-      setStreamTx,
-    ]);
+    const batchTx = await callerClient.populateCallBatchedTx(
+      mapFilterUndefined([createDripListTx, setDripListSplitsTx, setStreamTx, giveTx], (v) => v),
+    );
 
     if (!needsApproval) {
       const estimatedGasLimit = await callerClient.signer.estimateGas(batchTx);
@@ -305,6 +354,8 @@ export default class DripListService {
       // !HACK: Hardcoded gas limit for now to avoid the "out of gas" error.
       batchTx.gasLimit = BigNumber.from('0x0a05b6');
     }
+
+    assert(tokenApprovalTx);
 
     return [
       {
@@ -322,15 +373,21 @@ export default class DripListService {
   }
 
   private async _getNormalFlowTxs(
-    txs: { [name: string]: PopulatedTransaction },
+    txs: {
+      createDripListTx: PopulatedTransaction | undefined;
+      setDripListSplitsTx: PopulatedTransaction | undefined;
+      setStreamTx: PopulatedTransaction | undefined;
+      giveTx: PopulatedTransaction | undefined;
+    },
     needsApproval: boolean,
     callerClient: CallerClient,
   ) {
-    const { createDripListTx, setStreamListProjectsTx, setStreamTx } = txs;
+    const { createDripListTx, setDripListSplitsTx, setStreamTx, giveTx } = txs;
 
     if (!needsApproval) {
-      const requiredTxs = [createDripListTx, setStreamListProjectsTx, setStreamTx].filter(
-        (tx) => tx !== undefined,
+      const requiredTxs = mapFilterUndefined(
+        [createDripListTx, setDripListSplitsTx, setStreamTx, giveTx],
+        (v) => v,
       );
 
       const batchTx = await callerClient.populateCallBatchedTx(requiredTxs);
@@ -345,7 +402,10 @@ export default class DripListService {
     }
 
     return {
-      txs: [createDripListTx, setStreamListProjectsTx, setStreamTx],
+      txs: mapFilterUndefined(
+        [createDripListTx, setDripListSplitsTx, setStreamTx, giveTx],
+        (v) => v,
+      ),
     };
   }
 
@@ -386,7 +446,7 @@ export default class DripListService {
     return createDripListTx;
   }
 
-  private async _buildSetStreamListStreamTxs(
+  private async _buildSetDripListStreamTxs(
     salt: bigint,
     token: Address,
     dripListId: AccountId,

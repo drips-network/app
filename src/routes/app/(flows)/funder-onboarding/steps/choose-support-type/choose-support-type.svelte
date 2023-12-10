@@ -4,9 +4,7 @@
   import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import Pause from 'radicle-design-system/icons/Pause.svelte';
   import Transactions from 'radicle-design-system/icons/Transactions.svelte';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import Coin from 'radicle-design-system/icons/Coin.svelte';
-  import Sharrow from 'radicle-design-system/icons/Sharrow.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
@@ -15,6 +13,7 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../funder-onboarding-flow';
   import unreachable from '$lib/utils/unreachable';
+  import Heart from 'radicle-design-system/icons/Heart.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -38,11 +37,16 @@
       }
     }
   }
+
+  function supportLater() {
+    $context.selectedSupportOption = undefined;
+    dispatch('goForward');
+  }
 </script>
 
 <StandaloneFlowStepLayout
   headline="Support your Drip List"
-  description="How would you like to start funding your Drip List?"
+  description="How would you like to start funding your Drip List? You can freely create streams or send further one-time donations anytime later."
 >
   <TwoBigOptions
     bind:selected={$context.selectedSupportOption}
@@ -65,20 +69,16 @@
       ],
     }}
     option2={{
-      emoji: '⏩',
-      title: 'Support later',
+      emoji: '💸',
+      title: 'One-time donation',
       attributes: [
         {
-          icon: DripListIcon,
-          text: 'Publish the list.',
-        },
-        {
-          icon: Sharrow,
-          text: 'Share for public funding.',
-        },
-        {
           icon: Coin,
-          text: 'Stream funds to your list anytime.',
+          text: 'Send any ERC-20 token.',
+        },
+        {
+          icon: Heart,
+          text: 'Donate more anytime.',
         },
       ],
     }}
@@ -87,6 +87,7 @@
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
+    <Button on:click={supportLater}>Support later</Button>
     <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={submit}
       >Continue</Button
     >

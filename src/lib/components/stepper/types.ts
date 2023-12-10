@@ -67,6 +67,7 @@ export type Props<T> = T extends SvelteComponentTyped<infer P, any, any> ? OmitC
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
 export type Step<T extends SvelteComponent> = {
+  condition?: () => boolean;
   component: Constructor<T>;
   props: PropsOrUndefined<T>;
 };
