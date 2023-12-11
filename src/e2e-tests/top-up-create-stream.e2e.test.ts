@@ -46,18 +46,18 @@ describe('app', async () => {
 
   describe('streams and balances', () => {
     describe('global nav', () => {
-      it('opens up to streams tab', async () => {
+      it('opens up to funds tab', async () => {
         await page.goto('http://127.0.0.1:3001/app');
 
-        await expect(page).toHaveURL('http://127.0.0.1:3001/app/streams');
+        await expect(page).toHaveURL('http://127.0.0.1:3001/app/funds');
       });
 
-      it('switches to the streams tab', async () => {
-        await page.locator('div[data-testid="sidenav"] a:text("Streams")').click();
+      it('switches to the funds tab', async () => {
+        await page.locator('div[data-testid="sidenav"] a:text("Funds")').click();
       });
     });
 
-    describe('streams page empty state', () => {
+    describe('funds page empty state', () => {
       it('shows streams page empty states', async () => {
         const tokensEmptyState = page.locator('text=No tokens');
         await expect(tokensEmptyState).toHaveCount(1);
@@ -118,7 +118,7 @@ describe('app', async () => {
         await expect(page.locator('text=Approve')).toHaveCount(1);
       });
 
-      it('shows the topped-up amount on the streams page', async () => {
+      it('shows the topped-up amount on the funds page', async () => {
         await page.locator('text=Got it').click({ timeout: 10000 });
         await page.waitForTimeout(2000);
         await page.reload();
@@ -184,9 +184,9 @@ describe('app', async () => {
         await expect(page.locator('text=Testcoin')).toHaveCount(1);
       });
 
-      it('switches to recipient streams dashboard', async () => {
+      it('switches to recipient funds dashboard', async () => {
         await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-        await page.goto('http://127.0.0.1:3001/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/funds');
 
         await page.reload();
 
@@ -251,8 +251,8 @@ describe('app', async () => {
     });
 
     describe('stream detail view', () => {
-      it('opens the stream detail view', async () => {
-        await page.goto('http://127.0.0.1:3001/app/streams');
+      it('opens the funds detail view', async () => {
+        await page.goto('http://127.0.0.1:3001/app/funds');
         await page.locator('text=E2E Test Stream').click();
 
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
@@ -297,14 +297,14 @@ describe('app', async () => {
 
       it('switches back to the user receiving the stream', async () => {
         await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-        await page.goto('http://127.0.0.1:3001/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/funds');
 
         await page.reload();
 
         await expect(page.locator('text=Balances')).toHaveCount(1);
       });
 
-      it('displays the right incoming earned amount on the streams page', async () => {
+      it('displays the right incoming earned amount on the funds page', async () => {
         await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(2);
       });
 
@@ -326,14 +326,14 @@ describe('app', async () => {
     describe('delete stream', () => {
       it('switches back to the original user', async () => {
         await changeAddress(page, '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
-        await page.goto('http://127.0.0.1:3001/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/funds');
 
         await page.reload();
 
         await expect(page.locator('text=Balances')).toHaveCount(1);
       });
 
-      it('displays the right streamed amount on the streams page', async () => {
+      it('displays the right streamed amount on the funds page', async () => {
         await expect(page.locator(`text=${streamPausedAtTotalStreamed}`)).toHaveCount(1);
       });
 
@@ -350,7 +350,7 @@ describe('app', async () => {
         await page.locator('button', { hasText: 'Delete stream' }).click();
         await page.locator('button', { hasText: 'Got it' }).click();
 
-        expect(page.url().toLowerCase()).toBe('http://127.0.0.1:3001/app/streams');
+        expect(page.url().toLowerCase()).toBe('http://127.0.0.1:3001/app/funds');
       }, 20000);
 
       it('shows the streams empty state', async () => {
@@ -364,7 +364,7 @@ describe('app', async () => {
 
       it('switches back to the recipient', async () => {
         await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
-        await page.goto('http://127.0.0.1:3001/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/funds');
 
         await page.reload();
 
@@ -383,7 +383,7 @@ describe('app', async () => {
 
     describe('squeezing', () => {
       it('opens the collect flow', async () => {
-        await page.goto('http://127.0.0.1:3001/app/streams');
+        await page.goto('http://127.0.0.1:3001/app/funds');
 
         await page.locator('text=Testcoin').click();
         await page.locator('button', { hasText: 'Collect' }).click();
@@ -419,10 +419,10 @@ describe('app', async () => {
 
   describe('drip lists', () => {
     describe('create drip list flow', () => {
-      it('opens up to streams tab', async () => {
+      it('opens up to funds tab', async () => {
         await page.goto('http://127.0.0.1:3001/app');
 
-        await expect(page).toHaveURL('http://127.0.0.1:3001/app/streams');
+        await expect(page).toHaveURL('http://127.0.0.1:3001/app/funds');
       });
 
       it('switches to the Drip List tab', async () => {

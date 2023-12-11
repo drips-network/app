@@ -121,7 +121,7 @@ export default function (
           1000,
         );
 
-        goto('/app/streams');
+        goto('/app/funds');
       },
     }),
   );
