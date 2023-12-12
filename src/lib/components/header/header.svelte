@@ -8,6 +8,7 @@
   import { fade, fly } from 'svelte/transition';
   import { quadInOut, sineInOut } from 'svelte/easing';
   import Spinner from '../spinner/spinner.svelte';
+  import CollectButton from '../collect-button/collect-button.svelte';
 
   $: elevated = $scroll.pos > 16;
 
@@ -55,6 +56,9 @@
     </div>
     <div class="connect">
       <ConnectButton />
+    </div>
+    <div class="collect">
+      <CollectButton />
     </div>
   </div>
 </header>
