@@ -8,16 +8,21 @@
   import { fade, fly } from 'svelte/transition';
   import { quadInOut, sineInOut } from 'svelte/easing';
   import Spinner from '../spinner/spinner.svelte';
+  import CollectButton from '../collect-button/collect-button.svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   $: elevated = $scroll.pos > 16;
 
   export let showLoadingIndicator = true;
 
   let searchMode = false;
+
+  let collectButtonPeeking: boolean;
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
-  <a aria-label="Go to homepage" href={'/'}>
+  <a class="hide-on-mobile" aria-label="Go to homepage" href={'/'}>
     <div class="logo">
       <DripsLogo />
     </div>
@@ -31,12 +36,21 @@
       </div>
     {/if}
   </a>
+  {#if ($walletStore.connected && $breakpointsStore?.breakpoint === 'mobile') || $breakpointsStore?.breakpoint === 'tablet'}
+    <div data-highlightid="global-collect" class="collect mobile">
+      <CollectButton peekAmount={true} bind:isPeeking={collectButtonPeeking} />
+    </div>
+    <div />
+  {:else}
+    <!-- ensure nav items are right-aligned on mobile still even though nothing's on the left -->
+    <div />
+  {/if}
   {#if searchMode}
     <div class="search-bar" transition:fly|local={{ duration: 300, x: 64, easing: sineInOut }}>
       <SearchBar on:dismiss={() => (searchMode = false)} />
     </div>
   {/if}
-  <div class="right">
+  <div class="right" class:collect-button-peeking={collectButtonPeeking}>
     <div class="header-buttons">
       {#if !searchMode}
         <button
@@ -56,6 +70,11 @@
     <div class="connect">
       <ConnectButton />
     </div>
+    {#if ($walletStore.connected && $breakpointsStore?.breakpoint === 'desktop') || $breakpointsStore?.breakpoint === 'desktopWide'}
+      <div data-highlightid="global-collect" class="collect">
+        <CollectButton />
+      </div>
+    {/if}
   </div>
 </header>
 
@@ -94,6 +113,11 @@
     display: flex;
     gap: 0.75rem;
     align-items: center;
+    transition: opacity 0.3s;
+  }
+
+  .right.collect-button-peeking {
+    opacity: 0.5;
   }
 
   .header-buttons {
@@ -150,6 +174,15 @@
   @media (max-width: 577px) {
     header {
       padding: 1rem;
+    }
+
+    .hide-on-mobile {
+      display: none;
+    }
+
+    .collect.mobile {
+      position: absolute;
+      z-index: 10;
     }
   }
 </style>

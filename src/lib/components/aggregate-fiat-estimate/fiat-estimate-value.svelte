@@ -12,7 +12,7 @@
   {#if forceLoading || fiatEstimateCents === 'pending'}
     <span class="animate-pulse">$...</span>
   {:else if formattedFiatEstimate}
-    <span class="text-foreground-level-4">≈</span>{formattedFiatEstimate}
+    {formattedFiatEstimate}
   {:else}
     <span aria-label="Unknown amount">??</span>
   {/if}
