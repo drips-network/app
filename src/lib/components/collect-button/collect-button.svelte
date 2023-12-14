@@ -1,31 +1,75 @@
 <script lang="ts">
   import Download from 'radicle-design-system/icons/Download.svelte';
   import Spinner from '../spinner/spinner.svelte';
-  import { onMount, tick } from 'svelte';
+  import { tick } from 'svelte';
   import { browser } from '$app/environment';
   import { tweened } from 'svelte/motion';
   import { quintInOut } from 'svelte/easing';
   import { fade } from 'svelte/transition';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import aggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
+  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import FiatEstimateValue from '../aggregate-fiat-estimate/fiat-estimate-value.svelte';
+  import fetchBalancesForTokens from '$lib/utils/drips/fetch-balances-for-tokens';
+  import relevantTokens from '$lib/utils/drips/relevant-tokens';
+  import globalCollectFlowSteps from '$lib/flows/global-collect-flow/global-collect-flow-steps';
+  import modal from '$lib/stores/modal';
+  import Stepper from '../stepper/stepper.svelte';
 
-  let loading = true;
-
-  let amount: string | undefined = '$218.17';
   let amountElem: HTMLDivElement;
   let amountElemWidth = tweened(0, { duration: 400, easing: quintInOut });
+
+  $: ownAccountId = $walletStore.dripsAccountId;
+
+  let splittable:
+    | {
+        tokenAddress: string;
+        amount: bigint;
+      }[]
+    | undefined;
+
+  async function updateSplittable() {
+    if (ownAccountId) {
+      // This is duplicated from the balances readable, but since that won't be around for long,
+      // we're having it re-fetch the balances here again for now.
+
+      const tokens = await relevantTokens('splittable', ownAccountId);
+      const splittableRes = await fetchBalancesForTokens('splittable', tokens, ownAccountId);
+
+      splittable = splittableRes.map(({ tokenAddress, splittableAmount }) => ({
+        tokenAddress,
+        amount: splittableAmount,
+      }));
+    }
+  }
+
+  $: {
+    if (ownAccountId) {
+      updateSplittable();
+    }
+  }
+
+  // $: splittable = ownAccountId ? $balancesStore.accounts[ownAccountId].splittable : undefined;
+  $: tokenAddresses = splittable?.reduce<string[]>((acc, { tokenAddress }) => {
+    if (tokenAddress) {
+      acc.push(tokenAddress);
+    }
+    return acc;
+  }, []);
+
+  const fiatEstimatesStarted = fiatEstimates.started;
+
+  $: tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
+  $: priceReadable = tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined;
+  $: amount =
+    priceReadable && $priceReadable && splittable
+      ? aggregateFiatEstimate(priceReadable, splittable)
+      : undefined;
+
   let amountTransitioning = false;
-  let amountToShow: string | undefined = '$218.17';
+  let amountToShow: typeof amount;
 
-  onMount(() => {
-    // setInterval(() => {
-    //   // For testing, change amount to amounts with different amount of digits every second
-    //   amount = amount === '$218.1' ? undefined : '$218.1';
-    // }, 1500);
-
-    // For testing
-    setTimeout(() => {
-      loading = false;
-    }, 1000);
-  });
+  $: loading = typeof amount?.fiatEstimateCents !== 'number';
 
   async function updateAmountToShow() {
     await tick();
@@ -36,7 +80,11 @@
       amountToShow = amount;
       await tick();
 
-      const newWidth = loading ? 0 : amountElem?.getBoundingClientRect().width ?? 0;
+      const shouldHide =
+        loading ||
+        amountToShow?.fiatEstimateCents === 0 ||
+        amountToShow?.includesUnknownPrice === true;
+      const newWidth = shouldHide ? 0 : amountElem?.getBoundingClientRect().width ?? 0;
 
       if (newWidth === 24) {
         amountElemWidth.set(0);
@@ -57,16 +105,26 @@
       updateAmountToShow();
     }
   }
+
+  $: nothingToCollect = amountToShow?.fiatEstimateCents === 0;
+
+  function handleClick() {
+    if (!splittable) return;
+
+    modal.show(Stepper, undefined, globalCollectFlowSteps(splittable));
+  }
 </script>
 
-<button disabled={loading}>
+<button on:click={handleClick} disabled={loading} class:nothing-to-collect={nothingToCollect}>
   <div class="amount-wrapper" style:width="{$amountElemWidth}px">
     <div
       class="amount tabular-nums typo-text-bold"
       class:transitioning={amountTransitioning}
       bind:this={amountElem}
     >
-      {amountToShow ?? ''}
+      {#if amountToShow}
+        <FiatEstimateValue fiatEstimateCents={amountToShow.fiatEstimateCents} />
+      {/if}
     </div>
   </div>
   <div class="content">
@@ -90,6 +148,10 @@
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+  }
+
+  button.nothing-to-collect {
+    opacity: 0.5;
   }
 
   button .content {
@@ -142,6 +204,7 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
+    opacity: 1;
   }
 
   button:not(:disabled):active {
