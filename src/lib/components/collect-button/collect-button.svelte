@@ -134,7 +134,7 @@
       </div>
     {/if}
     <Download style="fill: var(--color-foreground)" />
-    Collect funds
+    Collect
   </div>
 </button>
 

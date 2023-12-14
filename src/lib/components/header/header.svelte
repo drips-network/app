@@ -9,6 +9,7 @@
   import { quadInOut, sineInOut } from 'svelte/easing';
   import Spinner from '../spinner/spinner.svelte';
   import CollectButton from '../collect-button/collect-button.svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
 
   $: elevated = $scroll.pos > 16;
 
@@ -18,7 +19,7 @@
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
-  <a aria-label="Go to homepage" href={'/'}>
+  <a class="hide-on-mobile" aria-label="Go to homepage" href={'/'}>
     <div class="logo">
       <DripsLogo />
     </div>
@@ -32,6 +33,11 @@
       </div>
     {/if}
   </a>
+  {#if $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet'}
+    <div data-highlightid="global-collect" class="collect">
+      <CollectButton />
+    </div>
+  {/if}
   {#if searchMode}
     <div class="search-bar" transition:fly|local={{ duration: 300, x: 64, easing: sineInOut }}>
       <SearchBar on:dismiss={() => (searchMode = false)} />
@@ -57,9 +63,11 @@
     <div class="connect">
       <ConnectButton />
     </div>
-    <div class="collect">
-      <CollectButton />
-    </div>
+    {#if $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
+      <div data-highlightid="global-collect" class="collect">
+        <CollectButton />
+      </div>
+    {/if}
   </div>
 </header>
 
@@ -154,6 +162,10 @@
   @media (max-width: 577px) {
     header {
       padding: 1rem;
+    }
+
+    .hide-on-mobile {
+      display: none;
     }
   }
 </style>
