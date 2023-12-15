@@ -5,9 +5,9 @@
 </script>
 
 <div class="flow-base-layout" in:fly={{ duration: 300, y: 16 }}>
-  <div class="logo">
+  <a href="/" class="logo">
     <DripsLogo />
-  </div>
+  </a>
   <div class="content">
     <slot />
   </div>
@@ -40,5 +40,6 @@
 
   .logo {
     width: 7rem;
+    display: block;
   }
 </style>
