@@ -37,6 +37,7 @@
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
   import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
   import { gql } from 'graphql-request';
+  import Download from 'radicle-design-system/icons/Download.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -92,6 +93,11 @@
       { project: projectWritable },
     );
   }
+
+  $: hasCollectableAmount =
+    $context.unclaimedFunds?.collectable && $context.unclaimedFunds?.collectable?.length > 0;
+  $: hasSplittableAmount =
+    $context.unclaimedFunds?.splittable && $context.unclaimedFunds?.splittable?.length > 0;
 </script>
 
 <StandaloneFlowStepLayout
@@ -116,7 +122,10 @@
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
-    <UnclaimedProjectCard unclaimedFunds={$context.unclaimedFunds} />
+    <UnclaimedProjectCard
+      detailedTokenBreakdown={hasCollectableAmount && hasSplittableAmount}
+      unclaimedFunds={$context.unclaimedFunds}
+    />
   </FormField>
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">
@@ -151,14 +160,46 @@
   </FormField>
   <div class="whats-next">
     <div class="card">
-      <h4>On transaction confirmation…</h4>
-      <ul>
-        <UlIconLi icon={SplitsIcon}
-          >All claimable funds will be <span class="typo-text-bold"
-            >immediately split as shown above</span
-          >.</UlIconLi
-        >
-      </ul>
+      {#if hasCollectableAmount || hasSplittableAmount}
+        <h4>On transaction confirmation…</h4>
+        <ul>
+          {#if hasCollectableAmount && hasSplittableAmount}
+            <!--
+              Something called "Split" before the project was claimed,
+              and there's also a splittable amount too.
+            -->
+            <UlIconLi icon={Download}
+              >Some of your claimable funds will be <span class="typo-text-bold"
+                >collected directly to your connected wallet</span
+              > as shown above.</UlIconLi
+            >
+            <UlIconLi icon={SplitsIcon}
+              >Remaining claimable funds will be <span class="typo-text-bold"
+                >immediately split</span
+              > as shown above.</UlIconLi
+            >
+          {:else if hasCollectableAmount}
+            <!--
+              Something called "Split" before the project was claimed.
+            -->
+            <UlIconLi icon={SplitsIcon}
+              >Claimable funds will be<span class="typo-text-bold"
+                >collected directly to your connected wallet</span
+              > as shown above.</UlIconLi
+            >
+          {:else if hasSplittableAmount}
+            <!--
+              The usual case; no-one has called `split` on the account before it
+              being claimed.
+            -->
+            <UlIconLi icon={SplitsIcon}
+              >All claimable funds will be <span class="typo-text-bold"
+                >immediately split as shown above</span
+              >.</UlIconLi
+            >
+          {/if}
+        </ul>
+      {/if}
     </div>
     <div class="card">
       <h4>After transaction confirmation…</h4>

@@ -9,6 +9,7 @@
   import buildUrl from '$lib/utils/build-url';
   import balancesStore from '$lib/stores/balances/balances.store';
   import assert from '$lib/utils/assert';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
 
   export let context: Writable<State>;
 
@@ -23,7 +24,11 @@
     const username = $context.project?.source.ownerName;
     const repoName = $context.project?.source.repoName;
 
-    const collectedFunds = ($context.unclaimedFunds?.length ?? 0) > 0;
+    const collectedFunds =
+      mergeAmounts(
+        $context.unclaimedFunds?.collectable ?? [],
+        $context.unclaimedFunds?.splittable ?? [],
+      ).length > 0;
 
     const ownAccountId = $walletStore.dripsAccountId;
     assert(ownAccountId);
