@@ -50,7 +50,12 @@
       <div class="badge"><TokensIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
     </div>
     <svelte:fragment slot="title">
-      <div class="highlighted">{@html highlighted}</div>
+      <div class="highlighted">
+        {@html sanitize(highlighted, {
+          allowedTags: [],
+          allowedAttributes: {},
+        })}
+      </div>
       {#if highlightPlainText !== item.item.info.name}<div class="typo-text-small">
           {item.item.info.name}
         </div>{/if}
@@ -79,7 +84,10 @@
             Jump to account ID:
           {/if}
         </span>
-        {@html highlighted}
+        {@html sanitize(highlighted, {
+          allowedTags: [],
+          allowedAttributes: {},
+        })}
       </div>
       {#if highlightPlainText !== item.item.name && item.item.name}<div class="typo-text-small">
           {item.item.name}
