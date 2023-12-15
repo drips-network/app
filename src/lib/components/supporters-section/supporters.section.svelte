@@ -307,6 +307,7 @@
             title={{
               component: IdentityBadge,
               props: {
+                tag: item.account.accountId === ownerAccountId ? 'Owner' : undefined,
                 disableTooltip: true,
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
