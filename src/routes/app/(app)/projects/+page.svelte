@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
+  import TokensIcon from 'radicle-design-system/icons/Coin.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';

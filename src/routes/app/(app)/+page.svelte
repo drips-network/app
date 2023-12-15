@@ -16,7 +16,7 @@
 
         if (isSafe) goto(decoded);
       } else {
-        goto('/app/streams');
+        goto('/app/funds');
       }
     }
   }
