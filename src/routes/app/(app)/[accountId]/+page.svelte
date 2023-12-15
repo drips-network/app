@@ -6,8 +6,8 @@
   import streams from '$lib/stores/streams';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
-  import Balances from '../streams/sections/balances.section.svelte';
-  import Streams from '../streams/sections/streams.section.svelte';
+  import Balances from '../funds/sections/balances.section.svelte';
+  import Streams from '../funds/sections/streams.section.svelte';
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';

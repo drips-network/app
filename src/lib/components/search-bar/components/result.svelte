@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
+  import TokensIcon from 'radicle-design-system/icons/Coin.svelte';
   import UserIcon from 'radicle-design-system/icons/User.svelte';
   import sanitize from 'sanitize-html';
 
