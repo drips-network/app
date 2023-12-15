@@ -101,6 +101,7 @@
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
 
   interface Amount {
     tokenAddress: string;
@@ -109,7 +110,8 @@
 
   export let project: ProjectProfileFragment;
 
-  export let unclaimedFunds: Promise<Amount[]> | undefined = undefined;
+  export let unclaimedFunds: Promise<{ splittable: Amount[]; collectable: Amount[] }> | undefined =
+    undefined;
   export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
   $: ownAccountId = $walletStore.dripsAccountId;
@@ -208,7 +210,8 @@
       <AnnotationBox type="info">
         {#await unclaimedFunds}
           <span />
-        {:then result}
+        {:then res}
+          {@const result = res && mergeAmounts(res.splittable, res.collectable)}
           {#if result?.length}This project has <span class="typo-text-small-bold"
               ><AggregateFiatEstimate amounts={result} /></span
             > in claimable funds! Project owners can collect by claiming their project.{:else}This
@@ -347,12 +350,13 @@
           {#await unclaimedFunds}
             <SectionSkeleton loaded={false} />
           {:then result}
+            {@const merged = result && mergeAmounts(result.splittable, result.collectable)}
             <SectionSkeleton loaded={true}>
               <div class="unclaimed-funds-section">
                 <UnclaimedProjectCard
                   unclaimedFunds={result}
                   unclaimedTokensExpandable={false}
-                  unclaimedTokensExpanded={result.length > 0}
+                  unclaimedTokensExpanded={merged.length > 0}
                   showClaimButton
                   on:claimButtonClick={() =>
                     goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}

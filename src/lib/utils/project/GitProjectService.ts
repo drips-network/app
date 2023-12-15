@@ -38,6 +38,7 @@ export default class GitProjectService {
   private _addressDriverClient!: AddressDriverClient;
   private readonly _dripsSubgraphClient = getSubgraphClient();
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
+  private _connectedAddress: string | undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
@@ -52,12 +53,14 @@ export default class GitProjectService {
     gitProjectService._addressDriverClient = await getAddressDriverClient();
     gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
-    const { connected, signer } = get(wallet);
+    const { connected, signer, address } = get(wallet);
 
     if (connected) {
       assert(signer, 'Signer address is undefined.');
 
       gitProjectService._repoDriverTxFactory = await getRepoDriverTxFactory();
+
+      gitProjectService._connectedAddress = address;
     }
 
     return gitProjectService;
@@ -265,13 +268,22 @@ export default class GitProjectService {
     );
 
     const splitTxs: Promise<PopulatedTransaction>[] = [];
-    context.unclaimedFunds?.map(({ tokenAddress }) => {
+    context.unclaimedFunds?.splittable.map(({ tokenAddress }) => {
       splitTxs.push(
         this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
       );
     });
 
-    return [setSplitsTx, emitAccountMetadataTx, ...(await Promise.all(splitTxs))];
+    const collectTxs: Promise<PopulatedTransaction>[] = [];
+    context.unclaimedFunds?.collectable.map(({ tokenAddress }) => {
+      assert(this._connectedAddress);
+
+      collectTxs.push(
+        this._repoDriverTxFactory.collect(accountId, tokenAddress, this._connectedAddress),
+      );
+    });
+
+    return Promise.all([setSplitsTx, emitAccountMetadataTx, ...splitTxs, ...collectTxs]);
   }
 
   // TODO: Copied from the SDK. Replace this when the SDK makes this function public.

@@ -37,6 +37,10 @@ interface SplitsConfig extends ListEditorConfig {
   itemsPromise: Promise<ClaimProjectFlowProject_UnclaimedProject_Fragment>[] | undefined;
 }
 
+interface Amount {
+  tokenAddress: string; amount: bigint;
+}
+
 export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
@@ -50,7 +54,10 @@ export interface State {
         defaultBranch: string | undefined;
       }
     | undefined;
-  unclaimedFunds: { tokenAddress: string; amount: bigint }[] | undefined;
+  unclaimedFunds: {
+    splittable: Amount[];
+    collectable: Amount[];
+  } | undefined;
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
