@@ -13,7 +13,7 @@
   import ens from '$lib/stores/ens';
   import User from 'radicle-design-system/icons/User.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
-  import Orgs from 'radicle-design-system/icons/Orgs.svelte';
+  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
 
   export let data: { pathname: string };
 
@@ -48,7 +48,7 @@
       <Sidenav
         items={{
           top: [
-            { label: 'Funds', href: '/app/funds', icon: Orgs },
+            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Box },
             { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
             {
@@ -71,7 +71,7 @@
     <div class="bottom-nav" data-testid="bottom-nav">
       <BottomNav
         items={[
-          { label: 'Funds', href: '/app/funds', icon: Orgs },
+          { label: 'Funds', href: '/app/funds', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Box },
           { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
           {
