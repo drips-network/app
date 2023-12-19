@@ -10,6 +10,7 @@
   import Spinner from '../spinner/spinner.svelte';
   import CollectButton from '../collect-button/collect-button.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   $: elevated = $scroll.pos > 16;
 
@@ -33,7 +34,7 @@
       </div>
     {/if}
   </a>
-  {#if $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet'}
+  {#if ($walletStore.connected && $breakpointsStore?.breakpoint === 'mobile') || $breakpointsStore?.breakpoint === 'tablet'}
     <div data-highlightid="global-collect" class="collect">
       <CollectButton />
     </div>
@@ -63,7 +64,7 @@
     <div class="connect">
       <ConnectButton />
     </div>
-    {#if $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
+    {#if ($walletStore.connected && $breakpointsStore?.breakpoint === 'desktop') || $breakpointsStore?.breakpoint === 'desktopWide'}
       <div data-highlightid="global-collect" class="collect">
         <CollectButton />
       </div>

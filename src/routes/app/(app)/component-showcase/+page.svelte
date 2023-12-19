@@ -320,7 +320,7 @@
         borderRadius: '2rem 0 2rem 2rem',
         paddingPx: 8,
       })}
-    disabled={!$walletStore.connected}>Attach highlight to projects button</Button
+    disabled={!$walletStore.connected}>Attach highlight to collect button</Button
   >
 </div>
 
