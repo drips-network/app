@@ -11,6 +11,11 @@ body {
   font-feature-settings: 'ss02', 'calt' 0;
 }
 
+::selection {
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
 /* hide input[number] arrows */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
