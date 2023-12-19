@@ -18,6 +18,7 @@
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   $: accountId = $page.params.accountId;
 
@@ -117,6 +118,7 @@
   }
 
   $: dripsAccountId && fetchRequestedAccount(dripsAccountId);
+  $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
 <HeadMeta title={(address && $ens[address]?.name) ?? address ?? accountId} />
@@ -179,7 +181,7 @@
     <Developer accountId={dripsAccountId} />
     <ProjectsSection collapsable {address} />
     <DripListsSection collapsable accountId={dripsAccountId} />
-    <Streams collapsable accountId={dripsAccountId} />
+    <Streams collapsable accountId={dripsAccountId} disableActions={!isSelf} />
     <Balances collapsable collapsed accountId={dripsAccountId} />
   </article>
 {/if}

@@ -190,6 +190,7 @@
             handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
             icon: Plus,
             label: 'Add funds',
+            variant: 'primary',
           },
         ],
   }}
