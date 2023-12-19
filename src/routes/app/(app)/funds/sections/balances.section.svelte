@@ -117,8 +117,7 @@
         enableSorting: false,
         size: (100 / 24) * 5,
         meta: {
-          tooltipMessage:
-            'Your incoming balance is a real-time estimate of what youʼve earned up until this moment, minus any prior withdrawals.',
+          tooltipMessage: 'Funds sent from others since your last withdrawal.',
         },
       },
       {
@@ -128,8 +127,7 @@
         enableSorting: false,
         size: (100 / 24) * 5,
         meta: {
-          tooltipMessage:
-            'Your outgoing balance is the remaining balance you can stream to others for this token.',
+          tooltipMessage: 'Your token balances for streaming to others.',
         },
       },
       {

@@ -121,10 +121,7 @@
     <section class="grid sm:grid-cols-2 gap-3">
       <h2 class="sr-only">Your Balances</h2>
 
-      <TokenStat
-        title="Incoming"
-        tooltip="Your incoming balance is a real-time estimate of what youʼve earned up until this moment, minus any prior withdrawals."
-      >
+      <TokenStat title="Incoming" tooltip="Amount received from others since your last withdrawal.">
         <svelte:fragment slot="detail">
           {#if incomingTotals && incomingTotals.amountPerSecond !== 0n}
             <Amount
@@ -154,10 +151,7 @@
         </svelte:fragment>
       </TokenStat>
 
-      <TokenStat
-        title="Outgoing"
-        tooltip="Your outgoing balance is the remaining balance you can stream to others for this token."
-      >
+      <TokenStat title="Outgoing" tooltip="Tokens available for streaming to others.">
         <svelte:fragment slot="detail">
           {#if loaded && outgoingEstimate}
             <Amount
