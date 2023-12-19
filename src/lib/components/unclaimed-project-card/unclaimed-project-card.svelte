@@ -51,6 +51,8 @@
     unclaimedFunds?.collectable ?? [],
   );
 
+  $: hasClaimableFunds = mergedUnclaimedFunds.length > 0;
+
   $: unclaimedTokenPile = mergedUnclaimedFunds?.map((fund) => ({
     component: Token,
     props: {
@@ -85,7 +87,7 @@
         <div class="flex flex-wrap items-start gap-6 sm:gap-12">
           {#if unclaimedTokenPile}
             <KeyValuePair key={claimableTokensKey}>
-              {#if mergedUnclaimedFunds.length > 0}
+              {#if hasClaimableFunds}
                 <Pile maxItems={4} components={unclaimedTokenPile} />
                 {#if unclaimedTokensExpandable}
                   <button
@@ -103,14 +105,16 @@
               {/if}
             </KeyValuePair>
           {/if}
-          <KeyValuePair highlight key="Estimated value">
-            <span style="color: var(--color-primary)"
-              ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
-            >
-          </KeyValuePair>
+          {#if hasClaimableFunds}
+            <KeyValuePair highlight key="Estimated value">
+              <span style="color: var(--color-primary)"
+                ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
+              >
+            </KeyValuePair>
+          {/if}
         </div>
 
-        {#if mergedUnclaimedFunds.length > 0 && showClaimButton}
+        {#if hasClaimableFunds && showClaimButton}
           <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
             <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
               >Claim funds</Button
