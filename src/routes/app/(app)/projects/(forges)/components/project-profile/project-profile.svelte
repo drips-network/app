@@ -368,7 +368,11 @@
           {/await}
         </section>
       {/if}
-      <SupportersSection type="project" supportItems={project.support} />
+      <SupportersSection
+        accountId={project.account.accountId}
+        type="project"
+        supportItems={project.support}
+      />
     </div>
     <aside>
       <div class="become-supporter-card">
