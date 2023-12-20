@@ -76,13 +76,13 @@ export default (() => {
 
     state.update((s) => {
       s.accounts[forAccountId].receivable = balances[0].map((b) => ({
-        amount: b.receivableAmount,
+        amount: b.amount,
         tokenAddress: b.tokenAddress.toLowerCase(),
         multiplier: 1n,
       }));
 
       s.accounts[forAccountId].splittable = balances[1].map((b) => ({
-        amount: b.splittableAmount,
+        amount: b.amount,
         tokenAddress: b.tokenAddress.toLowerCase(),
         multiplier: 1n,
       }));

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TokensIcon from 'radicle-design-system/icons/Orgs.svelte';
+  import TokensIcon from 'radicle-design-system/icons/Coin.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
@@ -117,8 +117,7 @@
         enableSorting: false,
         size: (100 / 24) * 5,
         meta: {
-          tooltipMessage:
-            'Your incoming balance is a real-time estimate of what youʼve earned up until this moment, minus any prior withdrawals.',
+          tooltipMessage: 'Funds sent from others since your last withdrawal.',
         },
       },
       {
@@ -128,8 +127,7 @@
         enableSorting: false,
         size: (100 / 24) * 5,
         meta: {
-          tooltipMessage:
-            'Your outgoing balance is the remaining balance you can stream to others for this token.',
+          tooltipMessage: 'Your token balances for streaming to others.',
         },
       },
       {
@@ -192,6 +190,7 @@
             handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
             icon: Plus,
             label: 'Add funds',
+            variant: 'primary',
           },
         ],
   }}

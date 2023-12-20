@@ -6,8 +6,8 @@
   import streams from '$lib/stores/streams';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
-  import Balances from '../streams/sections/balances.section.svelte';
-  import Streams from '../streams/sections/streams.section.svelte';
+  import Balances from '../funds/sections/balances.section.svelte';
+  import Streams from '../funds/sections/streams.section.svelte';
   import SocialLink from '$lib/components/social-link/social-link.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
@@ -18,6 +18,7 @@
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   $: accountId = $page.params.accountId;
 
@@ -117,6 +118,7 @@
   }
 
   $: dripsAccountId && fetchRequestedAccount(dripsAccountId);
+  $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
 <HeadMeta title={(address && $ens[address]?.name) ?? address ?? accountId} />
@@ -179,7 +181,7 @@
     <Developer accountId={dripsAccountId} />
     <ProjectsSection collapsable {address} />
     <DripListsSection collapsable accountId={dripsAccountId} />
-    <Streams collapsable accountId={dripsAccountId} />
+    <Streams collapsable accountId={dripsAccountId} disableActions={!isSelf} />
     <Balances collapsable collapsed accountId={dripsAccountId} />
   </article>
 {/if}

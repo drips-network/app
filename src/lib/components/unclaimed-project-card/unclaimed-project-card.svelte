@@ -22,8 +22,14 @@
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
   import { gql } from 'graphql-request';
   import type { UnclaimedProjectCardFragment } from './__generated__/gql.generated';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
 
   const dispatch = createEventDispatcher();
+
+  interface Amount {
+    tokenAddress: string;
+    amount: bigint;
+  }
 
   export let project: UnclaimedProjectCardFragment | undefined = undefined;
   export let projectMetadata:
@@ -35,12 +41,19 @@
     | undefined = undefined;
   export let unclaimedFunds:
     | {
-        tokenAddress: string;
-        amount: bigint;
-      }[]
+        splittable: Amount[];
+        collectable: Amount[];
+      }
     | undefined = undefined;
 
-  $: unclaimedTokenPile = unclaimedFunds?.map((fund) => ({
+  $: mergedUnclaimedFunds = mergeAmounts(
+    unclaimedFunds?.splittable ?? [],
+    unclaimedFunds?.collectable ?? [],
+  );
+
+  $: hasClaimableFunds = mergedUnclaimedFunds.length > 0;
+
+  $: unclaimedTokenPile = mergedUnclaimedFunds?.map((fund) => ({
     component: Token,
     props: {
       address: fund.tokenAddress,
@@ -52,6 +65,9 @@
   export let unclaimedTokensExpanded = false;
   export let showClaimButton = false;
   export let claimableTokensKey = 'Tokens';
+
+  /** Show which tokens are collectable / splittable */
+  export let detailedTokenBreakdown = false;
 </script>
 
 <div class="project-info" transition:fly|local={{ y: 8, duration: 300 }}>
@@ -71,7 +87,7 @@
         <div class="flex flex-wrap items-start gap-6 sm:gap-12">
           {#if unclaimedTokenPile}
             <KeyValuePair key={claimableTokensKey}>
-              {#if unclaimedFunds.length > 0}
+              {#if hasClaimableFunds}
                 <Pile maxItems={4} components={unclaimedTokenPile} />
                 {#if unclaimedTokensExpandable}
                   <button
@@ -89,14 +105,16 @@
               {/if}
             </KeyValuePair>
           {/if}
-          <KeyValuePair highlight key="Estimated value">
-            <span style="color: var(--color-primary)"
-              ><AggregateFiatEstimate amounts={unclaimedFunds} /></span
-            >
-          </KeyValuePair>
+          {#if hasClaimableFunds}
+            <KeyValuePair highlight key="Estimated value">
+              <span style="color: var(--color-primary)"
+                ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
+              >
+            </KeyValuePair>
+          {/if}
         </div>
 
-        {#if unclaimedFunds.length > 0 && showClaimButton}
+        {#if hasClaimableFunds && showClaimButton}
           <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
             <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
               >Claim funds</Button
@@ -105,7 +123,40 @@
         {/if}
       </div>
       <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
-        <div class="token-amounts-table"><TokenAmountsTable amounts={unclaimedFunds} /></div>
+        {#if detailedTokenBreakdown}
+          <div class="tables-container">
+            {#if unclaimedFunds.collectable.length > 0}
+              <div class="table-and-title">
+                <div class="title">
+                  <h5>Collectable</h5>
+                  <p class="typo-text-small">
+                    These claimable funds will be collected directly to your connected wallet.
+                  </p>
+                </div>
+                <div class="table">
+                  <TokenAmountsTable amounts={unclaimedFunds.collectable} />
+                </div>
+              </div>
+            {/if}
+            {#if unclaimedFunds.splittable.length > 0}
+              <div class="table-and-title">
+                <div class="title">
+                  <h5>Splittable</h5>
+                  <p class="typo-text-small">
+                    These claimable funds will be split with your maintainers and dependencies.
+                  </p>
+                </div>
+                <div class="table">
+                  <TokenAmountsTable amounts={unclaimedFunds.splittable} />
+                </div>
+              </div>
+            {/if}
+          </div>
+        {:else}
+          <div class="token-amounts-table">
+            <TokenAmountsTable amounts={mergedUnclaimedFunds} />
+          </div>
+        {/if}
       </Toggleable>
     </div>
   {/if}
@@ -143,5 +194,25 @@
 
   .muted {
     color: var(--color-foreground-level-5);
+  }
+
+  .tables-container {
+    border-top: 1px solid var(--color-foreground);
+  }
+
+  .tables-container .table-and-title {
+    margin-top: 1rem;
+  }
+
+  .tables-container .table-and-title .title {
+    padding: 0 1rem;
+  }
+
+  .tables-container .table-and-title .table {
+    width: 100%;
+  }
+
+  .tables-container .table-and-title .title {
+    color: var(--color-foreground-level-6);
   }
 </style>
