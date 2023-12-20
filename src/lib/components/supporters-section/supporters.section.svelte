@@ -52,11 +52,10 @@
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import Droplet from 'radicle-design-system/icons/Droplet.svelte';
-  import { AddressDriverClient, constants } from 'radicle-drips';
+  import { AddressDriverClient, constants, Utils, type SplitEvent } from 'radicle-drips';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import formatDate from '$lib/utils/format-date';
-  import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import aggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
   import DripList from 'radicle-design-system/icons/DripList.svelte';
   import DripListBadge, {
@@ -72,9 +71,12 @@
   import streamState, { STREAM_STATE_LABELS } from '$lib/utils/stream-state';
   import unreachable from '$lib/utils/unreachable';
   import streamsStore from '$lib/stores/streams/streams.store';
+  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
+  import { onMount } from 'svelte';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
+  export let accountId: string;
   export let ownerAccountId: string | undefined = undefined;
 
   export let forceLoading = false;
@@ -113,20 +115,50 @@
     [accountId: string]: { tokenAddress: string; amount: bigint }[] | 'pending';
   } = {};
 
-  function updateProjectAndDripListSupportAmounts(items: typeof allItems) {
-    items.forEach(async (i) => {
+  let incomingSplitEvents: SplitEvent[] | undefined = undefined;
+  onMount(async () => {
+    const subgraphClient = getSubgraphClient();
+    incomingSplitEvents = await subgraphClient.getSplitEventsByReceiverAccountId(accountId);
+  });
+
+  function updateProjectAndDripListSupportAmounts(
+    items: typeof allItems,
+    incomingSplitEvents: SplitEvent[],
+  ) {
+    items.forEach((i) => {
       if (i.__typename === 'ProjectSupport' || i.__typename === 'DripListSupport') {
         if (projectAndDripListSupportAmounts[i.account.accountId] === undefined) {
-          projectAndDripListSupportAmounts[i.account.accountId] = 'pending';
-
-          projectAndDripListSupportAmounts[i.account.accountId] = await getIncomingSplitTotal(
-            i.account.accountId,
+          const splitEventsFromReceiver = incomingSplitEvents.filter(
+            (e) => e.accountId === i.account.accountId,
           );
+
+          projectAndDripListSupportAmounts[i.account.accountId] = splitEventsFromReceiver.reduce<
+            {
+              tokenAddress: string;
+              amount: bigint;
+            }[]
+          >((acc, curr) => {
+            const currTokenAddress = Utils.Asset.getAddressFromId(curr.assetId);
+            const existing = acc.find((e) => e.tokenAddress === currTokenAddress);
+
+            if (existing) {
+              existing.amount += curr.amount;
+            } else {
+              acc.push({
+                tokenAddress: currTokenAddress,
+                amount: curr.amount,
+              });
+            }
+
+            return acc;
+          }, []);
         }
       }
     });
   }
-  $: browser && updateProjectAndDripListSupportAmounts(allItems);
+  $: browser &&
+    incomingSplitEvents &&
+    updateProjectAndDripListSupportAmounts(allItems, incomingSplitEvents);
 
   $: allItemsWithAmount = mapFilterUndefined(allItems, (i) => {
     if (i.__typename === 'StreamSupport') {
