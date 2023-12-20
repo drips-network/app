@@ -1,3 +1,15 @@
+<script lang="ts" context="module">
+  /**
+   * Hacky way to allow refreshing the collect button from elsewhere in the app.
+   * This will become obsolete once we move all balances to the API and make use of
+   * SvelteKit load functions everywhere.
+   *
+   * Set to `true` to refresh the collect button. It will automatically set itself back
+   * to `false`.
+   */
+  export const updateCollectButton = writable<boolean>(true);
+</script>
+
 <script lang="ts">
   import Download from 'radicle-design-system/icons/Download.svelte';
   import Spinner from '../spinner/spinner.svelte';
@@ -15,6 +27,7 @@
   import globalCollectFlowSteps from '$lib/flows/global-collect-flow/global-collect-flow-steps';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
+  import { writable } from 'svelte/store';
 
   let amountElem: HTMLDivElement;
   let amountElemWidth = tweened(0, { duration: 400, easing: quintInOut });
@@ -29,22 +42,20 @@
     | undefined;
 
   async function updateSplittable() {
+    splittable = undefined;
+
     if (ownAccountId) {
-      // This is duplicated from the balances readable, but since that won't be around for long,
+      // This is duplicated from the balances store, but since that won't be around for long,
       // we're having it re-fetch the balances here again for now.
 
       const tokens = await relevantTokens('splittable', ownAccountId);
-      const splittableRes = await fetchBalancesForTokens('splittable', tokens, ownAccountId);
-
-      splittable = splittableRes.map(({ tokenAddress, splittableAmount }) => ({
-        tokenAddress,
-        amount: splittableAmount,
-      }));
+      splittable = await fetchBalancesForTokens('splittable', tokens, ownAccountId);
     }
   }
 
   $: {
-    if (ownAccountId) {
+    if (ownAccountId && $updateCollectButton) {
+      $updateCollectButton = false;
       updateSplittable();
     }
   }
