@@ -102,6 +102,8 @@
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+  import { AddressDriverClient } from 'radicle-drips';
+  import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -142,6 +144,47 @@
             component: ProjectAvatar,
             props: {
               project: v.project,
+              outline: true,
+            },
+          };
+        case 'DripListReceiver':
+          return {
+            component: DripListAvatar,
+            props: { outline: true },
+          };
+        default:
+          return undefined;
+      }
+    });
+  }
+
+  function getSupportersPile(supportTable: (ProjectProfile_ClaimedProject_Fragment['support'])[]) {
+    const support = supportTable.flat();
+
+    return mapFilterUndefined(support, (v) => {
+      switch (v.__typename) {
+        case 'OneTimeDonationSupport':
+          return {
+            component: IdentityBadge,
+            props: {
+              address: AddressDriverClient.getUserAddress(v.account.accountId),
+              showIdentity: false,
+              outline: true,
+              size: 'medium',
+            },
+          };
+        case 'ProjectSupport':
+          return {
+            component: ProjectAvatar,
+            props: {
+              project: v.project,
+              outline: true,
+            },
+          };
+        case 'DripListSupport':
+          return {
+            component: DripListAvatar,
+            props: {
               outline: true,
             },
           };
@@ -255,10 +298,20 @@
             isClaimed(project) && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
         />
       </div>
+
       {#if isClaimed(project)}
         {#await earnedFunds}
-          <div class="stats loading">
-            <Spinner />
+          <div class="flex gap-4">
+            <div
+              class="stat border rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
+            >
+              <Spinner />
+            </div>
+            <div
+              class="stat border rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
+            >
+              <Spinner />
+            </div>
           </div>
         {:then earnedFundsResult}
           <div class="stats" in:fade|local={{ duration: 300 }}>
@@ -269,22 +322,27 @@
                 </KeyValuePair>
               </div>
             {/if}
-            {#if isClaimed(project)}
-              <div class="stat">
-                <KeyValuePair key="Splits with">
-                  {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
-                    <Pile
-                      maxItems={5}
-                      components={getSplitsPile([
-                        project.splits.maintainers ?? [],
-                        project.splits.dependencies ?? [],
-                      ])}
-                    />
-                  {:else}
-                    None
-                  {/if}
+            <!-- ("Supporters" stat) -->
+            {#if [project.support].flat().length > 0}
+              <a class="stat" href="#support">
+                <KeyValuePair key="Supporters">
+                  <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
                 </KeyValuePair>
-              </div>
+              </a>
+            {/if}
+            <!-- ("Splits with" stat) -->
+            {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
+              <a class="stat" href="#splits">
+                <KeyValuePair key="Splits with">
+                  <Pile
+                    maxItems={4}
+                    components={getSplitsPile([
+                      project.splits.maintainers ?? [],
+                      project.splits.dependencies ?? [],
+                    ])}
+                  />
+                </KeyValuePair>
+              </a>
             {/if}
           </div>
         {/await}
@@ -293,7 +351,7 @@
     <div class="content">
       <Developer accountId={project.account.accountId} />
       {#if isClaimed(project)}
-        <section class="app-section">
+        <section id="splits" class="app-section">
           <SectionHeader
             icon={SplitsIcon}
             label="Splits"
@@ -368,11 +426,13 @@
           {/await}
         </section>
       {/if}
-      <SupportersSection
-        accountId={project.account.accountId}
-        type="project"
-        supportItems={project.support}
-      />
+      <section id="support">
+        <SupportersSection
+          accountId={project.account.accountId}
+          type="project"
+          supportItems={project.support}
+        />
+      </section>
     </div>
     <aside>
       <div class="become-supporter-card">
@@ -440,24 +500,22 @@
   }
 
   .stats {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .stats.loading {
-    min-height: 6.125rem;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
+    width: calc(100% + 32px);
+    margin-left: -16px;
+    padding: 0 16px;
+    overflow: scroll;
+    white-space: nowrap;
   }
 
   .stats .stat {
+    display: inline-flex;
     padding: 1rem;
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     min-height: 6.125rem;
+  }
+  .stats .stat + .stat {
+    margin-left: 0.5rem;
   }
 
   .become-supporter-card {
