@@ -22,9 +22,11 @@
 </script>
 
 {#if !$walletStore.connected}
-  <Button on:click={onClickConnectWallet} size="large" icon={Wallet} variant="primary"
-    >Connect your wallet</Button
-  >
+  <div class="button-container">
+    <Button on:click={onClickConnectWallet} size="large" icon={Wallet} variant="primary"
+      >Connect your wallet</Button
+    >
+  </div>
 {:else if !supportMenuOpen}
   <div out:fade={transitions ? { duration: 300 } : { duration: 0 }} class="button-container">
     <Button
