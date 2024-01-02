@@ -13,11 +13,11 @@
 </script>
 
 <script lang="ts">
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import ensStore from '$lib/stores/ens';
   import formatAddress from '$lib/utils/format-address';
   import { gql } from 'graphql-request';
   import type { DripListBadgeFragment } from './__generated__/gql.generated';
+  import DripListAvatar from '../drip-list-avatar/drip-list-avatar.svelte';
 
   export let dripList: DripListBadgeFragment | undefined;
 
@@ -25,9 +25,7 @@
   export let showName = true;
   export let isLinked = true;
   export let showAvatar = true;
-  export let avatarSize: 'small' | 'default' = 'default';
-
-  /** Makes the drip list icon grey instead of primary. */
+  export let avatarSize: 'tiny' | 'small' = 'small';
   export let disabled = false;
 
   const ensConnected = ensStore.connected;
@@ -47,13 +45,7 @@
   class:disabled
 >
   {#if showAvatar}
-    <div class="avatar {avatarSize}" class:disabled>
-      <DripListIcon
-        style="fill: {disabled
-          ? 'var(--color-foreground-level-6)'
-          : 'var(--color-primary)'}; {avatarSize === 'small' ? 'width:18px; height:18px;' : ''}"
-      />
-    </div>
+    <DripListAvatar size={avatarSize} {disabled} />
   {/if}
   {#if showName}
     <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
@@ -70,35 +62,5 @@
   a.drip-list-badge:focus-visible .name > span {
     background: var(--color-primary-level-1);
     border-radius: 0.25rem;
-  }
-
-  .avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 100%;
-    flex-shrink: 0;
-    width: 2rem;
-    height: 2rem;
-    background-image: linear-gradient(
-        to right,
-        var(--color-primary-level-1),
-        var(--color-primary-level-1)
-      ),
-      linear-gradient(to right, var(--color-background), var(--color-background));
-  }
-
-  .avatar.small {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  .avatar.disabled {
-    background-image: linear-gradient(
-        to right,
-        var(--color-foreground-level-2),
-        var(--color-foreground-level-2)
-      ),
-      linear-gradient(to right, var(--color-background), var(--color-background));
   }
 </style>

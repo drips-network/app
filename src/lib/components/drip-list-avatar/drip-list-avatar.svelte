@@ -5,6 +5,9 @@
   export let size: Size = 'small';
   export let outline = false;
 
+  /** Makes the drip list icon grey instead of primary. */
+  export let disabled = false;
+
   const CONTAINER_SIZES: Record<Size, string> = {
     tiny: '1.5rem',
     small: '2rem',
@@ -16,26 +19,26 @@
 </script>
 
 <div
-  class="wrapper"
+  class="wrapper overflow-hidden select-none relative flex-shrink-0 rounded-full flex items-center justify-center"
   style="width: {containerSize}; height: {containerSize}"
   class:with-outline={outline}
+  class:disabled
 >
-  <DripListIcon style="width: min(80%, 3rem); height: min(80%, 3rem; fill: var(--color-primary)" />
+  <DripListIcon
+    style="
+      width: min(80%, 3rem);
+      height: min(80%, 3rem); 
+      fill: {disabled ? 'var(--color-foreground-level-6)' : 'var(--color-foreground-level-5)'};"
+  />
 </div>
 
 <style>
   .wrapper {
-    height: 2rem;
-    width: 2rem;
     background-color: var(--color-foreground-level-2);
-    overflow: hidden;
-    user-select: none;
-    position: relative;
-    flex-shrink: 0;
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  }
+
+  .wrapper.disabled {
+    background-color: var(--color-foreground-level-3);
   }
 
   .with-outline {

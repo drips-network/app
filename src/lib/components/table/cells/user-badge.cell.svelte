@@ -3,7 +3,9 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import { z } from 'zod';
   import type { AddressDriverAccount, NFTDriverAccount } from '$lib/stores/streams/types';
-  import DripListBadge, { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge, {
+    DRIP_LIST_BADGE_FRAGMENT,
+  } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import type { AccountId } from '$lib/utils/common-types';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
@@ -64,7 +66,7 @@
   <!-- TODO: Donʼt presume any NFT account is a Drip List. -->
   <DripListBadge
     dripList={dripList ?? undefined}
-    avatarSize="small"
+    avatarSize="tiny"
     isLinked={false}
     showOwner={false}
   />
