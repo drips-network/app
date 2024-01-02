@@ -90,7 +90,7 @@
   <StepHeader
     emoji="💀"
     headline="Add custom token"
-    description="Warning: You’re about to add a token which is not officially-supported by the Drips app. If this token is not fully compliant with the ERC-20 token standard, any deposited tokens <b class='typo-text-bold'>may be unrecoverable</b>."
+    description="Warning: You’re about to add a token which is not officially-supported by the Drips app. If this token is not fully compliant with the ERC-20 token standard, any deposited tokens may be unrecoverable."
   />
   <FormField title="Token contract address*">
     <TextInput
