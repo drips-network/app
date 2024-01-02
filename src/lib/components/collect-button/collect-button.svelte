@@ -147,7 +147,12 @@
   }
 </script>
 
-<button on:click={handleClick} disabled={loading} class:nothing-to-collect={nothingToCollect}>
+<button
+  data-testid="global-collect-button"
+  on:click={handleClick}
+  disabled={loading}
+  class:nothing-to-collect={nothingToCollect}
+>
   <div class="amount-wrapper" style:width="{$amountElemWidth}px">
     <div
       class="amount tabular-nums typo-text-bold"
