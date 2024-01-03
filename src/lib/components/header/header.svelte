@@ -22,20 +22,22 @@
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
-  <a class="hide-on-mobile" aria-label="Go to homepage" href={'/'}>
-    <div class="logo">
-      <DripsLogo />
-    </div>
-    {#if showLoadingIndicator}
-      <div
-        in:fly={{ duration: 300, y: -16 }}
-        out:fly={{ duration: 300, y: 16 }}
-        class="loading-indicator"
-      >
-        <Spinner />
+  {#if $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
+    <a aria-label="Go to homepage" href={'/'}>
+      <div class="logo">
+        <DripsLogo />
       </div>
-    {/if}
-  </a>
+      {#if showLoadingIndicator}
+        <div
+          in:fly={{ duration: 300, y: -16 }}
+          out:fly={{ duration: 300, y: 16 }}
+          class="loading-indicator"
+        >
+          <Spinner />
+        </div>
+      {/if}
+    </a>
+  {/if}
   {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
       <CollectButton peekAmount={true} bind:isPeeking={collectButtonPeeking} />
@@ -174,10 +176,6 @@
   @media (max-width: 577px) {
     header {
       padding: 1rem;
-    }
-
-    .hide-on-mobile {
-      display: none;
     }
 
     .collect.mobile {
