@@ -1,0 +1,30 @@
+#blog-article-content strong {
+  font-weight: 700;
+}
+
+#blog-article-content p {
+  margin-bottom: 1.5rem;
+}
+
+#blog-article-content h1 {
+  font-size: 24px;
+  margin-bottom: 1rem;
+}
+
+#blog-article-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+#blog-article-content blockquote {
+  margin: 1.5rem 0;
+  padding: 0 1.5rem;
+  font-style: italic;
+  border-left: 1px solid var(--color-primary);
+}
+
+#blog-article-content a {
+  color: var(--color-primary-level-6);
+  text-decoration: underline;
+}

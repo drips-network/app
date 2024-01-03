@@ -20,6 +20,8 @@ export const load = async () => {
 
       const slug = path.split('/').pop()?.slice(0, -3);
 
+      assert(slug);
+
       return { ...metadata, slug };
     }),
   );
