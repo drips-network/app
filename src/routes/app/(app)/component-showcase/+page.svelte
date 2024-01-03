@@ -36,7 +36,6 @@
     Driver,
   } from '$lib/graphql/__generated__/base-types';
   import highlightStore from '$lib/stores/highlight/highlight.store';
-  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
 
   // Button
@@ -294,9 +293,6 @@
   let sectionError = false;
   let sectionCollapsable = false;
   let sectionCollapsed = false;
-
-  $: mobileView =
-    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
 </script>
 
 <HeadMeta />
@@ -319,16 +315,12 @@
     on:click={() =>
       highlightStore.highlight({
         title: 'Collect your earnings',
-        description: 'You can collect earnings to your wallet on the Projects screen.',
-        element: document.querySelectorAll(
-          mobileView
-            ? "[data-highlightid='bottomnav-/app/projects']"
-            : "[data-highlightid='sidenav-/app/projects']",
-        )[0],
-        borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
-        paddingPx: mobileView ? 8 : 0,
+        description: 'You can collect earnings to your wallet here.',
+        element: document.querySelectorAll("[data-highlightid='global-collect']")[0],
+        borderRadius: '2rem 0 2rem 2rem',
+        paddingPx: 8,
       })}
-    disabled={!$walletStore.connected}>Attach highlight to projects button</Button
+    disabled={!$walletStore.connected}>Attach highlight to collect button</Button
   >
 </div>
 

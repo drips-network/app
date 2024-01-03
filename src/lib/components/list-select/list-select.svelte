@@ -243,9 +243,15 @@
             <svelte:component this={item.label.component} {...item.label.props} />
           {/if}
           <div class="right">
-            {#if item.type === 'selectable' && item.text}<span class="text typo-text tabular-nums"
-                >{item.text}</span
-              >{/if}
+            {#if item.type === 'selectable' && item.text}
+              {#if typeof item.text === 'string'}
+                <span class="text typo-text tabular-nums">
+                  {item.text}
+                </span>
+              {:else}
+                <svelte:component this={item.text.component} {...item.text.props} />
+              {/if}
+            {/if}
             {#if item.type === 'selectable' && item.editablePercentage}
               <PercentageEditor
                 bind:percentage={percentages[slug]}
