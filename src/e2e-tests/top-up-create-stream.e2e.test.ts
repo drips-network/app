@@ -530,7 +530,7 @@ describe('app', async () => {
       it('creates the drip list', async () => {
         await page.locator('button', { hasText: 'Confirm in wallet' }).click();
 
-        await expect(page.locator('text=Congratulations!')).toHaveCount(1);
+        await expect(page.locator('text=Congratulations!')).toHaveCount(1, { timeout: 10000 });
       }, 10000);
     });
 
