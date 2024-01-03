@@ -1,9 +1,16 @@
 <script lang="ts">
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
 
   export let data: PageData;
 </script>
+
+<HeadMeta
+  title="{data.meta.title} | Drips Blog"
+  description={data.meta.excerpt}
+  image={data.meta.coverImage}
+/>
 
 <article>
   <PostCard {...data.meta} first={true} link={false} />
