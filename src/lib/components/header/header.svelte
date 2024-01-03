@@ -36,7 +36,7 @@
       </div>
     {/if}
   </a>
-  {#if ($walletStore.connected && $breakpointsStore?.breakpoint === 'mobile') || $breakpointsStore?.breakpoint === 'tablet'}
+  {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
       <CollectButton peekAmount={true} bind:isPeeking={collectButtonPeeking} />
     </div>
@@ -70,7 +70,7 @@
     <div class="connect">
       <ConnectButton />
     </div>
-    {#if ($walletStore.connected && $breakpointsStore?.breakpoint === 'desktop') || $breakpointsStore?.breakpoint === 'desktopWide'}
+    {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
       <div data-highlightid="global-collect" class="collect">
         <CollectButton />
       </div>
