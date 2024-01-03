@@ -16,6 +16,7 @@ const config = {
     mdsvex({
       // The default mdsvex extension is .svx; this overrides that.
       extensions: ['.md'],
+      layout: '/src/lib/components/blog/article-layout/article-layout.svelte',
     }),
   ],
 

@@ -1,4 +1,4 @@
-#blog-article-content strong {
+#blog-article-content :not(.custom-component) strong {
   font-weight: 700;
 }
 
@@ -27,4 +27,9 @@
 #blog-article-content a {
   color: var(--color-primary-level-6);
   text-decoration: underline;
+}
+
+#blog-article-content img {
+  border-radius: 1rem 0 1rem 1rem;
+  margin: 2.5rem 0;
 }

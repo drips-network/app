@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ArticleContent from '$lib/components/blog/article-content/article-content.svelte';
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
   import type { PageData } from './$types';
 
@@ -9,7 +8,7 @@
 <article>
   <PostCard {...data.meta} first={true} link={false} />
   <div class="content">
-    <ArticleContent contentComponent={data.PostContent} />
+    <svelte:component this={data.PostContent} />
   </div>
 </article>
 
