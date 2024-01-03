@@ -13,6 +13,7 @@ export const load = async () => {
         excerpt: z.string(),
         date: z.string(),
         coverImage: z.string(),
+        coverImageAlt: z.string(),
       });
 
       const metadata = metadataSchema.parse(resolved.metadata);
