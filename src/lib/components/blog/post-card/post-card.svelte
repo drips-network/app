@@ -17,7 +17,13 @@
   });
 </script>
 
-<svelte:element this={link ? 'a' : 'div'} class="post" class:first href="/blog/posts/{slug}">
+<svelte:element
+  this={link ? 'a' : 'div'}
+  class:link
+  class="post"
+  class:first
+  href="/blog/posts/{slug}"
+>
   <img src={coverImage} alt={coverImageAlt} />
   <div class="content">
     {#if first}
@@ -32,12 +38,25 @@
 
 <style>
   .post {
-    border: 1px solid var(--color-foreground);
     display: flex;
+    box-shadow: var(--elevation-low);
     flex-direction: column;
     border-radius: 2rem 0 2rem 2rem;
     overflow: hidden;
     width: 100%;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+  }
+
+  .post.link:hover,
+  .post.link:focus-visible {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 4px 0px 1px var(--color-foreground),
+      inset 0 0px 0px 0px var(--color-foreground);
+    transform: translateY(-4px);
+  }
+
+  .post.link:active {
+    transform: translateY(0px);
+    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
   }
 
   .post .content {
@@ -60,7 +79,7 @@
     justify-content: center;
   }
 
-  @media (min-width: 650px) {
+  @media (min-width: 1024px) {
     .post {
       width: calc(50% - 1rem);
     }

@@ -9,6 +9,7 @@
 #blog-article-content h1 {
   font-size: 24px;
   margin-bottom: 1rem;
+  line-height: 2rem;
 }
 
 #blog-article-content ol {
