@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { env } from '$env/dynamic/private';
 
   export let title = 'Drips';
   export let image = '/assets/share/og-generic.png';
@@ -13,7 +12,7 @@
 
   $: fullTitle = `${title}${title.startsWith('Drips') ? '' : ' | Drips'}`;
 
-  const pageUrl = env.DEPLOY_URL ?? `https://${$page.url.host}`;
+  const pageUrl = import.meta.env.DEPLOY_URL ?? `https://${$page.url.host}`;
 </script>
 
 <svelte:head>
