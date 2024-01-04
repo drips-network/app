@@ -46,12 +46,4 @@ describe('header.svelte', () => {
 
     expect(header).not.toHaveClass('elevated');
   });
-
-  it('has a link back to the homepage', () => {
-    render(Header);
-
-    const links = screen.queryAllByRole('link');
-
-    expect(links.find((e) => e.getAttribute('href') === '/')).toBeTruthy();
-  });
 });

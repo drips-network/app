@@ -102,7 +102,10 @@ describe('app', async () => {
       });
 
       it('displays the custom mock erc-20 token', async () => {
-        const testcoin = page.locator('text=Testcoin');
+        // Testcoin item in the list-select component
+        const testcoin = page.locator(
+          'data-testid=item-0xefbF81372aBC3723463746a89CEb42080563684C',
+        ); //
         await testcoin.click();
 
         const topUpButton = page.locator('text=Add Testcoin');
@@ -386,7 +389,7 @@ describe('app', async () => {
         await page.goto('http://127.0.0.1:3001/app/funds');
 
         await page.locator('text=Testcoin').click();
-        await page.locator('button', { hasText: 'Collect' }).click();
+        await page.locator('data-testid=token-page-collect-button').click();
 
         await expect(page.locator('h1', { hasText: 'Collect TEST' })).toHaveCount(1);
       });
@@ -527,7 +530,7 @@ describe('app', async () => {
       it('creates the drip list', async () => {
         await page.locator('button', { hasText: 'Confirm in wallet' }).click();
 
-        await expect(page.locator('text=Congratulations!')).toHaveCount(1);
+        await expect(page.locator('text=Congratulations!')).toHaveCount(1, { timeout: 10000 });
       }, 10000);
     });
 

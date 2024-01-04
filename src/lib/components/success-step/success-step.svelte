@@ -11,10 +11,13 @@
 
   export let message: string | (() => string);
   export let action: 'close' | 'hide-modal' | 'continue' = 'close';
+  export let onAction: (() => void) | undefined = undefined;
 
   export let safeAppMode = false;
 
   function handleConfirm() {
+    onAction?.();
+
     if (action === 'continue') {
       dispatch('goForward');
     } else if (action === 'hide-modal') {

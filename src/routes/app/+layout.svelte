@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+  export const initializing = writable(false);
+</script>
+
 <script lang="ts">
   import { onMount } from 'svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
@@ -6,7 +10,7 @@
   import ens from '$lib/stores/ens';
   import balances from '$lib/stores/balances/balances.store';
   import streams from '$lib/stores/streams/streams.store';
-  import { derived } from 'svelte/store';
+  import { derived, writable } from 'svelte/store';
   import tickStore from '$lib/stores/tick/tick.store';
 
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
@@ -27,10 +31,9 @@
 
   let walletConnected = false;
   let loaded = false;
-  let initializing = false;
 
   async function initializeStores() {
-    initializing = true;
+    initializing.set(true);
     await wallet.initialize();
     loaded = true;
 
@@ -83,7 +86,7 @@
       streams.disconnect();
     }
 
-    initializing = false;
+    initializing.set(false);
   }
 
   async function warnIfSafe(chainId: number, address: string) {
@@ -119,7 +122,7 @@
     await initializeStores();
 
     wallet.subscribe((s) => {
-      if (initializing) return;
+      if ($initializing) return;
 
       if (s.connected !== walletConnected) {
         initializeStores();
@@ -165,7 +168,7 @@
 <ModalLayout />
 
 <div in:fade={{ duration: 300, delay: 300 }}>
-  {#if $page.data.blockWhileInitializing !== false && (!loaded || initializing)}
+  {#if $page.data.blockWhileInitializing !== false && (!loaded || $initializing)}
     <div out:fade|local={{ duration: 300 }} class="loading-spinner">
       <Spinner />
     </div>

@@ -11,7 +11,7 @@ export interface SelectableItem {
   type: 'selectable';
   label: string | ComponentAndProps;
   searchString?: SearchString;
-  text?: string;
+  text?: string | ComponentAndProps;
   disabled?: boolean;
   image?: string | ComponentAndProps;
   editablePercentage?: true;

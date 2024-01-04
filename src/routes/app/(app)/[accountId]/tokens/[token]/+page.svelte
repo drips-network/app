@@ -145,7 +145,7 @@
         </svelte:fragment>
 
         <svelte:fragment slot="actions">
-          <div class="flex gap-3">
+          <div data-testid="token-page-collect-button" class="flex gap-3">
             <Button disabled={!loaded} icon={ArrowUp} on:click={openCollectModal}>Collect</Button>
           </div>
         </svelte:fragment>

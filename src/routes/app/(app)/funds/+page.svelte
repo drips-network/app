@@ -69,7 +69,7 @@
   ].filter((ci) => !$dismissablesStore.includes(ci((i) => i).id));
 </script>
 
-<HeadMeta title="Streams" />
+<HeadMeta title="Funds" />
 
 <div class="dashboard">
   <div class="edu-carousel">
