@@ -4,10 +4,9 @@ import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { html as toReactElement } from 'satori-html';
 import { z } from 'zod';
-import imageDataUri from 'image-data-uri';
 import type { EntryGenerator } from './$types.js';
 
-export const GET = async ({ fetch, params }) => {
+export const GET = async ({ url, params }) => {
   const { slug, target } = params;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,12 +35,9 @@ export const GET = async ({ fetch, params }) => {
 
   const height = target === 'twitter' ? 600 : 675;
 
-  const coverImage = await fetch(metadata.coverImage);
-  const coverImageBase64 = await imageDataUri.encode(await coverImage.arrayBuffer(), 'png');
-
   const svg = await satori(
     toReactElement(
-      `<img src="${coverImageBase64}" width="1200px" height="${height}px" style="object-fit: cover" />`,
+      `<img src="${url.protocol}//${url.host}/${metadata.coverImage}" width="1200px" height="${height}px" style="object-fit: cover" />`,
     ),
     {
       width: 1200,
