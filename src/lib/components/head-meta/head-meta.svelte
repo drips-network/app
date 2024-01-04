@@ -9,17 +9,19 @@
 
   export let twitterCardType: 'summary' | 'summary_large_image' =
     twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
+
+  $: fullTitle = `${title}${title.startsWith('Drips') ? '' : ' | Drips'}`;
 </script>
 
 <svelte:head>
-  {#if title}
-    <title>{title}{title.startsWith('Drips') ? '' : ' | Drips'}</title>
-    <meta property="og:title" content="{title}{title.startsWith('Drips') ? '' : ' | Drips'}" />
+  {#if fullTitle}
+    <title>{fullTitle}</title>
+    <meta property="og:title" content={fullTitle} />
+    <meta name="twitter:title" content={fullTitle} />
   {/if}
   <meta name="description" content={description} />
   <meta property="og:image" content="https://{$page.url.host}{image}" />
   <meta property="og:description" content={description} />
-  <meta name="twitter:title" content="Drips" />
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content="https://{$page.url.host}{twitterImage}" />
   <meta name="twitter:card" content={twitterCardType} />
