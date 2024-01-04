@@ -14,7 +14,7 @@
 />
 
 <article>
-  <PostCard {...data.meta} first={true} link={false} />
+  <PostCard shareButton {...data.meta} first={true} link={false} />
   <div class="content">
     <svelte:component this={data.PostContent} />
   </div>
@@ -35,5 +35,8 @@
     max-width: 44rem;
     width: 100%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 </style>

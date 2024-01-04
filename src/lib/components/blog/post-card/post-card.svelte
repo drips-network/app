@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+  import ShareButton from '$lib/components/share-button/share-button.svelte';
+
   export let title: string;
   export let excerpt: string;
   export let date: string;
@@ -9,6 +12,7 @@
   export let first = false;
 
   export let link = true;
+  export let shareButton = false;
 
   $: formattedDate = new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -20,19 +24,25 @@
 <svelte:element
   this={link ? 'a' : 'div'}
   class:link
+  class:share-button={shareButton}
   class="post"
   class:first
   href="/blog/posts/{slug}"
 >
   <img src={coverImage} alt={coverImageAlt} />
   <div class="content">
-    {#if first}
-      <h1>{title}</h1>
-    {:else}
-      <h2 class="pixelated">{title}</h2>
+    <div>
+      {#if first}
+        <h1>{title}</h1>
+      {:else}
+        <h2 class="pixelated">{title}</h2>
+      {/if}
+      <p class="typo-text-small">{formattedDate}</p>
+      <p>{excerpt}</p>
+    </div>
+    {#if shareButton}
+      <ShareButton url={$page.url.toString()} />
     {/if}
-    <p class="typo-text-small">{formattedDate}</p>
-    <p>{excerpt}</p>
   </div>
 </svelte:element>
 
@@ -60,7 +70,16 @@
   }
 
   .post .content {
+    display: flex;
+    flex-direction: column;
     padding: 2rem;
+  }
+
+  .post.share-button .content {
+    justify-content: space-between;
+  }
+
+  .post .content div {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -75,7 +94,7 @@
     width: 100%;
   }
 
-  .post.first .content {
+  .post.first .content div {
     justify-content: center;
   }
 
