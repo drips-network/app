@@ -7,10 +7,8 @@ import { z } from 'zod';
 import imageDataUri from 'image-data-uri';
 import type { EntryGenerator } from './$types.js';
 
-export const prerender = true;
-
-export const GET = async ({ url, fetch, params }) => {
-  const { slug } = params;
+export const GET = async ({ fetch, params }) => {
+  const { slug, target } = params;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let post: any;
@@ -29,8 +27,6 @@ export const GET = async ({ url, fetch, params }) => {
   });
 
   const metadata = metadataSchema.parse(post.metadata);
-
-  const target = url.searchParams.get('target');
 
   try {
     assert(target === 'twitter' || target === 'og');
@@ -70,15 +66,22 @@ export const GET = async ({ url, fetch, params }) => {
   });
 };
 
+export const prerender = true;
+
+// Tell SvelteKit to prerender all blog post share images
 export const entries: EntryGenerator = async () => {
   const allPosts = import.meta.glob('/src/blog-posts/*.md', { as: 'raw' });
 
-  return await Promise.all(
+  const slugs = await Promise.all(
     Object.entries(allPosts).map(async ([path]) => {
       const slug = path.split('/').pop()?.slice(0, -3);
       assert(slug);
 
-      return { slug };
+      return slug;
     }),
   );
+
+  return slugs.reduce<{ slug: string; target: string }[]>((acc, slug) => {
+    return [...acc, { slug, target: 'twitter' }, { slug, target: 'og' }];
+  }, []);
 };
