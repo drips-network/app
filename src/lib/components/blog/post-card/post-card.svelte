@@ -73,7 +73,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 2rem;
+    padding: 1rem;
+    gap: 1.5rem;
   }
 
   .post.share-button .content {
@@ -102,6 +103,10 @@
   @media (min-width: 1024px) {
     .post {
       width: calc(50% - 1rem);
+    }
+
+    .post .content {
+      padding: 2rem;
     }
 
     .post img {
