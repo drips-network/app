@@ -6,11 +6,15 @@
   export let data: PageData;
 </script>
 
-<HeadMeta
-  title="{data.meta.title} | Drips Blog"
-  description={data.meta.excerpt}
-  image={data.meta.coverImage}
-/>
+{#if true}
+  {@const imageBaseUrl = `/api/share-images/blog-post/${encodeURIComponent(data.meta.slug)}.png`}
+  <HeadMeta
+    title="{data.meta.title} | Drips Blog"
+    image="{imageBaseUrl}?target=og"
+    twitterImage="{imageBaseUrl}?target=twitter"
+    description={data.meta.excerpt}
+  />
+{/if}
 
 <article>
   <PostCard {...data.meta} first={true} link={false} />

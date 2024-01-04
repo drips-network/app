@@ -7,8 +7,7 @@
   export let description =
     'A Web3 toolkit that enables FOSS developers to raise funds, without any platform fees.';
 
-  // If there's a custom share image for this route, display a large image card, otherwise standard.
-  $: twitterCardType =
+  export let twitterCardType: 'summary' | 'summary_large_image' =
     twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
 </script>
 
