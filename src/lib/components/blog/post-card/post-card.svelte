@@ -84,6 +84,10 @@
       width: calc(50% - 1rem);
     }
 
+    .post img {
+      min-height: 18rem;
+    }
+
     .post.first {
       flex-direction: row-reverse;
     }
