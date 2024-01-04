@@ -13,7 +13,7 @@ export const GET = async ({ fetch, params }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let post: any;
   try {
-    post = await import(`../../../../../blog-posts/${slug}.md`);
+    post = await import(`../../../../../../blog-posts/${slug}.md`);
   } catch {
     throw error(404, 'Post not found');
   }
