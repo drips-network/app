@@ -18,6 +18,8 @@ In 2023, Octant has already completed two public goods funding rounds, distribut
 
 Funds from Octant’s Epoch Zero and Epoch One will be streamed to the four dependencies on their [Drip List](https://www.drips.network/app/drip-lists/30178668158349445547603108732480118476541651095408979232800331391215): Web3.py, Flask, Wagmi, and Nimbus.
 
+![Octant's Drip List](/assets/blog-images/octant-dl.jpeg)
+
 [Web3.py](https://github.com/ethereum/web3.py) is a Python library that allows developers to interact with the Ethereum blockchain easily. [Flask](https://www.drips.network/external/https%3A%2F%2Fgithub.com%2Fpallets%2Fflask) is a micro web framework for Python, popular for its simplicity and flexibility in developing web applications. [Wagmi](https://www.drips.network/external/https%3A%2F%2Fgithub.com%2Fwagmi-dev%2Fwagmi) is a collection of React Hooks that make it easier to connect a frontend to the Ethereum blockchain, and [Nimbus](https://nimbus.team/) is an Ethereum 2.0 client optimized for resource-restricted devices, which plays a crucial role in the network's sustainability.
 
 Our partnership with Octant is only beginning. We’re hoping to see more funding directed towards Octant’s Drip List in Epoch Two, [which begins soon](https://x.com/OctantApp/status/1723995707084841354?s=20)!
@@ -29,6 +31,8 @@ Drips makes dependency funding possible at scale, giving projects a way to suppo
 As Eleftherios Diakomichalis, Co-Founder of Radicle & Drips describes: "Drips’ features, such as **per-second streaming**, **flexibility in token choice** as well as its **flexible identity model** where funders can stream to any Git forge URL or Ethereum address, ensures **a streamlined and user-friendly experience** for both our DAO and the recipients of funding. Unlike other solutions, **Drips makes programmatic, recurring funding easy and efficient** for both individuals and groups, so it’s multiplayer by design."
 
 By streaming with Drips, you can help ensure the sustainable development, stability, security and continuous improvement of the critical software we all depend on.
+
+![Octant's Drip List](/assets/blog-images/dependency-comic.png)
 
 # Believe in the Cause? How You Can Help…
 
@@ -52,4 +56,5 @@ Explore more details on Drips and other recent news:
 Octant was developed by the Golem Foundation to test various hypotheses around user control, community engagement, and participatory funding of public goods. It allows for running various governance experiments in a real-life environment and rewards user participation with ETH and is funded by staking rewards earned by the Golem Foundation’s 100,000 ETH. Every 90 days, a fraction of the staking rewards is used to fund the Octant reward pool. Follow Octant on X.
 
 ## Drips 💧
+
 Drips is an off-the-shelf solution allowing any organization or individual to provide direct and recurring financial support to the free and open source projects they depend on. Using Drips, organizations can effortlessly allocate funding to the projects they consider essential and to link their success to the success of their dependents. Follow Drips on X.
