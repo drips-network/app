@@ -11,8 +11,6 @@
     twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
 
   $: fullTitle = `${title}${title.startsWith('Drips') ? '' : ' | Drips'}`;
-
-  const pageUrl = import.meta.env.DEPLOY_URL ?? `https://${$page.url.host}`;
 </script>
 
 <svelte:head>
@@ -22,10 +20,10 @@
     <meta name="twitter:title" content={fullTitle} />
   {/if}
   <meta name="description" content={description} />
-  <meta property="og:image" content="{pageUrl}{image}" />
+  <meta property="og:image" content="https://{$page.url.host}{image}" />
   <meta property="og:description" content={description} />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content="{pageUrl}{twitterImage}" />
+  <meta name="twitter:image" content="https://{$page.url.host}{twitterImage}" />
   <meta name="twitter:card" content={twitterCardType} />
   <meta name="twitter:site" content="@dripsnetwork" />
 </svelte:head>
