@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -18,7 +18,7 @@
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
-  import type { State } from '../../funder-onboarding-flow';
+  import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import expect from '$lib/utils/expect';
   import type { DripsSubgraphClient } from 'radicle-drips';
@@ -40,6 +40,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+  export let connectedWalletHidden = false;
 
   let dripListService: DripListService;
   let subgraphClient: DripsSubgraphClient;
@@ -164,16 +165,18 @@
     </FormField>
   {/if}
 
-  <FormField type="div" title="Your connected wallet">
-    <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
-        >Edit</Button
-      >
-    </svelte:fragment>
-    <AccountBox hideDisconnect />
-  </FormField>
+  {#if !connectedWalletHidden}
+    <FormField type="div" title="Your connected wallet">
+      <svelte:fragment slot="action">
+        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+          >Edit</Button
+        >
+      </svelte:fragment>
+      <AccountBox hideDisconnect />
+    </FormField>
+  {/if}
 
-  <div class="whats-next">
+  <div class="whats-next text-left">
     <div class="card">
       <h4>On transaction confirmation…</h4>
       <ul>

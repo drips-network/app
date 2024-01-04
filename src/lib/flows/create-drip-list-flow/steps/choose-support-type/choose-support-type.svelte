@@ -1,7 +1,7 @@
 <script lang="ts">
   import TwoBigOptions from '$lib/components/two-big-options/two-big-options.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import Pause from 'radicle-design-system/icons/Pause.svelte';
   import Transactions from 'radicle-design-system/icons/Transactions.svelte';
   import Coin from 'radicle-design-system/icons/Coin.svelte';
@@ -11,7 +11,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
-  import type { State } from '../../funder-onboarding-flow';
+  import type { State } from '../../create-drip-list-flow';
   import unreachable from '$lib/utils/unreachable';
   import Heart from 'radicle-design-system/icons/Heart.svelte';
 

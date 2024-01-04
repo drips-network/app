@@ -2,10 +2,10 @@
   import Button from '$lib/components/button/button.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import Check from 'radicle-design-system/icons/Check.svelte';
   import type { Writable } from 'svelte/store';
-  import type { State } from '../../funder-onboarding-flow';
+  import type { State } from '../../create-drip-list-flow';
   import { page } from '$app/stores';
   import DripListEditor from '$lib/components/drip-list-editor/drip-list-editor.svelte';
 

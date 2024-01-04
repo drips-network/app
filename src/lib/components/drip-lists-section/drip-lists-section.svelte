@@ -12,6 +12,8 @@
   import { gql } from 'graphql-request';
   import type { DripListsQuery, DripListsQueryVariables } from './__generated__/gql.generated';
   import query from '$lib/graphql/dripsQL';
+  import modal from '$lib/stores/modal';
+  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
 
   export let accountId: string | undefined;
   export let collapsed = false;
@@ -28,13 +30,13 @@
 
       const dripListsQuery = gql`
         ${DRIP_LIST_CARD_FRAGMENT}
-        query DripLists($where: DripListWhereInput) {  
+        query DripLists($where: DripListWhereInput) {
           dripLists(where: $where) {
             ...DripListCard
           }
         }
       `;
-      
+
       const result = await query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {
         where: {
           ownerAddress: address,
@@ -66,7 +68,8 @@
             label: 'Create Drip List',
             icon: Plus,
             variant: 'primary',
-            handler: () => goto('/app/funder-onboarding'),
+            handler: () =>
+              modal.show(CreateDripListStepper, undefined, { skipWalletConnect: true }),
           },
         ]
       : [],

@@ -3,7 +3,7 @@ import { get, writable } from 'svelte/store';
 import BuildListStep from './steps/build-list/build-list.svelte';
 import ConfigureContinuousSupportStep from './steps/configure-continuous-support/configure-continuous-support.svelte';
 import ReviewStep from './steps/review/review.svelte';
-import type { Slots } from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
+import type { Slots } from '../../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import Pile from '$lib/components/pile/pile.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
@@ -13,7 +13,7 @@ import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelt
 import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
 import ConnectWalletStep from './steps/connect-wallet/connect-wallet.svelte';
 import ChooseSupportTypeStep from './steps/choose-support-type/choose-support-type.svelte';
-import WalletSlot from '../shared/slots/wallet-slot.svelte';
+import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
 import ConfigureOneTimeDonation from './steps/configure-one-time-donation/configure-one-time-donation.svelte';
 
@@ -117,15 +117,19 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = () => [
+export const steps = (skipWalletConnect = false) => [
   makeStep({
     component: BuildListStep,
     props: undefined,
   }),
-  makeStep({
-    component: ConnectWalletStep,
-    props: undefined,
-  }),
+  ...(skipWalletConnect
+    ? []
+    : [
+        makeStep({
+          component: ConnectWalletStep,
+          props: undefined,
+        }),
+      ]),
   makeStep({
     component: ChooseSupportTypeStep,
     props: undefined,
@@ -146,7 +150,9 @@ export const steps = () => [
   }),
   makeStep({
     component: ReviewStep,
-    props: undefined,
+    props: {
+      connectedWalletHidden: skipWalletConnect,
+    },
   }),
   makeStep({
     component: Success,

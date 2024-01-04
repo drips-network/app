@@ -24,7 +24,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
   import { createEventDispatcher, onMount } from 'svelte';
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import dripsJsonTemplate from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
