@@ -11,6 +11,7 @@
   image="/api/share-images/blog-post/og/{encodeURIComponent(data.meta.slug)}.png"
   twitterImage="/api/share-images/blog-post/twitter/{encodeURIComponent(data.meta.slug)}.png"
   description={data.meta.excerpt}
+  twitterCardType="summary"
 />
 
 <article>
