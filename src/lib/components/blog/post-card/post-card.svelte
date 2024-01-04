@@ -72,6 +72,7 @@
   .post .content {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     padding: 2rem;
   }
 
