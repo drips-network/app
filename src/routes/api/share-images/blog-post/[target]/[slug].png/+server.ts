@@ -1,12 +1,10 @@
 import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
-import satori from 'satori';
-import { Resvg } from '@resvg/resvg-js';
-import { html as toReactElement } from 'satori-html';
 import { z } from 'zod';
 import type { EntryGenerator } from './$types.js';
+import Jimp from 'jimp';
 
-export const GET = async ({ url, params }) => {
+export const GET = async ({ params }) => {
   const { slug, target } = params;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,27 +33,9 @@ export const GET = async ({ url, params }) => {
 
   const height = target === 'twitter' ? 600 : 675;
 
-  const svg = await satori(
-    toReactElement(
-      `<img src="${url.protocol}//${url.host}/${metadata.coverImage}" width="1200px" height="${height}px" style="object-fit: cover" />`,
-    ),
-    {
-      width: 1200,
-      height: height,
-      fonts: [],
-    },
-  );
+  const jimp = (await Jimp.read(`static${metadata.coverImage}`)).cover(1200, height);
 
-  const resvg = new Resvg(svg, {
-    fitTo: {
-      mode: 'width',
-      value: 1200,
-    },
-  });
-
-  const image = resvg.render();
-
-  return new Response(image.asPng(), {
+  return new Response(await jimp.getBufferAsync(Jimp.MIME_PNG), {
     headers: {
       'content-type': 'image/png',
     },
