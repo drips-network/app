@@ -1,20 +1,15 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import DripsLogo from '$lib/components/illustrations/logo.svelte';
-  import ThreeDrips from '$lib/components/illustrations/three-drips.svelte';
   import scrollStore from '$lib/stores/scroll/scroll.store';
 
   $: scrolledDown = $scrollStore.pos > 10;
-  $: showLogo = true;
 </script>
 
 <header class:raised={scrolledDown}>
   <div class="left">
     <a aria-label="Go to homepage" class="logo" href="/">
-      <div class="inner" class:logoOffset={showLogo}>
-        <ThreeDrips />
-        <DripsLogo />
-      </div>
+      <DripsLogo />
     </a>
   </div>
   <nav>
@@ -63,20 +58,6 @@
   .logo {
     margin-left: 0.5rem;
     height: 28px;
-  }
-
-  .logo .inner {
-    transition: transform 0.3s;
-  }
-
-  .logo .inner.logoOffset {
-    transform: translateY(-58px);
-  }
-
-  .logo > .inner {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
   }
 
   nav {
