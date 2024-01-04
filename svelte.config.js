@@ -1,7 +1,8 @@
+import 'dotenv/config';
+
 import adapter from '@sveltejs/adapter-netlify';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 import { mdsvex } from 'mdsvex';
-import { env } from '$env/dynamic/private';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -24,7 +25,7 @@ const config = {
   kit: {
     adapter: adapter(),
     prerender: {
-      origin: env.DEPLOY_URL,
+      origin: process.env.DEPLOY_URL,
     },
   },
 };
