@@ -1,8 +1,8 @@
 ---
 title: 'Dependency Funding with Drips'
-date: '2021-10-27'
+date: '2023-07-26'
 coverImage: '/assets/blog-images/drips-logo.png'
-coverImageAlt: 'Alt description of image'
+coverImageAlt: 'Drips Logo'
 excerpt: 'In the vast realm of software development, one concept has always stood out as a testament to the interconnected nature of our modern society: the software dependency tree.'
 ---
 
