@@ -36,10 +36,6 @@
     gap: 0.5rem;
   }
 
-  .lp-footer > .credits > .drip {
-    width: 0.6rem;
-  }
-
   .lp-footer * {
     white-space: nowrap;
   }
