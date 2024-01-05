@@ -1,16 +1,9 @@
 <script>
-  import Drip from '$lib/components/illustrations/drip.svelte';
   import RadworksLogo from '$lib/components/illustrations/radworks-logo.svelte';
 </script>
 
 <div class="lp-footer">
   <div class="credits">
-    <div>
-      Built by the <span class="typo-text-bold" style:color="var(--color-foreground)"
-        >Public Goods Association</span
-      >
-    </div>
-    <div class="drip"><Drip fill="var(--color-foreground-level-5)" /></div>
     <a class="supported-by" href="https://radworks.org/" target="_blank" rel="noreferrer">
       Supported by <div class="radworks-logo"><RadworksLogo /></div>
     </a>
