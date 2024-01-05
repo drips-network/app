@@ -4,19 +4,29 @@
 </script>
 
 <div class="lp-footer">
-  <div>
-    Built by the <span class="typo-text-bold" style:color="var(--color-foreground)"
-      >Public Goods Association</span
-    >
+  <div class="credits">
+    <div>
+      Built by the <span class="typo-text-bold" style:color="var(--color-foreground)"
+        >Public Goods Association</span
+      >
+    </div>
+    <div class="drip"><Drip fill="var(--color-foreground-level-5)" /></div>
+    <a class="supported-by" href="https://radworks.org/" target="_blank" rel="noreferrer">
+      Supported by <div class="radworks-logo"><RadworksLogo /></div>
+    </a>
   </div>
-  <div class="drip"><Drip fill="var(--color-foreground-level-5)" /></div>
-  <a class="supported-by" href="https://radworks.org/" target="_blank" rel="noreferrer">
-    Supported by <div class="radworks-logo"><RadworksLogo /></div>
-  </a>
+
+  <div class="legal">
+    <div class="legal-links typo-text-small">
+      <a href="/legal/privacy">Privacy Policy</a> •
+      <a href="/legal/disclaimer">Disclaimer</a> •
+      <a href="/legal/access">Access</a>
+    </div>
+  </div>
 </div>
 
 <style>
-  .lp-footer {
+  .lp-footer .credits {
     display: flex;
     gap: 0.75rem;
     color: var(--color-foreground-level-5);
@@ -27,13 +37,13 @@
     flex-wrap: wrap;
   }
 
-  .lp-footer > .supported-by {
+  .lp-footer > .credits > .supported-by {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
-  .lp-footer > .drip {
+  .lp-footer > .credits > .drip {
     width: 0.6rem;
   }
 
@@ -41,8 +51,15 @@
     white-space: nowrap;
   }
 
-  .lp-footer > .supported-by > .radworks-logo {
+  .lp-footer > .credits > .supported-by > .radworks-logo {
     height: 1.4rem;
     transform: translateY(0.1rem);
+  }
+
+  .lp-footer > .legal {
+    display: flex;
+    justify-content: center;
+    color: var(--color-foreground-level-5);
+    margin-bottom: 2rem;
   }
 </style>

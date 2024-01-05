@@ -332,18 +332,6 @@
 
     <div class="section-spacer" />
 
-    <section>
-      <div class="flex flex-col gap-4 items-center">
-        <div class="legal-links typo-text-small">
-          <a href="/legal/privacy">Privacy Policy</a> •
-          <a href="/legal/disclaimer">Disclaimer</a> •
-          <a href="/legal/access">Access</a>
-        </div>
-      </div>
-    </section>
-
-    <div class="section-spacer" />
-
     <LpFooter />
 
     <div class="section-spacer" />
