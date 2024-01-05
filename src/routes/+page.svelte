@@ -309,15 +309,15 @@
           <div class="flex gap-4">
             <Button
               variant="primary"
-              href="https://twitter.com/dripsnetwork"
+              href="https://drips.network/blog"
               target="_blank"
-              rel="noreferrer">Twitter</Button
+              rel="noreferrer">Blog</Button
             >
             <Button
               variant="primary"
-              href="https://mirror.xyz/dripsdev.eth"
+              href="https://twitter.com/dripsnetwork"
               target="_blank"
-              rel="noreferrer">Mirror</Button
+              rel="noreferrer">Twitter</Button
             >
             <Button
               variant="primary"
