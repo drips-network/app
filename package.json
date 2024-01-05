@@ -100,6 +100,7 @@
     "radicle-drips": "github:radicle-dev/drips-js-sdk#feature/dependency-funding",
     "redis": "^4.6.11",
     "rehype-external-links": "^3.0.0",
+    "rehype-img-size": "^1.0.1",
     "sanitize-html": "^2.11.0",
     "satori": "^0.10.9",
     "satori-html": "^0.3.2",

@@ -6,6 +6,7 @@ import { mdsvex } from 'mdsvex';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
 import rehypeLinks from 'rehype-external-links';
+import rehypeImageSize from 'rehype-img-size';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -22,7 +23,12 @@ const config = {
       // The default mdsvex extension is .svx; this overrides that.
       extensions: ['.md'],
       layout: '/src/lib/components/blog/article-layout/article-layout.svelte',
-      rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings, [rehypeLinks, { target: '_blank' }]],
+      rehypePlugins: [
+        rehypeSlug,
+        rehypeAutolinkHeadings,
+        [rehypeLinks, { target: '_blank' }],
+        [rehypeImageSize, { dir: 'static' }],
+      ],
     }),
   ],
 
