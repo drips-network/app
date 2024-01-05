@@ -89,6 +89,7 @@
 
   .post img {
     width: 100%;
+    height: 40vw;
     object-fit: cover;
   }
 
@@ -110,7 +111,8 @@
     }
 
     .post img {
-      min-height: 18rem;
+      min-height: 20rem;
+      height: auto;
     }
 
     .post.first {
