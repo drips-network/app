@@ -25,7 +25,7 @@
   import buildUrl from '$lib/utils/build-url';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
-  import RadworksLogo from '$lib/components/illustrations/radworks-logo.svelte';
+  import LpFooter from './components/lp-footer.svelte';
 
   onMount(() => {
     // When launching within a Safe, we donʼt want to display the landing page.
@@ -344,18 +344,7 @@
 
     <div class="section-spacer" />
 
-    <section class="credits">
-      <span>Supported by</span>
-      <a
-        href="https://radworks.org/"
-        target="_blank"
-        style:height="1.5rem"
-        style:display="inline-block"
-        aria-label="Radworks"
-      >
-        <RadworksLogo />
-      </a>
-    </section>
+    <LpFooter />
 
     <div class="section-spacer" />
   </div>
@@ -723,19 +712,6 @@
     gap: 1rem;
     align-items: center;
     padding: 0 2rem;
-  }
-
-  /* CREDITS */
-
-  .credits {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
-  }
-
-  .credits > span {
-    color: var(--color-foreground-level-5);
   }
 
   /* HOW IT WORKS */
