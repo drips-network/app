@@ -53,15 +53,13 @@
 
   $: hasClaimableFunds = mergedUnclaimedFunds.length > 0;
 
-  $: unclaimedTokenPile = mergedUnclaimedFunds
-    ?.map((fund) => ({
-      component: Token,
-      props: {
-        address: fund.tokenAddress,
-        show: 'none',
-      },
-    }))
-    .slice(0);
+  $: unclaimedTokenPile = mergedUnclaimedFunds?.map((fund) => ({
+    component: Token,
+    props: {
+      address: fund.tokenAddress,
+      show: 'none',
+    },
+  }));
 
   export let unclaimedTokensExpandable = true;
   export let unclaimedTokensExpanded = false;
