@@ -1,0 +1,57 @@
+#blog-article-content :not(.custom-component) strong {
+  font-weight: 700;
+}
+
+#blog-article-content p {
+  margin-bottom: 1.5rem;
+}
+
+#blog-article-content h1 {
+  font-size: 26px;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  line-height: 2rem;
+}
+
+#blog-article-content h2 {
+  font-size: 19px;
+  margin-bottom: 1rem;
+  line-height: 2rem;
+}
+
+#blog-article-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+#blog-article-content ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+#blog-article-content blockquote {
+  margin: 1.5rem 0;
+  padding: 0 1.5rem;
+  border-left: 1px solid var(--color-primary);
+}
+
+#blog-article-content a {
+  color: var(--color-primary-level-6);
+  text-decoration: underline;
+}
+
+#blog-article-content img {
+  max-width: calc(44rem + 4rem);
+  width: calc(100vw);
+  border-radius: 1rem 0 1rem 1rem;
+  margin: 2.5rem -2rem;
+}
+
+@media (max-width: 797px) {
+  #blog-article-content img {
+    width: 100%;
+    margin: 2.5rem 0;
+  }
+}

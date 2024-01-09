@@ -378,7 +378,7 @@
               component: DripListBadge,
               props: {
                 isLinked: false,
-                avatarSize: 'small',
+                avatarSize: 'tiny',
                 dripList: item.dripList,
               },
             }}

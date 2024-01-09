@@ -168,7 +168,7 @@
 <div
   role="listbox"
   aria-multiselectable={multiselect}
-  class="list"
+  class="flex flex-col box-border"
   style:pointer-events={blockInteraction ? 'none' : 'all'}
 >
   {#if searchable}
@@ -202,7 +202,7 @@
       <div
         role="option"
         aria-selected={selected.includes(slug)}
-        class="item"
+        class="item flex items-start p-3 select-none"
         class:selected={selected.includes(slug)}
         class:disabled={isItemDisabled(slug)}
         class:hidden={!Object.values(filteredItems).includes(item)}
@@ -236,16 +236,19 @@
             {/if}
           </div>
         {/if}
-        <div class="content" class:action={item.type === 'action'}>
+        <div
+          class="content xs:flex flex-wrap items-center justify-between w-full text-foreground"
+          class:action={item.type === 'action'}
+        >
           {#if typeof item.label === 'string'}
-            <span class="label typo-text">{item.label}</span>
+            <span class="label typo-text pr-4">{item.label}</span>
           {:else}
             <svelte:component this={item.label.component} {...item.label.props} />
           {/if}
           <div class="right">
             {#if item.type === 'selectable' && item.text}
               {#if typeof item.text === 'string'}
-                <span class="text typo-text tabular-nums">
+                <span class="text typo-text tabular-nums flex-shrink-0">
                   {item.text}
                 </span>
               {:else}
@@ -285,7 +288,6 @@
     border-bottom: 1px solid var(--color-foreground);
     display: flex;
     gap: 0.5rem;
-    /* color: var(--color-foreground); */
   }
 
   .item:last-child {
@@ -306,18 +308,8 @@
     text-align: center;
   }
 
-  .list {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-  }
-
   .item {
-    padding: 0.75rem 1rem;
-    user-select: none;
     transition: background-color 0.3s;
-    display: flex;
-    align-items: center;
   }
 
   .interstitial {
@@ -351,16 +343,6 @@
     width: 1.5rem;
     flex-shrink: 0;
     border-radius: 1rem;
-  }
-
-  .item .content {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    color: var(--color-foreground);
-    flex-wrap: wrap;
   }
 
   .item .content .text {
