@@ -68,9 +68,6 @@
     position: fixed;
     z-index: 10000;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: scroll;
   }
 
   .overlay {
@@ -81,8 +78,17 @@
     position: fixed;
   }
 
+  .content {
+    width: 100%;
+    display: flex;
+    overflow: scroll;
+    z-index: 200;
+    padding: 2rem 0;
+  }
+
   .modal-wrapper {
     position: relative;
+    margin: auto;
   }
 
   .close-button-wrapper {
@@ -115,10 +121,5 @@
   .close-button:focus {
     background-color: var(--color-foreground-level-1);
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
-  }
-
-  .content {
-    z-index: 200;
-    margin: auto;
   }
 </style>

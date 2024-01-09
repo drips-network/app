@@ -8,7 +8,6 @@
 
 <style>
   .modal {
-    margin: 2rem 0;
     background: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
     box-shadow: var(--elevation-high);
