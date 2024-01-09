@@ -20,7 +20,10 @@
 
 <style>
   .drip-animation {
-    animation: dripping 750ms linear infinite;
+    animation: dripping 750ms ease infinite;
+    /* start from frame: 0% so it doesn't flash */
+    transform-origin: top center;
+    transform: scale(0, 0);
   }
 
   @keyframes dripping {
