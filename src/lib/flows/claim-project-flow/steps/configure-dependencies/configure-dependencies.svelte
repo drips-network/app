@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
   import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
   import { createEventDispatcher, onMount } from 'svelte';

@@ -1,8 +1,8 @@
 <script lang="ts">
+  import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { slotsTemplate, state, steps } from './create-drip-list-flow';
   import StandaloneFlowSlots from '$lib/components/standalone-flow-slots/standalone-flow-slots.svelte';
-  import DripList from '$lib/components/illustrations/drip-list.svelte';
+  import { slotsTemplate, state, steps } from './claim-project-flow';
 
   export let skipWalletConnect = false;
 
@@ -20,7 +20,7 @@
 {/if}
 
 <div class="icon">
-  <DripList strokeWidth={6} />
+  <MultiChain strokeWidth={6} />
 </div>
 
 <Stepper
@@ -28,7 +28,7 @@
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
   steps={steps(skipWalletConnect)}
-  minHeightPx={128}
+  minHeightPx={0}
 />
 
 <style>

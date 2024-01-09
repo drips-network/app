@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Slots } from '../components/standalone-flow-slots/standalone-flow-slots.svelte';
+import type { Slots } from '../../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
 import EnterGitUrl, {
@@ -18,7 +18,7 @@ import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
-import WalletSlot from '../shared/slots/wallet-slot.svelte';
+import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProject_UnclaimedProject_Fragment } from './__generated__/gql.generated';
 
@@ -38,7 +38,8 @@ interface SplitsConfig extends ListEditorConfig {
 }
 
 interface Amount {
-  tokenAddress: string; amount: bigint;
+  tokenAddress: string;
+  amount: bigint;
 }
 
 export interface State {
@@ -54,10 +55,12 @@ export interface State {
         defaultBranch: string | undefined;
       }
     | undefined;
-  unclaimedFunds: {
-    splittable: Amount[];
-    collectable: Amount[];
-  } | undefined;
+  unclaimedFunds:
+    | {
+        splittable: Amount[];
+        collectable: Amount[];
+      }
+    | undefined;
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
@@ -132,15 +135,19 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = () => [
+export const steps = (skipWalletConnect = false) => [
   makeStep({
     component: EnterGitUrl,
     props: undefined,
   }),
-  makeStep({
-    component: ConnectWallet,
-    props: undefined,
-  }),
+  ...(skipWalletConnect
+    ? []
+    : [
+        makeStep({
+          component: ConnectWallet,
+          props: undefined,
+        }),
+      ]),
   makeStep({
     component: AddEthereumAddress,
     props: undefined,
@@ -159,7 +166,9 @@ export const steps = () => [
   }),
   makeStep({
     component: Review,
-    props: undefined,
+    props: {
+      canEditWalletConnection: !skipWalletConnect,
+    },
   }),
   makeStep({
     component: PollSubgraph,

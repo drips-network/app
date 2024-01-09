@@ -16,7 +16,7 @@
 <script lang="ts">
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { Writable } from 'svelte/store';
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT, type State } from '../../claim-project-flow';
   import LinkIcon from 'radicle-design-system/icons/Link.svelte';
   import Button from '$lib/components/button/button.svelte';

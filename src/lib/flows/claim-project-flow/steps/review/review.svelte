@@ -12,7 +12,7 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import StandaloneFlowStepLayout from '../../../components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
@@ -42,6 +42,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+  export let canEditWalletConnection = true;
 
   $: project = $context.project ?? unreachable();
 
@@ -115,9 +116,11 @@
   </FormField>
   <FormField type="div" title="Owned by">
     <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
-        >Edit</Button
-      >
+      {#if canEditWalletConnection}
+        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+          >Edit</Button
+        >
+      {/if}
     </svelte:fragment>
     <AccountBox hideDisconnect />
   </FormField>
@@ -159,8 +162,8 @@
     </div>
   </FormField>
   <div class="whats-next">
-    <div class="card">
-      {#if hasCollectableAmount || hasSplittableAmount}
+    {#if hasCollectableAmount || hasSplittableAmount}
+      <div class="card">
         <h4>On transaction confirmation…</h4>
         <ul>
           {#if hasCollectableAmount && hasSplittableAmount}
@@ -199,8 +202,8 @@
             >
           {/if}
         </ul>
-      {/if}
-    </div>
+      </div>
+    {/if}
     <div class="card">
       <h4>After transaction confirmation…</h4>
       <ul>
@@ -242,6 +245,7 @@
     gap: 0.5rem;
     flex-direction: column;
     overflow-x: scroll;
+    text-align: left;
   }
 
   ul {
