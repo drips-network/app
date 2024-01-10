@@ -169,10 +169,6 @@
     z-index: 50;
   }
 
-  .loading-indicator {
-    margin-left: 0.5rem;
-  }
-
   @media (max-width: 577px) {
     header {
       padding: 1rem;
