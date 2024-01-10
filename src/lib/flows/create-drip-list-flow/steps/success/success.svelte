@@ -7,7 +7,7 @@
   import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
   import { onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
-  import type { State } from '../../funder-onboarding-flow';
+  import type { State } from '../../create-drip-list-flow';
 
   export let context: Writable<State>;
 
