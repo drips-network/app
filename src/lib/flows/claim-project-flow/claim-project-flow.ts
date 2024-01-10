@@ -135,7 +135,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = (skipWalletConnect = false) => [
+export const steps = (skipWalletConnect = false, isModal = false) => [
   makeStep({
     component: EnterGitUrl,
     props: undefined,
@@ -168,6 +168,7 @@ export const steps = (skipWalletConnect = false) => [
     component: Review,
     props: {
       canEditWalletConnection: !skipWalletConnect,
+      isModal,
     },
   }),
   makeStep({

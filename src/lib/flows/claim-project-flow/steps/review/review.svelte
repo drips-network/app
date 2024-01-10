@@ -14,7 +14,7 @@
   import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { createEventDispatcher } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeStep, type StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
@@ -38,11 +38,13 @@
   import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
   import { gql } from 'graphql-request';
   import Download from 'radicle-design-system/icons/Download.svelte';
+  import ProjectCustomizerStep from './components/project-customizer-step.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
   export let canEditWalletConnection = true;
+  export let isModal = false;
 
   $: project = $context.project ?? unreachable();
 
@@ -83,16 +85,29 @@
   function customize() {
     const projectWritable = writable(fakeClaimedProject);
 
-    modal.show(
-      ProjectCustomizerModal,
-      () => {
-        const { emoji, color } = get(projectWritable);
+    if (isModal) {
+      dispatch('sidestep', {
+        steps: [
+          makeStep({
+            component: ProjectCustomizerStep,
+            props: {
+              project: projectWritable,
+            },
+          }),
+        ],
+      });
+    } else {
+      modal.show(
+        ProjectCustomizerModal,
+        () => {
+          const { emoji, color } = get(projectWritable);
 
-        $context.projectEmoji = emoji;
-        $context.projectColor = color;
-      },
-      { project: projectWritable },
-    );
+          $context.projectEmoji = emoji;
+          $context.projectColor = color;
+        },
+        { project: projectWritable },
+      );
+    }
   }
 
   $: hasCollectableAmount =

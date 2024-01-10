@@ -10,8 +10,12 @@
   import balancesStore from '$lib/stores/balances/balances.store';
   import assert from '$lib/utils/assert';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+  import { createEventDispatcher } from 'svelte';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
 
   export let context: Writable<State>;
+
+  const dispatch = createEventDispatcher<StepComponentEvents>();
 
   let loading = false;
 
@@ -42,6 +46,7 @@
       ),
     ).then(() => {
       loading = false;
+      dispatch('conclude');
     });
   }
 </script>

@@ -27,7 +27,7 @@
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
-  steps={steps(skipWalletConnect)}
+  steps={steps(skipWalletConnect, true)}
   minHeightPx={0}
 />
 
