@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type { Slots } from '../../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
@@ -67,6 +67,7 @@ export interface State {
   dependenciesAutoImported: boolean;
   projectEmoji: string;
   projectColor: string;
+  isSubgraphPolled: boolean;
 }
 
 export const state = writable<State>({
@@ -90,6 +91,7 @@ export const state = writable<State>({
   dependenciesAutoImported: false,
   projectEmoji: '❓',
   projectColor: '#000000',
+  isSubgraphPolled: false,
 });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
@@ -147,14 +149,11 @@ export const steps = (
       projectUrl,
     },
   }),
-  ...(skipWalletConnect
-    ? []
-    : [
-        makeStep({
-          component: ConnectWallet,
-          props: undefined,
-        }),
-      ]),
+  makeStep({
+    component: ConnectWallet,
+    props: undefined,
+    condition: () => !skipWalletConnect,
+  }),
   makeStep({
     component: AddEthereumAddress,
     props: undefined,
@@ -181,6 +180,7 @@ export const steps = (
   makeStep({
     component: PollSubgraph,
     props: undefined,
+    condition: () => !get(state).isSubgraphPolled,
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,

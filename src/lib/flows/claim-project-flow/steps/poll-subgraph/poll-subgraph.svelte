@@ -40,7 +40,7 @@
       }
     `;
 
-    await expect(
+    const response = await expect(
       () =>
         query<CheckProjectVerificationStatusQuery, CheckProjectVerificationStatusQueryVariables>(
           checkProjectVerificationStatusQuery,
@@ -54,5 +54,9 @@
       300000,
       2000,
     );
+
+    if (!response.failed) {
+      $context.isSubgraphPolled = true;
+    }
   }
 </script>
