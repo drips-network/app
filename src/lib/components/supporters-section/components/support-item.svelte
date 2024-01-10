@@ -4,7 +4,6 @@
   import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
 
-  export let icon: ComponentType;
   export let title: {
     component: ComponentType;
     props: Record<string, unknown>;
@@ -24,9 +23,6 @@
 
 <a class="support-item" {href} class:has-href={href}>
   <div class="left">
-    <div class="icon">
-      <svelte:component this={icon} style="fill: var(--color-foreground)" />
-    </div>
     <div class="content">
       <div class="title">
         <svelte:component this={title.component} {...title.props} />
@@ -83,16 +79,6 @@
     display: flex;
     gap: 0.125rem;
     justify-content: flex-end;
-  }
-
-  .icon {
-    height: 2.5rem;
-    width: 2.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-foreground-level-1);
-    border-radius: 2rem;
   }
 
   .muted {
