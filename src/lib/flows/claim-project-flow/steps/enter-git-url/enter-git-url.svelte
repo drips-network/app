@@ -38,6 +38,7 @@
   import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
 
   export let context: Writable<State>;
+  export let projectUrl: string | undefined = undefined;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -46,10 +47,13 @@
   $: formValid = validationState.type === 'valid';
 
   const { searchParams } = $page.url;
-  const projectUrlToAdd = searchParams.get('projectToAdd') ?? undefined;
+  const projectUrlToAdd = projectUrl ?? searchParams.get('projectToAdd') ?? undefined;
 
   onMount(() => {
-    if (projectUrlToAdd) $context.gitUrl = projectUrlToAdd;
+    if (projectUrlToAdd) {
+      $context.gitUrl = projectUrlToAdd;
+      fetchProject();
+    }
   });
 
   async function fetchProject() {

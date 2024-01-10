@@ -104,6 +104,7 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { AddressDriverClient } from 'radicle-drips';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
+  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -158,7 +159,7 @@
     });
   }
 
-  function getSupportersPile(supportTable: (ProjectProfile_ClaimedProject_Fragment['support'])[]) {
+  function getSupportersPile(supportTable: ProjectProfile_ClaimedProject_Fragment['support'][]) {
     const support = supportTable.flat();
 
     return mapFilterUndefined(support, (v) => {
@@ -267,7 +268,12 @@
               icon={Registered}
               variant="primary"
               on:click={() =>
-                goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                $walletStore.connected
+                  ? modal.show(ClaimProjectStepper, undefined, {
+                      skipWalletConnect: true,
+                      projectUrl: project.source.url,
+                    })
+                  : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
               >Claim project</Button
             >
           </div>

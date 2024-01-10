@@ -135,10 +135,17 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = (skipWalletConnect = false, isModal = false) => [
+export const steps = (
+  skipWalletConnect = false,
+  isModal = false,
+  projectUrl: string | undefined = undefined,
+) => [
+  // TODO: skip this step entirely if project is provided (like "Claim project" button on project-profile)
   makeStep({
     component: EnterGitUrl,
-    props: undefined,
+    props: {
+      projectUrl,
+    },
   }),
   ...(skipWalletConnect
     ? []

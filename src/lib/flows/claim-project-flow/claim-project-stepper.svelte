@@ -4,6 +4,7 @@
   import StandaloneFlowSlots from '$lib/components/standalone-flow-slots/standalone-flow-slots.svelte';
   import { slotsTemplate, state, steps } from './claim-project-flow';
 
+  export let projectUrl: string | undefined = undefined;
   export let skipWalletConnect = false;
 
   let currentStepIndex = 0;
@@ -27,7 +28,7 @@
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
-  steps={steps(skipWalletConnect, true)}
+  steps={steps(skipWalletConnect, true, projectUrl)}
   minHeightPx={0}
 />
 
