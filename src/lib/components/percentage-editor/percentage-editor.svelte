@@ -4,6 +4,7 @@
   export let percentage = 0;
   export let disabled = false;
   export let editable = true;
+  export let emptyIsError = true;
 
   let error = false;
   let empty = false;
@@ -87,6 +88,7 @@
   class="percentage-editor typo-text tabular-nums cursor-text"
   class:focus
   class:error
+  class:empty-is-error={emptyIsError}
   class:empty
   class:disabled
   class:editable
@@ -139,7 +141,7 @@
   }
 
   .percentage-editor:not(.disabled).error,
-  .percentage-editor:not(.disabled).empty {
+  .percentage-editor:not(.disabled).empty-is-error.empty {
     box-shadow: 0px 0px 0px 2px var(--color-negative);
     color: var(--color-negative);
   }
