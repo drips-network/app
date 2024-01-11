@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import { gql } from 'graphql-request';
   import type { ProjectAvatarFragment } from './__generated__/gql.generated';
+  import sanitize from 'sanitize-html';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
     fragment ProjectAvatar on Project {
@@ -35,7 +36,13 @@
 
   $: emojiElem =
     isClaimed(project) && project.emoji
-      ? twemoji.parse(project.emoji, { folder: 'svg', ext: '.svg' })
+      ? twemoji.parse(
+          sanitize(project.emoji, {
+            allowedTags: [],
+            allowedAttributes: {},
+          }),
+          { folder: 'svg', ext: '.svg' },
+        )
       : undefined;
 </script>
 
