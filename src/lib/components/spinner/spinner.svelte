@@ -12,11 +12,13 @@
   );
 </script>
 
-{#if render}
-  <div class="w-6 h-6 drip-animation flex justify-center" in:fade|local={{ duration: 150 }}>
-    <Drip height="100%" />
-  </div>
-{/if}
+<div class="w-6 h-6 flex justify-center">
+  {#if render}
+    <div class="drip-animation" in:fade|local={{ duration: 150 }}>
+      <Drip height="100%" />
+    </div>
+  {/if}
+</div>
 
 <style>
   .drip-animation {

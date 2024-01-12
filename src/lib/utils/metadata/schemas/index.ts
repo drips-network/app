@@ -6,6 +6,7 @@ import { nftDriverAccountMetadataSchemaV3 } from './nft-driver/v3';
 import { repoDriverAccountMetadataSchemaV1 } from './repo-driver/v1';
 import { repoDriverAccountMetadataSchemaV2 } from './repo-driver/v2';
 import { repoDriverAccountMetadataSchemaV3 } from './repo-driver/v3';
+import { repoDriverAccountMetadataSchemaV4 } from './repo-driver/v4';
 
 export const nftDriverAccountMetadataParser = createVersionedParser([
   nftDriverAccountMetadataSchemaV3.parse,
@@ -18,6 +19,7 @@ export const addressDriverAccountMetadataParser = createVersionedParser([
 ]);
 
 export const repoDriverAccountMetadataParser = createVersionedParser([
+  repoDriverAccountMetadataSchemaV4.parse,
   repoDriverAccountMetadataSchemaV3.parse,
   repoDriverAccountMetadataSchemaV2.parse,
   repoDriverAccountMetadataSchemaV1.parse,

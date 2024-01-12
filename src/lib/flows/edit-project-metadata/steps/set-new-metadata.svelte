@@ -3,7 +3,14 @@
     ${PROJECT_CUSTOMIZER_FRAGMENT}
     fragment SetNewMetadataStep on ClaimedProject {
       ...ProjectCustomizer
-      emoji
+      avatar {
+        ... on EmojiAvatar {
+          emoji
+        }
+        ... on ImageAvatar {
+          cid
+        }
+      }
       color
       account {
         accountId
@@ -29,6 +36,8 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { gql } from 'graphql-request';
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
+  import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+  import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -37,7 +46,9 @@
   let projectWritable = writable(structuredClone(project));
 
   $: changesMade =
-    project.emoji !== $projectWritable.emoji || project.color !== $projectWritable.color;
+    project.avatar !== $projectWritable.avatar || project.color !== $projectWritable.color;
+
+  let valid = false;
 
   function submit() {
     const metadataManager = new RepoDriverMetadataManager();
@@ -51,9 +62,20 @@
           )?.data;
           assert(currentMetadata, 'No metadata found for account');
 
-          const newMetadata = {
-            ...currentMetadata,
-            emoji: $projectWritable.emoji,
+          const upgraded = metadataManager.upgradeAccountMetadata(currentMetadata);
+
+          const newMetadata: LatestVersion<typeof repoDriverAccountMetadataParser> = {
+            ...upgraded,
+            avatar:
+              $projectWritable.avatar.__typename === 'EmojiAvatar'
+                ? {
+                    type: 'emoji',
+                    emoji: $projectWritable.avatar.emoji,
+                  }
+                : {
+                    type: 'image',
+                    cid: $projectWritable.avatar.cid,
+                  },
             color: $projectWritable.color,
           };
 
@@ -85,9 +107,9 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer project={projectWritable} />
+  <ProjectCustomizer bind:valid project={projectWritable} />
   <svelte:fragment slot="actions">
-    <Button on:click={submit} disabled={!changesMade} variant="primary" icon={Wallet}
+    <Button on:click={submit} disabled={!changesMade || !valid} variant="primary" icon={Wallet}
       >Confirm changes in your wallet</Button
     >
   </svelte:fragment>

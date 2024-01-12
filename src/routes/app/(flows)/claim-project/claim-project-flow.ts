@@ -38,7 +38,8 @@ interface SplitsConfig extends ListEditorConfig {
 }
 
 interface Amount {
-  tokenAddress: string; amount: bigint;
+  tokenAddress: string;
+  amount: bigint;
 }
 
 export interface State {
@@ -54,15 +55,17 @@ export interface State {
         defaultBranch: string | undefined;
       }
     | undefined;
-  unclaimedFunds: {
-    splittable: Amount[];
-    collectable: Amount[];
-  } | undefined;
+  unclaimedFunds:
+    | {
+        splittable: Amount[];
+        collectable: Amount[];
+      }
+    | undefined;
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
   dependenciesAutoImported: boolean;
-  projectEmoji: string;
+  avatar: { type: 'emoji'; emoji: string } | { type: 'image'; cid: string };
   projectColor: string;
 }
 
@@ -85,7 +88,10 @@ export const state = writable<State>({
     percentages: {},
   },
   dependenciesAutoImported: false,
-  projectEmoji: '❓',
+  avatar: {
+    type: 'emoji',
+    emoji: '❓',
+  },
   projectColor: '#000000',
 });
 

@@ -54,7 +54,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
   }
 
   public buildAccountMetadata(context: {
-    forProject: PickGQLF<ClaimedProject, 'account' | 'source' | 'emoji' | 'color' | 'description'>;
+    forProject: PickGQLF<ClaimedProject, 'account' | 'source' | 'avatar' | 'color' | 'description'>;
     forSplits: LatestVersion<typeof repoDriverAccountMetadataParser>['splits'];
   }): LatestVersion<typeof repoDriverAccountMetadataParser> {
     const { forProject, forSplits } = context;
@@ -71,7 +71,16 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
         ownerName: forProject.source.ownerName,
         url: forProject.source.url,
       },
-      emoji: forProject.emoji,
+      avatar:
+        forProject.avatar.__typename === 'EmojiAvatar'
+          ? {
+              type: 'emoji',
+              emoji: forProject.avatar.emoji,
+            }
+          : {
+              type: 'image',
+              cid: forProject.avatar.cid,
+            },
       color: forProject.color,
       description: forProject.description ?? undefined,
       splits: forSplits,
@@ -112,6 +121,19 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     result.splits.dependencies = result.splits.dependencies.map(upgradeSplit);
     result.splits.maintainers = result.splits.maintainers.map(upgradeSplit);
+
+    const newRes = result as LatestVersion<typeof repoDriverAccountMetadataParser>;
+
+    // Upgrade emoji
+
+    if (result.emoji) {
+      newRes.avatar = {
+        type: 'emoji',
+        emoji: result.emoji,
+      };
+
+      delete newRes.emoji;
+    }
 
     const parsed = repoDriverAccountMetadataParser.parseLatest(result);
 

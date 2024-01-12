@@ -118,6 +118,10 @@
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
+    avatar: {
+      __typename: 'EmojiAvatar',
+      emoji: '🚶',
+    },
     emoji: '🚶',
     color: '#fcc842',
     splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
@@ -144,6 +148,10 @@
       repoName: 'svelte-stored-writable',
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
+    },
+    avatar: {
+      __typename: 'EmojiAvatar',
+      emoji: '💾',
     },
     emoji: '💾',
     color: '#FF0000',
@@ -416,7 +424,10 @@
       project={{
         __typename: 'ClaimedProject',
         source: SOURCE_CONFIGS.github,
-        emoji: '🚶',
+        avatar: {
+          __typename: 'EmojiAvatar',
+          emoji: '🚶',
+        },
         color: '#fcc842',
       }}
     />
@@ -451,7 +462,10 @@
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
             source: SOURCE_CONFIGS[sourceType],
-            emoji: '🚶',
+            avatar: {
+              __typename: 'EmojiAvatar',
+              emoji: '🚶',
+            },
             color: '#fcc842',
           }
         : {

@@ -6,8 +6,8 @@ import { PUBLIC_PINATA_GATEWAY_URL } from '$env/static/public';
  * @returns The raw `Response` of fetching the given hash from our Pinata
  * gateway.
  */
-export async function fetchIpfs(hash: string) {
-  return fetch(`${PUBLIC_PINATA_GATEWAY_URL}/ipfs/${hash}`);
+export async function fetchIpfs(hash: string, f = fetch) {
+  return f(`${PUBLIC_PINATA_GATEWAY_URL}/ipfs/${hash}`);
 }
 
 /**
