@@ -90,7 +90,7 @@
     />
   </FormField>
 
-  <TabbedBox bind:activeTab>
+  <TabbedBox bind:activeTab ariaLabel="Avatar settings">
     <svelte:fragment slot="tab-1">
       <input class="emoji-search-input" type="text" bind:value={searchTerm} placeholder="Search…" />
       <div class="emojis-container">

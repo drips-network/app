@@ -10,6 +10,7 @@
 
   export let containerRole = 'radiogroup';
   export let itemRole = 'radio';
+  export let ariaLabel: string | undefined = undefined;
 
   const dispatch = createEventDispatcher<{ select: keyof T }>();
 
@@ -52,7 +53,7 @@
 </script>
 
 <div class="segmented-control" bind:this={containerElem}>
-  <div class="options" role={containerRole}>
+  <div class="options" role={containerRole} aria-label={ariaLabel}>
     {#each options as option}
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <div

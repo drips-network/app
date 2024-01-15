@@ -6,6 +6,8 @@
     2: 'Custom image',
   };
 
+  export let ariaLabel: string;
+
   export let activeTab = 'tab-1';
 </script>
 
@@ -13,6 +15,9 @@
   <div class="tabs">
     <SegmentedControl
       bind:active={activeTab}
+      itemRole="tab"
+      containerRole="tablist"
+      {ariaLabel}
       options={[
         { title: tabs[1], value: 'tab-1' },
         { title: tabs[2], value: 'tab-2' },
@@ -20,9 +25,13 @@
     />
   </div>
   {#if activeTab === 'tab-1'}
-    <slot name="tab-1" />
+    <div role="tabpanel">
+      <slot name="tab-1" />
+    </div>
   {:else if activeTab === 'tab-2'}
-    <slot name="tab-2" />
+    <div role="tabpanel">
+      <slot name="tab-2" />
+    </div>
   {/if}
 </div>
 
