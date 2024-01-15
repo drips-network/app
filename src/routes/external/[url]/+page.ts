@@ -1,11 +1,13 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
+const ALLOWED_PROTOCOLS = ['http:', 'https:'];
+
 export const load = (({ params }) => {
   const url = new URL(decodeURI(params.url));
 
-  if (url.protocol.includes('javascript')) {
-    throw error(404);
+  if (!ALLOWED_PROTOCOLS.includes(url.protocol)) {
+    throw error(400, 'Invalid protocol');
   }
 
   return {
