@@ -8,6 +8,7 @@
   import { onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
+  import modal from '$lib/stores/modal';
 
   export let context: Writable<State>;
 
@@ -20,6 +21,7 @@
 
     await goto(`/app/drip-lists/${$context.dripListId}`).then(() => {
       loading = false;
+      modal.hide();
     });
   }
 
