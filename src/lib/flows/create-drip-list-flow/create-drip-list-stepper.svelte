@@ -1,12 +1,14 @@
 <script lang="ts">
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { slotsTemplate, state, steps } from './create-drip-list-flow';
+  import { slotsTemplate, state as createState, steps } from './create-drip-list-flow';
   import StandaloneFlowSlots from '$lib/components/standalone-flow-slots/standalone-flow-slots.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
 
   export let skipWalletConnect = false;
 
   let currentStepIndex = 0;
+
+  const state = createState();
 
   $: slots = slotsTemplate($state, currentStepIndex);
 
@@ -27,7 +29,7 @@
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
-  steps={steps(skipWalletConnect)}
+  steps={steps(state, skipWalletConnect)}
   minHeightPx={128}
 />
 

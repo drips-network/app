@@ -1,5 +1,5 @@
 import { makeStep } from '$lib/components/stepper/types';
-import { get, writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import BuildListStep from './steps/build-list/build-list.svelte';
 import ConfigureContinuousSupportStep from './steps/configure-continuous-support/configure-continuous-support.svelte';
 import ReviewStep from './steps/review/review.svelte';
@@ -35,20 +35,21 @@ export interface State {
   dripListId: string | undefined;
 }
 
-export const state = writable<State>({
-  dripList: { title: 'My Drip List', percentages: {}, items: {}, description: undefined },
-  selectedSupportOption: undefined,
-  continuousSupportConfig: {
-    listSelected: [],
-  },
-  oneTimeDonationConfig: {
-    selectedTokenAddress: undefined,
-    amountInputValue: '0',
-    topUpMax: false,
-    amount: undefined,
-  },
-  dripListId: undefined,
-});
+export const state = () =>
+  writable<State>({
+    dripList: { title: 'My Drip List', percentages: {}, items: {}, description: undefined },
+    selectedSupportOption: undefined,
+    continuousSupportConfig: {
+      listSelected: [],
+    },
+    oneTimeDonationConfig: {
+      selectedTokenAddress: undefined,
+      amountInputValue: '0',
+      topUpMax: false,
+      amount: undefined,
+    },
+    dripListId: undefined,
+  });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
   const dripListSlot = {
@@ -117,7 +118,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = (skipWalletConnect = false) => [
+export const steps = (state: Writable<State>, skipWalletConnect = false) => [
   makeStep({
     component: BuildListStep,
     props: undefined,
