@@ -13,6 +13,7 @@ import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import isClaimed from '$lib/utils/project/is-claimed';
 import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
+import sanitize from 'sanitize-html';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { projectUrl } = params;
@@ -57,7 +58,12 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   }
 
   const projectName = `${project.source.ownerName}/${project.source.repoName}`;
-  const emoji = isClaimed(project) ? project.emoji : 'none';
+  const emoji = isClaimed(project)
+    ? sanitize(project.emoji, {
+        allowedTags: [],
+        allowedAttributes: {},
+      })
+    : 'none';
   const dependenciesCount = isClaimed(project)
     ? project.splits.dependencies.length.toString()
     : '0';

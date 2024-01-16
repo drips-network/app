@@ -4,6 +4,7 @@
   import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
   import CopyIcon from 'radicle-design-system/icons/Copy.svelte';
   import Button from '../button/button.svelte';
+  import sanitize from 'sanitize-html';
 
   export let path: string;
   export let code: string;
@@ -47,7 +48,10 @@
   </header>
   <div class="code-wrapper">
     <code class="typo-text-mono">
-      {@html code}
+      {@html sanitize(code, {
+        allowedTags: [],
+        allowedAttributes: {},
+      })}
     </code>
   </div>
   {#if repoUrl.includes('github')}
