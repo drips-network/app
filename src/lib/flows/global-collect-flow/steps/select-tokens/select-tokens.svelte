@@ -16,6 +16,7 @@
   import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import AddCustomTokenButton from './components/add-custom-token-button.svelte';
+  import nextSettlementDate from '$lib/utils/settlement-date';
 
   const dispatch = createEventDispatcher();
 
@@ -82,9 +83,6 @@
   onMount(async () => {
     cycle = await getCycle();
   });
-
-  // Adding one more day to current cycle end because we may split anytime during the day
-  $: currentCycleEnd = cycle && new Date(cycle.start.getTime() + cycle.durationMillis + 86400000);
 </script>
 
 <StepLayout>
@@ -100,7 +98,8 @@
         <InfoCircle />
         <svelte:fragment slot="tooltip-content">
           <p>
-            Earnings from projects, streams and Drip Lists settle and become collectable weekly.
+            Earnings from projects, streams and Drip Lists settle and become collectable on the last
+            Thursday of each month.
             <a
               target="_blank"
               rel="noreferrer"
@@ -111,11 +110,7 @@
         </svelte:fragment>
       </Tooltip>
     </div>
-    {#if currentCycleEnd}
-      <p class="typo-text-bold">{formatDate(currentCycleEnd, 'onlyDay')}</p>
-    {:else}
-      …
-    {/if}
+    <p class="typo-text-bold">{formatDate(nextSettlementDate(), 'onlyDay')}</p>
   </div>
   <div class="list-container">
     {#if selectorItems}

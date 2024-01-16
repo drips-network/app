@@ -35,6 +35,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { AddressDriverAccount } from '$lib/stores/streams/types';
+  import nextSettlementDate from '$lib/utils/settlement-date';
 
   export let context: Writable<CollectFlowState>;
 
@@ -224,8 +225,8 @@
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
   <div>
     <p>
-      Earnings settle once per week. The next settlement date is <span class="typo-text-bold"
-        >{formatDate(currentCycleEnd, 'onlyDay')}</span
+      Earnings settle on the last Thursday of every month. The next settlement date is <span
+        class="typo-text-bold">{formatDate(nextSettlementDate(), 'onlyDay')}</span
       >.
     </p>
   </div>
