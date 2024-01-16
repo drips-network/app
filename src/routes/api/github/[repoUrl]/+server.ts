@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
       if (redis) {
         await redis.set(lowercaseRepoUrl, JSON.stringify(repo), {
-          EX: 864000,
+          EX: 86400,
           NX: true,
         });
       }
