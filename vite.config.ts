@@ -1,9 +1,8 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 const config = defineConfig({
-  plugins: [sveltekit(), nodePolyfills()],
+  plugins: [sveltekit()],
   test: {
     // Jest like globals
     globals: true,

@@ -222,6 +222,7 @@
               <PercentageEditor
                 bind:percentage={percentageInputValues[id]}
                 on:confirm={() => handleConfirmPercentageInput(id)}
+                emptyIsError={false}
               />
             </div>
           {:else}
@@ -230,6 +231,7 @@
                 editable={false}
                 bind:percentage={percentageInputValues[id]}
                 on:confirm={() => handleConfirmPercentageInput(id)}
+                emptyIsError={false}
               />
             </div>
           {/if}

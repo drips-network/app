@@ -51,13 +51,10 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import tokensStore from '$lib/stores/tokens/tokens.store';
-  import Droplet from 'radicle-design-system/icons/Droplet.svelte';
   import { AddressDriverClient, constants, Utils, type SplitEvent } from 'radicle-drips';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
   import formatDate from '$lib/utils/format-date';
   import aggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
-  import DripList from 'radicle-design-system/icons/DripList.svelte';
   import DripListBadge, {
     DRIP_LIST_BADGE_FRAGMENT,
   } from '../drip-list-badge/drip-list-badge.svelte';
@@ -65,7 +62,6 @@
   import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import formatAmtPerSec from '$lib/stores/amt-delta-unit/utils/format-amt-per-sec';
   import { browser } from '$app/environment';
-  import Box from 'radicle-design-system/icons/Box.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildStreamUrl from '$lib/utils/build-stream-url';
   import streamState, { STREAM_STATE_LABELS } from '$lib/utils/stream-state';
@@ -335,7 +331,6 @@
       {#each sorted as item}
         {#if item.__typename === 'OneTimeDonationSupport'}
           <SupportItem
-            icon={Droplet}
             title={{
               component: IdentityBadge,
               props: {
@@ -357,7 +352,6 @@
               stream.streamConfig.amountPerSecond.tokenAddress,
               stream.streamConfig.dripId,
             )}
-            icon={TokenStreams}
             title={{
               component: IdentityBadge,
               props: {
@@ -373,7 +367,6 @@
         {#if item.__typename === 'DripListSupport'}
           <SupportItem
             href="/app/drip-lists/{item.dripList.account.accountId}"
-            icon={DripList}
             title={{
               component: DripListBadge,
               props: {
@@ -391,7 +384,6 @@
           {@const source = item.project.source}
           <SupportItem
             href={buildProjectUrl(source.forge, source.ownerName, source.repoName)}
-            icon={Box}
             title={{
               component: ProjectBadge,
               props: {
