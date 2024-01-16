@@ -212,8 +212,8 @@
         >
         <UlIconLi icon={TokenStreamsIcon}
           >Future incoming funds will be split to your recipients <span class="typo-text-bold"
-            >weekly</span
-          >.</UlIconLi
+            >monthly</span
+          >, on the last Thursday of every month.</UlIconLi
         >
       </ul>
     </div>
