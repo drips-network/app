@@ -104,6 +104,9 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { AddressDriverClient } from 'radicle-drips';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
+  import buildProjectUrl from '$lib/utils/build-project-url';
+  import { Forge } from '$lib/graphql/__generated__/base-types';
+  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -111,6 +114,15 @@
   }
 
   export let project: ProjectProfileFragment;
+
+  interface RepoInfo {
+    url: string;
+    repoName: string;
+    ownerName: string;
+  }
+
+  export let newRepo: RepoInfo | undefined;
+  export let correctCasingRepo: RepoInfo | undefined;
 
   export let unclaimedFunds: Promise<{ splittable: Amount[]; collectable: Amount[] }> | undefined =
     undefined;
@@ -158,7 +170,7 @@
     });
   }
 
-  function getSupportersPile(supportTable: (ProjectProfile_ClaimedProject_Fragment['support'])[]) {
+  function getSupportersPile(supportTable: ProjectProfile_ClaimedProject_Fragment['support'][]) {
     const support = supportTable.flat();
 
     return mapFilterUndefined(support, (v) => {
@@ -243,9 +255,85 @@
   />
 {/if}
 
+<svelte:head>
+  <!--
+    Canonical URL is either, in order of priority:
+    - The new repo URL if the project has been renamed
+    - The correct-casing repo URL if the project has different casing to the Drips project
+    - The project URL, without ?exact parameter
+  -->
+  {#if newRepo}
+    <link
+      rel="canonical"
+      href="https://drips.network{buildProjectUrl(
+        Forge.GitHub,
+        newRepo.ownerName,
+        newRepo.repoName,
+        false,
+      )}"
+    />
+  {:else if correctCasingRepo}
+    <link
+      rel="canonical"
+      href="https://drips.network{buildProjectUrl(
+        Forge.GitHub,
+        correctCasingRepo.ownerName,
+        correctCasingRepo.repoName,
+        false,
+      )}"
+    />
+  {:else}
+    <link
+      rel="canonical"
+      href="https://drips.network{buildProjectUrl(
+        project.source.forge,
+        project.source.ownerName,
+        project.source.repoName,
+        false,
+      )}"
+    />
+  {/if}
+</svelte:head>
+
 <PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
+  {#if newRepo}
+    <div class="notice">
+      <AnnotationBox>
+        The GitHub repo for this project has been renamed to {newRepo.ownerName}/{newRepo.repoName}.
+        <svelte:fragment slot="actions">
+          <Button
+            icon={ArrowRight}
+            variant="primary"
+            href={buildProjectUrl(Forge.GitHub, newRepo.ownerName, newRepo.repoName, false)}
+            >Go to the new project</Button
+          >
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
+  {#if correctCasingRepo}
+    <div class="notice">
+      <AnnotationBox>
+        The GitHub repo for this project ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName})
+        has different casing to this Drips project. New splits to this project will automatically be
+        corrected to the correct casing.
+        <svelte:fragment slot="actions">
+          <Button
+            icon={ArrowRight}
+            variant="primary"
+            href={buildProjectUrl(
+              Forge.GitHub,
+              correctCasingRepo.ownerName,
+              correctCasingRepo.repoName,
+              false,
+            )}>View the canonical project</Button
+          >
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
   {#if !isClaimed(project)}
-    <div class="unclaimed-project-notice">
+    <div class="notice">
       <AnnotationBox type="info">
         {#await unclaimedFunds}
           <span />
@@ -432,7 +520,7 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} />
+        <SupportCard {project} disabled={!!newRepo} />
       </div>
     </aside>
   </article>
@@ -477,7 +565,7 @@
     gap: 3rem;
   }
 
-  .unclaimed-project-notice {
+  .notice {
     margin-bottom: 2rem;
   }
 

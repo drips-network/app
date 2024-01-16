@@ -84,6 +84,8 @@
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
 
+  export let disabled = false;
+
   $: type = project ? ('project' as const) : ('dripList' as const);
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
@@ -105,7 +107,6 @@
   }
 
   const { initialized } = walletStore;
-  $: isWalletConnected = $walletStore.connected;
 
   let updating = true;
   async function updateState() {
@@ -199,7 +200,7 @@
   }
 </script>
 
-<div class="become-supporter-card">
+<div class="become-supporter-card" class:disabled>
   {#if ownDripLists === undefined || updating}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
@@ -254,6 +255,11 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
+  }
+
+  .become-supporter-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   .loading-overlay {
