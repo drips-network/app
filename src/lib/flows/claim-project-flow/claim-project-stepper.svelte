@@ -9,7 +9,9 @@
 
   let currentStepIndex = 0;
 
-  $: slots = slotsTemplate($state, currentStepIndex);
+  const myState = state();
+
+  $: slots = slotsTemplate($myState, currentStepIndex);
 
   function handleSlotEdit(e: CustomEvent<{ stepIndex: number }>) {
     currentStepIndex = e.detail.stepIndex;
@@ -27,7 +29,7 @@
 <Stepper
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
-  context={() => state}
+  context={() => myState}
   steps={steps(skipWalletConnect, true, projectUrl)}
   minHeightPx={0}
 />

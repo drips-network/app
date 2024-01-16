@@ -69,28 +69,29 @@ export interface State {
   projectColor: string;
 }
 
-export const state = writable<State>({
-  isPartiallyClaimed: false,
-  linkedToRepo: false,
-  gitUrl: '',
-  project: undefined,
-  projectMetadata: undefined,
-  unclaimedFunds: undefined,
-  highLevelPercentages: { maintainers: 60, dependencies: 40 },
-  maintainerSplits: {
-    itemsPromise: undefined,
-    items: {},
-    percentages: {},
-  },
-  dependencySplits: {
-    itemsPromise: undefined,
-    items: {},
-    percentages: {},
-  },
-  dependenciesAutoImported: false,
-  projectEmoji: '❓',
-  projectColor: '#000000',
-});
+export const state = () =>
+  writable<State>({
+    isPartiallyClaimed: false,
+    linkedToRepo: false,
+    gitUrl: '',
+    project: undefined,
+    projectMetadata: undefined,
+    unclaimedFunds: undefined,
+    highLevelPercentages: { maintainers: 60, dependencies: 40 },
+    maintainerSplits: {
+      itemsPromise: undefined,
+      items: {},
+      percentages: {},
+    },
+    dependencySplits: {
+      itemsPromise: undefined,
+      items: {},
+      percentages: {},
+    },
+    dependenciesAutoImported: false,
+    projectEmoji: '❓',
+    projectColor: '#000000',
+  });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
   const projectSlot = {
