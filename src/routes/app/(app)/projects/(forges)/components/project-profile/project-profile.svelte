@@ -107,6 +107,7 @@
   import buildProjectUrl from '$lib/utils/build-project-url';
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
+  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -294,19 +295,19 @@
   {#if correctCasingRepo}
     <div class="notice">
       <AnnotationBox>
-        The GitHub repo for this project ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName})
-        has different casing to this Drips project. New splits to this project will automatically be
-        corrected to the correct casing.
+        This project resolves to a GitHub repo with different casing ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName}).
+        Any new splits to this misnamed project will automatically be routed to the correct project.
         <svelte:fragment slot="actions">
           <Button
-            icon={ArrowRight}
+            size="small"
+            icon={EyeOpen}
             variant="primary"
             href={buildProjectUrl(
               Forge.GitHub,
               correctCasingRepo.ownerName,
               correctCasingRepo.repoName,
               false,
-            )}>View the canonical project</Button
+            )}>View correct project</Button
           >
         </svelte:fragment>
       </AnnotationBox>
