@@ -242,6 +242,8 @@
       }
     }
   }
+
+  $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
 </script>
 
 {#if true}
@@ -262,37 +264,15 @@
     - The correct-casing repo URL if the project has different casing to the Drips project
     - The project URL, without ?exact parameter
   -->
-  {#if newRepo}
-    <link
-      rel="canonical"
-      href="https://drips.network{buildProjectUrl(
-        Forge.GitHub,
-        newRepo.ownerName,
-        newRepo.repoName,
-        false,
-      )}"
-    />
-  {:else if correctCasingRepo}
-    <link
-      rel="canonical"
-      href="https://drips.network{buildProjectUrl(
-        Forge.GitHub,
-        correctCasingRepo.ownerName,
-        correctCasingRepo.repoName,
-        false,
-      )}"
-    />
-  {:else}
-    <link
-      rel="canonical"
-      href="https://drips.network{buildProjectUrl(
-        project.source.forge,
-        project.source.ownerName,
-        project.source.repoName,
-        false,
-      )}"
-    />
-  {/if}
+  <link
+    rel="canonical"
+    href="https://drips.network{buildProjectUrl(
+      Forge.GitHub,
+      canonicalRepoInfo.ownerName,
+      canonicalRepoInfo.repoName,
+      false,
+    )}"
+  />
 </svelte:head>
 
 <PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
@@ -378,6 +358,14 @@
         <ProjectProfileHeader
           {project}
           editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
+          shareButton={{
+            url: `https://drips.network${buildProjectUrl(
+              Forge.GitHub,
+              project.source.ownerName,
+              project.source.repoName,
+              false,
+            )}`,
+          }}
           on:editButtonClick={() =>
             isClaimed(project) && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
         />
@@ -520,7 +508,7 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} disabled={!!newRepo} />
+        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo} />
       </div>
     </aside>
   </article>
