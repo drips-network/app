@@ -105,6 +105,10 @@
   import { AddressDriverClient } from 'radicle-drips';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  import buildProjectUrl from '$lib/utils/build-project-url';
+  import { Forge } from '$lib/graphql/__generated__/base-types';
+  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
+  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -112,6 +116,15 @@
   }
 
   export let project: ProjectProfileFragment;
+
+  interface RepoInfo {
+    url: string;
+    repoName: string;
+    ownerName: string;
+  }
+
+  export let newRepo: RepoInfo | undefined;
+  export let correctCasingRepo: RepoInfo | undefined;
 
   export let unclaimedFunds: Promise<{ splittable: Amount[]; collectable: Amount[] }> | undefined =
     undefined;
@@ -231,6 +244,8 @@
       }
     }
   }
+
+  $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
 </script>
 
 {#if true}
@@ -244,9 +259,63 @@
   />
 {/if}
 
+<svelte:head>
+  <!--
+    Canonical URL is either, in order of priority:
+    - The new repo URL if the project has been renamed
+    - The correct-casing repo URL if the project has different casing to the Drips project
+    - The project URL, without ?exact parameter
+  -->
+  <link
+    rel="canonical"
+    href="https://drips.network{buildProjectUrl(
+      Forge.GitHub,
+      canonicalRepoInfo.ownerName,
+      canonicalRepoInfo.repoName,
+      false,
+    )}"
+  />
+</svelte:head>
+
 <PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
+  {#if newRepo}
+    <div class="notice">
+      <AnnotationBox>
+        The GitHub repo for this project has been renamed to {newRepo.ownerName}/{newRepo.repoName}.
+        <svelte:fragment slot="actions">
+          <Button
+            icon={ArrowRight}
+            variant="primary"
+            href={buildProjectUrl(Forge.GitHub, newRepo.ownerName, newRepo.repoName, false)}
+            >Go to the new project</Button
+          >
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
+  {#if correctCasingRepo}
+    <div class="notice">
+      <AnnotationBox>
+        This project resolves to a GitHub repo with different casing ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName}).
+        Any new splits to this misnamed project will automatically be routed to the correct project.
+        <svelte:fragment slot="actions">
+          <Button
+            size="small"
+            icon={EyeOpen}
+            variant="primary"
+            href={buildProjectUrl(
+              Forge.GitHub,
+              correctCasingRepo.ownerName,
+              correctCasingRepo.repoName,
+              false,
+            )}>View correct project</Button
+          >
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
   {#if !isClaimed(project)}
-    <div class="unclaimed-project-notice">
+    <div class="notice">
       <AnnotationBox type="info">
         {#await unclaimedFunds}
           <span />
@@ -296,6 +365,14 @@
         <ProjectProfileHeader
           {project}
           editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
+          shareButton={{
+            url: `https://drips.network${buildProjectUrl(
+              Forge.GitHub,
+              project.source.ownerName,
+              project.source.repoName,
+              false,
+            )}`,
+          }}
           on:editButtonClick={() =>
             isClaimed(project) && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
         />
@@ -438,7 +515,7 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} />
+        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo} />
       </div>
     </aside>
   </article>
@@ -483,7 +560,7 @@
     gap: 3rem;
   }
 
-  .unclaimed-project-notice {
+  .notice {
     margin-bottom: 2rem;
   }
 
