@@ -34,6 +34,8 @@ Drips enables any organisation to continuously and transparently fund their crit
 
 When you use Drips to stream funds to your dependencies, you're ensuring the sustainable development, stability, and ongoing improvement of essential software. With each contribution, we’re a step closer to making the 'lone maintainer' meme a thing of the past.
 
+![Drips Splitting Graph compared to XKCD 2347](/assets/blog-images/dependency-comic.png)
+
 # “Fostering a Community of Support”
 
 At Drips, our goal is to support and enable a robust FOSS ecosystem. As we onboard these projects on Drips, we collaborate with them to define THEIR most critical dependencies. Your funds don’t just support Octant’s direct dependencies but also cascade to the FOSS projects that enable them.
@@ -41,7 +43,7 @@ At Drips, our goal is to support and enable a robust FOSS ecosystem. As we onboa
 We commend James and Octant for being early to see the value in utilizing Drips to bolster the open-source ecosystem. As he describes, “it's not just about funding; it's about fostering a community of support and collaboration that elevates the entire sector.“
 If you’re interested in supporting the public goods that YOUR project depends on, we would be happy to [help you get onboarded to Drips](https://discord.gg/6cCKKSW2De). Thanks for your ongoing support for our work and our mission ✌️
 
-Learn More & Take Action
+# Learn More & Take Action
 
 Explore more details on Drips and other recent news:
 
