@@ -72,34 +72,69 @@ With all dependencies installed, simply run:
 npm run test:unit
 ```
 
-### E2E tests
+### Mock Local Environment & E2E Tests
+
+#### Running the mocked local environment
+
+We provide a docker-compose configuration which runs the following services and components locally:
+
+- A Ganache testnet with the [Drips Protocol contracts](https://github.com/drips-network/contracts) pre-deployed
+- [Drips Events Processor](https://github.com/drips-network/events-processor)
+- [Drips GraphQL API](https://github.com/drips-network/graphql-api)
+- [Drips Subgraph](https://github.com/drips-network/subgraph)
+- [Graph Node](https://github.com/graphprotocol/graph-node)
+- [IPFS Kubo Node](https://github.com/ipfs/kubo) (For Graph Node)
+- [Fake Pinata](https://github.com/drips-network/fake-pinata) (Simple local mock of Pinata API)
+- 2 Postgres Databases for Events Processor and Subgraph
+- One Redis instance for the app's GitHub API caching
+
+You can start and stop this environment with one command, and easily connect a local dev instance of the app to it. This allows entirely gasless local development on a testnet the state of which you can reset at will.
+
+To get started, run:
+
+```sh
+  npm run local-env:start
+```
+
+This command starts the local environment and starts logging all component's output to the console. When you run this for the first time, it'll take a while, but Docker will cache all build steps for subsequent usages.
+
+Stop the local environment by running:
+
+```sh
+  npm run local-env:stop
+```
+
+##### Note on service versions
+
+Docker is configured to always build the Drips Event Processor and Drips GraphQL API images from the latest `main` branch commit. When you run the local env, it will automatically check for newer commits and rebuild the images if necessary. If you want to use a different branch of either of these services, you can customize the branch used by specifying environment variables:
+
+```sh
+GQL_API_BRANCH=main EVENTS_PROCESSOR_BRANCH=main 
+```
+
+##### Connecting the app to the local mocked env
+
+To start a dev server that has the app talk to the locally-running environment, simply run:
+
+```sh
+npm run dev:local-env
+```
 
 #### Running E2E tests
 
-We're using `docker compose` to run a local test environment, including a `ganache` testnet with deployed Drips contracts (and a mock ERC-20), a local graph node with
+To run the E2E test suite, ensure the local mock environment is down, and then simply run:
 
-To get started, make sure you have Docker installed & running, ensure the app's dependencies are installed via NPM, and execute from the root directory of the app:
-
-```bash
+```sh
 npm run e2e
 ```
 
-This will build a production version of the app, and execute all E2E test suites. Each test suite itself will run `docker compose up` to start the E2E test environment (ipfs node, anvil testnet w/ Drips contracts, and Graph Node w/ Drips subgraph). On first run, youʼll see `Pinging Graph Node…` being logged for an extended amount of time. On subsequent runs, this step will be a lot faster, because much of the E2E Docker environment is being cached.
+This command will start the local mock environment, transfer your local source code of the app into a new container, build the app within it, and run tests.
 
-**Important:** The local testnet is based on a static chain state which is copied into the testnet image from ./src/e2e-tests/docker/testnet/state. When a new version of contracts is released, this state needs to be updated. The subgraph is downloaded at image build time from the latest state of the `drips-subgraph` repo's `v2` branch.
+For debugging tests, it's useful to be able to see what's going on within the Playwright browser. To do so, you can run the tests outside of Docker by simply starting the local mock environment (see "Running the mocked local environment"), and execute tests outside of docker by running `npm run test:e2e`.
+
+In order to make the Playwright browser headful, add `E2E_HEADLESS=0` to your `.env` file.
 
 #### Writing E2E tests
-
-##### Starting the E2E test environment
-
-To start the E2E environment (local testnet & graph node with deployed Drips contracts and subgraph), register the following Vitest callbacks on your test suites:
-
-```ts
-beforeAll(environment.start, 14400000);
-afterAll(environment.stop);
-```
-
-This will start the Docker environment before the tests run, and shut it down at the end.
 
 ##### Configuring the app for testing
 
@@ -157,10 +192,6 @@ After doing this, the app will display the token within all token pickers. Alter
 Unfortunately, two major differences in app logic for E2E tests couldnʼt be avoided: Firstly, the app uses a mock wallet store that connects to the local testnet instead of the real one, and IPFS access is mocked using localstorage. The logic checks for an env variable `PUBLIC_TEST_MODE` being true. The mock wallet store also checks for `window.playwrightAddress`, and initializes itself to be connected to that address. In order to make use of these adjustments, call `page.addInitScript` and set the two variables.
 
 ## 😱 Advanced
-
-### 🌐 Run app locally with a local testnet
-
-It's possible to connect the app running locally to the local E2E test environment described above. This allows simple and quick development locally, as all transactions will resolve instantly, and network requests are a lot faster. To do so, run `npm run dev:local-env:start-env` to up the local development environment, then run `dev:local-env:start-app` to start the dev server and connect it to the local services. Once done, run `npm run dev:local-env:stop-env` to stop the local development environment.
 
 ### Redis cache for GitHub API responses
 

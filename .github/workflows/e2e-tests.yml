@@ -13,43 +13,5 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: npm-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
-
-      - name: Populate .env file
-        uses: SpicyPizza/create-envfile@v1.3
-        with:
-          envkey_PINATA_SDK_KEY: ${{ secrets.PINATA_SDK_KEY }}
-          envkey_PINATA_SDK_SECRET: ${{ secrets.PINATA_SDK_SECRET }}
-          envkey_TENDERLY_ACCESS_SECRET: ${{ secrets.TENDERLY_ACCESS_SECRET }}
-          envkey_TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
-          envkey_TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
-          envkey_GELATO_API_KEY: ${{ secrets.GELATO_API_KEY }}
-          envkey_COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
-          envkey_PUBLIC_NETWORK: 5
-          # GQL URL is localhost, where the GQL API will run in Docker, but we generate GQL types
-          # later from the production GQL API in order to ensure this PR is aligned with the currently-deployed
-          # GQL schema once merged.
-          envkey_GQL_URL: http://localhost:8080
-          envkey_GQL_ACCESS_TOKEN: ${{ secrets.GQL_ACCESS_TOKEN }}
-          envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
-          envkey_GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build GQL types
-        run: GQL_URL=https://drips-api-mainnet-s1.up.railway.app/ npm run build:graphql
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Svelte Kit Sync
-        run: npx svelte-kit sync
-
       - name: Run E2E tests
-        run: GQL_URL=http://localhost:8080 npm run e2e
+        run: npm run e2e

@@ -1,0 +1,21 @@
+services:
+  testnet:
+    ports: [8545:8545]
+  graph-node-postgres:
+    ports: [5432:5432]
+  ipfs:
+    ports: [5001:5001]
+  graph-node:
+    ports: [
+      8000:8000,
+      8001:8001,
+      8020:8020
+    ]
+  postgres-event-processor:
+    ports: [5433:5432]
+  drips-gql-api:
+    ports: [8080:8080]
+  fake-pinata:
+    ports: [3000:3000]
+  redis:
+    ports: [6379:6379]
