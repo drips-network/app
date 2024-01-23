@@ -14,7 +14,6 @@
     {
       token: {
         address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-        decimals: 9,
       },
       started: new Date('September 4, 2023, 12:50 AM').getTime(),
       amtPerSec: '15854895991882',
@@ -51,10 +50,10 @@
   $: {
     if (tokens.connected) {
       const streamedAmoutns = streams.map((stream) => {
-        const durationSec = Math.floor((now - stream.started) / 1000);
+        const duration = (now - stream.started) / 1000;
         return {
           tokenAddress: stream.token.address,
-          amount: (BigInt(stream.amtPerSec) / BigInt(1e9)) * BigInt(durationSec),
+          amount: BigInt(Math.floor(Number(BigInt(stream.amtPerSec) / BigInt(1e9)) * duration)),
         };
       });
       amounts = [...gives, ...streamedAmoutns];
