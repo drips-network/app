@@ -26,6 +26,7 @@
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import LpFooter from './components/lp-footer.svelte';
+  import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
 
   onMount(() => {
     // When launching within a Safe, we donʼt want to display the landing page.
@@ -55,6 +56,9 @@
   <div class="wrapper">
     <div class="hero">
       <div class="text">
+        <div class="flex">
+          <LpTotalDrippedBadge />
+        </div>
         <h1>Funding that flows</h1>
         <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
         <div class="actions">
