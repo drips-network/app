@@ -66,7 +66,6 @@
       ? [
           {
             // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt.  😊
-            // handler: () => goto(`/app/claim-project`),
             label: 'Claim project',
             icon: Plus,
             variant: 'primary',
