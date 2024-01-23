@@ -5,12 +5,13 @@
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { goto } from '$app/navigation';
   import Section from '../section/section.svelte';
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
   import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import modal from '$lib/stores/modal';
+  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
 
   export let address: string | undefined;
 
@@ -65,10 +66,10 @@
       ? [
           {
             // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt.  😊
-            handler: () => goto(`/app/claim-project`),
             label: 'Claim project',
             icon: Plus,
             variant: 'primary',
+            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
           },
         ]
       : [],

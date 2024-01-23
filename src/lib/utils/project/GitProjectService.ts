@@ -17,7 +17,7 @@ import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import type { Address } from '../common-types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
-import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
+import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
 import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
