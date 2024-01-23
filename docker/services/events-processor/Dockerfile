@@ -11,7 +11,7 @@ RUN git clone --branch ${EVENTS_PROCESSOR_BRANCH} --single-branch https://github
 WORKDIR /app/events-processor
 COPY ./services/events-processor/envfile .env.local
 
-RUN npm ci
+RUN npm ci --fetch-timeout=600000
 RUN npm run build
 
 EXPOSE 3000

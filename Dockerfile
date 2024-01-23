@@ -14,7 +14,7 @@ COPY scripts scripts
 
 RUN mkdir -p static/twemoji
 
-RUN npm ci
+RUN npm ci --fetch-timeout=600000
 
 RUN npx playwright install --with-deps
 

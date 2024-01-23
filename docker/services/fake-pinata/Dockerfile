@@ -9,7 +9,7 @@ ADD "https://api.github.com/repos/drips-network/fake-pinata/commits/${FAKE_PINAT
 RUN git clone --branch ${FAKE_PINATA_BRANCH} --single-branch https://github.com/drips-network/fake-pinata.git
 
 WORKDIR /app/fake-pinata
-RUN npm ci
+RUN npm ci --fetch-timeout=600000
 RUN npm run build
 
 EXPOSE 3000
