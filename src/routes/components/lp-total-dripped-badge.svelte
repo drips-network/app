@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Amount } from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import Drip from '$lib/components/illustrations/drip.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
   import tokens from '$lib/stores/tokens';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import { onMount } from 'svelte';
@@ -81,7 +81,7 @@
   class:opacity-0={!visible}
   class:pointer-events-none={!visible}
 >
-  <Drip height="calc(16/14 * 1em)" />
+  <Spinner classes="w-3.5 h-3.5" />
   <div>
     <span class="typo-text-small-bold">
       <AggregateFiatEstimate
