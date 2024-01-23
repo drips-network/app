@@ -7,6 +7,7 @@
   import { onMount } from 'svelte';
 
   let now = new Date().getTime();
+  let visible = false;
 
   const streams = [
     // Radworks USDC
@@ -76,12 +77,19 @@
 <svelte:window on:blur={() => cancelAnimationFrame(anim)} on:focus={step} />
 
 <div
-  class="rounded-drip-lg flex items-center gap-2 bg-primary-level-1 text-primary px-3 h-8 typo-text-small"
+  class="rounded-drip-lg flex items-center gap-2 bg-primary-level-1 text-primary px-3 h-8 typo-text-small transition duration-150 transform {!visible
+    ? 'opacity-0 translate-y-1/2 pointer-events-none'
+    : ''}"
 >
   <Drip height="calc(16/14 * 1em)" />
   <div>
     <span class="typo-text-small-bold">
-      <AggregateFiatEstimate {amounts} />
+      <AggregateFiatEstimate
+        {amounts}
+        on:loaded={() => {
+          visible = true;
+        }}
+      />
     </span> dripped
   </div>
 </div>
