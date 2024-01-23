@@ -17,6 +17,7 @@
   export let collapsed = false;
   export let collapsable = false;
   export let showCreateNewListCard = false;
+  export let emptyOrderLast = false;
 
   let error = false;
 
@@ -28,13 +29,13 @@
 
       const dripListsQuery = gql`
         ${DRIP_LIST_CARD_FRAGMENT}
-        query DripLists($where: DripListWhereInput) {  
+        query DripLists($where: DripListWhereInput) {
           dripLists(where: $where) {
             ...DripListCard
           }
         }
       `;
-      
+
       const result = await query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {
         where: {
           ownerAddress: address,
@@ -56,6 +57,7 @@
 <Section
   bind:collapsed
   bind:collapsable
+  emptyOrderLast={emptyOrderLast && dripLists && dripLists.length === 0}
   header={{
     icon: DripListIcon,
     label: 'Drip Lists',

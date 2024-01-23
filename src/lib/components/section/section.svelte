@@ -8,9 +8,14 @@
 
   export let collapsable = false;
   export let collapsed = false;
+  export let emptyOrderLast = false;
 </script>
 
-<section class="app-section" style:margin-bottom={collapsed ? '-2rem' : 0}>
+<section
+  class="app-section"
+  style:margin-bottom={collapsed ? '-2rem' : 0}
+  class:order-last={emptyOrderLast}
+>
   <SectionHeader
     bind:collapsable
     bind:collapsed

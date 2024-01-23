@@ -13,6 +13,7 @@
   import isClaimed from '$lib/utils/project/is-claimed';
 
   export let address: string | undefined;
+  export let emptyOrderLast = false;
 
   let projects: ProjectsQuery['projects'] | undefined;
   let error = false;
@@ -58,6 +59,7 @@
 <Section
   bind:collapsed
   bind:collapsable
+  emptyOrderLast={emptyOrderLast && projects?.length === 0}
   header={{
     icon: Box,
     label: 'Projects',

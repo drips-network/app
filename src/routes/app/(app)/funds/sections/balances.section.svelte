@@ -32,6 +32,7 @@
 
   export let collapsed = false;
   export let collapsable = false;
+  export let emptyOrderLast = false;
 
   $: accountEstimate = accountId ? $balances.accounts[accountId] : undefined;
 
@@ -179,6 +180,7 @@
 <Section
   bind:collapsed
   bind:collapsable
+  emptyOrderLast={emptyOrderLast && tableData.length === 0}
   header={{
     label: 'Balances',
     icon: TokensIcon,

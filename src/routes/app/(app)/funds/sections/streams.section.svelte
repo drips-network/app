@@ -33,6 +33,7 @@
 
   export let collapsed = false;
   export let collapsable = false;
+  export let emptyOrderLast = false;
 
   export let emptyStateHeadline = 'No streams';
 
@@ -295,6 +296,7 @@
 <Section
   bind:collapsed
   bind:collapsable
+  emptyOrderLast={emptyOrderLast && empty}
   header={{
     infoTooltip,
     icon: TokenStreamIcon,

@@ -179,10 +179,10 @@
       {/if}
     </SectionSkeleton>
     <Developer accountId={dripsAccountId} />
-    <ProjectsSection collapsable {address} />
-    <DripListsSection collapsable accountId={dripsAccountId} />
-    <Streams collapsable accountId={dripsAccountId} disableActions={!isSelf} />
-    <Balances collapsable collapsed accountId={dripsAccountId} />
+    <ProjectsSection collapsable {address} emptyOrderLast />
+    <DripListsSection collapsable accountId={dripsAccountId} emptyOrderLast />
+    <Streams collapsable accountId={dripsAccountId} disableActions={!isSelf} emptyOrderLast />
+    <Balances collapsable collapsed accountId={dripsAccountId} emptyOrderLast />
   </article>
 {/if}
 
