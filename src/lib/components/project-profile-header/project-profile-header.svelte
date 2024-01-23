@@ -32,9 +32,15 @@
   import Pen from 'radicle-design-system/icons/Pen.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectProfileHeaderFragment } from './__generated__/gql.generated';
+  import ShareButton from '../share-button/share-button.svelte';
 
   export let project: ProjectProfileHeaderFragment;
   export let editButton: string | undefined = undefined;
+  export let shareButton:
+    | {
+        url: string;
+      }
+    | undefined = undefined;
 
   export let pendingAvatar = false;
 
@@ -52,10 +58,22 @@
         <ProjectBadge {project} forceUnclaimed tooltip={false} linkTo="external-url" />
       </Copyable>
     </div>
+    {#if editButton || shareButton}
+      <div class="actions">
+        {#if shareButton}
+          <ShareButton url={shareButton.url} />
+        {/if}
+        {#if editButton}
+          <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
+        {/if}
+      </div>
+    {/if}
   </div>
-  {#if editButton}
-    <div class="absolute top-0 right-0 sm:static">
-      <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
-    </div>
-  {/if}
 </div>
+
+<style>
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+</style>
