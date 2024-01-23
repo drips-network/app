@@ -76,13 +76,13 @@
 <svelte:window on:blur={() => cancelAnimationFrame(anim)} on:focus={step} />
 
 <div
-  class="rounded-drip-lg flex items-center gap-2 bg-primary-level-1 text-primary px-3 h-8 typo-text-small transition duration-300"
+  class="rounded-drip-lg flex items-center gap-2 bg-primary-level-1 text-primary px-3 h-8 typo-text transition duration-300"
   class:opacity-0={!visible}
   class:pointer-events-none={!visible}
 >
   <Spinner classes="w-3.5 h-3.5" />
   <div>
-    <span class="typo-text-small-bold">
+    <span class="typo-text-bold">
       <AggregateFiatEstimate
         {amounts}
         on:loaded={() => {
