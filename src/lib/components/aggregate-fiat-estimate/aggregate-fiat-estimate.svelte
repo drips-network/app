@@ -6,7 +6,9 @@
   import Tooltip from '../tooltip/tooltip.svelte';
   import FiatEstimateValue from './fiat-estimate-value.svelte';
   import aggregateFiatEstimate from './aggregate-fiat-estimate';
+  import { createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher<{ loaded: never }>();
   interface Amount {
     tokenAddress: string;
     amount: bigint;
@@ -38,6 +40,9 @@
       const result = aggregateFiatEstimate(priceStore, amounts);
 
       includesUnknownPrice = result.includesUnknownPrice;
+      if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
+        dispatch('loaded');
+      }
       fiatEstimateCents = result.fiatEstimateCents;
     }
   }

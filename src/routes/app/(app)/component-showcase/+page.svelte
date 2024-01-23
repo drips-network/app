@@ -121,6 +121,10 @@
     emoji: '🚶',
     color: '#fcc842',
     splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
+    avatar: {
+      __typename: 'EmojiAvatar',
+      emoji: '🍓',
+    },
   };
 
   const MOCK_PROJECT_2: Project = {
@@ -148,6 +152,10 @@
     emoji: '💾',
     color: '#FF0000',
     splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
+    avatar: {
+      __typename: 'EmojiAvatar',
+      emoji: '🎾',
+    },
   };
 
   const mockSplits: Splits = [
