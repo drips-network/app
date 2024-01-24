@@ -15,9 +15,18 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   function handleConfirm() {
-    const { emoji, color } = get(project);
+    const { avatar, color } = get(project);
 
-    $context.projectEmoji = emoji;
+    $context.avatar =
+      avatar.__typename === 'EmojiAvatar'
+        ? {
+            type: 'emoji',
+            emoji: avatar.emoji,
+          }
+        : {
+            type: 'image',
+            cid: avatar.cid,
+          };
     $context.projectColor = color;
 
     dispatch('conclude');

@@ -116,7 +116,10 @@
 
       $context.project = project;
 
-      $context.projectEmoji = seededRandomElement(possibleRandomEmoji, project.account.accountId);
+      $context.avatar = {
+        type: 'emoji',
+        emoji: seededRandomElement(possibleRandomEmoji, project.account.accountId),
+      };
       $context.projectColor = seededRandomElement(
         ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
         project.account.accountId,

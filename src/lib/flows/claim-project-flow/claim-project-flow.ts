@@ -65,7 +65,15 @@ export interface State {
   maintainerSplits: SplitsConfig;
   dependencySplits: SplitsConfig;
   dependenciesAutoImported: boolean;
-  projectEmoji: string;
+  avatar:
+    | {
+        type: 'emoji';
+        emoji: string;
+      }
+    | {
+        type: 'image';
+        cid: string;
+      };
   projectColor: string;
 }
 
@@ -89,7 +97,10 @@ export const state = () =>
       percentages: {},
     },
     dependenciesAutoImported: false,
-    projectEmoji: '❓',
+    avatar: {
+      type: 'emoji',
+      emoji: '💧',
+    },
     projectColor: '#000000',
   });
 

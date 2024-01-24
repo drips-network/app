@@ -42,13 +42,15 @@
       }
     | undefined = undefined;
 
+  export let pendingAvatar = false;
+
   const dispatch = createEventDispatcher<{ editButtonClick: never }>();
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
   <div class="max-w-full flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:gap-8 sm:items-center">
     <div class="avatar">
-      <ProjectAvatar {project} size="huge" />
+      <ProjectAvatar {pendingAvatar} {project} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{project.source.repoName}</h1>
