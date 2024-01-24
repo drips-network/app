@@ -33,7 +33,7 @@
   )}`;
 </script>
 
-<section class="codebox relative">
+<section class="codebox relative text-left">
   <header class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
     {path}
     <div class="actions">

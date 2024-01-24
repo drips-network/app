@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   import Drip from '../illustrations/drip.svelte';
   import { onMount } from 'svelte';
 
   export let visibilityDelay = 300; // so doesn't flash on loading site from cache
+  export let classes = 'w-6 h-6';
   let render = false;
   onMount(() =>
     setTimeout(() => {
@@ -12,12 +12,12 @@
   );
 </script>
 
-<div class="w-6 h-6 flex justify-center">
-  {#if render}
-    <div class="drip-animation" in:fade|local={{ duration: 150 }}>
-      <Drip height="100%" />
-    </div>
-  {/if}
+<div
+  class="{classes} flex justify-center transition duration-150 {!render
+    ? 'opacity-0'
+    : 'drip-animation'}"
+>
+  <Drip height="100%" />
 </div>
 
 <style>
