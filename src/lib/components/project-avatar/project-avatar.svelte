@@ -7,7 +7,14 @@
     fragment ProjectAvatar on Project {
       ... on ClaimedProject {
         color
-        emoji
+        avatar {
+          ... on EmojiAvatar {
+            emoji
+          }
+          ... on ImageAvatar {
+            cid
+          }
+        }
       }
     }
   `;
@@ -18,12 +25,19 @@
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import twemoji from 'twemoji';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import Question from 'radicle-design-system/icons/Question.svelte';
+  import Spinner from '../spinner/spinner.svelte';
+  import { fade } from 'svelte/transition';
+  import { onMount } from 'svelte';
 
   export let project: ProjectAvatarFragment;
 
+  export let pendingAvatar = false;
+
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
-  export let outline = false;
+  export let outline =
+    project.__typename === 'ClaimedProject' && project.avatar.__typename === 'ImageAvatar';
 
   const CONTAINER_SIZES: Record<Size, string> = {
     tiny: '1.5rem',
@@ -35,15 +49,35 @@
   $: containerSize = CONTAINER_SIZES[size];
 
   $: emojiElem =
-    isClaimed(project) && project.emoji
+    isClaimed(project) && project.avatar.__typename === 'EmojiAvatar'
       ? twemoji.parse(
-          sanitize(project.emoji, {
+          sanitize(project.avatar.emoji, {
             allowedTags: [],
             allowedAttributes: {},
           }),
           { folder: 'svg', ext: '.svg' },
         )
       : undefined;
+
+  let customImageEl: HTMLImageElement | undefined = undefined;
+  let customImageLoading = false;
+  let prevAvatarCid: string | undefined = undefined;
+  $: {
+    if (
+      project.__typename === 'ClaimedProject' &&
+      project.avatar.__typename === 'ImageAvatar' &&
+      project.avatar.cid !== prevAvatarCid
+    ) {
+      customImageLoading = true;
+      prevAvatarCid = project.avatar.cid;
+    }
+  }
+
+  onMount(async () => {
+    if (customImageEl && customImageEl.complete) {
+      customImageLoading = false;
+    }
+  });
 </script>
 
 <PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
@@ -52,12 +86,32 @@
     style="width: {containerSize}; height: {containerSize}"
     class:with-outline={outline}
   >
-    {#if isClaimed(project)}
-      <div class="project-avatar" style:background-color="var(--color-primary)">
-        <div class="inner">
-          {@html emojiElem}
-        </div>
+    {#if customImageLoading}
+      <div class="loading-state" transition:fade={{ duration: 300 }}>
+        <Spinner />
       </div>
+    {/if}
+    {#if isClaimed(project)}
+      {#if pendingAvatar}
+        <div class="project-avatar">
+          <Question />
+        </div>
+      {:else if project.avatar.__typename === 'ImageAvatar'}
+        <div class="project-avatar outline">
+          <img
+            bind:this={customImageEl}
+            on:load={() => (customImageLoading = false)}
+            src="/api/custom-avatars/{project.avatar.cid}"
+            alt="project avatar"
+          />
+        </div>
+      {:else if emojiElem}
+        <div class="project-avatar" style:background-color="var(--color-primary)">
+          <div class="inner">
+            {@html emojiElem}
+          </div>
+        </div>
+      {/if}
     {:else}
       <div class="project-avatar">
         <GithubIcon style="width: min(80%, 3rem); height: min(80%, 3rem)" />
@@ -76,6 +130,17 @@
     position: relative;
     flex-shrink: 0;
     border-radius: 50%;
+  }
+
+  .loading-state {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    background-color: var(--color-foreground-level-2);
   }
 
   .project-avatar {

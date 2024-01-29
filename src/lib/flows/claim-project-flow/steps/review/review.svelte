@@ -58,7 +58,16 @@
       address: $walletStore.address ?? unreachable(),
     },
     color: $context.projectColor,
-    emoji: $context.projectEmoji,
+    avatar:
+      $context.avatar.type === 'emoji'
+        ? {
+            __typename: 'EmojiAvatar',
+            emoji: $context.avatar.emoji,
+          }
+        : {
+            __typename: 'ImageAvatar',
+            cid: $context.avatar.cid,
+          },
   };
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
@@ -100,9 +109,12 @@
       modal.show(
         ProjectCustomizerModal,
         () => {
-          const { emoji, color } = get(projectWritable);
+          const { avatar, color } = get(projectWritable);
 
-          $context.projectEmoji = emoji;
+          $context.avatar =
+            avatar.__typename === 'EmojiAvatar'
+              ? { type: 'emoji', emoji: avatar.emoji }
+              : { type: 'image', cid: avatar.cid };
           $context.projectColor = color;
         },
         { project: projectWritable },

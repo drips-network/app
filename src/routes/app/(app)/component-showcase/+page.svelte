@@ -118,13 +118,13 @@
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
+    avatar: {
+      __typename: 'EmojiAvatar',
+      emoji: '🚶',
+    },
     emoji: '🚶',
     color: '#fcc842',
     splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
-    avatar: {
-      __typename: 'EmojiAvatar',
-      emoji: '🍓',
-    },
   };
 
   const MOCK_PROJECT_2: Project = {
@@ -149,13 +149,13 @@
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
+    avatar: {
+      __typename: 'EmojiAvatar',
+      emoji: '💾',
+    },
     emoji: '💾',
     color: '#FF0000',
     splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
-    avatar: {
-      __typename: 'EmojiAvatar',
-      emoji: '🎾',
-    },
   };
 
   const mockSplits: Splits = [
@@ -424,7 +424,10 @@
       project={{
         __typename: 'ClaimedProject',
         source: SOURCE_CONFIGS.github,
-        emoji: '🚶',
+        avatar: {
+          __typename: 'EmojiAvatar',
+          emoji: '🚶',
+        },
         color: '#fcc842',
       }}
     />
@@ -459,7 +462,10 @@
               address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
             },
             source: SOURCE_CONFIGS[sourceType],
-            emoji: '🚶',
+            avatar: {
+              __typename: 'EmojiAvatar',
+              emoji: '🚶',
+            },
             color: '#fcc842',
           }
         : {

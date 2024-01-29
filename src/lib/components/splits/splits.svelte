@@ -64,7 +64,6 @@
             ownerName
           }
           color
-          emoji
         }
       }
     }
