@@ -134,6 +134,8 @@ For debugging tests, it's useful to be able to see what's going on within the Pl
 
 In order to make the Playwright browser headful, add `E2E_HEADLESS=0` to your `.env` file.
 
+Please note that data is persisted in the local environment unless you explicitly stop and restart it. You will need to do this in-between test runs, because subsequent tests will fail unless the environment is is its initial state.
+
 #### Writing E2E tests
 
 ##### Configuring the app for testing
