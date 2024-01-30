@@ -1,7 +1,7 @@
 import { constants, type SplitsReceiverStruct } from 'radicle-drips';
 
 export default function roundWeights(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-  const totalWeight = receivers.reduce((sum, receiver) => sum + receiver.weight, 0);
+  const totalWeight = receivers.reduce((sum, receiver) => sum + (receiver.weight as number), 0);
   const totalRequired = constants.TOTAL_SPLITS_WEIGHT;
 
   if (totalWeight === totalRequired) {
