@@ -60,7 +60,7 @@
           <LpTotalDrippedBadge />
         </div>
         <h1>Funding that flows</h1>
-        <p>A decentralized toolkit for receiving ongoing support without platform fees.</p>
+        <p>A decentralized toolkit for funding your critical software dependencies.</p>
         <div class="actions">
           <Button href="#fund-projects" icon={TokenStreams}>Fund your dependencies</Button>
           <Button href="#get-funding" icon={Globe}>Get support for your project</Button>

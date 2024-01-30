@@ -5,7 +5,7 @@
   export let image = '/assets/share/og-generic.png';
   export let twitterImage = '/assets/share/twitter-summary.png';
   export let description =
-    'A Web3 toolkit that enables FOSS developers to raise funds, without any platform fees.';
+    'Drips is a decentralized toolkit for funding your critical software dependencies.';
 
   export let twitterCardType: 'summary' | 'summary_large_image' =
     twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
