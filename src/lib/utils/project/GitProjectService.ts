@@ -17,7 +17,7 @@ import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import type { Address } from '../common-types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { isAddress } from 'ethers/lib/utils';
-import type { State } from '../../../routes/app/(flows)/claim-project/claim-project-flow';
+import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
 import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
@@ -177,8 +177,10 @@ export default class GitProjectService {
     const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
     assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
 
+    const upgraded = this._repoDriverMetadataManager.upgradeAccountMetadata(currentMetadata.data);
+
     const newMetadata = {
-      ...currentMetadata.data,
+      ...upgraded,
       splits: {
         dependencies: dependenciesSplitMetadata,
         maintainers: maintainersSplitsMetadata,
@@ -232,7 +234,16 @@ export default class GitProjectService {
         driver: Driver.Repo,
       },
       color: context.projectColor,
-      emoji: context.projectEmoji,
+      avatar:
+        context.avatar.type === 'emoji'
+          ? {
+              __typename: 'EmojiAvatar' as const,
+              emoji: context.avatar.emoji,
+            }
+          : {
+              __typename: 'ImageAvatar' as const,
+              cid: context.avatar.cid,
+            },
       source: {
         __typename: 'Source' as const,
         forge: forge,
@@ -241,9 +252,6 @@ export default class GitProjectService {
         url: context.gitUrl,
       },
     };
-
-    project.emoji = context.projectEmoji;
-    project.color = context.projectColor;
 
     const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
       forProject: project,

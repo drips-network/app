@@ -438,10 +438,10 @@ describe('app', async () => {
         ).toHaveCount(1);
       });
 
-      it('opens the drip list creation flow', async () => {
+      it('opens the create drip list flow', async () => {
         await page.locator('text=Create Drip List').click();
 
-        await expect(page.locator('text=Create a Drip List')).toHaveCount(1);
+        await expect(page.locator('h1:has-text("Create a Drip List")')).toHaveCount(1);
       });
 
       it('adds items', async () => {
@@ -495,13 +495,6 @@ describe('app', async () => {
       });
 
       it('advances the flow', async () => {
-        await page.locator('button', { hasText: 'Continue' }).click();
-      });
-
-      it('connects the wallet and continues', async () => {
-        await page.waitForTimeout(1000); // Wait for previous step to be unmounted
-
-        await expect(page.locator('text=Connect your wallet')).toHaveCount(1);
         await page.locator('button', { hasText: 'Continue' }).click();
       });
 

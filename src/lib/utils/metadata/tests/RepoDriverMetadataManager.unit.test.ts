@@ -205,7 +205,10 @@ describe('RepoDriverMetadataManager', () => {
             repoName: 'repo',
             ownerName: 'owner',
           },
-          emoji: '👍',
+          avatar: {
+            __typename: 'EmojiAvatar',
+            emoji: '👍',
+          },
           color: 'red',
           description: 'description',
         },
@@ -245,7 +248,10 @@ describe('RepoDriverMetadataManager', () => {
           repoName: 'repo',
           ownerName: 'owner',
         },
-        emoji: '👍',
+        avatar: {
+          type: 'emoji',
+          emoji: '👍',
+        },
         color: 'red',
         description: 'description',
         splits: {

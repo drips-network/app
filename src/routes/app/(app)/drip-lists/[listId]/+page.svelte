@@ -56,7 +56,8 @@
 {#if data.dripList.name}
   {@const imageBaseUrl = `/api/share-images/drip-list/${dripList.account.accountId}.png`}
   <HeadMeta
-    title={data.dripList.name}
+    title="{data.dripList.name} | Drip List"
+    description={data.dripList.description ?? undefined}
     image="{imageBaseUrl}?target=og"
     twitterImage="{imageBaseUrl}?target=twitter"
   />

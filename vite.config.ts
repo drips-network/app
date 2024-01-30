@@ -18,6 +18,7 @@ const config = defineConfig({
         'cupertino-pane',
       ],
     },
+    testTimeout: 7000,
   },
   build: {
     target: 'es2020',

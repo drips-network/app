@@ -8,6 +8,10 @@
   export let options: Option<keyof T>;
   export let active: keyof T;
 
+  export let containerRole = 'radiogroup';
+  export let itemRole = 'radio';
+  export let ariaLabel: string | undefined = undefined;
+
   const dispatch = createEventDispatcher<{ select: keyof T }>();
 
   let optionElems: Partial<{ [key in keyof T]: HTMLDivElement }> = {};
@@ -49,10 +53,11 @@
 </script>
 
 <div class="segmented-control" bind:this={containerElem}>
-  <div class="options" role="radiogroup">
+  <div class="options" role={containerRole} aria-label={ariaLabel}>
     {#each options as option}
+      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
       <div
-        role="radio"
+        role={itemRole}
         aria-checked={active === option.value}
         class="option typo-text"
         bind:this={optionElems[option.value]}
@@ -84,6 +89,7 @@
     border-radius: 2rem 0 2rem 2rem;
     z-index: 0;
     user-select: none;
+    background-color: var(--color-background);
   }
 
   .segmented-control .options {
