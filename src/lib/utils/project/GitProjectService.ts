@@ -178,8 +178,10 @@ export default class GitProjectService {
     const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
     assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
 
+    const upgraded = this._repoDriverMetadataManager.upgradeAccountMetadata(currentMetadata.data);
+
     const newMetadata = {
-      ...currentMetadata.data,
+      ...upgraded,
       splits: {
         dependencies: dependenciesSplitMetadata,
         maintainers: maintainersSplitsMetadata,
