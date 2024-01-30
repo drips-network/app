@@ -25,7 +25,7 @@ import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import unreachable from '../unreachable';
 import type { Address, IpfsHash } from '../common-types';
-import type { State } from '../../flows/create-drip-list-flow/create-drip-list-flow';
+import type { State } from '../../../routes/app/(flows)/funder-onboarding/funder-onboarding-flow';
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
@@ -36,6 +36,7 @@ import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import { Forge } from '$lib/graphql/__generated__/base-types';
 import mapFilterUndefined from '../map-filter-undefined';
+import roundWeights from '../round-weights';
 
 type AccountId = string;
 
@@ -297,7 +298,7 @@ export default class DripListService {
 
     return {
       projectsSplitMetadata,
-      receivers,
+      receivers: roundWeights(receivers),
     };
   }
 
