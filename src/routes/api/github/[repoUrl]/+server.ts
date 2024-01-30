@@ -3,11 +3,10 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
-import { GITHUB_PERSONAL_ACCESS_TOKEN } from '$env/static/private';
 import { getRedis } from './redis';
 import { env } from '$env/dynamic/private';
 
-const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
+const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
 
 function mapGhResponse(response: Awaited<ReturnType<(typeof github)['getRepoByUrl']>>) {

@@ -1,1 +1,9 @@
 node_modules
+docs
+docker
+!docker/app-e2e-test-env
+!docker/scripts
+Dockerfile
+.git
+.gitignore
+.env

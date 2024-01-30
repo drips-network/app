@@ -28,6 +28,8 @@ describe('app', async () => {
     browser = await chromium.launch({ headless: process.env.E2E_HEADLESS === '0' ? false : true });
     page = await browser.newPage();
 
+    page.on('console', (msg) => console.log(msg.text()));
+
     await configureAppForTest(page);
   });
 
@@ -443,25 +445,39 @@ describe('app', async () => {
       });
 
       it('adds items', async () => {
+        console.log(1);
+
         const input = page.locator(
           'input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]',
         );
         await expect(input).toHaveCount(1);
         await input.click();
 
+        console.log(2);
+
         await page.keyboard.type('github.com/efstajas/drips-test-repo-10');
+        console.log(3);
         await page.keyboard.press('Enter');
+        console.log(4);
 
         await expect(
           page.locator('data-testid=item-https://github.com/efstajas/drips-test-repo-10'),
         ).toHaveCount(1);
 
+        console.log(5);
+
         await page.keyboard.type('0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
+
+        console.log(6);
         await page.keyboard.press('Enter');
+
+        console.log(7);
 
         await expect(
           page.locator('data-testid=item-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc'),
         ).toHaveCount(1);
+
+        console.log(8);
       });
 
       it('assigns equal percentages', async () => {
