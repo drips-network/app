@@ -252,9 +252,6 @@ export default class GitProjectService {
       },
     };
 
-    project.emoji = context.projectEmoji;
-    project.color = context.projectColor;
-
     const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
       forProject: project,
       forSplits: {
