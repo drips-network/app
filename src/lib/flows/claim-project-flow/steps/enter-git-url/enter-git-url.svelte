@@ -203,7 +203,9 @@
         You're claiming a project that has been renamed to {claimingRenamedRepoOriginalName.replace(
           'https://github.com/',
           '',
-        )} on GitHub.
+        )} on GitHub. Please ensure that the repository URL you entered matches the old name of your
+        repo exactly (including casing), and validate that any funds you're expecting to claim are displayed
+        above.
       </AnnotationBox>
     {/if}
   {/if}
