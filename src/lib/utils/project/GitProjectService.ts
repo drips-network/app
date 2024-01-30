@@ -233,7 +233,16 @@ export default class GitProjectService {
         driver: Driver.Repo,
       },
       color: context.projectColor,
-      emoji: context.projectEmoji,
+      avatar:
+        context.avatar.type === 'emoji'
+          ? {
+              __typename: 'EmojiAvatar' as const,
+              emoji: context.avatar.emoji,
+            }
+          : {
+              __typename: 'ImageAvatar' as const,
+              cid: context.avatar.cid,
+            },
       source: {
         __typename: 'Source' as const,
         forge: forge,
