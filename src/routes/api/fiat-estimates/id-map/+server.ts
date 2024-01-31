@@ -2,6 +2,8 @@ import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
+import { getRedis } from '../../redis';
+import { env } from '$env/dynamic/private';
 
 const cmcResponseSchema = z.object({
   data: z.array(
@@ -26,14 +28,28 @@ const COINMARKETCAP_ETHEREUM_PLATFORM_ID = 1;
 // but only the ones currently needed for estimates.
 
 export const GET: RequestHandler = async () => {
-  const idMapRes = await fetch(
-    `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,
-  );
+  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
 
-  const parsed = cmcResponseSchema.parse(await idMapRes.json());
+  const cachedResponse = redis && (await redis.get('cmc-id-map'));
+
+  let cmcIdMapRes: z.infer<typeof cmcResponseSchema>;
+
+  if (cachedResponse) {
+    cmcIdMapRes = cmcResponseSchema.parse(JSON.parse(cachedResponse));
+  } else {
+    const idMapRes = await fetch(
+      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,
+    );
+
+    cmcIdMapRes = cmcResponseSchema.parse(await idMapRes.json());
+
+    await redis?.set('cmc-id-map', JSON.stringify(cmcIdMapRes), {
+      EX: 60,
+    });
+  }
 
   const idMap = Object.fromEntries(
-    mapFilterUndefined(parsed.data, (tokenData) => {
+    mapFilterUndefined(cmcIdMapRes.data, (tokenData) => {
       // Don't include if platform is not Ethereum
       if (
         !tokenData.platform ||
