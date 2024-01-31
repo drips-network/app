@@ -2,6 +2,8 @@ import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
+import { env } from '$env/dynamic/private';
+import { getRedis } from '../../../redis';
 
 const cmcResponseSchema = z.object({
   data: z.record(
@@ -29,17 +31,52 @@ export const GET: RequestHandler = async ({ params }) => {
     throw error(400, 'Invalid token ID submitted');
   }
 
-  const priceRes = await fetch(
-    `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}&id=${token_ids}&convert=usd`,
+  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
+
+  let prices: Record<string, number | undefined> = Object.fromEntries(
+    tokenIds.map((tokenId) => [tokenId, undefined]),
   );
 
-  const parsedRes = cmcResponseSchema.parse(await priceRes.json());
+  await Promise.all(
+    tokenIds.map(async (tokenId) => {
+      const cachedPrice = redis && (await redis.get(`cmc-price-${tokenId}`));
+
+      if (cachedPrice) {
+        prices[tokenId] = JSON.parse(cachedPrice);
+      }
+    }),
+  );
+
+  const tokenIdsToFetch = tokenIds.filter((tokenId) => prices[tokenId] === undefined).join(',');
+
+  if (tokenIdsToFetch.length > 0) {
+    const priceRes = await fetch(
+      `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}&id=${tokenIdsToFetch}&convert=usd`,
+    );
+
+    const parsedRes = cmcResponseSchema.parse(await priceRes.json());
+
+    prices = {
+      ...prices,
+      ...Object.fromEntries(
+        Object.entries(parsedRes.data).map(([tokenId, data]) => [tokenId, data.quote.USD.price]),
+      ),
+    };
+
+    await Promise.all(
+      Object.entries(parsedRes.data).map(([tokenId, data]) =>
+        redis?.set(`cmc-price-${tokenId}`, data.quote.USD.price, {
+          EX: 60,
+        }),
+      ),
+    );
+  }
 
   // Return an object of tokenAddresses with their prices
   return new Response(
     JSON.stringify(
       Object.fromEntries(
-        tokenIds.map((tokenId) => [tokenId, parsedRes.data[tokenId].quote.USD.price]),
+        Object.entries(prices).map(([tokenId, price]) => [tokenId, price ?? null]),
       ),
     ),
     {
