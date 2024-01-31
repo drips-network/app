@@ -22,7 +22,8 @@ export const GET: RequestHandler = async ({ params }) => {
   const { token_ids } = params;
 
   // tokenIds is a comma-separated string of IDs, so parse it as such
-  const tokenIds = token_ids.split(',');
+  let tokenIds = token_ids.split(',');
+  tokenIds = Array.from(new Set(tokenIds));
 
   // Ensure all the token IDs are numeric strings
   try {
