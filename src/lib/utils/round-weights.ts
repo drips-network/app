@@ -27,12 +27,8 @@ export default function roundWeights(receivers: SplitsReceiverStruct[]): SplitsR
     let roundingRemainder = totalRequired - equalWeight * receivers.length;
 
     return receivers.map((r) => {
-      let additionalWeight = 0;
-
-      if (roundingRemainder > 0) {
-        additionalWeight = 1;
-        roundingRemainder -= 1;
-      }
+      const additionalWeight = roundingRemainder > 0 ? 1 : 0;
+      roundingRemainder -= additionalWeight;
       return {
         ...r,
         weight: equalWeight + additionalWeight,
