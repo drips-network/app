@@ -46,7 +46,7 @@
 
 <StandaloneFlowStepLayout
   headline="Support your Drip List"
-  description="How would you like to start funding your Drip List? You can freely create streams or send further one-time donations anytime later."
+  description="How would you like to start supporting your Drip List? You can freely create streams or send further one-time donations anytime later."
 >
   <TwoBigOptions
     bind:selected={$context.selectedSupportOption}

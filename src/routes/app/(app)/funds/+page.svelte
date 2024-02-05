@@ -52,8 +52,8 @@
       component: CarouselEduCard,
       props: {
         id: 'claim-a-project',
-        title: 'Raise funds for your project',
-        description: 'Claim your GitHub repository on Drips to start raising funds.',
+        title: 'Get support for your project',
+        description: 'Claim your GitHub repository on Drips to start receiving funds.',
         illustration: MultiChain,
         actions: [
           {

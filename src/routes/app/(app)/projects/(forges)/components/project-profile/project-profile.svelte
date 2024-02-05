@@ -396,7 +396,7 @@
           <div class="stats" in:fade|local={{ duration: 300 }}>
             {#if earnedFundsResult}
               <div class="stat">
-                <KeyValuePair key="Total income">
+                <KeyValuePair key="Total donations">
                   <AggregateFiatEstimate amounts={earnedFundsResult} />
                 </KeyValuePair>
               </div>

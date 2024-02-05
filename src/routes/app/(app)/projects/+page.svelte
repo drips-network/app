@@ -29,8 +29,8 @@
           <div style:display="flex" style:gap="0.5rem" style:flex-direction="column">
             <h2 class="pixelated">How donations reach your projects</h2>
             <p>
-              Donations from funders are automatically trickled down a global dependency tree once a
-              month.
+              Donations from supporters are automatically trickled down a global dependency tree
+              once a month.
             </p>
           </div>
           <Button href="https://docs.drips.network/" target="_blank" icon={ArrowBoxUpRight}>
