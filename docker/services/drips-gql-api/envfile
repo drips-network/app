@@ -1,6 +1,6 @@
 PORT=8080
 NETWORK=localtestnet
-API_KEYS=afdb8b7e-8fa7-4de9-bd95-b650b839e745
+PUBLIC_API_KEYS=afdb8b7e-8fa7-4de9-bd95-b650b839e745
 INFURA_API_KEY=f88a1229d473471bbf94d168401b9c93
 POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres-event-processor:5432/dripsdb
 PRETEND_ALL_REPOS_EXIST=true
