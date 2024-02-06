@@ -88,8 +88,8 @@
 <StepLayout>
   <StepHeader
     emoji="🫗"
-    headline="Collect earnings"
-    description="Choose which of your earned tokens you’d like to collect."
+    headline="Collect funds"
+    description="Choose which tokens you’d like to collect."
   />
   <div class="next-settlement">
     <div class="left">
@@ -116,7 +116,7 @@
     {#if selectorItems}
       <ListSelect
         bind:selected
-        emptyStateText="No earnings to collect"
+        emptyStateText="No tokens to collect"
         searchable={false}
         multiselect={true}
         items={selectorItems}

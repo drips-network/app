@@ -7,6 +7,11 @@ let client: RedisClientType | undefined;
 if (env.CACHE_REDIS_CONNECTION_STRING) {
   client = redis.createClient({ url: env.CACHE_REDIS_CONNECTION_STRING });
 
+  client.on('error', function (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  });
+
   (async () => {
     try {
       await client.connect();

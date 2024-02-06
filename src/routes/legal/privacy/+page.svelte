@@ -12,14 +12,14 @@
   maintained on a voluntary basis by the Public Goods Association (the “Association”). The
   Association is a Swiss Association whose purpose is to build digital coordination infrastructure
   that enables the development of public goods, including the Drips project. While the
-  Switzerland-based Radicle Foundation (the “Foundation”) previously assisted in the development and
-  deployment of the Drips Network, the Radicle Foundation and the Public Goods Association do not
-  own, manage, or control or act as an administrator or operator of the Drips Network. The Drips
-  Network presently operates in a fully decentralized and autonomous manner and is fully integrated
-  with the Ethereum protocol. Neither the Association nor the Foundation is involved in nor in any
-  way responsible for the ongoing operation, running, or functioning of the Drips Network and/or any
-  of the interactions, collaborations or contractual relationships between Users on the Drips
-  Network.
+  Switzerland-based Better Internet Foundation (the “Foundation”) previously assisted in the
+  development and deployment of the Drips Network, the Better Internet Foundation and the Public
+  Goods Association do not own, manage, or control or act as an administrator or operator of the
+  Drips Network. The Drips Network presently operates in a fully decentralized and autonomous manner
+  and is fully integrated with the Ethereum protocol. Neither the Association nor the Foundation is
+  involved in nor in any way responsible for the ongoing operation, running, or functioning of the
+  Drips Network and/or any of the interactions, collaborations or contractual relationships between
+  Users on the Drips Network.
 </p>
 <p>
   The Association voluntarily supports the growth and development of the Drips project, including
@@ -105,20 +105,20 @@
   Drips Network. Similarly, Your use of or interaction with the funding, sharing or streaming
   functions (as outlined and defined in the Disclaimer) in the Drips Network could lead other Drips
   Network participants to determine certain things about You through Your use of those
-  functions.&nbsp;Neither Public Goods Association nor Radicle Foundation collect this data from You
-  nor process it in any way.
+  functions.&nbsp;Neither Public Goods Association nor Better Internet Foundation collect this data
+  from You nor process it in any way.
 </p>
 <p>
   By using Drips Network and/or Drips App you acknowledge that Your personal data, including Your
   wallet address (and/or any third-party recipient&rsquo;s wallet address), is/are stored on public
-  searchable blockchains and neither Public Goods Association nor Radicle Foundation, nor any third
-  party, has any power to delete such data published by You or by its users to the blockchain. Any
-  details of any transfer initiated and made by You are public information and are stored on the
-  blockchain. You hereby release and indemnify Public Goods Association and/or Radicle Foundation of
-  any data privacy liabilities associated with personal data that You (and/or third parties) publish
-  to the blockchain by using Drips Network and/ or Drips App. Neither Public Goods Association nor
-  Radicle Foundation is acting as a data controller in this regard within the meaning of the data
-  protection legislation.&nbsp;
+  searchable blockchains and neither Public Goods Association nor Better Internet Foundation, nor
+  any third party, has any power to delete such data published by You or by its users to the
+  blockchain. Any details of any transfer initiated and made by You are public information and are
+  stored on the blockchain. You hereby release and indemnify Public Goods Association and/or Better
+  Internet Foundation of any data privacy liabilities associated with personal data that You (and/or
+  third parties) publish to the blockchain by using Drips Network and/ or Drips App. Neither Public
+  Goods Association nor Better Internet Foundation is acting as a data controller in this regard
+  within the meaning of the data protection legislation.&nbsp;
 </p>
 <p>
   The Association, the Drips Websites, Drips App and/or any third-party provider as outlined below
@@ -233,25 +233,25 @@
 <p>
   By using Drips Network and/or Drips App You acknowledge that Your personal data, including Your
   wallet address (and/or any third-party recipient’s wallet address), is/are stored on the Ethereum
-  Network and neither Public Goods Association nor Radicle Foundation, nor any third party, has any
-  power to delete such data published by You or other/its users to the blockchain. Any details of
-  any transfer initiated and made by You are public information and are stored on the blockchain.
-  You hereby release and indemnify Public Goods Association and/or Radicle Foundation of any data
-  privacy liabilities associated with personal data that You (and/or third parties) publish to the
-  Ethereum Network by using Drips Network and/ or Drips App. Neither Public Goods Association nor
-  Radicle Foundation is acting as a data controller in this regard within the meaning of the data
-  protection legislation.
+  Network and neither Public Goods Association nor Better Internet Foundation, nor any third party,
+  has any power to delete such data published by You or other/its users to the blockchain. Any
+  details of any transfer initiated and made by You are public information and are stored on the
+  blockchain. You hereby release and indemnify Public Goods Association and/or Better Internet
+  Foundation of any data privacy liabilities associated with personal data that You (and/or third
+  parties) publish to the Ethereum Network by using Drips Network and/ or Drips App. Neither Public
+  Goods Association nor Better Internet Foundation is acting as a data controller in this regard
+  within the meaning of the data protection legislation.
 </p>
 <h3>How Third Party Applications are Used</h3>
 <p>
   The Drips Website and/or Drips App may contain third-party websites and/or third-party
   applications. If You use Drips Website and/or Drips App, personal data that You provide may be
-  processed by third parties. Public Goods Association or Radicle Foundation have no control over,
-  do not review and cannot be responsible for these third-party websites, applications, or their
-  content. It is encouraged that You read the privacy policies of every website and/or application
-  You visit. Any links to third-party websites, applications or locations are for Your convenience
-  and do not signify our endorsement of such third parties or their products, content, applications,
-  or websites.
+  processed by third parties. Public Goods Association or Better Internet Foundation have no control
+  over, do not review and cannot be responsible for these third-party websites, applications, or
+  their content. It is encouraged that You read the privacy policies of every website and/or
+  application You visit. Any links to third-party websites, applications or locations are for Your
+  convenience and do not signify our endorsement of such third parties or their products, content,
+  applications, or websites.
 </p>
 <h4>Netlify:</h4>
 <p>
@@ -351,8 +351,9 @@
 <p>
   By using Drips Network and/or Drips App You acknowledge that your personal data, including Your
   wallet address (and/or any third-party recipient’s wallet address), is/are stored on public
-  searchable blockchains and neither Public Goods Association nor Radicle Foundation, nor any third
-  party, has any power to delete such data published by You or other/its users to the blockchain.
+  searchable blockchains and neither Public Goods Association nor Better Internet Foundation, nor
+  any third party, has any power to delete such data published by You or other/its users to the
+  blockchain.
 </p>
 <h3>Transferring Data Outside the EU</h3>
 <p>

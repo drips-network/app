@@ -27,18 +27,19 @@
 </p>
 
 <p>
-  The Drips Network has been developed as part of a community effort with the support of the Radicle
-  Foundation. This website is maintained on a voluntary basis by the Public Goods Association (the
-  &ldquo;Association&rdquo;), whose purpose is to build digital coordination infrastructure that
-  enables the development of public goods. Neither the Radicle Foundation nor the Public Goods
-  Association own, manage, or control or act as an administrator or operator of the Drips Network.
-  The Drips Network presently operates in a fully decentralized and autonomous manner and is fully
-  integrated with the Ethereum protocol. Neither the Association nor the Foundation is involved in,
-  or in any way responsible for the ongoing operation, maintenance, further development, running, or
-  functioning of the Drips Network and/or any of the interactions, collaborations or contractual
-  relationships between Users on the Drips Network. Being a decentralized network, any potential new
-  and/or upgraded versions of the Drips Network can only be released through a community governance
-  decision which neither the Radicle Foundation or the Public Goods Association control.
+  The Drips Network has been developed as part of a community effort with the support of the Better
+  Internet Foundation. This website is maintained on a voluntary basis by the Public Goods
+  Association (the &ldquo;Association&rdquo;), whose purpose is to build digital coordination
+  infrastructure that enables the development of public goods. Neither the Better Internet
+  Foundation nor the Public Goods Association own, manage, or control or act as an administrator or
+  operator of the Drips Network. The Drips Network presently operates in a fully decentralized and
+  autonomous manner and is fully integrated with the Ethereum protocol. Neither the Association nor
+  the Foundation is involved in, or in any way responsible for the ongoing operation, maintenance,
+  further development, running, or functioning of the Drips Network and/or any of the interactions,
+  collaborations or contractual relationships between Users on the Drips Network. Being a
+  decentralized network, any potential new and/or upgraded versions of the Drips Network can only be
+  released through a community governance decision which neither the Better Internet Foundation or
+  the Public Goods Association control.
 </p>
 
 <p>

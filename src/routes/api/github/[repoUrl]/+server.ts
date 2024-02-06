@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
-import { getRedis } from './redis';
+import { getRedis } from '../../redis';
 import { env } from '$env/dynamic/private';
 
 const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });

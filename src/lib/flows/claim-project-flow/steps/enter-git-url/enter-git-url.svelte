@@ -36,6 +36,7 @@
   import { gql } from 'graphql-request';
   import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
   import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -56,6 +57,8 @@
     }
   });
 
+  let claimingRenamedRepoOriginalName: string | undefined;
+
   async function fetchProject() {
     $context.linkedToRepo = false;
 
@@ -75,7 +78,14 @@
       const repoInfo = await repoInfoRes.json();
       const normalizedUrl = repoInfo.url;
 
-      $context.gitUrl = normalizedUrl;
+      // If the normalized URL is different from the original URL in lowercase, it means that the repo has likely
+      // been renamed on GitHub. In this case, we should let the user claim the outdated project too.
+      // In all other cases, we use the normalized URL to fix casing mismatches.
+      if (normalizedUrl.toLowerCase() === $context.gitUrl.toLowerCase()) {
+        $context.gitUrl = normalizedUrl;
+      } else {
+        claimingRenamedRepoOriginalName = normalizedUrl;
+      }
 
       $context.projectMetadata = {
         starCount: repoInfo.stargazersCount,
@@ -140,6 +150,8 @@
     $context.isPartiallyClaimed = false;
     $context.projectMetadata = undefined;
 
+    claimingRenamedRepoOriginalName = undefined;
+
     validationState = { type: 'unvalidated' };
   }
 
@@ -186,6 +198,16 @@
       unclaimedFunds={$context.unclaimedFunds}
       claimableTokensKey="Claimable tokens"
     />
+    {#if claimingRenamedRepoOriginalName}
+      <AnnotationBox>
+        You're claiming a project that has been renamed to {claimingRenamedRepoOriginalName.replace(
+          'https://github.com/',
+          '',
+        )} on GitHub. Please ensure that the repository URL you entered matches the old name of your
+        repo exactly (including casing), and validate that any funds you're expecting to claim are displayed
+        above.
+      </AnnotationBox>
+    {/if}
   {/if}
   <svelte:fragment slot="actions">
     <Button
