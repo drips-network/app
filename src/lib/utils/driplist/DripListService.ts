@@ -240,8 +240,6 @@ export default class DripListService {
   public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {
     const projectsInput = Object.entries(listEditorConfig.percentages);
 
-    const receivers: SplitsReceiverStruct[] = [];
-
     const projectsSplitMetadata: ReturnType<
       typeof nftDriverAccountMetadataParser.parseLatest
     >['projects'] = [];
@@ -262,7 +260,6 @@ export default class DripListService {
         };
 
         projectsSplitMetadata.push(receiver);
-        receivers.push(receiver);
       } else if (isValidGitUrl(itemId)) {
         // RepoDriver recipient
         const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
@@ -282,7 +279,6 @@ export default class DripListService {
           ...receiver,
           source: GitProjectService.populateSource(forge, repoName, username),
         });
-        receivers.push(receiver);
       } else {
         // It's the account ID for another Drip List
         const receiver = {
@@ -292,13 +288,30 @@ export default class DripListService {
         };
 
         projectsSplitMetadata.push(receiver);
-        receivers.push(receiver);
       }
     }
 
+    const roundedReceivers = roundWeights(
+      projectsSplitMetadata.map((r) => ({
+        accountId: r.accountId,
+        weight: r.weight,
+        typeOfReceiver: 'Dependency',
+      })),
+    );
+
+    const roundedProjectsSplitMetadata = projectsSplitMetadata.map((r) => ({
+      ...r,
+      weight: roundedReceivers.find((f) => f.accountId === r.accountId)?.weight ?? unreachable(),
+    }));
+
     return {
-      projectsSplitMetadata,
-      receivers: roundWeights(receivers),
+      projectsSplitMetadata: roundedProjectsSplitMetadata,
+      receivers: roundWeights(
+        roundedProjectsSplitMetadata.map((r) => ({
+          typeOfReceiver: 'Dependency',
+          ...r,
+        })),
+      ),
     };
   }
 

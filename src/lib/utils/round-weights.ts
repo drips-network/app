@@ -1,4 +1,11 @@
-import { constants, type SplitsReceiverStruct } from 'radicle-drips';
+import { BigNumber } from 'ethers';
+import { constants } from 'radicle-drips';
+
+export interface TypedReceiver {
+  typeOfReceiver: 'Dependency' | 'Maintainer';
+  accountId: string;
+  weight: number;
+}
 
 /**
  * Ensures the total weight of receivers in a `DripList` or `Project` equals `constants.TOTAL_SPLITS_WEIGHT`.
@@ -12,12 +19,16 @@ import { constants, type SplitsReceiverStruct } from 'radicle-drips';
  * @param {SplitsReceiverStruct[]} receivers - The list of receivers whose weights need to be adjusted.
  * @returns {SplitsReceiverStruct[]} The adjusted list of receivers with their weights ensuring the sum equals `constants.TOTAL_SPLITS_WEIGHT`.
  */
-export default function roundWeights(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-  const totalWeight = receivers.reduce((sum, receiver) => sum + (receiver.weight as number), 0);
-  const totalRequired = constants.TOTAL_SPLITS_WEIGHT;
+export default function roundWeights(receivers: TypedReceiver[]): TypedReceiver[] {
+  const totalWeight = receivers.reduce<number>((sum, receiver) => sum + receiver.weight, 0);
+  const totalRequired = BigNumber.from(constants.TOTAL_SPLITS_WEIGHT).toNumber();
 
   if (totalWeight === totalRequired) {
     return receivers;
+  }
+
+  if (totalWeight > totalRequired) {
+    throw new Error(`Total weight of receivers exceeds ${constants.TOTAL_SPLITS_WEIGHT}.`);
   }
 
   const allEqual = receivers.every((r) => r.weight === receivers[0].weight);
@@ -32,6 +43,7 @@ export default function roundWeights(receivers: SplitsReceiverStruct[]): SplitsR
       return {
         ...r,
         weight: equalWeight + additionalWeight,
+        typeOfReceiver: r.typeOfReceiver,
       };
     });
   } else {
@@ -44,7 +56,7 @@ export default function roundWeights(receivers: SplitsReceiverStruct[]): SplitsR
       }
     });
 
-    (receivers[maxWeightIndex].weight as number) += weightToAdjust;
+    receivers[maxWeightIndex].weight += weightToAdjust;
 
     return receivers;
   }

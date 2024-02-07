@@ -30,6 +30,7 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import roundWeights from '../round-weights';
+import unreachable from '../unreachable';
 
 export default class GitProjectService {
   private _github!: GitHub;
@@ -328,8 +329,6 @@ export default class GitProjectService {
     maintainerListEditorConfig: ListEditorConfig,
     dependencyListEditorConfig: ListEditorConfig,
   ) {
-    const receivers: SplitsReceiverStruct[] = [];
-
     // Populate dependencies splits and metadata.
     const dependenciesInput = Object.entries(dependencyListEditorConfig.percentages);
 
@@ -354,7 +353,6 @@ export default class GitProjectService {
         };
 
         dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
       } else if (isValidGitUrl(itemId)) {
         const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
 
@@ -373,7 +371,6 @@ export default class GitProjectService {
           ...receiver,
           source: GitProjectService.populateSource(forge, repoName, username),
         });
-        receivers.push(receiver);
       } else {
         // It's the account ID for another Drip List
         const receiver = {
@@ -383,7 +380,6 @@ export default class GitProjectService {
         };
 
         dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
       }
     }
 
@@ -408,17 +404,51 @@ export default class GitProjectService {
       };
 
       maintainersSplitsMetadata.push(receiver);
-      receivers.push(receiver);
     }
+
+    const dependenciesAndMaintainers = dependenciesSplitMetadata
+      .map((d) => ({
+        ...d,
+        typeOfReceiver: 'Dependency',
+      }))
+      .concat(
+        maintainersSplitsMetadata.map((m) => ({
+          ...m,
+          typeOfReceiver: 'Maintainer',
+        })),
+      );
+    const roundedReceivers = roundWeights(dependenciesAndMaintainers as any);
+    const roundedDependencies = roundedReceivers
+      .filter((r) => r.typeOfReceiver === 'Dependency')
+      .map((d) => {
+        const dep =
+          dependenciesSplitMetadata.find((s) => s.accountId === d.accountId) ?? unreachable();
+
+        return {
+          ...dep,
+          weight: d.weight,
+        };
+      });
+    const roundedMaintainers = roundedReceivers
+      .filter((r) => r.typeOfReceiver === 'Maintainer')
+      .map((m) => {
+        const maintainer =
+          maintainersSplitsMetadata.find((s) => s.accountId === m.accountId) ?? unreachable();
+
+        return {
+          ...maintainer,
+          weight: m.weight,
+        };
+      });
 
     return {
       tx: await this._repoDriverTxFactory.setSplits(
         accountId,
-        this._formatSplitReceivers(receivers),
+        this._formatSplitReceivers(roundedReceivers),
       ),
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
-      receivers: roundWeights(receivers),
+      dependenciesSplitMetadata: roundedDependencies,
+      maintainersSplitsMetadata: roundedMaintainers,
+      receivers: roundedReceivers,
     };
   }
 
