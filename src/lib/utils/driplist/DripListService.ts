@@ -36,7 +36,6 @@ import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import { Forge } from '$lib/graphql/__generated__/base-types';
 import mapFilterUndefined from '../map-filter-undefined';
-import roundWeights from '../round-weights';
 
 type AccountId = string;
 
@@ -298,7 +297,7 @@ export default class DripListService {
 
     return {
       projectsSplitMetadata,
-      receivers: roundWeights(receivers),
+      receivers: receivers,
     };
   }
 
