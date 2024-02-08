@@ -21,13 +21,10 @@
   import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
   import expect from '$lib/utils/expect';
-  import type { DripsSubgraphClient } from 'radicle-drips';
-  import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import streamsStore from '$lib/stores/streams/streams.store';
   import Pause from 'radicle-design-system/icons/Pause.svelte';
   import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import assert from '$lib/utils/assert';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
   import type {
@@ -43,11 +40,9 @@
   export let connectedWalletHidden = false;
 
   let dripListService: DripListService;
-  let subgraphClient: DripsSubgraphClient;
 
   onMount(async () => {
     dripListService = await DripListService.new();
-    subgraphClient = getSubgraphClient();
   });
 
   async function createDripList() {
@@ -55,26 +50,9 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const transactContext = await dripListService.buildTransactContext($context);
-
-          return transactContext;
+          return await dripListService.buildTransactContext($context);
         },
-        transactions: ({ callerClient, approvalFlowTxs, normalFlowTxs, needsApproval }) => {
-          if (needsApproval) {
-            assert(
-              approvalFlowTxs,
-              "needsApproval is true, but dripListService didn't build `approvalFlowTxs`",
-            );
-            return approvalFlowTxs;
-          } else {
-            return {
-              transaction: () =>
-                callerClient.callBatched(normalFlowTxs.txs, {
-                  gasLimit: normalFlowTxs.gasLimitWithBuffer,
-                }),
-            };
-          }
-        },
+        transactions: ({ txs }) => txs,
         after: async (_, { dripListId }) => {
           const dripListExistsQuery = gql`
             query DripListExists($id: ID!) {

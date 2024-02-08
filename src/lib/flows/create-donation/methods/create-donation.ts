@@ -4,7 +4,7 @@ import transact, { makeTransactPayload } from '$lib/components/stepper/utils/tra
 import streams from '$lib/stores/streams';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import expect from '$lib/utils/expect';
-import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
+import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
 import { constants } from 'ethers';
 import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
@@ -30,7 +30,6 @@ export default function (
     dispatch,
     makeTransactPayload({
       before: async () => {
-        const client = await getAddressDriverClient();
         const txFactory = await getAddressDriverTxFactory();
 
         const { address, signer } = get(walletStore);
@@ -55,10 +54,7 @@ export default function (
           */
           { gasLimit: 1 },
         );
-
         delete givePopulatedTx.gasLimit;
-
-        const giveTx = client.give(recipientAccountId, tokenAddress, amountToGive);
 
         const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
         const approvePopulatedTx = await erc20TxFactory.approve(
@@ -68,16 +64,14 @@ export default function (
 
         return {
           givePopulatedTx,
-          giveTx,
           approvePopulatedTx,
           needApproval,
           tokenAddress,
         };
       },
 
-      transactions: ({ givePopulatedTx, giveTx, approvePopulatedTx, needApproval }) =>
-        // If the ERC-20 needs approval, we send a batch TX including the approval TX and setStreams.
-        needApproval
+      transactions: ({ givePopulatedTx, approvePopulatedTx, needApproval }) => [
+        ...(needApproval
           ? [
               {
                 transaction: approvePopulatedTx,
@@ -87,16 +81,20 @@ export default function (
                   subtitle: 'You only have to do this once per token.',
                   icon: WAITING_WALLET_ICON,
                 },
-              },
-              {
-                transaction: givePopulatedTx,
-                waitingSignatureMessage: {
-                  message: 'Waiting for you to approve the donation transaction in your wallet...',
-                  icon: WAITING_WALLET_ICON,
-                },
+                applyGasBuffer: false,
               },
             ]
-          : { transaction: () => giveTx },
+          : []),
+
+        {
+          transaction: givePopulatedTx,
+          waitingSignatureMessage: {
+            message: 'Waiting for you to approve the donation transaction in your wallet...',
+            icon: WAITING_WALLET_ICON,
+          },
+          applyGasBuffer: false,
+        },
+      ],
 
       after: async (receipts, transactContext) => {
         const { provider } = get(walletStore);

@@ -32,7 +32,7 @@
   import { writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
+  import { getRepoDriverTxFactory } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { gql } from 'graphql-request';
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
@@ -90,17 +90,17 @@
             },
           ];
 
-          const repoDriverClient = await getRepoDriverClient();
+          const txFactory = await getRepoDriverTxFactory();
 
-          const emitAccountMetadataTx = repoDriverClient.emitAccountMetadata(
+          const tx = await txFactory.emitAccountMetadata(
             project.account.accountId,
             accountMetadataAsBytes,
           );
 
-          return { emitAccountMetadataTx };
+          return { tx };
         },
 
-        transactions: ({ emitAccountMetadataTx }) => ({ transaction: () => emitAccountMetadataTx }),
+        transactions: ({ tx }) => [{ transaction: tx, applyGasBuffer: false }],
       }),
     );
   }

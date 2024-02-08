@@ -52,17 +52,20 @@ export default function batchCollect(
 
         const flows = await Promise.all(flowsPromises);
         const transactions = flows.flat();
+        const tx = await callerClient.populateCallBatchedTx(transactions);
 
         return {
-          batch: transactions,
-          callerClient,
+          tx,
           accountId,
         };
       },
 
-      transactions: ({ callerClient, batch }) => ({
-        transaction: () => callerClient.callBatched(batch),
-      }),
+      transactions: ({ tx }) => [
+        {
+          transaction: tx,
+          applyGasBuffer: true,
+        },
+      ],
     }),
   );
 }
