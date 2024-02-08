@@ -13,7 +13,7 @@
   import { Utils } from 'radicle-drips';
   import randomBigintUntilUnique from '$lib/utils/random-bigint-until-unique';
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import Button from '$lib/components/button/button.svelte';
   import Wallet from 'radicle-design-system/icons/Wallet.svelte';
 
@@ -67,11 +67,12 @@
             amountPerSec: streamRateValueParsed / BigInt(2592000), // 30 days in seconds
           });
 
-          const addressDriverClient = await getAddressDriverClient();
+          const txFactory = await getAddressDriverTxFactory();
 
-          const tx = addressDriverClient.setStreams(
+          const tx = await txFactory.setStreams(
             assetConfig.tokenAddress,
             currentReceivers,
+            0n,
             [
               ...currentReceivers,
               {
@@ -79,13 +80,20 @@
                 config: dripConfig,
               },
             ],
-            $walletStore.address ?? unreachable(),
             0n,
+            0n,
+            $walletStore.address ?? unreachable(),
           );
 
           return { tx };
         },
-        transactions: ({ tx }) => ({ transaction: () => tx }),
+
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: true,
+          },
+        ],
       }),
     );
   }

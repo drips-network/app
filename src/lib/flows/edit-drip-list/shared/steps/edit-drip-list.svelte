@@ -83,7 +83,7 @@
   import unreachable from '$lib/utils/unreachable';
   import { gql } from 'graphql-request';
   import type {
-  EditDripListStepDripListToAddFragment,
+    EditDripListStepDripListToAddFragment,
     EditDripListStepProjectToAddFragment,
     EditDripListStepSelectedDripListFragment,
   } from './__generated__/gql.generated';
@@ -161,7 +161,6 @@
         before: async () => {
           const nftDriverTxFactory = await getNFTDriverTxFactory();
           const dripListService = await DripListService.new();
-          const callerClient = await getCallerClient();
 
           const { receivers, projectsSplitMetadata } =
             await dripListService.getProjectsSplitMetadataAndReceivers(dripList);
@@ -195,12 +194,18 @@
             ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
           );
 
-          return { callerClient, setSplitsTx, metadataTx };
+          const callerClient = await getCallerClient();
+          const tx = await callerClient.populateCallBatchedTx([setSplitsTx, metadataTx]);
+
+          return { tx };
         },
 
-        transactions: ({ callerClient, setSplitsTx, metadataTx }) => ({
-          transaction: () => callerClient.callBatched([setSplitsTx, metadataTx]),
-        }),
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: false,
+          },
+        ],
       }),
     );
   }

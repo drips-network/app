@@ -10,7 +10,7 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { AddressDriverClient, type SplitsReceiverStruct } from 'radicle-drips';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
@@ -107,14 +107,24 @@
               })),
           );
 
+          const txFactory = await getAddressDriverTxFactory();
+
+          const tx = await txFactory.setSplits(splits);
+
           return {
             client,
             splits,
+            tx,
           };
         },
-        transactions: (transactContext) => ({
-          transaction: () => transactContext.client.setSplits(transactContext.splits),
-        }),
+
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: false,
+          },
+        ],
+
         after: afterTx,
       }),
     );

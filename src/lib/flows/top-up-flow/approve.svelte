@@ -6,8 +6,8 @@
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-  import { ethers } from 'ethers';
+  import { getERC20TxFactory } from '$lib/utils/get-drips-clients';
+  import { constants, ethers } from 'ethers';
   import Button from '$lib/components/button/button.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import unreachable from '$lib/utils/unreachable';
@@ -23,10 +23,19 @@
     transact(
       dispatch,
       makeTransactPayload({
-        transactions: () => ({
-          transaction: async () =>
-            (await getAddressDriverClient()).approve(tokenAddress ?? unreachable()),
-        }),
+        transactions: async () => {
+          const txFactory = await getERC20TxFactory(tokenAddress ?? unreachable());
+
+          return [
+            {
+              transaction: await txFactory.approve(
+                tokenAddress ?? unreachable(),
+                constants.MaxUint256,
+              ),
+              applyGasBuffer: false,
+            },
+          ];
+        },
         after: async () => {
           context.update((c) => ({
             ...c,

@@ -19,7 +19,7 @@ import {
   RepoDriverClient,
 } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { CallerClient, SplitsReceiverStruct, StreamConfig } from 'radicle-drips';
+import type { SplitsReceiverStruct, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
@@ -35,7 +35,6 @@ import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import { Forge } from '$lib/graphql/__generated__/base-types';
-import mapFilterUndefined from '../map-filter-undefined';
 
 type AccountId = string;
 
@@ -132,10 +131,12 @@ export default class DripListService {
       this._formatSplitReceivers(receivers),
     );
 
-    const callerClient = await getCallerClient();
+    let needsApprovalForToken: string | undefined;
+    let txs: PopulatedTransaction[];
 
     if (context.selectedSupportOption === 1) {
       // User wants to create a support stream to the list
+
       const token = context.continuousSupportConfig.listSelected[0] ?? unreachable();
       let amountPerSec = context.continuousSupportConfig.streamRateValueParsed ?? unreachable();
       amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
@@ -144,7 +145,9 @@ export default class DripListService {
       const allowance = await this._addressDriverClient.getAllowance(token);
       const needsApproval = allowance < topUpAmount;
 
-      const tokenApprovalTx = await this._buildTokenApprovalTx(token);
+      if (needsApproval) {
+        needsApprovalForToken = token;
+      }
 
       const setStreamTx = await this._buildSetDripListStreamTxs(
         salt,
@@ -156,24 +159,7 @@ export default class DripListService {
         amountPerSec,
       );
 
-      const txs = {
-        tokenApprovalTx,
-        createDripListTx,
-        setDripListSplitsTx,
-        setStreamTx,
-        giveTx: undefined,
-      };
-
-      const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
-      const normalFlowTxs = await this._getNormalFlowTxs(txs, needsApproval, callerClient);
-
-      return {
-        dripListId,
-        needsApproval,
-        callerClient,
-        approvalFlowTxs,
-        normalFlowTxs,
-      };
+      txs = [createDripListTx, setDripListSplitsTx, setStreamTx];
     } else if (context.selectedSupportOption === 2) {
       // User wants to make a one-time donation to the list
 
@@ -182,7 +168,10 @@ export default class DripListService {
 
       const allowance = await this._addressDriverClient.getAllowance(token);
       const needsApproval = allowance < donationAmount;
-      const tokenApprovalTx = await this._buildTokenApprovalTx(token);
+
+      if (needsApproval) {
+        needsApprovalForToken = token;
+      }
 
       const txFactory = await getAddressDriverTxFactory();
       const giveTx = await txFactory.give(
@@ -198,42 +187,37 @@ export default class DripListService {
         { gasLimit: 1 },
       );
 
-      const txs = {
-        tokenApprovalTx,
-        createDripListTx,
-        setDripListSplitsTx,
-        giveTx,
-        setStreamTx: undefined,
-      };
-
-      const approvalFlowTxs = await this._getApprovalFlowTxs(txs, needsApproval, callerClient);
-      const normalFlowTxs = await this._getNormalFlowTxs(txs, needsApproval, callerClient);
-
-      return {
-        dripListId,
-        needsApproval,
-        callerClient,
-        approvalFlowTxs,
-        normalFlowTxs,
-      };
+      txs = [createDripListTx, setDripListSplitsTx, giveTx];
     } else {
       // No support
-      const txs = {
-        createDripListTx,
-        setDripListSplitsTx,
-        setStreamTx: undefined,
-        giveTx: undefined,
-      };
-
-      const normalFlowTxs = await this._getNormalFlowTxs(txs, false, callerClient);
-
-      return {
-        dripListId,
-        needsApproval: false,
-        callerClient,
-        normalFlowTxs,
-      };
+      txs = [createDripListTx, setDripListSplitsTx];
     }
+
+    const callerClient = await getCallerClient();
+    const batch = await callerClient.populateCallBatchedTx(txs);
+
+    return {
+      txs: [
+        ...(needsApprovalForToken
+          ? [
+              {
+                transaction: await this._buildTokenApprovalTx(needsApprovalForToken),
+                waitingSignatureMessage: {
+                  message: `Waiting for you to approve Drips access to the ERC-20 token in your wallet...`,
+                  subtitle: 'You only have to do this once per token.',
+                  icon: WAITING_WALLET_ICON,
+                },
+                applyGasBuffer: false,
+              },
+            ]
+          : []),
+        {
+          transaction: batch,
+          applyGasBuffer: true,
+        },
+      ],
+      dripListId,
+    };
   }
 
   public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {
@@ -328,107 +312,6 @@ export default class DripListService {
     return sortedReceivers;
   }
 
-  private async _getApprovalFlowTxs(
-    txs: {
-      tokenApprovalTx: PopulatedTransaction | undefined;
-      createDripListTx: PopulatedTransaction | undefined;
-      setDripListSplitsTx: PopulatedTransaction | undefined;
-      setStreamTx: PopulatedTransaction | undefined;
-      giveTx: PopulatedTransaction | undefined;
-    },
-    needsApproval: boolean,
-    callerClient: CallerClient,
-  ) {
-    const { tokenApprovalTx, createDripListTx, setDripListSplitsTx, setStreamTx, giveTx } = txs;
-
-    const batchTx = await callerClient.populateCallBatchedTx(
-      mapFilterUndefined([createDripListTx, setDripListSplitsTx, setStreamTx, giveTx], (v) => v),
-    );
-
-    if (!needsApproval) {
-      const estimatedGasLimit = await callerClient.signer.estimateGas(batchTx);
-      const gasLimit = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
-
-      batchTx.gasLimit = gasLimit;
-    } else {
-      // !HACK: Hardcoded gas limit for now to avoid the "out of gas" error.
-      batchTx.gasLimit = BigNumber.from('0x0a05b6');
-    }
-
-    assert(tokenApprovalTx);
-
-    return [
-      {
-        transaction: tokenApprovalTx,
-        waitingSignatureMessage: {
-          message: 'Waiting for you to approve access to the ERC-20 token in your wallet...',
-          subtitle: 'You only have to do this once per token.',
-          icon: WAITING_WALLET_ICON,
-        },
-      },
-      {
-        transaction: batchTx,
-      },
-    ];
-  }
-
-  private async _getNormalFlowTxs(
-    txs: {
-      createDripListTx: PopulatedTransaction | undefined;
-      setDripListSplitsTx: PopulatedTransaction | undefined;
-      setStreamTx: PopulatedTransaction | undefined;
-      giveTx: PopulatedTransaction | undefined;
-    },
-    needsApproval: boolean,
-    callerClient: CallerClient,
-  ) {
-    const { createDripListTx, setDripListSplitsTx, setStreamTx, giveTx } = txs;
-
-    if (!needsApproval) {
-      const requiredTxs = mapFilterUndefined(
-        [createDripListTx, setDripListSplitsTx, setStreamTx, giveTx],
-        (v) => v,
-      );
-
-      const batchTx = await callerClient.populateCallBatchedTx(requiredTxs);
-
-      const estimatedGasLimit = await callerClient.signer.estimateGas(batchTx);
-      const gasLimitWithBuffer = BigNumber.from(Math.ceil(estimatedGasLimit.toNumber() * 2));
-
-      return {
-        txs: requiredTxs,
-        gasLimitWithBuffer,
-      };
-    }
-
-    return {
-      txs: mapFilterUndefined(
-        [createDripListTx, setDripListSplitsTx, setStreamTx, giveTx],
-        (v) => v,
-      ),
-    };
-  }
-
-  private async _publishMetadataToIpfs(
-    dripListId: string,
-    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
-    name?: string,
-    description?: string,
-  ): Promise<IpfsHash> {
-    assert(this._ownerAddress, `This function requires an active wallet connection.`);
-
-    const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
-      forAccountId: dripListId,
-      projects,
-      name,
-      description,
-    });
-
-    const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);
-
-    return ipfsHash;
-  }
-
   private async _buildCreateDripListTx(salt: bigint, ipfsHash: IpfsHash) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
@@ -515,6 +398,26 @@ export default class DripListService {
     );
 
     return tokenApprovalTx;
+  }
+
+  private async _publishMetadataToIpfs(
+    dripListId: string,
+    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
+    name?: string,
+    description?: string,
+  ): Promise<IpfsHash> {
+    assert(this._ownerAddress, `This function requires an active wallet connection.`);
+
+    const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
+      forAccountId: dripListId,
+      projects,
+      name,
+      description,
+    });
+
+    const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);
+
+    return ipfsHash;
   }
 
   // We use the count of *all* NFT sub-accounts to generate the salt for the Drip List ID.

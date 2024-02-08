@@ -2,7 +2,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import { createEventDispatcher, onMount } from 'svelte';
   import assert from '$lib/utils/assert';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import type { Stream } from '$lib/stores/streams/types';
   import streams from '$lib/stores/streams';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -21,8 +21,6 @@
         before: async () => {
           const { dripsAccountId, address } = $wallet;
           assert(dripsAccountId && address);
-
-          const addressDriverClient = await getAddressDriverClient();
 
           const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
@@ -51,20 +49,26 @@
             },
           ];
 
-          const tx = addressDriverClient.setStreams(
+          const txFactory = await getAddressDriverTxFactory();
+          const tx = await txFactory.setStreams(
             tokenAddress,
             currentReceivers,
-            newReceivers,
-            address,
             0,
+            newReceivers,
+            0,
+            0,
+            address,
           );
 
           return { tx };
         },
 
-        transactions: (transactContext) => ({
-          transaction: () => transactContext.tx,
-        }),
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: true,
+          },
+        ],
 
         after: async () => {
           await expect(

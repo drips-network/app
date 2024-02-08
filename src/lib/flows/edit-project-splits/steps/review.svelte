@@ -44,14 +44,20 @@
             $context.dependencySplits,
           );
 
+          const callerClient = await getCallerClient();
+          const tx = await callerClient.populateCallBatchedTx(batch);
+
           return {
-            callerClient: await getCallerClient(),
-            batch,
+            tx,
           };
         },
-        transactions: ({ callerClient, batch }) => ({
-          transaction: () => callerClient.callBatched(batch),
-        }),
+
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: false,
+          },
+        ],
       }),
     );
   }
@@ -71,12 +77,12 @@
         <Splits
           list={[
             {
-              __typename: "SplitGroup",
+              __typename: 'SplitGroup',
               name: 'Dependencies',
               list: dependencyRepresentationalSplits,
             },
             {
-              __typename: "SplitGroup",
+              __typename: 'SplitGroup',
               name: 'Maintainers',
               list: maintainerRepresentationalSplits,
             },
