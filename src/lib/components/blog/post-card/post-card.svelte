@@ -9,6 +9,8 @@
   export let coverImage: string;
   export let coverImageAlt: string;
 
+  export let compact = false;
+
   export let first = false;
 
   export let link = true;
@@ -26,6 +28,7 @@
   class:link
   class:share-button={shareButton}
   class="post"
+  class:compact
   class:first
   href="/blog/posts/{slug}"
 >
@@ -93,6 +96,10 @@
     object-fit: cover;
   }
 
+  .post.compact img {
+    height: 20vw;
+  }
+
   .post.first {
     width: 100%;
   }
@@ -102,7 +109,7 @@
   }
 
   @media (min-width: 1024px) {
-    .post {
+    .post:not(.compact):not(.first) {
       width: calc(50% - 1rem);
     }
 
@@ -113,6 +120,11 @@
     .post img {
       min-height: 20rem;
       height: auto;
+    }
+
+    .post.compact img {
+      min-height: 10rem;
+      max-height: 11rem;
     }
 
     .post.first {

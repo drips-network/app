@@ -23,7 +23,7 @@
 
 <header class:elevated class:search-mode={searchMode}>
   {#if $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
-    <a aria-label="Go to homepage" href={'/'}>
+    <a aria-label="Go to explore page" href={'/app'}>
       <div class="logo">
         <DripsLogo />
       </div>
