@@ -110,9 +110,9 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const avatarHtml =
     isClaimed(project) && project.avatar.__typename === 'ImageAvatar'
-      ? `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
-          <img height="64px" width="64px" src="https://drips.network/api/custom-avatars/${cid}" />
-        </div>`
+      ? `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white; ">
+        <img height="100%" width="100%" src="https://drips.network/api/custom-avatars/${cid}" style="border-radius: 50%; border: 1px solid black" />
+      </div>`
       : `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
           <img height="64px" width="64px" src="${twemojiImg}" />
         </div>`;
