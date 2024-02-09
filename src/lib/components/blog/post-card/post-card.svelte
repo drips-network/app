@@ -10,6 +10,7 @@
   export let coverImageAlt: string;
 
   export let compact = false;
+  export let newTab = false;
 
   export let first = false;
 
@@ -31,6 +32,7 @@
   class:compact
   class:first
   href="/blog/posts/{slug}"
+  target={newTab ? '_blank' : undefined}
 >
   <img src={coverImage} alt={coverImageAlt} />
   <div class="content">
@@ -57,6 +59,7 @@
     border-radius: 2rem 0 2rem 2rem;
     overflow: hidden;
     width: 100%;
+    min-width: 0;
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
   }
 

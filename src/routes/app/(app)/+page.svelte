@@ -1,5 +1,4 @@
 <script lang="ts">
-  import TrophyIcon from 'radicle-design-system/icons/Trophy.svelte';
   import BoxIcon from 'radicle-design-system/icons/Box.svelte';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
@@ -10,11 +9,23 @@
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
   import { goto } from '$app/navigation';
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import { PUBLIC_NETWORK } from '$env/static/public';
 
-  const FEATURED_PROJECT_ACCOUNT_IDS = [
-    '80921576051643469277397866636792942368647018452892810554457309839360',
-    '80928956806149918791864723629668437820661066502202314166815319654400',
-  ];
+  const FEATURED_PROJECT_ACCOUNT_IDS =
+    {
+      1: [
+        '80921576051643469277397866636792942368647018452892810554457309839360',
+        '80928956806149918791864723629668437820661066502202314166815319654400',
+        '80989205010981758696261160004449877944077887004065826078532843448906',
+        '80921140646830818724035150101819719966329403614944137690624336855040',
+      ],
+      5: [
+        '81084611675088797239845552682012929720024883823846356540336220583709',
+        '80921553623925136102837120782793736893291544351678576578072673071411',
+        '81084953153801269804906196669849986124054336368266435383120426750828',
+        '80921553623925136102837120782793736893291544351678576578072673072128',
+      ],
+    }[PUBLIC_NETWORK] ?? [];
 
   export let data: PageData;
 
@@ -33,14 +44,6 @@
 </script>
 
 <div class="explore">
-  <Section
-    header={{
-      icon: TrophyIcon,
-      label: 'Stats',
-    }}
-    skeleton={{}}
-  />
-
   <Section
     header={{
       icon: BoxIcon,
@@ -74,11 +77,11 @@
         },
       ],
     }}
-    skeleton={{ loaded: true }}
+    skeleton={{ loaded: true, horizontalScroll: false }}
   >
     <div class="posts-grid">
       {#each blogPosts as post}
-        <PostCard compact {...post} />
+        <PostCard newTab compact {...post} />
       {/each}
     </div>
   </Section>
@@ -88,7 +91,9 @@
       icon: DripListIcon,
       label: 'Featured Drip Lists',
     }}
-    skeleton={{ loaded: true }}
+    skeleton={{
+      loaded: true,
+    }}
   >
     <div class="posts-grid">
       {#each data.featuredDripLists as dripList}
@@ -139,5 +144,11 @@
     grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
     gap: 1rem;
     padding: 4px 2px;
+  }
+
+  @media (max-width: 767px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
