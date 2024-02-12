@@ -243,7 +243,6 @@
   .stats {
     display: flex;
     gap: 1rem;
-    flex-wrap: wrap;
   }
 
   .stats .value-wrapper {
@@ -254,6 +253,16 @@
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
+  }
+
+  @media (max-width: 1070px) {
+    .stats {
+      flex-direction: column;
+    }
+
+    .stats .value-wrapper {
+      width: 100%;
+    }
   }
 
   .stats .value-wrapper .header {
