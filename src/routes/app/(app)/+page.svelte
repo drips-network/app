@@ -119,10 +119,15 @@
         >
       </div>
       <div class="value-wrapper">
-        <div class="header">
+        <a
+          href="https://etherscan.io/address/0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4"
+          target="_blank"
+          rel="noreferrer"
+          class="header"
+        >
           <h5>Total value on Drips</h5>
           <EtherscanIcon />
-        </div>
+        </a>
         <span class="large-number pixelated">${numberWithCommas(Math.round(data.tlv))}</span>
       </div>
     </div>
