@@ -82,6 +82,7 @@ export const load = async ({ fetch }) => {
         sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
       },
       fetch,
+      true,
     ),
     fetchFeaturedLists(),
   ]);
