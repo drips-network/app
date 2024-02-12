@@ -62,6 +62,7 @@ export const load = async ({ fetch }) => {
           featuredDripListQuery,
           { id },
           fetch,
+          true,
         ),
       ),
     );
@@ -71,6 +72,9 @@ export const load = async ({ fetch }) => {
 
   const [blogPosts, projectsRes, featuredDripLists] = await Promise.all([
     (await fetch('/api/blog/posts')).json(),
+    // TODO: It currently fetches all claimed projects because we don't yet have pagination
+    // capabilities on the API. It's fine because there's not a ton of projects yet,
+    // but at some point we need to start fetching only featured + latest 4 projects.
     query<ProjectsQuery, ProjectsQueryVariables>(
       getProjectsQuery,
       {
