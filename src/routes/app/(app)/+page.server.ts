@@ -86,11 +86,14 @@ export const load = async ({ fetch }) => {
     fetchFeaturedLists(),
   ]);
 
+  const tlv = await (await fetch('/api/tlv')).json();
+
   return {
     projects: projectsRes.projects,
     blogPosts: postsListingSchema.parse(blogPosts),
     featuredDripLists: mapFilterUndefined(featuredDripLists, (v) =>
       v === null || v === undefined ? undefined : v,
     ),
+    tlv,
   };
 };

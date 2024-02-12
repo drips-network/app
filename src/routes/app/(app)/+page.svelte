@@ -1,6 +1,8 @@
 <script lang="ts">
   import BoxIcon from 'radicle-design-system/icons/Box.svelte';
   import PenIcon from 'radicle-design-system/icons/Pen.svelte';
+  import TrophyIcon from 'radicle-design-system/icons/Trophy.svelte';
+  import EtherscanIcon from 'radicle-design-system/icons/Etherscan.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
   import type { PageData } from './$types';
@@ -10,6 +12,16 @@
   import { goto } from '$app/navigation';
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import { PUBLIC_NETWORK } from '$env/static/public';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import EduCard from '$lib/components/edu-card/edu-card.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import OneContract from '$lib/components/illustrations/one-contract.svelte';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
+  import { onDestroy, onMount } from 'svelte';
+  import tickStore from '$lib/stores/tick/tick.store';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -41,9 +53,81 @@
 
   // Last 4 projects. TODO: sort by claim date
   $: recentlyClaimedProjects = projects.slice(-4);
+
+  function numberWithCommas(input: number) {
+    return input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
+  function update() {
+    totalDrippedAmounts = totalDrippedApproximation();
+  }
+  update();
+
+  let tickHandle: number;
+  onMount(async () => {
+    tickHandle = tickStore.register(update);
+  });
+  onDestroy(() => {
+    tickStore.deregister(tickHandle);
+  });
 </script>
 
+<HeadMeta title="Explore" />
+
 <div class="explore">
+  {#if !$walletStore.connected}
+    <EduCard>
+      <svelte:fragment slot="text">
+        <h2 class="pixelated">Welcome to Drips</h2>
+        <p>
+          Connect your Ethereum wallet to claim your open-source project, create a Drip List, and
+          more.
+        </p>
+      </svelte:fragment>
+      <svelte:fragment slot="buttons">
+        <Button icon={WalletIcon} variant="primary" on:click={() => walletStore.connect()}
+          >Connect your wallet</Button
+        >
+      </svelte:fragment>
+      <svelte:fragment slot="illustration">
+        <div class="edu-card-illustration-bg" />
+        <div class="edu-card-illustration-wrapper">
+          <OneContract />
+        </div>
+      </svelte:fragment>
+    </EduCard>
+  {/if}
+
+  <Section
+    header={{
+      icon: TrophyIcon,
+      label: 'Stats',
+    }}
+    skeleton={{
+      loaded: true,
+      horizontalScroll: false,
+    }}
+  >
+    <div class="stats">
+      <div class="value-wrapper">
+        <div class="header">
+          <h5>Total dripped</h5>
+        </div>
+        <span class="large-number pixelated"
+          ><AggregateFiatEstimate amounts={totalDrippedAmounts} /></span
+        >
+      </div>
+      <div class="value-wrapper">
+        <div class="header">
+          <h5>Total value on Drips</h5>
+          <EtherscanIcon />
+        </div>
+        <span class="large-number pixelated">${numberWithCommas(Math.round(data.tlv))}</span>
+      </div>
+    </div>
+  </Section>
+
   <Section
     header={{
       icon: BoxIcon,
@@ -128,6 +212,55 @@
     display: flex;
     gap: 3rem;
     flex-direction: column;
+  }
+
+  .edu-card-illustration-bg {
+    position: absolute;
+    background-color: var(--color-primary-level-2);
+    top: 0;
+    width: 35%;
+    height: 50%;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .edu-card-illustration-wrapper {
+    max-width: 16rem;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .edu-card-illustration-bg {
+      width: 100%;
+      height: 30%;
+      border-radius: 0;
+    }
+  }
+
+  .stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .stats .value-wrapper {
+    border: 1px solid var(--color-foreground);
+    padding: 1rem;
+    border-radius: 1rem 0 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .stats .value-wrapper .header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .large-number {
+    font-size: min(12vw, 80px);
+    line-height: min(12vw, 80px);
+    color: var(--color-primary);
   }
 
   .projects-grid {
