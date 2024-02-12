@@ -79,7 +79,6 @@
   {#if !$walletStore.connected}
     <EduCard>
       <svelte:fragment slot="text">
-        <h2 class="pixelated">Welcome to Drips</h2>
         <p>
           Connect your Ethereum wallet to claim your open-source project, create a Drip List, and
           more.
@@ -223,13 +222,13 @@
     position: absolute;
     background-color: var(--color-primary-level-2);
     top: 0;
-    width: 35%;
+    width: 20%;
     height: 50%;
     border-radius: 0 0 1rem 1rem;
   }
 
   .edu-card-illustration-wrapper {
-    max-width: 16rem;
+    max-width: 10rem;
     z-index: 1;
   }
 
