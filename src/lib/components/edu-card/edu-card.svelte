@@ -4,20 +4,24 @@
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import Button from '../button/button.svelte';
 
-  export let dimissableId: string;
+  export let dismissableId: string | undefined = undefined;
   export let negativeMarginWhileCollapsed: string | undefined = undefined;
 </script>
 
 <TransitionedHeight removeFromTabIndexWhileCollapsed={false} {negativeMarginWhileCollapsed}>
-  {#if !$dismissablesStore.includes(dimissableId)}
+  {#if dismissableId ? !$dismissablesStore.includes(dismissableId) : true}
     <div out:fade|local={{ duration: 300 }} class="edu-card">
       <div class="text">
         <slot name="text" />
         <div class="flex gap-1">
           <slot name="buttons" />
-          <Button variant="ghost" on:click={() => dismissablesStore.dismiss(dimissableId)}
-            >Dismiss</Button
-          >
+          {#if dismissableId}
+            <Button
+              variant="ghost"
+              on:click={() => dismissableId && dismissablesStore.dismiss(dismissableId)}
+              >Dismiss</Button
+            >
+          {/if}
         </div>
       </div>
       <div class="illustration">

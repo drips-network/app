@@ -14,6 +14,7 @@
   import User from 'radicle-design-system/icons/User.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import RoadIcon from 'radicle-design-system/icons/Road.svelte';
 
   export let data: { pathname: string };
 
@@ -48,6 +49,7 @@
       <Sidenav
         items={{
           top: [
+            { label: 'Explore', href: '/app', icon: RoadIcon },
             { label: 'Funds', href: '/app/funds', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Box },
             { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
@@ -71,6 +73,7 @@
     <div class="bottom-nav" data-testid="bottom-nav">
       <BottomNav
         items={[
+          { label: 'Explore', href: '/app', icon: RoadIcon },
           { label: 'Funds', href: '/app/funds', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Box },
           { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },

@@ -22,7 +22,7 @@
 <HeadMeta title="Drip List" />
 
 <div class="page">
-  <EduCard dimissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
+  <EduCard dismissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
     <svelte:fragment slot="text">
       <h2 class="pixelated">Support all your dependencies at once with a&nbsp;Drip&nbsp;List</h2>
       <p>
