@@ -22,6 +22,7 @@
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
   import { onDestroy, onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
+  import Box from 'radicle-design-system/icons/Box.svelte';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -114,6 +115,13 @@
     header={{
       icon: BoxIcon,
       label: 'Featured projects',
+      actions: [
+        {
+          label: 'See all projects',
+          handler: () => goto('/app/projects/all'),
+          icon: Box,
+        },
+      ],
     }}
     skeleton={{
       loaded: true,
@@ -152,6 +160,13 @@
     header={{
       icon: BoxIcon,
       label: 'Recently claimed projects',
+      actions: [
+        {
+          label: 'See all projects',
+          handler: () => goto('/app/projects/all'),
+          icon: Box,
+        },
+      ],
     }}
     skeleton={{ loaded: true }}
   >
