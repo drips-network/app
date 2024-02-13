@@ -62,8 +62,8 @@
   interface TableRow {
     badge: DripListBadgeFragment;
     description: string;
-    recipientsCount: number;
-    supportersCount: number;
+    recipientsCount: number | string;
+    supportersCount: number | string;
   }
 
   const tableData: TableRow[] = data.dripLists
@@ -71,18 +71,19 @@
       return {
         badge: dripList,
         description: dripList.description ?? '',
-        recipientsCount: dripList.splits.length,
-        supportersCount: [
-          ...new Set(
-            mapFilterUndefined(
-              dripList.support,
-              (support) => 'account' in support && support.account?.accountId,
+        recipientsCount: dripList.splits.length.toString(),
+        supportersCount:
+          [
+            ...new Set(
+              mapFilterUndefined(
+                dripList.support,
+                (support) => 'account' in support && support.account?.accountId,
+              ),
             ),
-          ),
-        ].length,
+          ].length || '',
       } as TableRow;
     })
-    .sort((a, b) => b.recipientsCount - a.recipientsCount);
+    .sort((a, b) => Number(b.recipientsCount) - Number(a.recipientsCount));
 
   const tableColumns: ColumnDef<TableRow>[] = [
     {
@@ -101,7 +102,7 @@
     // },
     {
       accessorKey: 'recipientsCount',
-      header: 'Recipients',
+      header: 'Drips to',
       cell: (info) => info.getValue(),
       enableSorting: false,
       size: (100 / 24) * 2,

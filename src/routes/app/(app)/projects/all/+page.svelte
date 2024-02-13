@@ -69,8 +69,8 @@
   export let data: PageData;
   interface ProjectsTableRow {
     badge: ProjectBadgeFragment;
-    supportersCount: number;
-    dependenciesCount: number;
+    supportersCount: number | string;
+    dependenciesCount: number | string;
   }
 
   const projectsTableData: ProjectsTableRow[] = data.projects.map((project) => {
@@ -85,8 +85,8 @@
                   (item) => 'account' in item && item.account.accountId,
                 ),
               ),
-            ].length
-          : 0,
+            ].length || ''
+          : '',
       dependenciesCount:
         'splits' in project
           ? [
@@ -94,8 +94,8 @@
                 ...project.splits.maintainers.map((item) => item.account.accountId),
                 ...project.splits.dependencies.map((item) => item.account.accountId),
               ]),
-            ].length
-          : 0,
+            ].length || ''
+          : '',
     } as ProjectsTableRow;
   });
 
@@ -108,15 +108,15 @@
       size: (100 / 24) * 14,
     },
     {
-      accessorKey: 'supportersCount',
-      header: 'Supporters',
+      accessorKey: 'dependenciesCount',
+      header: 'Splits with',
       cell: (info) => info.getValue(),
       enableSorting: false,
       size: (100 / 24) * 4,
     },
     {
-      accessorKey: 'dependenciesCount',
-      header: 'Splits with',
+      accessorKey: 'supportersCount',
+      header: 'Supporters',
       cell: (info) => info.getValue(),
       enableSorting: false,
       size: (100 / 24) * 4,
