@@ -23,6 +23,8 @@
   import { onDestroy, onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import Box from 'radicle-design-system/icons/Box.svelte';
+  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
+  import DripList from 'radicle-design-system/icons/DripList.svelte';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -144,6 +146,13 @@
     header={{
       icon: DripListIcon,
       label: 'Featured Drip Lists',
+      actions: [
+        {
+          label: 'See all Drip Lists',
+          handler: () => goto('/app/drip-lists/all'),
+          icon: DripList,
+        },
+      ],
     }}
     skeleton={{
       loaded: true,
@@ -191,6 +200,7 @@
         {
           label: 'Read the blog',
           handler: () => goto('/blog'),
+          icon: EyeOpen,
         },
       ],
     }}
