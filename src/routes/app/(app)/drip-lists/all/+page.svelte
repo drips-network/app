@@ -3,40 +3,41 @@
 
   export const DRIP_LISTS_LISTINGS_ITEM_FRAGMENT = gql`
     ${DRIP_LIST_BADGE_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
     fragment DripListsListingsItem on DripList {
       ...DripListBadge
       description
       splits {
         ... on AddressReceiver {
           account {
-            accountId
+            address
           }
         }
         ... on ProjectReceiver {
-          account {
-            accountId
+          project {
+            ...ProjectAvatar
           }
         }
         ... on DripListReceiver {
-          account {
-            accountId
+          dripList {
+            ...DripListBadge
           }
         }
       }
       support {
         ... on DripListSupport {
-          account {
-            accountId
+          dripList {
+            ...DripListBadge
           }
         }
         ... on ProjectSupport {
-          account {
-            accountId
+          project {
+            ...ProjectAvatar
           }
         }
         ... on OneTimeDonationSupport {
           account {
-            accountId
+            address
           }
         }
       }
@@ -52,38 +53,98 @@
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { goto } from '$app/navigation';
-  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge, {
+    DRIP_LIST_BADGE_FRAGMENT,
+  } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
+  import type { PileComponent } from '$lib/components/pile/pile.svelte';
+  import ProjectAvatar, {
+    PROJECT_AVATAR_FRAGMENT,
+  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import type { ProjectAvatarFragment } from '$lib/components/project-avatar/__generated__/gql.generated';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let data: PageData;
+
+  interface PileComponentProps {
+    components: PileComponent[];
+    maxItems: number;
+  }
 
   interface TableRow {
     badge: DripListBadgeFragment;
     description: string;
-    recipientsCount: number | string;
-    supportersCount: number | string;
+    recipientsPile: PileComponentProps;
+    supportersPile: PileComponentProps;
   }
+
+  const dripListIcon = (dripList: DripListBadgeFragment) => ({
+    component: DripListBadge,
+    props: {
+      dripList,
+      showOwner: false,
+      showName: false,
+      outline: true,
+    },
+  });
+
+  const projectIcon = (project: ProjectAvatarFragment) => ({
+    component: ProjectAvatar,
+    props: {
+      project,
+      outline: true,
+      size: 'small',
+    },
+  });
+
+  const addressIcon = (address: string) => ({
+    component: IdentityBadge,
+    props: {
+      address,
+      showIdentity: false,
+      outline: true,
+      size: 'medium',
+      disableTooltip: true,
+    },
+  });
 
   const tableData: TableRow[] = data.dripLists
     .map((dripList) => {
       return {
         badge: dripList,
         description: dripList.description ?? '',
-        recipientsCount: dripList.splits.length.toString(),
-        supportersCount:
-          [
-            ...new Set(
-              mapFilterUndefined(
-                dripList.support,
-                (support) => 'account' in support && support.account?.accountId,
-              ),
-            ),
-          ].length || '',
+        recipientsPile: {
+          maxItems: 4,
+          components: mapFilterUndefined(dripList.splits, (s) => {
+            switch (s.__typename) {
+              case 'DripListReceiver':
+                return dripListIcon(s.dripList);
+              case 'ProjectReceiver':
+                return projectIcon(s.project);
+              case 'AddressReceiver':
+                return addressIcon(s.account.address);
+            }
+          }),
+        },
+        supportersPile: {
+          maxItems: 4,
+          components: mapFilterUndefined(dripList.support, (s) => {
+            switch (s.__typename) {
+              case 'DripListSupport':
+                return dripListIcon(s.dripList);
+              case 'ProjectSupport':
+                return projectIcon(s.project);
+              case 'OneTimeDonationSupport':
+                return addressIcon(s.account.address);
+            }
+          }),
+        },
       } as TableRow;
     })
-    .sort((a, b) => Number(b.recipientsCount) - Number(a.recipientsCount));
+    .sort((a, b) => b.recipientsPile.components.length - a.recipientsPile.components.length);
 
   const tableColumns: ColumnDef<TableRow>[] = [
     {
@@ -91,28 +152,21 @@
       header: 'Name',
       cell: () => DripListBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 18,
+      size: (100 / 24) * 14,
     },
-    // {
-    //   accessorKey: 'description',
-    //   header: 'Description',
-    //   cell: (cell) => cell.getValue(),
-    //   enableSorting: false,
-    //   size: (100 / 24) * 8
-    // },
     {
-      accessorKey: 'recipientsCount',
+      accessorKey: 'recipientsPile',
       header: 'Drips to',
-      cell: (info) => info.getValue(),
+      cell: () => PileCell,
       enableSorting: false,
-      size: (100 / 24) * 2,
+      size: (100 / 24) * 4,
     },
     {
-      accessorKey: 'supportersCount',
+      accessorKey: 'supportersPile',
       header: 'Supporters',
-      cell: (info) => info.getValue(),
+      cell: () => PileCell,
       enableSorting: false,
-      size: (100 / 24) * 2,
+      size: (100 / 24) * 4,
     },
     {
       accessorKey: 'chevron',

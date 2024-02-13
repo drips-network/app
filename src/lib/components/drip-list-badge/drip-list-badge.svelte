@@ -27,6 +27,7 @@
   export let showAvatar = true;
   export let avatarSize: 'tiny' | 'small' = 'small';
   export let disabled = false;
+  export let outline = false;
 
   const ensConnected = ensStore.connected;
 
@@ -45,7 +46,7 @@
   class:disabled
 >
   {#if showAvatar}
-    <DripListAvatar size={avatarSize} {disabled} />
+    <DripListAvatar size={avatarSize} {disabled} {outline} />
   {/if}
   {#if showName}
     <div class="name typo-text text-foreground flex-1 min-w-0 truncate">

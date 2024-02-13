@@ -1,3 +1,10 @@
+<script lang="ts" context="module">
+  export type PileComponent = {
+    component: typeof SvelteComponent;
+    props: Record<string, unknown>;
+  };
+</script>
+
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
@@ -9,10 +16,7 @@
   export let maxItems = 4;
   export let itemsClickable = false;
 
-  export let components: {
-    component: typeof SvelteComponent;
-    props: Record<string, unknown>;
-  }[] = [];
+  export let components: PileComponent[] = [];
   $: displayedComponents = components.slice(0, maxItems);
   $: overflowAmount = components.length - maxItems;
 
