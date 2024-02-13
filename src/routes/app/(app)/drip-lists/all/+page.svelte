@@ -66,21 +66,23 @@
     supportersCount: number;
   }
 
-  const tableData: TableRow[] = data.dripLists.map((dripList) => {
-    return {
-      badge: dripList,
-      description: dripList.description ?? '',
-      recipientsCount: dripList.splits.length,
-      supportersCount: [
-        ...new Set(
-          mapFilterUndefined(
-            dripList.support,
-            (support) => 'account' in support && support.account?.accountId,
+  const tableData: TableRow[] = data.dripLists
+    .map((dripList) => {
+      return {
+        badge: dripList,
+        description: dripList.description ?? '',
+        recipientsCount: dripList.splits.length,
+        supportersCount: [
+          ...new Set(
+            mapFilterUndefined(
+              dripList.support,
+              (support) => 'account' in support && support.account?.accountId,
+            ),
           ),
-        ),
-      ].length,
-    } as TableRow;
-  });
+        ].length,
+      } as TableRow;
+    })
+    .sort((a, b) => b.recipientsCount - a.recipientsCount);
 
   const tableColumns: ColumnDef<TableRow>[] = [
     {
