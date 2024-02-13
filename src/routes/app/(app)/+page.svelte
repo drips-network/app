@@ -92,7 +92,9 @@
       <svelte:fragment slot="illustration">
         <div class="edu-card-illustration-bg" />
         <div class="edu-card-illustration-wrapper">
-          <OneContract />
+          <div class="inner">
+            <OneContract />
+          </div>
         </div>
       </svelte:fragment>
     </EduCard>
@@ -219,24 +221,31 @@
   }
 
   .edu-card-illustration-bg {
-    position: absolute;
-    background-color: var(--color-primary-level-2);
-    top: 0;
-    width: 20%;
-    height: 50%;
-    border-radius: 0 0 1rem 1rem;
+    display: none;
   }
 
   .edu-card-illustration-wrapper {
-    max-width: 10rem;
+    position: absolute;
+    max-width: 20rem;
     z-index: 1;
+    right: -10%;
+    top: -10%;
   }
 
   @media (max-width: 768px) {
     .edu-card-illustration-bg {
+      position: absolute;
+      top: 0;
+      background-color: var(--color-primary-level-1);
       width: 100%;
-      height: 30%;
+      height: 25%;
       border-radius: 0;
+      display: block;
+    }
+
+    .edu-card-illustration-wrapper {
+      position: relative;
+      max-width: 8rem;
     }
   }
 
