@@ -76,30 +76,6 @@
 <HeadMeta title="Explore" />
 
 <div class="explore">
-  {#if !$walletStore.connected}
-    <EduCard>
-      <svelte:fragment slot="text">
-        <p>
-          Connect your Ethereum wallet to claim your open-source project, create a Drip List, and
-          more.
-        </p>
-      </svelte:fragment>
-      <svelte:fragment slot="buttons">
-        <Button icon={WalletIcon} variant="primary" on:click={() => walletStore.connect()}
-          >Connect your wallet</Button
-        >
-      </svelte:fragment>
-      <svelte:fragment slot="illustration">
-        <div class="edu-card-illustration-bg" />
-        <div class="edu-card-illustration-wrapper">
-          <div class="inner">
-            <OneContract />
-          </div>
-        </div>
-      </svelte:fragment>
-    </EduCard>
-  {/if}
-
   <Section
     header={{
       icon: TrophyIcon,
@@ -158,26 +134,6 @@
 
   <Section
     header={{
-      icon: PenIcon,
-      label: 'Latest news',
-      actions: [
-        {
-          label: 'Read the blog',
-          handler: () => goto('/blog'),
-        },
-      ],
-    }}
-    skeleton={{ loaded: true, horizontalScroll: false }}
-  >
-    <div class="posts-grid">
-      {#each blogPosts as post}
-        <PostCard newTab compact {...post} />
-      {/each}
-    </div>
-  </Section>
-
-  <Section
-    header={{
       icon: DripListIcon,
       label: 'Featured Drip Lists',
     }}
@@ -211,6 +167,50 @@
       {/each}
     </div>
   </Section>
+
+  <Section
+    header={{
+      icon: PenIcon,
+      label: 'Latest news',
+      actions: [
+        {
+          label: 'Read the blog',
+          handler: () => goto('/blog'),
+        },
+      ],
+    }}
+    skeleton={{ loaded: true, horizontalScroll: false }}
+  >
+    <div class="posts-grid">
+      {#each blogPosts as post}
+        <PostCard newTab compact {...post} />
+      {/each}
+    </div>
+  </Section>
+
+  {#if !$walletStore.connected}
+    <EduCard>
+      <svelte:fragment slot="text">
+        <p>
+          Connect your Ethereum wallet to claim your open-source project, create a Drip List, and
+          more.
+        </p>
+      </svelte:fragment>
+      <svelte:fragment slot="buttons">
+        <Button icon={WalletIcon} variant="primary" on:click={() => walletStore.connect()}
+          >Connect your wallet</Button
+        >
+      </svelte:fragment>
+      <svelte:fragment slot="illustration">
+        <div class="edu-card-illustration-bg" />
+        <div class="edu-card-illustration-wrapper">
+          <div class="inner">
+            <OneContract />
+          </div>
+        </div>
+      </svelte:fragment>
+    </EduCard>
+  {/if}
 </div>
 
 <style>
