@@ -256,7 +256,7 @@
         </div>
         <div class="typo-text tabular-nums total-streamed-badge">
           {#if browser}
-            <AggregateFiatEstimate amounts={totalIncomingAmounts} />
+            <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalIncomingAmounts} />
           {/if}
           <span class="muted">&nbsp;total</span>
         </div>

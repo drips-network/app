@@ -331,6 +331,7 @@
       {#each sorted as item}
         {#if item.__typename === 'OneTimeDonationSupport'}
           <SupportItem
+            tokenAddress={item.amount.tokenAddress}
             title={{
               component: IdentityBadge,
               props: {
@@ -347,6 +348,7 @@
         {#if item.__typename === 'StreamSupport'}
           {@const stream = item.stream}
           <SupportItem
+            tokenAddress={item.stream.streamConfig.amountPerSecond.tokenAddress}
             href={buildStreamUrl(
               stream.sender.accountId,
               stream.streamConfig.amountPerSecond.tokenAddress,
