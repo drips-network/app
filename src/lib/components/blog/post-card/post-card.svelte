@@ -9,6 +9,9 @@
   export let coverImage: string;
   export let coverImageAlt: string;
 
+  export let compact = false;
+  export let newTab = false;
+
   export let first = false;
 
   export let link = true;
@@ -26,8 +29,10 @@
   class:link
   class:share-button={shareButton}
   class="post"
+  class:compact
   class:first
   href="/blog/posts/{slug}"
+  target={newTab ? '_blank' : undefined}
 >
   <img src={coverImage} alt={coverImageAlt} />
   <div class="content">
@@ -54,6 +59,7 @@
     border-radius: 2rem 0 2rem 2rem;
     overflow: hidden;
     width: 100%;
+    min-width: 0;
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
   }
 
@@ -93,6 +99,10 @@
     object-fit: cover;
   }
 
+  .post.compact img {
+    height: 20vw;
+  }
+
   .post.first {
     width: 100%;
   }
@@ -102,7 +112,7 @@
   }
 
   @media (min-width: 1024px) {
-    .post {
+    .post:not(.compact):not(.first) {
       width: calc(50% - 1rem);
     }
 
@@ -113,6 +123,11 @@
     .post img {
       min-height: 20rem;
       height: auto;
+    }
+
+    .post.compact img {
+      min-height: 10rem;
+      max-height: 11rem;
     }
 
     .post.first {

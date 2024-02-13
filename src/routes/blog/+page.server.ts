@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import assert from '$lib/utils/assert';
+import { metadataSchema } from '../api/blog/posts/schema';
 
 export const load = async () => {
   const posts = await Promise.all(
@@ -7,14 +7,6 @@ export const load = async () => {
       const resolved = await resolver();
 
       assert(typeof resolved === 'object' && resolved && 'metadata' in resolved);
-
-      const metadataSchema = z.object({
-        title: z.string(),
-        excerpt: z.string(),
-        date: z.string(),
-        coverImage: z.string(),
-        coverImageAlt: z.string(),
-      });
 
       const metadata = metadataSchema.parse(resolved.metadata);
 

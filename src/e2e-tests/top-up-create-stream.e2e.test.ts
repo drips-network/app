@@ -48,10 +48,10 @@ describe('app', async () => {
 
   describe('streams and balances', () => {
     describe('global nav', () => {
-      it('opens up to funds tab', async () => {
+      it('opens up to explore tab', async () => {
         await page.goto('http://127.0.0.1:3001/app');
 
-        await expect(page).toHaveURL('http://127.0.0.1:3001/app/funds');
+        await expect(page.locator('text=Stats')).toHaveCount(1);
       });
 
       it('switches to the funds tab', async () => {
@@ -424,10 +424,10 @@ describe('app', async () => {
 
   describe('drip lists', () => {
     describe('create drip list flow', () => {
-      it('opens up to funds tab', async () => {
+      it('opens up to explore tab', async () => {
         await page.goto('http://127.0.0.1:3001/app');
 
-        await expect(page).toHaveURL('http://127.0.0.1:3001/app/funds');
+        await expect(page.locator('text=Stats')).toHaveCount(1);
       });
 
       it('switches to the Drip List tab', async () => {

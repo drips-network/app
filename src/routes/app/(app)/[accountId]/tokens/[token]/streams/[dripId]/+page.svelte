@@ -40,6 +40,7 @@
   import { Driver } from '$lib/graphql/__generated__/base-types';
   import streamState from '$lib/utils/stream-state';
   import streamsStore from '$lib/stores/streams/streams.store';
+  import StreamDeveloperSection from '$lib/components/developer-section/stream-developer.section.svelte';
 
   const walletInitialized = walletStore.initialized;
   const tokensInitialized = tokensStore.connected;
@@ -458,6 +459,11 @@
             </div>
           {/if}
         </div>
+        <StreamDeveloperSection
+          amtPerSec={stream.streamConfig.amountPerSecond.amount}
+          tokenDecimals={token?.info.decimals}
+          tokenAddress={token?.info.address}
+        />
       </div>
     </article>
   {/if}
