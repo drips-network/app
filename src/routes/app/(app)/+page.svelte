@@ -246,6 +246,8 @@
     .edu-card-illustration-wrapper {
       position: relative;
       max-width: 8rem;
+      right: 0%;
+      top: 0%;
     }
   }
 
