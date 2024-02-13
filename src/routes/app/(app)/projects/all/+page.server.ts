@@ -3,6 +3,11 @@ import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
 import { PROJECTS_LISTINGS_ITEM_FRAGMENT } from './+page.svelte';
+import {
+  ProjectSortField,
+  ProjectVerificationStatus,
+  SortDirection,
+} from '$lib/graphql/__generated__/base-types';
 
 export const load = (async ({ fetch }) => {
   const projectsQuery = gql`
@@ -19,11 +24,11 @@ export const load = (async ({ fetch }) => {
       projectsQuery,
       {
         where: {
-          verificationStatus: 'Claimed',
+          verificationStatus: ProjectVerificationStatus.Claimed,
         },
         sort: {
-          direction: 'DESC',
-          field: 'claimedAt',
+          direction: SortDirection.Desc,
+          field: ProjectSortField.ClaimedAt,
         },
       },
       fetch,

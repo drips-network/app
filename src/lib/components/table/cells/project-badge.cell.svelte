@@ -19,4 +19,4 @@
   // export let project: ProjectBadgeFragment;
 </script>
 
-<ProjectBadge {project} tooltip={false} />
+<ProjectBadge {project} maxWidth={false} tooltip={false} />

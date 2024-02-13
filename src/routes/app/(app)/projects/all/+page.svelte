@@ -7,14 +7,6 @@
     fragment ProjectsListingsItem on Project {
       ... on ClaimedProject {
         ...ProjectBadge
-        account {
-          accountId
-          driver
-        }
-        claimedAt
-        description
-        verificationStatus
-        emoji
         splits {
           maintainers {
             account {
@@ -71,36 +63,39 @@
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { goto } from '$app/navigation';
   import buildProjectUrl from '$lib/utils/build-project-url';
-  import type { ClaimedProject } from '$lib/graphql/__generated__/base-types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
 
   export let data: PageData;
   interface ProjectsTableRow {
     badge: ProjectBadgeFragment;
-    description: string;
     supportersCount: number;
     dependenciesCount: number;
   }
 
-  const projectsTableData: ProjectsTableRow[] = data.projects?.map((project: ClaimedProject) => {
+  const projectsTableData: ProjectsTableRow[] = data.projects.map((project) => {
     return {
       badge: project,
-      description: project.description ?? '-',
-      supportersCount: [
-        ...new Set(
-          mapFilterUndefined(
-            project.support,
-            (item) => 'account' in item && item.account?.accountId,
-          ),
-        ),
-      ].length,
-      dependenciesCount: [
-        ...new Set([
-          ...project.splits.maintainers.map((item) => item.account.accountId),
-          ...project.splits.dependencies.map((item) => item.account.accountId),
-        ]),
-      ].length,
+      supportersCount:
+        'support' in project
+          ? [
+              ...new Set(
+                mapFilterUndefined(
+                  project.support,
+                  (item) => 'account' in item && item.account.accountId,
+                ),
+              ),
+            ].length
+          : 0,
+      dependenciesCount:
+        'splits' in project
+          ? [
+              ...new Set([
+                ...project.splits.maintainers.map((item) => item.account.accountId),
+                ...project.splits.dependencies.map((item) => item.account.accountId),
+              ]),
+            ].length
+          : 0,
     } as ProjectsTableRow;
   });
 
@@ -110,28 +105,21 @@
       header: 'Name',
       cell: () => ProjectBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 8,
-    },
-    {
-      accessorKey: 'description',
-      header: 'Description',
-      cell: (info) => info.getValue(),
-      enableSorting: false,
-      size: (100 / 24) * 8,
+      size: (100 / 24) * 14,
     },
     {
       accessorKey: 'supportersCount',
       header: 'Supporters',
       cell: (info) => info.getValue(),
       enableSorting: false,
-      size: (100 / 24) * 3,
+      size: (100 / 24) * 4,
     },
     {
       accessorKey: 'dependenciesCount',
       header: 'Splits with',
       cell: (info) => info.getValue(),
       enableSorting: false,
-      size: (100 / 24) * 3,
+      size: (100 / 24) * 4,
     },
     {
       accessorKey: 'chevron',
