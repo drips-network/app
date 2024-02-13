@@ -77,14 +77,6 @@ export default function (
 
         delete setStreamsPopulatedTx.gasLimit;
 
-        const setStreamsTx = client.setStreams(
-          tokenAddress,
-          currentReceivers,
-          currentReceivers,
-          address,
-          amountToTopUp,
-        );
-
         const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
         const approvePopulatedTx = await erc20TxFactory.approve(
           txFactory.driverAddress,
@@ -93,16 +85,14 @@ export default function (
 
         return {
           setStreamsPopulatedTx,
-          setStreamsTx,
           approvePopulatedTx,
           needApproval,
           tokenAddress,
         };
       },
 
-      transactions: ({ setStreamsTx, setStreamsPopulatedTx, approvePopulatedTx, needApproval }) =>
-        // If the ERC-20 needs approval, we send a batch TX including the approval TX and setStreams.
-        needApproval
+      transactions: ({ setStreamsPopulatedTx, approvePopulatedTx, needApproval }) => [
+        ...(needApproval
           ? [
               {
                 transaction: approvePopulatedTx,
@@ -112,16 +102,19 @@ export default function (
                   subtitle: 'You only have to do this once per token.',
                   icon: WAITING_WALLET_ICON,
                 },
-              },
-              {
-                transaction: setStreamsPopulatedTx,
-                waitingSignatureMessage: {
-                  message: 'Waiting for you to approve the top-up transaction in your wallet...',
-                  icon: WAITING_WALLET_ICON,
-                },
+                applyGasBuffer: false,
               },
             ]
-          : { transaction: () => setStreamsTx },
+          : []),
+        {
+          transaction: setStreamsPopulatedTx,
+          waitingSignatureMessage: {
+            message: 'Waiting for you to approve the top-up transaction in your wallet...',
+            icon: WAITING_WALLET_ICON,
+          },
+          applyGasBuffer: true,
+        },
+      ],
 
       after: async (receipts, transactContext) => {
         const { provider } = get(walletStore);

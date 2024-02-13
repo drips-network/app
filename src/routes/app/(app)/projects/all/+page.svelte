@@ -7,6 +7,14 @@
     fragment ProjectsListingsItem on Project {
       ... on ClaimedProject {
         ...ProjectBadge
+        account {
+          accountId
+          driver
+        }
+        claimedAt
+        description
+        verificationStatus
+        emoji
         splits {
           maintainers {
             account {
@@ -31,7 +39,6 @@
             }
           }
         }
-        description
         support {
           ... on DripListSupport {
             account {

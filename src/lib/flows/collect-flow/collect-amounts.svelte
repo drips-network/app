@@ -140,7 +140,6 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const callerClient = await getCallerClient();
           const addressDriverClient = await getAddressDriverClient();
           const accountId = await addressDriverClient.getAccountId();
 
@@ -167,16 +166,21 @@
             transferToAddress: userAddress,
           });
 
+          const callerClient = await getCallerClient();
+          const tx = await callerClient.populateCallBatchedTx(collectFlow);
+
           return {
-            collectFlow,
-            callerClient,
+            tx,
             accountId,
           };
         },
 
-        transactions: (transactContext) => ({
-          transaction: () => transactContext.callerClient.callBatched(transactContext.collectFlow),
-        }),
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: false,
+          },
+        ],
 
         after: async (receipts, transactContext) => {
           const receipt = receipts[0];

@@ -159,16 +159,20 @@ export default function (
         };
       },
 
-      transactions: (transactContext) => ({
-        transaction: () =>
-          transactContext.callerClient.callBatched(transactContext.createStreamBatchPreset),
-      }),
+      transactions: async (transactContext) => [
+        {
+          transaction: await transactContext.callerClient.populateCallBatchedTx(
+            transactContext.createStreamBatchPreset,
+          ),
+          applyGasBuffer: true,
+        },
+      ],
 
       after: async (_, transactContext) => {
         /*
-      We wait up to five seconds for `refreshUserAccount` to update the user's own
-      account's `lastIpfsHash` to the new hash we just published.
-      */
+        We wait up to five seconds for `refreshUserAccount` to update the user's own
+        account's `lastIpfsHash` to the new hash we just published.
+        */
         await expect(
           streams.refreshUserAccount,
           () =>

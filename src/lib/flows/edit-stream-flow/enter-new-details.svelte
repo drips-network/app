@@ -15,11 +15,11 @@
   import streams from '$lib/stores/streams';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import {
-    getAddressDriverClient,
+    getAddressDriverTxFactory,
     getCallerClient,
     getNetworkConfig,
   } from '$lib/utils/get-drips-clients';
-  import type { ContractTransaction } from 'ethers';
+  import type { PopulatedTransaction } from 'ethers';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
@@ -161,10 +161,11 @@
             });
           }
 
-          const addressDriverClient = await getAddressDriverClient();
+          const addressDriverTxFactory = await getAddressDriverTxFactory();
           const callerClient = await getCallerClient();
 
-          let tx: Promise<ContractTransaction>;
+          let tx: PopulatedTransaction;
+          let needGasBuffer = false;
 
           if (amountUpdated && nameUpdated) {
             assert(newHash);
@@ -186,19 +187,23 @@
               transferToAddress: address,
             });
 
-            tx = callerClient.callBatched(createStreamBatchPreset);
+            needGasBuffer = true;
+            tx = await callerClient.populateCallBatchedTx(createStreamBatchPreset);
           } else if (amountUpdated) {
-            tx = addressDriverClient.setStreams(
+            needGasBuffer = true;
+            tx = await addressDriverTxFactory.setStreams(
               token.info.address,
               currentReceivers,
+              0,
               newReceivers,
-              address,
               0n,
+              0n,
+              address,
             );
           } else {
             assert(newHash);
 
-            tx = addressDriverClient.emitAccountMetadata([
+            tx = await addressDriverTxFactory.emitAccountMetadata([
               {
                 key: MetadataManagerBase.USER_METADATA_KEY,
                 value: newHash,
@@ -210,12 +215,16 @@
             tx,
             newHash,
             dripsAccountId,
+            needGasBuffer,
           };
         },
 
-        transactions: (transactContext) => ({
-          transaction: () => transactContext.tx,
-        }),
+        transactions: ({ tx, needGasBuffer }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: needGasBuffer,
+          },
+        ],
 
         after: async (_, transactContext) => {
           /*

@@ -27,7 +27,14 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
             ownerName
             repoName
           }
-          emoji
+          avatar {
+            ... on ImageAvatar {
+              cid
+            }
+            ... on EmojiAvatar {
+              emoji
+            }
+          }
           color
           splits {
             dependencies {
@@ -58,12 +65,18 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   }
 
   const projectName = `${project.source.ownerName}/${project.source.repoName}`;
-  const emoji = isClaimed(project)
-    ? sanitize(project.emoji, {
-        allowedTags: [],
-        allowedAttributes: {},
-      })
-    : 'none';
+
+  const emoji =
+    isClaimed(project) && project.avatar.__typename === 'EmojiAvatar'
+      ? sanitize(project.avatar.emoji, {
+          allowedTags: [],
+          allowedAttributes: {},
+        })
+      : 'none';
+
+  const cid =
+    isClaimed(project) && project.avatar.__typename === 'ImageAvatar' ? project.avatar.cid : 'none';
+
   const dependenciesCount = isClaimed(project)
     ? project.splits.dependencies.length.toString()
     : '0';
@@ -95,19 +108,22 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const twemojiImg = (twemojiSrc && (await loadImage(twemojiSrc, fetch))) ?? undefined;
 
+  const avatarHtml =
+    isClaimed(project) && project.avatar.__typename === 'ImageAvatar'
+      ? `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white; ">
+        <img height="100%" width="100%" src="https://drips.network/api/custom-avatars/${cid}" style="border-radius: 50%; border: 1px solid black" />
+      </div>`
+      : `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
+          <img height="64px" width="64px" src="${twemojiImg}" />
+        </div>`;
+
   const svg = await satori(
     toReactElement(`<div style="display: flex; background-color: ${bgColor}">
       ${getBackgroundImage(bgColor, textColor, target)}
       <div style="position: absolute; bottom: 40px; left: 40px; right: 200px; display: flex; flex-direction: column; color: ${textColor}; gap: 24px;">
         <span style="font-family: Inter; font-size: 40px">Project</span>
         <div style="display: flex; gap: 32px;">
-          ${
-            twemojiImg
-              ? `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
-            <img height="64px" width="64px" src="${twemojiImg}" />
-          </div>`
-              : ''
-          }
+        ${avatarHtml}
           <span style="font-family: Redaction; width: 1000px; font-size: 90px; display: block; line-clamp: 2;">${projectName}</span>
         </div>
         <div style="display: flex; gap: 24px; align-items: center; opacity: ${

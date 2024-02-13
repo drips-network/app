@@ -10,7 +10,7 @@
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
+  import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import unreachable from '$lib/utils/unreachable';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
   import TextInput from '$lib/components/text-input/text-input.svelte';
@@ -88,8 +88,6 @@
           const { address, dripsAccountId } = $wallet;
           assert(address && dripsAccountId);
 
-          const addressDriverClient = await getAddressDriverClient();
-
           const ownAccount = $streams.accounts[dripsAccountId];
           assert(ownAccount, "App hasnʼt yet fetched user's own account");
 
@@ -109,12 +107,16 @@
 
           assert(amountWei);
 
-          const tx = addressDriverClient.setStreams(
+          const txFactory = await getAddressDriverTxFactory();
+
+          const tx = await txFactory.setStreams(
             $context.tokenAddress,
             currentReceivers,
-            currentReceivers,
-            address,
             -amountWei,
+            currentReceivers,
+            0,
+            0,
+            address,
           );
 
           return {
@@ -122,9 +124,12 @@
             dripsAccountId,
           };
         },
-        transactions: (transactContext) => ({
-          transaction: () => transactContext.tx,
-        }),
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: true,
+          },
+        ],
         after: async (_, transactContext) => {
           const currentAssetConfigHistoryLength = getAssetConfigHistory(
             transactContext.dripsAccountId,

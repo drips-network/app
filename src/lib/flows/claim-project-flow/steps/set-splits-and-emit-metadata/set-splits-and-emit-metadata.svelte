@@ -29,21 +29,27 @@
 
           const setSplitsAndEmitMetadataBatch = await gitProjectService.buildBatchTx($context);
 
-          return { callerClient: await getCallerClient(), setSplitsAndEmitMetadataBatch };
+          const callerClient = await getCallerClient();
+          const tx = await callerClient.populateCallBatchedTx(setSplitsAndEmitMetadataBatch);
+
+          return { tx };
         },
         messages: {
           duringBefore: {
             message: 'Preparing to claim project...',
           },
         },
-        transactions: ({ callerClient, setSplitsAndEmitMetadataBatch }) => ({
-          transaction: () => callerClient.callBatched(setSplitsAndEmitMetadataBatch),
-          waitingSignatureMessage: {
-            message: 'Waiting for you to confirm the transaction in your wallet…',
-            subtitle:
-              "This transaction applies your project's splits, sets metadata, and concludes the claiming process.",
+        transactions: ({ tx }) => [
+          {
+            transaction: tx,
+            applyGasBuffer: false,
+            waitingSignatureMessage: {
+              message: 'Waiting for you to confirm the transaction in your wallet…',
+              subtitle:
+                "This transaction applies your project's splits, sets metadata, and concludes the claiming process.",
+            },
           },
-        }),
+        ],
         after: async () => {
           const projectId = $context.project?.account.accountId ?? unreachable();
 

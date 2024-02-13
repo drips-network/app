@@ -29,7 +29,6 @@ import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
-import roundWeights from '../round-weights';
 
 export default class GitProjectService {
   private _github!: GitHub;
@@ -418,7 +417,7 @@ export default class GitProjectService {
       ),
       dependenciesSplitMetadata,
       maintainersSplitsMetadata,
-      receivers: roundWeights(receivers),
+      receivers: receivers,
     };
   }
 

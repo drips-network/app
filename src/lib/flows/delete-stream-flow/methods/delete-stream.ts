@@ -22,8 +22,6 @@ export default function (
     dispatch,
     makeTransactPayload({
       before: async () => {
-        const callerClient = await getCallerClient();
-
         const { accountId, address } = stream.sender;
         const { tokenAddress } = stream.streamConfig.amountPerSecond;
 
@@ -94,18 +92,22 @@ export default function (
           transferToAddress: address,
         });
 
+        const tx = await (await getCallerClient()).populateCallBatchedTx(createStreamBatchPreset);
+
         return {
-          callerClient,
+          tx,
           createStreamBatchPreset,
           accountId,
           newHash,
         };
       },
 
-      transactions: (transactContext) => ({
-        transaction: () =>
-          transactContext.callerClient.callBatched(transactContext.createStreamBatchPreset),
-      }),
+      transactions: ({ tx }) => [
+        {
+          transaction: tx,
+          applyGasBuffer: true,
+        },
+      ],
 
       after: async (_, transactContext) => {
         /*
