@@ -140,7 +140,7 @@
   <Section
     header={{
       icon: Box,
-      label: 'All projects',
+      label: 'All Projects',
     }}
     skeleton={{
       horizontalScroll: true,
