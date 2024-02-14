@@ -12,7 +12,7 @@
   export let components: {
     component: typeof SvelteComponent;
     props: Record<string, unknown>;
-  }[] = [];
+  }[];
   $: displayedComponents = components.slice(0, maxItems);
   $: overflowAmount = components.length - maxItems;
 
