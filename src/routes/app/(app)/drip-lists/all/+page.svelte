@@ -65,6 +65,7 @@
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import type { ComponentProps } from 'svelte';
   import type Pile from '$lib/components/pile/pile.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data: PageData;
 
@@ -149,6 +150,8 @@
     goto('/app/drip-lists/' + dripList.account.accountId);
   }
 </script>
+
+<HeadMeta title="All Drip Lists" />
 
 <article>
   <Section

@@ -74,6 +74,7 @@
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import type Pile from '$lib/components/pile/pile.svelte';
   import type { ComponentProps } from 'svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data: PageData;
   interface ProjectsTableRow {
@@ -166,6 +167,8 @@
     goto(buildProjectUrl(source.forge, source.ownerName, source.repoName, true));
   }
 </script>
+
+<HeadMeta title="All Projects" />
 
 <article>
   <Section
