@@ -66,11 +66,8 @@
   import buildProjectUrl from '$lib/utils/build-project-url';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
-  import PileCell, {
-    dripListIcon,
-    projectIcon,
-    addressIcon,
-  } from '$lib/components/table/cells/pile-cell.svelte';
+  import { dripListIcon, projectIcon, addressIcon } from '$lib/components/pile/pile-presets';
+  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import type Pile from '$lib/components/pile/pile.svelte';
   import type { ComponentProps } from 'svelte';

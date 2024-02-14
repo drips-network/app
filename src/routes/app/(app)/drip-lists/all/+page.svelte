@@ -57,11 +57,8 @@
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import PileCell, {
-    addressIcon,
-    dripListIcon,
-    projectIcon,
-  } from '$lib/components/table/cells/pile-cell.svelte';
+  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
+  import { addressIcon, dripListIcon, projectIcon } from '$lib/components/pile/pile-presets';
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import type { ComponentProps } from 'svelte';
   import type Pile from '$lib/components/pile/pile.svelte';
