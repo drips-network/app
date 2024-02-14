@@ -3,6 +3,9 @@
   import hexToRgb from '$lib/utils/hex-to-rgb';
   import possibleColors from '$lib/utils/project/possible-colors';
 
+  // Currently supported project colors plus those that were previously available
+  const SUPPORTED_COLORS = [...possibleColors, '#5555FF', '#53DB53', '#FFC555', '#FF5555'];
+
   export let colorHex: string | undefined;
 
   $: isLightTheme = $themeStore.currentTheme === 'light';
@@ -15,7 +18,7 @@
   };
 
   $: {
-    if (colorHex && possibleColors.includes(colorHex)) {
+    if (colorHex && SUPPORTED_COLORS.includes(colorHex)) {
       const rgb = hexToRgb(colorHex);
       const level6Adjustment = isLightTheme ? 30 : -30;
 
