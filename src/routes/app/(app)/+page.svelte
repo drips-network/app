@@ -148,7 +148,7 @@
       label: 'Featured Drip Lists',
       actions: [
         {
-          label: 'See all Drip Lists',
+          label: 'See all',
           handler: () => goto('/app/drip-lists/all'),
           icon: DripList,
         },
@@ -171,7 +171,7 @@
       label: 'Recently claimed projects',
       actions: [
         {
-          label: 'See all projects',
+          label: 'See all',
           handler: () => goto('/app/projects/all'),
           icon: Box,
         },
