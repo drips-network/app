@@ -19,4 +19,6 @@
   // export let project: ProjectBadgeFragment;
 </script>
 
-<ProjectBadge {project} maxWidth={false} tooltip={false} />
+<div style="max-width: max(240px, 33vw)">
+  <ProjectBadge {project} maxWidth={false} tooltip={false} />
+</div>

@@ -4,47 +4,48 @@
 
   export const PROJECTS_LISTINGS_ITEM_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
+    ${DRIP_LIST_BADGE_FRAGMENT}
     fragment ProjectsListingsItem on Project {
       ... on ClaimedProject {
         ...ProjectBadge
         splits {
           maintainers {
             account {
-              accountId
+              address
             }
           }
           dependencies {
             ... on AddressReceiver {
               account {
-                accountId
+                address
               }
             }
             ... on ProjectReceiver {
-              account {
-                accountId
+              project {
+                ...ProjectAvatar
               }
             }
             ... on DripListReceiver {
-              account {
-                accountId
+              dripList {
+                ...DripListBadge
               }
             }
           }
         }
         support {
           ... on DripListSupport {
-            account {
-              accountId
+            dripList {
+              ...DripListBadge
             }
           }
           ... on ProjectSupport {
-            account {
-              accountId
+            project {
+              ...ProjectAvatar
             }
           }
           ... on OneTimeDonationSupport {
             account {
-              accountId
+              address
             }
           }
         }
@@ -65,39 +66,68 @@
   import buildProjectUrl from '$lib/utils/build-project-url';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
+  import PileCell, {
+    dripListIcon,
+    projectIcon,
+    type PileComponentProps,
+    addressIcon,
+  } from '$lib/components/table/cells/pile-cell.svelte';
+  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 
   export let data: PageData;
   interface ProjectsTableRow {
     badge: ProjectBadgeFragment;
-    supportersCount: number | string;
-    dependenciesCount: number | string;
+    supportersPile: PileComponentProps;
+    dependenciesPile: PileComponentProps;
   }
 
-  const projectsTableData: ProjectsTableRow[] = data.projects.map((project) => {
-    return {
-      badge: project,
-      supportersCount:
-        'support' in project
-          ? [
-              ...new Set(
-                mapFilterUndefined(
-                  project.support,
-                  (item) => 'account' in item && item.account.accountId,
-                ),
-              ),
-            ].length || ''
-          : '',
-      dependenciesCount:
-        'splits' in project
-          ? [
-              ...new Set([
-                ...project.splits.maintainers.map((item) => item.account.accountId),
-                ...project.splits.dependencies.map((item) => item.account.accountId),
-              ]),
-            ].length || ''
-          : '',
-    } as ProjectsTableRow;
-  });
+  const projectsTableData: ProjectsTableRow[] = data.projects
+    .map((project) => {
+      return {
+        badge: project,
+        dependenciesPile: {
+          maxItems: 4,
+          components:
+            'splits' in project
+              ? [
+                  ...mapFilterUndefined(project.splits.maintainers, (s) => {
+                    switch (s.__typename) {
+                      case 'AddressReceiver':
+                        return addressIcon(s.account.address);
+                    }
+                  }),
+                  ...mapFilterUndefined(project.splits.dependencies, (s) => {
+                    switch (s.__typename) {
+                      case 'DripListReceiver':
+                        return dripListIcon(s.dripList);
+                      case 'ProjectReceiver':
+                        return projectIcon(s.project);
+                      case 'AddressReceiver':
+                        return addressIcon(s.account.address);
+                    }
+                  }),
+                ]
+              : [],
+        },
+        supportersPile: {
+          maxItems: 4,
+          components:
+            'support' in project
+              ? mapFilterUndefined(project.support, (s) => {
+                  switch (s.__typename) {
+                    case 'DripListSupport':
+                      return dripListIcon(s.dripList);
+                    case 'ProjectSupport':
+                      return projectIcon(s.project);
+                    case 'OneTimeDonationSupport':
+                      return addressIcon(s.account.address);
+                  }
+                })
+              : [],
+        },
+      } as ProjectsTableRow;
+    })
+    .sort((a, b) => b.dependenciesPile.components.length - a.dependenciesPile.components.length);
 
   const projectsTableColumns: ColumnDef<ProjectsTableRow>[] = [
     {
@@ -105,21 +135,21 @@
       header: 'Name',
       cell: () => ProjectBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 14,
+      size: (100 / 24) * 11,
     },
     {
-      accessorKey: 'dependenciesCount',
-      header: 'Splits with',
-      cell: (info) => info.getValue(),
+      accessorKey: 'dependenciesPile',
+      header: 'Drips to',
+      cell: () => PileCell,
       enableSorting: false,
-      size: (100 / 24) * 4,
+      size: (100 / 24) * 6,
     },
     {
-      accessorKey: 'supportersCount',
+      accessorKey: 'supportersPile',
       header: 'Supporters',
-      cell: (info) => info.getValue(),
+      cell: () => PileCell,
       enableSorting: false,
-      size: (100 / 24) * 4,
+      size: (100 / 24) * 5,
     },
     {
       accessorKey: 'chevron',

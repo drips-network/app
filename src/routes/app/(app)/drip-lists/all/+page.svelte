@@ -53,26 +53,19 @@
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { goto } from '$app/navigation';
-  import DripListBadge, {
-    DRIP_LIST_BADGE_FRAGMENT,
-  } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
-  import type { PileComponent } from '$lib/components/pile/pile.svelte';
-  import ProjectAvatar, {
-    PROJECT_AVATAR_FRAGMENT,
-  } from '$lib/components/project-avatar/project-avatar.svelte';
-  import type { ProjectAvatarFragment } from '$lib/components/project-avatar/__generated__/gql.generated';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import PileCell, {
+    addressIcon,
+    dripListIcon,
+    projectIcon,
+    type PileComponentProps,
+  } from '$lib/components/table/cells/pile-cell.svelte';
+  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
 
   export let data: PageData;
-
-  interface PileComponentProps {
-    components: PileComponent[];
-    maxItems: number;
-  }
 
   interface TableRow {
     badge: DripListBadgeFragment;
@@ -80,36 +73,6 @@
     recipientsPile: PileComponentProps;
     supportersPile: PileComponentProps;
   }
-
-  const dripListIcon = (dripList: DripListBadgeFragment) => ({
-    component: DripListBadge,
-    props: {
-      dripList,
-      showOwner: false,
-      showName: false,
-      outline: true,
-    },
-  });
-
-  const projectIcon = (project: ProjectAvatarFragment) => ({
-    component: ProjectAvatar,
-    props: {
-      project,
-      outline: true,
-      size: 'small',
-    },
-  });
-
-  const addressIcon = (address: string) => ({
-    component: IdentityBadge,
-    props: {
-      address,
-      showIdentity: false,
-      outline: true,
-      size: 'medium',
-      disableTooltip: true,
-    },
-  });
 
   const tableData: TableRow[] = data.dripLists
     .map((dripList) => {
