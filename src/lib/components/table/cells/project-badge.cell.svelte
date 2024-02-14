@@ -16,7 +16,6 @@
   $: {
     project = context.getValue();
   }
-  // export let project: ProjectBadgeFragment;
 </script>
 
 <div style="max-width: max(240px, 33vw)">
