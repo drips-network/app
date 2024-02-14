@@ -56,9 +56,6 @@
   <div class="wrapper">
     <div class="hero">
       <div class="text">
-        <div class="flex">
-          <LpTotalDrippedBadge />
-        </div>
         <h1>Funding that flows</h1>
         <p>A decentralized toolkit for funding your critical software dependencies.</p>
         <div class="actions">
@@ -66,9 +63,14 @@
           <Button href="#get-funding" icon={Globe}>Get support for your project</Button>
         </div>
       </div>
-      <div class="illustration">
-        <LpHero />
-      </div>
+      <figure class="relative flex-1">
+        <div class="illustration">
+          <LpHero />
+        </div>
+        <div class="absolute overlay z-10 flex items-center justify-center">
+          <LpTotalDrippedBadge />
+        </div>
+      </figure>
     </div>
 
     <section class="card two-column">
@@ -415,7 +417,7 @@
 
   .hero .illustration {
     pointer-events: none;
-    width: 100%;
+    width: calc(100% + 14rem);
     margin-top: -4rem;
     margin-left: -14rem;
   }
@@ -435,16 +437,20 @@
     align-items: start;
   }
 
-  @media (max-width: 1155px) {
+  @media (max-width: 1023px) {
     .hero {
       flex-direction: column-reverse;
       align-items: flex-start;
       margin-bottom: 2rem;
     }
 
+    .hero figure {
+      width: 100%;
+    }
+
     .hero .illustration {
       width: 125%;
-      margin: -20% 0 0 -30%;
+      margin: -40% 0 0 -30%;
     }
 
     .hero .text {
@@ -601,7 +607,7 @@
     gap: 1.5rem;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1023px) {
     section.two-column:not(.card) .section-inner {
       flex-direction: column;
     }
@@ -775,6 +781,13 @@
     .claim-input {
       flex-direction: column;
       align-items: flex-end;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .hero .illustration {
+      margin-top: -10%;
+      margin-bottom: -2%;
     }
   }
 </style>
