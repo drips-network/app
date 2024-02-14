@@ -61,20 +61,21 @@
     addressIcon,
     dripListIcon,
     projectIcon,
-    type PileComponentProps,
   } from '$lib/components/table/cells/pile-cell.svelte';
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
+  import type { ComponentProps } from 'svelte';
+  import type Pile from '$lib/components/pile/pile.svelte';
 
   export let data: PageData;
 
   interface TableRow {
     badge: DripListBadgeFragment;
     description: string;
-    recipientsPile: PileComponentProps;
-    supportersPile: PileComponentProps;
+    recipientsPile: ComponentProps<Pile>;
+    supportersPile: ComponentProps<Pile>;
   }
 
-  const tableData: TableRow[] = data.dripLists
+  const tableData: TableRow[] = data.content.dripLists
     .map((dripList) => {
       return {
         badge: dripList,
@@ -107,7 +108,10 @@
         },
       } as TableRow;
     })
-    .sort((a, b) => b.recipientsPile.components.length - a.recipientsPile.components.length);
+    .sort(
+      (a, b) =>
+        (b.recipientsPile.components ?? []).length - (a.recipientsPile.components ?? []).length,
+    );
 
   const tableColumns: ColumnDef<TableRow>[] = [
     {

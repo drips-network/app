@@ -69,19 +69,20 @@
   import PileCell, {
     dripListIcon,
     projectIcon,
-    type PileComponentProps,
     addressIcon,
   } from '$lib/components/table/cells/pile-cell.svelte';
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import type Pile from '$lib/components/pile/pile.svelte';
+  import type { ComponentProps } from 'svelte';
 
   export let data: PageData;
   interface ProjectsTableRow {
     badge: ProjectBadgeFragment;
-    supportersPile: PileComponentProps;
-    dependenciesPile: PileComponentProps;
+    supportersPile: ComponentProps<Pile>;
+    dependenciesPile: ComponentProps<Pile>;
   }
 
-  const projectsTableData: ProjectsTableRow[] = data.projects
+  const projectsTableData: ProjectsTableRow[] = data.content.projects
     .map((project) => {
       return {
         badge: project,

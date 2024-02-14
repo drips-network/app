@@ -20,7 +20,7 @@ export const load = (async ({ fetch }) => {
   `;
 
   return {
-    projects: await query<ProjectsQuery, ProjectsQueryVariables>(
+    content: await query<ProjectsQuery, ProjectsQueryVariables>(
       projectsQuery,
       {
         where: {

@@ -1,9 +1,4 @@
 <script lang="ts" context="module">
-  export interface PileComponentProps {
-    components: PileComponent[];
-    maxItems: number;
-  }
-
   export const dripListIcon = (dripList: DripListBadgeFragment) => ({
     component: DripListBadge,
     props: {
@@ -38,7 +33,7 @@
 <script lang="ts">
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import Pile, { type PileComponent } from '$lib/components/pile/pile.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
   import type { ProjectAvatarFragment } from '$lib/components/project-avatar/__generated__/gql.generated';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import type { CellContext } from '@tanstack/svelte-table';
