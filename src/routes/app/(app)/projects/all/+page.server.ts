@@ -19,8 +19,8 @@ export const load = (async ({ fetch }) => {
     }
   `;
 
-  const fetches = await Promise.all([
-    query<ProjectsQuery, ProjectsQueryVariables>(
+  return {
+    projects: await query<ProjectsQuery, ProjectsQueryVariables>(
       projectsQuery,
       {
         where: {
@@ -33,10 +33,6 @@ export const load = (async ({ fetch }) => {
       },
       fetch,
     ),
-  ] as const);
-
-  return {
-    projects: fetches[0].projects,
     blockWhileInitializing: false,
   };
 }) satisfies PageServerLoad;
