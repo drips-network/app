@@ -14,12 +14,8 @@ export const load = (async ({ fetch }) => {
     }
   `;
 
-  const fetches = await Promise.all([
-    query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {}, fetch),
-  ] as const);
-
   return {
-    dripLists: fetches[0].dripLists,
+    dripLists: await query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {}, fetch),
     blockWhileInitializing: false,
   };
 }) satisfies PageServerLoad;
