@@ -38,8 +38,8 @@
   <Spinner classes="w-[1.125em] h-[1.125em]" />
   <div
     bind:this={frameEl}
-    class="overflow-hidden transition-[max-width] duration-[{animDuration}ms]"
-    style="max-width: 0.8em"
+    class="overflow-hidden"
+    style="max-width: 0.8em; transition: max-width {animDuration}ms"
   >
     <div bind:this={textEl} class="whitespace-nowrap pl-[0.3em] pr-[0.8em] opacity-0">
       <span class="font-bold">
