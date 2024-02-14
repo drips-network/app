@@ -35,6 +35,12 @@ import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import { Forge } from '$lib/graphql/__generated__/base-types';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import type {
+  MintedNftAccountsCountQuery,
+  MintedNftAccountsCountQueryVariables,
+} from './__generated__/gql.generated';
 
 type AccountId = string;
 
@@ -109,11 +115,19 @@ export default class DripListService {
       context.dripList,
     );
 
-    const ownerNftSubAccountsCount = (
-      await this._dripsSubgraphClient.getNftSubAccountsByOwner(this._ownerAddress)
-    ).length;
+    const mintedNftAccountsCountQuery = gql`
+      query MintedNftAccountsCount($ownerAddress: String!) {
+        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress)
+      }
+    `;
 
-    const salt = this._calcSaltFromAddress(this._ownerAddress, ownerNftSubAccountsCount);
+    const mintedNftAccountsCountRes = await query<
+      MintedNftAccountsCountQuery,
+      MintedNftAccountsCountQueryVariables
+    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress });
+    const mintedNftAccountsCount = mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress ?? 0;
+
+    const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
 
     const dripListId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
 
