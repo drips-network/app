@@ -65,6 +65,11 @@ h1,
   font-style: normal;
 }
 
+h3,
+.typo-header-3 {
+  font-family: var(--typeface-regular);
+}
+
 .tabular-nums {
   font-feature-settings: 'tnum', 'zero';
 }

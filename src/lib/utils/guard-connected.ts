@@ -16,7 +16,9 @@ export default function guardConnected(): boolean {
 
   if (!connected && get(initialized)) {
     const { pathname } = get(page).url;
-    goto(buildUrl('/app', { backTo: encodeURIComponent(pathname) }), { replaceState: true });
+    goto(buildUrl('/app/connect', { backTo: encodeURIComponent(pathname) }), {
+      replaceState: true,
+    });
 
     return false;
   }

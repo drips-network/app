@@ -37,6 +37,7 @@
   import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
   import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import possibleColors from '$lib/utils/project/possible-colors';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -130,10 +131,7 @@
         type: 'emoji',
         emoji: seededRandomElement(possibleRandomEmoji, project.account.accountId),
       };
-      $context.projectColor = seededRandomElement(
-        ['#5555FF', '#53DB53', '#FFC555', '#FF5555'],
-        project.account.accountId,
-      );
+      $context.projectColor = seededRandomElement(possibleColors, project.account.accountId);
 
       $context.unclaimedFunds = await fetchUnclaimedFunds(project.account.accountId);
 

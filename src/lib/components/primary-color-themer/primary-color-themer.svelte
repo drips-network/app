@@ -1,6 +1,10 @@
 <script lang="ts">
   import themeStore from '$lib/stores/theme/theme.store';
   import hexToRgb from '$lib/utils/hex-to-rgb';
+  import possibleColors from '$lib/utils/project/possible-colors';
+
+  // Currently supported project colors plus those that were previously available
+  const SUPPORTED_COLORS = [...possibleColors, '#5555FF', '#53DB53', '#FFC555', '#FF5555'];
 
   export let colorHex: string | undefined;
 
@@ -12,8 +16,9 @@
     'primary-level-2': string;
     'primary-level-6': string;
   };
+
   $: {
-    if (colorHex) {
+    if (colorHex && SUPPORTED_COLORS.includes(colorHex)) {
       const rgb = hexToRgb(colorHex);
       const level6Adjustment = isLightTheme ? 30 : -30;
 
@@ -33,7 +38,7 @@
 
 <div
   class="project-themer"
-  style={colorHex &&
+  style={colorVars &&
     Object.entries(colorVars)
       .map(([key, v]) => `--color-${key}: ${v};`)
       .join('\n')}

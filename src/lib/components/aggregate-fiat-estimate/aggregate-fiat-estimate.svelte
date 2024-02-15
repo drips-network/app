@@ -20,6 +20,8 @@
   export let amounts: Amounts | undefined;
   $: tokenAddresses = amounts?.map((a) => a.tokenAddress);
 
+  export let supressUnknownAmountsWarning = false;
+
   const fiatEstimatesStarted = fiatEstimates.started;
   $: {
     if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
@@ -50,10 +52,10 @@
 
 <div class="aggregate-fiat-estimate">
   <FiatEstimateValue forceLoading={amounts === undefined} {fiatEstimateCents} />
-  {#if includesUnknownPrice && fiatEstimateCents !== 'pending'}
+  {#if includesUnknownPrice && fiatEstimateCents !== 'pending' && !supressUnknownAmountsWarning}
     <div class="warning" transition:fade|local={{ duration: 100 }}>
       <Tooltip>
-        <WarningIcon style="fill: var(--color-negative)" />
+        <WarningIcon />
         <svelte:fragment slot="tooltip-content">
           This amount includes unknown tokens for which we couldnʼt determine a current USD value.
         </svelte:fragment>
