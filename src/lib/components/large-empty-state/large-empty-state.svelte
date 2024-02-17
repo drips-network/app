@@ -1,6 +1,7 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import Button from '../button/button.svelte';
+  import ConnectButton from '../connect-button/connect-button.svelte';
 
   export let emoji: string;
   export let headline: string;
@@ -35,6 +36,7 @@
           on:click={button.handler}>{button.label}</Button
         >{/if}
     </div>
+    <ConnectButton />
   </div>
 </div>
 
