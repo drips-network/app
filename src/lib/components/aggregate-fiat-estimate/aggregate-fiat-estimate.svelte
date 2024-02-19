@@ -44,15 +44,16 @@
       if ($connected) {
         $priceStore;
         result = aggregateFiatEstimate(priceStore, amounts);
+        if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
+          dispatch('loaded');
+        }
       } else if (prices) {
         result = aggregateFiatEstimate(prices, amounts);
+        dispatch('loaded');
       }
 
       if (result) {
         includesUnknownPrice = result.includesUnknownPrice;
-        if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
-          dispatch('loaded');
-        }
         fiatEstimateCents = result.fiatEstimateCents;
       }
     }
