@@ -3,35 +3,39 @@ import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
 import { getRedis } from './api/redis';
+import type { Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
 
-const amountsResponseSchema = z.array(
-  z.object({
-    tokenAddress: z.string(),
-    amount: z.string(),
-  }),
-);
+export const load = (async ({ fetch }) => {
+  let prices: Prices = {};
+  const cacheKey = 'total-dripped-prices';
 
-export const load = (async () => {
   const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
 
-  const cachedResponse = redis && (await redis.get('total-dripped-approx'));
-
-  let amounts: z.infer<typeof amountsResponseSchema>;
+  const cachedResponse = redis && (await redis.get(cacheKey));
 
   if (cachedResponse) {
-    amounts = amountsResponseSchema.parse(JSON.parse(cachedResponse));
+    prices = JSON.parse(cachedResponse);
   } else {
-    amounts = totalDrippedApproximation().map((row) => ({
-      ...row,
-      amount: row.amount.toString(),
-    }));
+    const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
 
-    await redis?.set('total-dripped-approx', JSON.stringify(amounts), {
+    // get pricing provider's tokenIds of our tokenAddresses...
+    const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
+    const idMap = z.record(z.string(), z.number()).parse(idMapRes);
+    const tokenIdsString = tokenAddresses.map((address) => idMap[address.toLowerCase()]).join(',');
+
+    // fetch prices...
+    const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+    const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+
+    // format
+    tokenAddresses.forEach((address: string) => (prices[address] = parsedRes[idMap[address]]));
+
+    await redis?.set(cacheKey, JSON.stringify(prices), {
       EX: 3600,
     });
   }
 
   return {
-    amounts,
+    prices,
   };
 }) satisfies PageServerLoad;

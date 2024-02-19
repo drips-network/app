@@ -28,6 +28,7 @@
   import LpFooter from './components/lp-footer.svelte';
   import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
   import type { PageData } from './$types';
+  import { readable } from 'svelte/store';
 
   export let data: PageData;
 
@@ -50,8 +51,6 @@
 
   let claimProjectInput = '';
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
-
-  $: totalDrippedAmounts = data.amounts.map((row) => ({ ...row, amount: BigInt(row.amount) }));
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
@@ -73,7 +72,7 @@
           <LpHero />
         </div>
         <div class="absolute overlay z-10 flex items-center justify-center">
-          <LpTotalDrippedBadge amounts={totalDrippedAmounts} />
+          <LpTotalDrippedBadge prices={readable(data.prices)} />
         </div>
       </figure>
     </div>

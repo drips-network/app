@@ -22,6 +22,8 @@
 
   export let supressUnknownAmountsWarning = false;
 
+  export let prices: ReturnType<typeof fiatEstimates.price> | undefined = undefined;
+
   const fiatEstimatesStarted = fiatEstimates.started;
   $: {
     if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
@@ -31,27 +33,37 @@
 
   $: priceStore = fiatEstimates.price(tokenAddresses ?? []);
 
-  let fiatEstimateCents: number | 'pending' = 'pending';
+  export let fiatEstimateCents: number | 'pending' = 'pending';
   let includesUnknownPrice = false;
 
   const connected = tokensStore.connected;
 
   $: {
-    if ($connected && amounts && $connected) {
-      $priceStore;
-      const result = aggregateFiatEstimate(priceStore, amounts);
-
-      includesUnknownPrice = result.includesUnknownPrice;
-      if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
-        dispatch('loaded');
+    if (amounts) {
+      let result;
+      if ($connected) {
+        $priceStore;
+        result = aggregateFiatEstimate(priceStore, amounts);
+      } else if (prices) {
+        result = aggregateFiatEstimate(prices, amounts);
       }
-      fiatEstimateCents = result.fiatEstimateCents;
+
+      if (result) {
+        includesUnknownPrice = result.includesUnknownPrice;
+        if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
+          dispatch('loaded');
+        }
+        fiatEstimateCents = result.fiatEstimateCents;
+      }
     }
   }
 </script>
 
 <div class="aggregate-fiat-estimate">
-  <FiatEstimateValue forceLoading={amounts === undefined} {fiatEstimateCents} />
+  <FiatEstimateValue
+    forceLoading={amounts === undefined && typeof fiatEstimateCents !== 'number'}
+    {fiatEstimateCents}
+  />
   {#if includesUnknownPrice && fiatEstimateCents !== 'pending' && !supressUnknownAmountsWarning}
     <div class="warning" transition:fade|local={{ duration: 100 }}>
       <Tooltip>

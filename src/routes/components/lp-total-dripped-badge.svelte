@@ -9,10 +9,14 @@
 
   let tickHandle: number;
 
-  export let amounts: ReturnType<typeof totalDrippedApproximation>;
+  export let prices: ReturnType<typeof fiatEstimates.price>;
+
+  let amounts: ReturnType<typeof totalDrippedApproximation>;
+
   function update() {
     amounts = totalDrippedApproximation();
   }
+  update();
 
   let textEl: HTMLDivElement;
   let frameEl: HTMLDivElement;
@@ -44,6 +48,7 @@
       <span class="font-bold">
         <AggregateFiatEstimate
           {amounts}
+          {prices}
           on:loaded={async () => {
             await tick();
             const width = frameEl.scrollWidth + 32;

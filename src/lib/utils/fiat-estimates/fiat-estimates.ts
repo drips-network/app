@@ -20,7 +20,7 @@ type Unsupported = 'unsupported';
 type Pending = 'pending';
 
 /** All prices relative to USD */
-type Prices = {
+export type Prices = {
   [tokenAddress: TokenAddress]: number | Unsupported | Pending;
 };
 
