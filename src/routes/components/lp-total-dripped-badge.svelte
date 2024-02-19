@@ -5,7 +5,7 @@
   import tokens from '$lib/stores/tokens';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
 
   let tickHandle: number;
 
@@ -46,10 +46,10 @@
         <AggregateFiatEstimate
           {amounts}
           on:loaded={async () => {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await tick();
             const width = frameEl.scrollWidth + 32;
             textEl.style.transform = `translateX(${width}px)`;
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await tick();
             frameEl.style.maxWidth = `${width}px`;
             textEl.style.transition = `transform ${animDuration}ms`;
             textEl.style.transform = 'none';
