@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { PageServerLoad } from './$types';
 import { getRedis } from './api/redis';
 import type { Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
+import { utils } from 'ethers';
 
 export const load = (async ({ fetch }) => {
   let prices: Prices = {};
@@ -28,7 +29,9 @@ export const load = (async ({ fetch }) => {
     const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
     // format
-    tokenAddresses.forEach((address: string) => (prices[address] = parsedRes[idMap[address]]));
+    tokenAddresses.forEach(
+      (address: string) => (prices[utils.getAddress(address)] = parsedRes[idMap[address]]),
+    );
 
     await redis?.set(cacheKey, JSON.stringify(prices), {
       EX: 3600,

@@ -1,12 +1,13 @@
 <script lang="ts">
   import tokensStore from '$lib/stores/tokens/tokens.store';
-  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import { fade } from 'svelte/transition';
   import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import FiatEstimateValue from './fiat-estimate-value.svelte';
   import aggregateFiatEstimate from './aggregate-fiat-estimate';
   import { createEventDispatcher } from 'svelte';
+  import { readable } from 'svelte/store';
 
   const dispatch = createEventDispatcher<{ loaded: never }>();
   interface Amount {
@@ -22,8 +23,6 @@
 
   export let supressUnknownAmountsWarning = false;
 
-  export let prices: ReturnType<typeof fiatEstimates.price> | undefined = undefined;
-
   const fiatEstimatesStarted = fiatEstimates.started;
   $: {
     if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
@@ -31,7 +30,9 @@
     }
   }
 
-  $: priceStore = fiatEstimates.price(tokenAddresses ?? []);
+  export let prices: Prices | undefined = undefined;
+
+  $: priceStore = prices ? readable(prices) : fiatEstimates.price(tokenAddresses ?? []);
 
   export let fiatEstimateCents: number | 'pending' = 'pending';
   let includesUnknownPrice = false;
@@ -39,23 +40,17 @@
   const connected = tokensStore.connected;
 
   $: {
-    if (amounts) {
-      let result;
-      if ($connected) {
-        $priceStore;
-        result = aggregateFiatEstimate(priceStore, amounts);
-        if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
-          dispatch('loaded');
-        }
-      } else if (prices) {
-        result = aggregateFiatEstimate(prices, amounts);
+    if (amounts && $connected) {
+      $priceStore;
+
+      const result = aggregateFiatEstimate(priceStore, amounts);
+
+      if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
         dispatch('loaded');
       }
 
-      if (result) {
-        includesUnknownPrice = result.includesUnknownPrice;
-        fiatEstimateCents = result.fiatEstimateCents;
-      }
+      includesUnknownPrice = result.includesUnknownPrice;
+      fiatEstimateCents = result.fiatEstimateCents;
     }
   }
 </script>

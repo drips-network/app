@@ -28,7 +28,6 @@
   import LpFooter from './components/lp-footer.svelte';
   import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
   import type { PageData } from './$types';
-  import { readable } from 'svelte/store';
 
   export let data: PageData;
 
@@ -72,7 +71,9 @@
           <LpHero />
         </div>
         <div class="absolute overlay z-10 flex items-center justify-center">
-          <LpTotalDrippedBadge prices={readable(data.prices)} />
+          {#if data.prices}
+            <LpTotalDrippedBadge prices={data.prices} />
+          {/if}
         </div>
       </figure>
     </div>

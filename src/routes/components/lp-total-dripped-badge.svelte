@@ -3,13 +3,13 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import tokens from '$lib/stores/tokens';
-  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
   import { onDestroy, onMount, tick } from 'svelte';
 
   let tickHandle: number;
 
-  export let prices: ReturnType<typeof fiatEstimates.price>;
+  export let prices: Prices;
 
   let amounts: ReturnType<typeof totalDrippedApproximation>;
 
