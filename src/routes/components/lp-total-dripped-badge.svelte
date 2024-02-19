@@ -9,11 +9,10 @@
 
   let tickHandle: number;
 
-  let amounts: ReturnType<typeof totalDrippedApproximation>;
+  export let amounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {
     amounts = totalDrippedApproximation();
   }
-  update();
 
   let textEl: HTMLDivElement;
   let frameEl: HTMLDivElement;

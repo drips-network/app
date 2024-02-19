@@ -27,6 +27,9 @@
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import LpFooter from './components/lp-footer.svelte';
   import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
+  import type { PageData } from './$types';
+
+  export let data: PageData;
 
   onMount(() => {
     // When launching within a Safe, we donʼt want to display the landing page.
@@ -47,6 +50,8 @@
 
   let claimProjectInput = '';
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
+
+  $: totalDrippedAmounts = data.amounts.map((row) => ({ ...row, amount: BigInt(row.amount) }));
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
@@ -68,7 +73,7 @@
           <LpHero />
         </div>
         <div class="absolute overlay z-10 flex items-center justify-center">
-          <LpTotalDrippedBadge />
+          <LpTotalDrippedBadge amounts={totalDrippedAmounts} />
         </div>
       </figure>
     </div>
