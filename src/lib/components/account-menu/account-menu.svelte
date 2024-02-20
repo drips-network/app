@@ -10,6 +10,7 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import { navigating } from '$app/stores';
   import LegalLinks from '../legal-links/legal-links.svelte';
+  import Settings from 'radicle-design-system/icons/Settings.svelte';
 
   $: $navigating && cupertinoPaneStore.closeSheet();
 
@@ -71,6 +72,10 @@
       href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
     >
       <svelte:fragment slot="title">Profile</svelte:fragment>
+    </AccountMenuItem>
+    <Divider sideMargin={0.5} />
+    <AccountMenuItem icon={Settings} href="/app/settings">
+      <svelte:fragment slot="title">Settings</svelte:fragment>
     </AccountMenuItem>
     <Divider sideMargin={0.5} />
     <LegalLinks />

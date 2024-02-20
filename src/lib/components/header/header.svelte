@@ -65,9 +65,11 @@
           <SearchIcon style="fill: var(--color-foreground)" />
         </button>
       {/if}
-      <a class="header-button" href="/app/settings">
-        <SettingsIcon style="fill: var(--color-foreground)" />
-      </a>
+      {#if !$walletStore.connected}
+        <a class="header-button" href="/app/settings">
+          <SettingsIcon style="fill: var(--color-foreground)" />
+        </a>
+      {/if}
     </div>
     <div class="connect">
       <ConnectButton />
