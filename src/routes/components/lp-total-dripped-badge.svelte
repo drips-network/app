@@ -28,8 +28,9 @@
   });
 </script>
 
-<div
-  class="lp-total-dripped-badge shadow-md flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto"
+<a
+  href="/app"
+  class="lp-total-dripped-badge shadow-md flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto mouse:hover:shadow-hi mouse:hover:translate-y-[-4px]"
 >
   <Spinner classes="w-[1.125em] h-[1.125em]" />
   <div class="whitespace-nowrap pl-[0.3em]">
@@ -37,7 +38,7 @@
       <AggregateFiatEstimate {amounts} {prices} />
     </span> dripped
   </div>
-</div>
+</a>
 
 <style>
   .lp-total-dripped-badge {
