@@ -25,7 +25,7 @@
 
   const fiatEstimatesStarted = fiatEstimates.started;
   $: {
-    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
+    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0 && !prices) {
       fiatEstimates.track(tokenAddresses);
     }
   }
