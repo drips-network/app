@@ -3,30 +3,23 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import tokens from '$lib/stores/tokens';
-  import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
+  import type { Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   let tickHandle: number;
 
   export let prices: Prices;
 
-  let amounts: ReturnType<typeof totalDrippedApproximation>;
+  let amounts = totalDrippedApproximation();
 
   function update() {
     amounts = totalDrippedApproximation();
   }
-  update();
-
-  let textEl: HTMLDivElement;
-  let frameEl: HTMLDivElement;
-  let animDuration = 1500;
 
   onMount(async () => {
     tokens.connect(1);
-    fiatEstimates.start();
     tickStore.start();
-
     tickHandle = tickStore.register(update);
   });
 
@@ -36,34 +29,13 @@
 </script>
 
 <div
-  class="lp-total-dripped-badge shadow-md flex items-center pl-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto"
+  class="lp-total-dripped-badge shadow-md flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto"
 >
   <Spinner classes="w-[1.125em] h-[1.125em]" />
-  <div
-    bind:this={frameEl}
-    class="overflow-hidden"
-    style="max-width: 0.8em; transition: max-width {animDuration}ms"
-  >
-    <div bind:this={textEl} class="whitespace-nowrap pl-[0.3em] pr-[0.8em] opacity-0">
-      <span class="font-bold">
-        <AggregateFiatEstimate
-          {amounts}
-          {prices}
-          on:loaded={async () => {
-            await tick();
-            const width = frameEl.scrollWidth + 32;
-            textEl.style.transform = `translateX(${width}px)`;
-            await tick();
-            frameEl.style.maxWidth = `${width}px`;
-            textEl.style.transition = `transform ${animDuration}ms`;
-            textEl.style.transform = 'none';
-            textEl.style.opacity = '1';
-            await new Promise((resolve) => setTimeout(resolve, animDuration * 1.1));
-            frameEl.style.maxWidth = 'none';
-          }}
-        />
-      </span> dripped
-    </div>
+  <div class="whitespace-nowrap pl-[0.3em]">
+    <span class="font-bold">
+      <AggregateFiatEstimate {amounts} {prices} />
+    </span> dripped
   </div>
 </div>
 

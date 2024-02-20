@@ -37,7 +37,6 @@
     If you do pass prices, make sure that there's a value for each token address included in `amounts`.
   */
   export let prices: Prices | undefined = undefined;
-
   $: priceStore = prices ? readable(prices) : fiatEstimates.price(tokenAddresses ?? []);
 
   export let fiatEstimateCents: number | 'pending' = 'pending';

@@ -70,11 +70,11 @@
         <div class="illustration">
           <LpHero />
         </div>
-        <div class="absolute overlay z-10 flex items-center justify-center">
-          {#if data.prices}
+        {#if data.prices}
+          <div class="absolute overlay z-10 flex items-center justify-center">
             <LpTotalDrippedBadge prices={data.prices} />
-          {/if}
-        </div>
+          </div>
+        {/if}
       </figure>
     </div>
 
