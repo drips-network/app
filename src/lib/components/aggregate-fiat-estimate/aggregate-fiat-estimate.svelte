@@ -30,6 +30,12 @@
     }
   }
 
+  /**
+    Pass prices if they've been fetched externally already (e.g. in a load function).
+    If undefined, it will call in and wait for prices from `fiatEstimates` store.
+    
+    If you do pass prices, make sure that there's a value for each token address included in `amounts`.
+  */
   export let prices: Prices | undefined = undefined;
 
   $: priceStore = prices ? readable(prices) : fiatEstimates.price(tokenAddresses ?? []);
