@@ -18,8 +18,9 @@
     amounts = totalDrippedApproximation();
   }
 
+  tokens.connect(1);
+
   onMount(async () => {
-    tokens.connect(1);
     tickStore.start();
     tickHandle = tickStore.register(update);
   });
@@ -32,7 +33,6 @@
 <a
   href="/app"
   class="lp-total-dripped-badge shadow-md flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto mouse:hover:shadow-hi mouse:hover:translate-y-[-4px]"
-  class:opacity-0={!visible}
 >
   <Spinner classes="w-[1.125em] h-[1.125em]" />
   <div class="whitespace-nowrap pl-[0.3em]">
