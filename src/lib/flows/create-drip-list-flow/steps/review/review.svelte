@@ -125,11 +125,9 @@
       {#if $context.selectedSupportOption === 1}
         <div class="card">
           <ContinuousSupportReviewCard
-            topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed ??
-              unreachable()}
+            topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed ?? 0n}
             tokenAddress={$context.continuousSupportConfig.listSelected[0] ?? unreachable()}
-            streamRateValueParsed={$context.continuousSupportConfig.streamRateValueParsed ??
-              unreachable()}
+            streamRateValueParsed={$context.continuousSupportConfig.streamRateValueParsed ?? 0n}
           />
         </div>
       {:else if $context.selectedSupportOption === 2}
