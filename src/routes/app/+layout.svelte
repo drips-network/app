@@ -132,7 +132,6 @@
 
   onMount(() => {
     tickStore.start();
-    return tickStore.stop;
   });
 
   onMount(() => {

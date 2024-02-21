@@ -51,6 +51,7 @@
         fiatEstimates[index] = fiatEstimatesStore.convert(
           { amount, tokenAddress },
           token.info.decimals,
+          priceStore,
         );
       });
     }
