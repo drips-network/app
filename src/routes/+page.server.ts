@@ -34,7 +34,7 @@ export const load = (async ({ fetch }) => {
     );
 
     await redis?.set(cacheKey, JSON.stringify(prices), {
-      EX: 3600,
+      EX: 60 * 60 * 6,
     });
   }
 
