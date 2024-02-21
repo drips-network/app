@@ -1,0 +1,7 @@
+:root {
+  --elevation-low: 0px 0px 0px 1px currentColor;
+
+  --elevation-medium: 0px 0px 0px 1px currentColor, 0 4px 0px 1px currentColor;
+
+  --elevation-high: 0px 0px 0px 1px currentColor, 0 8px 0px 1px currentColor;
+}

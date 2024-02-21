@@ -3,25 +3,25 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import tokens from '$lib/stores/tokens';
-  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import type { Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
   import { onDestroy, onMount } from 'svelte';
 
+  let tickHandle: number;
   let visible = false;
 
-  let tickHandle: number;
+  export let prices: Prices;
 
-  let amounts: ReturnType<typeof totalDrippedApproximation>;
+  let amounts = totalDrippedApproximation();
+
   function update() {
     amounts = totalDrippedApproximation();
   }
-  update();
+
+  tokens.connect(1);
 
   onMount(async () => {
-    tokens.connect(1);
-    fiatEstimates.start();
     tickStore.start();
-
     tickHandle = tickStore.register(update);
   });
 
@@ -30,20 +30,35 @@
   });
 </script>
 
-<div
-  class="rounded-drip-lg flex items-center gap-2 bg-primary-level-1 text-primary px-3 h-8 typo-text transition duration-300"
-  class:opacity-0={!visible}
-  class:pointer-events-none={!visible}
+<a
+  href="/app"
+  class="lp-total-dripped-badge shadow-md flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto mouse:hover:shadow-hi mouse:hover:translate-y-[-4px]"
 >
-  <Spinner classes="w-3.5 h-3.5" />
-  <div>
-    <span class="typo-text-bold">
+  <Spinner classes="w-[1.125em] h-[1.125em]" />
+  <div class="whitespace-nowrap pl-[0.3em]">
+    <span class="font-bold">
       <AggregateFiatEstimate
         {amounts}
+        {prices}
         on:loaded={() => {
           visible = true;
         }}
       />
     </span> dripped
   </div>
-</div>
+</a>
+
+<style>
+  .lp-total-dripped-badge {
+    font-size: min(24px, calc(24 / 500 * 100vw));
+    height: 2.375em;
+    line-height: 1.2;
+    border-radius: calc(96 / 40 * 1em) 0 calc(96 / 40 * 1em) calc(96 / 40 * 1em);
+  }
+
+  @media (min-width: 1280px) {
+    .lp-total-dripped-badge {
+      font-size: 40px;
+    }
+  }
+</style>
