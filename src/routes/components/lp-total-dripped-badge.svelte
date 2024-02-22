@@ -32,7 +32,7 @@
 
 <a
   href="/app"
-  class="lp-total-dripped-badge shadow-md flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto mouse:hover:shadow-hi mouse:hover:translate-y-[-4px]"
+  class="lp-total-dripped-badge flex items-center px-[0.8em] bg-primary-level-1 text-primary transition duration-300 pointer-events-auto"
 >
   <Spinner classes="w-[1.125em] h-[1.125em]" />
   <div class="whitespace-nowrap pl-[0.3em]">
@@ -54,6 +54,14 @@
     height: 2.375em;
     line-height: 1.2;
     border-radius: calc(96 / 40 * 1em) 0 calc(96 / 40 * 1em) calc(96 / 40 * 1em);
+    box-shadow: 0px 0px 0px 1px currentColor, 0 4px 0px 1px currentColor;
+  }
+
+  @media (hover: hover) {
+    .lp-total-dripped-badge:hover {
+      box-shadow: 0px 0px 0px 1px currentColor, 0 8px 0px 1px currentColor;
+      transform: translateY(-4px);
+    }
   }
 
   @media (min-width: 1280px) {
