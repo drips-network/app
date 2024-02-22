@@ -133,16 +133,18 @@
       loaded: true,
     }}
   >
-    <div class="projects-grid">
-      {#each featuredProjects as project}
-        <div>
-          {#if project.__typename === 'ClaimedProject'}
-            <PrimaryColorThemer colorHex={project.color}>
-              <ProjectCard {project} />
-            </PrimaryColorThemer>
-          {/if}
-        </div>
-      {/each}
+    <div class="horizontal-scroll">
+      <div class="projects-grid">
+        {#each featuredProjects as project}
+          <div>
+            {#if project.__typename === 'ClaimedProject'}
+              <PrimaryColorThemer colorHex={project.color}>
+                <ProjectCard {project} />
+              </PrimaryColorThemer>
+            {/if}
+          </div>
+        {/each}
+      </div>
     </div>
   </Section>
 
@@ -316,13 +318,19 @@
     color: var(--color-primary);
   }
 
+  /* New style for horizontal scroll */
+  .horizontal-scroll {
+    overflow: auto;
+    /* Adjust height if necessary */
+    max-height: 55vh;
+  }
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
     gap: 1rem;
     max-width: 100%;
     position: relative;
-    padding: 2px;
+    padding: 4px;
   }
 
   .posts-grid {
