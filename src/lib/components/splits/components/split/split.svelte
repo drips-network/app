@@ -14,7 +14,7 @@
   import { sineInOut } from 'svelte/easing';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
-  import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
+  import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;

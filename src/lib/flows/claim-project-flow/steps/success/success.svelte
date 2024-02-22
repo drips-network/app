@@ -4,7 +4,7 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import buildUrl from '$lib/utils/build-url';
   import balancesStore from '$lib/stores/balances/balances.store';

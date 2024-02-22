@@ -21,11 +21,11 @@
 </script>
 
 <script lang="ts">
-  import GithubIcon from 'radicle-design-system/icons/Github.svelte';
+  import GithubIcon from '$lib/components/icons/Github.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import twemoji from 'twemoji';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import Question from 'radicle-design-system/icons/Question.svelte';
+  import Question from '$lib/components/icons/Question.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';

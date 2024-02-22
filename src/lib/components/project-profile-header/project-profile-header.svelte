@@ -29,7 +29,7 @@
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
   import Copyable from '../copyable/copyable.svelte';
-  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectProfileHeaderFragment } from './__generated__/gql.generated';
   import ShareButton from '../share-button/share-button.svelte';

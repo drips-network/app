@@ -7,7 +7,7 @@
   import Button from '$lib/components/button/button.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import { goto } from '$app/navigation';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
 
   const walletInitialized = walletStore.initialized;
 

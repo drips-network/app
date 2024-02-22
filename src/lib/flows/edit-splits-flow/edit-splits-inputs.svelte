@@ -13,9 +13,9 @@
   import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { AddressDriverClient, type SplitsReceiverStruct } from 'radicle-drips';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
-  import Cross from 'radicle-design-system/icons/Cross.svelte';
+  import Cross from '$lib/components/icons/Cross.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';

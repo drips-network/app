@@ -2,13 +2,13 @@
 <script lang="ts">
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';
 
-  import CheckCircleIcon from 'radicle-design-system/icons/CheckCircle.svelte';
-  import ExclamationCircleIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
+  import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
   import KeyHint from 'radicle-design-system/KeyHint.svelte';
   import Spinner from 'radicle-design-system/Spinner.svelte';
   import { createEventDispatcher, type ComponentType } from 'svelte';
-  import Cross from 'radicle-design-system/icons/Cross.svelte';
+  import Cross from '$lib/components/icons/Cross.svelte';
 
   const dispatch = createEventDispatcher<{ clear: never }>();
 

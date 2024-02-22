@@ -18,9 +18,9 @@
   import type { Writable } from 'svelte/store';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT, type State } from '../../claim-project-flow';
-  import LinkIcon from 'radicle-design-system/icons/Link.svelte';
+  import LinkIcon from '$lib/components/icons/Link.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowRightIcon from 'radicle-design-system/icons/ArrowRight.svelte';
+  import ArrowRightIcon from '$lib/components/icons/ArrowRight.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from 'radicle-design-system/TextInput';

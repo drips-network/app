@@ -1,11 +1,11 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import DripList from 'radicle-design-system/icons/DripList.svelte';
-  import Droplet from 'radicle-design-system/icons/Droplet.svelte';
-  import Heart from 'radicle-design-system/icons/Heart.svelte';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
+  import Droplet from '$lib/components/icons/Droplet.svelte';
+  import Heart from '$lib/components/icons/Heart.svelte';
+  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import { fade } from 'svelte/transition';
 
   export let isOwner = false;

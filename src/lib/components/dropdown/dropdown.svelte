@@ -1,6 +1,6 @@
 <script lang="ts">
   import modal from '$lib/stores/modal';
-  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
+  import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
   import { fly, scale } from 'svelte/transition';
   import FocusTrap from '../focus-trap/focus-trap.svelte';
   import { Focus, focusIn } from '../focus-trap/methods/focus';

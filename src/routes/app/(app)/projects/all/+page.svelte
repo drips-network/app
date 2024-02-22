@@ -57,7 +57,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import Section from '$lib/components/section/section.svelte';
-  import Box from 'radicle-design-system/icons/Box.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import ProjectBadgeCell from '$lib/components/table/cells/project-badge.cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';

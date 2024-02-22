@@ -2,7 +2,7 @@
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import { fade } from 'svelte/transition';
-  import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import FiatEstimateValue from './fiat-estimate-value.svelte';
   import aggregateFiatEstimate from './aggregate-fiat-estimate';
