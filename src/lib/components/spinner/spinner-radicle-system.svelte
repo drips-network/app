@@ -7,6 +7,7 @@
 <!-- FYI: We're not using the <IconWrapper /> component here because it would be too complicated to animate the svg with it.  -->
 <svg
   on:click
+  on:keydown
   style={`flex-shrink: 0; ${style}`}
   {width}
   {height}

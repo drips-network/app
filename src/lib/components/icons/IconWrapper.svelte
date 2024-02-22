@@ -4,6 +4,7 @@
 
 <svg
   on:click
+  on:keydown
   style={`flex-shrink: 0; ${style ? style : ''}`}
   width="24"
   height="24"
