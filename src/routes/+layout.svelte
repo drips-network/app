@@ -1,12 +1,4 @@
 <script lang="ts">
-  // Global CSS imports
-  import '../styles/tailwind.css';
-  import 'radicle-design-system/static/reset.css';
-  import 'radicle-design-system/static/global.css';
-  import 'radicle-design-system/static/colors.css';
-  import 'radicle-design-system/static/elevation.css';
-  import 'radicle-design-system/static/typography.css';
-  import '../styles/fonts.css'; /* must be after radicle-design-system/.../typography.css !! */
   import '../styles/app.css';
 
   import '$lib/stores/theme/theme.store';

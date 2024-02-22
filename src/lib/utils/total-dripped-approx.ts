@@ -38,7 +38,7 @@ export default function totalDrippedApproximation() {
   const streamedAmounts = STREAMS.map((stream) => {
     const duration = (Date.now() - stream.started) / 1000;
     return {
-      tokenAddress: stream.token.address,
+      tokenAddress: stream.token.address.toLowerCase(),
       amount: BigInt(Math.floor(Number(BigInt(stream.amtPerSec) / BigInt(1e9)) * duration)),
     };
   });

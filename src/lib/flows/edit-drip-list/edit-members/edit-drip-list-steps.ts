@@ -5,9 +5,7 @@ import EditDripListStep from '../shared/steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import type { EditDripListStepSelectedDripListFragment } from '../shared/steps/__generated__/gql.generated';
 
-export default (
-  dripList: EditDripListStepSelectedDripListFragment,
-) => ({
+export default (dripList: EditDripListStepSelectedDripListFragment) => ({
   context: undefined,
   steps: [
     makeStep({
@@ -22,8 +20,7 @@ export default (
       component: SuccessStep,
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
-        message:
-          'Your Drip List has been updated. Please refresh your dashboard to see the changes.',
+        message: 'Your Drip List has been updated. Please refresh the page to see the changes.',
       },
     }),
   ],
