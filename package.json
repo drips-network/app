@@ -94,7 +94,6 @@
     "image-data-uri": "^2.0.1",
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.21",
-    "radicle-design-system": "github:radicle-dev/radicle-design-system#brandon+jason/drips-restyle",
     "radicle-drips": "https://github.com/radicle-dev/drips-js-sdk#feature/dependency-funding",
     "redis": "^4.6.11",
     "sanitize-html": "^2.11.0",
