@@ -97,7 +97,7 @@
     background-color: var(--color-background);
     transition: box-shadow 0.3s, background-color 0.5s;
     display: flex;
-    gap: 0.5rem;
+    /* gap: 0.5rem; */
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
@@ -188,7 +188,7 @@
 
   @media (max-width: 440px) {
     .is-testnet .logo {
-      height: 0.75rem;
+      height: 0.6rem;
     }
   }
 </style>
