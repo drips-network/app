@@ -1,7 +1,6 @@
-import type { RequestHandler } from '../api/ipfs/pin/$types';
 import manifest from './manifest.json';
 
-export const GET: RequestHandler = async () => {
+export const GET = async () => {
   return new Response(JSON.stringify(manifest), {
     headers: {
       'Access-Control-Allow-Origin': '*',
