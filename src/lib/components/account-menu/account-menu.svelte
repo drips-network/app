@@ -67,16 +67,17 @@
       </div>
     {/if}
     <Divider sideMargin={0.5} />
-    <AccountMenuItem
-      icon={UserIcon}
-      href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
-    >
-      <svelte:fragment slot="title">Profile</svelte:fragment>
-    </AccountMenuItem>
-    <Divider sideMargin={0.5} />
-    <AccountMenuItem icon={Settings} href="/app/settings">
-      <svelte:fragment slot="title">Settings</svelte:fragment>
-    </AccountMenuItem>
+    <div class="flex flex-col">
+      <AccountMenuItem
+        icon={UserIcon}
+        href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
+      >
+        <svelte:fragment slot="title">Profile</svelte:fragment>
+      </AccountMenuItem>
+      <AccountMenuItem icon={Settings} href="/app/settings">
+        <svelte:fragment slot="title">Settings</svelte:fragment>
+      </AccountMenuItem>
+    </div>
     <Divider sideMargin={0.5} />
     <LegalLinks />
   {/if}
