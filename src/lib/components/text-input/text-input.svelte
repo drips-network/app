@@ -6,7 +6,7 @@
   import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
   import KeyHint from '$lib/components/key-hint/KeyHint.svelte';
-  import Spinner from 'radicle-design-system/Spinner.svelte';
+  import Spinner from '$lib/components/spinner/spinner-radicle-system.svelte';
   import { createEventDispatcher, type ComponentType } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
 
