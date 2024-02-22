@@ -23,7 +23,7 @@
   import ArrowRightIcon from '$lib/components/icons/ArrowRight.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import UnclaimedProjectCard, {
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';

@@ -25,7 +25,7 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import balances from '$lib/stores/balances';
   import tokens from '$lib/stores/tokens';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import Button from '$lib/components/button/button.svelte';
   import streams from '$lib/stores/streams';
   import { constants } from 'radicle-drips';

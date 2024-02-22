@@ -7,7 +7,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import { fetchInfo } from '$lib/utils/erc20';
   import { isAddress } from 'ethers/lib/utils';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import assert from '$lib/utils/assert';
   import { createEventDispatcher } from 'svelte';

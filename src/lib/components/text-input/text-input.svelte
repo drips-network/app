@@ -1,6 +1,6 @@
 <!-- Adjusted from radicle-design-system's TextInput component -->
 <script lang="ts">
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
 
   import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
   import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
