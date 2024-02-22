@@ -14,7 +14,7 @@
   import User from 'radicle-design-system/icons/User.svelte';
   import Box from 'radicle-design-system/icons/Box.svelte';
   import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import ExploreIcon from '$lib/icons/ExploreIcon.svelte';
+  import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
 
   export let data: { pathname: string };
 
