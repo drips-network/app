@@ -53,6 +53,7 @@
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
   import Trash from 'radicle-design-system/icons/Trash.svelte';
   import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import ListIcon from 'radicle-design-system/icons/List.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectBadge, {
     PROJECT_BADGE_FRAGMENT,
@@ -78,7 +79,6 @@
   import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
 
   export let maxItems = 200;
-
   export let percentages: Percentages = {};
   export let isEditable = true;
   export let addOnMount: string | undefined = undefined;
@@ -95,6 +95,12 @@
   ];
 
   export let items: Items;
+
+  /**
+   * In percentages mode, every item will have a percentage value.
+   * In list mode, the user will be able to edit a list of items without percentages.
+   */
+  export let mode: 'percentages' | 'list' = 'percentages';
 
   $: itemsLength = Object.entries(items).length;
 
@@ -423,7 +429,11 @@
   {#if isEditable}
     <div class="add-project flex items-center">
       <div class="icon">
-        <DripListIcon style="fill: var(--color-foreground)" />
+        {#if mode === 'percentages'}
+          <DripListIcon style="fill: var(--color-foreground)" />
+        {:else}
+          <ListIcon style="fill: var(--color-foreground)" />
+        {/if}
       </div>
       <input
         bind:this={inputElem}
@@ -494,12 +504,14 @@
               {#if !isEditable}
                 <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
               {:else}
-                <PercentageEditor
-                  bind:percentage={percentages[slug]}
-                  on:confirm={() => {
-                    autoSplitEnabled = false;
-                  }}
-                />
+                {#if mode === 'percentages'}
+                  <PercentageEditor
+                    bind:percentage={percentages[slug]}
+                    on:confirm={() => {
+                      autoSplitEnabled = false;
+                    }}
+                  />
+                {/if}
                 <Button
                   icon={Trash}
                   variant="ghost"
@@ -514,7 +526,7 @@
       </ul>
     </div>
   {/if}
-  {#if isEditable && Object.keys(items).length > 0}
+  {#if isEditable && Object.keys(items).length > 0 && mode === 'percentages'}
     <div
       class="distribution-tools flex flex-col flex-wrap justify-center items-center sm:flex-row sm:justify-between gap-3 mt-4 select-none"
     >

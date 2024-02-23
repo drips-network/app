@@ -10,7 +10,7 @@ import AddEthereumAddress, {
 } from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
-import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
 import Review, { REVIEW_STEP_PROJECT_FRAGMENT } from './steps/review/review.svelte';

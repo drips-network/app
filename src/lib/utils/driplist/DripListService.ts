@@ -30,7 +30,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import { isAddress } from 'ethers/lib/utils';
-import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';

@@ -7,7 +7,7 @@
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

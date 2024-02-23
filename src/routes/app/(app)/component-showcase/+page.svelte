@@ -37,6 +37,7 @@
   } from '$lib/graphql/__generated__/base-types';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
 
   // Button
   let disabled = false;
@@ -303,11 +304,46 @@
   let sectionError = false;
   let sectionCollapsable = false;
   let sectionCollapsed = false;
+
+  // List editor
+
+  let percentagesMode = false;
+  let mode: 'list' | 'percentages' = 'list';
+  $: mode = percentagesMode ? 'percentages' : 'list';
+  let allowEthAddresses = true;
+  let allowProjects = true;
+  let allowDripLists = true;
+  $: allowedItems = [
+    allowEthAddresses ? 'eth-addresses' : undefined,
+    allowProjects ? 'projects' : undefined,
+    allowDripLists ? 'drip-lists' : undefined,
+  ].filter((x) => x !== undefined) as ('eth-addresses' | 'projects' | 'drip-lists')[];
 </script>
 
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>List Editor</h2>
+  <div>
+    <input id="percentages-mode-checkbox" type="checkbox" bind:checked={percentagesMode} />
+    <label for="percentages-mode-checkbox">Percentages mode</label>
+  </div>
+  <div>
+    <input id="allow-eth-addresses-checkbox" type="checkbox" bind:checked={allowEthAddresses} />
+    <label for="allow-eth-addresses-checkbox">Allow ETH addresses</label>
+  </div>
+  <div>
+    <input id="allow-projects-checkbox" type="checkbox" bind:checked={allowProjects} />
+    <label for="allow-projects-checkbox">Allow projects</label>
+  </div>
+  <div>
+    <input id="allow-drip-lists-checkbox" type="checkbox" bind:checked={allowDripLists} />
+    <label for="allow-drip-lists-checkbox">Allow drip lists</label>
+  </div>
+  <ListEditor items={{}} bind:mode bind:allowedItems />
+</div>
 
 <div class="showcase-item">
   <h2>Highlight</h2>

@@ -19,7 +19,7 @@
   import DripListService from '$lib/utils/driplist/DripListService';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../create-drip-list-flow';
-  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
   import streamsStore from '$lib/stores/streams/streams.store';
   import Pause from 'radicle-design-system/icons/Pause.svelte';

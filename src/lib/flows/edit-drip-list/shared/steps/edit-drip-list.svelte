@@ -72,9 +72,9 @@
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { Utils } from 'radicle-drips';
-  import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
-  import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
-  import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
+  import projectItem from '$lib/components/list-editor/item-templates/project';
+  import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
+  import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import DripListEditor, {
     type DripListConfig,
@@ -90,7 +90,7 @@
   import {
     DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT,
     DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT,
-  } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  } from '$lib/components/list-editor/list-editor.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

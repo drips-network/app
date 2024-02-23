@@ -8,11 +8,8 @@
 </script>
 
 <script lang="ts">
-  import type {
-    Items,
-    Percentages,
-  } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
-  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import TextArea from '../text-area/text-area.svelte';

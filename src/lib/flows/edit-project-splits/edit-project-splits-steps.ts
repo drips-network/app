@@ -3,7 +3,7 @@ import {
   DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT,
   type ListEditorConfig,
   type ListItem,
-} from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+} from '$lib/components/list-editor/list-editor.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
@@ -12,9 +12,9 @@ import EditDependencyList from './steps/edit-dependency-list.svelte';
 import Review from './steps/review.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
-import dripListItem from '$lib/components/drip-list-members-editor/item-templates/drip-list';
-import projectItem from '$lib/components/drip-list-members-editor/item-templates/project';
+import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
+import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
+import projectItem from '$lib/components/list-editor/item-templates/project';
 import { gql } from 'graphql-request';
 import type {
   EditProjectSplitsFlowAddressReceiverFragment,
@@ -59,7 +59,7 @@ type SplitReceiver =
 type Splits = {
   maintainers: EditProjectSplitsFlowAddressReceiverFragment[];
   dependencies: SplitReceiver[];
-}
+};
 
 export interface State {
   projectAccountId: string;
