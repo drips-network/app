@@ -27,7 +27,7 @@ export default function aggregateFiatEstimate(
         return sum;
       }
 
-      const res = fiatEstimates.convert({ amount, tokenAddress }, token.info.decimals);
+      const res = fiatEstimates.convert({ amount, tokenAddress }, token.info.decimals, priceStore);
 
       if (res === 'unsupported') {
         includesUnknownPrice = true;

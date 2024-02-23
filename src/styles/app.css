@@ -1,3 +1,10 @@
+@import 'tailwind.css';
+@import 'reset.css';
+@import 'global.css';
+@import 'colors.css';
+@import 'elevation.css';
+@import 'typography.css';
+
 html.smoothscroll {
   scroll-behavior: smooth;
 }
