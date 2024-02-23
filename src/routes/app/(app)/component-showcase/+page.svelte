@@ -98,6 +98,8 @@
 
   // Splits
 
+  let draftMode = false;
+
   const MOCK_PROJECT_1: Project = {
     __typename: 'ClaimedProject',
     support: [],
@@ -458,7 +460,11 @@
 
 <div class="showcase-item">
   <h2>Splits</h2>
-  <SplitsComponent list={mockSplits} />
+  <div>
+    <input id="splits-draft-mode" type="checkbox" bind:checked={draftMode} />
+    <label for="splits-draft-mode">Draft</label>
+  </div>
+  <SplitsComponent list={mockSplits} draft={draftMode} />
 </div>
 
 <div class="showcase-item" style="max-width: 16rem">

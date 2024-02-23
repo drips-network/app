@@ -156,6 +156,8 @@
   /** Set to false to hide the chevron next to split groups. */
   export let groupsExpandable = true;
 
+  export let draft = false;
+
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
     list.sort((a, b) => {
@@ -195,6 +197,7 @@
         {linkToNewTab}
         isNested={isGroup}
         split={listItem}
+        {draft}
       />
     </li>
   {/each}
