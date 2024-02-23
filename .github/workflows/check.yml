@@ -1,13 +1,11 @@
 name: Run svelte-check
 on:
   workflow_dispatch:
-  pull_request_target:
-    types: [labeled]
+  pull_request:
 
 jobs:
   svelte-check:
     runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'safe to test' }}
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -27,18 +25,17 @@ jobs:
       - name: Populate .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
-          envkey_PINATA_SDK_KEY: ${{ secrets.PINATA_SDK_KEY }}
-          envkey_PINATA_SDK_SECRET: ${{ secrets.PINATA_SDK_SECRET }}
-          envkey_TENDERLY_ACCESS_SECRET: ${{ secrets.TENDERLY_ACCESS_SECRET }}
-          envkey_TENDERLY_PROJECT: ${{ secrets.TENDERLY_PROJECT }}
-          envkey_TENDERLY_USER: ${{ secrets.TENDERLY_USER }}
-          envkey_GELATO_API_KEY: ${{ secrets.GELATO_API_KEY }}
-          envkey_COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
+          envkey_PINATA_SDK_KEY: 1234
+          envkey_PINATA_SDK_SECRET: 1234
+          envkey_TENDERLY_ACCESS_SECRET: 1234
+          envkey_TENDERLY_PROJECT: 1234
+          envkey_TENDERLY_USER: 1234
+          envkey_GELATO_API_KEY: 1234
+          envkey_COINMARKETCAP_API_KEY: 1234
           envkey_PUBLIC_NETWORK: 5
           envkey_GQL_URL: https://drips-api-mainnet-s1.up.railway.app/
-          envkey_GQL_ACCESS_TOKEN: ${{ secrets.GQL_ACCESS_TOKEN }}
+          envkey_GQL_ACCESS_TOKEN: afdb8b7e-8fa7-4de9-bd95-b650b839e745 # public token
           envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
-          envkey_GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB }}
 
       - name: Install dependencies
         run: npm ci
