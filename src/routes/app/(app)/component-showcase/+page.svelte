@@ -39,6 +39,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
+  import ButtonWithLabelProp from '$lib/components/button/props-only-button.svelte';
 
   // Button
   let disabled = false;
@@ -329,7 +330,12 @@
 
 <div class="showcase-item">
   <h2>Date input</h2>
-  <DateInput timePrecision="minute" format="yyyy-MM-dd HH:mm" placeholder="yyyy-MM-dd HH:mm" />
+  <DateInput
+    value={new Date()}
+    timePrecision="minute"
+    format="yyyy-MM-dd HH:mm"
+    placeholder="yyyy-MM-dd HH:mm"
+  />
 </div>
 
 <div class="showcase-item">
@@ -350,7 +356,27 @@
     <input id="allow-drip-lists-checkbox" type="checkbox" bind:checked={allowDripLists} />
     <label for="allow-drip-lists-checkbox">Allow drip lists</label>
   </div>
-  <ListEditor items={{}} bind:mode bind:allowedItems />
+  <ListEditor
+    items={{
+      '1': {
+        type: 'address',
+        address: '0x1234',
+        rightComponent: {
+          component: ButtonWithLabelProp,
+          props: {
+            buttonProps: {
+              variant: 'ghost',
+              icon: UserIcon,
+            },
+            onClick: () => alert('right action button clicked'),
+            label: 'Example item right component',
+          },
+        },
+      },
+    }}
+    bind:mode
+    bind:allowedItems
+  />
 </div>
 
 <div class="showcase-item">

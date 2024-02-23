@@ -13,19 +13,27 @@
     }
   `;
 
+  interface ComponentAndProps {
+    component: ComponentType;
+    props: Record<string, unknown>;
+  }
+
   interface ProjectItem {
     type: 'project';
     project: DripListMembersEditorProjectFragment;
+    rightComponent?: ComponentAndProps;
   }
 
   interface EthAddressItem {
     type: 'address';
     address: string;
+    rightComponent?: ComponentAndProps;
   }
 
   interface DripListItem {
     type: 'drip-list';
     list: DripListMembersEditorDripListFragment;
+    rightComponent?: ComponentAndProps;
   }
 
   export type ListItem = DripListItem | EthAddressItem | ProjectItem;
@@ -44,7 +52,7 @@
   import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
   import { fade, scale } from 'svelte/transition';
   import Button from '$lib/components/button/button.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, type ComponentType } from 'svelte';
   import { getAddress, isAddress } from 'ethers/lib/utils';
   import Plus from 'radicle-design-system/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
@@ -510,6 +518,12 @@
                     on:confirm={() => {
                       autoSplitEnabled = false;
                     }}
+                  />
+                {/if}
+                {#if item.rightComponent}
+                  <svelte:component
+                    this={item.rightComponent.component}
+                    {...item.rightComponent.props}
                   />
                 {/if}
                 <Button
