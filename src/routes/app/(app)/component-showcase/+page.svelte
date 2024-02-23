@@ -38,6 +38,7 @@
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import DateInput from '$lib/components/date-picker/DateInput.svelte';
 
   // Button
   let disabled = false;
@@ -323,6 +324,11 @@
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Date input</h2>
+  <DateInput timePrecision="minute" format="yyyy-MM-dd HH:mm" placeholder="yyyy-MM-dd HH:mm" />
+</div>
 
 <div class="showcase-item">
   <h2>List Editor</h2>
