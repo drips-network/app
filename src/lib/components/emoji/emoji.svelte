@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DesignSystemEmoji from './emoji-radicle-system.svelte';
+  import twemoji from 'twemoji';
   import type { ComponentType } from 'svelte';
   import { CUSTOM_EMOJI_COMPONENTS } from './emoji';
 
@@ -24,7 +24,12 @@
   {#if customEmoji}
     <svelte:component this={customEmoji} size={sizePx} />
   {:else}
-    <DesignSystemEmoji {emoji} {size} />
+    {@html twemoji.parse(emoji, {
+      className: `twemoji ${size}`,
+      base: '',
+      folder: '/twemoji',
+      ext: '.svg',
+    })}
   {/if}
 </div>
 
@@ -33,5 +38,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  :global(.twemoji.small) {
+    height: 0.75rem;
+    width: 0.75rem;
+  }
+
+  :global(.twemoji.regular) {
+    height: 1rem;
+    width: 1rem;
+  }
+
+  :global(.twemoji.large) {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  :global(.twemoji.huge) {
+    height: 3rem;
+    width: 3rem;
+  }
+
+  :global(.twemoji.massive) {
+    height: 4rem;
+    width: 4rem;
   }
 </style>
