@@ -66,8 +66,9 @@
     try {
       validationState = { type: 'pending' };
 
-      if (!$context.gitUrl.startsWith('http://') && !$context.gitUrl.startsWith('https://')) {
-        $context.gitUrl = 'https://' + $context.gitUrl;
+      // format URL with "https://" (add, or replace "http://" since API error)
+      if (!/^https:\/\//.test($context.gitUrl)) {
+        $context.gitUrl = 'https://' + $context.gitUrl.replace(/^http:\/\//, '');
       }
 
       // if url ends with /, remove it
