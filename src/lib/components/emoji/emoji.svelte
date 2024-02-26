@@ -1,7 +1,7 @@
 <script lang="ts">
-  import twemoji from 'twemoji';
   import type { ComponentType } from 'svelte';
   import { CUSTOM_EMOJI_COMPONENTS } from './emoji';
+  import twemoji from '$lib/utils/twemoji';
 
   export let emoji: string;
   export let size: 'small' | 'regular' | 'large' | 'huge' | 'massive';
@@ -24,11 +24,7 @@
   {#if customEmoji}
     <svelte:component this={customEmoji} size={sizePx} />
   {:else}
-    {@html twemoji.parse(emoji, {
-      className: `twemoji`,
-      base: '',
-      folder: '/twemoji',
-      ext: '.svg',
+    {@html twemoji(emoji, {
       attributes: () => ({
         width: sizePx + 'px',
       }),

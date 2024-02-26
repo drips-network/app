@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
   import { gql } from 'graphql-request';
   import type { ProjectAvatarFragment } from './__generated__/gql.generated';
-  import sanitize from 'sanitize-html';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
     fragment ProjectAvatar on Project {
@@ -23,12 +22,12 @@
 <script lang="ts">
   import GithubIcon from '$lib/components/icons/Github.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
-  import twemoji from 'twemoji';
   import isClaimed from '$lib/utils/project/is-claimed';
   import Question from '$lib/components/icons/Question.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import twemoji from '$lib/utils/twemoji';
 
   export let project: ProjectAvatarFragment;
 
@@ -50,13 +49,7 @@
 
   $: emojiElem =
     isClaimed(project) && project.avatar.__typename === 'EmojiAvatar'
-      ? twemoji.parse(
-          sanitize(project.avatar.emoji, {
-            allowedTags: [],
-            allowedAttributes: {},
-          }),
-          { folder: 'svg', ext: '.svg' },
-        )
+      ? twemoji(project.avatar.emoji)
       : undefined;
 
   let customImageEl: HTMLImageElement | undefined = undefined;
