@@ -83,7 +83,7 @@
       // If the normalized URL is different from the original URL in lowercase, it means that the repo has likely
       // been renamed on GitHub. In this case, we should let the user claim the outdated project too.
       // In all other cases, we use the normalized URL to fix casing mismatches.
-      if (normalizedUrl.toLowerCase() === $context.gitUrl.toLowerCase()) {
+      if (normalizedUrl?.toLowerCase() === $context.gitUrl.toLowerCase()) {
         $context.gitUrl = normalizedUrl;
       } else {
         claimingRenamedRepoOriginalName = normalizedUrl;
