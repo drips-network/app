@@ -97,7 +97,6 @@
     background-color: var(--color-background);
     transition: box-shadow 0.3s, background-color 0.5s;
     display: flex;
-    /* gap: 0.5rem; */
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
