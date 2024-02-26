@@ -9,6 +9,7 @@
   import Spinner from 'radicle-design-system/Spinner.svelte';
   import { createEventDispatcher, type ComponentType } from 'svelte';
   import Cross from 'radicle-design-system/icons/Cross.svelte';
+  import Button from '../button/button.svelte';
 
   const dispatch = createEventDispatcher<{ clear: never }>();
 
@@ -63,6 +64,7 @@
   function clear() {
     value = '';
     dispatch('clear');
+    return inputElement?.focus();
   }
 
   let rightContainerWidth: number;
@@ -107,9 +109,7 @@
     {/if}
 
     {#if showClearButton}
-      <button style="color: var(--color-foreground); margin: 0 0.75rem;" on:click={clear}>
-        <Cross />
-      </button>
+      <Button icon={Cross} variant="ghost" on:click={clear} />
     {/if}
 
     {#if suffix}
@@ -122,11 +122,11 @@
     {/if}
 
     {#if validationState.type === 'pending'}
-      <Spinner style="margin: 0 0.75rem;" />
+      <Spinner style="margin-right: 0.5rem" />
     {:else if showSuccessCheck && validationState.type === 'valid'}
-      <CheckCircleIcon style="fill: var(--color-positive); margin: 0 0.5rem;" />
+      <CheckCircleIcon style="fill: var(--color-positive); margin-right:0.5rem" />
     {:else if validationState.type === 'invalid'}
-      <ExclamationCircleIcon style="fill: var(--color-negative); margin: 0 0.5rem;" />
+      <ExclamationCircleIcon style="fill: var(--color-negative); margin-right:0.5rem " />
     {/if}
   </div>
 
@@ -178,10 +178,12 @@
   .right-container {
     align-items: center;
     display: flex;
+    gap: 0.25rem;
     height: 3rem;
     position: absolute;
-    right: 0;
     top: 0;
+    right: 0;
+    padding: 0 0.25rem 0 0.5rem;
   }
 
   .concealed {

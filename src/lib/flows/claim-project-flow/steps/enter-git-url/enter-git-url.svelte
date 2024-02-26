@@ -38,6 +38,7 @@
   import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import possibleColors from '$lib/utils/project/possible-colors';
+  import MagnifyingGlass from 'radicle-design-system/icons/MagnifyingGlass.svelte';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -172,24 +173,16 @@
   headline="Claim your project"
   description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
-  <div class="input" on:keydown={(e) => e.key === 'Enter' && submitInput()}>
-    <TextInput
-      bind:value={$context.gitUrl}
-      icon={LinkIcon}
-      placeholder="Paste your GitHub project URL"
-      disabled={validationState.type === 'valid' || validationState.type === 'pending'}
-      {validationState}
-      showClearButton={validationState.type === 'valid' || validationState.type === 'invalid'}
-      on:clear={clearProject}
-    />
-    <div class="submit-button">
-      <Button
-        disabled={!inputSubmittable}
-        variant={inputSubmittable ? 'primary' : undefined}
-        on:click={submitInput}>Search</Button
-      >
-    </div>
-  </div>
+  <TextInput
+    bind:value={$context.gitUrl}
+    icon={LinkIcon}
+    placeholder="Paste your GitHub project URL"
+    disabled={validationState.type === 'pending'}
+    {validationState}
+    showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
+    on:clear={clearProject}
+    on:keydown={(e) => e.key === 'Enter' && submitInput()}
+  />
   {#if $context.project && validationState.type === 'valid'}
     <UnclaimedProjectCard
       project={$context.project}
@@ -209,20 +202,17 @@
     {/if}
   {/if}
   <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRightIcon}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
+    {#if formValid}
+      <Button icon={ArrowRightIcon} variant="primary" on:click={() => dispatch('goForward')}
+        >Continue</Button
+      >
+    {:else}
+      <Button
+        disabled={validationState.type === 'pending'}
+        icon={MagnifyingGlass}
+        variant="primary"
+        on:click={() => submitInput()}>Search</Button
+      >
+    {/if}
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-  .input {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-end;
-  }
-</style>
