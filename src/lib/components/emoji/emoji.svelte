@@ -25,10 +25,13 @@
     <svelte:component this={customEmoji} size={sizePx} />
   {:else}
     {@html twemoji.parse(emoji, {
-      className: `twemoji ${size}`,
+      className: `twemoji`,
       base: '',
       folder: '/twemoji',
       ext: '.svg',
+      attributes: () => ({
+        width: sizePx + 'px',
+      }),
     })}
   {/if}
 </div>
@@ -38,30 +41,5 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  :global(.twemoji.small) {
-    height: 0.75rem;
-    width: 0.75rem;
-  }
-
-  :global(.twemoji.regular) {
-    height: 1rem;
-    width: 1rem;
-  }
-
-  :global(.twemoji.large) {
-    height: 2rem;
-    width: 2rem;
-  }
-
-  :global(.twemoji.huge) {
-    height: 3rem;
-    width: 3rem;
-  }
-
-  :global(.twemoji.massive) {
-    height: 4rem;
-    width: 4rem;
   }
 </style>
