@@ -202,7 +202,7 @@
       <div
         role="option"
         aria-selected={selected.includes(slug)}
-        class="item flex items-start p-3 select-none"
+        class="item flex items-center p-3 select-none"
         class:selected={selected.includes(slug)}
         class:disabled={isItemDisabled(slug)}
         class:hidden={!Object.values(filteredItems).includes(item)}
