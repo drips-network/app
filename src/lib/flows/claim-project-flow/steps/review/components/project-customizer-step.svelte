@@ -4,7 +4,7 @@
   import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import { createEventDispatcher } from 'svelte';
   import { get, type Writable } from 'svelte/store';
   import type { State } from '../../../claim-project-flow';

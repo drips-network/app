@@ -1,7 +1,7 @@
 <script lang="ts">
-  import DesignSystemEmoji from 'radicle-design-system/Emoji.svelte';
   import type { ComponentType } from 'svelte';
   import { CUSTOM_EMOJI_COMPONENTS } from './emoji';
+  import twemoji from '$lib/utils/twemoji';
 
   export let emoji: string;
   export let size: 'small' | 'regular' | 'large' | 'huge' | 'massive';
@@ -24,8 +24,11 @@
   {#if customEmoji}
     <svelte:component this={customEmoji} size={sizePx} />
   {:else}
-    <!-- Design System Emoji doesnʼt support "massive" size, so we fall back to "huge". -->
-    <DesignSystemEmoji {emoji} size={size === 'massive' ? 'huge' : size} />
+    {@html twemoji(emoji, {
+      attributes: () => ({
+        width: sizePx + 'px',
+      }),
+    })}
   {/if}
 </div>
 

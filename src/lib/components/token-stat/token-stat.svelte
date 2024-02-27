@@ -1,5 +1,5 @@
 <script lang="ts">
-  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
 
   export let title: string;

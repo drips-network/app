@@ -1,9 +1,9 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import LinkIcon from 'radicle-design-system/icons/Link.svelte';
-  import ShareIcon from 'radicle-design-system/icons/Sharrow.svelte';
-  import CopyIcon from 'radicle-design-system/icons/Copy.svelte';
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
+  import LinkIcon from '$lib/components/icons/Link.svelte';
+  import ShareIcon from '$lib/components/icons/Sharrow.svelte';
+  import CopyIcon from '$lib/components/icons/Copy.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import { fade } from 'svelte/transition';
 
   export let text: string | undefined = undefined;

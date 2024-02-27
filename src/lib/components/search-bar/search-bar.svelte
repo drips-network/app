@@ -1,6 +1,6 @@
 <script lang="ts">
-  import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
-  import CloseIcon from 'radicle-design-system/icons/CrossSmall.svelte';
+  import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
+  import CloseIcon from '$lib/components/icons/CrossSmall.svelte';
 
   import { createEventDispatcher, onMount } from 'svelte';
   import { sineIn, sineInOut, sineOut } from 'svelte/easing';

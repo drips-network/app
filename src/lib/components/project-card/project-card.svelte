@@ -25,10 +25,12 @@
 
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
-  import Github from 'radicle-design-system/icons/Github.svelte';
+  import Github from '$lib/components/icons/Github.svelte';
 
   import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
-  import ProjectName, { PROJECT_NAME_FRAGMENT } from '../project-badge/components/project-name.svelte';
+  import ProjectName, {
+    PROJECT_NAME_FRAGMENT,
+  } from '../project-badge/components/project-name.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
@@ -36,7 +38,10 @@
   export let project: ProjectCardFragment;
 </script>
 
-<a class="wrapper" href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}>
+<a
+  class="wrapper"
+  href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
+>
   <div class="project-card">
     <div
       class="background"

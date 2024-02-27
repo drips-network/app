@@ -2,8 +2,8 @@
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import ProjectCard, { PROJECT_CARD_FRAGMENT } from '../project-card/project-card.svelte';
   import assert from '$lib/utils/assert';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
-  import Box from 'radicle-design-system/icons/Box.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '../section/section.svelte';
   import query from '$lib/graphql/dripsQL';

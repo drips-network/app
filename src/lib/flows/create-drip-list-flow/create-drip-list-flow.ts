@@ -14,7 +14,7 @@ import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-
 import ConnectWalletStep from './steps/connect-wallet/connect-wallet.svelte';
 import ChooseSupportTypeStep from './steps/choose-support-type/choose-support-type.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
-import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+import DripListIcon from '$lib/components/icons/DripList.svelte';
 import ConfigureOneTimeDonation from './steps/configure-one-time-donation/configure-one-time-donation.svelte';
 
 export interface State {

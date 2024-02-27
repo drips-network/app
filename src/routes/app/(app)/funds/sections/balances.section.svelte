@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TokensIcon from 'radicle-design-system/icons/Coin.svelte';
+  import TokensIcon from '$lib/components/icons/Coin.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
@@ -14,7 +14,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import tokens from '$lib/stores/tokens';
   import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
