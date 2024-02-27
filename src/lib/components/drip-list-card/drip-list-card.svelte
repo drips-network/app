@@ -32,19 +32,6 @@
       }
     }
   `;
-
-  export const DRIP_LIST_CARD_PROJECT_SUPPORTER_FRAGMENT = gql`
-    fragment DripListCardRepresentationalProjectSupporter on Project {
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-        owner {
-          address
-        }
-      }
-    }
-  `;
 </script>
 
 <script lang="ts">
@@ -147,6 +134,7 @@
   export let inVoting: boolean = browser
     ? new URL(window.location.href).searchParams.get('tabs') !== null
     : false;
+
   let activeTab = 'tab-1';
 </script>
 

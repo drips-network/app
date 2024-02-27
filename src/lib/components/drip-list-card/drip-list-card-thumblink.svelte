@@ -30,19 +30,6 @@
       }
     }
   `;
-
-  export const DRIP_LIST_CARD_PROJECT_SUPPORTER_FRAGMENT = gql`
-    fragment DripListCardRepresentationalProjectSupporter on Project {
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-        owner {
-          address
-        }
-      }
-    }
-  `;
 </script>
 
 <script lang="ts">
