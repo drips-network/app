@@ -1,6 +1,6 @@
 <script lang="ts">
-  import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
-  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   export let type: 'warning' | 'info' = 'warning';
   export let size: 'normal' | 'small' = 'normal';
 </script>

@@ -39,7 +39,7 @@
 </script>
 
 <script lang="ts">
-  import Heart from 'radicle-design-system/icons/Heart.svelte';
+  import Heart from '$lib/components/icons/Heart.svelte';
   import SectionHeader from '../section-header/section-header.svelte';
   import SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';

@@ -9,7 +9,6 @@ module.exports = {
         'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
       },
       colors: {
-        // radicle-design-system - colors.css
         'primary': 'var(--color-primary)',
         'primary-level-1': 'var(--color-primary-level-1)',
         'primary-level-2': 'var(--color-primary-level-2)',
@@ -39,7 +38,7 @@ module.exports = {
         mono: 'var(--typeface-mono-regular), monospace',
       },
       fontSize: {
-        // radicle-design-system - typography.css
+        // from typography.css
         'typo-header-1': '36px',
         'typo-header-2': '24px',
         'typo-header-3': '20px',

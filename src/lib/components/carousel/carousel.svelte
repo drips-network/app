@@ -29,7 +29,7 @@
 </script>
 
 <script lang="ts">
-  import ArrowUp from 'radicle-design-system/icons/ArrowUp.svelte';
+  import ArrowUp from '$lib/components/icons/ArrowUp.svelte';
 
   export let items: CarouselItems;
   $: resolvedItems = items.map((someCarouselItem) => someCarouselItem((i) => i));

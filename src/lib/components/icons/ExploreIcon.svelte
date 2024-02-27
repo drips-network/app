@@ -1,5 +1,5 @@
 <script lang="ts">
-  import IconWrapper from 'radicle-design-system/icons/IconWrapper.svelte';
+  import IconWrapper from '$lib/components/icons/IconWrapper.svelte';
 
   export let style: string | undefined = undefined;
 </script>

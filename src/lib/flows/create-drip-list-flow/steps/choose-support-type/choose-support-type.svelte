@@ -1,19 +1,19 @@
 <script lang="ts">
   import TwoBigOptions from '$lib/components/two-big-options/two-big-options.svelte';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import Pause from 'radicle-design-system/icons/Pause.svelte';
-  import Transactions from 'radicle-design-system/icons/Transactions.svelte';
-  import Coin from 'radicle-design-system/icons/Coin.svelte';
-  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
+  import Pause from '$lib/components/icons/Pause.svelte';
+  import Transactions from '$lib/components/icons/Transactions.svelte';
+  import Coin from '$lib/components/icons/Coin.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
   import unreachable from '$lib/utils/unreachable';
-  import Heart from 'radicle-design-system/icons/Heart.svelte';
+  import Heart from '$lib/components/icons/Heart.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

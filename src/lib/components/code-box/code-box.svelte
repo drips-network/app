@@ -1,8 +1,8 @@
 <script lang="ts">
   import getContrastColor from '$lib/utils/get-contrast-text-color';
-  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
-  import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
-  import CopyIcon from 'radicle-design-system/icons/Copy.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import CheckIcon from '$lib/components/icons/CheckCircle.svelte';
+  import CopyIcon from '$lib/components/icons/Copy.svelte';
   import Button from '../button/button.svelte';
   import sanitize from 'sanitize-html';
 

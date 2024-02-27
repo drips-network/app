@@ -1,4 +1,4 @@
-import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+import type { TextInputValidationState } from '$lib/components/text-input/text-input';
 
 function parse(input: string): { h: number; m: number; s: number } {
   const date = new Date(`January 1, 1970 ${input} UTC`);

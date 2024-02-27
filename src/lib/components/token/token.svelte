@@ -2,8 +2,8 @@
   import tokens from '$lib/stores/tokens';
   import { convertIpfsUri } from '$lib/utils/ipfs';
   import seededRandomElement from '$lib/utils/seeded-random-element';
-  import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
-  import QuestionIcon from 'radicle-design-system/icons/Question.svelte';
+  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
+  import QuestionIcon from '$lib/components/icons/Question.svelte';
   import { onMount } from 'svelte';
   import CoinAnimation from '../coin-animation/coin-animation.svelte';
   import FitText from '../fit-text/fit-text.svelte';

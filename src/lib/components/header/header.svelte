@@ -3,8 +3,8 @@
   import ConnectButton from '../connect-button/connect-button.svelte';
   import SearchBar from '../search-bar/search-bar.svelte';
   import DripsLogo from '././drips-logo.svelte';
-  import SettingsIcon from 'radicle-design-system/icons/Settings.svelte';
-  import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
+  import SettingsIcon from '$lib/components/icons/Settings.svelte';
+  import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import { fade, fly } from 'svelte/transition';
   import { quadInOut, sineInOut } from 'svelte/easing';
   import Spinner from '../spinner/spinner.svelte';

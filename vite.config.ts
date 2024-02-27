@@ -24,7 +24,7 @@ const config = defineConfig({
     target: 'es2020',
   },
   optimizeDeps: {
-    exclude: ['radicle-design-system'],
+    exclude: [],
     esbuildOptions: {
       target: 'es2020',
     },

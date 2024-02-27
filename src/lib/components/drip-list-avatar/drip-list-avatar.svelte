@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
 
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
