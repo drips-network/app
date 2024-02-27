@@ -2,7 +2,7 @@
   import scroll from '$lib/stores/scroll';
   import ConnectButton from '../connect-button/connect-button.svelte';
   import SearchBar from '../search-bar/search-bar.svelte';
-  import DripsLogo from '././drips-logo.svelte';
+  import DripsLogo from '$lib/components/illustrations/logo.svelte';
   import SettingsIcon from '$lib/components/icons/Settings.svelte';
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import { fade, fly } from 'svelte/transition';
@@ -28,7 +28,7 @@
 >
   {#if !$walletStore.connected || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
     <a aria-label="Go to explore page" href={'/app'}>
-      <div class="logo">
+      <div class="logo flex items-center pb-px">
         <DripsLogo />
       </div>
       {#if showLoadingIndicator}
@@ -100,6 +100,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
+    gap: 0.5rem;
   }
 
   .logo {
@@ -118,7 +119,7 @@
 
   .right {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
     align-items: center;
     transition: opacity 0.3s;
   }
@@ -129,7 +130,6 @@
 
   .header-buttons {
     display: flex;
-    gap: 0.25rem;
   }
 
   .header-buttons > .header-button {
