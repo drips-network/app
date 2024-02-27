@@ -21,11 +21,7 @@
   let collectButtonPeeking: boolean;
 </script>
 
-<header
-  class:elevated
-  class:search-mode={searchMode}
-  class:is-testnet={$walletStore.network.chainId !== 1}
->
+<header class:elevated class:search-mode={searchMode}>
   {#if !$walletStore.connected || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
     <a aria-label="Go to explore page" href={'/app'}>
       <div class="logo flex items-center pb-px">
@@ -182,12 +178,6 @@
     .collect.mobile {
       position: absolute;
       z-index: 10;
-    }
-  }
-
-  @media (max-width: 440px) {
-    .is-testnet .logo {
-      height: 0.6rem;
     }
   }
 </style>
