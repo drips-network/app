@@ -1,8 +1,8 @@
 <script lang="ts">
-  import X from 'radicle-design-system/icons/X.svelte';
-  import Web from 'radicle-design-system/icons/Globe.svelte';
-  import Ethereum from 'radicle-design-system/icons/Ethereum.svelte';
-  import Github from 'radicle-design-system/icons/Github.svelte';
+  import X from '$lib/components/icons/X.svelte';
+  import Web from '$lib/components/icons/Globe.svelte';
+  import Ethereum from '$lib/components/icons/Ethereum.svelte';
+  import Github from '$lib/components/icons/Github.svelte';
   import type { ComponentType } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import formatAddress from '$lib/utils/format-address';

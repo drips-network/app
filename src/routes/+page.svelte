@@ -7,8 +7,8 @@
   import { onMount } from 'svelte';
   import LpHero from '$lib/components/illustrations/lp-hero.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Globe from 'radicle-design-system/icons/Globe.svelte';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import Globe from '$lib/components/icons/Globe.svelte';
+  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import LpInterstitialIllustration1 from '$lib/components/illustrations/lp-interstitial-illustration-1.svelte';
   import LpDripListIllustration from '$lib/components/illustrations/lp-drip-list-illustration.svelte';

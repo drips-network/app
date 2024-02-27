@@ -2,8 +2,8 @@
   import type { ComponentType } from 'svelte';
   import Button from '../button/button.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
-  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
-  import ChevronUp from 'radicle-design-system/icons/ChevronUp.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
+  import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 
   export let icon: ComponentType | undefined = undefined;
   export let label: string;

@@ -2,10 +2,10 @@
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import Setting from './components/setting.svelte';
-  import ListIcon from 'radicle-design-system/icons/Ledger.svelte';
+  import ListIcon from '$lib/components/icons/Ledger.svelte';
   import themeStore from '$lib/stores/theme/theme.store';
   import Button from '$lib/components/button/button.svelte';
-  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
+  import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import amtDeltaUnitStore from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
   import Toggle from '$lib/components/toggle/toggle.svelte';

@@ -2,11 +2,11 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../edit-project-splits-steps';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
-  import User from 'radicle-design-system/icons/User.svelte';
-  import Splits from 'radicle-design-system/icons/Splits.svelte';
+  import User from '$lib/components/icons/User.svelte';
+  import Splits from '$lib/components/icons/Splits.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
-  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';

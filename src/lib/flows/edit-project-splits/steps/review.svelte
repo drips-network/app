@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { Writable } from 'svelte/store';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';

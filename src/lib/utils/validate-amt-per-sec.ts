@@ -1,5 +1,5 @@
 import { constants } from 'radicle-drips';
-import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+import type { TextInputValidationState } from '$lib/components/text-input/text-input';
 
 /**
  * Constant representation of Drips's cycle_secs value. This value

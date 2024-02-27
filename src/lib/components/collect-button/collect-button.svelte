@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-  import Download from 'radicle-design-system/icons/Download.svelte';
+  import Download from '$lib/components/icons/Download.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { onMount, tick } from 'svelte';
   import { browser } from '$app/environment';

@@ -2,7 +2,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import unreachable from '$lib/utils/unreachable';
   import fuzzysort from 'fuzzysort';
-  import EyeClosed from 'radicle-design-system/icons/EyeClosed.svelte';
+  import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
   import type search from '../search';
   import Result from './result.svelte';
 

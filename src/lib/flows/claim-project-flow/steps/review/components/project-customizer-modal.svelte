@@ -3,7 +3,7 @@
   import type { ProjectCustomizerFragment } from '$lib/components/project-customizer/__generated__/gql.generated';
   import ProjectCustomizer from '$lib/components/project-customizer/project-customizer.svelte';
   import modal from '$lib/stores/modal';
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import type { Writable } from 'svelte/store';
 
   export let project: Writable<ProjectCustomizerFragment>;

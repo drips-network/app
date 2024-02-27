@@ -11,16 +11,16 @@
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { createEventDispatcher } from 'svelte';
   import { makeStep, type StepComponentEvents } from '$lib/components/stepper/types';
-  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
-  import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
-  import EyeOpenIcon from 'radicle-design-system/icons/EyeOpen.svelte';
-  import TokenStreamsIcon from 'radicle-design-system/icons/TokenStreams.svelte';
+  import SplitsIcon from '$lib/components/icons/Splits.svelte';
+  import EyeOpenIcon from '$lib/components/icons/EyeOpen.svelte';
+  import TokenStreamsIcon from '$lib/components/icons/TokenStreams.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
   import ProjectProfileHeader, {
     PROJECT_PROFILE_HEADER_FRAGMENT,
@@ -31,13 +31,13 @@
   import type { State } from '../../claim-project-flow';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
-  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
+  import PenIcon from '$lib/components/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
   import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
   import { gql } from 'graphql-request';
-  import Download from 'radicle-design-system/icons/Download.svelte';
+  import Download from '$lib/components/icons/Download.svelte';
   import ProjectCustomizerStep from './components/project-customizer-step.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();

@@ -2,7 +2,7 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import ens from '$lib/stores/ens';
   import { ethers } from 'ethers';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import { createEventDispatcher } from 'svelte';
 
   export let value: string | undefined = undefined;

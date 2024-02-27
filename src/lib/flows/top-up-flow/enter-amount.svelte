@@ -7,7 +7,7 @@
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import unreachable from '$lib/utils/unreachable';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';

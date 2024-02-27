@@ -1,6 +1,6 @@
 <script lang="ts">
-  import FileIcon from 'radicle-design-system/icons/File.svelte';
-  import CheckIcon from 'radicle-design-system/icons/CheckCircle.svelte';
+  import FileIcon from '$lib/components/icons/File.svelte';
+  import CheckIcon from '$lib/components/icons/CheckCircle.svelte';
   import Button from '../button/button.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { createEventDispatcher } from 'svelte';

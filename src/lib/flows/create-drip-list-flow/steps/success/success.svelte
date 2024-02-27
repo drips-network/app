@@ -4,7 +4,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import { onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';

@@ -1,11 +1,11 @@
 <script lang="ts">
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Check from 'radicle-design-system/icons/Check.svelte';
+  import Check from '$lib/components/icons/Check.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import ArrowLeftIcon from 'radicle-design-system/icons/ArrowLeft.svelte';
+  import ArrowLeftIcon from '$lib/components/icons/ArrowLeft.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
   import SupportStreamEditor from '$lib/components/support-stream-editor/support-stream-editor.svelte';
