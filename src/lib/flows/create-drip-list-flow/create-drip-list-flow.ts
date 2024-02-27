@@ -118,10 +118,12 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = (state: Writable<State>, skipWalletConnect = false) => [
+export const steps = (state: Writable<State>, skipWalletConnect = false, isModal = false) => [
   makeStep({
     component: BuildListStep,
-    props: undefined,
+    props: {
+      canCancel: isModal,
+    },
   }),
   ...(skipWalletConnect
     ? []
