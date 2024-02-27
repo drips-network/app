@@ -10,7 +10,7 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import { navigating } from '$app/stores';
   import LegalLinks from '../legal-links/legal-links.svelte';
-  import Settings from 'radicle-design-system/icons/Settings.svelte';
+  import Settings from '$lib/components/icons/Settings.svelte';
 
   $: $navigating && cupertinoPaneStore.closeSheet();
 
