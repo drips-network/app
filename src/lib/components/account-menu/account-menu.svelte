@@ -10,6 +10,7 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import { navigating } from '$app/stores';
   import LegalLinks from '../legal-links/legal-links.svelte';
+  import Settings from '$lib/components/icons/Settings.svelte';
 
   $: $navigating && cupertinoPaneStore.closeSheet();
 
@@ -66,12 +67,17 @@
       </div>
     {/if}
     <Divider sideMargin={0.5} />
-    <AccountMenuItem
-      icon={UserIcon}
-      href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
-    >
-      <svelte:fragment slot="title">Profile</svelte:fragment>
-    </AccountMenuItem>
+    <div class="flex flex-col">
+      <AccountMenuItem
+        icon={UserIcon}
+        href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
+      >
+        <svelte:fragment slot="title">Profile</svelte:fragment>
+      </AccountMenuItem>
+      <AccountMenuItem icon={Settings} href="/app/settings">
+        <svelte:fragment slot="title">Settings</svelte:fragment>
+      </AccountMenuItem>
+    </div>
     <Divider sideMargin={0.5} />
     <LegalLinks />
   {/if}
