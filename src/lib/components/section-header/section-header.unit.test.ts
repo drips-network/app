@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
+import ThumbsUp from '$lib/components/icons/ThumbsUp.svelte';
 import SectionHeader from './section-header.svelte';
 
 describe('section-header.svelte', () => {

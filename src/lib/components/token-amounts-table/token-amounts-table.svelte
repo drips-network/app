@@ -5,7 +5,7 @@
   import fiatEstimatesStore from '$lib/utils/fiat-estimates/fiat-estimates';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
-  import Download from 'radicle-design-system/icons/Download.svelte';
+  import Download from '$lib/components/icons/Download.svelte';
   import FiatEstimateValue from '../aggregate-fiat-estimate/fiat-estimate-value.svelte';
   import Button from '../button/button.svelte';
   import Stepper from '../stepper/stepper.svelte';

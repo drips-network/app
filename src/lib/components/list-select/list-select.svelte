@@ -1,6 +1,6 @@
 <script lang="ts">
-  import SearchIcon from 'radicle-design-system/icons/MagnifyingGlass.svelte';
-  import EyeClosedIcon from 'radicle-design-system/icons/EyeClosed.svelte';
+  import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
+  import EyeClosedIcon from '$lib/components/icons/EyeClosed.svelte';
   import type { Items } from './list-select.types';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';

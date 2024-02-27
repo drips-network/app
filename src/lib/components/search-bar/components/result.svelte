@@ -1,16 +1,16 @@
 <script lang="ts">
-  import TokensIcon from 'radicle-design-system/icons/Coin.svelte';
-  import UserIcon from 'radicle-design-system/icons/User.svelte';
+  import TokensIcon from '$lib/components/icons/Coin.svelte';
+  import UserIcon from '$lib/components/icons/User.svelte';
   import sanitize from 'sanitize-html';
 
   import AccountMenuItem from '$lib/components/account-menu/components/account-menu-item.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import Token from '$lib/components/token/token.svelte';
-  import StreamIcon from 'radicle-design-system/icons/TokenStreams.svelte';
+  import StreamIcon from '$lib/components/icons/TokenStreams.svelte';
   import { type Item, SearchItemType } from '../search';
   import wallet from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
-  import Folder from 'radicle-design-system/icons/Folder.svelte';
+  import Folder from '$lib/components/icons/Folder.svelte';
 
   export let item: Item;
   export let highlighted: string;

@@ -32,7 +32,7 @@
   import type { EditStreamFlowState } from './edit-stream-flow-state';
   import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

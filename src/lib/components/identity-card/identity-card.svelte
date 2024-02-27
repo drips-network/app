@@ -34,7 +34,7 @@
   import { fade } from 'svelte/transition';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
   import { gql } from 'graphql-request';
   import type {
     IdentityCardDripListFragment,
@@ -44,7 +44,7 @@
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
-  import Github from 'radicle-design-system/icons/Github.svelte';
+  import Github from '$lib/components/icons/Github.svelte';
 
   // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;

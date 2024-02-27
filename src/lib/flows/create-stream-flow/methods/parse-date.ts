@@ -1,4 +1,4 @@
-import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+import type { TextInputValidationState } from '$lib/components/text-input/text-input';
 
 export default function (value: string | undefined) {
   const validationRegex = /^\d{4}-\d{2}-\d{2}$/;

@@ -8,12 +8,12 @@ import { html as toReactElement } from 'satori-html';
 import loadFonts from '../../loadFonts';
 import { Resvg } from '@resvg/resvg-js';
 import getBackgroundImage from '../../getBackgroundImage';
-import twemoji from 'twemoji';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import isClaimed from '$lib/utils/project/is-claimed';
 import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
 import sanitize from 'sanitize-html';
+import twemoji from '$lib/utils/twemoji';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { projectUrl } = params;
@@ -102,11 +102,15 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const dependenciesString = dependenciesCount === '1' ? 'Dependency' : 'Dependencies';
 
-  const twemojiElem = (emoji !== 'none' && twemoji.parse(emoji)) ?? undefined;
-  const twemojiSrc =
-    (twemojiElem && /<img[^>]+src="(https:\/\/[^">]+)"/g.exec(twemojiElem)?.[1]) ?? undefined;
+  const twemojiElem = (emoji !== 'none' && twemoji(emoji)) ?? undefined;
+  const twemojiSrc = (twemojiElem && /src\s*=\s*"(.+?)"/g.exec(twemojiElem)?.[1]) ?? undefined;
 
-  const twemojiImg = (twemojiSrc && (await loadImage(twemojiSrc, fetch))) ?? undefined;
+  const twemojiImg = twemojiSrc && (await (await fetch(twemojiSrc)).text());
+
+  const resizedTwemojImg =
+    typeof twemojiImg === 'string'
+      ? twemojiImg.replace('<svg', '<svg height="60%" width="60%"')
+      : '';
 
   const avatarHtml =
     isClaimed(project) && project.avatar.__typename === 'ImageAvatar'
@@ -114,7 +118,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
         <img height="100%" width="100%" src="https://drips.network/api/custom-avatars/${cid}" style="border-radius: 50%; border: 1px solid black" />
       </div>`
       : `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white;">
-          <img height="64px" width="64px" src="${twemojiImg}" />
+          ${resizedTwemojImg}
         </div>`;
 
   const svg = await satori(

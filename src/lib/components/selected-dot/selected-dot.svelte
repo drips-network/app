@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CheckIcon from 'radicle-design-system/icons/CheckSmall.svelte';
+  import CheckIcon from '$lib/components/icons/CheckSmall.svelte';
   import { scale } from 'svelte/transition';
   export let selected: boolean;
   export let type: 'radio' | 'check' = 'radio';

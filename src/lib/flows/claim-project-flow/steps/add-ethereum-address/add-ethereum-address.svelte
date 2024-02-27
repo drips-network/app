@@ -28,8 +28,8 @@
   import dripsJsonTemplate from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import VerifiedIcon from 'radicle-design-system/icons/Registered.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import VerifiedIcon from '$lib/components/icons/Registered.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import assert from '$lib/utils/assert';

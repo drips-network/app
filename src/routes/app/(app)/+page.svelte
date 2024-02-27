@@ -1,9 +1,9 @@
 <script lang="ts">
-  import BoxIcon from 'radicle-design-system/icons/Box.svelte';
-  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
-  import TrophyIcon from 'radicle-design-system/icons/Trophy.svelte';
-  import EtherscanIcon from 'radicle-design-system/icons/Etherscan.svelte';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import BoxIcon from '$lib/components/icons/Box.svelte';
+  import PenIcon from '$lib/components/icons/Pen.svelte';
+  import TrophyIcon from '$lib/components/icons/Trophy.svelte';
+  import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
   import type { PageData } from './$types';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
@@ -15,16 +15,16 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
   import { onDestroy, onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
-  import Box from 'radicle-design-system/icons/Box.svelte';
-  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
-  import DripList from 'radicle-design-system/icons/DripList.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
+  import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {

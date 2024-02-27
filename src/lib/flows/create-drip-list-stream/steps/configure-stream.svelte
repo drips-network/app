@@ -15,7 +15,7 @@
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
   import Button from '$lib/components/button/button.svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
