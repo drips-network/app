@@ -2,7 +2,9 @@
   import assert from '$lib/utils/assert';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import { goto } from '$app/navigation';
-  import DripListCard, { DRIP_LIST_CARD_FRAGMENT } from '../drip-list-card/drip-list-card.svelte';
+  import DripListCardThumblink, {
+    DRIP_LIST_CARD_THUMBLINK_FRAGMENT,
+  } from '../drip-list-card/drip-list-card-thumblink.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '../section/section.svelte';
@@ -29,10 +31,10 @@
       const address = AddressDriverClient.getUserAddress(accountId);
 
       const dripListsQuery = gql`
-        ${DRIP_LIST_CARD_FRAGMENT}
+        ${DRIP_LIST_CARD_THUMBLINK_FRAGMENT}
         query DripLists($where: DripListWhereInput) {
           dripLists(where: $where) {
-            ...DripListCard
+            ...DripListCardThumblink
           }
         }
       `;
@@ -91,7 +93,7 @@
       class="grid gap-6 grid-cols-1 padding pt-px {dripLists.length > 0 ? 'lg:grid-cols-2' : ''}"
     >
       {#each dripLists as dripList}
-        <DripListCard {dripList} format="thumblink" />
+        <DripListCardThumblink {dripList} />
       {/each}
       {#if showCreateNewListCard}
         <div

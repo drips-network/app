@@ -1,17 +1,16 @@
 <script lang="ts" context="module">
   import { gql } from 'graphql-request';
 
-  export const DRIP_LIST_CARD_FRAGMENT = gql`
-    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
+  export const DRIP_LIST_CARD_THUMBLINK_FRAGMENT = gql`
     ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
     ${DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT}
-    fragment DripListCard on DripList {
-      ...EditDripListStepSelectedDripList
+    fragment DripListCardThumblink on DripList {
       ...DripListCardSupporterPile
       name
+      description
       account {
         accountId
       }
@@ -47,21 +46,13 @@
 </script>
 
 <script lang="ts">
-  import Pen from '$lib/components/icons/Pen.svelte';
-  import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
   import Splits, {
     SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
   } from '../splits/splits.svelte';
-  import checkIsUser from '$lib/utils/check-is-user';
   import balancesStore from '$lib/stores/balances/balances.store';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import modal from '$lib/stores/modal';
-  import Stepper from '../stepper/stepper.svelte';
-  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
-  import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { constants } from 'radicle-drips';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -72,8 +63,8 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
-  import type { DripListCardFragment } from './__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
+  import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
+  import type { DripListCardThumblinkFragment } from './__generated__/gql.generated';
   import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
   import { onMount } from 'svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
@@ -81,11 +72,10 @@
     DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
   } from './methods/get-supporters-pile';
 
-  export let dripList: DripListCardFragment;
+  export let dripList: DripListCardThumblinkFragment;
 
   $: listOwner = dripList.owner;
   $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
-  $: isOwnList = $walletStore && checkIsUser(dripList.owner.accountId);
 
   /*
     On mount, ensure the streams store has fetched the owner's account so that we can be sure that
@@ -135,37 +125,29 @@
       : undefined;
 
   $: supportersPile = getSupportersPile(supportStreams, dripList.support);
-
-  function triggerEditModal() {
-    modal.show(Stepper, undefined, editDripListSteps(dripList));
-  }
 </script>
 
-<section
+<a
   class:has-description={dripList.description}
+  href={dripListUrl}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-{dripList.description ? '4' : '6'}">
+  <div class="flex flex-col gap-{dripList.description ? '4' : '6'} pointer-events-none">
     <header class="px-6 pt-6 flex flex-col gap-2">
       <div class="title-and-actions">
-        <h1 class="title">
+        <h6 class="title truncate typo-header-1">
           <a
             href={dripListUrl}
             class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
           >
             {dripList.name}
           </a>
-        </h1>
-        <div class="flex items-center gap-4">
-          <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
-          {#if isOwnList}
-            <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
-          {/if}
-        </div>
+        </h6>
+        <ChevronRight />
       </div>
       {#if (dripList.description ?? '').length > 0}
         <div class="description">
-          <TextExpandable isExpandable={true}>
+          <TextExpandable isExpandable={false}>
             {dripList.description}
           </TextExpandable>
         </div>
@@ -191,12 +173,16 @@
         {/if}
       </div>
       <div class="splits-component">
-        <Splits groupsExpandable={true} list={dripList.splits} />
+        <Splits
+          groupsExpandable={false}
+          list={dripList.splits}
+          maxRows={dripList.description ? 3 : 4}
+        />
       </div>
     </div>
   </div>
   <div class="overflow-gradient" />
-</section>
+</a>
 
 <style>
   .drip-list-card {
@@ -205,18 +191,15 @@
     position: relative;
   }
 
+  .drip-list-card:hover {
+    box-shadow: var(--elevation-medium);
+    transform: translateY(-0.125rem);
+  }
+
   .drip-list-card .title-and-actions {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-  }
-
-  .drip-list-card .title-and-actions {
-    flex-wrap: wrap;
-  }
-
-  .drip-list-card .title-and-actions h1 {
-    min-width: fit-content;
   }
 
   .totals {
