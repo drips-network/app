@@ -1,9 +1,9 @@
 <script lang="ts">
-  import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
+  import PlusIcon from '$lib/components/icons/Plus.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import ThumbsUp from 'radicle-design-system/icons/ThumbsUp.svelte';
-  import UserIcon from 'radicle-design-system/icons/User.svelte';
-  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
+  import ThumbsUp from '$lib/components/icons/ThumbsUp.svelte';
+  import UserIcon from '$lib/components/icons/User.svelte';
+  import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
 
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items as ListItems } from '$lib/components/list-select/list-select.types';
@@ -22,7 +22,7 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
-  import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
+  import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';

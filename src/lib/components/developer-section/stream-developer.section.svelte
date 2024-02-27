@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DeviceIcon from 'radicle-design-system/icons/Device.svelte';
+  import DeviceIcon from '$lib/components/icons/Device.svelte';
   import Section from '../section/section.svelte';
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
   import Copyable from '../copyable/copyable.svelte';

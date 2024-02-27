@@ -1,7 +1,7 @@
 <script lang="ts">
   import FiatEstimateValue from '$lib/components/aggregate-fiat-estimate/fiat-estimate-value.svelte';
   import type { ComponentType } from 'svelte';
-  import WarningIcon from 'radicle-design-system/icons/ExclamationCircle.svelte';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';

@@ -8,12 +8,12 @@
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import batchCollect from '../../batch-collect';
   import { createEventDispatcher, onMount } from 'svelte';
   import getCycle from '$lib/utils/drips/get-cycle';
   import formatDate from '$lib/utils/format-date';
-  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import AddCustomTokenButton from './components/add-custom-token-button.svelte';
   import nextSettlementDate from '$lib/utils/settlement-date';

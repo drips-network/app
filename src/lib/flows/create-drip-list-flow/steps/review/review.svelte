@@ -1,30 +1,30 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import PenIcon from 'radicle-design-system/icons/Pen.svelte';
-  import ListIcon from 'radicle-design-system/icons/DripList.svelte';
-  import TransactionsIcon from 'radicle-design-system/icons/Transactions.svelte';
+  import PenIcon from '$lib/components/icons/Pen.svelte';
+  import ListIcon from '$lib/components/icons/DripList.svelte';
+  import TransactionsIcon from '$lib/components/icons/Transactions.svelte';
   import type { Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
-  import CoinIcon from 'radicle-design-system/icons/Coin.svelte';
-  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import CoinIcon from '$lib/components/icons/Coin.svelte';
+  import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
   import streamsStore from '$lib/stores/streams/streams.store';
-  import Pause from 'radicle-design-system/icons/Pause.svelte';
+  import Pause from '$lib/components/icons/Pause.svelte';
   import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
+  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
   import type {
@@ -32,7 +32,7 @@
     DripListExistsQueryVariables,
   } from './__generated__/gql.generated';
   import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
-  import Heart from 'radicle-design-system/icons/Heart.svelte';
+  import Heart from '$lib/components/icons/Heart.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

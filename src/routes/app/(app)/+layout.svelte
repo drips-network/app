@@ -5,16 +5,16 @@
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
 
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
-  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
   import { fly } from 'svelte/transition';
   import ens from '$lib/stores/ens';
-  import User from 'radicle-design-system/icons/User.svelte';
-  import Box from 'radicle-design-system/icons/Box.svelte';
-  import TokenStreams from 'radicle-design-system/icons/TokenStreams.svelte';
-  import ExploreIcon from '$lib/icons/ExploreIcon.svelte';
+  import User from '$lib/components/icons/User.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
+  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
+  import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
 
   export let data: { pathname: string };
 

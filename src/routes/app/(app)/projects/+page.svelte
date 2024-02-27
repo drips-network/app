@@ -4,8 +4,8 @@
   import guardConnected from '$lib/utils/guard-connected';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
-  import ArrowBoxUpRight from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
-  import CrossIcon from 'radicle-design-system/icons/Cross.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import CrossIcon from '$lib/components/icons/Cross.svelte';
   import { fade } from 'svelte/transition';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';

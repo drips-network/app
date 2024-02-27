@@ -3,9 +3,9 @@
   import { page } from '$app/stores';
   import Token from '$lib/components/token/token.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowUp from 'radicle-design-system/icons/ArrowUp.svelte';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
-  import Minus from 'radicle-design-system/icons/Minus.svelte';
+  import ArrowUp from '$lib/components/icons/ArrowUp.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
+  import Minus from '$lib/components/icons/Minus.svelte';
   import balances from '$lib/stores/balances';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';

@@ -13,7 +13,7 @@
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import TextArea from '../text-area/text-area.svelte';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
 
   export let dripList: DripListConfig = {
     title: 'My Drip List',

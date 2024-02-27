@@ -1,6 +1,6 @@
 <script lang="ts">
   import modal from '$lib/stores/modal/index';
-  import Cross from 'radicle-design-system/icons/Cross.svelte';
+  import Cross from '$lib/components/icons/Cross.svelte';
   import { fade, fly, scale } from 'svelte/transition';
   import FocusTrap from '../focus-trap/focus-trap.svelte';
   import Modal from './components/modal.svelte';

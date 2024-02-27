@@ -1,5 +1,5 @@
 <script lang="ts">
-  import VerifiedIcon from 'radicle-design-system/icons/Registered.svelte';
+  import VerifiedIcon from '$lib/components/icons/Registered.svelte';
 </script>
 
 <div class="typo-text-small-bold">

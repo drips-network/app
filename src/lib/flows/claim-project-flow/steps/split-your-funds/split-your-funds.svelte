@@ -3,14 +3,14 @@
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowLeft from 'radicle-design-system/icons/ArrowLeft.svelte';
-  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
-  import User from 'radicle-design-system/icons/User.svelte';
-  import InfoCircle from 'radicle-design-system/icons/InfoCircle.svelte';
+  import User from '$lib/components/icons/User.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import type { State } from '../../claim-project-flow';
   import type { Writable } from 'svelte/store';
-  import Splits from 'radicle-design-system/icons/Splits.svelte';
+  import Splits from '$lib/components/icons/Splits.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

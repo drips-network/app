@@ -46,7 +46,7 @@
 </script>
 
 <script lang="ts">
-  import Heart from 'radicle-design-system/icons/Heart.svelte';
+  import Heart from '$lib/components/icons/Heart.svelte';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
@@ -221,8 +221,7 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add them to your Drip
-    List.
+    Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add them to a Drip List.
   </p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">

@@ -57,7 +57,7 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';

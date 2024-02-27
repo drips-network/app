@@ -3,7 +3,7 @@
   import type { State } from '../edit-project-splits-steps';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
-  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';

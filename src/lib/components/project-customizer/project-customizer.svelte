@@ -24,11 +24,11 @@
   import ProjectProfileHeader, {
     PROJECT_PROFILE_HEADER_FRAGMENT,
   } from '../project-profile-header/project-profile-header.svelte';
-  import twemoji from 'twemoji';
   import { gql } from 'graphql-request';
   import type { ProjectCustomizerFragment } from './__generated__/gql.generated';
   import FileUpload from '../custom-avatar-upload/custom-avatar-upload.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
+  import twemoji from '$lib/utils/twemoji';
 
   export let project: Writable<ProjectCustomizerFragment>;
 
@@ -107,9 +107,7 @@
                 class="radio"
               />
               <label class="emoji-label" for={e.unicode}
-                >{@html twemoji.parse(e.unicode, {
-                  folder: 'svg',
-                  ext: '.svg',
+                >{@html twemoji(e.unicode, {
                   attributes: () => ({ loading: 'lazy' }),
                 })}</label
               >

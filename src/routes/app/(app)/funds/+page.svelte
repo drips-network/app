@@ -7,7 +7,7 @@
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
   import CarouselEduCard from '$lib/components/carousel/items/carousel-edu-card.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import ArrowUp from 'radicle-design-system/icons/ArrowBoxUpRight.svelte';
+  import ArrowUp from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fly } from 'svelte/transition';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';

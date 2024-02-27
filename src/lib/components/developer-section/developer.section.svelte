@@ -1,13 +1,13 @@
 <script lang="ts">
-  import DeviceIcon from 'radicle-design-system/icons/Device.svelte';
+  import DeviceIcon from '$lib/components/icons/Device.svelte';
   import Section from '../section/section.svelte';
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
   import Copyable from '../copyable/copyable.svelte';
-  import Coin from 'radicle-design-system/icons/Coin.svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
-  import Box from 'radicle-design-system/icons/Box.svelte';
+  import Coin from '$lib/components/icons/Coin.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
   import { Utils } from 'radicle-drips';
-  import Splits from 'radicle-design-system/icons/Splits.svelte';
+  import Splits from '$lib/components/icons/Splits.svelte';
 
   export let accountId: string | undefined = undefined;
 

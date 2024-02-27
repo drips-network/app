@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import { createEventDispatcher, type ComponentType } from 'svelte';
 
   const dispatch = createEventDispatcher<{ edit: { stepIndex: number } }>();

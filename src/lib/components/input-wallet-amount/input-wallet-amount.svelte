@@ -1,6 +1,6 @@
 <script lang="ts">
   import tokens from '$lib/stores/tokens';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import Toggle from '../toggle/toggle.svelte';

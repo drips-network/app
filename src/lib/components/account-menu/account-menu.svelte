@@ -1,6 +1,6 @@
 <script>
   import wallet from '$lib/stores/wallet/wallet.store';
-  import UserIcon from 'radicle-design-system/icons/User.svelte';
+  import UserIcon from '$lib/components/icons/User.svelte';
   import Button from '../button/button.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import AccountMenuItem from './components/account-menu-item.svelte';

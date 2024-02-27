@@ -27,7 +27,7 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
   import assert from '$lib/utils/assert';

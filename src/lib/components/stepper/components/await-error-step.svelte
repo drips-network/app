@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import modal from '$lib/stores/modal';
-  import CrossCircle from 'radicle-design-system/icons/CrossCircle.svelte';
+  import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
 

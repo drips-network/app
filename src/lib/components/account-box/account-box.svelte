@@ -3,8 +3,8 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import CrossCircle from 'radicle-design-system/icons/CrossCircle.svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
 
   export let hideDisconnect = false;
 
