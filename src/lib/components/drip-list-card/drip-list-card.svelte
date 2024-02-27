@@ -17,6 +17,7 @@
       }
       owner {
         accountId
+        address
       }
       splits {
         ... on AddressReceiver {
@@ -80,6 +81,7 @@
   import getSupportersPile, {
     DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
   } from './methods/get-supporters-pile';
+  import IdentityBadge from '../identity-badge/identity-badge.svelte';
 
   export let dripList: DripListCardFragment;
 
@@ -145,8 +147,8 @@
   class:has-description={dripList.description}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-{dripList.description ? '4' : '6'}">
-    <header class="px-6 pt-6 flex flex-col gap-2">
+  <div class="flex flex-col gap-4 lg:gap-6">
+    <header class="px-6 pt-6 flex flex-col gap-4 lg:gap-6">
       <div class="title-and-actions">
         <h1 class="title">
           <a
@@ -170,6 +172,13 @@
           </TextExpandable>
         </div>
       {/if}
+      <div class="flex gap-2">
+        Created by <IdentityBadge
+          showAvatar={true}
+          showIdentity={true}
+          address={listOwner.address}
+        />
+      </div>
     </header>
 
     <div class="list">

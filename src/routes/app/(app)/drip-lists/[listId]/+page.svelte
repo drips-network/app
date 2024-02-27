@@ -23,7 +23,6 @@
 <script lang="ts">
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SupportCard, {
     SUPPORT_CARD_DRIP_LIST_FRAGMENT,
@@ -65,10 +64,6 @@
 
 <article class="drip-list-page">
   <main class="list">
-    <div class="owner">
-      <span>Drip List owned by </span>
-      <IdentityBadge address={data.dripList.owner.address} disableTooltip />
-    </div>
     <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
       <DripListCard dripList={data.dripList} />
     </SectionSkeleton>
@@ -124,7 +119,6 @@
   }
 
   .support > div {
-    margin-top: 3.5rem;
     position: sticky;
     top: 6rem;
   }
@@ -134,15 +128,6 @@
     display: flex;
     flex-direction: column;
     gap: 4rem;
-  }
-
-  .owner {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  .owner span {
-    color: var(--color-foreground-level-6);
   }
 
   @media (max-width: 1080px) {
