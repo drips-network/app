@@ -81,6 +81,9 @@
     DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
   } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
+  import TabbedBox from '../tabbed-box/tabbed-box.svelte';
+  import { sineOut } from 'svelte/easing';
+  import { fly } from 'svelte/transition';
 
   export let dripList: DripListCardFragment;
 
@@ -140,6 +143,11 @@
   function triggerEditModal() {
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
+
+  export let inVoting: boolean = browser
+    ? new URL(window.location.href).searchParams.get('tabs') !== null
+    : false;
+  let activeTab = 'tab-1';
 </script>
 
 <section
@@ -186,24 +194,56 @@
       {/if}
     </header>
 
-    <div class="list">
-      <div class="totals">
-        <div class="drip-icon flex-shrink-0">
-          <Drip />
+    <section>
+      {#if inVoting}
+        <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-6">
+          <TabbedBox
+            bind:activeTab
+            tabs={{
+              1: 'Current',
+              2: 'In voting',
+            }}
+            ariaLabel="Toggle list versions"
+          />
         </div>
-        <div class="typo-text tabular-nums total-streamed-badge">
-          {#if browser}
-            <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalIncomingAmounts} />
-          {/if}
-          <span class="muted">&nbsp;total</span>
+      {/if}
+
+      {#if activeTab === 'tab-1' || !inVoting}
+        <div class="list" in:fly={{ duration: 300, x: 16, easing: sineOut }}>
+          <div class="totals">
+            <div class="drip-icon flex-shrink-0">
+              <Drip />
+            </div>
+            <div class="typo-text tabular-nums total-streamed-badge">
+              {#if browser}
+                <AggregateFiatEstimate
+                  supressUnknownAmountsWarning
+                  amounts={totalIncomingAmounts}
+                />
+              {/if}
+              <span class="muted">&nbsp;total</span>
+            </div>
+          </div>
+          <div class="splits-component">
+            <Splits groupsExpandable={true} list={dripList.splits} />
+          </div>
         </div>
-      </div>
-      <div class="splits-component">
-        <Splits groupsExpandable={true} list={dripList.splits} />
-      </div>
-    </div>
+      {/if}
+
+      {#if inVoting && activeTab === 'tab-2'}
+        <div class="list" in:fly={{ duration: 300, x: 16, easing: sineOut }}>
+          <div class="totals">
+            <div class="drip-icon flex-shrink-0">
+              <Drip fill="var(--color-foreground-level-5)" />
+            </div>
+          </div>
+          <div class="splits-component">
+            <Splits groupsExpandable={true} list={dripList.splits} draft={true} />
+          </div>
+        </div>
+      {/if}
+    </section>
   </div>
-  <div class="overflow-gradient" />
 </section>
 
 <style>
@@ -232,16 +272,6 @@
     align-items: center;
     gap: 1rem;
     position: relative;
-  }
-
-  .overflow-gradient {
-    position: absolute;
-    z-index: 1;
-    width: 2rem;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to right, transparent, var(--color-background) 75%);
   }
 
   .totals .drip-icon {
