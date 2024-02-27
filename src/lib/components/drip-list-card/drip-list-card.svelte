@@ -67,7 +67,6 @@
   import { constants } from 'radicle-drips';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   import Pile from '../pile/pile.svelte';
-  import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
@@ -147,8 +146,8 @@
   class:has-description={dripList.description}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-4 lg:gap-6">
-    <header class="px-6 pt-6 flex flex-col gap-4 lg:gap-6">
+  <div class="flex flex-col gap-8">
+    <header class="px-6 pt-6 flex flex-col gap-4 lg:gap-5">
       <div class="title-and-actions">
         <h1 class="title">
           <a
@@ -158,7 +157,7 @@
             {dripList.name}
           </a>
         </h1>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 -my-1">
           <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
           {#if isOwnList}
             <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
@@ -179,6 +178,12 @@
           address={listOwner.address}
         />
       </div>
+      {#if supportersPile && supportersPile.length > 0}
+        <div class="flex items-center gap-2">
+          Supported by
+          <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+        </div>
+      {/if}
     </header>
 
     <div class="list">
@@ -192,12 +197,6 @@
           {/if}
           <span class="muted">&nbsp;total</span>
         </div>
-        {#if supportersPile && supportersPile.length > 0}
-          <div in:fade|local={{ duration: 300 }} class="supporters min-w-0">
-            <span class="typo-text-small truncate muted">Supported by</span>
-            <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
-          </div>
-        {/if}
       </div>
       <div class="splits-component">
         <Splits groupsExpandable={true} list={dripList.splits} />
@@ -270,12 +269,6 @@
 
   .splits-component {
     margin-left: 10px;
-  }
-
-  .supporters {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
   }
 
   .muted {
