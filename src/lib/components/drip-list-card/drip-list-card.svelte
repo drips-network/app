@@ -69,8 +69,7 @@
   } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
-  import { sineOut } from 'svelte/easing';
-  import { fly } from 'svelte/transition';
+  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
 
   export let dripList: DripListCardFragment;
 
@@ -131,9 +130,8 @@
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
-  export let inVoting: boolean = browser
-    ? new URL(window.location.href).searchParams.get('tabs') !== null
-    : false;
+  // TODO: Needs to be real based on whether a list is in voting or not
+  export let inVoting = true;
 
   let activeTab = 'tab-1';
 </script>
@@ -196,40 +194,33 @@
         </div>
       {/if}
 
-      {#if activeTab === 'tab-1' || !inVoting}
-        <div class="list" in:fly={{ duration: 300, x: 16, easing: sineOut }}>
-          <div class="totals">
-            <div class="drip-icon flex-shrink-0">
-              <Drip />
+      <TransitionedHeight transitionHeightChanges>
+        <div class="tabs">
+          <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
+            <div class="totals">
+              <div class="drip-icon flex-shrink-0">
+                <Drip />
+              </div>
+              <div class="typo-text tabular-nums total-streamed-badge">
+                {#if browser}
+                  <AggregateFiatEstimate
+                    supressUnknownAmountsWarning
+                    amounts={totalIncomingAmounts}
+                  />
+                {/if}
+                <span class="muted">&nbsp;total</span>
+              </div>
             </div>
-            <div class="typo-text tabular-nums total-streamed-badge">
-              {#if browser}
-                <AggregateFiatEstimate
-                  supressUnknownAmountsWarning
-                  amounts={totalIncomingAmounts}
-                />
-              {/if}
-              <span class="muted">&nbsp;total</span>
+            <div class="splits-component">
+              <Splits groupsExpandable={true} list={dripList.splits} />
             </div>
           </div>
-          <div class="splits-component">
-            <Splits groupsExpandable={true} list={dripList.splits} />
-          </div>
-        </div>
-      {/if}
 
-      {#if inVoting && activeTab === 'tab-2'}
-        <div class="list" in:fly={{ duration: 300, x: 16, easing: sineOut }}>
-          <div class="totals">
-            <div class="drip-icon flex-shrink-0">
-              <Drip fill="var(--color-foreground-level-5)" />
-            </div>
-          </div>
-          <div class="splits-component">
-            <Splits groupsExpandable={true} list={dripList.splits} draft={true} />
+          <div class="list tab tab-2" class:active-tab={activeTab === 'tab-2'}>
+            voting drip list goes here
           </div>
         </div>
-      {/if}
+      </TransitionedHeight>
     </section>
   </div>
 </section>
@@ -281,15 +272,37 @@
     gap: 1rem;
   }
 
-  .list:not(:last-child) {
-    padding-bottom: 0;
-  }
-
   .splits-component {
     margin-left: 10px;
   }
 
   .muted {
     color: var(--color-foreground-level-5);
+  }
+
+  .tabs {
+    position: relative;
+  }
+
+  .tab {
+    position: absolute;
+    top: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .tab-1 {
+    transform: translateX(-4rem);
+  }
+
+  .tab-2 {
+    transform: translateX(4rem);
+  }
+
+  .tab.active-tab {
+    position: relative;
+    transform: none;
+    opacity: 1;
   }
 </style>
