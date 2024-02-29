@@ -148,6 +148,7 @@
     box-sizing: border-box;
     min-width: 100%;
     --border: 1px solid var(--color-foreground);
+    --first-cell-padding-left: 1.25rem;
   }
 
   .header {
@@ -176,6 +177,7 @@
 
   tbody > tr > td:first-child {
     border-left: var(--border);
+    padding-left: var(--first-cell-padding-left);
   }
 
   tbody > tr > td:last-child {
@@ -219,7 +221,7 @@
   }
 
   thead th:first-child {
-    padding-left: calc(0.75rem + 2px);
+    padding-left: var(--first-cell-padding-left);
   }
 
   thead th div {
