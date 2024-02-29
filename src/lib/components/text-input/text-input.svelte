@@ -94,6 +94,7 @@
     on:input
     on:keydown
     on:keypress
+    on:paste
     autocomplete={autocomplete ? 'on' : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}

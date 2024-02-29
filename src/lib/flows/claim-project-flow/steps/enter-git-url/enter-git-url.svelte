@@ -167,6 +167,12 @@
     isSupportedGitUrl($context.gitUrl) &&
     validationState.type !== 'valid' &&
     validationState.type !== 'pending';
+
+  async function onPaste() {
+    // need to wait some time for value to be available ¯\_(ツ)_/¯
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    submitInput();
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -182,6 +188,7 @@
     showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
     on:clear={clearProject}
     on:keydown={(e) => e.key === 'Enter' && submitInput()}
+    on:paste={onPaste}
   />
   {#if $context.project && validationState.type === 'valid'}
     <UnclaimedProjectCard
@@ -208,7 +215,7 @@
       >
     {:else}
       <Button
-        disabled={validationState.type === 'pending'}
+        disabled={!inputSubmittable}
         icon={MagnifyingGlass}
         variant="primary"
         on:click={() => submitInput()}>Search</Button
