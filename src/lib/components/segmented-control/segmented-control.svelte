@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { createEventDispatcher, onMount, tick } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   type T = $$Generic;
   type Option<V extends keyof T> = { title: string; value: V }[];
@@ -19,25 +19,19 @@
   let selectorWidth: number;
   let selectorOffset: number;
 
-  let initialRender = true;
+  let transition = false;
 
-  async function updateSelector() {
+  function updateSelector(shouldTransition = false) {
+    transition = shouldTransition;
+
     selectorOffset = (optionElems[active]?.offsetLeft ?? 4) - 4;
     selectorWidth = optionElems[active]?.offsetWidth ?? 0;
-
-    await tick();
-
-    initialRender = false;
   }
 
-  onMount(async () => {
-    updateSelector();
-  });
-
-  $: active && updateSelector();
+  $: active && updateSelector(true);
 
   let containerElem: HTMLDivElement | undefined;
-  let containerResizeObserver = browser ? new ResizeObserver(updateSelector) : undefined;
+  let containerResizeObserver = browser ? new ResizeObserver(() => updateSelector()) : undefined;
   $: containerElem && containerResizeObserver?.observe(containerElem);
 
   $: dispatch('select', active);
@@ -74,7 +68,7 @@
   </div>
   <div
     class="selector"
-    class:initial-render={initialRender}
+    class:transition
     class:at-beginning={options.findIndex((o) => o.value === active) === 0}
     class:at-end={options.findIndex((o) => o.value === active) === options.length - 1}
     style="transform: translateX({selectorOffset}px); width: {selectorWidth}px;"
@@ -119,11 +113,10 @@
     top: 0.25rem;
     bottom: 0.25rem;
     border-radius: 0.25rem;
-    transition: all 0.3s;
   }
 
-  .selector.initial-render {
-    transition: none;
+  .selector.transition {
+    transition: transform 0.3s, width 0.3s, border-radius 0.3s;
   }
 
   .selector.at-beginning {
