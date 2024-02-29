@@ -101,7 +101,7 @@
         >
           {toDisplay}
           {#if ens?.name && showFullAddress}
-            <div class="typo-text-small leading-none truncate">{address}</div>
+            <div class="leading-none truncate">{address}</div>
           {/if}
         </div>
         {#key toDisplay}
@@ -115,7 +115,7 @@
             <div class="flex-1 min-w-0">
               <div class="truncate">{toDisplay}</div>
               {#if ens?.name && showFullAddress}
-                <div class="typo-text-small leading-none truncate text-foreground-level-5">
+                <div class="leading-none truncate text-foreground-level-5">
                   {address}
                 </div>
               {/if}
