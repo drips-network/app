@@ -68,7 +68,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0rem;
+    gap: 0.5rem;
   }
 
   .trigger {
@@ -85,7 +85,6 @@
     background-color: var(--color-primary-level-1);
     border-radius: 1rem 0 1rem 1rem;
     color: var(--color-primary-level-6);
-    margin-right: 0.5rem;
   }
 
   .network-badge p {
