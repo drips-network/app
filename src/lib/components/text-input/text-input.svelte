@@ -7,7 +7,6 @@
   import Spinner from '$lib/components/spinner/spinner-radicle-system.svelte';
   import { createEventDispatcher, type ComponentType } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
-  import Button from '../button/button.svelte';
 
   const dispatch = createEventDispatcher<{ clear: never }>();
 
@@ -108,7 +107,9 @@
     {/if}
 
     {#if showClearButton}
-      <Button icon={Cross} variant="ghost" on:click={clear} />
+      <button on:click={clear} on:keydown={clear} tabindex="-1">
+        <Cross />
+      </button>
     {/if}
 
     {#if suffix}
@@ -121,11 +122,11 @@
     {/if}
 
     {#if validationState.type === 'pending'}
-      <Spinner style="margin-right: 0.5rem" />
+      <Spinner />
     {:else if showSuccessCheck && validationState.type === 'valid'}
-      <CheckCircleIcon style="fill: var(--color-positive); margin-right:0.5rem" />
+      <CheckCircleIcon style="fill: var(--color-positive)" />
     {:else if validationState.type === 'invalid'}
-      <ExclamationCircleIcon style="fill: var(--color-negative); margin-right:0.5rem " />
+      <ExclamationCircleIcon style="fill: var(--color-negative);" />
     {/if}
   </div>
 
@@ -182,7 +183,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    padding: 0 0.25rem 0 0.5rem;
+    padding: 0 0.75rem;
   }
 
   .concealed {
