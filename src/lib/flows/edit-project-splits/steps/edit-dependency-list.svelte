@@ -8,6 +8,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -32,6 +33,9 @@
     maxItems={200 - maintainerKeys.length}
     allowedItems={['eth-addresses', 'projects', 'drip-lists']}
   />
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+  </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
       disabled={!formValid}
