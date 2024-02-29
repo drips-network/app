@@ -70,6 +70,7 @@
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
+  import { fade } from 'svelte/transition';
 
   export let dripList: DripListCardFragment;
 
@@ -172,17 +173,11 @@
           address={listOwner.address}
         />
       </div>
-      {#if supportersPile && supportersPile.length > 0}
-        <div class="flex items-center gap-2">
-          Supported by
-          <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
-        </div>
-      {/if}
     </header>
 
     <section>
       {#if inVoting}
-        <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-6">
+        <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
           <TabbedBox
             bind:activeTab
             tabs={{
@@ -210,6 +205,12 @@
                 {/if}
                 <span class="muted">&nbsp;total</span>
               </div>
+              {#if supportersPile && supportersPile.length > 0}
+                <div in:fade|local={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
+                  <span class="typo-text-small truncate muted">Supported by</span>
+                  <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+                </div>
+              {/if}
             </div>
             <div class="splits-component">
               <Splits groupsExpandable={true} list={dripList.splits} />
@@ -304,5 +305,6 @@
     position: relative;
     transform: none;
     opacity: 1;
+    pointer-events: auto;
   }
 </style>
