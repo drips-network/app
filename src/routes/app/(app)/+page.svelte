@@ -134,7 +134,7 @@
     }}
   >
     <div class="horizontal-scroll">
-      <div class="projects-grid">
+      <div class="projects-grid featured-projects">
         {#each featuredProjects as project}
           <div>
             {#if project.__typename === 'ClaimedProject'}
@@ -318,12 +318,6 @@
     color: var(--color-primary);
   }
 
-  /* New style for horizontal scroll */
-  .horizontal-scroll {
-    overflow: auto;
-    /* Adjust height if necessary */
-    max-height: 55vh;
-  }
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
@@ -331,6 +325,23 @@
     max-width: 100%;
     position: relative;
     padding: 4px;
+  }
+
+  /* New style for horizontal scroll for featured projects */
+  .horizontal-scroll {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 767px) {
+    .featured-projects {
+      display: flex;
+      gap: 1rem;
+      padding: 4px;
+    }
+
+    .featured-projects > div {
+      width: 14rem;
+    }
   }
 
   .posts-grid {
