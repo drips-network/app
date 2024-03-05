@@ -67,7 +67,6 @@
           {
             label: 'Create Drip List',
             icon: Plus,
-            variant: 'primary',
             handler: () =>
               modal.show(CreateDripListStepper, undefined, { skipWalletConnect: true }),
           },
