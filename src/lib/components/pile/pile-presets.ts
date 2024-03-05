@@ -28,7 +28,6 @@ export const addressIcon = (address: string) => ({
   props: {
     address,
     showIdentity: false,
-    outline: true,
     size: 'medium',
     disableTooltip: true,
   },

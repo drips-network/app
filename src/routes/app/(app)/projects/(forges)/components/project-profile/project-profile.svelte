@@ -149,7 +149,6 @@
             props: {
               address: v.account.address,
               showIdentity: false,
-              outline: true,
               size: 'medium',
             },
           };
@@ -183,7 +182,6 @@
             props: {
               address: AddressDriverClient.getUserAddress(v.account.accountId),
               showIdentity: false,
-              outline: true,
               size: 'medium',
             },
           };
