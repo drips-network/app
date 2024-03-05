@@ -41,7 +41,7 @@
 <style>
   .large-empty-state {
     height: 100%;
-    padding: 30vh 0;
+    padding: 25vh 0;
     display: flex;
     justify-content: center;
     gap: 2rem;
