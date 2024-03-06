@@ -331,7 +331,6 @@
     padding: 4px;
   }
 
-  /* New style for horizontal scroll for featured projects */
   .horizontal-scroll {
     overflow-x: auto;
   }
