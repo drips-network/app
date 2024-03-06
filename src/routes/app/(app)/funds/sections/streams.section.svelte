@@ -361,7 +361,6 @@
 
   .table-group-header {
     color: var(--color-foreground-level-6);
-    margin-left: calc(0.75rem + 2px);
   }
 
   @media (max-width: 1024px) {

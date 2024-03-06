@@ -6,7 +6,6 @@
     ${PROJECT_AVATAR_FRAGMENT}
     fragment DripListsListingsItem on DripList {
       ...DripListBadge
-      description
       splits {
         ... on AddressReceiver {
           account {
@@ -63,12 +62,13 @@
   import type { ComponentProps } from 'svelte';
   import type Pile from '$lib/components/pile/pile.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import IdentityBadgeCell from '$lib/components/table/cells/identity-badge-cell.svelte';
 
   export let data: PageData;
 
   interface TableRow {
     badge: DripListBadgeFragment;
-    description: string;
+    owner: string;
     recipientsPile: ComponentProps<Pile>;
     supportersPile: ComponentProps<Pile>;
   }
@@ -77,7 +77,7 @@
     .map((dripList) => {
       return {
         badge: dripList,
-        description: dripList.description ?? '',
+        owner: dripList.owner.address,
         recipientsPile: {
           maxItems: 4,
           components: mapFilterUndefined(dripList.splits, (s) => {
@@ -117,7 +117,14 @@
       header: 'Name',
       cell: () => DripListBadgeCell,
       enableSorting: false,
-      size: (100 / 24) * 14,
+      size: (100 / 24) * 10,
+    },
+    {
+      accessorKey: 'owner',
+      header: 'Owner',
+      cell: () => IdentityBadgeCell,
+      enableSorting: false,
+      size: (100 / 24) * 4,
     },
     {
       accessorKey: 'recipientsPile',
