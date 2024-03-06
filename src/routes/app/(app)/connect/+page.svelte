@@ -29,5 +29,5 @@
   headline="Connect to Drips"
   description="Connect an Ethereum wallet to continue to your Dashboard."
   button={{ label: 'Connect wallet', handler: () => wallet.connect() }}
-  secondaryButton={{ label: 'Go to Explore', handler: () => goto('/app') }}
+  secondaryButton={{ label: 'Explore Drips', handler: () => goto('/app') }}
 />
