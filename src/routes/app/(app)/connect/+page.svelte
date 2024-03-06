@@ -27,5 +27,7 @@
 <LargeEmptyState
   emoji="🌐"
   headline="Connect to Drips"
-  description="Connect your wallet to view your Dashboard, or search to find profiles by ENS or address."
+  description="Connect an Ethereum wallet to continue to your Dashboard."
+  button={{ label: 'Connect wallet', handler: () => wallet.connect() }}
+  secondaryButton={{ label: 'Explore Drips', handler: () => goto('/app') }}
 />

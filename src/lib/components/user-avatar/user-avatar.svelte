@@ -2,7 +2,6 @@
   export let src: string | undefined = undefined;
   export let placeholderSrc: string | undefined = undefined;
   export let size = 24;
-  export let outline = true;
 
   export let imgElem: HTMLImageElement | undefined = undefined;
 
@@ -11,21 +10,9 @@
 
 <div class="avatar" style:height={size + 'px'} style:width={size + 'px'}>
   {#if src}
-    <img
-      class:outlined={outline}
-      bind:this={imgElem}
-      alt="user avatar"
-      {src}
-      on:load={() => (loaded = true)}
-    />
+    <img bind:this={imgElem} alt="user avatar" {src} on:load={() => (loaded = true)} />
   {/if}
-  <img
-    class:outlined={outline}
-    class="placeholder"
-    src={placeholderSrc}
-    alt="user avatar placeholder"
-    class:loaded
-  />
+  <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />
 </div>
 
 <style>
@@ -43,10 +30,11 @@
     border-radius: calc(100% / 2);
     object-fit: cover;
     box-sizing: border-box;
+    border: 1px solid var(--color-foreground);
   }
 
-  img.outlined {
-    border: 1px solid var(--color-foreground);
+  img {
+    background-color: var(--color-background);
   }
 
   .placeholder {

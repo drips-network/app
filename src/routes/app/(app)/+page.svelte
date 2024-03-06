@@ -33,12 +33,20 @@
         '80928956806149918791864723629668437820661066502202314166815319654400',
         '80989205010981758696261160004449877944077887004065826078532843448906',
         '80921140646830818724035150101819719966329403614944137690624336855040',
+        '80912096692731427285642748238291568975884076216206760523486136893440', // nice-node
+        '80927335273972468167722947750338907267861671542981060844246982983680', // starknet.js
+        '80927325632295926773992520689210905998818993360029926329589912567808', // snapshot
+        '80922395546375089598655709477693009806793075640399849243804470083584', // graph-node
       ],
       5: [
         '81084611675088797239845552682012929720024883823846356540336220583709',
         '80921553623925136102837120782793736893291544351678576578072673071411',
         '81084953153801269804906196669849986124054336368266435383120426750828',
         '80921553623925136102837120782793736893291544351678576578072673072128',
+        '80921553623925136102837120782793736893291544351678576578072673072640',
+        '80921553623925136102837120782793736893291544351678576578072673071412',
+        '80921553623925136102837120782793736893291544351678576578072673071408',
+        '80921553623925136102837120782793736893291544351678576578072673071616',
       ],
     }[PUBLIC_NETWORK] ?? [];
 
@@ -129,16 +137,18 @@
       loaded: true,
     }}
   >
-    <div class="projects-grid">
-      {#each featuredProjects as project}
-        <div>
-          {#if project.__typename === 'ClaimedProject'}
-            <PrimaryColorThemer colorHex={project.color}>
-              <ProjectCard {project} />
-            </PrimaryColorThemer>
-          {/if}
-        </div>
-      {/each}
+    <div class="horizontal-scroll">
+      <div class="projects-grid featured-projects">
+        {#each featuredProjects as project}
+          <div>
+            {#if project.__typename === 'ClaimedProject'}
+              <PrimaryColorThemer colorHex={project.color}>
+                <ProjectCard {project} />
+              </PrimaryColorThemer>
+            {/if}
+          </div>
+        {/each}
+      </div>
     </div>
   </Section>
 
@@ -318,7 +328,23 @@
     gap: 1rem;
     max-width: 100%;
     position: relative;
-    padding: 2px;
+    padding: 4px;
+  }
+
+  .horizontal-scroll {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 767px) {
+    .featured-projects {
+      display: flex;
+      gap: 1rem;
+      padding: 4px;
+    }
+
+    .featured-projects > div {
+      width: 14rem;
+    }
   }
 
   .posts-grid {
