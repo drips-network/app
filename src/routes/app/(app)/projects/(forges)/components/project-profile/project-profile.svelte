@@ -441,7 +441,11 @@
                         Stepper,
                         undefined,
                         isClaimed(project)
-                          ? editProjectSplitsSteps(project.account.accountId, project.splits)
+                          ? editProjectSplitsSteps(
+                              project.account.accountId,
+                              project.source.url,
+                              project.splits,
+                            )
                           : unreachable(),
                       ),
                     label: 'Edit',

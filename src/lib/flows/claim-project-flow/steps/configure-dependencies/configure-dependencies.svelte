@@ -73,7 +73,7 @@
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
     allowedItems={['eth-addresses', 'projects', 'drip-lists']}
-    blockedKeys={maintainerKeys}
+    blockedKeys={[$context.gitUrl, ...maintainerKeys]}
     maxItems={200 - maintainerKeys.length}
   />
   <svelte:fragment slot="left-actions">
