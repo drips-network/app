@@ -85,7 +85,6 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
               address: slug,
               showIdentity: false,
               size: 'medium',
-              outline: true,
               disableLink: true,
             },
           };
