@@ -15,7 +15,7 @@
   import type { Writable } from 'svelte/store';
   import type { TopUpFlowState } from './top-up-flow-state';
   import assert from '$lib/utils/assert';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
   import addCustomTokenFlowSteps from '../add-custom-token/add-custom-token-flow-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();

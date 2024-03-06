@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import WalletIcon from 'radicle-design-system/icons/Wallet.svelte';
+  import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { Writable } from 'svelte/store';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
@@ -13,6 +13,7 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -66,7 +67,7 @@
 <StepLayout>
   <StepHeader
     headline="Review"
-    description="Please double-check your new Project Splits and confirm in your wallet."
+    description="Double-check your new project splits then confirm in your wallet."
   />
   <FormField type="div" title="Split funds with">
     <div class="card">
@@ -91,6 +92,9 @@
       </div>
     </div>
   </FormField>
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+  </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button icon={WalletIcon} variant="primary" on:click={submit}
       >Confirm changes in your wallet</Button

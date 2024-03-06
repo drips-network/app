@@ -42,7 +42,7 @@
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import SplitsIcon from 'radicle-design-system/icons/Splits.svelte';
+  import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import SupportCard, {
     SUPPORT_CARD_PROJECT_FRAGMENT,
   } from '$lib/components/support-card/support-card.svelte';
@@ -52,7 +52,7 @@
   import UnclaimedProjectCard, {
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SplitsComponent, {
@@ -71,14 +71,14 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
-  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import editProjectMetadataSteps, {
     EDIT_PROJECT_METADATA_FLOW_FRAGMENT,
   } from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  import Registered from 'radicle-design-system/icons/Registered.svelte';
+  import Registered from '$lib/components/icons/Registered.svelte';
   import buildUrl from '$lib/utils/build-url';
   import editProjectSplitsSteps, {
     EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
@@ -107,8 +107,8 @@
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import { Forge } from '$lib/graphql/__generated__/base-types';
-  import ArrowRight from 'radicle-design-system/icons/ArrowRight.svelte';
-  import EyeOpen from 'radicle-design-system/icons/EyeOpen.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
+  import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -149,7 +149,6 @@
             props: {
               address: v.account.address,
               showIdentity: false,
-              outline: true,
               size: 'medium',
             },
           };
@@ -183,7 +182,6 @@
             props: {
               address: AddressDriverClient.getUserAddress(v.account.accountId),
               showIdentity: false,
-              outline: true,
               size: 'medium',
             },
           };

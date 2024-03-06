@@ -9,7 +9,7 @@
     type TableOptions,
   } from '@tanstack/svelte-table';
   import Button from '$lib/components/button/button.svelte';
-  import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
+  import PlusIcon from '$lib/components/icons/Plus.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
@@ -18,7 +18,7 @@
     type ActionsCellProps,
     default as ActionsCell,
   } from '$lib/components/table/cells/actions.cell.svelte';
-  import Trash from 'radicle-design-system/icons/Trash.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
   import ConfirmDeletion from './components/confirm-deletion.svelte';
   import {
     type AddressCellProps,

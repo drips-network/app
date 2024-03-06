@@ -1,6 +1,6 @@
 <script lang="ts">
-  import TokenStreamIcon from 'radicle-design-system/icons/TokenStreams.svelte';
-  import PlusIcon from 'radicle-design-system/icons/Plus.svelte';
+  import TokenStreamIcon from '$lib/components/icons/TokenStreams.svelte';
+  import PlusIcon from '$lib/components/icons/Plus.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
@@ -307,7 +307,6 @@
             handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
             icon: PlusIcon,
             label: 'Create stream',
-            variant: 'primary',
           },
         ],
   }}

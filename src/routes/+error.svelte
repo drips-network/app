@@ -27,6 +27,6 @@
   {description}
   button={{
     label: 'Go back home',
-    handler: () => goto('/'),
+    handler: () => goto('/app'),
   }}
 />

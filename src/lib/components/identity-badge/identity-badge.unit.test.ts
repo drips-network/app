@@ -13,7 +13,7 @@ vi.mock('$app/environment', () => ({
 
 vi.mock('$lib/stores/ens/ens.store.ts');
 
-vi.mock('radicle-design-system/lib/blockies', () => ({
+vi.mock('$lib/utils/blockies', () => ({
   createIcon: vi.fn(() => ({
     toDataURL: vi.fn(() => 'foobar.com'),
   })),

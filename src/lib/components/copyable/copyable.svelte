@@ -1,6 +1,6 @@
 <script lang="ts">
-  import CopyIcon from 'radicle-design-system/icons/CopySmall.svelte';
-  import SuccessIcon from 'radicle-design-system/icons/CheckCircle.svelte';
+  import CopyIcon from '$lib/components/icons/CopySmall.svelte';
+  import SuccessIcon from '$lib/components/icons/CheckCircle.svelte';
   import { fly } from 'svelte/transition';
 
   export let value: string;

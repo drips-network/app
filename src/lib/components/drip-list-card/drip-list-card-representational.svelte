@@ -64,7 +64,7 @@
 </script>
 
 <script lang="ts">
-  import Pen from 'radicle-design-system/icons/Pen.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
   import Splits, {
@@ -91,7 +91,7 @@
   import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import type { Stream } from '$lib/stores/streams/types';
   import type getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
-  import ChevronRight from 'radicle-design-system/icons/ChevronRight.svelte';
+  import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import type { DripListCardRepresentationalListFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -142,7 +142,6 @@
               props: {
                 address: s.dripList.owner.address,
                 showIdentity: false,
-                outline: true,
                 size: 'normal',
                 disableTooltip: true,
               },
@@ -162,7 +161,6 @@
               props: {
                 address: s.account.address,
                 showIdentity: false,
-                outline: true,
                 size: 'normal',
                 disableTooltip: true,
               },
@@ -178,7 +176,6 @@
         props: {
           address: streams[0].sender.address,
           showIdentity: false,
-          outline: true,
           size: 'normal',
           disableTooltip: true,
         },

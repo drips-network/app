@@ -1,5 +1,5 @@
 <script lang="ts">
-  import HamburgerIcon from 'radicle-design-system/icons/Hamburger.svelte';
+  import HamburgerIcon from '$lib/components/icons/Hamburger.svelte';
   export let dragging = false;
 </script>
 

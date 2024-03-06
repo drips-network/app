@@ -1,9 +1,9 @@
 <script lang="ts">
   import assert from '$lib/utils/assert';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
   import { goto } from '$app/navigation';
   import DripListCard, { DRIP_LIST_CARD_FRAGMENT } from '../drip-list-card/drip-list-card.svelte';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '../section/section.svelte';
   import { AddressDriverClient } from 'radicle-drips';
@@ -67,9 +67,11 @@
           {
             label: 'Create Drip List',
             icon: Plus,
-            variant: 'primary',
             handler: () =>
-              modal.show(CreateDripListStepper, undefined, { skipWalletConnect: true }),
+              modal.show(CreateDripListStepper, undefined, {
+                skipWalletConnect: true,
+                isModal: true,
+              }),
           },
         ]
       : [],

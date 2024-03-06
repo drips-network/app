@@ -13,13 +13,13 @@
   import Token from '../token/token.svelte';
   import KeyValuePair from '../key-value-pair/key-value-pair.svelte';
   import Pile from '../pile/pile.svelte';
-  import ChevronDown from 'radicle-design-system/icons/ChevronDown.svelte';
+  import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import Toggleable from '../toggleable/toggleable.svelte';
   import TokenAmountsTable from '../token-amounts-table/token-amounts-table.svelte';
   import Button from '../button/button.svelte';
   import { createEventDispatcher } from 'svelte';
-  import Wallet from 'radicle-design-system/icons/Wallet.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import { gql } from 'graphql-request';
   import type { UnclaimedProjectCardFragment } from './__generated__/gql.generated';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';

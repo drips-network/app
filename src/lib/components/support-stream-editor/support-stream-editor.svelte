@@ -8,7 +8,7 @@
   import { formatUnits } from 'ethers/lib/utils';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import { constants } from 'radicle-drips';
-  import type { TextInputValidationState } from 'radicle-design-system/TextInput';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { fetchBalance } from '$lib/utils/erc20';

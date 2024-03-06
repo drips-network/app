@@ -40,19 +40,19 @@
 </script>
 
 <script lang="ts">
-  import CheckIcon from 'radicle-design-system/icons/Check.svelte';
-  import ExclamationIcon from 'radicle-design-system/icons/Exclamation.svelte';
+  import CheckIcon from '$lib/components/icons/Check.svelte';
+  import ExclamationIcon from '$lib/components/icons/Exclamation.svelte';
   import { fade, scale } from 'svelte/transition';
   import Button from '$lib/components/button/button.svelte';
   import { onMount } from 'svelte';
   import { getAddress, isAddress } from 'ethers/lib/utils';
-  import Plus from 'radicle-design-system/icons/Plus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
   import ensStore from '$lib/stores/ens/ens.store';
   import assert from '$lib/utils/assert';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
-  import Trash from 'radicle-design-system/icons/Trash.svelte';
-  import DripListIcon from 'radicle-design-system/icons/DripList.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import ProjectBadge, {
     PROJECT_BADGE_FRAGMENT,
@@ -74,8 +74,8 @@
     ProjectToAddQuery,
     ProjectToAddQueryVariables,
   } from './__generated__/gql.generated';
-  import ExclamationCircle from 'radicle-design-system/icons/ExclamationCircle.svelte';
-  import CheckCircle from 'radicle-design-system/icons/CheckCircle.svelte';
+  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
   export let maxItems = 200;
 
