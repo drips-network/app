@@ -47,6 +47,7 @@
     bind:percentages={$context.highLevelPercentages}
   />
   <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button icon={ArrowRight} variant="primary" on:click={nextStep}>Continue</Button>
   </svelte:fragment>
 </StepLayout>

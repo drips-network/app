@@ -5,6 +5,7 @@
   import DripList from '$lib/components/illustrations/drip-list.svelte';
 
   export let skipWalletConnect = false;
+  export let isModal = false;
 
   let currentStepIndex = 0;
 
@@ -29,7 +30,7 @@
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => state}
-  steps={steps(state, skipWalletConnect)}
+  steps={steps(state, skipWalletConnect, isModal)}
   minHeightPx={128}
 />
 
