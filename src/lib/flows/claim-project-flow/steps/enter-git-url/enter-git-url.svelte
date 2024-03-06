@@ -183,7 +183,7 @@
     bind:value={$context.gitUrl}
     icon={LinkIcon}
     placeholder="Paste your GitHub project URL"
-    disabled={validationState.type === 'pending'}
+    disabled={validationState.type === 'valid' || validationState.type === 'pending'}
     {validationState}
     showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
     on:clear={clearProject}

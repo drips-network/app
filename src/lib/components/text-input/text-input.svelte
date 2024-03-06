@@ -5,7 +5,7 @@
   import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import KeyHint from '$lib/components/key-hint/KeyHint.svelte';
   import Spinner from '$lib/components/spinner/spinner-radicle-system.svelte';
-  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import { createEventDispatcher, type ComponentType, tick } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
 
   const dispatch = createEventDispatcher<{ clear: never }>();
@@ -58,9 +58,11 @@
     inputElement.type = variant.type;
   }
 
-  function clear() {
+  async function clear() {
     value = '';
     dispatch('clear');
+    // wait a tick in case parent has some disabling logic (enter-git-url)
+    await tick();
     return inputElement?.focus();
   }
 
