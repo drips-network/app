@@ -307,7 +307,6 @@
             handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
             icon: PlusIcon,
             label: 'Create stream',
-            variant: 'primary',
           },
         ],
   }}
