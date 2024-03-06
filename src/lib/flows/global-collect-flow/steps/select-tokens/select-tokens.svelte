@@ -68,6 +68,8 @@
       }),
     );
 
+  $: canCollect = Object.values(selectorItems ?? {}).length > 0;
+
   let selected =
     mapFilterUndefined(splittable, (s) => {
       const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
@@ -89,8 +91,21 @@
   <StepHeader
     emoji="🫗"
     headline="Collect funds"
-    description="Choose which tokens you’d like to collect."
+    description={canCollect
+      ? 'Choose which tokens you’d like to collect.'
+      : "You don't have any funds to collect this period."}
   />
+  {#if canCollect && selectorItems}
+    <div class="list-container">
+      <ListSelect
+        bind:selected
+        emptyStateText="No tokens to collect"
+        searchable={false}
+        multiselect={true}
+        items={selectorItems}
+      />
+    </div>
+  {/if}
   <div class="next-settlement">
     <div class="left">
       <p>Next settlement</p>
@@ -112,22 +127,15 @@
     </div>
     <p class="typo-text-bold">{formatDate(nextSettlementDate(), 'onlyDay')}</p>
   </div>
-  <div class="list-container">
-    {#if selectorItems}
-      <ListSelect
-        bind:selected
-        emptyStateText="No tokens to collect"
-        searchable={false}
-        multiselect={true}
-        items={selectorItems}
-      />
-    {/if}
-  </div>
   <svelte:fragment slot="actions">
-    <Button on:click={modal.hide} variant="ghost">Never mind</Button>
-    <Button on:click={submit} icon={Wallet} disabled={selected.length === 0} variant="primary"
-      >Confirm in wallet</Button
-    >
+    {#if canCollect}
+      <Button on:click={modal.hide} variant="ghost">Never mind</Button>
+      <Button on:click={submit} icon={Wallet} disabled={selected.length === 0} variant="primary"
+        >Confirm in wallet</Button
+      >
+    {:else}
+      <Button on:click={modal.hide}>Close</Button>
+    {/if}
   </svelte:fragment>
 </StepLayout>
 
