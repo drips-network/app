@@ -17,6 +17,7 @@ import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';
 import { env } from '$env/dynamic/private';
 import { getRedis } from '../../api/redis.js';
 import cached from '$lib/utils/cached.js';
+import queryCacheKey from '$lib/utils/query-cache-key.js';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -33,62 +34,74 @@ const FEATURED_DRIP_LISTS =
 export const load = async ({ fetch }) => {
   const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
 
-  const fetchProjects = async () =>
-    cached(redis, 'explore-projects', 30 * 60, async () => {
-      const getProjectsQuery = gql`
-        ${PROJECT_CARD_FRAGMENT}
-        query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
-          projects(where: $where, sort: $sort) {
-            ...ProjectCard
-            ... on ClaimedProject {
-              account {
-                accountId
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-              }
-            }
+  const getProjectsQuery = gql`
+    ${PROJECT_CARD_FRAGMENT}
+    query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
+      projects(where: $where, sort: $sort) {
+        ...ProjectCard
+        ... on ClaimedProject {
+          account {
+            accountId
           }
         }
-      `;
+        ... on UnclaimedProject {
+          account {
+            accountId
+          }
+        }
+      }
+    }
+  `;
 
-      const projectsRes = await query<ProjectsQuery, ProjectsQueryVariables>(
-        getProjectsQuery,
-        {
-          where: { verificationStatus: ProjectVerificationStatus.Claimed },
-          sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
-        },
-        fetch,
-      );
+  const getProjectsVariables = {
+    where: { verificationStatus: ProjectVerificationStatus.Claimed },
+    sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
+  };
 
-      return projectsRes.projects;
-    });
+  const fetchProjects = async () =>
+    cached(
+      redis,
+      queryCacheKey(getProjectsQuery, getProjectsVariables, 'explore-projects'),
+      30 * 60,
+      async () => {
+        const projectsRes = await query<ProjectsQuery, ProjectsQueryVariables>(
+          getProjectsQuery,
+          getProjectsVariables,
+          fetch,
+        );
+
+        return projectsRes.projects;
+      },
+    );
+
+  const featuredDripListQuery = gql`
+    ${DRIP_LIST_CARD_FRAGMENT}
+    query FeaturedDripList($id: ID!) {
+      dripList(id: $id) {
+        ...DripListCard
+      }
+    }
+  `;
 
   const fetchFeaturedLists = () =>
-    cached(redis, 'explore-featured-drip-lists', 60 * 60 * 24, async () => {
-      const featuredDripListQuery = gql`
-        ${DRIP_LIST_CARD_FRAGMENT}
-        query FeaturedDripList($id: ID!) {
-          dripList(id: $id) {
-            ...DripListCard
-          }
-        }
-      `;
-
-      const results = await Promise.all(
-        FEATURED_DRIP_LISTS.map((id) =>
-          query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
-            featuredDripListQuery,
-            { id },
-            fetch,
+    cached(
+      redis,
+      queryCacheKey(featuredDripListQuery, FEATURED_DRIP_LISTS, 'explore-featured-drip-lists'),
+      60 * 60 * 24,
+      async () => {
+        const results = await Promise.all(
+          FEATURED_DRIP_LISTS.map((id) =>
+            query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
+              featuredDripListQuery,
+              { id },
+              fetch,
+            ),
           ),
-        ),
-      );
+        );
 
-      return results.map((res) => res.dripList);
-    });
+        return results.map((res) => res.dripList);
+      },
+    );
 
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices] = await Promise.all([
     (await fetch('/api/blog/posts')).json(),

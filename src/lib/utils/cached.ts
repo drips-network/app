@@ -10,7 +10,7 @@ import type { getRedis } from '../../routes/api/redis';
  * @returns The result, either cached or freshly fetched.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function cached<T>(
+export default async function cached<T extends Record<string, any>>(
   redis: Awaited<ReturnType<typeof getRedis>> | undefined,
   key: string,
   EX: number,
