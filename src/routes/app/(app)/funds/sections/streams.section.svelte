@@ -23,6 +23,7 @@
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
+  import tokens from '$lib/stores/tokens';
 
   export let accountId: string | undefined;
   export let disableActions = true;
@@ -38,9 +39,11 @@
 
   $: isSelf = accountId === $walletStore.dripsAccountId;
 
-  export let emptyStateText = isSelf
-    ? 'Create a stream to send any ERC-20 to any Ethereum address.'
-    : 'This user isnʼt yet streaming any funds.';
+  $: token = tokenAddress ? tokens.getByAddress(tokenAddress) : undefined;
+
+  $: emptyStateText = `${isSelf ? "You aren't" : "This user isn't"} streaming ${
+    token?.info.name ? `any ${token.info.name}` : tokenAddress ? 'this token' : 'any tokens'
+  }.`;
 
   interface OutgoingStreamTableRow {
     streamId: string;
