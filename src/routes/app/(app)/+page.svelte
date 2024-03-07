@@ -103,10 +103,7 @@
           <h5>Total dripped</h5>
         </div>
         <span class="large-number pixelated"
-          ><AggregateFiatEstimate
-            amounts={totalDrippedAmounts}
-            prices={data.totalDrippedPrices}
-          /></span
+          ><AggregateFiatEstimate amounts={totalDrippedAmounts} /></span
         >
       </div>
       <div class="value-wrapper">

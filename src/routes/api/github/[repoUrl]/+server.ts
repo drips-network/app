@@ -5,7 +5,6 @@ import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
 import { getRedis } from '../../redis';
 import { env } from '$env/dynamic/private';
-import cached from '$lib/utils/cached';
 
 const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
@@ -29,14 +28,24 @@ export const GET: RequestHandler = async ({ params }) => {
 
   try {
     const lowercaseRepoUrl = repoUrl.toLowerCase();
+    const cachedRepo = redis && (await redis.get(lowercaseRepoUrl));
 
-    const repo = await cached(redis, lowercaseRepoUrl, 86400, async () => {
+    if (cachedRepo) {
+      const res = mapGhResponse(JSON.parse(cachedRepo));
+
+      return new Response(JSON.stringify(res));
+    } else {
       const repo = await github.getRepoByUrl(repoUrl);
 
-      return mapGhResponse(repo);
-    });
+      if (redis) {
+        await redis.set(lowercaseRepoUrl, JSON.stringify(repo), {
+          EX: 86400,
+          NX: true,
+        });
+      }
 
-    return new Response(JSON.stringify(repo));
+      return new Response(JSON.stringify(mapGhResponse(repo)));
+    }
   } catch (e) {
     const status =
       typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;

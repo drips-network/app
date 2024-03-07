@@ -7,9 +7,13 @@ export default async function query<TResponse, TVariables extends Variables = Va
   query: RequestDocument,
   variables?: TVariables,
   customFetch: typeof fetch = fetch,
+  cache = false,
 ): Promise<TResponse> {
   const client = new GraphQLClient('/api/gql', {
     fetch: customFetch,
+    headers: {
+      'X-Cache': cache ? 'Yes' : 'No',
+    },
   });
 
   const parsedQuery = typeof query === 'string' ? parse(query) : query;

@@ -13,11 +13,6 @@ import type { FeaturedDripListQuery } from './__generated__/gql.generated.js';
 import type { FeaturedDripListQueryVariables } from './__generated__/gql.generated.js';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { PUBLIC_NETWORK } from '$env/static/public';
-import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';
-import { env } from '$env/dynamic/private';
-import { getRedis } from '../../api/redis.js';
-import cached from '$lib/utils/cached.js';
-import queryCacheKey from '$lib/utils/query-cache-key.js';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -32,8 +27,6 @@ const FEATURED_DRIP_LISTS =
   }[PUBLIC_NETWORK] ?? [];
 
 export const load = async ({ fetch }) => {
-  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
-
   const getProjectsQuery = gql`
     ${PROJECT_CARD_FRAGMENT}
     query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
@@ -53,27 +46,6 @@ export const load = async ({ fetch }) => {
     }
   `;
 
-  const getProjectsVariables = {
-    where: { verificationStatus: ProjectVerificationStatus.Claimed },
-    sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
-  };
-
-  const fetchProjects = async () =>
-    cached(
-      redis,
-      queryCacheKey(getProjectsQuery, getProjectsVariables, 'explore-projects'),
-      30 * 60,
-      async () => {
-        const projectsRes = await query<ProjectsQuery, ProjectsQueryVariables>(
-          getProjectsQuery,
-          getProjectsVariables,
-          fetch,
-        );
-
-        return projectsRes.projects;
-      },
-    );
-
   const featuredDripListQuery = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
     query FeaturedDripList($id: ID!) {
@@ -83,45 +55,46 @@ export const load = async ({ fetch }) => {
     }
   `;
 
-  const fetchFeaturedLists = () =>
-    cached(
-      redis,
-      queryCacheKey(featuredDripListQuery, FEATURED_DRIP_LISTS, 'explore-featured-drip-lists'),
-      60 * 60 * 24,
-      async () => {
-        const results = await Promise.all(
-          FEATURED_DRIP_LISTS.map((id) =>
-            query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
-              featuredDripListQuery,
-              { id },
-              fetch,
-            ),
-          ),
-        );
-
-        return results.map((res) => res.dripList);
-      },
+  const fetchFeaturedLists = async () => {
+    const results = await Promise.all(
+      FEATURED_DRIP_LISTS.map((id) =>
+        query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
+          featuredDripListQuery,
+          { id },
+          fetch,
+          true,
+        ),
+      ),
     );
 
-  const [blogPosts, projects, featuredDripLists, totalDrippedPrices] = await Promise.all([
+    return results.map((res) => res.dripList);
+  };
+
+  const [blogPosts, projectsRes, featuredDripLists] = await Promise.all([
     (await fetch('/api/blog/posts')).json(),
     // TODO: It currently fetches all claimed projects because we don't yet have pagination
     // capabilities on the API. It's fine because there's not a ton of projects yet,
     // but at some point we need to start fetching only featured + latest 4 projects.
-    fetchProjects(),
+    query<ProjectsQuery, ProjectsQueryVariables>(
+      getProjectsQuery,
+      {
+        where: { verificationStatus: ProjectVerificationStatus.Claimed },
+        sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
+      },
+      fetch,
+      true,
+    ),
     fetchFeaturedLists(),
-    cachedTotalDrippedPrices(redis, fetch),
   ]);
 
   const tlv = await (await fetch('/api/tlv')).json();
 
   return {
-    projects,
+    projects: projectsRes.projects,
     blogPosts: postsListingSchema.parse(blogPosts),
     featuredDripLists: mapFilterUndefined(featuredDripLists, (v) =>
       v === null || v === undefined ? undefined : v,
     ),
     tlv,
-    totalDrippedPrices,
   };
 };
