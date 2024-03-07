@@ -13,6 +13,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+  export let projectSourceUrl: string | undefined = undefined;
 
   let formValid: boolean;
 
@@ -29,7 +30,7 @@
     bind:percentages={$context.dependencySplits.percentages}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
-    blockedKeys={maintainerKeys}
+    blockedKeys={projectSourceUrl ? [projectSourceUrl, ...maintainerKeys] : maintainerKeys}
     maxItems={200 - maintainerKeys.length}
     allowedItems={['eth-addresses', 'projects', 'drip-lists']}
   />

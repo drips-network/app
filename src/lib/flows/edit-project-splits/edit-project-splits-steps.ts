@@ -59,7 +59,7 @@ type SplitReceiver =
 type Splits = {
   maintainers: EditProjectSplitsFlowAddressReceiverFragment[];
   dependencies: SplitReceiver[];
-}
+};
 
 export interface State {
   projectAccountId: string;
@@ -145,7 +145,7 @@ const state = (projectAccountId: string, representationalSplits: Splits) => {
   });
 };
 
-export default (projectAccountId: string, splits: Splits) => ({
+export default (projectAccountId: string, projectSourceUrl: string, splits: Splits) => ({
   context: () => state(projectAccountId, splits),
   steps: [
     makeStep({
@@ -158,7 +158,9 @@ export default (projectAccountId: string, splits: Splits) => ({
     }),
     makeStep({
       component: EditDependencyList,
-      props: undefined,
+      props: {
+        projectSourceUrl,
+      },
     }),
     makeStep({
       component: Review,
