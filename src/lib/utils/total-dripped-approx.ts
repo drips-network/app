@@ -1,3 +1,8 @@
+import { z } from 'zod';
+import type { getRedis } from '../../routes/api/redis';
+import cached from './cached';
+import { getAddress } from 'ethers/lib/utils';
+
 const STREAMS = [
   // Radworks USDC
   {
@@ -45,3 +50,25 @@ export default function totalDrippedApproximation() {
 
   return [...GIVES, ...streamedAmounts];
 }
+
+const TOTAL_DRIPPED_PRICES_CACHE_KEY = 'total-dripped-prices';
+
+export const cachedTotalDrippedPrices = (
+  redis: Awaited<ReturnType<typeof getRedis>> | undefined,
+  fetch = window.fetch,
+) =>
+  cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {
+    const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
+
+    const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
+    const idMap = z.record(z.string(), z.number()).parse(idMapRes);
+    const tokenIdsString = tokenAddresses.map((address) => idMap[address.toLowerCase()]).join(',');
+
+    const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+    const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+
+    return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
+      acc[getAddress(address)] = parsedRes[idMap[address]];
+      return acc;
+    }, {});
+  });

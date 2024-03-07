@@ -4,6 +4,7 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
 import { getRedis } from '../../redis';
 import { env } from '$env/dynamic/private';
+import cached from '$lib/utils/cached';
 
 const cmcResponseSchema = z.object({
   data: z.array(
@@ -30,23 +31,13 @@ const COINMARKETCAP_ETHEREUM_PLATFORM_ID = 1;
 export const GET: RequestHandler = async () => {
   const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
 
-  const cachedResponse = redis && (await redis.get('cmc-id-map'));
-
-  let cmcIdMapRes: z.infer<typeof cmcResponseSchema>;
-
-  if (cachedResponse) {
-    cmcIdMapRes = cmcResponseSchema.parse(JSON.parse(cachedResponse));
-  } else {
+  const cmcIdMapRes = await cached(redis, 'cmc-id-map', 60, async () => {
     const idMapRes = await fetch(
       `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,
     );
 
-    cmcIdMapRes = cmcResponseSchema.parse(await idMapRes.json());
-
-    await redis?.set('cmc-id-map', JSON.stringify(cmcIdMapRes), {
-      EX: 60,
-    });
-  }
+    return cmcResponseSchema.parse(await idMapRes.json());
+  });
 
   const idMap = Object.fromEntries(
     mapFilterUndefined(cmcIdMapRes.data, (tokenData) => {

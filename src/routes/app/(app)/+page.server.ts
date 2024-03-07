@@ -13,6 +13,10 @@ import type { FeaturedDripListQuery } from './__generated__/gql.generated.js';
 import type { FeaturedDripListQueryVariables } from './__generated__/gql.generated.js';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { PUBLIC_NETWORK } from '$env/static/public';
+import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';
+import { env } from '$env/dynamic/private';
+import { getRedis } from '../../api/redis.js';
+import cached from '$lib/utils/cached.js';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -27,74 +31,84 @@ const FEATURED_DRIP_LISTS =
   }[PUBLIC_NETWORK] ?? [];
 
 export const load = async ({ fetch }) => {
-  const getProjectsQuery = gql`
-    ${PROJECT_CARD_FRAGMENT}
-    query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
-      projects(where: $where, sort: $sort) {
-        ...ProjectCard
-        ... on ClaimedProject {
-          account {
-            accountId
+  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
+
+  const fetchProjects = async () =>
+    cached(redis, 'explore-projects', 30 * 60, async () => {
+      const getProjectsQuery = gql`
+        ${PROJECT_CARD_FRAGMENT}
+        query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
+          projects(where: $where, sort: $sort) {
+            ...ProjectCard
+            ... on ClaimedProject {
+              account {
+                accountId
+              }
+            }
+            ... on UnclaimedProject {
+              account {
+                accountId
+              }
+            }
           }
         }
-        ... on UnclaimedProject {
-          account {
-            accountId
+      `;
+
+      const projectsRes = await query<ProjectsQuery, ProjectsQueryVariables>(
+        getProjectsQuery,
+        {
+          where: { verificationStatus: ProjectVerificationStatus.Claimed },
+          sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
+        },
+        fetch,
+      );
+
+      return projectsRes.projects;
+    });
+
+  const fetchFeaturedLists = () =>
+    cached(redis, 'explore-featured-drip-lists', 60 * 60 * 24, async () => {
+      const featuredDripListQuery = gql`
+        ${DRIP_LIST_CARD_FRAGMENT}
+        query FeaturedDripList($id: ID!) {
+          dripList(id: $id) {
+            ...DripListCard
           }
         }
-      }
-    }
-  `;
+      `;
 
-  const featuredDripListQuery = gql`
-    ${DRIP_LIST_CARD_FRAGMENT}
-    query FeaturedDripList($id: ID!) {
-      dripList(id: $id) {
-        ...DripListCard
-      }
-    }
-  `;
-
-  const fetchFeaturedLists = async () => {
-    const results = await Promise.all(
-      FEATURED_DRIP_LISTS.map((id) =>
-        query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
-          featuredDripListQuery,
-          { id },
-          fetch,
-          true,
+      const results = await Promise.all(
+        FEATURED_DRIP_LISTS.map((id) =>
+          query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
+            featuredDripListQuery,
+            { id },
+            fetch,
+          ),
         ),
-      ),
-    );
+      );
 
-    return results.map((res) => res.dripList);
-  };
+      return results.map((res) => res.dripList);
+    });
 
-  const [blogPosts, projectsRes, featuredDripLists] = await Promise.all([
+  const [blogPosts, projects, featuredDripLists, totalDrippedPrices] = await Promise.all([
     (await fetch('/api/blog/posts')).json(),
     // TODO: It currently fetches all claimed projects because we don't yet have pagination
     // capabilities on the API. It's fine because there's not a ton of projects yet,
     // but at some point we need to start fetching only featured + latest 4 projects.
-    query<ProjectsQuery, ProjectsQueryVariables>(
-      getProjectsQuery,
-      {
-        where: { verificationStatus: ProjectVerificationStatus.Claimed },
-        sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
-      },
-      fetch,
-      true,
-    ),
+    fetchProjects(),
     fetchFeaturedLists(),
+    cachedTotalDrippedPrices(redis, fetch),
   ]);
 
   const tlv = await (await fetch('/api/tlv')).json();
 
   return {
-    projects: projectsRes.projects,
+    projects,
     blogPosts: postsListingSchema.parse(blogPosts),
     featuredDripLists: mapFilterUndefined(featuredDripLists, (v) =>
       v === null || v === undefined ? undefined : v,
     ),
     tlv,
+    totalDrippedPrices,
   };
 };
