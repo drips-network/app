@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { getRedis } from '../../routes/api/redis';
 import cached from './cached';
 import { getAddress } from 'ethers/lib/utils';
+import isTest from './is-test';
 
 const STREAMS = [
   // Radworks USDC
@@ -58,6 +59,9 @@ export const cachedTotalDrippedPrices = (
   fetch = window.fetch,
 ) =>
   cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {
+    // In test env, we can't fetch prices from CMC, so we don't.
+    if (isTest()) return {};
+
     const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
 
     const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
