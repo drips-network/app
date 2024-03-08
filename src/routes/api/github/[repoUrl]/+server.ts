@@ -33,10 +33,10 @@ export const GET: RequestHandler = async ({ params }) => {
     const repo = await cached(redis, lowercaseRepoUrl, 86400, async () => {
       const repo = await github.getRepoByUrl(repoUrl);
 
-      return mapGhResponse(repo);
+      return repo;
     });
 
-    return new Response(JSON.stringify(repo));
+    return new Response(JSON.stringify(mapGhResponse(repo)));
   } catch (e) {
     const status =
       typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;
