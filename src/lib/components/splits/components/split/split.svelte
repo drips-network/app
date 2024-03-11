@@ -73,7 +73,6 @@
               showIdentity: false,
               address: s.account.address,
               size: 'medium',
-              outline: true,
               disableLink: true,
             },
           } as ComponentAndProps;

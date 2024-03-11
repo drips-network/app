@@ -142,7 +142,6 @@
               props: {
                 address: s.dripList.owner.address,
                 showIdentity: false,
-                outline: true,
                 size: 'normal',
                 disableTooltip: true,
               },
@@ -162,7 +161,6 @@
               props: {
                 address: s.account.address,
                 showIdentity: false,
-                outline: true,
                 size: 'normal',
                 disableTooltip: true,
               },
@@ -178,7 +176,6 @@
         props: {
           address: streams[0].sender.address,
           showIdentity: false,
-          outline: true,
           size: 'normal',
           disableTooltip: true,
         },

@@ -187,10 +187,6 @@
     transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
   }
 
-  button.nothing-to-collect {
-    opacity: 0.5;
-  }
-
   button .content {
     display: flex;
     gap: 0.25rem;
@@ -230,10 +226,6 @@
     background-color: var(--color-background);
     top: 0;
     left: 0;
-  }
-
-  button:disabled {
-    opacity: 0.5;
   }
 
   button:not(:disabled):hover,

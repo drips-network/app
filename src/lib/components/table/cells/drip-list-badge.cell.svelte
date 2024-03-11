@@ -11,6 +11,6 @@
   }
 </script>
 
-<div style="max-width: max(280px, 40vw)">
-  <DripListBadge {dripList} />
+<div style="max-width: max(240px, 28vw)">
+  <DripListBadge {dripList} showAvatar={false} showOwner={false} />
 </div>
