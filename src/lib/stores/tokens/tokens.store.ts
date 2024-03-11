@@ -1,5 +1,4 @@
-import uniswapTokenList from '@uniswap/default-token-list';
-import additionalTokens from './additional-tokens.json';
+import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 
 import type { TokenInfo } from '@uniswap/token-lists';
 import { get, writable } from 'svelte/store';
@@ -21,8 +20,6 @@ export interface CustomTokenInfoWrapper {
 
 export type TokenInfoWrapper = DefaultTokenInfoWrapper | CustomTokenInfoWrapper;
 
-const TOKEN_LIST = [...uniswapTokenList.tokens, ...additionalTokens.tokens];
-
 export default (() => {
   let chainId: number | undefined;
   const tokenList = writable<TokenInfoWrapper[] | undefined>();
@@ -40,12 +37,12 @@ export default (() => {
       ? storedTokens.readCustomTokensList().filter((t) => t.info.chainId === chainId)
       : [];
 
-    const defaultTokens: TokenInfoWrapper[] = TOKEN_LIST.filter((t) => t.chainId === chainId).map(
-      (t) => ({
-        info: t,
-        source: 'default',
-      }),
-    );
+    const defaultTokens: TokenInfoWrapper[] = DRIPS_DEFAULT_TOKEN_LIST.filter(
+      (t) => t.chainId === chainId,
+    ).map((t) => ({
+      info: t,
+      source: 'default',
+    }));
 
     tokenList.set([...defaultTokens, ...customTokens]);
 
