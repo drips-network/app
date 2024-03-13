@@ -6,31 +6,39 @@
   import Check from '$lib/components/icons/Check.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
-  import { page } from '$app/stores';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import DateInput from '$lib/components/date-picker/DateInput.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
 
-  const { searchParams } = $page.url;
-  const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
-
   let listValid = false;
+  $: isValid = listValid && $context.votingRoundConfig.votingEnds;
 </script>
 
 <StandaloneFlowStepLayout
-  headline="Create a Drip List"
-  description="What projects, individuals, organizations, or other Drip Lists would you like to support with your Drip List?"
+  headline="Collaborative list"
+  description="Configure who should be able to vote on your list's recipients."
 >
-  <FormField title="Recipients*">
+  <FormField title="Collaborators*">
     <ListEditor
-      bind:percentages={$context.dripList.percentages}
-      bind:items={$context.dripList.items}
+      allowedItems={['eth-addresses']}
+      bind:items={$context.votingRoundConfig.collaborators}
       bind:valid={listValid}
-      addOnMount={urlToAdd}
+      mode="list"
+    />
+  </FormField>
+  <FormField
+    title="Voting ends*"
+    description="Choose the specific day and time this voting period should end. You and your collaborators will have until this time to suggest and vote on recipients."
+  >
+    <DateInput
+      min={new Date(new Date(Date.now() + 24 * 60 * 60 * 1000).setHours(0, 0, 0, 0))}
+      bind:value={$context.votingRoundConfig.votingEnds}
+      timePrecision="second"
     />
   </FormField>
   <svelte:fragment slot="left-actions">
@@ -38,7 +46,7 @@
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
-      disabled={!listValid}
+      disabled={!isValid}
       icon={Check}
       variant="primary"
       on:click={() => dispatch('goForward')}>Continue</Button

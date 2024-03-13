@@ -333,7 +333,9 @@
   $: hasEmptyPercents = Object.values(percentages).filter((v) => v === 0).length > 0;
   export let valid = false;
   $: valid =
-    itemsLength > 0 && Math.round(totalPercentage * 100) / 100 === 100 && !hasEmptyPercents;
+    (itemsLength > 0 && mode === 'list') ||
+    (Math.round(totalPercentage * 100) / 100 === 100 && !hasEmptyPercents);
+
   export let error = false;
   $: error = Math.round(totalPercentage * 100) / 100 > 100 || hasEmptyPercents;
   $: canDistributeEvenly = itemsLength > 0;
@@ -510,7 +512,9 @@
 
             <div class="flex flex-shrink-0 justify-end items-center gap-3 pr-3">
               {#if !isEditable}
-                <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
+                {#if mode === 'percentages'}
+                  <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
+                {/if}
               {:else}
                 {#if mode === 'percentages'}
                   <PercentageEditor

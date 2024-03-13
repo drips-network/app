@@ -19,7 +19,10 @@
   async function viewDripList() {
     loading = true;
 
-    await goto(`/app/drip-lists/${$context.dripListId}`).then(() => {
+    const listId =
+      $context.selectedCreationMode === 2 ? $context.newVotingRoundId : $context.dripListId;
+
+    await goto(`/app/drip-lists/${listId}`).then(() => {
       loading = false;
       modal.hide();
     });
@@ -34,6 +37,15 @@
 <div class="center-div">
   {#if loading}
     <Spinner />
+  {:else if $context.selectedCreationMode === 2}
+    <h4>Congratulations!</h4>
+    <p>
+      Youʼve successfully created your new collaborative Drip List. Collaborators can start voting
+      now.
+    </p>
+    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewDripList}>
+      View your Drip List
+    </Button>
   {:else if safeAppMode}
     <h4>Continue in your Safe</h4>
     <p>

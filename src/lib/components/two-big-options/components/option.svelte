@@ -22,7 +22,7 @@
           <div class="icon">
             <svelte:component this={attribute.icon} style="fill: var(--color-foreground)" />
           </div>
-          <div class="text">
+          <div class="typo-text text">
             {attribute.text}
           </div>
         </div>
