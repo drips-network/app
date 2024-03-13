@@ -1,7 +1,7 @@
-import uniswapTokenList from '@uniswap/default-token-list';
 import { Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import tokens from '.';
+import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -29,12 +29,10 @@ describe('tokens store', () => {
     tokens.connect(1);
 
     expect(get(tokens)).toStrictEqual(
-      uniswapTokenList.tokens
-        .filter((t) => t.chainId === 1)
-        .map((t) => ({
-          source: 'default',
-          info: t,
-        })),
+      DRIPS_DEFAULT_TOKEN_LIST.filter((t) => t.chainId === 1).map((t) => ({
+        source: 'default',
+        info: t,
+      })),
     );
   });
 

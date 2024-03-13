@@ -38,6 +38,7 @@
   import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import possibleColors from '$lib/utils/project/possible-colors';
+  import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -66,8 +67,9 @@
     try {
       validationState = { type: 'pending' };
 
-      if (!$context.gitUrl.startsWith('http://') && !$context.gitUrl.startsWith('https://')) {
-        $context.gitUrl = 'https://' + $context.gitUrl;
+      // format URL with "https://" (add, or replace "http://" since API error)
+      if (!/^https:\/\//.test($context.gitUrl)) {
+        $context.gitUrl = 'https://' + $context.gitUrl.replace(/^http:\/\//, '');
       }
 
       // if url ends with /, remove it
@@ -82,7 +84,7 @@
       // If the normalized URL is different from the original URL in lowercase, it means that the repo has likely
       // been renamed on GitHub. In this case, we should let the user claim the outdated project too.
       // In all other cases, we use the normalized URL to fix casing mismatches.
-      if (normalizedUrl.toLowerCase() === $context.gitUrl.toLowerCase()) {
+      if (normalizedUrl?.toLowerCase() === $context.gitUrl.toLowerCase()) {
         $context.gitUrl = normalizedUrl;
       } else {
         claimingRenamedRepoOriginalName = normalizedUrl;
@@ -165,30 +167,29 @@
     isSupportedGitUrl($context.gitUrl) &&
     validationState.type !== 'valid' &&
     validationState.type !== 'pending';
+
+  async function onPaste() {
+    // need to wait some time for value to be available ¯\_(ツ)_/¯
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    submitInput();
+  }
 </script>
 
 <StandaloneFlowStepLayout
   headline="Claim your project"
   description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
 >
-  <div class="input" on:keydown={(e) => e.key === 'Enter' && submitInput()}>
-    <TextInput
-      bind:value={$context.gitUrl}
-      icon={LinkIcon}
-      placeholder="Paste your GitHub project URL"
-      disabled={validationState.type === 'valid' || validationState.type === 'pending'}
-      {validationState}
-      showClearButton={validationState.type === 'valid' || validationState.type === 'invalid'}
-      on:clear={clearProject}
-    />
-    <div class="submit-button">
-      <Button
-        disabled={!inputSubmittable}
-        variant={inputSubmittable ? 'primary' : undefined}
-        on:click={submitInput}>Search</Button
-      >
-    </div>
-  </div>
+  <TextInput
+    bind:value={$context.gitUrl}
+    icon={LinkIcon}
+    placeholder="Paste your GitHub project URL"
+    disabled={validationState.type === 'valid' || validationState.type === 'pending'}
+    {validationState}
+    showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
+    on:clear={clearProject}
+    on:keydown={(e) => e.key === 'Enter' && submitInput()}
+    on:paste={onPaste}
+  />
   {#if $context.project && validationState.type === 'valid'}
     <UnclaimedProjectCard
       project={$context.project}
@@ -208,20 +209,17 @@
     {/if}
   {/if}
   <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRightIcon}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
+    {#if formValid}
+      <Button icon={ArrowRightIcon} variant="primary" on:click={() => dispatch('goForward')}
+        >Continue</Button
+      >
+    {:else}
+      <Button
+        disabled={!inputSubmittable}
+        icon={MagnifyingGlass}
+        variant="primary"
+        on:click={() => submitInput()}>Search</Button
+      >
+    {/if}
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-  .input {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-end;
-  }
-</style>

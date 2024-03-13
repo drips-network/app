@@ -14,9 +14,6 @@
   </div>
   <nav>
     <Button variant="ghost" href="/blog">Blog</Button>
-    <Button variant="ghost" href="https://github.com/drips-network" target="_blank" rel="noreferrer"
-      >Code</Button
-    >
     <Button variant="ghost" href="https://docs.drips.network" target="_blank" rel="noreferrer"
       >Docs</Button
     >

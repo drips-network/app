@@ -1,0 +1,20 @@
+{
+  "name": "Drips App Extra Default Tokens",
+  "timestamp": "2024-02-26T23:41:27.220Z",
+  "version": {
+    "major": 0,
+    "minor": 0,
+    "patch": 1
+  },
+  "tags": {},
+  "tokens": [
+    {
+      "chainId": 1,
+      "address": "0x4F604735c1cF31399C6E711D5962b2B3E0225AD3",
+      "name": "Glo Dollar",
+      "symbol": "USDGLO",
+      "decimals": 18,
+      "logoURI": "https://etherscan.io/token/images/glo_32.png"
+    }
+  ]
+}

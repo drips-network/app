@@ -12,6 +12,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+  export let canCancel = false;
 
   const { searchParams } = $page.url;
   const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
@@ -25,6 +26,9 @@
 >
   <DripListEditor bind:isValid bind:dripList={$context.dripList} {urlToAdd} />
   <svelte:fragment slot="actions">
+    {#if canCancel}
+      <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    {/if}
     <Button
       disabled={!isValid}
       icon={Check}

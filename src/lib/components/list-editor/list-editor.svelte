@@ -163,7 +163,7 @@
       if (!project) throw new Error("Couldn't find that Git project. Is it private?");
 
       const id = project.source.url;
-      if (blockedKeys.includes(id)) throw new Error('Project ID is already used');
+      if (blockedKeys.includes(id)) throw new Error("Sorry, you can't add that Git project.");
 
       if (items[id]) {
         inputMessage = { type: 'success', message: 'Already added' };

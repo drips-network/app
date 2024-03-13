@@ -1,13 +1,11 @@
 <!-- Adjusted from radicle-design-system's TextInput component -->
 <script lang="ts">
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
-
   import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
   import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
-
   import KeyHint from '$lib/components/key-hint/KeyHint.svelte';
   import Spinner from '$lib/components/spinner/spinner-radicle-system.svelte';
-  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import { createEventDispatcher, type ComponentType, tick } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
 
   const dispatch = createEventDispatcher<{ clear: never }>();
@@ -60,9 +58,12 @@
     inputElement.type = variant.type;
   }
 
-  function clear() {
+  async function clear() {
     value = '';
     dispatch('clear');
+    // wait a tick in case parent has some disabling logic (enter-git-url)
+    await tick();
+    return inputElement?.focus();
   }
 
   let rightContainerWidth: number;
@@ -95,6 +96,7 @@
     on:focus
     on:keydown
     on:keypress
+    on:paste
     autocomplete={autocomplete ? 'on' : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}
@@ -108,7 +110,7 @@
     {/if}
 
     {#if showClearButton}
-      <button style="color: var(--color-foreground); margin: 0 0.75rem;" on:click={clear}>
+      <button on:click={clear} on:keydown={clear} tabindex="-1">
         <Cross />
       </button>
     {/if}
@@ -123,11 +125,11 @@
     {/if}
 
     {#if validationState.type === 'pending'}
-      <Spinner style="margin: 0 0.75rem;" />
+      <Spinner />
     {:else if showSuccessCheck && validationState.type === 'valid'}
-      <CheckCircleIcon style="fill: var(--color-positive); margin: 0 0.5rem;" />
+      <CheckCircleIcon style="fill: var(--color-positive)" />
     {:else if validationState.type === 'invalid'}
-      <ExclamationCircleIcon style="fill: var(--color-negative); margin: 0 0.5rem;" />
+      <ExclamationCircleIcon style="fill: var(--color-negative);" />
     {/if}
   </div>
 
@@ -179,10 +181,12 @@
   .right-container {
     align-items: center;
     display: flex;
+    gap: 0.25rem;
     height: 3rem;
     position: absolute;
-    right: 0;
     top: 0;
+    right: 0;
+    padding: 0 0.75rem;
   }
 
   .concealed {

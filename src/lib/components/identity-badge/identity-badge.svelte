@@ -14,7 +14,6 @@
   export let disableSelection = false;
   export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
   export let disableTooltip = false;
-  export let outline = false;
   export let linkToNewTab = false;
   export let showFullAddress = false;
   export let muted = false;
@@ -90,7 +89,6 @@
         bind:imgElem={avatarImgElem}
         src={ens?.avatarUrl}
         placeholderSrc={blockyUrl}
-        {outline}
       />
     {/if}
     {#if showIdentity}
