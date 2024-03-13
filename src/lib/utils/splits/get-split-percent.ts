@@ -2,21 +2,19 @@ const maxWeight = 1000000; // get from sdk/contract?
 
 export function getSplitPercent(weight: number | bigint = BigInt('0'), format = 'default'): string {
   const w = typeof weight === 'bigint' ? Number(weight) : weight;
-
   const percent = (Number((w * maxWeight) / maxWeight) / maxWeight) * 100;
 
   switch (format) {
     case 'pretty': {
-      const integer = Math.floor(percent);
+      const roundedPercent = Math.round(percent * 100) / 100;
 
-      return !integer && percent > 0
-        ? '<1%'
-        : integer === 99 && percent > integer
-        ? '>99%'
-        : `${integer}%`;
+      // Return with decimals if necessary
+      return roundedPercent === Math.floor(roundedPercent)
+        ? `${Math.floor(roundedPercent)}%`
+        : `${roundedPercent}%`;
     }
     default: {
-      return percent.toString();
+      return percent.toFixed(2);
     }
   }
 }
