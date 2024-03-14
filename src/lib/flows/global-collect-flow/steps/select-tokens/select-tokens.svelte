@@ -113,7 +113,7 @@
         <InfoCircle />
         <svelte:fragment slot="tooltip-content">
           <p>
-            Earnings from projects, streams and Drip Lists settle and become collectable on the last
+            Funds from projects, streams and Drip Lists settle and become collectable on the last
             Thursday of each month.
             <a
               target="_blank"

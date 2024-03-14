@@ -324,8 +324,8 @@
   <Button
     on:click={() =>
       highlightStore.highlight({
-        title: 'Collect your earnings',
-        description: 'You can collect earnings to your wallet here.',
+        title: 'Collect earned funds',
+        description: 'You can collect funds to your wallet here.',
         element: document.querySelectorAll("[data-highlightid='global-collect']")[0],
         borderRadius: '2rem 0 2rem 2rem',
         paddingPx: 8,
