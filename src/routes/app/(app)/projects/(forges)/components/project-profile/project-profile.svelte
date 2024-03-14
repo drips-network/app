@@ -216,7 +216,7 @@
 
     setTimeout(() => {
       highlightStore.highlight({
-        title: 'Collect earned funds',
+        title: 'Collect received funds',
         description: 'You can collect funds to your wallet here.',
         element: document.querySelectorAll("[data-highlightid='global-collect']")[0],
         borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
