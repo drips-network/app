@@ -22,7 +22,7 @@ export default function globalCollectFlowSteps(splittable: Amount[]) {
         makeStep({
           component: SuccessStep,
           props: {
-            message: 'Your earnings have successfully been delivered to your wallet address.',
+            message: 'Your funds have successfully been delivered to your wallet address.',
             onAction: () => {
               updateCollectButton.set(true);
             },
