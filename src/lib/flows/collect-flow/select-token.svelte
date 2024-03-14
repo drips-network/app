@@ -64,7 +64,7 @@
   <StepHeader
     emoji="👛"
     headline="Collect"
-    description="Select which token balance you'd like to collect earned funds from."
+    description="Select which token balance you'd like to collect received funds from."
   />
   <FormField title="Token">
     <div class="list-container">

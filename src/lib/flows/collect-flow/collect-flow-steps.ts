@@ -37,7 +37,7 @@ export default function getCollectFlowSteps(tokenAddress: string | undefined = u
           props: {
             message: `Your ${
               tokens.getByAddress(get(ctx).tokenAddress ?? unreachable())?.info.symbol
-            } earnings have successfully been delivered to your wallet address.`,
+            } funds have successfully been delivered to your wallet address.`,
             safeAppMode: Boolean(get(walletStore).safe),
           },
         }),

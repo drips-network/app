@@ -397,7 +397,7 @@ describe('app', async () => {
       });
 
       it('expands the squeezing section', async () => {
-        await page.locator('label:has-text("Include unsettled stream earnings")').click();
+        await page.locator('label:has-text("Include unsettled stream funds")').click();
 
         await expect(
           page.locator(`data-testid=item-383620263794848526656662033323214000554911775452`),
@@ -409,7 +409,7 @@ describe('app', async () => {
       it('shows the success screen', async () => {
         await expect(
           page.locator(
-            'text=Your TEST earnings have successfully been delivered to your wallet address.',
+            'text=Your TEST funds have successfully been delivered to your wallet address.',
           ),
         ).toBeVisible();
 

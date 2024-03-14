@@ -229,16 +229,16 @@
   <StepHeader headline={`Collect ${selectedToken.symbol}`} />
   <div>
     <p>
-      Earnings settle on the last Thursday of every month. The next settlement date is <span
+      Received funds settle on the last Thursday of every month. The next settlement date is <span
         class="typo-text-bold">{formatDate(nextSettlementDate(), 'onlyDay')}</span
       >.
     </p>
   </div>
   {#if incomingEstimatesBySender.length > 0}
     <div class="squeeze-section">
-      <Toggleable label="Include unsettled stream earnings" bind:toggled={$context.squeezeEnabled}>
+      <Toggleable label="Include unsettled stream funds" bind:toggled={$context.squeezeEnabled}>
         <AnnotationBox type="warning">
-          The network fee for collecting increases with each selected sender. Unsettled earnings are
+          The network fee for collecting increases with each selected sender. Unsettled funds are
           estimates, so you may collect less than expected.
         </AnnotationBox>
         <div class="list-wrapper">
@@ -247,7 +247,7 @@
             multiselect
             bind:selected={$context.selectedSqueezeSenderItems}
             searchable={false}
-            emptyStateText="You don't have any unsettled earnings from streams."
+            emptyStateText="You don't have any unsettled funds from streams."
           />
         </div>
       </Toggleable>
@@ -260,7 +260,7 @@
           balances.receivable > 0n
             ? {
                 title: `Streams`,
-                subtitle: $context.squeezeEnabled ? 'Including unsettled earnings' : undefined,
+                subtitle: $context.squeezeEnabled ? 'Including unsettled funds' : undefined,
                 value:
                   $context.squeezeEnabled && totalSelectedSqueezeAmount > 0n
                     ? '≈ ' +
