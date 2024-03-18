@@ -11,7 +11,7 @@ export const getVotingRoundResponseSchema = z.object({
   status: z.string(),
   dripListId: z.nullable(z.string()),
   name: z.string(),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   publisherAddress: z.string(),
 });
 
