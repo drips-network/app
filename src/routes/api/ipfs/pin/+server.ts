@@ -2,11 +2,11 @@ import { PINATA_SDK_KEY, PINATA_SDK_SECRET } from '$env/static/private';
 import isTest from '$lib/utils/is-test';
 import { env } from '$env/dynamic/private';
 
-import pinataSdk from '@pinata/sdk';
+import PinataSdk from '@pinata/sdk';
 import { error, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 
-const pinata = pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
+const pinata = new PinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
 
 export const POST: RequestHandler = async ({ request }: RequestEvent) => {
   try {
