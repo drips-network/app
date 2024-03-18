@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request }) => {
   );
 
   const relayRequest: SponsoredCallRequest = {
-    chainId: chainId,
+    chainId: BigInt(chainId),
     target: tx.to ?? unreachable(),
     data: tx.data ?? unreachable(),
   };
