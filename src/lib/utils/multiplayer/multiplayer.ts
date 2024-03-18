@@ -4,6 +4,7 @@ import {
   startVotingRoundResponseSchema,
   getVotingRoundResponseSchema,
   type VotingRound,
+  voteSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -130,14 +131,16 @@ export async function getVotingRounds(
   ).votingRounds;
 }
 
-export function getVotingRoundVotes(votingRoundId: string, fetch = window.fetch) {
-  return _authenticatedCall(
-    'GET',
-    `/votingRounds/${votingRoundId}/votes`,
-    z.any(),
-    undefined,
-    fetch,
-  );
+export async function getVotingRoundVotes(votingRoundId: string, fetch = window.fetch) {
+  return (
+    await _authenticatedCall(
+      'GET',
+      `/votingRounds/${votingRoundId}/votes`,
+      z.object({ votes: z.array(voteSchema) }),
+      undefined,
+      fetch,
+    )
+  ).votes;
 }
 
 export async function getVotingRoundResult(votingRoundId: string, fetch = window.fetch) {

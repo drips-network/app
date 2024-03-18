@@ -16,3 +16,9 @@ export const getVotingRoundResponseSchema = z.object({
 });
 
 export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;
+
+export const voteSchema = z.object({
+  collaboratorAddress: z.string(),
+});
+
+export type Vote = z.infer<typeof voteSchema>;

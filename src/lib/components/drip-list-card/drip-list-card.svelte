@@ -80,7 +80,8 @@
   import formatDate from '$lib/utils/format-date';
   import Countdown from '../countdown/countdown.svelte';
   import Trash from '../icons/Trash.svelte';
-  import * as multiplayer from '$lib/utils/multiplayer';
+  import deleteVotingRoundSteps from '$lib/flows/delete-voting-round/delete-voting-round-steps';
+  import VotingRoundCollaborators from './components/voting-round-collaborators.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -172,26 +173,7 @@
     }
   }
 
-  async function handleDeleteVotingRound() {
-    const timestamp = new Date();
-
-    const { signer, address } = $walletStore;
-    assert(signer && address);
-
-    const signature = await multiplayer.signDeleteVotingRound(
-      timestamp,
-      address,
-      votingRound?.id ?? unreachable(),
-      signer,
-    );
-
-    await multiplayer.deleteVotingRound(
-      signature,
-      timestamp,
-      address,
-      votingRound?.id ?? unreachable(),
-    );
-  }
+  $: isOwnVotingRound = votingRound?.publisherAddress === $walletStore?.address;
 </script>
 
 <section
@@ -283,6 +265,10 @@
             {#if votingRound}
               <VotingRoundSplits votingRoundId={votingRound.id} />
 
+              <FormField title="Collaborators" type="div">
+                <VotingRoundCollaborators votingRoundId={votingRound.id} />
+              </FormField>
+
               <FormField title="Voting ends" type="div">
                 <p style:margin-bottom="0.25rem" class="typo-text tabular-nums">
                   <Countdown targetDate={new Date(votingRound.endsAt)} />
@@ -292,11 +278,19 @@
                 </p>
               </FormField>
 
-              <div>
-                <Button icon={Trash} on:click={() => handleDeleteVotingRound()}
-                  >Delete this voting round</Button
-                >
-              </div>
+              {#if isOwnVotingRound}
+                <div>
+                  <Button
+                    icon={Trash}
+                    on:click={() =>
+                      modal.show(
+                        Stepper,
+                        undefined,
+                        deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                      )}>Delete this voting round</Button
+                  >
+                </div>
+              {/if}
             {/if}
           </div>
         </div>

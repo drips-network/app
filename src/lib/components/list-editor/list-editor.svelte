@@ -511,7 +511,7 @@
             </div>
 
             <div class="flex flex-shrink-0 justify-end items-center gap-3 pr-3">
-              {#if !isEditable}
+              {#if !isEditable && mode === 'percentages'}
                 {#if mode === 'percentages'}
                   <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
                 {/if}
@@ -530,13 +530,15 @@
                     {...item.rightComponent.props}
                   />
                 {/if}
-                <Button
-                  icon={Trash}
-                  variant="ghost"
-                  on:click={() => removeItem(slug)}
-                  ariaLabel="Remove from list"
-                  dataTestId={`remove-${slug}`}
-                />
+                {#if isEditable}
+                  <Button
+                    icon={Trash}
+                    variant="ghost"
+                    on:click={() => removeItem(slug)}
+                    ariaLabel="Remove from list"
+                    dataTestId={`remove-${slug}`}
+                  />
+                {/if}
               {/if}
             </div>
           </li>
