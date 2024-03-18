@@ -16,6 +16,8 @@
   import query from '$lib/graphql/dripsQL';
   import modal from '$lib/stores/modal';
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
+  import * as multiplayer from '$lib/utils/multiplayer';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
   export let accountId: string | undefined;
   export let collapsed = false;
@@ -25,6 +27,7 @@
   let error = false;
 
   let dripLists: DripListsQuery['dripLists'] | undefined;
+  let votingRounds: VotingRound[] | undefined;
   async function updateDripLists() {
     try {
       assert(accountId);
@@ -39,13 +42,17 @@
         }
       `;
 
-      const result = await query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {
-        where: {
-          ownerAddress: address,
-        },
-      });
+      const fetches = await Promise.all([
+        query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {
+          where: {
+            ownerAddress: address,
+          },
+        }),
+        multiplayer.getVotingRounds({ publisherAddress: address }),
+      ] as const);
 
-      dripLists = result.dripLists;
+      dripLists = fetches[0].dripLists;
+      votingRounds = fetches[1];
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -53,6 +60,11 @@
     }
   }
   $: accountId && updateDripLists();
+
+  $: dripListsAndVotingRounds = [
+    ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []),
+    ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
+  ];
 
   $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
 </script>
@@ -90,12 +102,18 @@
     horizontalScroll: false,
   }}
 >
-  {#if dripLists}
+  {#if dripListsAndVotingRounds}
     <div
-      class="grid gap-6 grid-cols-1 padding pt-px {dripLists.length > 0 ? 'lg:grid-cols-2' : ''}"
+      class="grid gap-6 grid-cols-1 padding pt-px {dripListsAndVotingRounds.length > 0
+        ? 'lg:grid-cols-2'
+        : ''}"
     >
-      {#each dripLists as dripList}
-        <DripListCardThumblink {dripList} />
+      {#each dripListsAndVotingRounds as dripList}
+        {#if dripList.type === 'drip-list'}
+          <DripListCardThumblink {dripList} />
+        {:else}
+          <a href="/app/drip-lists/{dripList.id}">voting round</a>
+        {/if}
       {/each}
       {#if showCreateNewListCard}
         <div

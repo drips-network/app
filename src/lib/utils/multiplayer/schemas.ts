@@ -12,20 +12,7 @@ export const getVotingRoundResponseSchema = z.object({
   dripListId: z.nullable(z.string()),
   name: z.string(),
   description: z.string(),
-  votes: z.array(
-    z.object({
-      collaboratorAddress: z.string(),
-    }),
-  ),
-  // TODO: Real schema
-  result: z.array(z.unknown()),
+  publisherAddress: z.string(),
 });
 
-export const getVotingRoundsResponseSchema = z.object({
-  votingRounds: z.array(
-    z.object({
-      id: z.string(),
-      status: z.string(),
-    }),
-  ),
-});
+export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;

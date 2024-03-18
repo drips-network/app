@@ -35,6 +35,7 @@
 </script>
 
 <script lang="ts">
+  import '$lib/utils/multiplayer/multiplayer';
   import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
@@ -71,12 +72,33 @@
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import unreachable from '$lib/utils/unreachable';
+  import assert from '$lib/utils/assert';
+  import VotingRoundSplits from './components/voting-round-splits.svelte';
+  import FormField from '../form-field/form-field.svelte';
+  import formatDate from '$lib/utils/format-date';
+  import Countdown from '../countdown/countdown.svelte';
+  import Trash from '../icons/Trash.svelte';
+  import * as multiplayer from '$lib/utils/multiplayer';
 
-  export let dripList: DripListCardFragment;
+  export let data: {
+    dripList?: DripListCardFragment | null;
+    votingRound?: VotingRound | null;
+  };
+  onMount(() => {
+    assert(
+      data.dripList || data.votingRound,
+      'DripListCard requires either a dripList or a votingRound, or both',
+    );
+  });
 
-  $: listOwner = dripList.owner;
-  $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
-  $: isOwnList = $walletStore && checkIsUser(dripList.owner.accountId);
+  $: dripList = data.dripList;
+  $: votingRound = data.votingRound;
+
+  $: listOwner = dripList?.owner;
+  $: dripListUrl = dripList && `/app/drip-lists/${dripList.account.accountId}`;
+  $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
 
   /*
     On mount, ensure the streams store has fetched the owner's account so that we can be sure that
@@ -84,6 +106,8 @@
     Then, select the support streams that are streaming to the list.
   */
   onMount(async () => {
+    if (!listOwner) return;
+
     if (!$streamsStore.accounts[listOwner.accountId]) {
       await streamsStore.fetchAccount(listOwner.accountId);
     }
@@ -94,19 +118,22 @@
     $streamsStore &&
     streamsStore
       .getStreamsForUser(listOwner.accountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
+      .outgoing.filter((s) => s.receiver.accountId === dripList?.account.accountId);
 
   let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined = undefined;
   onMount(async () => {
+    if (!dripList) return;
     incomingSplitTotal = await getIncomingSplitTotal(dripList.account.accountId);
   });
 
   let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined = undefined;
   onMount(async () => {
+    if (!dripList) return;
     incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
   });
 
   $: streamEstimates =
+    dripList &&
     $balancesStore &&
     balancesStore.getStreamEstimatesByReceiver('total', dripList.account.accountId).map((e) => ({
       amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
@@ -117,28 +144,58 @@
     Only the list owner can set support streams to the list, so we can consider the stream estimate to the list loaded when
     the owner account is loaded.
   */
-  $: streamEstimateLoaded = $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
+  $: streamEstimateLoaded =
+    dripList && $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
 
   let totalIncomingAmounts: ReturnType<typeof mergeAmounts> | undefined = undefined;
   $: totalIncomingAmounts =
-    incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
+    streamEstimates && incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
       ? mergeAmounts(streamEstimates, incomingSplitTotal, incomingGivesTotal)
       : undefined;
 
-  $: supportersPile = getSupportersPile(supportStreams, dripList.support);
+  $: supportersPile =
+    dripList && supportStreams && getSupportersPile(supportStreams, dripList.support);
 
   function triggerEditModal() {
+    if (!dripList) return;
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
-  // TODO: Needs to be real based on whether a list is in voting or not
-  export let inVoting = true;
+  let activeTab: string;
+  $: {
+    if (dripList && votingRound) {
+      activeTab = 'tab-1';
+    } else if (dripList) {
+      activeTab = 'tab-1';
+    } else if (votingRound) {
+      activeTab = 'tab-2';
+    }
+  }
 
-  let activeTab = 'tab-1';
+  async function handleDeleteVotingRound() {
+    const timestamp = new Date();
+
+    const { signer, address } = $walletStore;
+    assert(signer && address);
+
+    const signature = await multiplayer.signDeleteVotingRound(
+      timestamp,
+      address,
+      votingRound?.id ?? unreachable(),
+      signer,
+    );
+
+    await multiplayer.deleteVotingRound(
+      signature,
+      timestamp,
+      address,
+      votingRound?.id ?? unreachable(),
+    );
+  }
 </script>
 
 <section
-  class:has-description={dripList.description}
+  class:has-description={dripList?.description || votingRound?.description}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
   <div class="flex flex-col gap-8">
@@ -149,20 +206,23 @@
             href={dripListUrl}
             class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
           >
-            {dripList.name}
+            {(dripList?.name || votingRound?.name) ?? unreachable()}
           </a>
         </h1>
         <div class="flex items-center gap-4 -my-1">
-          <ShareButton url="https://drips.network/app/drip-lists/{dripList.account.accountId}" />
+          <ShareButton
+            url="https://drips.network/app/drip-lists/{dripList?.account.accountId ||
+              votingRound?.id}"
+          />
           {#if isOwnList}
             <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
           {/if}
         </div>
       </div>
-      {#if (dripList.description ?? '').length > 0}
+      {#if (dripList?.description ?? votingRound?.description ?? '').length > 0}
         <div class="description">
           <TextExpandable isExpandable={true}>
-            {dripList.description}
+            {dripList?.description || votingRound?.description}
           </TextExpandable>
         </div>
       {/if}
@@ -170,13 +230,13 @@
         Created by <IdentityBadge
           showAvatar={true}
           showIdentity={true}
-          address={listOwner.address}
+          address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
         />
       </div>
     </header>
 
     <section>
-      {#if inVoting}
+      {#if dripList && votingRound}
         <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
           <TabbedBox
             bind:activeTab
@@ -192,33 +252,52 @@
       <TransitionedHeight transitionHeightChanges>
         <div class="tabs">
           <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
-            <div class="totals">
-              <div class="drip-icon flex-shrink-0">
-                <Drip />
-              </div>
-              <div class="typo-text tabular-nums total-streamed-badge">
-                {#if browser}
-                  <AggregateFiatEstimate
-                    supressUnknownAmountsWarning
-                    amounts={totalIncomingAmounts}
-                  />
-                {/if}
-                <span class="muted">&nbsp;total</span>
-              </div>
-              {#if supportersPile && supportersPile.length > 0}
-                <div in:fade|local={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
-                  <span class="typo-text-small truncate muted">Supported by</span>
-                  <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+            {#if dripList}
+              <div class="totals">
+                <div class="drip-icon flex-shrink-0">
+                  <Drip />
                 </div>
-              {/if}
-            </div>
-            <div class="splits-component">
-              <Splits groupsExpandable={true} list={dripList.splits} />
-            </div>
+                <div class="typo-text tabular-nums total-streamed-badge">
+                  {#if browser}
+                    <AggregateFiatEstimate
+                      supressUnknownAmountsWarning
+                      amounts={totalIncomingAmounts}
+                    />
+                  {/if}
+                  <span class="muted">&nbsp;total</span>
+                </div>
+                {#if supportersPile && supportersPile.length > 0}
+                  <div in:fade|local={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
+                    <span class="typo-text-small truncate muted">Supported by</span>
+                    <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+                  </div>
+                {/if}
+              </div>
+              <div class="splits-component">
+                <Splits groupsExpandable={true} list={dripList.splits} />
+              </div>
+            {/if}
           </div>
 
           <div class="list tab tab-2" class:active-tab={activeTab === 'tab-2'}>
-            voting drip list goes here
+            {#if votingRound}
+              <VotingRoundSplits votingRoundId={votingRound.id} />
+
+              <FormField title="Voting ends" type="div">
+                <p style:margin-bottom="0.25rem" class="typo-text tabular-nums">
+                  <Countdown targetDate={new Date(votingRound.endsAt)} />
+                </p>
+                <p class="typo-text-small">
+                  That's {formatDate(new Date(votingRound.endsAt), 'verbose')} your time.
+                </p>
+              </FormField>
+
+              <div>
+                <Button icon={Trash} on:click={() => handleDeleteVotingRound()}
+                  >Delete this voting round</Button
+                >
+              </div>
+            {/if}
           </div>
         </div>
       </TransitionedHeight>

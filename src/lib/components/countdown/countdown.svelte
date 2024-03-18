@@ -24,5 +24,7 @@
   });
 </script>
 
-{Math.floor(timeLeft / 1000 / 60 / 60 / 24)} days, {Math.floor(timeLeft / 1000 / 60 / 60) % 24} hours,
+{Math.floor(timeLeft / 1000 / 60 / 60 / 24)} day{Math.floor(timeLeft / 1000 / 60 / 60 / 24) === 1
+  ? ''
+  : 's'}, {Math.floor(timeLeft / 1000 / 60 / 60) % 24} hours,
 {Math.floor(timeLeft / 1000 / 60) % 60} minutes, {Math.floor(timeLeft / 1000) % 60} seconds

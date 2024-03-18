@@ -18,7 +18,8 @@
   import Countdown from '$lib/components/countdown/countdown.svelte';
   import unreachable from '$lib/utils/unreachable';
   import formatDate from '$lib/utils/format-date';
-  import { startVotingRound } from '$lib/utils/multiplayer/multiplayer';
+  import * as multiplayer from '$lib/utils/multiplayer';
+  import assert from '$lib/utils/assert';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -28,18 +29,37 @@
 
   function submit() {
     dispatch('await', {
-      promise: async () => {
-        const { newVotingRoundId } = await startVotingRound({
+      promise: async (updateAwaitStep) => {
+        const { signer, address } = $walletStore;
+        assert(signer);
+
+        const timestamp = new Date();
+
+        const signature = await multiplayer.signVotingRound(
+          signer,
+          timestamp,
+          address,
+          Object.keys($context.votingRoundConfig.collaborators),
+        );
+
+        updateAwaitStep({
+          message: 'Creating your collaborative Drip List...',
+        });
+
+        const { newVotingRoundId } = await multiplayer.startVotingRound({
+          signature,
+          date: timestamp,
           name: $context.dripList.title,
           description: $context.dripList.description,
           collaborators: Object.keys($context.votingRoundConfig.collaborators),
           endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
           publisherAddress: $walletStore.address ?? unreachable(),
+          isPrivate: false,
         });
 
         $context.newVotingRoundId = newVotingRoundId;
       },
-      message: 'Creating your collaborative Drip List...',
+      message: 'Confirm in your wallet...',
     });
   }
 </script>

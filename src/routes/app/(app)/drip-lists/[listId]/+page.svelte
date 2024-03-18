@@ -40,23 +40,29 @@
   export let data: PageData;
 
   $: dripList = data.dripList;
+  $: votingRound = data.votingRound;
 
-  $: ownerAccountId = dripList.owner.accountId;
+  $: ownerAccountId = dripList?.owner.accountId ?? votingRound?.publisherAddress;
   $: supportStreams =
+    dripList &&
+    ownerAccountId &&
     $streamsStore &&
     streamsStore
       .getStreamsForUser(ownerAccountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
+      .outgoing.filter((s) => s.receiver.accountId === dripList?.account.accountId);
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
-  $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
+  $: streamsFetched =
+    dripList && ownerAccountId && $streamsFetchStatusses[ownerAccountId] === 'fetched';
 </script>
 
-{#if data.dripList.name}
-  {@const imageBaseUrl = `/api/share-images/drip-list/${dripList.account.accountId}.png`}
+{#if dripList?.name || votingRound?.name}
+  {@const imageBaseUrl = `/api/share-images/drip-list/${
+    dripList?.account.accountId || votingRound?.id
+  }.png`}
   <HeadMeta
-    title="{data.dripList.name} | Drip List"
-    description={data.dripList.description ?? undefined}
+    title="{dripList?.name || votingRound?.name} | Drip List"
+    description={dripList?.description ?? votingRound?.name ?? undefined}
     image="{imageBaseUrl}?target=og"
     twitterImage="{imageBaseUrl}?target=twitter"
   />
@@ -64,30 +70,36 @@
 
 <article class="drip-list-page">
   <main class="list">
-    <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
-      <DripListCard dripList={data.dripList} />
+    <SectionSkeleton loaded={Boolean(dripList || votingRound)} horizontalScroll={false}>
+      <DripListCard data={{ dripList, votingRound }} />
     </SectionSkeleton>
   </main>
 
-  <aside class="support">
-    <div>
-      <SupportCard {dripList} />
-    </div>
-  </aside>
+  {#if dripList}
+    <aside class="support">
+      <div>
+        <SupportCard {dripList} />
+      </div>
+    </aside>
+  {/if}
 
   <div class="sections">
-    <Developer accountId={dripList.account.accountId} />
+    {#if dripList}
+      <Developer accountId={dripList.account.accountId} />
+    {/if}
 
-    <Supporters
-      accountId={dripList.account.accountId}
-      headline="Support"
-      infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies, or send a one-time donation."
-      forceLoading={!streamsFetched}
-      {supportStreams}
-      type="dripList"
-      supportItems={data.dripList.support}
-      ownerAccountId={data.dripList.owner.accountId}
-    />
+    {#if dripList}
+      <Supporters
+        accountId={dripList.account.accountId}
+        headline="Support"
+        infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies, or send a one-time donation."
+        forceLoading={!streamsFetched}
+        supportStreams={supportStreams || undefined}
+        type="dripList"
+        supportItems={dripList.support}
+        ownerAccountId={dripList.owner.accountId}
+      />
+    {/if}
   </div>
 </article>
 
