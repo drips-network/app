@@ -22,6 +22,8 @@ const NETWORK_ID = {
   [11155111]: '0xaa36a7',
 };
 
+console.log("BASE URL", BASE_URL)
+
 const RPC_URLS = {
   [1]: `${BASE_URL}/api/infura/mainnet`,
   [11155111]: `${BASE_URL}/api/infura/sepolia`,
