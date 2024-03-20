@@ -2,10 +2,12 @@ import { MULTIPLAYER_API_ACCESS_TOKEN, MULTIPLAYER_API_URL } from '$env/static/p
 import type { RequestHandler } from './$types';
 
 /** Proxies all requests to multiplayer server and injects api access token */
-export const fallback: RequestHandler = async ({ request, params, fetch }) => {
+export const fallback: RequestHandler = async ({ request, params, url, fetch }) => {
   const body = await request.text();
 
-  const response = await fetch(`${MULTIPLAYER_API_URL}/${params.path}`, {
+  const searchParams = url.searchParams.toString();
+
+  const response = await fetch(`${MULTIPLAYER_API_URL}/${params.path}?${searchParams}`, {
     method: request.method,
     body: body || undefined,
     headers: {
