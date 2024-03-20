@@ -158,7 +158,7 @@ export function getCallerClient() {
  */
 export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
   ? {
-      5: {
+      11155111: {
         CHAIN: 'goerli',
         DEPLOYMENT_TIME: 'foobar',
         COMMIT_HASH: '232029aa1ded48751b01709311987535ee6d3a97',
