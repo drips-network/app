@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const { forge, projectName, chainId } = payload;
 
-  assert([5, 1].includes(chainId), 'Only Goerli and Sepolia are supported for now');
+  assert([1, 11155111].includes(chainId), 'Unsupported network');
 
   const repoDriverAddress = getNetworkConfig(chainId)?.REPO_DRIVER ?? unreachable();
 
@@ -48,8 +48,8 @@ export const POST: RequestHandler = async ({ request }) => {
       chainId,
       name:
         {
-          5: 'goerli',
           1: 'homestead',
+          11155111: 'sepolia',
         }[chainId] ?? unreachable(),
     },
     'f88a1229d473471bbf94d168401b9c93',
