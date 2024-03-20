@@ -3,8 +3,8 @@ import { writable } from 'svelte/store';
 const mockProvider = vi.fn(() => ({
   getSigner: vi.fn(() => mockSigner),
   getNetwork: vi.fn(() => ({
-    chainId: 5,
-    name: 'goerli',
+    chainId: 1115511,
+    name: 'sepolia',
   })),
 }));
 
@@ -19,8 +19,8 @@ const mockWalletStoreState = writable({
   provider: mockProvider,
   signer: mockSigner,
   network: {
-    chainId: 5,
-    name: 'goerli',
+    chainId: 11155111,
+    name: 'sepolia',
   },
 });
 
