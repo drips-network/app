@@ -35,7 +35,7 @@ export const projectVoteSchema = pendingVoteSchema.extend({
   accountId: z.string(),
 });
 
-export const voteSchema = z.union([pendingVoteSchema, addressVoteSchema, projectVoteSchema]);
+export const voteSchema = z.union([addressVoteSchema, projectVoteSchema, pendingVoteSchema]);
 
 export type AddressVote = z.infer<typeof addressVoteSchema>;
 export type ProjectVote = z.infer<typeof projectVoteSchema>;
