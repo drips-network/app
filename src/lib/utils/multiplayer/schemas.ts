@@ -17,8 +17,26 @@ export const getVotingRoundResponseSchema = z.object({
 
 export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;
 
-export const voteSchema = z.object({
+export const pendingVoteSchema = z.object({
   collaboratorAddress: z.string(),
 });
 
+export const addressVoteSchema = pendingVoteSchema.extend({
+  address: z.string(),
+  type: z.literal('address'),
+  weight: z.number(),
+  accountId: z.string(),
+});
+
+export const projectVoteSchema = pendingVoteSchema.extend({
+  url: z.string(),
+  type: z.literal('project'),
+  weight: z.number(),
+  accountId: z.string(),
+});
+
+export const voteSchema = z.union([pendingVoteSchema, addressVoteSchema, projectVoteSchema]);
+
+export type AddressVote = z.infer<typeof addressVoteSchema>;
+export type ProjectVote = z.infer<typeof projectVoteSchema>;
 export type Vote = z.infer<typeof voteSchema>;

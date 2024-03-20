@@ -3,12 +3,25 @@
   import * as multiplayer from '$lib/utils/multiplayer';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Emoji from '$lib/components/emoji/emoji.svelte';
+  import Splits, {
+    mapSplitsFromMultiplayerResults,
+    type SplitsComponentSplitsReceiver,
+  } from '$lib/components/splits/splits.svelte';
 
   export let votingRoundId: string;
 
   let result: Awaited<ReturnType<typeof multiplayer.getVotingRoundResult>> | undefined;
+  let splits: SplitsComponentSplitsReceiver[] | undefined;
   onMount(async () => {
-    result = await multiplayer.getVotingRoundResult(votingRoundId);
+    const res = await multiplayer.getVotingRoundResult(votingRoundId);
+
+    if (res.find((r) => 'type' in r)) {
+      // There's at least one vote
+
+      splits = await mapSplitsFromMultiplayerResults(res);
+    }
+
+    result = res;
   });
 </script>
 
@@ -21,8 +34,8 @@
       <h4>No recipients yet</h4>
       <p>Collaborators are currently voting on the recipients of this Drip List.</p>
     </div>
-  {:else}
-    splits
+  {:else if splits}
+    <Splits draft list={splits} />
   {/if}
 </div>
 

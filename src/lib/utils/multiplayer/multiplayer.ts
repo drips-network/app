@@ -11,12 +11,15 @@ import {
   CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE,
   DELETE_VOTING_ROUND_MESSAGE_TEMPLATE,
   START_VOTING_ROUND_MESSAGE_TEMPLATE,
+  VOTE_MESSAGE_TEMPLATE,
 } from './signature-message-templates';
+import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import { getAddressDriverClient, getRepoDriverClient } from '../get-drips-clients';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
   path: string,
-  responseSchema: ST,
+  responseSchema: ST | undefined,
   body?: Record<string, unknown>,
   fetch = window.fetch,
 ): Promise<z.infer<ST>> {
@@ -25,10 +28,18 @@ async function _authenticatedCall<ST extends ZodSchema>(
     body: body && JSON.stringify(body),
   });
 
+  if (response.body === null) {
+    if (!response.ok) throw new Error('Server error');
+    if (responseSchema) throw new Error('Unexpected empty body');
+
+    return;
+  }
+
   const parsed = await response.json();
 
   if (!response.ok) throw new Error(parsed.error);
 
+  if (!responseSchema) throw new Error('Missing zod schema for response');
   return responseSchema.parse(parsed);
 }
 
@@ -155,9 +166,111 @@ export async function getVotingRoundResult(votingRoundId: string, fetch = window
   ).result;
 }
 
+type ProjectReceiver = {
+  weight: number;
+  url: string;
+  accountId: string;
+  type: 'project';
+};
+
+type AddressReceiver = {
+  weight: number;
+  address: string;
+  accountId: string;
+  type: 'address';
+};
+
+export function signVote(
+  signer: ethers.Signer,
+  currentTime: Date,
+  collaboratorAddress: string,
+  votingRoundId: string,
+  receivers: (ProjectReceiver | AddressReceiver)[],
+) {
+  const message = VOTE_MESSAGE_TEMPLATE(currentTime, collaboratorAddress, votingRoundId, receivers);
+
+  return signer.signMessage(message);
+}
+
+export async function vote(
+  votingRoundId: string,
+  ballot: {
+    signature: string;
+    date: Date;
+    collaboratorAddress: string;
+    receivers: (
+      | {
+          weight: number;
+          url: string;
+          accountId: string;
+          type: 'project';
+        }
+      | {
+          weight: number;
+          address: string;
+          type: 'address';
+        }
+    )[];
+  },
+  fetch = window.fetch,
+) {
+  return _authenticatedCall(
+    'POST',
+    `/votingRounds/${votingRoundId}/votes`,
+    undefined,
+    {
+      ...ballot,
+      date: ballot.date.toISOString(),
+    },
+    fetch,
+  );
+}
+
 export function matchVotingRoundToDripList(
   votingRounds: VotingRound[],
   dripListId: string,
 ): VotingRound | undefined {
   return votingRounds.filter((vr) => vr.dripListId === dripListId && vr.status === 'started')[0];
+}
+
+export async function mapListEditorStateToVoteReceivers(
+  items: Items,
+  percentages: Percentages,
+): Promise<(ProjectReceiver | AddressReceiver)[]> {
+  const repoDriverClient = await getRepoDriverClient();
+  const addressDriverClient = await getAddressDriverClient();
+
+  const result: (ProjectReceiver | AddressReceiver)[] = [];
+
+  for (const [key, item] of Object.entries(items)) {
+    const percentage = percentages[key];
+
+    switch (item.type) {
+      case 'project':
+        result.push({
+          // TODO: Server should work with weights instead of percentages
+          weight: percentage,
+          url: item.project.source.url,
+          // TODO: Server should calculate the ID.
+          accountId: await repoDriverClient.getAccountId(
+            1,
+            `${item.project.source.ownerName}/${item.project.source.repoName}`,
+          ),
+          type: 'project',
+        });
+        break;
+      case 'address':
+        result.push({
+          weight: percentage,
+          address: item.address,
+          accountId: await addressDriverClient.getAccountIdByAddress(item.address),
+          type: 'address',
+        });
+        break;
+      default:
+        throw new Error(`Unknown item type: ${item.type}`);
+    }
+  }
+
+  return result;
 }

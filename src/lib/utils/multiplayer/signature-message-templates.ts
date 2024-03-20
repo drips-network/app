@@ -34,7 +34,8 @@ export const VOTE_MESSAGE_TEMPLATE = (
   currentTime: Date,
   voterAddress: string,
   votingRoundId: string,
-  receivers: string[],
+  // TODO: Real type
+  receivers: Record<string, unknown>[],
 ) => {
   const sortedReceivers = receivers.sort((a, b) => Number(a) - Number(b));
 

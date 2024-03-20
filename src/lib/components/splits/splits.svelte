@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
   import { gql } from 'graphql-request';
 
   export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
@@ -40,28 +41,35 @@
     }
   `;
 
-  export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
+  export const SPLITS_COMPONENT_PROJECT_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
+    fragment SplitsComponentProject on Project {
+      ...ProjectBadge
+      ... on UnclaimedProject {
+        source {
+          repoName
+          ownerName
+        }
+      }
+      ... on ClaimedProject {
+        owner {
+          address
+        }
+        source {
+          repoName
+          ownerName
+        }
+        color
+      }
+    }
+  `;
+
+  export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
+    ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
     fragment SplitsComponentProjectReceiver on ProjectReceiver {
       weight
       project {
-        ...ProjectBadge
-        ... on UnclaimedProject {
-          source {
-            repoName
-            ownerName
-          }
-        }
-        ... on ClaimedProject {
-          owner {
-            address
-          }
-          source {
-            repoName
-            ownerName
-          }
-          color
-        }
+        ...SplitsComponentProject
       }
     }
   `;
@@ -139,6 +147,59 @@
       }
     });
   }
+
+  export async function mapSplitsFromMultiplayerResults(
+    votes: Vote[],
+  ): Promise<SplitsComponentSplitsReceiver[]> {
+    const projectVoteReceivers = votes.filter((v): v is ProjectVote => {
+      return 'type' in v && v.type === 'project';
+    });
+
+    const projectsData = await Promise.all(
+      projectVoteReceivers.map(async (v) => {
+        const projectQuery = gql`
+          ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
+          query Project($url: String!) {
+            projectByUrl(url: $url) {
+              ...SplitsComponentProject
+            }
+          }
+        `;
+
+        const project = (
+          await query<ProjectQuery, ProjectQueryVariables>(projectQuery, { url: v.url })
+        ).projectByUrl;
+
+        return project;
+      }),
+    );
+
+    return mapFilterUndefined(votes, (v) => {
+      if (!('type' in v)) return undefined;
+
+      switch (v.type) {
+        case 'address':
+          return {
+            __typename: 'AddressReceiver',
+            account: {
+              __typename: 'AddressDriverAccount',
+              address: v.address,
+            },
+            weight: v.weight * 10000,
+          };
+        case 'project': {
+          const project = projectsData.find((p) => p?.source.url === v.url);
+          if (!project) throw new Error(`Project not found for url: ${v.url}`);
+
+          return {
+            __typename: 'ProjectReceiver',
+            project: project,
+            weight: v.weight * 10000,
+          };
+        }
+      }
+    });
+  }
 </script>
 
 <script lang="ts">
@@ -149,6 +210,8 @@
     SplitsComponentProjectReceiverFragment,
   } from './__generated__/gql.generated';
   import { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
+  import type { Vote, ProjectVote } from '$lib/utils/multiplayer/schemas';
+  import query from '$lib/graphql/dripsQL';
 
   export let list: Splits;
   export let maxRows: number | undefined = undefined;

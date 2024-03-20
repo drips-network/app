@@ -6,6 +6,10 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
   import Proposals from '$lib/components/icons/Proposals.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import voteFlowSteps from '$lib/flows/vote/vote-flow-steps';
+  import viewVoteFlowSteps from '$lib/flows/view-vote/view-vote-flow-steps';
 
   export let votingRoundId: string;
 
@@ -13,6 +17,56 @@
   onMount(async () => {
     collaborators = await multiplayer.getVotingRoundVotes(votingRoundId);
   });
+
+  function getCollaboratorRightButton(connectedAddress: string | undefined, vote: Vote) {
+    const { collaboratorAddress } = vote;
+
+    const isOwnVote = collaboratorAddress.toLowerCase() === connectedAddress?.toLowerCase();
+
+    if ('type' in vote) {
+      // Ballot already submitted
+
+      return isOwnVote
+        ? {
+            component: PropsOnlyButton,
+            props: {
+              label: 'View your vote',
+              onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRoundId)),
+              buttonProps: {
+                variant: 'primary',
+                icon: Proposals,
+              },
+            },
+          }
+        : {
+            component: PropsOnlyButton,
+            props: {
+              label: 'View vote',
+              onClick: () => modal.show(Stepper, undefined, viewVoteFlowSteps(vote)),
+              buttonProps: {
+                variant: 'secondary',
+                icon: Proposals,
+              },
+            },
+          };
+    }
+
+    if (isOwnVote) {
+      return {
+        component: PropsOnlyButton,
+        props: {
+          label: 'Cast your vote',
+          onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRoundId)),
+          buttonProps: {
+            variant: 'primary',
+            icon: Proposals,
+          },
+        },
+      };
+    }
+
+    return undefined;
+  }
 </script>
 
 {#if !collaborators}
@@ -27,19 +81,7 @@
         {
           type: 'address',
           address: c.collaboratorAddress,
-          rightComponent:
-            c.collaboratorAddress.toLowerCase() === $walletStore?.address?.toLowerCase()
-              ? {
-                  component: PropsOnlyButton,
-                  props: {
-                    label: 'Cast your vote',
-                    buttonProps: {
-                      variant: 'ghost',
-                      icon: Proposals,
-                    },
-                  },
-                }
-              : undefined,
+          rightComponent: getCollaboratorRightButton($walletStore.address, c),
         },
       ]),
     )}
