@@ -16,17 +16,18 @@ There are a few environment variables required for the app to function. You can 
 
 The Drips App depends on the custom [Drips GraphQL API](https://github.com/drips-network/graphql-api). You need to set `GQL_URL` to a URL of the API's `graphql` endpoint, and `GQL_ACCESS_TOKEN` for the `Authorization: Bearer` token that should be used.
 
-For most development tasks, you may use our Sepolia deployment of the API, hosted at [https://drips-api-sepolia-s1.up.railway.app/](https://drips-api-sepolia-s1.up.railway.app/). To use this API deployment, set `GQL_URL` to `https://drips-api-sepolia-s1.up.railway.app/`, and `GQL_ACCESS_TOKEN` to `afdb8b7e-8fa7-4de9-bd95-b650b839e745`. Ensure `PUBLIC_NETWORK` is set to `11155111`, so that both the app and API are talking to the Sepolia testnet.
+For most development tasks, you may use our Goerli deployment of the API, hosted at [https://drips-api-goerli-s1.up.railway.app/](https://drips-api-goerli-s1.up.railway.app/). To use this API deployment, set `GQL_URL` to `https://drips-api-goerli-s1.up.railway.app/`, and `GQL_ACCESS_TOKEN` to `1234`. Ensure `PUBLIC_NETWORK` is set to `5`, so that both the app and API are talking to the Goerli testnet.
 
 You can also use the local E2E env to easily spin up a fully-fledged deployment of the Drips GraphQL API, complete with event processing and a local, blank testnet to transact against. To do so, set `GQL_URL` to `http://localhost:8080/graphql`, `GQL_ACCESS_TOKEN` to `afdb8b7e-8fa7-4de9-bd95-b650b839e745`, and `PUBLIC_NETWORK` to `5`. Then, follow the instructions below under "🌐 Run app locally with a local testnet".
 
 ### 🔗 Chain Config
 
-To run the app, youʼll need to configure the `PUBLIC_NETWORK` environment variable. This should be the chainId of the chain you want to run the app for, and can currently be either 1 or 11155111. The app will only allow connecting wallets that are set to this network, and all server-side requests will be made for this network's subgraph.
+To run the app, youʼll need to configure the `PUBLIC_NETWORK` environment variable. This should be the chainId of the chain you want to run the app for, and can currently be either 1, 5 or 11155111. The app will only allow connecting wallets that are set to this network, and all server-side requests will be made for this network's subgraph.
 
 For your convenience, weʼve deployed production mirrors of the app set to allow testnet connections:
 
 ```sh
+https://goerli.drips.network/ # PUBLIC_NETWORK set to 5
 https://sepolia.drips.network/ # PUBLIC_NETWORK set to 11155111
 ```
 

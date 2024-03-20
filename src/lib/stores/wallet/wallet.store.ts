@@ -94,10 +94,12 @@ export interface DisconnectedWalletStoreState {
 
 type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState;
 
+const initNetwork = DEFAULT_NETWORK;
+
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
-  network: DEFAULT_NETWORK,
-  provider: new ethers.providers.JsonRpcProvider(network.rpcUrl, DEFAULT_NETWORK),
+  network: initNetwork,
+  provider: new ethers.providers.InfuraProvider(initNetwork, network.infuraKey),
 };
 
 const walletStore = () => {

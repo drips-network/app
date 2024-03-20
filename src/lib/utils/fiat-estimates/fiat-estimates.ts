@@ -32,11 +32,11 @@ const started = writable(false);
 
 const SUBSTITUTIONS = {
   // Map "WEENUS" testnet token to WETH mainnet
-  ['0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  ['0xaff4481d10270f50f203e0763e2597776068cbc5']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   // Map "XEENUS" testnet token to WETH mainnet
-  ['0xc21d97673B9E0B3AA53a06439F71fDc1facE393B']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-  // Map WETH sepolia token to WETH mainnet
-  ['0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  ['0x022e292b44b5a146f2e8ee36ff44d3dd863c915c']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  // Map WETH goerli token to WETH mainnet
+  ['0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 };
 
 /** Establish a connection to the data provider. */
