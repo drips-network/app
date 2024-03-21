@@ -2,8 +2,8 @@ import { providers } from 'ethers';
 import { env } from '$env/dynamic/public';
 
 const NETWORK = {
-  chainId: 5,
-  name: 'goerli',
+  chainId: 11155111,
+  name: 'sepolia',
 };
 
 class MockProvider extends providers.StaticJsonRpcProvider {
