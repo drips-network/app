@@ -4,7 +4,7 @@ import {
   startVotingRoundResponseSchema,
   getVotingRoundResponseSchema,
   type VotingRound,
-  voteSchema,
+  getVotingRoundVotesResponseSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -147,7 +147,7 @@ export async function getVotingRoundVotes(votingRoundId: string, fetch = window.
     await _authenticatedCall(
       'GET',
       `/votingRounds/${votingRoundId}/votes`,
-      z.object({ votes: z.array(voteSchema) }),
+      getVotingRoundVotesResponseSchema,
       undefined,
       fetch,
     )

@@ -15,6 +15,7 @@ import PenIcon from '$lib/components/icons/✏️.svelte';
 import ForwardIcon from '$lib/components/icons/⏩.svelte';
 import BubblesIcon from '$lib/components/icons/🫧.svelte';
 import HourglassIcon from '$lib/components/icons/⏳.svelte';
+import BallotIcon from '$lib/components/icons/🗳️.svelte';
 import type { ComponentType } from 'svelte';
 
 export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
@@ -35,4 +36,5 @@ export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
   ['⏳']: HourglassIcon,
   ['✏️']: PenIcon,
   ['⏩']: ForwardIcon,
+  ['🗳️']: BallotIcon,
 };

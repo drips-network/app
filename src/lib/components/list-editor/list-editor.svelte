@@ -1,4 +1,6 @@
 <script lang="ts" context="module">
+  import type { ProjectVoteReceiver, VoteReceiver } from '$lib/utils/multiplayer/schemas';
+
   export const DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     fragment DripListMembersEditorProject on Project {
@@ -45,6 +47,61 @@
     items: Items;
     percentages: Percentages;
   }
+
+  export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver[]) {
+    let items: Items = {};
+    let percentages: Percentages = {};
+
+    const projectVoteReceivers = receivers.filter((v): v is ProjectVoteReceiver => {
+      return 'type' in v && v.type === 'project';
+    });
+
+    const projectsData = await Promise.all(
+      projectVoteReceivers.map(async (v) => {
+        const projectQuery = gql`
+          ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+          query ProjectForVoteReceiver($url: String!) {
+            projectByUrl(url: $url) {
+              ...DripListMembersEditorProject
+            }
+          }
+        `;
+
+        const project = (
+          await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
+            projectQuery,
+            { url: v.url },
+          )
+        ).projectByUrl;
+
+        return project;
+      }),
+    );
+
+    for (const receiver of receivers) {
+      switch (receiver.type) {
+        case 'project': {
+          const project = projectsData.find((p) => p?.source.url === receiver.url);
+          if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
+
+          items[receiver.url] = { type: 'project', project };
+          percentages[receiver.url] = receiver.weight;
+          break;
+        }
+        case 'address':
+          items[receiver.address] = { type: 'address', address: receiver.address };
+          percentages[receiver.address] = receiver.weight;
+          break;
+        default:
+          throw new Error('Unknown receiver type');
+      }
+    }
+
+    return {
+      items,
+      percentages,
+    };
+  }
 </script>
 
 <script lang="ts">
@@ -80,6 +137,8 @@
     DripListMembersEditorProjectFragment,
     DripListToAddQuery,
     DripListToAddQueryVariables,
+    ProjectForVoteReceiverQuery,
+    ProjectForVoteReceiverQueryVariables,
     ProjectToAddQuery,
     ProjectToAddQueryVariables,
   } from './__generated__/gql.generated';

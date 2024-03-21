@@ -149,9 +149,9 @@
   }
 
   export async function mapSplitsFromMultiplayerResults(
-    votes: Vote[],
+    receivers: VoteReceiver[],
   ): Promise<SplitsComponentSplitsReceiver[]> {
-    const projectVoteReceivers = votes.filter((v): v is ProjectVote => {
+    const projectVoteReceivers = receivers.filter((v): v is ProjectVoteReceiver => {
       return 'type' in v && v.type === 'project';
     });
 
@@ -174,9 +174,7 @@
       }),
     );
 
-    return mapFilterUndefined(votes, (v) => {
-      if (!('type' in v)) return undefined;
-
+    return mapFilterUndefined(receivers, (v) => {
       switch (v.type) {
         case 'address':
           return {
@@ -210,7 +208,7 @@
     SplitsComponentProjectReceiverFragment,
   } from './__generated__/gql.generated';
   import { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
-  import type { Vote, ProjectVote } from '$lib/utils/multiplayer/schemas';
+  import type { VoteReceiver, ProjectVoteReceiver } from '$lib/utils/multiplayer/schemas';
   import query from '$lib/graphql/dripsQL';
 
   export let list: Splits;

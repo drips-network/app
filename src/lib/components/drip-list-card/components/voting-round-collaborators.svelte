@@ -23,7 +23,7 @@
 
     const isOwnVote = collaboratorAddress.toLowerCase() === connectedAddress?.toLowerCase();
 
-    if ('type' in vote) {
+    if ('latestVote' in vote) {
       // Ballot already submitted
 
       return isOwnVote

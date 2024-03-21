@@ -17,26 +17,37 @@ export const getVotingRoundResponseSchema = z.object({
 
 export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;
 
-export const pendingVoteSchema = z.object({
-  collaboratorAddress: z.string(),
-});
-
-export const addressVoteSchema = pendingVoteSchema.extend({
+export const addressVoteReceiverSchema = z.object({
   address: z.string(),
   type: z.literal('address'),
   weight: z.number(),
   accountId: z.string(),
 });
 
-export const projectVoteSchema = pendingVoteSchema.extend({
+export const projectVoteReceiverSchema = z.object({
   url: z.string(),
   type: z.literal('project'),
   weight: z.number(),
   accountId: z.string(),
 });
 
-export const voteSchema = z.union([addressVoteSchema, projectVoteSchema, pendingVoteSchema]);
+export const voteReceiverSchema = z.union([addressVoteReceiverSchema, projectVoteReceiverSchema]);
 
-export type AddressVote = z.infer<typeof addressVoteSchema>;
-export type ProjectVote = z.infer<typeof projectVoteSchema>;
+export const pendingVoteSchema = z.object({
+  collaboratorAddress: z.string(),
+});
+
+export const submittedVoteSchema = pendingVoteSchema.extend({
+  latestVote: z.array(voteReceiverSchema),
+});
+
+export const voteSchema = z.union([submittedVoteSchema, pendingVoteSchema]);
+
+export const getVotingRoundVotesResponseSchema = z.object({
+  votes: z.array(voteSchema),
+});
+
+export type AddressVoteReceiver = z.infer<typeof addressVoteReceiverSchema>;
+export type ProjectVoteReceiver = z.infer<typeof projectVoteReceiverSchema>;
+export type VoteReceiver = z.infer<typeof voteReceiverSchema>;
 export type Vote = z.infer<typeof voteSchema>;
