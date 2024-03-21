@@ -1,5 +1,6 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
 import assert from '$lib/utils/assert';
+import { BASE_URL } from '$lib/utils/base-url';
 
 const NETWORK_NAMES = {
   [1]: 'homestead',
@@ -22,8 +23,8 @@ const NETWORK_ID = {
 };
 
 const RPC_URLS = {
-  [1]: '/api/infura/mainnet',
-  [11155111]: '/api/infura/sepolia',
+  [1]: `${BASE_URL}/api/infura/mainnet`,
+  [11155111]: `${BASE_URL}/api/infura/sepolia`,
 };
 
 // Networks currently supported by the app
