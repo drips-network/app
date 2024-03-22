@@ -73,7 +73,7 @@
         ],
       }}
       option2={{
-        emoji: '👨‍👩‍👧',
+        emoji: '👪',
         title: 'Collaborate on recipients',
         attributes: [
           {

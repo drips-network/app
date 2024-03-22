@@ -10,6 +10,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import voteFlowSteps from '$lib/flows/vote/vote-flow-steps';
   import viewVoteFlowSteps from '$lib/flows/view-vote/view-vote-flow-steps';
+  import FormField from '$lib/components/form-field/form-field.svelte';
 
   export let votingRoundId: string;
 
@@ -30,7 +31,7 @@
         ? {
             component: PropsOnlyButton,
             props: {
-              label: 'View your vote',
+              label: 'Change your vote',
               onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRoundId)),
               buttonProps: {
                 variant: 'primary',
@@ -69,21 +70,23 @@
   }
 </script>
 
-{#if !collaborators}
-  loading...
-{:else}
-  <ListEditor
-    isEditable={false}
-    mode="list"
-    items={Object.fromEntries(
-      collaborators.map((c) => [
-        c.collaboratorAddress,
-        {
-          type: 'address',
-          address: c.collaboratorAddress,
-          rightComponent: getCollaboratorRightButton($walletStore.address, c),
-        },
-      ]),
-    )}
-  />
-{/if}
+<FormField title="Collaborators" type="div">
+  {#if !collaborators}
+    loading...
+  {:else}
+    <ListEditor
+      isEditable={false}
+      mode="list"
+      items={Object.fromEntries(
+        collaborators.map((c) => [
+          c.collaboratorAddress,
+          {
+            type: 'address',
+            address: c.collaboratorAddress,
+            rightComponent: getCollaboratorRightButton($walletStore.address, c),
+          },
+        ]),
+      )}
+    />
+  {/if}
+</FormField>

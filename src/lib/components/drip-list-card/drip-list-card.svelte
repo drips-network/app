@@ -76,12 +76,12 @@
   import unreachable from '$lib/utils/unreachable';
   import assert from '$lib/utils/assert';
   import VotingRoundSplits from './components/voting-round-splits.svelte';
-  import FormField from '../form-field/form-field.svelte';
-  import formatDate from '$lib/utils/format-date';
-  import Countdown from '../countdown/countdown.svelte';
   import Trash from '../icons/Trash.svelte';
   import deleteVotingRoundSteps from '$lib/flows/delete-voting-round/delete-voting-round-steps';
   import VotingRoundCollaborators from './components/voting-round-collaborators.svelte';
+  import VotingRoundNoticeCard from './components/voting-round-notice-card.svelte';
+  import VotingRoundCountdown from './components/voting-round-countdown.svelte';
+  import Wallet from '../icons/Wallet.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -176,6 +176,10 @@
   $: isOwnVotingRound = votingRound?.publisherAddress === $walletStore?.address;
 </script>
 
+{#if votingRound}
+  <VotingRoundNoticeCard {votingRound} />
+{/if}
+
 <section
   class:has-description={dripList?.description || votingRound?.description}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
@@ -265,30 +269,38 @@
             {#if votingRound}
               <VotingRoundSplits votingRoundId={votingRound.id} />
 
-              <FormField title="Collaborators" type="div">
-                <VotingRoundCollaborators votingRoundId={votingRound.id} />
-              </FormField>
+              <VotingRoundCollaborators votingRoundId={votingRound.id} />
 
-              <FormField title="Voting ends" type="div">
-                <p style:margin-bottom="0.25rem" class="typo-text tabular-nums">
-                  <Countdown targetDate={new Date(votingRound.endsAt)} />
-                </p>
-                <p class="typo-text-small">
-                  That's {formatDate(new Date(votingRound.endsAt), 'verbose')} your time.
-                </p>
-              </FormField>
+              <VotingRoundCountdown {votingRound} />
 
               {#if isOwnVotingRound}
-                <div>
-                  <Button
-                    icon={Trash}
-                    on:click={() =>
-                      modal.show(
-                        Stepper,
-                        undefined,
-                        deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
-                      )}>Delete this voting round</Button
-                  >
+                <div class="actions">
+                  <div>
+                    <Button
+                      icon={Trash}
+                      on:click={() =>
+                        modal.show(
+                          Stepper,
+                          undefined,
+                          deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                        )}>Delete voting round</Button
+                    >
+                  </div>
+
+                  {#if votingRound.status === 'completed'}
+                    <div>
+                      <Button
+                        variant="primary"
+                        icon={Wallet}
+                        on:click={() =>
+                          modal.show(
+                            Stepper,
+                            undefined,
+                            deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                          )}>Publish Drip List</Button
+                      >
+                    </div>
+                  {/if}
                 </div>
               {/if}
             {/if}
@@ -379,5 +391,18 @@
     transform: none;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .actions {
+      flex-direction: column;
+    }
   }
 </style>

@@ -28,7 +28,7 @@ async function _authenticatedCall<ST extends ZodSchema>(
     body: body && JSON.stringify(body),
   });
 
-  if (response.body === null) {
+  if (response.headers.get('Content-Type') === null) {
     if (!response.ok) throw new Error('Server error');
     if (responseSchema) throw new Error('Unexpected empty body');
 
@@ -105,7 +105,7 @@ export function deleteVotingRound(
   return _authenticatedCall(
     'DELETE',
     `/votingRounds/${votingRoundId}`,
-    z.any(),
+    undefined,
     {
       signature,
       date: date.toISOString(),

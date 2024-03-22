@@ -1,7 +1,6 @@
 <script lang="ts">
   import assert from '$lib/utils/assert';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
-  import { goto } from '$app/navigation';
   import DripListCardThumblink, {
     DRIP_LIST_CARD_THUMBLINK_FRAGMENT,
   } from '../drip-list-card/drip-list-card-thumblink.svelte';
@@ -112,7 +111,7 @@
         {#if dripList.type === 'drip-list'}
           <DripListCardThumblink {dripList} />
         {:else}
-          <a href="/app/drip-lists/{dripList.id}">voting round</a>
+          <a href="/app/drip-lists/{dripList.id}">{dripList.name}</a>
         {/if}
       {/each}
       {#if showCreateNewListCard}
@@ -125,8 +124,13 @@
             <h6 class="typo-text-bold">Got a new idea?</h6>
             <p>You can create as many Drip Lists as you like.</p>
             <div class="mt-2">
-              <Button icon={Plus} on:click={() => goto('/app/funder-onboarding')}
-                >Create a new Drip List</Button
+              <Button
+                icon={Plus}
+                on:click={() =>
+                  modal.show(CreateDripListStepper, undefined, {
+                    skipWalletConnect: true,
+                    isModal: true,
+                  })}>Create a new Drip List</Button
               >
             </div>
           </div>

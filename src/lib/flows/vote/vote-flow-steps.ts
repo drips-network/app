@@ -1,4 +1,5 @@
 import { makeStep } from '$lib/components/stepper/types';
+import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import Vote from './vote.svelte';
 
 export default (votingRoundId: string) => ({
@@ -8,6 +9,12 @@ export default (votingRoundId: string) => ({
       component: Vote,
       props: {
         votingRoundId,
+      },
+    }),
+    makeStep({
+      component: SuccessStep,
+      props: {
+        message: 'Your vote has been successfully submitted.',
       },
     }),
   ],

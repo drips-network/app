@@ -1,3 +1,5 @@
+import type { ComponentType } from 'svelte';
+
 import CheckIcon from '$lib/components/icons/✅.svelte';
 import WarningIcon from '$lib/components/icons/⚠️.svelte';
 import GlobeIcon from '$lib/components/icons/🌐.svelte';
@@ -16,7 +18,7 @@ import ForwardIcon from '$lib/components/icons/⏩.svelte';
 import BubblesIcon from '$lib/components/icons/🫧.svelte';
 import HourglassIcon from '$lib/components/icons/⏳.svelte';
 import BallotIcon from '$lib/components/icons/🗳️.svelte';
-import type { ComponentType } from 'svelte';
+import FamilyIcon from '$lib/components/icons/👪.svelte';
 
 export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
   ['✅']: CheckIcon,
@@ -37,4 +39,5 @@ export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
   ['✏️']: PenIcon,
   ['⏩']: ForwardIcon,
   ['🗳️']: BallotIcon,
+  ['👪']: FamilyIcon,
 };

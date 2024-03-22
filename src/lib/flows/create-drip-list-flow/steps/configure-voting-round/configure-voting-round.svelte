@@ -36,7 +36,7 @@
     description="Choose the specific day and time this voting period should end. You and your collaborators will have until this time to suggest and vote on recipients."
   >
     <DateInput
-      min={new Date(new Date(Date.now() + 24 * 60 * 60 * 1000).setHours(0, 0, 0, 0))}
+      min={new Date()}
       bind:value={$context.votingRoundConfig.votingEnds}
       timePrecision="second"
     />
