@@ -5,7 +5,7 @@ import { ethers, utils } from 'ethers';
 import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
-import { GELATO_API_KEY } from '$env/static/private';
+import { GELATO_API_KEY, INFURA_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
 
 const payloadSchema = z.object({
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
           11155111: 'sepolia',
         }[chainId] ?? unreachable(),
     },
-    'f88a1229d473471bbf94d168401b9c93',
+    INFURA_KEY,
   );
 
   const contract = new ethers.Contract(repoDriverAddress, REPO_DRIVER_ABI, provider);
