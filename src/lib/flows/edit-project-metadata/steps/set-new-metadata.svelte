@@ -38,6 +38,7 @@
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
   import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
   import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
+  import { Utils } from 'radicle-drips';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -88,7 +89,7 @@
               key: MetadataManagerBase.USER_METADATA_KEY,
               value: ipfsHash,
             },
-          ];
+          ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
 
           const txFactory = await getRepoDriverTxFactory();
 
