@@ -6,17 +6,6 @@ on:
       - main
 
 jobs:
-  sync-goerli-branch:
-    name: Update Goerli testnet branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@master
-      - uses: connor-baer/action-sync-branch@main
-        with:
-          branch: goerli
-          token: ${{ secrets.SYNC_BRANCH_GITHUB_TOKEN }}
-          force: true
   sync-sepolia-branch:
     name: Update Sepolia testnet branch
     runs-on: ubuntu-latest

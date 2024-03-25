@@ -15,8 +15,8 @@ vi.mock('$app/environment', () => ({
 vi.mock('$lib/stores/wallet', () => ({
   default: readable({
     network: {
-      chainId: 5,
-      name: 'goerli',
+      chainId: 11155111,
+      name: 'sepolia',
     },
   }),
 }));
