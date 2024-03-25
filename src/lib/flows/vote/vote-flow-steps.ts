@@ -2,7 +2,9 @@ import type { Items, Percentages } from '$lib/components/list-editor/list-editor
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { writable } from 'svelte/store';
-import Vote from './vote.svelte';
+import VoteStep from './vote.svelte';
+import type { Vote } from '$lib/utils/multiplayer/schemas';
+import FetchVoteData from './fetch-vote-data.svelte';
 
 export interface State {
   listEditorConfig: {
@@ -18,11 +20,17 @@ const state = writable<State>({
   },
 });
 
-export default (votingRoundId: string) => ({
+export default (votingRoundId: string, previousVote?: Vote) => ({
   context: () => state,
   steps: [
     makeStep({
-      component: Vote,
+      component: FetchVoteData,
+      props: {
+        previousVote,
+      },
+    }),
+    makeStep({
+      component: VoteStep,
       props: {
         votingRoundId,
       },

@@ -32,7 +32,7 @@
             component: PropsOnlyButton,
             props: {
               label: 'Change your vote',
-              onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id)),
+              onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id, vote)),
               buttonProps: {
                 variant: 'primary',
                 icon: Proposals,
