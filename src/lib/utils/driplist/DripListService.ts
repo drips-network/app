@@ -23,14 +23,12 @@ import type { SplitsReceiverStruct, StreamConfig } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
-import unreachable from '../unreachable';
 import type { Address, IpfsHash } from '../common-types';
-import type { State } from '../../flows/create-drip-list-flow/create-drip-list-flow';
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import { isAddress } from 'ethers/lib/utils';
-import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
+import type { Percentages } from '$lib/components/list-editor/list-editor.svelte';
 import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
@@ -102,17 +100,33 @@ export default class DripListService {
     return dripListService;
   }
 
-  public async buildTransactContext(context: State) {
+  public async buildTransactContext(config: {
+    listTitle: string;
+    listDescription?: string;
+    percentages: Percentages;
+    support?:
+      | {
+          type: 'continuous';
+          tokenAddress: string;
+          amountPerSec: bigint;
+          topUpAmount: bigint;
+        }
+      | {
+          type: 'one-time';
+          tokenAddress: string;
+          donationAmount: bigint;
+        };
+    latestVotingRoundId?: string;
+  }) {
     assert(
       this._ownerAddress && this._nftDriverClient,
       `This function requires an active wallet connection.`,
     );
 
-    const dripListName = context.dripList.title;
-    const dripListDescription = context.dripList.description;
+    const { listTitle, listDescription, percentages, support, latestVotingRoundId } = config;
 
     const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
-      context.dripList,
+      percentages,
     );
 
     const mintedNftAccountsCountQuery = gql`
@@ -129,44 +143,40 @@ export default class DripListService {
 
     const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
 
-    const dripListId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
+    const listId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
 
     const ipfsHash = await this._publishMetadataToIpfs(
-      dripListId,
+      listId,
       projectsSplitMetadata,
-      dripListName,
-      dripListDescription,
+      listTitle,
+      listDescription,
+      latestVotingRoundId,
     );
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
     const setDripListSplitsTx = await this._nftDriverTxFactory.setSplits(
-      dripListId,
+      listId,
       this._formatSplitReceivers(receivers),
     );
 
     let needsApprovalForToken: string | undefined;
     let txs: PopulatedTransaction[];
 
-    if (context.selectedSupportOption === 1) {
-      // User wants to create a support stream to the list
+    if (support?.type === 'continuous') {
+      const { tokenAddress, amountPerSec, topUpAmount } = support;
 
-      const token = context.continuousSupportConfig.listSelected[0] ?? unreachable();
-      let amountPerSec = context.continuousSupportConfig.streamRateValueParsed ?? unreachable();
-      amountPerSec = amountPerSec / BigInt(2592000); // 30 days in seconds.
-      const topUpAmount = context.continuousSupportConfig.topUpAmountValueParsed ?? unreachable();
-
-      const allowance = await this._addressDriverClient.getAllowance(token);
+      const allowance = await this._addressDriverClient.getAllowance(tokenAddress);
       const needsApproval = allowance < topUpAmount;
 
       if (needsApproval) {
-        needsApprovalForToken = token;
+        needsApprovalForToken = tokenAddress;
       }
 
       const setStreamTx = await this._buildSetDripListStreamTxs(
         salt,
-        token,
-        dripListId,
+        tokenAddress,
+        listId,
         topUpAmount,
         0n,
         0n,
@@ -174,23 +184,20 @@ export default class DripListService {
       );
 
       txs = [createDripListTx, setDripListSplitsTx, setStreamTx];
-    } else if (context.selectedSupportOption === 2) {
-      // User wants to make a one-time donation to the list
+    } else if (support?.type === 'one-time') {
+      const { tokenAddress, donationAmount } = support;
 
-      const token = context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable();
-      const donationAmount = context.oneTimeDonationConfig.amount ?? unreachable();
-
-      const allowance = await this._addressDriverClient.getAllowance(token);
+      const allowance = await this._addressDriverClient.getAllowance(tokenAddress);
       const needsApproval = allowance < donationAmount;
 
       if (needsApproval) {
-        needsApprovalForToken = token;
+        needsApprovalForToken = tokenAddress;
       }
 
       const txFactory = await getAddressDriverTxFactory();
       const giveTx = await txFactory.give(
-        dripListId,
-        token,
+        listId,
+        tokenAddress,
         donationAmount,
         /*
         Dirty hack to disable the SDK's built-in gas estimation, because
@@ -230,12 +237,12 @@ export default class DripListService {
           applyGasBuffer: true,
         },
       ],
-      dripListId,
+      dripListId: listId,
     };
   }
 
-  public async getProjectsSplitMetadataAndReceivers(listEditorConfig: ListEditorConfig) {
-    const projectsInput = Object.entries(listEditorConfig.percentages);
+  public async getProjectsSplitMetadataAndReceivers(percentages: Percentages) {
+    const projectsInput = Object.entries(percentages);
 
     const receivers: SplitsReceiverStruct[] = [];
 
@@ -419,6 +426,7 @@ export default class DripListService {
     projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
     name?: string,
     description?: string,
+    latestVotingRoundId?: string,
   ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
@@ -427,6 +435,7 @@ export default class DripListService {
       projects,
       name,
       description,
+      latestVotingRoundId,
     });
 
     const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);

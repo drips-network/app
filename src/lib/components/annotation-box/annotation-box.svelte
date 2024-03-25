@@ -1,7 +1,7 @@
 <script lang="ts">
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  export let type: 'warning' | 'info' = 'warning';
+  export let type: 'warning' | 'info' | 'error' = 'warning';
   export let size: 'normal' | 'small' = 'normal';
 </script>
 
@@ -11,8 +11,10 @@
   <div class="flex gap-2 items-start">
     {#if type === 'warning'}
       <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
-    {:else}
+    {:else if type === 'info'}
       <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
+    {:else}
+      <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-negative-level-6)" />
     {/if}
     <div class="flex-1 pt-px">
       <slot />
@@ -47,5 +49,11 @@
   .annotation-box.info {
     background-color: var(--color-primary-level-1);
     border: 1px solid var(--color-primary-level-6);
+  }
+
+  .annotation-box.error {
+    background-color: var(--color-negative-level-1);
+    border: 1px solid var(--color-negative-level-6);
+    color: var(--color-negative-level-6);
   }
 </style>

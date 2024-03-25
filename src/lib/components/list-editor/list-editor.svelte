@@ -78,6 +78,12 @@
       }),
     );
 
+    const MAX_SPLITS_WEIGHT = 1000000;
+
+    function getSplitPercent(weight: number) {
+      return ((weight * MAX_SPLITS_WEIGHT) / MAX_SPLITS_WEIGHT / MAX_SPLITS_WEIGHT) * 100;
+    }
+
     for (const receiver of receivers) {
       switch (receiver.type) {
         case 'project': {
@@ -85,12 +91,12 @@
           if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
 
           items[receiver.url] = { type: 'project', project };
-          percentages[receiver.url] = receiver.weight;
+          percentages[receiver.url] = getSplitPercent(receiver.weight);
           break;
         }
         case 'address':
           items[receiver.address] = { type: 'address', address: receiver.address };
-          percentages[receiver.address] = receiver.weight;
+          percentages[receiver.address] = getSplitPercent(receiver.weight);
           break;
         default:
           throw new Error('Unknown receiver type');

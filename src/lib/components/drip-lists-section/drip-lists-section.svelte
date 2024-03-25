@@ -63,7 +63,14 @@
   $: dripListsAndVotingRounds = [
     ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []),
     ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
-  ];
+  ].filter((v) => {
+    // filter out votingRounds that already are associated with a drip list based on votingROund.dripListId
+    if (v.type === 'voting-round') {
+      return !dripLists?.some((dl) => dl.account.accountId === v.dripListId);
+    } else {
+      return true;
+    }
+  });
 
   $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
 </script>

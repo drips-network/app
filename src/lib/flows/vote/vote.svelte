@@ -9,24 +9,24 @@
   import assert from '$lib/utils/assert';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import ListEditor, {
-    type Items,
-    type Percentages,
-  } from '$lib/components/list-editor/list-editor.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import type { Writable } from 'svelte/store';
+  import type { State } from './vote-flow-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
+  export let context: Writable<State>;
+
   export let votingRoundId: string;
 
-  let items: Items = {};
-  let percentages: Percentages = {};
+  let valid: boolean;
 
   function submit() {
     dispatch('await', {
       promise: async (updateAwaitStep) => {
-        const voteReceivers = await multiplayer.mapListEditorStateToVoteReceivers(
-          items,
-          percentages,
+        const voteReceivers = multiplayer.mapListEditorStateToVoteReceivers(
+          $context.listEditorConfig.items,
+          $context.listEditorConfig.percentages,
         );
 
         const { signer, address } = $walletStore;
@@ -71,11 +71,18 @@
 
   <FormField title="Recipients*">
     <!-- TODO: Allow Drip List items -->
-    <ListEditor bind:items bind:percentages allowedItems={['eth-addresses', 'projects']} />
+    <ListEditor
+      bind:valid
+      bind:items={$context.listEditorConfig.items}
+      bind:percentages={$context.listEditorConfig.percentages}
+      allowedItems={['eth-addresses', 'projects']}
+    />
   </FormField>
 
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button on:click={() => submit()} variant="primary" icon={Wallet}>Confirm in wallet</Button>
+    <Button on:click={() => submit()} variant="primary" icon={Wallet} disabled={!valid}
+      >Confirm in wallet</Button
+    >
   </svelte:fragment>
 </StepLayout>

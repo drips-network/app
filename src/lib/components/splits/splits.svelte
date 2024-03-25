@@ -183,7 +183,7 @@
               __typename: 'AddressDriverAccount',
               address: v.address,
             },
-            weight: v.weight * 10000,
+            weight: v.weight,
           };
         case 'project': {
           const project = projectsData.find((p) => p?.source.url === v.url);
@@ -192,7 +192,7 @@
           return {
             __typename: 'ProjectReceiver',
             project: project,
-            weight: v.weight * 10000,
+            weight: v.weight,
           };
         }
       }

@@ -82,6 +82,7 @@
   import VotingRoundNoticeCard from './components/voting-round-notice-card.svelte';
   import VotingRoundCountdown from './components/voting-round-countdown.svelte';
   import Wallet from '../icons/Wallet.svelte';
+  import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -267,9 +268,9 @@
 
           <div class="list tab tab-2" class:active-tab={activeTab === 'tab-2'}>
             {#if votingRound}
-              <VotingRoundSplits votingRoundId={votingRound.id} />
+              <VotingRoundSplits {votingRound} />
 
-              <VotingRoundCollaborators votingRoundId={votingRound.id} />
+              <VotingRoundCollaborators {votingRound} />
 
               <VotingRoundCountdown {votingRound} />
 
@@ -296,7 +297,13 @@
                           modal.show(
                             Stepper,
                             undefined,
-                            deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                            votingRound
+                              ? publishVotingRoundListFlowSteps(
+                                  votingRound.id,
+                                  votingRound.name,
+                                  votingRound.description ?? undefined,
+                                )
+                              : unreachable(),
                           )}>Publish Drip List</Button
                       >
                     </div>

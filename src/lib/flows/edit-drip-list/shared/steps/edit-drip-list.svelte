@@ -163,7 +163,7 @@
           const dripListService = await DripListService.new();
 
           const { receivers, projectsSplitMetadata } =
-            await dripListService.getProjectsSplitMetadataAndReceivers(dripList);
+            await dripListService.getProjectsSplitMetadataAndReceivers(dripList.percentages);
 
           const listId = $selectedDripListState.dripList?.account.accountId ?? unreachable();
 

@@ -50,9 +50,37 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          return await dripListService.buildTransactContext($context);
+          return await dripListService.buildTransactContext({
+            listTitle: $context.dripList.title,
+            listDescription: $context.dripList.description,
+            percentages: $context.dripList.percentages,
+            support: (() => {
+              if ($context.selectedSupportOption === 1) {
+                return {
+                  type: 'continuous',
+                  topUpAmount:
+                    $context.continuousSupportConfig.topUpAmountValueParsed ?? unreachable(),
+                  amountPerSec:
+                    ($context.continuousSupportConfig.streamRateValueParsed ?? unreachable()) /
+                    BigInt(2592000), // 30 days in seconds
+                  tokenAddress: $context.continuousSupportConfig.listSelected[0] ?? unreachable(),
+                };
+              } else if ($context.selectedSupportOption === 2) {
+                return {
+                  type: 'one-time',
+                  donationAmount: $context.oneTimeDonationConfig.amount ?? unreachable(),
+                  tokenAddress:
+                    $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
+                };
+              } else {
+                return unreachable();
+              }
+            })(),
+          });
         },
+
         transactions: ({ txs }) => txs,
+
         after: async (_, { dripListId }) => {
           const dripListExistsQuery = gql`
             query DripListExists($id: ID!) {

@@ -54,7 +54,7 @@
           collaborators: Object.keys($context.votingRoundConfig.collaborators),
           endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
           publisherAddress: $walletStore.address ?? unreachable(),
-          isPrivate: false,
+          privateVotes: false,
         });
 
         $context.newVotingRoundId = newVotingRoundId;

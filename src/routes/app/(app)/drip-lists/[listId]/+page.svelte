@@ -40,7 +40,7 @@
   export let data: PageData;
 
   $: dripList = data.dripList;
-  $: votingRound = data.votingRound;
+  $: votingRound = data.votingRounds.current;
 
   $: ownerAccountId = dripList?.owner.accountId ?? votingRound?.publisherAddress;
   $: supportStreams =
@@ -99,6 +99,11 @@
         supportItems={dripList.support}
         ownerAccountId={dripList.owner.accountId}
       />
+    {/if}
+
+    {#if data.votingRounds.past.length > 0}
+      <!-- TODO: past voting rounds component -->
+      {JSON.stringify(data.votingRounds.past)}
     {/if}
   </div>
 </article>

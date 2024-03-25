@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import * as multiplayer from '$lib/utils/multiplayer';
-  import type { Vote } from '$lib/utils/multiplayer/schemas';
+  import type { Vote, VotingRound } from '$lib/utils/multiplayer/schemas';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
@@ -12,11 +12,11 @@
   import viewVoteFlowSteps from '$lib/flows/view-vote/view-vote-flow-steps';
   import FormField from '$lib/components/form-field/form-field.svelte';
 
-  export let votingRoundId: string;
+  export let votingRound: VotingRound;
 
   let collaborators: Vote[] | undefined;
   onMount(async () => {
-    collaborators = await multiplayer.getVotingRoundVotes(votingRoundId);
+    collaborators = await multiplayer.getVotingRoundVotes(votingRound.id);
   });
 
   function getCollaboratorRightButton(connectedAddress: string | undefined, vote: Vote) {
@@ -27,12 +27,12 @@
     if ('latestVote' in vote) {
       // Ballot already submitted
 
-      return isOwnVote
+      return isOwnVote && votingRound.status === 'started'
         ? {
             component: PropsOnlyButton,
             props: {
               label: 'Change your vote',
-              onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRoundId)),
+              onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id)),
               buttonProps: {
                 variant: 'primary',
                 icon: Proposals,
@@ -52,12 +52,12 @@
           };
     }
 
-    if (isOwnVote) {
+    if (isOwnVote && votingRound.status === 'started') {
       return {
         component: PropsOnlyButton,
         props: {
           label: 'Cast your vote',
-          onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRoundId)),
+          onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id)),
           buttonProps: {
             variant: 'primary',
             icon: Proposals,

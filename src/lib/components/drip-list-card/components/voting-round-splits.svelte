@@ -7,13 +7,14 @@
     mapSplitsFromMultiplayerResults,
     type SplitsComponentSplitsReceiver,
   } from '$lib/components/splits/splits.svelte';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
-  export let votingRoundId: string;
+  export let votingRound: VotingRound;
 
   let result: Awaited<ReturnType<typeof multiplayer.getVotingRoundResult>> | undefined;
   let splits: SplitsComponentSplitsReceiver[] | undefined;
   onMount(async () => {
-    const res = await multiplayer.getVotingRoundResult(votingRoundId);
+    const res = await multiplayer.getVotingRoundResult(votingRound.id);
 
     if (res.find((r) => 'type' in r)) {
       // There's at least one vote
@@ -28,11 +29,17 @@
 <div class="results">
   {#if result === undefined}
     <Spinner />
-  {:else if result?.length === 0}
+  {:else if result?.length === 0 && votingRound.status === 'started'}
     <div class="empty-state">
       <Emoji emoji="🫙" size="huge" />
       <h4>No recipients yet</h4>
       <p>Collaborators are currently voting on the recipients of this Drip List.</p>
+    </div>
+  {:else if result?.length === 0 && votingRound.status === 'completed'}
+    <div class="empty-state">
+      <Emoji emoji="🫙" size="huge" />
+      <h4>No recipients</h4>
+      <p>No collaborators voted.</p>
     </div>
   {:else if splits}
     <Splits draft list={splits} />

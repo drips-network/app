@@ -6,6 +6,7 @@ import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 import { DRIP_LIST_PAGE_FRAGMENT } from './+page.svelte';
 import * as multiplayer from '$lib/utils/multiplayer';
+import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;
@@ -15,23 +16,27 @@ export const load = (async ({ params, fetch }) => {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listId);
 
   if (isVotingRoundId) {
+    let votingRound: VotingRound;
     try {
-      const votingRound = await multiplayer.getVotingRound(listId, fetch);
+      const votingRoundRes = await multiplayer.getVotingRound(listId, fetch);
 
-      // If the voting round has already been linked to a Drip List, we forward to the respective Drip List ID.
-      if (votingRound?.dripListId) {
-        return redirect(301, `/app/drip-lists/${votingRound.dripListId}`);
-      }
-
-      return {
-        dripList: undefined,
-        votingRound,
-        incomingSplitsTotal: [],
-        blockWhileInitializing: false,
-      };
+      if (!votingRoundRes) throw new Error();
+      votingRound = votingRoundRes;
     } catch (e) {
       throw error(404);
     }
+
+    // If the voting round has already been linked to a Drip List, we forward to the respective Drip List ID.
+    if (votingRound?.dripListId) {
+      throw redirect(301, `/app/drip-lists/${votingRound.dripListId}`);
+    }
+
+    return {
+      dripList: undefined,
+      votingRounds: { current: votingRound, past: [] },
+      incomingSplitsTotal: [],
+      blockWhileInitializing: false,
+    };
   }
 
   const dripListQuery = gql`
@@ -46,7 +51,12 @@ export const load = (async ({ params, fetch }) => {
   async function getVotingRoundForList(listId: string) {
     const res = await multiplayer.getVotingRounds({ dripListId: listId }, fetch);
 
-    return multiplayer.matchVotingRoundToDripList(res, listId);
+    const currentVotingRound = multiplayer.matchVotingRoundToDripList(res, listId);
+
+    return {
+      current: currentVotingRound,
+      past: res.filter((v) => v.id !== currentVotingRound?.id),
+    };
   }
 
   const fetches = await Promise.all([
@@ -59,7 +69,7 @@ export const load = (async ({ params, fetch }) => {
 
   return {
     dripList: fetches[0].dripList,
-    votingRound: fetches[1],
+    votingRounds: fetches[1],
     incomingSplitsTotal: fetches[2],
     blockWhileInitializing: false,
   };
