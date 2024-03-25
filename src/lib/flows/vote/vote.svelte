@@ -16,7 +16,6 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-
   export let votingRoundId: string;
 
   let valid: boolean;

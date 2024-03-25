@@ -8,6 +8,8 @@
     type SplitsComponentSplitsReceiver,
   } from '$lib/components/splits/splits.svelte';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import { fade } from 'svelte/transition';
 
   export let votingRound: VotingRound;
 
@@ -26,25 +28,31 @@
   });
 </script>
 
-<div class="results">
-  {#if result === undefined}
-    <Spinner />
-  {:else if result?.length === 0 && votingRound.status === 'started'}
-    <div class="empty-state">
-      <Emoji emoji="🫙" size="huge" />
-      <h4>No recipients yet</h4>
-      <p>Collaborators are currently voting on the recipients of this Drip List.</p>
-    </div>
-  {:else if result?.length === 0 && votingRound.status === 'completed'}
-    <div class="empty-state">
-      <Emoji emoji="🫙" size="huge" />
-      <h4>No recipients</h4>
-      <p>No collaborators voted.</p>
-    </div>
-  {:else if splits}
-    <Splits draft list={splits} />
-  {/if}
-</div>
+<TransitionedHeight transitionHeightChanges>
+  <div class="results" style:min-height={result === undefined ? '16rem' : undefined} out:fade>
+    {#if result === undefined}
+      <div>
+        <Spinner />
+      </div>
+    {:else if result?.length === 0 && votingRound.status === 'started'}
+      <div class="empty-state" in:fade>
+        <Emoji emoji="🫙" size="huge" />
+        <h4>No recipients yet</h4>
+        <p>Collaborators are currently voting on the recipients of this Drip List.</p>
+      </div>
+    {:else if result?.length === 0 && votingRound.status === 'completed'}
+      <div class="empty-state" in:fade>
+        <Emoji emoji="🫙" size="huge" />
+        <h4>No recipients</h4>
+        <p>No collaborators voted.</p>
+      </div>
+    {:else if splits}
+      <div class="splits" in:fade>
+        <Splits draft list={splits} />
+      </div>
+    {/if}
+  </div>
+</TransitionedHeight>
 
 <style>
   .results {
@@ -53,7 +61,11 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    min-height: 16rem;
+  }
+
+  .splits {
+    height: 100%;
+    width: 100%;
   }
 
   .empty-state {
@@ -63,5 +75,6 @@
     gap: 0.75rem;
     max-width: 16rem;
     text-align: center;
+    min-height: 16rem;
   }
 </style>
