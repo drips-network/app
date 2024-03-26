@@ -42,7 +42,7 @@ export default (votingRoundId: string, listName: string, listDescription?: strin
     makeStep({
       component: SuccessStep,
       props: {
-        message: 'Your vote has been successfully submitted.',
+        message: 'Your new Drip List has successfully been published on-chain.',
       },
     }),
   ],

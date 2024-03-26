@@ -39,6 +39,10 @@
   import Section from '$lib/components/section/section.svelte';
   import Proposals from '$lib/components/icons/Proposals.svelte';
   import formatDate from '$lib/utils/format-date';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import viewVotingRoundFlowSteps from '$lib/flows/view-voting-round/view-voting-round-flow-steps';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
   export let data: PageData;
 
@@ -57,6 +61,10 @@
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched =
     dripList && ownerAccountId && $streamsFetchStatusses[ownerAccountId] === 'fetched';
+
+  function handleVotingRoundClick(votingRound: VotingRound) {
+    modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));
+  }
 </script>
 
 {#if dripList?.name || votingRound?.name}
@@ -118,17 +126,22 @@
         </p>
         <div class="voting-rounds">
           {#each data.votingRounds.past as votingRound}
-            <div class="voting-round">
+            <button on:click={() => handleVotingRoundClick(votingRound)} class="voting-round">
               <div class="left">
                 <h4 class="typo-text">{formatDate(new Date(votingRound.endsAt), 'dayAndYear')}</h4>
-                <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
-                  >X recipients</span
-                >
+                <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
+                  {votingRound.result?.length === 1
+                    ? '1 recipient'
+                    : `${votingRound.result?.length ?? 0} recipients`}
+                </span>
               </div>
               <div class="right">
-                <span class="typo-text">X votes</span>
+                <span class="typo-text"
+                  >{votingRound.votes?.length ?? 0}
+                  {votingRound.votes?.length === 1 ? 'vote' : 'votes'}</span
+                >
               </div>
-            </div>
+            </button>
           {/each}
         </div>
       </Section>
@@ -184,6 +197,7 @@
     flex-direction: column;
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
   }
 
   .voting-rounds .voting-round {
@@ -192,6 +206,13 @@
     align-items: center;
     gap: 1rem;
     padding: 0.75rem 1rem;
+    text-align: left;
+    transition: background-color 0.3s;
+  }
+
+  .voting-rounds .voting-round:focus-visible,
+  .voting-rounds .voting-round:hover {
+    background-color: var(--color-primary-level-1);
   }
 
   .voting-rounds .voting-round:not(:only-child):not(:last-child) {
