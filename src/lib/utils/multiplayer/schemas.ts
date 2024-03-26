@@ -8,7 +8,7 @@ export const getVotingRoundResponseSchema = z.object({
   id: z.string(),
   startsAt: z.string(),
   endsAt: z.string(),
-  status: z.union([z.literal('started'), z.literal('completed')]),
+  status: z.union([z.literal('started'), z.literal('completed'), z.literal('linked')]),
   dripListId: z.nullable(z.string()),
   name: z.string(),
   description: z.string().optional().nullable(),
