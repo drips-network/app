@@ -267,7 +267,11 @@
             {/if}
           </div>
 
-          <div class="list tab tab-2" class:active-tab={activeTab === 'tab-2'}>
+          <div
+            class="list tab tab-2"
+            class:active-tab={activeTab === 'tab-2'}
+            class:-mt-6={!votingRound?.result}
+          >
             {#if votingRound}
               <VotingRoundSplits {votingRound} />
 
