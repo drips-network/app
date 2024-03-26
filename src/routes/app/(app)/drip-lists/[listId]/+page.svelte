@@ -36,6 +36,9 @@
     DRIP_LIST_CARD_FRAGMENT,
   } from '$lib/components/drip-list-card/drip-list-card.svelte';
   import { gql } from 'graphql-request';
+  import Section from '$lib/components/section/section.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
+  import formatDate from '$lib/utils/format-date';
 
   export let data: PageData;
 
@@ -103,7 +106,32 @@
 
     {#if data.votingRounds.past.length > 0}
       <!-- TODO: past voting rounds component -->
-      {JSON.stringify(data.votingRounds.past)}
+      <Section
+        header={{
+          label: 'Voting rounds',
+          icon: Proposals,
+        }}
+        skeleton={{ loaded: true, empty: false }}
+      >
+        <p class="voting-rounds-section-description">
+          Each time the recipients of this Drip List are voted on and changed, it’ll show up here.
+        </p>
+        <div class="voting-rounds">
+          {#each data.votingRounds.past as votingRound}
+            <div class="voting-round">
+              <div class="left">
+                <h4 class="typo-text">{formatDate(new Date(votingRound.endsAt), 'dayAndYear')}</h4>
+                <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
+                  >X recipients</span
+                >
+              </div>
+              <div class="right">
+                <span class="typo-text">X votes</span>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </Section>
     {/if}
   </div>
 </article>
@@ -145,6 +173,34 @@
     display: flex;
     flex-direction: column;
     gap: 4rem;
+  }
+
+  .voting-rounds-section-description {
+    margin-bottom: 1rem;
+  }
+
+  .voting-rounds {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  .voting-rounds .voting-round {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .voting-rounds .voting-round:not(:only-child):not(:last-child) {
+    border-bottom: 1px solid var(--color-foreground);
+  }
+
+  .voting-rounds .voting-round .left {
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 1080px) {
