@@ -43,6 +43,7 @@
     SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
+    type SplitsComponentSplitsReceiver,
   } from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import balancesStore from '$lib/stores/balances/balances.store';
@@ -86,7 +87,7 @@
 
   export let data: {
     dripList?: DripListCardFragment | null;
-    votingRound?: VotingRound | null;
+    votingRound?: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null;
   };
   onMount(() => {
     assert(

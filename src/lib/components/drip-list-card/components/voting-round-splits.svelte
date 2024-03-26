@@ -1,54 +1,30 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import * as multiplayer from '$lib/utils/multiplayer';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import Emoji from '$lib/components/emoji/emoji.svelte';
-  import Splits, {
-    mapSplitsFromMultiplayerResults,
-    type SplitsComponentSplitsReceiver,
-  } from '$lib/components/splits/splits.svelte';
+  import Splits, { type SplitsComponentSplitsReceiver } from '$lib/components/splits/splits.svelte';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
 
-  export let votingRound: VotingRound;
-
-  let result: Awaited<ReturnType<typeof multiplayer.getVotingRoundResult>> | undefined;
-  let splits: SplitsComponentSplitsReceiver[] | undefined;
-  onMount(async () => {
-    const res = await multiplayer.getVotingRoundResult(votingRound.id);
-
-    if (res.find((r) => 'type' in r)) {
-      // There's at least one vote
-
-      splits = await mapSplitsFromMultiplayerResults(res);
-    }
-
-    result = res;
-  });
+  export let votingRound: VotingRound & { splits?: SplitsComponentSplitsReceiver[] };
 </script>
 
 <TransitionedHeight transitionHeightChanges>
-  <div class="results" style:min-height={result === undefined ? '16rem' : undefined} out:fade>
-    {#if result === undefined}
-      <div>
-        <Spinner />
-      </div>
-    {:else if result?.length === 0 && votingRound.status === 'started'}
+  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade>
+    {#if !votingRound.result && votingRound.status === 'started'}
       <div class="empty-state" in:fade>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients yet</h4>
         <p>Collaborators are currently voting on the recipients of this Drip List.</p>
       </div>
-    {:else if result?.length === 0 && votingRound.status === 'completed'}
+    {:else if votingRound.result?.length === 0 && votingRound.status === 'completed'}
       <div class="empty-state" in:fade>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients</h4>
         <p>No collaborators voted.</p>
       </div>
-    {:else if splits}
+    {:else if votingRound.splits}
       <div class="splits" in:fade>
-        <Splits draft list={splits} />
+        <Splits draft list={votingRound.splits} />
       </div>
     {/if}
   </div>

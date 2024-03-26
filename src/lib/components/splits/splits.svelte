@@ -150,6 +150,7 @@
 
   export async function mapSplitsFromMultiplayerResults(
     receivers: VoteReceiver[],
+    fetch = window.fetch,
   ): Promise<SplitsComponentSplitsReceiver[]> {
     const projectVoteReceivers = receivers.filter((v): v is ProjectVoteReceiver => {
       return 'type' in v && v.type === 'project';
@@ -167,7 +168,7 @@
         `;
 
         const project = (
-          await query<ProjectQuery, ProjectQueryVariables>(projectQuery, { url: v.url })
+          await query<ProjectQuery, ProjectQueryVariables>(projectQuery, { url: v.url }, fetch)
         ).projectByUrl;
 
         return project;

@@ -7,6 +7,10 @@ import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.
 import { DRIP_LIST_PAGE_FRAGMENT } from './+page.svelte';
 import * as multiplayer from '$lib/utils/multiplayer';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+import {
+  mapSplitsFromMultiplayerResults,
+  type SplitsComponentSplitsReceiver,
+} from '$lib/components/splits/splits.svelte';
 
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;
@@ -16,7 +20,7 @@ export const load = (async ({ params, fetch }) => {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listId);
 
   if (isVotingRoundId) {
-    let votingRound: VotingRound;
+    let votingRound: VotingRound & { splits?: SplitsComponentSplitsReceiver[] };
     try {
       const votingRoundRes = await multiplayer.getVotingRound(listId, fetch);
 
@@ -29,6 +33,10 @@ export const load = (async ({ params, fetch }) => {
     // If the voting round has already been linked to a Drip List, we forward to the respective Drip List ID.
     if (votingRound?.dripListId) {
       throw redirect(301, `/app/drip-lists/${votingRound.dripListId}`);
+    }
+
+    if (votingRound.result) {
+      votingRound.splits = await mapSplitsFromMultiplayerResults(votingRound.result, fetch);
     }
 
     return {
@@ -51,7 +59,16 @@ export const load = (async ({ params, fetch }) => {
   async function getVotingRoundForList(listId: string) {
     const res = await multiplayer.getVotingRounds({ dripListId: listId }, fetch);
 
-    const currentVotingRound = multiplayer.matchVotingRoundToDripList(res, listId);
+    const currentVotingRound:
+      | (VotingRound & { splits?: SplitsComponentSplitsReceiver[] })
+      | undefined = multiplayer.matchVotingRoundToDripList(res, listId);
+
+    if (currentVotingRound?.result) {
+      currentVotingRound.splits = await mapSplitsFromMultiplayerResults(
+        currentVotingRound.result,
+        fetch,
+      );
+    }
 
     return {
       current: currentVotingRound,

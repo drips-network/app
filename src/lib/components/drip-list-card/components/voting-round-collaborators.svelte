@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import * as multiplayer from '$lib/utils/multiplayer';
   import type { Vote, VotingRound } from '$lib/utils/multiplayer/schemas';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -13,11 +11,6 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
 
   export let votingRound: VotingRound;
-
-  let collaborators: Vote[] | undefined;
-  onMount(async () => {
-    collaborators = await multiplayer.getVotingRoundVotes(votingRound.id);
-  });
 
   function getCollaboratorRightButton(connectedAddress: string | undefined, vote: Vote) {
     const { collaboratorAddress } = vote;
@@ -71,19 +64,17 @@
 </script>
 
 <FormField title="Collaborators" type="div">
-  {#if !collaborators}
-    loading...
-  {:else}
+  {#if votingRound.votes}
     <ListEditor
       isEditable={false}
       mode="list"
       items={Object.fromEntries(
-        collaborators.map((c) => [
-          c.collaboratorAddress,
+        votingRound.votes.map((v) => [
+          v.collaboratorAddress,
           {
             type: 'address',
-            address: c.collaboratorAddress,
-            rightComponent: getCollaboratorRightButton($walletStore.address, c),
+            address: v.collaboratorAddress,
+            rightComponent: getCollaboratorRightButton($walletStore.address, v),
           },
         ]),
       )}

@@ -4,19 +4,6 @@ export const startVotingRoundResponseSchema = z.object({
   newVotingRoundId: z.string(),
 });
 
-export const getVotingRoundResponseSchema = z.object({
-  id: z.string(),
-  startsAt: z.string(),
-  endsAt: z.string(),
-  status: z.union([z.literal('started'), z.literal('completed'), z.literal('linked')]),
-  dripListId: z.nullable(z.string()),
-  name: z.string(),
-  description: z.string().optional().nullable(),
-  publisherAddress: z.string(),
-});
-
-export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;
-
 export const addressVoteReceiverSchema = z.object({
   address: z.string(),
   type: z.literal('address'),
@@ -59,6 +46,20 @@ export const getVotingRoundResultsResponseSchema = z.object({
   result: z.array(voteReceiverSchema),
 });
 
+export const getVotingRoundResponseSchema = z.object({
+  id: z.string(),
+  startsAt: z.string(),
+  endsAt: z.string(),
+  status: z.union([z.literal('started'), z.literal('completed'), z.literal('linked')]),
+  dripListId: z.nullable(z.string()),
+  name: z.string(),
+  description: z.string().nullable(),
+  publisherAddress: z.string(),
+  result: z.array(voteReceiverSchema).nullable(),
+  votes: z.array(voteSchema).nullable(),
+});
+
+export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;
 export type AddressVoteReceiver = z.infer<typeof addressVoteReceiverSchema>;
 export type ProjectVoteReceiver = z.infer<typeof projectVoteReceiverSchema>;
 export type DripListVoteReceiver = z.infer<typeof dripListVoteReceiverSchema>;
