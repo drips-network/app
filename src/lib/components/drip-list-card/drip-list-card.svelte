@@ -91,12 +91,12 @@
     dripList?: DripListCardFragment | null;
     votingRound?: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null;
   };
-  onMount(() => {
+  $: {
     assert(
       data.dripList || data.votingRound,
       'DripListCard requires either a dripList or a votingRound, or both',
     );
-  });
+  }
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
