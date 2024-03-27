@@ -84,6 +84,8 @@
   import VotingRoundCountdown from './components/voting-round-countdown.svelte';
   import Wallet from '../icons/Wallet.svelte';
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
+  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer/multiplayer';
+  import { writable } from 'svelte/store';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -176,6 +178,10 @@
   }
 
   $: isOwnVotingRound = votingRound?.publisherAddress === $walletStore?.address;
+
+  $: votingRoundStatus = votingRound
+    ? getVotingRoundStatusReadable(votingRound)
+    : writable(undefined);
 </script>
 
 {#if votingRound}
@@ -289,11 +295,12 @@
                     >
                   </div>
 
-                  {#if votingRound.status === 'completed'}
+                  {#if $votingRoundStatus === 'completed'}
                     <div>
                       <Button
                         variant="primary"
                         icon={Wallet}
+                        disabled={!votingRound.result}
                         on:click={() =>
                           modal.show(
                             Stepper,
