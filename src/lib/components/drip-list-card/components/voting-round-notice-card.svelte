@@ -7,15 +7,18 @@
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
   import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
   export let votingRound: VotingRound;
+
+  const status = getVotingRoundStatusReadable(votingRound);
 
   $: isPublisher =
     $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase();
 </script>
 
-{#if votingRound.status === 'started'}
+{#if $status === 'started'}
   <div class="wrapper">
     <AnnotationBox type="info">
       This list is in voting.
@@ -24,7 +27,11 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if votingRound.status === 'completed' && isPublisher}
+{:else if $status === 'completed' && !votingRound.result}
+  <div class="wrapper">
+    <AnnotationBox type="error">Voting has ended but no collaborators voted.</AnnotationBox>
+  </div>
+{:else if $status === 'completed' && isPublisher}
   <div class="wrapper">
     <AnnotationBox type="info">
       Voting has ended. Publish the Drip List on-chain now.
@@ -46,7 +53,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if votingRound.status === 'completed'}
+{:else if $status === 'completed'}
   <div class="wrapper">
     <AnnotationBox type="info">
       Voting has ended. Waiting for the owner to publish this Drip List on-chain.

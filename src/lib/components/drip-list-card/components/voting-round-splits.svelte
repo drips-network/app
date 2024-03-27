@@ -4,19 +4,22 @@
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
+  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
 
   export let votingRound: VotingRound & { splits?: SplitsComponentSplitsReceiver[] };
+
+  const status = getVotingRoundStatusReadable(votingRound);
 </script>
 
 <TransitionedHeight transitionHeightChanges>
   <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade>
-    {#if !votingRound.result && votingRound.status === 'started'}
+    {#if !votingRound.result && $status === 'started'}
       <div class="empty-state" in:fade>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients yet</h4>
         <p>Collaborators are currently voting on the recipients of this Drip List.</p>
       </div>
-    {:else if votingRound.result?.length === 0 && votingRound.status === 'completed'}
+    {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'completed'}
       <div class="empty-state" in:fade>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients</h4>

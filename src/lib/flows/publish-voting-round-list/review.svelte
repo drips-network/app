@@ -106,11 +106,15 @@
   </FormField>
 
   <FormField title="Recipients">
-    <ListEditor
-      isEditable={false}
-      items={$context.dripListConfig.items}
-      percentages={$context.dripListConfig.percentages}
-    />
+    {#if Object.keys($context.dripListConfig.percentages).length === 0}
+      <span class="typo-text" style:color="var(--color-foreground-level-4)">No recipients</span>
+    {:else}
+      <ListEditor
+        isEditable={false}
+        items={$context.dripListConfig.items}
+        percentages={$context.dripListConfig.percentages}
+      />
+    {/if}
   </FormField>
 
   <div class="whats-next text-left">
@@ -136,7 +140,12 @@
 
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button on:click={() => submit()} variant="primary" icon={Wallet}>Confirm in wallet</Button>
+    <Button
+      on:click={() => submit()}
+      variant="primary"
+      disabled={Object.keys($context.dripListConfig.percentages).length === 0}
+      icon={Wallet}>Confirm in wallet</Button
+    >
   </svelte:fragment>
 </StepLayout>
 
