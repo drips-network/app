@@ -86,13 +86,14 @@
     </SectionSkeleton>
   </main>
 
-  {#if dripList}
-    <aside class="support">
-      <div>
-        <SupportCard {dripList} />
-      </div>
-    </aside>
-  {/if}
+  <aside class="support">
+    <div>
+      <SupportCard
+        dripList={dripList ?? undefined}
+        draftListMode={Boolean(!dripList && votingRound)}
+      />
+    </div>
+  </aside>
 
   <div class="sections">
     {#if dripList}
@@ -113,7 +114,6 @@
     {/if}
 
     {#if data.votingRounds.past.length > 0}
-      <!-- TODO: past voting rounds component -->
       <Section
         header={{
           label: 'Voting rounds',
