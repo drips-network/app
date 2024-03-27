@@ -3,6 +3,9 @@
   import Button from '$lib/components/button/button.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
+  import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
@@ -26,7 +29,20 @@
     <AnnotationBox type="info">
       Voting has ended. Publish the Drip List on-chain now.
       <svelte:fragment slot="actions">
-        <Button variant="primary" icon={Wallet}>Publish Drip List</Button>
+        <Button
+          on:click={() =>
+            modal.show(
+              Stepper,
+              undefined,
+              publishVotingRoundListFlowSteps(
+                votingRound.id,
+                votingRound.name,
+                votingRound.description ?? undefined,
+              ),
+            )}
+          variant="primary"
+          icon={Wallet}>Publish Drip List</Button
+        >
       </svelte:fragment>
     </AnnotationBox>
   </div>

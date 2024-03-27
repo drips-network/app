@@ -19,6 +19,10 @@
     DripListExistsQueryVariables,
   } from './__generated__/gql.generated';
   import * as multiplayer from '$lib/utils/multiplayer';
+  import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
+  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -89,6 +93,17 @@
     headline="Review"
     description="Last step: Review your list before publishing."
   />
+  <FormField title="Name">
+    <span class="typo-text">{$context.dripListConfig.title}</span>
+  </FormField>
+
+  <FormField title="Description">
+    {#if !$context.dripListConfig.description}
+      <span class="typo-text" style:color="var(--color-foreground-level-4)">No description</span>
+    {:else}
+      <span class="typo-text">{$context.dripListConfig.description}</span>
+    {/if}
+  </FormField>
 
   <FormField title="Recipients">
     <ListEditor
@@ -98,8 +113,53 @@
     />
   </FormField>
 
+  <div class="whats-next text-left">
+    <div class="card">
+      <h4>After transaction confirmation…</h4>
+      <ul>
+        <UlIconLi icon={DripList}
+          >The published Drip List will appear on your <span class="typo-text-bold"
+            >public profile</span
+          >.</UlIconLi
+        >
+        <UlIconLi icon={TokenStreams}
+          >You or anyone else can <span class="typo-text-bold">support the Drip List</span> with continuous
+          or one-time donations.</UlIconLi
+        >
+        <UlIconLi icon={Pen}
+          >You can <span class="typo-text-bold">edit the Drip List</span> anytime, or start another voting
+          round.</UlIconLi
+        >
+      </ul>
+    </div>
+  </div>
+
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button on:click={() => submit()} variant="primary" icon={Wallet}>Confirm in wallet</Button>
   </svelte:fragment>
 </StepLayout>
+
+<style>
+  .card {
+    background-color: var(--color-background);
+    padding: 1rem;
+    box-shadow: var(--elevation-low);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .whats-next {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+  }
+</style>
