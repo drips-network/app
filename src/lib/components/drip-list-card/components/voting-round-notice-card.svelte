@@ -23,7 +23,12 @@
     <AnnotationBox type="info">
       This list is in voting.
       <svelte:fragment slot="actions">
-        <ShareButton url="https://drips.network/app/drip-lists/{votingRound.id}" />
+        <ShareButton
+          copyLinkLabel="Share with collaborators"
+          shareLabel="Share with collaborators"
+          buttonVariant="primary"
+          url="https://drips.network/app/drip-lists/{votingRound.id}"
+        />
       </svelte:fragment>
     </AnnotationBox>
   </div>
