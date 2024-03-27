@@ -12,6 +12,7 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from './vote-flow-steps';
+  import { invalidateAll } from '$app/navigation';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -55,6 +56,12 @@
           collaboratorAddress: address,
           receivers: voteReceivers,
         });
+
+        updateAwaitStep({
+          message: 'Wrapping up...',
+        });
+
+        await invalidateAll();
       },
       message: 'Getting ready... ',
     });
