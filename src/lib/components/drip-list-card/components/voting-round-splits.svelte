@@ -12,21 +12,21 @@
 </script>
 
 <TransitionedHeight transitionHeightChanges>
-  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade>
+  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade|local>
     {#if !votingRound.result && $status === 'started'}
-      <div class="empty-state" in:fade>
+      <div class="empty-state" in:fade|local>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients yet</h4>
         <p>Collaborators are currently voting on the recipients of this Drip List.</p>
       </div>
     {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'completed'}
-      <div class="empty-state" in:fade>
+      <div class="empty-state" in:fade|local>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients</h4>
         <p>No collaborators voted.</p>
       </div>
     {:else if votingRound.splits}
-      <div class="splits" in:fade>
+      <div class="splits" in:fade|local>
         <Splits draft list={votingRound.splits} />
       </div>
     {/if}
