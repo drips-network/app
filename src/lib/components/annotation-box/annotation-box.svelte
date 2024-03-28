@@ -42,18 +42,15 @@
 
   .annotation-box.warning {
     background-color: var(--color-caution-level-1);
-    border: 1px solid var(--color-caution-level-6);
     color: var(--color-caution-level-6);
   }
 
   .annotation-box.info {
     background-color: var(--color-primary-level-1);
-    border: 1px solid var(--color-primary-level-6);
   }
 
   .annotation-box.error {
     background-color: var(--color-negative-level-1);
-    border: 1px solid var(--color-negative-level-6);
     color: var(--color-negative-level-6);
   }
 </style>
