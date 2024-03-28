@@ -286,11 +286,13 @@
           >
             {#if votingRound}
               <div class="flex flex-col gap-1.5">
-                <div class="totals">
-                  <div class="drip-icon flex-shrink-0">
-                    <Drip fill="var(--color-foreground-level-5)" />
+                {#if votingRound.result}
+                  <div class="totals">
+                    <div class="drip-icon flex-shrink-0">
+                      <Drip fill="var(--color-foreground-level-5)" />
+                    </div>
                   </div>
-                </div>
+                {/if}
                 <div class="splits-component">
                   <VotingRoundSplits {votingRound} />
                 </div>
