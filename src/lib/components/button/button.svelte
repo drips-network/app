@@ -40,6 +40,9 @@
   aria-disabled={isDisabled}
   on:click|stopPropagation
   data-testid={dataTestId}
+  on:mouseenter
+  on:mouseleave
+  on:focus
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}

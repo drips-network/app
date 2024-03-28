@@ -84,7 +84,12 @@
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
 
+  export let draftListMode = false;
+
   export let disabled = false;
+  $: {
+    if (!project && !dripList) disabled = true;
+  }
 
   $: type = project ? ('project' as const) : ('dripList' as const);
 
@@ -101,8 +106,6 @@
       supportUrl = project.source.url;
     } else if (dripList) {
       supportUrl = `https://drips.network/app/drip-lists/${dripList.account.accountId}`;
-    } else {
-      throw new Error('You must populate either the `project` or `dripList` prop.');
     }
   }
 
@@ -177,6 +180,8 @@
   }
 
   async function onClickAddToDripList() {
+    if (!project && !dripList) return;
+
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
     } else {
@@ -201,7 +206,7 @@
 </script>
 
 <div class="become-supporter-card" class:disabled>
-  {#if ownDripLists === undefined || updating}
+  {#if !draftListMode && (ownDripLists === undefined || updating)}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
@@ -221,27 +226,34 @@
   </div>
   <h2 class="pixelated">Become a supporter</h2>
   <p>
-    Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add them to a Drip List.
+    {#if draftListMode}
+      This Drip List can be supported once it's published after voting.
+    {:else}
+      Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add this to a Drip
+      List.
+    {/if}
   </p>
-  <div class="support-buttons-wrapper">
-    <div class="support-buttons">
-      <SupportButtons
-        {isOwner}
-        {type}
-        {onClickConnectWallet}
-        {onClickNewStream}
-        {onClickAddToDripList}
-        {onClickNewDonation}
-        bind:supportMenuOpen
-      />
+  {#if !draftListMode}
+    <div class="support-buttons-wrapper">
+      <div class="support-buttons">
+        <SupportButtons
+          {isOwner}
+          {type}
+          {onClickConnectWallet}
+          {onClickNewStream}
+          {onClickAddToDripList}
+          {onClickNewDonation}
+          bind:supportMenuOpen
+        />
+      </div>
+      <!-- Invisible duplicate of support buttons for smooth transition -->
+      <div class="support-buttons-placeholder">
+        <TransitionedHeight transitionHeightChanges={true}>
+          <SupportButtons transitions={false} {isOwner} {type} bind:supportMenuOpen />
+        </TransitionedHeight>
+      </div>
     </div>
-    <!-- Invisible duplicate of support buttons for smooth transition -->
-    <div class="support-buttons-placeholder">
-      <TransitionedHeight transitionHeightChanges={true}>
-        <SupportButtons transitions={false} {isOwner} {type} bind:supportMenuOpen />
-      </TransitionedHeight>
-    </div>
-  </div>
+  {/if}
 </div>
 
 <style>

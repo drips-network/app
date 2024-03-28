@@ -4,27 +4,30 @@
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
+  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
 
   export let votingRound: VotingRound & { splits?: SplitsComponentSplitsReceiver[] };
   export let maxRows: number | undefined = undefined;
+
+  const status = getVotingRoundStatusReadable(votingRound);
 </script>
 
 <TransitionedHeight transitionHeightChanges>
-  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade>
-    {#if !votingRound.result && votingRound.status === 'started'}
-      <div class="empty-state" in:fade>
+  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade|local>
+    {#if !votingRound.result && $status === 'started'}
+      <div class="empty-state" in:fade|local>
         <Emoji emoji="🗳️" size="huge" />
         <h4>Awaiting votes</h4>
         <p>No one has voted yet.</p>
       </div>
-    {:else if votingRound.result?.length === 0 && votingRound.status === 'completed'}
-      <div class="empty-state" in:fade>
-        <Emoji emoji="🗳️" size="huge" />
+    {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'completed'}
+      <div class="empty-state" in:fade|local>
+        <Emoji emoji="🫙" size="huge" />
         <h4>No recipients</h4>
         <p>No collaborators voted.</p>
       </div>
     {:else if votingRound.splits}
-      <div class="splits" in:fade>
+      <div class="splits" in:fade|local>
         <Splits draft list={votingRound.splits} {maxRows} />
       </div>
     {/if}

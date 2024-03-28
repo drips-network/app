@@ -3,34 +3,62 @@
   import Button from '$lib/components/button/button.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
+  import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
   export let votingRound: VotingRound;
+
+  const status = getVotingRoundStatusReadable(votingRound);
 
   $: isPublisher =
     $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase();
 </script>
 
-{#if votingRound.status === 'started'}
+{#if $status === 'started'}
   <div class="wrapper">
     <AnnotationBox type="info">
       This list is in voting.
       <svelte:fragment slot="actions">
-        <ShareButton url="https://drips.network/app/drip-lists/{votingRound.id}" />
+        <ShareButton
+          copyLinkLabel="Share with collaborators"
+          shareLabel="Share with collaborators"
+          buttonVariant="primary"
+          url="https://drips.network/app/drip-lists/{votingRound.id}"
+        />
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if votingRound.status === 'completed' && isPublisher}
+{:else if $status === 'completed' && !votingRound.result}
+  <div class="wrapper">
+    <AnnotationBox type="error">Voting has ended but no collaborators voted.</AnnotationBox>
+  </div>
+{:else if $status === 'completed' && isPublisher}
   <div class="wrapper">
     <AnnotationBox type="info">
       Voting has ended. Publish the Drip List on-chain now.
       <svelte:fragment slot="actions">
-        <Button variant="primary" icon={Wallet}>Publish Drip List</Button>
+        <Button
+          on:click={() =>
+            modal.show(
+              Stepper,
+              undefined,
+              publishVotingRoundListFlowSteps(
+                votingRound.id,
+                votingRound.name,
+                votingRound.description ?? undefined,
+              ),
+            )}
+          variant="primary"
+          icon={Wallet}>Publish Drip List</Button
+        >
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if votingRound.status === 'completed'}
+{:else if $status === 'completed'}
   <div class="wrapper">
     <AnnotationBox type="info">
       Voting has ended. Waiting for the owner to publish this Drip List on-chain.

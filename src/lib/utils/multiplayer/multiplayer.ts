@@ -17,6 +17,8 @@ import {
   VOTE_MESSAGE_TEMPLATE,
 } from './signature-message-templates';
 import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import { readable, type Readable } from 'svelte/store';
+import { onDestroy } from 'svelte';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -279,4 +281,25 @@ export function mapListEditorStateToVoteReceivers(
   }
 
   return result;
+}
+
+export function getVotingRoundStatusReadable(
+  votingRound: VotingRound,
+): Readable<VotingRound['status']> {
+  if (['completed', 'linked'].includes(votingRound.status)) return readable(votingRound.status);
+
+  let interval: NodeJS.Timeout;
+
+  const statusReadable = readable(votingRound.status, (set) => {
+    interval = setInterval(() => {
+      if (new Date(votingRound.endsAt) < new Date()) {
+        set('completed');
+        clearInterval(interval);
+      }
+    }, 1000);
+  });
+
+  onDestroy(() => clearInterval(interval));
+
+  return statusReadable;
 }
