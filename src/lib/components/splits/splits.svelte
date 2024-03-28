@@ -272,5 +272,6 @@
     position: relative;
     padding-top: 16px;
     width: fit-content;
+    overflow: hidden;
   }
 </style>
