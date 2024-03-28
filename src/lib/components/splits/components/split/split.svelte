@@ -243,13 +243,14 @@
     position: absolute;
     top: -1rem;
     left: 0.5px;
-    background: linear-gradient(to bottom, transparent, var(--color-foreground));
+    border-left: 1px solid var(--color-foreground);
     height: calc(1rem + 1px);
     width: 1px;
   }
 
   .draft .arrow .intro-line {
-    background: linear-gradient(to bottom, transparent, var(--color-foreground-level-5));
+    border-left: 1px dashed var(--color-foreground-level-5);
+    height: calc(1rem - 2px); /* dashes line up at -2px */
   }
 
   .arrow .percentage {
