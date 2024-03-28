@@ -67,12 +67,10 @@
   export let votingRound: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null =
     null;
 
-  onMount(() => {
-    assert(
-      dripList || votingRound,
-      'DripListCardThumblink requires either a dripList or a votingRound, or both',
-    );
-  });
+  assert(
+    dripList || votingRound,
+    'DripListCardThumblink requires either a dripList or a votingRound, or both',
+  );
 
   $: listOwner = dripList?.owner;
   $: dripListUrl = dripList
