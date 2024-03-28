@@ -54,5 +54,6 @@
     max-width: 16rem;
     text-align: center;
     min-height: 16rem;
+    justify-content: center;
   }
 </style>
