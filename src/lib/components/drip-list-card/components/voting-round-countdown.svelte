@@ -13,7 +13,7 @@
 <FormField title={votingRound.status === 'completed' ? 'Voting ended' : 'Voting ends'} type="div">
   {#if $status === 'completed'}
     <p class="typo-text">
-      Voting has ended at {formatDate(new Date(votingRound.endsAt), 'verbose')} your time.
+      {formatDate(new Date(votingRound.endsAt), 'verbose')} your time.
     </p>
   {:else}
     <p style:margin-bottom="0.25rem" class="typo-text tabular-nums">
