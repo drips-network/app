@@ -14,7 +14,7 @@
     {#if !votingRound.result && votingRound.status === 'started'}
       <div class="empty-state" in:fade>
         <Emoji emoji="🗳️" size="huge" />
-        <h4>Awaiting nominations</h4>
+        <h4>Awaiting votes</h4>
         <p>No one has voted yet.</p>
       </div>
     {:else if votingRound.result?.length === 0 && votingRound.status === 'completed'}
