@@ -17,6 +17,7 @@
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
   import * as multiplayer from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import { mapSplitsFromMultiplayerResults } from '../splits/splits.svelte';
 
   export let accountId: string | undefined;
   export let collapsed = false;
@@ -51,7 +52,20 @@
       ] as const);
 
       dripLists = fetches[0].dripLists;
-      votingRounds = fetches[1];
+      votingRounds = fetches[1].filter((v) => {
+        // filter out votingRounds that already are associated with a drip list based on votingRound.dripListId
+        return !dripLists?.some((dl) => dl.account.accountId === v.dripListId);
+      });
+
+      // add voting results as splits table data
+      const votingRoundsWithResults = votingRounds.filter((v) => v.result);
+      const splits = await Promise.all(
+        votingRoundsWithResults.map((v) => v.result && mapSplitsFromMultiplayerResults(v.result)),
+      );
+      votingRounds = votingRounds.map((v) => ({
+        ...v,
+        splits: splits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)],
+      }));
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -63,14 +77,7 @@
   $: dripListsAndVotingRounds = [
     ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []),
     ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
-  ].filter((v) => {
-    // filter out votingRounds that already are associated with a drip list based on votingROund.dripListId
-    if (v.type === 'voting-round') {
-      return !dripLists?.some((dl) => dl.account.accountId === v.dripListId);
-    } else {
-      return true;
-    }
-  });
+  ];
 
   $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
 </script>
@@ -114,11 +121,11 @@
         ? 'lg:grid-cols-2'
         : ''}"
     >
-      {#each dripListsAndVotingRounds as dripList}
-        {#if dripList.type === 'drip-list'}
-          <DripListCardThumblink {dripList} />
+      {#each dripListsAndVotingRounds as list}
+        {#if list.type === 'drip-list'}
+          <DripListCardThumblink dripList={list} />
         {:else}
-          <a href="/app/drip-lists/{dripList.id}">{dripList.name}</a>
+          <DripListCardThumblink votingRound={list} />
         {/if}
       {/each}
       {#if showCreateNewListCard}

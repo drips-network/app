@@ -7,6 +7,7 @@
   import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
 
   export let votingRound: VotingRound & { splits?: SplitsComponentSplitsReceiver[] };
+  export let maxRows: number | undefined = undefined;
 
   const status = getVotingRoundStatusReadable(votingRound);
 </script>
@@ -15,9 +16,9 @@
   <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade|local>
     {#if !votingRound.result && $status === 'started'}
       <div class="empty-state" in:fade|local>
-        <Emoji emoji="🫙" size="huge" />
-        <h4>No recipients yet</h4>
-        <p>Collaborators are currently voting on the recipients of this Drip List.</p>
+        <Emoji emoji="🗳️" size="huge" />
+        <h4>Awaiting votes</h4>
+        <p>No one has voted yet.</p>
       </div>
     {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'completed'}
       <div class="empty-state" in:fade|local>
@@ -27,7 +28,7 @@
       </div>
     {:else if votingRound.splits}
       <div class="splits" in:fade|local>
-        <Splits draft list={votingRound.splits} />
+        <Splits draft list={votingRound.splits} {maxRows} />
       </div>
     {/if}
   </div>
@@ -51,6 +52,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
     max-width: 16rem;
     text-align: center;

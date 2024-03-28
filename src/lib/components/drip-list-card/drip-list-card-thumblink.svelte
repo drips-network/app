@@ -38,31 +38,48 @@
     SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
+    type SplitsComponentSplitsReceiver,
   } from '../splits/splits.svelte';
   import balancesStore from '$lib/stores/balances/balances.store';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { constants } from 'radicle-drips';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   import Pile from '../pile/pile.svelte';
-  import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
-  import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import type { DripListCardThumblinkFragment } from './__generated__/gql.generated';
   import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import streamsStore from '$lib/stores/streams/streams.store';
   import getSupportersPile, {
     DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
   } from './methods/get-supporters-pile';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import VotingRoundSplits from './components/voting-round-splits.svelte';
+  import assert from '$lib/utils/assert';
+  import StatusBadge from '../status-badge/status-badge.svelte';
+  import Proposals from '../icons/Proposals.svelte';
 
-  export let dripList: DripListCardThumblinkFragment;
+  export let dripList: DripListCardThumblinkFragment | null = null;
+  export let votingRound: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null =
+    null;
 
-  $: listOwner = dripList.owner;
-  $: dripListUrl = `/app/drip-lists/${dripList.account.accountId}`;
+  assert(
+    dripList || votingRound,
+    'DripListCardThumblink requires either a dripList or a votingRound, or both',
+  );
+
+  $: listOwner = dripList?.owner;
+  $: dripListUrl = dripList
+    ? `/app/drip-lists/${dripList.account.accountId}`
+    : votingRound
+    ? `/app/drip-lists/${votingRound.id}`
+    : undefined;
+
+  $: description = dripList?.description || votingRound?.description;
 
   /*
     On mount, ensure the streams store has fetched the owner's account so that we can be sure that
@@ -70,6 +87,8 @@
     Then, select the support streams that are streaming to the list.
   */
   onMount(async () => {
+    if (!listOwner) return;
+
     if (!$streamsStore.accounts[listOwner.accountId]) {
       await streamsStore.fetchAccount(listOwner.accountId);
     }
@@ -80,19 +99,22 @@
     $streamsStore &&
     streamsStore
       .getStreamsForUser(listOwner.accountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
+      .outgoing.filter((s) => s.receiver.accountId === dripList?.account.accountId);
 
   let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined = undefined;
   onMount(async () => {
+    if (!dripList) return;
     incomingSplitTotal = await getIncomingSplitTotal(dripList.account.accountId);
   });
 
   let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined = undefined;
   onMount(async () => {
+    if (!dripList) return;
     incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
   });
 
   $: streamEstimates =
+    dripList &&
     $balancesStore &&
     balancesStore.getStreamEstimatesByReceiver('total', dripList.account.accountId).map((e) => ({
       amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
@@ -103,68 +125,91 @@
     Only the list owner can set support streams to the list, so we can consider the stream estimate to the list loaded when
     the owner account is loaded.
   */
-  $: streamEstimateLoaded = $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
+  $: streamEstimateLoaded =
+    dripList && $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
 
   let totalIncomingAmounts: ReturnType<typeof mergeAmounts> | undefined = undefined;
   $: totalIncomingAmounts =
-    incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
+    streamEstimates && incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
       ? mergeAmounts(streamEstimates, incomingSplitTotal, incomingGivesTotal)
       : undefined;
 
-  $: supportersPile = getSupportersPile(supportStreams, dripList.support);
+  $: supportersPile =
+    dripList && supportStreams && getSupportersPile(supportStreams, dripList.support);
+
+  /* Watch for voting ended */
+  let now = new Date();
+  $: votingEnded = votingRound ? now >= new Date(votingRound.endsAt) : undefined;
+  let counter: number;
+
+  onMount(() => {
+    if (votingRound && votingEnded === false) {
+      (function count() {
+        counter = window.setTimeout(() => {
+          now = new Date();
+          return !votingEnded && count();
+        }, 1000);
+      })();
+    }
+  });
+  onDestroy(() => clearTimeout(counter));
 </script>
 
 <a
-  class:has-description={dripList.description}
+  class:has-description={description}
   href={dripListUrl}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-{dripList.description ? '4' : '6'} pointer-events-none">
+  <div class="flex flex-col gap-6 pointer-events-noneff">
     <header class="px-6 pt-6 flex flex-col gap-2">
-      <div class="title-and-actions">
-        <h6 class="title truncate typo-header-1">
-          <a
-            href={dripListUrl}
-            class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
-          >
-            {dripList.name}
-          </a>
+      <div class="flex items-center justify-between gap-4">
+        <h6 class="title typo-header-1 truncate" style="line-height:1">
+          {dripList?.name || votingRound?.name}
         </h6>
-        <ChevronRight />
+        {#if votingRound}
+          <StatusBadge icon={Proposals} size="small" color={votingEnded ? 'foreground' : 'primary'}>
+            {votingEnded ? 'Voting ended' : 'In voting'}
+          </StatusBadge>
+        {/if}
       </div>
-      {#if (dripList.description ?? '').length > 0}
+      {#if (description ?? '').length > 0}
         <div class="description">
           <TextExpandable isExpandable={false}>
-            {dripList.description}
+            {description}
           </TextExpandable>
+        </div>
+      {/if}
+      {#if supportersPile && supportersPile.length > 0}
+        <div class="flex gap-2">
+          Supported by <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
         </div>
       {/if}
     </header>
 
     <div class="list">
-      <div class="totals">
-        <div class="drip-icon flex-shrink-0">
-          <Drip />
-        </div>
-        <div class="typo-text tabular-nums total-streamed-badge">
-          {#if browser}
-            <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalIncomingAmounts} />
-          {/if}
-          <span class="muted">&nbsp;total</span>
-        </div>
-        {#if supportersPile && supportersPile.length > 0}
-          <div in:fade|local={{ duration: 300 }} class="supporters min-w-0">
-            <span class="typo-text-small truncate muted">Supported by</span>
-            <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+      {#if dripList || votingRound?.result}
+        <div class="totals">
+          <div class="drip-icon flex-shrink-0">
+            <Drip fill={dripList ? 'var(--color-primary)' : 'var(--color-foreground-level-5)'} />
           </div>
-        {/if}
-      </div>
+          {#if dripList && browser}
+            <div class="typo-text tabular-nums total-streamed-badge">
+              <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalIncomingAmounts} />
+              <span class="muted">&nbsp;total</span>
+            </div>
+          {/if}
+        </div>
+      {/if}
       <div class="splits-component">
-        <Splits
-          groupsExpandable={false}
-          list={dripList.splits}
-          maxRows={dripList.description ? 3 : 4}
-        />
+        {#if dripList}
+          <Splits
+            groupsExpandable={false}
+            list={dripList.splits}
+            maxRows={dripList.description ? 3 : 4}
+          />
+        {:else if votingRound}
+          <VotingRoundSplits {votingRound} maxRows={votingRound.description ? 3 : 4} />
+        {/if}
       </div>
     </div>
   </div>
@@ -181,12 +226,6 @@
   .drip-list-card:hover {
     box-shadow: var(--elevation-medium);
     transform: translateY(-0.125rem);
-  }
-
-  .drip-list-card .title-and-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
   }
 
   .totals {
@@ -231,12 +270,6 @@
 
   .splits-component {
     margin-left: 10px;
-  }
-
-  .supporters {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
   }
 
   .muted {
