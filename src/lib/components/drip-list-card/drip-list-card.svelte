@@ -280,7 +280,16 @@
             class:-mt-6={!votingRound?.result}
           >
             {#if votingRound}
-              <VotingRoundSplits {votingRound} />
+              <div class="flex flex-col gap-1">
+                <div class="totals">
+                  <div class="drip-icon flex-shrink-0">
+                    <Drip fill="var(--color-foreground-level-5)" />
+                  </div>
+                </div>
+                <div class="splits-component">
+                  <VotingRoundSplits {votingRound} />
+                </div>
+              </div>
 
               <VotingRoundCollaborators {votingRound} />
 
