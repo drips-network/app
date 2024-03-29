@@ -34,6 +34,7 @@
     align-items: center;
     user-select: none;
     max-width: fit-content;
+    white-space: nowrap;
   }
 
   .status-badge.small {
