@@ -261,7 +261,7 @@
     padding: 0 1.5rem 1.5rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .list:not(:last-child) {

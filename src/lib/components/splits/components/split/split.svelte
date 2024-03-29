@@ -154,10 +154,12 @@
         class:is-nested={isNested}
         style:color={isNested ? 'var(--color-foreground)' : percentageTextColor}
       >
-        {getSplitPercent(
-          split.__typename === 'SplitGroup' ? calcGroupWeight(split) : split.weight,
-          'pretty',
-        )}
+        <span class:opacity-50={groupExpanded}>
+          {getSplitPercent(
+            split.__typename === 'SplitGroup' ? calcGroupWeight(split) : split.weight,
+            'pretty',
+          )}
+        </span>
       </div>
       {#if isFirst}
         <div class="intro-line" />
@@ -215,11 +217,27 @@
 <style>
   .wrapper {
     position: relative;
+    z-index: 1;
+  }
+
+  /* background overlay so it covers row above, when row above is expanding */
+  .wrapper:after {
+    content: '';
+    display: block;
+    position: absolute;
+    background-color: var(--color-background);
+    /* 1px offset so it doesn't break the linework in top-left corner */
+    top: 1px;
+    left: 1px;
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
   }
 
   .split {
     display: flex;
     gap: 1rem;
+    position: relative;
+    z-index: 1;
   }
 
   .arrow {
@@ -243,13 +261,14 @@
     position: absolute;
     top: -1rem;
     left: 0.5px;
-    background: linear-gradient(to bottom, transparent, var(--color-foreground));
+    border-left: 1px solid var(--color-foreground);
     height: calc(1rem + 1px);
     width: 1px;
   }
 
   .draft .arrow .intro-line {
-    background: linear-gradient(to bottom, transparent, var(--color-foreground-level-5));
+    border-left: 1px dashed var(--color-foreground-level-5);
+    height: calc(1rem - 2px); /* dashes line up at -2px */
   }
 
   .arrow .percentage {
@@ -293,7 +312,6 @@
   }
 
   .group {
-    overflow: hidden;
     width: 100%;
   }
 
@@ -307,6 +325,7 @@
 
   .group .members {
     margin-top: -0.5rem;
+    margin-left: -4rem;
   }
 
   .name {

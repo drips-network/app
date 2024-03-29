@@ -225,6 +225,7 @@
           showAvatar={true}
           showIdentity={true}
           address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
+          disableTooltip={true}
         />
       </div>
     </header>
@@ -247,28 +248,33 @@
         <div class="tabs">
           <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
             {#if dripList}
-              <div class="totals">
-                <div class="drip-icon flex-shrink-0">
-                  <Drip />
-                </div>
-                <div class="typo-text tabular-nums total-streamed-badge">
-                  {#if browser}
-                    <AggregateFiatEstimate
-                      supressUnknownAmountsWarning
-                      amounts={totalIncomingAmounts}
-                    />
-                  {/if}
-                  <span class="muted">&nbsp;total</span>
-                </div>
-                {#if supportersPile && supportersPile.length > 0}
-                  <div in:fade|local={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
-                    <span class="typo-text-small truncate muted">Supported by</span>
-                    <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+              <div class="flex flex-col gap-1.5">
+                <div class="totals">
+                  <div class="drip-icon flex-shrink-0">
+                    <Drip />
                   </div>
-                {/if}
-              </div>
-              <div class="splits-component">
-                <Splits groupsExpandable={true} list={dripList.splits} />
+                  <div class="typo-text tabular-nums total-streamed-badge">
+                    {#if browser}
+                      <AggregateFiatEstimate
+                        supressUnknownAmountsWarning
+                        amounts={totalIncomingAmounts}
+                      />
+                    {/if}
+                    <span class="muted">&nbsp;total</span>
+                  </div>
+                  {#if supportersPile && supportersPile.length > 0}
+                    <div
+                      in:fade|local={{ duration: 300 }}
+                      class="flex items-center gap-1.5 min-w-0"
+                    >
+                      <span class="typo-text-small truncate muted">Supported by</span>
+                      <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+                    </div>
+                  {/if}
+                </div>
+                <div class="splits-component">
+                  <Splits groupsExpandable={true} list={dripList.splits} />
+                </div>
               </div>
             {/if}
           </div>
@@ -279,7 +285,18 @@
             class:-mt-6={!votingRound?.result}
           >
             {#if votingRound}
-              <VotingRoundSplits {votingRound} />
+              <div class="flex flex-col gap-1.5">
+                {#if votingRound.result}
+                  <div class="totals">
+                    <div class="drip-icon flex-shrink-0">
+                      <Drip fill="var(--color-foreground-level-5)" />
+                    </div>
+                  </div>
+                {/if}
+                <div class="splits-component">
+                  <VotingRoundSplits {votingRound} />
+                </div>
+              </div>
 
               <VotingRoundCollaborators {votingRound} />
 
@@ -374,7 +391,7 @@
     padding: 0 1.5rem 1.5rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
   .splits-component {

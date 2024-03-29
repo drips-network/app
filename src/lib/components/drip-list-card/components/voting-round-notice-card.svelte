@@ -1,14 +1,18 @@
 <script lang="ts">
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
+  import deleteVotingRoundSteps from '$lib/flows/delete-voting-round/delete-voting-round-steps';
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
   import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import unreachable from '$lib/utils/unreachable';
 
   export let votingRound: VotingRound;
 
@@ -20,7 +24,7 @@
 
 {#if $status === 'started'}
   <div class="wrapper">
-    <AnnotationBox type="info">
+    <AnnotationBox type="info" icon={Proposals}>
       This list is in voting.
       <svelte:fragment slot="actions">
         <ShareButton
@@ -34,12 +38,28 @@
   </div>
 {:else if $status === 'completed' && !votingRound.result}
   <div class="wrapper">
-    <AnnotationBox type="error">Voting has ended but no collaborators voted.</AnnotationBox>
+    <AnnotationBox type="error" icon={Proposals}>
+      Voting has ended but no collaborators voted.
+      <svelte:fragment slot="actions">
+        {#if isPublisher}
+          <Button
+            icon={Trash}
+            variant="destructive"
+            on:click={() =>
+              modal.show(
+                Stepper,
+                undefined,
+                deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+              )}>Delete voting round</Button
+          >
+        {/if}
+      </svelte:fragment>
+    </AnnotationBox>
   </div>
 {:else if $status === 'completed' && isPublisher}
   <div class="wrapper">
-    <AnnotationBox type="info">
-      Voting has ended. Publish the Drip List on-chain now.
+    <AnnotationBox type="info" icon={Proposals}>
+      Voting has ended. You can now publish.
       <svelte:fragment slot="actions">
         <Button
           on:click={() =>
@@ -60,7 +80,7 @@
   </div>
 {:else if $status === 'completed'}
   <div class="wrapper">
-    <AnnotationBox type="info">
+    <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. Waiting for the owner to publish this Drip List on-chain.
     </AnnotationBox>
   </div>
