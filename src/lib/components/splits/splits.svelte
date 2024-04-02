@@ -206,6 +206,7 @@
               await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
                 projectQuery,
                 { url: v.url },
+                fetch,
               )
             ).projectByUrl;
           }
