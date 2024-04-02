@@ -49,7 +49,7 @@ export default class GitHub {
 
     const fundingJson = JSON.parse(fileContent);
 
-    if (JSON.stringify(fundingJson).replace(/\s/g, '') !== template.replace(/\s/g, '')) {
+    if (JSON.stringify(fundingJson).replace(/\s/g, '').toLowerCase() !== template.replace(/\s/g, '').toLowerCase()) {
       throw new Error('Invalid FUNDING.json file. Does it have the correct Ethereum address?');
     }
 
