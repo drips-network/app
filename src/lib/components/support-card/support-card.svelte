@@ -224,7 +224,6 @@
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons
-        {isOwner}
         {type}
         {onClickConnectWallet}
         {onClickNewStream}
@@ -236,7 +235,7 @@
     <!-- Invisible duplicate of support buttons for smooth transition -->
     <div class="support-buttons-placeholder">
       <TransitionedHeight transitionHeightChanges={true}>
-        <SupportButtons transitions={false} {isOwner} {type} bind:supportMenuOpen />
+        <SupportButtons transitions={false} {type} bind:supportMenuOpen />
       </TransitionedHeight>
     </div>
   </div>
