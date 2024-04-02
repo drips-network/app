@@ -1,5 +1,9 @@
 <script lang="ts" context="module">
-  import type { ProjectVoteReceiver, VoteReceiver } from '$lib/utils/multiplayer/schemas';
+  import type {
+    DripListVoteReceiver,
+    ProjectVoteReceiver,
+    VoteReceiver,
+  } from '$lib/utils/multiplayer/schemas';
 
   export const DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
@@ -52,30 +56,53 @@
     let items: Items = {};
     let percentages: Percentages = {};
 
-    const projectVoteReceivers = receivers.filter((v): v is ProjectVoteReceiver => {
-      return 'type' in v && v.type === 'project';
-    });
+    const receiversToFetchDataFor = receivers.filter(
+      (v): v is ProjectVoteReceiver | DripListVoteReceiver => {
+        return 'type' in v && (v.type === 'project' || v.type === 'dripList');
+      },
+    );
 
-    const projectsData = await Promise.all(
-      projectVoteReceivers.map(async (v) => {
-        const projectQuery = gql`
-          ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
-          query ProjectForVoteReceiver($url: String!) {
-            projectByUrl(url: $url) {
-              ...DripListMembersEditorProject
+    const receiversData = mapFilterUndefined(
+      await Promise.all(
+        receiversToFetchDataFor.map(async (v) => {
+          const projectQuery = gql`
+            ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+            query ProjectForVoteReceiver($url: String!) {
+              projectByUrl(url: $url) {
+                ...DripListMembersEditorProject
+              }
             }
+          `;
+
+          const dripListQuery = gql`
+            ${DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT}
+            query DripListForVoteReceiver($id: ID!) {
+              dripList(id: $id) {
+                ...DripListMembersEditorDripList
+              }
+            }
+          `;
+
+          if (v.type === 'dripList') {
+            return (
+              await query<DripListForVoteReceiverQuery, DripListForVoteReceiverQueryVariables>(
+                dripListQuery,
+                {
+                  id: v.accountId,
+                },
+              )
+            ).dripList;
+          } else {
+            return (
+              await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
+                projectQuery,
+                { url: v.url },
+              )
+            ).projectByUrl;
           }
-        `;
-
-        const project = (
-          await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
-            projectQuery,
-            { url: v.url },
-          )
-        ).projectByUrl;
-
-        return project;
-      }),
+        }),
+      ),
+      (v) => (v ? v : undefined),
     );
 
     const MAX_SPLITS_WEIGHT = 1000000;
@@ -87,7 +114,10 @@
     for (const receiver of receivers) {
       switch (receiver.type) {
         case 'project': {
-          const project = projectsData.find((p) => p?.source.url === receiver.url);
+          const project = receiversData.find(
+            (p): p is Extract<typeof receiversData, { __typename: 'ClaimedProject' }> =>
+              p.__typename !== 'DripList' && p.source.url === receiver.url,
+          );
           if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
 
           items[receiver.url] = { type: 'project', project };
@@ -98,6 +128,17 @@
           items[receiver.address] = { type: 'address', address: receiver.address };
           percentages[receiver.address] = getSplitPercent(receiver.weight);
           break;
+        case 'dripList': {
+          const dripList = receiversData.find(
+            (p): p is Extract<typeof receiversData, { __typename: 'DripList' }> =>
+              p.__typename === 'DripList' && p.account.accountId === receiver.accountId,
+          );
+          if (!dripList) throw new Error(`DripList not found for ID: ${receiver.accountId}`);
+
+          items[receiver.accountId] = { type: 'drip-list', list: dripList };
+          percentages[receiver.accountId] = getSplitPercent(receiver.weight);
+          break;
+        }
         default:
           throw new Error('Unknown receiver type');
       }
@@ -139,6 +180,8 @@
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
   import type {
+    DripListForVoteReceiverQuery,
+    DripListForVoteReceiverQueryVariables,
     DripListMembersEditorDripListFragment,
     DripListMembersEditorProjectFragment,
     DripListToAddQuery,
@@ -150,6 +193,7 @@
   } from './__generated__/gql.generated';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let maxItems = 200;
   export let percentages: Percentages = {};

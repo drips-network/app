@@ -81,7 +81,7 @@
       bind:valid
       bind:items={$context.listEditorConfig.items}
       bind:percentages={$context.listEditorConfig.percentages}
-      allowedItems={['eth-addresses', 'projects']}
+      allowedItems={['eth-addresses', 'projects', 'drip-lists']}
     />
   </FormField>
 

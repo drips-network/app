@@ -6,8 +6,7 @@ import {
   type VotingRound,
   getVotingRoundVotesResponseSchema,
   getVotingRoundResultsResponseSchema,
-  type ProjectVoteReceiver,
-  type AddressVoteReceiver,
+  type VoteReceiver,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -191,7 +190,7 @@ export async function signVote(
   currentTime: Date,
   collaboratorAddress: string,
   votingRoundId: string,
-  receivers: (ProjectVoteReceiver | AddressVoteReceiver)[],
+  receivers: VoteReceiver[],
 ) {
   const chainId = await signer.getChainId();
   const message = VOTE_MESSAGE_TEMPLATE(
@@ -211,7 +210,7 @@ export async function vote(
     signature: string;
     date: Date;
     collaboratorAddress: string;
-    receivers: (ProjectVoteReceiver | AddressVoteReceiver)[];
+    receivers: VoteReceiver[];
   },
   fetch = window.fetch,
 ) {
@@ -253,8 +252,8 @@ export function matchVotingRoundToDripList(
 export function mapListEditorStateToVoteReceivers(
   items: Items,
   percentages: Percentages,
-): (ProjectVoteReceiver | AddressVoteReceiver)[] {
-  const result: (ProjectVoteReceiver | AddressVoteReceiver)[] = [];
+): VoteReceiver[] {
+  const result: VoteReceiver[] = [];
 
   for (const [key, item] of Object.entries(items)) {
     const weight = Math.floor((Number(percentages[key]) / 100) * 1000000);
@@ -275,8 +274,13 @@ export function mapListEditorStateToVoteReceivers(
           type: 'address',
         });
         break;
-      default:
-        throw new Error(`Unknown item type: ${item.type}`);
+      case 'drip-list':
+        result.push({
+          weight,
+          type: 'dripList',
+          accountId: item.list.account.accountId,
+        });
+        break;
     }
   }
 

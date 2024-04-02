@@ -17,7 +17,7 @@ export const projectVoteReceiverSchema = z.object({
 });
 
 export const dripListVoteReceiverSchema = z.object({
-  type: z.literal('drip-list'),
+  type: z.literal('dripList'),
   weight: z.number(),
   accountId: z.string(),
 });

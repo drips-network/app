@@ -1,4 +1,4 @@
-import type { AddressVoteReceiver, DripListVoteReceiver, ProjectVoteReceiver } from './schemas';
+import type { VoteReceiver } from './schemas';
 
 export const START_VOTING_ROUND_MESSAGE_TEMPLATE = (
   currentTime: Date,
@@ -40,12 +40,7 @@ export const VOTE_MESSAGE_TEMPLATE = (
   chainId: number,
   voterAddress: string,
   votingRoundId: string,
-  // TODO: Real type
-  receivers: (
-    | Omit<ProjectVoteReceiver, 'accountId'>
-    | Omit<AddressVoteReceiver, 'accountId'>
-    | DripListVoteReceiver
-  )[],
+  receivers: VoteReceiver[],
 ) => {
   const sortedReceivers = receivers
     .map((r) => {
@@ -54,7 +49,7 @@ export const VOTE_MESSAGE_TEMPLATE = (
           return ['project', r.url, r.weight];
         case 'address':
           return ['address', r.address, r.weight];
-        case 'drip-list':
+        case 'dripList':
           return ['drip-list', r.accountId, r.weight];
       }
     })
