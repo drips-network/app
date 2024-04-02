@@ -41,7 +41,7 @@
     y="170"
     width="24"
     height="24"
-    xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f47e.png"
+    xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f47e.png"
   />
   <rect x="990.5" y="158.114" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
   <rect x="30.5" y="571.277" width="47" height="47" rx="23.5" fill="#BCE8BB" />
@@ -50,7 +50,7 @@
     y="580"
     width="24"
     height="24"
-    xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f422.png"
+    xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f422.png"
   />
   <rect x="30.5" y="571.277" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
   <path
@@ -69,7 +69,7 @@
     y="656"
     width="24"
     height="24"
-    xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f9e2.png"
+    xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9e2.png"
   />
   <rect x="1328.5" y="646.5" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
   <rect x="0.5" y="0.5" width="47" height="47" rx="23.5" fill="#FBE9BE" />
