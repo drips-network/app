@@ -42,6 +42,7 @@ export default (votingRoundId: string, listName: string, listDescription?: strin
     makeStep({
       component: SuccessStep,
       props: {
+        onAction: () => window.location.reload(),
         message: 'Your new Drip List has successfully been published on-chain.',
       },
     }),
