@@ -110,7 +110,7 @@
       y="693"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f3a8.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3a8.png"
     />
     <rect x="602" y="898.286" width="47" height="47" rx="23.5" fill="#C2DCF3" />
     <image
@@ -118,7 +118,7 @@
       y="907.5"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f48e.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f48e.png"
     />
     <rect x="602" y="898.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="829" y="974.286" width="47" height="47" rx="23.5" fill="#FFE6BA" />
@@ -127,7 +127,7 @@
       y="983.5"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f3a8.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3a8.png"
     />
     <rect x="829" y="974.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="981" y="860.286" width="47" height="47" rx="23.5" fill="#EDF396" />
@@ -136,7 +136,7 @@
       y="869.5"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f409.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f409.png"
     />
     <rect x="981" y="860.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="1095" y="709.286" width="47" height="47" rx="23.5" fill="#F3B6CD" />
@@ -145,7 +145,7 @@
       y="718.5"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f347.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f347.png"
     />
     <rect x="1095" y="709.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="829" y="595.286" width="47" height="47" rx="23.5" fill="#D9FAC6" />
@@ -154,7 +154,7 @@
       y="604.5"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f9e9.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9e9.png"
     />
     <rect x="829" y="595.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -185,7 +185,7 @@
       y="325"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f331.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f331.png"
     />
     <rect x="901" y="316.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="829" y="216.286" width="47" height="47" rx="23.5" fill="#BED6FD" />
@@ -194,7 +194,7 @@
       y="225.5"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f9e2.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9e2.png"
     />
     <rect x="829" y="216.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -219,7 +219,7 @@
       y="462"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f3b7.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3b7.png"
     />
     <rect x="1162" y="453.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="340.5" y="418.538" width="47" height="47" rx="23.5" fill="#D8C7F1" />
@@ -228,7 +228,7 @@
       y="427"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f47e.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f47e.png"
     />
     <rect x="340.5" y="418.538" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -244,7 +244,7 @@
       y="892"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f353.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f353.png"
     />
     <rect x="1170" y="883.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -260,7 +260,7 @@
       y="301"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f351.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f351.png"
     />
     <rect x="1246" y="292.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <rect x="564" y="330.286" width="47" height="47" rx="23.5" fill="#FFA79B" />
@@ -269,7 +269,7 @@
       y="339"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f34e.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f34e.png"
     />
     <rect x="564" y="330.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -313,7 +313,7 @@
       y="217"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f433.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f433.png"
     />
     <rect x="1048" y="208.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -329,7 +329,7 @@
       y="662"
       width="28"
       height="28"
-      xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f31a.png"
+      xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f31a.png"
     />
     <rect x="1246" y="652.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
@@ -395,7 +395,7 @@
     y="676"
     width="28"
     height="28"
-    xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f422.png"
+    xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f422.png"
   />
   <rect x="678" y="671.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
   <rect x="981" y="633.286" width="47" height="47" rx="23.5" fill="#FFC4C5" />
@@ -404,7 +404,7 @@
     y="642"
     width="28"
     height="28"
-    xlink:href="https://twemoji.maxcdn.com/v/13.0.0/72x72/1f9a9.png"
+    xlink:href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9a9.png"
   />
   <rect x="981" y="633.286" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
   <path
