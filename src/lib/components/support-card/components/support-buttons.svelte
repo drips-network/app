@@ -43,7 +43,7 @@
     in:fade={transitions ? { duration: 300, delay: 300 } : { duration: 0 }}
     class="button-container"
   >
-    {#if isOwner && type === 'dripList'}
+    {#if type === 'dripList'}
       <Button on:click={onClickNewStream} size="large" icon={TokenStreams}
         >Continuous donation</Button
       >

@@ -220,9 +220,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>
-    Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add them to a Drip List.
-  </p>
+  <p>Donate once, continuously, or add them to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons

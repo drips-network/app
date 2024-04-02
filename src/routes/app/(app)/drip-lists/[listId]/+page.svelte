@@ -44,10 +44,7 @@
 
   $: ownerAccountId = dripList.owner.accountId;
   $: supportStreams =
-    $streamsStore &&
-    streamsStore
-      .getStreamsForUser(ownerAccountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
+    $streamsStore && streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
