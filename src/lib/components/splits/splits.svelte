@@ -1,7 +1,12 @@
 <script lang="ts" context="module">
   import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
+  import type {
+    ProjectForVoteReceiverQuery,
+    ProjectForVoteReceiverQueryVariables,
+    DripListForVoteReceiverQuery,
+    DripListForVoteReceiverQueryVariables,
+  } from './__generated__/gql.generated';
   import { gql } from 'graphql-request';
 
   export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
@@ -64,6 +69,18 @@
     }
   `;
 
+  export const SPLITS_COMPONENT_DRIP_LIST_FRAGMENT = gql`
+    fragment SplitsComponentDripList on DripList {
+      account {
+        accountId
+      }
+      name
+      owner {
+        address
+      }
+    }
+  `;
+
   export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
     ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
     fragment SplitsComponentProjectReceiver on ProjectReceiver {
@@ -75,16 +92,11 @@
   `;
 
   export const SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT = gql`
+    ${SPLITS_COMPONENT_DRIP_LIST_FRAGMENT}
     fragment SplitsComponentDripListReceiver on DripListReceiver {
       weight
       dripList {
-        account {
-          accountId
-        }
-        name
-        owner {
-          address
-        }
+        ...SplitsComponentDripList
       }
     }
   `;
@@ -152,27 +164,54 @@
     receivers: VoteReceiver[],
     fetch = window.fetch,
   ): Promise<SplitsComponentSplitsReceiver[]> {
-    const projectVoteReceivers = receivers.filter((v): v is ProjectVoteReceiver => {
-      return 'type' in v && v.type === 'project';
-    });
+    const receiversToFetchDataFor = receivers.filter(
+      (v): v is ProjectVoteReceiver | DripListVoteReceiver => {
+        return 'type' in v && (v.type === 'project' || v.type === 'dripList');
+      },
+    );
 
-    const projectsData = await Promise.all(
-      projectVoteReceivers.map(async (v) => {
-        const projectQuery = gql`
-          ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
-          query Project($url: String!) {
-            projectByUrl(url: $url) {
-              ...SplitsComponentProject
+    const receiversData = mapFilterUndefined(
+      await Promise.all(
+        receiversToFetchDataFor.map(async (v) => {
+          const projectQuery = gql`
+            ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
+            query ProjectForVoteReceiver($url: String!) {
+              projectByUrl(url: $url) {
+                ...SplitsComponentProject
+              }
             }
+          `;
+
+          const dripListQuery = gql`
+            ${SPLITS_COMPONENT_DRIP_LIST_FRAGMENT}
+            query DripListForVoteReceiver($id: ID!) {
+              dripList(id: $id) {
+                ...SplitsComponentDripList
+              }
+            }
+          `;
+
+          if (v.type === 'dripList') {
+            return (
+              await query<DripListForVoteReceiverQuery, DripListForVoteReceiverQueryVariables>(
+                dripListQuery,
+                {
+                  id: v.accountId,
+                },
+                fetch,
+              )
+            ).dripList;
+          } else {
+            return (
+              await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
+                projectQuery,
+                { url: v.url },
+              )
+            ).projectByUrl;
           }
-        `;
-
-        const project = (
-          await query<ProjectQuery, ProjectQueryVariables>(projectQuery, { url: v.url }, fetch)
-        ).projectByUrl;
-
-        return project;
-      }),
+        }),
+      ),
+      (v) => (v ? v : undefined),
     );
 
     return mapFilterUndefined(receivers, (v) => {
@@ -187,12 +226,28 @@
             weight: v.weight,
           };
         case 'project': {
-          const project = projectsData.find((p) => p?.source.url === v.url);
+          const project = receiversData.find(
+            (p): p is Extract<typeof p, { __typename: 'ClaimedProject' | 'UnclaimedProject' }> =>
+              p.__typename !== 'DripList' && p.source.url === v.url,
+          );
           if (!project) throw new Error(`Project not found for url: ${v.url}`);
 
           return {
             __typename: 'ProjectReceiver',
             project: project,
+            weight: v.weight,
+          };
+        }
+        case 'dripList': {
+          const dripList = receiversData.find(
+            (d): d is Extract<typeof d, { __typename: 'DripList' }> =>
+              d.__typename === 'DripList' && d.account.accountId === v.accountId,
+          );
+          if (!dripList) throw new Error(`DripList not found for accountId: ${v.accountId}`);
+
+          return {
+            __typename: 'DripListReceiver',
+            dripList: dripList,
             weight: v.weight,
           };
         }
@@ -209,7 +264,11 @@
     SplitsComponentProjectReceiverFragment,
   } from './__generated__/gql.generated';
   import { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
-  import type { VoteReceiver, ProjectVoteReceiver } from '$lib/utils/multiplayer/schemas';
+  import type {
+    VoteReceiver,
+    ProjectVoteReceiver,
+    DripListVoteReceiver,
+  } from '$lib/utils/multiplayer/schemas';
   import query from '$lib/graphql/dripsQL';
 
   export let list: Splits;
