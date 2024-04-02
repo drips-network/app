@@ -12,7 +12,7 @@ import isTest from '$lib/utils/is-test';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
-import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
+import SafeAppsSDK from '@safe-global/safe-apps-sdk';
 import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import isRunningInSafe from '$lib/utils/is-running-in-safe';
 import storedWritable from '@efstajas/svelte-stored-writable';
@@ -277,8 +277,8 @@ const walletStore = () => {
 };
 
 const mockWalletStore = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const address =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (browser && (window as any))?.playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
   const provider = testnetMockProvider(address);
   const initialized = writable(false);

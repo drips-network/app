@@ -8,9 +8,9 @@ import { get } from 'svelte/store';
 import type { Nullable } from 'vitest';
 import type { StepComponentEvents, UpdateAwaitStepFn, UpdateAwaitStepParams } from '../types';
 import unreachable from '$lib/utils/unreachable';
-import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
 import assert from '$lib/utils/assert';
 import isTest from '$lib/utils/is-test';
+import SafeAppsSDK from '@safe-global/safe-apps-sdk';
 
 type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
