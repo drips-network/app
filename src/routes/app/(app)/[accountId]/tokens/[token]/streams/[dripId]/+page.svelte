@@ -74,9 +74,7 @@
   $: {
     if (stream) {
       streamName =
-        stream.receiver.driver === 'nft'
-          ? 'Drip List support stream'
-          : stream.name ?? 'Unnamed stream';
+        stream.receiver.driver === 'nft' ? 'Continuous donation' : stream.name ?? 'Unnamed stream';
     }
   }
 
@@ -225,7 +223,7 @@
   });
 </script>
 
-<HeadMeta title={stream?.name ?? 'Stream'} />
+<HeadMeta title={streamName ?? 'Stream'} />
 
 <div class="wrapper">
   {#if error === 'invalid-id'}
