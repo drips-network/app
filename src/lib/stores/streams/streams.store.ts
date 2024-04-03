@@ -57,6 +57,26 @@ export default (() => {
   }
 
   /**
+   * Fetches all accounts that are streaming to a given accountId
+   * @param accountId The user ID to fetch.
+   */
+  async function fetchAccountsStreamingToAccountId(accountId: AccountId): Promise<Account[]> {
+    const subgraphClient = getSubgraphClient();
+    const streamReceiverSeenEventForUser =
+      await subgraphClient.getStreamReceiverSeenEventsByReceiverId(accountId);
+
+    const accountsSendingToCurrentUser = streamReceiverSeenEventForUser.reduce<string[]>(
+      (acc, event) => {
+        const senderAccountId = event.senderAccountId.toString();
+        return !acc.includes(senderAccountId) ? [...acc, senderAccountId] : acc;
+      },
+      [],
+    );
+
+    return Promise.all(accountsSendingToCurrentUser.map((a) => _fetchAccount(a)));
+  }
+
+  /**
    * Fetches an account, and all accounts streaming to it.
    * @param accountId The user ID to fetch.
    */
@@ -66,18 +86,7 @@ export default (() => {
     try {
       const account = await _fetchAccount(accountId);
 
-      const subgraphClient = getSubgraphClient();
-      const streamReceiverSeenEventForUser =
-        await subgraphClient.getStreamReceiverSeenEventsByReceiverId(accountId);
-      const accountsSendingToCurrentUser = streamReceiverSeenEventForUser.reduce<string[]>(
-        (acc, event) => {
-          const senderAccountId = event.senderAccountId.toString();
-          return !acc.includes(senderAccountId) ? [...acc, senderAccountId] : acc;
-        },
-        [],
-      );
-
-      await Promise.all(accountsSendingToCurrentUser.map((a) => _fetchAccount(a)));
+      await fetchAccountsStreamingToAccountId(accountId);
 
       fetchStatusses.update((fs) => ({ ...fs, [accountId]: 'fetched' }));
       return account;
@@ -152,6 +161,7 @@ export default (() => {
     getAssetConfig,
     getStreamsForUser,
     fetchAccount,
+    fetchAccountsStreamingToAccountId,
     refreshUserAccount,
   };
 })();
