@@ -37,6 +37,7 @@
     DRIP_LIST_CARD_FRAGMENT,
   } from '$lib/components/drip-list-card/drip-list-card.svelte';
   import { gql } from 'graphql-request';
+  import { onMount } from 'svelte';
 
   export let data: PageData;
 
@@ -44,10 +45,9 @@
 
   $: ownerAccountId = dripList.owner.accountId;
   $: supportStreams =
-    $streamsStore &&
-    streamsStore
-      .getStreamsForUser(ownerAccountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList.account.accountId);
+    $streamsStore && streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
+
+  onMount(() => streamsStore.fetchAccountsStreamingToAccountId(dripList.account.accountId));
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
