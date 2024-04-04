@@ -10,6 +10,7 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -31,6 +32,7 @@
       mode="list"
     />
   </FormField>
+
   <FormField
     title="Voting ends*"
     description="Choose the specific day and time this voting period should end. You and your collaborators will have until this time to suggest and vote on recipients."
@@ -41,6 +43,16 @@
       timePrecision="second"
     />
   </FormField>
+
+  <FormField
+    title="Hide collaborators"
+    description="If you hide collaborators, only you as the publisher may see the list of collaborators and their votes. At the end of the voting period, only the vote's results will be made public."
+  >
+    <svelte:fragment slot="action">
+      <Toggle bind:checked={$context.votingRoundConfig.privateVotes} />
+    </svelte:fragment>
+  </FormField>
+
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>

@@ -20,7 +20,9 @@
   <StepHeader
     emoji="🗳️"
     headline="Vote from {formatDate(new Date(votingRound.startsAt), 'dayAndYear')}"
-    description="{votingRound.votes?.length} collaborators, {votingRound.result?.length} recipients"
+    description={!votingRound.privateVotes
+      ? `${votingRound.votes?.length} collaborators, ${votingRound.result?.length} recipients`
+      : undefined}
   />
   <Splits draft list={$context.splits} />
   <svelte:fragment slot="actions">

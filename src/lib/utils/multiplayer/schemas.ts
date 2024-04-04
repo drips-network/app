@@ -46,6 +46,11 @@ export const getVotingRoundResultsResponseSchema = z.object({
   result: z.array(voteReceiverSchema),
 });
 
+export const getCollaboratorResponseSchema = z.object({
+  isCollaborator: z.boolean(),
+  voted: z.boolean(),
+});
+
 export const getVotingRoundResponseSchema = z.object({
   id: z.string(),
   startsAt: z.string(),
@@ -54,6 +59,7 @@ export const getVotingRoundResponseSchema = z.object({
   dripListId: z.nullable(z.string()),
   name: z.string(),
   description: z.string().nullable(),
+  privateVotes: z.boolean(),
   publisherAddress: z.string(),
   result: z.array(voteReceiverSchema).nullable(),
   votes: z.array(voteSchema).nullable(),
@@ -65,3 +71,4 @@ export type ProjectVoteReceiver = z.infer<typeof projectVoteReceiverSchema>;
 export type DripListVoteReceiver = z.infer<typeof dripListVoteReceiverSchema>;
 export type VoteReceiver = z.infer<typeof voteReceiverSchema>;
 export type Vote = z.infer<typeof voteSchema>;
+export type Collaborator = z.infer<typeof getCollaboratorResponseSchema>;

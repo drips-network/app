@@ -59,3 +59,11 @@ export const VOTE_MESSAGE_TEMPLATE = (
     sortedReceivers,
   )}`;
 };
+
+export const REVEAL_VOTES_MESSAGE_TEMPLATE = (
+  currentTime: Date,
+  chainId: number,
+  publisherAddress: string,
+  votingRoundId: string,
+) =>
+  `Reveal the votes for voting round with ID ${votingRoundId}, owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;

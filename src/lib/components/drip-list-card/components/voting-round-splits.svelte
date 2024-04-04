@@ -18,7 +18,11 @@
       <div class="empty-state" in:fade|local>
         <Emoji emoji="🗳️" size="huge" />
         <h4>Awaiting votes</h4>
-        <p>No one has voted yet.</p>
+        {#if votingRound.privateVotes}
+          <p>Vote results will be revealed after the voting period ends.</p>
+        {:else}
+          <p>No one has voted yet.</p>
+        {/if}
       </div>
     {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'completed'}
       <div class="empty-state" in:fade|local>

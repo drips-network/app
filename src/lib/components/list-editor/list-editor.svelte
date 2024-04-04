@@ -198,6 +198,7 @@
   export let maxItems = 200;
   export let percentages: Percentages = {};
   export let isEditable = true;
+  export let outline = true;
   export let addOnMount: string | undefined = undefined;
 
   /**
@@ -574,7 +575,11 @@
     </div>
   {/if}
   {#if Object.keys(items).length > 0 || inputMessage}
-    <div class="list" bind:this={listElem}>
+    <div
+      class="list"
+      style:box-shadow={outline ? 'var(--elevation-low)' : undefined}
+      bind:this={listElem}
+    >
       {#if inputMessage}
         <div
           class="sticky top-0 left-0 w-full z-10 border-t border-foreground flex flex-wrap py-4 gap-1 items-start justify-between {inputMessage.type ===
@@ -730,7 +735,6 @@
 
   .list {
     background-color: var(--color-background);
-    box-shadow: var(--elevation-low);
     border-radius: 0 0 1.5rem 1.5rem;
     overflow: hidden;
     max-height: 24rem;

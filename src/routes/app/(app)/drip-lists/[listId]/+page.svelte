@@ -129,18 +129,22 @@
             <button on:click={() => handleVotingRoundClick(votingRound)} class="voting-round">
               <div class="left">
                 <h4 class="typo-text">{formatDate(new Date(votingRound.endsAt), 'dayAndYear')}</h4>
-                <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
-                  {votingRound.result?.length === 1
-                    ? '1 recipient'
-                    : `${votingRound.result?.length ?? 0} recipients`}
-                </span>
+                {#if !votingRound.privateVotes}
+                  <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
+                    {votingRound.result?.length === 1
+                      ? '1 recipient'
+                      : `${votingRound.result?.length ?? 0} recipients`}
+                  </span>
+                {/if}
               </div>
-              <div class="right">
-                <span class="typo-text"
-                  >{votingRound.votes?.length ?? 0}
-                  {votingRound.votes?.length === 1 ? 'vote' : 'votes'}</span
-                >
-              </div>
+              {#if !votingRound.privateVotes}
+                <div class="right">
+                  <span class="typo-text"
+                    >{votingRound.votes?.length ?? 0}
+                    {votingRound.votes?.length === 1 ? 'vote' : 'votes'}</span
+                  >
+                </div>
+              {/if}
             </button>
           {/each}
         </div>

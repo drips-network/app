@@ -7,11 +7,13 @@ import {
   getVotingRoundVotesResponseSchema,
   getVotingRoundResultsResponseSchema,
   type VoteReceiver,
+  getCollaboratorResponseSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
   CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE,
   DELETE_VOTING_ROUND_MESSAGE_TEMPLATE,
+  REVEAL_VOTES_MESSAGE_TEMPLATE,
   START_VOTING_ROUND_MESSAGE_TEMPLATE,
   VOTE_MESSAGE_TEMPLATE,
 } from './signature-message-templates';
@@ -161,11 +163,37 @@ export async function getVotingRounds(
   ).votingRounds;
 }
 
-export async function getVotingRoundVotes(votingRoundId: string, fetch = window.fetch) {
+/** If votes are set to private, an admin signature is required to get votes. */
+export async function signGetVotingRoundVotes(
+  signer: ethers.Signer,
+  currentTime: Date,
+  publisherAddress: string,
+  votingRoundId: string,
+) {
+  const chainId = await signer.getChainId();
+
+  const message = REVEAL_VOTES_MESSAGE_TEMPLATE(
+    currentTime,
+    chainId,
+    publisherAddress,
+    votingRoundId,
+  );
+
+  return signer.signMessage(message);
+}
+
+export async function getVotingRoundVotes(
+  votingRoundId: string,
+  adminSignature?: { signature: string; date: Date },
+  fetch = window.fetch,
+) {
   return (
     await _authenticatedCall(
       'GET',
-      `/votingRounds/${votingRoundId}/votes`,
+      `/votingRounds/${votingRoundId}/votes` +
+        (adminSignature
+          ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+          : ''),
       getVotingRoundVotesResponseSchema,
       undefined,
       fetch,
@@ -239,6 +267,14 @@ export async function linkVotingRoundToDripList(
       dripListId,
     },
     fetch,
+  );
+}
+
+export async function getCollaborator(votingRoundId: string, address: string) {
+  return _authenticatedCall(
+    'GET',
+    `/votingRounds/${votingRoundId}/collaborators/${address}`,
+    getCollaboratorResponseSchema,
   );
 }
 
