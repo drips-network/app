@@ -1,11 +1,14 @@
-import redis from 'redis';
+import redisSdk from 'redis';
 import { env } from '$env/dynamic/private';
 
-export const client = redis.createClient({ url: env.CACHE_REDIS_CONNECTION_STRING });
+export const redis = env.CACHE_REDIS_CONNECTION_STRING
+  ? redisSdk.createClient({ url: env.CACHE_REDIS_CONNECTION_STRING })
+  : undefined;
+export type RedisClientType = typeof redis;
 
-client.on('error', (err) => {
+redis?.on('error', (err) => {
   // eslint-disable-next-line no-console
   console.error(err);
 });
 
-await client.connect();
+await redis?.connect();

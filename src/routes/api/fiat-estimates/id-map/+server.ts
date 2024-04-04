@@ -2,9 +2,8 @@ import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
-import { getRedis } from '../../redis';
-import { env } from '$env/dynamic/private';
 import cached from '$lib/utils/cached';
+import { redis } from '../../redis';
 
 const cmcResponseSchema = z.object({
   data: z.array(
@@ -29,8 +28,6 @@ const COINMARKETCAP_ETHEREUM_PLATFORM_ID = 1;
 // but only the ones currently needed for estimates.
 
 export const GET: RequestHandler = async () => {
-  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
-
   const cmcIdMapRes = await cached(redis, 'cmc-id-map', 60, async () => {
     const idMapRes = await fetch(
       `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,

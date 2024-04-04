@@ -14,10 +14,9 @@ import type { FeaturedDripListQueryVariables } from './__generated__/gql.generat
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { PUBLIC_NETWORK } from '$env/static/public';
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';
-import { env } from '$env/dynamic/private';
-import { getRedis } from '../../api/redis.js';
 import cached from '$lib/utils/cached.js';
 import queryCacheKey from '$lib/utils/query-cache-key.js';
+import { redis } from '../../api/redis.js';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -32,8 +31,6 @@ const FEATURED_DRIP_LISTS =
   }[PUBLIC_NETWORK] ?? [];
 
 export const load = async ({ fetch }) => {
-  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
-
   const getProjectsQuery = gql`
     ${PROJECT_CARD_FRAGMENT}
     query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
