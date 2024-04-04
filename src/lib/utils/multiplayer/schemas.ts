@@ -48,7 +48,7 @@ export const getVotingRoundResultsResponseSchema = z.object({
 
 export const getCollaboratorResponseSchema = z.object({
   isCollaborator: z.boolean(),
-  voted: z.boolean(),
+  hasVoted: z.boolean(),
 });
 
 export const getVotingRoundResponseSchema = z.object({

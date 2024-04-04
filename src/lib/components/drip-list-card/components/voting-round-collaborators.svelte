@@ -116,7 +116,7 @@
             rightComponent: {
               component: PropsOnlyButton,
               props: {
-                label: 'Cast your vote',
+                label: collaborator.hasVoted ? 'Change your vote' : 'Cast your vote',
                 onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id)),
                 buttonProps: {
                   variant: 'primary',
