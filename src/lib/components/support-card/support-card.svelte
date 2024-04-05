@@ -225,35 +225,25 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>
-    {#if draftListMode}
-      This Drip List can be supported once it's published after voting.
-    {:else}
-      Donate instantly{#if isOwner && dripList}, create a support stream,{/if} or add this to a Drip
-      List.
-    {/if}
-  </p>
-  {#if !draftListMode}
-    <div class="support-buttons-wrapper">
-      <div class="support-buttons">
-        <SupportButtons
-          {isOwner}
-          {type}
-          {onClickConnectWallet}
-          {onClickNewStream}
-          {onClickAddToDripList}
-          {onClickNewDonation}
-          bind:supportMenuOpen
-        />
-      </div>
-      <!-- Invisible duplicate of support buttons for smooth transition -->
-      <div class="support-buttons-placeholder">
-        <TransitionedHeight transitionHeightChanges={true}>
-          <SupportButtons transitions={false} {isOwner} {type} bind:supportMenuOpen />
-        </TransitionedHeight>
-      </div>
+  <p>Donate once, continuously, or add this to your Drip List.</p>
+  <div class="support-buttons-wrapper">
+    <div class="support-buttons">
+      <SupportButtons
+        {type}
+        {onClickConnectWallet}
+        {onClickNewStream}
+        {onClickAddToDripList}
+        {onClickNewDonation}
+        bind:supportMenuOpen
+      />
     </div>
-  {/if}
+    <!-- Invisible duplicate of support buttons for smooth transition -->
+    <div class="support-buttons-placeholder">
+      <TransitionedHeight transitionHeightChanges={true}>
+        <SupportButtons transitions={false} {type} bind:supportMenuOpen />
+      </TransitionedHeight>
+    </div>
+  </div>
 </div>
 
 <style>

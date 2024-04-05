@@ -68,6 +68,6 @@
     dripList={dripList ?? undefined}
     avatarSize="tiny"
     isLinked={false}
-    showOwner={false}
+    showOwner={true}
   />
 {/if}

@@ -43,6 +43,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import viewVotingRoundFlowSteps from '$lib/flows/view-voting-round/view-voting-round-flow-steps';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import { onMount } from 'svelte';
 
   export let data: PageData;
 
@@ -52,11 +53,12 @@
   $: ownerAccountId = dripList?.owner.accountId ?? votingRound?.publisherAddress;
   $: supportStreams =
     dripList &&
-    ownerAccountId &&
     $streamsStore &&
-    streamsStore
-      .getStreamsForUser(ownerAccountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList?.account.accountId);
+    streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
+
+  onMount(
+    () => dripList && streamsStore.fetchAccountsStreamingToAccountId(dripList.account.accountId),
+  );
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
   $: streamsFetched =

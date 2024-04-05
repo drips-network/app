@@ -69,6 +69,7 @@
   import streamsStore from '$lib/stores/streams/streams.store';
   import { getSubgraphClient } from '$lib/utils/get-drips-clients';
   import { onMount } from 'svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
   export let supportStreams: Stream[] = [];
@@ -335,7 +336,12 @@
             title={{
               component: IdentityBadge,
               props: {
-                tag: item.account.accountId === ownerAccountId ? 'Owner' : undefined,
+                tag:
+                  item.account.accountId === $walletStore.dripsAccountId
+                    ? 'You'
+                    : item.account.accountId === ownerAccountId
+                    ? 'Owner'
+                    : undefined,
                 disableTooltip: true,
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
@@ -358,7 +364,12 @@
               component: IdentityBadge,
               props: {
                 disableTooltip: true,
-                tag: stream.sender.accountId === ownerAccountId ? 'Owner' : undefined,
+                tag:
+                  stream.sender.accountId === $walletStore.dripsAccountId
+                    ? 'You'
+                    : stream.sender.accountId === ownerAccountId
+                    ? 'Owner'
+                    : undefined,
                 address: AddressDriverClient.getUserAddress(item.account.accountId),
               },
             }}
