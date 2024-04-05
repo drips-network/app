@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { getRedis } from '../../routes/api/redis';
 import cached from './cached';
 import { getAddress } from 'ethers/lib/utils';
 import isTest from './is-test';
+import type { RedisClientType } from '../../routes/api/redis';
 
 const STREAMS = [
   // Radworks USDC
@@ -55,7 +55,7 @@ export default function totalDrippedApproximation() {
 const TOTAL_DRIPPED_PRICES_CACHE_KEY = 'total-dripped-prices';
 
 export const cachedTotalDrippedPrices = (
-  redis: Awaited<ReturnType<typeof getRedis>> | undefined,
+  redis: RedisClientType | undefined,
   fetch = window.fetch,
 ) =>
   cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {

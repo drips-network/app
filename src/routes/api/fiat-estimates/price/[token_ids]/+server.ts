@@ -2,8 +2,7 @@ import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
-import { env } from '$env/dynamic/private';
-import { getRedis } from '../../../redis';
+import { redis } from '../../../redis';
 
 const cmcResponseSchema = z.object({
   data: z.record(
@@ -31,8 +30,6 @@ export const GET: RequestHandler = async ({ params }) => {
   } catch {
     throw error(400, 'Invalid token ID submitted');
   }
-
-  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
 
   let prices: Record<string, number | undefined> = Object.fromEntries(
     tokenIds.map((tokenId) => [tokenId, undefined]),

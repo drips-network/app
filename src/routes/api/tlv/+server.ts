@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { formatUnits } from 'ethers/lib/utils.js';
 import { z } from 'zod';
-import { getRedis } from '../redis.js';
+import { redis } from '../redis.js';
 
 const etherscanTokensResponseSchema = z.array(
   z.object({
@@ -12,8 +12,6 @@ const etherscanTokensResponseSchema = z.array(
 );
 
 export const GET = async ({ fetch }) => {
-  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
-
   const cached = redis && (await redis.get('explore.tlv-estimate'));
 
   if (cached) {

@@ -3,9 +3,9 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
-import { getRedis } from '../../redis';
 import { env } from '$env/dynamic/private';
 import cached from '$lib/utils/cached';
+import { redis } from '../../redis';
 
 const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
@@ -24,8 +24,6 @@ function mapGhResponse(response: Awaited<ReturnType<(typeof github)['getRepoByUr
 
 export const GET: RequestHandler = async ({ params }) => {
   const { repoUrl } = uriDecodeParams(params);
-
-  const redis = env.CACHE_REDIS_CONNECTION_STRING ? await getRedis() : undefined;
 
   try {
     const lowercaseRepoUrl = repoUrl.toLowerCase();

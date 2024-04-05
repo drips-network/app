@@ -1,4 +1,4 @@
-import type { getRedis } from '../../routes/api/redis';
+import type { RedisClientType } from '../../routes/api/redis';
 
 /**
  * Caches the result of a fetcher function using Redis.
@@ -11,7 +11,7 @@ import type { getRedis } from '../../routes/api/redis';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function cached<T extends Record<string, any>>(
-  redis: Awaited<ReturnType<typeof getRedis>> | undefined,
+  redis: RedisClientType | undefined,
   key: string,
   EX: number,
   fetcher: () => Promise<T>,
