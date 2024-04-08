@@ -117,7 +117,7 @@
     {#if votingRound.privateVotes && collaborator?.isCollaborator && $walletStore.address && votingRound.status === 'started'}
       <ListEditor
         isEditable={false}
-        mode="list"
+        weightsMode={false}
         outline={false}
         items={{
           [$walletStore.address]: {
@@ -141,7 +141,7 @@
     {#if votingRound.votes || revealedVotes}
       <ListEditor
         isEditable={false}
-        mode="list"
+        weightsMode={false}
         outline={false}
         items={Object.fromEntries(
           sortVotes($walletStore.address, votingRound.votes || revealedVotes || []).map((v) => [

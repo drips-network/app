@@ -91,7 +91,11 @@
   </FormField>
 
   <FormField title="Collaborators">
-    <ListEditor items={$context.votingRoundConfig.collaborators} mode="list" isEditable={false} />
+    <ListEditor
+      items={$context.votingRoundConfig.collaborators}
+      weightsMode={false}
+      isEditable={false}
+    />
     <svelte:fragment slot="action">
       <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
         >Edit</Button

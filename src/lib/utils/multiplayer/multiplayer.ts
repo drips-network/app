@@ -8,6 +8,8 @@ import {
   getVotingRoundResultsResponseSchema,
   type VoteReceiver,
   getCollaboratorResponseSchema,
+  type ProjectVoteReceiver,
+  type DripListVoteReceiver,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -17,9 +19,24 @@ import {
   START_VOTING_ROUND_MESSAGE_TEMPLATE,
   VOTE_MESSAGE_TEMPLATE,
 } from './signature-message-templates';
-import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import {
+  LIST_EDITOR_PROJECT_FRAGMENT,
+  type Items,
+  type Weights,
+  LIST_EDITOR_DRIP_LIST_FRAGMENT,
+} from '$lib/components/list-editor/types';
 import { readable, type Readable } from 'svelte/store';
 import { onDestroy } from 'svelte';
+import mapFilterUndefined from '../map-filter-undefined';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import type {
+  DripListForVoteReceiverQuery,
+  DripListForVoteReceiverQueryVariables,
+  ProjectForVoteReceiverQuery,
+  ProjectForVoteReceiverQueryVariables,
+} from './__generated__/gql.generated';
+import { getAddressDriverClient } from '../get-drips-clients';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -285,19 +302,15 @@ export function matchVotingRoundToDripList(
   return votingRounds.filter((vr) => vr.dripListId === dripListId && vr.status === 'started')[0];
 }
 
-export function mapListEditorStateToVoteReceivers(
-  items: Items,
-  percentages: Percentages,
-): VoteReceiver[] {
+export function mapListEditorStateToVoteReceivers(items: Items, weights: Weights): VoteReceiver[] {
   const result: VoteReceiver[] = [];
 
-  for (const [key, item] of Object.entries(items)) {
-    const weight = Math.floor((Number(percentages[key]) / 100) * 1000000);
+  for (const [accountId, item] of Object.entries(items)) {
+    const weight = weights[accountId];
 
     switch (item.type) {
       case 'project':
         result.push({
-          // TODO: Server should work with weights instead of percentages
           weight,
           url: item.project.source.url,
           type: 'project',
@@ -314,13 +327,126 @@ export function mapListEditorStateToVoteReceivers(
         result.push({
           weight,
           type: 'dripList',
-          accountId: item.list.account.accountId,
+          accountId,
         });
         break;
     }
   }
 
   return result;
+}
+
+export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver[]) {
+  const items: Items = {};
+  const weights: Weights = {};
+
+  const receiversToFetchDataFor = receivers.filter(
+    (v): v is ProjectVoteReceiver | DripListVoteReceiver => {
+      return 'type' in v && (v.type === 'project' || v.type === 'dripList');
+    },
+  );
+
+  const receiversData = mapFilterUndefined(
+    await Promise.all(
+      receiversToFetchDataFor.map(async (v) => {
+        const projectQuery = gql`
+          ${LIST_EDITOR_PROJECT_FRAGMENT}
+          query ProjectForVoteReceiver($url: String!) {
+            projectByUrl(url: $url) {
+              ...ListEditorProject
+              ... on ClaimedProject {
+                account {
+                  accountId
+                }
+              }
+              ... on UnclaimedProject {
+                account {
+                  accountId
+                }
+              }
+            }
+          }
+        `;
+
+        const dripListQuery = gql`
+          ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
+          query DripListForVoteReceiver($id: ID!) {
+            dripList(id: $id) {
+              ...ListEditorDripList
+              account {
+                accountId
+              }
+            }
+          }
+        `;
+
+        if (v.type === 'dripList') {
+          return (
+            await query<DripListForVoteReceiverQuery, DripListForVoteReceiverQueryVariables>(
+              dripListQuery,
+              {
+                id: v.accountId,
+              },
+            )
+          ).dripList;
+        } else {
+          return (
+            await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
+              projectQuery,
+              { url: v.url },
+            )
+          ).projectByUrl;
+        }
+      }),
+    ),
+    (v) => (v ? v : undefined),
+  );
+
+  const addressDriverClient = await getAddressDriverClient();
+
+  for (const receiver of receivers) {
+    switch (receiver.type) {
+      case 'project': {
+        const project = receiversData.find(
+          (p): p is Extract<(typeof receiversData)[number], { __typename: 'ClaimedProject' }> =>
+            p.__typename !== 'DripList' && p.source.url === receiver.url,
+        );
+        if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
+
+        const { accountId } = project.account;
+        items[accountId] = { type: 'project', project };
+        weights[accountId] = receiver.weight;
+        break;
+      }
+      case 'address': {
+        const accountId = await addressDriverClient.getAccountIdByAddress(receiver.address);
+
+        items[accountId] = { type: 'address', address: receiver.address };
+        weights[accountId] = receiver.weight;
+
+        break;
+      }
+      case 'dripList': {
+        const dripList = receiversData.find(
+          (p): p is Extract<typeof receiversData, { __typename: 'DripList' }> =>
+            p.__typename === 'DripList' && p.account.accountId === receiver.accountId,
+        );
+        if (!dripList) throw new Error(`DripList not found for ID: ${receiver.accountId}`);
+
+        items[receiver.accountId] = { type: 'drip-list', dripList: dripList };
+        weights[receiver.accountId] = receiver.weight;
+
+        break;
+      }
+      default:
+        throw new Error('Unknown receiver type');
+    }
+  }
+
+  return {
+    items,
+    weights,
+  };
 }
 
 export function getVotingRoundStatusReadable(

@@ -27,7 +27,7 @@
 >
   <FormField title="Recipients*">
     <ListEditor
-      bind:percentages={$context.dripList.percentages}
+      bind:weights={$context.dripList.weights}
       bind:items={$context.dripList.items}
       bind:valid={listValid}
       addOnMount={urlToAdd}

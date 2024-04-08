@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import type { Slots } from '../../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
@@ -10,7 +10,6 @@ import AddEthereumAddress, {
 } from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/project-slot.svelte';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
-import type { ListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
 import Review, { REVIEW_STEP_PROJECT_FRAGMENT } from './steps/review/review.svelte';
@@ -21,6 +20,7 @@ import Success from './steps/success/success.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProject_UnclaimedProject_Fragment } from './__generated__/gql.generated';
+import type { Items, Weights } from '$lib/components/list-editor/types';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
@@ -33,8 +33,9 @@ export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   }
 `;
 
-interface SplitsConfig extends ListEditorConfig {
-  itemsPromise: Promise<ClaimProjectFlowProject_UnclaimedProject_Fragment>[] | undefined;
+interface ListEditorConfig {
+  items: Items;
+  weights: Weights;
 }
 
 interface Amount {
@@ -62,8 +63,8 @@ export interface State {
       }
     | undefined;
   highLevelPercentages: { [key: string]: number };
-  maintainerSplits: SplitsConfig;
-  dependencySplits: SplitsConfig;
+  maintainerSplits: ListEditorConfig;
+  dependencySplits: ListEditorConfig;
   dependenciesAutoImported: boolean;
   avatar:
     | {
@@ -87,14 +88,12 @@ export const state = () =>
     unclaimedFunds: undefined,
     highLevelPercentages: { maintainers: 60, dependencies: 40 },
     maintainerSplits: {
-      itemsPromise: undefined,
       items: {},
-      percentages: {},
+      weights: {},
     },
     dependencySplits: {
-      itemsPromise: undefined,
       items: {},
-      percentages: {},
+      weights: {},
     },
     dependenciesAutoImported: false,
     avatar: {
@@ -148,11 +147,11 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
 }
 
 export const steps = (
+  state: Writable<State>,
   skipWalletConnect = false,
   isModal = false,
   projectUrl: string | undefined = undefined,
 ) => [
-  // TODO: skip this step entirely if project is provided (like "Claim project" button on project-profile)
   makeStep({
     component: EnterGitUrl,
     props: {
@@ -178,10 +177,12 @@ export const steps = (
   makeStep({
     component: ConfigureMaintainers,
     props: undefined,
+    condition: () => get(state).highLevelPercentages.maintainers > 0,
   }),
   makeStep({
     component: ConfigureDependencies,
     props: undefined,
+    condition: () => get(state).highLevelPercentages.dependencies > 0,
   }),
   makeStep({
     component: Review,

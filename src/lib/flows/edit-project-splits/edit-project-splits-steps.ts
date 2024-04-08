@@ -1,9 +1,10 @@
 import {
-  DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT,
-  DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT,
-  type ListEditorConfig,
-  type ListItem,
-} from '$lib/components/list-editor/list-editor.svelte';
+  LIST_EDITOR_DRIP_LIST_FRAGMENT,
+  LIST_EDITOR_PROJECT_FRAGMENT,
+  type Items,
+  type ListEditorItem,
+  type Weights,
+} from '$lib/components/list-editor/types';
 import { makeStep } from '$lib/components/stepper/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
@@ -12,9 +13,6 @@ import EditDependencyList from './steps/edit-dependency-list.svelte';
 import Review from './steps/review.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
-import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
-import projectItem from '$lib/components/list-editor/item-templates/project';
 import { gql } from 'graphql-request';
 import type {
   EditProjectSplitsFlowAddressReceiverFragment,
@@ -32,21 +30,34 @@ export const EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT = gql`
 `;
 
 export const EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT = gql`
-  ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+  ${LIST_EDITOR_PROJECT_FRAGMENT}
   fragment EditProjectSplitsFlowProjectReceiver on ProjectReceiver {
     weight
     project {
-      ...DripListMembersEditorProject
+      ...ListEditorProject
+      ... on ClaimedProject {
+        account {
+          accountId
+        }
+      }
+      ... on UnclaimedProject {
+        account {
+          accountId
+        }
+      }
     }
   }
 `;
 
 export const EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT = gql`
-  ${DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT}
+  ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
   fragment EditProjectSplitsFlowDripListReceiver on DripListReceiver {
     weight
     dripList {
-      ...DripListMembersEditorDripList
+      ...ListEditorDripList
+      account {
+        accountId
+      }
     }
   }
 `;
@@ -61,6 +72,11 @@ type Splits = {
   dependencies: SplitReceiver[];
 };
 
+interface ListEditorConfig {
+  items: Items;
+  weights: Weights;
+}
+
 export interface State {
   projectAccountId: string;
   highLevelPercentages: { [key: string]: number };
@@ -68,39 +84,34 @@ export interface State {
   dependencySplits: ListEditorConfig;
 }
 
-const MAX_SPLITS_WEIGHT = 1000000;
-
-function getSplitPercent(weight: number) {
-  return ((weight * MAX_SPLITS_WEIGHT) / MAX_SPLITS_WEIGHT / MAX_SPLITS_WEIGHT) * 100;
-}
-
-function mapSplitReceiverToEditorItem(input: SplitReceiver): ListItem {
+function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
   switch (input.__typename) {
     case 'AddressReceiver':
-      return ethAddressItem(input.account.address);
+      return { type: 'address', address: input.account.address };
     case 'DripListReceiver':
-      return dripListItem(input.dripList);
+      return { type: 'drip-list', dripList: input.dripList };
     case 'ProjectReceiver':
-      return projectItem(input.project);
+      return { type: 'project', project: input.project };
+  }
+}
+
+function extractAccountId(input: SplitReceiver) {
+  switch (input.__typename) {
+    case 'AddressReceiver':
+      return input.account.address;
+    case 'DripListReceiver':
+      return input.dripList.account.accountId;
+    case 'ProjectReceiver':
+      return input.project.account.accountId;
   }
 }
 
 function mapSplitReceiversToEditorConfig(input: SplitReceiver[]) {
-  const mapSplitSlug = (split: SplitReceiver) => {
-    switch (split.__typename) {
-      case 'AddressReceiver':
-        return split.account.address;
-      case 'DripListReceiver':
-        return split.dripList.account.accountId;
-      case 'ProjectReceiver':
-        return split.project.source.url;
-    }
-  };
-
   return {
-    selected: input.map(mapSplitSlug),
-    items: Object.fromEntries(input.map((v) => [mapSplitSlug(v), mapSplitReceiverToEditorItem(v)])),
-    percentages: Object.fromEntries(input.map((v) => [mapSplitSlug(v), getSplitPercent(v.weight)])),
+    items: Object.fromEntries(
+      input.map((v) => [extractAccountId(v), mapSplitReceiverToEditorItem(v)]),
+    ),
+    weights: Object.fromEntries(input.map((v) => [extractAccountId(v), v.weight])),
   };
 }
 
@@ -108,34 +119,31 @@ const state = (projectAccountId: string, representationalSplits: Splits) => {
   const maintainerSplits = mapSplitReceiversToEditorConfig(representationalSplits.maintainers);
   const dependencySplits = mapSplitReceiversToEditorConfig(representationalSplits.dependencies);
 
-  const maintainerPercentage = Object.values(maintainerSplits.percentages).reduce(
-    (a, b) => a + b,
-    0,
-  );
+  const maintainersWeight = Object.values(maintainerSplits.weights).reduce((a, b) => a + b, 0);
 
   const highLevelPercentages = {
-    maintainers: Math.round((maintainerPercentage / 100) * 100),
-    dependencies: Math.round(((100 - maintainerPercentage) / 100) * 100),
+    maintainers: maintainersWeight / 10000,
+    dependencies: (1000000 - maintainersWeight) / 10000,
   };
 
-  // Rebase the percentages within maintainer and dependency splits to add up to 100%
+  // Scale the percentages within maintainer and dependency splits to add up to 100%
 
-  const rebasedMaintainerPercentages = Object.fromEntries(
-    Object.entries(maintainerSplits.percentages).map(([k, v]) => [
+  const rebasedMaintainerWeights = Object.fromEntries(
+    Object.entries(maintainerSplits.weights).map(([k, v]) => [
       k,
-      Math.round((v / maintainerPercentage) * 100),
+      Math.round((v / maintainersWeight) * 1000000),
     ]),
   );
 
-  const rebasedDependencyPercentages = Object.fromEntries(
-    Object.entries(dependencySplits.percentages).map(([k, v]) => [
+  const rebasedDependencyWeights = Object.fromEntries(
+    Object.entries(dependencySplits.weights).map(([k, v]) => [
       k,
-      Math.round((v / (100 - maintainerPercentage)) * 100),
+      Math.round((v / (1000000 - maintainersWeight)) * 1000000),
     ]),
   );
 
-  maintainerSplits.percentages = rebasedMaintainerPercentages;
-  dependencySplits.percentages = rebasedDependencyPercentages;
+  maintainerSplits.weights = rebasedMaintainerWeights;
+  dependencySplits.weights = rebasedDependencyWeights;
 
   return writable<State>({
     projectAccountId,
@@ -158,9 +166,7 @@ export default (projectAccountId: string, projectSourceUrl: string, splits: Spli
     }),
     makeStep({
       component: EditDependencyList,
-      props: {
-        projectSourceUrl,
-      },
+      props: undefined,
     }),
     makeStep({
       component: Review,

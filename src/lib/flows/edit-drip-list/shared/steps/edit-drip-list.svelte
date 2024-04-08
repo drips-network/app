@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export const EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT = gql`
-    ${DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT}
-    ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+    ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
+    ${LIST_EDITOR_PROJECT_FRAGMENT}
     fragment EditDripListStepSelectedDripList on DripList {
       name
       description
@@ -15,7 +15,7 @@
             accountId
           }
           dripList {
-            ...DripListMembersEditorDripList
+            ...ListEditorDripList
           }
         }
         ... on AddressReceiver {
@@ -30,7 +30,7 @@
             accountId
           }
           project {
-            ...DripListMembersEditorProject
+            ...ListEditorProject
           }
         }
       }
@@ -38,16 +38,16 @@
   `;
 
   export const EDIT_DRIP_LIST_STEP_DRIP_LIST_TO_ADD_FRAGMENT = gql`
-    ${DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT}
+    ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
     fragment EditDripListStepDripListToAdd on DripList {
-      ...DripListMembersEditorDripList
+      ...ListEditorDripList
     }
   `;
 
   export const EDIT_DRIP_LIST_STEP_PROJECT_TO_ADD_FRAGMENT = gql`
-    ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
+    ${LIST_EDITOR_PROJECT_FRAGMENT}
     fragment EditDripListStepProjectToAdd on Project {
-      ...DripListMembersEditorProject
+      ...ListEditorProject
     }
   `;
 </script>
@@ -72,9 +72,6 @@
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { Utils } from 'radicle-drips';
-  import projectItem from '$lib/components/list-editor/item-templates/project';
-  import ethAddressItem from '$lib/components/list-editor/item-templates/eth-address';
-  import dripListItem from '$lib/components/list-editor/item-templates/drip-list';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import DripListEditor, {
     type DripListConfig,
@@ -88,9 +85,9 @@
     EditDripListStepSelectedDripListFragment,
   } from './__generated__/gql.generated';
   import {
-    DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT,
-    DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT,
-  } from '$lib/components/list-editor/list-editor.svelte';
+    LIST_EDITOR_DRIP_LIST_FRAGMENT,
+    LIST_EDITOR_PROJECT_FRAGMENT,
+  } from '$lib/components/list-editor/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -104,49 +101,43 @@
 
   let items = Object.fromEntries(
     mapFilterUndefined($selectedDripListState.dripList?.splits ?? unreachable(), (rs) => {
-      if (rs.__typename === 'ProjectReceiver') {
-        return [rs.project.source.url, projectItem(rs.project)];
-      } else if (rs.__typename === 'AddressReceiver') {
-        return [rs.account.address, ethAddressItem(rs.account.address)];
-      } else if (rs.__typename === 'DripListReceiver') {
-        return [rs.dripList.account.accountId, dripListItem(rs.dripList)];
-      } else {
-        return undefined;
+      switch (rs.__typename) {
+        case 'AddressReceiver':
+          return [rs.account.address, { type: 'address', address: rs.account.address }];
+        case 'ProjectReceiver':
+          return [rs.project.source.url, { type: 'project', project: rs.project }];
+        case 'DripListReceiver':
+          return [rs.dripList.account.accountId, { type: 'dripList', dripList: rs.dripList }];
       }
     }),
   );
 
-  const MAX_SPLITS_WEIGHT = 1000000;
-
-  function getSplitPercent(weight: number) {
-    return ((weight * MAX_SPLITS_WEIGHT) / MAX_SPLITS_WEIGHT / MAX_SPLITS_WEIGHT) * 100;
-  }
-
-  let percentages = Object.fromEntries(
+  let weights = Object.fromEntries(
     mapFilterUndefined($selectedDripListState.dripList?.splits ?? unreachable(), (rs) => {
-      if (rs.__typename === 'ProjectReceiver') {
-        return [rs.project.source.url, getSplitPercent(rs.weight)];
-      } else if (rs.__typename === 'AddressReceiver') {
-        return [rs.account.address, getSplitPercent(rs.weight)];
-      } else if (rs.__typename === 'DripListReceiver') {
-        return [rs.dripList.account.accountId, getSplitPercent(rs.weight)];
-      } else {
-        return undefined;
+      switch (rs.__typename) {
+        case 'ProjectReceiver':
+          return [rs.project.source.url, rs.weight];
+        case 'AddressReceiver':
+          return [rs.account.address, rs.weight];
+        case 'DripListReceiver':
+          return [rs.dripList.account.accountId, rs.weight];
+        default:
+          return undefined;
       }
     }),
   );
 
   if (projectToAdd) {
-    items[projectToAdd.source.url] = projectItem(projectToAdd);
+    items[projectToAdd.source.url] = { type: 'project', project: projectToAdd };
   }
 
   if (dripListToAdd) {
-    items[dripListToAdd.account.accountId] = dripListItem(dripListToAdd);
+    items[dripListToAdd.account.accountId] = { type: 'dripList', dripList: dripListToAdd };
   }
 
   let dripList: DripListConfig = {
     items,
-    percentages,
+    weights,
     title: $selectedDripListState.dripList?.name ?? '',
     description: $selectedDripListState.dripList?.description ?? undefined,
   };
@@ -163,7 +154,10 @@
           const dripListService = await DripListService.new();
 
           const { receivers, projectsSplitMetadata } =
-            await dripListService.getProjectsSplitMetadataAndReceivers(dripList.percentages);
+            await dripListService.getProjectsSplitMetadataAndReceivers(
+              dripList.weights,
+              dripList.items,
+            );
 
           const listId = $selectedDripListState.dripList?.account.accountId ?? unreachable();
 

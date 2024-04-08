@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+  import type { Items, Weights } from '$lib/components/list-editor/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type {
     ProjectForVoteReceiverQuery,
@@ -125,37 +125,36 @@
 
   export function mapSplitsFromListEditorData(
     items: Items,
-    percentages: Percentages,
+    weights: Weights,
     groupPercentage: number,
   ): SplitsComponentSplitsReceiver[] {
-    return mapFilterUndefined(Object.keys(items), (slug) => {
-      const item = items[slug];
+    return mapFilterUndefined(Object.keys(items), (accountId) => {
+      const item = items[accountId];
 
-      const percentage = (groupPercentage / 100) * (percentages[slug] / 100) * 1000000;
+      const weight = Math.floor((groupPercentage / 100) * weights[accountId]);
 
-      if (!percentage) return;
-
-      if (item.type === 'project') {
-        return {
-          __typename: 'ProjectReceiver',
-          project: item.project,
-          weight: percentage,
-        };
-      } else if (item.type === 'drip-list') {
-        return {
-          __typename: 'DripListReceiver',
-          dripList: item.list,
-          weight: percentage,
-        };
-      } else {
-        return {
-          __typename: 'AddressReceiver',
-          account: {
-            __typename: 'AddressDriverAccount',
-            address: slug,
-          },
-          weight: percentage,
-        };
+      switch (item.type) {
+        case 'address':
+          return {
+            __typename: 'AddressReceiver',
+            account: {
+              __typename: 'AddressDriverAccount',
+              address: item.address,
+            },
+            weight,
+          };
+        case 'project':
+          return {
+            __typename: 'ProjectReceiver',
+            project: item.project,
+            weight,
+          };
+        case 'drip-list':
+          return {
+            __typename: 'DripListReceiver',
+            dripList: item.dripList,
+            weight,
+          };
       }
     });
   }

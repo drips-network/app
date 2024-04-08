@@ -26,10 +26,11 @@
 >
   <FormField title="Collaborators*">
     <ListEditor
-      allowedItems={['eth-addresses']}
+      allowProjects={false}
+      allowDripLists={false}
       bind:items={$context.votingRoundConfig.collaborators}
       bind:valid={listValid}
-      mode="list"
+      weightsMode={false}
     />
   </FormField>
 

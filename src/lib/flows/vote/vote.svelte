@@ -26,7 +26,7 @@
       promise: async (updateAwaitStep) => {
         const voteReceivers = multiplayer.mapListEditorStateToVoteReceivers(
           $context.listEditorConfig.items,
-          $context.listEditorConfig.percentages,
+          $context.listEditorConfig.weights,
         );
 
         const { signer, address } = $walletStore;
@@ -76,12 +76,10 @@
   />
 
   <FormField title="Recipients*">
-    <!-- TODO: Allow Drip List items -->
     <ListEditor
       bind:valid
       bind:items={$context.listEditorConfig.items}
-      bind:percentages={$context.listEditorConfig.percentages}
-      allowedItems={['eth-addresses', 'projects', 'drip-lists']}
+      bind:weights={$context.listEditorConfig.weights}
     />
   </FormField>
 

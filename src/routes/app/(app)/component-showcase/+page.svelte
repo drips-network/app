@@ -37,9 +37,10 @@
   } from '$lib/graphql/__generated__/base-types';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
-  import ButtonWithLabelProp from '$lib/components/button/props-only-button.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
+  import User from '$lib/components/icons/User.svelte';
 
   // Button
   let disabled = false;
@@ -311,17 +312,11 @@
 
   // List editor
 
-  let percentagesMode = false;
-  let mode: 'list' | 'percentages' = 'list';
-  $: mode = percentagesMode ? 'percentages' : 'list';
-  let allowEthAddresses = true;
+  let isEditable = true;
+  let weightsMode = true;
+  let allowAddresses = true;
   let allowProjects = true;
   let allowDripLists = true;
-  $: allowedItems = [
-    allowEthAddresses ? 'eth-addresses' : undefined,
-    allowProjects ? 'projects' : undefined,
-    allowDripLists ? 'drip-lists' : undefined,
-  ].filter((x) => x !== undefined) as ('eth-addresses' | 'projects' | 'drip-lists')[];
 </script>
 
 <HeadMeta />
@@ -341,11 +336,15 @@
 <div class="showcase-item">
   <h2>List Editor</h2>
   <div>
-    <input id="percentages-mode-checkbox" type="checkbox" bind:checked={percentagesMode} />
-    <label for="percentages-mode-checkbox">Percentages mode</label>
+    <input id="is-editable-checkbox" type="checkbox" bind:checked={isEditable} />
+    <label for="is-editable-checkbox">Editable</label>
   </div>
   <div>
-    <input id="allow-eth-addresses-checkbox" type="checkbox" bind:checked={allowEthAddresses} />
+    <input id="percentages-mode-checkbox" type="checkbox" bind:checked={weightsMode} />
+    <label for="percentages-mode-checkbox">Weights mode</label>
+  </div>
+  <div>
+    <input id="allow-eth-addresses-checkbox" type="checkbox" bind:checked={allowAddresses} />
     <label for="allow-eth-addresses-checkbox">Allow ETH addresses</label>
   </div>
   <div>
@@ -357,25 +356,29 @@
     <label for="allow-drip-lists-checkbox">Allow drip lists</label>
   </div>
   <ListEditor
+    weights={{ 1234: 1000000 }}
     items={{
-      '1': {
+      1234: {
         type: 'address',
-        address: '0x1234',
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
         rightComponent: {
-          component: ButtonWithLabelProp,
+          component: PropsOnlyButton,
           props: {
+            label: 'Right button',
+            onClick: () => alert('action done'),
             buttonProps: {
-              variant: 'ghost',
-              icon: UserIcon,
+              icon: User,
+              size: 'small',
             },
-            onClick: () => alert('right action button clicked'),
-            label: 'Example item right component',
           },
         },
       },
     }}
-    bind:mode
-    bind:allowedItems
+    {isEditable}
+    {allowAddresses}
+    {allowDripLists}
+    {allowProjects}
+    {weightsMode}
   />
 </div>
 

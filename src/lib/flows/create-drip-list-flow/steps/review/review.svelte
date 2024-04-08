@@ -53,7 +53,8 @@
           return await dripListService.buildTransactContext({
             listTitle: $context.dripList.title,
             listDescription: $context.dripList.description,
-            percentages: $context.dripList.percentages,
+            weights: $context.dripList.weights,
+            items: $context.dripList.items,
             support: (() => {
               if ($context.selectedSupportOption === 1) {
                 return {
@@ -72,8 +73,6 @@
                   tokenAddress:
                     $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
                 };
-              } else {
-                return unreachable();
               }
             })(),
           });
@@ -137,7 +136,7 @@
       <p class="my-4">{$context.dripList.description}</p>
     {/if}
     <ListEditor
-      bind:percentages={$context.dripList.percentages}
+      bind:weights={$context.dripList.weights}
       bind:items={$context.dripList.items}
       isEditable={false}
     />

@@ -36,6 +36,7 @@
   {rel}
   class="button size-{size}"
   class:disabled={isDisabled}
+  class:loading
   disabled={isDisabled}
   aria-disabled={isDisabled}
   on:click|stopPropagation
@@ -126,7 +127,7 @@
     box-shadow: var(--elevation-low);
   }
 
-  .button .inner.primary {
+  .button:not(.loading) .inner.primary {
     background-color: var(--color-primary);
   }
 

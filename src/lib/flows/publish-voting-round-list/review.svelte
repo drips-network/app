@@ -39,7 +39,8 @@
           return await dripListService.buildTransactContext({
             listTitle: $context.dripListConfig.title,
             listDescription: $context.dripListConfig.description,
-            percentages: $context.dripListConfig.percentages,
+            weights: $context.dripListConfig.weights,
+            items: $context.dripListConfig.items,
             support: undefined,
             latestVotingRoundId: votingRoundId,
           });
@@ -106,13 +107,13 @@
   </FormField>
 
   <FormField title="Recipients">
-    {#if Object.keys($context.dripListConfig.percentages).length === 0}
+    {#if Object.keys($context.dripListConfig.weights).length === 0}
       <span class="typo-text" style:color="var(--color-foreground-level-4)">No recipients</span>
     {:else}
       <ListEditor
         isEditable={false}
         items={$context.dripListConfig.items}
-        percentages={$context.dripListConfig.percentages}
+        weights={$context.dripListConfig.weights}
       />
     {/if}
   </FormField>
@@ -143,7 +144,7 @@
     <Button
       on:click={() => submit()}
       variant="primary"
-      disabled={Object.keys($context.dripListConfig.percentages).length === 0}
+      disabled={Object.keys($context.dripListConfig.weights).length === 0}
       icon={Wallet}>Confirm in wallet</Button
     >
   </svelte:fragment>

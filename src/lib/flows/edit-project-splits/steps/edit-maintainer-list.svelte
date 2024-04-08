@@ -36,12 +36,13 @@
     ]}% you assigned to your project’s maintainers."
   />
   <ListEditor
-    bind:percentages={$context.maintainerSplits.percentages}
+    bind:weights={$context.maintainerSplits.weights}
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
-    blockedKeys={dependencyKeys}
+    blockedAccountIds={dependencyKeys}
     maxItems={200 - dependencyKeys.length}
-    allowedItems={['eth-addresses']}
+    allowProjects={false}
+    allowDripLists={false}
   />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>

@@ -18,7 +18,7 @@ import DripListIcon from '$lib/components/icons/DripList.svelte';
 import ConfigureOneTimeDonation from './steps/configure-one-time-donation/configure-one-time-donation.svelte';
 import ChooseCreationMode from './steps/choose-creation-mode/choose-creation-mode.svelte';
 import ConfigureVotingRound from './steps/configure-voting-round/configure-voting-round.svelte';
-import type { Items } from '$lib/components/list-editor/list-editor.svelte';
+import type { Items } from '$lib/components/list-editor/types';
 import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
 
 export interface State {
@@ -49,7 +49,7 @@ export interface State {
 
 export const state = () =>
   writable<State>({
-    dripList: { title: 'My Drip List', percentages: {}, items: {}, description: undefined },
+    dripList: { title: 'My Drip List', weights: {}, items: {}, description: undefined },
     selectedCreationMode: undefined,
     selectedSupportOption: undefined,
     continuousSupportConfig: {
@@ -93,7 +93,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
             return {
               component: DripListBadge,
               props: {
-                listId: item.list.account.accountId,
+                listId: item.dripList.account.accountId,
               },
             };
           }
