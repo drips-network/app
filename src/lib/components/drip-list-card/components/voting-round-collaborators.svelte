@@ -100,6 +100,16 @@
       updateCollaborator(votingRound.id, $walletStore.address);
     }
   }
+
+  function sortVotes(connectedAddress: string | undefined, votes: Vote[]) {
+    if (!connectedAddress) return votes;
+
+    return votes.sort((a, b) => {
+      if (a.collaboratorAddress === connectedAddress) return -1;
+      if (b.collaboratorAddress === connectedAddress) return 1;
+      return 0;
+    });
+  }
 </script>
 
 <FormField title="Collaborators" type="div">
@@ -134,7 +144,7 @@
         mode="list"
         outline={false}
         items={Object.fromEntries(
-          (votingRound.votes || revealedVotes || []).map((v) => [
+          sortVotes($walletStore.address, votingRound.votes || revealedVotes || []).map((v) => [
             v.collaboratorAddress,
             {
               type: 'address',
