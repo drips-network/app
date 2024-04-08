@@ -10,6 +10,7 @@
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
   import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { BASE_URL } from '$lib/utils/base-url';
   import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import unreachable from '$lib/utils/unreachable';
@@ -31,7 +32,7 @@
           copyLinkLabel="Share with collaborators"
           shareLabel="Share with collaborators"
           buttonVariant="primary"
-          url="https://drips.network/app/drip-lists/{votingRound.id}"
+          url="{BASE_URL}/app/drip-lists/{votingRound.id}"
         />
       </svelte:fragment>
     </AnnotationBox>

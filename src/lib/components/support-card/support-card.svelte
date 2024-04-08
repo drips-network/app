@@ -80,6 +80,7 @@
   import unreachable from '$lib/utils/unreachable';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import SupportButtons from './components/support-buttons.svelte';
+  import { BASE_URL } from '$lib/utils/base-url';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -105,7 +106,7 @@
     if (project) {
       supportUrl = project.source.url;
     } else if (dripList) {
-      supportUrl = `https://drips.network/app/drip-lists/${dripList.account.accountId}`;
+      supportUrl = `${BASE_URL}/app/drip-lists/${dripList.account.accountId}`;
     }
   }
 

@@ -86,6 +86,7 @@
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
   import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer/multiplayer';
   import { writable } from 'svelte/store';
+  import { BASE_URL } from '$lib/utils/base-url';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -205,8 +206,7 @@
         </h1>
         <div class="flex items-center gap-4 -my-1">
           <ShareButton
-            url="https://drips.network/app/drip-lists/{dripList?.account.accountId ||
-              votingRound?.id}"
+            url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
           />
           {#if isOwnList}
             <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
