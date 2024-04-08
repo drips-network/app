@@ -250,7 +250,7 @@
             {#if dripList}
               <div class="flex flex-col gap-1.5">
                 <div class="totals">
-                  <div class="drip-icon flex-shrink-0">
+                  <div class="drip-icon">
                     <Drip />
                   </div>
                   <div class="typo-text tabular-nums total-streamed-badge">
@@ -272,8 +272,10 @@
                     </div>
                   {/if}
                 </div>
-                <div class="splits-component">
-                  <Splits groupsExpandable={true} list={dripList.splits} />
+                <div class="splits">
+                  <div class="splits-component">
+                    <Splits groupsExpandable={true} list={dripList.splits} />
+                  </div>
                 </div>
               </div>
             {/if}
@@ -286,15 +288,15 @@
           >
             {#if votingRound}
               <div class="flex flex-col gap-1.5">
-                {#if votingRound.result}
-                  <div class="totals">
-                    <div class="drip-icon flex-shrink-0">
+                <div class="splits">
+                  {#if votingRound.result}
+                    <div class="drip-icon">
                       <Drip fill="var(--color-foreground-level-5)" />
                     </div>
+                  {/if}
+                  <div class="splits-component">
+                    <VotingRoundSplits {votingRound} />
                   </div>
-                {/if}
-                <div class="splits-component">
-                  <VotingRoundSplits {votingRound} />
                 </div>
               </div>
 
@@ -392,6 +394,10 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .splits {
+    overflow-x: scroll;
   }
 
   .splits-component {
