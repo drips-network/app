@@ -53,7 +53,7 @@ export const VOTE_MESSAGE_TEMPLATE = (
           return ['drip-list', r.accountId, r.weight];
       }
     })
-    .sort((a, b) => Number(a[1]) - Number(b[1]));
+    .sort();
 
   return `Submit the vote for address ${voterAddress}, for the voting round with ID ${votingRoundId}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}. The receivers for this vote are: ${JSON.stringify(
     sortedReceivers,
