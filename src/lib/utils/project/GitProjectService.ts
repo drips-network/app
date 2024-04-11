@@ -423,7 +423,9 @@ export default class GitProjectService {
         this._formatSplitReceivers(receivers),
       ),
       dependenciesSplitMetadata: receivers.filter((v) => v.sublist === 'dependencies'),
-      maintainersSplitsMetadata: receivers.filter((v) => v.sublist === 'maintainers'),
+      maintainersSplitsMetadata: receivers.filter(
+        (v) => v.sublist === 'maintainers',
+      ) as LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['maintainers'],
       receivers,
     };
   }
