@@ -405,10 +405,10 @@ export default class GitProjectService {
     const MAX_WEIGHT = 1000000;
 
     function adjustWeights<T extends { weight: number }>(input: T[]): T[] {
-      const totalWeight = Object.values(input).reduce((acc, { weight }) => acc + weight, 0);
+      const totalWeight = input.reduce((acc, { weight }) => acc + weight, 0);
       const remainder = MAX_WEIGHT - totalWeight;
 
-      if (remainder > 0 && remainder < 5) {
+      if (remainder > 0) {
         input[0].weight += remainder;
       }
 
