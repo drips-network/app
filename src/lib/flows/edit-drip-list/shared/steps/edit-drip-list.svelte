@@ -22,6 +22,7 @@
           weight
           account {
             address
+            accountId
           }
         }
         ... on ProjectReceiver {
@@ -41,6 +42,9 @@
     ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
     fragment EditDripListStepDripListToAdd on DripList {
       ...ListEditorDripList
+      account {
+        accountId
+      }
     }
   `;
 
@@ -48,6 +52,16 @@
     ${LIST_EDITOR_PROJECT_FRAGMENT}
     fragment EditDripListStepProjectToAdd on Project {
       ...ListEditorProject
+      ... on ClaimedProject {
+        account {
+          accountId
+        }
+      }
+      ... on UnclaimedProject {
+        account {
+          accountId
+        }
+      }
     }
   `;
 </script>
@@ -87,6 +101,7 @@
   import {
     LIST_EDITOR_DRIP_LIST_FRAGMENT,
     LIST_EDITOR_PROJECT_FRAGMENT,
+    type Items,
   } from '$lib/components/list-editor/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -99,40 +114,33 @@
   export let projectToAdd: EditDripListStepProjectToAddFragment | undefined = undefined;
   export let dripListToAdd: EditDripListStepDripListToAddFragment | undefined = undefined;
 
-  let items = Object.fromEntries(
+  let items: Items = Object.fromEntries(
     mapFilterUndefined($selectedDripListState.dripList?.splits ?? unreachable(), (rs) => {
       switch (rs.__typename) {
         case 'AddressReceiver':
-          return [rs.account.address, { type: 'address', address: rs.account.address }];
+          return [rs.account.accountId, { type: 'address', address: rs.account.address }];
         case 'ProjectReceiver':
-          return [rs.project.source.url, { type: 'project', project: rs.project }];
+          return [rs.account.accountId, { type: 'project', project: rs.project }];
         case 'DripListReceiver':
-          return [rs.dripList.account.accountId, { type: 'dripList', dripList: rs.dripList }];
+          return [rs.account.accountId, { type: 'dripList', dripList: rs.dripList }];
       }
     }),
   );
 
   let weights = Object.fromEntries(
     mapFilterUndefined($selectedDripListState.dripList?.splits ?? unreachable(), (rs) => {
-      switch (rs.__typename) {
-        case 'ProjectReceiver':
-          return [rs.project.source.url, rs.weight];
-        case 'AddressReceiver':
-          return [rs.account.address, rs.weight];
-        case 'DripListReceiver':
-          return [rs.dripList.account.accountId, rs.weight];
-        default:
-          return undefined;
-      }
+      return [rs.account.accountId, rs.weight];
     }),
   );
 
   if (projectToAdd) {
-    items[projectToAdd.source.url] = { type: 'project', project: projectToAdd };
+    items[projectToAdd.account.accountId] = { type: 'project', project: projectToAdd };
+    weights[projectToAdd.account.accountId] = 0;
   }
 
   if (dripListToAdd) {
-    items[dripListToAdd.account.accountId] = { type: 'dripList', dripList: dripListToAdd };
+    items[dripListToAdd.account.accountId] = { type: 'drip-list', dripList: dripListToAdd };
+    weights[dripListToAdd.account.accountId] = 0;
   }
 
   let dripList: DripListConfig = {

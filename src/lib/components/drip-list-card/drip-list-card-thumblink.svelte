@@ -270,6 +270,7 @@
 
   .splits-component {
     margin-left: 10px;
+    pointer-events: none;
   }
 
   .muted {

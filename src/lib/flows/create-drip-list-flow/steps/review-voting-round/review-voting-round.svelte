@@ -51,7 +51,9 @@
           date: timestamp,
           name: $context.dripList.title,
           description: $context.dripList.description,
-          collaborators: Object.keys($context.votingRoundConfig.collaborators),
+          collaborators: Object.values($context.votingRoundConfig.collaborators).map((v) =>
+            v.type === 'address' ? v.address : unreachable(),
+          ),
           endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
           publisherAddress: $walletStore.address ?? unreachable(),
           privateVotes: $context.votingRoundConfig.privateVotes,
