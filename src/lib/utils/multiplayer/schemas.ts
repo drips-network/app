@@ -62,7 +62,7 @@ export const getVotingRoundResponseSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   linkedAt: z.string().nullable(),
-  privateVotes: z.boolean(),
+  areVotesPrivate: z.boolean(),
   publisherAddress: z.string(),
   result: z.array(voteReceiverSchema).nullable(),
   votes: z.array(voteSchema).nullable(),

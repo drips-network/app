@@ -22,7 +22,7 @@
   <StepHeader
     emoji="🗳️"
     headline="Vote from {formatDate(new Date(votingRound.startsAt), 'dayAndYear')}"
-    description={!votingRound.privateVotes
+    description={!votingRound.areVotesPrivate
       ? `${votingRound.votes?.length} collaborators, ${votingRound.result?.length} recipients`
       : undefined}
   />

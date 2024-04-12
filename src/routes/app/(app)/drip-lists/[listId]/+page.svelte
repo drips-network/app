@@ -131,7 +131,7 @@
             <button on:click={() => handleVotingRoundClick(votingRound)} class="voting-round">
               <div class="left">
                 <h4 class="typo-text">{formatDate(new Date(votingRound.endsAt), 'dayAndYear')}</h4>
-                {#if !votingRound.privateVotes}
+                {#if !votingRound.areVotesPrivate}
                   <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
                     {votingRound.result?.length === 1
                       ? '1 recipient'
@@ -139,7 +139,7 @@
                   </span>
                 {/if}
               </div>
-              {#if !votingRound.privateVotes}
+              {#if !votingRound.areVotesPrivate}
                 <div class="right">
                   <span class="typo-text"
                     >{votingRound.votes?.length ?? 0}

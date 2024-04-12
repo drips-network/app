@@ -100,7 +100,7 @@ export function startVotingRound(
     date: Date;
     collaborators: string[];
     signature: string;
-    privateVotes: boolean;
+    areVotesPrivate: boolean;
   } & ({ dripListId: string } | { name: string; description?: string }),
   fetch = window.fetch,
 ) {

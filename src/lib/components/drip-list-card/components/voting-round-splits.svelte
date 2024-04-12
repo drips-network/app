@@ -18,7 +18,7 @@
       <div class="empty-state" in:fade|local>
         <Emoji emoji="🗳️" size="huge" />
         <h4>Awaiting votes</h4>
-        {#if votingRound.privateVotes}
+        {#if votingRound.areVotesPrivate}
           <p>Vote results will be revealed after the voting period ends.</p>
         {:else}
           <p>No one has voted yet.</p>

@@ -56,7 +56,7 @@
           ),
           endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
           publisherAddress: $walletStore.address ?? unreachable(),
-          privateVotes: $context.votingRoundConfig.privateVotes,
+          areVotesPrivate: $context.votingRoundConfig.areVotesPrivate,
         });
 
         $context.newVotingRoundId = newVotingRoundId;

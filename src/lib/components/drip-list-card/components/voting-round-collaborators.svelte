@@ -125,7 +125,7 @@
 
 <FormField title="Collaborators" type="div">
   <div class="wrapper">
-    {#if votingRound.privateVotes && collaborator?.isCollaborator && $walletStore.address && votingRound.status === 'started'}
+    {#if votingRound.areVotesPrivate && collaborator?.isCollaborator && $walletStore.address && votingRound.status === 'started'}
       <ListEditor
         isEditable={false}
         weightsMode={false}
@@ -170,7 +170,7 @@
           ]),
         )}
       />
-    {:else if votingRound.privateVotes}
+    {:else if votingRound.areVotesPrivate}
       <div class="empty-state">
         <h4>Collaborators hidden</h4>
         <p>The owner of this list chose to hide collaborators and their votes.</p>

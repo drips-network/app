@@ -41,7 +41,7 @@ export interface State {
   votingRoundConfig: {
     collaborators: Items;
     votingEnds: Date | undefined;
-    privateVotes: boolean;
+    areVotesPrivate: boolean;
   };
   newVotingRoundId: string | undefined;
   dripListId: string | undefined;
@@ -64,7 +64,7 @@ export const state = () =>
     votingRoundConfig: {
       collaborators: {},
       votingEnds: undefined,
-      privateVotes: false,
+      areVotesPrivate: false,
     },
     newVotingRoundId: undefined,
     dripListId: undefined,

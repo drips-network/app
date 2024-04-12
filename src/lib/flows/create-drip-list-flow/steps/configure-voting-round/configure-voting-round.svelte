@@ -50,7 +50,7 @@
     description="If you hide collaborators, only you as the publisher may see the list of collaborators and their votes. At the end of the voting period, only the vote's results will be made public."
   >
     <svelte:fragment slot="action">
-      <Toggle bind:checked={$context.votingRoundConfig.privateVotes} />
+      <Toggle bind:checked={$context.votingRoundConfig.areVotesPrivate} />
     </svelte:fragment>
   </FormField>
 
