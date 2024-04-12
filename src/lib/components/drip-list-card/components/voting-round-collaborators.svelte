@@ -32,7 +32,7 @@
       latestVote: vote.latestVote,
     };
 
-    if ('latestVote' in vote) {
+    if (vote.latestVote) {
       // Ballot already submitted
 
       return isOwnVote && votingRound.status === 'started'
