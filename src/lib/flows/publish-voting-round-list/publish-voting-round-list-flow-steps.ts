@@ -1,10 +1,11 @@
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import LoadData from './load-data.svelte';
 import Review from './review.svelte';
 import type { VoteReceiver } from '$lib/utils/multiplayer/schemas';
 import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
+import walletStore from '$lib/stores/wallet/wallet.store';
 
 export interface State {
   results: VoteReceiver[];
@@ -42,6 +43,7 @@ export default (votingRoundId: string, listName: string, listDescription?: strin
     makeStep({
       component: SuccessStep,
       props: {
+        safeAppMode: Boolean(get(walletStore).safe),
         onAction: () => window.location.reload(),
         message: 'Your new Drip List has successfully been published on-chain.',
       },
