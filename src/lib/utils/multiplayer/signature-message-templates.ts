@@ -7,7 +7,7 @@ export const START_VOTING_ROUND_MESSAGE_TEMPLATE = (
   dripListId: string,
   collaborators: string[],
 ) => {
-  const sortedCollaborators = collaborators.sort((a, b) => Number(a) - Number(b));
+  const sortedCollaborators = collaborators.sort();
 
   return `Create a new voting round for the Drip List with ID ${dripListId}, owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}. The voters for this round are: ${JSON.stringify(
     sortedCollaborators,
@@ -20,7 +20,7 @@ export const CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE = (
   publisherAddress: string,
   collaborators: string[],
 ) => {
-  const sortedCollaborators = collaborators.sort((a, b) => Number(a) - Number(b));
+  const sortedCollaborators = collaborators.sort();
 
   return `Create a new collaborative Drip List owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}. The voters for this list are: ${JSON.stringify(
     sortedCollaborators,

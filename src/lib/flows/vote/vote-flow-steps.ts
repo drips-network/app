@@ -1,4 +1,4 @@
-import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
+import type { Items, Weights } from '$lib/components/list-editor/types';
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { writable } from 'svelte/store';
@@ -9,14 +9,14 @@ import FetchVoteData from './fetch-vote-data.svelte';
 export interface State {
   listEditorConfig: {
     items: Items;
-    percentages: Percentages;
+    weights: Weights;
   };
 }
 
 const state = writable<State>({
   listEditorConfig: {
     items: {},
-    percentages: {},
+    weights: {},
   },
 });
 

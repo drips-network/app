@@ -59,6 +59,7 @@ export const getVotingRoundResponseSchema = z.object({
   dripListId: z.nullable(z.string()),
   name: z.string(),
   description: z.string().nullable(),
+  linkedAt: z.string().nullable(),
   privateVotes: z.boolean(),
   publisherAddress: z.string(),
   result: z.array(voteReceiverSchema).nullable(),

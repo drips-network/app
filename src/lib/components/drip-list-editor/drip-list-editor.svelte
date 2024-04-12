@@ -1,14 +1,15 @@
 <script lang="ts" context="module">
+  import type { Items, Weights } from '$lib/components/list-editor/types';
+
   export interface DripListConfig {
     items: Items;
-    percentages: Percentages;
+    weights: Weights;
     title: string;
     description: string | undefined;
   }
 </script>
 
 <script lang="ts">
-  import type { Items, Percentages } from '$lib/components/list-editor/list-editor.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
@@ -17,7 +18,7 @@
 
   export let dripList: DripListConfig = {
     title: 'My Drip List',
-    percentages: {},
+    weights: {},
     items: {},
     description: undefined,
   };
@@ -56,7 +57,7 @@
 
   <FormField title="Recipients*">
     <ListEditor
-      bind:percentages={dripList.percentages}
+      bind:weights={dripList.weights}
       bind:items={dripList.items}
       bind:valid={listValid}
       addOnMount={urlToAdd}

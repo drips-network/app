@@ -14,10 +14,14 @@
 
   export let votingRound: VotingRound;
 
+  export let noButtons = false;
+
   $: isOwnVotingRound =
     votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
 
   function getCollaboratorRightButton(connectedAddress: string | undefined, vote: Vote) {
+    if (noButtons) return undefined;
+
     const { collaboratorAddress } = vote;
 
     const isOwnVote = collaboratorAddress.toLowerCase() === connectedAddress?.toLowerCase();
@@ -117,7 +121,7 @@
     {#if votingRound.privateVotes && collaborator?.isCollaborator && $walletStore.address && votingRound.status === 'started'}
       <ListEditor
         isEditable={false}
-        mode="list"
+        weightsMode={false}
         outline={false}
         items={{
           [$walletStore.address]: {
@@ -141,7 +145,7 @@
     {#if votingRound.votes || revealedVotes}
       <ListEditor
         isEditable={false}
-        mode="list"
+        weightsMode={false}
         outline={false}
         items={Object.fromEntries(
           sortVotes($walletStore.address, votingRound.votes || revealedVotes || []).map((v) => [
@@ -172,6 +176,7 @@
   .wrapper {
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
   }
 
   .empty-state {

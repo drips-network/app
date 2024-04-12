@@ -51,7 +51,9 @@
           date: timestamp,
           name: $context.dripList.title,
           description: $context.dripList.description,
-          collaborators: Object.keys($context.votingRoundConfig.collaborators),
+          collaborators: Object.values($context.votingRoundConfig.collaborators).map((v) =>
+            v.type === 'address' ? v.address : unreachable(),
+          ),
           endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
           publisherAddress: $walletStore.address ?? unreachable(),
           privateVotes: $context.votingRoundConfig.privateVotes,
@@ -91,7 +93,11 @@
   </FormField>
 
   <FormField title="Collaborators">
-    <ListEditor items={$context.votingRoundConfig.collaborators} mode="list" isEditable={false} />
+    <ListEditor
+      items={$context.votingRoundConfig.collaborators}
+      weightsMode={false}
+      isEditable={false}
+    />
     <svelte:fragment slot="action">
       <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
         >Edit</Button

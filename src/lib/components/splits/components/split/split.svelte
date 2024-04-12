@@ -175,7 +175,7 @@
         <DripListBadge dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
         <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
-          <ProjectBadge {linkToNewTab} project={split.project} maxWidth={false} />
+          <ProjectBadge {linkToNewTab} project={split.project} />
         </PrimaryColorThemer>
       {:else if split.__typename === 'SplitGroup'}
         <div

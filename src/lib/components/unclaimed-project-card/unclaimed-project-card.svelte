@@ -73,7 +73,7 @@
 <div class="project-info" transition:fly|local={{ y: 8, duration: 300 }}>
   {#if project}
     <div class="basic-info text-left">
-      <ProjectBadge linkToNewTab {project} maxWidth={false} />
+      <ProjectBadge linkToNewTab {project} />
       {#if projectMetadata?.description}
         <p class="description typo-text">
           {projectMetadata.description}

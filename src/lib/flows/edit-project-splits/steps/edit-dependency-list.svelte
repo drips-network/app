@@ -13,7 +13,6 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  export let projectSourceUrl: string | undefined = undefined;
 
   let formValid: boolean;
 
@@ -27,12 +26,13 @@
       .highLevelPercentages['dependencies']}% you assigned to your project’s dependencies."
   />
   <ListEditor
-    bind:percentages={$context.dependencySplits.percentages}
+    bind:weights={$context.dependencySplits.weights}
     bind:items={$context.dependencySplits.items}
     bind:valid={formValid}
-    blockedKeys={projectSourceUrl ? [projectSourceUrl, ...maintainerKeys] : maintainerKeys}
+    blockedAccountIds={$context.projectAccountId
+      ? [$context.projectAccountId, ...maintainerKeys]
+      : maintainerKeys}
     maxItems={200 - maintainerKeys.length}
-    allowedItems={['eth-addresses', 'projects', 'drip-lists']}
   />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>

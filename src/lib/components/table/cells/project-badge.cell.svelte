@@ -4,6 +4,7 @@
 
   export let context: CellContext<unknown, unknown>;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let project: any;
 
   $: {
@@ -12,5 +13,5 @@
 </script>
 
 <div style="max-width: max(240px, 33vw)">
-  <ProjectBadge {project} maxWidth={false} tooltip={false} />
+  <ProjectBadge {project} tooltip={false} />
 </div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { mapVoteReceiversToListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from './publish-voting-round-list-flow-steps';
@@ -18,7 +17,7 @@
         $context.results = await multiplayer.getVotingRoundResult(votingRoundId);
         $context.dripListConfig = {
           ...$context.dripListConfig,
-          ...(await mapVoteReceiversToListEditorConfig($context.results)),
+          ...(await multiplayer.mapVoteReceiversToListEditorConfig($context.results)),
         };
       },
     });

@@ -9,6 +9,8 @@
   import type { State } from './view-voting-round-flow-steps';
   import Splits from '$lib/components/splits/splits.svelte';
   import formatDate from '$lib/utils/format-date';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+  import VotingRoundCollaborators from '$lib/components/drip-list-card/components/voting-round-collaborators.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -24,7 +26,25 @@
       ? `${votingRound.votes?.length} collaborators, ${votingRound.result?.length} recipients`
       : undefined}
   />
+
   <Splits draft list={$context.splits} />
+
+  <VotingRoundCollaborators noButtons {votingRound} />
+
+  <FormField title="Voting started">
+    <span class="typo-text">{formatDate(new Date(votingRound.startsAt), 'verbose')}</span>
+  </FormField>
+
+  <FormField title="Voting ended">
+    <span class="typo-text">{formatDate(new Date(votingRound.endsAt), 'verbose')}</span>
+  </FormField>
+
+  {#if votingRound.linkedAt}
+    <FormField title="List published at">
+      <span class="typo-text">{formatDate(new Date(votingRound.linkedAt), 'verbose')}</span>
+    </FormField>
+  {/if}
+
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Close</Button>
   </svelte:fragment>

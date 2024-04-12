@@ -27,18 +27,15 @@ import type { Address, IpfsHash } from '../common-types';
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
-import { isAddress } from 'ethers/lib/utils';
-import type { Percentages } from '$lib/components/list-editor/list-editor.svelte';
-import { isValidGitUrl } from '../is-valid-git-url';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
-import { Forge } from '$lib/graphql/__generated__/base-types';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type {
   MintedNftAccountsCountQuery,
   MintedNftAccountsCountQueryVariables,
 } from './__generated__/gql.generated';
+import type { Items, Weights } from '$lib/components/list-editor/types';
 
 type AccountId = string;
 
@@ -103,7 +100,8 @@ export default class DripListService {
   public async buildTransactContext(config: {
     listTitle: string;
     listDescription?: string;
-    percentages: Percentages;
+    weights: Weights;
+    items: Items;
     support?:
       | {
           type: 'continuous';
@@ -123,10 +121,11 @@ export default class DripListService {
       `This function requires an active wallet connection.`,
     );
 
-    const { listTitle, listDescription, percentages, support, latestVotingRoundId } = config;
+    const { listTitle, listDescription, weights, items, support, latestVotingRoundId } = config;
 
     const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
-      percentages,
+      weights,
+      items,
     );
 
     const mintedNftAccountsCountQuery = gql`
@@ -241,8 +240,8 @@ export default class DripListService {
     };
   }
 
-  public async getProjectsSplitMetadataAndReceivers(percentages: Percentages) {
-    const projectsInput = Object.entries(percentages);
+  public async getProjectsSplitMetadataAndReceivers(weights: Weights, items: Items) {
+    const projectsInput = Object.entries(weights);
 
     const receivers: SplitsReceiverStruct[] = [];
 
@@ -250,53 +249,53 @@ export default class DripListService {
       typeof nftDriverAccountMetadataParser.parseLatest
     >['projects'] = [];
 
-    for (const [itemId, percentage] of projectsInput) {
-      const isAddr = isAddress(itemId);
-
-      const weight = Math.floor((Number(percentage) / 100) * 1000000);
-
+    for (const [accountId, weight] of projectsInput) {
+      const item = items[accountId];
       if (weight <= 0) continue;
 
-      if (isAddr) {
-        // AddressDriver recipient
-        const receiver = {
-          type: 'address' as const,
-          weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(itemId as Address),
-        };
+      switch (item.type) {
+        case 'address': {
+          const receiver = {
+            type: 'address' as const,
+            weight,
+            accountId,
+          };
 
-        projectsSplitMetadata.push(receiver);
-        receivers.push(receiver);
-      } else if (isValidGitUrl(itemId)) {
-        // RepoDriver recipient
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
+          projectsSplitMetadata.push(receiver);
+          receivers.push(receiver);
 
-        const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
+          break;
+        }
+        case 'project': {
+          const { forge, ownerName, repoName } = item.project.source;
 
-        const receiver = {
-          type: 'repoDriver' as const,
-          weight,
-          accountId: await this._repoDriverClient.getAccountId(
-            numericForgeValue,
-            `${username}/${repoName}`,
-          ),
-        };
+          const receiver = {
+            type: 'repoDriver' as const,
+            weight,
+            accountId,
+          };
 
-        projectsSplitMetadata.push({
-          ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
-        });
-        receivers.push(receiver);
-      } else {
-        // It's the account ID for another Drip List
-        const receiver = {
-          type: 'dripList' as const,
-          weight,
-          accountId: itemId,
-        };
+          projectsSplitMetadata.push({
+            ...receiver,
+            source: GitProjectService.populateSource(forge, repoName, ownerName),
+          });
 
-        projectsSplitMetadata.push(receiver);
-        receivers.push(receiver);
+          receivers.push(receiver);
+
+          break;
+        }
+        case 'drip-list': {
+          const receiver = {
+            type: 'dripList' as const,
+            weight,
+            accountId,
+          };
+
+          projectsSplitMetadata.push(receiver);
+          receivers.push(receiver);
+
+          break;
+        }
       }
     }
 

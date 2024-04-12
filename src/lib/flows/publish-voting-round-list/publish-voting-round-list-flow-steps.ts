@@ -19,7 +19,7 @@ const state = (listName: string, listDescription?: string) =>
       title: listName,
       description: listDescription,
       items: {},
-      percentages: {},
+      weights: {},
     },
     publishedDripListId: undefined,
   });

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { mapVoteReceiversToListEditorConfig } from '$lib/components/list-editor/list-editor.svelte';
   import type { Vote } from '$lib/utils/multiplayer/schemas';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { State } from './vote-flow-steps';
+  import { mapVoteReceiversToListEditorConfig } from '$lib/utils/multiplayer';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

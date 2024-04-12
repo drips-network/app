@@ -1,821 +1,255 @@
-<script lang="ts" context="module">
-  import type {
-    DripListVoteReceiver,
-    ProjectVoteReceiver,
-    VoteReceiver,
-  } from '$lib/utils/multiplayer/schemas';
-
-  export const DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT = gql`
-    ${PROJECT_BADGE_FRAGMENT}
-    fragment DripListMembersEditorProject on Project {
-      ...ProjectBadge
-    }
-  `;
-
-  export const DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT = gql`
-    ${DRIP_LIST_BADGE_FRAGMENT}
-    fragment DripListMembersEditorDripList on DripList {
-      ...DripListBadge
-    }
-  `;
-
-  interface ComponentAndProps {
-    component: ComponentType;
-    props: Record<string, unknown>;
-  }
-
-  interface ProjectItem {
-    type: 'project';
-    project: DripListMembersEditorProjectFragment;
-    rightComponent?: ComponentAndProps;
-  }
-
-  interface EthAddressItem {
-    type: 'address';
-    address: string;
-    rightComponent?: ComponentAndProps;
-  }
-
-  interface DripListItem {
-    type: 'drip-list';
-    list: DripListMembersEditorDripListFragment;
-    rightComponent?: ComponentAndProps;
-  }
-
-  export type ListItem = DripListItem | EthAddressItem | ProjectItem;
-  export type Items = { [slug: string]: ListItem };
-
-  export type Percentages = { [slug: string]: number };
-
-  export interface ListEditorConfig {
-    items: Items;
-    percentages: Percentages;
-  }
-
-  export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver[]) {
-    let items: Items = {};
-    let percentages: Percentages = {};
-
-    const receiversToFetchDataFor = receivers.filter(
-      (v): v is ProjectVoteReceiver | DripListVoteReceiver => {
-        return 'type' in v && (v.type === 'project' || v.type === 'dripList');
-      },
-    );
-
-    const receiversData = mapFilterUndefined(
-      await Promise.all(
-        receiversToFetchDataFor.map(async (v) => {
-          const projectQuery = gql`
-            ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
-            query ProjectForVoteReceiver($url: String!) {
-              projectByUrl(url: $url) {
-                ...DripListMembersEditorProject
-              }
-            }
-          `;
-
-          const dripListQuery = gql`
-            ${DRIP_LIST_MEMBERS_EDITOR_DRIP_LIST_FRAGMENT}
-            query DripListForVoteReceiver($id: ID!) {
-              dripList(id: $id) {
-                ...DripListMembersEditorDripList
-              }
-            }
-          `;
-
-          if (v.type === 'dripList') {
-            return (
-              await query<DripListForVoteReceiverQuery, DripListForVoteReceiverQueryVariables>(
-                dripListQuery,
-                {
-                  id: v.accountId,
-                },
-              )
-            ).dripList;
-          } else {
-            return (
-              await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
-                projectQuery,
-                { url: v.url },
-              )
-            ).projectByUrl;
-          }
-        }),
-      ),
-      (v) => (v ? v : undefined),
-    );
-
-    const MAX_SPLITS_WEIGHT = 1000000;
-
-    function getSplitPercent(weight: number) {
-      return ((weight * MAX_SPLITS_WEIGHT) / MAX_SPLITS_WEIGHT / MAX_SPLITS_WEIGHT) * 100;
-    }
-
-    for (const receiver of receivers) {
-      switch (receiver.type) {
-        case 'project': {
-          const project = receiversData.find(
-            (p): p is Extract<typeof receiversData, { __typename: 'ClaimedProject' }> =>
-              p.__typename !== 'DripList' && p.source.url === receiver.url,
-          );
-          if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
-
-          items[receiver.url] = { type: 'project', project };
-          percentages[receiver.url] = getSplitPercent(receiver.weight);
-          break;
-        }
-        case 'address':
-          items[receiver.address] = { type: 'address', address: receiver.address };
-          percentages[receiver.address] = getSplitPercent(receiver.weight);
-          break;
-        case 'dripList': {
-          const dripList = receiversData.find(
-            (p): p is Extract<typeof receiversData, { __typename: 'DripList' }> =>
-              p.__typename === 'DripList' && p.account.accountId === receiver.accountId,
-          );
-          if (!dripList) throw new Error(`DripList not found for ID: ${receiver.accountId}`);
-
-          items[receiver.accountId] = { type: 'drip-list', list: dripList };
-          percentages[receiver.accountId] = getSplitPercent(receiver.weight);
-          break;
-        }
-        default:
-          throw new Error('Unknown receiver type');
-      }
-    }
-
-    return {
-      items,
-      percentages,
-    };
-  }
-</script>
-
 <script lang="ts">
-  import CheckIcon from '$lib/components/icons/Check.svelte';
-  import ExclamationIcon from '$lib/components/icons/Exclamation.svelte';
-  import { fade, scale } from 'svelte/transition';
-  import Button from '$lib/components/button/button.svelte';
-  import { onMount, type ComponentType } from 'svelte';
-  import { getAddress, isAddress } from 'ethers/lib/utils';
-  import Plus from '$lib/components/icons/Plus.svelte';
-  import ensStore from '$lib/stores/ens/ens.store';
-  import assert from '$lib/utils/assert';
-  import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
-  import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
-  import ListIcon from '$lib/components/icons/List.svelte';
-  import Trash from '$lib/components/icons/Trash.svelte';
-  import DripListIcon from '$lib/components/icons/DripList.svelte';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import ProjectBadge, {
-    PROJECT_BADGE_FRAGMENT,
-  } from '$lib/components/project-badge/project-badge.svelte';
-  import ethAddressItem from './item-templates/eth-address';
-  import projectItem from './item-templates/project';
-  import dripListItem from './item-templates/drip-list';
-  import unreachable from '$lib/utils/unreachable';
-  import DripListBadge, {
-    DRIP_LIST_BADGE_FRAGMENT,
-  } from '../drip-list-badge/drip-list-badge.svelte';
-  import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
+  import type { AccountId, Items, ListEditorItem, Weights } from './types';
+  import ListEditorInput from './components/list-editor-input.svelte';
+  import ListEditorItemComponent from './components/list-editor-item.svelte';
+  import ListEditorPie from './components/list-editor-pie.svelte';
+  import Button from '../button/button.svelte';
   import type {
-    DripListForVoteReceiverQuery,
-    DripListForVoteReceiverQueryVariables,
-    DripListMembersEditorDripListFragment,
-    DripListMembersEditorProjectFragment,
-    DripListToAddQuery,
-    DripListToAddQueryVariables,
-    ProjectForVoteReceiverQuery,
-    ProjectForVoteReceiverQueryVariables,
-    ProjectToAddQuery,
-    ProjectToAddQueryVariables,
+    ListEditorDripListFragment,
+    ListEditorProjectFragment,
   } from './__generated__/gql.generated';
-  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
-  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import { onMount, tick } from 'svelte';
 
-  export let maxItems = 200;
-  export let percentages: Percentages = {};
+  const MAX_WEIGHT = 1000000;
+
+  export let items: Items = {};
+
+  export let weightsMode = true;
+  export let weights: Weights = {};
+  onMount(() => (weights = adjustWeights(weights)));
+
   export let isEditable = true;
-  export let outline = true;
+  export let maxItems = 200;
+
+  export let allowDripLists = true;
+  export let allowProjects = true;
+  export let allowAddresses = true;
+
+  export let blockedAccountIds: string[] = [];
+
   export let addOnMount: string | undefined = undefined;
 
-  /**
-   * Pass an array of keys for items which the user will not be able to add to the list.
-   */
-  export let blockedKeys: string[] = [];
+  export let outline = true;
 
-  export let allowedItems: ('eth-addresses' | 'projects' | 'drip-lists')[] = [
-    'projects',
-    'eth-addresses',
-    'drip-lists',
-  ];
+  $: totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
 
-  export let items: Items;
-
-  /**
-   * In percentages mode, every item will have a percentage value.
-   * In list mode, the user will be able to edit a list of items without percentages.
-   */
-  export let mode: 'percentages' | 'list' = 'percentages';
-
-  $: itemsLength = Object.entries(items).length;
-
-  let listElem: HTMLDivElement;
-  let inputElem: HTMLInputElement;
-
-  let isAddingItem = false;
-  let inputValue = '';
-  let inputMessage: { type: 'caution' | 'success'; message: string } | undefined = undefined;
-
-  async function addProject() {
-    if (!allowedItems.includes('projects')) return;
-
-    try {
-      isAddingItem = true;
-
-      let url = inputValue;
-
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-
-      // If URL ends with /, remove it
-      if (url.endsWith('/')) {
-        url = url.slice(0, -1);
-      }
-
-      const repoInfoRes = await fetch(`/api/github/${encodeURIComponent(url)}`);
-      const repoInfo = await repoInfoRes.json();
-      const normalizedUrl = repoInfo.url;
-
-      if (!normalizedUrl) {
-        throw new Error("Couldn't find that Git project. Is it private?");
-      }
-
-      const projectToAddQuery = gql`
-        ${DRIP_LIST_MEMBERS_EDITOR_PROJECT_FRAGMENT}
-        query ProjectToAdd($url: String!) {
-          projectByUrl(url: $url) {
-            ...DripListMembersEditorProject
-          }
-        }
-      `;
-
-      const { projectByUrl: project } = await query<ProjectToAddQuery, ProjectToAddQueryVariables>(
-        projectToAddQuery,
-        {
-          url: normalizedUrl,
-        },
-      );
-
-      if (!project) throw new Error("Couldn't find that Git project. Is it private?");
-
-      const id = project.source.url;
-      if (blockedKeys.includes(id)) throw new Error("Sorry, you can't add that Git project.");
-
-      if (items[id]) {
-        inputMessage = { type: 'success', message: 'Already added' };
-        setTimeout(() => inputElem.select());
-        return;
-      }
-
-      items[id] = projectItem(project);
-
-      addItemToPercentages(id);
-
-      afterInputAdded();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      const message = e instanceof Error ? e.message : 'Error adding project';
-      inputMessage = { type: 'caution', message };
-    } finally {
-      isAddingItem = false;
-    }
-  }
-
-  async function addDripList() {
-    isAddingItem = true;
-
-    if (!allowedItems.includes('drip-lists')) return;
-
-    try {
-      const dripListId = inputValue.substring(inputValue.lastIndexOf('/') + 1);
-      if (!dripListId) throw new Error('Invalid drip list ID');
-
-      const dripListToAddQuery = gql`
-        query DripListToAdd($id: ID!) {
-          dripList(id: $id) {
-            name
-            owner {
-              address
-            }
-            account {
-              accountId
-            }
-          }
-        }
-      `;
-
-      const { dripList: dripListToAdd } = await query<
-        DripListToAddQuery,
-        DripListToAddQueryVariables
-      >(dripListToAddQuery, {
-        id: dripListId,
-      });
-
-      if (!dripListToAdd) throw new Error('Drip list not found');
-
-      if (blockedKeys.includes(dripListToAdd.account.accountId)) {
-        throw new Error('Drip List ID is already used');
-      }
-
-      if (items[dripListId]) {
-        inputMessage = { type: 'success', message: 'Already added' };
-        setTimeout(() => inputElem.select());
-        return;
-      }
-
-      items[dripListId] = dripListItem(dripListToAdd);
-
-      addItemToPercentages(dripListId);
-
-      afterInputAdded();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      const message = e instanceof Error ? e.message : 'Error adding Drip List';
-      inputMessage = { type: 'caution', message };
-    } finally {
-      isAddingItem = false;
-    }
-  }
-
-  async function addEthAddress() {
-    isAddingItem = true;
-
-    try {
-      const address = isAddress(inputValue)
-        ? getAddress(inputValue)
-        : await ensStore.reverseLookup(inputValue);
-
-      assert(
-        address,
-        inputValue.endsWith('.eth')
-          ? `Couldn't resolve an Ethereum address for "${inputValue}"`
-          : 'Invalid Ethereum address',
-      );
-
-      if (blockedKeys.includes(address)) throw new Error('This address is already used');
-
-      if (items[address]) {
-        inputMessage = { type: 'success', message: 'Already added' };
-        setTimeout(() => inputElem.select());
-        return;
-      }
-
-      items[address] = ethAddressItem(address);
-
-      addItemToPercentages(address);
-
-      afterInputAdded();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      const message = e instanceof Error ? e.message : 'Error adding Ethereum address';
-      inputMessage = { type: 'caution', message };
-    } finally {
-      isAddingItem = false;
-    }
-  }
-
-  let autoSplitEnabled = Object.keys(items).length === 0;
-
-  function addItemToPercentages(key: string) {
-    let pcts = { ...percentages, [key]: 0 };
-    // auto split new entries unless they've manually edited percents
-    if (autoSplitEnabled) {
-      const amounts = Object.entries(pcts);
-      pcts = Object.fromEntries(amounts.map(([key]) => [key, 100 / amounts.length]));
-    }
-    percentages = pcts;
-  }
-
-  function removeItem(slug: string) {
-    delete items[slug];
-    delete percentages[slug];
-    items = items;
-    percentages = percentages;
-  }
-
-  function handleSubmitInput() {
-    if (itemsLength >= maxItems) {
-      inputMessage = { type: 'caution', message: `You can't add anymore items to this list` };
-      return;
-    }
-
-    if (isSupportedGitUrl(inputValue) && allowedItems.includes('projects')) {
-      addProject();
-    } else if (
-      allowedItems.includes('drip-lists') &&
-      inputValue.includes('drips.network/app/drip-lists/')
-    ) {
-      addDripList();
-    } else if (
-      allowedItems.includes('eth-addresses') &&
-      (isAddress(inputValue) || inputValue.endsWith('.eth'))
-    ) {
-      addEthAddress();
-    } else {
-      inputMessage = { type: 'caution', message: "You can't add that to this list." };
-    }
-  }
-
-  $: validInput =
-    isSupportedGitUrl(inputValue) ||
-    isAddress(inputValue) ||
-    inputValue.endsWith('.eth') ||
-    inputValue.includes('drips.network/app/drip-lists/');
-
-  $: totalPercentage = Object.values(percentages ?? {}).reduce<number>((acc, v) => acc + v, 0);
-  $: hasEmptyPercents = Object.values(percentages).filter((v) => v === 0).length > 0;
   export let valid = false;
-  $: valid =
-    (itemsLength > 0 && mode === 'list') ||
-    (Math.round(totalPercentage * 100) / 100 === 100 && !hasEmptyPercents);
+  $: valid = totalWeight === MAX_WEIGHT;
 
-  export let error = false;
-  $: error = Math.round(totalPercentage * 100) / 100 > 100 || hasEmptyPercents;
-  $: canDistributeEvenly = itemsLength > 0;
+  let percentagesManuallyChanged = false;
 
-  function setAllPercentagesTo(value: number) {
-    Object.keys(percentages).forEach((key) => {
-      percentages[key] = value;
-    });
-  }
+  function adjustWeights(weights: Weights) {
+    const result = { ...weights };
 
-  function distributeEvenly() {
-    setAllPercentagesTo(100 / itemsLength);
-  }
+    const totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
+    const remainder = MAX_WEIGHT - totalWeight;
 
-  $: canDistributeRemaining =
-    hasEmptyPercents &&
-    Object.values(percentages).find((v) => v !== 0) &&
-    Object.values(percentages).reduce((acc, cur) => acc + cur, 0) < 100;
-
-  function distributeRemaining() {
-    const remaining = 100 - totalPercentage;
-
-    const remainingIds = Object.entries(percentages)
-      .filter(([, v]) => v === 0)
-      .map(([id]) => id);
-
-    const percentage = remaining / remainingIds.length;
-
-    remainingIds.forEach((id) => {
-      percentages[id] = percentage;
-    });
-  }
-
-  $: canClearPercentages = Object.values(percentages).filter((v) => v !== 0).length > 0;
-
-  function clearPercentages() {
-    setAllPercentagesTo(0);
-  }
-
-  let highlightLastItemAdded = false;
-
-  function afterInputAdded() {
-    // It doesnʼt work without setTimeout for some reason 🤷‍♂️
-    setTimeout(() => {
-      inputValue = '';
-      inputElem.focus();
-
-      highlightLastItemAdded = true;
-      setTimeout(() => {
-        highlightLastItemAdded = false;
-      }, 5000);
-
-      listElem.scroll({ top: 999999, behavior: 'smooth' });
-
-      const listBox = listElem.getBoundingClientRect();
-      if (listBox.bottom > window.innerHeight) {
-        window.scroll({
-          top: window.scrollY + inputElem.getBoundingClientRect().top - 24,
-          behavior: 'smooth',
-        });
-      }
-    });
-  }
-
-  onMount(() => {
-    if (addOnMount) {
-      inputValue = addOnMount;
+    if (remainder > 0 && remainder < 5) {
+      const keys = Object.keys(weights);
+      const key = keys[0];
+      result[key] += remainder;
     }
-  });
 
-  let inputPlaceholder: string;
-  $: {
-    const allowed = [...allowedItems];
+    return result;
+  }
 
-    const possibilities: Record<(typeof allowedItems)[number], string> = {
-      projects: 'GitHub URL',
-      'drip-lists': 'Drip List URL',
-      'eth-addresses': 'Ethereum address',
+  function equallyDistributeWeights(keys: AccountId[]): Weights {
+    const total = keys.length;
+    const weight = Math.floor(MAX_WEIGHT / total);
+
+    const result = keys.reduce<Weights>((acc, key) => {
+      acc[key] = weight;
+      return acc;
+    }, {});
+
+    return adjustWeights(result);
+  }
+
+  let itemsContainer: HTMLDivElement;
+  let highlightedItemKey: AccountId | undefined = undefined;
+
+  async function addItem(key: AccountId, item: ListEditorItem) {
+    items = {
+      [key]: item,
+      ...items,
     };
 
-    const possibilityName = (key: (typeof allowedItems)[number]) => possibilities[key];
-
-    if (allowed.length === 0) {
-      inputPlaceholder = '';
-    } else if (allowed.length === 1) {
-      inputPlaceholder = possibilityName(allowed[0]);
+    if (percentagesManuallyChanged) {
+      weights[key] = 0;
     } else {
-      inputPlaceholder = `${allowed
-        .filter((_, i, a) => i !== a.length - 1)
-        .map(possibilityName)
-        .join(', ')}, or ${possibilityName(allowed.pop() ?? unreachable())}`;
+      weights = equallyDistributeWeights(Object.keys(items));
+    }
+
+    await tick();
+
+    itemsContainer.scroll({ top: 0, behavior: 'smooth' });
+    highlightedItemKey = key;
+  }
+
+  function handleAddAddress(accountId: AccountId, address: string) {
+    if (allowAddresses) {
+      addItem(accountId, {
+        type: 'address',
+        address,
+      });
     }
   }
 
-  $: {
-    inputValue, (inputMessage = undefined);
+  function handleAddProject(accountId: AccountId, project: ListEditorProjectFragment) {
+    if (allowProjects) {
+      addItem(accountId, {
+        type: 'project',
+        project,
+      });
+    }
+  }
+
+  function handleAddDripList(accountId: AccountId, dripList: ListEditorDripListFragment) {
+    if (allowDripLists) {
+      addItem(accountId, {
+        type: 'drip-list',
+        dripList,
+      });
+    }
+  }
+
+  function handlePercentageEdit(key: AccountId, value: number) {
+    percentagesManuallyChanged = true;
+
+    const newWeights = { ...weights };
+    newWeights[key] = Math.floor((Number(value) / 100) * 1000000);
+
+    weights = adjustWeights(newWeights);
+  }
+
+  function handleItemDelete(key: AccountId) {
+    delete items[key];
+    delete weights[key];
+
+    items = items;
+    weights = weights;
+  }
+
+  $: distributeEquallyActionAvailable = Object.keys(items).length > 0;
+  $: distributeRemainingActionAvailable = Object.values(weights).some((v) => v === 0);
+  $: clearAllActionAvailable = Object.keys(items).length > 0;
+
+  function handleDistributeEquallyAction() {
+    weights = equallyDistributeWeights(Object.keys(items));
+  }
+
+  function handleDistributeRemainingAction() {
+    // Take all weights where the value is 0, and distribute the remaining unassigned weight across them
+    const zeroWeights = Object.entries(weights).filter((v) => v[1] === 0);
+    const totalZeroWeights = zeroWeights.length;
+
+    if (totalZeroWeights === 0) return;
+
+    const remainder = MAX_WEIGHT - totalWeight;
+
+    const newWeights = { ...weights };
+
+    zeroWeights.forEach(([key]) => {
+      newWeights[key] = Math.floor(remainder / totalZeroWeights);
+    });
+
+    weights = adjustWeights(newWeights);
+  }
+
+  function handleClearAllAction() {
+    weights = Object.fromEntries(Object.keys(items).map((key) => [key, 0]));
   }
 </script>
 
-<div class="list-editor">
-  {#if isEditable}
-    <div class="add-project flex items-center">
-      <div class="icon">
-        {#if mode === 'percentages'}
-          <DripListIcon style="fill: var(--color-foreground)" />
-        {:else}
-          <ListIcon style="fill: var(--color-foreground)" />
-        {/if}
-      </div>
-      <input
-        bind:this={inputElem}
-        bind:value={inputValue}
-        disabled={isAddingItem}
-        on:keydown={(e) => e.key === 'Enter' && handleSubmitInput()}
-        on:paste={() => setTimeout(() => handleSubmitInput())}
-        class="typo-text"
-        type="text"
-        placeholder={inputPlaceholder}
+<div class="list-editor" class:with-outline={outline}>
+  <div class="inner">
+    {#if isEditable}
+      <ListEditorInput
+        existingKeys={Object.keys(items)}
+        {addOnMount}
+        {weightsMode}
+        {allowAddresses}
+        {allowProjects}
+        {allowDripLists}
+        {blockedAccountIds}
+        maxItemsReached={Object.keys(items).length >= maxItems}
+        on:addAddress={(e) => handleAddAddress(e.detail.accountId, e.detail.address)}
+        on:addProject={(e) => handleAddProject(e.detail.accountId, e.detail.project)}
+        on:addDripList={(e) => handleAddDripList(e.detail.accountId, e.detail.dripList)}
       />
-      <Button
-        icon={Plus}
-        disabled={!validInput}
-        variant={validInput ? 'primary' : undefined}
-        on:click={handleSubmitInput}
-        loading={isAddingItem}>Add</Button
-      >
-    </div>
-  {/if}
-  {#if Object.keys(items).length > 0 || inputMessage}
-    <div
-      class="list"
-      style:box-shadow={outline ? 'var(--elevation-low)' : undefined}
-      bind:this={listElem}
-    >
-      {#if inputMessage}
-        <div
-          class="sticky top-0 left-0 w-full z-10 border-t border-foreground flex flex-wrap py-4 gap-1 items-start justify-between {inputMessage.type ===
-          'success'
-            ? 'bg-primary-level-1 text-primary-level-6'
-            : 'bg-caution-level-1 text-caution-level-6'}"
-        >
-          <div class="pl-4 pr-2">
-            {#if inputMessage.type === 'success'}
-              <CheckCircle style="fill:currentColor" />
-            {:else}
-              <ExclamationCircle style="fill: currentColor" />
-            {/if}
-          </div>
-          <div class="flex-1 typo-text">
-            {inputMessage.message}
-          </div>
-        </div>
-      {/if}
-      <ul>
-        {#each Object.entries(items) as [slug, item], index}
-          <li
-            class="flex flex-wrap py-4 gap-1 items-center justify-between"
-            data-testid={`item-${slug}`}
-            class:bg-primary-level-1={index === Object.entries(items).length - 1 &&
-              highlightLastItemAdded}
-          >
-            <div class="flex-1 min-w-0">
-              <div class="w-full px-3">
-                {#if item.type === 'address'}
-                  <IdentityBadge
-                    address={item.address}
-                    size="medium"
-                    disableLink={true}
-                    showFullAddress={true}
-                  />
-                {:else if item.type === 'project'}
-                  <ProjectBadge project={item.project} linkTo="nothing" />
-                {:else if item.type === 'drip-list'}
-                  <DripListBadge dripList={item.list} isLinked={false} />
-                {/if}
-              </div>
-            </div>
+    {/if}
 
-            <div class="flex flex-shrink-0 justify-end items-center gap-3 pr-3">
-              {#if !isEditable && mode === 'percentages'}
-                {#if mode === 'percentages'}
-                  <div class="typo-text">{percentages[slug].toFixed(2).replace('.00', '')}%</div>
-                {/if}
-              {:else}
-                {#if mode === 'percentages'}
-                  <PercentageEditor
-                    bind:percentage={percentages[slug]}
-                    on:confirm={() => {
-                      autoSplitEnabled = false;
-                    }}
-                  />
-                {/if}
-                {#if item.rightComponent}
-                  <svelte:component
-                    this={item.rightComponent.component}
-                    {...item.rightComponent.props}
-                  />
-                {/if}
-                {#if isEditable}
-                  <Button
-                    icon={Trash}
-                    variant="ghost"
-                    on:click={() => removeItem(slug)}
-                    ariaLabel="Remove from list"
-                    dataTestId={`remove-${slug}`}
-                  />
-                {/if}
-              {/if}
-            </div>
-          </li>
+    {#if Object.keys(items).length > 0}
+      <div class="items" bind:this={itemsContainer}>
+        {#each Object.entries(items) as [key, item]}
+          <ListEditorItemComponent
+            highlight={highlightedItemKey === key}
+            {weightsMode}
+            {isEditable}
+            on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
+            on:deleteItem={() => handleItemDelete(key)}
+            {item}
+            weight={weights[key]}
+          />
         {/each}
-      </ul>
-    </div>
-  {/if}
-  {#if isEditable && Object.keys(items).length > 0 && mode === 'percentages'}
-    <div
-      class="distribution-tools flex flex-col flex-wrap justify-center items-center sm:flex-row sm:justify-between gap-3 mt-4 select-none"
-    >
-      <div class="flex flex-wrap gap-0.5 flex-shrink-0 justify-center">
-        <Button size="small" on:click={distributeEvenly} disabled={!canDistributeEvenly}
-          >Split evenly</Button
-        >
-        <Button size="small" on:click={distributeRemaining} disabled={!canDistributeRemaining}
-          >Split remaining</Button
-        >
-        <Button size="small" on:click={clearPercentages} disabled={!canClearPercentages}
-          >Clear</Button
-        >
       </div>
-      <div class="remaining-percentage-indicator typo-text-small-bold" class:error class:valid>
-        {#if hasEmptyPercents}
-          Empty inputs
-        {:else}
-          {Math.round(totalPercentage * 100) / 100}% split
-        {/if}
-        <div class="pie">
-          <svg height="32" width="32" viewBox="0 0 32 32">
-            {#if !error && !valid}
-              <circle
-                transition:fade|local={{ duration: 200 }}
-                r="12"
-                cx="16"
-                cy="16"
-                fill="var(--color-primary-level-1"
-              />
-            {/if}
-            <circle
-              class="pie-piece"
-              r="6"
-              cx="16"
-              cy="16"
-              fill="transparent"
-              stroke-width="12"
-              stroke-dasharray="calc({hasEmptyPercents
-                ? 100
-                : totalPercentage} * 37.6991118431 / 100) 37.6991118431"
-              transform="rotate(-90) translate(-32)"
-            /></svg
-          >
-          {#if error}
-            <div
-              class="icon"
-              in:scale={{ duration: 300, start: 1.5 }}
-              out:scale={{ duration: 300, start: 0.8 }}
-            >
-              <ExclamationIcon style="fill: var(--color-background);" />
-            </div>
-          {:else if valid}
-            <div
-              class="icon"
-              in:scale={{ duration: 300, start: 1.5 }}
-              out:scale={{ duration: 300, start: 0.8 }}
-            >
-              <CheckIcon style="fill: var(--color-background);" />
-            </div>
-          {/if}
-        </div>
+    {/if}
+  </div>
+
+  {#if weightsMode && isEditable}
+    <div class="action-row">
+      <div class="actions">
+        <Button
+          size="small"
+          disabled={!distributeEquallyActionAvailable}
+          on:click={handleDistributeEquallyAction}
+        >
+          <span class="typo-text-small">Split equally</span>
+        </Button>
+        <Button
+          size="small"
+          disabled={!distributeRemainingActionAvailable}
+          on:click={handleDistributeRemainingAction}
+        >
+          <span class="typo-text-small">Split remaining</span>
+        </Button>
+        <Button size="small" disabled={!clearAllActionAvailable} on:click={handleClearAllAction}>
+          <span class="typo-text-small">Clear</span>
+        </Button>
       </div>
+
+      <ListEditorPie {totalWeight} hasEmptyInputs={Object.values(weights).some((v) => v === 0)} />
     </div>
   {/if}
 </div>
 
 <style>
   .list-editor {
-    text-align: left;
+    container-type: inline-size;
   }
 
-  .list {
-    background-color: var(--color-background);
-    border-radius: 0 0 1.5rem 1.5rem;
-    overflow: hidden;
-    max-height: 24rem;
-    overflow-y: scroll;
-  }
-
-  .list:first-child {
+  .list-editor.with-outline .inner {
+    border: 1px solid var(--color-foreground);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
+    overflow: hidden;
   }
 
-  .list ul li + li {
-    border-top: 1px solid;
-  }
-
-  .add-project {
+  .action-row {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background-color: var(--color-background);
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 0 0;
-    position: relative;
+    justify-content: space-between;
+    margin-top: 1rem;
   }
 
-  .add-project:only-child {
-    border-radius: 2.5rem 0 2.5rem 2.5rem;
+  .items {
+    max-height: 24rem;
+    overflow: scroll;
   }
 
-  .add-project input {
-    width: 100%;
-  }
-
-  .add-project input:disabled {
-    color: var(--color-foreground-level-5);
-  }
-
-  .add-project input:focus {
-    outline: none;
-  }
-
-  .remaining-percentage-indicator {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.25rem;
-    white-space: nowrap;
-  }
-
-  .remaining-percentage-indicator.error {
-    color: var(--color-negative);
-  }
-
-  .remaining-percentage-indicator.valid {
-    color: var(--color-positive);
-  }
-
-  .remaining-percentage-indicator .pie {
-    overflow: visible;
-    position: relative;
-  }
-
-  .remaining-percentage-indicator .pie .icon {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-  }
-
-  .remaining-percentage-indicator .pie .pie-piece {
-    transition: all 0.2s;
-  }
-
-  .remaining-percentage-indicator .pie .pie-piece {
-    stroke: var(--color-primary);
-  }
-
-  .remaining-percentage-indicator.error .pie .pie-piece {
-    stroke: var(--color-negative);
-  }
-
-  .remaining-percentage-indicator.valid .pie .pie-piece {
-    stroke: var(--color-positive);
+  @container (max-width: 600px) {
+    .action-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
   }
 </style>
