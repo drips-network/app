@@ -21,7 +21,7 @@
       promise: async (updateAwaitStep: UpdateAwaitStepFn) => {
         const { latestVote } = collaborator ?? {};
 
-        if (latestVote && 'latestVote' in latestVote) {
+        if (latestVote) {
           $context.listEditorConfig = await multiplayer.mapVoteReceiversToListEditorConfig(
             latestVote,
           );
