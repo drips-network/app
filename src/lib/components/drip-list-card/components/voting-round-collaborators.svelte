@@ -14,10 +14,14 @@
 
   export let votingRound: VotingRound;
 
+  export let noButtons = false;
+
   $: isOwnVotingRound =
     votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
 
   function getCollaboratorRightButton(connectedAddress: string | undefined, vote: Vote) {
+    if (noButtons) return undefined;
+
     const { collaboratorAddress } = vote;
 
     const isOwnVote = collaboratorAddress.toLowerCase() === connectedAddress?.toLowerCase();
