@@ -13,11 +13,12 @@
   import type { Writable } from 'svelte/store';
   import type { State } from './vote-flow-steps';
   import { invalidateAll } from '$app/navigation';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  export let votingRoundId: string;
+  export let votingRound: VotingRound;
 
   let valid: boolean;
 
@@ -42,7 +43,7 @@
           signer,
           timestamp,
           address,
-          votingRoundId,
+          votingRound.id,
           voteReceivers,
         );
 
@@ -50,7 +51,7 @@
           message: 'Submitting vote...',
         });
 
-        await multiplayer.vote(votingRoundId, {
+        await multiplayer.vote(votingRound.id, {
           signature,
           date: timestamp,
           collaboratorAddress: address,

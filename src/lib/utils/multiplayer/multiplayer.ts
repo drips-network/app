@@ -15,6 +15,7 @@ import type { ethers } from 'ethers';
 import {
   CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE,
   DELETE_VOTING_ROUND_MESSAGE_TEMPLATE,
+  REVEAL_MY_VOTE_MESSAGE_TEMPLATE,
   REVEAL_VOTES_MESSAGE_TEMPLATE,
   START_VOTING_ROUND_MESSAGE_TEMPLATE,
   VOTE_MESSAGE_TEMPLATE,
@@ -287,10 +288,31 @@ export async function linkVotingRoundToDripList(
   );
 }
 
-export async function getCollaborator(votingRoundId: string, address: string) {
+export async function signGetCollaborator(
+  signer: ethers.Signer,
+  currentTime: Date,
+  votingRoundId: string,
+) {
+  const chainId = await signer.getChainId();
+
+  const message = REVEAL_MY_VOTE_MESSAGE_TEMPLATE(currentTime, chainId, votingRoundId);
+
+  return signer.signMessage(message);
+}
+
+export async function getCollaborator(
+  votingRoundId: string,
+  address: string,
+  collaboratorSignature?: { signature: string; date: Date },
+) {
   return _authenticatedCall(
     'GET',
-    `/votingRounds/${votingRoundId}/collaborators/${address}`,
+    `/votingRounds/${votingRoundId}/collaborators/${address}` +
+      (collaboratorSignature
+        ? `?signature=${
+            collaboratorSignature.signature
+          }&date=${collaboratorSignature.date.toISOString()}`
+        : ''),
     getCollaboratorResponseSchema,
   );
 }

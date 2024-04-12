@@ -26,6 +26,12 @@
 
     const isOwnVote = collaboratorAddress.toLowerCase() === connectedAddress?.toLowerCase();
 
+    const collaborator: Collaborator = {
+      isCollaborator: true,
+      hasVoted: Boolean(vote.latestVote),
+      latestVote: vote.latestVote,
+    };
+
     if ('latestVote' in vote) {
       // Ballot already submitted
 
@@ -34,7 +40,8 @@
             component: PropsOnlyButton,
             props: {
               label: 'Change your vote',
-              onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id, vote)),
+              onClick: () =>
+                modal.show(Stepper, undefined, voteFlowSteps(votingRound, collaborator)),
               buttonProps: {
                 variant: 'primary',
                 icon: Proposals,
@@ -59,7 +66,7 @@
         component: PropsOnlyButton,
         props: {
           label: 'Cast your vote',
-          onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id)),
+          onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound)),
           buttonProps: {
             variant: 'primary',
             icon: Proposals,
@@ -131,7 +138,12 @@
               component: PropsOnlyButton,
               props: {
                 label: collaborator.hasVoted ? 'Change your vote' : 'Cast your vote',
-                onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound.id)),
+                onClick: () =>
+                  modal.show(
+                    Stepper,
+                    undefined,
+                    voteFlowSteps(votingRound, collaborator ?? undefined),
+                  ),
                 buttonProps: {
                   variant: 'primary',
                   icon: Proposals,

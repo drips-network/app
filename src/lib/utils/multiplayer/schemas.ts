@@ -30,6 +30,7 @@ export const voteReceiverSchema = z.union([
 
 export const pendingVoteSchema = z.object({
   collaboratorAddress: z.string(),
+  latestVote: z.null(),
 });
 
 export const submittedVoteSchema = pendingVoteSchema.extend({
@@ -49,6 +50,7 @@ export const getVotingRoundResultsResponseSchema = z.object({
 export const getCollaboratorResponseSchema = z.object({
   isCollaborator: z.boolean(),
   hasVoted: z.boolean(),
+  latestVote: z.array(voteReceiverSchema).nullable(),
 });
 
 export const getVotingRoundResponseSchema = z.object({

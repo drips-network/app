@@ -3,7 +3,7 @@ import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { writable } from 'svelte/store';
 import VoteStep from './vote.svelte';
-import type { Vote } from '$lib/utils/multiplayer/schemas';
+import type { Collaborator, VotingRound } from '$lib/utils/multiplayer/schemas';
 import FetchVoteData from './fetch-vote-data.svelte';
 
 export interface State {
@@ -13,26 +13,28 @@ export interface State {
   };
 }
 
-const state = writable<State>({
-  listEditorConfig: {
-    items: {},
-    weights: {},
-  },
-});
+const state = () =>
+  writable<State>({
+    listEditorConfig: {
+      items: {},
+      weights: {},
+    },
+  });
 
-export default (votingRoundId: string, previousVote?: Vote) => ({
-  context: () => state,
+export default (votingRound: VotingRound, collaborator?: Collaborator) => ({
+  context: () => state(),
   steps: [
     makeStep({
       component: FetchVoteData,
       props: {
-        previousVote,
+        votingRound,
+        collaborator,
       },
     }),
     makeStep({
       component: VoteStep,
       props: {
-        votingRoundId,
+        votingRound,
       },
     }),
     makeStep({
