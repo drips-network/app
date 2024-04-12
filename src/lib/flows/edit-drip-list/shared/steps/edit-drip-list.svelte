@@ -122,7 +122,7 @@
         case 'ProjectReceiver':
           return [rs.account.accountId, { type: 'project', project: rs.project }];
         case 'DripListReceiver':
-          return [rs.account.accountId, { type: 'dripList', dripList: rs.dripList }];
+          return [rs.account.accountId, { type: 'drip-list', dripList: rs.dripList }];
       }
     }),
   );
