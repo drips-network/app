@@ -139,7 +139,7 @@
 
   /* Watch for voting ended */
   let now = new Date();
-  $: votingEnded = votingRound ? now >= new Date(votingRound.endsAt) : undefined;
+  $: votingEnded = votingRound ? now >= new Date(votingRound.schedule.voting.endsAt) : undefined;
   let counter: number;
 
   onMount(() => {

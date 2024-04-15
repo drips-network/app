@@ -130,7 +130,9 @@
           {#each data.votingRounds.past as votingRound}
             <button on:click={() => handleVotingRoundClick(votingRound)} class="voting-round">
               <div class="left">
-                <h4 class="typo-text">{formatDate(new Date(votingRound.endsAt), 'dayAndYear')}</h4>
+                <h4 class="typo-text">
+                  {formatDate(new Date(votingRound.schedule.voting.endsAt), 'dayAndYear')}
+                </h4>
                 {#if !votingRound.areVotesPrivate}
                   <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
                     {votingRound.result?.length === 1

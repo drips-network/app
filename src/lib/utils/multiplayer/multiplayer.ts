@@ -95,7 +95,11 @@ export async function signVotingRound(
 
 export function startVotingRound(
   config: {
-    endsAt: Date;
+    schedule: {
+      voting: {
+        endsAt: Date;
+      };
+    };
     publisherAddress: string;
     date: Date;
     collaborators: string[];
@@ -110,7 +114,11 @@ export function startVotingRound(
     startVotingRoundResponseSchema,
     {
       ...config,
-      endsAt: config.endsAt.toISOString(),
+      schedule: {
+        voting: {
+          endsAt: config.schedule.voting.endsAt.toISOString(),
+        },
+      },
       date: config.date.toISOString(),
     },
     fetch,
@@ -480,7 +488,7 @@ export function getVotingRoundStatusReadable(
 
   const statusReadable = readable(votingRound.status, (set) => {
     interval = setInterval(() => {
-      if (new Date(votingRound.endsAt) < new Date()) {
+      if (new Date(votingRound.schedule.voting.endsAt) < new Date()) {
         set('completed');
         clearInterval(interval);
       }

@@ -35,11 +35,15 @@
 
         const timestamp = new Date();
 
+        const collaborators = Object.values($context.votingRoundConfig.collaborators).map((v) =>
+          v.type === 'address' ? v.address : unreachable(),
+        );
+
         const signature = await multiplayer.signVotingRound(
           signer,
           timestamp,
           address,
-          Object.keys($context.votingRoundConfig.collaborators),
+          collaborators,
         );
 
         updateAwaitStep({
@@ -51,10 +55,12 @@
           date: timestamp,
           name: $context.dripList.title,
           description: $context.dripList.description,
-          collaborators: Object.values($context.votingRoundConfig.collaborators).map((v) =>
-            v.type === 'address' ? v.address : unreachable(),
-          ),
-          endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
+          collaborators,
+          schedule: {
+            voting: {
+              endsAt: $context.votingRoundConfig.votingEnds ?? unreachable(),
+            },
+          },
           publisherAddress: $walletStore.address ?? unreachable(),
           areVotesPrivate: $context.votingRoundConfig.areVotesPrivate,
         });

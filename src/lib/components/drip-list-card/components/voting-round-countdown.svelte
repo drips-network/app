@@ -13,14 +13,14 @@
 <FormField title={votingRound.status === 'completed' ? 'Voting ended' : 'Voting ends'} type="div">
   {#if $status === 'completed'}
     <p class="typo-text">
-      {formatDate(new Date(votingRound.endsAt), 'verbose')} your time.
+      {formatDate(new Date(votingRound.schedule.voting.endsAt), 'verbose')} your time.
     </p>
   {:else}
     <p style:margin-bottom="0.25rem" class="typo-text tabular-nums">
-      <Countdown targetDate={new Date(votingRound.endsAt)} />
+      <Countdown targetDate={new Date(votingRound.schedule.voting.endsAt)} />
     </p>
     <p class="typo-text-small">
-      That's {formatDate(new Date(votingRound.endsAt), 'verbose')} your time.
+      That's {formatDate(new Date(votingRound.schedule.voting.endsAt), 'verbose')} your time.
     </p>
   {/if}
 </FormField>

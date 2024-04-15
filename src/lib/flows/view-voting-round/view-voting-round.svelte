@@ -21,7 +21,7 @@
 <StepLayout>
   <StepHeader
     emoji="🗳️"
-    headline="Vote from {formatDate(new Date(votingRound.startsAt), 'dayAndYear')}"
+    headline="Vote from {formatDate(new Date(votingRound.schedule.voting.startsAt), 'dayAndYear')}"
     description={!votingRound.areVotesPrivate
       ? `${votingRound.votes?.length} collaborators, ${votingRound.result?.length} recipients`
       : undefined}
@@ -32,11 +32,15 @@
   <VotingRoundCollaborators noButtons {votingRound} />
 
   <FormField title="Voting started">
-    <span class="typo-text">{formatDate(new Date(votingRound.startsAt), 'verbose')}</span>
+    <span class="typo-text"
+      >{formatDate(new Date(votingRound.schedule.voting.startsAt), 'verbose')}</span
+    >
   </FormField>
 
   <FormField title="Voting ended">
-    <span class="typo-text">{formatDate(new Date(votingRound.endsAt), 'verbose')}</span>
+    <span class="typo-text"
+      >{formatDate(new Date(votingRound.schedule.voting.endsAt), 'verbose')}</span
+    >
   </FormField>
 
   {#if votingRound.linkedAt}

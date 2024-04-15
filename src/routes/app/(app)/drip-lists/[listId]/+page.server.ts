@@ -23,6 +23,8 @@ export const load = (async ({ params, fetch }) => {
       if (!votingRoundRes) throw new Error();
       votingRound = votingRoundRes;
     } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
       throw error(404);
     }
 
