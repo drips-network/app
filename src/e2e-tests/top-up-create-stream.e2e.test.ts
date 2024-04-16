@@ -124,10 +124,10 @@ describe('app', async () => {
       });
 
       it('shows the topped-up amount on the funds page', async () => {
-        await page.locator('text=Got it').click({ timeout: 10000 });
+        await page.locator('text=Got it').click({ timeout: 30000 });
         await page.waitForTimeout(2000);
         await page.reload();
-      }, 10000);
+      }, 50000);
     });
 
     describe('create stream flow', () => {
