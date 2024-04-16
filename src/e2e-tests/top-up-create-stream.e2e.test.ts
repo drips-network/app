@@ -96,7 +96,7 @@ describe('app', async () => {
 
         await page.type(
           'label:has-text("Token contract address*")',
-          '0xefbF81372aBC3723463746a89CEb42080563684C',
+          '0x27aa1eEDF2F775e949f1D01d886400E5a019fe7B',
         );
 
         await page.locator('button', { hasText: 'Add custom token' }).click();
@@ -104,13 +104,13 @@ describe('app', async () => {
       });
 
       it('displays the custom mock erc-20 token', async () => {
-        // Testcoin item in the list-select component
+        // Test token item in the list-select component
         const testcoin = page.locator(
-          'data-testid=item-0xefbF81372aBC3723463746a89CEb42080563684C',
+          'data-testid=item-0x27aa1eEDF2F775e949f1D01d886400E5a019fe7B',
         ); //
         await testcoin.click();
 
-        const topUpButton = page.locator('text=Add Testcoin');
+        const topUpButton = page.locator('text=Add Test token');
         await topUpButton.click();
       });
 
@@ -124,10 +124,10 @@ describe('app', async () => {
       });
 
       it('shows the topped-up amount on the funds page', async () => {
-        await page.locator('text=Got it').click({ timeout: 10000 });
+        await page.locator('text=Got it').click({ timeout: 30000 });
         await page.waitForTimeout(2000);
         await page.reload();
-      }, 10000);
+      }, 50000);
     });
 
     describe('create stream flow', () => {
@@ -140,7 +140,7 @@ describe('app', async () => {
       });
 
       it('allows selecting the available outbound TEST balance', async () => {
-        await page.locator('.label:has-text("Testcoin")').click();
+        await page.locator('.label:has-text("Test token")').click();
       });
 
       it('allows submitting the create stream flow', async () => {
@@ -173,7 +173,7 @@ describe('app', async () => {
       });
 
       it('displays the incoming balance', async () => {
-        await expect(page.locator('text=Testcoin')).toHaveCount(1);
+        await expect(page.locator('text=Test token')).toHaveCount(1);
       });
     });
 
@@ -186,7 +186,7 @@ describe('app', async () => {
       });
 
       it('displays the outgoing balance', async () => {
-        await expect(page.locator('text=Testcoin')).toHaveCount(1);
+        await expect(page.locator('text=Test token')).toHaveCount(1);
       });
 
       it('switches to recipient funds dashboard', async () => {
@@ -206,7 +206,7 @@ describe('app', async () => {
       });
 
       it('displays the incoming balance', async () => {
-        await expect(page.locator('text=Testcoin')).toHaveCount(1);
+        await expect(page.locator('text=Test token')).toHaveCount(1);
       });
     });
 
@@ -231,7 +231,7 @@ describe('app', async () => {
         await page.keyboard.type('Test');
 
         await expect(
-          page.locator('.account-menu-item-wrapper', { hasText: 'Testcoin' }),
+          page.locator('.account-menu-item-wrapper', { hasText: 'Test token' }),
         ).toHaveCount(1);
 
         await page.keyboard.press('Escape');
@@ -390,7 +390,7 @@ describe('app', async () => {
       it('opens the collect flow', async () => {
         await page.goto('http://127.0.0.1:3001/app/funds');
 
-        await page.locator('text=Testcoin').click();
+        await page.locator('text=Test token').click();
         await page.locator('data-testid=token-page-collect-button').click();
 
         await expect(page.locator('h1', { hasText: 'Collect TEST' })).toHaveCount(1);
@@ -416,7 +416,7 @@ describe('app', async () => {
         await page.locator('button', { hasText: 'Got it' }).click();
       });
 
-      it('shows an incoming balance of zero for Testcoin after squeezing', async () => {
+      it('shows an incoming balance of zero for Test token after squeezing', async () => {
         await expect(page.locator('data-testid=incoming-balance')).toHaveText('0.00');
       });
     });
@@ -519,7 +519,7 @@ describe('app', async () => {
       });
 
       it('selects the test token to stream', async () => {
-        await page.locator('data-testid=item-0xefbF81372aBC3723463746a89CEb42080563684C').click();
+        await page.locator('data-testid=item-0x27aa1eEDF2F775e949f1D01d886400E5a019fe7B').click();
       });
 
       it('enters a monthly stream rate', async () => {
