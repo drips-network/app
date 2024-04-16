@@ -31,9 +31,33 @@ export const load = (async ({ params, fetch, url }) => {
 
   let repo: z.infer<typeof repoSchema>;
 
+  const getProjectsQuery = gql`
+    ${PROJECT_PROFILE_FRAGMENT}
+    query ProjectByUrl($url: String!) {
+      projectByUrl(url: $url) {
+        ...ProjectProfile
+      }
+    }
+  `;
+
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
-  const repoRes = await fetch(`/api/github/${encodeURIComponent(repoUrl)}`);
+  const [repoRes, projectRes] = await Promise.all([
+    await fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
+    await query<ProjectByUrlQuery, QueryProjectByUrlArgs>(
+      getProjectsQuery,
+      {
+        url: repoUrl,
+      },
+      fetch,
+    ),
+  ]);
+
+  const project = projectRes.projectByUrl;
+  if (!project) {
+    throw error(404);
+  }
+
   const repoResJson = await repoRes.json();
 
   if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
@@ -52,27 +76,6 @@ export const load = (async ({ params, fetch, url }) => {
 
   if (!exact && !repoUrlIsCanonical) {
     throw redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
-  }
-
-  const getProjectsQuery = gql`
-    ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!) {
-      projectByUrl(url: $url) {
-        ...ProjectProfile
-      }
-    }
-  `;
-
-  const { projectByUrl: project } = await query<ProjectByUrlQuery, QueryProjectByUrlArgs>(
-    getProjectsQuery,
-    {
-      url: repoUrl,
-    },
-    fetch,
-  );
-
-  if (!project) {
-    throw error(404);
   }
 
   const unclaimedFunds = !isClaimed(project)
