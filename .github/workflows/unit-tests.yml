@@ -30,6 +30,8 @@ jobs:
           envkey_GQL_ACCESS_TOKEN: afdb8b7e-8fa7-4de9-bd95-b650b839e745 # public token
           envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
           envkey_INFURA_KEY: 1234
+          envkey_MULTIPLAYER_API_ACCESS_TOKEN: 1234
+          envkey_MULTIPLAYER_API_URL: http://foobar:3000/
 
       - name: Install dependencies
         run: npm ci
