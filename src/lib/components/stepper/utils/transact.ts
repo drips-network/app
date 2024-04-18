@@ -150,13 +150,12 @@ export default function transact(
     const beforeResult = await before?.();
 
     const transactionWrappers = await transactionsBuilder(beforeResult);
-    const isTxBatch = transactionWrappers.length > 1;
 
     let safeSendTransactionResponse: SendTransactionsResponse | undefined = undefined;
 
     // If we're in a Safe and need to process more than one transaction, we send them to the
     // Safe as a batch.
-    if (safeAppMode && isTxBatch) {
+    if (safeAppMode) {
       const safeAppsSdk = new SafeAppsSDK();
 
       let estimatedGasWithBuffer: number;

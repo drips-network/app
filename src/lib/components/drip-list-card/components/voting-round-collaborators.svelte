@@ -35,7 +35,7 @@
     if (vote.latestVote) {
       // Ballot already submitted
 
-      return isOwnVote && votingRound.status === 'started'
+      return isOwnVote && votingRound.status === 'Started'
         ? {
             component: PropsOnlyButton,
             props: {
@@ -61,7 +61,7 @@
           };
     }
 
-    if (isOwnVote && votingRound.status === 'started') {
+    if (isOwnVote && votingRound.status === 'Started') {
       return {
         component: PropsOnlyButton,
         props: {

@@ -29,7 +29,7 @@ export const load = (async ({ params, fetch }) => {
     }
 
     // If the voting round has already been linked to a Drip List, we forward to the respective Drip List ID.
-    if (votingRound?.dripListId) {
+    if (votingRound.status === 'Linked') {
       throw redirect(301, `/app/drip-lists/${votingRound.dripListId}`);
     }
 

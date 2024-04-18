@@ -380,11 +380,11 @@ export async function linkVotingRoundToDripList(
 ) {
   return _authenticatedCall(
     'POST',
-    `/votingRounds/${votingRoundId}/link` +
-      (safeTransactionHash ? `?safeTransactionHash=${safeTransactionHash}` : ''),
+    `/votingRounds/${votingRoundId}/link`,
     undefined,
     {
       dripListId,
+      safeTransactionHash,
     },
     fetch,
   );

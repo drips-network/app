@@ -14,7 +14,7 @@
 
 <TransitionedHeight transitionHeightChanges>
   <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade|local>
-    {#if !votingRound.result && $status === 'started'}
+    {#if !votingRound.result && $status === 'Started'}
       <div class="empty-state" in:fade|local>
         <Emoji emoji="🗳️" size="huge" />
         <h4>Awaiting votes</h4>
@@ -24,7 +24,7 @@
           <p>No one has voted yet.</p>
         {/if}
       </div>
-    {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'completed'}
+    {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'Completed'}
       <div class="empty-state" in:fade|local>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients</h4>
