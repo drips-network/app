@@ -15,7 +15,7 @@
     dispatch('await', {
       message: 'Fetching vote data…',
       promise: async () => {
-        if ('latestVote' in vote) {
+        if (vote.latestVote) {
           $context.listEditorConfig = await mapVoteReceiversToListEditorConfig(vote.latestVote);
         }
       },
