@@ -318,7 +318,7 @@
                     >
                   </div>
 
-                  {#if $votingRoundStatus === 'completed'}
+                  {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
                     <div>
                       <Button
                         variant="primary"

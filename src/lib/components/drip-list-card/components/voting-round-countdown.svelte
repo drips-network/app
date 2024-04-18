@@ -10,8 +10,13 @@
   const status = getVotingRoundStatusReadable(votingRound);
 </script>
 
-<FormField title={votingRound.status === 'completed' ? 'Voting ended' : 'Voting ends'} type="div">
-  {#if $status === 'completed'}
+<FormField
+  title={$status === 'Completed' || $status === 'PendingLinkCompletion'
+    ? 'Voting ended'
+    : 'Voting ends'}
+  type="div"
+>
+  {#if $status === 'Completed' || $status === 'PendingLinkCompletion'}
     <p class="typo-text">
       {formatDate(new Date(votingRound.schedule.voting.endsAt), 'verbose')} your time.
     </p>

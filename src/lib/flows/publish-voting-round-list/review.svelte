@@ -48,6 +48,14 @@
 
         transactions: ({ txs }) => txs,
 
+        afterSafe: async (sendTransactionResponse, { dripListId }) => {
+          await multiplayer.linkVotingRoundToDripList(
+            votingRoundId,
+            dripListId,
+            sendTransactionResponse.safeTxHash,
+          );
+        },
+
         after: async (_, { dripListId }) => {
           const dripListExistsQuery = gql`
             query DripListExists($id: ID!) {

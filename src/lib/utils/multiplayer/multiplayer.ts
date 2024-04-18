@@ -66,6 +66,15 @@ async function _authenticatedCall<ST extends ZodSchema>(
   return responseSchema.parse(parsed);
 }
 
+/**
+ * Sign a message to start a voting round.
+ * @param signer The signer to use.
+ * @param currentTime The current timestamp, used to prevent replay attacks. Must match the timestamp later passed to the `startVotingRound` function.
+ * @param publisherAddress The address of the publisher.
+ * @param collaborators The addresses of the collaborators, which will be able to vote on the voting round later.
+ * @param dripListId If voting round is for an existing Drip List, ID of that list. If not provided, returns message for creating a new collaborative list.
+ * @returns The signature.
+ */
 export async function signVotingRound(
   signer: ethers.Signer,
   currentTime: Date,
@@ -93,6 +102,12 @@ export async function signVotingRound(
   return signer.signMessage(message);
 }
 
+/**
+ * Start a voting round.
+ * @param config The configuration for the voting round.
+ * @param fetch The fetch function to use.
+ * @returns The request response.
+ */
 export function startVotingRound(
   config: {
     schedule: {
@@ -101,8 +116,10 @@ export function startVotingRound(
       };
     };
     publisherAddress: string;
+    /** Timestamp for replay prevention. Must match timestamp in `signature`. */
     date: Date;
     collaborators: string[];
+    /** Signature previously created with `signVotingRound` */
     signature: string;
     areVotesPrivate: boolean;
   } & ({ dripListId: string } | { name: string; description?: string }),
@@ -125,6 +142,14 @@ export function startVotingRound(
   );
 }
 
+/**
+ * Sign a message to delete a voting round.
+ * @param currentTime The current timestamp, used to prevent replay attacks. Must match the timestamp later passed to the `deleteVotingRound` function.
+ * @param publisherAddress The address of the publisher.
+ * @param votingRoundId The ID of the voting round to delete.
+ * @param signer The signer to use.
+ * @returns The signature.
+ */
 export async function signDeleteVotingRound(
   currentTime: Date,
   publisherAddress: string,
@@ -143,6 +168,15 @@ export async function signDeleteVotingRound(
   return signer.signMessage(message);
 }
 
+/**
+ * Delete a voting round.
+ * @param signature The signature created with `signDeleteVotingRound`.
+ * @param date The timestamp used to create the signature.
+ * @param publisherAddress The address of the publisher.
+ * @param votingRoundId The ID of the voting round to delete.
+ * @param fetch The fetch function to use.
+ * @returns The request response.
+ */
 export function deleteVotingRound(
   signature: string,
   date: Date,
@@ -162,6 +196,12 @@ export function deleteVotingRound(
   );
 }
 
+/**
+ * Get a voting round.
+ * @param id The ID of the voting round.
+ * @param fetch The fetch function to use.
+ * @returns The voting round.
+ */
 export function getVotingRound(id: string, fetch = window.fetch) {
   return _authenticatedCall(
     'GET',
@@ -172,6 +212,12 @@ export function getVotingRound(id: string, fetch = window.fetch) {
   );
 }
 
+/**
+ * Get voting rounds.
+ * @param filter The filter to apply.
+ * @param fetch The fetch function to use.
+ * @returns The voting rounds.
+ */
 export async function getVotingRounds(
   filter: { dripListId?: string; publisherAddress?: string },
   fetch = window.fetch,
@@ -189,7 +235,14 @@ export async function getVotingRounds(
   ).votingRounds;
 }
 
-/** If votes are set to private, an admin signature is required to get votes. */
+/**
+ * Sign a message to get voting round votes. This is only needed if the votes are private. In this case, only a signature by the publisher is accepted.
+ * @param signer The signer to use.
+ * @param currentTime The current timestamp, used to prevent replay attacks. Must match the timestamp later passed to the `getVotingRoundVotes` function.
+ * @param publisherAddress The address of the publisher.
+ * @param votingRoundId The ID of the voting round.
+ * @returns The signature.
+ */
 export async function signGetVotingRoundVotes(
   signer: ethers.Signer,
   currentTime: Date,
@@ -208,6 +261,13 @@ export async function signGetVotingRoundVotes(
   return signer.signMessage(message);
 }
 
+/**
+ * Get voting round votes.
+ * @param votingRoundId The ID of the voting round.
+ * @param adminSignature The signature created with `signGetVotingRoundVotes`.
+ * @param fetch The fetch function to use.
+ * @returns The votes.
+ */
 export async function getVotingRoundVotes(
   votingRoundId: string,
   adminSignature?: { signature: string; date: Date },
@@ -227,6 +287,12 @@ export async function getVotingRoundVotes(
   ).votes;
 }
 
+/**
+ * Get voting round results, or preview of results if voting is still ongoing.
+ * @param votingRoundId The ID of the voting round.
+ * @param fetch The fetch function to use.
+ * @returns The results.
+ */
 export async function getVotingRoundResult(votingRoundId: string, fetch = window.fetch) {
   return (
     await _authenticatedCall(
@@ -239,6 +305,15 @@ export async function getVotingRoundResult(votingRoundId: string, fetch = window
   ).result;
 }
 
+/**
+ * Sign a message for submitting a vote. Must be signed by a collaborator for the given voting round.
+ * @param signer The signer to use.
+ * @param currentTime The current timestamp, used to prevent replay attacks. Must match the timestamp later passed to the `vote` function.
+ * @param collaboratorAddress The address of the collaborator.
+ * @param votingRoundId The ID of the voting round.
+ * @param receivers The receivers of the vote.
+ * @returns The signature.
+ */
 export async function signVote(
   signer: ethers.Signer,
   currentTime: Date,
@@ -258,10 +333,19 @@ export async function signVote(
   return signer.signMessage(message);
 }
 
+/**
+ * Submit a vote.
+ * @param votingRoundId The ID of the voting round.
+ * @param ballot The ballot to submit.
+ * @param fetch The fetch function to use.
+ * @returns The request response.
+ */
 export async function vote(
   votingRoundId: string,
   ballot: {
+    /** Signature previously created with `signVote` */
     signature: string;
+    /** Timestamp for replay prevention. Must match timestamp in `signature`. */
     date: Date;
     collaboratorAddress: string;
     receivers: VoteReceiver[];
@@ -280,14 +364,24 @@ export async function vote(
   );
 }
 
+/**
+ * Link a voting round to a Drip List.
+ * @param votingRoundId The ID of the voting round.
+ * @param dripListId The ID of the Drip List.
+ * @param safeTransactionHash If the link transaction was NOT yet submitted, but only proposed to a safe, the hash of that safe transaction.
+ * @param fetch The fetch function to use.
+ * @returns The request response.
+ */
 export async function linkVotingRoundToDripList(
   votingRoundId: string,
   dripListId: string,
+  safeTransactionHash?: string,
   fetch = window.fetch,
 ) {
   return _authenticatedCall(
     'POST',
-    `/votingRounds/${votingRoundId}/link`,
+    `/votingRounds/${votingRoundId}/link` +
+      (safeTransactionHash ? `?safeTransactionHash=${safeTransactionHash}` : ''),
     undefined,
     {
       dripListId,
@@ -296,6 +390,13 @@ export async function linkVotingRoundToDripList(
   );
 }
 
+/**
+ * Sign a message to get a collaborator. Only needed if votes are private and the collaborator wants to see their own vote.
+ * @param signer The signer to use.
+ * @param currentTime The current timestamp, used to prevent replay attacks. Must match the timestamp later passed to the `getCollaborator` function.
+ * @param votingRoundId The ID of the voting round.
+ * @returns The signature.
+ */
 export async function signGetCollaborator(
   signer: ethers.Signer,
   currentTime: Date,
@@ -308,6 +409,13 @@ export async function signGetCollaborator(
   return signer.signMessage(message);
 }
 
+/**
+ * Get a collaborator.
+ * @param votingRoundId The ID of the voting round.
+ * @param address The address of the collaborator.
+ * @param collaboratorSignature The signature created with `signGetCollaborator`, only needed if votes are private and the collaborator wants to see their own vote.
+ * @returns The collaborator.
+ */
 export async function getCollaborator(
   votingRoundId: string,
   address: string,
@@ -325,13 +433,25 @@ export async function getCollaborator(
   );
 }
 
+/**
+ * In an array of voting rounds, find the one that is associated with a given dripListId.
+ * @param votingRounds The voting rounds to search in.
+ * @param dripListId The ID of the Drip List.
+ * @returns The voting round.
+ */
 export function matchVotingRoundToDripList(
   votingRounds: VotingRound[],
   dripListId: string,
 ): VotingRound | undefined {
-  return votingRounds.filter((vr) => vr.dripListId === dripListId && vr.status === 'started')[0];
+  return votingRounds.filter((vr) => vr.dripListId === dripListId && vr.status === 'Started')[0];
 }
 
+/**
+ * Map a list editor state to vote receivers. Needed e.g. when submitting a vote, where we take a list editor state and convert it to a list of receivers to submit.
+ * @param items The items in the list editor.
+ * @param weights The weights of the items.
+ * @returns The vote receivers.
+ */
 export function mapListEditorStateToVoteReceivers(items: Items, weights: Weights): VoteReceiver[] {
   const result: VoteReceiver[] = [];
 
@@ -366,6 +486,11 @@ export function mapListEditorStateToVoteReceivers(items: Items, weights: Weights
   return result;
 }
 
+/**
+ * Map vote receivers to a list editor configuration. Fetches all necessary data for projects & lists. Needed e.g. when showing a list of receivers in a list editor.
+ * @param receivers The vote receivers.
+ * @returns The list editor configuration.
+ */
 export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver[]) {
   const items: Items = {};
   const weights: Weights = {};
@@ -479,17 +604,24 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
   };
 }
 
+/**
+ * Get a readable that matches the status of a given voting round. Automatically switches from `Started` to `Completed` when voting ends.
+ * @param votingRound The voting round.
+ * @returns The readable store.
+ */
 export function getVotingRoundStatusReadable(
   votingRound: VotingRound,
 ): Readable<VotingRound['status']> {
-  if (['completed', 'linked'].includes(votingRound.status)) return readable(votingRound.status);
+  if (['Completed', 'Linked', 'PendingLinkCompletion'].includes(votingRound.status)) {
+    return readable(votingRound.status);
+  }
 
   let interval: NodeJS.Timeout;
 
   const statusReadable = readable(votingRound.status, (set) => {
     interval = setInterval(() => {
       if (new Date(votingRound.schedule.voting.endsAt) < new Date()) {
-        set('completed');
+        set('Completed');
         clearInterval(interval);
       }
     }, 1000);
@@ -500,6 +632,13 @@ export function getVotingRoundStatusReadable(
   return statusReadable;
 }
 
+/**
+ * Check if a given string is a Voting Round ID.
+ * Drip Lists use numeric strings, while Voting Rounds use UUIDs.
+ * Since those are the only two options, we can safely assume that if the string is a UUID, it's a Voting Round ID.
+ * @param listId The list ID.
+ * @returns Whether the ID is a voting round ID.
+ */
 export function isVotingRoundId(listId: string) {
   // If the ID is a UUID, we can assume it's a voting round ID
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(listId);

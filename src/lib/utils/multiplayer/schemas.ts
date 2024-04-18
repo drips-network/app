@@ -61,7 +61,12 @@ export const getVotingRoundResponseSchema = z.object({
       endsAt: z.string(),
     }),
   }),
-  status: z.union([z.literal('started'), z.literal('completed'), z.literal('linked')]),
+  status: z.union([
+    z.literal('Started'),
+    z.literal('Completed'),
+    z.literal('Linked'),
+    z.literal('PendingLinkCompletion'),
+  ]),
   dripListId: z.nullable(z.string()),
   name: z.string(),
   description: z.string().nullable(),

@@ -23,7 +23,7 @@
     $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase();
 </script>
 
-{#if $status === 'started'}
+{#if $status === 'Started'}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       This list is in voting.
@@ -37,7 +37,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if $status === 'completed' && !votingRound.result}
+{:else if ($status === 'Completed' || $status === 'PendingLinkCompletion') && !votingRound.result}
   <div class="wrapper">
     <AnnotationBox type="error" icon={Proposals}>
       Voting has ended but no collaborators voted.
@@ -57,7 +57,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if $status === 'completed' && isPublisher}
+{:else if ($status === 'Completed' || $status === 'PendingLinkCompletion') && isPublisher}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. You can now publish.
@@ -79,7 +79,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if $status === 'completed'}
+{:else if $status === 'Completed' || $status === 'PendingLinkCompletion'}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. Waiting for the owner to publish this Drip List on-chain.
