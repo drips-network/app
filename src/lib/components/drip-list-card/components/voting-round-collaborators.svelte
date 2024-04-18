@@ -125,7 +125,7 @@
 
 <FormField title="Collaborators" type="div">
   <div class="wrapper">
-    {#if votingRound.areVotesPrivate && collaborator?.isCollaborator && $walletStore.address && votingRound.status === 'started'}
+    {#if votingRound.areVotesPrivate && collaborator?.isCollaborator && $walletStore.address && votingRound.status === 'Started'}
       <ListEditor
         isEditable={false}
         weightsMode={false}
