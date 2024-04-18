@@ -13,6 +13,7 @@
   }>();
 
   export let item: ListEditorItem;
+  export let key: string;
   export let weight: number;
 
   export let weightsMode: boolean;
@@ -86,7 +87,7 @@
   }
 </script>
 
-<div class="item typo-text tabular-nums" class:highlight>
+<div class="item typo-text tabular-nums" class:highlight data-testid={`item-${key}`}>
   <div class="left">
     <div class="inner">
       {#if item.type === 'project'}
@@ -131,7 +132,13 @@
     {/if}
 
     {#if isEditable}
-      <Button icon={Trash} size="small" variant="ghost" on:click={handleDelete} />
+      <Button
+        dataTestId={`remove-${key}`}
+        icon={Trash}
+        size="small"
+        variant="ghost"
+        on:click={handleDelete}
+      />
     {/if}
   </div>
 </div>

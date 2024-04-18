@@ -183,6 +183,7 @@
       <div class="items" bind:this={itemsContainer}>
         {#each Object.entries(items) as [key, item]}
           <ListEditorItemComponent
+            {key}
             highlight={highlightedItemKey === key}
             {weightsMode}
             {isEditable}
@@ -204,7 +205,7 @@
           disabled={!distributeEquallyActionAvailable}
           on:click={handleDistributeEquallyAction}
         >
-          <span class="typo-text-small">Split equally</span>
+          <span class="typo-text-small">Split evenly</span>
         </Button>
         <Button
           size="small"
