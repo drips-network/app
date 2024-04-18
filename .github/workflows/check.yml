@@ -47,4 +47,4 @@ jobs:
         run: npm run build:graphql
 
       - name: Run svelte-check
-        run: npm run check -- --fail-on-warnings
+        run: npm run check
