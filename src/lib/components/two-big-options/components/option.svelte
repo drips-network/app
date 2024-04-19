@@ -22,7 +22,7 @@
           <div class="icon">
             <svelte:component this={attribute.icon} style="fill: var(--color-foreground)" />
           </div>
-          <div class="text">
+          <div class="typo-text text">
             {attribute.text}
           </div>
         </div>
@@ -48,16 +48,16 @@
     z-index: 1;
   }
 
-  .option.selected {
-    background-color: var(--color-primary-level-1);
-  }
-
-  .option:hover:not(.selected) {
+  .option:hover {
     background-color: var(--color-foreground-level-1);
   }
 
   .option:focus-visible {
     box-shadow: 0px 0px 0px 2px var(--color-primary);
+  }
+
+  .option.selected {
+    background-color: var(--color-primary-level-1);
   }
 
   .attributes {

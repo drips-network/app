@@ -19,7 +19,7 @@
   import DripListService from '$lib/utils/driplist/DripListService';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../create-drip-list-flow';
-  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
   import streamsStore from '$lib/stores/streams/streams.store';
   import Pause from '$lib/components/icons/Pause.svelte';
@@ -50,9 +50,36 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          return await dripListService.buildTransactContext($context);
+          return await dripListService.buildTransactContext({
+            listTitle: $context.dripList.title,
+            listDescription: $context.dripList.description,
+            weights: $context.dripList.weights,
+            items: $context.dripList.items,
+            support: (() => {
+              if ($context.selectedSupportOption === 1) {
+                return {
+                  type: 'continuous',
+                  topUpAmount:
+                    $context.continuousSupportConfig.topUpAmountValueParsed ?? unreachable(),
+                  amountPerSec:
+                    ($context.continuousSupportConfig.streamRateValueParsed ?? unreachable()) /
+                    BigInt(2592000), // 30 days in seconds
+                  tokenAddress: $context.continuousSupportConfig.listSelected[0] ?? unreachable(),
+                };
+              } else if ($context.selectedSupportOption === 2) {
+                return {
+                  type: 'one-time',
+                  donationAmount: $context.oneTimeDonationConfig.amount ?? unreachable(),
+                  tokenAddress:
+                    $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
+                };
+              }
+            })(),
+          });
         },
+
         transactions: ({ txs }) => txs,
+
         after: async (_, { dripListId }) => {
           const dripListExistsQuery = gql`
             query DripListExists($id: ID!) {
@@ -109,7 +136,7 @@
       <p class="my-4">{$context.dripList.description}</p>
     {/if}
     <ListEditor
-      bind:percentages={$context.dripList.percentages}
+      bind:weights={$context.dripList.weights}
       bind:items={$context.dripList.items}
       isEditable={false}
     />

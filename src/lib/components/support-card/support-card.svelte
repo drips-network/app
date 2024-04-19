@@ -80,11 +80,17 @@
   import unreachable from '$lib/utils/unreachable';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import SupportButtons from './components/support-buttons.svelte';
+  import { BASE_URL } from '$lib/utils/base-url';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
 
+  export let draftListMode = false;
+
   export let disabled = false;
+  $: {
+    if (!project && !dripList) disabled = true;
+  }
 
   $: type = project ? ('project' as const) : ('dripList' as const);
 
@@ -100,9 +106,7 @@
     if (project) {
       supportUrl = project.source.url;
     } else if (dripList) {
-      supportUrl = `https://drips.network/app/drip-lists/${dripList.account.accountId}`;
-    } else {
-      throw new Error('You must populate either the `project` or `dripList` prop.');
+      supportUrl = `${BASE_URL}/app/drip-lists/${dripList.account.accountId}`;
     }
   }
 
@@ -177,6 +181,8 @@
   }
 
   async function onClickAddToDripList() {
+    if (!project && !dripList) return;
+
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
     } else {
@@ -201,7 +207,7 @@
 </script>
 
 <div class="become-supporter-card" class:disabled>
-  {#if ownDripLists === undefined || updating}
+  {#if !draftListMode && (ownDripLists === undefined || updating)}
     <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
@@ -220,7 +226,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, continuously, or add them to your Drip List.</p>
+  <p>Donate once, continuously, or add this to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons

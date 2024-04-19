@@ -23,7 +23,6 @@
 <script lang="ts">
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SupportCard, {
     SUPPORT_CARD_DRIP_LIST_FRAGMENT,
@@ -37,27 +36,46 @@
     DRIP_LIST_CARD_FRAGMENT,
   } from '$lib/components/drip-list-card/drip-list-card.svelte';
   import { gql } from 'graphql-request';
+  import Section from '$lib/components/section/section.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
+  import formatDate from '$lib/utils/format-date';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import viewVotingRoundFlowSteps from '$lib/flows/view-voting-round/view-voting-round-flow-steps';
+  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import { onMount } from 'svelte';
 
   export let data: PageData;
 
   $: dripList = data.dripList;
+  $: votingRound = data.votingRounds.current;
 
-  $: ownerAccountId = dripList.owner.accountId;
+  $: ownerAccountId = dripList?.owner.accountId ?? votingRound?.publisherAddress;
   $: supportStreams =
-    $streamsStore && streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
+    dripList &&
+    $streamsStore &&
+    streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
 
-  onMount(() => streamsStore.fetchAccountsStreamingToAccountId(dripList.account.accountId));
+  onMount(
+    () => dripList && streamsStore.fetchAccountsStreamingToAccountId(dripList.account.accountId),
+  );
 
   const streamsFetchStatusses = streamsStore.fetchStatusses;
-  $: streamsFetched = $streamsFetchStatusses[ownerAccountId] === 'fetched';
+  $: streamsFetched =
+    dripList && ownerAccountId && $streamsFetchStatusses[ownerAccountId] === 'fetched';
+
+  function handleVotingRoundClick(votingRound: VotingRound) {
+    modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));
+  }
 </script>
 
-{#if data.dripList.name}
-  {@const imageBaseUrl = `/api/share-images/drip-list/${dripList.account.accountId}.png`}
+{#if dripList?.name || votingRound?.name}
+  {@const imageBaseUrl = `/api/share-images/drip-list/${
+    dripList?.account.accountId || votingRound?.id
+  }.png`}
   <HeadMeta
-    title="{data.dripList.name} | Drip List"
-    description={data.dripList.description ?? undefined}
+    title="{dripList?.name || votingRound?.name} | Drip List"
+    description={dripList?.description ?? votingRound?.name ?? undefined}
     image="{imageBaseUrl}?target=og"
     twitterImage="{imageBaseUrl}?target=twitter"
   />
@@ -65,34 +83,77 @@
 
 <article class="drip-list-page">
   <main class="list">
-    <div class="owner">
-      <span>Drip List owned by </span>
-      <IdentityBadge address={data.dripList.owner.address} disableTooltip />
-    </div>
-    <SectionSkeleton loaded={Boolean(data.dripList)} horizontalScroll={false}>
-      <DripListCard dripList={data.dripList} />
+    <SectionSkeleton loaded={Boolean(dripList || votingRound)} horizontalScroll={false}>
+      <DripListCard data={{ dripList, votingRound }} />
     </SectionSkeleton>
   </main>
 
   <aside class="support">
     <div>
-      <SupportCard {dripList} />
+      <SupportCard
+        dripList={dripList ?? undefined}
+        draftListMode={Boolean(!dripList && votingRound)}
+      />
     </div>
   </aside>
 
   <div class="sections">
-    <Developer accountId={dripList.account.accountId} />
+    {#if dripList}
+      <Developer accountId={dripList.account.accountId} />
+    {/if}
 
-    <Supporters
-      accountId={dripList.account.accountId}
-      headline="Support"
-      infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies, or send a one-time donation."
-      forceLoading={!streamsFetched}
-      {supportStreams}
-      type="dripList"
-      supportItems={data.dripList.support}
-      ownerAccountId={data.dripList.owner.accountId}
-    />
+    {#if dripList}
+      <Supporters
+        accountId={dripList.account.accountId}
+        headline="Support"
+        infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies, or send a one-time donation."
+        forceLoading={!streamsFetched}
+        supportStreams={supportStreams || undefined}
+        type="dripList"
+        supportItems={dripList.support}
+        ownerAccountId={dripList.owner.accountId}
+      />
+    {/if}
+
+    {#if data.votingRounds.past.length > 0}
+      <Section
+        header={{
+          label: 'Voting rounds',
+          icon: Proposals,
+        }}
+        skeleton={{ loaded: true, empty: false }}
+      >
+        <p class="voting-rounds-section-description">
+          Each time the recipients of this Drip List are voted on and changed, it’ll show up here.
+        </p>
+        <div class="voting-rounds">
+          {#each data.votingRounds.past as votingRound}
+            <button on:click={() => handleVotingRoundClick(votingRound)} class="voting-round">
+              <div class="left">
+                <h4 class="typo-text">
+                  {formatDate(new Date(votingRound.schedule.voting.endsAt), 'dayAndYear')}
+                </h4>
+                {#if !votingRound.areVotesPrivate}
+                  <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
+                    {votingRound.result?.length === 1
+                      ? '1 recipient'
+                      : `${votingRound.result?.length ?? 0} recipients`}
+                  </span>
+                {/if}
+              </div>
+              {#if !votingRound.areVotesPrivate}
+                <div class="right">
+                  <span class="typo-text"
+                    >{votingRound.votes?.length ?? 0}
+                    {votingRound.votes?.length === 1 ? 'vote' : 'votes'}</span
+                  >
+                </div>
+              {/if}
+            </button>
+          {/each}
+        </div>
+      </Section>
+    {/if}
   </div>
 </article>
 
@@ -124,7 +185,6 @@
   }
 
   .support > div {
-    margin-top: 3.5rem;
     position: sticky;
     top: 6rem;
   }
@@ -136,13 +196,40 @@
     gap: 4rem;
   }
 
-  .owner {
-    display: flex;
-    gap: 0.25rem;
+  .voting-rounds-section-description {
+    margin-bottom: 1rem;
   }
 
-  .owner span {
-    color: var(--color-foreground-level-6);
+  .voting-rounds {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
+  }
+
+  .voting-rounds .voting-round {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    transition: background-color 0.3s;
+  }
+
+  .voting-rounds .voting-round:focus-visible,
+  .voting-rounds .voting-round:hover {
+    background-color: var(--color-primary-level-1);
+  }
+
+  .voting-rounds .voting-round:not(:only-child):not(:last-child) {
+    border-bottom: 1px solid var(--color-foreground);
+  }
+
+  .voting-rounds .voting-round .left {
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 1080px) {

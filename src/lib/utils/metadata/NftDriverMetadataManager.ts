@@ -15,8 +15,9 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
     projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'];
     name?: string;
     description?: string;
+    latestVotingRoundId?: string;
   }): LatestVersion<typeof nftDriverAccountMetadataParser> {
-    const { forAccountId, projects, name, description } = context;
+    const { forAccountId, projects, name, description, latestVotingRoundId } = context;
 
     return {
       driver: 'nft',
@@ -28,6 +29,7 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       projects,
       name,
       description,
+      latestVotingRoundId,
     };
   }
 

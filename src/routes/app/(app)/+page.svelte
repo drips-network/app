@@ -10,7 +10,6 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
   import { goto } from '$app/navigation';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import { PUBLIC_NETWORK } from '$env/static/public';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
@@ -25,6 +24,7 @@
   import Box from '$lib/components/icons/Box.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
+  import DripListCardThumblink from '$lib/components/drip-list-card/drip-list-card-thumblink.svelte';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -173,7 +173,7 @@
   >
     <div class="posts-grid">
       {#each data.featuredDripLists as dripList}
-        <DripListCard format="thumblink" {dripList} />
+        <DripListCardThumblink {dripList} />
       {/each}
     </div>
   </Section>

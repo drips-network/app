@@ -444,11 +444,28 @@ describe('app', async () => {
         await expect(page.locator('h1:has-text("Create a Drip List")')).toHaveCount(1);
       });
 
+      it('renames the drip list', async () => {
+        const titleField = page.locator('label:has-text("Title*")');
+        await titleField.clear();
+        await titleField.fill('This is a Test Drip List');
+      });
+
+      it('gives a description', async () => {
+        await page.locator('label:has-text("Description")').fill('This is my list description.');
+      });
+
+      it('selects choose yourself option', async () => {
+        await page.locator('text=Choose by yourself').click();
+        await page.locator('text=Continue').click();
+
+        await expect(page.locator('h1:has-text("Create a Drip List")')).toHaveCount(1);
+      });
+
       it('adds items', async () => {
         console.log(1);
 
         const input = page.locator(
-          'input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]',
+          'input[placeholder="GitHub URL, ETH address, or Drip List URL"]',
         );
         await expect(input).toHaveCount(1);
         await input.click();
@@ -461,7 +478,9 @@ describe('app', async () => {
         console.log(4);
 
         await expect(
-          page.locator('data-testid=item-https://github.com/efstajas/drips-test-repo-10'),
+          page.locator(
+            'data-testid=item-80921553623925136102837120782793736893291544351678576578072673071408',
+          ),
         ).toHaveCount(1);
 
         console.log(5);
@@ -474,24 +493,10 @@ describe('app', async () => {
         console.log(7);
 
         await expect(
-          page.locator('data-testid=item-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc'),
+          page.locator('data-testid=item-383620263794848526656662033323214000554911775452'),
         ).toHaveCount(1);
 
         console.log(8);
-      });
-
-      it('assigns equal percentages', async () => {
-        await page.locator('button', { hasText: 'Split evenly' }).click();
-      });
-
-      it('renames the drip list', async () => {
-        const titleField = page.locator('label:has-text("Title*")');
-        await titleField.clear();
-        await titleField.fill('This is a Test Drip List');
-      });
-
-      it('gives a description', async () => {
-        await page.locator('label:has-text("Description")').fill('This is my list description.');
       });
 
       it('advances the flow', async () => {
@@ -539,8 +544,8 @@ describe('app', async () => {
       it('creates the drip list', async () => {
         await page.locator('button', { hasText: 'Confirm in wallet' }).click();
 
-        await expect(page.locator('text=Congratulations!')).toHaveCount(1, { timeout: 10000 });
-      }, 10000);
+        await expect(page.locator('text=Congratulations!')).toHaveCount(1, { timeout: 20000 });
+      }, 30000);
     });
 
     describe('edit drip list', () => {
@@ -558,14 +563,14 @@ describe('app', async () => {
       });
 
       it('removes an item', async () => {
-        await page.getByTestId('remove-0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc').click();
+        await page.getByTestId('remove-383620263794848526656662033323214000554911775452').click();
 
         await expect(page.locator('text=50% split')).toHaveCount(1);
       });
 
       it('adds a new item', async () => {
         await page
-          .locator('input[placeholder="GitHub URL, Ethereum address, or Drip List URL"]')
+          .locator('input[placeholder="GitHub URL, ETH address, or Drip List URL"]')
           .click();
 
         await page.keyboard.type('github.com/efstajas/drips-test-repo-11');

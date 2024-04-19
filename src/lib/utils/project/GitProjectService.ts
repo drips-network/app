@@ -14,21 +14,23 @@ import {
   getSubgraphClient,
 } from '../get-drips-clients';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
-import type { Address } from '../common-types';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import { isAddress } from 'ethers/lib/utils';
 import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
 import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
-import { isValidGitUrl } from '../is-valid-git-url';
-import type { ListEditorConfig } from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
 import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
+import type { Items, Weights } from '$lib/components/list-editor/types';
+
+interface ListEditorConfig {
+  items: Items;
+  weights: Weights;
+}
 
 export default class GitProjectService {
   private _github!: GitHub;
@@ -327,97 +329,104 @@ export default class GitProjectService {
     maintainerListEditorConfig: ListEditorConfig,
     dependencyListEditorConfig: ListEditorConfig,
   ) {
-    const receivers: SplitsReceiverStruct[] = [];
+    let receivers: ((
+      | LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['maintainers'][number]
+      | LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['dependencies'][number]
+    ) & { sublist: 'dependencies' | 'maintainers' })[] = [];
 
-    // Populate dependencies splits and metadata.
-    const dependenciesInput = Object.entries(dependencyListEditorConfig.percentages);
-
-    const dependenciesSplitMetadata: LatestVersion<
-      typeof repoDriverAccountMetadataParser
-    >['splits']['dependencies'] = [];
-
-    for (const [itemId, percentage] of dependenciesInput) {
-      const isAddr = isAddress(itemId);
-
-      const weight = Math.floor(
-        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['dependencies'] / 100),
-      );
-
+    for (const [accountId, weight] of Object.entries(dependencyListEditorConfig.weights)) {
+      const item = dependencyListEditorConfig.items[accountId];
       if (weight === 0) continue;
 
-      if (isAddr) {
-        const receiver = {
-          type: 'address' as const,
-          weight,
-          accountId: await this._addressDriverClient.getAccountIdByAddress(itemId as Address),
-        };
+      const scaledWeight = Math.floor(
+        Math.floor(weight * (highLevelPercentages['dependencies'] / 100)),
+      );
 
-        dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
-      } else if (isValidGitUrl(itemId)) {
-        const { forge, username, repoName } = GitProjectService.deconstructUrl(itemId);
+      switch (item.type) {
+        case 'address': {
+          const receiver = {
+            sublist: 'dependencies' as const,
+            type: 'address' as const,
+            weight: scaledWeight,
+            accountId: accountId,
+          };
 
-        const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
+          receivers.push(receiver);
+          break;
+        }
+        case 'drip-list': {
+          const receiver = {
+            sublist: 'dependencies' as const,
+            type: 'dripList' as const,
+            weight: scaledWeight,
+            accountId: accountId,
+          };
 
-        const receiver = {
-          type: 'repoDriver' as const,
-          weight,
-          accountId: await this._repoDriverClient.getAccountId(
-            numericForgeValue,
-            `${username}/${repoName}`,
-          ),
-        };
+          receivers.push(receiver);
+          break;
+        }
+        case 'project': {
+          const receiver = {
+            sublist: 'dependencies' as const,
+            type: 'repoDriver' as const,
+            weight: scaledWeight,
+            accountId: accountId,
+            source: GitProjectService.populateSource(
+              item.project.source.forge,
+              item.project.source.repoName,
+              item.project.source.ownerName,
+            ),
+          };
 
-        dependenciesSplitMetadata.push({
-          ...receiver,
-          source: GitProjectService.populateSource(forge, repoName, username),
-        });
-        receivers.push(receiver);
-      } else {
-        // It's the account ID for another Drip List
-        const receiver = {
-          type: 'dripList' as const,
-          weight,
-          accountId: itemId,
-        };
-
-        dependenciesSplitMetadata.push(receiver);
-        receivers.push(receiver);
+          receivers.push(receiver);
+          break;
+        }
       }
     }
 
-    // Populate maintainers splits and metadata.
-    const maintainersInput = Object.entries(maintainerListEditorConfig.percentages);
-
-    const maintainersSplitsMetadata: LatestVersion<
-      typeof repoDriverAccountMetadataParser
-    >['splits']['maintainers'] = [];
-
-    for (const [address, percentage] of maintainersInput) {
-      const weight = Math.floor(
-        (Number(percentage) / 100) * 1000000 * (highLevelPercentages['maintainers'] / 100),
-      );
-
+    for (const [accountId, weight] of Object.entries(maintainerListEditorConfig.weights)) {
       if (weight === 0) continue;
 
+      const scaledWeight = Math.floor(
+        Math.floor(weight * (highLevelPercentages['maintainers'] / 100)),
+      );
+
       const receiver = {
+        sublist: 'maintainers' as const,
         type: 'address' as const,
-        weight,
-        accountId: await this._addressDriverClient.getAccountIdByAddress(address),
+        weight: scaledWeight,
+        accountId,
       };
 
-      maintainersSplitsMetadata.push(receiver);
       receivers.push(receiver);
     }
+
+    // Adjust weights to ensure no tiny remainder
+    const MAX_WEIGHT = 1000000;
+
+    function adjustWeights<T extends { weight: number }>(input: T[]): T[] {
+      const totalWeight = input.reduce((acc, { weight }) => acc + weight, 0);
+      const remainder = MAX_WEIGHT - totalWeight;
+
+      if (remainder > 0) {
+        input[0].weight += remainder;
+      }
+
+      return input;
+    }
+
+    receivers = adjustWeights(receivers);
 
     return {
       tx: await this._repoDriverTxFactory.setSplits(
         accountId,
         this._formatSplitReceivers(receivers),
       ),
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
-      receivers: receivers,
+      dependenciesSplitMetadata: receivers.filter((v) => v.sublist === 'dependencies'),
+      maintainersSplitsMetadata: receivers.filter(
+        (v) => v.sublist === 'maintainers',
+      ) as LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['maintainers'],
+      receivers,
     };
   }
 

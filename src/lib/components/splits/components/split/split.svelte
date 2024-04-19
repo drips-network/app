@@ -20,6 +20,7 @@
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let linkToNewTab = false;
   export let isNested = false;
+  export let draft = false;
 
   /** Set to false to hide the chevron next to split groups. */
   export let groupsExpandable = true;
@@ -132,7 +133,7 @@
 </script>
 
 <div class="wrapper">
-  <div class="split" bind:this={element}>
+  <div class="split" class:draft bind:this={element}>
     <div class="arrow">
       <svg
         width="103"
@@ -143,8 +144,9 @@
       >
         <path
           d="M1 1C1 1 1 25 25 25C55.0704 25 102 25 102 25M102 25L95.5 18.5M102 25L95.5 31.5"
-          stroke="var(--color-foreground)"
+          stroke={draft ? 'var(--color-foreground-level-5)' : 'var(--color-foreground)'}
           stroke-linecap="round"
+          stroke-dasharray={draft ? '2,2' : undefined}
         />
       </svg>
       <div
@@ -152,10 +154,12 @@
         class:is-nested={isNested}
         style:color={isNested ? 'var(--color-foreground)' : percentageTextColor}
       >
-        {getSplitPercent(
-          split.__typename === 'SplitGroup' ? calcGroupWeight(split) : split.weight,
-          'pretty',
-        )}
+        <span class:opacity-50={groupExpanded}>
+          {getSplitPercent(
+            split.__typename === 'SplitGroup' ? calcGroupWeight(split) : split.weight,
+            'pretty',
+          )}
+        </span>
       </div>
       {#if isFirst}
         <div class="intro-line" />
@@ -171,7 +175,7 @@
         <DripListBadge dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
         <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
-          <ProjectBadge {linkToNewTab} project={split.project} maxWidth={false} />
+          <ProjectBadge {linkToNewTab} project={split.project} />
         </PrimaryColorThemer>
       {:else if split.__typename === 'SplitGroup'}
         <div
@@ -200,7 +204,7 @@
           </button>
           {#if groupExpanded}
             <div transition:fade|local={{ duration: GROUP_EXPAND_DURATION }} class="members">
-              <SplitsListComponent {linkToNewTab} isGroup list={split.list} />
+              <SplitsListComponent {draft} {linkToNewTab} isGroup list={split.list} />
             </div>
           {/if}
           <div class="cutoff-gradient" />
@@ -213,11 +217,27 @@
 <style>
   .wrapper {
     position: relative;
+    z-index: 1;
+  }
+
+  /* background overlay so it covers row above, when row above is expanding */
+  .wrapper:after {
+    content: '';
+    display: block;
+    position: absolute;
+    background-color: var(--color-background);
+    /* 1px offset so it doesn't break the linework in top-left corner */
+    top: 1px;
+    left: 1px;
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
   }
 
   .split {
     display: flex;
     gap: 1rem;
+    position: relative;
+    z-index: 1;
   }
 
   .arrow {
@@ -227,19 +247,28 @@
   .arrow .line {
     position: absolute;
     top: 0;
-    left: 0.5px;
+    left: 0.25px;
     width: 1px;
     height: calc(100% + 1px);
-    background-color: var(--color-foreground);
+    border-left: 1px solid var(--color-foreground);
+  }
+
+  .draft .arrow .line {
+    border-left: 1px dashed var(--color-foreground-level-5);
   }
 
   .arrow .intro-line {
     position: absolute;
     top: -1rem;
     left: 0.5px;
-    background: linear-gradient(to bottom, transparent, var(--color-foreground));
+    border-left: 1px solid var(--color-foreground);
     height: calc(1rem + 1px);
     width: 1px;
+  }
+
+  .draft .arrow .intro-line {
+    border-left: 1px dashed var(--color-foreground-level-5);
+    height: calc(1rem - 2px); /* dashes line up at -2px */
   }
 
   .arrow .percentage {
@@ -262,6 +291,19 @@
       linear-gradient(45deg, var(--color-background), var(--color-background));
   }
 
+  .draft .arrow .percentage {
+    background-color: var(--color-foreground-level-5);
+  }
+
+  .draft .arrow .percentage.is-nested {
+    background: linear-gradient(
+        45deg,
+        var(--color-foreground-level-2),
+        var(--color-foreground-level-2)
+      ),
+      linear-gradient(45deg, var(--color-background), var(--color-background));
+  }
+
   .receiver {
     display: flex;
     position: relative;
@@ -270,7 +312,6 @@
   }
 
   .group {
-    overflow: hidden;
     width: 100%;
   }
 
@@ -284,6 +325,7 @@
 
   .group .members {
     margin-top: -0.5rem;
+    margin-left: -4rem;
   }
 
   .name {

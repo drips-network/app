@@ -16,8 +16,6 @@
   export let safeAppMode = false;
 
   function handleConfirm() {
-    onAction?.();
-
     if (action === 'continue') {
       dispatch('goForward');
     } else if (action === 'hide-modal') {
@@ -25,6 +23,8 @@
     } else {
       dispatch('conclude');
     }
+
+    onAction?.();
   }
 </script>
 

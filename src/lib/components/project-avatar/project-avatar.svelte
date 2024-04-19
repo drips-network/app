@@ -35,8 +35,7 @@
 
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
-  export let outline =
-    project.__typename === 'ClaimedProject' && project.avatar.__typename === 'ImageAvatar';
+  export let outline = project.__typename === 'ClaimedProject';
 
   const CONTAINER_SIZES: Record<Size, string> = {
     tiny: '1.5rem',
@@ -90,7 +89,7 @@
           <Question />
         </div>
       {:else if project.avatar.__typename === 'ImageAvatar'}
-        <div class="project-avatar outline">
+        <div class="project-avatar" class:with-outline={outline}>
           <img
             bind:this={customImageEl}
             on:load={() => (customImageLoading = false)}

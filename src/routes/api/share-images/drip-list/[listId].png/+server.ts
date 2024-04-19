@@ -10,32 +10,52 @@ import getBackgroundImage from '../../getBackgroundImage';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
+import * as multiplayer from '$lib/utils/multiplayer';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const listId = params.listId;
   assert(listId, 'Missing listId param');
 
-  const dripListQuery = gql`
-    query DripList($listId: ID!) {
-      dripList(id: $listId) {
-        name
-        splits {
-          __typename
+  let listName: string;
+  let recipientsCount: string | undefined = undefined;
+
+  if (multiplayer.isVotingRoundId(listId)) {
+    const votingRound = await multiplayer.getVotingRound(listId, fetch);
+
+    try {
+      assert(votingRound);
+      listName = votingRound.name;
+    } catch {
+      throw error(404);
+    }
+  } else {
+    const dripListQuery = gql`
+      query DripList($listId: ID!) {
+        dripList(id: $listId) {
+          name
+          splits {
+            __typename
+          }
         }
       }
-    }
-  `;
+    `;
 
-  const res = await query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch);
-  const { dripList } = res;
-  try {
-    assert(dripList);
-  } catch {
-    throw error(404);
+    const res = await query<DripListQuery, DripListQueryVariables>(
+      dripListQuery,
+      { listId },
+      fetch,
+    );
+    const { dripList } = res;
+
+    try {
+      assert(dripList);
+      listName = dripList.name;
+      recipientsCount = dripList.splits.length.toString();
+    } catch {
+      throw error(404);
+    }
   }
 
-  const listName = dripList.name;
-  const recipientsCount = dripList.splits.length.toString();
   const target = url.searchParams.get('target');
 
   try {
@@ -57,8 +77,13 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
          <span style="font-family: Inter; font-size: 40px">Drip List</span>
          <span style="font-family: Redaction; font-size: 90px; display: block; line-clamp: 2;">${listName}</span>
          <div style="display: flex; gap: 24px; align-items: center">
-           <img src="${dripListIconDataURI}" height="64px" width="64px" />
-           <span style="font-family: Inter; font-size: 40px">${recipientsCount} ${recipientsString}</span>
+         ${
+           recipientsCount
+             ? `
+              <img src="${dripListIconDataURI}" height="64px" width="64px" />
+              <span style="font-family: Inter; font-size: 40px">${recipientsCount} ${recipientsString}</span>`
+             : ''
+         }
          </div>
        </div>
     </div>`),

@@ -11,7 +11,7 @@
   export let activeTab = 'tab-1';
 </script>
 
-<div class="tabbed-box">
+<div class="tabbed-box whitespace-nowrap">
   <div class="tabs">
     <SegmentedControl
       bind:active={activeTab}
@@ -37,7 +37,7 @@
 
 <style>
   .tabbed-box {
-    border: 1px solid var(--color-foreground);
+    border-top: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     margin-top: 21px;
     position: relative;

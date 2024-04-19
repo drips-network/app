@@ -33,7 +33,6 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import assert from '$lib/utils/assert';
-  import ethAddressItem from '$lib/components/drip-list-members-editor/item-templates/eth-address';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import GitHub from '$lib/utils/github/GitHub';
   import { gql } from 'graphql-request';
@@ -53,21 +52,19 @@
   function verify() {
     dispatch('await', {
       promise: async () => {
-        const { address } = $walletStore;
-        assert(address);
+        const { address, dripsAccountId } = $walletStore;
+        assert(address && dripsAccountId);
 
-        const addressInMaintainers = $context.maintainerSplits.items[address];
+        const addressInMaintainers = Boolean($context.maintainerSplits.items[dripsAccountId]);
         const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
 
         if (!addressInMaintainers && maintainersListEmpty) {
           $context.maintainerSplits.items = {
-            [address]: ethAddressItem(address),
+            [dripsAccountId]: { type: 'address', address },
           };
 
-          $context.maintainerSplits.items[address] = ethAddressItem(address);
-
-          $context.maintainerSplits.percentages = {
-            [address]: 100,
+          $context.maintainerSplits.weights = {
+            [dripsAccountId]: 1000000,
           };
         }
 

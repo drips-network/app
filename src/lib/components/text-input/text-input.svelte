@@ -35,6 +35,8 @@
   export let hint: string | undefined = undefined;
   export let suffix: string | undefined = undefined;
 
+  export let inputElement: HTMLInputElement | undefined = undefined;
+
   export let validationState: TextInputValidationState = {
     type: 'unvalidated',
   };
@@ -42,8 +44,6 @@
   export const focus = (): void => {
     inputElement && inputElement.focus();
   };
-
-  let inputElement: HTMLInputElement | undefined = undefined;
 
   // Canʼt use normal `autofocus` attribute on the `inputElement`: "Autofocus
   // processing was blocked because a document's URL has a fragment".
@@ -93,6 +93,7 @@
     on:change
     on:click
     on:input
+    on:focus
     on:keydown
     on:keypress
     on:paste

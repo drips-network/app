@@ -7,30 +7,38 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
   import { page } from '$app/stores';
-  import DripListEditor from '$lib/components/drip-list-editor/drip-list-editor.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  export let canCancel = false;
 
   const { searchParams } = $page.url;
   const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
 
-  let isValid = false;
+  let listValid = false;
 </script>
 
 <StandaloneFlowStepLayout
   headline="Create a Drip List"
   description="What projects, individuals, organizations, or other Drip Lists would you like to support with your Drip List?"
 >
-  <DripListEditor bind:isValid bind:dripList={$context.dripList} {urlToAdd} />
+  <FormField title="Recipients*">
+    <ListEditor
+      bind:weights={$context.dripList.weights}
+      bind:items={$context.dripList.items}
+      bind:valid={listValid}
+      addOnMount={urlToAdd}
+    />
+  </FormField>
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+  </svelte:fragment>
   <svelte:fragment slot="actions">
-    {#if canCancel}
-      <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    {/if}
     <Button
-      disabled={!isValid}
+      disabled={!listValid}
       icon={Check}
       variant="primary"
       on:click={() => dispatch('goForward')}>Continue</Button

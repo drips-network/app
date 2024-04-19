@@ -36,10 +36,14 @@
   {rel}
   class="button size-{size}"
   class:disabled={isDisabled}
+  class:loading
   disabled={isDisabled}
   aria-disabled={isDisabled}
   on:click|stopPropagation
   data-testid={dataTestId}
+  on:mouseenter
+  on:mouseleave
+  on:focus
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
@@ -123,7 +127,7 @@
     box-shadow: var(--elevation-low);
   }
 
-  .button .inner.primary {
+  .button:not(.loading) .inner.primary {
     background-color: var(--color-primary);
   }
 

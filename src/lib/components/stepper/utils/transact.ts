@@ -8,9 +8,9 @@ import { get } from 'svelte/store';
 import type { Nullable } from 'vitest';
 import type { StepComponentEvents, UpdateAwaitStepFn, UpdateAwaitStepParams } from '../types';
 import unreachable from '$lib/utils/unreachable';
-import SafeAppsSDK from '$lib/stores/wallet/safe/sdk';
 import assert from '$lib/utils/assert';
 import isTest from '$lib/utils/is-test';
+import SafeAppsSDK, { type SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
 
 type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
@@ -42,9 +42,19 @@ export type TransactPayload<T extends Nullable<BeforeFunc>> = {
    * to a Safe.
    * @param receipts An array of transaction receipts for all transactions described in `transactions`.
    * @param context Object with optional context returned from `before`.
-   * @returns
+   * @returns A promise that will be awaited before moving on in the flow.
    */
   after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
+  /**
+   * Function to run after transctions have been proposed to a Safe. This function will ONLY run if the app is
+   * connected to a Safe.
+   * @param sendTransactionsResponse The response from the Safe Apps SDK after proposing the transactions.
+   * @returns A promise that will be awaited before moving on in the flow.
+   */
+  afterSafe?: (
+    sendTransactionsResponse: SendTransactionsResponse,
+    context: Context<T>,
+  ) => PromiseLike<void>;
   /**
    * Optionally specify custom messages that appear while the `before` and `after` steps are executed.
    */
@@ -128,7 +138,7 @@ export default function transact(
   assert(address);
   const safeAppMode = Boolean(safe);
 
-  const { before, transactions: transactionsBuilder, after, messages } = resolvedPayload;
+  const { before, transactions: transactionsBuilder, after, afterSafe, messages } = resolvedPayload;
 
   const receipts: ContractReceipt[] = [];
 
@@ -140,11 +150,12 @@ export default function transact(
     const beforeResult = await before?.();
 
     const transactionWrappers = await transactionsBuilder(beforeResult);
-    const isTxBatch = transactionWrappers.length > 1;
+
+    let safeSendTransactionResponse: SendTransactionsResponse | undefined = undefined;
 
     // If we're in a Safe and need to process more than one transaction, we send them to the
     // Safe as a batch.
-    if (safeAppMode && isTxBatch) {
+    if (safeAppMode) {
       const safeAppsSdk = new SafeAppsSDK();
 
       let estimatedGasWithBuffer: number;
@@ -189,7 +200,7 @@ export default function transact(
         value: '0',
       }));
 
-      await safeAppsSdk.txs.send({
+      safeSendTransactionResponse = await safeAppsSdk.txs.send({
         txs,
         params: {
           safeTxGas: estimatedGasWithBuffer,
@@ -269,6 +280,16 @@ export default function transact(
       );
 
       await after?.(receipts, beforeResult);
+    } else if (afterSafe) {
+      updateAwaitStep(
+        messages?.duringAfter ?? {
+          message: 'Wrapping up...',
+        },
+      );
+
+      assert(safeSendTransactionResponse, 'Expected SafeSendTransactionResponse to be defined.');
+
+      await afterSafe?.(safeSendTransactionResponse, beforeResult);
     }
 
     modal.setHideable(true);

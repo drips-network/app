@@ -7,7 +7,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
-  import ListEditor from '$lib/components/drip-list-members-editor/drip-list-members-editor.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -36,12 +36,13 @@
     ]}% you assigned to your project’s maintainers."
   />
   <ListEditor
-    bind:percentages={$context.maintainerSplits.percentages}
+    bind:weights={$context.maintainerSplits.weights}
     bind:items={$context.maintainerSplits.items}
     bind:valid={formValid}
-    blockedKeys={dependencyKeys}
+    blockedAccountIds={dependencyKeys}
     maxItems={200 - dependencyKeys.length}
-    allowedItems={['eth-addresses']}
+    allowProjects={false}
+    allowDripLists={false}
   />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>

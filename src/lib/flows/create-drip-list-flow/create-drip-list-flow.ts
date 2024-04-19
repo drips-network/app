@@ -16,9 +16,15 @@ import ChooseSupportTypeStep from './steps/choose-support-type/choose-support-ty
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import DripListIcon from '$lib/components/icons/DripList.svelte';
 import ConfigureOneTimeDonation from './steps/configure-one-time-donation/configure-one-time-donation.svelte';
+import ChooseCreationMode from './steps/choose-creation-mode/choose-creation-mode.svelte';
+import ConfigureVotingRound from './steps/configure-voting-round/configure-voting-round.svelte';
+import type { Items } from '$lib/components/list-editor/types';
+import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
 
 export interface State {
   dripList: DripListConfig;
+  /** 1 is immediate DL creation, 2 is creating a draft / voting round */
+  selectedCreationMode: 1 | 2 | undefined;
   /** 1 is Continuous Support, 2 is one-time donation */
   selectedSupportOption: 1 | 2 | undefined;
   continuousSupportConfig: {
@@ -32,12 +38,19 @@ export interface State {
     topUpMax: boolean;
     amount: bigint | undefined;
   };
+  votingRoundConfig: {
+    collaborators: Items;
+    votingEnds: Date | undefined;
+    areVotesPrivate: boolean;
+  };
+  newVotingRoundId: string | undefined;
   dripListId: string | undefined;
 }
 
 export const state = () =>
   writable<State>({
-    dripList: { title: 'My Drip List', percentages: {}, items: {}, description: undefined },
+    dripList: { title: 'My Drip List', weights: {}, items: {}, description: undefined },
+    selectedCreationMode: undefined,
     selectedSupportOption: undefined,
     continuousSupportConfig: {
       listSelected: [],
@@ -48,6 +61,12 @@ export const state = () =>
       topUpMax: false,
       amount: undefined,
     },
+    votingRoundConfig: {
+      collaborators: {},
+      votingEnds: undefined,
+      areVotesPrivate: false,
+    },
+    newVotingRoundId: undefined,
     dripListId: undefined,
   });
 
@@ -74,7 +93,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
             return {
               component: DripListBadge,
               props: {
-                listId: item.list.account.accountId,
+                listId: item.dripList.account.accountId,
               },
             };
           }
@@ -119,9 +138,23 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
 
 export const steps = (state: Writable<State>, skipWalletConnect = false, isModal = false) => [
   makeStep({
-    component: BuildListStep,
+    component: ChooseCreationMode,
     props: {
       canCancel: isModal,
+    },
+  }),
+  makeStep({
+    component: BuildListStep,
+    props: undefined,
+    condition: () => {
+      return get(state).selectedCreationMode === 1;
+    },
+  }),
+  makeStep({
+    component: ConfigureVotingRound,
+    props: undefined,
+    condition: () => {
+      return get(state).selectedCreationMode === 2;
     },
   }),
   ...(skipWalletConnect
@@ -135,25 +168,38 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   makeStep({
     component: ChooseSupportTypeStep,
     props: undefined,
+    condition: () => {
+      return get(state).selectedCreationMode === 1;
+    },
   }),
   makeStep({
     component: ConfigureContinuousSupportStep,
     props: undefined,
     condition: () => {
-      return get(state).selectedSupportOption === 1;
+      return get(state).selectedCreationMode === 1 && get(state).selectedSupportOption === 1;
     },
   }),
   makeStep({
     component: ConfigureOneTimeDonation,
     props: undefined,
     condition: () => {
-      return get(state).selectedSupportOption === 2;
+      return get(state).selectedCreationMode === 1 && get(state).selectedSupportOption === 2;
     },
   }),
   makeStep({
     component: ReviewStep,
     props: {
       connectedWalletHidden: skipWalletConnect,
+    },
+    condition: () => {
+      return get(state).selectedCreationMode === 1;
+    },
+  }),
+  makeStep({
+    component: ReviewVotingRound,
+    props: undefined,
+    condition: () => {
+      return get(state).selectedCreationMode === 2;
     },
   }),
   makeStep({

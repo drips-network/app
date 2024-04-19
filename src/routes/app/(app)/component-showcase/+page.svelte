@@ -37,6 +37,10 @@
   } from '$lib/graphql/__generated__/base-types';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import DateInput from '$lib/components/date-picker/DateInput.svelte';
+  import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
+  import User from '$lib/components/icons/User.svelte';
 
   // Button
   let disabled = false;
@@ -95,6 +99,8 @@
   };
 
   // Splits
+
+  let draftMode = false;
 
   const MOCK_PROJECT_1: Project = {
     __typename: 'ClaimedProject',
@@ -303,11 +309,78 @@
   let sectionError = false;
   let sectionCollapsable = false;
   let sectionCollapsed = false;
+
+  // List editor
+
+  let isEditable = true;
+  let weightsMode = true;
+  let allowAddresses = true;
+  let allowProjects = true;
+  let allowDripLists = true;
 </script>
 
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Date input</h2>
+  <DateInput
+    value={new Date()}
+    timePrecision="minute"
+    format="yyyy-MM-dd HH:mm"
+    placeholder="yyyy-MM-dd HH:mm"
+  />
+</div>
+
+<div class="showcase-item">
+  <h2>List Editor</h2>
+  <div>
+    <input id="is-editable-checkbox" type="checkbox" bind:checked={isEditable} />
+    <label for="is-editable-checkbox">Editable</label>
+  </div>
+  <div>
+    <input id="percentages-mode-checkbox" type="checkbox" bind:checked={weightsMode} />
+    <label for="percentages-mode-checkbox">Weights mode</label>
+  </div>
+  <div>
+    <input id="allow-eth-addresses-checkbox" type="checkbox" bind:checked={allowAddresses} />
+    <label for="allow-eth-addresses-checkbox">Allow ETH addresses</label>
+  </div>
+  <div>
+    <input id="allow-projects-checkbox" type="checkbox" bind:checked={allowProjects} />
+    <label for="allow-projects-checkbox">Allow projects</label>
+  </div>
+  <div>
+    <input id="allow-drip-lists-checkbox" type="checkbox" bind:checked={allowDripLists} />
+    <label for="allow-drip-lists-checkbox">Allow drip lists</label>
+  </div>
+  <ListEditor
+    weights={{ 1234: 1000000 }}
+    items={{
+      1234: {
+        type: 'address',
+        address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        rightComponent: {
+          component: PropsOnlyButton,
+          props: {
+            label: 'Right button',
+            onClick: () => alert('action done'),
+            buttonProps: {
+              icon: User,
+              size: 'small',
+            },
+          },
+        },
+      },
+    }}
+    {isEditable}
+    {allowAddresses}
+    {allowDripLists}
+    {allowProjects}
+    {weightsMode}
+  />
+</div>
 
 <div class="showcase-item">
   <h2>Highlight</h2>
@@ -416,7 +489,11 @@
 
 <div class="showcase-item">
   <h2>Splits</h2>
-  <SplitsComponent list={mockSplits} />
+  <div>
+    <input id="splits-draft-mode" type="checkbox" bind:checked={draftMode} />
+    <label for="splits-draft-mode">Draft</label>
+  </div>
+  <SplitsComponent list={mockSplits} draft={draftMode} />
 </div>
 
 <div class="showcase-item" style="max-width: 16rem">

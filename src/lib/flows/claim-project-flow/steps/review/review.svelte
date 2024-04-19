@@ -72,13 +72,13 @@
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
     $context.dependencySplits.items,
-    $context.dependencySplits.percentages,
+    $context.dependencySplits.weights,
     $context.highLevelPercentages['dependencies'],
   );
 
   $: maintainerRepresentationalSplits = mapSplitsFromListEditorData(
     $context.maintainerSplits.items,
-    $context.maintainerSplits.percentages,
+    $context.maintainerSplits.weights,
     $context.highLevelPercentages['maintainers'],
   );
 

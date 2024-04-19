@@ -74,7 +74,7 @@ services:
       postgres_pass: postgres
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
-      ethereum: "goerli:http://testnet:8545"
+      ethereum: "sepolia:http://testnet:8545"
       GRAPH_LOG: info
 
   subgraph-deployer:
