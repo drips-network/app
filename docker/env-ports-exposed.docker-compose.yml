@@ -19,3 +19,7 @@ services:
     ports: [3000:3000]
   redis:
     ports: [6379:6379]
+  postgres-multiplayer:
+    ports: [5434:5432]
+  multiplayer:
+    ports: [5002:5002]
