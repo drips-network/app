@@ -146,9 +146,6 @@
         <UlIconLi icon={ArrowUp}
           >You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.</UlIconLi
         >
-        <UlIconLi icon={Proposals}
-          >Start <span class="typo-text-bold">another voting round</span> to update recipients anytime.</UlIconLi
-        >
         <UlIconLi icon={Pen}
           ><span class="typo-text-bold">Edit your Drip List</span> anytime.</UlIconLi
         >
