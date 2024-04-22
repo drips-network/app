@@ -463,22 +463,24 @@
             emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
           >
             <div class="card">
-              <div class="outgoing-splits">
+              <div class="p-6">
                 <ProjectBadge {project} />
-                <SplitsComponent
-                  list={[
-                    {
-                      __typename: 'SplitGroup',
-                      name: 'Maintainers',
-                      list: project.splits.maintainers,
-                    },
-                    {
-                      __typename: 'SplitGroup',
-                      name: 'Dependencies',
-                      list: project.splits.dependencies,
-                    },
-                  ]}
-                />
+                <div class="pl-3.5 mt-2.5">
+                  <SplitsComponent
+                    list={[
+                      {
+                        __typename: 'SplitGroup',
+                        name: 'Maintainers',
+                        list: project.splits.maintainers,
+                      },
+                      {
+                        __typename: 'SplitGroup',
+                        name: 'Dependencies',
+                        list: project.splits.dependencies,
+                      },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
           </SectionSkeleton>
@@ -608,10 +610,6 @@
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
-  }
-
-  .outgoing-splits {
-    padding: 1.5rem;
   }
 
   .unclaimed-funds-section {
