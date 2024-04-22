@@ -380,12 +380,12 @@
         {#await earnedFunds}
           <div class="flex gap-4">
             <div
-              class="stat border rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
+              class="stat shadow-low rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
             >
               <Spinner />
             </div>
             <div
-              class="stat border rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
+              class="stat shadow-low rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
             >
               <Spinner />
             </div>
@@ -393,7 +393,7 @@
         {:then earnedFundsResult}
           <div class="stats" in:fade|local={{ duration: 300 }}>
             {#if earnedFundsResult}
-              <div class="stat">
+              <div class="stat shadow-low rounded-drip-lg">
                 <KeyValuePair key="Donations">
                   <AggregateFiatEstimate amounts={earnedFundsResult} />
                 </KeyValuePair>
@@ -401,7 +401,7 @@
             {/if}
             <!-- ("Supporters" stat) -->
             {#if [project.support].flat().length > 0}
-              <a class="stat" href="#support">
+              <a class="stat btn-theme-outlined" href="#support">
                 <KeyValuePair key="Supporters">
                   <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
                 </KeyValuePair>
@@ -409,7 +409,7 @@
             {/if}
             <!-- ("Splits with" stat) -->
             {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
-              <a class="stat" href="#splits">
+              <a class="stat btn-theme-outlined" href="#splits">
                 <KeyValuePair key="Splits with">
                   <Pile
                     maxItems={4}
@@ -584,8 +584,8 @@
 
   .stats {
     width: calc(100% + 32px);
-    margin-left: -16px;
-    padding: 0 16px;
+    margin: -16px 0 -16px -16px;
+    padding: 16px;
     overflow: scroll;
     white-space: nowrap;
   }
@@ -593,8 +593,6 @@
   .stats .stat {
     display: inline-flex;
     padding: 1rem;
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
     min-height: 6.125rem;
   }
   .stats .stat + .stat {

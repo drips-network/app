@@ -14,3 +14,7 @@
 .btn-theme-transparent {
   @apply mouse:hover:bg-foreground-level-1 focus:bg-foreground-level-1 focus:ring-2 focus-visible:outline-none focus-visible:text-foreground focus:ring-foreground-level-4 transition duration-300;
 }
+
+.btn-theme-outlined {
+  @apply shadow-low rounded-drip-lg mouse:hover:shadow-md transform mouse:hover:-translate-y-[3px] transition duration-150 focus-visible:-translate-y-[3px] focus-visible:shadow-md focus-visible:outline-none;
+}
