@@ -42,7 +42,6 @@
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import SupportCard, {
     SUPPORT_CARD_PROJECT_FRAGMENT,
   } from '$lib/components/support-card/support-card.svelte';
@@ -109,6 +108,7 @@
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -430,7 +430,7 @@
       {#if isClaimed(project)}
         <section id="splits" class="app-section">
           <SectionHeader
-            icon={SplitsIcon}
+            icon={DripList}
             label="Splits"
             actions={isOwnProject
               ? [
