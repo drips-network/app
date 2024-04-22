@@ -241,6 +241,12 @@ export default function transact(
           wrappersWithGas.forEach((wrapper, i) => {
             if (!wrapper.applyGasBuffer) return;
 
+            if (simulationRes.error) {
+              // eslint-disable-next-line no-console
+              console.error('Unable to apply gas buffer.', simulationRes.error);
+              return;
+            }
+
             const res = simulationRes.simulation_results[i];
             const gasUsed = res.simulation.gas_used;
 
