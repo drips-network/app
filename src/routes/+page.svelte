@@ -164,7 +164,7 @@
                 <CoinAnimation playSound>
                   <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
                 </CoinAnimation>
-                <p>USD Coin</p>
+                <p class="whitespace-nowrap">USD Coin</p>
               </div>
               <p>
                 <span class="green tabular-nums">+1.037574 USDC</span><span class="muted">/sec</span
@@ -181,7 +181,7 @@
                 <CoinAnimation playSound>
                   <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
                 </CoinAnimation>
-                <p>Wrapped Bitcoin</p>
+                <p class="whitespace-nowrap">Wrapped Bitcoin</p>
               </div>
               <p>
                 <span class="green tabular-nums">+0.00181397 WBTC</span><span class="muted"
