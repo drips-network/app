@@ -36,10 +36,10 @@
 
   let searchTerm = '';
   $: filteredEmoji = emoji.filter((e) => {
-    let { tags, description, aliases, unicode } = e;
+    let { tags, description, aliases } = e;
 
-    return [...tags, ...aliases, description, unicode].some((a) =>
-      a.toLowerCase().includes(searchTerm.toLowerCase()),
+    return [...tags, ...aliases, description].some((a) =>
+      a.toLowerCase().startsWith(searchTerm.toLowerCase()),
     );
   });
 
@@ -90,7 +90,7 @@
     />
   </FormField>
 
-  <TabbedBox bind:activeTab ariaLabel="Avatar settings" border={true}>
+  <TabbedBox bind:activeTab ariaLabel="Avatar settings">
     <svelte:fragment slot="tab-1">
       <input class="emoji-search-input" type="text" bind:value={searchTerm} placeholder="Search…" />
       <div class="emojis-container">
