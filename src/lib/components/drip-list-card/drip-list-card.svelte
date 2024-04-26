@@ -87,6 +87,7 @@
   import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer/multiplayer';
   import { writable } from 'svelte/store';
   import { BASE_URL } from '$lib/utils/base-url';
+  import twemoji from '$lib/utils/twemoji';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -105,6 +106,9 @@
   $: listOwner = dripList?.owner;
   $: dripListUrl = dripList && `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
+
+  $: title = (dripList?.name || votingRound?.name) ?? unreachable();
+  $: description = (dripList?.description || votingRound?.description) ?? '';
 
   /*
     On mount, ensure the streams store has fetched the owner's account so that we can be sure that
@@ -199,9 +203,9 @@
         <h1 class="title">
           <a
             href={dripListUrl}
-            class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded"
+            class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded twemoji-text"
           >
-            {(dripList?.name || votingRound?.name) ?? unreachable()}
+            {@html twemoji(title)}
           </a>
         </h1>
         <div class="flex items-center gap-4 -my-1">
@@ -213,10 +217,10 @@
           {/if}
         </div>
       </div>
-      {#if (dripList?.description ?? votingRound?.description ?? '').length > 0}
-        <div class="description">
+      {#if description.length > 0}
+        <div class="description twemoji-text">
           <TextExpandable isExpandable={true}>
-            {dripList?.description || votingRound?.description}
+            {@html twemoji(description)}
           </TextExpandable>
         </div>
       {/if}
