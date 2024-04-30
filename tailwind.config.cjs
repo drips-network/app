@@ -8,6 +8,9 @@ module.exports = {
         'sm': '540px',
         'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
       },
+      spacing: {
+        18: '4.5rem',
+      },
       colors: {
         'primary': 'var(--color-primary)',
         'primary-level-1': 'var(--color-primary-level-1)',
@@ -36,6 +39,7 @@ module.exports = {
       },
       fontFamily: {
         mono: 'var(--typeface-mono-regular), monospace',
+        pixelated: '"Redaction 50", Times, serif',
       },
       fontSize: {
         // from typography.css

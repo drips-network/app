@@ -66,7 +66,7 @@
 
   @media (min-width: 1280px) {
     .lp-total-dripped-badge {
-      font-size: 40px;
+      font-size: 20px;
     }
   }
 </style>

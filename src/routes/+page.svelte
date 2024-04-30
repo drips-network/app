@@ -5,13 +5,9 @@
   import { goto } from '$app/navigation';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { onMount } from 'svelte';
-  import LpHero from '$lib/components/illustrations/lp-hero.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Globe from '$lib/components/icons/Globe.svelte';
-  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import LpInterstitialIllustration1 from '$lib/components/illustrations/lp-interstitial-illustration-1.svelte';
-  import LpDripListIllustration from '$lib/components/illustrations/lp-drip-list-illustration.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
   import LpCard from './components/lp-card/lp-card.svelte';
   import ImageAndCaption from './components/image-and-caption.svelte';
@@ -24,10 +20,16 @@
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import buildUrl from '$lib/utils/build-url';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
-  import DripList from '$lib/components/illustrations/drip-list.svelte';
   import LpFooter from './components/lp-footer.svelte';
   import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
   import type { PageData } from './$types';
+  import LpHeroBigGraph from '$lib/components/illustrations/lp-hero-big-graph.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import Registered from '$lib/components/icons/Registered.svelte';
+  import LpQuadsparkle from '$lib/components/illustrations/lp-quadsparkle.svelte';
+  import LpDripListCardTemp from '$lib/components/illustrations/lp-drip-list-card-temp.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
+  import LpDripListsHowItWorks from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works.svelte';
 
   export let data: PageData;
 
@@ -57,7 +59,25 @@
 <LpHeader />
 <div class="page">
   <div class="wrapper">
-    <div class="hero">
+    <div class="relative">
+      <LpHeroBigGraph />
+      <div class="absolute overlay flex items-center justify-center">
+        <div class="flex flex-col gap-7">
+          <div class="flex w-full justify-center">
+            <LpTotalDrippedBadge prices={data.prices} />
+          </div>
+          <h1 class="font-pixelated bg-background text-center">
+            Continuously fund your critical dependencies.
+          </h1>
+          <div class="flex gap-2 justify-center w-full">
+            <Button icon={DripListIcon} variant="primary">Start a Drip List</Button>
+            <Button icon={Registered} variant="primary">Claim your repo</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="hero">
       <div class="text">
         <h1>Funding that flows</h1>
         <p>A decentralized toolkit for funding your critical software dependencies.</p>
@@ -76,13 +96,89 @@
           </div>
         {/if}
       </figure>
-    </div>
+    </div> -->
+
+    <section>
+      <div class="flex flex-col items-center gap-10 pt-9">
+        <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+          <LpQuadsparkle />
+          <h2 class="font-pixelated text-typo-header-1">Introducing Drips Lists</h2>
+          <LpQuadsparkle />
+        </header>
+
+        <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+          <p class="text-typo-header-3">Send money to a curated list of recipients</p>
+          <p>
+            Imagine giving back to your favorite projects or curating a list of people you want to
+            support or sustainably distributing tokens over time or even streaming salaries in real
+            time — this is all possible with Drip Lists.
+          </p>
+        </div>
+
+        <!-- TEMP -->
+        <LpDripListCardTemp />
+      </div>
+    </section>
+
+    <div class="section-spacer" />
+
+    <section>
+      <div class="flex flex-col items-center gap-10 pt-9">
+        <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+          <LpQuadsparkle />
+          <h2 class="font-pixelated text-typo-header-1">How Drip Lists work</h2>
+          <LpQuadsparkle />
+        </header>
+
+        <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+          <p>
+            Work with a group or build a list by yourself to build a list of recipients to fund for
+            any purpose you can think of.
+          </p>
+        </div>
+
+        <div class="flex gap-4 items-center">
+          By yourself
+          <Toggle checked={true} />
+          Collaborative
+        </div>
+
+        <LpDripListsHowItWorks />
+      </div>
+    </section>
+
+    <div class="section-spacer" />
+
+    <section>
+      <div class="flex flex-col gap-10">
+        <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+          <LpQuadsparkle />
+          <h2
+            class="font-pixelated text-typo-header-1 text-center leading-tight"
+            style="max-width: calc(454/36 * 1em)"
+          >
+            An ecosystem for supporting any repo on GitHub
+          </h2>
+          <LpQuadsparkle />
+        </header>
+
+        <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+          <p class="text-typo-header-3">Effortlessly supporting open source</p>
+          <p>
+            Empower your contributions by supporting any GitHub repository with Drips, effortlessly
+            directing funds to projects you believe in.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-spacer" />
 
     <section class="card two-column">
       <div class="anchor" id="get-funding" />
       <div class="section-inner">
         <div class="text">
-          <h2>Get the funds you need for your project</h2>
+          <h2 class="section-header-huge">Get the funds you need for your project</h2>
           <p>
             On Drips, your open-source projects earn funds from direct supporters, as well as other
             projects that depend on yours.
@@ -202,75 +298,6 @@
       </div>
     </section>
 
-    <section class="card two-column">
-      <div class="anchor" id="fund-projects" />
-      <div class="section-inner">
-        <div class="illustration framed">
-          <LpDripListIllustration />
-        </div>
-        <div class="text">
-          <h2>Pass it on: Support your software dependencies</h2>
-          <p>
-            Create your Drip List to fund the projects you depend on. Ensure their sustainable
-            development, stability, security and continuous improvement.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <div class="section-spacer" />
-
-    <section class="two-column">
-      <div class="section-inner">
-        <div class="text centered">
-          <h3>How Drip Lists work</h3>
-          <div class="how-it-works">
-            <div class="item">
-              <div class="count">1</div>
-              <h5>Make a list</h5>
-              <p class="typo-text-small">
-                Find and support any GitHub project or Ethereum address.
-              </p>
-            </div>
-            <div class="item">
-              <div class="count">2</div>
-              <h5>Set your splits</h5>
-              <p class="typo-text-small">
-                Decide on what projects receive what percentage of your budget.
-              </p>
-            </div>
-            <div class="item">
-              <div class="count">3</div>
-              <h5>Support it</h5>
-              <p class="typo-text-small">
-                Send a continuous stream of any ERC-20 token to your Drip List.
-              </p>
-            </div>
-            <div class="item">
-              <div class="count">4</div>
-              <h5>Show it off</h5>
-              <p class="typo-text-small">Drip Lists are public on your profile. Be proud!</p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="illustration-background top" />
-          <div class="illustration">
-            <DripList />
-          </div>
-          <div class="text">
-            <h3>Start your Drip List</h3>
-            <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
-            <Button variant="primary" size="large" href="/app/funder-onboarding" target="_blank"
-              >Create your Drip List</Button
-            >
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="section-spacer" />
-
     <section class="grid">
       <LpCard
         ><ImageAndCaption background>
@@ -316,7 +343,7 @@
     <section>
       <LpSectionHeader>
         <div class="socials">
-          <h2>Stay up to date</h2>
+          <h2 class="section-header-huge">Stay up to date</h2>
           <div class="flex gap-4">
             <Button
               variant="primary"
@@ -371,11 +398,11 @@
   /* TYPOGRAPHY */
 
   h1 {
-    font-size: 80px;
-    line-height: 80px;
+    line-height: min(75px, 5.2vw);
+    font-size: min(56px, 3.88vw);
   }
 
-  h2 {
+  .section-header-huge {
     font-family: 'Redaction 50', Times, serif;
     line-height: min(60px, 5vw);
     font-size: min(60px, 5vw);
@@ -406,7 +433,7 @@
   }
 
   @media (max-width: 819px) {
-    h2 {
+    .section-header-huge {
       font-size: 36px;
       line-height: 36px;
     }
@@ -467,7 +494,7 @@
   /* SECTIONS */
 
   .section-spacer {
-    height: 3rem;
+    height: 4.5rem;
   }
 
   section {

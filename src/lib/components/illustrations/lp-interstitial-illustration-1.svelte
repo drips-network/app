@@ -6,10 +6,6 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   >{@html `
   <path
-    d="M288.25 670.5H329.25C342.505 670.5 353.25 681.245 353.25 694.5V754"
-    stroke="var(--color-foreground)"
-  />
-  <path
     d="M54.0005 541.5L54.0005 206.5C54.0005 193.245 64.7456 182.5 78.0005 182.5H1014.5"
     stroke="var(--color-foreground)"
   />
