@@ -192,6 +192,7 @@
     !setStartAndEndDate ||
     (combinedStartDate &&
       combinedEndDate &&
+      combinedStartDate.getTime() > new Date().getTime() &&
       combinedStartDate?.getTime() < combinedEndDate?.getTime());
 
   $: formValid =
