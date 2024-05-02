@@ -13,7 +13,7 @@ export default (dripListId: string) => ({
       component: SuccessStep,
       props: {
         message:
-          'Your support stream has successfully been created. Please refresh the app to see your changes.',
+          'Your continuous donation was created successfully. Please refresh the app to see your changes.',
       },
     }),
   ],
