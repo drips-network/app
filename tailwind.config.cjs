@@ -6,6 +6,7 @@ module.exports = {
       screens: {
         'xs': '440px', /* just above most phones in portrait-mode */
         'sm': '540px',
+        'mlg': '896px',
         'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
       },
       spacing: {

@@ -59,17 +59,28 @@
 <LpHeader />
 <div class="page">
   <div class="wrapper">
-    <div class="relative">
-      <LpHeroBigGraph />
+    <!-- hero graph -->
+    <div class="relative mb-24 mlg:mb-9">
+      <div class="flex w-full justify-center overflow-hidden">
+        <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
+          <LpHeroBigGraph />
+        </div>
+      </div>
       <div class="absolute overlay flex items-center justify-center">
-        <div class="flex flex-col gap-7">
+        <div class="flex flex-col gap-4 mlg:gap-7">
           <div class="flex w-full justify-center">
             <LpTotalDrippedBadge prices={data.prices} />
           </div>
-          <h1 class="font-pixelated bg-background text-center">
-            Continuously fund your critical dependencies.
+          <h1
+            class="font-pixelated text-center text-[36px] md:text-[5.2vw] md:text-[3.88vw] xl:text-[3.75rem] leading-[1.15]"
+          >
+            {#each 'Continuously fund your critical dependencies.'.split(' ') as word}<div
+                class="inline-block bg-background"
+              >
+                {word}&nbsp;
+              </div>{/each}
           </h1>
-          <div class="flex gap-2 justify-center w-full">
+          <div class="flex flex-wrap gap-1 justify-center w-full">
             <Button icon={DripListIcon} variant="primary">Start a Drip List</Button>
             <Button icon={Registered} variant="primary">Claim your repo</Button>
           </div>
@@ -77,32 +88,11 @@
       </div>
     </div>
 
-    <!-- <div class="hero">
-      <div class="text">
-        <h1>Funding that flows</h1>
-        <p>A decentralized toolkit for funding your critical software dependencies.</p>
-        <div class="actions">
-          <Button href="#fund-projects" icon={TokenStreams}>Fund your dependencies</Button>
-          <Button href="#get-funding" icon={Globe}>Get support for your project</Button>
-        </div>
-      </div>
-      <figure class="relative flex-1">
-        <div class="illustration">
-          <LpHero />
-        </div>
-        {#if data.prices}
-          <div class="absolute overlay z-10 flex items-center justify-center">
-            <LpTotalDrippedBadge prices={data.prices} />
-          </div>
-        {/if}
-      </figure>
-    </div> -->
-
     <section>
-      <div class="flex flex-col items-center gap-10 pt-9">
+      <div class="flex flex-col items-center gap-10">
         <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
           <LpQuadsparkle />
-          <h2 class="font-pixelated text-typo-header-1">Introducing Drips Lists</h2>
+          <h2 class="typo-header-1">Introducing Drips Lists</h2>
           <LpQuadsparkle />
         </header>
 
@@ -126,7 +116,7 @@
       <div class="flex flex-col items-center gap-10 pt-9">
         <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
           <LpQuadsparkle />
-          <h2 class="font-pixelated text-typo-header-1">How Drip Lists work</h2>
+          <h2 class="typo-header-1">How Drip Lists work</h2>
           <LpQuadsparkle />
         </header>
 
@@ -153,10 +143,7 @@
       <div class="flex flex-col gap-10">
         <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
           <LpQuadsparkle />
-          <h2
-            class="font-pixelated text-typo-header-1 text-center leading-tight"
-            style="max-width: calc(454/36 * 1em)"
-          >
+          <h2 class="typo-header-1 text-center" style="max-width: calc(454/36 * 1em)">
             An ecosystem for supporting any repo on GitHub
           </h2>
           <LpQuadsparkle />
@@ -397,10 +384,10 @@
 
   /* TYPOGRAPHY */
 
-  h1 {
+  /* h1 {
     line-height: min(75px, 5.2vw);
     font-size: min(56px, 3.88vw);
-  }
+  } */
 
   .section-header-huge {
     font-family: 'Redaction 50', Times, serif;
@@ -504,6 +491,7 @@
     padding: 0 1rem;
     margin: 0 auto;
     position: relative;
+    text-align: center;
   }
 
   section .section-inner {
