@@ -7,12 +7,11 @@
   };
 
   export let ariaLabel: string;
-  export let border = false;
 
   export let activeTab = 'tab-1';
 </script>
 
-<div class="tabbed-box whitespace-nowrap relative {border ? 'border rounded-drip-lg' : 'border-t'}">
+<div class="tabbed-box whitespace-nowrap">
   <div class="tabs">
     <SegmentedControl
       bind:active={activeTab}
@@ -38,7 +37,10 @@
 
 <style>
   .tabbed-box {
+    border-top: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
     margin-top: 21px;
+    position: relative;
   }
 
   .tabs {
