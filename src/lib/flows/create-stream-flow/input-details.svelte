@@ -255,7 +255,7 @@
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
-    headline={receiver ? 'Create a Support Stream' : 'Create stream'}
+    headline={receiver ? 'Start a Continuous Donation' : 'Create stream'}
     description="Stream any ERC-20 token from your Drips account."
   />
   {#if !nameInputHidden}
