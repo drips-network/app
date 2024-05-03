@@ -116,50 +116,91 @@
 
     <div class="section-spacer" />
 
-    <section>
-      <div class="flex flex-col items-center gap-10 pt-9">
-        <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
-          <LpQuadsparkle />
-          <h2 class="typo-header-1">How Drip Lists work</h2>
-          <LpQuadsparkle />
-        </header>
+    <div class="relative">
+      <section>
+        <div class="flex flex-col items-center gap-10 pt-9">
+          <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+            <LpQuadsparkle />
+            <h2 class="typo-header-1">How Drip Lists work</h2>
+            <LpQuadsparkle />
+          </header>
 
-        <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
-          <p>
-            Work with a group or build a list by yourself to build a list of recipients to fund for
-            any purpose you can think of.
-          </p>
+          <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+            <p>
+              Work with a group or build a list by yourself to build a list of recipients to fund
+              for any purpose you can think of.
+            </p>
+          </div>
+
+          <div class="flex gap-4 items-center">
+            By yourself
+            <Toggle bind:checked={collabVisible} />
+            Collaborative
+          </div>
+
+          <TransitionedHeight transitionHeightChanges>
+            <!-- mobile: no fade, height transitions -->
+            <!-- laptop (lg): cross-fade -->
+            <section class="relative">
+              <div
+                class="{!collabVisible
+                  ? 'hidden lg:block opacity-0 pointer-events-none '
+                  : ''} transition duration-200"
+              >
+                <LpDripListsHowItWorksMultiplayer />
+              </div>
+
+              <div
+                class="{collabVisible
+                  ? 'hidden lg:block opacity-0 pointer-events-none '
+                  : ''} transition duration-200 lg:absolute overlay"
+              >
+                <LpDripListsHowItWorksSolo />
+              </div>
+            </section>
+          </TransitionedHeight>
         </div>
+      </section>
 
-        <div class="flex gap-4 items-center">
-          By yourself
-          <Toggle bind:checked={collabVisible} />
-          Collaborative
+      <!-- background (upper) -->
+      <div class="absolute top-0 left-0 w-full flex justify-center overflow-hidden">
+        <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
+          <svg
+            width="100%"
+            viewBox="0 0 1440 605"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio
+          >
+            <path
+              d="M1314.41 409H1351.5C1360.34 409 1367.5 416.163 1367.5 425V577"
+              stroke="black"
+            />
+            <path
+              d="M1440 46H1295C1286.16 46 1279 53.1634 1279 62V393C1279 401.837 1286.16 409 1295 409H1440"
+              stroke="black"
+            />
+            <path
+              d="M278 47.5V170.643C278 183.898 267.255 194.643 254 194.643H104.5C91.2452 194.643 80.5 205.389 80.5 218.643V509"
+              stroke="black"
+            />
+            <path
+              d="M0 74.6434H56.5C69.7548 74.6434 80.5 85.3885 80.5 98.6434V580.143C80.5 593.398 69.7548 604.143 56.5 604.143H0"
+              stroke="black"
+            />
+            <rect x="56.5" y="326.143" width="47" height="47" rx="23.5" fill="#B5E5FD" />
+            <rect x="56.5" y="326.143" width="47" height="47" rx="23.5" stroke="#28333D" />
+            <path d="M66.5 363.533H93.5V336.533H66.5V363.533Z" fill="black" />
+            <rect x="1344" y="540.5" width="47" height="47" rx="23.5" fill="#B5E5FD" />
+            <rect x="1344" y="540.5" width="47" height="47" rx="23.5" stroke="#28333D" />
+            <path d="M1354 577.89H1381V550.89H1354V577.89Z" fill="black" />
+            <rect x="256" y="0.5" width="47" height="47" rx="23.5" fill="#F5E2BC" />
+            <rect x="256" y="0.5" width="47" height="47" rx="23.5" stroke="#28333D" />
+            <path d="M266 32.89H293V5.89H266V32.89Z" fill="black" />
+          </svg>
         </div>
-
-        <TransitionedHeight transitionHeightChanges>
-          <!-- mobile: no fade, height transitions -->
-          <!-- laptop (lg): cross-fade -->
-          <section class="relative">
-            <div
-              class="{!collabVisible
-                ? 'hidden lg:block opacity-0 pointer-events-none '
-                : ''} transition duration-200"
-            >
-              <LpDripListsHowItWorksMultiplayer />
-            </div>
-
-            <div
-              class="{collabVisible
-                ? 'hidden lg:block opacity-0 pointer-events-none '
-                : ''} transition duration-200 lg:absolute overlay"
-            >
-              <LpDripListsHowItWorksSolo />
-            </div>
-          </section>
-        </TransitionedHeight>
       </div>
-    </section>
+    </div>
 
     <div class="section-spacer" />
 
