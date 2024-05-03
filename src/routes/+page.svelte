@@ -29,7 +29,9 @@
   import LpQuadsparkle from '$lib/components/illustrations/lp-quadsparkle.svelte';
   import LpDripListCardTemp from '$lib/components/illustrations/lp-drip-list-card-temp.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
-  import LpDripListsHowItWorks from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works.svelte';
+  import LpDripListsHowItWorksSolo from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-solo.svelte';
+  import LpDripListsHowItWorksMultiplayer from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-multiplayer.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
 
   export let data: PageData;
 
@@ -52,6 +54,8 @@
 
   let claimProjectInput = '';
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
+
+  let collabVisible = true;
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
@@ -129,11 +133,31 @@
 
         <div class="flex gap-4 items-center">
           By yourself
-          <Toggle checked={true} />
+          <Toggle bind:checked={collabVisible} />
           Collaborative
         </div>
 
-        <LpDripListsHowItWorks />
+        <TransitionedHeight transitionHeightChanges>
+          <!-- mobile: no fade, height transitions -->
+          <!-- laptop (lg): cross-fade -->
+          <section class="relative">
+            <div
+              class="{!collabVisible
+                ? 'hidden lg:block opacity-0 pointer-events-none '
+                : ''} transition duration-200"
+            >
+              <LpDripListsHowItWorksMultiplayer />
+            </div>
+
+            <div
+              class="{collabVisible
+                ? 'hidden lg:block opacity-0 pointer-events-none '
+                : ''} transition duration-200 lg:absolute overlay"
+            >
+              <LpDripListsHowItWorksSolo />
+            </div>
+          </section>
+        </TransitionedHeight>
       </div>
     </section>
 

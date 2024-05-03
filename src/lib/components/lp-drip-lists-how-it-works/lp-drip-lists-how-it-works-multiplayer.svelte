@@ -1,27 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import Button from '../button/button.svelte';
   import { goto } from '$app/navigation';
+  import ResponsiveFlowChart, { type Step } from './responsive-flow-chart.svelte';
 
-  // this svg is the boxes and lines of the zig zag 'how it works' graphic
-  // think the approach is to onMounted, calc the box positions, then absolute position some divs with text to those positions
-  // for mobile just hide the svg and stack the divs (and add borders)
-
-  let svgEl: SVGElement;
-  const boxPaths: SVGPathElement[] = [];
-
-  interface Step {
-    heading: string;
-    text: string;
-    position?: Pick<DOMRect, 'top' | 'left' | 'width' | 'height'>;
-    customClasses?: string;
-    button?: {
-      text: string;
-      handler: () => void;
-    };
-  }
-
-  const steps: Step[] = [
+  let steps: Step[] = [
     {
       heading: 'Choose collaborators',
       text: 'Add anyone with an Ethereum address. These collaborators will vote on the final recipients.',
@@ -30,6 +11,7 @@
       heading: 'Nominate recipients',
       text: 'Each collaborator can nominate any Ethereum address or GitHub project.',
       customClasses: 'border-dashed',
+      isOptional: true,
     },
     {
       heading: 'Vote on recipients',
@@ -53,66 +35,44 @@
       },
     },
   ];
-
-  const positionBoxes = () => {
-    const svgBox = svgEl.getBoundingClientRect();
-    boxPaths.forEach((el, i) => {
-      let { top, left, width, height } = el.getBoundingClientRect();
-      if (!width) {
-        // svg is hidden on mobile
-        steps[i].position = undefined;
-        return;
-      }
-      top = top - svgBox.top;
-      left = left - svgBox.left;
-      steps[i].position = { top, left, width, height };
-    });
-  };
-
-  onMount(() => {
-    positionBoxes();
-  });
 </script>
 
-<svelte:window on:resize={positionBoxes} />
-
-<section class="relative w-full max-w-[1110px] mx-auto">
+<ResponsiveFlowChart bind:steps>
   <svg
-    bind:this={svgEl}
-    class="hidden lg:block w-full"
+    width="100%"
     viewBox="0 0 1110 1584"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio
   >
     <path
-      bind:this={boxPaths[0]}
+      bind:this={steps[0].path}
       d="M24 1.02039H479.5V305.52C479.5 318.499 468.979 329.02 456 329.02H24C11.0213 329.02 0.5 318.499 0.5 305.52V24.5204C0.5 11.5417 11.0213 1.02039 24 1.02039Z"
       stroke="var(--color-foreground)"
     />
     <path
-      bind:this={boxPaths[1]}
+      bind:this={steps[1].path}
       d="M601 185.02H1056.5V489.52C1056.5 502.499 1045.98 513.02 1033 513.02H601C588.021 513.02 577.5 502.499 577.5 489.52V208.52C577.5 195.542 588.021 185.02 601 185.02Z"
       stroke-dasharray="4 4"
       stroke="var(--color-foreground)"
     />
     <path
-      bind:this={boxPaths[2]}
+      bind:this={steps[2].path}
       d="M24 482.02H479.5V786.52C479.5 799.499 468.979 810.02 456 810.02H24C11.0213 810.02 0.5 799.499 0.5 786.52V505.52C0.5 492.542 11.0213 482.02 24 482.02Z"
       stroke="var(--color-foreground)"
     />
     <path
-      bind:this={boxPaths[3]}
+      bind:this={steps[3].path}
       d="M601 666.02H1056.5V970.52C1056.5 983.499 1045.98 994.02 1033 994.02H601C588.021 994.02 577.5 983.499 577.5 970.52V689.52C577.5 676.542 588.021 666.02 601 666.02Z"
       stroke="var(--color-foreground)"
     />
     <path
-      bind:this={boxPaths[4]}
+      bind:this={steps[4].path}
       d="M24 963.02H479.5V1267.52C479.5 1280.5 468.979 1291.02 456 1291.02H24C11.0213 1291.02 0.5 1280.5 0.5 1267.52V986.52C0.5 973.542 11.0213 963.02 24 963.02Z"
       stroke="var(--color-foreground)"
     />
     <path
-      bind:this={boxPaths[5]}
+      bind:this={steps[5].path}
       d="M546.5 1255.02H1109V1567.52C1109 1576.08 1102.06 1583.02 1093.5 1583.02H546.5C537.94 1583.02 531 1576.08 531 1567.52V1270.52C531 1261.96 537.94 1255.02 546.5 1255.02Z"
       stroke="var(--color-foreground)"
       fill="var(--color-primary-level-1)"
@@ -139,28 +99,4 @@
     <path d="M577 884.643H257C248.163 884.643 241 877.48 241 868.643V809.643" stroke="#28333D" />
     <path d="M568 894.52L578 884.52L568 874.52" stroke="#28333D" />
   </svg>
-
-  <ol class="flex flex-col items-center gap-6 lg:block">
-    <!-- mobile: stack of bordered-boxes -->
-    <!-- lg/laptop: position inside the SVG's outlined boxes -->
-    {#each steps as step}
-      <li
-        class="flex flex-col px-8 py-12 gap-6 items-center justify-center text-center rounded-drip-lg border w-full max-w-[480px] lg:border-none lg:absolute lg:py-0 lg:gap-4 lg:max-w-none {step.customClasses ??
-          ''}"
-        style={!step.position
-          ? ''
-          : Object.entries(step.position)
-              .map((entry) => `${entry[0]}: ${entry[1]}px`)
-              .join(';')}
-        data-step={step.position?.width}
-      >
-        <figure class="h-30 w-30 bg-gray-100" />
-        <h3 class="text-typo-header-1 font-pixelated leading-[1]">{step.heading}</h3>
-        <p>{step.text}</p>
-        {#if step.button}
-          <Button variant="primary" on:click={step.button.handler}>{step.button.text}</Button>
-        {/if}
-      </li>
-    {/each}
-  </ol>
-</section>
+</ResponsiveFlowChart>
