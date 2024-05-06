@@ -23,6 +23,14 @@
   const radius = 3;
   const maxDrips = 3;
 
+  function generateRandomUniqueInt(min: number, max: number, excludedNumbers: number[]) {
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    while (excludedNumbers.includes(num)) {
+      num = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    return num;
+  }
+
   function animate(timestamp: number) {
     if (!start) {
       start = timestamp;
@@ -31,7 +39,11 @@
     if (currentDrips.length < Math.min(paths.length, maxDrips)) {
       currentDrips.push({
         startTimestamp: timestamp,
-        pathIndex: Math.floor(Math.random() * paths.length),
+        pathIndex: generateRandomUniqueInt(
+          0,
+          paths.length,
+          currentDrips.map((drip) => drip.pathIndex),
+        ),
         x: undefined,
         y: undefined,
         scale: undefined,
