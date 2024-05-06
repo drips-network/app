@@ -65,7 +65,7 @@
 <div class="page">
   <div class="wrapper">
     <!-- hero graph -->
-    <div class="relative mb-24 mlg:mb-12">
+    <div class="relative">
       <div class="flex w-full justify-center overflow-hidden">
         <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
           <LpHeroBigGraph />
@@ -91,7 +91,7 @@
       </div>
     </div>
 
-    <div class="relative">
+    <div class="relative pt-24 mlg:pt-12 pb-18">
       <section>
         <div class="flex flex-col items-center gap-10">
           <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
@@ -114,6 +114,7 @@
         </div>
       </section>
 
+      <!-- flying coins foreground -->
       <div
         class="absolute z-10 bottom-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
       >
@@ -121,9 +122,26 @@
           <LpIllustrationFlyingCoins />
         </div>
       </div>
-    </div>
 
-    <div class="section-spacer" />
+      <!-- vertical line background -->
+      <div
+        class="absolute overlay flex justify-center"
+        style="top:-24px; height: calc(100% + 24px);"
+      >
+        <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full flex items-start">
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 1440 605"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+          >
+            <path d="M275 0C275 236.267 275 368.733 275 605" stroke="black" />
+          </svg>
+        </div>
+      </div>
+    </div>
 
     <div class="relative">
       <section>
@@ -174,13 +192,7 @@
       <!-- background (upper) -->
       <div class="absolute top-0 left-0 w-full flex justify-center overflow-hidden">
         <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
-          <svg
-            width="100%"
-            viewBox="0 0 1440 605"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio
-          >
+          <svg width="100%" viewBox="0 0 1440 605" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M1314.41 409H1351.5C1360.34 409 1367.5 416.163 1367.5 425V577"
               stroke="black"
@@ -190,7 +202,7 @@
               stroke="black"
             />
             <path
-              d="M278 47.5V170.643C278 183.898 267.255 194.643 254 194.643H104.5C91.2452 194.643 80.5 205.389 80.5 218.643V509"
+              d="M275.06 47.5V170.643C275.06 183.898 264.315 194.643 251.06 194.643H104.5C91.2452 194.643 80.5 205.389 80.5 218.643V509"
               stroke="black"
             />
             <path
@@ -203,9 +215,9 @@
             <rect x="1344" y="540.5" width="47" height="47" rx="23.5" fill="#B5E5FD" />
             <rect x="1344" y="540.5" width="47" height="47" rx="23.5" stroke="#28333D" />
             <path d="M1354 577.89H1381V550.89H1354V577.89Z" fill="black" />
-            <rect x="256" y="0.5" width="47" height="47" rx="23.5" fill="#F5E2BC" />
-            <rect x="256" y="0.5" width="47" height="47" rx="23.5" stroke="#28333D" />
-            <path d="M266 32.89H293V5.89H266V32.89Z" fill="black" />
+            <rect x="251.561" y="0.5" width="47" height="47" rx="23.5" fill="#F5E2BC" />
+            <rect x="251.561" y="0.5" width="47" height="47" rx="23.5" stroke="#28333D" />
+            <path d="M261.561 32.89H288.561V5.89H261.561V32.89Z" fill="black" />
           </svg>
         </div>
       </div>
