@@ -32,6 +32,7 @@
   import LpDripListsHowItWorksSolo from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-solo.svelte';
   import LpDripListsHowItWorksMultiplayer from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-multiplayer.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
 
   export let data: PageData;
 
@@ -64,7 +65,7 @@
 <div class="page">
   <div class="wrapper">
     <!-- hero graph -->
-    <div class="relative mb-24 mlg:mb-9">
+    <div class="relative mb-24 mlg:mb-12">
       <div class="flex w-full justify-center overflow-hidden">
         <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
           <LpHeroBigGraph />
@@ -79,7 +80,7 @@
             class="font-pixelated text-center text-[36px] md:text-[5.2vw] md:text-[3.88vw] xl:text-[3.75rem] leading-[1.15]"
           >
             {#each 'Continuously fund your critical dependencies.'.split(' ') as word}<div
-                class="inline-block bg-background"
+                class="inline-block bg-background leading-none"
               >
                 {word}&nbsp;
               </div>{/each}
@@ -92,27 +93,37 @@
       </div>
     </div>
 
-    <section>
-      <div class="flex flex-col items-center gap-10">
-        <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
-          <LpQuadsparkle />
-          <h2 class="typo-header-1">Introducing Drips Lists</h2>
-          <LpQuadsparkle />
-        </header>
+    <div class="relative">
+      <section>
+        <div class="flex flex-col items-center gap-10">
+          <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+            <LpQuadsparkle />
+            <h2 class="typo-header-1">Introducing Drips Lists</h2>
+            <LpQuadsparkle />
+          </header>
 
-        <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
-          <p class="text-typo-header-3">Send money to a curated list of recipients</p>
-          <p>
-            Imagine giving back to your favorite projects or curating a list of people you want to
-            support or sustainably distributing tokens over time or even streaming salaries in real
-            time — this is all possible with Drip Lists.
-          </p>
+          <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+            <p class="text-typo-header-3">Send money to a curated list of recipients</p>
+            <p>
+              Imagine giving back to your favorite projects or curating a list of people you want to
+              support or sustainably distributing tokens over time or even streaming salaries in
+              real time — this is all possible with Drip Lists.
+            </p>
+          </div>
+
+          <!-- TEMP -->
+          <LpDripListCardTemp />
         </div>
+      </section>
 
-        <!-- TEMP -->
-        <LpDripListCardTemp />
+      <div
+        class="absolute z-10 bottom-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
+      >
+        <div style="flex:0 0 1750px">
+          <LpIllustrationFlyingCoins />
+        </div>
       </div>
-    </section>
+    </div>
 
     <div class="section-spacer" />
 
