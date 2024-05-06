@@ -76,9 +76,7 @@
           <div class="flex w-full justify-center">
             <LpTotalDrippedBadge prices={data.prices} />
           </div>
-          <h1
-            class="font-pixelated text-center text-[36px] md:text-[5.2vw] md:text-[3.88vw] xl:text-[3.75rem] leading-[1.15]"
-          >
+          <h1 class="font-pixelated text-center leading-[1.15] px-2">
             {#each 'Continuously fund your critical dependencies.'.split(' ') as word}<div
                 class="inline-block bg-background leading-none"
               >
@@ -119,7 +117,7 @@
       <div
         class="absolute z-10 bottom-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
       >
-        <div style="flex:0 0 1750px">
+        <div style="flex:0 0 1750px; perspective:1px; transform: translateZ(-1px); ">
           <LpIllustrationFlyingCoins />
         </div>
       </div>
@@ -460,10 +458,24 @@
 
   /* TYPOGRAPHY */
 
-  /* h1 {
-    line-height: min(75px, 5.2vw);
-    font-size: min(56px, 3.88vw);
-  } */
+  h1 {
+    font-size: 2.25rem;
+  }
+  @media (min-width: 726px) {
+    h1 {
+      font-size: 5.2vw;
+    }
+  }
+  @media (min-width: 896px) {
+    h1 {
+      font-size: 3.88vw;
+    }
+  }
+  @media (min-width: 1440px) {
+    h1 {
+      font-size: 3.5rem;
+    }
+  }
 
   .section-header-huge {
     font-family: 'Redaction 50', Times, serif;
