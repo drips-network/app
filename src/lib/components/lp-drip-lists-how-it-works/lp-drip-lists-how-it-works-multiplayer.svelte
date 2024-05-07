@@ -78,26 +78,35 @@
       stroke="var(--color-foreground)"
       fill="var(--color-primary-level-1)"
     />
-    <path d="M530.5 1395.14H233C219.745 1395.14 209 1384.4 209 1371.14V1291.5" stroke="black" />
+    <path
+      d="M530.5 1395.14H233C219.745 1395.14 209 1384.4 209 1371.14V1291.5"
+      stroke="var(--color-foreground)"
+    />
     <rect x="432.5" y="1371.5" width="47" height="47" rx="23.5" fill="#DCFAC8" />
-    <rect x="432.5" y="1371.5" width="47" height="47" rx="23.5" stroke="#28333D" />
+    <rect x="432.5" y="1371.5" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
       d="M480 80.6433H799C807.837 80.6433 815 87.8068 815 96.6433V183.643"
-      stroke="#28333D"
+      stroke="var(--color-foreground)"
       stroke-dasharray="4 4"
     />
-    <path d="M825 174L815 184L805 174" stroke="#28333D" />
-    <path d="M241 328.643V404.643V480.643" stroke="black" />
-    <path d="M251 471L241 481L231 471" stroke="#28333D" />
+    <path d="M825 174L815 184L805 174" stroke="var(--color-foreground)" />
+    <path d="M241 328.643V404.643V480.643" stroke="var(--color-foreground)" />
+    <path d="M251 471L241 481L231 471" stroke="var(--color-foreground)" />
     <path
       d="M482 587.643H799C807.837 587.643 815 580.48 815 571.643V512.643"
-      stroke="#28333D"
+      stroke="var(--color-foreground)"
       stroke-dasharray="4 4"
     />
-    <path d="M492 597.643L482 587.643L492 577.643" stroke="#28333D" />
-    <path d="M480 1069H799C807.837 1069 815 1061.84 815 1053V994" stroke="#28333D" />
-    <path d="M489 1079L479 1069L489 1059" stroke="#28333D" />
-    <path d="M577 884.643H257C248.163 884.643 241 877.48 241 868.643V809.643" stroke="#28333D" />
-    <path d="M568 894.52L578 884.52L568 874.52" stroke="#28333D" />
+    <path d="M492 597.643L482 587.643L492 577.643" stroke="var(--color-foreground)" />
+    <path
+      d="M480 1069H799C807.837 1069 815 1061.84 815 1053V994"
+      stroke="var(--color-foreground)"
+    />
+    <path d="M489 1079L479 1069L489 1059" stroke="var(--color-foreground)" />
+    <path
+      d="M577 884.643H257C248.163 884.643 241 877.48 241 868.643V809.643"
+      stroke="var(--color-foreground)"
+    />
+    <path d="M568 894.52L578 884.52L568 874.52" stroke="var(--color-foreground)" />
   </svg>
 </ResponsiveFlowChart>

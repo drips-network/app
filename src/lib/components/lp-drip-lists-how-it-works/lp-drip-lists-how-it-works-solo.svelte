@@ -46,3 +46,9 @@
     <path d="M568 894L578 884L568 874" stroke="#28333D" />
   </svg>
 </ResponsiveFlowChart>
+
+<style>
+  path[stroke='#28333D'] {
+    stroke: var(--color-foreground);
+  }
+</style>

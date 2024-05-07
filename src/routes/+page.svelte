@@ -156,7 +156,7 @@
             xmlns="http://www.w3.org/2000/svg"
             preserveAspectRatio="none"
           >
-            <path d="M275 0C275 236.267 275 368.733 275 605" stroke="black" />
+            <path d="M275 0C275 236.267 275 368.733 275 605" stroke="var(--color-foreground)" />
           </svg>
         </div>
       </div>
@@ -215,28 +215,49 @@
             <AnimateDripOnSvgPaths pathQueries={['M275.06']}>
               <path
                 d="M1314.41 409H1351.5C1360.34 409 1367.5 416.163 1367.5 425V577"
-                stroke="black"
+                stroke="var(--color-foreground)"
               />
               <path
                 d="M1440 46H1295C1286.16 46 1279 53.1634 1279 62V393C1279 401.837 1286.16 409 1295 409H1440"
-                stroke="black"
+                stroke="var(--color-foreground)"
               />
               <path
                 d="M275.06 47.5V170.643C275.06 183.898 264.315 194.643 251.06 194.643H104.5C91.2452 194.643 80.5 205.389 80.5 218.643V326"
-                stroke="black"
+                stroke="var(--color-foreground)"
               />
               <path
                 d="M0 74.6434H56.5C69.7548 74.6434 80.5 85.3885 80.5 98.6434V580.143C80.5 593.398 69.7548 604.143 56.5 604.143H0"
-                stroke="black"
+                stroke="var(--color-foreground)"
               />
               <rect x="56.5" y="326.143" width="47" height="47" rx="23.5" fill="#B5E5FD" />
-              <rect x="56.5" y="326.143" width="47" height="47" rx="23.5" stroke="#28333D" />
+              <rect
+                x="56.5"
+                y="326.143"
+                width="47"
+                height="47"
+                rx="23.5"
+                stroke="var(--color-foreground)"
+              />
               <path d="M66.5 363.533H93.5V336.533H66.5V363.533Z" fill="black" />
               <rect x="1344" y="540.5" width="47" height="47" rx="23.5" fill="#B5E5FD" />
-              <rect x="1344" y="540.5" width="47" height="47" rx="23.5" stroke="#28333D" />
+              <rect
+                x="1344"
+                y="540.5"
+                width="47"
+                height="47"
+                rx="23.5"
+                stroke="var(--color-foreground)"
+              />
               <path d="M1354 577.89H1381V550.89H1354V577.89Z" fill="black" />
               <rect x="251.561" y="0.5" width="47" height="47" rx="23.5" fill="#F5E2BC" />
-              <rect x="251.561" y="0.5" width="47" height="47" rx="23.5" stroke="#28333D" />
+              <rect
+                x="251.561"
+                y="0.5"
+                width="47"
+                height="47"
+                rx="23.5"
+                stroke="var(--color-foreground)"
+              />
               <path d="M261.561 32.89H288.561V5.89H261.561V32.89Z" fill="black" />
             </AnimateDripOnSvgPaths>
           </svg>
