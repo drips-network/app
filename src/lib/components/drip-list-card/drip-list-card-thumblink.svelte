@@ -173,7 +173,7 @@
         {/if}
       </div>
       {#if (description ?? '').length > 0}
-        <div class="description">
+        <div class="description text-left">
           <TextExpandable isExpandable={false}>
             {description}
           </TextExpandable>
