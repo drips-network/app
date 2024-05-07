@@ -34,6 +34,7 @@
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import AnimateDripOnSvgPaths from '$lib/components/animate-drip-on-svg-paths/animate-drip-on-svg-paths.svelte';
   import DripListCardThumblink from '$lib/components/drip-list-card/drip-list-card-thumblink.svelte';
+  import AnimateTypeWords from '$lib/components/animate-type-words/animate-type-words.svelte';
 
   export let data: PageData;
 
@@ -58,6 +59,13 @@
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
 
   let collabVisible = true;
+
+  const heroTexts = [
+    'Continuously fund your critical dependencies',
+    'Run a RetroPGF funding round',
+    'Reward positive contributions to your ecosystem',
+  ];
+  let heroTextsIndex = 0;
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
@@ -77,12 +85,23 @@
           <div class="flex w-full justify-center">
             <LpTotalDrippedBadge prices={data.prices} />
           </div>
-          <h1 class="font-pixelated text-center leading-[1.15] px-2">
-            {#each 'Continuously fund your critical dependencies.'.split(' ') as word}<div
-                class="inline-block bg-background leading-none"
-              >
-                {word}&nbsp;
-              </div>{/each}
+          <h1 class="w-full relative font-pixelated text-center leading-[1.15] px-2">
+            <div class="invisible">
+              {heroTexts.slice(0).sort((a, b) => b.length - a.length)[0]}|
+            </div>
+            <div class="absolute overlay flex items-center justify-center">
+              <div class="w-full text-center">
+                {#key heroTextsIndex}<AnimateTypeWords
+                    text={heroTexts[heroTextsIndex]}
+                    wordClasses="bg-background"
+                    on:done={() => {
+                      setTimeout(() => {
+                        heroTextsIndex = (heroTextsIndex + 1) % heroTexts.length;
+                      }, 2500);
+                    }}
+                  />{/key}
+              </div>
+            </div>
           </h1>
           <div class="flex flex-wrap gap-1 justify-center w-full">
             <Button icon={DripListIcon} variant="primary">Start a Drip List</Button>

@@ -66,6 +66,15 @@ module.exports = {
       },
       translate: {
         '2px': '2px'
+      },
+      animation: {
+        'blink': 'blink 1000ms infinite linear',
+      },
+      keyframes: {
+        'blink': {
+          '0%, 49%': { opacity: 0 },
+          '50%, 100%': { opacity: 1 }
+        }
       }
     },
   },
