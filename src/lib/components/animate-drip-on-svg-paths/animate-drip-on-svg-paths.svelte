@@ -53,6 +53,8 @@
     currentDrips.forEach((drip, index) => {
       let path = paths[drip.pathIndex];
 
+      if (!path) return;
+
       // If the path coordinates and scale are undefined, set them to the start of the path
       if (drip.x === undefined && drip.y === undefined && drip.scale === undefined) {
         drip.x = path.getPointAtLength(0).x;

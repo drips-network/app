@@ -27,13 +27,13 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Registered from '$lib/components/icons/Registered.svelte';
   import LpQuadsparkle from '$lib/components/illustrations/lp-quadsparkle.svelte';
-  import LpDripListCardTemp from '$lib/components/illustrations/lp-drip-list-card-temp.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import LpDripListsHowItWorksSolo from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-solo.svelte';
   import LpDripListsHowItWorksMultiplayer from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-multiplayer.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import AnimateDripOnSvgPaths from '$lib/components/animate-drip-on-svg-paths/animate-drip-on-svg-paths.svelte';
+  import DripListCardThumblink from '$lib/components/drip-list-card/drip-list-card-thumblink.svelte';
 
   export let data: PageData;
 
@@ -110,8 +110,7 @@
             </p>
           </div>
 
-          <!-- TEMP -->
-          <LpDripListCardTemp />
+          <DripListCardThumblink dripList={data.dripLists[0].dripList} />
         </div>
       </section>
 
