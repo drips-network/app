@@ -50,7 +50,7 @@
 
 <style>
   .lp-total-dripped-badge {
-    font-size: min(24px, calc(24 / 500 * 100vw));
+    font-size: min(20px, calc(20 / 500 * 100vw));
     height: 2.375em;
     line-height: 1.2;
     border-radius: calc(96 / 40 * 1em) 0 calc(96 / 40 * 1em) calc(96 / 40 * 1em);
