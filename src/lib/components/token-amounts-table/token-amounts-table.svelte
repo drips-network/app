@@ -10,7 +10,7 @@
   import Button from '../button/button.svelte';
   import Stepper from '../stepper/stepper.svelte';
   import Token from '../token/token.svelte';
-  import getCollectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
+  // import getCollectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
 
   export let showCollectButtons = false;
 
@@ -60,7 +60,7 @@
   }
 
   function openCollectModal(tokenAddress: string) {
-    modal.show(Stepper, undefined, getCollectFlowSteps(tokenAddress));
+    // modal.show(Stepper, undefined, getCollectFlowSteps(tokenAddress));
   }
 </script>
 

@@ -8,12 +8,9 @@
 
   import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
-  import balances from '$lib/stores/balances/balances.store';
-  import streams from '$lib/stores/streams/streams.store';
-  import { derived, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
   import tickStore from '$lib/stores/tick/tick.store';
 
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import globalAdvisoryStore from '$lib/stores/global-advisory/global-advisory.store';
   import GlobalAdvisory from '$lib/components/global-advisory/global-advisory.svelte';
   import { fade } from 'svelte/transition';
@@ -41,7 +38,6 @@
 
     tokens.connect(network.chainId);
     ens.connect(provider);
-    balances.initialize();
 
     themeStore.subscribe((v) => {
       const onboardTheme = v.currentTheme === 'h4x0r' ? 'dark' : v.currentTheme;
@@ -51,10 +47,7 @@
 
     walletConnected = connected;
 
-    balances.setAccounts(derived([streams], ([streams]) => streams.accounts));
-
     if (connected) {
-      const addressDriverClient = await getAddressDriverClient();
       ens.lookup(address);
 
       /*
@@ -64,26 +57,6 @@
       */
       if (!safe) warnIfSafe(network.chainId, address);
 
-      try {
-        await streams.connect(
-          (await addressDriverClient.getAccountIdByAddress(address)).toString(),
-        );
-      } catch (e) {
-        if (e instanceof Error) {
-          globalAdvisoryStore.add({
-            fatal: true,
-            headline: 'A fatal error occured',
-            description: e.message,
-          });
-        } else {
-          globalAdvisoryStore.add({
-            fatal: true,
-            headline: 'A fatal error occured',
-          });
-        }
-      }
-    } else {
-      streams.disconnect();
     }
 
     initializing.set(false);

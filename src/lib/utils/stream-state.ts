@@ -1,37 +1,43 @@
-import type balances from '$lib/stores/balances';
-import type streamsStore from '$lib/stores/streams/streams.store';
-import getStreamHistory from './stream-history';
-import unreachable from './unreachable';
+import { gql } from 'graphql-request';
+import type { StreamStateStreamFragment } from './__generated__/gql.generated';
+import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT, currentAmounts as getCurrentAmounts } from '$lib/flows/create-stream-flow/methods/current-amounts';
+import { TimelineItemType } from '$lib/graphql/__generated__/base-types';
 
 type StreamState = 'paused' | 'ended' | 'scheduled' | 'out-of-funds' | 'active';
 
+export const STREAM_STATE_STREAM_FRAGMENT = gql`
+  ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
+  fragment StreamStateStream on Stream {
+    isPaused
+    config {
+      durationSeconds
+      startDate
+    }
+    timeline {
+      ...CurrentAmountsTimelineItem
+    }
+  }
+`;
+
 export default function streamState(
-  streamId: string,
-  streamScheduledStart: Date | undefined,
-  streamDurationSeconds: number | undefined,
-  streamPaused: boolean,
-  estimate: NonNullable<ReturnType<typeof balances.getEstimateByStreamId>>,
-  streamAssetConfig: NonNullable<ReturnType<typeof streamsStore.getAssetConfig>>,
+  stream: StreamStateStreamFragment,
 ) {
   let state: StreamState;
 
-  const streamHistory = getStreamHistory(streamAssetConfig, streamId);
-  const streamCreated = streamHistory?.[0].timestamp;
+  // TODO(streams): If duration seconds sewt but startDate undefined, fall back to stream creation date
+  const endDate = stream.config.durationSeconds ? new Date(stream.config.startDate + stream.config.durationSeconds * 1000) : undefined;
 
-  const streamStartDate = new Date(streamScheduledStart ?? streamCreated ?? unreachable());
-  const streamEndDate = streamDurationSeconds
-    ? new Date(streamStartDate.getTime() + streamDurationSeconds * 1000)
-    : undefined;
+  const currentAmounts = getCurrentAmounts(stream.timeline);
 
-  if (streamPaused) {
+  if (stream.isPaused) {
     state = 'paused';
-  } else if (streamEndDate && streamEndDate.getTime() < new Date().getTime()) {
+  } else if (endDate && endDate.getTime() < new Date().getTime()) {
     state = 'ended';
-  } else if (streamScheduledStart && streamScheduledStart.getTime() > new Date().getTime()) {
+  } else if (stream.config.startDate && stream.config.startDate.getTime() > new Date().getTime()) {
     state = 'scheduled';
-  } else if (estimate.currentAmountPerSecond === 0n) {
+  } else if(currentAmounts.lastTimelineItemType === TimelineItemType.OutOfFunds) {
     state = 'out-of-funds';
-  } else if (estimate.currentAmountPerSecond > 0n) {
+  } else if (currentAmounts.currentAmount.amount > 0n) {
     state = 'active';
   } else {
     throw new Error('Invalid stream state');

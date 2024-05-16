@@ -34,7 +34,6 @@
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/environment';
   import amtDeltaUnitStore, {
     FRIENDLY_NAMES,
     MULTIPLIERS,
@@ -55,6 +54,7 @@
     DripVisualNftDriverAccountFragment,
     DripVisualProjectFragment,
   } from './__generated__/gql.generated';
+  import { browser } from '$app/environment';
 
   export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
   export let to:

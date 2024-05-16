@@ -3,7 +3,6 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import ens from '$lib/stores/ens';
-  import streams from '$lib/stores/streams';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { onMount } from 'svelte';
   import Balances from '../funds/sections/balances.section.svelte';
@@ -107,17 +106,6 @@
     return socialLinks.includes(input as (typeof socialLinks)[number]);
   }
 
-  async function fetchRequestedAccount(accountId: string) {
-    try {
-      await streams.fetchAccount(accountId);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      error = true;
-    }
-  }
-
-  $: dripsAccountId && fetchRequestedAccount(dripsAccountId);
   $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 

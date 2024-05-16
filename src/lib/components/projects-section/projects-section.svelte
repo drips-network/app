@@ -11,7 +11,7 @@
   import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import modal from '$lib/stores/modal';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
 
   export let address: string | undefined;
 
@@ -64,12 +64,12 @@
     label: 'Projects',
     actions: isSelf
       ? [
-          {
-            // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt.  😊
-            label: 'Claim project',
-            icon: Plus,
-            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
-          },
+          // {
+          //   // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt.  😊
+          //   label: 'Claim project',
+          //   icon: Plus,
+          //   handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
+          // },
         ]
       : [],
   }}

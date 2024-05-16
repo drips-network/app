@@ -23,11 +23,9 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import balances from '$lib/stores/balances';
   import tokens from '$lib/stores/tokens';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import Button from '$lib/components/button/button.svelte';
-  import streams from '$lib/stores/streams';
   import { constants } from 'radicle-drips';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -88,35 +86,7 @@
   // Token dropdown
 
   let tokenList: Items;
-  $: tokenList = Object.fromEntries(
-    mapFilterUndefined(
-      Object.entries($balances.accounts[accountId].tokens),
-      ([tokenAddress, tokenEstimate]) => {
-        const remaining = tokenEstimate.total.totals.remainingBalance;
-
-        const token = tokens.getByAddress(tokenAddress);
-        if (!token) return undefined;
-
-        return [
-          token.info.address.toLowerCase(),
-          {
-            type: 'selectable',
-            searchString: [token.info.name, token.info.symbol],
-            label: token.info.name,
-            text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
-            image: {
-              component: Token,
-              props: {
-                show: 'none',
-                address: token.info.address,
-                size: 'small',
-              },
-            },
-          },
-        ];
-      },
-    ) ?? [],
-  );
+  $: tokenList = {};
 
   let selectedTokenAddress: string[] =
     restorer.restore('selectedTokenAddress') ??
@@ -209,7 +179,8 @@
       amountPerSecond ?? unreachable(),
       recipientInputValue ?? unreachable(),
       streamNameValue,
-      $streams.accounts[get(wallet).dripsAccountId ?? unreachable()],
+      // TODO(streams): insert real value from api
+      [],
       setStartAndEndDate
         ? {
             start: combinedStartDate ?? unreachable(),

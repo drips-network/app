@@ -1,275 +1,130 @@
-<script lang="ts">
-  import { page } from '$app/stores';
-  import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
-  import streams from '$lib/stores/streams';
-  import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
-  import { onMount } from 'svelte';
-  import assert from '$lib/utils/assert';
-  import type { Stream } from '$lib/stores/streams/types';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
-  import DripVisual from '$lib/components/drip-visual/drip-visual.svelte';
-  import balances from '$lib/stores/balances';
-  import decodeAccountId from '$lib/utils/decode-universal-account-id';
-  import unreachable from '$lib/utils/unreachable';
-  import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
-  import tokens from '$lib/stores/tokens';
-  import formatDate from '$lib/utils/format-date';
-  import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
-  import StreamStateBadge from '$lib/components/stream-state-badge/stream-state-badge.svelte';
-  import { fly } from 'svelte/transition';
-  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
-  import InfoCircleIcon from '$lib/components/icons/InfoCircle.svelte';
-  import Button from '$lib/components/button/button.svelte';
-  import PauseIcon from '$lib/components/icons/Pause.svelte';
-  import PlayIcon from '$lib/components/icons/Play.svelte';
-  import DeleteIcon from '$lib/components/icons/Trash.svelte';
-  import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import checkIsUser from '$lib/utils/check-is-user';
-  import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
-  import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
-  import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
-  import PenIcon from '$lib/components/icons/Pen.svelte';
-  import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
-  import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
-  import getStreamHistory from '$lib/utils/stream-history';
-  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import { browser } from '$app/environment';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import tokensStore from '$lib/stores/tokens/tokens.store';
-  import { Driver } from '$lib/graphql/__generated__/base-types';
-  import streamState from '$lib/utils/stream-state';
-  import streamsStore from '$lib/stores/streams/streams.store';
-  import StreamDeveloperSection from '$lib/components/developer-section/stream-developer.section.svelte';
-
-  const walletInitialized = walletStore.initialized;
-  const tokensInitialized = tokensStore.connected;
-
-  const { accountId, token: tokenAddress, dripId } = $page.params;
-
-  let dripsAccountId: string | undefined;
-  let streamId: string | undefined;
-  let error: 'invalid-id' | 'not-found' | 'unknown-token' | undefined;
-  let loading = true;
-  let stream: Stream | undefined;
-  let token: TokenInfoWrapper | undefined;
-
-  $: {
-    $streams;
-    if (streamId && dripsAccountId) {
-      stream = streams.getStreamById(streamId);
-    }
-  }
-
-  $: {
-    if (stream && dripsAccountId && streamId) {
-      streamHistory = getStreamHistory(
-        streams.getAssetConfig(dripsAccountId, tokenAddress) ?? unreachable(),
-        streamId,
-      );
-    }
-  }
-
-  let streamName: string | undefined;
-  $: {
-    if (stream) {
-      streamName =
-        stream.receiver.driver === 'nft' ? 'Continuous donation' : stream.name ?? 'Unnamed stream';
-    }
-  }
-
-  $: estimate = streamId ? $balances && balances.getEstimateByStreamId(streamId) : undefined;
-  $: streamScheduledStart = stream?.streamConfig.startDate;
-  $: streamCreated = streamHistory?.[0].timestamp;
-  $: streamStartDate =
-    stream && streamHistory
-      ? new Date(streamScheduledStart ?? streamCreated ?? unreachable())
-      : undefined;
-  $: streamEndDate =
-    streamStartDate && stream?.streamConfig.durationSeconds
-      ? new Date(streamStartDate.getTime() + stream?.streamConfig.durationSeconds * 1000)
-      : undefined;
-  $: assetConfig = stream && streamsStore.getAssetConfig(stream?.sender.accountId, tokenAddress);
-
-  $: state =
-    stream && estimate && assetConfig
-      ? streamState(
-          stream.id,
-          streamScheduledStart,
-          stream?.streamConfig.durationSeconds,
-          stream.paused,
-          estimate,
-          assetConfig,
-        )
-      : undefined;
-
-  let streamHistory: ReturnType<typeof getStreamHistory> | undefined;
-
-  /**
-   * The date at which the particular token ran out of funds, even if its associated asset
-   * config was changed later.
-   */
-  let outOfFundsDate: Date | undefined;
-  $: {
-    if (streamHistory) {
-      const latestStreamHistoryItem = streamHistory[streamHistory.length - 1];
-
-      if (
-        latestStreamHistoryItem.runsOutOfFunds?.getTime() ===
-          latestStreamHistoryItem.timestamp.getTime() &&
-        state === 'out-of-funds'
-      ) {
-        const reverseHistory = streamHistory;
-        reverseHistory.reverse();
-
-        // Find the latest history item which wasnʼt already out-of-funds when it was created.
-        outOfFundsDate = reverseHistory.find(
-          (hi) => hi.runsOutOfFunds && hi.runsOutOfFunds.getTime() !== hi.timestamp.getTime(),
-        )?.runsOutOfFunds;
-      } else {
-        outOfFundsDate = latestStreamHistoryItem.runsOutOfFunds;
+<script lang="ts" context="module">
+  export const STREAM_PAGE_STREAM_FRAGMENT = gql`
+    ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
+    ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
+    ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
+    fragment StreamPageStream on Stream {
+      timeline {
+        ...CurrentAmountsTimelineItem
+      }
+      sender {
+        account {
+          ...DripVisualAddressDriverAccount
+        }
+      }
+      receiver {
+        ... on User {
+          account {
+            ...DripVisualAddressDriverAccount
+          }
+        }
+        ... on DripList {
+          account {
+            ...DripVisualNftDriverAccount
+          }
+        }
+      }
+      name
+      config {
+        durationSeconds
+        startDate
+        amountPerSecond {
+          tokenAddress
+        }
       }
     }
-  }
-
-  async function getStreamInfo() {
-    if (!browser || !$walletInitialized || !$tokensInitialized) return;
-
-    error = undefined;
-
-    token = tokens.getByAddress(tokenAddress);
-
-    if (!token) {
-      error = 'unknown-token';
-      return;
-    }
-
-    try {
-      token = tokens.getByAddress(tokenAddress) ?? unreachable();
-      dripsAccountId = (await decodeAccountId(accountId)).dripsAccountId;
-      streamId = makeStreamId(dripsAccountId, tokenAddress, dripId);
-    } catch {
-      error = 'invalid-id';
-      return;
-    }
-
-    try {
-      stream = streams.getStreamById(streamId);
-      if (stream) {
-        streamHistory = getStreamHistory(
-          streams.getAssetConfig(accountId, tokenAddress) ?? unreachable(),
-          streamId,
-        );
-      }
-
-      await streams.fetchAccount(dripsAccountId);
-      stream = streams.getStreamById(streamId);
-      assert(stream);
-    } catch {
-      error = 'not-found';
-      return;
-    }
-
-    error = undefined;
-  }
-
-  $: {
-    if ($tokens || $walletInitialized || $tokensInitialized) {
-      getStreamInfo();
-    }
-  }
-
-  $: loading = !(stream && estimate);
-
-  $: hasDuration = stream && stream.streamConfig.durationSeconds !== undefined;
-
-  // The maximum that is intended to be streamed between the start date and end date (if any)
-  $: targetAmount = hasDuration
-    ? stream &&
-      stream.streamConfig.amountPerSecond.amount *
-        BigInt(stream.streamConfig.durationSeconds ?? unreachable())
-    : undefined;
-
-  // Duration progress bar logic
-
-  let elapsedDurationPercentage: number;
-
-  function updateElapsedDurationPercentage() {
-    if (!stream || !stream.streamConfig.startDate || !streamStartDate) return;
-
-    const streamStartTimestamp = streamStartDate.getTime();
-
-    const now = new Date().getTime();
-    const endDate = streamEndDate?.getTime() ?? now;
-
-    const newValue = Math.min(
-      100,
-      ((now - streamStartTimestamp) / (endDate - streamStartTimestamp)) * 100,
-    );
-
-    elapsedDurationPercentage = Math.max(0, newValue);
-  }
-
-  let updateElapsedDurationPercentageInterval: ReturnType<typeof setInterval> | undefined;
-
-  onMount(() => {
-    updateElapsedDurationPercentageInterval = setInterval(updateElapsedDurationPercentage, 1000);
-
-    return () => {
-      if (updateElapsedDurationPercentageInterval) {
-        clearInterval(updateElapsedDurationPercentageInterval);
-      }
-    };
-  });
+  `;
 </script>
 
-<HeadMeta title={streamName ?? 'Stream'} />
+<script lang="ts">
+  import DripVisual, {
+    DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
+  } from '$lib/components/drip-visual/drip-visual.svelte';
+
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { gql } from 'graphql-request';
+  import type { StreamPageStreamFragment } from './__generated__/gql.generated';
+  import type { PageData } from './$types';
+  import {
+    CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT,
+    streamCurrentAmountsStore,
+  } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
+  import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
+  import tokensStore from '$lib/stores/tokens/tokens.store';
+
+  export let data: PageData;
+  const stream: StreamPageStreamFragment = data.stream;
+
+  const currentStreamAmounts = streamCurrentAmountsStore(stream.timeline);
+
+  console.log(stream.timeline)
+
+  $: token = $tokensStore && tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress);
+</script>
+
+<HeadMeta title={stream.name ?? 'Stream'} />
 
 <div class="wrapper">
-  {#if error === 'invalid-id'}
-    <LargeEmptyState
-      emoji="💀"
-      headline="Invalid stream ID"
-      description="Please make sure you're supplying a valid stream ID in the URL."
-    />
-  {:else if error === 'unknown-token'}
-    <LargeEmptyState
-      emoji="💀"
-      headline="Unknown token"
-      description="This stream is streaming an ERC-20 token which is not supported by default. You can manually add it to your custom tokens list."
-      button={{
-        handler: () => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress)),
-        label: 'Add custom token',
-      }}
-    />
-  {:else if error === 'not-found'}
-    <LargeEmptyState
-      emoji="🧐"
-      headline="Stream not found"
-      description="We werenʼt able to find a stream with this ID."
-    />
-  {:else if loading || !walletInitialized}
-    <div class="loading-state" out:fly={{ duration: 300, y: -16 }}>
-      <Spinner />
+  <div class="headline">
+    <h1>{stream.name ?? 'Unnamed stream'}</h1>
+  </div>
+  <DripVisual
+    from={stream.sender.account}
+    to={stream.receiver.account}
+    amountPerSecond={$currentStreamAmounts.currentDeltaPerSecond.amount}
+    tokenInfo={{ symbol: 'TOKEN', decimals: 18 }}
+    halted={false}
+  />
+  <div class="details">
+    <div class="key-value-group">
+      <div class="key-value">
+        <div class="keys">
+          <h5 class="key">Total Streamed</h5>
+        </div>
+        <div class="total-streamed">
+          <div class="value-box" class:align-right={stream.config.durationSeconds === undefined}>
+            <span class="highlight large-text tabular-nums" data-testid="total-streamed">
+              {#if token}
+              <FormattedAmount
+                amount={$currentStreamAmounts.currentAmount.amount}
+                decimals={token.info.decimals}
+              />
+                {#if stream.config.durationSeconds !== undefined}
+                  {token?.info.symbol}
+                {/if}
+              {/if}
+            </span>
+          </div>
+          <!-- {#if hasDuration}
+            <span class="typo-header-5">OF</span>
+            <div class="value-box">
+              <span class="large-text tabular-nums">
+                <FormattedAmount
+                  amount={targetAmount ?? unreachable()}
+                  decimals={token?.info.decimals ?? unreachable()}
+                  preserveTrailingZeroes={false}
+                />
+                {token?.info.symbol}
+              </span>
+            </div>
+          {/if} -->
+        </div>
+      </div>
     </div>
-  {:else if streamId && stream}
+  </div>
+</div>
+
+<!-- <div class="wrapper">
     <article class="stream-page" in:fly={{ duration: 300, y: 16 }}>
       <header class="hero">
         <div class="flex flex-col-reverse gap-4 md:flex-row items-center">
-          <h1>{streamName}</h1>
-          <StreamStateBadge
-            size="normal"
-            {streamId}
-            streamPaused={stream.paused}
-            streamSenderAccountId={stream.sender.accountId}
-            streamDurationSeconds={stream.streamConfig.durationSeconds}
-            streamScheduledStart={stream.streamConfig.startDate}
-            streamTokenAddress={tokenAddress}
-          />
+          <h1>{stream.name}</h1>
+          stream state badge
         </div>
         {#if checkIsUser(stream.sender.accountId)}
           <div class="actions">
-            <!-- Pause & Unpause are only available for "managed" streams that appear in account metadata -->
             {#if stream?.managed}
               {#if !stream.paused}
                 <Button
@@ -290,7 +145,6 @@
                 >
               {/if}
             {/if}
-            <!-- Any stream can be deleted and edited -->
             {#if stream}
               <Button
                 icon={DeleteIcon}
@@ -420,7 +274,7 @@
               <Tooltip>
                 <InfoCircleIcon style="height: 1.25rem" />
                 <svelte:fragment slot="tooltip-content">
-                  The stream sender's currently remaining {token?.info.symbol} balance. When this cannot
+                  The stream sender's currently remaining {'TOKEN'} balance. When this cannot
                   cover all the sender's streams for this token anymore, all their streams for this token
                   will cease.
                 </svelte:fragment>
@@ -428,10 +282,8 @@
             </div>
             <span class="value small-text tabular-nums">
               <FormattedAmount
-                decimals={token?.info.decimals ?? unreachable()}
-                amount={$balances.accounts[dripsAccountId ?? unreachable()].tokens[
-                  tokenAddress.toLowerCase()
-                ].total.totals.remainingBalance}
+                decimals={18}
+                amount={0n}
               />
               {token?.info.symbol}
             </span>
@@ -465,8 +317,7 @@
       </div>
     </article>
   {/if}
-</div>
-
+</div> -->
 <style>
   .wrapper {
     position: relative;

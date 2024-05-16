@@ -19,6 +19,7 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { isConfiguredChainId } from './network';
+import { invalidateAll } from '$app/navigation';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -230,6 +231,13 @@ const walletStore = () => {
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
 
+    if (browser) {
+      // set 'connected-address' cookie
+      console.log('set cookie')
+      document.cookie = `connected-address=${accounts[0]}; Path=/; max-age=31536000; SameSite=Lax`;
+      await invalidateAll();
+    }
+
     state.set({
       connected: true,
       address: accounts[0],
@@ -243,6 +251,7 @@ const walletStore = () => {
 
   function _clear() {
     lastConnectedWallet.clear();
+    document.cookie = 'connected-address=; Path=/; max-age=0; SameSite=Lax';
     state.set(INITIAL_STATE);
   }
 

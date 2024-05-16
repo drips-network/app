@@ -30,7 +30,6 @@
   import Supporters, {
     SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT,
   } from '$lib/components/supporters-section/supporters.section.svelte';
-  import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
   import DripListCard, {
     DRIP_LIST_CARD_FRAGMENT,
@@ -43,26 +42,11 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import viewVotingRoundFlowSteps from '$lib/flows/view-voting-round/view-voting-round-flow-steps';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-  import { onMount } from 'svelte';
 
   export let data: PageData;
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRounds.current;
-
-  $: ownerAccountId = dripList?.owner.accountId ?? votingRound?.publisherAddress;
-  $: supportStreams =
-    dripList &&
-    $streamsStore &&
-    streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
-
-  onMount(
-    () => dripList && streamsStore.fetchAccountsStreamingToAccountId(dripList.account.accountId),
-  );
-
-  const streamsFetchStatusses = streamsStore.fetchStatusses;
-  $: streamsFetched =
-    dripList && ownerAccountId && $streamsFetchStatusses[ownerAccountId] === 'fetched';
 
   function handleVotingRoundClick(votingRound: VotingRound) {
     modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));
@@ -107,8 +91,6 @@
         accountId={dripList.account.accountId}
         headline="Support"
         infoTooltip="A Drip List can be supported by continuous donations, one-time donations, or funds split by projects and other Drip Lists."
-        forceLoading={!streamsFetched}
-        supportStreams={supportStreams || undefined}
         type="dripList"
         supportItems={dripList.support}
         ownerAccountId={dripList.owner.accountId}

@@ -1,7 +1,4 @@
 <script lang="ts">
-  import Balances from './sections/balances.section.svelte';
-  import Streams from './sections/streams.section.svelte';
-
   import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
@@ -13,6 +10,10 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
+  import Streams from './sections/streams.section.svelte';
+  import type { PageData } from './$types';
+
+  export let data: PageData;
 
   $: accountId = $wallet.dripsAccountId;
 
@@ -83,8 +84,8 @@
     </TransitionedHeight>
   </div>
   <div class="sections">
-    <Balances {accountId} disableActions={false} />
-    <Streams {accountId} disableActions={false} />
+    <!-- <Balances {accountId} disableActions={false} /> -->
+    <Streams {accountId} userStreams={data.streams} disableActions={false} />
   </div>
 </div>
 

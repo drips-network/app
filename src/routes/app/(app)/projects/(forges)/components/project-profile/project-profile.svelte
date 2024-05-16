@@ -103,7 +103,7 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { AddressDriverClient } from 'radicle-drips';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
@@ -334,13 +334,15 @@
               size="small"
               icon={Registered}
               variant="primary"
-              on:click={() =>
-                $walletStore.connected
-                  ? modal.show(ClaimProjectStepper, undefined, {
-                      skipWalletConnect: true,
-                      projectUrl: project.source.url,
-                    })
-                  : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+              on:click={() => {
+                return undefined;
+                // $walletStore.connected
+                //   ? modal.show(ClaimProjectStepper, undefined, {
+                //       skipWalletConnect: true,
+                //       projectUrl: project.source.url,
+                //     })
+                //   : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }
+              }}
               >Claim project</Button
             >
           </div>

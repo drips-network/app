@@ -1,7 +1,6 @@
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
-import streams from '$lib/stores/streams';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import expect from '$lib/utils/expect';
 import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
@@ -108,20 +107,23 @@ export default function (
         after five tries, we move forward anyway, but the user will be made aware that they
         may need to wait for a while for their dashboard to refresh.
         */
-        await expect(
-          streams.refreshUserAccount,
-          (account) =>
-            Boolean(
-              account.assetConfigs
-                .find(
-                  (ac) =>
-                    ac.tokenAddress.toLowerCase() === transactContext.tokenAddress.toLowerCase(),
-                )
-                ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
-            ),
-          5000,
-          1000,
-        );
+
+        // TODO(streams): poll api here
+
+        // await expect(
+        //   streams.refreshUserAccount,
+        //   (account) =>
+        //     Boolean(
+        //       account.assetConfigs
+        //         .find(
+        //           (ac) =>
+        //             ac.tokenAddress.toLowerCase() === transactContext.tokenAddress.toLowerCase(),
+        //         )
+        //         ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
+        //     ),
+        //   5000,
+        //   1000,
+        // );
       },
     }),
   );

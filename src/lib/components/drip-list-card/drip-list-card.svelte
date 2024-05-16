@@ -46,7 +46,6 @@
     type SplitsComponentSplitsReceiver,
   } from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
-  import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
@@ -59,13 +58,11 @@
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
-  import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import type { DripListCardFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
   import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
   import { onMount } from 'svelte';
-  import streamsStore from '$lib/stores/streams/streams.store';
   import getSupportersPile, {
     DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
   } from './methods/get-supporters-pile';
@@ -110,26 +107,6 @@
   $: title = (dripList?.name || votingRound?.name) ?? unreachable();
   $: description = (dripList?.description || votingRound?.description) ?? '';
 
-  /*
-    On mount, ensure the streams store has fetched the owner's account so that we can be sure that
-    any support streams appear as expected.
-    Then, select the support streams that are streaming to the list.
-  */
-  onMount(async () => {
-    if (!listOwner) return;
-
-    if (!$streamsStore.accounts[listOwner.accountId]) {
-      await streamsStore.fetchAccount(listOwner.accountId);
-    }
-  });
-
-  $: supportStreams =
-    listOwner &&
-    $streamsStore &&
-    streamsStore
-      .getStreamsForUser(listOwner.accountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList?.account.accountId);
-
   let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined = undefined;
   onMount(async () => {
     if (!dripList) return;
@@ -142,29 +119,8 @@
     incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
   });
 
-  $: streamEstimates =
-    dripList &&
-    $balancesStore &&
-    balancesStore.getStreamEstimatesByReceiver('total', dripList.account.accountId).map((e) => ({
-      amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-      tokenAddress: e.tokenAddress,
-    }));
-
-  /*
-    Only the list owner can set support streams to the list, so we can consider the stream estimate to the list loaded when
-    the owner account is loaded.
-  */
-  $: streamEstimateLoaded =
-    dripList && $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
-
-  let totalIncomingAmounts: ReturnType<typeof mergeAmounts> | undefined = undefined;
-  $: totalIncomingAmounts =
-    streamEstimates && incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
-      ? mergeAmounts(streamEstimates, incomingSplitTotal, incomingGivesTotal)
-      : undefined;
-
   $: supportersPile =
-    dripList && supportStreams && getSupportersPile(supportStreams, dripList.support);
+    dripList && getSupportersPile(dripList.support);
 
   function triggerEditModal() {
     if (!dripList) return;
@@ -261,7 +217,7 @@
                     {#if browser}
                       <AggregateFiatEstimate
                         supressUnknownAmountsWarning
-                        amounts={totalIncomingAmounts}
+                        amounts={[]}
                       />
                     {/if}
                     <span class="muted">&nbsp;total</span>

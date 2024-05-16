@@ -1,9 +1,7 @@
 <script lang="ts">
   import TokensIcon from '$lib/components/icons/Coin.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
-  import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
-  import balances from '$lib/stores/balances/balances.store';
   import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import modal from '$lib/stores/modal';
   import assert from '$lib/utils/assert';
@@ -17,11 +15,12 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import tokens from '$lib/stores/tokens';
-  import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import Section from '$lib/components/section/section.svelte';
+  import type { ComponentProps } from 'svelte';
+  import Token from '$lib/components/token/token.svelte';
 
   interface TokenTableRow {
-    token: TokenCellData;
+    token: ComponentProps<Token>;
     earnings: AmountCellData;
     streaming: AmountCellData;
     netRate: AmountCellData;
@@ -33,12 +32,10 @@
   export let collapsed = false;
   export let collapsable = false;
 
-  $: accountEstimate = accountId ? $balances.accounts[accountId] : undefined;
-
   let tableData: TokenTableRow[] = [];
 
   function updateTable() {
-    if (!$balances || !accountEstimate || !accountId) {
+    if (!accountId) {
       tableData = [];
       return;
     }
@@ -49,25 +46,17 @@
     tableData = mapFilterUndefined(tokensToShow, (tokenAddress) => {
       assert(accountId);
 
-      const outgoingEstimate = accountEstimate?.tokens[tokenAddress.toLowerCase()];
-      const incomingEstimate = balances.getIncomingBalanceForUser(tokenAddress, accountId);
-
-      if (!incomingEstimate) return undefined;
-      if (!outgoingEstimate?.total.totals.remainingBalance && !incomingEstimate.totalEarned) {
-        return undefined;
-      }
-
       return {
         token: {
           address: tokenAddress,
         },
         earnings: {
           amount: {
-            amount: incomingEstimate.totalEarned,
+            amount: 0n,
             tokenAddress,
           },
           amountPerSecond: {
-            amount: incomingEstimate.amountPerSecond,
+            amount: 0n,
             tokenAddress,
           },
           showSymbol: false,
@@ -75,19 +64,17 @@
         streaming: {
           amount: {
             tokenAddress,
-            amount: outgoingEstimate?.total.totals.remainingBalance ?? 0n,
+            amount: 0n,
           },
           amountPerSecond: {
             tokenAddress,
-            amount: -(outgoingEstimate?.total.totals.totalAmountPerSecond ?? 0n),
+            amount: -(0n),
           },
           showSymbol: false,
         },
         netRate: {
           amountPerSecond: {
-            amount:
-              incomingEstimate.amountPerSecond -
-              (outgoingEstimate?.total.totals.totalAmountPerSecond ?? 0n),
+            amount: 0n,
             tokenAddress,
           },
           showSymbol: false,
@@ -97,7 +84,6 @@
   }
 
   $: {
-    $balances;
     if (accountId) updateTable();
   }
 
@@ -106,7 +92,7 @@
       {
         accessorKey: 'token',
         header: 'Token',
-        cell: () => TokenCell,
+        cell: () => Token,
         enableSorting: false,
         size: (100 / 24) * 8,
       },
@@ -157,16 +143,6 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  $: fetchStatus = accountId ? $accountFetchStatussesStore[accountId] : undefined;
-
-  // As soon as the given account has been fetched at least once, display content.
-  let loaded = false;
-  $: if (accountId && fetchStatus && ['error', 'fetched'].includes(fetchStatus.all)) {
-    loaded = true;
-  }
-
-  $: error = Boolean(accountId && fetchStatus?.all === 'error');
-
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     // go to token page by address
     const tokenAddress = tableData[event.detail.rowIndex].token.address;
@@ -182,7 +158,6 @@
   header={{
     label: 'Balances',
     icon: TokensIcon,
-    actionsDisabled: !accountEstimate,
     actions: disableActions
       ? []
       : [
@@ -199,8 +174,7 @@
     emptyStateText: isSelf
       ? 'Top up any ERC-20 token to stream it to your Drip List or any Ethereum address.'
       : 'This user hasnʼt yet topped-up or received any funds.',
-    loaded,
-    error,
+    loaded: true,
     empty: tableData.length === 0,
   }}
 >

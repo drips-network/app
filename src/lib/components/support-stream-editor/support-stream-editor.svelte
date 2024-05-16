@@ -17,7 +17,6 @@
   import Button from '../button/button.svelte';
   import unreachable from '$lib/utils/unreachable';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import balancesStore from '$lib/stores/balances/balances.store';
 
   export let streamRateValueParsed: bigint | undefined = undefined;
   export let topUpAmountValueParsed: bigint | undefined = undefined;
@@ -53,59 +52,61 @@
 
   // If top up is disabled, the token list should only show available token balances to stream.
   let tokenList: Items = {};
-  $: tokenList = withoutTopUp
-    ? Object.fromEntries(
-        mapFilterUndefined(
-          Object.entries($balancesStore.accounts[ownAccountId ?? unreachable()].tokens),
-          ([tokenAddress, tokenEstimate]) => {
-            const remaining = tokenEstimate.total.totals.remainingBalance;
+  // TODO(streams): Use API data
 
-            const token = tokensStore.getByAddress(tokenAddress);
-            if (!token) return undefined;
+  // $: tokenList = withoutTopUp
+  //   ? Object.fromEntries(
+  //       mapFilterUndefined(
+  //         Object.entries($balancesStore.accounts[ownAccountId ?? unreachable()].tokens),
+  //         ([tokenAddress, tokenEstimate]) => {
+  //           const remaining = tokenEstimate.total.totals.remainingBalance;
 
-            return [
-              token.info.address,
-              {
-                type: 'selectable',
-                label: token.info.name,
-                searchString: [token.info.name, token.info.symbol],
-                text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
-                image: {
-                  component: Token,
-                  props: {
-                    show: 'none',
-                    address: token.info.address,
-                    size: 'small',
-                  },
-                },
-              },
-            ];
-          },
-        ) ?? [],
-      )
-    : Object.fromEntries(
-        $tokensStore?.map((token) => {
-          const { address, name, symbol } = token.info;
+  //           const token = tokensStore.getByAddress(tokenAddress);
+  //           if (!token) return undefined;
 
-          return [
-            address,
-            {
-              type: 'selectable',
-              label: name,
-              text: symbol,
-              searchString: [token.info.name, token.info.symbol],
-              image: {
-                component: Token,
-                props: {
-                  show: 'none',
-                  address: address,
-                  size: 'small',
-                },
-              },
-            },
-          ];
-        }) ?? [],
-      );
+  //           return [
+  //             token.info.address,
+  //             {
+  //               type: 'selectable',
+  //               label: token.info.name,
+  //               searchString: [token.info.name, token.info.symbol],
+  //               text: `${formatTokenAmount(remaining, token.info.decimals)} ${token.info.symbol}`,
+  //               image: {
+  //                 component: Token,
+  //                 props: {
+  //                   show: 'none',
+  //                   address: token.info.address,
+  //                   size: 'small',
+  //                 },
+  //               },
+  //             },
+  //           ];
+  //         },
+  //       ) ?? [],
+  //     )
+  //   : Object.fromEntries(
+  //       $tokensStore?.map((token) => {
+  //         const { address, name, symbol } = token.info;
+
+  //         return [
+  //           address,
+  //           {
+  //             type: 'selectable',
+  //             label: name,
+  //             text: symbol,
+  //             searchString: [token.info.name, token.info.symbol],
+  //             image: {
+  //               component: Token,
+  //               props: {
+  //                 show: 'none',
+  //                 address: address,
+  //                 size: 'small',
+  //               },
+  //             },
+  //           },
+  //         ];
+  //       }) ?? [],
+  //     );
 
   // –––––––––––––––––––––––––
   // FETCH ERC-20 BALANCES IN BACKGROUND

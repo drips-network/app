@@ -1,45 +1,31 @@
 <script context="module" lang="ts">
-  import type { CellContext } from '@tanstack/svelte-table';
-  import { z } from 'zod';
+  import { STREAM_STATE_BADGE_STREAM_FRAGMENT } from "$lib/components/stream-state-badge/stream-state-badge.svelte";
+  import { gql } from "graphql-request";
 
-  export interface NameAndBadgeCellProps {
-    name: string;
-    streamId: string;
-    streamPaused: boolean;
-    streamSenderAccountId: string;
-    streamTokenAddress: string;
-    streamScheduledStart?: Date | undefined;
-    streamDurationSeconds?: number | undefined;
-  }
+  export const NAME_AND_BADGE_CELL_STREAM_FRAGMENT = gql`
+    ${STREAM_STATE_BADGE_STREAM_FRAGMENT}
+    fragment NameAndBadgeCellStream on Stream {
+      id
+      name
+      ...StreamStateBadgeStream
+    }
+  `;
 </script>
 
 <script lang="ts">
   import StreamStateBadge from '$lib/components/stream-state-badge/stream-state-badge.svelte';
+  import type { NameAndBadgeCellStreamFragment } from "./__generated__/gql.generated";
 
-  export let context: CellContext<unknown, unknown>;
+  export let stream: NameAndBadgeCellStreamFragment;
 
-  let props: NameAndBadgeCellProps;
-
-  $: {
-    const propsSchema = z.object({
-      name: z.string(),
-      streamId: z.string(),
-      streamPaused: z.boolean(),
-      streamSenderAccountId: z.string(),
-      streamTokenAddress: z.string(),
-      streamScheduledStart: z.date().optional(),
-      streamDurationSeconds: z.number().optional(),
-    });
-
-    props = propsSchema.parse(context.getValue());
-  }
+  $: console.log(stream)
 </script>
 
 <div class="name-and-badge">
   <span class="typo-text">
-    {props.name}
+    {stream.name}
   </span>
-  <StreamStateBadge {...props} hideActive size="small" />
+  <StreamStateBadge {stream} hideActive size="small" />
 </div>
 
 <style>

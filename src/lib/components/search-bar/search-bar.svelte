@@ -7,11 +7,9 @@
   import { fade, fly } from 'svelte/transition';
   import search, { updateSearchItems } from './search';
   import scroll from '$lib/stores/scroll';
-  import streams from '$lib/stores/streams';
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
   import Results from './components/results.svelte';
-  import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
 
   const dispatch = createEventDispatcher<{ dismiss: never }>();
 
@@ -31,23 +29,12 @@
     dispatch('dismiss');
   }
 
-  let loading = true;
-
-  $: {
-    const { dripsAccountId } = $wallet;
-
-    if (dripsAccountId && $accountFetchStatussesStore[dripsAccountId]?.all !== 'fetched') {
-      loading = true;
-    } else {
-      loading = false;
-    }
-  }
+  let loading = false;
 
   let results: ReturnType<typeof search> = [];
   $: results = search(searchTerm);
 
   $: {
-    $streams;
     $tokens;
     if (!loading) {
       updateSearchItems($wallet.dripsAccountId);
