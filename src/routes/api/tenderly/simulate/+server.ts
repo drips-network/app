@@ -1,5 +1,4 @@
 import { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_SECRET } from '$env/static/private';
-import { error } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
 
@@ -28,6 +27,6 @@ export const POST: RequestHandler = async ({ request }) => {
     // eslint-disable-next-line no-console
     console.error('Failed to simulate bundle:', e);
 
-    return error(500, 'Failed to simulate bundle');
+    return new Response(JSON.stringify('Failed to simulate bundle'), { status: 500 });
   }
 };
