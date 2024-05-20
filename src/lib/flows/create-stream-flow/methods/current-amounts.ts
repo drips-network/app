@@ -1,21 +1,38 @@
-import { gql } from "graphql-request";
-import type { CurrentAmountsTimelineItemFragment } from "./__generated__/gql.generated";
-import { writable, type Unsubscriber } from "svelte/store";
-import tickStore from "$lib/stores/tick/tick.store";
-import type { TimelineItemType } from "$lib/graphql/__generated__/base-types";
+import { gql } from 'graphql-request';
+import type {
+  CurrentAmountsTimelineItemFragment,
+  CurrentAmountsUserBalanceTimelineItemFragment,
+} from './__generated__/gql.generated';
+import { writable, type Unsubscriber } from 'svelte/store';
+import tickStore from '$lib/stores/tick/tick.store';
+import type { TimelineItemType } from '$lib/graphql/__generated__/base-types';
 
 export const CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT = gql`
   fragment CurrentAmountsTimelineItem on TimelineItem {
-      timestamp
-      deltaPerSecond {
-        tokenAddress
-        amount
-      }
-      currentAmount {
-        tokenAddress
-        amount
-      }
-      type
+    timestamp
+    deltaPerSecond {
+      tokenAddress
+      amount
+    }
+    currentAmount {
+      tokenAddress
+      amount
+    }
+    type
+  }
+`;
+
+export const CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT = gql`
+  fragment CurrentAmountsUserBalanceTimelineItem on UserBalanceTimelineItem {
+    timestamp
+    deltaPerSecond {
+      tokenAddress
+      amount
+    }
+    currentAmount {
+      tokenAddress
+      amount
+    }
   }
 `;
 
@@ -24,18 +41,23 @@ interface Amount {
   amount: bigint;
 }
 
-let iterations = 0;
-
-export function currentAmounts(timeline: CurrentAmountsTimelineItemFragment[]): {
+export function currentAmounts(
+  timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[],
+): {
   currentAmount: Amount;
   currentDeltaPerSecond: Amount;
   lastTimelineItemType: TimelineItemType | undefined;
 } {
   const now = Date.now();
 
-  const nextTimelineItemIndex = timeline.findIndex((item) => new Date(item.timestamp).getTime() > now);
+  const nextTimelineItemIndex = timeline.findIndex(
+    (item) => new Date(item.timestamp).getTime() > now,
+  );
 
-  const currentlyActiveTimelineItem =nextTimelineItemIndex === -1 ? timeline[timeline.length - 1] : timeline[nextTimelineItemIndex - 1];
+  const currentlyActiveTimelineItem =
+    nextTimelineItemIndex === -1
+      ? timeline[timeline.length - 1]
+      : timeline[nextTimelineItemIndex - 1];
 
   if (!currentlyActiveTimelineItem) {
     return {
@@ -45,13 +67,15 @@ export function currentAmounts(timeline: CurrentAmountsTimelineItemFragment[]): 
     };
   }
 
-  const millisSinceLastTimelineItem = now - new Date(currentlyActiveTimelineItem.timestamp).getTime();
+  const millisSinceLastTimelineItem =
+    now - new Date(currentlyActiveTimelineItem.timestamp).getTime();
 
   const lastAmount = BigInt(currentlyActiveTimelineItem.currentAmount.amount);
 
   const lastDeltaPerSecond = BigInt(currentlyActiveTimelineItem.deltaPerSecond.amount);
 
-  const currentAmount = lastAmount + (lastDeltaPerSecond * BigInt(millisSinceLastTimelineItem)) / BigInt(1000);
+  const currentAmount =
+    lastAmount + (lastDeltaPerSecond * BigInt(millisSinceLastTimelineItem)) / BigInt(1000);
 
   return {
     currentAmount: {
@@ -66,7 +90,9 @@ export function currentAmounts(timeline: CurrentAmountsTimelineItemFragment[]): 
   };
 }
 
-export const streamCurrentAmountsStore = (timeline: CurrentAmountsTimelineItemFragment[]) => {
+export const streamCurrentAmountsStore = (
+  timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[],
+) => {
   const state = writable<ReturnType<typeof currentAmounts>>(currentAmounts(timeline));
 
   let unsubscriber: Unsubscriber;
@@ -84,7 +110,7 @@ export const streamCurrentAmountsStore = (timeline: CurrentAmountsTimelineItemFr
     unsubscriber?.();
     if (tickHandle) tickStore.deregister(tickHandle);
   }
-  
+
   function _update() {
     state.set(currentAmounts(timeline));
   }
@@ -92,5 +118,5 @@ export const streamCurrentAmountsStore = (timeline: CurrentAmountsTimelineItemFr
   return {
     subscribe,
     unsubscribe,
-  }
-}
+  };
+};

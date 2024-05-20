@@ -1,30 +1,44 @@
+<script lang="ts" context="module">
+  import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT } from "$lib/flows/create-stream-flow/methods/current-amounts";
+  import { gql } from "graphql-request";
+
+  export const USER_BALANCES_FRAGMENT = gql`
+    ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
+    fragment UserBalances on UserBalances {
+      tokenAddress
+      incoming {
+        ...CurrentAmountsUserBalanceTimelineItem
+      }
+      outgoing {
+        ...CurrentAmountsUserBalanceTimelineItem
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import TokensIcon from '$lib/components/icons/Coin.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
-  import Amount, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
-  import modal from '$lib/stores/modal';
   import assert from '$lib/utils/assert';
   import { goto } from '$app/navigation';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
   import { AddressDriverClient } from 'radicle-drips';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
-  import Plus from '$lib/components/icons/Plus.svelte';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import tokens from '$lib/stores/tokens';
   import Section from '$lib/components/section/section.svelte';
   import type { ComponentProps } from 'svelte';
   import Token from '$lib/components/token/token.svelte';
+  import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
+  import type { UserBalancesFragment } from "./__generated__/gql.generated";
 
   interface TokenTableRow {
     token: ComponentProps<Token>;
-    earnings: AmountCellData;
-    streaming: AmountCellData;
-    netRate: AmountCellData;
+    earnings: ComponentProps<RealtimeAmount>;
+    streaming: ComponentProps<RealtimeAmount>;
   }
+
+  export let userBalances: UserBalancesFragment[];
 
   export let accountId: string | undefined;
   export let disableActions = true;
@@ -33,59 +47,17 @@
   export let collapsable = false;
 
   let tableData: TokenTableRow[] = [];
-
-  function updateTable() {
-    if (!accountId) {
-      tableData = [];
-      return;
-    }
-
-    // TODO: Only consider relevant tokens here.
-    const tokensToShow = $tokens?.map((t) => t.info.address) ?? [];
-
-    tableData = mapFilterUndefined(tokensToShow, (tokenAddress) => {
-      assert(accountId);
-
-      return {
-        token: {
-          address: tokenAddress,
-        },
-        earnings: {
-          amount: {
-            amount: 0n,
-            tokenAddress,
-          },
-          amountPerSecond: {
-            amount: 0n,
-            tokenAddress,
-          },
-          showSymbol: false,
-        },
-        streaming: {
-          amount: {
-            tokenAddress,
-            amount: 0n,
-          },
-          amountPerSecond: {
-            tokenAddress,
-            amount: -(0n),
-          },
-          showSymbol: false,
-        },
-        netRate: {
-          amountPerSecond: {
-            amount: 0n,
-            tokenAddress,
-          },
-          showSymbol: false,
-        },
-      };
-    });
-  }
-
-  $: {
-    if (accountId) updateTable();
-  }
+  $: tableData = userBalances.map((balance) => ({
+    token: {
+      address: balance.tokenAddress,
+    },
+    earnings: {
+      timeline: balance.incoming,
+    },
+    streaming: {
+      timeline: balance.outgoing,
+    },
+  }));
 
   function buildTableColumns(isClickable = false): ColumnDef<TokenTableRow>[] {
     return [
@@ -99,7 +71,7 @@
       {
         accessorKey: 'earnings',
         header: 'Incoming',
-        cell: () => Amount,
+        cell: () => RealtimeAmount,
         enableSorting: false,
         size: (100 / 24) * 5,
         meta: {
@@ -109,19 +81,12 @@
       {
         accessorKey: 'streaming',
         header: 'Outgoing',
-        cell: () => Amount,
+        cell: () => RealtimeAmount,
         enableSorting: false,
         size: (100 / 24) * 5,
         meta: {
           tooltipMessage: 'Your token balances for streaming to others.',
         },
-      },
-      {
-        accessorKey: 'netRate',
-        header: 'Net rate',
-        cell: () => Amount,
-        enableSorting: false,
-        size: (100 / 24) * 2,
       },
       {
         accessorKey: 'chevron',
@@ -161,11 +126,11 @@
     actions: disableActions
       ? []
       : [
-          {
-            handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
-            icon: Plus,
-            label: 'Add funds',
-          },
+          // {
+          //   handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
+          //   icon: Plus,
+          //   label: 'Add funds',
+          // },
         ],
   }}
   skeleton={{

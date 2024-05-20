@@ -12,6 +12,8 @@
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
   import Streams from './sections/streams.section.svelte';
   import type { PageData } from './$types';
+  import Balances from './sections/balances.section.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   export let data: PageData;
 
@@ -84,8 +86,8 @@
     </TransitionedHeight>
   </div>
   <div class="sections">
-    <!-- <Balances {accountId} disableActions={false} /> -->
-    <Streams {accountId} userStreams={data.streams} disableActions={false} />
+    <Balances {accountId} userBalances={data.balances ?? unreachable()} disableActions={false} />
+    <Streams {accountId} userStreams={data.streams ?? unreachable()} disableActions={false} />
   </div>
 </div>
 

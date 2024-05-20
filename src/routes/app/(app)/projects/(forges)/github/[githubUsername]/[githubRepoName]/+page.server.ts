@@ -5,14 +5,17 @@ import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
-import type { ProjectByUrlQuery } from './__generated__/gql.generated';
-import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-types';
+import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generated__/gql.generated';
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
+import { Forge } from 'radicle-drips';
+import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 
 export const load = (async ({ params, fetch, url }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
+
+  const repoDriver = await getRepoDriverClient();
 
   // `exact` param disables the redirect to the "real" github repo URL.
   // For example, after a repo has been renamed, it would usually automatically redirect
@@ -31,11 +34,17 @@ export const load = (async ({ params, fetch, url }) => {
 
   let repo: z.infer<typeof repoSchema>;
 
+  const accountId = await repoDriver.getAccountId(Forge.GitHub, `${githubUsername}/${githubRepoName}`);
+
   const getProjectsQuery = gql`
     ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!) {
+    query ProjectByUrl($url: String!, $projectId: String!) {
       projectByUrl(url: $url) {
         ...ProjectProfile
+      }
+      earnedFunds(projectId: $projectId) {
+        amount
+        tokenAddress
       }
     }
   `;
@@ -44,14 +53,17 @@ export const load = (async ({ params, fetch, url }) => {
 
   const [repoRes, projectRes] = await Promise.all([
     await fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
-    await query<ProjectByUrlQuery, QueryProjectByUrlArgs>(
+    await query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
       getProjectsQuery,
       {
         url: repoUrl,
+        projectId: accountId,
       },
       fetch,
     ),
   ]);
+
+  // TODO(streams): use earned funds values from API
 
   const project = projectRes.projectByUrl;
   if (!project) {

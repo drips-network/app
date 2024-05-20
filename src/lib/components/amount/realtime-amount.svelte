@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CurrentAmountsTimelineItemFragment } from "$lib/flows/create-stream-flow/methods/__generated__/gql.generated";
+  import type { CurrentAmountsTimelineItemFragment, CurrentAmountsUserBalanceTimelineItemFragment } from "$lib/flows/create-stream-flow/methods/__generated__/gql.generated";
   import { streamCurrentAmountsStore } from "$lib/flows/create-stream-flow/methods/current-amounts";
   import tokensStore from "$lib/stores/tokens/tokens.store";
   import FormattedAmount from "../formatted-amount/formatted-amount.svelte";
@@ -11,7 +11,7 @@
   import Stepper from "../stepper/stepper.svelte";
   import addCustomTokenFlowSteps from "$lib/flows/add-custom-token/add-custom-token-flow-steps";
 
-  export let timeline: CurrentAmountsTimelineItemFragment[];
+  export let timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[];
 
   $: currentAmountsStore = streamCurrentAmountsStore(timeline);
   $: token = $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress);
@@ -22,7 +22,14 @@
 </script>
 
 <div class="realtime-amount">
-  {#if token}
+  {#if timeline.length === 0}
+    <span class="typo-text tabular-nums">
+      0.00
+    </span>
+    <span class="delta typo-text-small">
+      0.00 / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
+    </span>
+  {:else if token}
     <span class="typo-text tabular-nums">
       <FormattedAmount amount={$currentAmountsStore.currentAmount.amount} decimals={token.info.decimals} />
     </span>
