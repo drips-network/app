@@ -162,7 +162,7 @@ export default function transact(
       try {
         // We use a third-party API provided by Tenderly to estimate this batch's gas cost, because
         // its transactions are inter-dependent, meaning they cannot be independently simulated.
-        const simulationRes = await (
+        const { estimatedGas } = await (
           await fetch('/api/tenderly/simulate', {
             method: 'POST',
             body: JSON.stringify({
@@ -179,13 +179,6 @@ export default function transact(
             }),
           })
         ).json();
-
-        const estimatedGas = simulationRes.simulation_results.reduce(
-          (acc: number, res: { simulation: { gas_used: number } }) => res.simulation.gas_used + acc,
-          0,
-        );
-
-        assert(typeof estimatedGas === 'number' && estimatedGas > 0);
 
         estimatedGasWithBuffer = applyGasBuffer(estimatedGas);
       } catch (e) {
@@ -241,18 +234,11 @@ export default function transact(
           wrappersWithGas.forEach((wrapper, i) => {
             if (!wrapper.applyGasBuffer) return;
 
-            if (simulationRes.error) {
-              // eslint-disable-next-line no-console
-              console.error('Unable to apply gas buffer.', simulationRes.error);
-              return;
-            }
+            const { estimatedGas } = simulationRes[i];
 
-            const res = simulationRes.simulation_results[i];
-            const gasUsed = res.simulation.gas_used;
+            assert(typeof estimatedGas === 'number' && estimatedGas > 0);
 
-            assert(typeof gasUsed === 'number' && gasUsed > 0);
-
-            wrapper.gasLimit = applyGasBuffer(gasUsed);
+            wrapper.gasLimit = applyGasBuffer(estimatedGas);
           });
         } catch (e) {
           throw new Error(`Unable to estimate gas for transactions: ${e}`);

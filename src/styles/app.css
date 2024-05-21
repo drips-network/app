@@ -11,6 +11,7 @@ html.smoothscroll {
 
 body {
   -webkit-tap-highlight-color: transparent;
+  text-wrap: pretty;
 }
 
 * {
@@ -85,4 +86,11 @@ h3,
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.twemoji-text .emoji {
+  display: inline-block;
+  width: 1em;
+  margin-bottom: 0.1em;
+  vertical-align: middle;
 }

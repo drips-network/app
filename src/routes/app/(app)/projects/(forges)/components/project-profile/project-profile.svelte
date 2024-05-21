@@ -42,7 +42,6 @@
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import SupportCard, {
     SUPPORT_CARD_PROJECT_FRAGMENT,
   } from '$lib/components/support-card/support-card.svelte';
@@ -109,6 +108,7 @@
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
 
   interface Amount {
     tokenAddress: string;
@@ -380,12 +380,12 @@
         {#await earnedFunds}
           <div class="flex gap-4">
             <div
-              class="stat border rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
+              class="stat shadow-low rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
             >
               <Spinner />
             </div>
             <div
-              class="stat border rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
+              class="stat shadow-low rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
             >
               <Spinner />
             </div>
@@ -393,7 +393,7 @@
         {:then earnedFundsResult}
           <div class="stats" in:fade|local={{ duration: 300 }}>
             {#if earnedFundsResult}
-              <div class="stat">
+              <div class="stat shadow-low rounded-drip-lg">
                 <KeyValuePair key="Donations">
                   <AggregateFiatEstimate amounts={earnedFundsResult} />
                 </KeyValuePair>
@@ -401,7 +401,7 @@
             {/if}
             <!-- ("Supporters" stat) -->
             {#if [project.support].flat().length > 0}
-              <a class="stat" href="#support">
+              <a class="stat btn-theme-outlined" href="#support">
                 <KeyValuePair key="Supporters">
                   <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
                 </KeyValuePair>
@@ -409,7 +409,7 @@
             {/if}
             <!-- ("Splits with" stat) -->
             {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
-              <a class="stat" href="#splits">
+              <a class="stat btn-theme-outlined" href="#splits">
                 <KeyValuePair key="Splits with">
                   <Pile
                     maxItems={4}
@@ -430,7 +430,7 @@
       {#if isClaimed(project)}
         <section id="splits" class="app-section">
           <SectionHeader
-            icon={SplitsIcon}
+            icon={DripList}
             label="Splits"
             actions={isOwnProject
               ? [
@@ -463,22 +463,24 @@
             emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
           >
             <div class="card">
-              <div class="outgoing-splits">
+              <div class="p-6">
                 <ProjectBadge {project} />
-                <SplitsComponent
-                  list={[
-                    {
-                      __typename: 'SplitGroup',
-                      name: 'Maintainers',
-                      list: project.splits.maintainers,
-                    },
-                    {
-                      __typename: 'SplitGroup',
-                      name: 'Dependencies',
-                      list: project.splits.dependencies,
-                    },
-                  ]}
-                />
+                <div class="pl-3.5 mt-2.5">
+                  <SplitsComponent
+                    list={[
+                      {
+                        __typename: 'SplitGroup',
+                        name: 'Maintainers',
+                        list: project.splits.maintainers,
+                      },
+                      {
+                        __typename: 'SplitGroup',
+                        name: 'Dependencies',
+                        list: project.splits.dependencies,
+                      },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
           </SectionSkeleton>
@@ -582,8 +584,8 @@
 
   .stats {
     width: calc(100% + 32px);
-    margin-left: -16px;
-    padding: 0 16px;
+    margin: -16px 0 -16px -16px;
+    padding: 16px;
     overflow: scroll;
     white-space: nowrap;
   }
@@ -591,8 +593,6 @@
   .stats .stat {
     display: inline-flex;
     padding: 1rem;
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
     min-height: 6.125rem;
   }
   .stats .stat + .stat {
@@ -608,10 +608,6 @@
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
-  }
-
-  .outgoing-splits {
-    padding: 1.5rem;
   }
 
   .unclaimed-funds-section {

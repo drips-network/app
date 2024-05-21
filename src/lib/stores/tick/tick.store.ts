@@ -64,9 +64,9 @@ export default (() => {
   function register(listener: () => void): number {
     const currListeners = Object.keys(get(listeners));
 
-    let id = Object.keys(get(listeners)).length;
+    let id = 0;
 
-    while (currListeners[id]) id++;
+    while (currListeners.find((v) => v === id.toString())) id++;
 
     listeners.update((v) => ({ ...v, [id]: listener }));
 
