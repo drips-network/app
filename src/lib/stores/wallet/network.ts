@@ -2,38 +2,62 @@ import { PUBLIC_NETWORK } from '$env/static/public';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 
-const NETWORK_NAMES = {
+const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532] as const;
+export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
+
+export type Network = {
+  chainId: ChainId;
+  name: string;
+  label: string;
+  token: string;
+  id: string;
+  rpcUrl: string;
+};
+
+export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
+
+const NETWORK_NAMES: ValueForEachSupportedChain<string> = {
   [1]: 'homestead',
+  [80002]: 'amoy',
+  [11155420]: 'optimism-sepolia',
   [11155111]: 'sepolia',
+  [84532]: 'base-sepolia',
 };
 
-const NETWORK_LABELS = {
+const NETWORK_LABELS: ValueForEachSupportedChain<string> = {
   [1]: 'Ethereum Mainnet',
-  [11155111]: 'Ethereum Sepolia',
+  [80002]: 'Polygon Amoy',
+  [11155420]: 'OP Sepolia',
+  [11155111]: 'Sepolia',
+  [84532]: 'Base Sepolia',
 };
 
-const NETWORK_TOKENS = {
+const NETWORK_TOKENS: ValueForEachSupportedChain<string> = {
   [1]: 'ETH',
+  [80002]: 'MATIC',
+  [11155420]: 'ETH',
   [11155111]: 'ETH',
+  [84532]: 'ETH',
 };
 
-const NETWORK_ID = {
+const NETWORK_ID: ValueForEachSupportedChain<string> = {
   [1]: '0x1',
+  [80002]: '0x13882',
+  [11155420]: '0xaa37dc',
   [11155111]: '0xaa36a7',
+  [84532]: '0x14a34',
 };
 
-const RPC_URLS = {
+const RPC_URLS: ValueForEachSupportedChain<string> = {
   [1]: `${BASE_URL}/api/infura/mainnet`,
+  [80002]: `${BASE_URL}/api/infura/polygon-amoy`,
+  [11155420]: `${BASE_URL}/api/infura/optimism-sepolia`,
   [11155111]: `${BASE_URL}/api/infura/sepolia`,
-};
+  [84532]: `${BASE_URL}/api/infura/base-sepolia`,
+} as const;
 
-// Networks currently supported by the app
-type ChainId = 1 | 11155111;
-
-function isSupportedChainId(chainId: number): chainId is ChainId {
-  const CHAIN_IDS = [1, 11155111];
-
-  return CHAIN_IDS.includes(chainId);
+export function isSupportedChainId(chainId: number): chainId is ChainId {
+  return SUPPORTED_CHAIN_IDS.includes(chainId as ChainId);
 }
 
 const configuredChainId = Number(PUBLIC_NETWORK);
@@ -46,11 +70,17 @@ export function isConfiguredChainId(chainId: number): boolean {
   return chainId === configuredChainId;
 }
 
-export default {
-  chainId: configuredChainId,
-  name: NETWORK_NAMES[configuredChainId],
-  label: NETWORK_LABELS[configuredChainId],
-  token: NETWORK_TOKENS[configuredChainId],
-  id: NETWORK_ID[configuredChainId],
-  rpcUrl: RPC_URLS[configuredChainId],
-};
+export function getNetwork(chainId: number): Network {
+  assert(isSupportedChainId(chainId), 'Unsupported chain id');
+
+  return {
+    chainId,
+    name: NETWORK_NAMES[chainId],
+    label: NETWORK_LABELS[chainId],
+    token: NETWORK_TOKENS[chainId],
+    id: NETWORK_ID[chainId],
+    rpcUrl: RPC_URLS[chainId],
+  };
+}
+
+export default getNetwork(configuredChainId);
