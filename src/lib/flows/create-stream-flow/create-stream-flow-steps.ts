@@ -8,6 +8,7 @@ import type {
   CreateStreamFlowAddressDriverAccountFragment,
   CreateStreamFlowDetailsNftDriverAccountFragment,
 } from './__generated__/gql.generated';
+import FetchData from './fetch-data.svelte';
 
 export default (
   tokenAddress?: string,
@@ -15,14 +16,16 @@ export default (
     | CreateStreamFlowDetailsNftDriverAccountFragment
     | CreateStreamFlowAddressDriverAccountFragment,
 ) => ({
-  context: createStreamFlowState,
+  context: () => createStreamFlowState(receiver, tokenAddress),
   steps: [
+    makeStep({
+      component: FetchData,
+      props: undefined,
+    }),
     makeStep({
       component: InputDetails,
       props: {
-        tokenAddress,
         receiver,
-        nameInputHidden: receiver !== undefined,
       },
     }),
     makeStep({

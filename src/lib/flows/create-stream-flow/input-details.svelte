@@ -35,50 +35,34 @@
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
-  import Token from '$lib/components/token/token.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
-  import formatTokenAmount from '$lib/utils/format-token-amount';
   import InputAddress from '$lib/components/input-address/input-address.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import createStream from './methods/create-stream';
-  import { get, type Writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
   import parseDate from './methods/parse-date';
   import parseTime from './methods/parse-time';
   import combineDateAndTime from './methods/combine-date-and-time';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { CreateStreamFlowState } from './create-stream-flow-state';
   import { Driver } from '$lib/graphql/__generated__/base-types';
   import { gql } from 'graphql-request';
-  import type {
-    CreateStreamFlowAddressDriverAccountFragment,
-    CreateStreamFlowDetailsNftDriverAccountFragment,
-  } from './__generated__/gql.generated';
+  import Token from '$lib/components/token/token.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<CreateStreamFlowState>;
-  export let tokenAddress: string | undefined = undefined;
-  export let receiver:
-    | CreateStreamFlowDetailsNftDriverAccountFragment
-    | CreateStreamFlowAddressDriverAccountFragment
-    | undefined = undefined;
-  export let nameInputHidden: boolean | undefined = false;
 
-  const restorer = $context.restorer;
-
-  const accountId = $wallet.dripsAccountId ?? unreachable();
-
-  let streamNameValue = restorer.restore('streamNameValue');
+  $: nameInputHidden = $context.receiver?.__typename === 'NftDriverAccount';
 
   // Recipient Address
 
-  let recipientInputValue = receiver?.accountId ?? restorer.restore('recipientInputValue');
   let recipientInputValidationState: TextInputValidationState = { type: 'unvalidated' };
-
   function onRecipientInputValidationChange(event: CustomEvent) {
     recipientInputValidationState = event.detail ?? { type: 'unvalidated' };
   }
@@ -86,67 +70,79 @@
   // Token dropdown
 
   let tokenList: Items;
-  $: tokenList = {};
+  $: tokenList = Object.fromEntries(mapFilterUndefined($context.userOutgoingTokenBalances, (b) => {
+    const token = tokens.getByAddress(b.tokenAddress);
+    if (!token) return undefined;
 
-  let selectedTokenAddress: string[] =
-    restorer.restore('selectedTokenAddress') ??
-    (tokenAddress ? [tokenAddress.toLowerCase()] : tokenList ? [Object.keys(tokenList)[0]] : []);
+    return [
+      token.info.address.toLowerCase(),  
+      {
+        type: 'selectable',
+        label: token.info.name,
+        searchString: [token.info.name, token.info.symbol],
+        text: {
+          component: RealtimeAmount,
+          props: {
+            timeline: b.outgoing,
+            showDelta: false,
+          }
+        },
+        image: {
+          component: Token,
+          props: {
+            show: 'none',
+            address: token.info.address,
+            size: 'small',
+          },
+        },
+      }
+    ];
+  }));
 
   onMount(() => {
-    if (selectedTokenAddress.length !== 0) return;
+    if ($context.selectedTokenAddress && $context.selectedTokenAddress.length !== 0) return;
 
     const firstToken = Object.keys(tokenList ?? {})[0];
-    if (firstToken) selectedTokenAddress = [firstToken];
+    if (firstToken) $context.selectedTokenAddress = [firstToken];
   });
 
   $: selectedToken =
-    selectedTokenAddress.length === 1 ? tokens.getByAddress(selectedTokenAddress[0]) : undefined;
+    $context.selectedTokenAddress?.length === 1 ? tokens.getByAddress($context.selectedTokenAddress[0]) : undefined;
 
   // Amount input
 
-  let amountValue: string | undefined = restorer.restore('amountValue');
   $: amountValueParsed =
-    amountValue && selectedToken
+    $context.amountValue && selectedToken
       ? parseTokenAmount(
-          amountValue,
+          $context.amountValue,
           selectedToken?.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
       : undefined;
 
-  // Multiplier dropdown
-
-  let selectedMultiplier = restorer.restore('selectedMultiplier');
-
   // Amount per second
 
   $: amountPerSecond =
-    amountValueParsed && selectedMultiplier && selectedToken
-      ? amountValueParsed / BigInt(selectedMultiplier)
+    amountValueParsed && $context.selectedMultiplier && selectedToken
+      ? amountValueParsed / BigInt($context.selectedMultiplier)
       : undefined;
 
   $: amountValidationState = validateAmtPerSecInput(amountPerSecond);
 
-  let setStartAndEndDate = restorer.restore('setStartAndEndDate');
-
   // Stream start date
-  let streamStartDateValue = restorer.restore('streamStartDateValue');
-  $: streamStartDate = parseDate(streamStartDateValue).date;
-  $: streamStartDateValidationState = parseDate(streamStartDateValue).validationState;
+  $: streamStartDate = parseDate($context.streamStartDateValue).date;
+  $: streamStartDateValidationState = parseDate($context.streamStartDateValue).validationState;
 
   // Stream start time
-  let streamStartTimeValue = restorer.restore('streamStartTimeValue');
-  $: streamStartTime = parseTime(streamStartTimeValue).time;
-  $: streamStartTimeValidationState = parseTime(streamStartTimeValue).validationState;
+  $: streamStartTime = parseTime($context.streamStartTimeValue).time;
+  $: streamStartTimeValidationState = parseTime($context.streamStartTimeValue).validationState;
 
   // Stream end date
-  let streamEndDateValue = restorer.restore('streamEndDateValue');
-  $: streamEndDate = parseDate(streamEndDateValue).date;
-  $: streamEndDateValidationState = parseDate(streamEndDateValue).validationState;
+  $: streamEndDate = parseDate($context.streamEndDateValue).date;
+  $: streamEndDateValidationState = parseDate($context.streamEndDateValue).validationState;
 
   // Stream end time
-  let streamEndTimeValue = restorer.restore('streamEndTimeValue');
-  $: streamEndTime = parseTime(streamEndTimeValue).time;
-  $: streamEndTimeValidationState = parseTime(streamEndTimeValue).validationState;
+  $: streamEndTime = parseTime($context.streamEndTimeValue).time;
+  $: streamEndTimeValidationState = parseTime($context.streamEndTimeValue).validationState;
 
   $: combinedStartDate =
     streamStartDate &&
@@ -159,7 +155,7 @@
     combineDateAndTime(streamEndDate ?? unreachable(), streamEndTime ?? unreachable());
 
   $: timeRangeValid =
-    !setStartAndEndDate ||
+    !$context.setStartAndEndDate ||
     (combinedStartDate &&
       combinedEndDate &&
       combinedStartDate.getTime() > new Date().getTime() &&
@@ -167,9 +163,9 @@
 
   $: formValid =
     streamEndDateValidationState.type !== 'invalid' &&
-    (receiver || recipientInputValidationState.type === 'valid') &&
+    ($context.receiver || recipientInputValidationState.type === 'valid') &&
     amountValidationState?.type === 'valid' &&
-    (nameInputHidden || streamNameValue) &&
+    (nameInputHidden || $context.streamNameValue) &&
     timeRangeValid;
 
   function submit() {
@@ -177,11 +173,11 @@
       dispatch,
       selectedToken ?? unreachable(),
       amountPerSecond ?? unreachable(),
-      recipientInputValue ?? unreachable(),
-      streamNameValue,
+      $context.recipientInputValue ?? unreachable(),
+      $context.streamNameValue,
       // TODO(streams): insert real value from api
       [],
-      setStartAndEndDate
+      $context.setStartAndEndDate
         ? {
             start: combinedStartDate ?? unreachable(),
             end: combinedEndDate ?? unreachable(),
@@ -189,19 +185,6 @@
         : undefined,
     );
   }
-
-  $: restorer.saveAll({
-    streamNameValue,
-    amountValue,
-    selectedTokenAddress,
-    selectedMultiplier,
-    recipientInputValue,
-    streamStartDateValue,
-    streamStartTimeValue,
-    streamEndDateValue,
-    streamEndTimeValue,
-    setStartAndEndDate,
-  });
 </script>
 
 <StepLayout>
@@ -214,30 +197,30 @@
           address: $wallet.address,
         }
       : undefined}
-    to={receiver
-      ? receiver
-      : recipientInputValidationState.type === 'valid' && recipientInputValue
+    to={$context.receiver
+      ? $context.receiver
+      : recipientInputValidationState.type === 'valid' && $context.recipientInputValue
       ? {
           __typename: 'AddressDriverAccount',
           driver: Driver.Address,
-          address: recipientInputValue,
+          address: $context.recipientInputValue,
         }
       : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader
-    headline={receiver ? 'Start a Continuous Donation' : 'Create stream'}
+    headline={$context.receiver ? 'Start a Continuous Donation' : 'Create stream'}
     description="Stream any ERC-20 token from your Drips account."
   />
   {#if !nameInputHidden}
     <FormField title="Stream name*">
-      <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
+      <TextInput bind:value={$context.streamNameValue} placeholder="Enter any name" />
     </FormField>
   {/if}
-  {#if !receiver}
+  {#if !$context.receiver}
     <FormField title="Stream to*">
       <InputAddress
-        bind:value={recipientInputValue}
+        bind:value={$context.recipientInputValue}
         on:validationChange={onRecipientInputValidationChange}
       />
     </FormField>
@@ -245,7 +228,7 @@
   <FormField title="Token*">
     <div class="list-container">
       <ListSelect
-        bind:selected={selectedTokenAddress}
+        bind:selected={$context.selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
         emptyStateText={`No tokens available to stream. Add one first by clicking "Add funds" from your Account page.`}
@@ -257,7 +240,7 @@
     <FormField title="Stream rate*">
       <TextInput
         suffix={selectedToken?.info.symbol}
-        bind:value={amountValue}
+        bind:value={$context.amountValue}
         variant={{ type: 'number', min: 0 }}
         placeholder="Amount"
         validationState={amountValidationState}
@@ -265,7 +248,7 @@
     </FormField>
     <FormField title="Amount per*">
       <Dropdown
-        bind:value={selectedMultiplier}
+        bind:value={$context.selectedMultiplier}
         options={[
           {
             value: '1',
@@ -299,7 +282,7 @@
       />
     </FormField>
   </div>
-  <Toggleable bind:toggled={setStartAndEndDate} label="Specify start and end dates">
+  <Toggleable bind:toggled={$context.setStartAndEndDate} label="Specify start and end dates">
     <div class="start-end-date">
       <p>
         Be aware that if your transaction is confirmed after the configured start date, your stream
@@ -310,14 +293,14 @@
           <TextInput
             validationState={streamStartDateValidationState}
             placeholder="YYYY-MM-DD"
-            bind:value={streamStartDateValue}
+            bind:value={$context.streamStartDateValue}
           />
         </FormField>
         <FormField title="Start time (UTC, 24-hour)* ">
           <TextInput
             validationState={streamStartTimeValidationState}
             placeholder="HH:MM:SS"
-            bind:value={streamStartTimeValue}
+            bind:value={$context.streamStartTimeValue}
           />
         </FormField>
       </div>
@@ -326,14 +309,14 @@
           <TextInput
             validationState={streamEndDateValidationState}
             placeholder="YYYY-MM-DD"
-            bind:value={streamEndDateValue}
+            bind:value={$context.streamEndDateValue}
           />
         </FormField>
         <FormField title="End time (UTC, 24-hour)*">
           <TextInput
             validationState={streamEndTimeValidationState}
             placeholder="HH:MM:SS"
-            bind:value={streamEndTimeValue}
+            bind:value={$context.streamEndTimeValue}
           />
         </FormField>
       </div>

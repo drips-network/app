@@ -13,6 +13,8 @@
 
   export let timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[];
 
+  export let showDelta = true;
+
   $: currentAmountsStore = streamCurrentAmountsStore(timeline);
   $: token = $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress);
 
@@ -26,13 +28,16 @@
     <span class="typo-text tabular-nums">
       0.00
     </span>
+    {#if showDelta}
     <span class="delta typo-text-small">
       0.00 / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
     </span>
+    {/if}
   {:else if token}
     <span class="typo-text tabular-nums">
       <FormattedAmount amount={$currentAmountsStore.currentAmount.amount} decimals={token.info.decimals} />
     </span>
+    {#if showDelta}
     <span class="delta typo-text-small">
       {#if $currentAmountsStore.currentDeltaPerSecond.amount > 0}
         +
@@ -40,6 +45,7 @@
       <FormattedAmount amount={applyAmtPerSecMultiplier($currentAmountsStore.currentDeltaPerSecond.amount, MULTIPLIERS[$amtDeltaUnitStore])} decimals={token.info.decimals} />
       / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
     </span>
+    {/if}
   {:else}
     <button class="typo-text" style:color="var(--color-foreground-level-5)" on:click={
       (e) => {
