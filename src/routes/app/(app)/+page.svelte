@@ -24,7 +24,7 @@
   import Box from '$lib/components/icons/Box.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
-  import DripListCardThumblink from '$lib/components/drip-list-card/drip-list-card-thumblink.svelte';
+  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -173,7 +173,7 @@
   >
     <div class="posts-grid">
       {#each data.featuredDripLists as dripList}
-        <DripListCardThumblink {dripList} />
+        <DripListCard listingMode data={{ dripList: dripList}} />
       {/each}
     </div>
   </Section>

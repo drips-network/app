@@ -1,4 +1,13 @@
 <script lang="ts" context="module">
+  import { DRIP_LIST_BADGE_FRAGMENT } from "$lib/components/drip-list-badge/drip-list-badge.svelte";
+  import { PROJECT_PROFILE_HEADER_FRAGMENT } from "$lib/components/project-profile-header/project-profile-header.svelte";
+  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from "$lib/components/splits/splits.svelte";
+  import { SUPPORT_CARD_PROJECT_FRAGMENT } from "$lib/components/support-card/support-card.svelte";
+  import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from "$lib/components/supporters-section/supporters.section.svelte";
+  import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from "$lib/components/unclaimed-project-card/unclaimed-project-card.svelte";
+  import { EDIT_PROJECT_METADATA_FLOW_FRAGMENT } from "$lib/flows/edit-project-metadata/edit-project-metadata-steps";
+  import { EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT, EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT, EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT } from "$lib/flows/edit-project-splits/edit-project-splits-steps";
+
   export const PROJECT_PROFILE_FRAGMENT = gql`
     ${PROJECT_PROFILE_HEADER_FRAGMENT}
     ${EDIT_PROJECT_METADATA_FLOW_FRAGMENT}
@@ -34,56 +43,44 @@
         support {
           ...SupportersSectionSupportItem
         }
+        totalEarned {
+          tokenAddress
+          amount
+        }
       }
     }
   `;
 </script>
 
+
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import SupportCard, {
-    SUPPORT_CARD_PROJECT_FRAGMENT,
-  } from '$lib/components/support-card/support-card.svelte';
-  import ProjectProfileHeader, {
-    PROJECT_PROFILE_HEADER_FRAGMENT,
-  } from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import UnclaimedProjectCard, {
-    UNCLAIMED_PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import SupportCard from '$lib/components/support-card/support-card.svelte';
+  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import SplitsComponent, {
-    SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT,
-  } from '$lib/components/splits/splits.svelte';
+  import SplitsComponent from '$lib/components/splits/splits.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import SupportersSection, {
-    SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT,
-  } from '$lib/components/supporters-section/supporters.section.svelte';
+  import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import editProjectMetadataSteps, {
-    EDIT_PROJECT_METADATA_FLOW_FRAGMENT,
-  } from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
+  import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Registered from '$lib/components/icons/Registered.svelte';
   import buildUrl from '$lib/utils/build-url';
-  import editProjectSplitsSteps, {
-    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
-    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
-    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
-  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
@@ -94,7 +91,6 @@
     ProjectProfileFragment,
     ProjectProfile_ClaimedProject_Fragment,
   } from './__generated__/gql.generated';
-  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import unreachable from '$lib/utils/unreachable';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import highlightStore from '$lib/stores/highlight/highlight.store';
@@ -128,7 +124,6 @@
 
   export let unclaimedFunds: Promise<{ splittable: Amount[]; collectable: Amount[] }> | undefined =
     undefined;
-  export let earnedFunds: Promise<Amount[]> | undefined = undefined;
 
   $: ownAccountId = $walletStore.dripsAccountId;
   $: isOwnProject = ownAccountId === (isClaimed(project) ? project.owner.accountId : undefined);
@@ -379,28 +374,12 @@
       </div>
 
       {#if isClaimed(project)}
-        {#await earnedFunds}
-          <div class="flex gap-4">
-            <div
-              class="stat shadow-low rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
-            >
-              <Spinner />
-            </div>
-            <div
-              class="stat shadow-low rounded-drip-lg h-[6.125rem] w-[11rem] flex items-center justify-center"
-            >
-              <Spinner />
-            </div>
-          </div>
-        {:then earnedFundsResult}
           <div class="stats" in:fade|local={{ duration: 300 }}>
-            {#if earnedFundsResult}
               <div class="stat shadow-low rounded-drip-lg">
                 <KeyValuePair key="Donations">
-                  <AggregateFiatEstimate amounts={earnedFundsResult} />
+                  <AggregateFiatEstimate amounts={project.totalEarned} />
                 </KeyValuePair>
               </div>
-            {/if}
             <!-- ("Supporters" stat) -->
             {#if [project.support].flat().length > 0}
               <a class="stat btn-theme-outlined" href="#support">
@@ -424,7 +403,6 @@
               </a>
             {/if}
           </div>
-        {/await}
       {/if}
     </header>
     <div class="content">
@@ -513,7 +491,6 @@
       {/if}
       <section id="support">
         <SupportersSection
-          accountId={project.account.accountId}
           type="project"
           supportItems={project.support}
         />

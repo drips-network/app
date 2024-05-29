@@ -112,11 +112,13 @@
     );
   }
 
+  /** Minimal version w/ link to Drip List page for listing contexts */
+  export let listingMode = false;
+
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
 
   $: listOwner = dripList?.owner;
-  $: dripListUrl = dripList && `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
 
   $: title = (dripList?.name || votingRound?.name) ?? unreachable();
@@ -172,13 +174,21 @@
   })
 
   $: totalEarned = mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []);
+
+  $: dripListUrl = dripList
+    ? `/app/drip-lists/${dripList.account.accountId}`
+    : votingRound
+    ? `/app/drip-lists/${votingRound.id}`
+    : undefined;
 </script>
 
 {#if votingRound}
   <VotingRoundNoticeCard {votingRound} />
 {/if}
 
-<section
+<svelte:element
+  this={listingMode ? 'a' : 'section'}
+  href={dripListUrl}
   class:has-description={dripList?.description || votingRound?.description}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
@@ -194,33 +204,37 @@
           </a>
         </h1>
         <div class="flex items-center gap-4 -my-1">
-          <ShareButton
-            url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
-          />
-          {#if isOwnList}
-            <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+          {#if !listingMode}
+            <ShareButton
+              url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
+            />
+            {#if isOwnList}
+              <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+            {/if}
           {/if}
         </div>
       </div>
       {#if description.length > 0}
         <div class="description twemoji-text">
-          <TextExpandable isExpandable={true}>
+          <TextExpandable numberOfLines={listingMode ? 1 : 2} isExpandable={!listingMode}>
             {@html twemoji(description)}
           </TextExpandable>
         </div>
       {/if}
-      <div class="flex gap-2">
-        Created by <IdentityBadge
-          showAvatar={true}
-          showIdentity={true}
-          address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
-          disableTooltip={true}
-        />
-      </div>
+      {#if !listingMode}
+        <div class="flex gap-2">
+          Created by <IdentityBadge
+            showAvatar={true}
+            showIdentity={true}
+            address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
+            disableTooltip={true}
+          />
+        </div>
+      {/if}
     </header>
 
     <section>
-      {#if dripList && votingRound}
+      {#if !listingMode && dripList && votingRound}
         <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
           <TabbedBox
             bind:activeTab
@@ -262,8 +276,8 @@
                   {/if}
                 </div>
                 <div class="splits">
-                  <div class="splits-component">
-                    <Splits groupsExpandable={true} list={dripList.splits} />
+                  <div class="splits-component" style:pointer-events={listingMode ? 'none' : undefined}>
+                    <Splits maxRows={dripList.description ? 3 : 4} groupsExpandable={!listingMode} list={dripList.splits} />
                   </div>
                 </div>
               </div>
@@ -284,7 +298,7 @@
                     </div>
                   {/if}
                   <div class="splits-component">
-                    <VotingRoundSplits {votingRound} />
+                    <VotingRoundSplits maxRows={votingRound.description ? 3 : 4} {votingRound} />
                   </div>
                 </div>
               </div>
@@ -336,13 +350,18 @@
       </TransitionedHeight>
     </section>
   </div>
-</section>
+</svelte:element>
 
 <style>
   .drip-list-card {
     box-shadow: var(--elevation-low);
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
+  }
+
+  a.drip-list-card:hover, a.drip-list-card:focus-visible {
+    box-shadow: var(--elevation-medium);
+    transform: translateY(-0.125rem);
   }
 
   .drip-list-card .title-and-actions {

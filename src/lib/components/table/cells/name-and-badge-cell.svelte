@@ -8,6 +8,14 @@
       id
       name
       ...StreamStateBadgeStream
+      receiver {
+        ... on User {
+          __typename
+        }
+        ... on DripList {
+          __typename
+        }
+      }
     }
   `;
 </script>
@@ -17,13 +25,17 @@
   import type { NameAndBadgeCellStreamFragment } from "./__generated__/gql.generated";
 
   export let stream: NameAndBadgeCellStreamFragment;
-
-  $: console.log(stream)
 </script>
 
 <div class="name-and-badge">
   <span class="typo-text">
-    {stream.name}
+    {#if stream.name}
+      {stream.name}
+    {:else if stream.receiver.__typename === 'DripList'}
+      Continuous support
+    {:else}
+      Unnamed stream
+    {/if}
   </span>
   <StreamStateBadge {stream} hideActive size="small" />
 </div>

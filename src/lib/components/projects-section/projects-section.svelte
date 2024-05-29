@@ -1,59 +1,29 @@
+<script lang="ts" context="module">
+  export const PROJECTS_SECTION_PROJECT_FRAGMENT = gql`
+    ${PROJECT_CARD_FRAGMENT}
+    fragment ProjectsSectionProject on Project {
+      ...ProjectCard
+    }
+  `;
+</script>
+
 <script lang="ts">
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import ProjectCard, { PROJECT_CARD_FRAGMENT } from '../project-card/project-card.svelte';
-  import assert from '$lib/utils/assert';
-  import Plus from '$lib/components/icons/Plus.svelte';
   import Box from '$lib/components/icons/Box.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '../section/section.svelte';
-  import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
-  import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
+  import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import modal from '$lib/stores/modal';
   // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
 
-  export let address: string | undefined;
+  export let projects: ProjectsSectionProjectFragment[];
+  export let withClaimProjectButton = false;
 
-  let projects: ProjectsQuery['projects'] | undefined;
   let error = false;
-  let loaded = false;
 
   export let collapsed = false;
   export let collapsable = false;
-
-  async function updateProjects() {
-    try {
-      assert(address);
-
-      const getProjectsQuery = gql`
-        ${PROJECT_CARD_FRAGMENT}
-        query Projects($where: ProjectWhereInput) {
-          projects(where: $where) {
-            ...ProjectCard
-          }
-        }
-      `;
-
-      const response = await query<ProjectsQuery, ProjectsQueryVariables>(getProjectsQuery, {
-        where: {
-          ownerAddress: address,
-        },
-      });
-      projects = response.projects;
-
-      loaded = true;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      loaded = true;
-      error = true;
-    }
-  }
-
-  $: address && updateProjects();
-
-  $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
 <Section
@@ -62,7 +32,7 @@
   header={{
     icon: Box,
     label: 'Projects',
-    actions: isSelf
+    actions: withClaimProjectButton
       ? [
           // {
           //   // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt.  😊
@@ -75,12 +45,12 @@
   }}
   skeleton={{
     horizontalScroll: false,
-    loaded,
+    loaded: true,
     empty: projects?.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',
-    emptyStateText: isSelf
+    emptyStateText: withClaimProjectButton
       ? 'If you develop an open-source project, click "Claim project" to get started.'
       : 'This user hasnʼt claimed any software projects yet.',
   }}

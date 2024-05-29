@@ -1,13 +1,29 @@
+<script lang="ts" context="module">
+  export const DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT = gql`
+    ${DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT}
+    fragment DripListsPageDripList on DripList {
+      ...DripListsSectionDripList
+    }
+  `;
+</script>
+
 <script lang="ts">
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
-  import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+  import DripListsSection, { DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import Button from '$lib/components/button/button.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import { goto } from '$app/navigation';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import { gql } from 'graphql-request';
+  import type { PageData } from './$types';
+
+  export let data: PageData;
+
+  $: votingRounds = data.votingRounds ?? [];
+  $: dripLists = data.dripLists ?? [];
 
   const walletInitialized = walletStore.initialized;
 
@@ -46,7 +62,7 @@
       </div>
     </svelte:fragment>
   </EduCard>
-  <DripListsSection accountId={$walletStore.dripsAccountId} showCreateNewListCard={true} />
+  <DripListsSection {votingRounds} {dripLists} showCreateNewListCard={true} />
 </div>
 
 <style>

@@ -1,85 +1,42 @@
+<script lang="ts" context="module">
+  import { gql } from "graphql-request";
+  import { DRIP_LIST_CARD_FRAGMENT } from "../drip-list-card/drip-list-card.svelte";
+
+  export const DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT = gql`
+    ${DRIP_LIST_CARD_FRAGMENT}
+    fragment DripListsSectionDripList on DripList {
+      ...DripListCard
+    }
+  `
+</script>
+
 <script lang="ts">
-  import assert from '$lib/utils/assert';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
-  import DripListCardThumblink, {
-    DRIP_LIST_CARD_THUMBLINK_FRAGMENT,
-  } from '../drip-list-card/drip-list-card-thumblink.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '../section/section.svelte';
-  import { AddressDriverClient } from 'radicle-drips';
   import Button from '../button/button.svelte';
   import Illustration from '../icons/✏️.svelte';
-  import { gql } from 'graphql-request';
-  import type { DripListsQuery, DripListsQueryVariables } from './__generated__/gql.generated';
-  import query from '$lib/graphql/dripsQL';
   import modal from '$lib/stores/modal';
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
-  import * as multiplayer from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-  import { mapSplitsFromMultiplayerResults } from '../splits/splits.svelte';
+  import type { SplitsComponentSplitsReceiver } from '../splits/splits.svelte';
+  import DripListCard from '../drip-list-card/drip-list-card.svelte';
+  import type { DripListsSectionDripListFragment } from "./__generated__/gql.generated";
 
-  export let accountId: string | undefined;
+  export let dripLists: DripListsSectionDripListFragment[];
+  export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
+  export let withCreateButton = false;
+
   export let collapsed = false;
   export let collapsable = false;
   export let showCreateNewListCard = false;
 
   let error = false;
 
-  let dripLists: DripListsQuery['dripLists'] | undefined;
-  let votingRounds: VotingRound[] | undefined;
-  async function updateDripLists() {
-    try {
-      assert(accountId);
-      const address = AddressDriverClient.getUserAddress(accountId);
-
-      const dripListsQuery = gql`
-        ${DRIP_LIST_CARD_THUMBLINK_FRAGMENT}
-        query DripLists($where: DripListWhereInput) {
-          dripLists(where: $where) {
-            ...DripListCardThumblink
-          }
-        }
-      `;
-
-      const fetches = await Promise.all([
-        query<DripListsQuery, DripListsQueryVariables>(dripListsQuery, {
-          where: {
-            ownerAddress: address,
-          },
-        }),
-        multiplayer.getVotingRounds({ publisherAddress: address }),
-      ] as const);
-
-      dripLists = fetches[0].dripLists;
-      votingRounds = fetches[1].filter((v) => {
-        // filter out votingRounds that already are associated with a drip list based on votingRound.dripListId
-        return !dripLists?.some((dl) => dl.account.accountId === v.dripListId);
-      });
-
-      // add voting results as splits table data
-      const votingRoundsWithResults = votingRounds.filter((v) => v.result);
-      const splits = await Promise.all(
-        votingRoundsWithResults.map((v) => v.result && mapSplitsFromMultiplayerResults(v.result)),
-      );
-      votingRounds = votingRounds.map((v) => ({
-        ...v,
-        splits: splits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)],
-      }));
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      error = true;
-    }
-  }
-  $: accountId && updateDripLists();
-
   $: dripListsAndVotingRounds = [
     ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []),
     ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
   ];
-
-  $: isSelf = Boolean(accountId && accountId === $walletStore.dripsAccountId);
 </script>
 
 <Section
@@ -89,7 +46,7 @@
     icon: DripListIcon,
     label: 'Drip Lists',
     actionsDisabled: !dripLists,
-    actions: isSelf
+    actions: withCreateButton
       ? [
           {
             label: 'Create Drip List',
@@ -108,8 +65,8 @@
     empty: dripListsAndVotingRounds.length === 0 ?? undefined,
     error,
     emptyStateEmoji: '🫗',
-    emptyStateHeadline: isSelf ? 'You donʼt have any Drip Lists' : 'No Drip Lists',
-    emptyStateText: isSelf
+    emptyStateHeadline: 'No Drip Lists',
+    emptyStateText: withCreateButton
       ? 'Create a Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects',
     horizontalScroll: false,
@@ -123,9 +80,9 @@
     >
       {#each dripListsAndVotingRounds as list}
         {#if list.type === 'drip-list'}
-          <DripListCardThumblink dripList={list} />
+          <DripListCard listingMode data={{ dripList: list }} />
         {:else}
-          <DripListCardThumblink votingRound={list} />
+          <DripListCard listingMode data={{ votingRound: list}} />
         {/if}
       {/each}
       {#if showCreateNewListCard}

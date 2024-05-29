@@ -1,142 +1,53 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
-  import ens from '$lib/stores/ens';
-  import wallet from '$lib/stores/wallet/wallet.store';
-  import { onMount } from 'svelte';
   import Balances from '../funds/sections/balances.section.svelte';
   import Streams from '../funds/sections/streams.section.svelte';
   import SocialLink from '$lib/components/social-link/social-link.svelte';
-  import unreachable from '$lib/utils/unreachable';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade } from 'svelte/transition';
-  import decodeUniversalAccountId from '$lib/utils/decode-universal-account-id';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
-  import { goto } from '$app/navigation';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
-  $: accountId = $page.params.accountId;
+  export let data;
 
-  let dripsAccountId: string | undefined;
-  let address: string | undefined;
-  let error: 'is-repo-driver-account-id' | 'ens-not-resolved' | true | undefined;
+  $: socialLinkValues = {
+    'com.twitter': data.ensData?.records['com.twitter'],
+    'com.github': data.ensData?.records['com.github'],
+    url: data.ensData?.records.url,
+  };
 
-  const ensRecords = ['description', 'url', 'com.twitter', 'com.github'] as const;
-  const socialLinks = ['com.twitter', 'com.github', 'url'] as const;
-
-  let socialLinkValues: { [key in (typeof socialLinks)[number]]: string } | undefined = undefined;
   let description: string | undefined;
+  $: description = data.ensData?.records.description;
 
-  async function fetchEnsRecords(
-    ensName: string,
-  ): Promise<{ [key in (typeof ensRecords)[number]]: string } | undefined> {
-    try {
-      const { provider } = $wallet;
-
-      const resolver = await provider.getResolver(ensName);
-
-      const promises = ensRecords.map(async (recordName) => [
-        recordName,
-        await resolver?.getText(recordName),
-      ]);
-
-      const result = Object.fromEntries(await Promise.all(promises));
-
-      return result;
-    } catch {
-      return undefined;
-    }
-  }
-
-  async function updateEnsRecords(name: string) {
-    const records = await fetchEnsRecords(name);
-
-    if (!records) return;
-
-    description = records.description;
-
-    socialLinkValues = {
-      url: records.url,
-      'com.github': records['com.github'],
-      'com.twitter': records['com.twitter'],
-    };
-  }
-
-  onMount(async () => {
-    try {
-      const decodedAccountId = await decodeUniversalAccountId(accountId);
-
-      switch (decodedAccountId.driver) {
-        case 'address': {
-          address = decodedAccountId.address;
-          dripsAccountId = decodedAccountId.dripsAccountId;
-          break;
-        }
-        case 'nft': {
-          goto(`/app/drip-lists/${decodedAccountId.dripsAccountId}`);
-          break;
-        }
-        case 'repo': {
-          error = 'is-repo-driver-account-id';
-          break;
-        }
-      }
-    } catch (e) {
-      if (typeof e === 'object' && e && 'message' in e && e.message === 'Not found') {
-        error = 'ens-not-resolved';
-      } else {
-        // eslint-disable-next-line no-console
-        console.error(e);
-
-        error = true;
-      }
-    }
-  });
-
-  $: {
-    const name = address && $ens[address]?.name;
-    if (name) updateEnsRecords(name);
-  }
-
-  function isNetwork(input: string): input is (typeof socialLinks)[number] {
-    return socialLinks.includes(input as (typeof socialLinks)[number]);
-  }
-
-  $: isSelf = address && address.toLowerCase() === $walletStore.address?.toLowerCase();
+  $: isSelf = data.profileData?.account.address && data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
 
-<HeadMeta title={(address && $ens[address]?.name) ?? address ?? accountId} />
+<HeadMeta title={data.ensData?.ensName ?? data.profileData?.account.address ?? undefined} />
 
-{#if error === 'is-repo-driver-account-id'}
+{#if data.error && data.type === 'is-repo-driver-account-id'}
   <LargeEmptyState
     emoji="🕸️"
     headline="Unable to jump to projects by account ID"
     description="Sorry, but jumping to a Drips Project by its account ID is currently not supported."
   />
-{:else if error === 'ens-not-resolved'}
+{:else if data.error && data.type === 'ens-not-resolved'}
   <LargeEmptyState
     emoji="🕸️"
     headline="Not found"
     description="Sorry, but we couldn't find that ENS name."
   />
-{:else if error}
-  <LargeEmptyState
-    emoji="🕸️"
-    headline="Something went wrong"
-    description="There may be more information in the developer console."
-  />
-{:else}
+{:else if data.profileData}
   <article class="flex flex-col gap-16">
-    <SectionSkeleton placeholderOutline={false} loaded={Boolean(address)}>
-      {#if address}
+    <SectionSkeleton placeholderOutline={false} loaded>
         <header class="flex flex-wrap sm:flex-nowrap gap-4">
           <IdentityBadge
             disableLink
-            {address}
+            address={data.profileData.account.address}
             size="gigantic"
             showIdentity={false}
             disableTooltip
@@ -146,17 +57,17 @@
               <h1 class="w-full -mb-2">
                 <IdentityBadge
                   disableLink
-                  {address}
+                  address={data.profileData.account.address}
                   size="gigantic"
                   showAvatar={false}
                   disableTooltip
                 />
               </h1>
               <ul class="social-links">
-                <div in:fade|local><SocialLink network="ethereum" value={address} /></div>
+                <div in:fade|local><SocialLink network="ethereum" value={data.profileData.account.address} /></div>
                 {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
                   {#if value}<li in:fade|local>
-                      <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
+                      <SocialLink network={network} {value} />
                     </li>{/if}
                 {/each}
               </ul>
@@ -164,13 +75,12 @@
             </div>
           </div>
         </header>
-      {/if}
     </SectionSkeleton>
-    <Developer accountId={dripsAccountId} />
-    <ProjectsSection collapsable {address} />
-    <DripListsSection collapsable accountId={dripsAccountId} />
-    <Streams collapsable accountId={dripsAccountId} disableActions={!isSelf} />
-    <Balances collapsable collapsed accountId={dripsAccountId} />
+    <Developer accountId={data.profileData.account.accountId} />
+    <ProjectsSection collapsable projects={mapFilterUndefined(data.profileData.projects, (v) => v === null ? undefined : v)} />
+    <DripListsSection collapsable votingRounds={data.profileData.votingRounds} dripLists={mapFilterUndefined(data.profileData.dripLists, (v) => v === null ? undefined : v)} />
+    <Streams collapsable userStreams={data.profileData.streams} disableActions={!isSelf} accountId={data.profileData.account.accountId} />
+    <Balances collapsable collapsed userBalances={data.profileData.balances} accountId={data.profileData.account.accountId} />
   </article>
 {/if}
 

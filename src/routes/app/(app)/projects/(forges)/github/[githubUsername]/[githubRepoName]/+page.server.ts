@@ -1,7 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import type { PageServerLoad } from './$types';
-import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
@@ -9,13 +8,9 @@ import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generate
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
-import { Forge } from 'radicle-drips';
-import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 
 export const load = (async ({ params, fetch, url }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
-
-  const repoDriver = await getRepoDriverClient();
 
   // `exact` param disables the redirect to the "real" github repo URL.
   // For example, after a repo has been renamed, it would usually automatically redirect
@@ -34,17 +29,11 @@ export const load = (async ({ params, fetch, url }) => {
 
   let repo: z.infer<typeof repoSchema>;
 
-  const accountId = await repoDriver.getAccountId(Forge.GitHub, `${githubUsername}/${githubRepoName}`);
-
   const getProjectsQuery = gql`
     ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!, $projectId: String!) {
+    query ProjectByUrl($url: String!) {
       projectByUrl(url: $url) {
         ...ProjectProfile
-      }
-      earnedFunds(projectId: $projectId) {
-        amount
-        tokenAddress
       }
     }
   `;
@@ -57,13 +46,10 @@ export const load = (async ({ params, fetch, url }) => {
       getProjectsQuery,
       {
         url: repoUrl,
-        projectId: accountId,
       },
       fetch,
     ),
   ]);
-
-  // TODO(streams): use earned funds values from API
 
   const project = projectRes.projectByUrl;
   if (!project) {
@@ -94,8 +80,6 @@ export const load = (async ({ params, fetch, url }) => {
     ? fetchUnclaimedFunds(project.account.accountId)
     : undefined;
 
-  const earnedFunds = isClaimed(project) ? fetchEarnedFunds(project.account.accountId) : undefined;
-
   if (isClaimed(project) && !project.splits) {
     throw new Error('Claimed project somehow does not have splits');
   }
@@ -125,7 +109,6 @@ export const load = (async ({ params, fetch, url }) => {
     project,
     streamed: {
       unclaimedFunds,
-      earnedFunds,
     },
     newRepo,
     correctCasingRepo,
