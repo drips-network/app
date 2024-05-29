@@ -51,15 +51,12 @@
     streamCurrentAmountsStore,
   } from '$lib/flows/create-stream-flow/methods/current-amounts';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
-  import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
   import tokensStore from '$lib/stores/tokens/tokens.store';
 
   export let data: PageData;
   const stream: StreamPageStreamFragment = data.stream;
 
   const currentStreamAmounts = streamCurrentAmountsStore(stream.timeline);
-
-  console.log(stream.timeline)
 
   $: token = $tokensStore && tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress);
 </script>
@@ -74,7 +71,7 @@
     from={stream.sender.account}
     to={stream.receiver.account}
     amountPerSecond={$currentStreamAmounts.currentDeltaPerSecond.amount}
-    tokenInfo={{ symbol: 'TOKEN', decimals: 18 }}
+    tokenInfo={token ? { symbol: token.info.symbol, decimals: token.info.decimals } : undefined}
     halted={false}
   />
   <div class="details">

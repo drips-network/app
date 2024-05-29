@@ -12,7 +12,7 @@
   const dispatch = createEventDispatcher<{ loaded: never }>();
   interface Amount {
     tokenAddress: string;
-    amount: bigint;
+    amount: bigint | string;
   }
 
   type Amounts = Amount[];

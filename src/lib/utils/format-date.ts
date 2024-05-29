@@ -13,6 +13,7 @@ const DATE_FORMAT_CONVENTIONS = {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    year: 'numeric',
   },
   verbose: {
     month: 'long',

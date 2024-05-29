@@ -1,4 +1,3 @@
-import type { Items } from '$lib/components/list-select/list-select.types';
 import { writable } from 'svelte/store';
 import type { CreateStreamFlowAddressDriverAccountFragment, CreateStreamFlowDetailsNftDriverAccountFragment } from './__generated__/gql.generated';
 import type { CurrentAmountsUserBalanceTimelineItemFragment } from './methods/__generated__/gql.generated';

@@ -10,10 +10,18 @@
   import modal from "$lib/stores/modal";
   import Stepper from "../stepper/stepper.svelte";
   import addCustomTokenFlowSteps from "$lib/flows/add-custom-token/add-custom-token-flow-steps";
+  import { fade } from "svelte/transition";
+  import AggregateFiatEstimate from "../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte";
+  import { constants } from "radicle-drips";
 
   export let timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[];
+  export let showFiatValue = false;
+
+  export let unknownTokenButton = true;
 
   export let showDelta = true;
+
+  const tokensStoreConnectedReadable = tokensStore.connected;
 
   $: currentAmountsStore = streamCurrentAmountsStore(timeline);
   $: token = $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress);
@@ -25,20 +33,27 @@
 
 <div class="realtime-amount">
   {#if timeline.length === 0}
-    <span class="typo-text tabular-nums">
+    <span in:fade|local={{ duration: 300 }} class="typo-text tabular-nums">
       0.00
     </span>
     {#if showDelta}
-    <span class="delta typo-text-small">
+    <span in:fade|local={{ duration: 300 }} class="delta typo-text-small">
       0.00 / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
     </span>
     {/if}
   {:else if token}
-    <span class="typo-text tabular-nums">
-      <FormattedAmount amount={$currentAmountsStore.currentAmount.amount} decimals={token.info.decimals} />
+    <span in:fade|local={{ duration: 300 }} class="typo-text tabular-nums">
+      {#if showFiatValue}
+        <AggregateFiatEstimate amounts={[{
+          tokenAddress: $currentAmountsStore.currentAmount.tokenAddress,
+          amount: $currentAmountsStore.currentAmount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+        }]} />
+      {:else}
+        <FormattedAmount amount={$currentAmountsStore.currentAmount.amount} decimals={token.info.decimals} />
+      {/if}
     </span>
     {#if showDelta}
-    <span class="delta typo-text-small">
+    <span in:fade|local={{ duration: 300 }} class="delta typo-text-small">
       {#if $currentAmountsStore.currentDeltaPerSecond.amount > 0}
         +
       {/if}
@@ -46,13 +61,18 @@
       / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
     </span>
     {/if}
-  {:else}
+  {:else if $tokensStoreConnectedReadable}
     <button class="typo-text" style:color="var(--color-foreground-level-5)" on:click={
       (e) => {
+        if (!unknownTokenButton) return;
+
+        e.stopImmediatePropagation();
         modal.show(Stepper, undefined, addCustomTokenFlowSteps($currentAmountsStore.currentAmount.tokenAddress));
-        e.stopPropagation();
       }
     }>Unknown token</button>
+  {:else}
+    <!-- Empty span while tokens store is loading (can only be visible on SSR'd pages where blockWhileInitializing set to false) -->
+    <span>​</span>
   {/if}
 </div>
 

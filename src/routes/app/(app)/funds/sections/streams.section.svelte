@@ -84,8 +84,6 @@
   $: incoming = userStreams.incoming;
   $: outgoing = userStreams.outgoing;
 
-  $: console.log(userStreams)
-
   $: isSelf = accountId === $walletStore.dripsAccountId;
 
   $: token = tokenAddress ? tokens.getByAddress(tokenAddress) : undefined;
@@ -274,6 +272,7 @@
     emptyStateHeadline,
     emptyStateText,
     loaded: true,
+    empty: incoming.length === 0 && outgoing.length === 0,
   }}
 >
   {#if optionsIncoming.data.length > 0 && !onlyDripListStreams}

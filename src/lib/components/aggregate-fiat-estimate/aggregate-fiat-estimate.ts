@@ -4,7 +4,7 @@ import { get } from 'svelte/store';
 
 export interface Amount {
   tokenAddress: string;
-  amount: bigint;
+  amount: bigint | string;
 }
 
 export default function aggregateFiatEstimate(
@@ -27,7 +27,9 @@ export default function aggregateFiatEstimate(
         return sum;
       }
 
-      const res = fiatEstimates.convert({ amount, tokenAddress }, token.info.decimals, priceStore);
+      const bigIntAmount = BigInt(amount);
+
+      const res = fiatEstimates.convert({ amount: bigIntAmount, tokenAddress }, token.info.decimals, priceStore);
 
       if (res === 'unsupported') {
         includesUnknownPrice = true;

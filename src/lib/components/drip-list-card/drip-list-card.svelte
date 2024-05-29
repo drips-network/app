@@ -8,6 +8,7 @@
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
     ${DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT}
+    ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
       ...EditDripListStepSelectedDripList
       ...DripListCardSupporterPile
@@ -28,6 +29,19 @@
         }
         ... on DripListReceiver {
           ...SplitsComponentDripListReceiver
+        }
+      }
+      totalEarned {
+        tokenAddress
+        amount
+      }
+      support {
+        ... on StreamSupport {
+          stream {
+            timeline {
+              ...CurrentAmountsTimelineItem
+            }
+          }
         }
       }
     }
@@ -52,17 +66,12 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import { constants } from 'radicle-drips';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   import Pile from '../pile/pile.svelte';
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
-  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
-  import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import type { DripListCardFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
-  import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
-  import { onMount } from 'svelte';
   import getSupportersPile, {
     DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
   } from './methods/get-supporters-pile';
@@ -82,9 +91,15 @@
   import Wallet from '../icons/Wallet.svelte';
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
   import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer/multiplayer';
-  import { writable } from 'svelte/store';
+  import { derived, get, writable } from 'svelte/store';
   import { BASE_URL } from '$lib/utils/base-url';
   import twemoji from '$lib/utils/twemoji';
+  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT, currentAmounts, streamCurrentAmountsStore } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+  import { onMount } from 'svelte';
+  import tickStore from '$lib/stores/tick/tick.store';
+  import { constants } from 'radicle-drips';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -106,18 +121,6 @@
 
   $: title = (dripList?.name || votingRound?.name) ?? unreachable();
   $: description = (dripList?.description || votingRound?.description) ?? '';
-
-  let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined = undefined;
-  onMount(async () => {
-    if (!dripList) return;
-    incomingSplitTotal = await getIncomingSplitTotal(dripList.account.accountId);
-  });
-
-  let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined = undefined;
-  onMount(async () => {
-    if (!dripList) return;
-    incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
-  });
 
   $: supportersPile =
     dripList && getSupportersPile(dripList.support);
@@ -143,6 +146,32 @@
   $: votingRoundStatus = votingRound
     ? getVotingRoundStatusReadable(votingRound)
     : writable(undefined);
+
+  let incomingStreamsTotalStreamed: { tokenAddress: string, amount: bigint }[];
+  function updateIncomingStreamsTotalStreamed() {
+    if (!dripList) return;
+
+    const incomingStreams = mapFilterUndefined(dripList.support, (s) => {
+      if (s.__typename === 'StreamSupport') {
+        return s.stream;
+      }
+    });
+
+    incomingStreamsTotalStreamed = mergeAmounts(incomingStreams.map((stream) => {
+      const amount = currentAmounts(stream.timeline).currentAmount;
+
+      return {
+        tokenAddress: amount.tokenAddress,
+        amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      }
+    }));
+  }
+  onMount(() => {
+    const tick = tickStore.register(updateIncomingStreamsTotalStreamed);
+    return () => tickStore.deregister(tick);
+  })
+
+  $: totalEarned = mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []);
 </script>
 
 {#if votingRound}
@@ -217,7 +246,7 @@
                     {#if browser}
                       <AggregateFiatEstimate
                         supressUnknownAmountsWarning
-                        amounts={[]}
+                        amounts={totalEarned}
                       />
                     {/if}
                     <span class="muted">&nbsp;total</span>
