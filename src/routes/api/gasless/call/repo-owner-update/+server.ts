@@ -5,8 +5,9 @@ import { ethers, utils } from 'ethers';
 import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
-import { GELATO_API_KEY, INFURA_KEY } from '$env/static/private';
+import { GELATO_API_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
+import { getNetwork, isSupportedChainId } from '$lib/stores/wallet/network';
 
 const payloadSchema = z.object({
   forge: z.number(),
@@ -39,22 +40,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const { forge, projectName, chainId } = payload;
 
-  assert([1, 11155111].includes(chainId), 'Unsupported network');
+  assert(isSupportedChainId(chainId), 'Unsupported chain id');
 
   const repoDriverAddress = getNetworkConfig(chainId)?.REPO_DRIVER ?? unreachable();
 
-  const provider = new ethers.providers.InfuraProvider(
-    {
-      chainId,
-      name:
-        {
-          1: 'homestead',
-          11155111: 'sepolia',
-        }[chainId] ?? unreachable(),
-    },
-    INFURA_KEY,
-  );
-
+  const provider = new ethers.providers.JsonRpcProvider(getNetwork(chainId).rpcUrl);
   const contract = new ethers.Contract(repoDriverAddress, REPO_DRIVER_ABI, provider);
 
   const tx = await contract.populateTransaction.requestUpdateOwner(

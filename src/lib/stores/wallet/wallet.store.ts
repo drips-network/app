@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import type { Network } from '@ethersproject/networks';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { AddressDriverClient } from 'radicle-drips';
@@ -18,15 +17,12 @@ import isRunningInSafe from '$lib/utils/is-running-in-safe';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
-import network, { isConfiguredChainId } from './network';
+import network, { getNetwork, isConfiguredChainId, type Network } from './network';
 import { invalidateAll } from '$app/navigation';
 
 const appsSdk = new SafeAppsSDK();
 
-const DEFAULT_NETWORK: Network = {
-  chainId: network.chainId,
-  name: network.name,
-};
+const DEFAULT_NETWORK: Network = network;
 
 const injected = injectedWallets();
 
@@ -233,7 +229,6 @@ const walletStore = () => {
 
     if (browser) {
       // set 'connected-address' cookie
-      console.log('set cookie')
       document.cookie = `connected-address=${accounts[0]}; Path=/; max-age=31536000; SameSite=Lax`;
       await invalidateAll();
     }
@@ -244,7 +239,7 @@ const walletStore = () => {
       dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
       provider,
       signer,
-      network: await provider.getNetwork(),
+      network: getNetwork((await provider.getNetwork()).chainId),
       safe: safeInfo,
     });
   }
@@ -295,7 +290,7 @@ const mockWalletStore = () => {
 
   const state = writable<WalletStoreState>({
     connected: false,
-    network: provider.network,
+    network: getNetwork(provider.network.chainId),
     provider,
   });
 
@@ -309,7 +304,7 @@ const mockWalletStore = () => {
       address,
       provider,
       signer,
-      network: provider.network,
+      network: getNetwork(provider.network.chainId),
       dripsAccountId: accountId,
     });
 

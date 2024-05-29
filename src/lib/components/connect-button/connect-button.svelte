@@ -17,7 +17,7 @@
 <div class="wrapper">
   {#if $wallet.network.chainId !== 1}
     <div class="network-badge">
-      <p>{$wallet.network.name}</p>
+      <p>{$wallet.network.label}</p>
     </div>
   {/if}
   {#if $wallet.connected}
