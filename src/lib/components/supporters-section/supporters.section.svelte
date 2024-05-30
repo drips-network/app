@@ -199,7 +199,7 @@
             }}
           >
             <svelte:fragment slot="amount-value">
-              <RealtimeAmount unknownTokenButton={false} showFiatValue showDelta={false} timeline={stream.timeline} />
+              <RealtimeAmount unknownTokenButton={false} showFiatValue showDelta={false} timeline={stream.timeline} tokenAddress={stream.config.amountPerSecond.tokenAddress}/>
             </svelte:fragment>
             <svelte:fragment slot="amount-sub">
               {#if $tokensStoreConnected}

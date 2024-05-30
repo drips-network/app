@@ -52,9 +52,11 @@
       address: balance.tokenAddress,
     },
     earnings: {
+      tokenAddress: balance.tokenAddress,
       timeline: balance.incoming,
     },
     streaming: {
+      tokenAddress: balance.tokenAddress,
       timeline: balance.outgoing,
     },
   }));

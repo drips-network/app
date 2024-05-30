@@ -15,6 +15,8 @@
   import { constants } from "radicle-drips";
 
   export let timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[];
+  export let tokenAddress: string;
+
   export let showFiatValue = false;
 
   export let unknownTokenButton = true;
@@ -23,7 +25,7 @@
 
   const tokensStoreConnectedReadable = tokensStore.connected;
 
-  $: currentAmountsStore = streamCurrentAmountsStore(timeline);
+  $: currentAmountsStore = streamCurrentAmountsStore(timeline, tokenAddress);
   $: token = $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress);
 
   function applyAmtPerSecMultiplier(amount: bigint, multiplier: number) {

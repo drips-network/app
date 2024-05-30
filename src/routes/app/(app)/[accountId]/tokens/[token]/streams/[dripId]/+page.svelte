@@ -56,7 +56,7 @@
   export let data: PageData;
   const stream: StreamPageStreamFragment = data.stream;
 
-  const currentStreamAmounts = streamCurrentAmountsStore(stream.timeline);
+  const currentStreamAmounts = streamCurrentAmountsStore(stream.timeline, stream.config.amountPerSecond.tokenAddress);
 
   $: token = $tokensStore && tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress);
 </script>

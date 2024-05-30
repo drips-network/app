@@ -46,15 +46,10 @@
 
 <script lang="ts">
   import TokenStreamIcon from '$lib/components/icons/TokenStreams.svelte';
-  import PlusIcon from '$lib/components/icons/Plus.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
-  import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
   import UserBadgeCell, { USER_BADGE_CELL_DRIP_LIST_FRAGMENT, USER_BADGE_CELL_USER_FRAGMENT } from '$lib/components/table/cells/user-badge.cell.svelte';
-  import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import { onMount, type ComponentProps } from 'svelte';
+  import type { ComponentProps } from 'svelte';
   import NameAndBadgeCell from '$lib/components/table/cells/name-and-badge-cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import onClickGoto from '$lib/utils/on-click-goto';
@@ -62,7 +57,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
   import tokens from '$lib/stores/tokens';
-  import type { StreamsSectionStreamFragment, StreamsSectionStreamsFragment } from "./__generated__/gql.generated";
+  import type { StreamsSectionStreamsFragment } from "./__generated__/gql.generated";
   import { decodeStreamId } from "$lib/stores/streams/methods/make-stream-id";
   import Token from "$lib/components/token/token.svelte";
   import RealtimeAmount from "$lib/components/amount/realtime-amount.svelte";
@@ -81,8 +76,8 @@
   export let emptyStateHeadline = 'No streams';
 
   export let userStreams: StreamsSectionStreamsFragment;
-  $: incoming = userStreams.incoming;
-  $: outgoing = userStreams.outgoing;
+  $: incoming = userStreams.incoming.filter((s) => tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true);
+  $: outgoing = userStreams.outgoing.filter((s) => tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true);
 
   $: isSelf = accountId === $walletStore.dripsAccountId;
 

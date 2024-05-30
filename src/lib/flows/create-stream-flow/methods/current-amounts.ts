@@ -43,6 +43,7 @@ interface Amount {
 
 export function currentAmounts(
   timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[],
+  tokenAddress: string,
 ): {
   currentAmount: Amount;
   currentDeltaPerSecond: Amount;
@@ -61,8 +62,8 @@ export function currentAmounts(
 
   if (!currentlyActiveTimelineItem) {
     return {
-      currentAmount: { tokenAddress: '', amount: BigInt(0) },
-      currentDeltaPerSecond: { tokenAddress: '', amount: BigInt(0) },
+      currentAmount: { tokenAddress, amount: BigInt(0) },
+      currentDeltaPerSecond: { tokenAddress, amount: BigInt(0) },
       lastTimelineItemType: undefined,
     };
   }
@@ -86,14 +87,15 @@ export function currentAmounts(
       tokenAddress: currentlyActiveTimelineItem.deltaPerSecond.tokenAddress,
       amount: lastDeltaPerSecond,
     },
-    lastTimelineItemType: currentlyActiveTimelineItem.type,
+    lastTimelineItemType: currentlyActiveTimelineItem.__typename === 'TimelineItem' ? currentlyActiveTimelineItem.type : undefined,
   };
 }
 
 export const streamCurrentAmountsStore = (
   timeline: (CurrentAmountsTimelineItemFragment | CurrentAmountsUserBalanceTimelineItemFragment)[],
+  tokenAddress: string,
 ) => {
-  const state = writable<ReturnType<typeof currentAmounts>>(currentAmounts(timeline));
+  const state = writable<ReturnType<typeof currentAmounts>>(currentAmounts(timeline, tokenAddress));
 
   let unsubscriber: Unsubscriber;
   let tickHandle: number;
@@ -112,7 +114,7 @@ export const streamCurrentAmountsStore = (
   }
 
   function _update() {
-    state.set(currentAmounts(timeline));
+    state.set(currentAmounts(timeline, tokenAddress));
   }
 
   return {

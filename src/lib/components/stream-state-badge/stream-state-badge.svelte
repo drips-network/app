@@ -5,6 +5,11 @@
     ${STREAM_STATE_STREAM_FRAGMENT}
     fragment StreamStateBadgeStream on Stream {
       ...StreamStateStream
+      config {
+        amountPerSecond {
+          tokenAddress
+        }
+      }
     }
   `
 </script>
@@ -20,7 +25,7 @@
   export let hideActive = false;
   export let size: 'small' | 'normal' | 'large' = 'normal';
 
-  const streamReadable = streamCurrentAmountsStore(stream.timeline);
+  const streamReadable = streamCurrentAmountsStore(stream.timeline, stream.config.amountPerSecond.tokenAddress);
 
   // listen to updates of the stream's current realtime state and update the state
   $: state = $streamReadable && streamState(stream);
