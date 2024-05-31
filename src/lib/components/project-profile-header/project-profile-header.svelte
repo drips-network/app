@@ -33,6 +33,7 @@
   import { gql } from 'graphql-request';
   import type { ProjectProfileHeaderFragment } from './__generated__/gql.generated';
   import ShareButton from '../share-button/share-button.svelte';
+  import twemoji from '$lib/utils/twemoji';
 
   export let project: ProjectProfileHeaderFragment;
   export let description: string | undefined = undefined;
@@ -60,10 +61,11 @@
       </Copyable>
       {#if description}
         <span
-          class="typo-text-small line-clamp-2"
+          class="typo-text-small line-clamp-2 twemoji-text"
           style:margin-top="0.25rem"
-          style:color="var(--color-foreground-level-4)">{description}</span
-        >
+          style:color="var(--color-foreground-level-4)"
+          >{@html twemoji(description)}
+        </span>
       {/if}
     </div>
     {#if editButton || shareButton}
