@@ -35,6 +35,7 @@
   import ShareButton from '../share-button/share-button.svelte';
 
   export let project: ProjectProfileHeaderFragment;
+  export let description: string | undefined = undefined;
   export let editButton: string | undefined = undefined;
   export let shareButton:
     | {
@@ -57,6 +58,13 @@
       <Copyable alwaysVisible={true} value={project.source.url}>
         <ProjectBadge {project} forceUnclaimed tooltip={false} linkTo="external-url" />
       </Copyable>
+      {#if description}
+        <span
+          class="typo-text-small line-clamp-2"
+          style:margin-top="0.25rem"
+          style:color="var(--color-foreground-level-4)">{description}</span
+        >
+      {/if}
     </div>
     {#if editButton || shareButton}
       <div class="actions">
