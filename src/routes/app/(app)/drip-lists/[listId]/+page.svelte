@@ -78,7 +78,7 @@
     description={dripList?.description ??
       votingRound?.description ??
       (dripList
-        ? `"${dripList.name}" is a fundable list of open-source projects. Anyone can send one-time or continuous donations.`
+        ? `"${dripList.name}" is a Drip List of open source projects, Ethereum addresses, or Drip Lists. Anyone with an Ethereum wallet can send one-time or continuous donations to it.`
         : undefined)}
     image="{imageBaseUrl}?target=og"
     twitterImage="{imageBaseUrl}?target=twitter"
