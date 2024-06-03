@@ -355,14 +355,6 @@
 
   <article class="project-profile" class:claimed={isClaimed(project)}>
     <header class="header">
-      {#if isClaimed(project)}
-        <div class="owner">
-          <span class="typo-text" style:color="var(--color-foreground-level-5)"
-            >Project claimed by</span
-          >
-          <IdentityBadge address={project.owner.address} disableTooltip />
-        </div>
-      {/if}
       <div>
         <ProjectProfileHeader
           {project}

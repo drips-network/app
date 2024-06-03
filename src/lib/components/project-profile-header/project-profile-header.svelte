@@ -9,6 +9,9 @@
         source {
           url
         }
+        owner {
+          address
+        }
       }
       ... on UnclaimedProject {
         source {
@@ -28,12 +31,13 @@
   } from '$lib/components/project-badge/project-badge.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from '../button/button.svelte';
-  import Copyable from '../copyable/copyable.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectProfileHeaderFragment } from './__generated__/gql.generated';
   import ShareButton from '../share-button/share-button.svelte';
   import twemoji from '$lib/utils/twemoji';
+  import IdentityBadge from '../identity-badge/identity-badge.svelte';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   export let project: ProjectProfileHeaderFragment;
   export let description: string | undefined = undefined;
@@ -56,9 +60,12 @@
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{project.source.repoName}</h1>
-      <Copyable alwaysVisible={true} value={project.source.url}>
-        <ProjectBadge {project} forceUnclaimed tooltip={false} linkTo="external-url" />
-      </Copyable>
+      <div style:display="flex" style:gap="0.75rem" style:flex-wrap="wrap">
+        {#if isClaimed(project)}
+          <IdentityBadge address={project.owner.address} />
+        {/if}
+        <ProjectBadge size="tiny" {project} forceUnclaimed tooltip={false} linkTo="external-url" />
+      </div>
       {#if description}
         <span
           class="typo-text-small line-clamp-2 twemoji-text"
@@ -71,7 +78,7 @@
     {#if editButton || shareButton}
       <div class="actions">
         {#if shareButton}
-          <ShareButton url={shareButton.url} />
+          <ShareButton buttonVariant="normal" url={shareButton.url} />
         {/if}
         {#if editButton}
           <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
