@@ -115,12 +115,16 @@
 
   export let infoTooltip: string | undefined = undefined;
 
+  /** Bind to this to get the section skeleton instance of this section. */
+  export let sectionSkeleton: SectionSkeleton | undefined = undefined;
+
   const tokensStoreConnected = tokensStore.connected;
 </script>
 
 <section class="app-section">
   <SectionHeader {infoTooltip} icon={Heart} label={headline} />
   <SectionSkeleton
+    bind:this={sectionSkeleton}
     loaded={true}
     empty={supportItems.length === 0}
     emptyStateEmoji="🫧"
@@ -163,7 +167,8 @@
                       token.info.decimals,
                       1n,
                       false,
-                    )} {token.info.symbol}
+                    )}
+                    {token.info.symbol}
                   </div>
                 {:else}
                   <AddUnknownTokenButton tokenAddress={amount.tokenAddress} />
@@ -199,13 +204,19 @@
             }}
           >
             <svelte:fragment slot="amount-value">
-              <RealtimeAmount unknownTokenButton={false} showFiatValue showDelta={false} timeline={stream.timeline} tokenAddress={stream.config.amountPerSecond.tokenAddress}/>
+              <RealtimeAmount
+                unknownTokenButton={false}
+                showFiatValue
+                showDelta={false}
+                timeline={stream.timeline}
+                tokenAddress={stream.config.amountPerSecond.tokenAddress}
+              />
             </svelte:fragment>
             <svelte:fragment slot="amount-sub">
               {#if $tokensStoreConnected}
-                {@const token = $tokensStore && tokensStore.getByAddress(
-                  stream.config.amountPerSecond.tokenAddress,
-                )}
+                {@const token =
+                  $tokensStore &&
+                  tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
                 <div in:fade={{ duration: 300 }}>
                   {#if token}
                     {STREAM_STATE_LABELS[streamState(stream)]} · {formatAmtPerSec(

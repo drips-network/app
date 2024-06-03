@@ -36,7 +36,6 @@
   } from '$lib/components/drip-visual/drip-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
-  import InputAddress from '$lib/components/input-address/input-address.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import createStream from './methods/create-stream';
   import type { Writable } from 'svelte/store';
@@ -53,6 +52,8 @@
   import Token from '$lib/components/token/token.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
+  import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
+  import { isAddress } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -70,34 +71,36 @@
   // Token dropdown
 
   let tokenList: Items;
-  $: tokenList = Object.fromEntries(mapFilterUndefined($context.userOutgoingTokenBalances, (b) => {
-    const token = tokens.getByAddress(b.tokenAddress);
-    if (!token) return undefined;
+  $: tokenList = Object.fromEntries(
+    mapFilterUndefined($context.userOutgoingTokenBalances, (b) => {
+      const token = tokens.getByAddress(b.tokenAddress);
+      if (!token) return undefined;
 
-    return [
-      token.info.address.toLowerCase(),  
-      {
-        type: 'selectable',
-        label: token.info.name,
-        searchString: [token.info.name, token.info.symbol],
-        text: {
-          component: RealtimeAmount,
-          props: {
-            timeline: b.outgoing,
-            showDelta: false,
-          }
-        },
-        image: {
-          component: Token,
-          props: {
-            show: 'none',
-            address: token.info.address,
-            size: 'small',
+      return [
+        token.info.address.toLowerCase(),
+        {
+          type: 'selectable',
+          label: token.info.name,
+          searchString: [token.info.name, token.info.symbol],
+          text: {
+            component: RealtimeAmount,
+            props: {
+              timeline: b.outgoing,
+              showDelta: false,
+            },
+          },
+          image: {
+            component: Token,
+            props: {
+              show: 'none',
+              address: token.info.address,
+              size: 'small',
+            },
           },
         },
-      }
-    ];
-  }));
+      ];
+    }),
+  );
 
   onMount(() => {
     if ($context.selectedTokenAddress && $context.selectedTokenAddress.length !== 0) return;
@@ -107,7 +110,9 @@
   });
 
   $: selectedToken =
-    $context.selectedTokenAddress?.length === 1 ? tokens.getByAddress($context.selectedTokenAddress[0]) : undefined;
+    $context.selectedTokenAddress?.length === 1
+      ? tokens.getByAddress($context.selectedTokenAddress[0])
+      : undefined;
 
   // Amount input
 
@@ -200,11 +205,17 @@
     to={$context.receiver
       ? $context.receiver
       : recipientInputValidationState.type === 'valid' && $context.recipientInputValue
-      ? {
-          __typename: 'AddressDriverAccount',
-          driver: Driver.Address,
-          address: $context.recipientInputValue,
-        }
+      ? isAddress($context.recipientInputValue) // TODO: Extract to function when project receiver is supported.
+        ? {
+            __typename: 'AddressDriverAccount',
+            driver: Driver.Address,
+            address: $context.recipientInputValue,
+          }
+        : {
+            __typename: 'NftDriverAccount',
+            driver: Driver.Nft,
+            accountId: $context.recipientInputValue,
+          }
       : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
@@ -212,14 +223,12 @@
     headline={$context.receiver ? 'Start a Continuous Donation' : 'Create stream'}
     description="Stream any ERC-20 token from your Drips account."
   />
-  {#if !nameInputHidden}
-    <FormField title="Stream name*">
-      <TextInput bind:value={$context.streamNameValue} placeholder="Enter any name" />
-    </FormField>
-  {/if}
+  <FormField title="Stream name*">
+    <TextInput bind:value={$context.streamNameValue} placeholder="Enter any name" />
+  </FormField>
   {#if !$context.receiver}
     <FormField title="Stream to*">
-      <InputAddress
+      <InputStreamReceiver
         bind:value={$context.recipientInputValue}
         on:validationChange={onRecipientInputValidationChange}
       />

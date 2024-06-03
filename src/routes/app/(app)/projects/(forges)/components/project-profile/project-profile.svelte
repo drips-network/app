@@ -1,12 +1,16 @@
 <script lang="ts" context="module">
-  import { DRIP_LIST_BADGE_FRAGMENT } from "$lib/components/drip-list-badge/drip-list-badge.svelte";
-  import { PROJECT_PROFILE_HEADER_FRAGMENT } from "$lib/components/project-profile-header/project-profile-header.svelte";
-  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from "$lib/components/splits/splits.svelte";
-  import { SUPPORT_CARD_PROJECT_FRAGMENT } from "$lib/components/support-card/support-card.svelte";
-  import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from "$lib/components/supporters-section/supporters.section.svelte";
-  import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from "$lib/components/unclaimed-project-card/unclaimed-project-card.svelte";
-  import { EDIT_PROJECT_METADATA_FLOW_FRAGMENT } from "$lib/flows/edit-project-metadata/edit-project-metadata-steps";
-  import { EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT, EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT, EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT } from "$lib/flows/edit-project-splits/edit-project-splits-steps";
+  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import { PROJECT_PROFILE_HEADER_FRAGMENT } from '$lib/components/project-profile-header/project-profile-header.svelte';
+  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/splits.svelte';
+  import { SUPPORT_CARD_PROJECT_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
+  import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
+  import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import { EDIT_PROJECT_METADATA_FLOW_FRAGMENT } from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
+  import {
+    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
 
   export const PROJECT_PROFILE_FRAGMENT = gql`
     ${PROJECT_PROFILE_HEADER_FRAGMENT}
@@ -51,7 +55,6 @@
     }
   `;
 </script>
-
 
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
@@ -112,6 +115,7 @@
   }
 
   export let project: ProjectProfileFragment;
+  export let description: string | undefined;
 
   interface RepoInfo {
     url: string;
@@ -239,6 +243,9 @@
   }
 
   $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
+
+  let splitsSectionSkeleton: SectionSkeleton | undefined;
+  let supportersSectionSkeleton: SectionSkeleton | undefined;
 </script>
 
 {#if true}
@@ -337,8 +344,7 @@
                 //       projectUrl: project.source.url,
                 //     })
                 //   : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }
-              }}
-              >Claim project</Button
+              }}>Claim project</Button
             >
           </div>
         </svelte:fragment>
@@ -348,17 +354,10 @@
 
   <article class="project-profile" class:claimed={isClaimed(project)}>
     <header class="header">
-      {#if isClaimed(project)}
-        <div class="owner">
-          <span class="typo-text" style:color="var(--color-foreground-level-5)"
-            >Project claimed by</span
-          >
-          <IdentityBadge address={project.owner.address} disableTooltip />
-        </div>
-      {/if}
       <div>
         <ProjectProfileHeader
           {project}
+          {description}
           editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
           shareButton={{
             url: `https://drips.network${buildProjectUrl(
@@ -374,35 +373,43 @@
       </div>
 
       {#if isClaimed(project)}
-          <div class="stats" in:fade|local={{ duration: 300 }}>
-              <div class="stat shadow-low rounded-drip-lg">
-                <KeyValuePair key="Donations">
-                  <AggregateFiatEstimate amounts={project.totalEarned} />
-                </KeyValuePair>
-              </div>
-            <!-- ("Supporters" stat) -->
-            {#if [project.support].flat().length > 0}
-              <a class="stat btn-theme-outlined" href="#support">
-                <KeyValuePair key="Supporters">
-                  <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
-                </KeyValuePair>
-              </a>
-            {/if}
-            <!-- ("Splits with" stat) -->
-            {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
-              <a class="stat btn-theme-outlined" href="#splits">
-                <KeyValuePair key="Splits with">
-                  <Pile
-                    maxItems={4}
-                    components={getSplitsPile([
-                      project.splits.maintainers ?? [],
-                      project.splits.dependencies ?? [],
-                    ])}
-                  />
-                </KeyValuePair>
-              </a>
-            {/if}
+        <div class="stats" in:fade|local={{ duration: 300 }}>
+          <div class="stat shadow-low rounded-drip-lg">
+            <KeyValuePair key="Donations">
+              <AggregateFiatEstimate amounts={project.totalEarned} />
+            </KeyValuePair>
           </div>
+          <!-- ("Supporters" stat) -->
+          {#if [project.support].flat().length > 0}
+            <a
+              class="stat btn-theme-outlined"
+              href="#support"
+              on:click={() => supportersSectionSkeleton?.highlightSection()}
+            >
+              <KeyValuePair key="Supporters">
+                <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
+              </KeyValuePair>
+            </a>
+          {/if}
+          <!-- ("Splits with" stat) -->
+          {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
+            <a
+              class="stat btn-theme-outlined"
+              href="#splits"
+              on:click={() => splitsSectionSkeleton?.highlightSection()}
+            >
+              <KeyValuePair key="Splits with">
+                <Pile
+                  maxItems={4}
+                  components={getSplitsPile([
+                    project.splits.maintainers ?? [],
+                    project.splits.dependencies ?? [],
+                  ])}
+                />
+              </KeyValuePair>
+            </a>
+          {/if}
+        </div>
       {/if}
     </header>
     <div class="content">
@@ -435,6 +442,7 @@
               : []}
           />
           <SectionSkeleton
+            bind:this={splitsSectionSkeleton}
             loaded={true}
             empty={project.splits.maintainers.length === 0 &&
               project.splits.dependencies.length === 0}
@@ -491,6 +499,7 @@
       {/if}
       <section id="support">
         <SupportersSection
+          bind:sectionSkeleton={supportersSectionSkeleton}
           type="project"
           supportItems={project.support}
         />

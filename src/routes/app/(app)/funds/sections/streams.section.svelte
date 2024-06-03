@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-  import { NAME_AND_BADGE_CELL_STREAM_FRAGMENT } from "$lib/components/table/cells/name-and-badge-cell.svelte";
-  import { gql } from "graphql-request";
+  import { NAME_AND_BADGE_CELL_STREAM_FRAGMENT } from '$lib/components/table/cells/name-and-badge-cell.svelte';
+  import { gql } from 'graphql-request';
 
   export const STREAMS_SECTION_STREAM_FRAGMENT = gql`
     ${NAME_AND_BADGE_CELL_STREAM_FRAGMENT}
@@ -48,7 +48,10 @@
   import TokenStreamIcon from '$lib/components/icons/TokenStreams.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
-  import UserBadgeCell, { USER_BADGE_CELL_DRIP_LIST_FRAGMENT, USER_BADGE_CELL_USER_FRAGMENT } from '$lib/components/table/cells/user-badge.cell.svelte';
+  import UserBadgeCell, {
+    USER_BADGE_CELL_DRIP_LIST_FRAGMENT,
+    USER_BADGE_CELL_USER_FRAGMENT,
+  } from '$lib/components/table/cells/user-badge.cell.svelte';
   import type { ComponentProps } from 'svelte';
   import NameAndBadgeCell from '$lib/components/table/cells/name-and-badge-cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
@@ -57,11 +60,11 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
   import tokens from '$lib/stores/tokens';
-  import type { StreamsSectionStreamsFragment } from "./__generated__/gql.generated";
-  import { decodeStreamId } from "$lib/stores/streams/methods/make-stream-id";
-  import Token from "$lib/components/token/token.svelte";
-  import RealtimeAmount from "$lib/components/amount/realtime-amount.svelte";
-  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from "$lib/flows/create-stream-flow/methods/current-amounts";
+  import type { StreamsSectionStreamsFragment } from './__generated__/gql.generated';
+  import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
+  import Token from '$lib/components/token/token.svelte';
+  import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
+  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/flows/create-stream-flow/methods/current-amounts';
 
   export let accountId: string | undefined;
   export let disableActions = true;
@@ -76,8 +79,12 @@
   export let emptyStateHeadline = 'No streams';
 
   export let userStreams: StreamsSectionStreamsFragment;
-  $: incoming = userStreams.incoming.filter((s) => tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true);
-  $: outgoing = userStreams.outgoing.filter((s) => tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true);
+  $: incoming = userStreams.incoming.filter((s) =>
+    tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true,
+  );
+  $: outgoing = userStreams.outgoing.filter((s) =>
+    tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true,
+  );
 
   $: isSelf = accountId === $walletStore.dripsAccountId;
 
@@ -116,6 +123,7 @@
     },
     amount: {
       timeline: s.timeline,
+      tokenAddress: s.config.amountPerSecond.tokenAddress,
     },
     streamId: s.id,
   }));
@@ -133,6 +141,7 @@
     },
     amount: {
       timeline: s.timeline,
+      tokenAddress: s.config.amountPerSecond.tokenAddress,
     },
     streamId: s.id,
   }));

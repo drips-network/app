@@ -59,7 +59,11 @@
   }.png`}
   <HeadMeta
     title="{dripList?.name || votingRound?.name} | Drip List"
-    description={dripList?.description ?? votingRound?.name ?? undefined}
+    description={dripList?.description ??
+      votingRound?.description ??
+      (dripList
+        ? `"${dripList.name}" is a Drip List of open source projects, Ethereum addresses, or Drip Lists. Anyone with an Ethereum wallet can send one-time or continuous donations to it.`
+        : undefined)}
     image="{imageBaseUrl}?target=og"
     twitterImage="{imageBaseUrl}?target=twitter"
   />
