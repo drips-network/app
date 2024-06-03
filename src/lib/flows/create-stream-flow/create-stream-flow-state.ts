@@ -1,6 +1,10 @@
 import { writable } from 'svelte/store';
-import type { CreateStreamFlowAddressDriverAccountFragment, CreateStreamFlowDetailsNftDriverAccountFragment } from './__generated__/gql.generated';
+import type {
+  CreateStreamFlowAddressDriverAccountFragment,
+  CreateStreamFlowDetailsNftDriverAccountFragment,
+} from './__generated__/gql.generated';
 import type { CurrentAmountsUserBalanceTimelineItemFragment } from './methods/__generated__/gql.generated';
+
 export interface CreateStreamFlowState {
   streamNameValue: string | undefined;
   recipientInputValue: string | undefined;
@@ -12,11 +16,23 @@ export interface CreateStreamFlowState {
   streamEndDateValue: string | undefined;
   streamEndTimeValue: string | undefined;
   setStartAndEndDate: boolean;
-  userOutgoingTokenBalances: { tokenAddress: string, outgoing: CurrentAmountsUserBalanceTimelineItemFragment[] }[];
-  receiver: CreateStreamFlowAddressDriverAccountFragment | CreateStreamFlowDetailsNftDriverAccountFragment | undefined;
+  userOutgoingTokenBalances: {
+    tokenAddress: string;
+    outgoing: CurrentAmountsUserBalanceTimelineItemFragment[];
+  }[];
+  receiver:
+    | CreateStreamFlowAddressDriverAccountFragment
+    | CreateStreamFlowDetailsNftDriverAccountFragment
+    | undefined;
 }
 
-export default (receiver: CreateStreamFlowAddressDriverAccountFragment | CreateStreamFlowDetailsNftDriverAccountFragment | undefined, selectedTokenAddress: string | undefined) =>
+export default (
+  receiver:
+    | CreateStreamFlowAddressDriverAccountFragment
+    | CreateStreamFlowDetailsNftDriverAccountFragment
+    | undefined,
+  selectedTokenAddress: string | undefined,
+) =>
   writable<CreateStreamFlowState>({
     streamNameValue: undefined,
     recipientInputValue: undefined,

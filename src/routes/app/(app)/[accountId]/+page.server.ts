@@ -12,6 +12,7 @@ import query from '$lib/graphql/dripsQL';
 import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated__/gql.generated';
 import { getVotingRounds } from '$lib/utils/multiplayer';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
+import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
 
 const provider = new providers.JsonRpcProvider(network.rpcUrl);
 
@@ -20,6 +21,7 @@ const PROFILE_PAGE_QUERY = gql`
   ${DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT}
   ${STREAMS_SECTION_STREAMS_FRAGMENT}
   ${USER_BALANCES_FRAGMENT}
+  ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
   query ProfilePage($address: String!) {
     userByAddress(address: $address) {
       account {
@@ -37,6 +39,9 @@ const PROFILE_PAGE_QUERY = gql`
       }
       streams {
         ...StreamsSectionStreams
+      }
+      support {
+        ...SupportersSectionSupportItem
       }
     }
   }
@@ -79,7 +84,7 @@ export const load = async ({ params, fetch }) => {
   } else if (/^\d+$/.test(universalAccountId)) {
     const driver = Utils.AccountId.getDriver(universalAccountId);
 
-    switch(driver) {
+    switch (driver) {
       case 'address': {
         address = AddressDriverClient.getUserAddress(universalAccountId);
         break;
