@@ -76,6 +76,8 @@
   export let collapsed = false;
   export let collapsable = false;
 
+  export let hideIncoming = false;
+
   export let emptyStateHeadline = 'No streams';
 
   export let userStreams: StreamsSectionStreamsFragment;
@@ -279,7 +281,7 @@
     empty: incoming.length === 0 && outgoing.length === 0,
   }}
 >
-  {#if optionsIncoming.data.length > 0 && !onlyDripListStreams}
+  {#if !hideIncoming && optionsIncoming.data.length > 0 && !onlyDripListStreams}
     <div class="table-container">
       {#if optionsOutgoing.data.length > 0}
         <h4 class="table-group-header">↓ Incoming</h4>

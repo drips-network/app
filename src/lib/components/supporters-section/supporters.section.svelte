@@ -74,8 +74,7 @@
 
 <script lang="ts">
   import Heart from '$lib/components/icons/Heart.svelte';
-  import SectionHeader from '../section-header/section-header.svelte';
-  import SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
+  import type SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import SupportItem from './components/support-item.svelte';
   import { gql } from 'graphql-request';
@@ -101,17 +100,33 @@
   import formatAmtPerSec from '$lib/stores/amt-delta-unit/utils/format-amt-per-sec';
   import { fade } from 'svelte/transition';
   import AddUnknownTokenButton from './components/add-unknown-token-button.svelte';
+  import Section from '../section/section.svelte';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
 
   export let ownerAccountId: string | undefined = undefined;
 
-  export let type: 'project' | 'dripList';
+  export let type: 'project' | 'dripList' | 'address';
   export let headline = 'Support';
   export let emptyStateHeadline = 'No supporters';
-  export let emptyStateText = `This ${
-    type === 'dripList' ? 'Drip List' : 'project'
-  } doesnʼt have any supporters yet.`;
+
+  export let collapsed = false;
+  export let collapsable = false;
+
+  let emptyStateText: string;
+  $: {
+    switch (type) {
+      case 'project':
+        emptyStateText = `This project doesnʼt have any supporters yet.`;
+        break;
+      case 'dripList':
+        emptyStateText = `This Drip List doesnʼt have any supporters yet.`;
+        break;
+      case 'address':
+        emptyStateText = `This user doesnʼt have any supporters yet.`;
+        break;
+    }
+  }
 
   export let infoTooltip: string | undefined = undefined;
 
@@ -122,14 +137,22 @@
 </script>
 
 <section class="app-section">
-  <SectionHeader {infoTooltip} icon={Heart} label={headline} />
-  <SectionSkeleton
-    bind:this={sectionSkeleton}
-    loaded={true}
-    empty={supportItems.length === 0}
-    emptyStateEmoji="🫧"
-    {emptyStateHeadline}
-    {emptyStateText}
+  <Section
+    bind:collapsed
+    bind:collapsable
+    header={{
+      icon: Heart,
+      label: headline,
+      infoTooltip,
+    }}
+    skeleton={{
+      loaded: true,
+      empty: supportItems.length === 0,
+      emptyStateEmoji: '🫧',
+      emptyStateHeadline,
+      emptyStateText,
+    }}
+    bind:skeletonInstance={sectionSkeleton}
   >
     <div class="items">
       {#each supportItems as item}
@@ -280,7 +303,7 @@
         {/if}
       {/each}
     </div>
-  </SectionSkeleton>
+  </Section>
 </section>
 
 <style>
