@@ -86,6 +86,9 @@
 
   export let infoTooltip: string | undefined = undefined;
 
+  /** Bind to this to get the section skeleton instance of this section. */
+  export let sectionSkeleton: SectionSkeleton | undefined = undefined;
+
   interface StreamSupport {
     __typename: 'StreamSupport';
     account: {
@@ -320,6 +323,7 @@
 <section class="app-section">
   <SectionHeader {infoTooltip} icon={Heart} label={headline} />
   <SectionSkeleton
+    bind:this={sectionSkeleton}
     loaded={!forceLoading &&
       $tokensStoreConnectedReadable &&
       !allItemsWithFiatEstimate.find((i) => i.fiatEstimate.fiatEstimateCents === 'pending')}

@@ -116,6 +116,7 @@
   }
 
   export let project: ProjectProfileFragment;
+  export let description: string | undefined;
 
   interface RepoInfo {
     url: string;
@@ -244,6 +245,9 @@
   }
 
   $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
+
+  let splitsSectionSkeleton: SectionSkeleton | undefined;
+  let supportersSectionSkeleton: SectionSkeleton | undefined;
 </script>
 
 {#if true}
@@ -351,17 +355,10 @@
 
   <article class="project-profile" class:claimed={isClaimed(project)}>
     <header class="header">
-      {#if isClaimed(project)}
-        <div class="owner">
-          <span class="typo-text" style:color="var(--color-foreground-level-5)"
-            >Project claimed by</span
-          >
-          <IdentityBadge address={project.owner.address} disableTooltip />
-        </div>
-      {/if}
       <div>
         <ProjectProfileHeader
           {project}
+          {description}
           editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
           shareButton={{
             url: `https://drips.network${buildProjectUrl(
@@ -401,7 +398,11 @@
             {/if}
             <!-- ("Supporters" stat) -->
             {#if [project.support].flat().length > 0}
-              <a class="stat btn-theme-outlined" href="#support">
+              <a
+                class="stat btn-theme-outlined"
+                href="#support"
+                on:click={() => supportersSectionSkeleton?.highlightSection()}
+              >
                 <KeyValuePair key="Supporters">
                   <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
                 </KeyValuePair>
@@ -409,7 +410,11 @@
             {/if}
             <!-- ("Splits with" stat) -->
             {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
-              <a class="stat btn-theme-outlined" href="#splits">
+              <a
+                class="stat btn-theme-outlined"
+                href="#splits"
+                on:click={() => splitsSectionSkeleton?.highlightSection()}
+              >
                 <KeyValuePair key="Splits with">
                   <Pile
                     maxItems={4}
@@ -455,6 +460,7 @@
               : []}
           />
           <SectionSkeleton
+            bind:this={splitsSectionSkeleton}
             loaded={true}
             empty={project.splits.maintainers.length === 0 &&
               project.splits.dependencies.length === 0}
@@ -511,6 +517,7 @@
       {/if}
       <section id="support">
         <SupportersSection
+          bind:sectionSkeleton={supportersSectionSkeleton}
           accountId={project.account.accountId}
           type="project"
           supportItems={project.support}

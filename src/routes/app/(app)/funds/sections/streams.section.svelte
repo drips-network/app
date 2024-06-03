@@ -94,7 +94,8 @@
 
       // TODO: Donʼt presume that any stream to an NFT subaccount is going to a Drip List.
       const streamName =
-        stream.receiver.driver === 'nft' ? 'Continuous donation' : stream.name ?? 'Unnamed stream';
+        stream.name ||
+        (stream.receiver.driver === 'nft' ? 'Continuous donation' : 'Unnamed stream');
 
       return {
         streamId: stream.id,

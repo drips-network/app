@@ -4,6 +4,9 @@
   import { ethers } from 'ethers';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import { createEventDispatcher } from 'svelte';
+  import { BASE_URL } from '$lib/utils/base-url';
+  import assert from '$lib/utils/assert';
+  import { Utils } from 'radicle-drips';
 
   export let value: string | undefined = undefined;
   export let validatedValue: string | undefined = undefined;
@@ -17,18 +20,49 @@
 
   const dispatch = createEventDispatcher();
 
-  let addressValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let inputValidationState: TextInputValidationState = { type: 'unvalidated' };
 
-  async function validateAddress(input: string | undefined) {
+  async function validateInput(input: string | undefined) {
     if (!input) {
-      addressValidationState = { type: 'unvalidated' };
+      inputValidationState = { type: 'unvalidated' };
       validatedValue = undefined;
       return;
     }
 
-    if (input.endsWith('.eth')) {
+    if (input.includes(`${BASE_URL}/app/drip-lists/`)) {
+      inputValidationState = {
+        type: 'pending',
+      };
+
+      const dripListId = input.substring(input.lastIndexOf('/') + 1);
+      assert(dripListId);
+
+      if (Utils.AccountId.getDriver(dripListId) !== 'nft') {
+        inputValidationState = {
+          type: 'invalid',
+          message: 'Invalid Drip List URL',
+        };
+
+        throw new Error('Invalid Drip List URL');
+      }
+
+      if (dripListId) {
+        validatedValue = dripListId;
+        value = dripListId;
+
+        inputValidationState = {
+          type: 'valid',
+        };
+      } else {
+        validatedValue = undefined;
+        inputValidationState = {
+          type: 'invalid',
+          message: 'Unable to resolve Drip List URL',
+        };
+      }
+    } else if (input.endsWith('.eth')) {
       // lookup ENS
-      addressValidationState = {
+      inputValidationState = {
         type: 'pending',
       };
 
@@ -38,12 +72,12 @@
         validatedValue = address;
         value = address;
 
-        addressValidationState = {
+        inputValidationState = {
           type: 'valid',
         };
       } else {
         validatedValue = undefined;
-        addressValidationState = {
+        inputValidationState = {
           type: 'invalid',
           message: 'Unable to resolve ENS name',
         };
@@ -58,33 +92,33 @@
 
       if (exclusionMatch) {
         // is excluded!
-        addressValidationState = {
+        inputValidationState = {
           type: 'invalid',
           message: exclusionMatch.msg,
         };
       } else {
         // valid
-        addressValidationState = {
+        inputValidationState = {
           type: 'valid',
         };
       }
     } else {
       // invalid
       validatedValue = undefined;
-      addressValidationState = {
+      inputValidationState = {
         type: 'invalid',
-        message: 'Enter a valid Ethereum address or ENS name.',
+        message: 'Enter a valid Ethereum address, ENS name, or Drip List URL.',
       };
     }
   }
 
-  // ensure initial value is validated since validateAddress() is async
+  // ensure initial value is validated since validateInput() is async
   if (value?.length) {
-    validateAddress(value).then(() => dispatch('validationChange', addressValidationState));
+    validateInput(value).then(() => dispatch('validationChange', inputValidationState));
   }
 
-  $: validateAddress(value);
-  $: dispatch('validationChange', addressValidationState);
+  $: validateInput(value);
+  $: dispatch('validationChange', inputValidationState);
 </script>
 
 <TextInput
@@ -92,7 +126,7 @@
   autocapitalize={false}
   autocorrect={false}
   showSuccessCheck
-  validationState={addressValidationState}
+  validationState={inputValidationState}
   bind:value
-  placeholder="Ethereum address or ENS name"
+  placeholder="Ethereum address, ENS name, or Drip List URL"
 />
