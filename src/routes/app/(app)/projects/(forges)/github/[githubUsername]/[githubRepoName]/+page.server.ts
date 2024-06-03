@@ -111,6 +111,8 @@ export const load = (async ({ params, fetch, url }) => {
 
   return {
     project,
+    description:
+      typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
     streamed: {
       unclaimedFunds,
       earnedFunds,

@@ -116,6 +116,7 @@
   }
 
   export let project: ProjectProfileFragment;
+  export let description: string | undefined;
 
   interface RepoInfo {
     url: string;
@@ -365,6 +366,7 @@
       <div>
         <ProjectProfileHeader
           {project}
+          {description}
           editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
           shareButton={{
             url: `https://drips.network${buildProjectUrl(
