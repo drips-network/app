@@ -92,7 +92,6 @@
 
     {#if dripList}
       <Supporters
-        accountId={dripList.account.accountId}
         headline="Support"
         infoTooltip="A Drip List can be supported by continuous donations, one-time donations, or funds split by projects and other Drip Lists."
         type="dripList"

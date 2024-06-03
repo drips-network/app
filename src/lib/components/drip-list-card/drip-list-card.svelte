@@ -41,6 +41,11 @@
             timeline {
               ...CurrentAmountsTimelineItem
             }
+            config {
+              amountPerSecond {
+                tokenAddress
+              }
+            }
           }
         }
       }
@@ -94,7 +99,10 @@
   import { writable } from 'svelte/store';
   import { BASE_URL } from '$lib/utils/base-url';
   import twemoji from '$lib/utils/twemoji';
-  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT, currentAmounts } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import {
+    CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT,
+    currentAmounts,
+  } from '$lib/flows/create-stream-flow/methods/current-amounts';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { onMount } from 'svelte';
@@ -124,8 +132,7 @@
   $: title = (dripList?.name || votingRound?.name) ?? unreachable();
   $: description = (dripList?.description || votingRound?.description) ?? '';
 
-  $: supportersPile =
-    dripList && getSupportersPile(dripList.support);
+  $: supportersPile = dripList && getSupportersPile(dripList.support);
 
   function triggerEditModal() {
     if (!dripList) return;
@@ -149,7 +156,7 @@
     ? getVotingRoundStatusReadable(votingRound)
     : writable(undefined);
 
-  let incomingStreamsTotalStreamed: { tokenAddress: string, amount: bigint }[];
+  let incomingStreamsTotalStreamed: { tokenAddress: string; amount: bigint }[];
   function updateIncomingStreamsTotalStreamed() {
     if (!dripList) return;
 
@@ -159,19 +166,24 @@
       }
     });
 
-    incomingStreamsTotalStreamed = mergeAmounts(incomingStreams.map((stream) => {
-      const amount = currentAmounts(stream.timeline).currentAmount;
+    incomingStreamsTotalStreamed = mergeAmounts(
+      incomingStreams.map((stream) => {
+        const amount = currentAmounts(
+          stream.timeline,
+          stream.config.amountPerSecond.tokenAddress,
+        ).currentAmount;
 
-      return {
-        tokenAddress: amount.tokenAddress,
-        amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-      }
-    }));
+        return {
+          tokenAddress: amount.tokenAddress,
+          amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+        };
+      }),
+    );
   }
   onMount(() => {
     const tick = tickStore.register(updateIncomingStreamsTotalStreamed);
     return () => tickStore.deregister(tick);
-  })
+  });
 
   $: totalEarned = mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []);
 
@@ -258,10 +270,7 @@
                   </div>
                   <div class="typo-text tabular-nums total-streamed-badge">
                     {#if browser}
-                      <AggregateFiatEstimate
-                        supressUnknownAmountsWarning
-                        amounts={totalEarned}
-                      />
+                      <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
                     {/if}
                     <span class="muted">&nbsp;total</span>
                   </div>
@@ -276,8 +285,15 @@
                   {/if}
                 </div>
                 <div class="splits">
-                  <div class="splits-component" style:pointer-events={listingMode ? 'none' : undefined}>
-                    <Splits maxRows={dripList.description ? 3 : 4} groupsExpandable={!listingMode} list={dripList.splits} />
+                  <div
+                    class="splits-component"
+                    style:pointer-events={listingMode ? 'none' : undefined}
+                  >
+                    <Splits
+                      maxRows={listingMode ? (dripList.description ? 3 : 4) : undefined}
+                      groupsExpandable={!listingMode}
+                      list={dripList.splits}
+                    />
                   </div>
                 </div>
               </div>
@@ -359,7 +375,8 @@
     position: relative;
   }
 
-  a.drip-list-card:hover, a.drip-list-card:focus-visible {
+  a.drip-list-card:hover,
+  a.drip-list-card:focus-visible {
     box-shadow: var(--elevation-medium);
     transform: translateY(-0.125rem);
   }
