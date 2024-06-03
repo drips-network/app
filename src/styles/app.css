@@ -90,7 +90,8 @@ h3,
 
 .twemoji-text .emoji {
   display: inline-block;
-  width: 1em;
+  height: 1em;
+  padding: 0 0.125rem;
   margin-bottom: 0.1em;
   vertical-align: middle;
 }

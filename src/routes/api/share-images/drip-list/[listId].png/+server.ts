@@ -11,6 +11,7 @@ import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 import * as multiplayer from '$lib/utils/multiplayer';
+import twemoji from '$lib/utils/twemoji';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const listId = params.listId;
@@ -91,6 +92,21 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       width: 1200,
       height: height,
       fonts: await loadFonts(fetch),
+      loadAdditionalAsset: async (code, segment) => {
+        if (code !== 'emoji') return '';
+
+        const parsed = twemoji(segment);
+
+        // eww!
+        const twemojiUrl = /<img[^>]+src="(http:\/\/[^">]+)"/g.exec(parsed);
+
+        if (twemojiUrl) {
+          const res = await loadImage(twemojiUrl[1], fetch, 'data:image/svg+xml;base64,');
+          return res;
+        }
+
+        return '';
+      },
     },
   );
 

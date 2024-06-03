@@ -1,6 +1,6 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
   import Spinner from '../spinner/spinner.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
@@ -10,6 +10,15 @@
   export let error = false;
   export let placeholderOutline = true;
   export let horizontalScroll = true;
+
+  let highlit = false;
+
+  export const highlightSection = () => {
+    highlit = true;
+    setTimeout(() => {
+      highlit = false;
+    }, 500);
+  };
 
   export let collapsed = false;
 
@@ -84,6 +93,13 @@
       {/if}
     </div>
   </TransitionedHeight>
+  {#if highlit}
+    <div
+      in:scale={{ duration: 300, start: 0.9 }}
+      out:scale={{ duration: 300, start: 1.05 }}
+      class="highlight-overlay"
+    />
+  {/if}
 </div>
 
 <style>
@@ -120,5 +136,18 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .highlight-overlay {
+    position: absolute;
+    top: -0.5rem;
+    left: 2rem;
+    right: 2rem;
+    bottom: -0.5rem;
+    background-color: var(--color-primary);
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.25rem 0 1.25rem 1.25rem;
   }
 </style>
