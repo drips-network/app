@@ -40,7 +40,6 @@
   import Token from '$lib/components/token/token.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import InputAddress from '$lib/components/input-address/input-address.svelte';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
   import createStream from './methods/create-stream';
   import { get, type Writable } from 'svelte/store';
@@ -59,6 +58,8 @@
     CreateStreamFlowAddressDriverAccountFragment,
     CreateStreamFlowDetailsNftDriverAccountFragment,
   } from './__generated__/gql.generated';
+  import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
+  import { isAddress } from 'ethers/lib/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -246,11 +247,17 @@
     to={receiver
       ? receiver
       : recipientInputValidationState.type === 'valid' && recipientInputValue
-      ? {
-          __typename: 'AddressDriverAccount',
-          driver: Driver.Address,
-          address: recipientInputValue,
-        }
+      ? isAddress(recipientInputValue) // TODO: Extract to function when project receiver is supported.
+        ? {
+            __typename: 'AddressDriverAccount',
+            driver: Driver.Address,
+            address: recipientInputValue,
+          }
+        : {
+            __typename: 'NftDriverAccount',
+            driver: Driver.Nft,
+            accountId: recipientInputValue,
+          }
       : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
@@ -258,14 +265,12 @@
     headline={receiver ? 'Start a Continuous Donation' : 'Create stream'}
     description="Stream any ERC-20 token from your Drips account."
   />
-  {#if !nameInputHidden}
-    <FormField title="Stream name*">
-      <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
-    </FormField>
-  {/if}
+  <FormField title="Stream name*">
+    <TextInput bind:value={streamNameValue} placeholder="Enter any name" />
+  </FormField>
   {#if !receiver}
     <FormField title="Stream to*">
-      <InputAddress
+      <InputStreamReceiver
         bind:value={recipientInputValue}
         on:validationChange={onRecipientInputValidationChange}
       />

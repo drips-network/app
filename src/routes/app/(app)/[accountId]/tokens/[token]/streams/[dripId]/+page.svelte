@@ -74,7 +74,8 @@
   $: {
     if (stream) {
       streamName =
-        stream.receiver.driver === 'nft' ? 'Continuous donation' : stream.name ?? 'Unnamed stream';
+        stream.name ||
+        (stream.receiver.driver === 'nft' ? 'Continuous donation' : 'Unnamed stream');
     }
   }
 
