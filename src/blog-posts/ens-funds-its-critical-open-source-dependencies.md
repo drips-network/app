@@ -3,7 +3,7 @@ title: 'ENS Uses Drips to Support Its Critical Software Dependencies'
 date: '2024-05-30'
 coverImage: '/assets/blog-images/ens.gif'
 coverImageAlt: 'Drips Logo'
-excerpt: 'The ENS Ecosystem Working Group is leveraging Drips to support the open source projects it depends on and their developers.'
+excerpt: 'The ENS Ecosystem Working Group is leveraging Drips to support the open source projects it depends on.'
 ---
 
 The ENS Ecosystem Working Group is streaming $50,000 USDC over the next six months to seven essential projects through its [Drip List](https://www.drips.network/app/drip-lists/31017209032870028068280040871339261037749177808773684797297972107972): **Wagmi**, **ethers.js**, **graphql-request**, **openzeppelin-contracts**, **noble-hashes**, **scure-base**, and **dns-packet**. This initiative highlights ENS DAO's commitment to reward the open-source projects that underpin its infrastructure.
