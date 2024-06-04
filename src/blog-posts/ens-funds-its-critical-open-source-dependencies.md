@@ -1,6 +1,6 @@
 ---
 title: 'ENS Uses Drips to Support Its Critical Software Dependencies'
-date: '2024-05-30'
+date: '2024-06-04'
 coverImage: '/assets/blog-images/ens.gif'
 coverImageAlt: 'Drips Logo'
 excerpt: 'The ENS Ecosystem Working Group is leveraging Drips to support the open source projects it depends on.'
