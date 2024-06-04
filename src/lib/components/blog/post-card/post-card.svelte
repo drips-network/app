@@ -46,7 +46,7 @@
       <p>{excerpt}</p>
     </div>
     {#if shareButton}
-      <ShareButton url={$page.url.toString()} />
+      <ShareButton buttonVariant="normal" url={$page.url.toString()} />
     {/if}
   </div>
 </svelte:element>
