@@ -23,3 +23,23 @@ export function convertIpfsUri(uri: string) {
 
   return `${PUBLIC_PINATA_GATEWAY_URL}/ipfs/${hash}`;
 }
+
+/**
+ * Pin the given data to IPFS.
+ * @param data The data to pin.
+ * @returns The hash of the pinned data.
+ */
+export async function pin(data: Record<string, unknown>, f = fetch) {
+  const res = await f('/api/ipfs/pin', {
+    method: 'POST',
+    body: JSON.stringify(data, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    ),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Pinning account metadata failed: ${await res.text()}`);
+  }
+
+  return res.text();
+}

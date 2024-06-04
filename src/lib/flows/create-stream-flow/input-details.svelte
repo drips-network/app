@@ -37,7 +37,6 @@
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import Toggleable from '$lib/components/toggleable/toggleable.svelte';
-  import createStream from './methods/create-stream';
   import type { Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
   import parseDate from './methods/parse-date';
@@ -54,6 +53,10 @@
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
   import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
   import { isAddress } from 'ethers/lib/utils';
+  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
+  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
+  import assert from '$lib/utils/assert';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -174,20 +177,53 @@
     timeRangeValid;
 
   function submit() {
-    createStream(
+    transact(
       dispatch,
-      selectedToken ?? unreachable(),
-      amountPerSecond ?? unreachable(),
-      $context.recipientInputValue ?? unreachable(),
-      $context.streamNameValue,
-      // TODO(streams): insert real value from api
-      [],
-      $context.setStartAndEndDate
-        ? {
-            start: combinedStartDate ?? unreachable(),
-            end: combinedEndDate ?? unreachable(),
+      makeTransactPayload({
+        before: async () => {
+          const callerClient = await getCallerClient();
+          const addressDriverClient = await getAddressDriverClient();
+          const { signer } = $wallet;
+          assert(signer, 'No signer available');
+
+          let recipientAccountId: string;
+          if ($context.receiver) {
+            recipientAccountId = $context.receiver.accountId;
+          } else {
+            const recipientInputValue = $context.recipientInputValue ?? unreachable();
+
+            recipientAccountId = isAddress(recipientInputValue)
+              ? await addressDriverClient.getAccountIdByAddress(recipientInputValue)
+              : recipientInputValue;
           }
-        : undefined,
+
+          const batch = await buildStreamCreateBatchTx(addressDriverClient, signer, {
+            tokenAddress: $context.selectedTokenAddress?.[0] ?? unreachable(),
+            amountPerSecond: amountPerSecond ?? unreachable(),
+            recipientAccountId,
+            name: $context.streamNameValue,
+            startAt: combinedStartDate,
+            durationSeconds:
+              combinedEndDate && combinedStartDate
+                ? Math.floor((combinedEndDate.getTime() - combinedStartDate.getTime()) / 1000)
+                : undefined,
+          });
+
+          return {
+            callerClient,
+            batch,
+          };
+        },
+
+        transactions: async (transactContext) => [
+          {
+            transaction: await transactContext.callerClient.populateCallBatchedTx(
+              transactContext.batch,
+            ),
+            applyGasBuffer: true,
+          },
+        ],
+      }),
     );
   }
 </script>

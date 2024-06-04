@@ -56,7 +56,7 @@
   import NameAndBadgeCell from '$lib/components/table/cells/name-and-badge-cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import onClickGoto from '$lib/utils/on-click-goto';
-  // import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
+  import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
   import tokens from '$lib/stores/tokens';
@@ -65,6 +65,9 @@
   import Token from '$lib/components/token/token.svelte';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
   import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import modal from '$lib/stores/modal';
+  import PlusIcon from '$lib/components/icons/Plus.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
 
   export let accountId: string | undefined;
   export let disableActions = true;
@@ -265,11 +268,11 @@
     actions: disableActions
       ? []
       : [
-          // {
-          //   handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
-          //   icon: PlusIcon,
-          //   label: 'Create stream',
-          // },
+          {
+            handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
+            icon: PlusIcon,
+            label: 'Create stream',
+          },
         ],
   }}
   skeleton={{

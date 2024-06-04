@@ -24,9 +24,7 @@ export default (
     }),
     makeStep({
       component: InputDetails,
-      props: {
-        receiver,
-      },
+      props: undefined,
     }),
     makeStep({
       component: SuccessStep,
