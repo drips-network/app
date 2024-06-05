@@ -102,7 +102,7 @@
   import {
     CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT,
     currentAmounts,
-  } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  } from '$lib/utils/current-amounts';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { onMount } from 'svelte';

@@ -37,7 +37,7 @@
   import {
     CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT,
     streamCurrentAmountsStore,
-  } from '../create-stream-flow/methods/current-amounts';
+  } from '../../utils/current-amounts';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

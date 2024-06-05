@@ -64,7 +64,7 @@
   import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import Token from '$lib/components/token/token.svelte';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
-  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import modal from '$lib/stores/modal';
   import PlusIcon from '$lib/components/icons/Plus.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';

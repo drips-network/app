@@ -49,7 +49,7 @@
   import {
     CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT,
     streamCurrentAmountsStore,
-  } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  } from '$lib/utils/current-amounts';
 
   export let data;
 

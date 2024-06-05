@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import { gql } from 'graphql-request';
 
   export const USER_BALANCES_FRAGMENT = gql`

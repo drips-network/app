@@ -2,7 +2,7 @@ import { gql } from 'graphql-request';
 import type {
   CurrentAmountsTimelineItemFragment,
   CurrentAmountsUserBalanceTimelineItemFragment,
-} from './__generated__/gql.generated';
+} from '../flows/create-stream-flow/methods/__generated__/gql.generated';
 import { writable, type Unsubscriber } from 'svelte/store';
 import tickStore from '$lib/stores/tick/tick.store';
 import type { TimelineItemType } from '$lib/graphql/__generated__/base-types';
@@ -87,7 +87,10 @@ export function currentAmounts(
       tokenAddress: currentlyActiveTimelineItem.deltaPerSecond.tokenAddress,
       amount: lastDeltaPerSecond,
     },
-    lastTimelineItemType: currentlyActiveTimelineItem.__typename === 'TimelineItem' ? currentlyActiveTimelineItem.type : undefined,
+    lastTimelineItemType:
+      currentlyActiveTimelineItem.__typename === 'TimelineItem'
+        ? currentlyActiveTimelineItem.type
+        : undefined,
   };
 }
 

@@ -89,7 +89,7 @@
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildStreamUrl from '$lib/utils/build-stream-url';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import RealtimeAmount from '../amount/realtime-amount.svelte';

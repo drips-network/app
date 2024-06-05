@@ -52,7 +52,7 @@
   import {
     CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT,
     streamCurrentAmountsStore,
-  } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  } from '$lib/utils/current-amounts';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import checkIsUser from '$lib/utils/check-is-user';
