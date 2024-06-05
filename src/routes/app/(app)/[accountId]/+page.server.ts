@@ -48,20 +48,23 @@ const PROFILE_PAGE_QUERY = gql`
 `;
 
 async function resolveEnsFields(address: string) {
-  const ensName = await provider.lookupAddress(address);
+  try {
+    const ensName = await provider.lookupAddress(address);
 
-  if (ensName) {
-    const resolver = await provider.getResolver(ensName);
+    if (ensName) {
+      const resolver = await provider.getResolver(ensName);
 
-    const promises = ['description', 'url', 'com.twitter', 'com.github'].map(async (recordName) => [
-      recordName,
-      await resolver?.getText(recordName),
-    ]);
+      const promises = ['description', 'url', 'com.twitter', 'com.github'].map(
+        async (recordName) => [recordName, await resolver?.getText(recordName)],
+      );
 
-    return {
-      ensName,
-      records: Object.fromEntries(await Promise.all(promises)),
-    };
+      return {
+        ensName,
+        records: Object.fromEntries(await Promise.all(promises)),
+      };
+    }
+  } catch {
+    return null;
   }
 }
 
