@@ -85,10 +85,14 @@
 
   export let userStreams: StreamsSectionStreamsFragment;
   $: incoming = userStreams.incoming.filter((s) =>
-    tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true,
+    tokenAddress
+      ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+      : true,
   );
   $: outgoing = userStreams.outgoing.filter((s) =>
-    tokenAddress ? s.config.amountPerSecond.tokenAddress === tokenAddress : true,
+    tokenAddress
+      ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+      : true,
   );
 
   $: isSelf = accountId === $walletStore.dripsAccountId;

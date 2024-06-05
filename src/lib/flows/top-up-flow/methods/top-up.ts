@@ -1,16 +1,14 @@
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
-import streams from '$lib/stores/streams';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import expect from '$lib/utils/expect';
 import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { constants } from 'ethers';
 import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -43,36 +41,10 @@ export default function (
 
         const needApproval = tokenAllowance < amountToTopUp;
 
-        const ownAccountId = (await client.getAccountId()).toString();
-        const ownAccount = get(streams).accounts[ownAccountId];
-        const assetConfig = ownAccount.assetConfigs.find(
-          (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
-        );
-
-        const currentReceivers = mapFilterUndefined(assetConfig?.streams || [], (stream) =>
-          stream.paused
-            ? undefined
-            : {
-                accountId: stream.receiver.accountId,
-                config: stream.streamConfig.raw,
-              },
-        );
-
-        const setStreamsPopulatedTx = await txFactory.setStreams(
+        const setStreamsPopulatedTx = await buildBalanceChangePopulatedTx(
+          client,
           tokenAddress,
-          currentReceivers,
           amountToTopUp,
-          currentReceivers,
-          0,
-          0,
-          address,
-          /*
-          Dirty hack to disable the SDK's built-in gas estimation, because
-          it would fail if there's no token approval yet.
-
-          TODO: Introduce a more graceful method of disabling gas estimation.
-          */
-          { gasLimit: 1 },
         );
 
         delete setStreamsPopulatedTx.gasLimit;
@@ -115,34 +87,6 @@ export default function (
           applyGasBuffer: true,
         },
       ],
-
-      after: async (receipts, transactContext) => {
-        const { provider } = get(walletStore);
-
-        const block = await provider.getBlock(receipts[0].blockNumber);
-        const { timestamp: blockTimestamp } = block;
-
-        /*
-        We wait up to five seconds for `refreshUserAccount` to include a history item
-        matching our transaction's block timestamp, checking once a second. If it doesnʼt
-        after five tries, we move forward anyway, but the user will be made aware that they
-        may need to wait for a while for their dashboard to refresh.
-        */
-        await expect(
-          streams.refreshUserAccount,
-          (account) =>
-            Boolean(
-              account.assetConfigs
-                .find(
-                  (ac) =>
-                    ac.tokenAddress.toLowerCase() === transactContext.tokenAddress.toLowerCase(),
-                )
-                ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
-            ),
-          5000,
-          1000,
-        );
-      },
     }),
   );
 }

@@ -4,6 +4,7 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import EnterAmount from './enter-amount.svelte';
 import withdrawFlowState from './withdraw-flow-state';
+import FetchData from './fetch-data.svelte';
 
 export default function getWithdrawSteps(tokenAddress: string) {
   const state = withdrawFlowState(tokenAddress);
@@ -11,6 +12,10 @@ export default function getWithdrawSteps(tokenAddress: string) {
   return {
     context: () => state,
     steps: [
+      makeStep({
+        component: FetchData,
+        props: undefined,
+      }),
       makeStep({
         component: EnterAmount,
         props: undefined,

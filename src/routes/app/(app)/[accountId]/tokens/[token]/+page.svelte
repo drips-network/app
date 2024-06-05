@@ -17,7 +17,7 @@
     fragment TokenPageUserStreams on UserStreams {
       ...StreamsSectionStreams
     }
-  `
+  `;
 </script>
 
 <script lang="ts">
@@ -30,7 +30,9 @@
   import Minus from '$lib/components/icons/Minus.svelte';
   import Amount from '$lib/components/amount/amount.svelte';
   import TokenStat from '$lib/components/token-stat/token-stat.svelte';
-  import Streams, { STREAMS_SECTION_STREAMS_FRAGMENT } from '../../../funds/sections/streams.section.svelte';
+  import Streams, {
+    STREAMS_SECTION_STREAMS_FRAGMENT,
+  } from '../../../funds/sections/streams.section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet/wallet.store';
@@ -39,12 +41,15 @@
   import decodeAccountId from '$lib/utils/decode-universal-account-id';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   // import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
-  // import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
-  // import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
+  import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
+  import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { gql } from 'graphql-request';
-  import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT, streamCurrentAmountsStore } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import {
+    CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT,
+    streamCurrentAmountsStore,
+  } from '$lib/flows/create-stream-flow/methods/current-amounts';
 
   export let data;
 
@@ -54,13 +59,19 @@
     (balance) => balance.tokenAddress.toLowerCase() === urlParamToken?.toLowerCase(),
   ) ?? { tokenAddress: urlParamToken, incoming: [], outgoing: [] };
 
-  $: currentOutgoingAmountReadable = streamCurrentAmountsStore(tokenBalances.outgoing, urlParamToken);
-  $: currentIncomingAmountReadable = streamCurrentAmountsStore(tokenBalances.incoming, urlParamToken);
+  $: currentOutgoingAmountReadable = streamCurrentAmountsStore(
+    tokenBalances.outgoing,
+    urlParamToken,
+  );
+  $: currentIncomingAmountReadable = streamCurrentAmountsStore(
+    tokenBalances.incoming,
+    urlParamToken,
+  );
 
   $: token = $tokens?.find(
     (token) =>
       token.info.address.toLowerCase() === urlParamToken ||
-      token.info.symbol.toLowerCase() === urlParamToken
+      token.info.symbol.toLowerCase() === urlParamToken,
   );
 
   $: tokenAddress = token?.info.address.toLowerCase() ?? urlParamToken;
@@ -74,11 +85,11 @@
   }
 
   function openAddFundsModal() {
-    // modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
+    modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
   }
 
   function openWithdrawModal() {
-    // modal.show(Stepper, undefined, getWithdrawSteps(tokenAddress));
+    modal.show(Stepper, undefined, getWithdrawSteps(tokenAddress));
   }
 
   let error: 'connected-to-wrong-user' | 'unknown-token' | undefined;
@@ -100,7 +111,9 @@
   }
 </script>
 
-<HeadMeta title={token?.info.name ?? 'Unknown Token'} />
+{#if token}
+  <HeadMeta title={token?.info.name ?? 'Unknown Token'} />
+{/if}
 
 {#if error === 'unknown-token'}
   <LargeEmptyState
@@ -143,7 +156,11 @@
         <svelte:fragment slot="value">
           <div data-testid="incoming-balance">
             <span class:text-foreground-level-4={true}>
-              <Amount showSymbol={false} amount={$currentIncomingAmountReadable.currentAmount} amountClasses="" />
+              <Amount
+                showSymbol={false}
+                amount={$currentIncomingAmountReadable.currentAmount}
+                amountClasses=""
+              />
             </span>
           </div>
         </svelte:fragment>
@@ -165,8 +182,15 @@
 
         <svelte:fragment slot="value">
           <div data-testid="outgoing-balance">
-            <span class:text-foreground-level-4={$currentOutgoingAmountReadable.currentAmount.amount === 0n}>
-              <Amount showSymbol={false} amount={$currentOutgoingAmountReadable.currentAmount} amountClasses="" />
+            <span
+              class:text-foreground-level-4={$currentOutgoingAmountReadable.currentAmount.amount ===
+                0n}
+            >
+              <Amount
+                showSymbol={false}
+                amount={$currentOutgoingAmountReadable.currentAmount}
+                amountClasses=""
+              />
             </span>
           </div>
         </svelte:fragment>

@@ -3,13 +3,16 @@
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
     ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
+    ${DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT}
     fragment StreamPageStream on Stream {
+      ...DeleteStreamConfirmStep
       timeline {
         ...CurrentAmountsTimelineItem
       }
       sender {
         account {
           ...DripVisualAddressDriverAccount
+          accountId
         }
       }
       receiver {
@@ -52,11 +55,22 @@
   } from '$lib/flows/create-stream-flow/methods/current-amounts';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
   import tokensStore from '$lib/stores/tokens/tokens.store';
+  import checkIsUser from '$lib/utils/check-is-user';
+  import Button from '$lib/components/button/button.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
+  import { DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT } from '$lib/flows/delete-stream-flow/confirm.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let data: PageData;
   const stream: StreamPageStreamFragment = data.stream;
 
-  const currentStreamAmounts = streamCurrentAmountsStore(stream.timeline, stream.config.amountPerSecond.tokenAddress);
+  const currentStreamAmounts = streamCurrentAmountsStore(
+    stream.timeline,
+    stream.config.amountPerSecond.tokenAddress,
+  );
 
   $: token = $tokensStore && tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress);
 </script>
@@ -67,6 +81,15 @@
   <div class="headline">
     <h1>{stream.name ?? 'Unnamed stream'}</h1>
   </div>
+  {#if $walletStore && checkIsUser(stream.sender.account.accountId)}
+    <div class="actions">
+      <Button
+        icon={Trash}
+        on:click={() => modal.show(Stepper, undefined, deleteStreamFlowSteps(stream))}
+        >Delete</Button
+      >
+    </div>
+  {/if}
   <DripVisual
     from={stream.sender.account}
     to={stream.receiver.account}
@@ -84,10 +107,10 @@
           <div class="value-box" class:align-right={stream.config.durationSeconds === undefined}>
             <span class="highlight large-text tabular-nums" data-testid="total-streamed">
               {#if token}
-              <FormattedAmount
-                amount={$currentStreamAmounts.currentAmount.amount}
-                decimals={token.info.decimals}
-              />
+                <FormattedAmount
+                  amount={$currentStreamAmounts.currentAmount.amount}
+                  decimals={token.info.decimals}
+                />
                 {#if stream.config.durationSeconds !== undefined}
                   {token?.info.symbol}
                 {/if}

@@ -57,6 +57,8 @@
   import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
   import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import assert from '$lib/utils/assert';
+  import { waitForAccountMetadata } from '$lib/utils/ipfs';
+  import { invalidateAll } from '$app/navigation';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -197,7 +199,7 @@
               : recipientInputValue;
           }
 
-          const batch = await buildStreamCreateBatchTx(addressDriverClient, signer, {
+          const { batch, newHash } = await buildStreamCreateBatchTx(addressDriverClient, signer, {
             tokenAddress: $context.selectedTokenAddress?.[0] ?? unreachable(),
             amountPerSecond: amountPerSecond ?? unreachable(),
             recipientAccountId,
@@ -212,17 +214,25 @@
           return {
             callerClient,
             batch,
+            newHash,
           };
         },
 
-        transactions: async (transactContext) => [
+        transactions: async ({ callerClient, batch }) => [
           {
-            transaction: await transactContext.callerClient.populateCallBatchedTx(
-              transactContext.batch,
-            ),
+            transaction: await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: true,
           },
         ],
+
+        after: async (_, { newHash }) => {
+          const { dripsAccountId } = $wallet;
+          assert(dripsAccountId);
+
+          await waitForAccountMetadata(dripsAccountId, newHash);
+
+          await invalidateAll();
+        },
       }),
     );
   }

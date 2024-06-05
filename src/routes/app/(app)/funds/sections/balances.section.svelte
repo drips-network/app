@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-  import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT } from "$lib/flows/create-stream-flow/methods/current-amounts";
-  import { gql } from "graphql-request";
+  import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT } from '$lib/flows/create-stream-flow/methods/current-amounts';
+  import { gql } from 'graphql-request';
 
   export const USER_BALANCES_FRAGMENT = gql`
     ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
@@ -30,7 +30,11 @@
   import type { ComponentProps } from 'svelte';
   import Token from '$lib/components/token/token.svelte';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
-  import type { UserBalancesFragment } from "./__generated__/gql.generated";
+  import type { UserBalancesFragment } from './__generated__/gql.generated';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
+  import modal from '$lib/stores/modal';
+  import Plus from '$lib/components/icons/Plus.svelte';
 
   interface TokenTableRow {
     token: ComponentProps<Token>;
@@ -125,15 +129,16 @@
   header={{
     label: 'Balances',
     icon: TokensIcon,
-    actions: disableActions
-      ? []
-      : [
-          // {
-          //   handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
-          //   icon: Plus,
-          //   label: 'Add funds',
-          // },
-        ],
+    actions:
+      disableActions || !isSelf
+        ? []
+        : [
+            {
+              handler: () => modal.show(Stepper, undefined, getTopUpFlowSteps()),
+              icon: Plus,
+              label: 'Add funds',
+            },
+          ],
   }}
   skeleton={{
     emptyStateHeadline: 'No tokens',

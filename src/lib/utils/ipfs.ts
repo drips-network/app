@@ -1,4 +1,11 @@
 import { PUBLIC_PINATA_GATEWAY_URL } from '$env/static/public';
+import query from '$lib/graphql/dripsQL';
+import { gql } from 'graphql-request';
+import expect from './expect';
+import type {
+  LatestAccountMetadataHashQuery,
+  LatestAccountMetadataHashQueryVariables,
+} from './__generated__/gql.generated';
 
 /**
  * Fetch the given hash from IPFS.
@@ -42,4 +49,32 @@ export async function pin(data: Record<string, unknown>, f = fetch) {
   }
 
   return res.text();
+}
+
+export async function waitForAccountMetadata(
+  accountId: string,
+  expectedIpfsHash: string,
+  f = fetch,
+) {
+  await expect(
+    async () => {
+      const res = await query<
+        LatestAccountMetadataHashQuery,
+        LatestAccountMetadataHashQueryVariables
+      >(
+        gql`
+          query LatestAccountMetadataHash($accountId: ID!) {
+            userById(accountId: $accountId) {
+              latestMetadataIpfsHash
+            }
+          }
+        `,
+        { accountId },
+        f,
+      );
+
+      return res.userById?.latestMetadataIpfsHash;
+    },
+    (result) => expectedIpfsHash === result,
+  );
 }
