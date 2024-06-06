@@ -3,7 +3,7 @@ import type {
   CreateStreamFlowAddressDriverAccountFragment,
   CreateStreamFlowDetailsNftDriverAccountFragment,
 } from './__generated__/gql.generated';
-import type { CurrentAmountsUserBalanceTimelineItemFragment } from './methods/__generated__/gql.generated';
+import type { CurrentAmountsUserBalanceTimelineItemFragment } from '$lib/utils/__generated__/gql.generated';
 
 export interface CreateStreamFlowState {
   streamNameValue: string | undefined;

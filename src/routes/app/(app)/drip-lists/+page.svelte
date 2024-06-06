@@ -10,7 +10,9 @@
 <script lang="ts">
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
-  import DripListsSection, { DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+  import DripListsSection, {
+    DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT,
+  } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -62,7 +64,12 @@
       </div>
     </svelte:fragment>
   </EduCard>
-  <DripListsSection {votingRounds} {dripLists} showCreateNewListCard={true} />
+  <DripListsSection
+    {votingRounds}
+    {dripLists}
+    showCreateNewListCard={true}
+    withCreateButton={true}
+  />
 </div>
 
 <style>

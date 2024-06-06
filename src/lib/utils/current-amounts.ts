@@ -1,11 +1,12 @@
 import { gql } from 'graphql-request';
-import type {
-  CurrentAmountsTimelineItemFragment,
-  CurrentAmountsUserBalanceTimelineItemFragment,
-} from '../flows/create-stream-flow/methods/__generated__/gql.generated';
+
 import { writable, type Unsubscriber } from 'svelte/store';
 import tickStore from '$lib/stores/tick/tick.store';
 import type { TimelineItemType } from '$lib/graphql/__generated__/base-types';
+import type {
+  CurrentAmountsTimelineItemFragment,
+  CurrentAmountsUserBalanceTimelineItemFragment,
+} from './__generated__/gql.generated';
 
 export const CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT = gql`
   fragment CurrentAmountsTimelineItem on TimelineItem {

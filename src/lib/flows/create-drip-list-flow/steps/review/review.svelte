@@ -111,7 +111,6 @@
           );
 
           // TODO(streams): invalidate appropriate load function
-          // await streamsStore.refreshUserAccount();
 
           $context.dripListId = dripListId;
         },

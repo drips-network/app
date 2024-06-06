@@ -15,6 +15,9 @@ export const STREAM_STATE_STREAM_FRAGMENT = gql`
     config {
       durationSeconds
       startDate
+      amountPerSecond {
+        tokenAddress
+      }
     }
     timeline {
       ...CurrentAmountsTimelineItem
@@ -30,7 +33,10 @@ export default function streamState(stream: StreamStateStreamFragment) {
     ? new Date(stream.config.startDate + stream.config.durationSeconds * 1000)
     : undefined;
 
-  const currentAmounts = getCurrentAmounts(stream.timeline);
+  const currentAmounts = getCurrentAmounts(
+    stream.timeline,
+    stream.config.amountPerSecond.tokenAddress,
+  );
 
   if (stream.isPaused) {
     state = 'paused';
