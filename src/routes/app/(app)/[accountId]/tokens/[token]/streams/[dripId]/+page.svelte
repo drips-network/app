@@ -4,7 +4,9 @@
     ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     ${DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT}
+    ${EDIT_STREAM_FLOW_STREAM}
     fragment StreamPageStream on Stream {
+      ...EditStreamFlowStream
       ...DeleteStreamConfirmStep
       timeline {
         ...CurrentAmountsTimelineItem
@@ -35,6 +37,7 @@
           tokenAddress
         }
       }
+      isPaused
     }
   `;
 </script>
@@ -63,6 +66,13 @@
   import deleteStreamFlowSteps from '$lib/flows/delete-stream-flow/delete-stream-flow-steps';
   import { DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT } from '$lib/flows/delete-stream-flow/confirm.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import Pause from '$lib/components/icons/Pause.svelte';
+  import pauseFlowSteps from '$lib/flows/pause-flow/pause-flow-steps';
+  import Play from '$lib/components/icons/Play.svelte';
+  import unpauseFlowSteps from '$lib/flows/unpause-flow/unpause-flow-steps';
+  import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
+  import { EDIT_STREAM_FLOW_STREAM } from '$lib/flows/edit-stream-flow/enter-new-details.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
 
   export let data: PageData;
   const stream: StreamPageStreamFragment = data.stream;
@@ -83,6 +93,21 @@
   </div>
   {#if $walletStore && checkIsUser(stream.sender.account.accountId)}
     <div class="actions">
+      <Button
+        icon={Pen}
+        on:click={() => modal.show(Stepper, undefined, editStreamFlowSteps(stream))}>Edit</Button
+      >
+      {#if stream.isPaused}
+        <Button
+          icon={Play}
+          on:click={() => modal.show(Stepper, undefined, unpauseFlowSteps(stream))}>Unpause</Button
+        >
+      {:else}
+        <Button icon={Pause} on:click={() => modal.show(Stepper, undefined, pauseFlowSteps(stream))}
+          >Pause</Button
+        >
+      {/if}
+
       <Button
         icon={Trash}
         on:click={() => modal.show(Stepper, undefined, deleteStreamFlowSteps(stream))}

@@ -10,7 +10,9 @@ import type {
 import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
 import { pin } from '../ipfs';
 import { getAddressDriverTxFactory, getNetworkConfig } from '../get-drips-clients';
-import type { Signer } from 'ethers';
+import type { PopulatedTransaction, Signer } from 'ethers';
+import unreachable from '../unreachable';
+import assert from '$lib/utils/assert';
 
 type NewStreamOptions = {
   tokenAddress: string;
@@ -34,6 +36,7 @@ async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: s
             outgoing {
               id
               name
+              isPaused
               config {
                 raw
                 amountPerSecond {
@@ -75,6 +78,7 @@ async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: s
       (stream) =>
         stream.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
     )
+    .filter((stream) => !stream.isPaused)
     .map((stream) => ({
       accountId: stream.receiver.account.accountId,
       config: stream.config.raw,
@@ -317,4 +321,164 @@ export async function buildBalanceChangePopulatedTx(
     */
     { gasLimit: 1 },
   );
+}
+
+export async function buildPauseStreamPopulatedTx(
+  addressDriverClient: AddressDriverClient,
+  streamId: string,
+) {
+  const ownAccountId = await addressDriverClient.getAccountId();
+  const txFactory = await getAddressDriverTxFactory();
+
+  const { dripId, tokenAddress } = decodeStreamId(streamId);
+
+  const { currentReceivers } = await _getCurrentStreamsAndReceivers(ownAccountId, tokenAddress);
+
+  const newReceivers = currentReceivers.filter((r) => {
+    const streamConfig = Utils.StreamConfiguration.fromUint256(r.config);
+    return streamConfig.dripId.toString() !== dripId;
+  });
+
+  return txFactory.setStreams(
+    tokenAddress,
+    currentReceivers,
+    0,
+    newReceivers,
+    0,
+    0,
+    AddressDriverClient.getUserAddress(ownAccountId),
+    /*
+    Dirty hack to disable the SDK's built-in gas estimation, because
+    it would fail if there's no token approval yet.
+    */
+    { gasLimit: 1 },
+  );
+}
+
+export async function buildUnpauseStreamPopulatedTx(
+  addressDriverClient: AddressDriverClient,
+  streamId: string,
+) {
+  const ownAccountId = await addressDriverClient.getAccountId();
+  const { dripId, tokenAddress } = decodeStreamId(streamId);
+
+  const { currentStreams, currentReceivers } = await _getCurrentStreamsAndReceivers(
+    ownAccountId,
+    tokenAddress,
+  );
+
+  const streamToUnpause = currentStreams.find(
+    (stream) =>
+      stream.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase() &&
+      stream.config.dripId === dripId,
+  );
+
+  if (!streamToUnpause?.isPaused) {
+    throw new Error(`Stream ${streamId} is not paused`);
+  }
+
+  const newReceivers = currentReceivers.concat({
+    accountId: streamToUnpause.receiver.account.accountId,
+    config: streamToUnpause.config.raw,
+  });
+
+  return (await getAddressDriverTxFactory()).setStreams(
+    tokenAddress,
+    currentReceivers,
+    0,
+    newReceivers,
+    0,
+    0,
+    AddressDriverClient.getUserAddress(ownAccountId),
+    /*
+    Dirty hack to disable the SDK's built-in gas estimation, because
+    it would fail if there's no token approval yet.
+    */
+    { gasLimit: 1 },
+  );
+}
+
+export async function buildEditStreamBatch(
+  addressDriverClient: AddressDriverClient,
+  streamId: string,
+  newData: {
+    name?: string;
+    amountPerSecond?: bigint;
+  },
+) {
+  const ownAccountId = await addressDriverClient.getAccountId();
+  const { dripId, tokenAddress } = decodeStreamId(streamId);
+
+  const { currentStreams, currentReceivers } = await _getCurrentStreamsAndReceivers(
+    ownAccountId,
+    tokenAddress,
+  );
+
+  const streamToEdit = currentStreams.find((stream) => stream.id === streamId);
+  assert(streamToEdit, `Stream ${streamId} not found`);
+
+  const batch: PopulatedTransaction[] = [];
+
+  const addressDriverTxFactory = await getAddressDriverTxFactory();
+
+  if (newData.name) {
+    const metadata = _buildMetadata(currentStreams, ownAccountId);
+
+    const assetConfigIndex = metadata.assetConfigs.findIndex(
+      (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    );
+
+    const streamIndex = metadata.assetConfigs[assetConfigIndex]?.streams.findIndex(
+      (stream) => stream.id === streamId,
+    );
+
+    assert(
+      assetConfigIndex !== undefined && streamIndex !== undefined,
+      `Stream ${streamId} not found in metadata`,
+    );
+
+    metadata.assetConfigs[assetConfigIndex].streams[streamIndex].name = newData.name;
+
+    const hash = await pin(metadata);
+
+    batch.push(
+      await addressDriverTxFactory.emitAccountMetadata([
+        Utils.Metadata.createFromStrings(USER_METADATA_KEY, hash),
+      ]),
+    );
+  }
+
+  if (newData.amountPerSecond) {
+    const newReceivers = currentReceivers.map((r) => {
+      const streamConfig = Utils.StreamConfiguration.fromUint256(r.config);
+
+      if (streamConfig.dripId.toString() === dripId) {
+        return {
+          accountId: r.accountId,
+          config: Utils.StreamConfiguration.toUint256({
+            dripId: streamConfig.dripId,
+            start: streamConfig.start,
+            duration: streamConfig.duration,
+            amountPerSec: newData.amountPerSecond ?? unreachable(),
+          }),
+        };
+      }
+
+      return r;
+    });
+
+    batch.push(
+      await addressDriverTxFactory.setStreams(
+        tokenAddress,
+        currentReceivers,
+        0,
+        newReceivers,
+        0,
+        0,
+        AddressDriverClient.getUserAddress(ownAccountId),
+      ),
+    );
+  }
+
+  return batch;
 }

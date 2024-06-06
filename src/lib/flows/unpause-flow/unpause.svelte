@@ -1,66 +1,47 @@
+<script lang="ts" context="module">
+  import { gql } from 'graphql-request';
+
+  export const UNPAUSE_FLOW_STREAM_FRAGMENT = gql`
+    fragment UnpauseFlowStream on Stream {
+      id
+      sender {
+        account {
+          accountId
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
-  import wallet from '$lib/stores/wallet/wallet.store';
   import { createEventDispatcher, onMount } from 'svelte';
-  import assert from '$lib/utils/assert';
-  import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-  import type { Stream } from '$lib/stores/streams/types';
-  import streams from '$lib/stores/streams';
+  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+  import type {
+    CheckUserStreamPausedQuery,
+    CheckUserStreamPausedQueryVariables,
+    UnpauseFlowStreamFragment,
+  } from './__generated__/gql.generated';
+  import { buildUnpauseStreamPopulatedTx } from '$lib/utils/streams/streams';
+  import query from '$lib/graphql/dripsQL';
+  import { invalidateAll } from '$app/navigation';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let stream: Stream;
+  export let stream: UnpauseFlowStreamFragment;
 
   onMount(() => {
     transact(
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const { dripsAccountId, address } = $wallet;
-          assert(dripsAccountId && address);
+          const addressDriverClient = await getAddressDriverClient();
 
-          const { tokenAddress } = stream.streamConfig.amountPerSecond;
+          const tx = await buildUnpauseStreamPopulatedTx(addressDriverClient, stream.id);
 
-          const ownAccount = $streams.accounts[dripsAccountId];
-          assert(ownAccount, "App hasnʼt yet fetched user's own account");
-
-          const assetConfig = ownAccount.assetConfigs.find(
-            (ac) => ac.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
-          );
-          assert(assetConfig, 'App hasnʼt yet fetched the right asset config');
-
-          const currentReceivers = mapFilterUndefined(assetConfig.streams, (stream) =>
-            stream.paused
-              ? undefined
-              : {
-                  accountId: stream.receiver.accountId,
-                  config: stream.streamConfig.raw,
-                },
-          );
-
-          const newReceivers = [
-            ...currentReceivers,
-            {
-              accountId: stream.receiver.accountId,
-              config: stream.streamConfig.raw,
-            },
-          ];
-
-          const txFactory = await getAddressDriverTxFactory();
-          const tx = await txFactory.setStreams(
-            tokenAddress,
-            currentReceivers,
-            0,
-            newReceivers,
-            0,
-            0,
-            address,
-          );
-
-          return { tx };
+          return { tx, accountId: stream.sender.account.accountId };
         },
 
         transactions: ({ tx }) => [
@@ -70,13 +51,31 @@
           },
         ],
 
-        after: async () => {
+        after: async (_, { accountId }) => {
           await expect(
-            streams.refreshUserAccount,
-            () => streams.getStreamById(stream.id)?.paused === false,
-            5000,
+            () =>
+              query<CheckUserStreamPausedQuery, CheckUserStreamPausedQueryVariables>(
+                gql`
+                  query CheckUserStreamPaused($accountId: ID!) {
+                    userById(accountId: $accountId) {
+                      streams {
+                        outgoing {
+                          id
+                          isPaused
+                        }
+                      }
+                    }
+                  }
+                `,
+                { accountId },
+              ),
+            (res) =>
+              res.userById?.streams?.outgoing?.find((s) => s.id === stream.id)?.isPaused === false,
+            10000,
             1000,
           );
+
+          await invalidateAll();
         },
       }),
     );
