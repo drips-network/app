@@ -25,7 +25,6 @@
   import { page } from '$app/stores';
   import Token from '$lib/components/token/token.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowUp from '$lib/components/icons/ArrowUp.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Amount from '$lib/components/amount/amount.svelte';
@@ -77,12 +76,6 @@
   $: tokenAddress = token?.info.address.toLowerCase() ?? urlParamToken;
 
   $: accountId = $wallet.dripsAccountId;
-
-  // TODO(streams): make the modals work
-
-  function openCollectModal() {
-    // modal.show(Stepper, undefined, collectFlowSteps(tokenAddress));
-  }
 
   function openAddFundsModal() {
     modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
@@ -162,12 +155,6 @@
                 amountClasses=""
               />
             </span>
-          </div>
-        </svelte:fragment>
-
-        <svelte:fragment slot="actions">
-          <div data-testid="token-page-collect-button" class="flex gap-3">
-            <Button icon={ArrowUp} on:click={openCollectModal}>Collect</Button>
           </div>
         </svelte:fragment>
       </TokenStat>

@@ -19,14 +19,10 @@
   export let context: Writable<TopUpFlowState>;
   export let backButton: boolean;
 
-  const restorer = $context.restorer;
-
   $: tokenAddress = $context.tokenAddress;
   $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
 
-  let amountValue = restorer.restore('amountValue');
   let amount: bigint | undefined = undefined;
-  let topUpMax = restorer.restore('topUpMax');
 
   let validationState: TextInputValidationState = {
     type: 'unvalidated',
@@ -37,7 +33,7 @@
 
     const { tokenBalance, tokenAllowance } = $context;
 
-    const amountToTopUp = topUpMax ? tokenBalance : amount;
+    const amountToTopUp = $context.topUpMax ? tokenBalance : amount;
 
     context.update((c) => ({
       ...c,
@@ -51,8 +47,6 @@
       tokenAllowance ?? unreachable(),
     );
   }
-
-  $: restorer.saveAll({ amountValue, topUpMax });
 </script>
 
 <StepLayout>
@@ -64,8 +58,8 @@
   <InputWalletAmount
     tokenAddress={$context.tokenAddress}
     tokenBalance={$context.tokenBalance}
-    bind:topUpMax
-    bind:inputValue={amountValue}
+    bind:topUpMax={$context.topUpMax}
+    bind:inputValue={$context.amountValue}
     bind:amount
     bind:validationState
   />
@@ -74,7 +68,11 @@
     {#if backButton}
       <Button
         on:click={() => {
-          restorer.clear();
+          context.set({
+            tokenAddress: undefined,
+            amountValue: '',
+            topUpMax: false,
+          });
           dispatch('goBackward');
         }}
         variant="ghost"

@@ -18,13 +18,13 @@
 
   onMount(() =>
     dispatch('await', {
-      promise: pollSubgraph,
+      promise: pollApi,
       message: 'Waiting for the verification to finalize…',
       subtitle: 'This might take a while. Please donʼt close this window.',
     }),
   );
 
-  async function pollSubgraph() {
+  async function pollApi() {
     const projectAccountId = $context.project?.account.accountId ?? unreachable();
 
     const checkProjectVerificationStatusQuery = gql`
