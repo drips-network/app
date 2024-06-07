@@ -5,14 +5,9 @@
   import fiatEstimatesStore from '$lib/utils/fiat-estimates/fiat-estimates';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
-  import Download from '$lib/components/icons/Download.svelte';
   import FiatEstimateValue from '../aggregate-fiat-estimate/fiat-estimate-value.svelte';
-  import Button from '../button/button.svelte';
   import Stepper from '../stepper/stepper.svelte';
   import Token from '../token/token.svelte';
-  // import getCollectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
-
-  export let showCollectButtons = false;
 
   interface Amount {
     tokenAddress: string;
@@ -37,8 +32,6 @@
   const connected = tokensStore.connected;
 
   $: {
-    $priceStore;
-
     if ($connected) {
       amounts.forEach(({ tokenAddress, amount }, index) => {
         const token = tokensStore.getByAddress(tokenAddress);
@@ -51,16 +44,12 @@
         fiatEstimates[index] = fiatEstimatesStore.convert(
           { amount, tokenAddress },
           token.info.decimals,
-          priceStore,
+          $priceStore,
         );
       });
     }
 
     fiatEstimates = fiatEstimates;
-  }
-
-  function openCollectModal(tokenAddress: string) {
-    // modal.show(Stepper, undefined, getCollectFlowSteps(tokenAddress));
   }
 </script>
 
@@ -79,11 +68,6 @@
           {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
           {tokens[i]?.info.symbol}
         </div>
-        {#if showCollectButtons}
-          <div class="-mr-1 sm:order-last">
-            <Button icon={Download} on:click={() => openCollectModal(tokenAddress)}>Collect</Button>
-          </div>
-        {/if}
       {:else if $connected}
         <button
           on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}

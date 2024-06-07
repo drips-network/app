@@ -140,17 +140,17 @@ export async function track(addresses: TokenAddress[]) {
  * Convert the given amount to USD.
  * @param amount The amount to convert.
  * @param tokenDecimals The amount of decimals for the token the amount is in.
- * @param prices The store of prices to source from.
+ * @param prices The prices to source from.
  * @returns A float representing the amount in USD, `undefined` if the asset
  * isnʼt currently tracked, `pending` if we're waiting for the data provider to
  * report the price for the first time, or `unsupported` if it can't provide
  * a price for the given asset.
  */
-export function convert(amount: Amount, tokenDecimals: number, prices: ReturnType<typeof price>) {
+export function convert(amount: Amount, tokenDecimals: number, prices: Prices) {
   let { tokenAddress } = amount;
   tokenAddress = utils.getAddress(tokenAddress);
 
-  const price = get(prices)[tokenAddress];
+  const price = prices[tokenAddress];
 
   if (!price) return undefined;
   if (typeof price === 'string') return price;

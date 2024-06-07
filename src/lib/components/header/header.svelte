@@ -1,3 +1,17 @@
+<script lang="ts" context="module">
+  import { gql } from 'graphql-request';
+  import { COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT } from '../collect-button/collect-button.svelte';
+
+  export const HEADER_USER_FRAGMENT = gql`
+    ${COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT}
+    fragment HeaderUser on User {
+      withdrawableBalances {
+        ...CollectButtonWithdrawableBalance
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import scroll from '$lib/stores/scroll';
   import ConnectButton from '../connect-button/connect-button.svelte';
@@ -10,7 +24,9 @@
   import Spinner from '../spinner/spinner.svelte';
   import CollectButton from '../collect-button/collect-button.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  import walletStore from '$lib/stores/wallet/wallet.store';
+  import type { HeaderUserFragment } from './__generated__/gql.generated';
+
+  export let user: HeaderUserFragment | null;
 
   $: elevated = $scroll.pos > 16;
 
@@ -22,7 +38,7 @@
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
-  {#if !$walletStore.connected || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
+  {#if !user || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
     <a aria-label="Go to explore page" href={'/app'}>
       <div class="logo flex items-center pb-px">
         <DripsLogo />
@@ -38,9 +54,13 @@
       {/if}
     </a>
   {/if}
-  {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
+  {#if user && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
-      <CollectButton peekAmount={true} bind:isPeeking={collectButtonPeeking} />
+      <CollectButton
+        withdrawableBalances={user.withdrawableBalances}
+        peekAmount={true}
+        bind:isPeeking={collectButtonPeeking}
+      />
     </div>
     <div />
   {:else}
@@ -65,7 +85,7 @@
           <SearchIcon style="fill: var(--color-foreground)" />
         </button>
       {/if}
-      {#if !$walletStore.connected}
+      {#if !user}
         <a class="header-button" href="/app/settings">
           <SettingsIcon style="fill: var(--color-foreground)" />
         </a>
@@ -74,9 +94,9 @@
     <div class="connect">
       <ConnectButton />
     </div>
-    {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
+    {#if user && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
       <div data-highlightid="global-collect" class="collect">
-        <CollectButton />
+        <CollectButton withdrawableBalances={user.withdrawableBalances} />
       </div>
     {/if}
   </div>

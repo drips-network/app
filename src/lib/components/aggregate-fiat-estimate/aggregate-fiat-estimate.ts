@@ -1,18 +1,13 @@
 import tokensStore from '$lib/stores/tokens/tokens.store';
-import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
-import { get } from 'svelte/store';
+import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
+import { derived, type Readable } from 'svelte/store';
 
 export interface Amount {
   tokenAddress: string;
   amount: bigint | string;
 }
 
-export default function aggregateFiatEstimate(
-  priceStore: ReturnType<typeof fiatEstimates.price>,
-  amounts: Amount[],
-) {
-  const prices = get(priceStore);
-
+export default function aggregateFiatEstimate(prices: Prices, amounts: Amount[]) {
   let includesUnknownPrice = false;
   let fiatEstimateCents: number | 'pending' = 'pending';
 
@@ -29,7 +24,11 @@ export default function aggregateFiatEstimate(
 
       const bigIntAmount = BigInt(amount);
 
-      const res = fiatEstimates.convert({ amount: bigIntAmount, tokenAddress }, token.info.decimals, priceStore);
+      const res = fiatEstimates.convert(
+        { amount: bigIntAmount, tokenAddress },
+        token.info.decimals,
+        prices,
+      );
 
       if (res === 'unsupported') {
         includesUnknownPrice = true;
@@ -48,4 +47,19 @@ export default function aggregateFiatEstimate(
     fiatEstimateCents,
     includesUnknownPrice,
   };
+}
+
+export function aggregateFiatEstimateReadable(
+  priceStore: Readable<Prices> | undefined,
+  amounts: Amount[],
+) {
+  if (!priceStore) {
+    return derived([], () => {
+      return aggregateFiatEstimate({}, amounts);
+    });
+  }
+
+  return derived([priceStore], ([$prices]) => {
+    return aggregateFiatEstimate($prices, amounts);
+  });
 }

@@ -46,9 +46,7 @@
 
   $: {
     if (amounts && $connected) {
-      $priceStore;
-
-      const result = aggregateFiatEstimate(priceStore, amounts);
+      const result = aggregateFiatEstimate($priceStore, amounts);
 
       if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
         dispatch('loaded');

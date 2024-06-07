@@ -20,7 +20,7 @@
   export let backButton: boolean;
 
   $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
+  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : undefined;
 
   let amount: bigint | undefined = undefined;
 
@@ -50,7 +50,9 @@
 </script>
 
 <StepLayout>
-  <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
+  {#if tokenInfo}
+    <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
+  {/if}
   <StepHeader
     headline={`Add ${tokenInfo?.info.symbol}`}
     description="Add funds to your Drips account's outgoing balance."
