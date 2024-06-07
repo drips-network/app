@@ -38,11 +38,6 @@ interface ListEditorConfig {
   weights: Weights;
 }
 
-interface Amount {
-  tokenAddress: string;
-  amount: bigint;
-}
-
 export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
@@ -54,12 +49,6 @@ export interface State {
         forkCount: number;
         description?: string | undefined;
         defaultBranch: string | undefined;
-      }
-    | undefined;
-  unclaimedFunds:
-    | {
-        splittable: Amount[];
-        collectable: Amount[];
       }
     | undefined;
   highLevelPercentages: { [key: string]: number };
@@ -85,7 +74,6 @@ export const state = () =>
     gitUrl: '',
     project: undefined,
     projectMetadata: undefined,
-    unclaimedFunds: undefined,
     highLevelPercentages: { maintainers: 60, dependencies: 40 },
     maintainerSplits: {
       items: {},

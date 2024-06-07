@@ -1,5 +1,4 @@
 import { error, redirect } from '@sveltejs/kit';
-import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import type { PageServerLoad } from './$types';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import query from '$lib/graphql/dripsQL';
@@ -76,10 +75,6 @@ export const load = (async ({ params, fetch, url }) => {
     throw redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
   }
 
-  const unclaimedFunds = !isClaimed(project)
-    ? fetchUnclaimedFunds(project.account.accountId)
-    : undefined;
-
   if (isClaimed(project) && !project.splits) {
     throw new Error('Claimed project somehow does not have splits');
   }
@@ -109,9 +104,6 @@ export const load = (async ({ params, fetch, url }) => {
     project,
     description:
       typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
-    streamed: {
-      unclaimedFunds,
-    },
     newRepo,
     correctCasingRepo,
     blockWhileInitializing: false,

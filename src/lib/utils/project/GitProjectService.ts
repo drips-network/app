@@ -1,5 +1,4 @@
 import {
-  AddressDriverClient,
   type RepoDriverClient,
   RepoDriverTxFactory,
   Utils,
@@ -7,11 +6,9 @@ import {
   DripsTxFactory,
 } from 'radicle-drips';
 import {
-  getAddressDriverClient,
   getDripsTxFactory,
   getRepoDriverClient,
   getRepoDriverTxFactory,
-  getSubgraphClient,
 } from '../get-drips-clients';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
@@ -37,8 +34,6 @@ export default class GitProjectService {
   private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
-  private _addressDriverClient!: AddressDriverClient;
-  private readonly _dripsSubgraphClient = getSubgraphClient();
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
 
@@ -52,7 +47,6 @@ export default class GitProjectService {
     gitProjectService._github = new GitHub(octokit);
 
     gitProjectService._repoDriverClient = await getRepoDriverClient();
-    gitProjectService._addressDriverClient = await getAddressDriverClient();
     gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
     const { connected, signer, address } = get(wallet);

@@ -1,8 +1,12 @@
 <script lang="ts" context="module">
   export const UNCLAIMED_PROJECT_CARD_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
+    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
     fragment UnclaimedProjectCard on UnclaimedProject {
       ...ProjectBadge
+      withdrawableBalances {
+        ...MergeWithdrawableBalances
+      }
     }
   `;
 </script>
@@ -22,16 +26,16 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { gql } from 'graphql-request';
   import type { UnclaimedProjectCardFragment } from './__generated__/gql.generated';
+  import {
+    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+    mergeCollectableFunds,
+    mergeSplittableFunds,
+  } from '$lib/utils/merge-withdrawable-balances';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
 
   const dispatch = createEventDispatcher();
 
-  interface Amount {
-    tokenAddress: string;
-    amount: bigint;
-  }
-
-  export let project: UnclaimedProjectCardFragment | undefined = undefined;
+  export let project: UnclaimedProjectCardFragment;
   export let projectMetadata:
     | {
         description?: string | undefined;
@@ -39,17 +43,11 @@
         forkCount: number;
       }
     | undefined = undefined;
-  export let unclaimedFunds:
-    | {
-        splittable: Amount[];
-        collectable: Amount[];
-      }
-    | undefined = undefined;
 
-  $: mergedUnclaimedFunds = mergeAmounts(
-    unclaimedFunds?.splittable ?? [],
-    unclaimedFunds?.collectable ?? [],
-  );
+  $: collectableFunds = mergeCollectableFunds(project.withdrawableBalances);
+  $: splittableFunds = mergeSplittableFunds(project.withdrawableBalances);
+
+  $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
 
   $: hasClaimableFunds = mergedUnclaimedFunds.length > 0;
 
@@ -81,7 +79,7 @@
       {/if}
     </div>
   {/if}
-  {#if unclaimedFunds}
+  {#if hasClaimableFunds}
     <div class="unclaimed-funds">
       <div class="flex flex-col gap-6 p-4 sm:flex-row">
         <div class="flex flex-wrap items-start gap-6 sm:gap-12">
@@ -125,7 +123,7 @@
       <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
         {#if detailedTokenBreakdown}
           <div class="tables-container">
-            {#if unclaimedFunds.collectable.length > 0}
+            {#if collectableFunds.length > 0}
               <div class="table-and-title">
                 <div class="title">
                   <h5>Collectable</h5>
@@ -134,11 +132,11 @@
                   </p>
                 </div>
                 <div class="table">
-                  <TokenAmountsTable amounts={unclaimedFunds.collectable} />
+                  <TokenAmountsTable amounts={collectableFunds} />
                 </div>
               </div>
             {/if}
-            {#if unclaimedFunds.splittable.length > 0}
+            {#if splittableFunds.length > 0}
               <div class="table-and-title">
                 <div class="title">
                   <h5>Splittable</h5>
@@ -147,7 +145,7 @@
                   </p>
                 </div>
                 <div class="table">
-                  <TokenAmountsTable amounts={unclaimedFunds.splittable} />
+                  <TokenAmountsTable amounts={splittableFunds} />
                 </div>
               </div>
             {/if}

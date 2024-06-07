@@ -1,6 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
@@ -77,7 +76,6 @@ export const load = (async ({ params, fetch }) => {
   const fetches = await Promise.all([
     query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch),
     getVotingRoundForList(listId),
-    getIncomingSplitTotal(listId),
   ] as const);
 
   if (!fetches[0]?.dripList && !fetches[1]) throw error(404);
@@ -85,7 +83,6 @@ export const load = (async ({ params, fetch }) => {
   return {
     dripList: fetches[0].dripList,
     votingRounds: fetches[1],
-    incomingSplitsTotal: fetches[2],
     blockWhileInitializing: false,
   };
 }) satisfies PageServerLoad;

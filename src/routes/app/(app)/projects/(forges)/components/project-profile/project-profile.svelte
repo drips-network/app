@@ -23,6 +23,7 @@
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
     ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
+    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
     fragment ProjectProfile on Project {
       ...UnclaimedProjectCard
       ...ProjectProfileHeader
@@ -34,6 +35,9 @@
         }
         support {
           ...SupportersSectionSupportItem
+        }
+        withdrawableBalances {
+          ...MergeWithdrawableBalances
         }
       }
       ... on ClaimedProject {
@@ -99,20 +103,17 @@
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { AddressDriverClient } from 'radicle-drips';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
-  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
-
-  interface Amount {
-    tokenAddress: string;
-    amount: bigint;
-  }
+  import mergeWithdrawableBalances, {
+    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+  } from '$lib/utils/merge-withdrawable-balances';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -125,9 +126,6 @@
 
   export let newRepo: RepoInfo | undefined;
   export let correctCasingRepo: RepoInfo | undefined;
-
-  export let unclaimedFunds: Promise<{ splittable: Amount[]; collectable: Amount[] }> | undefined =
-    undefined;
 
   $: ownAccountId = $walletStore.dripsAccountId;
   $: isOwnProject = ownAccountId === (isClaimed(project) ? project.owner.accountId : undefined);
@@ -317,18 +315,14 @@
   {#if !isClaimed(project)}
     <div class="notice">
       <AnnotationBox type="info">
-        {#await unclaimedFunds}
-          <span />
-        {:then res}
-          {@const result = res && mergeAmounts(res.splittable, res.collectable)}
-          {#if result?.length}This project has <span class="typo-text-small-bold"
-              ><AggregateFiatEstimate amounts={result} /></span
-            > in claimable funds! Project owners can collect by claiming their project.{:else}This
-            project has not been claimed yet but can still receive funds that the owner can collect
-            later.{/if}
-        {:catch}
-          This project is unclaimed.
-        {/await}
+        {#if project.withdrawableBalances.length > 0}This project has <span
+            class="typo-text-small-bold"
+            ><AggregateFiatEstimate
+              amounts={mergeWithdrawableBalances(project.withdrawableBalances)}
+            /></span
+          > in claimable funds! Project owners can collect by claiming their project.{:else}This
+          project has not been claimed yet but can still receive funds that the owner can collect
+          later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
             <ShareButton url={browser ? window.location.href : ''} />
@@ -336,15 +330,14 @@
               size="small"
               icon={Registered}
               variant="primary"
-              on:click={() => {
-                return undefined;
-                // $walletStore.connected
-                //   ? modal.show(ClaimProjectStepper, undefined, {
-                //       skipWalletConnect: true,
-                //       projectUrl: project.source.url,
-                //     })
-                //   : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }
-              }}>Claim project</Button
+              on:click={() =>
+                $walletStore.connected
+                  ? modal.show(ClaimProjectStepper, undefined, {
+                      skipWalletConnect: true,
+                      projectUrl: project.source.url,
+                    })
+                  : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+              >Claim project</Button
             >
           </div>
         </svelte:fragment>
@@ -473,28 +466,21 @@
             </div>
           </SectionSkeleton>
         </section>
-      {:else if unclaimedFunds}
+      {:else if project.withdrawableBalances.length > 0}
         <section class="app-section">
           <SectionHeader icon={Wallet} label="Claimable funds" />
-          {#await unclaimedFunds}
-            <SectionSkeleton loaded={false} />
-          {:then result}
-            {@const merged = result && mergeAmounts(result.splittable, result.collectable)}
-            <SectionSkeleton loaded={true}>
-              <div class="unclaimed-funds-section">
-                <UnclaimedProjectCard
-                  unclaimedFunds={result}
-                  unclaimedTokensExpandable={false}
-                  unclaimedTokensExpanded={merged.length > 0}
-                  showClaimButton
-                  on:claimButtonClick={() =>
-                    goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
-                />
-              </div>
-            </SectionSkeleton>
-          {:catch}
-            <SectionSkeleton loaded={true} error={true} />
-          {/await}
+          <SectionSkeleton loaded={true}>
+            <div class="unclaimed-funds-section">
+              <UnclaimedProjectCard
+                {project}
+                unclaimedTokensExpandable={false}
+                unclaimedTokensExpanded={project.withdrawableBalances.length > 0}
+                showClaimButton
+                on:claimButtonClick={() =>
+                  goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+              />
+            </div>
+          </SectionSkeleton>
         </section>
       {/if}
       <section id="support">
