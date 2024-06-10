@@ -38,6 +38,13 @@
 
   let percentagesManuallyChanged = false;
 
+  // If the component is initialized with existing weights, we don't want to auto-distribute equally on edit.
+  onMount(() => {
+    if (Object.keys(items).length > 0) {
+      percentagesManuallyChanged = true;
+    }
+  });
+
   function adjustWeights(weights: Weights) {
     const result = { ...weights };
 
