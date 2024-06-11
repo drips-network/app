@@ -34,7 +34,9 @@
   $: totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
 
   export let valid = false;
-  $: valid = weightsMode ? totalWeight === MAX_WEIGHT : Object.keys(items).length > 0;
+  $: valid = weightsMode
+    ? totalWeight === MAX_WEIGHT && !Object.values(weights).some((v) => v === 0)
+    : Object.keys(items).length > 0;
 
   let percentagesManuallyChanged = false;
 
