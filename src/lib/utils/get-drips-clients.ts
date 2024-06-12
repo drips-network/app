@@ -17,7 +17,7 @@ import {
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-import { env } from '$env/dynamic/public';
+import { BASE_URL } from './base-url';
 
 /**
  * Get an initialized Drips Subgraph client.
@@ -156,7 +156,7 @@ export function getCallerClient() {
  * clients are initialized with addresses matching local testnet deployments. See `README`'s
  * E2E test section.
  */
-export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
+export const networkConfigs: { [chainId: number]: Omit<NetworkConfig, 'SUBGRAPH_URL'> } = isTest()
   ? {
       11155111: {
         CHAIN: 'sepolia',
@@ -170,9 +170,6 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
         ADDRESS_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
         NFT_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
         IMMUTABLE_SPLITS_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
-        SUBGRAPH_URL: `http://${
-          env?.PUBLIC_TEST_SUBGRAPH_HOST ?? 'localhost'
-        }:8000/subgraphs/name/drips-subgraph-local`,
         CALLER: '0xaBf7431BFC75BAD19AA98911c4dd7165b619771F',
         DRIPS: '0xa0523b86472561f0859d84C094cc04e6c4B33169',
         NFT_DRIVER: '0xc95eb214845d5693abc750692161CB008796ae5C',
@@ -208,5 +205,8 @@ export function getNetworkConfig(chainId = get(wallet).network.chainId): Network
   const config = networkConfigs[chainId];
   assert(config, `No network config found for chainId ${chainId}`);
 
-  return config;
+  return {
+    ...config,
+    SUBGRAPH_URL: `${BASE_URL}/api/subgraph/query`,
+  };
 }

@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 
+import { SUBGRAPH_URL } from '$env/static/private';
+
 export async function wait() {
   console.log('Waiting for Graph Node…', {
     host: process.env?.PUBLIC_TEST_SUBGRAPH_HOST ?? '127.0.0.1',
@@ -10,9 +12,7 @@ export async function wait() {
     const interval = setInterval(async () => {
       try {
         const res = await fetch(
-          `http://${
-            process.env?.PUBLIC_TEST_SUBGRAPH_HOST ?? '127.0.0.1'
-          }:8000/subgraphs/name/drips-subgraph-local`,
+          SUBGRAPH_URL ?? 'http://127.0.0.1:8000/subgraphs/name/drips-subgraph-local',
           {
             method: 'POST',
             body: '{ "operationName": "introspectionQuery", "query": "query { __schema }" }',
