@@ -6,7 +6,13 @@ module.exports = {
       screens: {
         'xs': '440px', /* just above most phones in portrait-mode */
         'sm': '540px',
+        'mlg': '896px',
+        '2xl': '1440px',
         'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
+      },
+      spacing: {
+        18: '4.5rem',
+        30: '7.5rem',
       },
       colors: {
         'primary': 'var(--color-primary)',
@@ -36,6 +42,7 @@ module.exports = {
       },
       fontFamily: {
         mono: 'var(--typeface-mono-regular), monospace',
+        pixelated: '"Redaction 50", Times, serif',
       },
       fontSize: {
         // from typography.css
@@ -59,6 +66,15 @@ module.exports = {
       },
       translate: {
         '2px': '2px'
+      },
+      animation: {
+        'blink': 'blink 1000ms infinite linear',
+      },
+      keyframes: {
+        'blink': {
+          '0%, 49%': { opacity: 0 },
+          '50%, 100%': { opacity: 1 }
+        }
       }
     },
   },
