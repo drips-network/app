@@ -1,6 +1,5 @@
-import { getSubgraphClient } from '$lib/utils/get-drips-clients';
 import type { ContractTransaction } from 'ethers';
-import type { DripsSubgraphClient, AccountMetadata } from 'radicle-drips';
+import type { AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser/lib/types';
@@ -39,12 +38,10 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
 
   private readonly _parser: TParser;
   private readonly _emitMetadataFunc: EmitMetadataFunc | undefined;
-  protected readonly subgraphClient: DripsSubgraphClient;
 
   protected constructor(parser: TParser, emitMetadataFunc?: EmitMetadataFunc) {
     this._parser = parser;
     this._emitMetadataFunc = emitMetadataFunc;
-    this.subgraphClient = getSubgraphClient();
   }
 
   /**
@@ -70,14 +67,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
    * @param accountId The user ID to fetch the metadata hash for.
    * @returns The latest metadata hash for the given user ID, or null if no metadata hash exists.
    */
-  public async fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null> {
-    const accountMetadata = await this.subgraphClient.getLatestAccountMetadata(
-      accountId,
-      MetadataManagerBase.USER_METADATA_KEY,
-    );
-
-    return accountMetadata?.value ?? null;
-  }
+  public abstract fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null>;
 
   private async fetchIpfs(hash: IpfsHash) {
     return await (await ipfsFetch(hash)).json();

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import * as fetchIpfs from '$lib/utils/ipfs';
-import { AddressDriverClient, DripsSubgraphClient, type AccountMetadata } from 'radicle-drips';
+import { AddressDriverClient, type AccountMetadata } from 'radicle-drips';
 import MetadataManagerBase, { type EmitMetadataFunc } from '../MetadataManagerBase';
 import type { ContractTransaction } from 'ethers';
 import type { ParseFn, Parser } from '@efstajas/versioned-parser/lib/types';
@@ -11,9 +11,9 @@ vi.mock('$env/dynamic/public', () => ({
   env: {},
 }));
 
-class TestMetadataManager<TAccountMetadataSchema extends z.ZodType> extends MetadataManagerBase<
-  Parser
-> {
+class TestMetadataManager<
+  TAccountMetadataSchema extends z.ZodType,
+> extends MetadataManagerBase<Parser> {
   public buildAccountMetadata(): z.TypeOf<TAccountMetadataSchema> {
     throw new Error('Method not implemented.');
   }
@@ -44,14 +44,6 @@ describe('MetadataManagerBase', () => {
         lastUpdatedBlockTimestamp: 1n,
       };
 
-      const subgraphClientMock = {
-        getLatestAccountMetadata: vi
-          .fn(DripsSubgraphClient.prototype.getLatestAccountMetadata)
-          .mockResolvedValue(expectedMetadata),
-      } as unknown as DripsSubgraphClient;
-      const getClient = await import('$lib/utils/get-drips-clients');
-      getClient.getSubgraphClient = vi.fn().mockImplementation(() => subgraphClientMock);
-
       const testMetadataManager = new TestMetadataManager(
         addressDriverAccountMetadataParser.parseAny,
       );
@@ -61,10 +53,6 @@ describe('MetadataManagerBase', () => {
 
       // Assert
       expect(metadataHash).toEqual(expectedMetadata.value);
-      expect(subgraphClientMock.getLatestAccountMetadata).toHaveBeenCalledWith(
-        accountId,
-        MetadataManagerBase.USER_METADATA_KEY,
-      );
     });
   });
 

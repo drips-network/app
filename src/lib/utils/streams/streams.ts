@@ -27,7 +27,7 @@ const METADATA_PARSER = addressDriverAccountMetadataParser;
 const { ADDRESS_DRIVER: ADDRESS_DRIVER_ADDRESS } = getNetworkConfig();
 const USER_METADATA_KEY = 'ipfs';
 
-async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: string) {
+export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: string) {
   const currentStreamsQueryRes = await query<CurrentStreamsQuery, CurrentStreamsQueryVariables>(
     gql`
       query CurrentStreams($userAccountId: ID!) {
@@ -188,6 +188,7 @@ export async function buildStreamCreateBatchTx(
   addressDriverClient: AddressDriverClient,
   signer: Signer,
   streamOptions: NewStreamOptions,
+  topUpAmount?: bigint,
 ) {
   const ownAccountId = await addressDriverClient.getAccountId();
 
@@ -241,7 +242,7 @@ export async function buildStreamCreateBatchTx(
           value: newHash,
         },
       ],
-      balanceDelta: 0,
+      balanceDelta: topUpAmount ?? 0,
       transferToAddress: AddressDriverClient.getUserAddress(ownAccountId),
     }),
   };

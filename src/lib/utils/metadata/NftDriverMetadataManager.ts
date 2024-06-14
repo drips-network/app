@@ -2,12 +2,36 @@ import MetadataManagerBase from './MetadataManagerBase';
 import { nftDriverAccountMetadataParser } from './schemas';
 import type { NFTDriverClient } from 'radicle-drips';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import query from '$lib/graphql/dripsQL';
+import { gql } from 'graphql-request';
+import type {
+  LatestDripListMetadataHashQuery,
+  LatestDripListMetadataHashQueryVariables,
+} from './__generated__/gql.generated';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataParser
 > {
   constructor(nftDriverClient?: NFTDriverClient) {
     super(nftDriverAccountMetadataParser, nftDriverClient?.emitAccountMetadata);
+  }
+
+  public async fetchMetadataHashByAccountId(accountId: string): Promise<string | null> {
+    const res = await query<
+      LatestDripListMetadataHashQuery,
+      LatestDripListMetadataHashQueryVariables
+    >(
+      gql`
+        query LatestDripListMetadataHash($accountId: ID!) {
+          dripList(id: $accountId) {
+            latestMetadataIpfsHash
+          }
+        }
+      `,
+      { accountId },
+    );
+
+    return res.dripList?.latestMetadataIpfsHash ?? null;
   }
 
   public buildAccountMetadata(context: {

@@ -3,18 +3,32 @@
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
     ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
+    ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
     ${DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT}
     ${EDIT_STREAM_FLOW_STREAM}
+    ${STREAM_STATE_BADGE_STREAM_FRAGMENT}
     fragment StreamPageStream on Stream {
+      ...StreamStateBadgeStream
       ...EditStreamFlowStream
       ...DeleteStreamConfirmStep
       timeline {
         ...CurrentAmountsTimelineItem
+        timestamp
+        type
+        currentAmount {
+          amount
+        }
       }
       sender {
         account {
           ...DripVisualAddressDriverAccount
           accountId
+        }
+        balances {
+          tokenAddress
+          outgoing {
+            ...CurrentAmountsUserBalanceTimelineItem
+          }
         }
       }
       receiver {
@@ -30,6 +44,7 @@
         }
       }
       name
+      createdAt
       config {
         durationSeconds
         startDate
@@ -54,6 +69,7 @@
   import type { PageData } from './$types';
   import {
     CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT,
+    CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT,
     streamCurrentAmountsStore,
   } from '$lib/utils/current-amounts';
   import FormattedAmount from '$lib/components/formatted-amount/formatted-amount.svelte';
@@ -73,48 +89,106 @@
   import editStreamFlowSteps from '$lib/flows/edit-stream-flow/edit-stream-flow-steps';
   import { EDIT_STREAM_FLOW_STREAM } from '$lib/flows/edit-stream-flow/enter-new-details.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
+  import StreamStateBadge, {
+    STREAM_STATE_BADGE_STREAM_FRAGMENT,
+  } from '$lib/components/stream-state-badge/stream-state-badge.svelte';
+  import { fade } from 'svelte/transition';
+  import { TimelineItemType } from '$lib/graphql/__generated__/base-types';
+  import formatDate from '$lib/utils/format-date';
+  import { onMount } from 'svelte';
+  import { tweened } from 'svelte/motion';
+  import { quintOut } from 'svelte/easing';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
 
   export let data: PageData;
   const stream: StreamPageStreamFragment = data.stream;
 
-  const currentStreamAmounts = streamCurrentAmountsStore(
+  $: currentStreamAmounts = streamCurrentAmountsStore(
     stream.timeline,
     stream.config.amountPerSecond.tokenAddress,
   );
 
-  $: token = $tokensStore && tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress);
+  $: tokenAddress = stream.config.amountPerSecond.tokenAddress.toLowerCase();
+  $: token = $tokensStore && tokensStore.getByAddress(tokenAddress);
+
+  $: endTimelineItem = stream.timeline.find((item) => item.type === TimelineItemType.End);
+  $: endDate = endTimelineItem?.timestamp ? new Date(endTimelineItem.timestamp) : undefined;
+  $: startDate = new Date(stream.config.startDate ?? stream.createdAt);
+
+  let elapsedDurationPercentage = tweened(0, { duration: 1000, easing: quintOut });
+
+  function updateElapsedDurationPercentage() {
+    if (!stream || !stream.config.startDate || !startDate) return;
+
+    const streamStartTimestamp = startDate.getTime();
+
+    const now = new Date().getTime();
+    const end = endDate?.getTime() ?? now;
+
+    const newValue = Math.min(
+      100,
+      ((now - streamStartTimestamp) / (end - streamStartTimestamp)) * 100,
+    );
+
+    elapsedDurationPercentage.set(Math.max(0, newValue));
+  }
+  onMount(() => {
+    const interval = setInterval(updateElapsedDurationPercentage, 1000);
+    return () => clearInterval(interval);
+  });
+
+  $: senderOutgoingBalanceTimeline = stream.sender.balances.find(
+    (b) => b.tokenAddress.toLowerCase() === tokenAddress,
+  )?.outgoing;
+  $: senderOutgoingBalance = senderOutgoingBalanceTimeline
+    ? streamCurrentAmountsStore(senderOutgoingBalanceTimeline, tokenAddress)
+    : undefined;
 </script>
 
 <HeadMeta title={stream.name ?? 'Stream'} />
 
 <div class="wrapper">
-  <div class="headline">
-    <h1>{stream.name ?? 'Unnamed stream'}</h1>
-  </div>
-  {#if $walletStore && checkIsUser(stream.sender.account.accountId)}
-    <div class="actions">
-      <Button
-        icon={Pen}
-        on:click={() => modal.show(Stepper, undefined, editStreamFlowSteps(stream))}>Edit</Button
-      >
-      {#if stream.isPaused}
-        <Button
-          icon={Play}
-          on:click={() => modal.show(Stepper, undefined, unpauseFlowSteps(stream))}>Unpause</Button
-        >
-      {:else}
-        <Button icon={Pause} on:click={() => modal.show(Stepper, undefined, pauseFlowSteps(stream))}
-          >Pause</Button
-        >
-      {/if}
-
-      <Button
-        icon={Trash}
-        on:click={() => modal.show(Stepper, undefined, deleteStreamFlowSteps(stream))}
-        >Delete</Button
-      >
+  <div class="header">
+    <div class="headline">
+      <h1>
+        {stream.name
+          ? stream.name
+          : stream.receiver.__typename === 'DripList'
+          ? 'Continuous donation'
+          : 'Unnamed stream'}
+        <div class="state-badge" style:display="inline-block" style:vertical-align="middle">
+          <StreamStateBadge {stream} />
+        </div>
+      </h1>
     </div>
-  {/if}
+    {#if $walletStore && checkIsUser(stream.sender.account.accountId)}
+      <div in:fade|local={{ duration: 300 }} class="actions">
+        <Button
+          icon={Pen}
+          on:click={() => modal.show(Stepper, undefined, editStreamFlowSteps(stream))}>Edit</Button
+        >
+        {#if stream.isPaused}
+          <Button
+            icon={Play}
+            on:click={() => modal.show(Stepper, undefined, unpauseFlowSteps(stream))}
+            >Unpause</Button
+          >
+        {:else}
+          <Button
+            icon={Pause}
+            on:click={() => modal.show(Stepper, undefined, pauseFlowSteps(stream))}>Pause</Button
+          >
+        {/if}
+
+        <Button
+          icon={Trash}
+          on:click={() => modal.show(Stepper, undefined, deleteStreamFlowSteps(stream))}
+          >Delete</Button
+        >
+      </div>
+    {/if}
+  </div>
   <DripVisual
     from={stream.sender.account}
     to={stream.receiver.account}
@@ -132,31 +206,102 @@
           <div class="value-box" class:align-right={stream.config.durationSeconds === undefined}>
             <span class="highlight large-text tabular-nums" data-testid="total-streamed">
               {#if token}
-                <FormattedAmount
-                  amount={$currentStreamAmounts.currentAmount.amount}
-                  decimals={token.info.decimals}
-                />
-                {#if stream.config.durationSeconds !== undefined}
-                  {token?.info.symbol}
-                {/if}
+                <div in:fade|local={{ duration: 300 }}>
+                  <FormattedAmount
+                    amount={$currentStreamAmounts.currentAmount.amount}
+                    decimals={token.info.decimals}
+                  />
+                  {#if !endTimelineItem}
+                    {token.info.symbol}
+                  {/if}
+                </div>
               {/if}
             </span>
           </div>
-          <!-- {#if hasDuration}
+          {#if endTimelineItem}
             <span class="typo-header-5">OF</span>
             <div class="value-box">
               <span class="large-text tabular-nums">
-                <FormattedAmount
-                  amount={targetAmount ?? unreachable()}
-                  decimals={token?.info.decimals ?? unreachable()}
-                  preserveTrailingZeroes={false}
-                />
-                {token?.info.symbol}
+                {#if token}
+                  <div in:fade|local={{ duration: 300 }}>
+                    <FormattedAmount
+                      amount={BigInt(endTimelineItem.currentAmount.amount)}
+                      decimals={token.info.decimals}
+                      preserveTrailingZeroes={false}
+                    />
+                    {token?.info.symbol}
+                  </div>
+                {/if}
               </span>
             </div>
-          {/if} -->
+          {/if}
         </div>
       </div>
+      {#if startDate && endTimelineItem}
+        {@const endTimestamp = new Date(endTimelineItem.timestamp)}
+        <div class="key-value">
+          <div class="keys">
+            <h5 class="key">
+              {new Date().getTime() > startDate.getTime() ? 'Progress' : 'Scheduled'}
+            </h5>
+          </div>
+          <div class="rounded-drip-lg shadow-low pt-3 px-4 pb-4 relative overflow-hidden">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8 relative z-10"
+            >
+              <div>
+                <div class="typo-header-5">
+                  {new Date().getTime() > (startDate.getTime() ?? 0) ? 'Started' : 'Starts'}
+                </div>
+                <div class="small-text">
+                  {formatDate(startDate, 'verbose')}
+                </div>
+              </div>
+              <div>
+                <div class="typo-header-5">
+                  {new Date().getTime() > (endTimestamp.getTime() ?? 0) ? 'Ended' : 'Ends'}
+                </div>
+                <div class="small-text">{formatDate(endTimestamp, 'verbose')}</div>
+              </div>
+            </div>
+            <div class="absolute overlay flex flex-col sm:flex-row">
+              <div style:flex-basis="{$elapsedDurationPercentage}%" class="bg-primary-level-1" />
+            </div>
+          </div>
+        </div>
+      {/if}
+    </div>
+    <div class="secondary-details">
+      <div class="key-value">
+        <h5 class="key greyed-out">Created at</h5>
+        <span class="value small-text">{formatDate(new Date(stream.createdAt), 'verbose')}</span>
+      </div>
+      {#if $senderOutgoingBalance}
+        <div class="key-value">
+          <div class="with-info-icon">
+            <h5 class="key greyed-out">Senderʼs balance</h5>
+            <Tooltip>
+              <InfoCircle style="height: 1.25rem" />
+              <svelte:fragment slot="tooltip-content">
+                The stream sender's currently remaining {'TOKEN'} balance. When this cannot cover all
+                the sender's streams for this token anymore, all their streams for this token will cease.
+              </svelte:fragment>
+            </Tooltip>
+          </div>
+
+          {#if token}
+            <span
+              in:fade|local={{ duration: 200, delay: 250 }}
+              class="value small-text tabular-nums"
+            >
+              <FormattedAmount decimals={18} amount={$senderOutgoingBalance.currentAmount.amount} />
+              {token?.info.symbol}
+            </span>
+          {:else}
+            <div out:fade|local={{ duration: 200 }} class="loading value small-text tabular-nums" />
+          {/if}
+        </div>
+      {/if}
     </div>
   </div>
 </div>
@@ -301,13 +446,7 @@
           {/if}
           <div class="key-value" class:order-last={streamStartDate && streamEndDate}>
             <h5 class="key greyed-out">
-              {#if streamStartDate && streamEndDate}
-                Stream created
-              {:else}
-                {new Date().getTime() > ((streamStartDate || streamCreated)?.getTime() ?? 0)
-                  ? 'Started'
-                  : 'Starts'}
-              {/if}
+              Stream created at
             </h5>
             <span class="value small-text"
               >{formatDate(streamCreated ?? unreachable(), 'verbose')}</span
@@ -368,6 +507,27 @@
     position: relative;
     max-width: 56rem;
     margin: 0 auto 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header > .headline {
+    gap: 1rem;
+    align-items: center;
+    float: left;
+  }
+
+  .secondary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 
   .loading-state {
@@ -453,6 +613,27 @@
     justify-content: right;
   }
 
+  .value.loading {
+    width: 100%;
+    max-width: 12rem;
+    height: 1em;
+    background-color: var(--color-foreground-level-3);
+    animation: pulse 1s infinite;
+    border-radius: 0.5rem;
+  }
+
+  @keyframes pulse {
+    0% {
+      background-color: var(--color-foreground-level-3);
+    }
+    50% {
+      background-color: var(--color-foreground-level-2);
+    }
+    100% {
+      background-color: var(--color-foreground-level-3);
+    }
+  }
+
   .small-text {
     font-size: clamp(1rem, 3vw, 1.25rem);
   }
@@ -467,17 +648,12 @@
   }
 
   @media (max-width: 768px) {
-    .hero {
-      align-items: center;
-    }
-
     .align-right {
       text-align: left;
     }
 
     .actions {
       display: flex;
-      justify-content: space-around;
     }
 
     .total-streamed {

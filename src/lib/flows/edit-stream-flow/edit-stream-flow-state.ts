@@ -3,6 +3,7 @@ import type { EditStreamFlowStreamFragment } from './__generated__/gql.generated
 import { formatUnits } from 'ethers/lib/utils';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import unreachable from '$lib/utils/unreachable';
+import { constants } from 'radicle-drips';
 
 export interface EditStreamFlowState {
   newAmountValue: string | undefined;
@@ -15,7 +16,10 @@ export default (stream: EditStreamFlowStreamFragment) => {
     tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress) ?? unreachable();
 
   return writable<EditStreamFlowState>({
-    newAmountValue: formatUnits(stream.config.amountPerSecond.amount, token.info.decimals),
+    newAmountValue: formatUnits(
+      BigInt(stream.config.amountPerSecond.amount) / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+      token.info.decimals,
+    ),
     newName: stream.name ?? undefined,
     newSelectedMultiplier: '1',
   });

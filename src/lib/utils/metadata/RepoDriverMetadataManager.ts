@@ -1,10 +1,16 @@
 import type { ClaimedProject } from '$lib/graphql/__generated__/base-types';
+import query from '$lib/graphql/dripsQL';
 import type { PickGQLF } from '$lib/graphql/utils/pick-gql-fields';
+import { gql } from 'graphql-request';
 import RepoDriverUtils from '../RepoDriverUtils';
 import { getRepoDriverClient } from '../get-drips-clients';
 import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverAccountMetadataParser } from './schemas';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type {
+  LatestProjectMetadataHashQuery,
+  LatestProjectMetadataHashQueryVariables,
+} from './__generated__/gql.generated';
 
 type AccountId = string;
 
@@ -13,6 +19,30 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 > {
   constructor() {
     super(repoDriverAccountMetadataParser);
+  }
+
+  public async fetchMetadataHashByAccountId(accountId: string): Promise<string | null> {
+    const res = await query<
+      LatestProjectMetadataHashQuery,
+      LatestProjectMetadataHashQueryVariables
+    >(
+      gql`
+        query LatestProjectMetadataHash($accountId: ID!) {
+          projectById(id: $accountId) {
+            ... on ClaimedProject {
+              latestMetadataIpfsHash
+            }
+          }
+        }
+      `,
+      { accountId },
+    );
+
+    if (res.projectById?.__typename === 'ClaimedProject') {
+      return res.projectById.latestMetadataIpfsHash;
+    }
+
+    return null;
   }
 
   /**

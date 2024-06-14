@@ -5,7 +5,6 @@ import {
   AddressDriverTxFactory,
   CallerClient,
   DripsClient,
-  DripsSubgraphClient,
   Utils,
   type NetworkConfig,
   NFTDriverClient,
@@ -18,16 +17,6 @@ import {
 import { get } from 'svelte/store';
 import isTest from './is-test';
 import { env } from '$env/dynamic/public';
-
-/**
- * Get an initialized Drips Subgraph client.
- * @returns An initialized Drips Subgraph client.
- */
-export function getSubgraphClient() {
-  const { network } = get(wallet);
-
-  return DripsSubgraphClient.create(network.chainId, getNetworkConfig().SUBGRAPH_URL);
-}
 
 /**
  * Get an initialized Repo Driver client.
