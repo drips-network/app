@@ -104,6 +104,9 @@
 
   const MOCK_PROJECT_1: Project = {
     __typename: 'ClaimedProject',
+    latestMetadataIpfsHash: '',
+    totalEarned: [],
+    withdrawableBalances: [],
     support: [],
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {
@@ -136,6 +139,9 @@
 
   const MOCK_PROJECT_2: Project = {
     __typename: 'ClaimedProject',
+    latestMetadataIpfsHash: '',
+    totalEarned: [],
+    withdrawableBalances: [],
     support: [],
     verificationStatus: ProjectVerificationStatus.Claimed,
     account: {

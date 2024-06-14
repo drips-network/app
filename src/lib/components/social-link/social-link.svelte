@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+  type SocialNetwork = 'com.twitter' | 'com.github' | 'url' | 'ethereum';
+
+  export function isNetwork(value: string): value is SocialNetwork {
+    return ['com.twitter', 'com.github', 'url', 'ethereum'].includes(value);
+  }
+</script>
+
 <script lang="ts">
   import X from '$lib/components/icons/X.svelte';
   import Web from '$lib/components/icons/Globe.svelte';
@@ -7,8 +15,6 @@
   import Copyable from '../copyable/copyable.svelte';
   import formatAddress from '$lib/utils/format-address';
   import buildExternalUrl from '$lib/utils/build-external-url';
-
-  type SocialNetwork = 'com.twitter' | 'com.github' | 'url' | 'ethereum';
 
   export let network: SocialNetwork;
   export let value: string;

@@ -359,28 +359,6 @@
     gap: 2rem;
   }
 
-  .loading-state {
-    width: 100%;
-    position: absolute;
-    padding: 30vh 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .stream-page {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-  }
-
-  .hero {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
   .with-info-icon {
     display: flex;
     gap: 0.25rem;

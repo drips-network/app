@@ -9,7 +9,6 @@ import {
   type NetworkConfig,
   NFTDriverClient,
   NFTDriverTxFactory,
-  RepoDriverClient,
   RepoDriverTxFactory,
   DripsTxFactory,
   ERC20TxFactory,
@@ -17,18 +16,6 @@ import {
 import { get } from 'svelte/store';
 import isTest from './is-test';
 import { BASE_URL } from './base-url';
-
-/**
- * Get an initialized Repo Driver client.
- * @returns An initialized Repo Driver client.
- */
-export function getRepoDriverClient(withSigner = get(wallet).signer) {
-  const { provider } = get(wallet);
-
-  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
-
-  return RepoDriverClient.create(provider, withSigner, repoDriverAddress);
-}
 
 /**
  * Get an initialized Repo Driver transaction factory.

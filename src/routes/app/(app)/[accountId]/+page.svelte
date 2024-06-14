@@ -3,7 +3,7 @@
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import Balances from '../funds/sections/balances.section.svelte';
   import Streams from '../funds/sections/streams.section.svelte';
-  import SocialLink from '$lib/components/social-link/social-link.svelte';
+  import SocialLink, { isNetwork } from '$lib/components/social-link/social-link.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade } from 'svelte/transition';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -13,6 +13,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   export let data;
 
@@ -72,7 +73,7 @@
               </div>
               {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
                 {#if value}<li in:fade|local>
-                    <SocialLink {network} {value} />
+                    <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                   </li>{/if}
               {/each}
             </ul>

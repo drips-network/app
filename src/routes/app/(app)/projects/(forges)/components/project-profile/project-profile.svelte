@@ -550,12 +550,6 @@
     margin-bottom: 1rem;
   }
 
-  .header .owner {
-    display: flex;
-    gap: 0.375rem;
-    align-items: center;
-  }
-
   .stats {
     width: calc(100% + 32px);
     margin: -16px 0 -16px -16px;
