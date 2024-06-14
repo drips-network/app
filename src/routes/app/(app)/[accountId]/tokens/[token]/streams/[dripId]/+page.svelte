@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export const STREAM_PAGE_STREAM_FRAGMENT = gql`
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
-    ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
+    ${DRIP_VISUAL_DRIP_LIST_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
     ${DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT}
@@ -38,9 +38,7 @@
           }
         }
         ... on DripList {
-          account {
-            ...DripVisualNftDriverAccount
-          }
+          ...DripVisualDripList
         }
       }
       name
@@ -60,7 +58,7 @@
 <script lang="ts">
   import DripVisual, {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
-    DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_DRIP_LIST_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
 
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -100,6 +98,9 @@
   import { quintOut } from 'svelte/easing';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
+  import tokens from '$lib/stores/tokens';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
 
   export let data: PageData;
   const stream: StreamPageStreamFragment = data.stream;
@@ -144,6 +145,9 @@
   $: senderOutgoingBalance = senderOutgoingBalanceTimeline
     ? streamCurrentAmountsStore(senderOutgoingBalanceTimeline, tokenAddress)
     : undefined;
+
+  const tokensStoreConnected = tokens.connected;
+  $: isUnknownToken = $tokensStoreConnected && !token;
 </script>
 
 <HeadMeta title={stream.name ?? 'Stream'} />
@@ -162,7 +166,7 @@
         </div>
       </h1>
     </div>
-    {#if $walletStore && checkIsUser(stream.sender.account.accountId)}
+    {#if $walletStore && checkIsUser(stream.sender.account.accountId) && !isUnknownToken}
       <div in:fade|local={{ duration: 300 }} class="actions">
         <Button
           icon={Pen}
@@ -191,119 +195,140 @@
   </div>
   <DripVisual
     from={stream.sender.account}
-    to={stream.receiver.account}
+    to={stream.receiver}
     amountPerSecond={$currentStreamAmounts.currentDeltaPerSecond.amount}
     tokenInfo={token ? { symbol: token.info.symbol, decimals: token.info.decimals } : undefined}
     halted={false}
   />
-  <div class="details">
-    <div class="key-value-group">
-      <div class="key-value">
-        <div class="keys">
-          <h5 class="key">Total Streamed</h5>
-        </div>
-        <div class="total-streamed">
-          <div class="value-box" class:align-right={stream.config.durationSeconds === undefined}>
-            <span class="highlight large-text tabular-nums" data-testid="total-streamed">
-              {#if token}
-                <div in:fade|local={{ duration: 300 }}>
-                  <FormattedAmount
-                    amount={$currentStreamAmounts.currentAmount.amount}
-                    decimals={token.info.decimals}
-                  />
-                  {#if !endTimelineItem}
-                    {token.info.symbol}
-                  {/if}
-                </div>
-              {/if}
-            </span>
+  {#if isUnknownToken}
+    <AnnotationBox type="warning">
+      This stream is streaming a token that's not supported by default. To see stream details, add
+      it as a custom token.
+      <svelte:fragment slot="actions">
+        <Button
+          variant="primary"
+          on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
+          >Add custom token</Button
+        >
+      </svelte:fragment>
+    </AnnotationBox>
+  {:else}
+    <div class="details">
+      <div class="key-value-group">
+        <div class="key-value">
+          <div class="keys">
+            <h5 class="key">Total Streamed</h5>
           </div>
-          {#if endTimelineItem}
-            <span class="typo-header-5">OF</span>
-            <div class="value-box">
-              <span class="large-text tabular-nums">
+          <div class="total-streamed">
+            <div class="value-box" class:align-right={stream.config.durationSeconds === undefined}>
+              <span class="highlight large-text tabular-nums" data-testid="total-streamed">
                 {#if token}
                   <div in:fade|local={{ duration: 300 }}>
                     <FormattedAmount
-                      amount={BigInt(endTimelineItem.currentAmount.amount)}
+                      amount={$currentStreamAmounts.currentAmount.amount}
                       decimals={token.info.decimals}
-                      preserveTrailingZeroes={false}
                     />
-                    {token?.info.symbol}
+                    {#if !endTimelineItem}
+                      {token.info.symbol}
+                    {/if}
                   </div>
                 {/if}
               </span>
             </div>
-          {/if}
-        </div>
-      </div>
-      {#if startDate && endTimelineItem}
-        {@const endTimestamp = new Date(endTimelineItem.timestamp)}
-        <div class="key-value">
-          <div class="keys">
-            <h5 class="key">
-              {new Date().getTime() > startDate.getTime() ? 'Progress' : 'Scheduled'}
-            </h5>
-          </div>
-          <div class="rounded-drip-lg shadow-low pt-3 px-4 pb-4 relative overflow-hidden">
-            <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8 relative z-10"
-            >
-              <div>
-                <div class="typo-header-5">
-                  {new Date().getTime() > (startDate.getTime() ?? 0) ? 'Started' : 'Starts'}
-                </div>
-                <div class="small-text">
-                  {formatDate(startDate, 'verbose')}
-                </div>
+            {#if endTimelineItem}
+              <span class="typo-header-5">OF</span>
+              <div class="value-box">
+                <span class="large-text tabular-nums">
+                  {#if token}
+                    <div in:fade|local={{ duration: 300 }}>
+                      <FormattedAmount
+                        amount={BigInt(endTimelineItem.currentAmount.amount)}
+                        decimals={token.info.decimals}
+                        preserveTrailingZeroes={false}
+                      />
+                      {token?.info.symbol}
+                    </div>
+                  {/if}
+                </span>
               </div>
-              <div>
-                <div class="typo-header-5">
-                  {new Date().getTime() > (endTimestamp.getTime() ?? 0) ? 'Ended' : 'Ends'}
-                </div>
-                <div class="small-text">{formatDate(endTimestamp, 'verbose')}</div>
-              </div>
-            </div>
-            <div class="absolute overlay flex flex-col sm:flex-row">
-              <div style:flex-basis="{$elapsedDurationPercentage}%" class="bg-primary-level-1" />
-            </div>
+            {/if}
           </div>
         </div>
-      {/if}
-    </div>
-    <div class="secondary-details">
-      <div class="key-value">
-        <h5 class="key greyed-out">Created at</h5>
-        <span class="value small-text">{formatDate(new Date(stream.createdAt), 'verbose')}</span>
-      </div>
-      {#if $senderOutgoingBalance}
-        <div class="key-value">
-          <div class="with-info-icon">
-            <h5 class="key greyed-out">Senderʼs balance</h5>
-            <Tooltip>
-              <InfoCircle style="height: 1.25rem" />
-              <svelte:fragment slot="tooltip-content">
-                The stream sender's currently remaining {'TOKEN'} balance. When this cannot cover all
-                the sender's streams for this token anymore, all their streams for this token will cease.
-              </svelte:fragment>
-            </Tooltip>
+        {#if startDate && endTimelineItem}
+          {@const endTimestamp = new Date(endTimelineItem.timestamp)}
+          <div class="key-value">
+            <div class="keys">
+              <h5 class="key">
+                {new Date().getTime() > startDate.getTime() ? 'Progress' : 'Scheduled'}
+              </h5>
+            </div>
+            <div class="rounded-drip-lg shadow-low pt-3 px-4 pb-4 relative overflow-hidden">
+              <div
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8 relative z-10"
+              >
+                <div>
+                  <div class="typo-header-5">
+                    {new Date().getTime() > (startDate.getTime() ?? 0) ? 'Started' : 'Starts'}
+                  </div>
+                  <div class="small-text">
+                    {formatDate(startDate, 'verbose')}
+                  </div>
+                </div>
+                <div>
+                  <div class="typo-header-5">
+                    {new Date().getTime() > (endTimestamp.getTime() ?? 0) ? 'Ended' : 'Ends'}
+                  </div>
+                  <div class="small-text">{formatDate(endTimestamp, 'verbose')}</div>
+                </div>
+              </div>
+              <div class="absolute overlay flex flex-col sm:flex-row">
+                <div style:flex-basis="{$elapsedDurationPercentage}%" class="bg-primary-level-1" />
+              </div>
+            </div>
           </div>
+        {/if}
+      </div>
+      <div class="secondary-details">
+        <div class="key-value">
+          <h5 class="key greyed-out">Created at</h5>
+          <span class="value small-text">{formatDate(new Date(stream.createdAt), 'verbose')}</span>
+        </div>
+        {#if $senderOutgoingBalance}
+          <div class="key-value">
+            <div class="with-info-icon">
+              <h5 class="key greyed-out">Senderʼs balance</h5>
+              <Tooltip>
+                <InfoCircle style="height: 1.25rem" />
+                <svelte:fragment slot="tooltip-content">
+                  The stream sender's currently remaining {'TOKEN'} balance. When this cannot cover all
+                  the sender's streams for this token anymore, all their streams for this token will
+                  cease.
+                </svelte:fragment>
+              </Tooltip>
+            </div>
 
-          {#if token}
-            <span
-              in:fade|local={{ duration: 200, delay: 250 }}
-              class="value small-text tabular-nums"
-            >
-              <FormattedAmount decimals={18} amount={$senderOutgoingBalance.currentAmount.amount} />
-              {token?.info.symbol}
-            </span>
-          {:else}
-            <div out:fade|local={{ duration: 200 }} class="loading value small-text tabular-nums" />
-          {/if}
-        </div>
-      {/if}
+            {#if token}
+              <span
+                in:fade|local={{ duration: 200, delay: 250 }}
+                class="value small-text tabular-nums"
+              >
+                <FormattedAmount
+                  decimals={token.info.decimals}
+                  amount={$senderOutgoingBalance.currentAmount.amount}
+                />
+                {token.info.symbol}
+              </span>
+            {:else}
+              <div
+                out:fade|local={{ duration: 200 }}
+                class="loading value small-text tabular-nums"
+              />
+            {/if}
+          </div>
+        {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style>

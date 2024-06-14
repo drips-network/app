@@ -46,7 +46,7 @@ export default (() => {
 
     tokenList.set([...defaultTokens, ...customTokens]);
 
-    connected.set(true);
+    if (browser) connected.set(true);
   }
 
   /**
