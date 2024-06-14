@@ -271,15 +271,22 @@ export default class GitProjectService {
       accountMetadataAsBytes,
     );
 
+    const splittableAmounts = context.project?.withdrawableBalances.filter(
+      (wb) => BigInt(wb.splittableAmount) > 0n,
+    );
+    const collectableAmounts = context.project?.withdrawableBalances.filter(
+      (wb) => BigInt(wb.collectableAmount) > 0n,
+    );
+
     const splitTxs: Promise<PopulatedTransaction>[] = [];
-    context.unclaimedFunds?.splittable.map(({ tokenAddress }) => {
+    splittableAmounts?.forEach(({ tokenAddress }) => {
       splitTxs.push(
         this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
       );
     });
 
     const collectTxs: Promise<PopulatedTransaction>[] = [];
-    context.unclaimedFunds?.collectable.map(({ tokenAddress }) => {
+    collectableAmounts?.forEach(({ tokenAddress }) => {
       assert(this._connectedAddress);
 
       collectTxs.push(

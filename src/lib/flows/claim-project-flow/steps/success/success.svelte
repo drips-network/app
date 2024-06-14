@@ -29,8 +29,10 @@
 
     const collectedFunds =
       mergeAmounts(
-        $context.unclaimedFunds?.collectable ?? [],
-        $context.unclaimedFunds?.splittable ?? [],
+        $context.project?.withdrawableBalances.map((wb) => ({
+          tokenAddress: wb.tokenAddress,
+          amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
+        })) ?? [],
       ).length > 0;
 
     const ownAccountId = $walletStore.dripsAccountId;

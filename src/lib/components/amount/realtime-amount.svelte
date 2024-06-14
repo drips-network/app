@@ -1,8 +1,4 @@
 <script lang="ts">
-  import type {
-    CurrentAmountsTimelineItemFragment,
-    CurrentAmountsUserBalanceTimelineItemFragment,
-  } from '$lib/flows/create-stream-flow/methods/__generated__/gql.generated';
   import { streamCurrentAmountsStore } from '$lib/utils/current-amounts';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
@@ -16,6 +12,10 @@
   import { fade } from 'svelte/transition';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { constants } from 'radicle-drips';
+  import type {
+    CurrentAmountsTimelineItemFragment,
+    CurrentAmountsUserBalanceTimelineItemFragment,
+  } from '$lib/utils/__generated__/gql.generated';
 
   export let timeline: (
     | CurrentAmountsTimelineItemFragment

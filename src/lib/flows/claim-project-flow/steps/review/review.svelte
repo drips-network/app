@@ -1,10 +1,8 @@
 <script lang="ts" context="module">
-  export const REVIEW_STEP_PROJECT_FRAGMENT = gql`
-    ${PROJECT_PROFILE_HEADER_FRAGMENT}
-    fragment ReviewStepProject on Project {
-      ... on ClaimedProject {
-        ...ProjectProfileHeader
-      }
+  export const REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT = gql`
+    ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
+    fragment ReviewStepUnclaimedProject on UnclaimedProject {
+      ...UnclaimedProjectCard
     }
   `;
 </script>
@@ -22,14 +20,14 @@
   import EyeOpenIcon from '$lib/components/icons/EyeOpen.svelte';
   import TokenStreamsIcon from '$lib/components/icons/TokenStreams.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import ProjectProfileHeader, {
-    PROJECT_PROFILE_HEADER_FRAGMENT,
-  } from '$lib/components/project-profile-header/project-profile-header.svelte';
+  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
   import { get, writable, type Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import UnclaimedProjectCard, {
+    UNCLAIMED_PROJECT_CARD_FRAGMENT,
+  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
@@ -123,9 +121,9 @@
   }
 
   $: hasCollectableAmount =
-    $context.unclaimedFunds?.collectable && $context.unclaimedFunds?.collectable?.length > 0;
+    project.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length > 0;
   $: hasSplittableAmount =
-    $context.unclaimedFunds?.splittable && $context.unclaimedFunds?.splittable?.length > 0;
+    project.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length > 0;
 </script>
 
 <StandaloneFlowStepLayout
@@ -154,7 +152,7 @@
   <FormField type="div" title="Claimable funds">
     <UnclaimedProjectCard
       detailedTokenBreakdown={hasCollectableAmount && hasSplittableAmount}
-      unclaimedFunds={$context.unclaimedFunds}
+      {project}
     />
   </FormField>
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->

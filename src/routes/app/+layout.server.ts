@@ -1,7 +1,7 @@
 import { HEADER_USER_FRAGMENT } from '$lib/components/header/header.svelte';
 import query from '$lib/graphql/dripsQL.js';
 import { gql } from 'graphql-request';
-import type { UserQuery, UserQueryVariables } from './(app)/__generated__/gql.generated.js';
+import type { UserQuery, UserQueryVariables } from './__generated__/gql.generated.js';
 
 export const load = async ({ url: { pathname }, fetch, cookies, depends }) => {
   const connectedAddress = cookies.get('connected-address');

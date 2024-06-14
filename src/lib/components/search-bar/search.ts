@@ -3,14 +3,12 @@ import fuzzysort from 'fuzzysort';
 import tokens from '$lib/stores/tokens';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { get } from 'svelte/store';
-import ens from '$lib/stores/ens';
 import { isAddress } from 'ethers/lib/utils';
 import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 
 export enum SearchItemType {
   PROFILE,
-  STREAM,
   TOKEN,
   REPO,
 }
@@ -59,14 +57,8 @@ function searchMatchStringsForToken(token: TokenInfoWrapper): MatchStrings {
 
 let searchItems: Item[] = [];
 
-interface AddressAccountIdPair {
-  address: string;
-  accountId?: string;
-}
-
 export function updateSearchItems(accountId: string | undefined) {
   const tokensVal = get(tokens);
-  const ensVal = get(ens);
 
   const currentTokens = (accountId && tokensVal) || [];
 
