@@ -90,6 +90,7 @@
           text: {
             component: RealtimeAmount,
             props: {
+              tokenAddress: token.info.address,
               timeline: b.outgoing,
               showDelta: false,
             },
