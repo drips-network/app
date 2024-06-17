@@ -3,7 +3,7 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 
-const DEFAULT_TICK_INTERVAL_MS = 100;
+const DEFAULT_TICK_INTERVAL_MS = 200;
 const SLOW_MODE_TICK_INTERVAL_MS = 1000;
 
 export default (() => {
@@ -24,7 +24,7 @@ export default (() => {
 
   /**
    * Starts the internal interval, causing all registered listeners
-   * to be called every 100ms.
+   * to be called every DEFAULT_TICK_INTERVAL_MS.
    */
   function start() {
     if (get(interval)) return;
@@ -48,7 +48,7 @@ export default (() => {
 
   /**
    * True if the tick is currently running and listeners are being
-   * called every 100ms.
+   * called every DEFAULT_TICK_INTERVAL_MS.
    */
   function isRunning() {
     return Boolean(get(interval));
@@ -56,7 +56,7 @@ export default (() => {
 
   /**
    * Register a new tick listener. Once registered, while the tick
-   * is started, each listener will be called once every 100ms.
+   * is started, each listener will be called once every DEFAULT_TICK_INTERVAL_MS.
    * @param listener The listener function to call on every tick.
    * @returns The listener registration ID, which can be used to
    * subsequently de-register the listener by calling `deregister`.
@@ -75,7 +75,7 @@ export default (() => {
 
   /**
    * De-register a previously-registered tick listener, so that it
-   * no longer gets called once every 100ms.
+   * no longer gets called once every DEFAULT_TICK_INTERVAL_MS.
    * @param registrationId The registration ID of the listener to
    * de-register.
    * @returns True if the registration ID was found and the listener
