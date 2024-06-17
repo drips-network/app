@@ -15,7 +15,9 @@
   import { gql } from 'graphql-request';
   import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
-  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  import Plus from '../icons/Plus.svelte';
+  import modal from '$lib/stores/modal';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -34,12 +36,11 @@
     label: 'Projects',
     actions: withClaimProjectButton
       ? [
-          // {
-          //   // TODO: (FIX) clicking this button after completing the claim project flow freezes the UI (in all browsers). It shouldnʼt.  😊
-          //   label: 'Claim project',
-          //   icon: Plus,
-          //   handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
-          // },
+          {
+            label: 'Claim project',
+            icon: Plus,
+            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
+          },
         ]
       : [],
   }}

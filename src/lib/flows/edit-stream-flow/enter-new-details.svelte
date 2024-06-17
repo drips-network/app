@@ -115,10 +115,6 @@
             applyGasBuffer: needGasBuffer,
           },
         ],
-
-        after: async () => {
-          // TODO(streams): reload page data when update indexed
-        },
       }),
     );
   }

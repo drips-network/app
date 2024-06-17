@@ -79,85 +79,81 @@
       {/if}
     </div>
   {/if}
-  {#if hasClaimableFunds}
-    <div class="unclaimed-funds">
-      <div class="flex flex-col gap-6 p-4 sm:flex-row">
-        <div class="flex flex-wrap items-start gap-6 sm:gap-12">
-          {#if unclaimedTokenPile}
-            <KeyValuePair key={claimableTokensKey}>
-              {#if hasClaimableFunds}
-                <Pile maxItems={4} components={unclaimedTokenPile} />
-                {#if unclaimedTokensExpandable}
-                  <button
-                    class="expand-chevron"
-                    on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
-                    style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
-                  >
-                    <ChevronDown
-                      style="fill: var(--color-foreground); width: 2rem; height: 2rem;"
-                    />
-                  </button>
-                {/if}
-              {:else}
-                <span class="muted">None</span>
+  <div class="unclaimed-funds">
+    <div class="flex flex-col gap-6 p-4 sm:flex-row">
+      <div class="flex flex-wrap items-start gap-6 sm:gap-12">
+        {#if unclaimedTokenPile}
+          <KeyValuePair key={claimableTokensKey}>
+            {#if hasClaimableFunds}
+              <Pile maxItems={4} components={unclaimedTokenPile} />
+              {#if unclaimedTokensExpandable}
+                <button
+                  class="expand-chevron"
+                  on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                  style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
+                >
+                  <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+                </button>
               {/if}
-            </KeyValuePair>
-          {/if}
-          {#if hasClaimableFunds}
-            <KeyValuePair highlight key="Estimated value">
-              <span style="color: var(--color-primary)"
-                ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
-              >
-            </KeyValuePair>
-          {/if}
-        </div>
-
-        {#if hasClaimableFunds && showClaimButton}
-          <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
-            <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
-              >Claim funds</Button
+            {:else}
+              <span class="muted">None</span>
+            {/if}
+          </KeyValuePair>
+        {/if}
+        {#if hasClaimableFunds}
+          <KeyValuePair highlight key="Estimated value">
+            <span style="color: var(--color-primary)"
+              ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
             >
-          </div>
+          </KeyValuePair>
         {/if}
       </div>
-      <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
-        {#if detailedTokenBreakdown}
-          <div class="tables-container">
-            {#if collectableFunds.length > 0}
-              <div class="table-and-title">
-                <div class="title">
-                  <h5>Collectable</h5>
-                  <p class="typo-text-small">
-                    These claimable funds will be collected directly to your connected wallet.
-                  </p>
-                </div>
-                <div class="table">
-                  <TokenAmountsTable amounts={collectableFunds} />
-                </div>
-              </div>
-            {/if}
-            {#if splittableFunds.length > 0}
-              <div class="table-and-title">
-                <div class="title">
-                  <h5>Splittable</h5>
-                  <p class="typo-text-small">
-                    These claimable funds will be split with your maintainers and dependencies.
-                  </p>
-                </div>
-                <div class="table">
-                  <TokenAmountsTable amounts={splittableFunds} />
-                </div>
-              </div>
-            {/if}
-          </div>
-        {:else}
-          <div class="token-amounts-table">
-            <TokenAmountsTable amounts={mergedUnclaimedFunds} />
-          </div>
-        {/if}
-      </Toggleable>
+
+      {#if hasClaimableFunds && showClaimButton}
+        <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
+          <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
+            >Claim funds</Button
+          >
+        </div>
+      {/if}
     </div>
-  {/if}
+    <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
+      {#if detailedTokenBreakdown}
+        <div class="tables-container">
+          {#if collectableFunds.length > 0}
+            <div class="table-and-title">
+              <div class="title">
+                <h5>Collectable</h5>
+                <p class="typo-text-small">
+                  These claimable funds will be collected directly to your connected wallet.
+                </p>
+              </div>
+              <div class="table">
+                <TokenAmountsTable amounts={collectableFunds} />
+              </div>
+            </div>
+          {/if}
+          {#if splittableFunds.length > 0}
+            <div class="table-and-title">
+              <div class="title">
+                <h5>Splittable</h5>
+                <p class="typo-text-small">
+                  These claimable funds will be split with your maintainers and dependencies.
+                </p>
+              </div>
+              <div class="table">
+                <TokenAmountsTable amounts={splittableFunds} />
+              </div>
+            </div>
+          {/if}
+        </div>
+      {:else}
+        <div class="token-amounts-table">
+          <TokenAmountsTable amounts={mergedUnclaimedFunds} />
+        </div>
+      {/if}
+    </Toggleable>
+  </div>
 </div>
 
 <style>

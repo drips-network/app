@@ -47,7 +47,6 @@
 
   // If top up is disabled, the token list should only show available token balances to stream.
   let tokenList: Items = {};
-  // TODO(streams): Use API data
 
   $: tokenList = Object.fromEntries(
     $tokensStore?.map((token) => {

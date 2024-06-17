@@ -16,7 +16,9 @@
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import CrossIcon from '$lib/components/icons/Cross.svelte';
   import { fade } from 'svelte/transition';
-  import ProjectsSection, { PROJECTS_SECTION_PROJECT_FRAGMENT } from '$lib/components/projects-section/projects-section.svelte';
+  import ProjectsSection, {
+    PROJECTS_SECTION_PROJECT_FRAGMENT,
+  } from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { gql } from 'graphql-request';
 
@@ -61,7 +63,7 @@
 
   <div class="section">
     {#if data.projects}
-      <ProjectsSection projects={data.projects} />
+      <ProjectsSection withClaimProjectButton projects={data.projects} />
     {/if}
   </div>
 </div>
