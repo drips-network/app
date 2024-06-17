@@ -161,7 +161,7 @@
 
   export async function mapSplitsFromMultiplayerResults(
     receivers: VoteReceiver[],
-    fetch = window.fetch,
+    f = fetch,
   ): Promise<SplitsComponentSplitsReceiver[]> {
     const receiversToFetchDataFor = receivers.filter(
       (v): v is ProjectVoteReceiver | DripListVoteReceiver => {
@@ -197,7 +197,7 @@
                 {
                   id: v.accountId,
                 },
-                fetch,
+                f,
               )
             ).dripList;
           } else {
@@ -205,7 +205,7 @@
               await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
                 projectQuery,
                 { url: v.url },
-                fetch,
+                f,
               )
             ).projectByUrl;
           }
