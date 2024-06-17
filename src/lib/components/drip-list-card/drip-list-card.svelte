@@ -201,34 +201,35 @@
 <svelte:element
   this={listingMode ? 'a' : 'section'}
   href={dripListUrl}
-  class:has-description={dripList?.description || votingRound?.description}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-8">
-    <header class="px-6 pt-6 flex flex-col gap-4 lg:gap-5">
+  <div class="flex flex-col gap-4">
+    <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
         <h1 class="title">
           <a
             href={dripListUrl}
             class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded twemoji-text"
+            class:line-clamp-1={listingMode}
           >
             {@html twemoji(title)}
           </a>
         </h1>
-        <div class="flex items-center gap-4 -my-1">
-          {#if !listingMode}
+        {#if !listingMode}
+          <div class="flex items-center gap-4 -my-1">
             <ShareButton
+              buttonVariant="normal"
               url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
             />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
             {/if}
-          {/if}
-        </div>
+          </div>
+        {/if}
       </div>
       {#if description.length > 0}
         <div class="description twemoji-text">
-          <TextExpandable numberOfLines={listingMode ? 1 : 2} isExpandable={!listingMode}>
+          <TextExpandable numberOfLines={listingMode ? 2 : 4} isExpandable={!listingMode}>
             {@html twemoji(description)}
           </TextExpandable>
         </div>

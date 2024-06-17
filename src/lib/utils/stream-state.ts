@@ -42,7 +42,10 @@ export default function streamState(stream: StreamStateStreamFragment) {
     state = 'paused';
   } else if (endDate && endDate.getTime() < new Date().getTime()) {
     state = 'ended';
-  } else if (stream.config.startDate && stream.config.startDate.getTime() > new Date().getTime()) {
+  } else if (
+    stream.config.startDate &&
+    new Date(stream.config.startDate).getTime() > new Date().getTime()
+  ) {
     state = 'scheduled';
   } else if (currentAmounts.lastTimelineItemType === TimelineItemType.OutOfFunds) {
     state = 'out-of-funds';
