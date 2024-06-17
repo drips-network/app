@@ -108,6 +108,8 @@
   import { onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import { constants } from 'radicle-drips';
+  import StatusBadge from '../status-badge/status-badge.svelte';
+  import Proposals from '../icons/Proposals.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -192,9 +194,13 @@
     : votingRound
     ? `/app/drip-lists/${votingRound.id}`
     : undefined;
+
+  $: votingEnded = votingRound
+    ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
+    : undefined;
 </script>
 
-{#if votingRound}
+{#if !listingMode && votingRound}
   <VotingRoundNoticeCard {votingRound} />
 {/if}
 
@@ -215,6 +221,11 @@
             {@html twemoji(title)}
           </a>
         </h1>
+        {#if listingMode && votingRound}
+          <StatusBadge icon={Proposals} size="small" color={votingEnded ? 'foreground' : 'primary'}>
+            {votingEnded ? 'Voting ended' : 'In voting'}
+          </StatusBadge>
+        {/if}
         {#if !listingMode}
           <div class="flex items-center gap-4 -my-1">
             <ShareButton
@@ -320,46 +331,48 @@
                 </div>
               </div>
 
-              <VotingRoundCollaborators {votingRound} />
+              {#if !listingMode}
+                <VotingRoundCollaborators {votingRound} />
 
-              <VotingRoundCountdown {votingRound} />
+                <VotingRoundCountdown {votingRound} />
 
-              {#if isOwnVotingRound}
-                <div class="actions">
-                  <div>
-                    <Button
-                      icon={Trash}
-                      on:click={() =>
-                        modal.show(
-                          Stepper,
-                          undefined,
-                          deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
-                        )}>Delete voting round</Button
-                    >
-                  </div>
-
-                  {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
+                {#if isOwnVotingRound}
+                  <div class="actions">
                     <div>
                       <Button
-                        variant="primary"
-                        icon={Wallet}
-                        disabled={!votingRound.result}
+                        icon={Trash}
                         on:click={() =>
                           modal.show(
                             Stepper,
                             undefined,
-                            votingRound
-                              ? publishVotingRoundListFlowSteps(
-                                  votingRound.id,
-                                  votingRound.name,
-                                  votingRound.description ?? undefined,
-                                )
-                              : unreachable(),
-                          )}>Publish Drip List</Button
+                            deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                          )}>Delete voting round</Button
                       >
                     </div>
-                  {/if}
-                </div>
+
+                    {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
+                      <div>
+                        <Button
+                          variant="primary"
+                          icon={Wallet}
+                          disabled={!votingRound.result}
+                          on:click={() =>
+                            modal.show(
+                              Stepper,
+                              undefined,
+                              votingRound
+                                ? publishVotingRoundListFlowSteps(
+                                    votingRound.id,
+                                    votingRound.name,
+                                    votingRound.description ?? undefined,
+                                  )
+                                : unreachable(),
+                            )}>Publish Drip List</Button
+                        >
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
               {/if}
             {/if}
           </div>
