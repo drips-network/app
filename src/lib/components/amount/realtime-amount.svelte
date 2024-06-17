@@ -45,7 +45,7 @@
     <span in:fade|local={{ duration: 300 }} class="typo-text tabular-nums"> 0.00 </span>
     {#if showDelta}
       <span in:fade|local={{ duration: 300 }} class="delta typo-text-small">
-        0.00 / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
+        0.00 /{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </span>
     {/if}
   {:else if token}
@@ -79,8 +79,9 @@
             MULTIPLIERS[$amtDeltaUnitStore],
           )}
           decimals={token.info.decimals}
+          preserveTrailingZeroes={false}
         />
-        / {FRIENDLY_NAMES[$amtDeltaUnitStore]}
+        /{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </span>
     {/if}
   {:else if $tokensStoreConnectedReadable}
