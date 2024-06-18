@@ -1,13 +1,22 @@
 import query from '$lib/graphql/dripsQL.js';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { gql } from 'graphql-request';
 import { DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT } from './+page.svelte';
 import { getVotingRounds } from '$lib/utils/multiplayer';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
-import type { DripListsPageQuery, DripListsPageQueryVariables } from './__generated__/gql.generated';
+import type {
+  DripListsPageQuery,
+  DripListsPageQueryVariables,
+} from './__generated__/gql.generated';
+import getCookieClientSide from '$lib/utils/get-cookie-clientside';
+import buildUrl from '$lib/utils/build-url';
 
-export const load = async ({ fetch, cookies }) => {
-  const connectedAddress = cookies.get('connected-address');
+export const load = async ({ fetch }) => {
+  const connectedAddress = getCookieClientSide('connected-address');
+
+  if (!connectedAddress) {
+    throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
+  }
 
   const dripListsPageQuery = gql`
     ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
@@ -44,3 +53,5 @@ export const load = async ({ fetch, cookies }) => {
 
   return { dripLists: dripListsRes.dripLists, votingRounds: votingRoundsWithSplits };
 };
+
+export const ssr = false;

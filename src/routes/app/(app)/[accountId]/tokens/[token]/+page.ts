@@ -1,15 +1,20 @@
 import { gql } from 'graphql-request';
-import { TOKEN_PAGE_USER_BALANCES_FRAGMENT, TOKEN_PAGE_USER_STREAMS_FRAGMENT } from './+page.svelte';
+import {
+  TOKEN_PAGE_USER_BALANCES_FRAGMENT,
+  TOKEN_PAGE_USER_STREAMS_FRAGMENT,
+} from './+page.svelte';
 import query from '$lib/graphql/dripsQL';
 import type { TokenPageQuery, TokenPageQueryVariables } from './__generated__/gql.generated';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { isAddress } from 'ethers/lib/utils';
+import getCookieClientSide from '$lib/utils/get-cookie-clientside';
+import buildUrl from '$lib/utils/build-url';
 
-export const load = async ({ fetch, params, cookies }) => {
-  const connectedAddress = cookies.get('connected-address');
+export const load = async ({ fetch, params }) => {
+  const connectedAddress = getCookieClientSide('connected-address');
 
   if (!connectedAddress) {
-    throw error(401, 'Unauthorized');
+    throw redirect(307, buildUrl('/app/connect', { backTo: `/app/tokens/${params.token}` }));
   }
 
   if (!isAddress(params.token)) {
@@ -31,10 +36,16 @@ export const load = async ({ fetch, params, cookies }) => {
     }
   `;
 
-  const res = await query<TokenPageQuery, TokenPageQueryVariables>(tokenPageQuery, { address: connectedAddress }, fetch);
+  const res = await query<TokenPageQuery, TokenPageQueryVariables>(
+    tokenPageQuery,
+    { address: connectedAddress },
+    fetch,
+  );
 
   return {
     balances: res.userByAddress.balances,
     streams: res.userByAddress.streams,
   };
 };
+
+export const ssr = false;
