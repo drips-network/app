@@ -4,7 +4,7 @@ import { gql } from 'graphql-request';
 import { STREAM_PAGE_STREAM_FRAGMENT } from './+page.svelte';
 import query from '$lib/graphql/dripsQL';
 import type { StreamPageQuery, StreamPageQueryVariables } from './__generated__/gql.generated';
-import makeStreamId from '$lib/stores/streams/methods/make-stream-id';
+import makeStreamId from '$lib/utils/streams/make-stream-id';
 
 export const load = async ({ params, fetch }) => {
   const { accountId, token, dripId } = params;
@@ -25,19 +25,21 @@ export const load = async ({ params, fetch }) => {
     }
   `;
 
-  const res = await query<StreamPageQuery, StreamPageQueryVariables>(streamPageQuery, {
-    senderAccountId: decodedId.dripsAccountId,
-  }, fetch);
+  const res = await query<StreamPageQuery, StreamPageQueryVariables>(
+    streamPageQuery,
+    {
+      senderAccountId: decodedId.dripsAccountId,
+    },
+    fetch,
+  );
 
-  const matchingStream = res.streams.find((stream) => stream.id === makeStreamId(
-    decodedId.dripsAccountId,
-    token,
-    dripId,
-  )); 
+  const matchingStream = res.streams.find(
+    (stream) => stream.id === makeStreamId(decodedId.dripsAccountId, token, dripId),
+  );
 
   if (!matchingStream) {
     throw error(404);
   }
 
-  return { stream: matchingStream, blockWhileInitializing: false }
+  return { stream: matchingStream, blockWhileInitializing: false };
 };

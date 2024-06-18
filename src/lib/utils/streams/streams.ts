@@ -7,12 +7,12 @@ import type {
   CurrentStreamsQuery,
   CurrentStreamsQueryVariables,
 } from './__generated__/gql.generated';
-import makeStreamId, { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
 import { pin } from '../ipfs';
 import { getAddressDriverTxFactory, getNetworkConfig } from '../get-drips-clients';
 import type { PopulatedTransaction, Signer } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
+import makeStreamId from './make-stream-id';
 
 type NewStreamOptions = {
   tokenAddress: string;

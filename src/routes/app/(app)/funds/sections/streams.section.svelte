@@ -61,13 +61,13 @@
   import Section from '$lib/components/section/section.svelte';
   import tokens from '$lib/stores/tokens';
   import type { StreamsSectionStreamsFragment } from './__generated__/gql.generated';
-  import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import Token from '$lib/components/token/token.svelte';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
   import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import modal from '$lib/stores/modal';
   import PlusIcon from '$lib/components/icons/Plus.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { decodeStreamId } from '$lib/utils/streams/make-stream-id';
 
   export let accountId: string | undefined;
   export let disableActions = true;

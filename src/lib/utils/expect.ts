@@ -29,7 +29,7 @@ export default async function expect<T extends (() => any) | (() => Promise<any>
   toMatchCondition: (result: Awaited<ReturnType<T>>) => boolean,
   within = 5000,
   checkingEvery = 1000,
-  debug = true,
+  debug = false,
 ): Promise<MetExpectation<Awaited<ReturnType<T>>> | FailedExpectation> {
   const numberOfChecks = Math.floor(within / checkingEvery);
 
