@@ -12,7 +12,7 @@ import { getAddressDriverTxFactory, getNetworkConfig } from '../get-drips-client
 import type { PopulatedTransaction, Signer } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
-import makeStreamId from './make-stream-id';
+import makeStreamId, { decodeStreamId } from './make-stream-id';
 
 type NewStreamOptions = {
   tokenAddress: string;
