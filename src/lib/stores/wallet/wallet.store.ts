@@ -228,8 +228,6 @@ const walletStore = () => {
     const signer = provider.getSigner();
 
     if (browser) {
-      // set 'connected-address' cookie
-      document.cookie = `connected-address=${accounts[0]}; Path=/; max-age=31536000; SameSite=Lax`;
       await invalidateAll();
     }
 
@@ -246,7 +244,6 @@ const walletStore = () => {
 
   function _clear() {
     lastConnectedWallet.clear();
-    document.cookie = 'connected-address=; Path=/; max-age=0; SameSite=Lax';
     state.set(INITIAL_STATE);
   }
 
