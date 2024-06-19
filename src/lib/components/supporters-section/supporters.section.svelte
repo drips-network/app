@@ -98,6 +98,7 @@
     stream: Stream;
   }
 
+  let allItems: (StreamSupport | SupportersSectionSupportItemFragment)[] = [];
   $: allItems = [
     ...supportItems,
     ...supportStreams.map<StreamSupport>((stream) => ({
@@ -161,7 +162,7 @@
     updateProjectAndDripListSupportAmounts(allItems, incomingSplitEvents);
 
   $: allItemsWithAmount = mapFilterUndefined(allItems, (i) => {
-    if (i.__typename === 'StreamSupport') {
+    if (i.__typename === 'StreamSupport' && 'stream' in i) {
       $balancesStore;
 
       const estimate = balancesStore.getEstimateByStreamId(i.stream.id);
