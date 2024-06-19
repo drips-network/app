@@ -34,7 +34,7 @@ export const load = async ({ params, fetch }) => {
   );
 
   const matchingStream = res.streams.find(
-    (stream) => stream.id === makeStreamId(decodedId.dripsAccountId, token, dripId),
+    (stream) => stream.id.toLowerCase() === makeStreamId(decodedId.dripsAccountId, token, dripId),
   );
 
   if (!matchingStream) {
