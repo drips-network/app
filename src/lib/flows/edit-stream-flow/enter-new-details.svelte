@@ -54,6 +54,10 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import type { EditStreamFlowStreamFragment } from './__generated__/gql.generated';
   import { buildEditStreamBatch } from '$lib/utils/streams/streams';
+  import assert from '$lib/utils/assert';
+  import { waitForAccountMetadata } from '$lib/utils/ipfs';
+  import { invalidateAll } from '$app/navigation';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -94,7 +98,7 @@
         before: async () => {
           const addressDriverClient = await getAddressDriverClient();
 
-          const batch = await buildEditStreamBatch(addressDriverClient, stream.id, {
+          const { newHash, batch } = await buildEditStreamBatch(addressDriverClient, stream.id, {
             name: nameUpdated ? $context.newName : undefined,
             amountPerSecond: amountUpdated ? newAmountPerSecond : undefined,
           });
@@ -103,6 +107,7 @@
 
           return {
             batch,
+            newHash,
             needGasBuffer: amountUpdated,
             callerClient,
           };
@@ -115,6 +120,17 @@
             applyGasBuffer: needGasBuffer,
           },
         ],
+
+        after: async (_, { newHash }) => {
+          if (!newHash) return;
+
+          const { dripsAccountId } = $walletStore;
+          assert(dripsAccountId);
+
+          await waitForAccountMetadata(dripsAccountId, newHash);
+
+          await invalidateAll();
+        },
       }),
     );
   }

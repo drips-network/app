@@ -20,7 +20,7 @@ export default function makeStreamId(
     throw new Error('Invalid values');
   }
 
-  return `${senderAccountId}-${tokenAddress}-${dripId}`;
+  return `${senderAccountId}-${tokenAddress.toLowerCase()}-${dripId}`;
 }
 
 /**
@@ -37,7 +37,7 @@ export function decodeStreamId(streamId: string) {
 
   const values = {
     senderAccountId: parts[0],
-    tokenAddress: parts[1],
+    tokenAddress: parts[1].toLowerCase(),
     dripId: parts[2],
   };
 

@@ -19,7 +19,7 @@ export default (stream: DeleteStreamConfirmStepFragment) => ({
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
         message:
-          'Your stream has been successfully deleted. It may take some time for your dashboard to update.',
+          'Your stream has been successfully deleted. You may need to refresh the app for your dashboard to update.',
       },
     }),
   ],

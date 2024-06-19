@@ -25,7 +25,7 @@ export default function getWithdrawSteps(tokenAddress: string) {
         props: {
           safeAppMode: Boolean(get(walletStore).safe),
           message:
-            'Youʼve successfully withdrawn, and your funds are back in your wallet. It may take some time for your dashboard to update.',
+            'Youʼve successfully withdrawn, and your funds are back in your wallet. You may need to refresh the app for your dashboard to update.',
         },
       }),
     ],

@@ -70,7 +70,9 @@
                 { accountId },
               ),
             (res) =>
-              res.userById?.streams?.outgoing?.find((s) => s.id === stream.id)?.isPaused === false,
+              res.userById?.streams?.outgoing?.find(
+                (s) => s.id.toLowerCase() === stream.id.toLowerCase(),
+              )?.isPaused === false,
             10000,
             1000,
           );

@@ -285,7 +285,7 @@
     emptyStateHeadline,
     emptyStateText,
     loaded: true,
-    empty: incoming.length === 0 && outgoing.length === 0,
+    empty: (hideIncoming ? true : incoming.length === 0) && outgoing.length === 0,
   }}
 >
   {#if !hideIncoming && optionsIncoming.data.length > 0 && !onlyDripListStreams}

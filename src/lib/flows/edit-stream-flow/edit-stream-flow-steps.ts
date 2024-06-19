@@ -20,7 +20,7 @@ export default (stream: EditStreamFlowStreamFragment) => ({
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
         message:
-          'Your stream has successfully been edited. It may take some time for your dashboard to update.',
+          'Your stream has successfully been edited. You may need to refresh the app for your dashboard to update.',
       },
     }),
   ],

@@ -320,7 +320,7 @@ export async function buildBalanceChangePopulatedTx(
 
     TODO: Introduce a more graceful method of disabling gas estimation.
     */
-    { gasLimit: 1 },
+    amount > 0n ? { gasLimit: 1 } : undefined,
   );
 }
 
@@ -348,11 +348,6 @@ export async function buildPauseStreamPopulatedTx(
     0,
     0,
     AddressDriverClient.getUserAddress(ownAccountId),
-    /*
-    Dirty hack to disable the SDK's built-in gas estimation, because
-    it would fail if there's no token approval yet.
-    */
-    { gasLimit: 1 },
   );
 }
 
@@ -391,11 +386,6 @@ export async function buildUnpauseStreamPopulatedTx(
     0,
     0,
     AddressDriverClient.getUserAddress(ownAccountId),
-    /*
-    Dirty hack to disable the SDK's built-in gas estimation, because
-    it would fail if there's no token approval yet.
-    */
-    { gasLimit: 1 },
   );
 }
 
@@ -422,6 +412,8 @@ export async function buildEditStreamBatch(
 
   const addressDriverTxFactory = await getAddressDriverTxFactory();
 
+  let hash: string | undefined;
+
   if (newData.name) {
     const metadata = _buildMetadata(currentStreams, ownAccountId);
 
@@ -440,7 +432,7 @@ export async function buildEditStreamBatch(
 
     metadata.assetConfigs[assetConfigIndex].streams[streamIndex].name = newData.name;
 
-    const hash = await pin(metadata);
+    hash = await pin(metadata);
 
     batch.push(
       await addressDriverTxFactory.emitAccountMetadata([
@@ -481,5 +473,8 @@ export async function buildEditStreamBatch(
     );
   }
 
-  return batch;
+  return {
+    newHash: hash,
+    batch,
+  };
 }

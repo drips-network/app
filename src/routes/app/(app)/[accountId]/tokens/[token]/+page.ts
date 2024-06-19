@@ -7,11 +7,11 @@ import query from '$lib/graphql/dripsQL';
 import type { TokenPageQuery, TokenPageQueryVariables } from './__generated__/gql.generated';
 import { error, redirect } from '@sveltejs/kit';
 import { isAddress } from 'ethers/lib/utils';
-import getCookieClientSide from '$lib/utils/get-cookie-clientside';
 import buildUrl from '$lib/utils/build-url';
+import getConnectedAddress from '$lib/utils/get-connected-address';
 
 export const load = async ({ fetch, params }) => {
-  const connectedAddress = getCookieClientSide('connected-address');
+  const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
     throw redirect(307, buildUrl('/app/connect', { backTo: `/app/tokens/${params.token}` }));

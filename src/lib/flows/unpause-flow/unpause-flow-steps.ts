@@ -19,7 +19,7 @@ export default (stream: UnpauseFlowStreamFragment) => ({
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
         message:
-          'Your stream has been unpaused. Please note that it may take some time for your dashboard to update.',
+          'Your stream has been unpaused. You may need to refresh the app for your dashboard to update.',
       },
     }),
   ],
