@@ -1,13 +1,13 @@
 <script lang="ts" context="module">
-  import { gql } from "graphql-request";
-  import { DRIP_LIST_CARD_FRAGMENT } from "../drip-list-card/drip-list-card.svelte";
+  import { gql } from 'graphql-request';
+  import { DRIP_LIST_CARD_FRAGMENT } from '../drip-list-card/drip-list-card.svelte';
 
   export const DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
     fragment DripListsSectionDripList on DripList {
       ...DripListCard
     }
-  `
+  `;
 </script>
 
 <script lang="ts">
@@ -21,7 +21,7 @@
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import type { SplitsComponentSplitsReceiver } from '../splits/splits.svelte';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
-  import type { DripListsSectionDripListFragment } from "./__generated__/gql.generated";
+  import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -79,10 +79,16 @@
         : ''}"
     >
       {#each dripListsAndVotingRounds as list}
-        {#if list.type === 'drip-list'}
+        {@const matchingVotingRound =
+          list.type === 'drip-list'
+            ? votingRounds.find((vr) => vr.dripListId === list.account.accountId)
+            : undefined}
+        {#if list.type === 'drip-list' && matchingVotingRound}
+          <DripListCard listingMode data={{ dripList: list, votingRound: matchingVotingRound }} />
+        {:else if list.type === 'drip-list'}
           <DripListCard listingMode data={{ dripList: list }} />
-        {:else}
-          <DripListCard listingMode data={{ votingRound: list}} />
+        {:else if list.type === 'voting-round' && !dripLists.find((dl) => dl.account.accountId === list.dripListId)}
+          <DripListCard listingMode data={{ votingRound: list }} />
         {/if}
       {/each}
       {#if showCreateNewListCard}
