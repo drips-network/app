@@ -73,8 +73,6 @@ export const load = async ({ fetch }) => {
       },
     );
 
-  console.log('fetchProjects', fetchProjects)
-
   const featuredDripListQuery = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
     query FeaturedDripList($id: ID!) {
@@ -104,8 +102,6 @@ export const load = async ({ fetch }) => {
       },
     );
 
-  console.log('fetchFeaturedLists', fetchFeaturedLists)
-
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices] = await Promise.all([
     (await fetch('/api/blog/posts')).json(),
     // TODO: It currently fetches all claimed projects because we don't yet have pagination
@@ -116,11 +112,7 @@ export const load = async ({ fetch }) => {
     cachedTotalDrippedPrices(redis, fetch),
   ]);
 
-  console.log('batch', { blogPosts, projects, featuredDripLists, totalDrippedPrices })
-
   const tlv = await (await fetch('/api/tlv')).json();
-
-  console.log('tlv', tlv)
 
   return {
     projects,
