@@ -8,11 +8,11 @@ import type {
   DripListsPageQuery,
   DripListsPageQueryVariables,
 } from './__generated__/gql.generated';
-import getCookieClientSide from '$lib/utils/get-cookie-clientside';
 import buildUrl from '$lib/utils/build-url';
+import getConnectedAddress from '$lib/utils/get-connected-address';
 
 export const load = async ({ fetch }) => {
-  const connectedAddress = getCookieClientSide('connected-address');
+  const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
     throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));

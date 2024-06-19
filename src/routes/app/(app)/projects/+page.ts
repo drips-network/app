@@ -3,14 +3,14 @@ import { PROJECTS_PAGE_PROJECT_FRAGMENT } from './+page.svelte';
 import query from '$lib/graphql/dripsQL';
 import type { ProjectsPageQuery, ProjectsPageQueryVariables } from './__generated__/gql.generated';
 import { redirect } from '@sveltejs/kit';
-import getCookieClientSide from '$lib/utils/get-cookie-clientside';
 import buildUrl from '$lib/utils/build-url';
+import getConnectedAddress from '$lib/utils/get-connected-address';
 
 export const load = async ({ fetch }) => {
-  const connectedAddress = getCookieClientSide('connected-address');
+  const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
-    return redirect(307, buildUrl('/app/connect', { backTo: '/app/projects' }));
+    throw redirect(307, buildUrl('/app/connect', { backTo: '/app/projects' }));
   }
 
   const projectsQuery = gql`

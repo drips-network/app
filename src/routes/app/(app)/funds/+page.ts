@@ -5,10 +5,10 @@ import type { UserStreamsQuery, UserStreamsQueryVariables } from './__generated_
 import { redirect } from '@sveltejs/kit';
 import { USER_BALANCES_FRAGMENT } from './sections/balances.section.svelte';
 import buildUrl from '$lib/utils/build-url';
-import getCookieClientSide from '$lib/utils/get-cookie-clientside';
+import getConnectedAddress from '$lib/utils/get-connected-address';
 
 export const load = async ({ fetch }) => {
-  const connectedAddress = getCookieClientSide('connected-address');
+  const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
     throw redirect(307, buildUrl('/app/connect', { backTo: '/app/funds' }));
