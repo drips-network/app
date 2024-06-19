@@ -227,10 +227,6 @@ const walletStore = () => {
     const accounts = await provider.listAccounts();
     const signer = provider.getSigner();
 
-    if (browser) {
-      await invalidateAll();
-    }
-
     state.set({
       connected: true,
       address: accounts[0],
@@ -240,6 +236,10 @@ const walletStore = () => {
       network: getNetwork((await provider.getNetwork()).chainId),
       safe: safeInfo,
     });
+
+    if (browser) {
+      await invalidateAll();
+    }
   }
 
   function _clear() {
