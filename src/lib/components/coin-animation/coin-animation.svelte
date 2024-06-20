@@ -13,7 +13,9 @@
   const coinSound = browser ? new Audio('/assets/coin-sound.mp3') : undefined;
   if (coinSound) coinSound.volume = 0.1;
 
-  onMount(() => enable && animateOnMount && animate(false));
+  onMount(() => {
+    if (enable && animateOnMount) animate(false);
+  });
 
   let containerElem: HTMLDivElement;
   let tokenRotationDeg = tweened(0);

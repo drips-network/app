@@ -52,19 +52,19 @@ export const load = (async ({ params, fetch, url }) => {
 
   const project = projectRes.projectByUrl;
   if (!project) {
-    error(404);
+    throw error(404);
   }
 
   const repoResJson = await repoRes.json();
 
   if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
-    error(404);
+    throw error(404);
   }
 
   try {
     repo = repoSchema.parse(repoResJson);
   } catch {
-    error(500, 'Unable to fetch repo info from GitHub / cache');
+    throw error(500, 'Unable to fetch repo info from GitHub / cache');
   }
 
   const { url: realRepoUrl } = repo;
@@ -72,7 +72,7 @@ export const load = (async ({ params, fetch, url }) => {
   const repoUrlIsCanonical = repoUrl === realRepoUrl;
 
   if (!exact && !repoUrlIsCanonical) {
-    redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
+    return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
   }
 
   if (isClaimed(project) && !project.splits) {

@@ -9,7 +9,7 @@
   import { createEventDispatcher } from 'svelte';
   import { readable } from 'svelte/store';
 
-  const dispatch = createEventDispatcher<{ loaded: never }>();
+  const dispatch = createEventDispatcher<{ loaded: void }>();
   interface Amount {
     tokenAddress: string;
     amount: bigint | string;

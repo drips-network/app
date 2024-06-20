@@ -36,7 +36,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { gql } from 'graphql-request';
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
-  import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+  import type { LatestVersion } from '@efstajas/versioned-parser';
   import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import { Utils } from 'radicle-drips';
 

@@ -61,7 +61,7 @@
 
   const dispatch = createEventDispatcher<{
     /** Fired when the user blurs the input after selecting or hits enter to confirm. */
-    confirm: never;
+    confirm: void;
   }>();
 
   function handleBlur() {

@@ -8,7 +8,7 @@
   import { createEventDispatcher, type ComponentType, tick } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
 
-  const dispatch = createEventDispatcher<{ clear: never }>();
+  const dispatch = createEventDispatcher<{ clear: void }>();
 
   export let variant: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number } = {
     type: 'text',

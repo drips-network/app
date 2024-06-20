@@ -4,7 +4,7 @@ import type { PickGQLF } from '$lib/graphql/utils/pick-gql-fields';
 import { gql } from 'graphql-request';
 import MetadataManagerBase from './MetadataManagerBase';
 import { repoDriverAccountMetadataParser } from './schemas';
-import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser';
 import type {
   LatestProjectMetadataHashQuery,
   LatestProjectMetadataHashQueryVariables,

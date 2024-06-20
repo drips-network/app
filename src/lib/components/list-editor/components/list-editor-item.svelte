@@ -9,7 +9,7 @@
 
   const dispatch = createEventDispatcher<{
     editPercentage: number;
-    deleteItem: never;
+    deleteItem: void;
   }>();
 
   export let item: ListEditorItem;
