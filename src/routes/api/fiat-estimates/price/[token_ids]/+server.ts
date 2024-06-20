@@ -64,7 +64,7 @@ export const GET: RequestHandler = async ({ params }) => {
     await Promise.all(
       Object.entries(parsedRes.data).map(([tokenId, data]) =>
         redis?.set(`cmc-price-${tokenId}`, data.quote.USD.price, {
-          EX: 60,
+          EX: 180,
         }),
       ),
     );
