@@ -24,7 +24,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
-import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { LatestVersion } from '@efstajas/versioned-parser';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type {
@@ -60,7 +60,6 @@ export default class DripListService {
   private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   /**
@@ -316,8 +315,8 @@ export default class DripListService {
       BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
         ? 1
         : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-        ? -1
-        : 0,
+          ? -1
+          : 0,
     );
 
     return sortedReceivers;

@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ params }) => {
   try {
     z.array(z.preprocess(Number, z.number())).parse(tokenIds);
   } catch {
-    throw error(400, 'Invalid token ID submitted');
+    error(400, 'Invalid token ID submitted');
   }
 
   let prices: Record<string, number | undefined> = Object.fromEntries(

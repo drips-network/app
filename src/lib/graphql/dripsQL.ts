@@ -1,7 +1,7 @@
 import uniqBy from 'lodash/uniqBy';
-import { addTypenameToDocument } from 'apollo-utilities';
 import { parse } from 'graphql';
 import { GraphQLClient, type RequestDocument, type Variables } from 'graphql-request';
+import { addTypenameToDocument } from '@apollo/client/utilities';
 
 export default async function query<TResponse, TVariables extends Variables = Variables>(
   query: RequestDocument,

@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       assert(votingRound);
       listName = votingRound.name;
     } catch {
-      throw error(404);
+      error(404);
     }
   } else {
     const dripListQuery = gql`
@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       listName = dripList.name;
       recipientsCount = dripList.splits.length.toString();
     } catch {
-      throw error(404);
+      error(404);
     }
   }
 
@@ -61,8 +61,8 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   try {
     assert(target === 'twitter' || target === 'og');
-  } catch (e) {
-    throw error(400, 'Invalid or missing target param');
+  } catch {
+    error(400, 'Invalid or missing target param');
   }
 
   const height = target === 'twitter' ? 600 : 675;

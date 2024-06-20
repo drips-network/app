@@ -319,5 +319,4 @@ const mockWalletStore = () => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default isTest() ? mockWalletStore() : walletStore();

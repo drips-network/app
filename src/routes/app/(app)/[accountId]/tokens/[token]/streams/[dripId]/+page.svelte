@@ -159,15 +159,15 @@
         {stream.name
           ? stream.name
           : stream.receiver.__typename === 'DripList'
-          ? 'Continuous donation'
-          : 'Unnamed stream'}
+            ? 'Continuous donation'
+            : 'Unnamed stream'}
         <div class="state-badge" style:display="inline-block" style:vertical-align="middle">
           <StreamStateBadge {stream} />
         </div>
       </h1>
     </div>
     {#if $walletStore && checkIsUser(stream.sender.account.accountId) && !isUnknownToken}
-      <div in:fade|local={{ duration: 300 }} class="actions">
+      <div in:fade={{ duration: 300 }} class="actions">
         <Button
           icon={Pen}
           on:click={() => modal.show(Stepper, undefined, editStreamFlowSteps(stream))}>Edit</Button
@@ -223,7 +223,7 @@
             <div class="value-box" class:align-right={stream.config.durationSeconds === undefined}>
               <span class="highlight large-text tabular-nums" data-testid="total-streamed">
                 {#if token}
-                  <div in:fade|local={{ duration: 300 }}>
+                  <div in:fade={{ duration: 300 }}>
                     <FormattedAmount
                       amount={$currentStreamAmounts.currentAmount.amount}
                       decimals={token.info.decimals}
@@ -240,7 +240,7 @@
               <div class="value-box">
                 <span class="large-text tabular-nums">
                   {#if token}
-                    <div in:fade|local={{ duration: 300 }}>
+                    <div in:fade={{ duration: 300 }}>
                       <FormattedAmount
                         amount={BigInt(endTimelineItem.currentAmount.amount)}
                         decimals={token.info.decimals}
@@ -308,10 +308,7 @@
             </div>
 
             {#if token}
-              <span
-                in:fade|local={{ duration: 200, delay: 250 }}
-                class="value small-text tabular-nums"
-              >
+              <span in:fade={{ duration: 200, delay: 250 }} class="value small-text tabular-nums">
                 <FormattedAmount
                   decimals={token.info.decimals}
                   amount={$senderOutgoingBalance.currentAmount.amount}
@@ -319,10 +316,7 @@
                 {token.info.symbol}
               </span>
             {:else}
-              <div
-                out:fade|local={{ duration: 200 }}
-                class="loading value small-text tabular-nums"
-              />
+              <div out:fade={{ duration: 200 }} class="loading value small-text tabular-nums" />
             {/if}
           </div>
         {/if}

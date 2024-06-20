@@ -42,6 +42,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="coin-animation"
   bind:this={containerElem}

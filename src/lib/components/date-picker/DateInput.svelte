@@ -142,35 +142,20 @@
   let InputElement: HTMLInputElement;
   let pickerElement: HTMLElement | null;
   let showAbove = false;
-  let pickerLeftPosition: number | null = null;
 
   function setDatePickerPosition() {
     // Defaults
     showAbove = false;
-    pickerLeftPosition = null;
 
     if (visible && pickerElement && dynamicPositioning) {
       // The child of the dateField is what is visually seen, all calculations should use this to make sure they line up properly
       const inputRect = InputElement.getBoundingClientRect();
-      const horizontalOverflow = pickerElement.offsetWidth - inputRect.width;
 
       const bottomThreshold = inputRect.bottom + pickerElement.offsetHeight + 5;
-      const rightThreshold = inputRect.left + pickerElement.offsetWidth + 5;
 
       if (bottomThreshold > window.innerHeight) {
         // If .date-time-field is on the bottom half of the screen, open above
         showAbove = true;
-      }
-      if (rightThreshold > window.innerWidth) {
-        // If date-time-field is on the right of the screen, open to the left
-        pickerLeftPosition = -horizontalOverflow;
-
-        if (inputRect.left < horizontalOverflow + 5) {
-          // If it would overflow on the left too, open in the middle of the screen
-          const windowCenterPos = window.innerWidth / 2;
-          const newPos = windowCenterPos - pickerElement.offsetWidth / 2;
-          pickerLeftPosition = newPos - inputRect.left;
-        }
       }
     }
   }
@@ -221,7 +206,7 @@
       class="picker"
       class:visible
       class:above={showAbove}
-      transition:flyAutoPosition
+      transition:flyAutoPosition|global
       bind:this={pickerElement}
     >
       <DateTimePicker

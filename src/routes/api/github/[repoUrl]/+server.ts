@@ -39,6 +39,6 @@ export const GET: RequestHandler = async ({ params }) => {
     const status =
       typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;
 
-    throw error(status);
+    error(status);
   }
 };

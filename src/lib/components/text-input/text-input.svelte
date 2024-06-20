@@ -157,8 +157,14 @@
     height: 3rem;
     padding: 0.5rem 0.75rem;
     width: 100%;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    font-feature-settings: 'ss01', 'ss02', 'cv01', 'calt' 0;
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s;
+    font-feature-settings:
+      'ss01',
+      'ss02',
+      'cv01',
+      'calt' 0;
   }
   input::placeholder {
     color: var(--color-foreground-level-4);

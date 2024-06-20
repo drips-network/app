@@ -14,11 +14,11 @@ export const load = async ({ fetch, params }) => {
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
-    throw redirect(307, buildUrl('/app/connect', { backTo: `/app/tokens/${params.token}` }));
+    redirect(307, buildUrl('/app/connect', { backTo: `/app/tokens/${params.token}` }));
   }
 
   if (!isAddress(params.token)) {
-    throw error(404);
+    error(404);
   }
 
   const tokenPageQuery = gql`

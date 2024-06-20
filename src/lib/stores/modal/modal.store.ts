@@ -1,5 +1,5 @@
 import { derived, get, writable } from 'svelte/store';
-import type { ComponentType, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponent } from 'svelte';
 import scroll from '../scroll';
 
 type OnHide = () => void;
@@ -74,7 +74,7 @@ export const setFocusTrapped = (value: boolean): void => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T> = new (...args: any[]) => T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Props<T> = T extends SvelteComponentTyped<infer P, any, any> ? P : never;
+export type Props<T> = T extends SvelteComponent<infer P, any, any> ? P : never;
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
 /**
@@ -83,7 +83,7 @@ export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undef
  * @param onHide An optional function that gets triggered when the modal is closed.
  * @param modalComponentProps Props for the modal component.
  */
-export const show = <T extends SvelteComponentTyped>(
+export const show = <T extends SvelteComponent>(
   modalComponent: Constructor<T>,
   onHide: OnHide = doNothing,
   modalComponentProps: Props<T>,

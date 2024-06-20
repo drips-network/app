@@ -6,7 +6,7 @@ import pinataSdk from '@pinata/sdk';
 import { error, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 
-const pinata = pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
+const pinata = new pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
 
 export const POST: RequestHandler = async ({ request }: RequestEvent) => {
   try {
@@ -44,6 +44,6 @@ export const POST: RequestHandler = async ({ request }: RequestEvent) => {
     // eslint-disable-next-line no-console
     console.log('💧 ~ Failed to pin on Pinata:', e);
 
-    throw error(500, 'Something went wrong while pinning metadata to IPFS.');
+    error(500, 'Something went wrong while pinning metadata to IPFS.');
   }
 };

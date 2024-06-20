@@ -27,7 +27,7 @@
     <svg height="32" width="32" viewBox="0 0 32 32">
       {#if !error && !valid}
         <circle
-          transition:fade|local={{ duration: 200 }}
+          transition:fade={{ duration: 200 }}
           r="12"
           cx="16"
           cy="16"
@@ -50,16 +50,16 @@
     {#if error}
       <div
         class="icon"
-        in:scale|local={{ duration: 300, start: 1.5 }}
-        out:scale|local={{ duration: 300, start: 0.8 }}
+        in:scale={{ duration: 300, start: 1.5 }}
+        out:scale={{ duration: 300, start: 0.8 }}
       >
         <Exclamation style="fill: var(--color-background);" />
       </div>
     {:else if valid}
       <div
         class="icon"
-        in:scale|local={{ duration: 300, start: 1.5 }}
-        out:scale|local={{ duration: 300, start: 0.8 }}
+        in:scale={{ duration: 300, start: 1.5 }}
+        out:scale={{ duration: 300, start: 0.8 }}
       >
         <Check style="fill: var(--color-background);" />
       </div>

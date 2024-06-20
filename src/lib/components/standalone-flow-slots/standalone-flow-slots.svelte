@@ -54,7 +54,7 @@
 
 <div class="overflow-hidden" style:height="{$wrapperHeight}px">
   {#if slots.length > 0}
-    <ul transition:fade|local class="slots flex flex-col gap-4" bind:this={slotsElem}>
+    <ul transition:fade class="slots flex flex-col gap-4" bind:this={slotsElem}>
       {#each slots as slot}
         <StandaloneFlowSlot on:edit {...slot} />
       {/each}

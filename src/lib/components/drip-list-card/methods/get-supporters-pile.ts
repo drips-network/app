@@ -28,9 +28,7 @@ export const DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT = gql`
   }
 `;
 
-export default function getSupportersPile(
-  support: DripListCardSupporterPileFragment['support'],
-) {
+export default function getSupportersPile(support: DripListCardSupporterPileFragment['support']) {
   let result = [];
 
   result.push(

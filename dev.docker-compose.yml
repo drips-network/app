@@ -8,7 +8,7 @@ services:
     image: postgres
     ports:
       - '5432:5432'
-    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    command: ['postgres', '-cshared_preload_libraries=pg_stat_statements']
     environment:
       POSTGRES_USER: graph-node
       POSTGRES_PASSWORD: postgres
@@ -25,7 +25,7 @@ services:
     image: postgres
     ports:
       - '5433:5432'
-    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    command: ['postgres', '-cshared_preload_libraries=pg_stat_statements']
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: admin
@@ -54,7 +54,7 @@ services:
       dockerfile: ./src/e2e-tests/docker/testnet/Dockerfile
       context: .
     ports:
-      - "8545:8545"
+      - '8545:8545'
 
   graph-node:
     image: graphprotocol/graph-node
@@ -74,16 +74,8 @@ services:
       postgres_pass: postgres
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
-      ethereum: "sepolia:http://testnet:8545"
+      ethereum: 'sepolia:http://testnet:8545'
       GRAPH_LOG: info
-
-  subgraph-deployer:
-    build:
-      dockerfile: ./src/e2e-tests/docker/subgraph-deployer/Dockerfile
-      context: .
-    depends_on:
-      - testnet
-      - graph-node
 
   fake-pinata:
     build:

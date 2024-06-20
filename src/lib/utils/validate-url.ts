@@ -7,7 +7,7 @@ export default function (input: string) {
   let url;
   try {
     url = new URL(input);
-  } catch (_) {
+  } catch {
     return false;
   }
 

@@ -32,7 +32,6 @@ jobs:
           envkey_INFURA_KEY: 1234
           envkey_MULTIPLAYER_API_ACCESS_TOKEN: 1234
           envkey_MULTIPLAYER_API_URL: http://foobar:3000/
-          envkey_SUBGRAPH_URL: http://foo.bar/
 
       - name: Install dependencies
         run: npm ci

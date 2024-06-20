@@ -17,7 +17,7 @@ import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
-import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { LatestVersion } from '@efstajas/versioned-parser';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
@@ -37,7 +37,6 @@ export default class GitProjectService {
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   public static async new(): Promise<GitProjectService> {
@@ -317,8 +316,8 @@ export default class GitProjectService {
       BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
         ? 1
         : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-        ? -1
-        : 0,
+          ? -1
+          : 0,
     );
 
     return sortedReceivers;

@@ -56,7 +56,6 @@
       directly. If this is the case, the function triggers a warning modal.
       */
       if (!safe) warnIfSafe(network.chainId, address);
-
     }
 
     initializing.set(false);
@@ -139,9 +138,9 @@
 
 <ModalLayout />
 
-<div in:fade={{ duration: 300, delay: 300 }}>
+<div in:fade|global={{ duration: 300, delay: 300 }}>
   {#if $page.data.blockWhileInitializing !== false && (!loaded || $initializing)}
-    <div out:fade|local={{ duration: 300 }} class="loading-spinner">
+    <div out:fade={{ duration: 300 }} class="loading-spinner">
       <Spinner />
     </div>
   {/if}

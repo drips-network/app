@@ -88,7 +88,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
 
     try {
       accountMetadataRes = await this.fetchIpfs(metadataHash);
-    } catch (e) {
+    } catch {
       return null;
     }
 

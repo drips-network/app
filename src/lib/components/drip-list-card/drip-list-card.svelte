@@ -192,8 +192,8 @@
   $: dripListUrl = dripList
     ? `/app/drip-lists/${dripList.account.accountId}`
     : votingRound
-    ? `/app/drip-lists/${votingRound.id}`
-    : undefined;
+      ? `/app/drip-lists/${votingRound.id}`
+      : undefined;
 
   $: votingEnded = votingRound
     ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
@@ -287,10 +287,7 @@
                     <span class="muted">&nbsp;total</span>
                   </div>
                   {#if supportersPile && supportersPile.length > 0}
-                    <div
-                      in:fade|local={{ duration: 300 }}
-                      class="flex items-center gap-1.5 min-w-0"
-                    >
+                    <div in:fade={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
                       <span class="typo-text-small truncate muted">Supported by</span>
                       <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
                     </div>
@@ -385,7 +382,9 @@
 <style>
   .drip-list-card {
     box-shadow: var(--elevation-low);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
     position: relative;
   }
 
@@ -454,7 +453,9 @@
   .tab {
     position: absolute;
     top: 0;
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+      opacity 0.3s,
+      transform 0.3s;
     opacity: 0;
     pointer-events: none;
   }

@@ -2,6 +2,7 @@
   export let style: string | undefined = undefined;
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <svg
   on:click
   on:keydown

@@ -35,7 +35,7 @@
 <div class="page">
   {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
     <div class="edu-card-wrapper">
-      <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
+      <div transition:fade={{ duration: 300 }} class="splitting-graph-edu card">
         <div class="illustration">
           <SplittingGraph />
         </div>

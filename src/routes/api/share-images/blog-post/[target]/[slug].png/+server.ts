@@ -12,7 +12,7 @@ export const GET = async ({ params }) => {
   try {
     post = await import(`../../../../../../blog-posts/${slug}.md`);
   } catch {
-    throw error(404, 'Post not found');
+    error(404, 'Post not found');
   }
 
   const metadataSchema = z.object({
@@ -27,8 +27,8 @@ export const GET = async ({ params }) => {
 
   try {
     assert(target === 'twitter' || target === 'og');
-  } catch (e) {
-    throw error(400, 'Invalid or missing target param');
+  } catch {
+    error(400, 'Invalid or missing target param');
   }
 
   const height = target === 'twitter' ? 600 : 675;

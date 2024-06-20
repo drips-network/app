@@ -64,7 +64,7 @@
     {fiatEstimateCents}
   />
   {#if includesUnknownPrice && fiatEstimateCents !== 'pending' && !supressUnknownAmountsWarning}
-    <div class="warning" transition:fade|local={{ duration: 100 }}>
+    <div class="warning" transition:fade={{ duration: 100 }}>
       <Tooltip>
         <WarningIcon />
         <svelte:fragment slot="tooltip-content">

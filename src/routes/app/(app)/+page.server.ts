@@ -1,16 +1,16 @@
 import { PROJECT_CARD_FRAGMENT } from '$lib/components/project-card/project-card.svelte';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
-import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated.js';
+import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
 import {
   ProjectSortField,
   ProjectVerificationStatus,
   SortDirection,
-} from '$lib/graphql/__generated__/base-types.js';
+} from '$lib/graphql/__generated__/base-types';
 import { postsListingSchema } from '../../api/blog/posts/schema';
 import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
-import type { FeaturedDripListQuery } from './__generated__/gql.generated.js';
-import type { FeaturedDripListQueryVariables } from './__generated__/gql.generated.js';
+import type { FeaturedDripListQuery } from './__generated__/gql.generated';
+import type { FeaturedDripListQueryVariables } from './__generated__/gql.generated';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { PUBLIC_NETWORK } from '$env/static/public';
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';

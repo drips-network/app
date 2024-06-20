@@ -16,7 +16,9 @@ body {
 
 * {
   transition: background-color 0.2s;
-  font-feature-settings: 'ss02', 'calt' 0;
+  font-feature-settings:
+    'ss02',
+    'calt' 0;
 }
 
 ::selection {

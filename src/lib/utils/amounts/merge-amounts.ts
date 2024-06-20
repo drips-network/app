@@ -8,10 +8,12 @@ type Amount = {
  * where each particular tokenAddress appears once.
  * @param args The arrays of amounts to add together.
  */
-export default function mergeAmounts(...args: {
-  tokenAddress: string;
-  amount: bigint | string;
-}[][]) {
+export default function mergeAmounts(
+  ...args: {
+    tokenAddress: string;
+    amount: bigint | string;
+  }[][]
+) {
   const amounts = new Map<string, Amount>();
 
   args.forEach((amountsArray) => {

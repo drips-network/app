@@ -22,9 +22,8 @@
         const { latestVote } = collaborator ?? {};
 
         if (latestVote) {
-          $context.listEditorConfig = await multiplayer.mapVoteReceiversToListEditorConfig(
-            latestVote,
-          );
+          $context.listEditorConfig =
+            await multiplayer.mapVoteReceiversToListEditorConfig(latestVote);
           return;
         }
 

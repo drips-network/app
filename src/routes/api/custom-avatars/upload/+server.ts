@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 
 import pinataSdk from '@pinata/sdk';
 
-const pinata = pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
+const pinata = new pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
 
 export const POST = async ({ request }) => {
   const blob = await request.arrayBuffer();

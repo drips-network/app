@@ -93,17 +93,18 @@ export const load = async ({ params, fetch }) => {
         break;
       }
       case 'nft': {
-        throw redirect(301, `/app/drip-lists/${universalAccountId}`);
+        redirect(301, `/app/drip-lists/${universalAccountId}`);
+        break;
       }
       case 'repo': {
         return { error: true, type: 'is-repo-driver-account-id' as const };
       }
       default: {
-        throw error(404, 'Not Found');
+        error(404, 'Not Found');
       }
     }
   } else {
-    throw error(404, 'Not Found');
+    error(404, 'Not Found');
   }
 
   const [votingRounds, userRes, ensData] = await Promise.all([

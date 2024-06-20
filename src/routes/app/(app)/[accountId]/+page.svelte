@@ -68,16 +68,16 @@
               />
             </h1>
             <ul class="social-links">
-              <div in:fade|local>
+              <div in:fade>
                 <SocialLink network="ethereum" value={data.profileData.account.address} />
               </div>
               {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
-                {#if value}<li in:fade|local>
+                {#if value}<li in:fade>
                     <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                   </li>{/if}
               {/each}
             </ul>
-            {#if description}<p in:fade|local>{description}</p>{/if}
+            {#if description}<p in:fade>{description}</p>{/if}
           </div>
         </div>
       </header>

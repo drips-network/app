@@ -173,7 +173,7 @@
   >
     <div class="posts-grid">
       {#each data.featuredDripLists as dripList}
-        <DripListCard listingMode data={{ dripList: dripList}} />
+        <DripListCard listingMode data={{ dripList: dripList }} />
       {/each}
     </div>
   </Section>

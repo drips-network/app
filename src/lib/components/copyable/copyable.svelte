@@ -17,6 +17,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="copyable"
   on:click={(e) => {
@@ -38,10 +39,10 @@
     class:animate={!alwaysVisible}
   >
     {#if success}
-      <div transition:fly|local={{ duration: 300, y: 8 }}>
+      <div transition:fly={{ duration: 300, y: 8 }}>
         <SuccessIcon style="fill: var(--color-positive)" />
       </div>
-    {:else}<div transition:fly|local={{ duration: 300, y: -8 }}><CopyIcon /></div>{/if}
+    {:else}<div transition:fly={{ duration: 300, y: -8 }}><CopyIcon /></div>{/if}
   </div>
 </div>
 
@@ -68,7 +69,10 @@
   .copy-icon.animate {
     transform: translateX(-24px);
     opacity: 0;
-    transition: transform 0.3s, opacity 0.3s, width 0.3s;
+    transition:
+      transform 0.3s,
+      opacity 0.3s,
+      width 0.3s;
   }
 
   .copy-icon.visible {

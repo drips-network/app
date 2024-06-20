@@ -62,7 +62,7 @@
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
-    empty: dripListsAndVotingRounds.length === 0 ?? undefined,
+    empty: dripListsAndVotingRounds.length === 0,
     error,
     emptyStateEmoji: '🫗',
     emptyStateHeadline: 'No Drip Lists',
