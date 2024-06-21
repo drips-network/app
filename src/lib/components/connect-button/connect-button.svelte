@@ -42,6 +42,8 @@
     </div>
     <div
       class="mobile-only"
+      role="button"
+      tabindex="0"
       on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
       on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
     >

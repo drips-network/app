@@ -8,8 +8,8 @@ export const load = async ({ params }) => {
       PostContent: post.default,
       meta: { ...post.metadata, slug: params.slug },
     };
-  } catch (err) {
-    throw error(404);
+  } catch {
+    error(404);
   }
 };
 

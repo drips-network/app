@@ -165,8 +165,8 @@
                   item.account.accountId === $walletStore.dripsAccountId
                     ? 'You'
                     : item.account.accountId === ownerAccountId
-                    ? 'Owner'
-                    : undefined,
+                      ? 'Owner'
+                      : undefined,
                 disableTooltip: true,
                 address: item.account.address,
               },
@@ -181,7 +181,7 @@
               {#if $tokensStoreConnected}
                 {@const token = $tokensStore && tokensStore.getByAddress(amount.tokenAddress)}
                 {#if token}
-                  <div in:fade={{ duration: 300 }}>
+                  <div in:fade|global={{ duration: 300 }}>
                     {formatTokenAmount(
                       {
                         tokenAddress: amount.tokenAddress,
@@ -220,8 +220,8 @@
                   stream.sender.account.accountId === $walletStore.dripsAccountId
                     ? 'You'
                     : stream.sender.account.accountId === ownerAccountId
-                    ? 'Owner'
-                    : undefined,
+                      ? 'Owner'
+                      : undefined,
                 address: item.stream.sender.account.address,
               },
             }}
@@ -240,7 +240,7 @@
                 {@const token =
                   $tokensStore &&
                   tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
-                <div in:fade={{ duration: 300 }}>
+                <div in:fade|global={{ duration: 300 }}>
                   {#if token}
                     {STREAM_STATE_LABELS[streamState(stream)]} · {formatAmtPerSec(
                       BigInt(stream.config.amountPerSecond.amount),

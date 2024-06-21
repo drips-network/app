@@ -63,7 +63,6 @@
     ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT,
   } from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
   import type {
@@ -95,11 +94,6 @@
   $: type = project ? ('project' as const) : ('dripList' as const);
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
-
-  $: isOwner =
-    $walletStore.connected &&
-    (dripList?.owner.accountId === $walletStore.dripsAccountId ||
-      (project && isClaimed(project) && $walletStore.dripsAccountId === project?.owner?.accountId));
 
   let supportUrl: string;
   $: {
@@ -208,7 +202,7 @@
 
 <div class="become-supporter-card" class:disabled>
   {#if !draftListMode && (ownDripLists === undefined || updating)}
-    <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
+    <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
   {/if}

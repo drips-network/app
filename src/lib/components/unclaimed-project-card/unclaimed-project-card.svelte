@@ -68,7 +68,7 @@
   export let detailedTokenBreakdown = false;
 </script>
 
-<div class="project-info" transition:fly|local={{ y: 8, duration: 300 }}>
+<div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
   {#if project}
     <div class="basic-info text-left">
       <ProjectBadge linkToNewTab {project} />
@@ -178,7 +178,9 @@
   }
 
   .expand-chevron {
-    transition: transform 0.3s, background-color 0.3s;
+    transition:
+      transform 0.3s,
+      background-color 0.3s;
     border-radius: 50%;
   }
 

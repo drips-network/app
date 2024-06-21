@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html class="smoothscroll" lang="en">
   <head>
     <script>
-      (function() {
+      (function () {
         try {
           const themePreference = localStorage.getItem('theme')?.replaceAll('"', '');
 
@@ -17,16 +17,23 @@
           }
 
           const colorPreference = localStorage.getItem('primary-color').replaceAll('"', '');
-          
-          if (colorPreference) document.documentElement.setAttribute('data-primary-color', colorPreference);
+
+          if (colorPreference)
+            document.documentElement.setAttribute('data-primary-color', colorPreference);
         } catch (e) {}
       })();
     </script>
     <meta charset="utf-8" />
-    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
-    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/redaction/Redaction_50-Italic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/redaction/Redaction_50-Italic.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <meta name="viewport" content="width=device-width" />
     <meta name="theme-color" content="" />
     <script defer data-domain="drips.network" src="https://plausible.io/js/script.js"></script>

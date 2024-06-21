@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
   import { gql } from 'graphql-request';
-  import type { ProjectAvatarFragment } from './__generated__/gql.generated';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
     fragment ProjectAvatar on Project {
@@ -28,6 +27,7 @@
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
   import twemoji from '$lib/utils/twemoji';
+  import type { ProjectAvatarFragment } from './__generated__/gql.generated';
 
   export let project: ProjectAvatarFragment;
 
@@ -79,7 +79,7 @@
     class:with-outline={outline}
   >
     {#if customImageLoading}
-      <div class="loading-state" transition:fade={{ duration: 300 }}>
+      <div class="loading-state" transition:fade|global={{ duration: 300 }}>
         <Spinner />
       </div>
     {/if}

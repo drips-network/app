@@ -141,7 +141,7 @@
   </div>
   <div class="content">
     {#if loading}
-      <div transition:fade class="loading-state">
+      <div transition:fade|global class="loading-state">
         <Spinner />
       </div>
     {/if}
@@ -159,7 +159,12 @@
     box-shadow: var(--elevation-low);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.2s,
+      box-shadow 0.2s,
+      opacity 0.3s;
   }
 
   button .content {
@@ -205,7 +210,9 @@
 
   button:not(:disabled):hover,
   button:not(:disabled):focus-visible {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
     opacity: 1;
@@ -213,6 +220,8 @@
 
   button:not(:disabled):active {
     transform: translateY(0px);
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 0px 0px 0px var(--color-foreground);
   }
 </style>

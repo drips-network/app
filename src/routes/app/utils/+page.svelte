@@ -17,7 +17,7 @@
   $: {
     try {
       decoded = decode(streamConfigValue);
-    } catch (e) {
+    } catch {
       decoded = undefined;
     }
   }

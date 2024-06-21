@@ -12,9 +12,9 @@ export const load = async ({ url }) => {
       const decoded = decodeURIComponent(backTo);
       const isSafe = isSafePath(decoded);
 
-      if (isSafe) throw redirect(301, decoded);
+      if (isSafe) redirect(301, decoded);
     } else {
-      throw redirect(301, '/app');
+      redirect(301, '/app');
     }
   }
 };

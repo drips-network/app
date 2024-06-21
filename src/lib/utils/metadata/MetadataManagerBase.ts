@@ -2,7 +2,7 @@ import type { ContractTransaction } from 'ethers';
 import type { AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
-import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser/lib/types';
+import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser';
 import assert from '$lib/utils/assert';
 
 type IpfsHash = string;
@@ -88,7 +88,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
 
     try {
       accountMetadataRes = await this.fetchIpfs(metadataHash);
-    } catch (e) {
+    } catch {
       return null;
     }
 

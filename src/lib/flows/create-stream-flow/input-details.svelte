@@ -252,18 +252,18 @@
     to={$context.receiver
       ? $context.receiver
       : recipientInputValidationState.type === 'valid' && $context.recipientInputValue
-      ? isAddress($context.recipientInputValue) // TODO: Extract to function when project receiver is supported.
-        ? {
-            __typename: 'AddressDriverAccount',
-            driver: Driver.Address,
-            address: $context.recipientInputValue,
-          }
-        : {
-            __typename: 'NftDriverAccount',
-            driver: Driver.Nft,
-            accountId: $context.recipientInputValue,
-          }
-      : undefined}
+        ? isAddress($context.recipientInputValue) // TODO: Extract to function when project receiver is supported.
+          ? {
+              __typename: 'AddressDriverAccount',
+              driver: Driver.Address,
+              address: $context.recipientInputValue,
+            }
+          : {
+              __typename: 'NftDriverAccount',
+              driver: Driver.Nft,
+              accountId: $context.recipientInputValue,
+            }
+        : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
   />
   <StepHeader

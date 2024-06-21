@@ -181,7 +181,7 @@ export default function transact(
         ).json();
 
         estimatedGasWithBuffer = applyGasBuffer(estimatedGas);
-      } catch (e) {
+      } catch {
         throw new Error('Unable to estimate gas for Safe Batch operation.');
       }
 

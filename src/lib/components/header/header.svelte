@@ -45,8 +45,8 @@
       </div>
       {#if showLoadingIndicator}
         <div
-          in:fly={{ duration: 300, y: -16 }}
-          out:fly={{ duration: 300, y: 16 }}
+          in:fly|global={{ duration: 300, y: -16 }}
+          out:fly|global={{ duration: 300, y: 16 }}
           class="loading-indicator"
         >
           <Spinner />
@@ -68,7 +68,7 @@
     <div />
   {/if}
   {#if searchMode}
-    <div class="search-bar" transition:fly|local={{ duration: 300, x: 64, easing: sineInOut }}>
+    <div class="search-bar" transition:fly={{ duration: 300, x: 64, easing: sineInOut }}>
       <SearchBar on:dismiss={() => (searchMode = false)} />
     </div>
   {/if}
@@ -78,7 +78,7 @@
         <button
           class="header-button"
           on:click={() => (searchMode = true)}
-          transition:fly|local={{ duration: 300, x: -64, easing: quadInOut }}
+          transition:fly={{ duration: 300, x: -64, easing: quadInOut }}
           data-testid="search-button"
           data-highlightid="search"
         >
@@ -103,7 +103,7 @@
 </header>
 
 {#if searchMode}
-  <div class="search-background" transition:fade|local={{ duration: 300 }} />
+  <div class="search-background" transition:fade={{ duration: 300 }} />
 {/if}
 
 <style>
@@ -111,7 +111,9 @@
     height: 4rem;
     width: 100%;
     background-color: var(--color-background);
-    transition: box-shadow 0.3s, background-color 0.5s;
+    transition:
+      box-shadow 0.3s,
+      background-color 0.5s;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -155,7 +157,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.3s, box-shadow 0.3s;
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s;
     cursor: pointer;
   }
 

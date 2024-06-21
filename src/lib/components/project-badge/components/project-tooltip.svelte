@@ -42,7 +42,6 @@
   import ProjectName from './project-name.svelte';
   import type { ProjectTooltipFragment } from './__generated__/gql.generated';
 
-
   export let project: ProjectTooltipFragment;
 
   const SOURCE_TYPE_STRINGS: { [K in Forge]: string } = {
@@ -60,8 +59,13 @@
   />
   <div class="header">
     <ProjectAvatar {project} size="large" outline />
-    <a class="name typo-header-4" href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
-      ><ProjectName {project} /></a
+    <a
+      class="name typo-header-4"
+      href={buildProjectUrl(
+        project.source.forge,
+        project.source.ownerName,
+        project.source.repoName,
+      )}><ProjectName {project} /></a
     >
     {#if isClaimed(project)}
       <div class="owner typo-text-small">

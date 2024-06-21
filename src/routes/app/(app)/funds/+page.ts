@@ -11,7 +11,7 @@ export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
-    throw redirect(307, buildUrl('/app/connect', { backTo: '/app/funds' }));
+    redirect(307, buildUrl('/app/connect', { backTo: '/app/funds' }));
   }
 
   const streamsQuery = gql`

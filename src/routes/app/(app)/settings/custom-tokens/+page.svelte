@@ -1,11 +1,7 @@
 <script lang="ts">
   import Table from '$lib/components/table/table.svelte';
   import tokens from '$lib/stores/tokens/tokens.store';
-  import {
-    getCoreRowModel,
-    type ColumnDef,
-    type TableOptions,
-  } from '@tanstack/svelte-table';
+  import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import Button from '$lib/components/button/button.svelte';
   import PlusIcon from '$lib/components/icons/Plus.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';

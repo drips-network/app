@@ -9,7 +9,7 @@
   import { createEventDispatcher } from 'svelte';
   import { readable } from 'svelte/store';
 
-  const dispatch = createEventDispatcher<{ loaded: never }>();
+  const dispatch = createEventDispatcher<{ loaded: void }>();
   interface Amount {
     tokenAddress: string;
     amount: bigint | string;
@@ -64,7 +64,7 @@
     {fiatEstimateCents}
   />
   {#if includesUnknownPrice && fiatEstimateCents !== 'pending' && !supressUnknownAmountsWarning}
-    <div class="warning" transition:fade|local={{ duration: 100 }}>
+    <div class="warning" transition:fade={{ duration: 100 }}>
       <Tooltip>
         <WarningIcon />
         <svelte:fragment slot="tooltip-content">

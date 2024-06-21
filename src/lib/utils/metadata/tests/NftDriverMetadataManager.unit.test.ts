@@ -1,6 +1,6 @@
 import NftDriverMetadataManager from '../NftDriverMetadataManager';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { LatestVersion } from '@efstajas/versioned-parser';
 import type { nftDriverAccountMetadataParser } from '../schemas';
 import unreachable from '$lib/utils/unreachable';
 

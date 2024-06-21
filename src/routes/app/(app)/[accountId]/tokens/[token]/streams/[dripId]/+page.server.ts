@@ -12,7 +12,7 @@ export const load = async ({ params, fetch }) => {
   const decodedId = await decodeUniversalAccountId(accountId);
 
   if (decodedId.driver !== 'address') {
-    throw error(404);
+    error(404);
   }
 
   const streamPageQuery = gql`
@@ -38,7 +38,7 @@ export const load = async ({ params, fetch }) => {
   );
 
   if (!matchingStream) {
-    throw error(404);
+    error(404);
   }
 
   return { stream: matchingStream, blockWhileInitializing: false };

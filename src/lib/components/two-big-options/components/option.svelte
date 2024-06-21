@@ -44,7 +44,9 @@
     user-select: none;
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     box-shadow: none;
-    transition: box-shadow 0.3s, background-color 0.3s;
+    transition:
+      box-shadow 0.3s,
+      background-color 0.3s;
     z-index: 1;
   }
 

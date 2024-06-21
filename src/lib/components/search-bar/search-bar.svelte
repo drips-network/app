@@ -11,7 +11,7 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import Results from './components/results.svelte';
 
-  const dispatch = createEventDispatcher<{ dismiss: never }>();
+  const dispatch = createEventDispatcher<{ dismiss: void }>();
 
   let focus = false;
 
@@ -106,14 +106,14 @@
       on:focusout={handleSearchBlur}
       autocomplete="off"
     />
-    {#if focus}<div transition:fly|local={{ duration: 300, y: 4 }}>
+    {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
       </div>{/if}
   </div>
   {#if focus && searchTerm}
     <div
-      in:fly={{ duration: 200, y: 8, easing: sineOut }}
-      out:fly={{ duration: 200, y: 8, easing: sineIn }}
+      in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
+      out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
       class="results"
       on:focusout={handleSearchBlur}
     >
@@ -122,11 +122,12 @@
   {/if}
 </div>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if focus}<div
     class="overlay"
     on:click={closeSearch}
     on:keydown={closeSearch}
-    transition:fade|local={{ duration: 200, easing: sineInOut }}
+    transition:fade={{ duration: 200, easing: sineInOut }}
   />{/if}
 
 <style>
@@ -163,7 +164,10 @@
     transition: border 0.3s;
     z-index: 100;
     position: relative;
-    transition: border 0.3s, background-color 0.3s, box-shadow 0.3s;
+    transition:
+      border 0.3s,
+      background-color 0.3s,
+      box-shadow 0.3s;
   }
 
   .search-bar:hover:not(.focus) {

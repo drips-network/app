@@ -44,7 +44,7 @@
       tokenDecimals = info.decimals;
 
       tokenAddressValidationState = { type: 'valid' };
-    } catch (e) {
+    } catch {
       tokenAddressValidationState = {
         type: 'invalid',
         message: 'Unable to verify ERC-20 token at this address',

@@ -2,7 +2,6 @@ import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import expect from '$lib/utils/expect';
 import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
 import { constants } from 'ethers';
 import { ERC20TxFactory } from 'radicle-drips';
@@ -95,21 +94,14 @@ export default function (
         },
       ],
 
-      after: async (receipts, transactContext) => {
-        const { provider } = get(walletStore);
-
-        const block = await provider.getBlock(receipts[0].blockNumber);
-        const { timestamp: blockTimestamp } = block;
-
+      after: async () => {
         /*
         We wait up to five seconds for `refreshUserAccount` to include a history item
         matching our transaction's block timestamp, checking once a second. If it doesnʼt
         after five tries, we move forward anyway, but the user will be made aware that they
         may need to wait for a while for their dashboard to refresh.
         */
-
         // TODO(streams): poll api here
-
         // await expect(
         //   streams.refreshUserAccount,
         //   (account) =>

@@ -10,8 +10,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import batchCollect from '../../batch-collect';
-  import { createEventDispatcher, onMount } from 'svelte';
-  import getCycle from '$lib/utils/drips/get-cycle';
+  import { createEventDispatcher } from 'svelte';
   import formatDate from '$lib/utils/format-date';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
@@ -80,11 +79,6 @@
   function submit() {
     batchCollect(selected, dispatch);
   }
-
-  let cycle: Awaited<ReturnType<typeof getCycle>> | undefined = undefined;
-  onMount(async () => {
-    cycle = await getCycle();
-  });
 </script>
 
 <StepLayout>

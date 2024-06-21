@@ -66,7 +66,7 @@
       {#if activeElem}
         <div
           class="selector"
-          transition:fade|local={{ duration: 300 }}
+          transition:fade={{ duration: 300 }}
           style={`left: ${selectorOffset}px; width: ${selectorWidth}px`}
         />
       {/if}
@@ -122,6 +122,8 @@
     height: calc(100% - 0.5rem);
     margin: 0.25rem 0;
     border-radius: 1rem 0 1rem 1rem;
-    transition: left 0.3s, width 0.3s;
+    transition:
+      left 0.3s,
+      width 0.3s;
   }
 </style>

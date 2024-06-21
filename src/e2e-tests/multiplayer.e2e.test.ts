@@ -1,7 +1,8 @@
-import { preview, type PreviewServer } from "vite";
-import configureAppForTest from "./helpers/configure-app-for-test";
-import { chromium, type Browser, type Page } from "playwright";
-import { expect } from "@playwright/test";
+/* eslint-disable no-console */
+import { preview, type PreviewServer } from 'vite';
+import configureAppForTest from './helpers/configure-app-for-test';
+import { chromium, type Browser, type Page } from 'playwright';
+import { expect } from '@playwright/test';
 
 describe.skip('multiplayer', async () => {
   let server: PreviewServer;
@@ -53,18 +54,14 @@ describe.skip('multiplayer', async () => {
     });
 
     it('fills a collaborator', async () => {
-      await page
-        .locator('input[placeholder="ETH address"]')
-        .click();
+      await page.locator('input[placeholder="ETH address"]').click();
 
       await page.keyboard.type('0xAa90c43123ACEc193A35D33db5D71011B019779D');
       await page.locator('text=Add').click();
     });
 
     it('fills voting end date', async () => {
-      await page
-        .locator('input[placeholder="YYYY-MM-DD HH:MM:SS"]')
-        .click();
+      await page.locator('input[placeholder="YYYY-MM-DD HH:MM:SS"]').click();
 
       const date = new Date();
       date.setDate(date.getDate() + 7);

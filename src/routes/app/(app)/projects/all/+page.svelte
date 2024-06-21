@@ -67,9 +67,8 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import { dripListIcon, projectIcon, addressIcon } from '$lib/components/pile/pile-presets';
-  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
-  import type Pile from '$lib/components/pile/pile.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
   import type { ComponentProps } from 'svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
@@ -139,14 +138,14 @@
     {
       accessorKey: 'dependenciesPile',
       header: 'Drips to',
-      cell: () => PileCell,
+      cell: () => Pile,
       enableSorting: false,
       size: (100 / 24) * 6,
     },
     {
       accessorKey: 'supportersPile',
       header: 'Supporters',
-      cell: () => PileCell,
+      cell: () => Pile,
       enableSorting: false,
       size: (100 / 24) * 5,
     },

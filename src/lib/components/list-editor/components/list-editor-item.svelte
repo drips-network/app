@@ -9,7 +9,7 @@
 
   const dispatch = createEventDispatcher<{
     editPercentage: number;
-    deleteItem: never;
+    deleteItem: void;
   }>();
 
   export let item: ListEditorItem;
@@ -103,6 +103,7 @@
   <div class="right">
     {#if weightsMode}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="percentage-editor tabular-nums"
         class:editable={isEditable}
@@ -187,7 +188,9 @@
     cursor: pointer;
     border-radius: 4px;
     box-shadow: 0 0 0 0 var(--color-primary);
-    transition: box-shadow 0.2s, color 0.2s;
+    transition:
+      box-shadow 0.2s,
+      color 0.2s;
   }
 
   .percentage-editor.editable {

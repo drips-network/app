@@ -1,10 +1,13 @@
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+import ProjectAvatar, {
+  PROJECT_AVATAR_FRAGMENT,
+} from '$lib/components/project-avatar/project-avatar.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { gql } from 'graphql-request';
 import type { DripListCardSupporterPileFragment } from './__generated__/gql.generated';
 
 export const DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT = gql`
+  ${PROJECT_AVATAR_FRAGMENT}
   fragment DripListCardSupporterPile on DripList {
     support {
       ... on DripListSupport {
@@ -28,9 +31,7 @@ export const DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT = gql`
   }
 `;
 
-export default function getSupportersPile(
-  support: DripListCardSupporterPileFragment['support'],
-) {
+export default function getSupportersPile(support: DripListCardSupporterPileFragment['support']) {
   let result = [];
 
   result.push(

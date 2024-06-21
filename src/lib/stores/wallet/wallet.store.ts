@@ -33,6 +33,7 @@ const onboard = Onboard({
       version: 2,
       projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
       requiredChains: [network.chainId],
+      dappUrl: 'https://drips.network',
     }),
   ],
   chains: [
@@ -319,5 +320,4 @@ const mockWalletStore = () => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default isTest() ? mockWalletStore() : walletStore();

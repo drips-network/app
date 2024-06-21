@@ -56,17 +56,15 @@
       <div class="button-inner">
         <div class="icon">
           {#if copySuccess}
-            <span transition:fade|local={{ duration: 200 }}>
+            <span transition:fade={{ duration: 200 }}>
               <CheckCircle style="fill: var(--color-positive)" />
             </span>
           {:else if hovering}
-            <span transition:fade|local={{ duration: 200 }}>
+            <span transition:fade={{ duration: 200 }}>
               <CopyIcon style="fill: currentColor" />
             </span>
           {:else}
-            <span transition:fade|local={{ duration: 200 }}
-              ><LinkIcon style="fill: currentColor" /></span
-            >
+            <span transition:fade={{ duration: 200 }}><LinkIcon style="fill: currentColor" /></span>
           {/if}
         </div>
         {copyLinkLabel}

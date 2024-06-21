@@ -42,14 +42,14 @@
 
 <div class="realtime-amount">
   {#if timeline.length === 0}
-    <span in:fade|local={{ duration: 300 }} class="typo-text tabular-nums"> 0.00 </span>
+    <span in:fade={{ duration: 300 }} class="typo-text tabular-nums"> 0.00 </span>
     {#if showDelta}
-      <span in:fade|local={{ duration: 300 }} class="delta typo-text-small">
+      <span in:fade={{ duration: 300 }} class="delta typo-text-small">
         0.00 /{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </span>
     {/if}
   {:else if token}
-    <span in:fade|local={{ duration: 300 }} class="typo-text tabular-nums">
+    <span in:fade={{ duration: 300 }} class="typo-text tabular-nums">
       {#if showFiatValue}
         <AggregateFiatEstimate
           amounts={[
@@ -69,7 +69,7 @@
       {/if}
     </span>
     {#if showDelta}
-      <span in:fade|local={{ duration: 300 }} class="delta typo-text-small">
+      <span in:fade={{ duration: 300 }} class="delta typo-text-small">
         {#if $currentAmountsStore.currentDeltaPerSecond.amount > 0}
           +
         {/if}
@@ -101,6 +101,7 @@
     >
   {:else}
     <!-- Empty span while tokens store is loading (can only be visible on SSR'd pages where blockWhileInitializing set to false) -->
+    <!-- eslint-disable-next-line no-irregular-whitespace -->
     <span>​</span>
   {/if}
 </div>

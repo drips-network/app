@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-  import { STREAM_STATE_BADGE_STREAM_FRAGMENT } from "$lib/components/stream-state-badge/stream-state-badge.svelte";
-  import { gql } from "graphql-request";
+  import { STREAM_STATE_BADGE_STREAM_FRAGMENT } from '$lib/components/stream-state-badge/stream-state-badge.svelte';
+  import { gql } from 'graphql-request';
 
   export const NAME_AND_BADGE_CELL_STREAM_FRAGMENT = gql`
     ${STREAM_STATE_BADGE_STREAM_FRAGMENT}
@@ -22,7 +22,7 @@
 
 <script lang="ts">
   import StreamStateBadge from '$lib/components/stream-state-badge/stream-state-badge.svelte';
-  import type { NameAndBadgeCellStreamFragment } from "./__generated__/gql.generated";
+  import type { NameAndBadgeCellStreamFragment } from './__generated__/gql.generated';
 
   export let stream: NameAndBadgeCellStreamFragment;
 </script>

@@ -108,16 +108,16 @@
         bind:this={rowElems[index]}
       >
         {#each row.getVisibleCells() as cell}
-        {@const props = cell.getContext().getValue()}
+          {@const props = cell.getContext().getValue()}
           <td
             class:typo-text-bold={cell.column.getIsSorted()}
             class:sorted={cell.column.getIsSorted()}
           >
             <div>
-                <svelte:component
-                  this={flexRender(cell.column.columnDef.cell, props)}
-                  {...(typeof props === 'object' ? props : {})}
-                />
+              <svelte:component
+                this={flexRender(cell.column.columnDef.cell, props)}
+                {...typeof props === 'object' ? props : {}}
+              />
             </div>
           </td>
         {/each}

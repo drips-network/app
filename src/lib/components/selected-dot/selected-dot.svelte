@@ -15,7 +15,7 @@
   <div class="selected-dot check" class:focussed>
     <div class="inner check" class:selected>
       {#if selected}
-        <div class="check-icon" transition:scale|local={{ start: 1.5, duration: 300 }}>
+        <div class="check-icon" transition:scale={{ start: 1.5, duration: 300 }}>
           <CheckIcon style="fill: white" />
         </div>
       {/if}
@@ -47,7 +47,11 @@
     width: 1.25rem;
     height: 1.25rem;
     border-radius: 1.25rem;
-    transition: width 0.3s, height 0.3s, background-color 0.3s, box-shadow 0.3s;
+    transition:
+      width 0.3s,
+      height 0.3s,
+      background-color 0.3s,
+      box-shadow 0.3s;
   }
 
   .check.inner {
@@ -81,7 +85,10 @@
     height: 1.75rem;
     border-radius: 1.5rem;
     box-shadow: red;
-    transition: width 0.3s, height 0.3s, box-shadow 0.3s;
+    transition:
+      width 0.3s,
+      height 0.3s,
+      box-shadow 0.3s;
   }
 
   .check.outer {

@@ -366,7 +366,7 @@
       </div>
 
       {#if isClaimed(project)}
-        <div class="stats" in:fade|local={{ duration: 300 }}>
+        <div class="stats" in:fade={{ duration: 300 }}>
           <div class="stat shadow-low rounded-drip-lg">
             <KeyValuePair key="Donations">
               <AggregateFiatEstimate amounts={project.totalEarned} />

@@ -3,7 +3,8 @@
   import assert from '$lib/utils/assert';
   import { browser } from '$app/environment';
 
-  const RESOLUTION_RATIO = browser && window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
+  const RESOLUTION_RATIO =
+    browser && window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
 
   export let speedMultiplier = 1;
   export let vertical = false;

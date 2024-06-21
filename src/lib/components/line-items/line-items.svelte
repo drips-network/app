@@ -21,8 +21,8 @@
   {#each lineItems as lineItem, index (lineItem.title + lineItem.subtitle + lineItem.symbol)}
     <div
       class="line-item"
-      in:fade|local={{ duration: 300 }}
-      out:fade|local={{ duration: 300 }}
+      in:fade={{ duration: 300 }}
+      out:fade={{ duration: 300 }}
       animate:flip={{ duration: 300 }}
     >
       <LineItemComponent {animateValueChanges} {...lineItem} />
