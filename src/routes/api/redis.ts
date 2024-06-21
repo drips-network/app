@@ -1,7 +1,7 @@
 import redisSdk from 'redis';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 
-const connectionString = getOptionalEnvVar('REDIS_URL');
+const connectionString = getOptionalEnvVar('CACHE_REDIS_CONNECTION_STRING');
 
 export const redis = connectionString
   ? redisSdk.createClient({ url: connectionString })
