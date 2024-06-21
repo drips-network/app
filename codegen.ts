@@ -31,9 +31,9 @@ const config: CodegenConfig = {
         pruneGeneratedFiles: true,
         baseTypesPath: 'lib/graphql/__generated__/base-types.ts',
       },
-      // plugins: ['typescript-operations'],
+      plugins: ['typescript-operations'],
       config: {
-        // dedupeFragments: true,
+        dedupeFragments: true,
         namingConvention: {
           enumValues: 'keep',
         },
