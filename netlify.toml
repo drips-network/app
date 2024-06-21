@@ -1,16 +1,16 @@
 [build.environment]
 
 [context.deploy-preview]
-    command = "mv robots-disallow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"$DEPLOY_URL\" npm run build"
+    command = "mv robots-disallow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"\"$DEPLOY_URL\"\" npm run build"
 
 [context.branch-deploy]
-    command = "mv robots-disallow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"$DEPLOY_URL\" npm run build"
+    command = "mv robots-disallow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"\"$DEPLOY_URL\"\" npm run build"
 
 [context.dev]
-    command = "mv robots-disallow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"$DEPLOY_URL\" npm run build"
+    command = "mv robots-disallow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"\"$DEPLOY_URL\"\" npm run build"
 
 [context.production]
-    command = "mv robots-allow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"$DEPLOY_URL\" npm run build"
+    command = "mv robots-allow.txt ./static/robots.txt && npm i esbuild && npm run build:graphql && BUILD_DEPLOY_URL=\"\"$DEPLOY_URL\"\" npm run build"
 
 [[redirects]]
   from = "https://beta.drips.network/*"
