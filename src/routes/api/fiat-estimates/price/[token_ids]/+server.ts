@@ -80,6 +80,7 @@ export const GET: RequestHandler = async ({ params }) => {
     {
       headers: {
         'content-type': 'application/json',
+        'cache-control': 'public, max-age=300',
       },
     },
   );

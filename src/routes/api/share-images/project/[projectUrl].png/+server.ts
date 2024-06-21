@@ -157,6 +157,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   return new Response(image.asPng(), {
     headers: {
       'content-type': 'image/png',
+      'cache-control': 'public, max-age=86400', // 24 hours
     },
   });
 };

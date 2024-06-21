@@ -34,7 +34,11 @@ export const GET: RequestHandler = async ({ params }) => {
       return repo;
     });
 
-    return new Response(JSON.stringify(mapGhResponse(repo)));
+    return new Response(JSON.stringify(mapGhResponse(repo)), {
+      headers: {
+        'cache-control': 'public, max-age=120',
+      },
+    });
   } catch (e) {
     const status =
       typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;

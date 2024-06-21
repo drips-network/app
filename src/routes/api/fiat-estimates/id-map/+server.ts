@@ -57,6 +57,7 @@ export const GET: RequestHandler = async () => {
   return new Response(JSON.stringify(idMap), {
     headers: {
       'content-type': 'application/json',
+      'cache-control': 'public, max-age=43200',
     },
   });
 };
