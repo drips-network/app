@@ -18,7 +18,7 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { getNetwork, isConfiguredChainId, type Network } from './network';
-import { invalidateAll } from '$app/navigation';
+import { invalidateAll } from '../fetched-data-cache/invalidate';
 
 const appsSdk = new SafeAppsSDK();
 

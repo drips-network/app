@@ -5,6 +5,9 @@ import type { ProjectsPageQuery, ProjectsPageQueryVariables } from './__generate
 import { redirect } from '@sveltejs/kit';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
+import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
+
+const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
@@ -22,11 +25,15 @@ export const load = async ({ fetch }) => {
     }
   `;
 
-  const res = await query<ProjectsPageQuery, ProjectsPageQueryVariables>(
-    projectsQuery,
-    { address: connectedAddress },
-    fetch,
-  );
+  const res =
+    fetchedDataCache.read() ??
+    (await query<ProjectsPageQuery, ProjectsPageQueryVariables>(
+      projectsQuery,
+      { address: connectedAddress },
+      fetch,
+    ));
+
+  fetchedDataCache.write(res);
 
   return { projects: res.projects };
 };

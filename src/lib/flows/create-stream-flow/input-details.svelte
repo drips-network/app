@@ -58,7 +58,7 @@
   import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

@@ -1,4 +1,4 @@
-import { invalidate } from '$app/navigation';
+import { invalidate } from '$lib/stores/fetched-data-cache/invalidate';
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
