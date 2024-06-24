@@ -25,6 +25,7 @@
   import CollectButton from '../collect-button/collect-button.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import type { HeaderUserFragment } from './__generated__/gql.generated';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let user: HeaderUserFragment | null;
 
@@ -54,10 +55,10 @@
       {/if}
     </a>
   {/if}
-  {#if user && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
+  {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
       <CollectButton
-        withdrawableBalances={user.withdrawableBalances}
+        withdrawableBalances={user?.withdrawableBalances}
         peekAmount={true}
         bind:isPeeking={collectButtonPeeking}
       />
@@ -94,9 +95,9 @@
     <div class="connect">
       <ConnectButton />
     </div>
-    {#if user && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
+    {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
       <div data-highlightid="global-collect" class="collect">
-        <CollectButton withdrawableBalances={user.withdrawableBalances} />
+        <CollectButton withdrawableBalances={user?.withdrawableBalances} />
       </div>
     {/if}
   </div>

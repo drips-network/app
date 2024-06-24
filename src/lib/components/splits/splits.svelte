@@ -271,6 +271,8 @@
   } from '$lib/utils/multiplayer/schemas';
   import query from '$lib/graphql/dripsQL';
 
+  export let disableLinks = true;
+
   export let list: Splits;
   export let maxRows: number | undefined = undefined;
 
@@ -312,6 +314,7 @@
   {#each sortedList as listItem, index}
     <li class="split">
       <SplitComponent
+        disableLink={disableLinks}
         {groupsExpandable}
         isFirst={index === 0}
         isLast={index === sortedList.length - 1}

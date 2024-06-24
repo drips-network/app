@@ -7,8 +7,18 @@ vi.mock('$app/environment', () => ({
   browser: true,
 }));
 
+const mockNetwork = (chainId: number) =>
+  vi.mock('$lib/stores/wallet/network', async (importOriginal) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const actual = (await importOriginal()) as any;
+    return {
+      ...actual,
+      configuredChainId: chainId,
+    };
+  });
+mockNetwork(1);
+
 afterEach(() => {
-  tokens.disconnect();
   window.localStorage.clear();
 });
 
@@ -26,8 +36,6 @@ describe('tokens store', () => {
   });
 
   it('lists default tokens for chain after initialization', () => {
-    tokens.connect(1);
-
     expect(get(tokens)).toStrictEqual(
       DRIPS_DEFAULT_TOKEN_LIST.filter((t) => t.chainId === 1).map((t) => ({
         source: 'default',
@@ -37,7 +45,6 @@ describe('tokens store', () => {
   });
 
   it('finds tokens by address, symbol or drips asset ID', () => {
-    tokens.connect(1);
     expect(tokens.getBySymbol('RAD')?.info.address).toBe(
       '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
     );
@@ -52,7 +59,8 @@ describe('tokens store', () => {
   });
 
   it('adds and removes custom tokens', () => {
-    tokens.connect(5);
+    vi.resetAllMocks();
+    mockNetwork(5);
 
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
 
@@ -81,13 +89,16 @@ describe('tokens store', () => {
   });
 
   it('prevents adding the same custom token twice', () => {
-    tokens.connect(5);
+    vi.resetAllMocks();
+    mockNetwork(5);
+
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
     expect(() => tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO)).toThrow();
   });
 
   it('bans and unbans custom tokens', () => {
-    tokens.connect(5);
+    vi.resetAllMocks();
+    mockNetwork(5);
 
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
 
@@ -123,7 +134,8 @@ describe('tokens store', () => {
   });
 
   it('restores custom tokens on the same chain from localstorage', () => {
-    tokens.connect(5);
+    vi.resetAllMocks();
+    mockNetwork(5);
 
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
     tokens.setCustomTokenBanStatus(
@@ -132,17 +144,14 @@ describe('tokens store', () => {
       true,
     );
 
-    tokens.disconnect();
-    tokens.connect(5);
-
     expect(tokens.getByAddress(TEST_CUSTOM_TOKEN_INFO.address)).toStrictEqual({
       source: 'custom',
       info: TEST_CUSTOM_TOKEN_INFO,
       banned: true,
     });
 
-    tokens.disconnect();
-    tokens.connect(6);
+    vi.resetAllMocks();
+    mockNetwork(6);
 
     expect(tokens.getByAddress(TEST_CUSTOM_TOKEN_INFO.address)).toBeUndefined();
   });

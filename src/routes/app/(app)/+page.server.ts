@@ -121,5 +121,6 @@ export const load = async ({ fetch }) => {
     ),
     tlv,
     totalDrippedPrices,
+    blockWhileInitializing: false,
   };
 };

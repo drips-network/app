@@ -1,5 +1,4 @@
 <script lang="ts">
-  import tokensStore from '$lib/stores/tokens/tokens.store';
   import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import { fade } from 'svelte/transition';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
@@ -42,10 +41,8 @@
   export let fiatEstimateCents: number | 'pending' = 'pending';
   let includesUnknownPrice = false;
 
-  const connected = tokensStore.connected;
-
   $: {
-    if (amounts && $connected) {
+    if (amounts) {
       const result = aggregateFiatEstimate($priceStore, amounts);
 
       if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {

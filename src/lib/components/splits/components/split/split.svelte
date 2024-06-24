@@ -18,6 +18,7 @@
   import isClaimed from '$lib/utils/project/is-claimed';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
+  export let disableLink = true;
   export let linkToNewTab = false;
   export let isNested = false;
   export let draft = false;
@@ -85,6 +86,7 @@
               dripList: s.dripList,
               showOwner: false,
               showName: false,
+              isLinked: !disableLink,
             },
           } as ComponentAndProps;
         case 'ProjectReceiver':
@@ -171,12 +173,16 @@
     </div>
     <div class="receiver">
       {#if split.__typename === 'AddressReceiver'}
-        <IdentityBadge {linkToNewTab} address={split.account.address} size="medium" />
+        <IdentityBadge {disableLink} {linkToNewTab} address={split.account.address} size="medium" />
       {:else if split.__typename === 'DripListReceiver'}
-        <DripListBadge dripList={split.dripList} />
+        <DripListBadge isLinked={!disableLink} dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
         <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
-          <ProjectBadge {linkToNewTab} project={split.project} />
+          <ProjectBadge
+            linkTo={disableLink ? 'nothing' : undefined}
+            {linkToNewTab}
+            project={split.project}
+          />
         </PrimaryColorThemer>
       {:else if split.__typename === 'SplitGroup'}
         <div

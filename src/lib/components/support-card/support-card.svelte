@@ -80,6 +80,7 @@
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import SupportButtons from './components/support-buttons.svelte';
   import { BASE_URL } from '$lib/utils/base-url';
+  import awaitStoreValue from '$lib/utils/await-store-value';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -104,23 +105,11 @@
     }
   }
 
-  const { initialized } = walletStore;
-
   let updating = true;
   async function updateState() {
     updating = true;
 
-    if (!$initialized) {
-      // Wait for wallet to be initialized before proceeding
-      await new Promise<void>((resolve) => {
-        const unsubscribe = initialized.subscribe((v) => {
-          if (v) {
-            unsubscribe();
-            resolve();
-          }
-        });
-      });
-    }
+    await awaitStoreValue(walletStore.initialized, (v) => v);
 
     const { address } = $walletStore;
     if (!address) {

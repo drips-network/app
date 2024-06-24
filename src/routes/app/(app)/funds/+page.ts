@@ -47,6 +47,7 @@ export const load = async ({ fetch }) => {
   return {
     streams: res.userByAddress.streams,
     balances: res.userByAddress.balances,
+    blockWhileInitializing: false,
   };
 };
 

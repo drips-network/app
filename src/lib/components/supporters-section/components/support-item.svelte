@@ -32,6 +32,10 @@
 </a>
 
 <style>
+  a {
+    display: block;
+  }
+
   .support-item {
     display: flex;
     justify-content: space-between;

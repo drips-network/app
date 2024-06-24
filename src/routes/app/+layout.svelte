@@ -6,7 +6,6 @@
   import { onMount } from 'svelte';
   import wallet from '$lib/stores/wallet/wallet.store';
 
-  import tokens from '$lib/stores/tokens';
   import ens from '$lib/stores/ens';
   import { writable } from 'svelte/store';
   import tickStore from '$lib/stores/tick/tick.store';
@@ -36,7 +35,6 @@
 
     const { connected, network, provider, address, safe } = $wallet;
 
-    tokens.connect(network.chainId);
     ens.connect(provider);
 
     themeStore.subscribe((v) => {

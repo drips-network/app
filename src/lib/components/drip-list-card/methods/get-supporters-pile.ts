@@ -27,6 +27,15 @@ export const DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT = gql`
           address
         }
       }
+      ... on StreamSupport {
+        stream {
+          sender {
+            account {
+              address
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -45,6 +54,7 @@ export default function getSupportersPile(support: DripListCardSupporterPileFrag
               showIdentity: false,
               size: 'normal',
               disableTooltip: true,
+              disableLink: true,
             },
           };
         case 'ProjectSupport':
@@ -54,6 +64,7 @@ export default function getSupportersPile(support: DripListCardSupporterPileFrag
               project: s.project,
               outline: true,
               size: 'tiny',
+              isLinked: false,
             },
           };
         case 'OneTimeDonationSupport':
@@ -64,6 +75,18 @@ export default function getSupportersPile(support: DripListCardSupporterPileFrag
               showIdentity: false,
               size: 'normal',
               disableTooltip: true,
+              disableLink: true,
+            },
+          };
+        case 'StreamSupport':
+          return {
+            component: IdentityBadge,
+            props: {
+              address: s.stream.sender.account.address,
+              showIdentity: false,
+              size: 'normal',
+              disableTooltip: true,
+              disableLink: true,
             },
           };
       }

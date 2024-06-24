@@ -29,8 +29,6 @@
 
   export let showDelta = true;
 
-  const tokensStoreConnectedReadable = tokensStore.connected;
-
   $: currentAmountsStore = streamCurrentAmountsStore(timeline, tokenAddress);
   $: token =
     $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress);
@@ -84,7 +82,7 @@
         /{FRIENDLY_NAMES[$amtDeltaUnitStore]}
       </span>
     {/if}
-  {:else if $tokensStoreConnectedReadable}
+  {:else if tokensStore.customTokensLoaded}
     <button
       class="typo-text"
       style:color="var(--color-foreground-level-5)"

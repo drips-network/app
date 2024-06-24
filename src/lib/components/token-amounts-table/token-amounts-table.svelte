@@ -29,27 +29,21 @@
 
   let fiatEstimates: (number | 'pending' | 'unsupported' | undefined)[] = [];
 
-  const connected = tokensStore.connected;
-
   $: {
-    if ($connected) {
-      amounts.forEach(({ tokenAddress, amount }, index) => {
-        const token = tokensStore.getByAddress(tokenAddress);
+    amounts.forEach(({ tokenAddress, amount }, index) => {
+      const token = tokensStore.getByAddress(tokenAddress);
 
-        if (!token) {
-          fiatEstimates[index] = 'unsupported';
-          return;
-        }
+      if (!token) {
+        fiatEstimates[index] = 'unsupported';
+        return;
+      }
 
-        fiatEstimates[index] = fiatEstimatesStore.convert(
-          { amount, tokenAddress },
-          token.info.decimals,
-          $priceStore,
-        );
-      });
-    }
-
-    fiatEstimates = fiatEstimates;
+      fiatEstimates[index] = fiatEstimatesStore.convert(
+        { amount, tokenAddress },
+        token.info.decimals,
+        $priceStore,
+      );
+    });
   }
 </script>
 
@@ -68,7 +62,7 @@
           {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
           {tokens[i]?.info.symbol}
         </div>
-      {:else if $connected}
+      {:else if tokensStore.customTokensLoaded}
         <button
           on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
           >Unknown token</button

@@ -212,14 +212,8 @@
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
-        <h1 class="title">
-          <a
-            href={dripListUrl}
-            class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded twemoji-text"
-            class:line-clamp-1={listingMode}
-          >
-            {@html twemoji(title)}
-          </a>
+        <h1 class="title rounded twemoji-text">
+          {@html twemoji(title)}
         </h1>
         {#if listingMode && votingRound}
           <StatusBadge icon={Proposals} size="small" color={votingEnded ? 'foreground' : 'primary'}>
@@ -289,7 +283,11 @@
                   {#if supportersPile && supportersPile.length > 0}
                     <div in:fade={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
                       <span class="typo-text-small truncate muted">Supported by</span>
-                      <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+                      <Pile
+                        maxItems={3}
+                        components={supportersPile ?? []}
+                        itemsClickable={!listingMode}
+                      />
                     </div>
                   {/if}
                 </div>
@@ -299,6 +297,7 @@
                     style:pointer-events={listingMode ? 'none' : undefined}
                   >
                     <Splits
+                      disableLinks={listingMode}
                       maxRows={listingMode ? (dripList.description ? 3 : 4) : undefined}
                       groupsExpandable={!listingMode}
                       list={dripList.splits}

@@ -1,14 +1,9 @@
-import tokens from '$lib/stores/tokens';
 import { cleanup, render, screen } from '@testing-library/svelte';
 import Amount from './amount.svelte';
 
 vi.mock('$app/environment', () => ({
   browser: true,
 }));
-
-beforeAll(() => {
-  tokens.connect(1);
-});
 
 afterEach(() => {
   cleanup();

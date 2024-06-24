@@ -4,10 +4,13 @@ import { gql } from 'graphql-request';
 import type { UserQuery, UserQueryVariables } from './__generated__/gql.generated';
 import getConnectedAddress from '$lib/utils/get-connected-address.js';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
+import { browser } from '$app/environment';
 
 const fetchedDataCache = makeFetchedDataCache<UserQuery>('app-layout:user');
 
 export const load = async ({ url: { pathname }, fetch, depends }) => {
+  if (!browser) return { pathname, user: null };
+
   const connectedAddress = getConnectedAddress();
 
   if (connectedAddress) {
@@ -35,5 +38,3 @@ export const load = async ({ url: { pathname }, fetch, depends }) => {
 
   return { pathname, user: null };
 };
-
-export const ssr = false;

@@ -147,6 +147,7 @@
               address: v.account.address,
               showIdentity: false,
               size: 'medium',
+              disableLink: true,
             },
           };
         case 'ProjectReceiver':
@@ -155,12 +156,13 @@
             props: {
               project: v.project,
               outline: true,
+              isLinked: false,
             },
           };
         case 'DripListReceiver':
           return {
             component: DripListAvatar,
-            props: { outline: true },
+            props: { outline: true, isLinked: false },
           };
         default:
           return undefined;

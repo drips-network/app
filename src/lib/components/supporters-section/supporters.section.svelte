@@ -132,8 +132,6 @@
 
   /** Bind to this to get the section skeleton instance of this section. */
   export let sectionSkeleton: SectionSkeleton | undefined = undefined;
-
-  const tokensStoreConnected = tokensStore.connected;
 </script>
 
 <section class="app-section">
@@ -169,6 +167,7 @@
                       : undefined,
                 disableTooltip: true,
                 address: item.account.address,
+                disableLink: true,
               },
             }}
             subtitle={formatDate(item.date)}
@@ -178,24 +177,22 @@
             </svelte:fragment>
             <svelte:fragment slot="amount-sub">
               {@const amount = item.amount}
-              {#if $tokensStoreConnected}
-                {@const token = $tokensStore && tokensStore.getByAddress(amount.tokenAddress)}
-                {#if token}
-                  <div in:fade|global={{ duration: 300 }}>
-                    {formatTokenAmount(
-                      {
-                        tokenAddress: amount.tokenAddress,
-                        amount: BigInt(amount.amount),
-                      },
-                      token.info.decimals,
-                      1n,
-                      false,
-                    )}
-                    {token.info.symbol}
-                  </div>
-                {:else}
-                  <AddUnknownTokenButton tokenAddress={amount.tokenAddress} />
-                {/if}
+              {@const token = $tokensStore && tokensStore.getByAddress(amount.tokenAddress)}
+              {#if token}
+                <div in:fade|global={{ duration: 300 }}>
+                  {formatTokenAmount(
+                    {
+                      tokenAddress: amount.tokenAddress,
+                      amount: BigInt(amount.amount),
+                    },
+                    token.info.decimals,
+                    1n,
+                    false,
+                  )}
+                  {token.info.symbol}
+                </div>
+              {:else if tokensStore.customTokensLoaded}
+                <AddUnknownTokenButton tokenAddress={amount.tokenAddress} />
               {:else}
                 <!-- Placeholder for right height during SSR -->
                 <span>⠀</span>
@@ -216,6 +213,7 @@
               component: IdentityBadge,
               props: {
                 disableTooltip: true,
+                disableLink: true,
                 tag:
                   stream.sender.account.accountId === $walletStore.dripsAccountId
                     ? 'You'
@@ -236,18 +234,16 @@
               />
             </svelte:fragment>
             <svelte:fragment slot="amount-sub">
-              {#if $tokensStoreConnected}
-                {@const token =
-                  $tokensStore &&
-                  tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
+              {@const token =
+                $tokensStore &&
+                tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
+              {#if token}
                 <div in:fade|global={{ duration: 300 }}>
-                  {#if token}
-                    {STREAM_STATE_LABELS[streamState(stream)]} · {formatAmtPerSec(
-                      BigInt(stream.config.amountPerSecond.amount),
-                      token.info.decimals,
-                      token.info.symbol,
-                    )}
-                  {/if}
+                  {STREAM_STATE_LABELS[streamState(stream)]} · {formatAmtPerSec(
+                    BigInt(stream.config.amountPerSecond.amount),
+                    token.info.decimals,
+                    token.info.symbol,
+                  )}
                 </div>
               {:else}
                 <!-- Placeholder for right height during SSR -->

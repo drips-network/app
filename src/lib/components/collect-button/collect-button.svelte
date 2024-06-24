@@ -28,9 +28,8 @@
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import type { CollectButtonWithdrawableBalanceFragment } from './__generated__/gql.generated';
-  import tokensStore from '$lib/stores/tokens/tokens.store';
 
-  export let withdrawableBalances: CollectButtonWithdrawableBalanceFragment[];
+  export let withdrawableBalances: CollectButtonWithdrawableBalanceFragment[] | undefined;
 
   /** If true, the collectable amount will only briefly peek on screen when updated, rather than staying forever. */
   export let peekAmount = false;
@@ -50,24 +49,22 @@
 
   const fiatEstimatesStarted = fiatEstimates.started;
 
-  $: amounts = withdrawableBalances.map(
+  $: amounts = withdrawableBalances?.map(
     ({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
       tokenAddress,
       amount: BigInt(splittableAmount) + BigInt(receivableAmount) + BigInt(collectableAmount),
     }),
   );
 
-  const tokensConnected = tokensStore.connected;
-
   $: tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
   $: priceReadable =
     $fiatEstimatesStarted && tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined;
-  $: amount = $tokensConnected ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined;
+  $: amount = amounts ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined;
 
   let amountTransitioning = false;
   let amountToShow: ReturnType<typeof aggregateFiatEstimate> | undefined;
 
-  $: loading = typeof $amount?.fiatEstimateCents !== 'number';
+  $: loading = !amount || typeof $amount?.fiatEstimateCents !== 'number';
 
   async function updateAmountToShow(hide = false) {
     await tick();
@@ -118,7 +115,7 @@
   $: nothingToCollect = amountToShow?.fiatEstimateCents === 0;
 
   function handleClick() {
-    modal.show(Stepper, undefined, globalCollectFlowSteps(amounts));
+    if (amounts) modal.show(Stepper, undefined, globalCollectFlowSteps(amounts));
   }
 </script>
 

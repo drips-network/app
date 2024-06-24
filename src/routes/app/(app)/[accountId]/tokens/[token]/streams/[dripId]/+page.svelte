@@ -98,7 +98,6 @@
   import { quintOut } from 'svelte/easing';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  import tokens from '$lib/stores/tokens';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
 
@@ -146,8 +145,7 @@
     ? streamCurrentAmountsStore(senderOutgoingBalanceTimeline, tokenAddress)
     : undefined;
 
-  const tokensStoreConnected = tokens.connected;
-  $: isUnknownToken = $tokensStoreConnected && !token;
+  $: isUnknownToken = tokensStore.customTokensLoaded && !token;
 </script>
 
 <HeadMeta title={stream.name ?? 'Stream'} />
