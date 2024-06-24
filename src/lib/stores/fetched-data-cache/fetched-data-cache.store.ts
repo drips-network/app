@@ -35,6 +35,9 @@ export function clearAll() {
  * **Also important**: No runtime type checking is being done. You need to make sure that
  *    1. The key you pass to this function is unique
  *    2. The type you pass to this function is correct
+ *
+ * **Also important**: What this returns is only a wrapper around a global store. Even if this
+ * wrapper is abandoned, the values it wrote persist in the global store.
  * @param key
  * @returns
  */
