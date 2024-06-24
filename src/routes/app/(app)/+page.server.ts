@@ -1,7 +1,10 @@
 import { PROJECT_CARD_FRAGMENT } from '$lib/components/project-card/project-card.svelte';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
-import type { ProjectsQuery, ProjectsQueryVariables } from './__generated__/gql.generated';
+import type {
+  ExploreProjectsQuery,
+  ExploreProjectsQueryVariables,
+} from './__generated__/gql.generated';
 import {
   ProjectSortField,
   ProjectVerificationStatus,
@@ -73,7 +76,7 @@ export const load = async ({ fetch }) => {
   );
 
   const fetchProjects = async () => {
-    const projectsRes = await query<ProjectsQuery, ProjectsQueryVariables>(
+    const projectsRes = await query<ExploreProjectsQuery, ExploreProjectsQueryVariables>(
       getProjectsQuery,
       getProjectsVariables,
       fetch,
