@@ -2,7 +2,6 @@
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
-  import tokens from '$lib/stores/tokens';
   import type { Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import totalDrippedApproximation from '$lib/utils/total-dripped-approx';
   import { onDestroy, onMount } from 'svelte';
@@ -16,8 +15,6 @@
   function update() {
     amounts = totalDrippedApproximation();
   }
-
-  tokens.connect(1);
 
   onMount(async () => {
     tickStore.start();
