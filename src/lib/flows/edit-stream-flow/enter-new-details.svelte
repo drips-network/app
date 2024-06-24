@@ -56,7 +56,7 @@
   import { buildEditStreamBatch } from '$lib/utils/streams/streams';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();

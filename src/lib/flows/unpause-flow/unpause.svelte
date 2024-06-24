@@ -26,7 +26,7 @@
   } from './__generated__/gql.generated';
   import { buildUnpauseStreamPopulatedTx } from '$lib/utils/streams/streams';
   import query from '$lib/graphql/dripsQL';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

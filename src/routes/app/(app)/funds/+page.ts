@@ -6,6 +6,9 @@ import { redirect } from '@sveltejs/kit';
 import { USER_BALANCES_FRAGMENT } from './sections/balances.section.svelte';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
+import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
+
+const fetchedDataCache = makeFetchedDataCache<UserStreamsQuery>('dashboard:funds');
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
@@ -29,13 +32,17 @@ export const load = async ({ fetch }) => {
     }
   `;
 
-  const res = await query<UserStreamsQuery, UserStreamsQueryVariables>(
-    streamsQuery,
-    {
-      connectedAddress,
-    },
-    fetch,
-  );
+  const res =
+    fetchedDataCache.read() ??
+    (await query<UserStreamsQuery, UserStreamsQueryVariables>(
+      streamsQuery,
+      {
+        connectedAddress,
+      },
+      fetch,
+    ));
+
+  fetchedDataCache.write(res);
 
   return {
     streams: res.userByAddress.streams,

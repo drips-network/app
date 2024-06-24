@@ -3,6 +3,9 @@ import query from '$lib/graphql/dripsQL.js';
 import { gql } from 'graphql-request';
 import type { UserQuery, UserQueryVariables } from './__generated__/gql.generated';
 import getConnectedAddress from '$lib/utils/get-connected-address.js';
+import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
+
+const fetchedDataCache = makeFetchedDataCache<UserQuery>('app-layout:user');
 
 export const load = async ({ url: { pathname }, fetch, depends }) => {
   const connectedAddress = getConnectedAddress();
@@ -10,18 +13,22 @@ export const load = async ({ url: { pathname }, fetch, depends }) => {
   if (connectedAddress) {
     depends('app-layout:user');
 
-    const user = await query<UserQuery, UserQueryVariables>(
-      gql`
-        ${HEADER_USER_FRAGMENT}
-        query User($connectedAddress: String!) {
-          userByAddress(address: $connectedAddress) {
-            ...HeaderUser
+    const user =
+      fetchedDataCache.read() ??
+      (await query<UserQuery, UserQueryVariables>(
+        gql`
+          ${HEADER_USER_FRAGMENT}
+          query User($connectedAddress: String!) {
+            userByAddress(address: $connectedAddress) {
+              ...HeaderUser
+            }
           }
-        }
-      `,
-      { connectedAddress },
-      fetch,
-    );
+        `,
+        { connectedAddress },
+        fetch,
+      ));
+
+    fetchedDataCache.write(user);
 
     return { user: user.userByAddress, pathname };
   }

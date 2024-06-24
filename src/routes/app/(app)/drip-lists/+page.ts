@@ -1,21 +1,33 @@
 import query from '$lib/graphql/dripsQL.js';
-import { error, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { gql } from 'graphql-request';
 import { DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT } from './+page.svelte';
 import { getVotingRounds } from '$lib/utils/multiplayer';
-import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
+import {
+  mapSplitsFromMultiplayerResults,
+  type SplitsComponentSplitsReceiver,
+} from '$lib/components/splits/splits.svelte';
 import type {
   DripListsPageQuery,
   DripListsPageQueryVariables,
 } from './__generated__/gql.generated';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
+import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
+import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+
+type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
+
+const fetchedDataCache = makeFetchedDataCache<{
+  dripLists: DripListsPageQuery['dripLists'];
+  votingRounds: VotingRoundWithSplits[];
+}>('dashboard:drip-lists');
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
-    redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
+    throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
   }
 
   const dripListsPageQuery = gql`
@@ -26,6 +38,12 @@ export const load = async ({ fetch }) => {
       }
     }
   `;
+
+  const locallyCached = fetchedDataCache.read();
+
+  if (locallyCached) {
+    return locallyCached;
+  }
 
   const [votingRounds, dripListsRes] = await Promise.all([
     await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
@@ -47,9 +65,10 @@ export const load = async ({ fetch }) => {
     splits: votingRoundsSplits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)] ?? [],
   }));
 
-  if (!connectedAddress) {
-    return error(401, 'Unauthorized');
-  }
+  fetchedDataCache.write({
+    dripLists: dripListsRes.dripLists,
+    votingRounds: votingRoundsWithSplits,
+  });
 
   return { dripLists: dripListsRes.dripLists, votingRounds: votingRoundsWithSplits };
 };
