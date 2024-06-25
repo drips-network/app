@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-  import type { ProjectBadgeFragment } from '$lib/components/project-badge/__generated__/gql.generated';
   import { gql } from 'graphql-request';
 
   export const PROJECTS_LISTINGS_ITEM_FRAGMENT = gql`
@@ -59,13 +58,14 @@
   import Section from '$lib/components/section/section.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
-  import ProjectBadgeCell from '$lib/components/table/cells/project-badge.cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { goto } from '$app/navigation';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge, {
+    PROJECT_BADGE_FRAGMENT,
+  } from '$lib/components/project-badge/project-badge.svelte';
   import { dripListIcon, projectIcon, addressIcon } from '$lib/components/pile/pile-presets';
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
@@ -74,7 +74,7 @@
 
   export let data: PageData;
   interface ProjectsTableRow {
-    badge: ProjectBadgeFragment;
+    badge: ComponentProps<ProjectBadge>;
     supportersPile: ComponentProps<Pile>;
     dependenciesPile: ComponentProps<Pile>;
   }
@@ -82,7 +82,10 @@
   const projectsTableData: ProjectsTableRow[] = data.content.projects
     .map((project) => {
       return {
-        badge: project,
+        badge: {
+          project,
+          tooltip: false,
+        },
         dependenciesPile: {
           maxItems: 4,
           components:
@@ -131,7 +134,7 @@
     {
       accessorKey: 'badge',
       header: 'Name',
-      cell: () => ProjectBadgeCell,
+      cell: () => ProjectBadge,
       enableSorting: false,
       size: (100 / 24) * 11,
     },

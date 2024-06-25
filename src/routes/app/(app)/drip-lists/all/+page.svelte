@@ -61,14 +61,14 @@
   import type { ComponentProps } from 'svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import IdentityBadgeCell from '$lib/components/table/cells/identity-badge-cell.svelte';
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let data: PageData;
 
   interface TableRow {
     badge: ComponentProps<DripListBadge> & { dripList: DripListBadgeFragment };
-    owner: string;
+    owner: ComponentProps<IdentityBadge>;
     recipientsPile: ComponentProps<Pile>;
     supportersPile: ComponentProps<Pile>;
   }
@@ -77,7 +77,9 @@
     .map((dripList) => {
       return {
         badge: { dripList, showAvatar: false, showOwner: false },
-        owner: dripList.owner.address,
+        owner: {
+          address: dripList.owner.address,
+        },
         recipientsPile: {
           maxItems: 4,
           components: mapFilterUndefined(dripList.splits, (s) => {
@@ -122,9 +124,9 @@
     {
       accessorKey: 'owner',
       header: 'Owner',
-      cell: () => IdentityBadgeCell,
+      cell: () => IdentityBadge,
       enableSorting: false,
-      size: (100 / 24) * 4,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'recipientsPile',
