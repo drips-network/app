@@ -64,7 +64,6 @@ export default function getSupportersPile(support: DripListCardSupporterPileFrag
               project: s.project,
               outline: true,
               size: 'tiny',
-              isLinked: false,
             },
           };
         case 'OneTimeDonationSupport':
