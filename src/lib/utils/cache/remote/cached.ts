@@ -1,4 +1,4 @@
-import type { RedisClientType } from '../../routes/api/redis';
+import type { RedisClientType } from '../../../../routes/api/redis';
 
 /**
  * Caches the result of a fetcher function using Redis.

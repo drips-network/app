@@ -17,9 +17,9 @@ import type { FeaturedDripListQueryVariables } from './__generated__/gql.generat
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { PUBLIC_NETWORK } from '$env/static/public';
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';
-import cached from '$lib/utils/cached.js';
-import queryCacheKey from '$lib/utils/query-cache-key.js';
 import { redis } from '../../api/redis.js';
+import cached from '$lib/utils/cache/remote/cached';
+import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 
 const FEATURED_DRIP_LISTS =
   {

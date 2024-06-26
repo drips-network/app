@@ -7,11 +7,11 @@ import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generate
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
-import queryCacheKey from '$lib/utils/query-cache-key';
-import cached from '$lib/utils/cached';
 import { redis } from '../../../../../../../api/redis';
 import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 import { Forge } from 'radicle-drips';
+import cached from '$lib/utils/cache/remote/cached';
+import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`

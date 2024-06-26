@@ -4,8 +4,8 @@ import type { RequestHandler } from './$types';
 import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
 import { env } from '$env/dynamic/private';
-import cached from '$lib/utils/cached';
 import { redis } from '../../redis';
+import cached from '$lib/utils/cache/remote/cached';
 
 const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
