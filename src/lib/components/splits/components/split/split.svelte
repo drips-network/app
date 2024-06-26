@@ -211,7 +211,13 @@
           </button>
           {#if groupExpanded}
             <div transition:fade={{ duration: GROUP_EXPAND_DURATION }} class="members">
-              <SplitsListComponent {draft} {linkToNewTab} isGroup list={split.list} />
+              <SplitsListComponent
+                disableLinks={disableLink}
+                {draft}
+                {linkToNewTab}
+                isGroup
+                list={split.list}
+              />
             </div>
           {/if}
           <div class="cutoff-gradient" />

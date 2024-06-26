@@ -450,6 +450,7 @@
                 <ProjectBadge {project} />
                 <div class="pl-3.5 mt-2.5">
                   <SplitsComponent
+                    disableLinks={false}
                     list={[
                       {
                         __typename: 'SplitGroup',
