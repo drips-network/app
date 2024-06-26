@@ -110,7 +110,7 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
       ...project.support.map((support) => support.__typename === 'SupportGroup' ? unreachable() : support.account.accountId),
       ...isClaimed(project) ? project.splits.dependencies.map((dependency) => dependency.account.accountId) : [],
       ...isClaimed(project) ? project.splits.maintainers.map((maintainer) => maintainer.account.accountId) : [],
-      ...(isClaimed(project) ? [project.owner.account.accountId] : []),
+      ...(isClaimed(project) ? [project.owner.accountId] : []),
     ];
 
     console.log('invalidateProjectCache', { project, accountIdsToClear })
