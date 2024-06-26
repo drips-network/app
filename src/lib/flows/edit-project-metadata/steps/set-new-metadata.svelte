@@ -39,6 +39,9 @@
   import type { LatestVersion } from '@efstajas/versioned-parser';
   import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import { Utils } from 'radicle-drips';
+  import { waitForAccountMetadata } from '$lib/utils/ipfs';
+  import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -58,9 +61,9 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const currentMetadata = (
-            await metadataManager.fetchAccountMetadata(project.account.accountId)
-          )?.data;
+          const { accountId } = project.account;
+
+          const currentMetadata = (await metadataManager.fetchAccountMetadata(accountId))?.data;
           assert(currentMetadata, 'No metadata found for account');
 
           const upgraded = metadataManager.upgradeAccountMetadata(currentMetadata);
@@ -93,15 +96,18 @@
 
           const txFactory = await getRepoDriverTxFactory();
 
-          const tx = await txFactory.emitAccountMetadata(
-            project.account.accountId,
-            accountMetadataAsBytes,
-          );
+          const tx = await txFactory.emitAccountMetadata(accountId, accountMetadataAsBytes);
 
-          return { tx };
+          return { tx, ipfsHash, accountId };
         },
 
         transactions: ({ tx }) => [{ transaction: tx, applyGasBuffer: false }],
+
+        after: async (_, { accountId, ipfsHash }) => {
+          await waitForAccountMetadata(accountId, ipfsHash);
+          await invalidateAccountCache(accountId);
+          await invalidateAll();
+        },
       }),
     );
   }
