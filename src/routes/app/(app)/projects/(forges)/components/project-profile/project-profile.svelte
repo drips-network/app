@@ -24,6 +24,7 @@
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
     ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
     ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
+    ${SUPPORTER_PILE_FRAGMENT}
     fragment ProjectProfile on Project {
       ...UnclaimedProjectCard
       ...ProjectProfileHeader
@@ -35,6 +36,7 @@
         }
         support {
           ...SupportersSectionSupportItem
+          ...SupporterPile
         }
         withdrawableBalances {
           ...MergeWithdrawableBalances
@@ -50,6 +52,7 @@
         }
         support {
           ...SupportersSectionSupportItem
+          ...SupporterPile
         }
         totalEarned {
           tokenAddress
@@ -103,7 +106,6 @@
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import { AddressDriverClient } from 'radicle-drips';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
@@ -114,6 +116,9 @@
   import mergeWithdrawableBalances, {
     MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
   } from '$lib/utils/merge-withdrawable-balances';
+  import getSupportersPile, {
+    SUPPORTER_PILE_FRAGMENT,
+  } from '$lib/components/drip-list-card/methods/get-supporters-pile';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -163,41 +168,6 @@
           return {
             component: DripListAvatar,
             props: { outline: true, isLinked: false },
-          };
-        default:
-          return undefined;
-      }
-    });
-  }
-
-  function getSupportersPile(supportTable: ProjectProfile_ClaimedProject_Fragment['support'][]) {
-    const support = supportTable.flat();
-
-    return mapFilterUndefined(support, (v) => {
-      switch (v.__typename) {
-        case 'OneTimeDonationSupport':
-          return {
-            component: IdentityBadge,
-            props: {
-              address: AddressDriverClient.getUserAddress(v.account.accountId),
-              showIdentity: false,
-              size: 'medium',
-            },
-          };
-        case 'ProjectSupport':
-          return {
-            component: ProjectAvatar,
-            props: {
-              project: v.project,
-              outline: true,
-            },
-          };
-        case 'DripListSupport':
-          return {
-            component: DripListAvatar,
-            props: {
-              outline: true,
-            },
           };
         default:
           return undefined;
@@ -382,7 +352,7 @@
               on:click={() => supportersSectionSkeleton?.highlightSection()}
             >
               <KeyValuePair key="Supporters">
-                <Pile maxItems={4} components={getSupportersPile([project.support ?? []])} />
+                <Pile maxItems={4} components={getSupportersPile(project.support)} />
               </KeyValuePair>
             </a>
           {/if}

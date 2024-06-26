@@ -7,11 +7,10 @@
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
-    ${DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT}
+    ${SUPPORTER_PILE_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
       ...EditDripListStepSelectedDripList
-      ...DripListCardSupporterPile
       name
       account {
         accountId
@@ -36,6 +35,7 @@
         amount
       }
       support {
+        ...SupporterPile
         ... on StreamSupport {
           stream {
             timeline {
@@ -77,9 +77,7 @@
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import type { DripListCardFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
-  import getSupportersPile, {
-    DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
-  } from './methods/get-supporters-pile';
+  import getSupportersPile, { SUPPORTER_PILE_FRAGMENT } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
@@ -134,7 +132,7 @@
   $: title = (dripList?.name || votingRound?.name) ?? unreachable();
   $: description = (dripList?.description || votingRound?.description) ?? '';
 
-  $: supportersPile = dripList && getSupportersPile(dripList.support);
+  $: supportersPile = dripList && getSupportersPile(dripList.support, 'tiny');
 
   function triggerEditModal() {
     if (!dripList) return;
