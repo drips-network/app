@@ -16,6 +16,7 @@
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import { browser } from '$app/environment';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -194,17 +195,19 @@
             <div class="pile" bind:this={groupPileElem}>
               <Pile transitionedOut={groupExpanded} components={getPileComponents(split.list)} />
             </div>
-            <div class="label" style:transform="translateX({$groupNameOffset}px)">
-              <div class="typo-header-4">{split.name}</div>
-              {#if split.list.length > 0 && groupsExpandable}
-                <div
-                  class="chevron"
-                  style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 90deg)' : ''}
-                >
-                  <ChevronRight />
-                </div>
-              {/if}
-            </div>
+            {#if browser}
+              <div in:fade class="label" style:transform="translateX({$groupNameOffset}px)">
+                <div class="typo-header-4">{split.name}</div>
+                {#if split.list.length > 0 && groupsExpandable}
+                  <div
+                    class="chevron"
+                    style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 90deg)' : ''}
+                  >
+                    <ChevronRight />
+                  </div>
+                {/if}
+              </div>
+            {/if}
             <div class="label placeholder" aria-hidden="true">
               <div class="typo-header-4">{split.name}</div>
             </div>
