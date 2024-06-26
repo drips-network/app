@@ -1,11 +1,18 @@
 import { redis, type RedisClientType } from '../../redis';
 import assert from '$lib/utils/assert';
-import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import { Utils } from 'radicle-drips';
-import type { AssociatedAccountIdsQuery, AssociatedAccountIdsQueryVariables } from './__generated__/gql.generated';
-import unreachable from '$lib/utils/unreachable';
 import isClaimed from '$lib/utils/project/is-claimed';
+import type {
+  DripListAssociatedAccountIdsQuery,
+  DripListAssociatedAccountIdsQueryVariables,
+  ProjectAssociatedAccountIdsQuery,
+  ProjectAssociatedAccountIdsQueryVariables,
+} from './queries/__generated__/gql.generated';
+import {
+  dripListAssociatedAccountIdsQuery,
+  projectAssociatedAccountIdsQuery,
+} from './queries/associated-account-ids-queries';
 
 async function invalidateAccountCache(accountId: string, client: RedisClientType) {
   if (!client) return;
@@ -18,116 +25,66 @@ async function invalidateAccountCache(accountId: string, client: RedisClientType
 }
 
 async function invalidateProjectCache(projectAccountId: string, client: RedisClientType) {
-  const associatedAccountIdsQuery = gql`
-    query AssociatedAccountIds($projectAccountId: ID!) {
-      projectById(id: $projectAccountId) {
-        ... on ClaimedProject {
-          owner {
-            accountId
-          }
-          support {
-            ... on ProjectSupport {
-              account {
-                accountId
-              }
-            }
-            ... on DripListSupport {
-              account {
-                accountId
-              }
-            }
-            ... on OneTimeDonationSupport {
-              account {
-                accountId
-              }
-            }
-            ... on StreamSupport {
-              account {
-                accountId
-              }
-            }
-          }
-          splits {
-            dependencies {
-              ... on AddressReceiver {
-                account {
-                  accountId
-                }
-              }
-              ... on ProjectReceiver {
-                account {
-                  accountId
-                }
-              }
-              ... on DripListReceiver {
-                account {
-                  accountId
-                }
-              }
-            }
-            maintainers {
-              account {
-                accountId
-              }
-            }
-          }
-        }
-        ... on UnclaimedProject {
-          support {
-            ... on ProjectSupport {
-              account {
-                accountId
-              }
-            }
-            ... on DripListSupport {
-              account {
-                accountId
-              }
-            }
-            ... on OneTimeDonationSupport {
-              account {
-                accountId
-              }
-            }
-            ... on StreamSupport {
-              account {
-                accountId
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  const associatedAccountIds = await query<AssociatedAccountIdsQuery, AssociatedAccountIdsQueryVariables>(associatedAccountIdsQuery, { projectAccountId }, fetch);
-
+  const associatedAccountIds = await query<
+    ProjectAssociatedAccountIdsQuery,
+    ProjectAssociatedAccountIdsQueryVariables
+  >(projectAssociatedAccountIdsQuery, { projectAccountId }, fetch);
   const project = associatedAccountIds.projectById;
 
   if (project) {
     const accountIdsToClear = [
       projectAccountId,
-      ...project.support.map((support) => support.__typename === 'SupportGroup' ? unreachable() : support.account.accountId),
-      ...isClaimed(project) ? project.splits.dependencies.map((dependency) => dependency.account.accountId) : [],
-      ...isClaimed(project) ? project.splits.maintainers.map((maintainer) => maintainer.account.accountId) : [],
+      ...project.support.map((support) => support.account.accountId),
+      ...(isClaimed(project)
+        ? project.splits.dependencies.map((dependency) => dependency.account.accountId)
+        : []),
+      ...(isClaimed(project)
+        ? project.splits.maintainers.map((maintainer) => maintainer.account.accountId)
+        : []),
       ...(isClaimed(project) ? [project.owner.accountId] : []),
     ];
 
-    console.log('invalidateProjectCache', { project, accountIdsToClear })
+    console.log('invalidateProjectCache', { project, accountIdsToClear });
 
     await Promise.all(
       accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
     );
   } else {
-    console.log('invalidateProjectCache', { project, accountIdsToClear: [projectAccountId] })
+    console.log('invalidateProjectCache', { project, accountIdsToClear: [projectAccountId] });
 
     await invalidateAccountCache(projectAccountId, client);
   }
 }
 
+async function invalidateDripListCache(dripListAccountId: string, client: RedisClientType) {
+  const associatedAccountIds = await query<
+    DripListAssociatedAccountIdsQuery,
+    DripListAssociatedAccountIdsQueryVariables
+  >(dripListAssociatedAccountIdsQuery, { dripListAccountId }, fetch);
+  const { dripList } = associatedAccountIds;
+
+  if (dripList) {
+    const accountIdsToClear = [
+      dripListAccountId,
+      dripList.owner.accountId,
+      ...dripList.support.map((support) => support.account.accountId),
+      ...dripList.splits.map((split) => split.account.accountId),
+    ];
+
+    console.log('invalidateDripListCache', { dripList, accountIdsToClear });
+
+    await Promise.all(
+      accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
+    );
+  } else {
+    console.log('invalidateDripListCache', { dripList, accountIdsToClear: [dripListAccountId] });
+
+    await invalidateAccountCache(dripListAccountId, client);
+  }
+}
+
 export const POST = async ({ request }) => {
   const accountIds = await request.json();
-  console.log('POST invalidate-account-ids', accountIds)
   assert(Array.isArray(accountIds), 'Invalid account ids');
 
   accountIds.forEach((accountId) => {
@@ -138,8 +95,11 @@ export const POST = async ({ request }) => {
     accountIds.map((accountId) => {
       const driver = Utils.AccountId.getDriver(accountId);
 
-      if (driver === 'repo') {
-        return invalidateProjectCache(accountId, redis);
+      switch (driver) {
+        case 'repo':
+          return invalidateProjectCache(accountId, redis);
+        case 'nft':
+          return invalidateDripListCache(accountId, redis);
       }
     }),
   );
