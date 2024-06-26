@@ -71,10 +71,12 @@
   import Pile from '$lib/components/pile/pile.svelte';
   import type { ComponentProps } from 'svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import type { ProjectsListingsItemFragment } from './__generated__/gql.generated';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   export let data: PageData;
   interface ProjectsTableRow {
-    badge: ComponentProps<ProjectBadge>;
+    badge: { project: ProjectsListingsItemFragment };
     supportersPile: ComponentProps<Pile>;
     dependenciesPile: ComponentProps<Pile>;
   }
@@ -162,7 +164,10 @@
   ];
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
-    const source = projectsTableData[event.detail.rowIndex].badge.source;
+    const { project } = projectsTableData[event.detail.rowIndex].badge;
+    if (!isClaimed(project)) return;
+
+    const { source } = project;
     goto(buildProjectUrl(source.forge, source.ownerName, source.repoName, true));
   }
 </script>
