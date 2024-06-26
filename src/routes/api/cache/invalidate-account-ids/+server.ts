@@ -127,13 +127,12 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
 
 export const POST = async ({ request }) => {
   const accountIds = await request.json();
+  console.log('POST invalidate-account-ids', accountIds)
   assert(Array.isArray(accountIds), 'Invalid account ids');
 
   accountIds.forEach((accountId) => {
     assert(/^[0-9]+$/.test(accountId), `Invalid account ID: ${accountId}`);
   });
-
-  console.log('POST invalidate-account-ids', { accountIds} )
 
   await Promise.all(
     accountIds.map((accountId) => {
