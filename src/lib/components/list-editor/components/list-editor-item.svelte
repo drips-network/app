@@ -91,11 +91,11 @@
   <div class="left">
     <div class="inner">
       {#if item.type === 'project'}
-        <ProjectBadge project={item.project} />
+        <ProjectBadge linkTo={'nothing'} project={item.project} />
       {:else if item.type === 'address'}
-        <IdentityBadge size="medium" showFullAddress address={item.address} />
+        <IdentityBadge disableLink={true} size="medium" showFullAddress address={item.address} />
       {:else if item.type === 'drip-list'}
-        <DripListBadge dripList={item.dripList} />
+        <DripListBadge isLinked={false} dripList={item.dripList} />
       {/if}
     </div>
   </div>
