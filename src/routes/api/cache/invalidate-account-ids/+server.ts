@@ -44,14 +44,10 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
       ...(isClaimed(project) ? [project.owner.accountId] : []),
     ];
 
-    console.log('invalidateProjectCache', { project, accountIdsToClear });
-
     await Promise.all(
       accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
     );
   } else {
-    console.log('invalidateProjectCache', { project, accountIdsToClear: [projectAccountId] });
-
     await invalidateAccountCache(projectAccountId, client);
   }
 }
@@ -71,19 +67,17 @@ async function invalidateDripListCache(dripListAccountId: string, client: RedisC
       ...dripList.splits.map((split) => split.account.accountId),
     ];
 
-    console.log('invalidateDripListCache', { dripList, accountIdsToClear });
-
     await Promise.all(
       accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
     );
   } else {
-    console.log('invalidateDripListCache', { dripList, accountIdsToClear: [dripListAccountId] });
-
     await invalidateAccountCache(dripListAccountId, client);
   }
 }
 
 export const POST = async ({ request }) => {
+  if (!redis) return new Response('OK (no cache)');
+
   const accountIds = await request.json();
   assert(Array.isArray(accountIds), 'Invalid account ids');
 

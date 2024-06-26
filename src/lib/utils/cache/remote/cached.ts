@@ -19,11 +19,8 @@ export default async function cached<T extends Record<string, any>>(
   const cachedResponse = redis && (await redis.get(key));
 
   if (cachedResponse) {
-    console.log('HIT', key)
     return JSON.parse(cachedResponse) as Awaited<ReturnType<typeof fetcher>>;
   } else {
-    console.log('MISS', key)
-
     const data = await fetcher();
 
     await redis?.set(key, JSON.stringify(data), {
