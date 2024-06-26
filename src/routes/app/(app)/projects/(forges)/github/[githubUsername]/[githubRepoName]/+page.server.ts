@@ -7,6 +7,44 @@ import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generate
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
+import queryCacheKey from '$lib/utils/query-cache-key';
+import cached from '$lib/utils/cached';
+import { redis } from '../../../../../../../api/redis';
+import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
+import { Forge } from 'radicle-drips';
+
+async function fetchDripsProject(repoUrl: string) {
+  const getProjectsQuery = gql`
+    ${PROJECT_PROFILE_FRAGMENT}
+    query ProjectByUrl($url: String!) {
+      projectByUrl(url: $url) {
+        ...ProjectProfile
+      }
+    }
+  `;
+
+  const url = new URL(repoUrl);
+  const [, owner, repo] = url.pathname.split('/');
+
+  const repoDriverClient = await getRepoDriverClient();
+
+  const accountId = await repoDriverClient.getAccountId(Forge.GitHub, `${owner}/${repo}`);
+
+  const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
+
+  return await cached(
+    redis,
+    cacheKey,
+    172800,
+    () => query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
+      getProjectsQuery,
+      {
+        url: repoUrl,
+      },
+      fetch,
+    ),
+  )
+}
 
 export const load = (async ({ params, fetch, url }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
@@ -28,26 +66,11 @@ export const load = (async ({ params, fetch, url }) => {
 
   let repo: z.infer<typeof repoSchema>;
 
-  const getProjectsQuery = gql`
-    ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!) {
-      projectByUrl(url: $url) {
-        ...ProjectProfile
-      }
-    }
-  `;
-
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
   const [repoRes, projectRes] = await Promise.all([
-    await fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
-    await query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
-      getProjectsQuery,
-      {
-        url: repoUrl,
-      },
-      fetch,
-    ),
+    fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
+    fetchDripsProject(repoUrl),
   ]);
 
   const project = projectRes.projectByUrl;
