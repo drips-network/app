@@ -14,6 +14,9 @@
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import { waitForAccountMetadata } from '$lib/utils/ipfs';
+  import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -38,7 +41,7 @@
         before: async () => {
           const gitProjectService = await GitProjectService.new();
 
-          const batch = await gitProjectService.buildUpdateSplitsBatchTx(
+          const { batch, newMetadataHash } = await gitProjectService.buildUpdateSplitsBatchTx(
             $context.projectAccountId,
             $context.highLevelPercentages,
             $context.maintainerSplits,
@@ -50,6 +53,7 @@
 
           return {
             tx,
+            newMetadataHash,
           };
         },
 
@@ -59,6 +63,12 @@
             applyGasBuffer: false,
           },
         ],
+
+        after: async (_, { newMetadataHash }) => {
+          await waitForAccountMetadata($context.projectAccountId, newMetadataHash);
+          await invalidateAccountCache($context.projectAccountId);
+          await invalidateAll();
+        },
       }),
     );
   }

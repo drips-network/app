@@ -155,7 +155,7 @@ export default class GitProjectService {
     highLevelPercentages: { [slug: string]: number },
     maintainers: ListEditorConfig,
     dependencies: ListEditorConfig,
-  ): Promise<PopulatedTransaction[]> {
+  ): Promise<{ newMetadataHash: string; batch: PopulatedTransaction[] }> {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
     const {
@@ -196,7 +196,7 @@ export default class GitProjectService {
       accountMetadataAsBytes,
     );
 
-    return [setSplitsTx, emitAccountMetadataTx];
+    return { batch: [setSplitsTx, emitAccountMetadataTx], newMetadataHash: ipfsHash };
   }
 
   public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {

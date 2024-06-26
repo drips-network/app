@@ -110,9 +110,13 @@
   let groupPileElem: HTMLDivElement | undefined;
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
-  onMount(() => {
+  function alignGroupName() {
     groupNameOffset.set((groupPileElem?.offsetWidth ?? 0) + 8, { duration: 0 });
-  });
+  }
+
+  // Align group name on mount and when splits change
+  onMount(alignGroupName);
+  $: split && alignGroupName();
 
   async function toggleGroup() {
     if (!groupElem) return;
