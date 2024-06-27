@@ -22,23 +22,27 @@ export interface CustomTokenInfoWrapper {
 export type TokenInfoWrapper = DefaultTokenInfoWrapper | CustomTokenInfoWrapper;
 
 export default (() => {
-  const chainId = network.chainId;
-
+  let chainId = network.chainId;
   const tokenList = writable<TokenInfoWrapper[] | undefined>();
   const customTokensLoaded = browser;
 
-  const customTokens = browser
-    ? storedTokens.readCustomTokensList().filter((t) => t.info.chainId === chainId)
-    : [];
+  function init() {
+    chainId = network.chainId;
 
-  const defaultTokens: TokenInfoWrapper[] = DRIPS_DEFAULT_TOKEN_LIST.filter(
-    (t) => t.chainId === chainId,
-  ).map((t) => ({
-    info: t,
-    source: 'default',
-  }));
+    const customTokens = browser
+      ? storedTokens.readCustomTokensList().filter((t) => t.info.chainId === chainId)
+      : [];
 
-  tokenList.set([...defaultTokens, ...customTokens]);
+    const defaultTokens: TokenInfoWrapper[] = DRIPS_DEFAULT_TOKEN_LIST.filter(
+      (t) => t.chainId === chainId,
+    ).map((t) => ({
+      info: t,
+      source: 'default',
+    }));
+
+    tokenList.set([...defaultTokens, ...customTokens]);
+  }
+  init();
 
   /**
    * Retrieve token information for a given token by its address.
@@ -188,6 +192,7 @@ export default (() => {
   }
 
   return {
+    init,
     subscribe: tokenList.subscribe,
     customTokensLoaded,
     getByAddress,

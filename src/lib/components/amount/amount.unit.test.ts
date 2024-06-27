@@ -9,6 +9,12 @@ afterEach(() => {
   cleanup();
 });
 
+vi.mock('$lib/stores/wallet/network', () => ({
+  default: {
+    chainId: 1,
+  },
+}));
+
 describe('amount.svelte', () => {
   it('displays unknown token if the token address is unknown', () => {
     render(Amount, {
