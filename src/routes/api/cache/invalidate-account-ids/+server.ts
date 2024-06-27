@@ -14,7 +14,18 @@ import {
   projectAssociatedAccountIdsQuery,
 } from './queries/associated-account-ids-queries';
 
+const ENABLE_INVALIDATE_LOGS = true;
+
+function log(...content: unknown[]) {
+  if (ENABLE_INVALIDATE_LOGS) {
+    // eslint-disable-next-line no-console
+    console.log(...content);
+  }
+}
+
 async function invalidateAccountCache(accountId: string, client: RedisClientType) {
+  log('INVALIDATE ACCOUNT CACHE', { accountId });
+
   if (!client) return;
 
   const pattern = `*:${accountId}:*`;
@@ -25,6 +36,8 @@ async function invalidateAccountCache(accountId: string, client: RedisClientType
 }
 
 async function invalidateProjectCache(projectAccountId: string, client: RedisClientType) {
+  log('INVALIDATE PROJECT CACHE', { projectAccountId });
+
   const associatedAccountIds = await query<
     ProjectAssociatedAccountIdsQuery,
     ProjectAssociatedAccountIdsQueryVariables
@@ -53,6 +66,8 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
 }
 
 async function invalidateDripListCache(dripListAccountId: string, client: RedisClientType) {
+  log('INVALIDATE DRIP LIST CACHE', { dripListAccountId });
+
   const associatedAccountIds = await query<
     DripListAssociatedAccountIdsQuery,
     DripListAssociatedAccountIdsQueryVariables
@@ -79,6 +94,8 @@ export const POST = async ({ request }) => {
   if (!redis) return new Response('OK (no cache)');
 
   const accountIds = await request.json();
+  log('INVALIDATE ACCOUNT IDS', { accountIds });
+
   assert(Array.isArray(accountIds), 'Invalid account ids');
 
   accountIds.forEach((accountId) => {
