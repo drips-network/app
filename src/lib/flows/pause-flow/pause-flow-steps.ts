@@ -18,8 +18,7 @@ export default (stream: PauseFlowStreamFragment) => ({
       component: SuccessStep,
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
-        message:
-          'Your stream has been paused. You may need to refresh the app for your dashboard to update.',
+        message: 'Your stream has been paused.',
       },
     }),
   ],

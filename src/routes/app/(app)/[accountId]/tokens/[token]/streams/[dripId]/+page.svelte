@@ -102,7 +102,8 @@
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
 
   export let data: PageData;
-  const stream: StreamPageStreamFragment = data.stream;
+  let stream: StreamPageStreamFragment;
+  $: stream = data.stream;
 
   $: currentStreamAmounts = streamCurrentAmountsStore(
     stream.timeline,
