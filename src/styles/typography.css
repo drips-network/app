@@ -15,16 +15,6 @@
   src: url('/fonts/Inter-Regular.woff2');
 }
 
-@font-face {
-  font-family: 'SourceCodePro Bold';
-  src: url('fonts/SourceCodePro-Bold.otf');
-}
-
-@font-face {
-  font-family: 'SourceCodePro Regular';
-  src: url('fonts/SourceCodePro-Regular.otf');
-}
-
 :root {
   --typeface-bold: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
@@ -56,11 +46,6 @@
   --typeface-bold: Inter Bold, Helvetica, sans-serif;
   --typeface-medium: Inter SemiBold, Helvetica, sans-serif;
   --typeface-regular: Inter Regular, Helvetica, sans-serif;
-}
-
-[data-codefont='sourceCode'] {
-  --typeface-mono-bold: 'SourceCodePro Bold';
-  --typeface-mono-regular: 'SourceCodePro Regular';
 }
 
 h1,
