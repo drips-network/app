@@ -60,12 +60,12 @@
     "rehype-slug": "^6.0.0",
     "svelte": "^4.2.18",
     "svelte-check": "^3.8.1",
+    "svelte2tsx": "^0.7.10",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.0.0-alpha.20",
     "vite": "^5.3.1",
-    "vitest": "^1.6.0",
-    "svelte2tsx": "^0.7.10"
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "@apollo/client": "^3.10.5",
@@ -92,7 +92,7 @@
     "graphql-request": "^7.0.1",
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.21",
-    "radicle-drips": "github:radicle-dev/drips-js-sdk#efstajas-patch-1",
+    "radicle-drips": "github:drips-network/sdk",
     "redis": "^4.6.14",
     "sanitize-html": "^2.13.0",
     "satori": "^0.10.13",
