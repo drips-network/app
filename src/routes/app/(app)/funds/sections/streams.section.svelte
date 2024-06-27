@@ -129,6 +129,8 @@
     },
     token: {
       address: s.config.amountPerSecond.tokenAddress,
+      show: 'symbol',
+      size: 'small',
     },
     amount: {
       timeline: s.timeline,
@@ -147,6 +149,8 @@
     },
     token: {
       address: s.config.amountPerSecond.tokenAddress,
+      show: 'symbol',
+      size: 'small',
     },
     amount: {
       timeline: s.timeline,
