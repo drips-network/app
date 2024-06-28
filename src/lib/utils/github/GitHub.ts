@@ -56,7 +56,7 @@ export default class GitHub {
 
     const { address: expectedOwner } = get(walletStore);
 
-    if (fundingJsonOwner !== expectedOwner) {
+    if (fundingJsonOwner.toLowerCase() !== expectedOwner.toLowerCase()) {
       throw new Error('Invalid FUNDING.json file. Does it have the correct Ethereum address?');
     }
   }
