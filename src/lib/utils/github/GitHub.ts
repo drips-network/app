@@ -1,5 +1,8 @@
+import network from '$lib/stores/wallet/network';
+import walletStore from '$lib/stores/wallet/wallet.store';
 import type { Octokit } from '@octokit/rest';
 import { Buffer } from 'buffer';
+import { get } from 'svelte/store';
 
 export default class GitHub {
   private octokit: Octokit;
@@ -29,8 +32,7 @@ export default class GitHub {
     return this.getRepoByOwnerAndName(owner, repo);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async getFundingJson(owner: string, repo: string, template: string): Promise<any> {
+  public async verifyFundingJson(owner: string, repo: string): Promise<void> {
     const { data } = await this.octokit.repos
       .getContent({
         owner,
@@ -49,13 +51,13 @@ export default class GitHub {
 
     const fundingJson = JSON.parse(fileContent);
 
-    if (
-      JSON.stringify(fundingJson).replace(/\s/g, '').toLowerCase() !==
-      template.replace(/\s/g, '').toLowerCase()
-    ) {
+    const fundingJsonOwner =
+      fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name].ownedBy;
+
+    const { address: expectedOwner } = get(walletStore);
+
+    if (fundingJsonOwner !== expectedOwner) {
       throw new Error('Invalid FUNDING.json file. Does it have the correct Ethereum address?');
     }
-
-    return fundingJson;
   }
 }

@@ -70,18 +70,7 @@
 
         const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
 
-        await github.getFundingJson(
-          ownerName,
-          repoName,
-          dripsJsonTemplate(
-            $walletStore.address ?? unreachable(),
-            $walletStore.network.name
-              ? $walletStore.network.name === 'homestead'
-                ? 'ethereum'
-                : $walletStore.network.name
-              : unreachable(),
-          ),
-        );
+        await github.verifyFundingJson(ownerName, repoName);
 
         $context.linkedToRepo = true;
 
