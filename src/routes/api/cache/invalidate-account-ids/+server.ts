@@ -1,5 +1,4 @@
 import { redis, type RedisClientType } from '../../redis';
-import assert from '$lib/utils/assert';
 import query from '$lib/graphql/dripsQL';
 import { Utils } from 'radicle-drips';
 import isClaimed from '$lib/utils/project/is-claimed';
@@ -13,6 +12,7 @@ import {
   dripListAssociatedAccountIdsQuery,
   projectAssociatedAccountIdsQuery,
 } from './queries/associated-account-ids-queries';
+import { error } from '@sveltejs/kit';
 
 const ENABLE_INVALIDATE_LOGS = true;
 
@@ -96,7 +96,9 @@ export const POST = async ({ request }) => {
   const accountIds = await request.json();
   log('INVALIDATE ACCOUNT IDS', { accountIds });
 
-  assert(Array.isArray(accountIds), 'Invalid account ids');
+  if (!Array.isArray(accountIds)) {
+    throw error(400);
+  }
 
   const validAccountIds: string[] = accountIds.filter((v) => {
     if (typeof v === 'string' && /^[0-9]+$/.test(v)) {
@@ -106,6 +108,10 @@ export const POST = async ({ request }) => {
       return false;
     }
   });
+
+  // Process max 100 account ids. If there's more than that something must be wrong
+  // or it's some kind of script kiddie DOS attempt.
+  validAccountIds.splice(100);
 
   await Promise.all(
     validAccountIds.map((accountId) => {
