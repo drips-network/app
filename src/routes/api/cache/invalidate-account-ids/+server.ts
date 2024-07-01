@@ -98,12 +98,17 @@ export const POST = async ({ request }) => {
 
   assert(Array.isArray(accountIds), 'Invalid account ids');
 
-  accountIds.forEach((accountId) => {
-    assert(/^[0-9]+$/.test(accountId), `Invalid account ID: ${accountId}`);
+  const validAccountIds: string[] = accountIds.filter((v) => {
+    if (typeof v === 'string' && /^[0-9]+$/.test(v)) {
+      return true;
+    } else {
+      log('INVALID ACCOUNT ID', { accountId: v });
+      return false;
+    }
   });
 
   await Promise.all(
-    accountIds.map((accountId) => {
+    validAccountIds.map((accountId) => {
       const driver = Utils.AccountId.getDriver(accountId);
 
       switch (driver) {
