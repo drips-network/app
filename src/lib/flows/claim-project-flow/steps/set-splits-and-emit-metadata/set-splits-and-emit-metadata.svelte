@@ -15,6 +15,7 @@
   } from './__generated__/gql.generated';
   import expect from '$lib/utils/expect';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -74,6 +75,10 @@
             300000,
             2000,
           );
+
+          // Invalidate cached project page (if any). This should happen automatically, but without
+          // awaiting it here in addition, there could be a race condition. Better safe than sorry!
+          await invalidateAccountCache(projectId);
         },
       }),
     ),

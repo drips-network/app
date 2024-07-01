@@ -4,22 +4,18 @@ import {
   getCallerClient,
   getNFTDriverClient,
   getNFTDriverTxFactory,
-  getRepoDriverClient,
-  getSubgraphClient,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import {
   NFTDriverTxFactory,
   AddressDriverClient,
   Utils,
-  type StreamReceiverStruct,
   AddressDriverTxFactory,
   NFTDriverClient,
   ERC20TxFactory,
-  RepoDriverClient,
 } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { SplitsReceiverStruct, StreamConfig } from 'radicle-drips';
+import type { SplitsReceiverStruct } from 'radicle-drips';
 import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
@@ -28,7 +24,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
-import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { LatestVersion } from '@efstajas/versioned-parser';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type {
@@ -36,6 +32,7 @@ import type {
   MintedNftAccountsCountQueryVariables,
 } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
+import { buildStreamCreateBatchTx } from '../streams/streams';
 
 type AccountId = string;
 
@@ -58,14 +55,11 @@ export default class DripListService {
   private _owner!: Signer | undefined;
   private _ownerAddress!: Address | undefined;
   private _nftDriverClient!: NFTDriverClient | undefined;
-  private _repoDriverClient!: RepoDriverClient;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
-  private readonly _dripsSubgraphClient = getSubgraphClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   /**
@@ -75,7 +69,6 @@ export default class DripListService {
   public static async new(): Promise<DripListService> {
     const dripListService = new DripListService();
 
-    dripListService._repoDriverClient = await getRepoDriverClient();
     dripListService._addressDriverClient = await getAddressDriverClient();
 
     const { connected, signer } = get(wallet);
@@ -173,16 +166,13 @@ export default class DripListService {
       }
 
       const setStreamTx = await this._buildSetDripListStreamTxs(
-        salt,
         tokenAddress,
         listId,
         topUpAmount,
-        0n,
-        0n,
         amountPerSec,
       );
 
-      txs = [createDripListTx, setDripListSplitsTx, setStreamTx];
+      txs = [createDripListTx, setDripListSplitsTx, ...setStreamTx.batch];
     } else if (support?.type === 'one-time') {
       const { tokenAddress, donationAmount } = support;
 
@@ -325,8 +315,8 @@ export default class DripListService {
       BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
         ? 1
         : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-        ? -1
-        : 0,
+          ? -1
+          : 0,
     );
 
     return sortedReceivers;
@@ -350,61 +340,24 @@ export default class DripListService {
   }
 
   private async _buildSetDripListStreamTxs(
-    salt: bigint,
     token: Address,
     dripListId: AccountId,
     topUpAmount: bigint,
-    start: bigint,
-    duration: bigint,
     amountPerSec: bigint,
   ) {
-    assert(this._ownerAddress, `This function requires an active wallet connection.`);
+    assert(this._owner, `This function requires an active wallet connection.`);
 
-    const ownerAddressDriverAccountId = await this._addressDriverClient.getAccountIdByAddress(
-      this._ownerAddress,
-    );
-
-    const currentReceivers: StreamReceiverStruct[] =
-      await this._dripsSubgraphClient.getCurrentStreamsReceivers(
-        ownerAddressDriverAccountId,
-        token,
-        get(wallet).provider,
-      );
-
-    const config: StreamConfig = {
-      start,
-      duration,
-      amountPerSec,
-      dripId: BigInt(this._generateDripIdFromSalt(salt)),
-    };
-
-    const newReceivers: StreamReceiverStruct[] = [
-      ...currentReceivers,
+    return await buildStreamCreateBatchTx(
+      this._addressDriverClient,
+      this._owner,
       {
-        accountId: dripListId,
-        config: Utils.StreamConfiguration.toUint256(config),
+        tokenAddress: token,
+        amountPerSecond: amountPerSec,
+        recipientAccountId: dripListId,
+        name: undefined,
       },
-    ];
-
-    const setStreamTx = await this._addressDriverTxFactory.setStreams(
-      token,
-      currentReceivers,
       topUpAmount,
-      newReceivers,
-      0,
-      0,
-      this._ownerAddress,
-      /*
-      Dirty hack to disable the SDK's built-in gas estimation, because
-      it would fail if there's no token approval yet. See `top-up.ts`.
-
-      TODO: Introduce a more graceful method of disabling gas estimation.
-      */ { gasLimit: 1 },
     );
-
-    delete setStreamTx.gasLimit;
-
-    return setStreamTx;
   }
 
   private async _buildTokenApprovalTx(token: Address): Promise<PopulatedTransaction> {

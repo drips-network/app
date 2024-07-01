@@ -17,8 +17,8 @@
   </div>
   {#key value + symbol}
     <div
-      out:fly={{ duration: animateValueChanges ? 300 : 0, y: 8 }}
-      in:fly={{ duration: animateValueChanges ? 300 : 0, y: -8 }}
+      out:fly|global={{ duration: animateValueChanges ? 300 : 0, y: 8 }}
+      in:fly|global={{ duration: animateValueChanges ? 300 : 0, y: -8 }}
       class="value"
     >
       <p class="typo-text tabular-nums">{value}</p>

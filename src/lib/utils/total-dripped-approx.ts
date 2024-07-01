@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import cached from './cached';
+import cached from './cache/remote/cached';
 import { getAddress } from 'ethers/lib/utils';
 import isTest from './is-test';
 import type { RedisClientType } from '../../routes/api/redis';

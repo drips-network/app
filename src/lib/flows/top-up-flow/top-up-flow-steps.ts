@@ -25,7 +25,7 @@ function getSuccessMessage(state: TopUpFlowState) {
 
   return `
     Youʼve successfully topped up ${formattedAmount} ${tokenInfo.info.name}.
-    It may take some time for your balance to update on your dashboard.
+    You may need to refresh the app for your balance to update on your dashboard.
   `;
 }
 

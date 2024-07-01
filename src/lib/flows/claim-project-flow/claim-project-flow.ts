@@ -12,8 +12,8 @@ import ProjectSlot from './slots/project-slot.svelte';
 import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
-import Review, { REVIEW_STEP_PROJECT_FRAGMENT } from './steps/review/review.svelte';
-import PollSubgraph from './steps/poll-subgraph/poll-subgraph.svelte';
+import Review, { REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT } from './steps/review/review.svelte';
+import PollApi from './steps/poll-api/poll-api.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
@@ -25,22 +25,19 @@ import type { Items, Weights } from '$lib/components/list-editor/types';
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
   ${ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT}
-  ${REVIEW_STEP_PROJECT_FRAGMENT}
+  ${REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT}
   fragment ClaimProjectFlowProject on Project {
     ...EnterGitUrlStepProject
     ...AddEthereumAddressStepProject
-    ...ReviewStepProject
+    ... on UnclaimedProject {
+      ...ReviewStepUnclaimedProject
+    }
   }
 `;
 
 interface ListEditorConfig {
   items: Items;
   weights: Weights;
-}
-
-interface Amount {
-  tokenAddress: string;
-  amount: bigint;
 }
 
 export interface State {
@@ -54,12 +51,6 @@ export interface State {
         forkCount: number;
         description?: string | undefined;
         defaultBranch: string | undefined;
-      }
-    | undefined;
-  unclaimedFunds:
-    | {
-        splittable: Amount[];
-        collectable: Amount[];
       }
     | undefined;
   highLevelPercentages: { [key: string]: number };
@@ -85,7 +76,6 @@ export const state = () =>
     gitUrl: '',
     project: undefined,
     projectMetadata: undefined,
-    unclaimedFunds: undefined,
     highLevelPercentages: { maintainers: 60, dependencies: 40 },
     maintainerSplits: {
       items: {},
@@ -192,7 +182,7 @@ export const steps = (
     },
   }),
   makeStep({
-    component: PollSubgraph,
+    component: PollApi,
     props: undefined,
   }),
   makeStep({

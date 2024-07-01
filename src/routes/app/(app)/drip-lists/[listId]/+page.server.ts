@@ -1,6 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
@@ -25,12 +24,12 @@ export const load = (async ({ params, fetch }) => {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      throw error(404);
+      error(404);
     }
 
     // If the voting round has already been linked to a Drip List, we forward to the respective Drip List ID.
     if (votingRound.status === 'Linked') {
-      throw redirect(301, `/app/drip-lists/${votingRound.dripListId}`);
+      redirect(301, `/app/drip-lists/${votingRound.dripListId}`);
     }
 
     if (votingRound.result) {
@@ -77,15 +76,13 @@ export const load = (async ({ params, fetch }) => {
   const fetches = await Promise.all([
     query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch),
     getVotingRoundForList(listId),
-    getIncomingSplitTotal(listId),
   ] as const);
 
-  if (!fetches[0]?.dripList && !fetches[1]) throw error(404);
+  if (!fetches[0]?.dripList && !fetches[1]) error(404);
 
   return {
     dripList: fetches[0].dripList,
     votingRounds: fetches[1],
-    incomingSplitsTotal: fetches[2],
     blockWhileInitializing: false,
   };
 }) satisfies PageServerLoad;

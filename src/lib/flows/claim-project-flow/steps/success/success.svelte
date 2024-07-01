@@ -7,7 +7,6 @@
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import buildUrl from '$lib/utils/build-url';
-  import balancesStore from '$lib/stores/balances/balances.store';
   import assert from '$lib/utils/assert';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { createEventDispatcher } from 'svelte';
@@ -30,14 +29,14 @@
 
     const collectedFunds =
       mergeAmounts(
-        $context.unclaimedFunds?.collectable ?? [],
-        $context.unclaimedFunds?.splittable ?? [],
+        $context.project?.withdrawableBalances.map((wb) => ({
+          tokenAddress: wb.tokenAddress,
+          amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
+        })) ?? [],
       ).length > 0;
 
     const ownAccountId = $walletStore.dripsAccountId;
     assert(ownAccountId);
-
-    await balancesStore.updateBalances($walletStore.dripsAccountId);
 
     await goto(
       buildUrl(

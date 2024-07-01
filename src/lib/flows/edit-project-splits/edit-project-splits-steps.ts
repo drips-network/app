@@ -24,6 +24,7 @@ export const EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT = gql`
   fragment EditProjectSplitsFlowAddressReceiver on AddressReceiver {
     weight
     account {
+      accountId
       address
     }
   }
@@ -98,7 +99,7 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
 function extractAccountId(input: SplitReceiver) {
   switch (input.__typename) {
     case 'AddressReceiver':
-      return input.account.address;
+      return input.account.accountId;
     case 'DripListReceiver':
       return input.dripList.account.accountId;
     case 'ProjectReceiver':
@@ -176,8 +177,7 @@ export default (projectAccountId: string, projectSourceUrl: string, splits: Spli
       component: SuccessStep,
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
-        message:
-          'Your Project Splits have been updated sucessfully. Please refresh your dashboard to see the changes.',
+        message: "Your project's splits have been updated sucessfully.",
       },
     }),
   ],

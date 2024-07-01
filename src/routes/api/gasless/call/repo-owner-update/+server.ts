@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const body = await request.text();
     payload = payloadSchema.parse(JSON.parse(body));
   } catch {
-    throw error(400, 'Invalid payload');
+    error(400, 'Invalid payload');
   }
 
   const { forge, projectName, chainId } = payload;
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
   );
 
   const relayRequest: SponsoredCallRequest = {
-    chainId: chainId,
+    chainId: BigInt(chainId),
     target: tx.to ?? unreachable(),
     data: tx.data ?? unreachable(),
   };

@@ -2,8 +2,8 @@ import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
-import cached from '$lib/utils/cached';
 import { redis } from '../../redis';
+import cached from '$lib/utils/cache/remote/cached';
 
 const cmcResponseSchema = z.object({
   data: z.array(
@@ -57,6 +57,7 @@ export const GET: RequestHandler = async () => {
   return new Response(JSON.stringify(idMap), {
     headers: {
       'content-type': 'application/json',
+      'cache-control': 'public, max-age=43200',
     },
   });
 };

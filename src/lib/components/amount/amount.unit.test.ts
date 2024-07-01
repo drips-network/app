@@ -1,4 +1,3 @@
-import tokens from '$lib/stores/tokens';
 import { cleanup, render, screen } from '@testing-library/svelte';
 import Amount from './amount.svelte';
 
@@ -6,13 +5,15 @@ vi.mock('$app/environment', () => ({
   browser: true,
 }));
 
-beforeAll(() => {
-  tokens.connect(1);
-});
-
 afterEach(() => {
   cleanup();
 });
+
+vi.mock('$lib/stores/wallet/network', () => ({
+  default: {
+    chainId: 1,
+  },
+}));
 
 describe('amount.svelte', () => {
   it('displays unknown token if the token address is unknown', () => {

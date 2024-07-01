@@ -50,11 +50,7 @@
     </div>
   </div>
 {:else if nonFatalAdvisories[0]}
-  <div
-    class="non-fatal-error"
-    in:fly|local={{ duration: 300, y: 16 }}
-    out:fly|local={{ duration: 300, y: 16 }}
-  >
+  <div class="non-fatal-error" in:fly={{ duration: 300, y: 16 }} out:fly={{ duration: 300, y: 16 }}>
     <LargeEmptyState
       headline={nonFatalAdvisories[0].headline}
       description={nonFatalAdvisories[0].description}

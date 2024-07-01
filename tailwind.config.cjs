@@ -4,35 +4,35 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'xs': '440px', /* just above most phones in portrait-mode */
-        'sm': '540px',
-        'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
+        xs: '440px' /* just above most phones in portrait-mode */,
+        sm: '540px',
+        mouse: { raw: '(hover:hover)' }, // targets only browser with mouse hover
       },
       colors: {
-        'primary': 'var(--color-primary)',
+        primary: 'var(--color-primary)',
         'primary-level-1': 'var(--color-primary-level-1)',
         'primary-level-2': 'var(--color-primary-level-2)',
         'primary-level-6': 'var(--color-primary-level-6)',
-        'positive': 'var(--color-positive)',
+        positive: 'var(--color-positive)',
         'positive-level-1': 'var(--color-positive-level-1)',
         'positive-level-2': 'var(--color-positive-level-2)',
         'positive-level-6': 'var(--color-positive-level-6)',
-        'caution': 'var(--color-caution)',
+        caution: 'var(--color-caution)',
         'caution-level-1': 'var(--color-caution-level-1)',
         'caution-level-2': 'var(--color-caution-level-2)',
         'caution-level-6': 'var(--color-caution-level-6)',
-        'negative': 'var(--color-negative)',
+        negative: 'var(--color-negative)',
         'negative-level-1': 'var(--color-negative-level-1)',
         'negative-level-2': 'var(--color-negative-level-2)',
         'negative-level-6': 'var(--color-negative-level-6)',
-        'foreground': 'var(--color-foreground)',
+        foreground: 'var(--color-foreground)',
         'foreground-level-1': 'var(--color-foreground-level-1)',
         'foreground-level-2': 'var(--color-foreground-level-2)',
         'foreground-level-3': 'var(--color-foreground-level-3)',
         'foreground-level-4': 'var(--color-foreground-level-4)',
         'foreground-level-5': 'var(--color-foreground-level-5)',
         'foreground-level-6': 'var(--color-foreground-level-6)',
-        'background': 'var(--color-background)',
+        background: 'var(--color-background)',
       },
       fontFamily: {
         mono: 'var(--typeface-mono-regular), monospace',
@@ -53,13 +53,13 @@ module.exports = {
         'drip-xl': '1.5rem 0 1.5rem 1.5rem',
       },
       boxShadow: {
-        'low': 'var(--elevation-low)',
-        'md': 'var(--elevation-medium)',
-        'hi': 'var(--elevation-high)',
+        low: 'var(--elevation-low)',
+        md: 'var(--elevation-medium)',
+        hi: 'var(--elevation-high)',
       },
       translate: {
-        '2px': '2px'
-      }
+        '2px': '2px',
+      },
     },
   },
   plugins: [],

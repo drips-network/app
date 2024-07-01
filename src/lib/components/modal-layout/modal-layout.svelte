@@ -27,17 +27,18 @@
 {#if store.overlay !== null}
   <FocusTrap enabled={store.focusTrapped} containers={new Set([modalContainer])} />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="overlay"
-      transition:fade|local={{ duration: 200 }}
+      transition:fade={{ duration: 200 }}
       on:click={clickOutside}
       on:keydown={clickOutside}
     />
     <div class="content">
       <div
         class="modal-wrapper"
-        in:scale={{ start: 0.97, duration: 300, delay: 150 }}
-        out:scale={{ start: 0.97, duration: 200 }}
+        in:scale|global={{ start: 0.97, duration: 300, delay: 150 }}
+        out:scale|global={{ start: 0.97, duration: 200 }}
       >
         <Modal>
           <svelte:component
@@ -47,7 +48,7 @@
           {#if store.hideable}
             <div class="close-button-wrapper">
               <button
-                transition:fly|local={{ duration: 200, y: -4, x: 4 }}
+                transition:fly={{ duration: 200, y: -4, x: 4 }}
                 class="close-button"
                 on:click={modal.hide}
               >
@@ -108,7 +109,9 @@
     background-color: var(--color-background);
     border-right: none;
     border-top: none;
-    transition: border 0.3s, box-shadow 0.3s;
+    transition:
+      border 0.3s,
+      box-shadow 0.3s;
     display: flex;
     justify-content: center;
     align-items: center;

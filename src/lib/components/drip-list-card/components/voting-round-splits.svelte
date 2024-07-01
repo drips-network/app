@@ -13,9 +13,9 @@
 </script>
 
 <TransitionedHeight transitionHeightChanges>
-  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade|local>
+  <div class="results" style:min-height={!votingRound.result ? '16rem' : undefined} out:fade>
     {#if !votingRound.result && $status === 'Started'}
-      <div class="empty-state" in:fade|local>
+      <div class="empty-state" in:fade>
         <Emoji emoji="🗳️" size="huge" />
         <h4>Awaiting votes</h4>
         {#if votingRound.areVotesPrivate}
@@ -25,13 +25,13 @@
         {/if}
       </div>
     {:else if (!votingRound.result || votingRound.result?.length === 0) && $status === 'Completed'}
-      <div class="empty-state" in:fade|local>
+      <div class="empty-state" in:fade>
         <Emoji emoji="🫙" size="huge" />
         <h4>No recipients</h4>
         <p>No collaborators voted.</p>
       </div>
     {:else if votingRound.splits}
-      <div class="splits" in:fade|local>
+      <div class="splits" in:fade>
         <Splits draft list={votingRound.splits} {maxRows} />
       </div>
     {/if}

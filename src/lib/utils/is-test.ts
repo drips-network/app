@@ -1,5 +1,7 @@
-import { env } from '$env/dynamic/public';
+import getOptionalEnvVar from './get-optional-env-var/public';
 
 export default function isTest(): boolean {
-  return env?.PUBLIC_TEST_MODE === 'true' || import.meta.env.VITE_TEST_MODE === 'true';
+  return (
+    getOptionalEnvVar('PUBLIC_TEST_MODE') === 'true' || import.meta.env.VITE_TEST_MODE === 'true'
+  );
 }

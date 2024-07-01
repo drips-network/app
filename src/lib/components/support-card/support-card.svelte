@@ -63,7 +63,6 @@
     ADD_DRIP_LIST_MEMBER_FLOW_PROJECT_TO_ADD_FRAGMENT,
   } from '$lib/flows/edit-drip-list/add-member/add-drip-list-member-steps';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
   import type {
@@ -81,6 +80,7 @@
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import SupportButtons from './components/support-buttons.svelte';
   import { BASE_URL } from '$lib/utils/base-url';
+  import awaitStoreValue from '$lib/utils/await-store-value';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -96,11 +96,6 @@
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
-  $: isOwner =
-    $walletStore.connected &&
-    (dripList?.owner.accountId === $walletStore.dripsAccountId ||
-      (project && isClaimed(project) && $walletStore.dripsAccountId === project?.owner?.accountId));
-
   let supportUrl: string;
   $: {
     if (project) {
@@ -110,23 +105,11 @@
     }
   }
 
-  const { initialized } = walletStore;
-
   let updating = true;
   async function updateState() {
     updating = true;
 
-    if (!$initialized) {
-      // Wait for wallet to be initialized before proceeding
-      await new Promise<void>((resolve) => {
-        const unsubscribe = initialized.subscribe((v) => {
-          if (v) {
-            unsubscribe();
-            resolve();
-          }
-        });
-      });
-    }
+    await awaitStoreValue(walletStore.initialized, (v) => v);
 
     const { address } = $walletStore;
     if (!address) {
@@ -208,7 +191,7 @@
 
 <div class="become-supporter-card" class:disabled>
   {#if !draftListMode && (ownDripLists === undefined || updating)}
-    <div transition:fade|local={{ duration: 300 }} class="loading-overlay">
+    <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>
   {/if}

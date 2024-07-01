@@ -187,7 +187,7 @@
 
 {#if $highlightStore && highlightBB && highlightPos}
   <div
-    transition:fade|local={{ duration: 300 }}
+    transition:fade={{ duration: 300 }}
     class="highlight-wrapper"
     style:top="{highlightBB.top - $highlightStore.paddingPx}px"
     style:left="{highlightBB.left - $highlightStore.paddingPx}px"
@@ -199,7 +199,7 @@
     <div class="background" style:border-radius={$highlightStore.borderRadius} />
     <div class="animated-outline" style:border-radius={$highlightStore.borderRadius} />
     <div
-      transition:fly|local={{ duration: 600, ...ANIMATION_SETTINGS[highlightPos.alignment] }}
+      transition:fly={{ duration: 600, ...ANIMATION_SETTINGS[highlightPos.alignment] }}
       class="highlight {highlightPos.alignment} side-{highlightPos.textAlignment}"
       style:width="{highlightPos.width}px"
       style:top="{highlightPos.y}px"
@@ -213,6 +213,7 @@
     </div>
     <!-- Dismisses clicks outside the target -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="click-preventer" on:click={dismiss} />
     <!-- Catches & forwards clicks on the target -->
     <div

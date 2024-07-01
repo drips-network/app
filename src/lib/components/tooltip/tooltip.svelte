@@ -110,6 +110,7 @@
   });
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <span
   bind:this={tooltipElem}
   class="tooltip"
@@ -119,8 +120,9 @@
 >
   <div class="trigger"><slot /></div>
   {#if expanded}
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      transition:fade|local={{ duration: 200 }}
+      transition:fade={{ duration: 200 }}
       bind:this={contentElem}
       class="expanded-tooltip"
       style:left={`${tooltipPos.left}px`}

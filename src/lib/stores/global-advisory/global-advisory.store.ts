@@ -67,8 +67,8 @@ export default (() => {
   type GetErrorsReturnType<T> = T extends 'fatal'
     ? FatalGlobalAdvisory | undefined
     : T extends 'non-fatal'
-    ? NonFatalGlobalAdvisory[]
-    : never;
+      ? NonFatalGlobalAdvisory[]
+      : never;
 
   /**
    * Get either the current fatal advisory, or array of non-fatal advisories.

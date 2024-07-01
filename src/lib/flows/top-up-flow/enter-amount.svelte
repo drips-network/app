@@ -19,14 +19,10 @@
   export let context: Writable<TopUpFlowState>;
   export let backButton: boolean;
 
-  const restorer = $context.restorer;
-
   $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : unreachable();
+  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : undefined;
 
-  let amountValue = restorer.restore('amountValue');
   let amount: bigint | undefined = undefined;
-  let topUpMax = restorer.restore('topUpMax');
 
   let validationState: TextInputValidationState = {
     type: 'unvalidated',
@@ -37,7 +33,7 @@
 
     const { tokenBalance, tokenAllowance } = $context;
 
-    const amountToTopUp = topUpMax ? tokenBalance : amount;
+    const amountToTopUp = $context.topUpMax ? tokenBalance : amount;
 
     context.update((c) => ({
       ...c,
@@ -51,12 +47,12 @@
       tokenAllowance ?? unreachable(),
     );
   }
-
-  $: restorer.saveAll({ amountValue, topUpMax });
 </script>
 
 <StepLayout>
-  <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
+  {#if tokenInfo}
+    <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
+  {/if}
   <StepHeader
     headline={`Add ${tokenInfo?.info.symbol}`}
     description="Add funds to your Drips account's outgoing balance."
@@ -64,8 +60,8 @@
   <InputWalletAmount
     tokenAddress={$context.tokenAddress}
     tokenBalance={$context.tokenBalance}
-    bind:topUpMax
-    bind:inputValue={amountValue}
+    bind:topUpMax={$context.topUpMax}
+    bind:inputValue={$context.amountValue}
     bind:amount
     bind:validationState
   />
@@ -74,7 +70,11 @@
     {#if backButton}
       <Button
         on:click={() => {
-          restorer.clear();
+          context.set({
+            tokenAddress: undefined,
+            amountValue: '',
+            topUpMax: false,
+          });
           dispatch('goBackward');
         }}
         variant="ghost"

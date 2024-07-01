@@ -25,10 +25,10 @@
   $: textAreaValidationState = !$context.dripList.description
     ? { type: 'valid' }
     : $context.dripList.description.length >= 1000
-    ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
-    : /<[^>]+>/gi.test($context.dripList.description)
-    ? { type: 'invalid', message: 'HTML currently not allowed.' }
-    : { type: 'valid' };
+      ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
+      : /<[^>]+>/gi.test($context.dripList.description)
+        ? { type: 'invalid', message: 'HTML currently not allowed.' }
+        : { type: 'valid' };
 
   $: isValid =
     $context.selectedCreationMode !== undefined &&

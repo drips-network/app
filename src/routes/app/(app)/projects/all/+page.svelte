@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-  import type { ProjectBadgeFragment } from '$lib/components/project-badge/__generated__/gql.generated';
   import { gql } from 'graphql-request';
 
   export const PROJECTS_LISTINGS_ITEM_FRAGMENT = gql`
@@ -59,23 +58,25 @@
   import Section from '$lib/components/section/section.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
-  import ProjectBadgeCell from '$lib/components/table/cells/project-badge.cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { goto } from '$app/navigation';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
+  import ProjectBadge, {
+    PROJECT_BADGE_FRAGMENT,
+  } from '$lib/components/project-badge/project-badge.svelte';
   import { dripListIcon, projectIcon, addressIcon } from '$lib/components/pile/pile-presets';
-  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
-  import type Pile from '$lib/components/pile/pile.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
   import type { ComponentProps } from 'svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import type { ProjectsListingsItemFragment } from './__generated__/gql.generated';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   export let data: PageData;
   interface ProjectsTableRow {
-    badge: ProjectBadgeFragment;
+    badge: { project: ProjectsListingsItemFragment };
     supportersPile: ComponentProps<Pile>;
     dependenciesPile: ComponentProps<Pile>;
   }
@@ -83,7 +84,10 @@
   const projectsTableData: ProjectsTableRow[] = data.content.projects
     .map((project) => {
       return {
-        badge: project,
+        badge: {
+          project,
+          tooltip: false,
+        },
         dependenciesPile: {
           maxItems: 4,
           components:
@@ -132,21 +136,21 @@
     {
       accessorKey: 'badge',
       header: 'Name',
-      cell: () => ProjectBadgeCell,
+      cell: () => ProjectBadge,
       enableSorting: false,
       size: (100 / 24) * 11,
     },
     {
       accessorKey: 'dependenciesPile',
       header: 'Drips to',
-      cell: () => PileCell,
+      cell: () => Pile,
       enableSorting: false,
       size: (100 / 24) * 6,
     },
     {
       accessorKey: 'supportersPile',
       header: 'Supporters',
-      cell: () => PileCell,
+      cell: () => Pile,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
@@ -160,7 +164,10 @@
   ];
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
-    const source = projectsTableData[event.detail.rowIndex].badge.source;
+    const { project } = projectsTableData[event.detail.rowIndex].badge;
+    if (!isClaimed(project)) return;
+
+    const { source } = project;
     goto(buildProjectUrl(source.forge, source.ownerName, source.repoName, true));
   }
 </script>

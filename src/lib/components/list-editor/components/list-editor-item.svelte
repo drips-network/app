@@ -9,7 +9,7 @@
 
   const dispatch = createEventDispatcher<{
     editPercentage: number;
-    deleteItem: never;
+    deleteItem: void;
   }>();
 
   export let item: ListEditorItem;
@@ -91,11 +91,11 @@
   <div class="left">
     <div class="inner">
       {#if item.type === 'project'}
-        <ProjectBadge project={item.project} />
+        <ProjectBadge linkTo={'nothing'} project={item.project} />
       {:else if item.type === 'address'}
-        <IdentityBadge size="medium" showFullAddress address={item.address} />
+        <IdentityBadge disableLink={true} size="medium" showFullAddress address={item.address} />
       {:else if item.type === 'drip-list'}
-        <DripListBadge dripList={item.dripList} />
+        <DripListBadge isLinked={false} dripList={item.dripList} />
       {/if}
     </div>
   </div>
@@ -103,6 +103,7 @@
   <div class="right">
     {#if weightsMode}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="percentage-editor tabular-nums"
         class:editable={isEditable}
@@ -187,7 +188,9 @@
     cursor: pointer;
     border-radius: 4px;
     box-shadow: 0 0 0 0 var(--color-primary);
-    transition: box-shadow 0.2s, color 0.2s;
+    transition:
+      box-shadow 0.2s,
+      color 0.2s;
   }
 
   .percentage-editor.editable {

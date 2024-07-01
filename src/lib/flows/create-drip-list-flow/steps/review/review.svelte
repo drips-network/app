@@ -21,7 +21,6 @@
   import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
-  import streamsStore from '$lib/stores/streams/streams.store';
   import Pause from '$lib/components/icons/Pause.svelte';
   import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
@@ -111,7 +110,7 @@
             1000,
           );
 
-          await streamsStore.refreshUserAccount();
+          // TODO(streams): invalidate appropriate load function
 
           $context.dripListId = dripListId;
         },

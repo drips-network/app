@@ -31,10 +31,25 @@
       }
     }
   `;
+
+  export const DRIP_VISUAL_DRIP_LIST_FRAGMENT = gql`
+    ${IDENTITY_CARD_DRIP_LIST_FRAGMENT}
+    fragment DripVisualDripList on DripList {
+      ...IdentityCardDripList
+    }
+  `;
+
+  export const DRIP_VISUAL_USER_FRAGMENT = gql`
+    ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
+    fragment DripVisualUser on User {
+      account {
+        ...DripVisualAddressDriverAccount
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/environment';
   import amtDeltaUnitStore, {
     FRIENDLY_NAMES,
     MULTIPLIERS,
@@ -52,15 +67,20 @@
     DripListNameQuery,
     DripListNameQueryVariables,
     DripVisualAddressDriverAccountFragment,
+    DripVisualDripListFragment,
     DripVisualNftDriverAccountFragment,
     DripVisualProjectFragment,
+    DripVisualUserFragment,
   } from './__generated__/gql.generated';
+  import { browser } from '$app/environment';
 
   export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
   export let to:
     | DripVisualNftDriverAccountFragment
     | DripVisualAddressDriverAccountFragment
     | DripVisualProjectFragment
+    | DripVisualDripListFragment
+    | DripVisualUserFragment
     | undefined = undefined;
   export let visual: 'stream' | 'donation' = 'stream';
   export let disableLinks = false;
@@ -146,6 +166,10 @@
       {/await}
     {:else if (to && to.__typename === 'ClaimedProject') || (to && to.__typename === 'UnclaimedProject')}
       <IdentityCard disableLink={disableLinks} project={to} title="To" />
+    {:else if to && to.__typename === 'DripList'}
+      <IdentityCard disableLink={disableLinks} dripList={to} title="To" />
+    {:else if to && to.__typename === 'User'}
+      <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

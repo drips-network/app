@@ -86,7 +86,9 @@
     height: 3rem;
     min-height: 3rem;
     resize: none;
-    transition: background-color 0.3s, box-shadow 0.3s;
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s;
   }
 
   .resizable {

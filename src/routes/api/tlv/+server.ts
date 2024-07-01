@@ -66,5 +66,9 @@ export const GET = async ({ fetch }) => {
     EX: 86400,
   });
 
-  return new Response(total.toString());
+  return new Response(total.toString(), {
+    headers: {
+      'cache-control': 'public, max-age=3600',
+    },
+  });
 };

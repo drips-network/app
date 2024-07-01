@@ -1,5 +1,4 @@
 import {
-  AddressDriverClient,
   type RepoDriverClient,
   RepoDriverTxFactory,
   Utils,
@@ -7,11 +6,9 @@ import {
   DripsTxFactory,
 } from 'radicle-drips';
 import {
-  getAddressDriverClient,
   getDripsTxFactory,
   getRepoDriverClient,
   getRepoDriverTxFactory,
-  getSubgraphClient,
 } from '../get-drips-clients';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
@@ -20,7 +17,7 @@ import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
-import type { LatestVersion } from '@efstajas/versioned-parser/lib/types';
+import type { LatestVersion } from '@efstajas/versioned-parser';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
@@ -37,12 +34,9 @@ export default class GitProjectService {
   private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
-  private _addressDriverClient!: AddressDriverClient;
-  private readonly _dripsSubgraphClient = getSubgraphClient();
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   public static async new(): Promise<GitProjectService> {
@@ -52,7 +46,6 @@ export default class GitProjectService {
     gitProjectService._github = new GitHub(octokit);
 
     gitProjectService._repoDriverClient = await getRepoDriverClient();
-    gitProjectService._addressDriverClient = await getAddressDriverClient();
     gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
     const { connected, signer, address } = get(wallet);
@@ -162,7 +155,7 @@ export default class GitProjectService {
     highLevelPercentages: { [slug: string]: number },
     maintainers: ListEditorConfig,
     dependencies: ListEditorConfig,
-  ): Promise<PopulatedTransaction[]> {
+  ): Promise<{ newMetadataHash: string; batch: PopulatedTransaction[] }> {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
     const {
@@ -203,7 +196,7 @@ export default class GitProjectService {
       accountMetadataAsBytes,
     );
 
-    return [setSplitsTx, emitAccountMetadataTx];
+    return { batch: [setSplitsTx, emitAccountMetadataTx], newMetadataHash: ipfsHash };
   }
 
   public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {
@@ -277,15 +270,22 @@ export default class GitProjectService {
       accountMetadataAsBytes,
     );
 
+    const splittableAmounts = context.project?.withdrawableBalances.filter(
+      (wb) => BigInt(wb.splittableAmount) > 0n,
+    );
+    const collectableAmounts = context.project?.withdrawableBalances.filter(
+      (wb) => BigInt(wb.collectableAmount) > 0n,
+    );
+
     const splitTxs: Promise<PopulatedTransaction>[] = [];
-    context.unclaimedFunds?.splittable.map(({ tokenAddress }) => {
+    splittableAmounts?.forEach(({ tokenAddress }) => {
       splitTxs.push(
         this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
       );
     });
 
     const collectTxs: Promise<PopulatedTransaction>[] = [];
-    context.unclaimedFunds?.collectable.map(({ tokenAddress }) => {
+    collectableAmounts?.forEach(({ tokenAddress }) => {
       assert(this._connectedAddress);
 
       collectTxs.push(
@@ -316,8 +316,8 @@ export default class GitProjectService {
       BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
         ? 1
         : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-        ? -1
-        : 0,
+          ? -1
+          : 0,
     );
 
     return sortedReceivers;

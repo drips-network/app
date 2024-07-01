@@ -1,7 +1,5 @@
-import matchers from '@testing-library/jest-dom/matchers';
-import { expect, vi } from 'vitest';
-
-expect.extend(matchers);
+import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -15,4 +13,29 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
+});
+
+class ESBuildAndJSDOMCompatibleTextEncoder extends TextEncoder {
+  constructor() {
+    super();
+  }
+
+  encode(input) {
+    if (typeof input !== 'string') {
+      throw new TypeError('`input` must be a string');
+    }
+
+    const decodedURI = decodeURIComponent(encodeURIComponent(input));
+    const arr = new Uint8Array(decodedURI.length);
+    const chars = decodedURI.split('');
+    for (let i = 0; i < chars.length; i++) {
+      arr[i] = decodedURI[i].charCodeAt(0);
+    }
+    return arr;
+  }
+}
+
+Object.defineProperty(global, 'TextEncoder', {
+  value: ESBuildAndJSDOMCompatibleTextEncoder,
+  writable: true,
 });

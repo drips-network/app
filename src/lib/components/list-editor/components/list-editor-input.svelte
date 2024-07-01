@@ -61,7 +61,10 @@
     (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
 
   class AddItemError extends Error {
-    constructor(message: string, public severity: 'warning' | 'error') {
+    constructor(
+      message: string,
+      public severity: 'warning' | 'error',
+    ) {
       super(message);
     }
   }
@@ -295,7 +298,7 @@
   {@const color = currentError.severity === 'error' ? 'negative' : 'caution'}
   {@const textColor = `var(--color-${color}-level-6)`}
   <div
-    transition:slide={{ duration: 300 }}
+    transition:slide|global={{ duration: 300 }}
     class="error {currentError.severity}"
     style:background-color="var(--color-{color}-level-1)"
     style:color={textColor}

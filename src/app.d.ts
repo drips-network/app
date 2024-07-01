@@ -16,3 +16,5 @@ declare namespace App {
   // interface PageError {}
   // interface Platform {}
 }
+
+declare const INJECTED_DEPLOY_URL: string | undefined;

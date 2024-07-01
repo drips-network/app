@@ -50,7 +50,7 @@
 
   export let pendingAvatar = false;
 
-  const dispatch = createEventDispatcher<{ editButtonClick: never }>();
+  const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">

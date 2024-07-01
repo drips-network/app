@@ -40,7 +40,9 @@
     border-radius: 1rem 0 1rem 1rem;
     position: relative;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
-    transition: background-color 0.3s, box-shadow 0.2s;
+    transition:
+      background-color 0.3s,
+      box-shadow 0.2s;
   }
 
   .slider.checked {
@@ -63,7 +65,12 @@
     right: 1.25rem;
     border-radius: 0.5rem;
     background-color: var(--color-foreground-level-5);
-    transition: border-radius 0.2s, left 0.2s, right 0.2s, background-color 0.3s, box-shadow 0.3s,
+    transition:
+      border-radius 0.2s,
+      left 0.2s,
+      right 0.2s,
+      background-color 0.3s,
+      box-shadow 0.3s,
       width 0.2s;
   }
 

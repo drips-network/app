@@ -6,7 +6,6 @@
   import AccountMenuItem from '$lib/components/account-menu/components/account-menu-item.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import Token from '$lib/components/token/token.svelte';
-  import StreamIcon from '$lib/components/icons/TokenStreams.svelte';
   import { type Item, SearchItemType } from '../search';
   import wallet from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
@@ -18,29 +17,7 @@
   $: highlightPlainText = highlighted.replace(/<\/?[^>]+(>|$)/g, '');
 </script>
 
-{#if item.type === SearchItemType.STREAM}
-  <AccountMenuItem
-    on:click
-    icon={StreamIcon}
-    href={`/app/${item.item.sender.address}/tokens/${item.item.streamConfig.amountPerSecond.tokenAddress}/streams/${item.item.streamConfig.dripId}`}
-  >
-    <div class="icon" slot="title">
-      <div class="highlighted">
-        <span style="color: var(--color-foreground)">
-          {#if highlightPlainText !== item.item.name}
-            Stream ID:
-          {/if}
-        </span>{@html sanitize(highlighted, {
-          allowedTags: [],
-          allowedAttributes: {},
-        })}
-      </div>
-      {#if highlightPlainText !== item.item.name && item.item.name}<div class="typo-text-small">
-          {item.item.name}
-        </div>{/if}
-    </div>
-  </AccountMenuItem>
-{:else if item.type === SearchItemType.TOKEN}
+{#if item.type === SearchItemType.TOKEN}
   <AccountMenuItem
     on:click
     href={`/app/${$wallet.address ?? unreachable()}/tokens/${item.item.info.address}`}

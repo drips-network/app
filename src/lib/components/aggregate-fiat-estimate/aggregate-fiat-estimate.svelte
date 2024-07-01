@@ -1,5 +1,4 @@
 <script lang="ts">
-  import tokensStore from '$lib/stores/tokens/tokens.store';
   import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import { fade } from 'svelte/transition';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
@@ -9,10 +8,10 @@
   import { createEventDispatcher } from 'svelte';
   import { readable } from 'svelte/store';
 
-  const dispatch = createEventDispatcher<{ loaded: never }>();
+  const dispatch = createEventDispatcher<{ loaded: void }>();
   interface Amount {
     tokenAddress: string;
-    amount: bigint;
+    amount: bigint | string;
   }
 
   type Amounts = Amount[];
@@ -42,13 +41,9 @@
   export let fiatEstimateCents: number | 'pending' = 'pending';
   let includesUnknownPrice = false;
 
-  const connected = tokensStore.connected;
-
   $: {
-    if (amounts && $connected) {
-      $priceStore;
-
-      const result = aggregateFiatEstimate(priceStore, amounts);
+    if (amounts) {
+      const result = aggregateFiatEstimate($priceStore, amounts);
 
       if (fiatEstimateCents === 'pending' && typeof result.fiatEstimateCents === 'number') {
         dispatch('loaded');
@@ -66,7 +61,7 @@
     {fiatEstimateCents}
   />
   {#if includesUnknownPrice && fiatEstimateCents !== 'pending' && !supressUnknownAmountsWarning}
-    <div class="warning" transition:fade|local={{ duration: 100 }}>
+    <div class="warning" transition:fade={{ duration: 100 }}>
       <Tooltip>
         <WarningIcon />
         <svelte:fragment slot="tooltip-content">

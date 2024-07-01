@@ -4,18 +4,10 @@
   export let checked: boolean;
   export let label: string | undefined = undefined;
   export let size: 'normal' | 'big' = 'normal';
-
-  let focus = false;
 </script>
 
 <label class="toggle {size}">
-  <input
-    tabindex="0"
-    type="checkbox"
-    bind:checked
-    on:focus={() => (focus = true)}
-    on:blur={() => (focus = false)}
-  />
+  <input tabindex="0" type="checkbox" bind:checked />
   <SelectedDot type="check" bind:selected={checked} />
   {#if label}<span class="typo-text-bold">{label}</span>{/if}
 </label>

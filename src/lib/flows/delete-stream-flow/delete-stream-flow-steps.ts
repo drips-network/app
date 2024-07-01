@@ -1,11 +1,11 @@
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
-import type { Stream } from '$lib/stores/streams/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import Confirm from './confirm.svelte';
+import type { DeleteStreamConfirmStepFragment } from './__generated__/gql.generated';
 
-export default (stream: Stream) => ({
+export default (stream: DeleteStreamConfirmStepFragment) => ({
   context: undefined,
   steps: [
     makeStep({
@@ -19,7 +19,7 @@ export default (stream: Stream) => ({
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
         message:
-          'Your stream has been successfully deleted. It may take some time for your dashboard to update.',
+          'Your stream has been successfully deleted. You may need to refresh the app for your dashboard to update.',
       },
     }),
   ],

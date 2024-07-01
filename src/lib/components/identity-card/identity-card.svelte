@@ -59,8 +59,8 @@
   $: link = disableLink
     ? undefined
     : dripList
-    ? `/app/drip-lists/${dripList.account.accountId}`
-    : `/app/${address}`;
+      ? `/app/drip-lists/${dripList.account.accountId}`
+      : `/app/${address}`;
 </script>
 
 <svelte:element
@@ -70,7 +70,7 @@
 >
   {#if title}<p class="title typo-all-caps">{title}</p>{/if}
   {#if address}
-    <div class="content-container" in:fade|local>
+    <div class="content-container" in:fade>
       <IdentityBadge
         disableLink={true}
         size="huge"
@@ -82,14 +82,14 @@
       <IdentityBadge disableLink={true} size="huge" {address} showAvatar={false} disableTooltip />
     </div>
   {:else if dripList}
-    <div class="content-container" in:fade|local>
+    <div class="content-container" in:fade>
       <div class="icon">
         <DripListIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
       </div>
       <span class="typo-header-3 ellipsis">{dripList.name}</span>
     </div>
   {:else if project}
-    <div class="content-container" in:fade|local>
+    <div class="content-container" in:fade>
       <div class="flex">
         {#if 'owner' in project}
           <div class="-mr-[5%]">

@@ -33,7 +33,9 @@
     height: 3rem;
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     padding: 0.75rem;
-    transition: background-color 0.3s, color 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
     overflow: hidden;
   }
 

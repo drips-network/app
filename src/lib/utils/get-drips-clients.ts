@@ -5,29 +5,17 @@ import {
   AddressDriverTxFactory,
   CallerClient,
   DripsClient,
-  DripsSubgraphClient,
   Utils,
   type NetworkConfig,
   NFTDriverClient,
   NFTDriverTxFactory,
-  RepoDriverClient,
   RepoDriverTxFactory,
   DripsTxFactory,
   ERC20TxFactory,
+  RepoDriverClient,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-import { BASE_URL } from './base-url';
-
-/**
- * Get an initialized Drips Subgraph client.
- * @returns An initialized Drips Subgraph client.
- */
-export function getSubgraphClient() {
-  const { network } = get(wallet);
-
-  return DripsSubgraphClient.create(network.chainId, getNetworkConfig().SUBGRAPH_URL);
-}
 
 /**
  * Get an initialized Repo Driver client.
@@ -201,12 +189,11 @@ export const networkConfigs: { [chainId: number]: Omit<NetworkConfig, 'SUBGRAPH_
  * Get the networkConfig for the current network.
  * @returns The networkConfig for the current network.
  */
-export function getNetworkConfig(chainId = get(wallet).network.chainId): NetworkConfig {
+export function getNetworkConfig(
+  chainId = get(wallet).network.chainId,
+): Omit<NetworkConfig, 'SUBGRAPH_URL'> {
   const config = networkConfigs[chainId];
   assert(config, `No network config found for chainId ${chainId}`);
 
-  return {
-    ...config,
-    SUBGRAPH_URL: `${BASE_URL}/api/subgraph/query`,
-  };
+  return config;
 }

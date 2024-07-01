@@ -34,6 +34,7 @@
     on:mouseenter={() => handleHover(true)}
     on:mouseleave={() => handleHover(false)}
   >
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="trigger-content"
       on:keydown={() => handleHover(true)}
@@ -42,7 +43,7 @@
       <slot name="trigger" />
     </div>
     {#if visible}
-      <div transition:fly|local={{ y: 8 }} class="content" class:left={direction === 'left'}>
+      <div transition:fly={{ y: 8 }} class="content" class:left={direction === 'left'}>
         <div class="margin" />
         <div class="wrapper">
           <slot name="content" />

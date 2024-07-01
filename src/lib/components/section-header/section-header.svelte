@@ -22,6 +22,7 @@
 </script>
 
 <!--svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="section-header"
   on:click={() => (collapsable ? (collapsed = !collapsed) : undefined)}
@@ -103,7 +104,9 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    transition: transform 0.3s, background-color 0.3s;
+    transition:
+      transform 0.3s,
+      background-color 0.3s;
   }
 
   .collapsed .expand-button {

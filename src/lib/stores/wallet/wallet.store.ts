@@ -18,6 +18,7 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { getNetwork, isConfiguredChainId, type Network } from './network';
+import { invalidateAll } from '../fetched-data-cache/invalidate';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -32,6 +33,7 @@ const onboard = Onboard({
       version: 2,
       projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
       requiredChains: [network.chainId],
+      dappUrl: 'https://drips.network',
     }),
   ],
   chains: [
@@ -235,6 +237,10 @@ const walletStore = () => {
       network: getNetwork((await provider.getNetwork()).chainId),
       safe: safeInfo,
     });
+
+    if (browser) {
+      await invalidateAll();
+    }
   }
 
   function _clear() {
@@ -314,5 +320,4 @@ const mockWalletStore = () => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default isTest() ? mockWalletStore() : walletStore();

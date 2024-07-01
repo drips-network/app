@@ -9,7 +9,6 @@ import { expect } from '@playwright/test';
 import fetch from 'node-fetch';
 import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
-import environment from './helpers/environment';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -32,12 +31,6 @@ describe('app', async () => {
 
     await configureAppForTest(page);
   });
-
-  beforeAll(async () => {
-    await environment.wait();
-
-    console.log('🌳 Environment is up. Running tests...');
-  }, 14400000);
 
   afterAll(async () => {
     await browser.close();

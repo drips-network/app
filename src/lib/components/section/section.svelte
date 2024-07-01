@@ -8,6 +8,9 @@
 
   export let collapsable = false;
   export let collapsed = false;
+
+  /** Bind to this to get the section skeleton instance of this section. */
+  export let skeletonInstance: SectionSkeleton | undefined = undefined;
 </script>
 
 <section class="app-section" style:margin-bottom={collapsed ? '-2rem' : 0}>
@@ -18,7 +21,7 @@
     actionsDisabled={collapsed || header.actionsDisabled}
   />
   <div>
-    <SectionSkeleton bind:collapsed {...skeleton}>
+    <SectionSkeleton bind:this={skeletonInstance} bind:collapsed {...skeleton}>
       <slot />
     </SectionSkeleton>
   </div>

@@ -1,19 +1,14 @@
 import fuzzysort from 'fuzzysort';
 
-import streams from '$lib/stores/streams';
-import type { Stream } from '$lib/stores/streams/types';
 import tokens from '$lib/stores/tokens';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { get } from 'svelte/store';
-import ens from '$lib/stores/ens';
 import { isAddress } from 'ethers/lib/utils';
-import { AddressDriverClient } from 'radicle-drips';
 import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 
 export enum SearchItemType {
   PROFILE,
-  STREAM,
   TOKEN,
   REPO,
 }
@@ -35,11 +30,6 @@ export type Item =
       };
     }
   | {
-      type: SearchItemType.STREAM;
-      matchStrings: MatchStrings;
-      item: Stream;
-    }
-  | {
       type: SearchItemType.TOKEN;
       matchStrings: MatchStrings;
       item: TokenInfoWrapper;
@@ -55,19 +45,6 @@ export type Item =
       };
     };
 
-function searchMatchStringsForStream(stream: Stream): MatchStrings {
-  const { name } = stream;
-  const { dripId } = stream.streamConfig;
-
-  const strings = [];
-  if (name) strings.push(name);
-
-  return {
-    primary: dripId,
-    secondary: name,
-  };
-}
-
 function searchMatchStringsForToken(token: TokenInfoWrapper): MatchStrings {
   const { name, symbol, address } = token.info;
 
@@ -80,63 +57,16 @@ function searchMatchStringsForToken(token: TokenInfoWrapper): MatchStrings {
 
 let searchItems: Item[] = [];
 
-interface AddressAccountIdPair {
-  address: string;
-  accountId?: string;
-}
-
 export function updateSearchItems(accountId: string | undefined) {
   const tokensVal = get(tokens);
-  const ensVal = get(ens);
-  const { accounts } = get(streams);
 
-  const streamsForCurrentUser = accountId ? streams.getStreamsForUser(accountId) : undefined;
-  const currentStreams = streamsForCurrentUser
-    ? [...streamsForCurrentUser.incoming, ...streamsForCurrentUser.outgoing]
-    : [];
   const currentTokens = (accountId && tokensVal) || [];
 
-  const addresses: AddressAccountIdPair[] = Object.keys(accounts).map((a) => ({
-    address: AddressDriverClient.getUserAddress(a),
-    accountId: a,
-  }));
-
-  addresses.push(
-    ...Object.keys(ensVal).reduce<AddressAccountIdPair[]>((acc, val) => {
-      return addresses.find((v) => v.address.toLowerCase() === val.toLowerCase())
-        ? acc
-        : [
-            ...acc,
-            {
-              address: val,
-            },
-          ];
-    }, []),
-  );
-
   searchItems = [
-    ...currentStreams.map<Item>((stream) => ({
-      type: SearchItemType.STREAM,
-      matchStrings: searchMatchStringsForStream(stream),
-      item: stream,
-    })),
     ...currentTokens.map<Item>((token) => ({
       type: SearchItemType.TOKEN,
       matchStrings: searchMatchStringsForToken(token),
       item: token,
-    })),
-    ...addresses.map<Item>((v) => ({
-      type: SearchItemType.PROFILE,
-      matchStrings: {
-        primary: ensVal[v.address]?.name,
-        secondary: v.address,
-        tertiary: v.accountId,
-      },
-      item: {
-        address: v.address,
-        name: ensVal[v.address]?.name,
-        dripsAccountId: v.accountId,
-      },
     })),
   ];
 }
