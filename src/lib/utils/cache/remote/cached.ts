@@ -36,9 +36,10 @@ export default async function cached<T extends Record<string, any>>(
 
     const data = await fetcher();
 
-    await redis?.set(key, JSON.stringify(data), {
+    redis?.set(key, JSON.stringify(data), {
       EX,
     });
+
     return data;
   }
 }
