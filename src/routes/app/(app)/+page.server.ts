@@ -99,17 +99,25 @@ export const load = async ({ fetch }) => {
     return results.map((res) => res.dripList);
   };
 
+  const fetchBlogPosts = async () => {
+    return (await fetch('/api/blog/posts')).json();
+  };
+
+  const fetchTlv = async () => {
+    return (await fetch('/api/tlv')).json();
+  };
+
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
     redis,
     cacheKey,
     6 * 60 * 60, // Change the cache expiration time to 6 hours
     async () =>
       Promise.all([
-        (await fetch('/api/blog/posts')).json(),
+        fetchBlogPosts(),
         fetchProjects(),
         fetchFeaturedLists(),
         cachedTotalDrippedPrices(redis, fetch),
-        (await fetch('/api/tlv')).json(),
+        fetchTlv(),
       ]),
   );
 
