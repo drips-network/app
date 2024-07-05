@@ -18,7 +18,9 @@ export const SUPPORTER_PILE_FRAGMENT = gql`
     }
     ... on ProjectSupport {
       project {
-        ...ProjectAvatar
+        chainData {
+          ...ProjectAvatar
+        }
       }
     }
     ... on OneTimeDonationSupport {

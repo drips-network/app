@@ -4,18 +4,15 @@
     ${PROJECT_AVATAR_FRAGMENT}
     fragment ProjectProfileHeader on Project {
       ...ProjectBadge
-      ...ProjectAvatar
-      ... on ClaimedProject {
-        source {
-          url
-        }
-        owner {
-          address
-        }
+      source {
+        url
       }
-      ... on UnclaimedProject {
-        source {
-          url
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
         }
       }
     }

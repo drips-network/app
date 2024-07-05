@@ -20,6 +20,7 @@ import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx.js';
 import { redis } from '../../api/redis.js';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
+import network from '$lib/stores/wallet/network';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -37,18 +38,15 @@ const FEATURED_DRIP_LISTS =
 
 const getProjectsQuery = gql`
   ${PROJECT_CARD_FRAGMENT}
-  query ExploreProjects($where: ProjectWhereInput, $sort: ProjectSortInput) {
-    projects(where: $where, sort: $sort) {
+  query ExploreProjects(
+    $where: ProjectWhereInput
+    $sort: ProjectSortInput
+    $chains: [SupportedChain!]!
+  ) {
+    projects(where: $where, sort: $sort, chains: $chains) {
       ...ProjectCard
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
+      account {
+        accountId
       }
     }
   }
@@ -56,8 +54,8 @@ const getProjectsQuery = gql`
 
 const featuredDripListQuery = gql`
   ${DRIP_LIST_CARD_FRAGMENT}
-  query FeaturedDripList($id: ID!) {
-    dripList(id: $id) {
+  query FeaturedDripList($id: ID!, $chain: SupportedChain!) {
+    dripList(id: $id, chain: $chain) {
       ...DripListCard
     }
   }
@@ -67,6 +65,7 @@ export const load = async ({ fetch }) => {
   const getProjectsVariables = {
     where: { verificationStatus: ProjectVerificationStatus.Claimed },
     sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
+    chains: [network.gqlName],
   };
 
   const cacheKey = queryCacheKey(
@@ -90,7 +89,7 @@ export const load = async ({ fetch }) => {
       FEATURED_DRIP_LISTS.map((id) =>
         query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
           featuredDripListQuery,
-          { id },
+          { id, chain: network.gqlName },
           fetch,
         ),
       ),

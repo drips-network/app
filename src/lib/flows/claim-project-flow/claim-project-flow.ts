@@ -29,9 +29,7 @@ export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   fragment ClaimProjectFlowProject on Project {
     ...EnterGitUrlStepProject
     ...AddEthereumAddressStepProject
-    ... on UnclaimedProject {
-      ...ReviewStepUnclaimedProject
-    }
+    ...ReviewStepUnclaimedProject
   }
 `;
 

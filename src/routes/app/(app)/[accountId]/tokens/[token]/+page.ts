@@ -26,11 +26,13 @@ export const load = async ({ fetch, params }) => {
     ${TOKEN_PAGE_USER_STREAMS_FRAGMENT}
     query TokenPage($address: String!) {
       userByAddress(address: $address) {
-        balances {
-          ...TokenPageUserBalances
-        }
-        streams {
-          ...TokenPageUserStreams
+        chainData {
+          balances {
+            ...TokenPageUserBalances
+          }
+          streams {
+            ...TokenPageUserStreams
+          }
         }
       }
     }

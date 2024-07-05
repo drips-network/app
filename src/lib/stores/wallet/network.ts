@@ -1,4 +1,5 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
+import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 
@@ -12,9 +13,18 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
+  gqlName: SupportedChain;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
+
+const NETWORK_GQL_NAMES: ValueForEachSupportedChain<SupportedChain> = {
+  [1]: SupportedChain.Mainnet,
+  [80002]: SupportedChain.PolygonAmoy,
+  [11155420]: SupportedChain.OptimismSepolia,
+  [11155111]: SupportedChain.Sepolia,
+  [84532]: SupportedChain.BaseSepolia,
+};
 
 const NETWORK_NAMES: ValueForEachSupportedChain<string> = {
   [1]: 'homestead',
@@ -80,6 +90,7 @@ export function getNetwork(chainId: number): Network {
     token: NETWORK_TOKENS[chainId],
     id: NETWORK_ID[chainId],
     rpcUrl: RPC_URLS[chainId],
+    gqlName: NETWORK_GQL_NAMES[chainId],
   };
 }
 

@@ -3,10 +3,12 @@
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     fragment EnterGitUrlStepProject on Project {
       ...UnclaimedProjectCard
-      ... on UnclaimedProject {
-        verificationStatus
-        account {
-          accountId
+      account {
+        accountId
+      }
+      chainData {
+        ... on UnClaimedProjectData {
+          verificationStatus
         }
       }
     }

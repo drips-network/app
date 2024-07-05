@@ -57,9 +57,9 @@
           const projectClaimedQuery = gql`
             query ProjectIsClaimed($id: ID!) {
               projectById(id: $id) {
-                ... on ClaimedProject {
-                  account {
-                    accountId
+                chainData {
+                  ... on ClaimedProjectData {
+                    chain
                   }
                 }
               }

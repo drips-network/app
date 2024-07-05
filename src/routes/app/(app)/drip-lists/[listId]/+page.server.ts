@@ -10,6 +10,7 @@ import {
   mapSplitsFromMultiplayerResults,
   type SplitsComponentSplitsReceiver,
 } from '$lib/components/splits/splits.svelte';
+import network from '$lib/stores/wallet/network';
 
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;
@@ -46,8 +47,8 @@ export const load = (async ({ params, fetch }) => {
 
   const dripListQuery = gql`
     ${DRIP_LIST_PAGE_FRAGMENT}
-    query DripList($listId: ID!) {
-      dripList(id: $listId) {
+    query DripList($listId: ID!, $chain: SupportedChain!) {
+      dripList(id: $listId, chain: $chain) {
         ...DripListPage
       }
     }
@@ -74,7 +75,11 @@ export const load = (async ({ params, fetch }) => {
   }
 
   const fetches = await Promise.all([
-    query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch),
+    query<DripListQuery, DripListQueryVariables>(
+      dripListQuery,
+      { listId, chain: network.gqlName },
+      fetch,
+    ),
     getVotingRoundForList(listId),
   ] as const);
 

@@ -24,22 +24,14 @@
     fragment SupportCardProject on Project {
       ...CreateDonationFlowProject
       ...AddDripListMemberFlowProjectToAdd
-      ...ProjectAvatar
-      ... on ClaimedProject {
-        owner {
-          accountId
-        }
-        account {
-          accountId
-        }
-        source {
-          url
-        }
+      account {
+        accountId
       }
-      ... on UnclaimedProject {
-        source {
-          url
-        }
+      source {
+        url
+      }
+      chainData {
+        ...ProjectAvatar
       }
     }
   `;

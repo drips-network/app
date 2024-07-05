@@ -29,8 +29,10 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       gql`
         query LatestProjectMetadataHash($accountId: ID!) {
           projectById(id: $accountId) {
-            ... on ClaimedProject {
-              latestMetadataIpfsHash
+            chainData {
+              ... on ClaimedProjectData {
+                latestMetadataIpfsHash
+              }
             }
           }
         }

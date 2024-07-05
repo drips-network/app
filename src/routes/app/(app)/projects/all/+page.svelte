@@ -5,46 +5,52 @@
     ${PROJECT_BADGE_FRAGMENT}
     ${DRIP_LIST_BADGE_FRAGMENT}
     fragment ProjectsListingsItem on Project {
-      ... on ClaimedProject {
-        ...ProjectBadge
-        splits {
-          maintainers {
-            account {
-              address
-            }
-          }
-          dependencies {
-            ... on AddressReceiver {
+      ...ProjectBadge
+      chainData {
+        ... on ClaimedProjectData {
+          splits {
+            maintainers {
               account {
                 address
               }
             }
-            ... on ProjectReceiver {
-              project {
-                ...ProjectAvatar
+            dependencies {
+              ... on AddressReceiver {
+                account {
+                  address
+                }
+              }
+              ... on ProjectReceiver {
+                project {
+                  chainData {
+                    ...ProjectAvatar
+                  }
+                }
+              }
+              ... on DripListReceiver {
+                dripList {
+                  ...DripListBadge
+                }
               }
             }
-            ... on DripListReceiver {
+          }
+          support {
+            ... on DripListSupport {
               dripList {
                 ...DripListBadge
               }
             }
-          }
-        }
-        support {
-          ... on DripListSupport {
-            dripList {
-              ...DripListBadge
+            ... on ProjectSupport {
+              project {
+                chainData {
+                  ...ProjectAvatar
+                }
+              }
             }
-          }
-          ... on ProjectSupport {
-            project {
-              ...ProjectAvatar
-            }
-          }
-          ... on OneTimeDonationSupport {
-            account {
-              address
+            ... on OneTimeDonationSupport {
+              account {
+                address
+              }
             }
           }
         }

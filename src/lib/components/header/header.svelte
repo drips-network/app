@@ -5,8 +5,10 @@
   export const HEADER_USER_FRAGMENT = gql`
     ${COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT}
     fragment HeaderUser on User {
-      withdrawableBalances {
-        ...CollectButtonWithdrawableBalance
+      chainData {
+        withdrawableBalances {
+          ...CollectButtonWithdrawableBalance
+        }
       }
     }
   `;

@@ -1,79 +1,81 @@
 import { gql } from 'graphql-request';
 
 export const projectAssociatedAccountIdsQuery = gql`
-  query ProjectAssociatedAccountIds($projectAccountId: ID!) {
-    projectById(id: $projectAccountId) {
-      ... on ClaimedProject {
-        owner {
-          accountId
-        }
-        support {
-          ... on ProjectSupport {
-            account {
-              accountId
-            }
+  query ProjectAssociatedAccountIds($projectAccountId: ID!, $chains: [SupportedChain!]!) {
+    projectById(id: $projectAccountId, chains: $chains) {
+      chainData {
+        ... on ClaimedProjectData {
+          owner {
+            accountId
           }
-          ... on DripListSupport {
-            account {
-              accountId
-            }
-          }
-          ... on OneTimeDonationSupport {
-            account {
-              accountId
-            }
-          }
-          ... on StreamSupport {
-            account {
-              accountId
-            }
-          }
-        }
-        splits {
-          dependencies {
-            ... on AddressReceiver {
+          support {
+            ... on ProjectSupport {
               account {
                 accountId
               }
             }
-            ... on ProjectReceiver {
+            ... on DripListSupport {
               account {
                 accountId
               }
             }
-            ... on DripListReceiver {
+            ... on OneTimeDonationSupport {
+              account {
+                accountId
+              }
+            }
+            ... on StreamSupport {
               account {
                 accountId
               }
             }
           }
-          maintainers {
-            account {
-              accountId
+          splits {
+            dependencies {
+              ... on AddressReceiver {
+                account {
+                  accountId
+                }
+              }
+              ... on ProjectReceiver {
+                account {
+                  accountId
+                }
+              }
+              ... on DripListReceiver {
+                account {
+                  accountId
+                }
+              }
+            }
+            maintainers {
+              account {
+                accountId
+              }
             }
           }
         }
-      }
-      ... on UnclaimedProject {
-        support {
-          ... on ProjectSupport {
-            account {
-              accountId
+        ... on UnClaimedProjectData {
+          support {
+            ... on ProjectSupport {
+              account {
+                accountId
+              }
             }
-          }
-          ... on DripListSupport {
-            account {
-              accountId
+            ... on DripListSupport {
+              account {
+                accountId
+              }
             }
-          }
-          ... on OneTimeDonationSupport {
-            account {
-              accountId
+            ... on OneTimeDonationSupport {
+              account {
+                accountId
+              }
             }
-          }
-          ... on StreamSupport {
-            account {
-              accountId
+            ... on StreamSupport {
+              account {
+                accountId
+              }
             }
           }
         }
@@ -83,8 +85,8 @@ export const projectAssociatedAccountIdsQuery = gql`
 `;
 
 export const dripListAssociatedAccountIdsQuery = gql`
-  query DripListAssociatedAccountIds($dripListAccountId: ID!) {
-    dripList(id: $dripListAccountId) {
+  query DripListAssociatedAccountIds($dripListAccountId: ID!, $chain: SupportedChain!) {
+    dripList(id: $dripListAccountId, chain: $chain) {
       owner {
         accountId
       }

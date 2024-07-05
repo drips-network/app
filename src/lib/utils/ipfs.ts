@@ -65,7 +65,9 @@ export async function waitForAccountMetadata(
         gql`
           query LatestAccountMetadataHash($accountId: ID!) {
             userById(accountId: $accountId) {
-              latestMetadataIpfsHash
+              chainData {
+                latestMetadataIpfsHash
+              }
             }
           }
         `,

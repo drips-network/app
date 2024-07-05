@@ -1,19 +1,23 @@
 <script lang="ts" context="module">
   export const SET_NEW_METADATA_STEP_FRAGMENT = gql`
     ${PROJECT_CUSTOMIZER_FRAGMENT}
-    fragment SetNewMetadataStep on ClaimedProject {
+    fragment SetNewMetadataStep on Project {
       ...ProjectCustomizer
-      avatar {
-        ... on EmojiAvatar {
-          emoji
-        }
-        ... on ImageAvatar {
-          cid
-        }
-      }
-      color
       account {
         accountId
+      }
+      chainData {
+        ... on ClaimedProjectData {
+          avatar {
+            ... on EmojiAvatar {
+              emoji
+            }
+            ... on ImageAvatar {
+              cid
+            }
+          }
+          color
+        }
       }
     }
   `;

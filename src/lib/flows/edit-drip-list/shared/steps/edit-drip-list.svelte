@@ -52,15 +52,8 @@
     ${LIST_EDITOR_PROJECT_FRAGMENT}
     fragment EditDripListStepProjectToAdd on Project {
       ...ListEditorProject
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
+      account {
+        accountId
       }
     }
   `;

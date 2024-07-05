@@ -8,6 +8,7 @@ import type {
   LatestDripListMetadataHashQuery,
   LatestDripListMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
+import network from '$lib/stores/wallet/network';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataParser
@@ -22,13 +23,13 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       LatestDripListMetadataHashQueryVariables
     >(
       gql`
-        query LatestDripListMetadataHash($accountId: ID!) {
-          dripList(id: $accountId) {
+        query LatestDripListMetadataHash($accountId: ID!, $chain: SupportedChain!) {
+          dripList(id: $accountId, chain: $chain) {
             latestMetadataIpfsHash
           }
         }
       `,
-      { accountId },
+      { accountId, chain: network.gqlName },
     );
 
     return res.dripList?.latestMetadataIpfsHash ?? null;

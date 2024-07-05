@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export const REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT = gql`
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
-    fragment ReviewStepUnclaimedProject on UnclaimedProject {
+    fragment ReviewStepUnclaimedProject on Project {
       ...UnclaimedProjectCard
     }
   `;

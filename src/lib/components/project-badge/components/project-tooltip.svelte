@@ -7,25 +7,19 @@
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_NAME_FRAGMENT}
     fragment ProjectTooltip on Project {
-      ...ProjectAvatar
       ...ProjectName
-      ... on ClaimedProject {
-        owner {
-          address
-        }
-        source {
-          url
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        url
+        ownerName
+        repoName
+        forge
       }
-      ... on UnclaimedProject {
-        source {
-          url
-          ownerName
-          repoName
-          forge
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
         }
       }
     }

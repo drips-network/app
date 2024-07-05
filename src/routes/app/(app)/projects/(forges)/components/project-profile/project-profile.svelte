@@ -29,34 +29,33 @@
       ...UnclaimedProjectCard
       ...ProjectProfileHeader
       ...SupportCardProject
-      ...SplitsComponentProjectSplits
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
-        support {
-          ...SupportersSectionSupportItem
-          ...SupporterPile
-        }
-        withdrawableBalances {
-          ...MergeWithdrawableBalances
-        }
+      ...EditProjectMetadataFlow
+      account {
+        accountId
       }
-      ... on ClaimedProject {
-        ...EditProjectMetadataFlow
-        account {
-          accountId
+      chainData {
+        ...SplitsComponentProjectSplits
+        ... on UnClaimedProjectData {
+          support {
+            ...SupportersSectionSupportItem
+            ...SupporterPile
+          }
+          withdrawableBalances {
+            ...MergeWithdrawableBalances
+          }
         }
-        owner {
-          accountId
-        }
-        support {
-          ...SupportersSectionSupportItem
-          ...SupporterPile
-        }
-        totalEarned {
-          tokenAddress
-          amount
+        ... on ClaimedProjectData {
+          owner {
+            accountId
+          }
+          support {
+            ...SupportersSectionSupportItem
+            ...SupporterPile
+          }
+          totalEarned {
+            tokenAddress
+            amount
+          }
         }
       }
     }

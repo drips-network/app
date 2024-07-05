@@ -58,10 +58,12 @@
                 gql`
                   query CheckUserStreamPaused($accountId: ID!) {
                     userById(accountId: $accountId) {
-                      streams {
-                        outgoing {
-                          id
-                          isPaused
+                      chainData {
+                        streams {
+                          outgoing {
+                            id
+                            isPaused
+                          }
                         }
                       }
                     }

@@ -30,11 +30,13 @@
     const checkProjectVerificationStatusQuery = gql`
       query CheckProjectVerificationStatus($projectId: ID!) {
         projectById(id: $projectId) {
-          ... on UnclaimedProject {
-            verificationStatus
-          }
-          ... on ClaimedProject {
-            verificationStatus
+          chainData {
+            ... on UnClaimedProjectData {
+              verificationStatus
+            }
+            ... on ClaimedProjectData {
+              verificationStatus
+            }
           }
         }
       }

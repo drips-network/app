@@ -14,7 +14,9 @@
         }
         ... on ProjectReceiver {
           project {
-            ...ProjectAvatar
+            chainData {
+              ...ProjectAvatar
+            }
           }
         }
         ... on DripListReceiver {
@@ -31,7 +33,9 @@
         }
         ... on ProjectSupport {
           project {
-            ...ProjectAvatar
+            chainData {
+              ...ProjectAvatar
+            }
           }
         }
         ... on OneTimeDonationSupport {

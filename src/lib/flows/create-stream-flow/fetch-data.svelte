@@ -27,10 +27,12 @@
           ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
           query TokenBalances($address: String!) {
             userByAddress(address: $address) {
-              balances {
-                tokenAddress
-                outgoing {
-                  ...CurrentAmountsUserBalanceTimelineItem
+              chainData {
+                balances {
+                  tokenAddress
+                  outgoing {
+                    ...CurrentAmountsUserBalanceTimelineItem
+                  }
                 }
               }
             }

@@ -32,6 +32,7 @@
   } from './__generated__/gql.generated';
   import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -81,8 +82,8 @@
 
         after: async (_, { dripListId }) => {
           const dripListExistsQuery = gql`
-            query DripListExists($id: ID!) {
-              dripList(id: $id) {
+            query DripListExists($id: ID!, $chain: SupportedChain!) {
+              dripList(id: $id, chain: $chain) {
                 account {
                   accountId
                 }
@@ -96,6 +97,7 @@
                 dripListExistsQuery,
                 {
                   id: listId,
+                  chain: network.gqlName,
                 },
               );
             } catch {

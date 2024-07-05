@@ -3,17 +3,9 @@
 
   export const PROJECT_NAME_FRAGMENT = gql`
     fragment ProjectName on Project {
-      ... on ClaimedProject {
-        source {
-          ownerName
-          repoName
-        }
-      }
-      ... on UnclaimedProject {
-        source {
-          ownerName
-          repoName
-        }
+      source {
+        ownerName
+        repoName
       }
     }
   `;

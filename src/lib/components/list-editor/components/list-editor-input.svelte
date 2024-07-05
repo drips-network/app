@@ -108,15 +108,8 @@
         query GetProject($url: String!) {
           project: projectByUrl(url: $url) {
             ...ListEditorProject
-            ... on ClaimedProject {
-              account {
-                accountId
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-              }
+            account {
+              accountId
             }
           }
         }
@@ -160,8 +153,8 @@
     const res = await query<GetDripListQuery, GetDripListQueryVariables>(
       gql`
         ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-        query GetDripList($id: ID!) {
-          dripList: dripList(id: $id) {
+        query GetDripList($id: ID!, $chain: SupportedChain!) {
+          dripList: dripList(id: $id, chain: $chain) {
             ...ListEditorDripList
             account {
               accountId

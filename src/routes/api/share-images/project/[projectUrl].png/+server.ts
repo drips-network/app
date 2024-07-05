@@ -22,30 +22,26 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const projectQuery = gql`
     query Project($url: String!) {
       projectByUrl(url: $url) {
-        ... on ClaimedProject {
-          source {
-            ownerName
-            repoName
-          }
-          avatar {
-            ... on ImageAvatar {
-              cid
-            }
-            ... on EmojiAvatar {
-              emoji
-            }
-          }
-          color
-          splits {
-            dependencies {
-              __typename
-            }
-          }
+        source {
+          ownerName
+          repoName
         }
-        ... on UnclaimedProject {
-          source {
-            ownerName
-            repoName
+        chainData {
+          ... on ClaimedProjectData {
+            avatar {
+              ... on ImageAvatar {
+                cid
+              }
+              ... on EmojiAvatar {
+                emoji
+              }
+            }
+            color
+            splits {
+              dependencies {
+                __typename
+              }
+            }
           }
         }
       }

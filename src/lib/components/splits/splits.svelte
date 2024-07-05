@@ -10,8 +10,13 @@
   import { gql } from 'graphql-request';
 
   export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
-    fragment SplitsComponentProjectSplits on Project {
-      ... on ClaimedProject {
+    ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    fragment SplitsComponentProjectSplits on ProjectData {
+      ... on ClaimedProjectData {
         splits {
           dependencies {
             ... on AddressReceiver {
@@ -23,7 +28,9 @@
             ... on ProjectReceiver {
               ...EditProjectSplitsFlowProjectReceiver
               project {
-                ...ProjectAvatar
+                chainData {
+                  ...ProjectAvatar
+                }
               }
             }
             ... on DripListReceiver {
@@ -50,21 +57,17 @@
     ${PROJECT_BADGE_FRAGMENT}
     fragment SplitsComponentProject on Project {
       ...ProjectBadge
-      ... on UnclaimedProject {
-        source {
-          repoName
-          ownerName
-        }
+      source {
+        repoName
+        ownerName
       }
-      ... on ClaimedProject {
-        owner {
-          address
+      chainData {
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
+          color
         }
-        source {
-          repoName
-          ownerName
-        }
-        color
       }
     }
   `;
@@ -183,8 +186,8 @@
 
           const dripListQuery = gql`
             ${SPLITS_COMPONENT_DRIP_LIST_FRAGMENT}
-            query DripListForVoteReceiver($id: ID!) {
-              dripList(id: $id) {
+            query DripListForVoteReceiver($id: ID!, $chain: SupportedChain!) {
+              dripList(id: $id, chain: $chain) {
                 ...SplitsComponentDripList
               }
             }
@@ -196,6 +199,7 @@
                 dripListQuery,
                 {
                   id: v.accountId,
+                  chain: network.gqlName,
                 },
                 f,
               )
@@ -270,6 +274,14 @@
     DripListVoteReceiver,
   } from '$lib/utils/multiplayer/schemas';
   import query from '$lib/graphql/dripsQL';
+  import {
+    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
+  import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
+  import network from '$lib/stores/wallet/network';
 
   export let disableLinks = true;
 

@@ -24,10 +24,12 @@
           ...DripVisualAddressDriverAccount
           accountId
         }
-        balances {
-          tokenAddress
-          outgoing {
-            ...CurrentAmountsUserBalanceTimelineItem
+        chainData {
+          balances {
+            tokenAddress
+            outgoing {
+              ...CurrentAmountsUserBalanceTimelineItem
+            }
           }
         }
       }

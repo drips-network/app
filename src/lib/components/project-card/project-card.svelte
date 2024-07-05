@@ -3,21 +3,14 @@
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_NAME_FRAGMENT}
     fragment ProjectCard on Project {
-      ...ProjectAvatar
       ...ProjectName
-      ... on ClaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        forge
+        ownerName
+        repoName
       }
-      ... on UnclaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
+      chainData {
+        ...ProjectAvatar
       }
     }
   `;

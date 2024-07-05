@@ -22,11 +22,13 @@ export const load = async ({ fetch }) => {
     ${USER_BALANCES_FRAGMENT}
     query UserStreams($connectedAddress: String!) {
       userByAddress(address: $connectedAddress) {
-        streams {
-          ...StreamsSectionStreams
-        }
-        balances {
-          ...UserBalances
+        chainData {
+          streams {
+            ...StreamsSectionStreams
+          }
+          balances {
+            ...UserBalances
+          }
         }
       }
     }

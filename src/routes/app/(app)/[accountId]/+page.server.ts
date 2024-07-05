@@ -28,20 +28,22 @@ const PROFILE_PAGE_QUERY = gql`
         address
         accountId
       }
-      balances {
-        ...UserBalances
-      }
-      dripLists {
-        ...DripListsSectionDripList
-      }
-      projects {
-        ...ProjectsSectionProject
-      }
-      streams {
-        ...StreamsSectionStreams
-      }
-      support {
-        ...SupportersSectionSupportItem
+      chainData {
+        balances {
+          ...UserBalances
+        }
+        dripLists {
+          ...DripListsSectionDripList
+        }
+        projects {
+          ...ProjectsSectionProject
+        }
+        streams {
+          ...StreamsSectionStreams
+        }
+        support {
+          ...SupportersSectionSupportItem
+        }
       }
     }
   }

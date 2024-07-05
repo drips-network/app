@@ -27,8 +27,10 @@
           ${WITHDRAW_FLOW_ENTER_AMOUNT_STEP_BALANCES_FRAGMENT}
           query TokenBalances($address: String!) {
             userByAddress(address: $address) {
-              balances {
-                ...WithdrawFlowEnterAmountStepBalances
+              chainData {
+                balances {
+                  ...WithdrawFlowEnterAmountStepBalances
+                }
               }
             }
           }

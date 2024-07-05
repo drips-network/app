@@ -4,30 +4,26 @@
     ProjectBadge_UnclaimedProject_Fragment,
   } from './__generated__/gql.generated';
   import { gql } from 'graphql-request';
+  import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
+  import { PROJECT_TOOLTIP_FRAGMENT } from './components/project-tooltip.svelte';
 
   export const PROJECT_BADGE_FRAGMENT = gql`
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_TOOLTIP_FRAGMENT}
     fragment ProjectBadge on Project {
-      ...ProjectAvatar
       ...ProjectTooltip
-      ... on ClaimedProject {
-        owner {
-          address
-        }
-        source {
-          url
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        url
+        forge
+        ownerName
+        repoName
       }
-      ... on UnclaimedProject {
-        source {
-          url
-          ownerName
-          repoName
-          forge
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
         }
       }
     }
@@ -35,11 +31,9 @@
 </script>
 
 <script lang="ts">
-  import ProjectAvatar, {
-    PROJECT_AVATAR_FRAGMENT,
-  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
-  import ProjectTooltip, { PROJECT_TOOLTIP_FRAGMENT } from './components/project-tooltip.svelte';
+  import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';

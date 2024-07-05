@@ -12,18 +12,15 @@
     ${PROJECT_AVATAR_FRAGMENT}
     fragment IdentityCardProject on Project {
       ...ProjectBadge
-      ...ProjectAvatar
-      ... on ClaimedProject {
-        owner {
-          address
-        }
-        source {
-          repoName
-        }
+      source {
+        repoName
       }
-      ... on UnclaimedProject {
-        source {
-          repoName
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
         }
       }
     }

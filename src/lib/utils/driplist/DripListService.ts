@@ -33,6 +33,7 @@ import type {
 } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
+import network from '$lib/stores/wallet/network';
 
 type AccountId = string;
 
@@ -122,15 +123,17 @@ export default class DripListService {
     );
 
     const mintedNftAccountsCountQuery = gql`
-      query MintedNftAccountsCount($ownerAddress: String!) {
-        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress)
+      query MintedNftAccountsCount($ownerAddress: String!, $chain: SupportedChain!) {
+        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress, chain: $chain) {
+          total
+        }
       }
     `;
 
     const mintedNftAccountsCountRes = await query<
       MintedNftAccountsCountQuery,
       MintedNftAccountsCountQueryVariables
-    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress });
+    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress, chain: network.gqlName });
     const mintedNftAccountsCount = mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress ?? 0;
 
     const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);

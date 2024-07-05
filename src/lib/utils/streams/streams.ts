@@ -32,32 +32,34 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
     gql`
       query CurrentStreams($userAccountId: ID!) {
         userById(accountId: $userAccountId) {
-          streams {
-            outgoing {
-              id
-              name
-              isPaused
-              config {
-                raw
-                amountPerSecond {
-                  tokenAddress
-                }
-                dripId
-                amountPerSecond {
-                  amount
-                }
-                durationSeconds
-                startDate
-              }
-              receiver {
-                ... on User {
-                  account {
-                    accountId
+          chainData {
+            streams {
+              outgoing {
+                id
+                name
+                isPaused
+                config {
+                  raw
+                  amountPerSecond {
+                    tokenAddress
                   }
+                  dripId
+                  amountPerSecond {
+                    amount
+                  }
+                  durationSeconds
+                  startDate
                 }
-                ... on DripList {
-                  account {
-                    accountId
+                receiver {
+                  ... on User {
+                    account {
+                      accountId
+                    }
+                  }
+                  ... on DripList {
+                    account {
+                      accountId
+                    }
                   }
                 }
               }

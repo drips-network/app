@@ -2,10 +2,14 @@
   export const UNCLAIMED_PROJECT_CARD_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-    fragment UnclaimedProjectCard on UnclaimedProject {
+    fragment UnclaimedProjectCard on Project {
       ...ProjectBadge
-      withdrawableBalances {
-        ...MergeWithdrawableBalances
+      chainData {
+        ... on UnClaimedProjectData {
+          withdrawableBalances {
+            ...MergeWithdrawableBalances
+          }
+        }
       }
     }
   `;

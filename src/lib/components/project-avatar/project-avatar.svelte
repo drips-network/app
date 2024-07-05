@@ -2,8 +2,8 @@
   import { gql } from 'graphql-request';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
-    fragment ProjectAvatar on Project {
-      ... on ClaimedProject {
+    fragment ProjectAvatar on ProjectData {
+      ... on ClaimedProjectData {
         color
         avatar {
           ... on EmojiAvatar {

@@ -38,6 +38,7 @@ import type {
   ProjectForVoteReceiverQueryVariables,
 } from './__generated__/gql.generated';
 import { getAddressDriverClient } from '../get-drips-clients';
+import network from '$lib/stores/wallet/network';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -506,18 +507,11 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
       receiversToFetchDataFor.map(async (v) => {
         const projectQuery = gql`
           ${LIST_EDITOR_PROJECT_FRAGMENT}
-          query ProjectForVoteReceiver($url: String!) {
+          query ProjectForVoteReceiver($url: String!, $chains: [SupportedChain!]!) {
             projectByUrl(url: $url) {
               ...ListEditorProject
-              ... on ClaimedProject {
-                account {
-                  accountId
-                }
-              }
-              ... on UnclaimedProject {
-                account {
-                  accountId
-                }
+              account {
+                accountId
               }
             }
           }
@@ -525,8 +519,8 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
 
         const dripListQuery = gql`
           ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-          query DripListForVoteReceiver($id: ID!) {
-            dripList(id: $id) {
+          query DripListForVoteReceiver($id: ID!, $chain: SupportedChain!) {
+            dripList(id: $id, chain: $chain) {
               ...ListEditorDripList
               account {
                 accountId
@@ -541,6 +535,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
               dripListQuery,
               {
                 id: v.accountId,
+                chain: network.gqlName,
               },
             )
           ).dripList;
@@ -548,7 +543,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
           return (
             await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
               projectQuery,
-              { url: v.url },
+              { url: v.url, chains: [network.gqlName] },
             )
           ).projectByUrl;
         }
