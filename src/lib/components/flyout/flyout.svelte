@@ -8,8 +8,18 @@
   export let visible = false;
   let triggerElem: HTMLDivElement;
 
+  let timerId: NodeJS.Timeout;
+
   function handleHover(hovering: boolean) {
-    visible = hovering;
+    clearTimeout(timerId);
+
+    if (hovering) {
+      visible = true;
+    } else {
+      timerId = setTimeout(() => {
+        visible = false;
+      }, 250);
+    }
   }
 
   function handleFocusChange(e: FocusEvent) {
