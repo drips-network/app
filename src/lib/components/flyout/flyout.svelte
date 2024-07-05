@@ -3,8 +3,9 @@
   import { fly } from 'svelte/transition';
 
   export let direction: 'left' | 'right' = 'left';
+  export let width = '24rem';
 
-  let visible = false;
+  export let visible = false;
   let triggerElem: HTMLDivElement;
 
   function handleHover(hovering: boolean) {
@@ -43,7 +44,7 @@
       <slot name="trigger" />
     </div>
     {#if visible}
-      <div transition:fly={{ y: 8 }} class="content" class:left={direction === 'left'}>
+      <div transition:fly={{ y: 8 }} class="content" class:left={direction === 'left'} style:width>
         <div class="margin" />
         <div class="wrapper">
           <slot name="content" />
@@ -70,7 +71,6 @@
     position: absolute;
     z-index: 3;
     left: 0;
-    width: 24rem;
     max-width: calc(100vw - 2rem);
   }
 
