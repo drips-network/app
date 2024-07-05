@@ -42,10 +42,11 @@
   let collectButtonPeeking: boolean;
 
   let networkPickerExpanded = false;
+  $: connected = $walletStore.connected;
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
-  {#if !user || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
+  {#if !connected || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
     <a aria-label="Go to explore page" href={'/app'}>
       <div class="logo flex items-center pb-px">
         <DripsLogo />
@@ -61,7 +62,7 @@
       {/if}
     </a>
   {/if}
-  {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
+  {#if connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
       <CollectButton
         withdrawableBalances={user?.withdrawableBalances}
@@ -92,7 +93,7 @@
           <SearchIcon style="fill: var(--color-foreground)" />
         </button>
       {/if}
-      {#if !user}
+      {#if !connected}
         <a class="header-button" href="/app/settings">
           <SettingsIcon style="fill: var(--color-foreground)" />
         </a>
