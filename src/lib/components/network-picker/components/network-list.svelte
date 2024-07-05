@@ -17,7 +17,7 @@
     const url = new URL(`https://${getNetwork(chainId).subdomain}${path}`);
 
     if (!$page.data.preservePathOnNetworkChange) {
-      url.pathname = '/explore';
+      url.pathname = '/app';
     }
 
     return url.href;
