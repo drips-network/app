@@ -7,7 +7,11 @@
     fragment ProjectsListingsItem on Project {
       ...ProjectBadge
       chainData {
+        ... on UnClaimedProjectData {
+          chain
+        }
         ... on ClaimedProjectData {
+          chain
           splits {
             maintainers {
               account {
@@ -79,6 +83,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { ProjectsListingsItemFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data: PageData;
   interface ProjectsTableRow {
@@ -89,6 +94,8 @@
 
   const projectsTableData: ProjectsTableRow[] = data.content.projects
     .map((project) => {
+      const projectChainData = filterCurrentChainData(project.chainData);
+
       return {
         badge: {
           project,
@@ -97,20 +104,20 @@
         dependenciesPile: {
           maxItems: 4,
           components:
-            'splits' in project
+            projectChainData && 'splits' in projectChainData
               ? [
-                  ...mapFilterUndefined(project.splits.maintainers, (s) => {
+                  ...mapFilterUndefined(projectChainData.splits.maintainers, (s) => {
                     switch (s.__typename) {
                       case 'AddressReceiver':
                         return addressIcon(s.account.address);
                     }
                   }),
-                  ...mapFilterUndefined(project.splits.dependencies, (s) => {
+                  ...mapFilterUndefined(projectChainData.splits.dependencies, (s) => {
                     switch (s.__typename) {
                       case 'DripListReceiver':
                         return dripListIcon(s.dripList);
                       case 'ProjectReceiver':
-                        return projectIcon(s.project);
+                        return projectIcon(projectChainData);
                       case 'AddressReceiver':
                         return addressIcon(s.account.address);
                     }
@@ -121,13 +128,13 @@
         supportersPile: {
           maxItems: 4,
           components:
-            'support' in project
-              ? mapFilterUndefined(project.support, (s) => {
+            projectChainData && 'support' in projectChainData
+              ? mapFilterUndefined(projectChainData.support, (s) => {
                   switch (s.__typename) {
                     case 'DripListSupport':
                       return dripListIcon(s.dripList);
                     case 'ProjectSupport':
-                      return projectIcon(s.project);
+                      return projectIcon(projectChainData);
                     case 'OneTimeDonationSupport':
                       return addressIcon(s.account.address);
                   }
@@ -171,7 +178,9 @@
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     const { project } = projectsTableData[event.detail.rowIndex].badge;
-    if (!isClaimed(project)) return;
+    const chainData = filterCurrentChainData(project.chainData);
+
+    if (!chainData || !isClaimed(chainData)) return;
 
     const { source } = project;
     goto(buildProjectUrl(source.forge, source.ownerName, source.repoName, true));
