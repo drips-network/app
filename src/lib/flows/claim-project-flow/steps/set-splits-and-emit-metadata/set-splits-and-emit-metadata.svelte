@@ -16,6 +16,8 @@
   import expect from '$lib/utils/expect';
   import isClaimed from '$lib/utils/project/is-claimed';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -55,10 +57,13 @@
           const projectId = $context.project?.account.accountId ?? unreachable();
 
           const projectClaimedQuery = gql`
-            query ProjectIsClaimed($id: ID!) {
-              projectById(id: $id) {
+            query ProjectIsClaimed($id: ID!, $chains: [SupportedChain!]) {
+              projectById(id: $id, chains: $chains) {
                 chainData {
                   ... on ClaimedProjectData {
+                    chain
+                  }
+                  ... on UnClaimedProjectData {
                     chain
                   }
                 }
@@ -70,8 +75,13 @@
             () =>
               query<ProjectIsClaimedQuery, ProjectIsClaimedQueryVariables>(projectClaimedQuery, {
                 id: projectId,
+                chains: [network.gqlName],
               }),
-            (result) => Boolean(result.projectById && isClaimed(result.projectById)),
+            (result) =>
+              Boolean(
+                result.projectById &&
+                  isClaimed(filterCurrentChainData(result.projectById.chainData)),
+              ),
             300000,
             2000,
           );

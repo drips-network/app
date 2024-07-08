@@ -27,6 +27,12 @@
               ... on ProjectReceiver {
                 project {
                   chainData {
+                    ... on ClaimedProjectData {
+                      chain
+                    }
+                    ... on UnClaimedProjectData {
+                      chain
+                    }
                     ...ProjectAvatar
                   }
                 }
@@ -47,6 +53,12 @@
             ... on ProjectSupport {
               project {
                 chainData {
+                  ... on ClaimedProjectData {
+                    chain
+                  }
+                  ... on UnClaimedProjectData {
+                    chain
+                  }
                   ...ProjectAvatar
                 }
               }
@@ -117,7 +129,7 @@
                       case 'DripListReceiver':
                         return dripListIcon(s.dripList);
                       case 'ProjectReceiver':
-                        return projectIcon(projectChainData);
+                        return projectIcon(filterCurrentChainData(s.project.chainData));
                       case 'AddressReceiver':
                         return addressIcon(s.account.address);
                     }

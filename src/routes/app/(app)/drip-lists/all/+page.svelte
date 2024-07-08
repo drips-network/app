@@ -16,6 +16,12 @@
           project {
             chainData {
               ...ProjectAvatar
+              ... on ClaimedProjectData {
+                chain
+              }
+              ... on UnClaimedProjectData {
+                chain
+              }
             }
           }
         }
@@ -34,6 +40,12 @@
         ... on ProjectSupport {
           project {
             chainData {
+              ... on ClaimedProjectData {
+                chain
+              }
+              ... on UnClaimedProjectData {
+                chain
+              }
               ...ProjectAvatar
             }
           }
@@ -67,6 +79,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data: PageData;
 
@@ -90,8 +103,9 @@
             switch (s.__typename) {
               case 'DripListReceiver':
                 return dripListIcon(s.dripList);
-              case 'ProjectReceiver':
-                return projectIcon(s.project);
+              case 'ProjectReceiver': {
+                return projectIcon(filterCurrentChainData(s.project.chainData));
+              }
               case 'AddressReceiver':
                 return addressIcon(s.account.address);
             }
@@ -104,7 +118,7 @@
               case 'DripListSupport':
                 return dripListIcon(s.dripList);
               case 'ProjectSupport':
-                return projectIcon(s.project);
+                return projectIcon(filterCurrentChainData(s.project.chainData));
               case 'OneTimeDonationSupport':
                 return addressIcon(s.account.address);
             }

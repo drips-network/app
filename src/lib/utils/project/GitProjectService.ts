@@ -23,6 +23,9 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
+import filterCurrentChainData from '../filter-current-chain-data';
+import unreachable from '../unreachable';
+import network from '$lib/stores/wallet/network';
 
 interface ListEditorConfig {
   items: Items;
@@ -222,29 +225,33 @@ export default class GitProjectService {
     );
 
     const project = {
-      __typename: 'ClaimedProject' as const,
+      __typename: 'Project' as const,
       account: {
         __typename: 'RepoDriverAccount' as const,
         accountId,
         driver: Driver.Repo,
       },
-      color: context.projectColor,
-      avatar:
-        context.avatar.type === 'emoji'
-          ? {
-              __typename: 'EmojiAvatar' as const,
-              emoji: context.avatar.emoji,
-            }
-          : {
-              __typename: 'ImageAvatar' as const,
-              cid: context.avatar.cid,
-            },
       source: {
         __typename: 'Source' as const,
         forge: forge,
         ownerName: username,
         repoName: repoName,
         url: context.gitUrl,
+      },
+      chainData: {
+        __typename: 'ClaimedProjectData',
+        chain: network.gqlName,
+        color: context.projectColor,
+        avatar:
+          context.avatar.type === 'emoji'
+            ? {
+                __typename: 'EmojiAvatar' as const,
+                emoji: context.avatar.emoji,
+              }
+            : {
+                __typename: 'ImageAvatar' as const,
+                cid: context.avatar.cid,
+              },
       },
     };
 
@@ -270,12 +277,18 @@ export default class GitProjectService {
       accountMetadataAsBytes,
     );
 
-    const splittableAmounts = context.project?.withdrawableBalances.filter(
-      (wb) => BigInt(wb.splittableAmount) > 0n,
-    );
-    const collectableAmounts = context.project?.withdrawableBalances.filter(
-      (wb) => BigInt(wb.collectableAmount) > 0n,
-    );
+    const projectChainData = context.project?.chainData
+      ? filterCurrentChainData(context.project.chainData)
+      : unreachable();
+
+    const splittableAmounts =
+      'withdrawableBalances' in projectChainData
+        ? projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n)
+        : undefined;
+    const collectableAmounts =
+      'withdrawableBalances' in projectChainData
+        ? projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n)
+        : undefined;
 
     const splitTxs: Promise<PopulatedTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
@@ -298,20 +311,7 @@ export default class GitProjectService {
 
   // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
   private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
-
-    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
-      if (
-        !unique.some(
-          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
-        )
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    const sortedReceivers = uniqueReceivers.sort((a, b) =>
+    const sortedReceivers = receivers.sort((a, b) =>
       // Sort by user ID.
       BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
         ? 1

@@ -10,6 +10,12 @@
         repoName
       }
       chainData {
+        ... on ClaimedProjectData {
+          chain
+        }
+        ... on UnClaimedProjectData {
+          chain
+        }
         ...ProjectAvatar
       }
     }
@@ -27,8 +33,10 @@
   import { gql } from 'graphql-request';
   import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let project: ProjectCardFragment;
+  let projectChainData = filterCurrentChainData(project.chainData);
 </script>
 
 <a
@@ -38,12 +46,14 @@
   <div class="project-card">
     <div
       class="background"
-      style:background-color={isClaimed(project)
+      style:background-color={isClaimed(projectChainData)
         ? 'var(--color-primary-level-2)'
         : 'var(--color-foreground-level-1)'}
     />
     <div class="header">
-      <div class="avatar"><ProjectAvatar {project} size="large" outline /></div>
+      <div class="avatar">
+        <ProjectAvatar project={projectChainData} size="large" outline />
+      </div>
     </div>
     <div class="name-and-description">
       <div class="source">

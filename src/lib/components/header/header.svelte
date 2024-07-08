@@ -6,6 +6,7 @@
     ${COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT}
     fragment HeaderUser on User {
       chainData {
+        chain
         withdrawableBalances {
           ...CollectButtonWithdrawableBalance
         }
@@ -28,8 +29,11 @@
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import type { HeaderUserFragment } from './__generated__/gql.generated';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let user: HeaderUserFragment | null;
+
+  $: chainData = user?.chainData ? filterCurrentChainData(user.chainData) : undefined;
 
   $: elevated = $scroll.pos > 16;
 
@@ -62,7 +66,7 @@
   {#if connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
       <CollectButton
-        withdrawableBalances={user?.withdrawableBalances}
+        withdrawableBalances={chainData?.withdrawableBalances}
         peekAmount={true}
         bind:isPeeking={collectButtonPeeking}
       />
@@ -101,7 +105,7 @@
     </div>
     {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
       <div data-highlightid="global-collect" class="collect">
-        <CollectButton withdrawableBalances={user?.withdrawableBalances} />
+        <CollectButton withdrawableBalances={chainData?.withdrawableBalances} />
       </div>
     {/if}
   </div>

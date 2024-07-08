@@ -46,15 +46,22 @@
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let project: SetNewMetadataStepFragment;
+  let projectChainData = filterCurrentChainData(project.chainData) as ClaimedProjectData;
 
   let projectWritable = writable(structuredClone(project));
+  let projectWritableChainData = filterCurrentChainData(
+    $projectWritable.chainData,
+  ) as ClaimedProjectData;
 
   $: changesMade =
-    project.avatar !== $projectWritable.avatar || project.color !== $projectWritable.color;
+    projectChainData.avatar !== projectWritableChainData.avatar ||
+    projectChainData.color !== projectWritableChainData.color;
 
   let valid = false;
 
@@ -75,16 +82,16 @@
           const newMetadata: LatestVersion<typeof repoDriverAccountMetadataParser> = {
             ...upgraded,
             avatar:
-              $projectWritable.avatar.__typename === 'EmojiAvatar'
+              projectWritableChainData.avatar.__typename === 'EmojiAvatar'
                 ? {
                     type: 'emoji',
-                    emoji: $projectWritable.avatar.emoji,
+                    emoji: projectWritableChainData.avatar.emoji,
                   }
                 : {
                     type: 'image',
-                    cid: $projectWritable.avatar.cid,
+                    cid: projectWritableChainData.avatar.cid,
                   },
-            color: $projectWritable.color,
+            color: projectWritableChainData.color,
           };
 
           const upgradedMetadata = metadataManager.upgradeAccountMetadata(newMetadata);

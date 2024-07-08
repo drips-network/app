@@ -85,7 +85,7 @@
         <div class="avatar-and-forge">
           {#if !forceUnclaimed && isClaimed(chainData)}
             <div>
-              <ProjectAvatar {size} project={chainData} />
+              <ProjectAvatar {size} project={filterCurrentChainData(unclaimedProject.chainData)} />
             </div>
           {/if}
           <div><ProjectAvatar {size} project={chainData} /></div>

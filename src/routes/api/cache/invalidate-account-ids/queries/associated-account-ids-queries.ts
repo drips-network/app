@@ -5,6 +5,7 @@ export const projectAssociatedAccountIdsQuery = gql`
     projectById(id: $projectAccountId, chains: $chains) {
       chainData {
         ... on ClaimedProjectData {
+          chain
           owner {
             accountId
           }
@@ -56,6 +57,7 @@ export const projectAssociatedAccountIdsQuery = gql`
           }
         }
         ... on UnClaimedProjectData {
+          chain
           support {
             ... on ProjectSupport {
               account {

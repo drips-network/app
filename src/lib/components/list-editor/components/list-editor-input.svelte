@@ -27,6 +27,7 @@
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import { slide } from 'svelte/transition';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -105,8 +106,8 @@
     const res = await query<GetProjectQuery, GetProjectQueryVariables>(
       gql`
         ${LIST_EDITOR_PROJECT_FRAGMENT}
-        query GetProject($url: String!) {
-          project: projectByUrl(url: $url) {
+        query GetProject($url: String!, $chains: [SupportedChain!]) {
+          project: projectByUrl(url: $url, chains: $chains) {
             ...ListEditorProject
             account {
               accountId
@@ -114,7 +115,7 @@
           }
         }
       `,
-      { url: normalizedUrl },
+      { url: normalizedUrl, chains: [network.gqlName] },
     );
 
     if (res.project) {
@@ -162,7 +163,7 @@
           }
         }
       `,
-      { id: dripListId },
+      { id: dripListId, chain: network.gqlName },
     );
 
     if (res.dripList) {

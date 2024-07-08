@@ -1,6 +1,7 @@
 import { ethers, providers } from 'ethers';
 import { readable } from 'svelte/store';
 import type { ConnectedWalletStoreState } from '../wallet.store';
+import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
 const NETWORK = {
   chainId: 11155111 as const,
@@ -9,6 +10,7 @@ const NETWORK = {
   token: 'ETH',
   id: '0xaa36a7',
   rpcUrl: 'http://127.0.0.1:8545',
+  gqlName: SupportedChain.Sepolia,
 };
 
 const provider = new providers.StaticJsonRpcProvider(

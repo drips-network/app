@@ -508,7 +508,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
         const projectQuery = gql`
           ${LIST_EDITOR_PROJECT_FRAGMENT}
           query ProjectForVoteReceiver($url: String!, $chains: [SupportedChain!]!) {
-            projectByUrl(url: $url) {
+            projectByUrl(url: $url, chains: $chains) {
               ...ListEditorProject
               account {
                 accountId
@@ -558,7 +558,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
     switch (receiver.type) {
       case 'project': {
         const project = receiversData.find(
-          (p): p is Extract<(typeof receiversData)[number], { __typename: 'ClaimedProject' }> =>
+          (p): p is Extract<(typeof receiversData)[number], { __typename: 'Project' }> =>
             p.__typename !== 'DripList' && p.source.url === receiver.url,
         );
         if (!project) throw new Error(`Project not found for url: ${receiver.url}`);

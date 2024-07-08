@@ -74,8 +74,7 @@
       case 'NftDriverAccount':
         recipientAccountId = receiver.accountId;
         break;
-      case 'ClaimedProject':
-      case 'UnclaimedProject':
+      case 'Project':
         recipientAccountId = receiver.account.accountId;
         break;
     }

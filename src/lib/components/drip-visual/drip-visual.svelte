@@ -158,7 +158,7 @@
           <IdentityCard dripList={result} title="To" />
         {/if}
       {/await}
-    {:else if (to && to.__typename === 'ClaimedProject') || (to && to.__typename === 'UnClaimedProjectData')}
+    {:else if to && to.__typename === 'Project'}
       <IdentityCard disableLink={disableLinks} project={to} title="To" />
     {:else if to && to.__typename === 'DripList'}
       <IdentityCard disableLink={disableLinks} dripList={to} title="To" />

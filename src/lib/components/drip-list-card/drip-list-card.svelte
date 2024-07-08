@@ -10,6 +10,7 @@
     ${SUPPORTER_PILE_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
+      chain
       ...EditDripListStepSelectedDripList
       name
       account {

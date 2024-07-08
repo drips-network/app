@@ -28,6 +28,7 @@
   import query from '$lib/graphql/dripsQL';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -57,8 +58,8 @@
             () =>
               query<CheckUserStreamPausedQuery, CheckUserStreamPausedQueryVariables>(
                 gql`
-                  query CheckUserStreamPaused($accountId: ID!) {
-                    userById(accountId: $accountId) {
+                  query CheckUserStreamPaused($accountId: ID!, $chains: [SupportedChain!]) {
+                    userById(accountId: $accountId, chains: $chains) {
                       chainData {
                         chain
                         streams {
@@ -71,7 +72,7 @@
                     }
                   }
                 `,
-                { accountId },
+                { accountId, chains: [network.gqlName] },
               ),
             (res) =>
               filterCurrentChainData(res.userById.chainData).streams?.outgoing?.find(

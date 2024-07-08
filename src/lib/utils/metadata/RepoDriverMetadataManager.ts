@@ -1,4 +1,3 @@
-import type { ClaimedProject } from '$lib/graphql/__generated__/base-types';
 import query from '$lib/graphql/dripsQL';
 import type { PickGQLF } from '$lib/graphql/utils/pick-gql-fields';
 import { gql } from 'graphql-request';
@@ -11,6 +10,9 @@ import type {
 } from './__generated__/gql.generated';
 import { getRepoDriverClient } from '../get-drips-clients';
 import RepoDriverUtils from '../RepoDriverUtils';
+import filterCurrentChainData from '../filter-current-chain-data';
+import type { ClaimedProjectData, Project } from '$lib/graphql/__generated__/base-types';
+import network from '$lib/stores/wallet/network';
 
 type AccountId = string;
 
@@ -27,21 +29,33 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       LatestProjectMetadataHashQueryVariables
     >(
       gql`
-        query LatestProjectMetadataHash($accountId: ID!) {
-          projectById(id: $accountId) {
+        query LatestProjectMetadataHash($accountId: ID!, $chains: [SupportedChain!]) {
+          projectById(id: $accountId, chains: $chains) {
             chainData {
               ... on ClaimedProjectData {
+                __typename
+                chain
                 latestMetadataIpfsHash
+              }
+              ... on UnClaimedProjectData {
+                __typename
+                chain
               }
             }
           }
         }
       `,
-      { accountId },
+      { accountId, chains: [network.gqlName] },
     );
 
-    if (res.projectById?.__typename === 'ClaimedProject') {
-      return res.projectById.latestMetadataIpfsHash;
+    if (!res.projectById) {
+      return null;
+    }
+
+    const projectChainData = filterCurrentChainData(res.projectById.chainData);
+
+    if (projectChainData.__typename === 'ClaimedProjectData') {
+      return projectChainData.latestMetadataIpfsHash;
     }
 
     return null;
@@ -86,7 +100,9 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
   }
 
   public buildAccountMetadata(context: {
-    forProject: PickGQLF<ClaimedProject, 'account' | 'source' | 'avatar' | 'color' | 'description'>;
+    forProject: PickGQLF<Project, 'account' | 'source'> & {
+      chainData: Pick<ClaimedProjectData, 'avatar' | 'color' | 'description'>;
+    };
     forSplits: LatestVersion<typeof repoDriverAccountMetadataParser>['splits'];
   }): LatestVersion<typeof repoDriverAccountMetadataParser> {
     const { forProject, forSplits } = context;
@@ -104,17 +120,17 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
         url: forProject.source.url,
       },
       avatar:
-        forProject.avatar.__typename === 'EmojiAvatar'
+        forProject.chainData.avatar.__typename === 'EmojiAvatar'
           ? {
               type: 'emoji',
-              emoji: forProject.avatar.emoji,
+              emoji: forProject.chainData.avatar.emoji,
             }
           : {
               type: 'image',
-              cid: forProject.avatar.cid,
+              cid: forProject.chainData.avatar.cid,
             },
-      color: forProject.color,
-      description: forProject.description ?? undefined,
+      color: forProject.chainData.color,
+      description: forProject.chainData.description ?? undefined,
       splits: forSplits,
     };
   }

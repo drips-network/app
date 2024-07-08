@@ -4,6 +4,7 @@
   export const PROJECT_AVATAR_FRAGMENT = gql`
     fragment ProjectAvatar on ProjectData {
       ... on ClaimedProjectData {
+        chain
         color
         avatar {
           ... on EmojiAvatar {

@@ -15,14 +15,15 @@ import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.ge
 import sanitize from 'sanitize-html';
 import twemoji from '$lib/utils/twemoji';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { projectUrl } = params;
   assert(projectUrl, 'Missing projectUrl param');
 
   const projectQuery = gql`
-    query Project($url: String!) {
-      projectByUrl(url: $url) {
+    query Project($url: String!, $chains: [SupportedChain!]) {
+      projectByUrl(url: $url, chains: $chains) {
         source {
           ownerName
           repoName
@@ -55,7 +56,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const res = await query<ProjectQuery, ProjectQueryVariables>(
     projectQuery,
-    { url: projectUrl },
+    { url: projectUrl, chains: [network.gqlName] },
     fetch,
   );
   const { projectByUrl: project } = res;

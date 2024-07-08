@@ -6,6 +6,7 @@
       ...ProjectBadge
       chainData {
         ... on UnClaimedProjectData {
+          chain
           withdrawableBalances {
             ...MergeWithdrawableBalances
           }
@@ -36,6 +37,8 @@
     mergeSplittableFunds,
   } from '$lib/utils/merge-withdrawable-balances';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import type { UnClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
   const dispatch = createEventDispatcher();
 
@@ -48,8 +51,10 @@
       }
     | undefined = undefined;
 
-  $: collectableFunds = mergeCollectableFunds(project.withdrawableBalances);
-  $: splittableFunds = mergeSplittableFunds(project.withdrawableBalances);
+  $: projectChainData = filterCurrentChainData(project.chainData) as UnClaimedProjectData;
+
+  $: collectableFunds = mergeCollectableFunds(projectChainData.withdrawableBalances);
+  $: splittableFunds = mergeSplittableFunds(projectChainData.withdrawableBalances);
 
   $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
 

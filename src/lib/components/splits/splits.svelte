@@ -23,7 +23,9 @@
               ...EditProjectSplitsFlowAddressReceiver
               account {
                 address
+                driver
               }
+              driver
             }
             ... on ProjectReceiver {
               ...EditProjectSplitsFlowProjectReceiver
@@ -38,6 +40,11 @@
               dripList {
                 ...DripListBadge
               }
+              account {
+                accountId
+                driver
+              }
+              driver
             }
           }
           maintainers {
@@ -45,7 +52,9 @@
               ...EditProjectSplitsFlowAddressReceiver
               account {
                 address
+                driver
               }
+              driver
             }
           }
         }
@@ -63,6 +72,7 @@
       }
       chainData {
         ... on ClaimedProjectData {
+          chain
           owner {
             address
           }
@@ -99,6 +109,7 @@
     fragment SplitsComponentDripListReceiver on DripListReceiver {
       weight
       dripList {
+        chain
         ...SplitsComponentDripList
       }
     }
@@ -177,8 +188,8 @@
         receiversToFetchDataFor.map(async (v) => {
           const projectQuery = gql`
             ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
-            query ProjectForVoteReceiver($url: String!) {
-              projectByUrl(url: $url) {
+            query ProjectForVoteReceiver($url: String!, $chains: [SupportedChain!]) {
+              projectByUrl(url: $url, chains: $chains) {
                 ...SplitsComponentProject
               }
             }
@@ -188,6 +199,7 @@
             ${SPLITS_COMPONENT_DRIP_LIST_FRAGMENT}
             query DripListForVoteReceiver($id: ID!, $chain: SupportedChain!) {
               dripList(id: $id, chain: $chain) {
+                chain
                 ...SplitsComponentDripList
               }
             }
@@ -208,7 +220,7 @@
             return (
               await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
                 projectQuery,
-                { url: v.url },
+                { url: v.url, chains: [network.gqlName] },
                 f,
               )
             ).projectByUrl;
@@ -231,8 +243,12 @@
           };
         case 'project': {
           const project = receiversData.find(
-            (p): p is Extract<typeof p, { __typename: 'ClaimedProject' | 'UnclaimedProject' }> =>
-              p.__typename !== 'DripList' && p.source.url === v.url,
+            (
+              p,
+            ): p is Extract<
+              typeof p,
+              { __typename: 'ClaimedProjectData' | 'UnclaimedProjectData' }
+            > => p.__typename !== 'DripList' && p.source.url === v.url,
           );
           if (!project) throw new Error(`Project not found for url: ${v.url}`);
 

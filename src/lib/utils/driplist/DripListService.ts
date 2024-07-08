@@ -134,9 +134,11 @@ export default class DripListService {
       MintedNftAccountsCountQuery,
       MintedNftAccountsCountQueryVariables
     >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress, chain: network.gqlName });
-    const mintedNftAccountsCount = mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress ?? 0;
 
-    const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
+    const salt = this._calcSaltFromAddress(
+      this._ownerAddress,
+      mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress.total ?? 0,
+    );
 
     const listId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
 

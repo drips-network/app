@@ -48,6 +48,14 @@ const getProjectsQuery = gql`
       account {
         accountId
       }
+      chainData {
+        ... on ClaimedProjectData {
+          chain
+        }
+        ... on UnClaimedProjectData {
+          chain
+        }
+      }
     }
   }
 `;

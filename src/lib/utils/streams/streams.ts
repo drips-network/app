@@ -13,6 +13,8 @@ import type { PopulatedTransaction, Signer } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
 import makeStreamId, { decodeStreamId } from './make-stream-id';
+import filterCurrentChainData from '../filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 type NewStreamOptions = {
   tokenAddress: string;
@@ -30,9 +32,10 @@ const USER_METADATA_KEY = 'ipfs';
 export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: string) {
   const currentStreamsQueryRes = await query<CurrentStreamsQuery, CurrentStreamsQueryVariables>(
     gql`
-      query CurrentStreams($userAccountId: ID!) {
-        userById(accountId: $userAccountId) {
+      query CurrentStreams($userAccountId: ID!, $chains: [SupportedChain!]) {
+        userById(accountId: $userAccountId, chains: $chains) {
           chainData {
+            chain
             streams {
               outgoing {
                 id
@@ -70,10 +73,13 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
     `,
     {
       userAccountId: accountId,
+      chains: [network.gqlName],
     },
   );
 
-  const { outgoing: currentStreams } = currentStreamsQueryRes.userById.streams;
+  const chainData = filterCurrentChainData(currentStreamsQueryRes.userById.chainData);
+
+  const { outgoing: currentStreams } = chainData.streams;
 
   const currentReceivers = currentStreams
     .filter(
@@ -93,12 +99,15 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
 }
 
 function _buildMetadata(
-  streams: CurrentStreamsQuery['userById']['streams']['outgoing'],
+  streams: CurrentStreamsQuery['userById']['chainData'][number]['streams']['outgoing'],
   accountId: string,
   newStream?: NewStreamOptions & { dripId: bigint },
 ) {
   const streamsByTokenAddress = streams.reduce<
-    Record<string, CurrentStreamsQuery['userById']['streams']['outgoing'][number][]>
+    Record<
+      string,
+      CurrentStreamsQuery['userById']['chainData'][number]['streams']['outgoing'][number][]
+    >
   >(
     (acc, stream) => ({
       ...acc,

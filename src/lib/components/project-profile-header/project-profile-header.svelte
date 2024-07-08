@@ -10,6 +10,7 @@
       chainData {
         ...ProjectAvatar
         ... on ClaimedProjectData {
+          chain
           owner {
             address
           }
@@ -35,6 +36,7 @@
   import twemoji from '$lib/utils/twemoji';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let project: ProjectProfileHeaderFragment;
   export let description: string | undefined = undefined;
@@ -47,19 +49,21 @@
 
   export let pendingAvatar = false;
 
+  let projectChainData = filterCurrentChainData(project.chainData);
+
   const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
   <div class="max-w-full flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:gap-8 sm:items-center">
     <div class="avatar">
-      <ProjectAvatar {pendingAvatar} {project} size="huge" />
+      <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{project.source.repoName}</h1>
       <div style:display="flex" style:gap="0.75rem" style:flex-wrap="wrap">
-        {#if isClaimed(project)}
-          <IdentityBadge address={project.owner.address} />
+        {#if isClaimed(projectChainData)}
+          <IdentityBadge address={projectChainData.owner.address} />
         {/if}
         <ProjectBadge size="tiny" {project} forceUnclaimed tooltip={false} linkTo="external-url" />
       </div>
