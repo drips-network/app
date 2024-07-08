@@ -11,6 +11,11 @@ declare namespace App {
      * load function.
      */
     blockWhileInitializing?: false;
+
+    /**
+     * If false, the app will redirect to the explore page.
+     */
+    preservePathOnNetworkChange?: boolean;
   }
 
   // interface PageError {}

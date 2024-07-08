@@ -26,6 +26,10 @@
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import type { HeaderUserFragment } from './__generated__/gql.generated';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import Flyout from '../flyout/flyout.svelte';
+  import NetworkPicker from '../network-picker/network-picker.svelte';
+  import NetworkList from '../network-picker/components/network-list.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
   export let user: HeaderUserFragment | null;
 
@@ -37,6 +41,7 @@
 
   let collectButtonPeeking: boolean;
 
+  let networkPickerExpanded = false;
   $: connected = $walletStore.connected;
 </script>
 
@@ -92,6 +97,33 @@
         <a class="header-button" href="/app/settings">
           <SettingsIcon style="fill: var(--color-foreground)" />
         </a>
+
+        <div class="network-picker">
+          <div class="desktop-only">
+            <div class="network-picker-flyout">
+              <Flyout width="16rem" bind:visible={networkPickerExpanded}>
+                <div slot="trigger">
+                  <NetworkPicker
+                    toggled={networkPickerExpanded}
+                    on:click={() => (networkPickerExpanded = !networkPickerExpanded)}
+                  />
+                </div>
+                <div slot="content">
+                  <NetworkList />
+                </div>
+              </Flyout>
+            </div>
+          </div>
+          <div
+            class="mobile-only"
+            role="button"
+            tabindex="0"
+            on:click={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+            on:keydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+          >
+            <NetworkPicker />
+          </div>
+        </div>
       {/if}
     </div>
     <div class="connect">
@@ -205,6 +237,33 @@
     .collect.mobile {
       position: absolute;
       z-index: 10;
+    }
+  }
+
+  .network-picker-flyout {
+    display: flex;
+    align-items: center;
+    margin-left: 0.5rem;
+  }
+
+  .network-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-only {
+      display: none;
+    }
+
+    .mobile-only {
+      display: initial;
     }
   }
 </style>

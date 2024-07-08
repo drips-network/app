@@ -15,11 +15,6 @@
 </script>
 
 <div class="wrapper">
-  {#if $wallet.network.chainId !== 1}
-    <div class="network-badge">
-      <p>{$wallet.network.label}</p>
-    </div>
-  {/if}
   {#if $wallet.connected}
     <div class="desktop-only">
       <Flyout>
@@ -75,22 +70,6 @@
 
   .trigger {
     display: flex;
-  }
-
-  .network-badge {
-    height: 2rem;
-    padding: 0 8px;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    text-transform: capitalize;
-    background-color: var(--color-primary-level-1);
-    border-radius: 1rem 0 1rem 1rem;
-    color: var(--color-primary-level-6);
-  }
-
-  .network-badge p {
-    line-height: 2rem;
   }
 
   .trigger > .safe-logo {

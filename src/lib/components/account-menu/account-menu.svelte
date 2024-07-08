@@ -11,10 +11,15 @@
   import { navigating } from '$app/stores';
   import LegalLinks from '../legal-links/legal-links.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
+  import NetworkPicker from '../network-picker/network-picker.svelte';
+  import NetworkList from '../network-picker/components/network-list.svelte';
+  import { slide } from 'svelte/transition';
 
   $: $navigating && cupertinoPaneStore.closeSheet();
 
   $: safeAppMode = Boolean($wallet.safe);
+
+  let shouldShowNetworkList = false;
 </script>
 
 <div class="account-menu">
@@ -40,7 +45,11 @@
         /></svelte:fragment
       >
       <svelte:fragment slot="right"
-        ><Button
+        ><NetworkPicker
+          bind:toggled={shouldShowNetworkList}
+          on:click={() => (shouldShowNetworkList = !shouldShowNetworkList)}
+        />
+        <Button
           disabled={safeAppMode}
           variant="ghost"
           on:click={() => {
@@ -64,6 +73,15 @@
             >
           </div>
         </AnnotationBox>
+      </div>
+    {/if}
+    {#if shouldShowNetworkList}
+      <div
+        transition:slide={{ delay: 0, duration: 300 }}
+        on:introend={cupertinoPaneStore.reCalcHeight}
+        on:outroend={cupertinoPaneStore.reCalcHeight}
+      >
+        <NetworkList />
       </div>
     {/if}
     <Divider sideMargin={0.5} />

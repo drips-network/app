@@ -1,8 +1,13 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
+import Base from '$lib/components/icons/networks/Base.svelte';
+import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
+import Optimism from '$lib/components/icons/networks/Optimism.svelte';
+import Polygon from '$lib/components/icons/networks/Polygon.svelte';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
+import type { ComponentType } from 'svelte';
 
-const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532] as const;
+export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type Network = {
@@ -12,9 +17,45 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
+  icon: ComponentType;
+  color: string;
+  isTestnet: boolean;
+  subdomain: string;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
+
+const NETWORK_IS_TESTNET: ValueForEachSupportedChain<boolean> = {
+  [1]: false,
+  [80002]: true,
+  [11155420]: true,
+  [11155111]: true,
+  [84532]: true,
+};
+
+const NETWORK_SUBDOMAIN: ValueForEachSupportedChain<string> = {
+  [1]: 'drips.network',
+  [80002]: 'amoy.drips.network',
+  [11155420]: 'optimism-sepolia.drips.network',
+  [11155111]: 'sepolia.drips.network',
+  [84532]: 'base-sepolia.drips.network',
+};
+
+const NETWORK_ICONS: ValueForEachSupportedChain<ComponentType> = {
+  [1]: Ethereum,
+  [80002]: Polygon,
+  [11155420]: Optimism,
+  [11155111]: Ethereum,
+  [84532]: Base,
+};
+
+const NETWORK_COLORS: ValueForEachSupportedChain<string> = {
+  [1]: '#627EEA',
+  [80002]: '#627EEA',
+  [11155420]: '#627EEA',
+  [11155111]: '#627EEA',
+  [84532]: '#627EEA',
+};
 
 const NETWORK_NAMES: ValueForEachSupportedChain<string> = {
   [1]: 'homestead',
@@ -80,6 +121,10 @@ export function getNetwork(chainId: number): Network {
     token: NETWORK_TOKENS[chainId],
     id: NETWORK_ID[chainId],
     rpcUrl: RPC_URLS[chainId],
+    icon: NETWORK_ICONS[chainId],
+    color: NETWORK_COLORS[chainId],
+    isTestnet: NETWORK_IS_TESTNET[chainId],
+    subdomain: NETWORK_SUBDOMAIN[chainId],
   };
 }
 

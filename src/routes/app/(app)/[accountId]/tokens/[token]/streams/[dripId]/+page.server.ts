@@ -41,5 +41,9 @@ export const load = async ({ params, fetch }) => {
     error(404);
   }
 
-  return { stream: matchingStream, blockWhileInitializing: false };
+  return {
+    stream: matchingStream,
+    blockWhileInitializing: false,
+    preservePathOnNetworkChange: false,
+  };
 };
