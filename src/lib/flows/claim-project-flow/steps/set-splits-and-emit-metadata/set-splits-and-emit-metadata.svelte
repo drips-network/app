@@ -18,6 +18,7 @@
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -89,6 +90,7 @@
           // Invalidate cached project page (if any). This should happen automatically, but without
           // awaiting it here in addition, there could be a race condition. Better safe than sorry!
           await invalidateAccountCache(projectId);
+          await invalidateAll();
         },
       }),
     ),
