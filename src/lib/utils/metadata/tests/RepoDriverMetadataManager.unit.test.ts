@@ -2,6 +2,7 @@
 import { Forge, RepoDriverClient } from 'radicle-drips';
 import RepoDriverMetadataManager from '../RepoDriverMetadataManager';
 import MetadataManagerBase from '../MetadataManagerBase';
+import network from '$lib/stores/wallet/network';
 
 vi.mock('$env/dynamic/public', () => ({
   env: {},
@@ -205,12 +206,16 @@ describe('RepoDriverMetadataManager', () => {
             repoName: 'repo',
             ownerName: 'owner',
           },
-          avatar: {
-            __typename: 'EmojiAvatar',
-            emoji: '👍',
+          chainData: {
+            __typename: 'ClaimedProjectData',
+            chain: network.gqlName,
+            avatar: {
+              __typename: 'EmojiAvatar',
+              emoji: '👍',
+            },
+            color: 'red',
+            description: 'description',
           },
-          color: 'red',
-          description: 'description',
         },
         forSplits: {
           maintainers: [
