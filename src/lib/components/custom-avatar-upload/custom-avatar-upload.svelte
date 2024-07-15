@@ -140,6 +140,8 @@
 />
 
 <div
+  role="region"
+  aria-label="Drop a JPG or PNG file here to upload"
   class="drop-zone"
   class:dragging-over={draggingOver}
   class:error

@@ -16,8 +16,10 @@
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import { browser } from '$app/environment';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
+  export let disableLink = true;
   export let linkToNewTab = false;
   export let isNested = false;
   export let draft = false;
@@ -58,7 +60,8 @@
   }
 
   interface ComponentAndProps {
-    component: typeof SvelteComponent;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: typeof SvelteComponent<any>;
     props: Record<string, unknown>;
   }
 
@@ -84,6 +87,7 @@
               dripList: s.dripList,
               showOwner: false,
               showName: false,
+              isLinked: !disableLink,
             },
           } as ComponentAndProps;
         case 'ProjectReceiver':
@@ -106,9 +110,13 @@
   let groupPileElem: HTMLDivElement | undefined;
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
-  onMount(() => {
+  function alignGroupName() {
     groupNameOffset.set((groupPileElem?.offsetWidth ?? 0) + 8, { duration: 0 });
-  });
+  }
+
+  // Align group name on mount and when splits change
+  onMount(alignGroupName);
+  $: split && alignGroupName();
 
   async function toggleGroup() {
     if (!groupElem) return;
@@ -170,12 +178,16 @@
     </div>
     <div class="receiver">
       {#if split.__typename === 'AddressReceiver'}
-        <IdentityBadge {linkToNewTab} address={split.account.address} size="medium" />
+        <IdentityBadge {disableLink} {linkToNewTab} address={split.account.address} size="medium" />
       {:else if split.__typename === 'DripListReceiver'}
-        <DripListBadge dripList={split.dripList} />
+        <DripListBadge isLinked={!disableLink} dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
         <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
-          <ProjectBadge {linkToNewTab} project={split.project} />
+          <ProjectBadge
+            linkTo={disableLink ? 'nothing' : undefined}
+            {linkToNewTab}
+            project={split.project}
+          />
         </PrimaryColorThemer>
       {:else if split.__typename === 'SplitGroup'}
         <div
@@ -187,24 +199,32 @@
             <div class="pile" bind:this={groupPileElem}>
               <Pile transitionedOut={groupExpanded} components={getPileComponents(split.list)} />
             </div>
-            <div class="label" style:transform="translateX({$groupNameOffset}px)">
-              <div class="typo-header-4">{split.name}</div>
-              {#if split.list.length > 0 && groupsExpandable}
-                <div
-                  class="chevron"
-                  style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 90deg)' : ''}
-                >
-                  <ChevronRight />
-                </div>
-              {/if}
-            </div>
+            {#if browser}
+              <div in:fade class="label" style:transform="translateX({$groupNameOffset}px)">
+                <div class="typo-header-4">{split.name}</div>
+                {#if split.list.length > 0 && groupsExpandable}
+                  <div
+                    class="chevron"
+                    style:transform={groupExpanded ? 'rotate3d(1, 0, 0, 90deg)' : ''}
+                  >
+                    <ChevronRight />
+                  </div>
+                {/if}
+              </div>
+            {/if}
             <div class="label placeholder" aria-hidden="true">
               <div class="typo-header-4">{split.name}</div>
             </div>
           </button>
           {#if groupExpanded}
-            <div transition:fade|local={{ duration: GROUP_EXPAND_DURATION }} class="members">
-              <SplitsListComponent {draft} {linkToNewTab} isGroup list={split.list} />
+            <div transition:fade={{ duration: GROUP_EXPAND_DURATION }} class="members">
+              <SplitsListComponent
+                disableLinks={disableLink}
+                {draft}
+                {linkToNewTab}
+                isGroup
+                list={split.list}
+              />
             </div>
           {/if}
           <div class="cutoff-gradient" />

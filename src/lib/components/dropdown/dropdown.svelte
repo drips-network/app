@@ -106,11 +106,7 @@
       />{/if}
     <div class="title" data-testid="title-field">
       {#key selectedOption.title}
-        <span
-          class="value"
-          in:fly|local={{ y: 10, duration: 200 }}
-          out:fly|local={{ y: -10, duration: 200 }}
-        >
+        <span class="value" in:fly={{ y: 10, duration: 200 }} out:fly={{ y: -10, duration: 200 }}>
           {selectedOption.title}
         </span>
       {/key}
@@ -123,7 +119,7 @@
 
   {#if expanded}
     <div
-      transition:scale|local={{ start: 0.95, duration: 200 }}
+      transition:scale={{ start: 0.95, duration: 200 }}
       class="options"
       class:expanded
       class:left={dropdownWidth?.align === 'left'}
@@ -174,7 +170,10 @@
     padding: 0.5rem 2.5rem 0.5rem 0.75rem;
     box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    transition: border-radius 0.2s, box-shadow 0.3s, background-color 0.3s;
+    transition:
+      border-radius 0.2s,
+      box-shadow 0.3s,
+      background-color 0.3s;
     cursor: pointer;
     outline: none;
     cursor: pointer;

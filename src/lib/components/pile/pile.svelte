@@ -10,7 +10,8 @@
   export let itemsClickable = false;
 
   export let components: {
-    component: typeof SvelteComponent;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: typeof SvelteComponent<any>;
     props: Record<string, unknown>;
   }[];
   $: displayedComponents = components.slice(0, maxItems);
@@ -31,13 +32,13 @@
         <div
           class="item"
           class:pointer-events-none={!itemsClickable}
-          out:fly|local={{
+          out:fly={{
             y: 16,
             duration: 200,
             delay: getTransitionDelay(components.indexOf(component), 'out'),
             easing: sineIn,
           }}
-          in:fly|local={{
+          in:fly={{
             y: 16,
             duration: 200,
             delay: getTransitionDelay(components.indexOf(component), 'in'),
@@ -49,16 +50,17 @@
       {/if}
     {/each}
     {#if overflowAmount > 0 && !transitionedOut}
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <svelte:element
         this={overflowCounterClickable ? 'button' : 'div'}
-        class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1 "
-        out:fly|local={{
+        class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1"
+        out:fly={{
           y: 16,
           duration: 200,
           delay: getTransitionDelay(components.length - 1, 'out'),
           easing: sineIn,
         }}
-        in:fly|local={{
+        in:fly={{
           y: 16,
           duration: 200,
           delay: getTransitionDelay(components.length - 1, 'in'),

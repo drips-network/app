@@ -46,7 +46,7 @@
       <p>{excerpt}</p>
     </div>
     {#if shareButton}
-      <ShareButton url={$page.url.toString()} />
+      <ShareButton buttonVariant="normal" url={$page.url.toString()} />
     {/if}
   </div>
 </svelte:element>
@@ -60,19 +60,28 @@
     overflow: hidden;
     width: 100%;
     min-width: 0;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.2s,
+      box-shadow 0.2s,
+      opacity 0.3s;
   }
 
   .post.link:hover,
   .post.link:focus-visible {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 4px 0px 1px var(--color-foreground),
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 4px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-4px);
   }
 
   .post.link:active {
     transform: translateY(0px);
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 0px 0px 0px var(--color-foreground);
   }
 
   .post .content {

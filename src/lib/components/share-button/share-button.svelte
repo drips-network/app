@@ -36,42 +36,42 @@
   let copySuccess = false;
 </script>
 
-{#if shareSupported}
-  <Button variant={buttonVariant} on:click={handleClick}>
-    <div class="button-inner">
-      <ShareIcon style="fill:currentColor" />
-      {shareLabel}
-    </div>
-  </Button>
-{:else}
-  <Button
-    on:mouseenter={() => (hovering = true)}
-    on:focus={() => (hovering = true)}
-    on:mouseleave={() => (hovering = false)}
-    on:blur={() => (hovering = false)}
-    on:click={handleClick}
-    variant={buttonVariant}
-  >
-    <div class="button-inner">
-      <div class="icon">
-        {#if copySuccess}
-          <span transition:fade|local={{ duration: 200 }}>
-            <CheckCircle style="fill: var(--color-positive)" />
-          </span>
-        {:else if hovering}
-          <span transition:fade|local={{ duration: 200 }}>
-            <CopyIcon style="fill: currentColor" />
-          </span>
-        {:else}
-          <span transition:fade|local={{ duration: 200 }}
-            ><LinkIcon style="fill: currentColor" /></span
-          >
-        {/if}
+<div>
+  {#if shareSupported}
+    <Button variant={buttonVariant} on:click={handleClick}>
+      <div class="button-inner">
+        <ShareIcon style="fill:currentColor" />
+        {shareLabel}
       </div>
-      {copyLinkLabel}
-    </div>
-  </Button>
-{/if}
+    </Button>
+  {:else}
+    <Button
+      on:mouseenter={() => (hovering = true)}
+      on:focus={() => (hovering = true)}
+      on:mouseleave={() => (hovering = false)}
+      on:blur={() => (hovering = false)}
+      on:click={handleClick}
+      variant={buttonVariant}
+    >
+      <div class="button-inner">
+        <div class="icon">
+          {#if copySuccess}
+            <span transition:fade={{ duration: 200 }}>
+              <CheckCircle style="fill: var(--color-positive)" />
+            </span>
+          {:else if hovering}
+            <span transition:fade={{ duration: 200 }}>
+              <CopyIcon style="fill: currentColor" />
+            </span>
+          {:else}
+            <span transition:fade={{ duration: 200 }}><LinkIcon style="fill: currentColor" /></span>
+          {/if}
+        </div>
+        {copyLinkLabel}
+      </div>
+    </Button>
+  {/if}
+</div>
 
 <style>
   .button-inner {

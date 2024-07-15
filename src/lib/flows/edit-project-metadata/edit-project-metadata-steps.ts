@@ -26,8 +26,7 @@ export default (project: EditProjectMetadataFlowFragment) => ({
       component: SuccessStep,
       props: {
         safeAppMode: Boolean(get(walletStore).safe),
-        message:
-          'Your project has successfully been updated. Please refresh the page to see the changes.',
+        message: 'Your project has successfully been updated.',
       },
     }),
   ],

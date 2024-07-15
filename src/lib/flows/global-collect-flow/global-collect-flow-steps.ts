@@ -1,4 +1,4 @@
-import { updateCollectButton } from '$lib/components/collect-button/collect-button.svelte';
+import { invalidate } from '$lib/stores/fetched-data-cache/invalidate';
 import { makeStep } from '$lib/components/stepper/types';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -24,7 +24,8 @@ export default function globalCollectFlowSteps(splittable: Amount[]) {
           props: {
             message: 'Your funds have successfully been delivered to your wallet address.',
             onAction: () => {
-              updateCollectButton.set(true);
+              // Refresh collectable balances
+              invalidate('app-layout:user');
             },
           },
         }),

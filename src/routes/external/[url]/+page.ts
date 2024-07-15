@@ -7,7 +7,7 @@ export const load = (({ params }) => {
   const url = new URL(decodeURI(params.url));
 
   if (!ALLOWED_PROTOCOLS.includes(url.protocol)) {
-    throw error(400, 'Invalid protocol');
+    error(400, 'Invalid protocol');
   }
 
   return {

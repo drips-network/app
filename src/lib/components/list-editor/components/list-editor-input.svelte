@@ -26,6 +26,7 @@
   import List from '$lib/components/icons/List.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import { slide } from 'svelte/transition';
+  import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -55,12 +56,15 @@
   });
 
   $: validInput =
-    (allowProjects && isSupportedGitUrl(inputValue)) ||
+    (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
     (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
     (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
 
   class AddItemError extends Error {
-    constructor(message: string, public severity: 'warning' | 'error') {
+    constructor(
+      message: string,
+      public severity: 'warning' | 'error',
+    ) {
       super(message);
     }
   }
@@ -73,6 +77,10 @@
     if (existingKeys.includes(accountId)) {
       throw new AddItemError('Already added', 'warning');
     }
+  }
+
+  async function addDripsProject(urlValue: string) {
+    return addProject(buildRepositoryURL(urlValue));
   }
 
   async function addProject(urlValue: string) {
@@ -239,6 +247,8 @@
         await addAddress(value);
       } else if (value.includes(`${BASE_URL}/app/drip-lists/`)) {
         await addDripList(value);
+      } else if (value.includes(`${BASE_URL}/app/projects/`)) {
+        await addDripsProject(value);
       }
     } catch (e) {
       if (e instanceof AddItemError) {
@@ -288,7 +298,7 @@
   {@const color = currentError.severity === 'error' ? 'negative' : 'caution'}
   {@const textColor = `var(--color-${color}-level-6)`}
   <div
-    transition:slide={{ duration: 300 }}
+    transition:slide|global={{ duration: 300 }}
     class="error {currentError.severity}"
     style:background-color="var(--color-{color}-level-1)"
     style:color={textColor}

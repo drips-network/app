@@ -2,18 +2,18 @@ import { Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import tokens from '.';
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
+import network from '../wallet/network';
 
 vi.mock('$app/environment', () => ({
   browser: true,
 }));
 
 afterEach(() => {
-  tokens.disconnect();
   window.localStorage.clear();
 });
 
 const TEST_CUSTOM_TOKEN_INFO = {
-  chainId: 5,
+  chainId: 11155111,
   address: '0x1111111111111111111111111111111111111111',
   name: 'Foobar',
   decimals: 18,
@@ -21,12 +21,9 @@ const TEST_CUSTOM_TOKEN_INFO = {
 };
 
 describe('tokens store', () => {
-  it('is initially undefined', () => {
-    expect(get(tokens)).toBeUndefined();
-  });
-
   it('lists default tokens for chain after initialization', () => {
-    tokens.connect(1);
+    vi.mocked(network).chainId = 1;
+    tokens.init();
 
     expect(get(tokens)).toStrictEqual(
       DRIPS_DEFAULT_TOKEN_LIST.filter((t) => t.chainId === 1).map((t) => ({
@@ -37,7 +34,6 @@ describe('tokens store', () => {
   });
 
   it('finds tokens by address, symbol or drips asset ID', () => {
-    tokens.connect(1);
     expect(tokens.getBySymbol('RAD')?.info.address).toBe(
       '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
     );
@@ -52,7 +48,8 @@ describe('tokens store', () => {
   });
 
   it('adds and removes custom tokens', () => {
-    tokens.connect(5);
+    vi.mocked(network).chainId = 11155111;
+    tokens.init();
 
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
 
@@ -81,13 +78,16 @@ describe('tokens store', () => {
   });
 
   it('prevents adding the same custom token twice', () => {
-    tokens.connect(5);
+    vi.mocked(network).chainId = 11155111;
+    tokens.init();
+
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
     expect(() => tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO)).toThrow();
   });
 
   it('bans and unbans custom tokens', () => {
-    tokens.connect(5);
+    vi.mocked(network).chainId = 11155111;
+    tokens.init();
 
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
 
@@ -123,7 +123,8 @@ describe('tokens store', () => {
   });
 
   it('restores custom tokens on the same chain from localstorage', () => {
-    tokens.connect(5);
+    vi.mocked(network).chainId = 11155111;
+    tokens.init();
 
     tokens.addCustomToken(TEST_CUSTOM_TOKEN_INFO);
     tokens.setCustomTokenBanStatus(
@@ -132,17 +133,15 @@ describe('tokens store', () => {
       true,
     );
 
-    tokens.disconnect();
-    tokens.connect(5);
-
     expect(tokens.getByAddress(TEST_CUSTOM_TOKEN_INFO.address)).toStrictEqual({
       source: 'custom',
       info: TEST_CUSTOM_TOKEN_INFO,
       banned: true,
     });
 
-    tokens.disconnect();
-    tokens.connect(6);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(network).chainId = 1234 as any;
+    tokens.init();
 
     expect(tokens.getByAddress(TEST_CUSTOM_TOKEN_INFO.address)).toBeUndefined();
   });

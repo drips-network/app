@@ -78,7 +78,10 @@
     gap: 1rem;
     display: flex;
     flex-direction: column;
-    transition: box-shadow 0.2s, backgorund-color 0.2s, transform 0.2s;
+    transition:
+      box-shadow 0.2s,
+      backgorund-color 0.2s,
+      transform 0.2s;
   }
 
   .wrapper:hover:not(:active) .project-card,

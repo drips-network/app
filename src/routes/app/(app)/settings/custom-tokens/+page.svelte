@@ -1,13 +1,7 @@
 <script lang="ts">
-  import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
   import Table from '$lib/components/table/table.svelte';
   import tokens from '$lib/stores/tokens/tokens.store';
-  import {
-    flexRender,
-    getCoreRowModel,
-    type ColumnDef,
-    type TableOptions,
-  } from '@tanstack/svelte-table';
+  import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
   import Button from '$lib/components/button/button.svelte';
   import PlusIcon from '$lib/components/icons/Plus.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
@@ -26,9 +20,11 @@
   } from '$lib/components/table/cells/address.cell.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import Token from '$lib/components/token/token.svelte';
+  import type { ComponentProps } from 'svelte';
 
   interface TokenTableRow {
-    token: TokenCellData;
+    token: ComponentProps<Token>;
     address: AddressCellProps;
     symbol: string;
     decimals: number;
@@ -39,34 +35,34 @@
     {
       accessorKey: 'token',
       header: 'Name',
-      cell: () => TokenCell,
+      cell: () => Token,
       enableSorting: false,
       size: (100 / 24) * 7,
     },
     {
       accessorKey: 'address',
       header: 'Address',
-      cell: (info) => flexRender(AddressCell, info.getValue()),
+      cell: () => AddressCell,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
     {
       accessorKey: 'symbol',
       header: 'Symbol',
-      cell: (info) => info.getValue(),
+      cell: (info) => info,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
     {
       accessorKey: 'decimals',
       header: 'decimals',
-      cell: (info) => info.getValue(),
+      cell: (info) => info,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
     {
       accessorKey: 'actions',
-      cell: (info) => flexRender(ActionsCell, info.getValue()),
+      cell: () => ActionsCell,
       size: (100 / 24) * 3,
     },
   ];

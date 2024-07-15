@@ -44,6 +44,7 @@
   on:mouseenter
   on:mouseleave
   on:focus
+  role={href ? 'link' : 'button'}
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
@@ -61,7 +62,7 @@
     {/if}
     <slot />
     {#if loading}
-      <div out:fade|local={{ duration: 300 }} class="loading">
+      <div out:fade={{ duration: 300 }} class="loading">
         <Spinner />
       </div>
     {/if}
@@ -99,7 +100,12 @@
     white-space: nowrap;
     color: var(--color-foreground);
     user-select: none;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.2s,
+      box-shadow 0.2s,
+      opacity 0.3s;
     position: relative;
   }
 
@@ -145,14 +151,18 @@
 
   .button:not(.disabled):hover .inner,
   .button:not(.disabled):focus-visible .inner {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
   }
 
   .button:not(.disabled):active .inner {
     transform: translateY(0px);
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 0px 0px 0px var(--color-foreground);
   }
 
   .button:focus {

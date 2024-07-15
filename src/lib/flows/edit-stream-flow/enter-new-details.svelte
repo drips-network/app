@@ -1,77 +1,93 @@
+<script lang="ts" context="module">
+  import { gql } from 'graphql-request';
+
+  export const EDIT_STREAM_FLOW_STREAM = gql`
+    fragment EditStreamFlowStream on Stream {
+      id
+      name
+      isPaused
+      config {
+        dripId
+        startDate
+        durationSeconds
+        amountPerSecond {
+          tokenAddress
+          amount
+        }
+      }
+      receiver {
+        ... on User {
+          account {
+            accountId
+          }
+        }
+        ... on DripList {
+          account {
+            accountId
+          }
+        }
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import type { Stream } from '$lib/stores/streams/types';
   import tokens from '$lib/stores/tokens';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import unreachable from '$lib/utils/unreachable';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { AddressDriverPresets, constants, Utils } from 'radicle-drips';
-  import assert from '$lib/utils/assert';
-  import wallet from '$lib/stores/wallet/wallet.store';
-  import streams from '$lib/stores/streams';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import {
-    getAddressDriverTxFactory,
-    getCallerClient,
-    getNetworkConfig,
-  } from '$lib/utils/get-drips-clients';
-  import type { PopulatedTransaction } from 'ethers';
+  import { constants } from 'radicle-drips';
+  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import expect from '$lib/utils/expect';
-  import { get, type Writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import modal from '$lib/stores/modal';
-  import { formatUnits } from 'ethers/lib/utils';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
-  import AddressDriverMetadataManager from '$lib/utils/metadata/AddressDriverMetadataManager';
-  import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import Wallet from '$lib/components/icons/Wallet.svelte';
+  import type { EditStreamFlowStreamFragment } from './__generated__/gql.generated';
+  import { buildEditStreamBatch } from '$lib/utils/streams/streams';
+  import assert from '$lib/utils/assert';
+  import { waitForAccountMetadata } from '$lib/utils/ipfs';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let stream: Stream;
+  export let stream: EditStreamFlowStreamFragment;
+
   export let context: Writable<EditStreamFlowState>;
 
-  const restorer = $context.restorer;
+  const token = tokens.getByAddress(stream.config.amountPerSecond.tokenAddress) ?? unreachable();
 
-  const token =
-    tokens.getByAddress(stream.streamConfig.amountPerSecond.tokenAddress) ?? unreachable();
+  $: amountLocked = stream.isPaused === true;
 
-  let newName: string | undefined = restorer.restore('newName') ?? stream.name;
-  let newSelectedMultiplier = restorer.restore('newAmountValue')
-    ? restorer.restore('newSelectedMultiplier')
-    : '1';
-  let newAmountValue: string | undefined =
-    restorer.restore('newAmountValue') ??
-    formatUnits(
-      stream.streamConfig.amountPerSecond.amount / BigInt(newSelectedMultiplier),
-      token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
-    );
-
-  $: amountLocked = stream.paused === true;
-
-  $: newAmountValueParsed = newAmountValue
-    ? parseTokenAmount(newAmountValue, token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS)
+  $: newAmountValueParsed = $context.newAmountValue
+    ? parseTokenAmount(
+        $context.newAmountValue,
+        token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+      )
     : undefined;
 
   $: newAmountPerSecond = newAmountValueParsed
-    ? newAmountValueParsed / BigInt(newSelectedMultiplier)
+    ? newAmountValueParsed / BigInt($context.newSelectedMultiplier)
     : undefined;
 
   $: amountValidationState = validateAmtPerSecInput(newAmountPerSecond);
 
-  $: nameUpdated = newName !== stream.name;
-  $: amountUpdated = newAmountPerSecond !== stream.streamConfig.amountPerSecond.amount;
+  $: nameUpdated = $context.newName !== stream.name;
+  $: amountUpdated =
+    newAmountPerSecond?.toString() !== stream.config.amountPerSecond.amount.toString();
   $: canUpdate =
     newAmountValueParsed &&
-    (!stream.managed || newName) &&
+    $context.newName &&
     (nameUpdated || amountUpdated) &&
     amountValidationState?.type === 'valid';
 
@@ -80,197 +96,56 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          assert(newAmountPerSecond);
+          const addressDriverClient = await getAddressDriverClient();
 
-          if (stream.managed) assert(newName);
+          const { newHash, batch } = await buildEditStreamBatch(addressDriverClient, stream.id, {
+            name: nameUpdated ? $context.newName : undefined,
+            amountPerSecond: amountUpdated ? newAmountPerSecond : undefined,
+          });
 
-          const { dripsAccountId, address, signer } = $wallet;
-          assert(dripsAccountId && address);
-          const ownAccount = $streams.accounts[dripsAccountId];
-          assert(ownAccount);
-          const assetConfig = ownAccount.assetConfigs.find(
-            (ac) => ac.tokenAddress === token.info.address,
-          );
-          assert(assetConfig);
-
-          let newHash = ownAccount.lastIpfsHash;
-
-          if (nameUpdated) {
-            const metadataMgr = new AddressDriverMetadataManager();
-
-            const accountMetadata = metadataMgr.buildAccountMetadata({
-              forAccount: ownAccount,
-              address,
-            });
-
-            const currentAssetConfigIndex = accountMetadata.assetConfigs.findIndex(
-              (ac) => ac.tokenAddress === token.info.address,
-            );
-
-            const currentStreamIndex = accountMetadata.assetConfigs[
-              currentAssetConfigIndex
-            ].streams.findIndex((s) => s.id === stream.id);
-
-            const currentStream =
-              accountMetadata.assetConfigs[currentAssetConfigIndex].streams[currentStreamIndex];
-
-            accountMetadata.assetConfigs[currentAssetConfigIndex].streams[currentStreamIndex] = {
-              ...currentStream,
-              name: newName,
-            };
-
-            accountMetadata.timestamp = new Date().getTime() / 1000;
-
-            newHash = await metadataMgr.pinAccountMetadata(accountMetadata);
-          }
-
-          let currentReceivers: {
-            accountId: string;
-            config: bigint;
-          }[] = [];
-
-          let newReceivers: {
-            accountId: string;
-            config: bigint;
-          }[] = [];
-
-          if (amountUpdated) {
-            currentReceivers = mapFilterUndefined(assetConfig.streams, (s) =>
-              s.paused
-                ? undefined
-                : {
-                    accountId: s.receiver.accountId,
-                    config: s.streamConfig.raw,
-                  },
-            );
-
-            newReceivers = structuredClone(currentReceivers);
-            const currentStreamReciverIndex = newReceivers.findIndex(
-              (r) =>
-                Utils.StreamConfiguration.fromUint256(r.config).dripId ===
-                BigInt(stream.streamConfig.dripId),
-            );
-            newReceivers.splice(currentStreamReciverIndex, 1, {
-              accountId: stream.receiver.accountId,
-              config: Utils.StreamConfiguration.toUint256({
-                dripId: BigInt(stream.streamConfig.dripId),
-                start: BigInt(stream.streamConfig.startDate?.getTime() ?? 0 / 1000),
-                duration: BigInt(stream.streamConfig.durationSeconds ?? 0),
-                amountPerSec: newAmountPerSecond,
-              }),
-            });
-          }
-
-          const addressDriverTxFactory = await getAddressDriverTxFactory();
           const callerClient = await getCallerClient();
 
-          let tx: PopulatedTransaction;
-          let needGasBuffer = false;
-
-          if (amountUpdated && nameUpdated) {
-            assert(newHash);
-            const { ADDRESS_DRIVER } = getNetworkConfig();
-
-            const createStreamBatchPreset = await AddressDriverPresets.Presets.createNewStreamFlow({
-              signer,
-              driverAddress: ADDRESS_DRIVER,
-              tokenAddress: token.info.address,
-              currentReceivers,
-              newReceivers,
-              accountMetadata: [
-                {
-                  key: MetadataManagerBase.USER_METADATA_KEY,
-                  value: newHash,
-                },
-              ],
-              balanceDelta: 0,
-              transferToAddress: address,
-            });
-
-            needGasBuffer = true;
-            tx = await callerClient.populateCallBatchedTx(createStreamBatchPreset);
-          } else if (amountUpdated) {
-            needGasBuffer = true;
-            tx = await addressDriverTxFactory.setStreams(
-              token.info.address,
-              currentReceivers,
-              0,
-              newReceivers,
-              0n,
-              0n,
-              address,
-            );
-          } else {
-            assert(newHash);
-
-            tx = await addressDriverTxFactory.emitAccountMetadata([
-              {
-                key: MetadataManagerBase.USER_METADATA_KEY,
-                value: newHash,
-              },
-            ]);
-          }
-
           return {
-            tx,
+            batch,
             newHash,
-            dripsAccountId,
-            needGasBuffer,
+            needGasBuffer: amountUpdated,
+            callerClient,
           };
         },
 
-        transactions: ({ tx, needGasBuffer }) => [
+        transactions: async ({ callerClient, batch, needGasBuffer }) => [
           {
-            transaction: tx,
+            transaction:
+              batch.length === 1 ? batch[0] : await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: needGasBuffer,
           },
         ],
 
-        after: async (_, transactContext) => {
-          /*
-        We wait up to five seconds for `refreshUserAccount` to update either the account's
-        lastIpfsHash or the stream's amount per second.
-        */
-          await expect(
-            streams.refreshUserAccount,
-            () =>
-              nameUpdated
-                ? get(streams).accounts[transactContext.dripsAccountId].lastIpfsHash ===
-                  transactContext.newHash
-                : streams.getStreamById(stream.id)?.streamConfig.amountPerSecond.amount ===
-                  newAmountPerSecond,
-            5000,
-            1000,
-          );
+        after: async (_, { newHash }) => {
+          if (!newHash) return;
+
+          const { dripsAccountId } = $walletStore;
+          assert(dripsAccountId);
+
+          await waitForAccountMetadata(dripsAccountId, newHash);
+
+          await invalidateAll();
         },
       }),
     );
   }
-
-  $: restorer.saveAll({
-    newAmountValue,
-    newName,
-    newSelectedMultiplier,
-  });
 </script>
 
 <StepLayout>
-  <StepHeader
-    headline="Edit stream"
-    description={stream.managed
-      ? 'Set a new name or edit the stream rate.'
-      : 'Set a new stream rate.'}
-  />
-  {#if stream.managed}
-    <FormField title="New name*">
-      <TextInput bind:value={newName} />
-    </FormField>
-  {/if}
+  <StepHeader headline="Edit stream" description="Set a new name or edit the stream rate." />
+  <FormField title="New name*">
+    <TextInput bind:value={$context.newName} />
+  </FormField>
   <div class="form-row">
     <FormField title="New stream rate*" disabled={amountLocked}>
       <TextInput
         suffix={token.info.symbol}
-        bind:value={newAmountValue}
+        bind:value={$context.newAmountValue}
         variant={{ type: 'number', min: 0 }}
         placeholder="Amount"
         validationState={amountValidationState}
@@ -280,7 +155,7 @@
     <FormField title="Amount per*" disabled={amountLocked}>
       <Dropdown
         disabled={amountLocked}
-        bind:value={newSelectedMultiplier}
+        bind:value={$context.newSelectedMultiplier}
         options={[
           {
             value: '1',

@@ -15,8 +15,9 @@
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
+  import type { LayoutData } from './$types';
 
-  export let data: { pathname: string };
+  export let data: LayoutData;
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -32,7 +33,7 @@
   }
 </script>
 
-<div class="main" class:disconnected={!$wallet.connected} in:fly={{ duration: 300, y: 16 }}>
+<div class="main" class:disconnected={!$wallet.connected} in:fly|global={{ duration: 300, y: 16 }}>
   <div class="page">
     <PageTransition pathname={data.pathname}>
       <div class:loading={$navigating}><slot /></div>
@@ -42,8 +43,8 @@
   {#if $wallet.connected}
     <div
       class="sidenav"
-      in:fly={{ duration: 300, x: -64, easing: quintOut }}
-      out:fly={{ duration: 300, x: -64, easing: quintIn }}
+      in:fly|global={{ duration: 300, x: -64, easing: quintOut }}
+      out:fly|global={{ duration: 300, x: -64, easing: quintIn }}
       data-testid="sidenav"
     >
       <Sidenav
@@ -89,8 +90,8 @@
 
   <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
 
-  <div class="header" in:fly={{ duration: 300, y: 16 }}>
-    <Header showLoadingIndicator={showLoadingSpinner} />
+  <div class="header" in:fly|global={{ duration: 300, y: 16 }}>
+    <Header user={data.user} showLoadingIndicator={showLoadingSpinner} />
   </div>
 </div>
 

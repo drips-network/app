@@ -27,7 +27,7 @@ function validateUrl(url: string, allowedHosts: string[]): boolean {
     }
 
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

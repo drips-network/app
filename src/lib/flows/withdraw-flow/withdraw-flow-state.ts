@@ -1,19 +1,19 @@
-import { newRestorer, type Restorer } from '$lib/utils/restorer';
 import { writable } from 'svelte/store';
-
-type Restorable = {
-  withdrawAll: boolean;
-  amount: string | undefined;
-};
+import type { WithdrawFlowEnterAmountStepBalancesFragment } from './__generated__/gql.generated';
 
 export interface WithdrawFlowState {
   tokenAddress: string;
-  amountToWithdraw?: bigint;
-  restorer: Restorer<Restorable>;
+  amountToWithdraw: bigint | undefined;
+  withdrawAll: boolean;
+  amount: string | undefined;
+  userOutgoingTokenBalances: WithdrawFlowEnterAmountStepBalancesFragment[];
 }
 
 export default (tokenAddress: string) =>
   writable<WithdrawFlowState>({
     tokenAddress,
-    restorer: newRestorer<Restorable>({ withdrawAll: false }),
+    amountToWithdraw: undefined,
+    withdrawAll: false,
+    amount: undefined,
+    userOutgoingTokenBalances: [],
   });

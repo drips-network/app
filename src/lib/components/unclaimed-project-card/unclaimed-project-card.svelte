@@ -1,8 +1,12 @@
 <script lang="ts" context="module">
   export const UNCLAIMED_PROJECT_CARD_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
+    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
     fragment UnclaimedProjectCard on UnclaimedProject {
       ...ProjectBadge
+      withdrawableBalances {
+        ...MergeWithdrawableBalances
+      }
     }
   `;
 </script>
@@ -22,16 +26,16 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { gql } from 'graphql-request';
   import type { UnclaimedProjectCardFragment } from './__generated__/gql.generated';
+  import {
+    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+    mergeCollectableFunds,
+    mergeSplittableFunds,
+  } from '$lib/utils/merge-withdrawable-balances';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
 
   const dispatch = createEventDispatcher();
 
-  interface Amount {
-    tokenAddress: string;
-    amount: bigint;
-  }
-
-  export let project: UnclaimedProjectCardFragment | undefined = undefined;
+  export let project: UnclaimedProjectCardFragment;
   export let projectMetadata:
     | {
         description?: string | undefined;
@@ -39,17 +43,11 @@
         forkCount: number;
       }
     | undefined = undefined;
-  export let unclaimedFunds:
-    | {
-        splittable: Amount[];
-        collectable: Amount[];
-      }
-    | undefined = undefined;
 
-  $: mergedUnclaimedFunds = mergeAmounts(
-    unclaimedFunds?.splittable ?? [],
-    unclaimedFunds?.collectable ?? [],
-  );
+  $: collectableFunds = mergeCollectableFunds(project.withdrawableBalances);
+  $: splittableFunds = mergeSplittableFunds(project.withdrawableBalances);
+
+  $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
 
   $: hasClaimableFunds = mergedUnclaimedFunds.length > 0;
 
@@ -70,7 +68,7 @@
   export let detailedTokenBreakdown = false;
 </script>
 
-<div class="project-info" transition:fly|local={{ y: 8, duration: 300 }}>
+<div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
   {#if project}
     <div class="basic-info text-left">
       <ProjectBadge linkToNewTab {project} />
@@ -81,85 +79,81 @@
       {/if}
     </div>
   {/if}
-  {#if unclaimedFunds}
-    <div class="unclaimed-funds">
-      <div class="flex flex-col gap-6 p-4 sm:flex-row">
-        <div class="flex flex-wrap items-start gap-6 sm:gap-12">
-          {#if unclaimedTokenPile}
-            <KeyValuePair key={claimableTokensKey}>
-              {#if hasClaimableFunds}
-                <Pile maxItems={4} components={unclaimedTokenPile} />
-                {#if unclaimedTokensExpandable}
-                  <button
-                    class="expand-chevron"
-                    on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
-                    style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
-                  >
-                    <ChevronDown
-                      style="fill: var(--color-foreground); width: 2rem; height: 2rem;"
-                    />
-                  </button>
-                {/if}
-              {:else}
-                <span class="muted">None</span>
+  <div class="unclaimed-funds">
+    <div class="flex flex-col gap-6 p-4 sm:flex-row">
+      <div class="flex flex-wrap items-start gap-6 sm:gap-12">
+        {#if unclaimedTokenPile}
+          <KeyValuePair key={claimableTokensKey}>
+            {#if hasClaimableFunds}
+              <Pile maxItems={4} components={unclaimedTokenPile} />
+              {#if unclaimedTokensExpandable}
+                <button
+                  class="expand-chevron"
+                  on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                  style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
+                >
+                  <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
+                </button>
               {/if}
-            </KeyValuePair>
-          {/if}
-          {#if hasClaimableFunds}
-            <KeyValuePair highlight key="Estimated value">
-              <span style="color: var(--color-primary)"
-                ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
-              >
-            </KeyValuePair>
-          {/if}
-        </div>
-
-        {#if hasClaimableFunds && showClaimButton}
-          <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
-            <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
-              >Claim funds</Button
+            {:else}
+              <span class="muted">None</span>
+            {/if}
+          </KeyValuePair>
+        {/if}
+        {#if hasClaimableFunds}
+          <KeyValuePair highlight key="Estimated value">
+            <span style="color: var(--color-primary)"
+              ><AggregateFiatEstimate amounts={mergedUnclaimedFunds} /></span
             >
-          </div>
+          </KeyValuePair>
         {/if}
       </div>
-      <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
-        {#if detailedTokenBreakdown}
-          <div class="tables-container">
-            {#if unclaimedFunds.collectable.length > 0}
-              <div class="table-and-title">
-                <div class="title">
-                  <h5>Collectable</h5>
-                  <p class="typo-text-small">
-                    These claimable funds will be collected directly to your connected wallet.
-                  </p>
-                </div>
-                <div class="table">
-                  <TokenAmountsTable amounts={unclaimedFunds.collectable} />
-                </div>
-              </div>
-            {/if}
-            {#if unclaimedFunds.splittable.length > 0}
-              <div class="table-and-title">
-                <div class="title">
-                  <h5>Splittable</h5>
-                  <p class="typo-text-small">
-                    These claimable funds will be split with your maintainers and dependencies.
-                  </p>
-                </div>
-                <div class="table">
-                  <TokenAmountsTable amounts={unclaimedFunds.splittable} />
-                </div>
-              </div>
-            {/if}
-          </div>
-        {:else}
-          <div class="token-amounts-table">
-            <TokenAmountsTable amounts={mergedUnclaimedFunds} />
-          </div>
-        {/if}
-      </Toggleable>
+
+      {#if hasClaimableFunds && showClaimButton}
+        <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
+          <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
+            >Claim funds</Button
+          >
+        </div>
+      {/if}
     </div>
-  {/if}
+    <Toggleable showToggle={false} toggled={unclaimedTokensExpanded}>
+      {#if detailedTokenBreakdown}
+        <div class="tables-container">
+          {#if collectableFunds.length > 0}
+            <div class="table-and-title">
+              <div class="title">
+                <h5>Collectable</h5>
+                <p class="typo-text-small">
+                  These claimable funds will be collected directly to your connected wallet.
+                </p>
+              </div>
+              <div class="table">
+                <TokenAmountsTable amounts={collectableFunds} />
+              </div>
+            </div>
+          {/if}
+          {#if splittableFunds.length > 0}
+            <div class="table-and-title">
+              <div class="title">
+                <h5>Splittable</h5>
+                <p class="typo-text-small">
+                  These claimable funds will be split with your maintainers and dependencies.
+                </p>
+              </div>
+              <div class="table">
+                <TokenAmountsTable amounts={splittableFunds} />
+              </div>
+            </div>
+          {/if}
+        </div>
+      {:else}
+        <div class="token-amounts-table">
+          <TokenAmountsTable amounts={mergedUnclaimedFunds} />
+        </div>
+      {/if}
+    </Toggleable>
+  </div>
 </div>
 
 <style>
@@ -184,7 +178,9 @@
   }
 
   .expand-chevron {
-    transition: transform 0.3s, background-color 0.3s;
+    transition:
+      transform 0.3s,
+      background-color 0.3s;
     border-radius: 50%;
   }
 

@@ -1,34 +1,35 @@
 <script lang="ts" context="module">
-  /**
-   * Hacky way to allow refreshing the collect button from elsewhere in the app.
-   * This will become obsolete once we move all balances to the API and make use of
-   * SvelteKit load functions everywhere.
-   *
-   * Set to `true` to refresh the collect button. It will automatically set itself back
-   * to `false`.
-   */
-  export const updateCollectButton = writable<boolean>(false);
+  import { gql } from 'graphql-request';
+
+  export const COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT = gql`
+    fragment CollectButtonWithdrawableBalance on WithdrawableBalance {
+      tokenAddress
+      collectableAmount
+      receivableAmount
+      splittableAmount
+    }
+  `;
 </script>
 
 <script lang="ts">
   import Download from '$lib/components/icons/Download.svelte';
   import Spinner from '../spinner/spinner.svelte';
-  import { onMount, tick } from 'svelte';
+  import { tick } from 'svelte';
   import { browser } from '$app/environment';
   import { tweened } from 'svelte/motion';
   import { quintInOut } from 'svelte/easing';
   import { fade } from 'svelte/transition';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import aggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
+  import aggregateFiatEstimate, {
+    aggregateFiatEstimateReadable,
+  } from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import FiatEstimateValue from '../aggregate-fiat-estimate/fiat-estimate-value.svelte';
-  import fetchBalancesForTokens from '$lib/utils/drips/fetch-balances-for-tokens';
-  import relevantTokens from '$lib/utils/drips/relevant-tokens';
   import globalCollectFlowSteps from '$lib/flows/global-collect-flow/global-collect-flow-steps';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
-  import { writable } from 'svelte/store';
-  import { initializing } from '../../../routes/app/+layout.svelte';
+  import type { CollectButtonWithdrawableBalanceFragment } from './__generated__/gql.generated';
+
+  export let withdrawableBalances: CollectButtonWithdrawableBalanceFragment[] | undefined;
 
   /** If true, the collectable amount will only briefly peek on screen when updated, rather than staying forever. */
   export let peekAmount = false;
@@ -39,42 +40,7 @@
   let amountElem: HTMLDivElement;
   let amountElemWidth = tweened(0, { duration: 400, easing: quintInOut });
 
-  $: ownAccountId = $walletStore.dripsAccountId;
-
-  let splittable:
-    | {
-        tokenAddress: string;
-        amount: bigint;
-      }[]
-    | undefined;
-
-  async function updateSplittable() {
-    splittable = undefined;
-
-    if (ownAccountId) {
-      // This is duplicated from the balances store, but since that won't be around for long,
-      // we're having it re-fetch the balances here again for now.
-
-      const tokens = await relevantTokens('splittable', ownAccountId);
-      splittable = await fetchBalancesForTokens('splittable', tokens, ownAccountId);
-    }
-  }
-
-  $: layoutInitialized = $initializing === false;
-
-  $: {
-    if (ownAccountId && $updateCollectButton && layoutInitialized) {
-      $updateCollectButton = false;
-      updateSplittable();
-    }
-  }
-
-  // On mount, we set the updateCollectButton to true, so that it initially fetches splittable balances.
-  onMount(() => {
-    $updateCollectButton = true;
-  });
-
-  $: tokenAddresses = splittable?.reduce<string[]>((acc, { tokenAddress }) => {
+  $: tokenAddresses = withdrawableBalances?.reduce<string[]>((acc, { tokenAddress }) => {
     if (tokenAddress) {
       acc.push(tokenAddress);
     }
@@ -83,24 +49,32 @@
 
   const fiatEstimatesStarted = fiatEstimates.started;
 
+  $: amounts = withdrawableBalances?.map(
+    ({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
+      tokenAddress,
+      amount: BigInt(splittableAmount) + BigInt(receivableAmount) + BigInt(collectableAmount),
+    }),
+  );
+
   $: tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
-  $: priceReadable = tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined;
-  $: amount =
-    priceReadable && $priceReadable && splittable
-      ? aggregateFiatEstimate(priceReadable, splittable)
-      : undefined;
+  $: priceReadable =
+    $fiatEstimatesStarted && tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined;
+  $: amount = amounts ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined;
 
   let amountTransitioning = false;
-  let amountToShow: typeof amount;
+  let amountToShow: ReturnType<typeof aggregateFiatEstimate> | undefined;
 
-  $: loading = typeof amount?.fiatEstimateCents !== 'number';
+  $: loading = !amount || typeof $amount?.fiatEstimateCents !== 'number';
 
   async function updateAmountToShow(hide = false) {
     await tick();
 
-    amountTransitioning = true;
+    const newAmount = $amount;
 
-    amountToShow = amount;
+    if (newAmount?.fiatEstimateCents !== amountToShow?.fiatEstimateCents)
+      amountTransitioning = true;
+
+    amountToShow = newAmount;
     await tick();
 
     const shouldHide =
@@ -131,9 +105,9 @@
   }
 
   $: {
-    amount;
+    $amount;
     loading;
-    if (browser && amount) {
+    if (browser && $amount) {
       updateAmountToShow();
     }
   }
@@ -141,9 +115,7 @@
   $: nothingToCollect = amountToShow?.fiatEstimateCents === 0;
 
   function handleClick() {
-    if (!splittable) return;
-
-    modal.show(Stepper, undefined, globalCollectFlowSteps(splittable));
+    if (amounts) modal.show(Stepper, undefined, globalCollectFlowSteps(amounts));
   }
 </script>
 
@@ -166,7 +138,7 @@
   </div>
   <div class="content">
     {#if loading}
-      <div transition:fade class="loading-state">
+      <div transition:fade|global class="loading-state">
         <Spinner />
       </div>
     {/if}
@@ -184,7 +156,12 @@
     box-shadow: var(--elevation-low);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.2s,
+      box-shadow 0.2s,
+      opacity 0.3s;
   }
 
   button .content {
@@ -230,7 +207,9 @@
 
   button:not(:disabled):hover,
   button:not(:disabled):focus-visible {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 2px 0px 1px var(--color-foreground),
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
     transform: translateY(-2px);
     opacity: 1;
@@ -238,6 +217,8 @@
 
   button:not(:disabled):active {
     transform: translateY(0px);
-    box-shadow: 0px 0px 0px 1px var(--color-foreground), 0 0px 0px 0px var(--color-foreground);
+    box-shadow:
+      0px 0px 0px 1px var(--color-foreground),
+      0 0px 0px 0px var(--color-foreground);
   }
 </style>

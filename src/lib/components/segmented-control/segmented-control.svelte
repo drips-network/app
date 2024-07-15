@@ -1,8 +1,7 @@
-<script lang="ts">
+<script lang="ts" generics="T">
   import { browser } from '$app/environment';
   import { createEventDispatcher } from 'svelte';
 
-  type T = $$Generic;
   type Option<V extends keyof T> = { title: string; value: V }[];
 
   export let options: Option<keyof T>;
@@ -116,7 +115,10 @@
   }
 
   .selector.transition {
-    transition: transform 0.3s, width 0.3s, border-radius 0.3s;
+    transition:
+      transform 0.3s,
+      width 0.3s,
+      border-radius 0.3s;
   }
 
   .selector.at-beginning {

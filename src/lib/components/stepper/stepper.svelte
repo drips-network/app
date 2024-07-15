@@ -10,7 +10,7 @@
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
 
-  const dispatch = createEventDispatcher<{ stepChange: never }>();
+  const dispatch = createEventDispatcher<{ stepChange: void }>();
 
   export let steps: Steps;
   export let context: (() => Writable<unknown>) | undefined = undefined;
@@ -41,7 +41,6 @@
   function nextValidStepIndex(startIndex: number, direction: 'forward' | 'backward') {
     let index = startIndex;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (index < 0 || index >= resolvedSteps.length) {
         return startIndex;
@@ -246,8 +245,8 @@
 >
   {#key `${awaiting}${awaitError}${currentStepIndex}`}
     <div
-      in:fly|local={(() => getTransition('in'))()}
-      out:fly|local={(() => getTransition('out'))()}
+      in:fly={(() => getTransition('in'))()}
+      out:fly={(() => getTransition('out'))()}
       on:outrostart={() => setTransitioning(true)}
       on:introend={() => setTransitioning(false)}
       class="step-wrapper"

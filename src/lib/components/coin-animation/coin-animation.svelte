@@ -13,7 +13,9 @@
   const coinSound = browser ? new Audio('/assets/coin-sound.mp3') : undefined;
   if (coinSound) coinSound.volume = 0.1;
 
-  onMount(() => enable && animateOnMount && animate(false));
+  onMount(() => {
+    if (enable && animateOnMount) animate(false);
+  });
 
   let containerElem: HTMLDivElement;
   let tokenRotationDeg = tweened(0);
@@ -42,6 +44,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="coin-animation"
   bind:this={containerElem}

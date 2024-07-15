@@ -11,6 +11,7 @@ import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 import * as multiplayer from '$lib/utils/multiplayer';
+import twemoji from '$lib/utils/twemoji';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const listId = params.listId;
@@ -26,7 +27,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       assert(votingRound);
       listName = votingRound.name;
     } catch {
-      throw error(404);
+      error(404);
     }
   } else {
     const dripListQuery = gql`
@@ -52,7 +53,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       listName = dripList.name;
       recipientsCount = dripList.splits.length.toString();
     } catch {
-      throw error(404);
+      error(404);
     }
   }
 
@@ -60,8 +61,8 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   try {
     assert(target === 'twitter' || target === 'og');
-  } catch (e) {
-    throw error(400, 'Invalid or missing target param');
+  } catch {
+    error(400, 'Invalid or missing target param');
   }
 
   const height = target === 'twitter' ? 600 : 675;
@@ -91,6 +92,21 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       width: 1200,
       height: height,
       fonts: await loadFonts(fetch),
+      loadAdditionalAsset: async (code, segment) => {
+        if (code !== 'emoji') return '';
+
+        const parsed = twemoji(segment);
+
+        // eww!
+        const twemojiUrl = /<img[^>]+src="(http:\/\/[^">]+)"/g.exec(parsed);
+
+        if (twemojiUrl) {
+          const res = await loadImage(twemojiUrl[1], fetch, 'data:image/svg+xml;base64,');
+          return res;
+        }
+
+        return '';
+      },
     },
   );
 
@@ -106,6 +122,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   return new Response(image.asPng(), {
     headers: {
       'content-type': 'image/png',
+      'cache-control': 'public, max-age=86400', // 24 hours
     },
   });
 };

@@ -36,10 +36,10 @@
   $: textAreaValidationState = !dripList.description
     ? { type: 'valid' }
     : dripList.description.length >= 1000
-    ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
-    : /<[^>]+>/gi.test(dripList.description)
-    ? { type: 'invalid', message: 'HTML currently not allowed.' }
-    : { type: 'valid' };
+      ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
+      : /<[^>]+>/gi.test(dripList.description)
+        ? { type: 'invalid', message: 'HTML currently not allowed.' }
+        : { type: 'valid' };
 </script>
 
 <section class="flex flex-col gap-8">

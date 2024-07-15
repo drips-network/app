@@ -1,3 +1,12 @@
+<script lang="ts" context="module">
+  export const PROJECTS_PAGE_PROJECT_FRAGMENT = gql`
+    ${PROJECTS_SECTION_PROJECT_FRAGMENT}
+    fragment ProjectsPageProject on Project {
+      ...ProjectsSectionProject
+    }
+  `;
+</script>
+
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -7,8 +16,13 @@
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import CrossIcon from '$lib/components/icons/Cross.svelte';
   import { fade } from 'svelte/transition';
-  import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
+  import ProjectsSection, {
+    PROJECTS_SECTION_PROJECT_FRAGMENT,
+  } from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { gql } from 'graphql-request';
+
+  export let data;
 
   $: {
     $walletStore.connected;
@@ -21,7 +35,7 @@
 <div class="page">
   {#if !$dismissablesStore.includes('splitting-graph-edu-card')}
     <div class="edu-card-wrapper">
-      <div transition:fade|local={{ duration: 300 }} class="splitting-graph-edu card">
+      <div transition:fade={{ duration: 300 }} class="splitting-graph-edu card">
         <div class="illustration">
           <SplittingGraph />
         </div>
@@ -48,7 +62,9 @@
   {/if}
 
   <div class="section">
-    <ProjectsSection address={$walletStore.address} />
+    {#if data.projects}
+      <ProjectsSection withClaimProjectButton projects={data.projects} />
+    {/if}
   </div>
 </div>
 

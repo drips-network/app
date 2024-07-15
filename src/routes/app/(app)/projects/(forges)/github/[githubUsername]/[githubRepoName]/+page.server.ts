@@ -1,15 +1,47 @@
 import { error, redirect } from '@sveltejs/kit';
-import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
 import type { PageServerLoad } from './$types';
-import fetchEarnedFunds from '$lib/utils/project/earned-funds';
 import uriDecodeParams from '$lib/utils/url-decode-params';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
-import type { ProjectByUrlQuery } from './__generated__/gql.generated';
-import type { QueryProjectByUrlArgs } from '$lib/graphql/__generated__/base-types';
+import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generated__/gql.generated';
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
+import { redis } from '../../../../../../../api/redis';
+import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
+import { Forge } from 'radicle-drips';
+import cached from '$lib/utils/cache/remote/cached';
+import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
+
+async function fetchDripsProject(repoUrl: string) {
+  const getProjectsQuery = gql`
+    ${PROJECT_PROFILE_FRAGMENT}
+    query ProjectByUrl($url: String!) {
+      projectByUrl(url: $url) {
+        ...ProjectProfile
+      }
+    }
+  `;
+
+  const url = new URL(repoUrl);
+  const [, owner, repo] = url.pathname.split('/');
+
+  const repoDriverClient = await getRepoDriverClient();
+
+  const accountId = await repoDriverClient.getAccountId(Forge.GitHub, `${owner}/${repo}`);
+
+  const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
+
+  return await cached(redis, cacheKey, 172800, () =>
+    query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
+      getProjectsQuery,
+      {
+        url: repoUrl,
+      },
+      fetch,
+    ),
+  );
+}
 
 export const load = (async ({ params, fetch, url }) => {
   const { githubUsername, githubRepoName } = uriDecodeParams(params);
@@ -31,26 +63,11 @@ export const load = (async ({ params, fetch, url }) => {
 
   let repo: z.infer<typeof repoSchema>;
 
-  const getProjectsQuery = gql`
-    ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!) {
-      projectByUrl(url: $url) {
-        ...ProjectProfile
-      }
-    }
-  `;
-
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
   const [repoRes, projectRes] = await Promise.all([
-    await fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
-    await query<ProjectByUrlQuery, QueryProjectByUrlArgs>(
-      getProjectsQuery,
-      {
-        url: repoUrl,
-      },
-      fetch,
-    ),
+    fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
+    fetchDripsProject(repoUrl),
   ]);
 
   const project = projectRes.projectByUrl;
@@ -66,7 +83,7 @@ export const load = (async ({ params, fetch, url }) => {
 
   try {
     repo = repoSchema.parse(repoResJson);
-  } catch (e) {
+  } catch {
     throw error(500, 'Unable to fetch repo info from GitHub / cache');
   }
 
@@ -75,14 +92,8 @@ export const load = (async ({ params, fetch, url }) => {
   const repoUrlIsCanonical = repoUrl === realRepoUrl;
 
   if (!exact && !repoUrlIsCanonical) {
-    throw redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
+    return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
   }
-
-  const unclaimedFunds = !isClaimed(project)
-    ? fetchUnclaimedFunds(project.account.accountId)
-    : undefined;
-
-  const earnedFunds = isClaimed(project) ? fetchEarnedFunds(project.account.accountId) : undefined;
 
   if (isClaimed(project) && !project.splits) {
     throw new Error('Claimed project somehow does not have splits');
@@ -111,10 +122,8 @@ export const load = (async ({ params, fetch, url }) => {
 
   return {
     project,
-    streamed: {
-      unclaimedFunds,
-      earnedFunds,
-    },
+    description:
+      typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
     newRepo,
     correctCasingRepo,
     blockWhileInitializing: false,

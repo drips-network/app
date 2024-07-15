@@ -1,6 +1,6 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
   import Spinner from '../spinner/spinner.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
@@ -10,6 +10,15 @@
   export let error = false;
   export let placeholderOutline = true;
   export let horizontalScroll = true;
+
+  let highlit = false;
+
+  export const highlightSection = () => {
+    highlit = true;
+    setTimeout(() => {
+      highlit = false;
+    }, 500);
+  };
 
   export let collapsed = false;
 
@@ -27,7 +36,7 @@
     <div class="inner-wrapper">
       {#if !loaded || error || empty}
         <div
-          out:fade|local={{ duration: 250 }}
+          out:fade={{ duration: 250 }}
           class="placeholder-container"
           bind:this={placeholderContainerElem}
           style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
@@ -35,7 +44,7 @@
           {#if !loaded}
             <Spinner />
           {:else if error}
-            <div class="notice" in:fade|local={{ duration: 250 }}>
+            <div class="notice" in:fade={{ duration: 250 }}>
               <Emoji emoji="⚠️" size="huge" />
               <div class="text-group">
                 <p class="typo-text-small-bold">Oops, something went wrong.</p>
@@ -52,7 +61,7 @@
             </div>
           {:else if empty}
             <!-- Empty state -->
-            <div class="notice" in:fade|local={{ duration: 250 }}>
+            <div class="notice" in:fade={{ duration: 250 }}>
               <Emoji emoji={emptyStateEmoji} size="huge" />
               <div class="text-group">
                 {#if emptyStateHeadline}<p class="typo-text-small-bold">
@@ -72,7 +81,7 @@
         <div
           class="content-container"
           style:margin-top={placeholderContainerElem ? '-16rem' : undefined}
-          in:fade|local={{ duration: 250 }}
+          in:fade={{ duration: 250 }}
           on:transitionend={() => {
             contentTransitonedIn = true;
           }}
@@ -84,6 +93,13 @@
       {/if}
     </div>
   </TransitionedHeight>
+  {#if highlit}
+    <div
+      in:scale|global={{ duration: 300, start: 0.9 }}
+      out:scale|global={{ duration: 300, start: 1.05 }}
+      class="highlight-overlay"
+    />
+  {/if}
 </div>
 
 <style>
@@ -120,5 +136,18 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .highlight-overlay {
+    position: absolute;
+    top: -0.5rem;
+    left: 2rem;
+    right: 2rem;
+    bottom: -0.5rem;
+    background-color: var(--color-primary);
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.25rem 0 1.25rem 1.25rem;
   }
 </style>

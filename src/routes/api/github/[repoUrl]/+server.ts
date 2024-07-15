@@ -4,8 +4,8 @@ import type { RequestHandler } from './$types';
 import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
 import { env } from '$env/dynamic/private';
-import cached from '$lib/utils/cached';
 import { redis } from '../../redis';
+import cached from '$lib/utils/cache/remote/cached';
 
 const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
@@ -34,11 +34,15 @@ export const GET: RequestHandler = async ({ params }) => {
       return repo;
     });
 
-    return new Response(JSON.stringify(mapGhResponse(repo)));
+    return new Response(JSON.stringify(mapGhResponse(repo)), {
+      headers: {
+        'cache-control': 'public, max-age=120',
+      },
+    });
   } catch (e) {
     const status =
       typeof e === 'object' && e && 'status' in e && typeof e.status === 'number' ? e.status : 500;
 
-    throw error(status);
+    error(status);
   }
 };

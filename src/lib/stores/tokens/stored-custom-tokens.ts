@@ -25,7 +25,10 @@ export function updateCustomToken(address: string, newTokenInfoWrapper: CustomTo
     (t) => t.info.address.toLowerCase() === address.toLowerCase(),
   );
 
-  assert(indexToUpdate !== -1, `Could not remove custom token with address '${address}': address not found`);
+  assert(
+    indexToUpdate !== -1,
+    `Could not remove custom token with address '${address}': address not found`,
+  );
 
   customTokenWrappers.splice(indexToUpdate, 1, newTokenInfoWrapper);
 

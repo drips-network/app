@@ -161,7 +161,7 @@
 
   export async function mapSplitsFromMultiplayerResults(
     receivers: VoteReceiver[],
-    fetch = window.fetch,
+    f = fetch,
   ): Promise<SplitsComponentSplitsReceiver[]> {
     const receiversToFetchDataFor = receivers.filter(
       (v): v is ProjectVoteReceiver | DripListVoteReceiver => {
@@ -197,7 +197,7 @@
                 {
                   id: v.accountId,
                 },
-                fetch,
+                f,
               )
             ).dripList;
           } else {
@@ -205,7 +205,7 @@
               await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
                 projectQuery,
                 { url: v.url },
-                fetch,
+                f,
               )
             ).projectByUrl;
           }
@@ -271,6 +271,8 @@
   } from '$lib/utils/multiplayer/schemas';
   import query from '$lib/graphql/dripsQL';
 
+  export let disableLinks = true;
+
   export let list: Splits;
   export let maxRows: number | undefined = undefined;
 
@@ -312,6 +314,7 @@
   {#each sortedList as listItem, index}
     <li class="split">
       <SplitComponent
+        disableLink={disableLinks}
         {groupsExpandable}
         isFirst={index === 0}
         isLast={index === sortedList.length - 1}

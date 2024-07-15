@@ -1,29 +1,73 @@
+<script lang="ts" context="module">
+  import { NAME_AND_BADGE_CELL_STREAM_FRAGMENT } from '$lib/components/table/cells/name-and-badge-cell.svelte';
+  import { gql } from 'graphql-request';
+
+  export const STREAMS_SECTION_STREAM_FRAGMENT = gql`
+    ${NAME_AND_BADGE_CELL_STREAM_FRAGMENT}
+    ${USER_BADGE_CELL_USER_FRAGMENT}
+    ${USER_BADGE_CELL_DRIP_LIST_FRAGMENT}
+    ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
+    fragment StreamsSectionStream on Stream {
+      ...NameAndBadgeCellStream
+      receiver {
+        ... on User {
+          ...UserBadgeCellUser
+        }
+        ... on DripList {
+          ...UserBadgeCellDripList
+        }
+      }
+      sender {
+        ...UserBadgeCellUser
+      }
+      config {
+        amountPerSecond {
+          tokenAddress
+        }
+      }
+      timeline {
+        ...CurrentAmountsTimelineItem
+      }
+    }
+  `;
+
+  export const STREAMS_SECTION_STREAMS_FRAGMENT = gql`
+    ${STREAMS_SECTION_STREAM_FRAGMENT}
+    fragment StreamsSectionStreams on UserStreams {
+      incoming {
+        ...StreamsSectionStream
+      }
+      outgoing {
+        ...StreamsSectionStream
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import TokenStreamIcon from '$lib/components/icons/TokenStreams.svelte';
-  import PlusIcon from '$lib/components/icons/Plus.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
-  import AmountCell, { type AmountCellData } from '$lib/components/table/cells/amount.cell.svelte';
-  import streams from '$lib/stores/streams/streams.store';
-  import UserBadgeCell from '$lib/components/table/cells/user-badge.cell.svelte';
-  import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import balances from '$lib/stores/balances';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import TokenCell, { type TokenCellData } from '$lib/components/table/cells/token.cell.svelte';
-  import { onMount } from 'svelte';
-  import type { AddressDriverAccount, NFTDriverAccount, Stream } from '$lib/stores/streams/types';
-  import NameAndBadgeCell, {
-    type NameAndBadgeCellProps,
-  } from '$lib/components/table/cells/name-and-badge-cell.svelte';
+  import UserBadgeCell, {
+    USER_BADGE_CELL_DRIP_LIST_FRAGMENT,
+    USER_BADGE_CELL_USER_FRAGMENT,
+  } from '$lib/components/table/cells/user-badge.cell.svelte';
+  import type { ComponentProps } from 'svelte';
+  import NameAndBadgeCell from '$lib/components/table/cells/name-and-badge-cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
-  import { decodeStreamId } from '$lib/stores/streams/methods/make-stream-id';
   import onClickGoto from '$lib/utils/on-click-goto';
-  import accountFetchStatussesStore from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
   import createStreamFlowSteps from '$lib/flows/create-stream-flow/create-stream-flow-steps';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
   import tokens from '$lib/stores/tokens';
+  import type { StreamsSectionStreamsFragment } from './__generated__/gql.generated';
+  import Token from '$lib/components/token/token.svelte';
+  import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
+  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
+  import modal from '$lib/stores/modal';
+  import PlusIcon from '$lib/components/icons/Plus.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { decodeStreamId } from '$lib/utils/streams/make-stream-id';
 
   export let accountId: string | undefined;
   export let disableActions = true;
@@ -35,7 +79,21 @@
   export let collapsed = false;
   export let collapsable = false;
 
+  export let hideIncoming = false;
+
   export let emptyStateHeadline = 'No streams';
+
+  export let userStreams: StreamsSectionStreamsFragment;
+  $: incoming = userStreams.incoming.filter((s) =>
+    tokenAddress
+      ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+      : true,
+  );
+  $: outgoing = userStreams.outgoing.filter((s) =>
+    tokenAddress
+      ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+      : true,
+  );
 
   $: isSelf = accountId === $walletStore.dripsAccountId;
 
@@ -47,131 +105,59 @@
 
   interface OutgoingStreamTableRow {
     streamId: string;
-    name: NameAndBadgeCellProps;
-    to: NFTDriverAccount | AddressDriverAccount;
-    amount: AmountCellData;
-    token: TokenCellData;
+    name: ComponentProps<NameAndBadgeCell>;
+    to: ComponentProps<UserBadgeCell>;
+    amount: ComponentProps<RealtimeAmount>;
+    token: ComponentProps<Token>;
   }
 
   interface IncomingStreamTableRow {
     streamId: string;
-    name: NameAndBadgeCellProps;
-    from: AddressDriverAccount;
-    amount: AmountCellData;
-    token: TokenCellData;
+    name: ComponentProps<NameAndBadgeCell>;
+    from: ComponentProps<UserBadgeCell>;
+    amount: ComponentProps<RealtimeAmount>;
+    token: ComponentProps<Token>;
   }
 
-  let outgoingTableData: OutgoingStreamTableRow[] = [];
-  let incomingTableData: IncomingStreamTableRow[] = [];
+  let outgoingTableData: OutgoingStreamTableRow[];
+  $: outgoingTableData = outgoing.map((s) => ({
+    name: {
+      stream: s,
+    },
+    to: {
+      userOrDripList: s.receiver,
+    },
+    token: {
+      address: s.config.amountPerSecond.tokenAddress,
+      show: 'symbol',
+      size: 'small',
+    },
+    amount: {
+      timeline: s.timeline,
+      tokenAddress: s.config.amountPerSecond.tokenAddress,
+    },
+    streamId: s.id,
+  }));
 
-  let ownStreams: ReturnType<typeof streams.getStreamsForUser> = { outgoing: [], incoming: [] };
-
-  function updateTable() {
-    ownStreams = accountId ? streams.getStreamsForUser(accountId) : { outgoing: [], incoming: [] };
-
-    // filter by tokenAddress ?
-    if (tokenAddress) {
-      const byToken = (stream: Stream) =>
-        stream.streamConfig.amountPerSecond.tokenAddress.toLowerCase() ===
-        tokenAddress?.toLowerCase();
-      ownStreams = {
-        outgoing: ownStreams.outgoing.filter(byToken),
-        incoming: ownStreams.incoming.filter(byToken),
-      };
-    }
-
-    // if onlyDripListStreams, filter all streams not going to an nft receiver
-    if (onlyDripListStreams) {
-      const isNFTReceiver = (stream: Stream) => stream.receiver.driver === 'nft';
-      ownStreams.outgoing = ownStreams.outgoing.filter(isNFTReceiver);
-    }
-
-    outgoingTableData = mapFilterUndefined(ownStreams.outgoing, (stream) => {
-      const estimate = balances.getEstimateByStreamId(stream.id);
-      if (!estimate) return undefined;
-
-      const { tokenAddress } = stream.streamConfig.amountPerSecond;
-
-      // TODO: Donʼt presume that any stream to an NFT subaccount is going to a Drip List.
-      const streamName =
-        stream.receiver.driver === 'nft' ? 'Continuous donation' : stream.name ?? 'Unnamed stream';
-
-      return {
-        streamId: stream.id,
-        name: {
-          name: streamName,
-          streamId: stream.id,
-          streamPaused: stream.paused,
-          streamDurationSeconds: stream.streamConfig.durationSeconds,
-          streamScheduledStart: stream.streamConfig.startDate,
-          streamSenderAccountId: stream.sender.accountId,
-          streamTokenAddress: tokenAddress,
-        },
-        to: stream.receiver,
-        amount: {
-          amount: {
-            amount: estimate.totalStreamed,
-            tokenAddress,
-          },
-          amountPerSecond: {
-            amount: estimate.currentAmountPerSecond,
-            tokenAddress,
-          },
-          showSymbol: false,
-        },
-        token: {
-          address: tokenAddress,
-          size: 'small',
-          show: 'symbol',
-        },
-      };
-    });
-
-    incomingTableData = mapFilterUndefined(ownStreams.incoming ?? [], (stream) => {
-      const estimate = balances.getEstimateByStreamId(stream.id);
-      if (!estimate) return undefined;
-
-      const { tokenAddress } = stream.streamConfig.amountPerSecond;
-
-      return {
-        streamId: stream.id,
-        name: {
-          name: stream.name ?? 'Unnamed stream',
-          streamId: stream.id,
-          streamPaused: stream.paused,
-          streamDurationSeconds: stream.streamConfig.durationSeconds,
-          streamScheduledStart: stream.streamConfig.startDate,
-          streamSenderAccountId: stream.sender.accountId,
-          streamTokenAddress: tokenAddress,
-        },
-        from: stream.sender,
-        amount: {
-          amountPerSecond: {
-            amount: estimate.currentAmountPerSecond,
-            tokenAddress,
-          },
-          amount: {
-            amount: estimate.totalStreamed,
-            tokenAddress,
-          },
-          showSymbol: false,
-        },
-        token: {
-          address: tokenAddress,
-          size: 'small',
-          show: 'symbol',
-        },
-      };
-    });
-  }
-
-  $: {
-    accountId;
-    $balances;
-    updateTable();
-  }
-
-  onMount(updateTable);
+  let incomingTableData: IncomingStreamTableRow[];
+  $: incomingTableData = incoming.map((s) => ({
+    name: {
+      stream: s,
+    },
+    from: {
+      userOrDripList: s.sender,
+    },
+    token: {
+      address: s.config.amountPerSecond.tokenAddress,
+      show: 'symbol',
+      size: 'small',
+    },
+    amount: {
+      timeline: s.timeline,
+      tokenAddress: s.config.amountPerSecond.tokenAddress,
+    },
+    streamId: s.id,
+  }));
 
   const outgoingTableColumns: ColumnDef<OutgoingStreamTableRow>[] = [
     {
@@ -191,14 +177,14 @@
     {
       accessorKey: 'amount',
       header: 'Total streamed',
-      cell: () => AmountCell,
+      cell: () => RealtimeAmount,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
     {
       accessorKey: 'token',
       header: 'Token',
-      cell: () => TokenCell,
+      cell: () => Token,
       enableSorting: false,
       size: (100 / 24) * 2,
     },
@@ -228,15 +214,15 @@
     },
     {
       accessorKey: 'amount',
-      header: 'Received',
-      cell: () => AmountCell,
+      header: 'Total streamed',
+      cell: () => RealtimeAmount,
       enableSorting: false,
       size: (100 / 24) * 5,
     },
     {
       accessorKey: 'token',
       header: 'Token',
-      cell: () => TokenCell,
+      cell: () => Token,
       enableSorting: false,
       size: (100 / 24) * 2,
     },
@@ -265,19 +251,6 @@
     getCoreRowModel: getCoreRowModel(),
   };
 
-  // As soon as the given account has been fetched at least once, display content.
-  let loaded = false;
-  $: if (
-    accountId &&
-    ['error', 'fetched'].includes($accountFetchStatussesStore[accountId]?.all ?? '')
-  ) {
-    loaded = true;
-  }
-
-  $: error = Boolean(accountId && $accountFetchStatussesStore[accountId]?.all === 'error');
-  $: empty =
-    (onlyDripListStreams || ownStreams.incoming.length === 0) && ownStreams.outgoing.length === 0;
-
   function onRowClick(
     tableData: OutgoingStreamTableRow[] | IncomingStreamTableRow[],
     event: CustomEvent<RowClickEventPayload>,
@@ -300,7 +273,6 @@
     infoTooltip,
     icon: TokenStreamIcon,
     label: onlyDripListStreams ? 'Streams to your Drip List' : 'Streams',
-    actionsDisabled: !loaded,
     actions: disableActions
       ? []
       : [
@@ -316,12 +288,11 @@
     emptyStateEmoji: '🫙',
     emptyStateHeadline,
     emptyStateText,
-    loaded,
-    error,
-    empty,
+    loaded: true,
+    empty: (hideIncoming ? true : incoming.length === 0) && outgoing.length === 0,
   }}
 >
-  {#if optionsIncoming.data.length > 0 && !onlyDripListStreams}
+  {#if !hideIncoming && optionsIncoming.data.length > 0 && !onlyDripListStreams}
     <div class="table-container">
       {#if optionsOutgoing.data.length > 0}
         <h4 class="table-group-header">↓ Incoming</h4>

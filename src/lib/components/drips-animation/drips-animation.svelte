@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import assert from '$lib/utils/assert';
+  import { browser } from '$app/environment';
 
-  const RESOLUTION_RATIO = window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
+  const RESOLUTION_RATIO =
+    browser && window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
 
   export let speedMultiplier = 1;
   export let vertical = false;
@@ -77,9 +79,10 @@
     ctx = context;
   });
 
-  const resizeObserver = new ResizeObserver(updateContainerSize);
+  let resizeObserver: ResizeObserver;
 
   onMount(() => {
+    resizeObserver = new ResizeObserver(updateContainerSize);
     resizeObserver.observe(container);
 
     return () => {
@@ -159,6 +162,7 @@
     lastDraw = timer;
     requestAnimationFrame(draw);
   }
+  onMount(() => draw(0));
 </script>
 
 <div class="drips-animation" bind:this={container}>

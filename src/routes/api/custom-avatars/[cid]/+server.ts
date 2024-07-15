@@ -23,6 +23,7 @@ export const GET = async ({ params, fetch }) => {
   return new Response(await resized.getBufferAsync(Jimp.MIME_PNG), {
     headers: {
       'content-type': 'image/png',
+      'cache-control': 'public, max-age=3600',
     },
   });
 };

@@ -61,7 +61,7 @@
 
   const dispatch = createEventDispatcher<{
     /** Fired when the user blurs the input after selecting or hits enter to confirm. */
-    confirm: never;
+    confirm: void;
   }>();
 
   function handleBlur() {
@@ -84,6 +84,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="percentage-editor typo-text tabular-nums cursor-text"
   class:focus
@@ -121,7 +122,9 @@
     border-radius: 0.25rem;
     padding: 0 0.125rem;
     box-sizing: border-box;
-    transition: box-shadow 0.2s, color 0.2s;
+    transition:
+      box-shadow 0.2s,
+      color 0.2s;
   }
 
   .percentage-editor.editable {

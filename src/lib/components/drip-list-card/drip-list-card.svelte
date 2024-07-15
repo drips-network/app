@@ -7,10 +7,10 @@
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
-    ${DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT}
+    ${SUPPORTER_PILE_FRAGMENT}
+    ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
       ...EditDripListStepSelectedDripList
-      ...DripListCardSupporterPile
       name
       account {
         accountId
@@ -30,6 +30,25 @@
           ...SplitsComponentDripListReceiver
         }
       }
+      totalEarned {
+        tokenAddress
+        amount
+      }
+      support {
+        ...SupporterPile
+        ... on StreamSupport {
+          stream {
+            timeline {
+              ...CurrentAmountsTimelineItem
+            }
+            config {
+              amountPerSecond {
+                tokenAddress
+              }
+            }
+          }
+        }
+      }
     }
   `;
 </script>
@@ -46,29 +65,19 @@
     type SplitsComponentSplitsReceiver,
   } from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
-  import balancesStore from '$lib/stores/balances/balances.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import { constants } from 'radicle-drips';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   import Pile from '../pile/pile.svelte';
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
-  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
-  import accountFetchStatusses from '$lib/stores/account-fetch-statusses/account-fetch-statusses.store';
-  import getIncomingSplitTotal from '$lib/utils/splits/get-incoming-split-total';
   import type { DripListCardFragment } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
-  import getIncomingGivesTotal from '$lib/utils/gives/get-incoming-gives-total';
-  import { onMount } from 'svelte';
-  import streamsStore from '$lib/stores/streams/streams.store';
-  import getSupportersPile, {
-    DRIP_LIST_CARD_SUPPORTER_PILE_FRAGMENT,
-  } from './methods/get-supporters-pile';
+  import getSupportersPile, { SUPPORTER_PILE_FRAGMENT } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
@@ -88,6 +97,17 @@
   import { writable } from 'svelte/store';
   import { BASE_URL } from '$lib/utils/base-url';
   import twemoji from '$lib/utils/twemoji';
+  import {
+    CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT,
+    currentAmounts,
+  } from '$lib/utils/current-amounts';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+  import { onMount } from 'svelte';
+  import tickStore from '$lib/stores/tick/tick.store';
+  import { constants } from 'radicle-drips';
+  import StatusBadge from '../status-badge/status-badge.svelte';
+  import Proposals from '../icons/Proposals.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -100,71 +120,19 @@
     );
   }
 
+  /** Minimal version w/ link to Drip List page for listing contexts */
+  export let listingMode = false;
+
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
 
   $: listOwner = dripList?.owner;
-  $: dripListUrl = dripList && `/app/drip-lists/${dripList.account.accountId}`;
   $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
 
   $: title = (dripList?.name || votingRound?.name) ?? unreachable();
   $: description = (dripList?.description || votingRound?.description) ?? '';
 
-  /*
-    On mount, ensure the streams store has fetched the owner's account so that we can be sure that
-    any support streams appear as expected.
-    Then, select the support streams that are streaming to the list.
-  */
-  onMount(async () => {
-    if (!listOwner) return;
-
-    if (!$streamsStore.accounts[listOwner.accountId]) {
-      await streamsStore.fetchAccount(listOwner.accountId);
-    }
-  });
-
-  $: supportStreams =
-    listOwner &&
-    $streamsStore &&
-    streamsStore
-      .getStreamsForUser(listOwner.accountId)
-      .outgoing.filter((s) => s.receiver.accountId === dripList?.account.accountId);
-
-  let incomingSplitTotal: Awaited<ReturnType<typeof getIncomingSplitTotal>> | undefined = undefined;
-  onMount(async () => {
-    if (!dripList) return;
-    incomingSplitTotal = await getIncomingSplitTotal(dripList.account.accountId);
-  });
-
-  let incomingGivesTotal: Awaited<ReturnType<typeof getIncomingGivesTotal>> | undefined = undefined;
-  onMount(async () => {
-    if (!dripList) return;
-    incomingGivesTotal = await getIncomingGivesTotal(dripList.account.accountId);
-  });
-
-  $: streamEstimates =
-    dripList &&
-    $balancesStore &&
-    balancesStore.getStreamEstimatesByReceiver('total', dripList.account.accountId).map((e) => ({
-      amount: e.totalStreamed / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
-      tokenAddress: e.tokenAddress,
-    }));
-
-  /*
-    Only the list owner can set support streams to the list, so we can consider the stream estimate to the list loaded when
-    the owner account is loaded.
-  */
-  $: streamEstimateLoaded =
-    dripList && $accountFetchStatusses[dripList.owner.accountId]?.all === 'fetched';
-
-  let totalIncomingAmounts: ReturnType<typeof mergeAmounts> | undefined = undefined;
-  $: totalIncomingAmounts =
-    streamEstimates && incomingSplitTotal && streamEstimateLoaded && incomingGivesTotal
-      ? mergeAmounts(streamEstimates, incomingSplitTotal, incomingGivesTotal)
-      : undefined;
-
-  $: supportersPile =
-    dripList && supportStreams && getSupportersPile(supportStreams, dripList.support);
+  $: supportersPile = dripList && getSupportersPile(dripList.support, 'tiny');
 
   function triggerEditModal() {
     if (!dripList) return;
@@ -187,55 +155,102 @@
   $: votingRoundStatus = votingRound
     ? getVotingRoundStatusReadable(votingRound)
     : writable(undefined);
+
+  let incomingStreamsTotalStreamed: { tokenAddress: string; amount: bigint }[];
+  function updateIncomingStreamsTotalStreamed() {
+    if (!dripList) return;
+
+    const incomingStreams = mapFilterUndefined(dripList.support, (s) => {
+      if (s.__typename === 'StreamSupport') {
+        return s.stream;
+      }
+    });
+
+    incomingStreamsTotalStreamed = mergeAmounts(
+      incomingStreams.map((stream) => {
+        const amount = currentAmounts(
+          stream.timeline,
+          stream.config.amountPerSecond.tokenAddress,
+        ).currentAmount;
+
+        return {
+          tokenAddress: amount.tokenAddress,
+          amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+        };
+      }),
+    );
+  }
+  onMount(() => {
+    const tick = tickStore.register(updateIncomingStreamsTotalStreamed);
+    return () => tickStore.deregister(tick);
+  });
+
+  $: totalEarned = mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []);
+
+  $: dripListUrl = dripList
+    ? `/app/drip-lists/${dripList.account.accountId}`
+    : votingRound
+      ? `/app/drip-lists/${votingRound.id}`
+      : undefined;
+
+  $: votingEnded = votingRound
+    ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
+    : undefined;
 </script>
 
-{#if votingRound}
+{#if !listingMode && votingRound}
   <VotingRoundNoticeCard {votingRound} />
 {/if}
 
-<section
-  class:has-description={dripList?.description || votingRound?.description}
+<svelte:element
+  this={listingMode ? 'a' : 'section'}
+  href={dripListUrl}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
-  <div class="flex flex-col gap-8">
-    <header class="px-6 pt-6 flex flex-col gap-4 lg:gap-5">
+  <div class="flex flex-col gap-4">
+    <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
-        <h1 class="title">
-          <a
-            href={dripListUrl}
-            class="focus-visible:outline-none focus-visible:bg-primary-level-1 rounded twemoji-text"
-          >
-            {@html twemoji(title)}
-          </a>
+        <h1 class="title rounded twemoji-text">
+          {@html twemoji(title)}
         </h1>
-        <div class="flex items-center gap-4 -my-1">
-          <ShareButton
-            url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
-          />
-          {#if isOwnList}
-            <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
-          {/if}
-        </div>
+        {#if listingMode && votingRound}
+          <StatusBadge icon={Proposals} size="small" color={votingEnded ? 'foreground' : 'primary'}>
+            {votingEnded ? 'Voting ended' : 'In voting'}
+          </StatusBadge>
+        {/if}
+        {#if !listingMode}
+          <div class="flex items-center gap-4 -my-1">
+            <ShareButton
+              buttonVariant="normal"
+              url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
+            />
+            {#if isOwnList}
+              <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+            {/if}
+          </div>
+        {/if}
       </div>
       {#if description.length > 0}
         <div class="description twemoji-text">
-          <TextExpandable isExpandable={true}>
+          <TextExpandable numberOfLines={listingMode ? 2 : 4} isExpandable={!listingMode}>
             {@html twemoji(description)}
           </TextExpandable>
         </div>
       {/if}
-      <div class="flex gap-2">
-        Created by <IdentityBadge
-          showAvatar={true}
-          showIdentity={true}
-          address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
-          disableTooltip={true}
-        />
-      </div>
+      {#if !listingMode}
+        <div class="flex gap-2">
+          Created by <IdentityBadge
+            showAvatar={true}
+            showIdentity={true}
+            address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
+            disableTooltip={true}
+          />
+        </div>
+      {/if}
     </header>
 
     <section>
-      {#if dripList && votingRound}
+      {#if !listingMode && dripList && votingRound}
         <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
           <TabbedBox
             bind:activeTab
@@ -259,26 +274,32 @@
                   </div>
                   <div class="typo-text tabular-nums total-streamed-badge">
                     {#if browser}
-                      <AggregateFiatEstimate
-                        supressUnknownAmountsWarning
-                        amounts={totalIncomingAmounts}
-                      />
+                      <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
                     {/if}
                     <span class="muted">&nbsp;total</span>
                   </div>
                   {#if supportersPile && supportersPile.length > 0}
-                    <div
-                      in:fade|local={{ duration: 300 }}
-                      class="flex items-center gap-1.5 min-w-0"
-                    >
+                    <div in:fade={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
                       <span class="typo-text-small truncate muted">Supported by</span>
-                      <Pile maxItems={3} components={supportersPile ?? []} itemsClickable={true} />
+                      <Pile
+                        maxItems={3}
+                        components={supportersPile ?? []}
+                        itemsClickable={!listingMode}
+                      />
                     </div>
                   {/if}
                 </div>
                 <div class="splits">
-                  <div class="splits-component">
-                    <Splits groupsExpandable={true} list={dripList.splits} />
+                  <div
+                    class="splits-component"
+                    style:pointer-events={listingMode ? 'none' : undefined}
+                  >
+                    <Splits
+                      disableLinks={listingMode}
+                      maxRows={listingMode ? (dripList.description ? 3 : 4) : undefined}
+                      groupsExpandable={!listingMode}
+                      list={dripList.splits}
+                    />
                   </div>
                 </div>
               </div>
@@ -299,51 +320,53 @@
                     </div>
                   {/if}
                   <div class="splits-component">
-                    <VotingRoundSplits {votingRound} />
+                    <VotingRoundSplits maxRows={votingRound.description ? 3 : 4} {votingRound} />
                   </div>
                 </div>
               </div>
 
-              <VotingRoundCollaborators {votingRound} />
+              {#if !listingMode}
+                <VotingRoundCollaborators {votingRound} />
 
-              <VotingRoundCountdown {votingRound} />
+                <VotingRoundCountdown {votingRound} />
 
-              {#if isOwnVotingRound}
-                <div class="actions">
-                  <div>
-                    <Button
-                      icon={Trash}
-                      on:click={() =>
-                        modal.show(
-                          Stepper,
-                          undefined,
-                          deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
-                        )}>Delete voting round</Button
-                    >
-                  </div>
-
-                  {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
+                {#if isOwnVotingRound}
+                  <div class="actions">
                     <div>
                       <Button
-                        variant="primary"
-                        icon={Wallet}
-                        disabled={!votingRound.result}
+                        icon={Trash}
                         on:click={() =>
                           modal.show(
                             Stepper,
                             undefined,
-                            votingRound
-                              ? publishVotingRoundListFlowSteps(
-                                  votingRound.id,
-                                  votingRound.name,
-                                  votingRound.description ?? undefined,
-                                )
-                              : unreachable(),
-                          )}>Publish Drip List</Button
+                            deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                          )}>Delete voting round</Button
                       >
                     </div>
-                  {/if}
-                </div>
+
+                    {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
+                      <div>
+                        <Button
+                          variant="primary"
+                          icon={Wallet}
+                          disabled={!votingRound.result}
+                          on:click={() =>
+                            modal.show(
+                              Stepper,
+                              undefined,
+                              votingRound
+                                ? publishVotingRoundListFlowSteps(
+                                    votingRound.id,
+                                    votingRound.name,
+                                    votingRound.description ?? undefined,
+                                  )
+                                : unreachable(),
+                            )}>Publish Drip List</Button
+                        >
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
               {/if}
             {/if}
           </div>
@@ -351,13 +374,21 @@
       </TransitionedHeight>
     </section>
   </div>
-</section>
+</svelte:element>
 
 <style>
   .drip-list-card {
     box-shadow: var(--elevation-low);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
     position: relative;
+  }
+
+  a.drip-list-card:hover,
+  a.drip-list-card:focus-visible {
+    box-shadow: var(--elevation-medium);
+    transform: translateY(-0.125rem);
   }
 
   .drip-list-card .title-and-actions {
@@ -419,7 +450,9 @@
   .tab {
     position: absolute;
     top: 0;
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+      opacity 0.3s,
+      transform 0.3s;
     opacity: 0;
     pointer-events: none;
   }

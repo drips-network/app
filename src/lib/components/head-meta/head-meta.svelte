@@ -10,7 +10,7 @@
   export let twitterCardType: 'summary' | 'summary_large_image' =
     twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
 
-  $: fullTitle = `${title}${title.startsWith('Drips') ? '' : ' | Drips'}`;
+  $: fullTitle = `${title}${title?.startsWith('Drips') ? '' : ' | Drips'}`;
 </script>
 
 <svelte:head>

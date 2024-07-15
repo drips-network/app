@@ -1,4 +1,11 @@
 import { PUBLIC_PINATA_GATEWAY_URL } from '$env/static/public';
+import query from '$lib/graphql/dripsQL';
+import { gql } from 'graphql-request';
+import expect from './expect';
+import type {
+  LatestAccountMetadataHashQuery,
+  LatestAccountMetadataHashQueryVariables,
+} from './__generated__/gql.generated';
 
 /**
  * Fetch the given hash from IPFS.
@@ -22,4 +29,52 @@ export function convertIpfsUri(uri: string) {
   const hash = uri.replace('ipfs://', '');
 
   return `${PUBLIC_PINATA_GATEWAY_URL}/ipfs/${hash}`;
+}
+
+/**
+ * Pin the given data to IPFS.
+ * @param data The data to pin.
+ * @returns The hash of the pinned data.
+ */
+export async function pin(data: Record<string, unknown>, f = fetch) {
+  const res = await f('/api/ipfs/pin', {
+    method: 'POST',
+    body: JSON.stringify(data, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    ),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Pinning account metadata failed: ${await res.text()}`);
+  }
+
+  return res.text();
+}
+
+export async function waitForAccountMetadata(
+  accountId: string,
+  expectedIpfsHash: string,
+  f = fetch,
+) {
+  await expect(
+    async () => {
+      const res = await query<
+        LatestAccountMetadataHashQuery,
+        LatestAccountMetadataHashQueryVariables
+      >(
+        gql`
+          query LatestAccountMetadataHash($accountId: ID!) {
+            userById(accountId: $accountId) {
+              latestMetadataIpfsHash
+            }
+          }
+        `,
+        { accountId },
+        f,
+      );
+
+      return res.userById?.latestMetadataIpfsHash;
+    },
+    (result) => expectedIpfsHash === result,
+  );
 }

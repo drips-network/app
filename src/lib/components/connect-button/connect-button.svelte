@@ -17,7 +17,7 @@
 <div class="wrapper">
   {#if $wallet.network.chainId !== 1}
     <div class="network-badge">
-      <p>{$wallet.network.name}</p>
+      <p>{$wallet.network.label}</p>
     </div>
   {/if}
   {#if $wallet.connected}
@@ -42,6 +42,8 @@
     </div>
     <div
       class="mobile-only"
+      role="button"
+      tabindex="0"
       on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
       on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
     >

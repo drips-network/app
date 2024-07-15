@@ -30,7 +30,6 @@
   import Supporters, {
     SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT,
   } from '$lib/components/supporters-section/supporters.section.svelte';
-  import streamsStore from '$lib/stores/streams/streams.store';
   import type { PageData } from './$types';
   import DripListCard, {
     DRIP_LIST_CARD_FRAGMENT,
@@ -43,26 +42,11 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import viewVotingRoundFlowSteps from '$lib/flows/view-voting-round/view-voting-round-flow-steps';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-  import { onMount } from 'svelte';
 
   export let data: PageData;
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRounds.current;
-
-  $: ownerAccountId = dripList?.owner.accountId ?? votingRound?.publisherAddress;
-  $: supportStreams =
-    dripList &&
-    $streamsStore &&
-    streamsStore.getStreamsForUser(dripList.account.accountId).incoming;
-
-  onMount(
-    () => dripList && streamsStore.fetchAccountsStreamingToAccountId(dripList.account.accountId),
-  );
-
-  const streamsFetchStatusses = streamsStore.fetchStatusses;
-  $: streamsFetched =
-    dripList && ownerAccountId && $streamsFetchStatusses[ownerAccountId] === 'fetched';
 
   function handleVotingRoundClick(votingRound: VotingRound) {
     modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));
@@ -75,7 +59,11 @@
   }.png`}
   <HeadMeta
     title="{dripList?.name || votingRound?.name} | Drip List"
-    description={dripList?.description ?? votingRound?.name ?? undefined}
+    description={dripList?.description ??
+      votingRound?.description ??
+      (dripList
+        ? `"${dripList.name}" is a Drip List of open source projects, Ethereum addresses, or Drip Lists. Anyone with an Ethereum wallet can send one-time or continuous donations to it.`
+        : undefined)}
     image="{imageBaseUrl}?target=og"
     twitterImage="{imageBaseUrl}?target=twitter"
   />
@@ -104,11 +92,8 @@
 
     {#if dripList}
       <Supporters
-        accountId={dripList.account.accountId}
         headline="Support"
-        infoTooltip="A Drip List can be supported by one or more support streams by the list's owner. Others can also add a Drip List to their own Drip Lists or project's dependencies, or send a one-time donation."
-        forceLoading={!streamsFetched}
-        supportStreams={supportStreams || undefined}
+        infoTooltip="A Drip List can be supported by continuous donations, one-time donations, or funds split by projects and other Drip Lists."
         type="dripList"
         supportItems={dripList.support}
         ownerAccountId={dripList.owner.accountId}

@@ -6,6 +6,7 @@ import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
 import { Utils } from 'radicle-drips';
 import { browser } from '$app/environment';
+import network, { isSupportedChainId } from '../wallet/network';
 
 interface DefaultTokenInfoWrapper {
   info: TokenInfo;
@@ -21,17 +22,12 @@ export interface CustomTokenInfoWrapper {
 export type TokenInfoWrapper = DefaultTokenInfoWrapper | CustomTokenInfoWrapper;
 
 export default (() => {
-  let chainId: number | undefined;
+  let chainId = network.chainId;
   const tokenList = writable<TokenInfoWrapper[] | undefined>();
-  const connected = writable(false);
+  const customTokensLoaded = browser;
 
-  /**
-   * Connect the store to a chain, which is required before any other
-   * functionality can be used.
-   * @param toChainId The ID of the chain to serve tokens for.
-   */
-  function connect(toChainId: number) {
-    chainId = toChainId;
+  function init() {
+    chainId = network.chainId;
 
     const customTokens = browser
       ? storedTokens.readCustomTokensList().filter((t) => t.info.chainId === chainId)
@@ -45,19 +41,8 @@ export default (() => {
     }));
 
     tokenList.set([...defaultTokens, ...customTokens]);
-
-    connected.set(true);
   }
-
-  /**
-   * Disconnect the store from the connected chain, and clear it completely. Any custom
-   * tokens persisted in localstorage will be restored on next call to `connect`.
-   */
-  function disconnect() {
-    chainId = undefined;
-    tokenList.set(undefined);
-    connected.set(false);
-  }
+  init();
 
   /**
    * Retrieve token information for a given token by its address.
@@ -159,6 +144,8 @@ export default (() => {
     let tokens = get(tokenList);
     if (!tokens) return;
 
+    assert(isSupportedChainId(chainId));
+
     const token = getByAddress(address, chainId);
     assert(
       token && token.source === 'custom',
@@ -185,6 +172,8 @@ export default (() => {
     const tokens = get(tokenList);
     if (!tokens) return;
 
+    assert(isSupportedChainId(chainId));
+
     const token = getByAddress(address, chainId);
     assert(
       token && token.source === 'custom',
@@ -203,10 +192,9 @@ export default (() => {
   }
 
   return {
+    init,
     subscribe: tokenList.subscribe,
-    connect,
-    disconnect,
-    connected: { subscribe: connected.subscribe },
+    customTokensLoaded,
     getByAddress,
     getBySymbol,
     getByDripsAssetId,

@@ -5,29 +5,17 @@ import {
   AddressDriverTxFactory,
   CallerClient,
   DripsClient,
-  DripsSubgraphClient,
   Utils,
   type NetworkConfig,
   NFTDriverClient,
   NFTDriverTxFactory,
-  RepoDriverClient,
   RepoDriverTxFactory,
   DripsTxFactory,
   ERC20TxFactory,
+  RepoDriverClient,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-import { env } from '$env/dynamic/public';
-
-/**
- * Get an initialized Drips Subgraph client.
- * @returns An initialized Drips Subgraph client.
- */
-export function getSubgraphClient() {
-  const { network } = get(wallet);
-
-  return DripsSubgraphClient.create(network.chainId, getNetworkConfig().SUBGRAPH_URL);
-}
 
 /**
  * Get an initialized Repo Driver client.
@@ -156,7 +144,7 @@ export function getCallerClient() {
  * clients are initialized with addresses matching local testnet deployments. See `README`'s
  * E2E test section.
  */
-export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
+export const networkConfigs: { [chainId: number]: Omit<NetworkConfig, 'SUBGRAPH_URL'> } = isTest()
   ? {
       11155111: {
         CHAIN: 'sepolia',
@@ -170,9 +158,6 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
         ADDRESS_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
         NFT_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
         IMMUTABLE_SPLITS_DRIVER_ADMIN: '0xFAdDb8777bf0445aBb85DA2d1889836BaCC5C9A3',
-        SUBGRAPH_URL: `http://${
-          env?.PUBLIC_TEST_SUBGRAPH_HOST ?? 'localhost'
-        }:8000/subgraphs/name/drips-subgraph-local`,
         CALLER: '0xaBf7431BFC75BAD19AA98911c4dd7165b619771F',
         DRIPS: '0xa0523b86472561f0859d84C094cc04e6c4B33169',
         NFT_DRIVER: '0xc95eb214845d5693abc750692161CB008796ae5C',
@@ -204,7 +189,9 @@ export const networkConfigs: { [chainId: number]: NetworkConfig } = isTest()
  * Get the networkConfig for the current network.
  * @returns The networkConfig for the current network.
  */
-export function getNetworkConfig(chainId = get(wallet).network.chainId): NetworkConfig {
+export function getNetworkConfig(
+  chainId = get(wallet).network.chainId,
+): Omit<NetworkConfig, 'SUBGRAPH_URL'> {
   const config = networkConfigs[chainId];
   assert(config, `No network config found for chainId ${chainId}`);
 

@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import type { Network } from '@ethersproject/networks';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { AddressDriverClient } from 'radicle-drips';
@@ -18,14 +17,12 @@ import isRunningInSafe from '$lib/utils/is-running-in-safe';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
-import network, { isConfiguredChainId } from './network';
+import network, { getNetwork, isConfiguredChainId, type Network } from './network';
+import { invalidateAll } from '../fetched-data-cache/invalidate';
 
 const appsSdk = new SafeAppsSDK();
 
-const DEFAULT_NETWORK: Network = {
-  chainId: network.chainId,
-  name: network.name,
-};
+const DEFAULT_NETWORK: Network = network;
 
 const injected = injectedWallets();
 
@@ -36,6 +33,7 @@ const onboard = Onboard({
       version: 2,
       projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
       requiredChains: [network.chainId],
+      dappUrl: 'https://drips.network',
     }),
   ],
   chains: [
@@ -236,9 +234,13 @@ const walletStore = () => {
       dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
       provider,
       signer,
-      network: await provider.getNetwork(),
+      network: getNetwork((await provider.getNetwork()).chainId),
       safe: safeInfo,
     });
+
+    if (browser) {
+      await invalidateAll();
+    }
   }
 
   function _clear() {
@@ -286,7 +288,7 @@ const mockWalletStore = () => {
 
   const state = writable<WalletStoreState>({
     connected: false,
-    network: provider.network,
+    network: getNetwork(provider.network.chainId),
     provider,
   });
 
@@ -300,7 +302,7 @@ const mockWalletStore = () => {
       address,
       provider,
       signer,
-      network: provider.network,
+      network: getNetwork(provider.network.chainId),
       dripsAccountId: accountId,
     });
 
@@ -318,5 +320,4 @@ const mockWalletStore = () => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default isTest() ? mockWalletStore() : walletStore();

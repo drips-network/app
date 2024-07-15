@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   try {
     assert(project);
   } catch {
-    throw error(404);
+    error(404);
   }
 
   const projectName = `${project.source.ownerName}/${project.source.repoName}`;
@@ -86,8 +86,8 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   try {
     assert(target === 'twitter' || target === 'og');
-  } catch (e) {
-    throw error(400, 'Invalid or missing query params');
+  } catch {
+    error(400, 'Invalid or missing query params');
   }
 
   const height = target === 'twitter' ? 600 : 675;
@@ -157,6 +157,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   return new Response(image.asPng(), {
     headers: {
       'content-type': 'image/png',
+      'cache-control': 'public, max-age=86400', // 24 hours
     },
   });
 };

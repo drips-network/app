@@ -1,7 +1,4 @@
 <script lang="ts">
-  import Balances from './sections/balances.section.svelte';
-  import Streams from './sections/streams.section.svelte';
-
   import wallet from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import Carousel, { makeCarouselItem } from '$lib/components/carousel/carousel.svelte';
@@ -13,6 +10,12 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
+  import Streams from './sections/streams.section.svelte';
+  import type { PageData } from './$types';
+  import Balances from './sections/balances.section.svelte';
+  import unreachable from '$lib/utils/unreachable';
+
+  export let data: PageData;
 
   $: accountId = $wallet.dripsAccountId;
 
@@ -75,7 +78,7 @@
   <div class="edu-carousel">
     <TransitionedHeight negativeMarginWhileCollapsed="-64px">
       {#if eduCarouselItems.length > 0}
-        <div out:fly|local={{ y: -10, duration: 300 }} class="edu-carousel-inner">
+        <div out:fly={{ y: -10, duration: 300 }} class="edu-carousel-inner">
           <h4 class="typo-all-caps">Getting started</h4>
           <Carousel items={eduCarouselItems} />
         </div>
@@ -83,8 +86,8 @@
     </TransitionedHeight>
   </div>
   <div class="sections">
-    <Balances {accountId} disableActions={false} />
-    <Streams {accountId} disableActions={false} />
+    <Balances {accountId} userBalances={data.balances ?? unreachable()} disableActions={false} />
+    <Streams {accountId} userStreams={data.streams ?? unreachable()} disableActions={false} />
   </div>
 </div>
 

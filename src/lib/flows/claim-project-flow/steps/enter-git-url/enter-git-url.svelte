@@ -28,7 +28,6 @@
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
-  import fetchUnclaimedFunds from '$lib/utils/project/unclaimed-funds';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
@@ -113,7 +112,7 @@
       const project = response.projectByUrl;
 
       if (!project) {
-        throw new Error('Project not found');
+        throw new Error("Repo doesn't exist or is private");
       }
 
       if (project.__typename === 'ClaimedProject') {
@@ -134,8 +133,6 @@
         emoji: seededRandomElement(possibleRandomEmoji, project.account.accountId),
       };
       $context.projectColor = seededRandomElement(possibleColors, project.account.accountId);
-
-      $context.unclaimedFunds = await fetchUnclaimedFunds(project.account.accountId);
 
       validationState = { type: 'valid' };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -194,7 +191,6 @@
     <UnclaimedProjectCard
       project={$context.project}
       projectMetadata={$context.projectMetadata}
-      unclaimedFunds={$context.unclaimedFunds}
       claimableTokensKey="Claimable tokens"
     />
     {#if claimingRenamedRepoOriginalName}

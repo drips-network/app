@@ -1,8 +1,10 @@
 import redisSdk from 'redis';
-import { env } from '$env/dynamic/private';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 
-export const redis = env.CACHE_REDIS_CONNECTION_STRING
-  ? redisSdk.createClient({ url: env.CACHE_REDIS_CONNECTION_STRING })
+const connectionString = getOptionalEnvVar('CACHE_REDIS_CONNECTION_STRING');
+
+export const redis = connectionString
+  ? redisSdk.createClient({ url: connectionString })
   : undefined;
 export type RedisClientType = typeof redis;
 

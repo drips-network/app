@@ -7,8 +7,7 @@
 
 <ProjectProfile
   project={data.project}
+  description={data.description}
   newRepo={data.newRepo}
   correctCasingRepo={data.correctCasingRepo}
-  unclaimedFunds={data.streamed.unclaimedFunds}
-  earnedFunds={data.streamed.earnedFunds}
 />

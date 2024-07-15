@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ params }) => {
   try {
     z.array(z.preprocess(Number, z.number())).parse(tokenIds);
   } catch {
-    throw error(400, 'Invalid token ID submitted');
+    error(400, 'Invalid token ID submitted');
   }
 
   let prices: Record<string, number | undefined> = Object.fromEntries(
@@ -64,7 +64,7 @@ export const GET: RequestHandler = async ({ params }) => {
     await Promise.all(
       Object.entries(parsedRes.data).map(([tokenId, data]) =>
         redis?.set(`cmc-price-${tokenId}`, data.quote.USD.price, {
-          EX: 60,
+          EX: 180,
         }),
       ),
     );
@@ -80,6 +80,7 @@ export const GET: RequestHandler = async ({ params }) => {
     {
       headers: {
         'content-type': 'application/json',
+        'cache-control': 'public, max-age=300',
       },
     },
   );

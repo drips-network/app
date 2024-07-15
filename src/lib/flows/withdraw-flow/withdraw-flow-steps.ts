@@ -4,6 +4,7 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import EnterAmount from './enter-amount.svelte';
 import withdrawFlowState from './withdraw-flow-state';
+import FetchData from './fetch-data.svelte';
 
 export default function getWithdrawSteps(tokenAddress: string) {
   const state = withdrawFlowState(tokenAddress);
@@ -11,6 +12,10 @@ export default function getWithdrawSteps(tokenAddress: string) {
   return {
     context: () => state,
     steps: [
+      makeStep({
+        component: FetchData,
+        props: undefined,
+      }),
       makeStep({
         component: EnterAmount,
         props: undefined,
@@ -20,7 +25,7 @@ export default function getWithdrawSteps(tokenAddress: string) {
         props: {
           safeAppMode: Boolean(get(walletStore).safe),
           message:
-            'Youʼve successfully withdrawn, and your funds are back in your wallet. It may take some time for your dashboard to update.',
+            'Youʼve successfully withdrawn, and your funds are back in your wallet. You may need to refresh the app for your dashboard to update.',
         },
       }),
     ],

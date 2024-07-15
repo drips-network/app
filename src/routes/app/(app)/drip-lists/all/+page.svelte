@@ -48,27 +48,27 @@
   import type { PageData } from './$types';
   import Section from '$lib/components/section/section.svelte';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
-  import DripListBadgeCell from '$lib/components/table/cells/drip-list-badge.cell.svelte';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { goto } from '$app/navigation';
-  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
-  import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
+  import DripListBadge, {
+    DRIP_LIST_BADGE_FRAGMENT,
+  } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import PileCell from '$lib/components/table/cells/pile-cell.svelte';
   import { addressIcon, dripListIcon, projectIcon } from '$lib/components/pile/pile-presets';
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import type { ComponentProps } from 'svelte';
-  import type Pile from '$lib/components/pile/pile.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import IdentityBadgeCell from '$lib/components/table/cells/identity-badge-cell.svelte';
+  import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let data: PageData;
 
   interface TableRow {
-    badge: DripListBadgeFragment;
-    owner: string;
+    badge: ComponentProps<DripListBadge> & { dripList: DripListBadgeFragment };
+    owner: ComponentProps<IdentityBadge>;
     recipientsPile: ComponentProps<Pile>;
     supportersPile: ComponentProps<Pile>;
   }
@@ -76,8 +76,10 @@
   const tableData: TableRow[] = data.content.dripLists
     .map((dripList) => {
       return {
-        badge: dripList,
-        owner: dripList.owner.address,
+        badge: { dripList, showAvatar: false, showOwner: false },
+        owner: {
+          address: dripList.owner.address,
+        },
         recipientsPile: {
           maxItems: 4,
           components: mapFilterUndefined(dripList.splits, (s) => {
@@ -115,28 +117,28 @@
     {
       accessorKey: 'badge',
       header: 'Name',
-      cell: () => DripListBadgeCell,
+      cell: () => DripListBadge,
       enableSorting: false,
       size: (100 / 24) * 10,
     },
     {
       accessorKey: 'owner',
       header: 'Owner',
-      cell: () => IdentityBadgeCell,
+      cell: () => IdentityBadge,
       enableSorting: false,
-      size: (100 / 24) * 4,
+      size: (100 / 24) * 6,
     },
     {
       accessorKey: 'recipientsPile',
       header: 'Drips to',
-      cell: () => PileCell,
+      cell: () => Pile,
       enableSorting: false,
       size: (100 / 24) * 4,
     },
     {
       accessorKey: 'supportersPile',
       header: 'Supporters',
-      cell: () => PileCell,
+      cell: () => Pile,
       enableSorting: false,
       size: (100 / 24) * 4,
     },
@@ -150,7 +152,7 @@
   ];
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
-    const dripList = tableData[event.detail.rowIndex].badge;
+    const { dripList } = tableData[event.detail.rowIndex].badge;
     goto('/app/drip-lists/' + dripList.account.accountId);
   }
 </script>

@@ -5,7 +5,6 @@ import {
   getAddressDriverClient,
   getCallerClient,
   getNetworkConfig,
-  getSubgraphClient,
 } from '$lib/utils/get-drips-clients';
 import { AddressDriverPresets } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
@@ -23,14 +22,11 @@ export default function batchCollect(
         const callerClient = await getCallerClient();
         const addressDriverClient = await getAddressDriverClient();
         const accountId = await addressDriverClient.getAccountId();
-        const subgraphClient = await getSubgraphClient();
         const { address: userAddress, signer } = get(walletStore);
 
         assert(userAddress && signer);
 
         const { DRIPS, ADDRESS_DRIVER } = getNetworkConfig();
-
-        const splitsConfig = await subgraphClient.getSplitsConfigByAccountId(accountId);
 
         const flowsPromises: ReturnType<
           (typeof AddressDriverPresets.Presets)['createCollectFlow']
@@ -42,7 +38,7 @@ export default function batchCollect(
             dripsAddress: DRIPS,
             tokenAddress,
             maxCycles: 1000,
-            currentReceivers: splitsConfig,
+            currentReceivers: [],
             transferToAddress: userAddress,
             accountId,
           });
