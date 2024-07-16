@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      dockerfile: Dockerfile
+      dockerfile: e2e-test-dockerfile
       context: ../
     depends_on:
       drips-gql-api:

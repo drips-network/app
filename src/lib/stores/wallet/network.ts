@@ -83,4 +83,6 @@ export function getNetwork(chainId: number): Network {
   };
 }
 
+console.log('default network', getNetwork(configuredChainId));
+
 export default getNetwork(configuredChainId);
