@@ -1,6 +1,6 @@
 <script lang="ts">
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import { onMount } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
   interface Drip {
     startTimestamp: number;
@@ -10,9 +10,7 @@
     scale: number | undefined;
   }
 
-  export let pathQueries: string[] = [];
-
-  export let paths: SVGPathElement[] = [];
+  export let svgElemAttrs: Record<string, string>;
 
   let currentDrips: Drip[] = [];
 
@@ -21,7 +19,7 @@
   // options
   const speed = 0.1; // pixels per millisecond
   const radius = 3;
-  const maxDrips = 3;
+  const maxDrips = 10;
 
   function generateRandomUniqueInt(min: number, max: number, excludedNumbers: number[]) {
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -41,7 +39,7 @@
         startTimestamp: timestamp,
         pathIndex: generateRandomUniqueInt(
           0,
-          paths.length,
+          paths.length - 1,
           currentDrips.map((drip) => drip.pathIndex),
         ),
         x: undefined,
@@ -102,29 +100,20 @@
     requestAnimationFrame(animate);
   }
 
-  let el: HTMLSpanElement;
+  let paths: SVGPathElement[] = [];
+  let contentEl: HTMLDivElement;
 
   onMount(async () => {
-    // collect paths if received queries
-    if (pathQueries.length) {
-      const svg = el.parentElement;
-      paths = mapFilterUndefined(pathQueries, (string) => {
-        const match = svg?.querySelector(`path[d^="${string}"]`);
-        if (match instanceof SVGPathElement) {
-          return match;
-        }
-        return undefined;
-      });
-    }
-
+    paths = Array.from(contentEl.querySelectorAll('path[data-drip-path]'));
     requestAnimationFrame(animate);
   });
 </script>
 
-<span bind:this={el} />
-
-<slot />
-
-{#each currentDrips as { x, y, scale }}
-  <circle r={(scale ?? 0) * radius} cx={x} cy={y} fill="var(--color-primary)" class="circle" />
-{/each}
+<div bind:this={contentEl} class="content">
+  <svg {...svgElemAttrs}>
+    <slot />
+    {#each currentDrips as { x, y, scale }}
+      <circle r={(scale ?? 0) * radius} cx={x} cy={y} fill="var(--color-primary)" class="circle" />
+    {/each}
+  </svg>
+</div>

@@ -1,6 +1,5 @@
 <script lang="ts">
   import LpHeader from './components/lp-header.svelte';
-
   import isRunningInSafe from '$lib/utils/is-running-in-safe';
   import { goto } from '$app/navigation';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -33,8 +32,10 @@
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import AnimateDripOnSvgPaths from '$lib/components/animate-drip-on-svg-paths/animate-drip-on-svg-paths.svelte';
-  import DripListCardThumblink from '$lib/components/drip-list-card/drip-list-card-thumblink.svelte';
   import AnimateTypeWords from '$lib/components/animate-type-words/animate-type-words.svelte';
+  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import DripListCarousel from './components/drip-list-carousel.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let data: PageData;
 
@@ -61,9 +62,11 @@
   let collabVisible = true;
 
   const heroTexts = [
-    'Continuously fund your critical dependencies',
-    'Run a RetroPGF funding round',
-    'Reward positive contributions to your ecosystem',
+    'Continuously support your critical dependencies',
+    'Reward contributions to your ecosystem',
+    'Empower open-source builders',
+    'Retroactively reward important projects',
+    'Support the people driving impact',
   ];
   let heroTextsIndex = 0;
 </script>
@@ -74,13 +77,21 @@
 <div class="page">
   <div class="wrapper">
     <!-- hero graph -->
-    <div class="relative">
-      <div class="flex w-full justify-center overflow-hidden">
-        <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
+    <div style:position="relative">
+      <div
+        style:display="flex"
+        style:justify-content="center"
+        style:overflow="hidden"
+        style:width="100%"
+      >
+        <div class="big-hero-graph">
           <LpHeroBigGraph />
         </div>
       </div>
-      <div class="absolute overlay flex items-center justify-center">
+      <div
+        style:transform="translateY(-2rem)"
+        class="absolute overlay flex items-center justify-center"
+      >
         <div class="flex flex-col gap-4 mlg:gap-7">
           <div class="flex w-full justify-center">
             <LpTotalDrippedBadge prices={data.prices} />
@@ -129,7 +140,9 @@
             </p>
           </div>
 
-          <DripListCardThumblink dripList={data.dripLists[0].dripList} />
+          <div class="lists" style:display="flex" style:flex-direction="column" style:max-width="500px">
+            <DripListCarousel dripLists={data.dripLists} />
+          </div>
         </div>
       </section>
 
@@ -566,6 +579,13 @@
       font-size: 36px;
       line-height: 36px;
     }
+  }
+
+  /* HERO */
+  .big-hero-graph {
+    width: 100vw;
+    min-width: 900px;
+    height: 100%;
   }
 
   /* SECTIONS */

@@ -123,6 +123,10 @@
   /** Minimal version w/ link to Drip List page for listing contexts */
   export let listingMode = false;
 
+  export let hideTotal = false;
+  export let hideSupporterPile = false;
+  export let hideDescription = false;
+
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
 
@@ -210,7 +214,7 @@
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
-        <h1 class="title rounded twemoji-text">
+        <h1 class="line-clamp-1 title rounded twemoji-text">
           {@html twemoji(title)}
         </h1>
         {#if listingMode && votingRound}
@@ -230,7 +234,7 @@
           </div>
         {/if}
       </div>
-      {#if description.length > 0}
+      {#if !hideDescription && description.length > 0}
         <div class="description twemoji-text">
           <TextExpandable numberOfLines={listingMode ? 2 : 4} isExpandable={!listingMode}>
             {@html twemoji(description)}
@@ -272,13 +276,15 @@
                   <div class="drip-icon">
                     <Drip />
                   </div>
+                  {#if !hideTotal}
                   <div class="typo-text tabular-nums total-streamed-badge">
                     {#if browser}
                       <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
                     {/if}
                     <span class="muted">&nbsp;total</span>
                   </div>
-                  {#if supportersPile && supportersPile.length > 0}
+                  {/if}
+                  {#if !hideSupporterPile && supportersPile && supportersPile.length > 0}
                     <div in:fade={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
                       <span class="typo-text-small truncate muted">Supported by</span>
                       <Pile
@@ -296,7 +302,7 @@
                   >
                     <Splits
                       disableLinks={listingMode}
-                      maxRows={listingMode ? (dripList.description ? 3 : 4) : undefined}
+                      maxRows={listingMode ? (dripList.description && !hideDescription ? 3 : 4) : undefined}
                       groupsExpandable={!listingMode}
                       list={dripList.splits}
                     />
@@ -320,7 +326,7 @@
                     </div>
                   {/if}
                   <div class="splits-component">
-                    <VotingRoundSplits maxRows={votingRound.description ? 3 : 4} {votingRound} />
+                    <VotingRoundSplits maxRows={votingRound.description && !hideDescription ? 3 : 4} {votingRound} />
                   </div>
                 </div>
               </div>
@@ -383,6 +389,7 @@
       transform 0.2s,
       box-shadow 0.2s;
     position: relative;
+    background: var(--color-background);
   }
 
   a.drip-list-card:hover,
@@ -395,6 +402,7 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    text-align: left;
   }
 
   .drip-list-card .title-and-actions {
