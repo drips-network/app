@@ -15,6 +15,8 @@
 
   let start: number | undefined = undefined;
 
+  let lastAnimationHandle: number | undefined = undefined;
+
   function animate(timestamp: number) {
     if (!start) {
       start = timestamp;
@@ -77,10 +79,18 @@
       }
     });
 
-    requestAnimationFrame(animate);
+    lastAnimationHandle = requestAnimationFrame(animate);
   }
 
-  onMount(() => requestAnimationFrame(animate));
+  onMount(() => {
+    animate(0);
+
+    return () => {
+      if (lastAnimationHandle) {
+        cancelAnimationFrame(lastAnimationHandle);
+      }
+    };
+  });
 </script>
 
 <!-- TODO: Minify SVG -->

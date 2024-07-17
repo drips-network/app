@@ -116,6 +116,7 @@
   }
 
   let lastDraw = 0;
+  let lastAnimationHandle: number | undefined = undefined;
 
   function draw(timer: number) {
     if (!canvasElem) return;
@@ -160,9 +161,15 @@
     }
 
     lastDraw = timer;
-    requestAnimationFrame(draw);
+    lastAnimationHandle = requestAnimationFrame(draw);
   }
-  onMount(() => draw(0));
+  onMount(() => {
+    draw(0);
+
+    return () => {
+      if (lastAnimationHandle) cancelAnimationFrame(lastAnimationHandle);
+    };
+  });
 </script>
 
 <div class="drips-animation" bind:this={container}>
