@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import adapter from '@sveltejs/adapter-netlify';
+import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { mdsvex } from 'mdsvex';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';

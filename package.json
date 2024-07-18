@@ -45,7 +45,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.36.0",
     "husky": "^9.0.11",
-    "jimp": "^0.22.12",
     "jsdom": "^24.1.0",
     "mdsvex": "^0.11.2",
     "mime-types": "^2.1.35",
@@ -68,6 +67,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "jimp": "^0.22.12",
     "@apollo/client": "^3.10.5",
     "@efstajas/svelte-stored-writable": "^0.2.0",
     "@efstajas/versioned-parser": "^0.1.4",
@@ -77,6 +77,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@safe-global/safe-apps-provider": "^0.18.3",
     "@safe-global/safe-apps-sdk": "^9.1.0",
+    "@sveltejs/adapter-node": "^5.2.0",
     "@tanstack/svelte-table": "^8.17.3",
     "@uniswap/default-token-list": "^11.19.0",
     "@uniswap/token-lists": "^1.0.0-beta.34",
