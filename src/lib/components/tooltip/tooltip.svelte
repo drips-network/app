@@ -2,7 +2,7 @@
   import { onMount, tick } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
-  import { fade } from 'svelte/transition';
+  import { navigating } from '$app/stores';
 
   export let text: string | undefined = undefined;
   export let copyable = false;
@@ -94,7 +94,7 @@
   }
 
   function setContentFocussable(canFocus: boolean) {
-    setTabIndexRecursively(contentElem, canFocus ? '0' : '-1');
+    if (contentElem) setTabIndexRecursively(contentElem, canFocus ? '0' : '-1');
   }
 
   onMount(() => {
@@ -108,6 +108,8 @@
       window.removeEventListener('resize', updatePosIfExpanded);
     };
   });
+
+  $navigating;
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -119,10 +121,9 @@
   on:mouseleave={() => !disabled && handleHover(false)}
 >
   <div class="trigger"><slot /></div>
-  {#if expanded}
+  {#if expanded && !$navigating}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      transition:fade={{ duration: 200 }}
       bind:this={contentElem}
       class="expanded-tooltip"
       style:left={`${tooltipPos.left}px`}
