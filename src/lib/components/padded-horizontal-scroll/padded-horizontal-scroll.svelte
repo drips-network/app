@@ -39,12 +39,12 @@
   .gradient.left-edge {
     left: -0;
     background: linear-gradient(to right, var(--color-background) 0%, transparent);
-    z-index: 2;
+    z-index: 1;
   }
 
   .gradient.right-edge {
     right: 0;
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
-    z-index: 2;
+    z-index: 1;
   }
 </style>
