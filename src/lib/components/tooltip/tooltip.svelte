@@ -115,8 +115,10 @@
   bind:this={tooltipElem}
   class="tooltip"
   class:disabled
-  on:mouseenter={() => !disabled && handleHover(true)}
-  on:mouseleave={() => !disabled && handleHover(false)}
+  on:pointerover={(e) => {
+    if (!disabled && e.pointerType !== 'touch') handleHover(true);
+  }}
+  on:pointerleave={() => !disabled && handleHover(false)}
 >
   <div class="trigger"><slot /></div>
   {#if expanded}
