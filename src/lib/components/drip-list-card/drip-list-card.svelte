@@ -220,7 +220,7 @@
           </StatusBadge>
         {/if}
         {#if !listingMode}
-          <div class="flex items-center gap-4 -my-1">
+          <div class="flex items-center gap-2 -my-1">
             <ShareButton
               buttonVariant="normal"
               url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
