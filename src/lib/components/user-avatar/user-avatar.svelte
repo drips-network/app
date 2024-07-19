@@ -6,11 +6,18 @@
   export let imgElem: HTMLImageElement | undefined = undefined;
 
   let loaded = false;
+  let error = false;
 </script>
 
 <div class="avatar" style:height={size + 'px'} style:width={size + 'px'}>
-  {#if src}
-    <img bind:this={imgElem} alt="user avatar" {src} on:load={() => (loaded = true)} />
+  {#if src && !error}
+    <img
+      bind:this={imgElem}
+      alt="user avatar"
+      {src}
+      on:load={() => (loaded = true)}
+      on:error={() => (error = true)}
+    />
   {/if}
   <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />
 </div>
