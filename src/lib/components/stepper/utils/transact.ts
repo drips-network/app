@@ -113,8 +113,8 @@ function setStepCopyWaitingForConfirmation(
 }
 
 function applyGasBuffer(gasLimit: number) {
-  // 15% buffer because sometimes Drips transactions' complexity varies on-chain second-by-second.
-  return Math.ceil(gasLimit * 1.15);
+  // 25% buffer because sometimes Drips transactions' complexity varies on-chain second-by-second.
+  return Math.ceil(gasLimit * 1.25);
 }
 
 /**
