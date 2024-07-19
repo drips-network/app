@@ -1,23 +1,29 @@
-<script lang="ts">
-  export let enabled = true;
-</script>
-
-<div class:padded-horizontal-scroll={enabled}>
-  <div class="content">
-    <slot />
+<div class="wrapper">
+  <div class="inner">
+    <div class="content">
+      <slot />
+    </div>
   </div>
   <div class="gradient left-edge" />
   <div class="gradient right-edge" />
 </div>
 
 <style>
-  .padded-horizontal-scroll {
+  .wrapper {
     width: calc(100% + 5rem);
     margin-left: -2.5rem;
+    position: relative;
+  }
+
+  .inner {
     overflow: scroll;
   }
 
-  .padded-horizontal-scroll > .content {
+  .content {
+    position: relative;
+  }
+
+  .inner > .content {
     min-width: 100%;
     padding: 1px 2.5rem; /* 1px so box-shadow outlined content is not clipped */
     width: fit-content;
@@ -33,10 +39,12 @@
   .gradient.left-edge {
     left: -0;
     background: linear-gradient(to right, var(--color-background) 0%, transparent);
+    z-index: 2;
   }
 
   .gradient.right-edge {
     right: 0;
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
+    z-index: 2;
   }
 </style>

@@ -108,6 +108,7 @@
   import { constants } from 'radicle-drips';
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
+  import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -279,7 +280,10 @@
                     <span class="muted">&nbsp;total</span>
                   </div>
                   {#if supportersPile && supportersPile.length > 0}
-                    <div in:fade={{ duration: 300 }} class="flex items-center gap-1.5 min-w-0">
+                    <div
+                      in:fade={{ duration: 300 }}
+                      class="hide-on-mobile flex items-center gap-1.5 min-w-0"
+                    >
                       <span class="typo-text-small truncate muted">Supported by</span>
                       <Pile
                         maxItems={3}
@@ -289,7 +293,7 @@
                     </div>
                   {/if}
                 </div>
-                <div class="splits">
+                <PaddedHorizontalScroll>
                   <div
                     class="splits-component"
                     style:pointer-events={listingMode ? 'none' : undefined}
@@ -301,7 +305,7 @@
                       list={dripList.splits}
                     />
                   </div>
-                </div>
+                </PaddedHorizontalScroll>
               </div>
             {/if}
           </div>
@@ -482,6 +486,10 @@
   @media (max-width: 768px) {
     .actions {
       flex-direction: column;
+    }
+
+    .hide-on-mobile {
+      display: none;
     }
   }
 </style>
