@@ -49,12 +49,12 @@
 
   const fiatEstimatesStarted = fiatEstimates.started;
 
-  $: amounts = withdrawableBalances
-    ?.map(({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
+  $: amounts = withdrawableBalances?.map(
+    ({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
       tokenAddress,
       amount: BigInt(splittableAmount) + BigInt(receivableAmount) + BigInt(collectableAmount),
-    }))
-    .filter(({ amount }) => amount > 0n);
+    }),
+  );
 
   $: tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
   $: priceReadable =
