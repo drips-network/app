@@ -10,7 +10,7 @@
   export let subtitle: string | undefined = undefined;
 </script>
 
-<a class="support-item" {href} class:has-href={href}>
+<svelte:element this={href ? 'a' : 'div'} class="support-item" {href} class:has-href={href}>
   <div class="left">
     <div class="content">
       <div class="title">
@@ -29,13 +29,9 @@
       <slot name="amount-sub" />
     </div>
   </div>
-</a>
+</svelte:element>
 
 <style>
-  a {
-    display: block;
-  }
-
   .support-item {
     display: flex;
     justify-content: space-between;
