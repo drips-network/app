@@ -10,7 +10,7 @@ const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN');
 
 if (dsn) {
   Sentry.init({
-    dsn: 'https://b36b44888fb783f2bf5ca04bfbe412ab@o4507628947111936.ingest.de.sentry.io/4507645274947664',
+    dsn,
     tracesSampleRate: 0.1,
     profilesSampleRate: 0.1,
 

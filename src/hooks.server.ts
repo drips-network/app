@@ -8,7 +8,7 @@ const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN');
 
 if (dsn) {
   Sentry.init({
-    dsn: '',
+    dsn,
     tracesSampleRate: 0.1,
     profilesSampleRate: 0.1,
     integrations: [nodeProfilingIntegration()],
