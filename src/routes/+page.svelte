@@ -33,9 +33,7 @@
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import AnimateDripOnSvgPaths from '$lib/components/animate-drip-on-svg-paths/animate-drip-on-svg-paths.svelte';
   import AnimateTypeWords from '$lib/components/animate-type-words/animate-type-words.svelte';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import DripListCarousel from './components/drip-list-carousel.svelte';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   export let data: PageData;
 
@@ -140,7 +138,12 @@
             </p>
           </div>
 
-          <div class="lists" style:display="flex" style:flex-direction="column" style:max-width="500px">
+          <div
+            class="lists"
+            style:display="flex"
+            style:flex-direction="column"
+            style:max-width="500px"
+          >
             <DripListCarousel dripLists={data.dripLists} />
           </div>
         </div>

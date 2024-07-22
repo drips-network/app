@@ -1,8 +1,10 @@
 <script context="module" lang="ts">
-  import DripListCard, { DRIP_LIST_CARD_FRAGMENT } from "$lib/components/drip-list-card/drip-list-card.svelte";
-  import { gql } from "graphql-request";
-  import type { DripListCarouselDripListFragment } from "./__generated__/gql.generated";
-  import { onMount } from "svelte";
+  import DripListCard, {
+    DRIP_LIST_CARD_FRAGMENT,
+  } from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import { gql } from 'graphql-request';
+  import type { DripListCarouselDripListFragment } from './__generated__/gql.generated';
+  import { onMount } from 'svelte';
 
   export const DRIP_LIST_CAROUSEL_DRIP_LIST_FRAGMENT = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
@@ -13,7 +15,7 @@
 </script>
 
 <script lang="ts">
-  import { browser } from "$app/environment";
+  import { browser } from '$app/environment';
 
   export let dripLists: DripListCarouselDripListFragment[];
 
@@ -22,15 +24,16 @@
 
   $: currentDripListId = dripLists[currentIndex].account.accountId;
   $: nextDripListId = (dripLists[currentIndex + 1] ?? dripLists[0]).account.accountId;
-  $: previousDripListId = (dripLists[currentIndex - 1] ?? dripLists[dripLists.length - 1]).account.accountId;
+  $: previousDripListId = (dripLists[currentIndex - 1] ?? dripLists[dripLists.length - 1]).account
+    .accountId;
 
   let dripListContainerElems: HTMLDivElement[] = [];
 
   onMount(() => {
     setInterval(() => {
       currentIndex = (currentIndex + 1) % dripLists.length;
-    }, 2000);
-  })
+    }, 4000);
+  });
 </script>
 
 <!-- <div
@@ -57,12 +60,18 @@
         class:next={nextDripListId === id}
         class:previous={previousDripListId === id}
       >
-        <DripListCard hideDescription hideTotal listingMode data={{ dripList }} />
+        <DripListCard hideSupporterPile hideDescription hideTotal listingMode data={{ dripList }} />
       </div>
     {/each}
   {/if}
   <div class="placeholder" style:visibility="hidden">
-    <DripListCard hideDescription hideTotal listingMode data={{ dripList: dripLists[initialIndex] }} />
+    <DripListCard
+      hideSupporterPile
+      hideDescription
+      hideTotal
+      listingMode
+      data={{ dripList: dripLists[initialIndex] }}
+    />
   </div>
 </div>
 
@@ -90,20 +99,26 @@
   .list.current {
     visibility: visible;
     z-index: 1;
-    transition: transform 0.5s, opacity 0.5s;
+    transition:
+      transform 0.5s,
+      opacity 0.5s;
   }
 
   .list.previous {
     visibility: visible;
     transform: translate(5rem) scale(0.9);
     opacity: 0.5;
-    transition: transform 0.5s, opacity 0.5s;
+    transition:
+      transform 0.5s,
+      opacity 0.5s;
   }
 
   .list.next {
     visibility: visible;
     transform: translate(-5rem) scale(0.9);
     opacity: 0.5;
-    transition: transform 0.5s, opacity 0.5s;
+    transition:
+      transform 0.5s,
+      opacity 0.5s;
   }
 </style>

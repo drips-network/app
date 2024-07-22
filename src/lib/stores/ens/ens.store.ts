@@ -1,7 +1,6 @@
-import type { BaseProvider } from '@ethersproject/providers';
-import type { ethers } from 'ethers';
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import walletStore from '../wallet/wallet.store';
 
 export interface ResolvedRecord {
   name?: string;
@@ -14,19 +13,7 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
-  const connected = writable(false);
-
-  let provider: ethers.providers.BaseProvider | undefined;
-
-  /**
-   * Connect the store to a provider, which is needed in order to resolve ENS
-   * records.
-   * @param toProvider The provider to connect to.
-   */
-  function connect(toProvider: BaseProvider) {
-    provider = toProvider;
-    connected.set(true);
-  }
+  const provider = get(walletStore).provider;
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -91,8 +78,6 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
-    connect,
-    connected: { subscribe: connected.subscribe },
     lookup,
     reverseLookup,
     clear,

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
 
   interface Drip {
     startTimestamp: number;
@@ -29,6 +28,8 @@
     return num;
   }
 
+  let lastAnimationFrameRequest: number | undefined = undefined;
+
   function animate(timestamp: number) {
     if (!start) {
       start = timestamp;
@@ -49,7 +50,7 @@
     }
 
     currentDrips.forEach((drip, index) => {
-      let path = paths[drip.pathIndex];
+      let { element: path, reverse } = paths[drip.pathIndex];
 
       if (!path) return;
 
@@ -65,7 +66,7 @@
 
         const duration = pathLength / speed;
         let time = timestamp - drip.startTimestamp;
-        const distance = speed * time;
+        const distance = !reverse ? speed * time : pathLength - speed * time;
 
         let dripScale = 0;
         if (time < duration / 4) {
@@ -81,7 +82,7 @@
         drip.scale = dripScale;
 
         // If the path is fully covered, set dripsCoordinates to undefined
-        if (distance >= pathLength) {
+        if (distance > pathLength || distance < 0) {
           drip.x = undefined;
           drip.y = undefined;
           drip.scale = undefined;
@@ -97,15 +98,25 @@
       }
     });
 
-    requestAnimationFrame(animate);
+    lastAnimationFrameRequest = requestAnimationFrame(animate);
   }
 
-  let paths: SVGPathElement[] = [];
+  let paths: {
+    element: SVGPathElement;
+    reverse: boolean;
+  }[] = [];
   let contentEl: HTMLDivElement;
 
-  onMount(async () => {
-    paths = Array.from(contentEl.querySelectorAll('path[data-drip-path]'));
-    requestAnimationFrame(animate);
+  onMount(() => {
+    paths = Array.from(contentEl.querySelectorAll('path[data-drip-path]')).map((el) => ({
+      element: el as SVGPathElement,
+      reverse: el.getAttribute('data-drip-path-reverse') !== null,
+    }));
+    animate(0);
+
+    return () => {
+      if (lastAnimationFrameRequest) cancelAnimationFrame(lastAnimationFrameRequest);
+    };
   });
 </script>
 
