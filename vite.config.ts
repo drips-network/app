@@ -6,15 +6,7 @@ import { defineConfig } from 'vitest/config';
 const env = loadEnv(process.env['NODE_ENV'] ?? 'development', process.cwd(), 'BUILD_');
 
 const config = defineConfig({
-  plugins: [
-    sentrySvelteKit({
-      sourceMapsUploadOptions: {
-        org: 'drips',
-        project: 'drips-app',
-      },
-    }),
-    sveltekit(),
-  ],
+  plugins: [sentrySvelteKit(), sveltekit()],
   test: {
     // Jest like globals
     globals: true,
