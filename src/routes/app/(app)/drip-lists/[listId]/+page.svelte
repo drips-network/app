@@ -23,7 +23,6 @@
 <script lang="ts">
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SupportCard, {
     SUPPORT_CARD_DRIP_LIST_FRAGMENT,
   } from '$lib/components/support-card/support-card.svelte';
@@ -71,9 +70,7 @@
 
 <article class="drip-list-page">
   <main class="list">
-    <SectionSkeleton loaded={Boolean(dripList || votingRound)} horizontalScroll={false}>
-      <DripListCard data={{ dripList, votingRound }} />
-    </SectionSkeleton>
+    <DripListCard data={{ dripList, votingRound }} />
   </main>
 
   <aside class="support">
