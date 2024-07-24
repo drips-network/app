@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
-import { formatUnits } from 'ethers/lib/utils.js';
 import { z } from 'zod';
 import { redis } from '../redis.js';
+import { formatUnits } from 'ethers';
 
 const etherscanTokensResponseSchema = z.array(
   z.object({

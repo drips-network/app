@@ -82,7 +82,7 @@
           message: 'Unable to resolve ENS name',
         };
       }
-    } else if (input && ethers.utils.isAddress(input)) {
+    } else if (input && ethers.isAddress(input)) {
       // is address
       validatedValue = input;
 

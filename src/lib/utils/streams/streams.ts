@@ -9,7 +9,7 @@ import type {
 } from './__generated__/gql.generated';
 import { pin } from '../ipfs';
 import { getAddressDriverTxFactory, getNetworkConfig } from '../get-drips-clients';
-import type { PopulatedTransaction, Signer } from 'ethers';
+import type { Signer, Transaction } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
 import makeStreamId, { decodeStreamId } from './make-stream-id';
@@ -408,7 +408,7 @@ export async function buildEditStreamBatch(
   const streamToEdit = currentStreams.find((stream) => stream.id === streamId);
   assert(streamToEdit, `Stream ${streamId} not found`);
 
-  const batch: PopulatedTransaction[] = [];
+  const batch: Transaction[] = [];
 
   const addressDriverTxFactory = await getAddressDriverTxFactory();
 

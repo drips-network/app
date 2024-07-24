@@ -2,8 +2,7 @@ import { derived, writable, get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import deduplicateReadable from '../deduplicate-readable';
 import { z } from 'zod';
-import { formatUnits } from 'ethers/lib/utils';
-import { utils } from 'ethers';
+import { formatUnits, getAddress, isAddress } from 'ethers';
 
 type TokenAddress = string;
 type DataProviderTokenId = number;
@@ -67,12 +66,12 @@ export async function track(addresses: TokenAddress[]) {
 
   // Validate all the addresses are valid ETH addresses
   addresses.forEach((address) => {
-    assert(utils.isAddress(address), `Invalid address: ${address}`);
+    assert(isAddress(address), `Invalid address: ${address}`);
   });
 
   // If we're already tracking any of the given addresses, remove them from the list.
   addresses = addresses.filter(
-    (address) => !Object.keys(pricesValue).includes(utils.getAddress(address)),
+    (address) => !Object.keys(pricesValue).includes(getAddress(address)),
   );
 
   // Make all the addresses lowercase
@@ -85,7 +84,7 @@ export async function track(addresses: TokenAddress[]) {
   addresses.forEach((address) => {
     prices.set({
       ...pricesValue,
-      [utils.getAddress(address)]: 'pending',
+      [getAddress(address)]: 'pending',
     });
   });
 
@@ -105,7 +104,7 @@ export async function track(addresses: TokenAddress[]) {
     if (i[1] === undefined) {
       prices.update(($prices) => ({
         ...$prices,
-        [utils.getAddress(i[0])]: 'unsupported',
+        [getAddress(i[0])]: 'unsupported',
       }));
     }
   });
@@ -130,7 +129,7 @@ export async function track(addresses: TokenAddress[]) {
     return {
       ...$prices,
       ...Object.fromEntries(
-        Object.values(knownIds).map(([address, id]) => [utils.getAddress(address), parsedRes[id]]),
+        Object.values(knownIds).map(([address, id]) => [getAddress(address), parsedRes[id]]),
       ),
     };
   });
@@ -148,7 +147,7 @@ export async function track(addresses: TokenAddress[]) {
  */
 export function convert(amount: Amount, tokenDecimals: number, prices: Prices) {
   let { tokenAddress } = amount;
-  tokenAddress = utils.getAddress(tokenAddress);
+  tokenAddress = getAddress(tokenAddress);
 
   const price = prices[tokenAddress];
 
@@ -166,7 +165,7 @@ export function convert(amount: Amount, tokenDecimals: number, prices: Prices) {
  * @param tokenAddresses The tokens to subscribe to.
  */
 const price = (tokenAddresses: TokenAddress[]) => {
-  tokenAddresses = tokenAddresses.map((address) => utils.getAddress(address));
+  tokenAddresses = tokenAddresses.map((address) => getAddress(address));
 
   return deduplicateReadable(
     derived(prices, ($prices) => {

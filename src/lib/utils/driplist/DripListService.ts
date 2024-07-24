@@ -16,7 +16,7 @@ import {
 } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { SplitsReceiverStruct } from 'radicle-drips';
-import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
+import { ethers, MaxUint256, type Signer, toBigInt, Transaction } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import type { Address, IpfsHash } from '../common-types';
@@ -33,6 +33,7 @@ import type {
 } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
+import type { BigNumberish } from 'ethers';
 
 type AccountId = string;
 
@@ -153,7 +154,7 @@ export default class DripListService {
     );
 
     let needsApprovalForToken: string | undefined;
-    let txs: PopulatedTransaction[];
+    let txs: Transaction[];
 
     if (support?.type === 'continuous') {
       const { tokenAddress, amountPerSec, topUpAmount } = support;
@@ -312,9 +313,9 @@ export default class DripListService {
 
     const sortedReceivers = uniqueReceivers.sort((a, b) =>
       // Sort by user ID.
-      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
+      toBigInt(a.accountId as BigNumberish) > toBigInt(b.accountId as BigNumberish)
         ? 1
-        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
+        : toBigInt(a.accountId as BigNumberish) < toBigInt(b.accountId as BigNumberish)
           ? -1
           : 0,
     );
@@ -360,14 +361,14 @@ export default class DripListService {
     );
   }
 
-  private async _buildTokenApprovalTx(token: Address): Promise<PopulatedTransaction> {
+  private async _buildTokenApprovalTx(token: Address): Promise<Transaction> {
     assert(this._owner, `This function requires an active wallet connection.`);
 
     const erc20TxFactory = await ERC20TxFactory.create(this._owner, token);
 
     const tokenApprovalTx = await erc20TxFactory.approve(
       this._addressDriverTxFactory.driverAddress,
-      constants.MaxUint256,
+      MaxUint256,
     );
 
     return tokenApprovalTx;
@@ -398,10 +399,10 @@ export default class DripListService {
   // We use the count of *all* NFT sub-accounts to generate the salt for the Drip List ID.
   // This is because we want to avoid making HTTP requests to the subgraph for each NFT sub-account to check if it's a Drip List.
   private _calcSaltFromAddress = (address: string, listCount: number): bigint /* 64bit */ => {
-    const hash = ethers.utils.keccak256(
-      ethers.utils.defaultAbiCoder.encode(['string'], [this.SEED_CONSTANT + address]),
+    const hash = ethers.keccak256(
+      ethers.AbiCoder.defaultAbiCoder().encode(['string'], [this.SEED_CONSTANT + address]),
     );
-    const randomBigInt = ethers.BigNumber.from('0x' + hash.slice(26));
+    const randomBigInt = ethers.toBigInt('0x' + hash.slice(26));
 
     let random64BitBigInt = BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
 

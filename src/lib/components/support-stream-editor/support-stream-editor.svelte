@@ -4,7 +4,6 @@
   import type { Items } from '$lib/components/list-select/list-select.types';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import tokensStore from '$lib/stores/tokens/tokens.store';
-  import { formatUnits } from 'ethers/lib/utils';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import { constants } from 'radicle-drips';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
@@ -16,6 +15,7 @@
   import Button from '../button/button.svelte';
   import unreachable from '$lib/utils/unreachable';
   import Token from '../token/token.svelte';
+  import { formatUnits } from 'ethers';
 
   export let streamRateValueParsed: bigint | undefined = undefined;
   export let topUpAmountValueParsed: bigint | undefined = undefined;

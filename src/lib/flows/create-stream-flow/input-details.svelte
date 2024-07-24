@@ -52,13 +52,13 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
   import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
-  import { isAddress } from 'ethers/lib/utils';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
   import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { isAddress } from 'ethers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

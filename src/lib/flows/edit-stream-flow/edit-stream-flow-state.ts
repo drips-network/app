@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import type { EditStreamFlowStreamFragment } from './__generated__/gql.generated';
-import { formatUnits } from 'ethers/lib/utils';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import unreachable from '$lib/utils/unreachable';
 import { constants } from 'radicle-drips';
+import { formatUnits } from 'ethers';
 
 export interface EditStreamFlowState {
   newAmountValue: string | undefined;

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { z } from 'zod';
 import erc20Abi from './erc20.abi.json';
+import type { BrowserProvider, JsonRpcProvider } from 'ethers';
 
 /**
  * Fetches the name, symbol and decimals of any ERC-20 token contract, if provided.
@@ -8,10 +9,7 @@ import erc20Abi from './erc20.abi.json';
  * @param provider The provider to use for the fetch.
  * @throw An error if there is no properly-implemented ERC-20 contract at the given address.
  */
-export default async (
-  tokenAddress: string,
-  provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider,
-) => {
+export default async (tokenAddress: string, provider: BrowserProvider | JsonRpcProvider) => {
   const contract = new ethers.Contract(tokenAddress, erc20Abi, provider);
 
   const name = await contract.name();

@@ -3,11 +3,11 @@ import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-import { constants } from 'ethers';
 import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import { MaxUint256 } from 'ethers';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -57,7 +57,7 @@ export default function (
         const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
         const approvePopulatedTx = await erc20TxFactory.approve(
           txFactory.driverAddress,
-          constants.MaxUint256,
+          MaxUint256,
         );
 
         return {

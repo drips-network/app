@@ -13,7 +13,6 @@ import {
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
-import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
@@ -23,6 +22,8 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
+import { toBigInt, type Transaction } from 'ethers';
+import type { BigNumberish } from 'ethers';
 
 interface ListEditorConfig {
   items: Items;
@@ -155,7 +156,7 @@ export default class GitProjectService {
     highLevelPercentages: { [slug: string]: number },
     maintainers: ListEditorConfig,
     dependencies: ListEditorConfig,
-  ): Promise<{ newMetadataHash: string; batch: PopulatedTransaction[] }> {
+  ): Promise<{ newMetadataHash: string; batch: Transaction[] }> {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
     const {
@@ -199,7 +200,7 @@ export default class GitProjectService {
     return { batch: [setSplitsTx, emitAccountMetadataTx], newMetadataHash: ipfsHash };
   }
 
-  public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {
+  public async buildBatchTx(context: State): Promise<Transaction[]> {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
     const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
@@ -277,14 +278,14 @@ export default class GitProjectService {
       (wb) => BigInt(wb.collectableAmount) > 0n,
     );
 
-    const splitTxs: Promise<PopulatedTransaction>[] = [];
+    const splitTxs: Promise<Transaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
       splitTxs.push(
         this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
       );
     });
 
-    const collectTxs: Promise<PopulatedTransaction>[] = [];
+    const collectTxs: Promise<Transaction>[] = [];
     collectableAmounts?.forEach(({ tokenAddress }) => {
       assert(this._connectedAddress);
 
@@ -313,9 +314,9 @@ export default class GitProjectService {
 
     const sortedReceivers = uniqueReceivers.sort((a, b) =>
       // Sort by user ID.
-      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
+      toBigInt(a.accountId as BigNumberish) > toBigInt(b.accountId as BigNumberish)
         ? 1
-        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
+        : toBigInt(a.accountId as BigNumberish) < toBigInt(b.accountId as BigNumberish)
           ? -1
           : 0,
     );

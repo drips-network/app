@@ -1,6 +1,6 @@
 import ens from '$lib/stores/ens';
 import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-import { isAddress } from 'ethers/lib/utils';
+import { isAddress } from 'ethers';
 import { AddressDriverClient, Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 
@@ -40,7 +40,7 @@ export default async function (
       address,
       dripsAccountId,
     };
-  } else if (universalAcccountIdentifier.endsWith('.eth')) {
+  } else if ((universalAcccountIdentifier as string).endsWith('.eth')) {
     // Subscribe to ens.connected store and wait until it's true
 
     const ensConnected = ens.connected;

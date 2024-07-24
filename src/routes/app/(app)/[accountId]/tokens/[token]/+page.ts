@@ -6,9 +6,9 @@ import {
 import query from '$lib/graphql/dripsQL';
 import type { TokenPageQuery, TokenPageQueryVariables } from './__generated__/gql.generated';
 import { error, redirect } from '@sveltejs/kit';
-import { isAddress } from 'ethers/lib/utils';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
+import { isAddress } from 'ethers';
 
 export const load = async ({ fetch, params }) => {
   const connectedAddress = getConnectedAddress();

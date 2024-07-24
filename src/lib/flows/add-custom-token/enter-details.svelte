@@ -6,13 +6,13 @@
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { fetchInfo } from '$lib/utils/erc20';
-  import { isAddress } from 'ethers/lib/utils';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import assert from '$lib/utils/assert';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import validateUrl from '$lib/utils/validate-url';
+  import { isAddress } from 'ethers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

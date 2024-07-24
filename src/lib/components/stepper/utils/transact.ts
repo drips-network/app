@@ -1,7 +1,6 @@
 import modal from '$lib/stores/modal';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import etherscanLink from '$lib/utils/etherscan-link';
-import type { ContractReceipt, PopulatedTransaction } from 'ethers';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
@@ -11,13 +10,14 @@ import unreachable from '$lib/utils/unreachable';
 import assert from '$lib/utils/assert';
 import isTest from '$lib/utils/is-test';
 import SafeAppsSDK, { type SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
+import type { TransactionReceipt, Transaction } from 'ethers';
 
 type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
 type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
 
 type TransactionWrapper = {
-  transaction: PopulatedTransaction;
+  transaction: Transaction;
   applyGasBuffer: boolean;
   waitingSignatureMessage?: UpdateAwaitStepParams;
   waitingConfirmationMessage?: UpdateAwaitStepParams;
@@ -44,7 +44,7 @@ export type TransactPayload<T extends Nullable<BeforeFunc>> = {
    * @param context Object with optional context returned from `before`.
    * @returns A promise that will be awaited before moving on in the flow.
    */
-  after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
+  after?: (receipts: TransactionReceipt[], context: Context<T>) => PromiseLike<void>;
   /**
    * Function to run after transctions have been proposed to a Safe. This function will ONLY run if the app is
    * connected to a Safe.
@@ -140,7 +140,7 @@ export default function transact(
 
   const { before, transactions: transactionsBuilder, after, afterSafe, messages } = resolvedPayload;
 
-  const receipts: ContractReceipt[] = [];
+  const receipts: TransactionReceipt[] = [];
 
   const promise = async (updateAwaitStep: UpdateAwaitStepFn) => {
     modal.setHideable(false);
@@ -259,7 +259,7 @@ export default function transact(
 
         setStepCopyWaitingForConfirmation(updateAwaitStep, network.name, tx.hash);
 
-        if (!safeAppMode) receipts.push(await tx.wait(1));
+        if (!safeAppMode) receipts.push((await tx.wait(1)) ?? unreachable());
       }
     }
 

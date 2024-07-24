@@ -1,11 +1,9 @@
 import { DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
 import { PROJECTS_SECTION_PROJECT_FRAGMENT } from '$lib/components/projects-section/projects-section.svelte';
 import { error, redirect } from '@sveltejs/kit';
-import { isAddress } from 'ethers/lib/utils.js';
 import { gql } from 'graphql-request';
 import { STREAMS_SECTION_STREAMS_FRAGMENT } from '../funds/sections/streams.section.svelte';
 import { USER_BALANCES_FRAGMENT } from '../funds/sections/balances.section.svelte';
-import { providers } from 'ethers';
 import network from '$lib/stores/wallet/network';
 import { AddressDriverClient, Utils } from 'radicle-drips';
 import query from '$lib/graphql/dripsQL';
@@ -13,8 +11,9 @@ import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated_
 import { getVotingRounds } from '$lib/utils/multiplayer';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
 import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
+import { isAddress, JsonRpcProvider } from 'ethers';
 
-const provider = new providers.JsonRpcProvider(network.rpcUrl);
+const provider = new JsonRpcProvider(network.rpcUrl);
 
 const PROFILE_PAGE_QUERY = gql`
   ${PROJECTS_SECTION_PROJECT_FRAGMENT}
@@ -76,7 +75,7 @@ export const load = async ({ params, fetch }) => {
 
   if (isAddress(universalAccountId)) {
     address = universalAccountId;
-  } else if (universalAccountId.endsWith('.eth')) {
+  } else if ((universalAccountId as string).endsWith('.eth')) {
     const lookupRes = await provider.resolveName(universalAccountId);
 
     if (!lookupRes) {
@@ -98,6 +97,7 @@ export const load = async ({ params, fetch }) => {
       }
       case 'repo': {
         return { error: true, type: 'is-repo-driver-account-id' as const };
+        break;
       }
       default: {
         error(404, 'Not Found');

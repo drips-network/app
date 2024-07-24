@@ -38,6 +38,7 @@ import type {
   ProjectForVoteReceiverQueryVariables,
 } from './__generated__/gql.generated';
 import { getAddressDriverClient } from '../get-drips-clients';
+import unreachable from '../unreachable';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -82,19 +83,19 @@ export async function signVotingRound(
   collaborators: string[],
   dripListId?: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = dripListId
     ? START_VOTING_ROUND_MESSAGE_TEMPLATE(
         currentTime,
-        chainId,
+        Number(chainId),
         publisherAddress,
         dripListId,
         collaborators,
       )
     : CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE(
         currentTime,
-        chainId,
+        Number(chainId),
         publisherAddress,
         collaborators,
       );
@@ -156,11 +157,11 @@ export async function signDeleteVotingRound(
   votingRoundId: string,
   signer: ethers.Signer,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = DELETE_VOTING_ROUND_MESSAGE_TEMPLATE(
     currentTime,
-    chainId,
+    Number(chainId),
     publisherAddress,
     votingRoundId,
   );
@@ -249,11 +250,11 @@ export async function signGetVotingRoundVotes(
   publisherAddress: string,
   votingRoundId: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = REVEAL_VOTES_MESSAGE_TEMPLATE(
     currentTime,
-    chainId,
+    Number(chainId),
     publisherAddress,
     votingRoundId,
   );
@@ -321,10 +322,10 @@ export async function signVote(
   votingRoundId: string,
   receivers: VoteReceiver[],
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
   const message = VOTE_MESSAGE_TEMPLATE(
     currentTime,
-    chainId,
+    Number(chainId),
     collaboratorAddress,
     votingRoundId,
     receivers,
@@ -402,9 +403,9 @@ export async function signGetCollaborator(
   currentTime: Date,
   votingRoundId: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
-  const message = REVEAL_MY_VOTE_MESSAGE_TEMPLATE(currentTime, chainId, votingRoundId);
+  const message = REVEAL_MY_VOTE_MESSAGE_TEMPLATE(currentTime, Number(chainId), votingRoundId);
 
   return signer.signMessage(message);
 }

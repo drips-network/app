@@ -7,7 +7,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
   import { getERC20TxFactory } from '$lib/utils/get-drips-clients';
-  import { constants, ethers } from 'ethers';
+  import { ethers, MaxUint256 } from 'ethers';
   import Button from '$lib/components/button/button.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import unreachable from '$lib/utils/unreachable';
@@ -28,10 +28,7 @@
 
           return [
             {
-              transaction: await txFactory.approve(
-                tokenAddress ?? unreachable(),
-                constants.MaxUint256,
-              ),
+              transaction: await txFactory.approve(tokenAddress ?? unreachable(), MaxUint256),
               applyGasBuffer: false,
             },
           ];
@@ -39,7 +36,7 @@
         after: async () => {
           context.update((c) => ({
             ...c,
-            tokenAllowance: ethers.constants.MaxUint256.toBigInt(),
+            tokenAllowance: ethers.MaxUint256,
           }));
         },
       }),

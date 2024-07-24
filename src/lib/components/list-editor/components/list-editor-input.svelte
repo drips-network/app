@@ -19,7 +19,6 @@
     GetProjectQuery,
     GetProjectQueryVariables,
   } from './__generated__/gql.generated';
-  import { isAddress } from 'ethers/lib/utils';
   import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripList from '$lib/components/icons/DripList.svelte';
@@ -27,6 +26,7 @@
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import { slide } from 'svelte/transition';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
+  import { isAddress } from 'ethers';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -245,9 +245,9 @@
         await addProject(value);
       } else if (value.endsWith('.eth') || isAddress(value)) {
         await addAddress(value);
-      } else if (value.includes(`${BASE_URL}/app/drip-lists/`)) {
+      } else if ((value as string).includes(`${BASE_URL}/app/drip-lists/`)) {
         await addDripList(value);
-      } else if (value.includes(`${BASE_URL}/app/projects/`)) {
+      } else if ((value as string).includes(`${BASE_URL}/app/projects/`)) {
         await addDripsProject(value);
       }
     } catch (e) {

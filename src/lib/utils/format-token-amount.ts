@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { formatUnits } from 'ethers';
 import { constants } from 'radicle-drips';
 
 const MAX_DECIMAL_ZEROES_IN_MOTION = 8;
@@ -53,7 +53,7 @@ export default function formatTokenAmount(
 
   if (amount === 0n) return localDecimal(0, { min: 2 });
 
-  const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
+  const parsedAmount = parseFloat(formatUnits(amount / precisionMultiplier, tokenDecimals));
 
   const paddedAmount = localDecimal(parsedAmount, { min: maxDecimals });
 

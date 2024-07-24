@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { JsonRpcProvider, JsonRpcSigner } from 'ethers';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { AddressDriverClient } from 'radicle-drips';
@@ -19,6 +19,8 @@ import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { getNetwork, isConfiguredChainId, type Network } from './network';
 import { invalidateAll } from '../fetched-data-cache/invalidate';
+import { BrowserProvider, InfuraProvider } from 'ethers';
+import unreachable from '$lib/utils/unreachable';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -71,8 +73,8 @@ export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
   dripsAccountId: string;
-  provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
-  signer: ethers.providers.JsonRpcSigner;
+  provider: BrowserProvider | JsonRpcProvider;
+  signer: JsonRpcSigner;
   network: Network;
   safe?: SafeInfo;
 }
@@ -80,10 +82,7 @@ export interface ConnectedWalletStoreState {
 export interface DisconnectedWalletStoreState {
   connected: false;
   network: Network;
-  provider:
-    | ethers.providers.Web3Provider
-    | ethers.providers.InfuraProvider
-    | ethers.providers.JsonRpcProvider;
+  provider: BrowserProvider | InfuraProvider | JsonRpcProvider;
   dripsAccountId?: undefined;
   address?: undefined;
   signer?: undefined;
@@ -95,7 +94,7 @@ type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
   network: DEFAULT_NETWORK,
-  provider: new ethers.providers.JsonRpcProvider(network.rpcUrl, DEFAULT_NETWORK),
+  provider: new JsonRpcProvider(network.rpcUrl, DEFAULT_NETWORK),
 };
 
 const walletStore = () => {
@@ -164,12 +163,12 @@ const walletStore = () => {
       });
     }, 2000);
 
-    let provider: ethers.providers.Web3Provider;
+    let provider: BrowserProvider;
     let safeInfo: SafeInfo | undefined;
 
     if (isSafeApp) {
       safeInfo = await appsSdk.safe.getInfo();
-      provider = new ethers.providers.Web3Provider(new SafeAppProvider(safeInfo, appsSdk));
+      provider = new BrowserProvider(new SafeAppProvider(safeInfo, appsSdk));
     } else {
       waitingForOnboard.set(true);
       const wallets = await onboard.connectWallet(onboardOptions);
@@ -183,7 +182,7 @@ const walletStore = () => {
 
       lastConnectedWallet.set(walletName);
 
-      provider = new ethers.providers.Web3Provider(wallets[0].provider);
+      provider = new BrowserProvider(wallets[0].provider);
       _attachListeners(wallets[0].provider);
     }
 
@@ -192,7 +191,7 @@ const walletStore = () => {
 
     const connectedToNetwork = await provider.getNetwork();
 
-    if (!isConfiguredChainId(connectedToNetwork.chainId)) {
+    if (!isConfiguredChainId(Number(connectedToNetwork.chainId))) {
       const clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
@@ -221,20 +220,17 @@ const walletStore = () => {
     _clear();
   }
 
-  async function _setConnectedState(
-    provider: ethers.providers.Web3Provider,
-    safeInfo?: SafeInfo,
-  ): Promise<void> {
+  async function _setConnectedState(provider: BrowserProvider, safeInfo?: SafeInfo): Promise<void> {
     const accounts = await provider.listAccounts();
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
 
     state.set({
       connected: true,
-      address: accounts[0],
+      address: accounts[0].address,
       dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
       provider,
       signer,
-      network: getNetwork((await provider.getNetwork()).chainId),
+      network: getNetwork(Number((await provider.getNetwork()).chainId)),
       safe: safeInfo,
     });
 
@@ -288,21 +284,23 @@ const mockWalletStore = () => {
 
   const state = writable<WalletStoreState>({
     connected: false,
-    network: getNetwork(provider.network.chainId),
+    network: getNetwork(Number(provider._network.chainId)),
     provider,
   });
 
   async function initialize() {
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
 
     const accountId = await (await getAddressDriverClient(signer)).getAccountId();
+
+    const chainId = Number((await provider.getNetwork()).chainId ?? unreachable());
 
     state.set({
       connected: true,
       address,
       provider,
       signer,
-      network: getNetwork(provider.network.chainId),
+      network: getNetwork(chainId),
       dripsAccountId: accountId,
     });
 

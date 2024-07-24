@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { ethers, utils } from 'ethers';
+import { ethers, toUtf8Bytes } from 'ethers';
 import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
@@ -44,12 +44,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const repoDriverAddress = getNetworkConfig(chainId)?.REPO_DRIVER ?? unreachable();
 
-  const provider = new ethers.providers.JsonRpcProvider(getNetwork(chainId).rpcUrl);
+  const provider = new ethers.JsonRpcProvider(getNetwork(chainId).rpcUrl);
   const contract = new ethers.Contract(repoDriverAddress, REPO_DRIVER_ABI, provider);
 
-  const tx = await contract.populateTransaction.requestUpdateOwner(
+  const tx = await contract.requestUpdateOwner.populateTransaction(
     forge,
-    ethers.utils.hexlify(utils.toUtf8Bytes(projectName)),
+    ethers.hexlify(toUtf8Bytes(projectName)),
   );
 
   const relayRequest: SponsoredCallRequest = {
