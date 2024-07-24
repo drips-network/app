@@ -12,22 +12,9 @@ import {
   RepoDriverTxFactory,
   DripsTxFactory,
   ERC20TxFactory,
-  RepoDriverClient,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-
-/**
- * Get an initialized Repo Driver client.
- * @returns An initialized Repo Driver client.
- */
-export function getRepoDriverClient(withSigner = get(wallet).signer) {
-  const { provider } = get(wallet);
-
-  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
-
-  return RepoDriverClient.create(provider, withSigner, repoDriverAddress);
-}
 
 /**
  * Get an initialized Repo Driver transaction factory.

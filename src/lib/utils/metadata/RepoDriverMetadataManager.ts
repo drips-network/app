@@ -9,8 +9,9 @@ import type {
   LatestProjectMetadataHashQuery,
   LatestProjectMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
-import { getRepoDriverClient } from '../get-drips-clients';
-import RepoDriverUtils from '../RepoDriverUtils';
+import { Forge, type HexString } from '../sdk/sdk-types';
+import { hexlify, toUtf8Bytes } from 'ethers';
+import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
 
 type AccountId = string;
 
@@ -62,13 +63,12 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName, ownerName, forge } = metadata.data.source;
 
-    const repoDriverClient = await getRepoDriverClient();
-    const onChainAccountId = await repoDriverClient.getAccountId(
-      RepoDriverUtils.forgeFromString(forge),
-      `${ownerName}/${repoName}`, // TODO: This would only work for GitHub. Update this when we add support other forges.
-    );
+    const onChainAccountId = await repoDriverRead({
+      functionName: 'calcAccountId',
+      args: [Forge.gitHub, hexlify(toUtf8Bytes(`${ownerName}/${repoName}`)) as HexString], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
+    });
 
-    if (onChainAccountId !== accountId) {
+    if (onChainAccountId.toString() !== accountId) {
       throw new Error(
         `The user ID ${accountId} does not match the on-chain user ID ${onChainAccountId} for the repo ${repoName} on ${forge}.`,
       );

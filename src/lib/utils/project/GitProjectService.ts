@@ -1,15 +1,10 @@
 import {
-  type RepoDriverClient,
   RepoDriverTxFactory,
   Utils,
   type SplitsReceiverStruct,
   DripsTxFactory,
 } from 'radicle-drips';
-import {
-  getDripsTxFactory,
-  getRepoDriverClient,
-  getRepoDriverTxFactory,
-} from '../get-drips-clients';
+import { getDripsTxFactory, getRepoDriverTxFactory } from '../get-drips-clients';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
@@ -22,8 +17,11 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
-import { toBigInt, type Transaction } from 'ethers';
+import { hexlify, toBigInt, toUtf8Bytes, type Transaction } from 'ethers';
 import type { BigNumberish } from 'ethers';
+import type { HexString } from '../sdk/sdk-types';
+import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
+import unreachable from '../unreachable';
 
 interface ListEditorConfig {
   items: Items;
@@ -33,7 +31,6 @@ interface ListEditorConfig {
 export default class GitProjectService {
   private _github!: GitHub;
   private _dripsTxFactory!: DripsTxFactory;
-  private _repoDriverClient!: RepoDriverClient;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
@@ -46,7 +43,6 @@ export default class GitProjectService {
     const octokit = new Octokit();
     gitProjectService._github = new GitHub(octokit);
 
-    gitProjectService._repoDriverClient = await getRepoDriverClient();
     gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
     const { connected, signer, address } = get(wallet);
@@ -204,11 +200,16 @@ export default class GitProjectService {
     assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
 
     const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
-    const accountId = await this._repoDriverClient.getAccountId(
-      numericForgeValue,
-      `${username}/${repoName}`,
-    );
+
+    const accountId = (
+      await repoDriverRead({
+        functionName: 'calcAccountId',
+        args: [
+          forge === Forge.GitHub ? 0 : unreachable(),
+          hexlify(toUtf8Bytes(`${username}/${repoName}`)) as HexString,
+        ], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
+      })
+    ).toString();
 
     const {
       tx: setSplitsTx,
