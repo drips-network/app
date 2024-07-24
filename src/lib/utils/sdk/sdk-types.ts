@@ -3,4 +3,4 @@ export enum Forge {
   gitLab = 1,
 }
 
-export type HexString = `0x${string}`;
+export type OxString = `0x${string}`;

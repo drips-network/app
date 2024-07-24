@@ -8,12 +8,13 @@ import type {
   LatestDripListMetadataHashQuery,
   LatestDripListMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
+import type { nftDriverWrite } from '../sdk/nft-driver/nft-driver';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataParser
 > {
-  constructor(nftDriverClient?: NFTDriverClient) {
-    super(nftDriverAccountMetadataParser, nftDriverClient?.emitAccountMetadata);
+  constructor(nftDriver?: typeof nftDriverWrite) {
+    super(nftDriverAccountMetadataParser, nftDriver);
   }
 
   public async fetchMetadataHashByAccountId(accountId: string): Promise<string | null> {

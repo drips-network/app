@@ -7,7 +7,6 @@ import {
   DripsClient,
   Utils,
   type NetworkConfig,
-  NFTDriverClient,
   NFTDriverTxFactory,
   RepoDriverTxFactory,
   DripsTxFactory,
@@ -51,19 +50,6 @@ export function getERC20TxFactory(tokenAddress: string) {
   assert(signer);
 
   return ERC20TxFactory.create(signer, tokenAddress);
-}
-
-/**
- * Get an initialized NFT Driver client.
- * @returns An initialized NFT Driver client.
- */
-export function getNFTDriverClient() {
-  const { provider, signer, connected } = get(wallet);
-  assert(connected, 'Wallet must be connected to create a NFTDriverClient');
-
-  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
-
-  return NFTDriverClient.create(provider, signer, nftDriverAddress);
 }
 
 /**

@@ -9,7 +9,7 @@ import type {
   LatestProjectMetadataHashQuery,
   LatestProjectMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
-import { Forge, type HexString } from '../sdk/sdk-types';
+import { Forge, type OxString } from '../sdk/sdk-types';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
 
@@ -65,7 +65,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const onChainAccountId = await repoDriverRead({
       functionName: 'calcAccountId',
-      args: [Forge.gitHub, hexlify(toUtf8Bytes(`${ownerName}/${repoName}`)) as HexString], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
+      args: [Forge.gitHub, hexlify(toUtf8Bytes(`${ownerName}/${repoName}`)) as OxString], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
     });
 
     if (onChainAccountId.toString() !== accountId) {

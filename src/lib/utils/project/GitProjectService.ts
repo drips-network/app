@@ -19,7 +19,7 @@ import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { hexlify, toBigInt, toUtf8Bytes, type Transaction } from 'ethers';
 import type { BigNumberish } from 'ethers';
-import type { HexString } from '../sdk/sdk-types';
+import type { OxString } from '../sdk/sdk-types';
 import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
 import unreachable from '../unreachable';
 
@@ -206,7 +206,7 @@ export default class GitProjectService {
         functionName: 'calcAccountId',
         args: [
           forge === Forge.GitHub ? 0 : unreachable(),
-          hexlify(toUtf8Bytes(`${username}/${repoName}`)) as HexString,
+          hexlify(toUtf8Bytes(`${username}/${repoName}`)) as OxString,
         ], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
       })
     ).toString();

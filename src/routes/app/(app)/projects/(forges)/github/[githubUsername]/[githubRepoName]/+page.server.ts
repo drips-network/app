@@ -11,7 +11,7 @@ import { redis } from '../../../../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { repoDriverRead } from '$lib/utils/sdk/repo-driver/repo-driver';
-import { Forge, type HexString } from '$lib/utils/sdk/sdk-types';
+import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import { hexlify, toUtf8Bytes } from 'ethers';
 
 async function fetchDripsProject(repoUrl: string) {
@@ -29,7 +29,7 @@ async function fetchDripsProject(repoUrl: string) {
 
   const accountId = await repoDriverRead({
     functionName: 'calcAccountId',
-    args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as HexString],
+    args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as OxString],
   });
 
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);

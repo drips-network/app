@@ -75,11 +75,7 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import {
-    getCallerClient,
-    getNFTDriverClient,
-    getNFTDriverTxFactory,
-  } from '$lib/utils/get-drips-clients';
+  import { getCallerClient, getNFTDriverTxFactory } from '$lib/utils/get-drips-clients';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -103,6 +99,7 @@
     LIST_EDITOR_PROJECT_FRAGMENT,
     type Items,
   } from '$lib/components/list-editor/types';
+  import { nftDriverWrite } from '$lib/utils/sdk/nft-driver/nft-driver';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -171,8 +168,7 @@
 
           const setSplitsTx = await nftDriverTxFactory.setSplits(listId, receivers);
 
-          const nftDriverClient = await getNFTDriverClient();
-          const metadataManager = new NftDriverMetadataManager(nftDriverClient);
+          const metadataManager = new NftDriverMetadataManager(nftDriverWrite);
 
           const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
           assert(currentMetadata);

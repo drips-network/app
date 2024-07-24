@@ -1,9 +1,18 @@
-import type { ContractTransaction } from 'ethers';
+import {
+  encodeBytes32String,
+  hexlify,
+  toBigInt,
+  toUtf8Bytes,
+  type ContractTransaction,
+} from 'ethers';
 import type { AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser';
 import assert from '$lib/utils/assert';
+import type { nftDriverWrite } from '../sdk/nft-driver/nft-driver';
+import type { OxString } from '../sdk/sdk-types';
+import type { TransactionResponse } from 'ethers';
 
 type IpfsHash = string;
 type AccountId = string;
@@ -21,7 +30,7 @@ export interface IMetadataManager<TParser extends Parser> {
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
     schema: T,
-  ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }>;
+  ): Promise<{ newHash: IpfsHash; tx: TransactionResponse }>;
 
   buildAccountMetadata(context: unknown): LatestVersion<TParser>;
 }
@@ -37,9 +46,12 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
   public static readonly USER_METADATA_KEY = 'ipfs';
 
   private readonly _parser: TParser;
-  private readonly _emitMetadataFunc: EmitMetadataFunc | undefined;
+  private readonly _emitMetadataFunc: typeof nftDriverWrite | undefined;
 
-  protected constructor(parser: TParser, emitMetadataFunc?: EmitMetadataFunc) {
+  protected constructor(
+    parser: TParser,
+    emitMetadataFunc?: typeof nftDriverWrite | typeof nftDriverWrite,
+  ) {
     this._parser = parser;
     this._emitMetadataFunc = emitMetadataFunc;
   }
@@ -133,7 +145,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
   public async updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
-  ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }> {
+  ): Promise<{ newHash: IpfsHash; tx: TransactionResponse }> {
     const { accountId } = newData.describes;
     const currentOnChainHash = await this.fetchMetadataHashByAccountId(accountId);
 
@@ -162,9 +174,15 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
       },
-    ];
+    ].map((m) => ({
+      key: encodeBytes32String(m.key) as OxString,
+      value: hexlify(toUtf8Bytes(m.value)) as OxString,
+    }));
 
-    const tx = await this._emitMetadataFunc(accountId, accountMetadata);
+    const tx = await this._emitMetadataFunc({
+      functionName: 'emitAccountMetadata',
+      args: [toBigInt(accountId), accountMetadata],
+    });
 
     return tx;
   }

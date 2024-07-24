@@ -2,7 +2,6 @@ import {
   getAddressDriverClient,
   getAddressDriverTxFactory,
   getCallerClient,
-  getNFTDriverClient,
   getNFTDriverTxFactory,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
@@ -34,6 +33,8 @@ import type {
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
 import type { BigNumberish } from 'ethers';
+import { nftDriverRead, nftDriverWrite } from '../sdk/nft-driver/nft-driver';
+import type { OxString } from '../sdk/sdk-types';
 
 type AccountId = string;
 
@@ -55,7 +56,6 @@ export default class DripListService {
 
   private _owner!: Signer | undefined;
   private _ownerAddress!: Address | undefined;
-  private _nftDriverClient!: NFTDriverClient | undefined;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverClient!: AddressDriverClient;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
@@ -75,18 +75,17 @@ export default class DripListService {
     const { connected, signer } = get(wallet);
 
     if (connected) {
-      dripListService._nftDriverClient = await getNFTDriverClient();
       dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
       dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
 
       assert(signer, 'Signer address is undefined.');
       dripListService._owner = signer;
       dripListService._ownerAddress = await signer.getAddress();
-    }
 
-    dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(
-      dripListService._nftDriverClient,
-    );
+      dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(nftDriverWrite);
+    } else {
+      dripListService._nftDriverMetadataManager = new NftDriverMetadataManager();
+    }
 
     return dripListService;
   }
@@ -110,10 +109,7 @@ export default class DripListService {
         };
     latestVotingRoundId?: string;
   }) {
-    assert(
-      this._ownerAddress && this._nftDriverClient,
-      `This function requires an active wallet connection.`,
-    );
+    assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
     const { listTitle, listDescription, weights, items, support, latestVotingRoundId } = config;
 
@@ -136,7 +132,12 @@ export default class DripListService {
 
     const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
 
-    const listId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
+    const listId = (
+      await nftDriverRead({
+        functionName: 'calcTokenIdWithSalt',
+        args: [this._ownerAddress as OxString, salt],
+      })
+    ).toString();
 
     const ipfsHash = await this._publishMetadataToIpfs(
       listId,
