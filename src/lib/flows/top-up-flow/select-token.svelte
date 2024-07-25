@@ -10,7 +10,6 @@
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { fetchBalance } from '$lib/utils/erc20';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { TopUpFlowState } from './top-up-flow-state';
@@ -18,7 +17,7 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import addCustomTokenFlowSteps from '../add-custom-token/add-custom-token-flow-steps';
   import { getAllowance } from '$lib/utils/sdk/address-driver/address-driver';
-  import { OxString } from '$lib/utils/sdk/sdk-types';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

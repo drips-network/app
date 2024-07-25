@@ -32,10 +32,12 @@ function validateUrl(url: string, allowedHosts: string[]): boolean {
   }
 }
 
-export function isValidGitUrl(url: string): boolean {
-  return validateUrl(url, ['github.com', 'gitlab.com']);
-}
-
 export function isSupportedGitUrl(url: string): boolean {
+  const githubUrlRegex = /^https:\/\/github\.com\/[\w-]+\/[\w.-]+$/;
+
+  if (!githubUrlRegex.test(url)) {
+    return false;
+  }
+
   return validateUrl(url, ['github.com']);
 }
