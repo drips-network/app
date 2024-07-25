@@ -39,7 +39,6 @@
   import checkIsUser from '$lib/utils/check-is-user';
   import decodeAccountId from '$lib/utils/decode-universal-account-id';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
-  // import collectFlowSteps from '$lib/flows/collect-flow/collect-flow-steps';
   import getWithdrawSteps from '$lib/flows/withdraw-flow/withdraw-flow-steps';
   import topUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
