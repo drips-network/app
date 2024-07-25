@@ -9,8 +9,8 @@ import { Contract } from 'ethers';
 import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 import { addressDriverAbi, type AddressDriverAbi } from './address-driver-abi';
-import { erc20 } from '../erc20/erc20';
 import type { OxString } from '../sdk-types';
+import { erc20Read } from '../erc20/erc20';
 
 export async function addressDriverRead<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,
@@ -26,15 +26,15 @@ export async function addressDriverRead<
   return addressDriverContractRead[config.functionName](...config.args);
 }
 
-export async function getAllowance(tokenAddress: OxString): Promise<bigint> {
+export async function getAllowance(token: OxString): Promise<bigint> {
   const owner = get(wallet).signer?.address as OxString;
-  assert(owner, `'getAllowance' requires a signer but none was provided.`);
+  assert(owner, `'getAllowance' requires a signer but it's missing.`);
 
   const spender = getNetworkConfig().ADDRESS_DRIVER as OxString;
 
   return (
-    await erc20({
-      tokenAddress,
+    await erc20Read({
+      token,
       functionName: 'allowance',
       args: [owner, spender],
     })

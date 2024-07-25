@@ -8,7 +8,6 @@ import {
   NFTDriverTxFactory,
   RepoDriverTxFactory,
   DripsTxFactory,
-  ERC20TxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -37,17 +36,6 @@ export function getNFTDriverTxFactory() {
   const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
 
   return NFTDriverTxFactory.create(signer, nftDriverAddress);
-}
-
-/**
- * Get an initialized ERC20 transaction factory.
- * @returns An initialized ERC20 transaction factory.
- */
-export function getERC20TxFactory(tokenAddress: string) {
-  const { signer } = get(wallet);
-  assert(signer);
-
-  return ERC20TxFactory.create(signer, tokenAddress);
 }
 
 /**

@@ -10,14 +10,14 @@ import unreachable from '$lib/utils/unreachable';
 import assert from '$lib/utils/assert';
 import isTest from '$lib/utils/is-test';
 import SafeAppsSDK, { type SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-import type { TransactionReceipt, Transaction } from 'ethers';
+import type { TransactionReceipt, ContractTransaction } from 'ethers';
 
 type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
 type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
 
 type TransactionWrapper = {
-  transaction: Transaction;
+  transaction: ContractTransaction;
   applyGasBuffer: boolean;
   waitingSignatureMessage?: UpdateAwaitStepParams;
   waitingConfirmationMessage?: UpdateAwaitStepParams;

@@ -3,12 +3,13 @@ import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
 import { MaxUint256 } from 'ethers';
+import { populateApproveTx } from '$lib/utils/sdk/erc20/erc20';
+import type { OxString } from '$lib/utils/sdk/sdk-types';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -30,7 +31,7 @@ export default function (
       before: async () => {
         const txFactory = await getAddressDriverTxFactory();
 
-        const { address, signer } = get(walletStore);
+        const { address } = get(walletStore);
 
         assert(address, 'User is not connected to wallet');
         assert(
@@ -47,9 +48,9 @@ export default function (
 
         delete setStreamsPopulatedTx.gasLimit;
 
-        const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
-        const approvePopulatedTx = await erc20TxFactory.approve(
-          txFactory.driverAddress,
+        const approvePopulatedTx = await populateApproveTx(
+          tokenAddress as OxString,
+          txFactory.driverAddress as OxString,
           MaxUint256,
         );
 

@@ -34,7 +34,7 @@ export async function nftDriverWrite<
   functionName: functionName | ExtractAbiFunctionNames<NftDriverAbi, 'nonpayable' | 'payable'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<TransactionResponse> {
-  assert(signer, `'${config.functionName}' requires a signer but none was provided.`);
+  assert(signer, `'${config.functionName}' requires a signer but it's missing.`);
 
   return nftDriverContractWrite[config.functionName](...config.args);
 }

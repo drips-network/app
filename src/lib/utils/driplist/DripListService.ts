@@ -4,7 +4,7 @@ import {
   getNFTDriverTxFactory,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import { NFTDriverTxFactory, Utils, AddressDriverTxFactory, ERC20TxFactory } from 'radicle-drips';
+import { NFTDriverTxFactory, Utils, AddressDriverTxFactory } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { SplitsReceiverStruct } from 'radicle-drips';
 import { ethers, MaxUint256, type Signer, toBigInt, Transaction } from 'ethers';
@@ -28,6 +28,8 @@ import type { BigNumberish } from 'ethers';
 import { nftDriverRead, nftDriverWrite } from '../sdk/nft-driver/nft-driver';
 import type { OxString } from '../sdk/sdk-types';
 import { getAllowance } from '../sdk/address-driver/address-driver';
+import { populateApproveTx } from '../sdk/erc20/erc20';
+import type { ContractTransaction } from 'ethers';
 
 type AccountId = string;
 
@@ -351,13 +353,12 @@ export default class DripListService {
     );
   }
 
-  private async _buildTokenApprovalTx(token: Address): Promise<Transaction> {
+  private async _buildTokenApprovalTx(token: Address): Promise<ContractTransaction> {
     assert(this._owner, `This function requires an active wallet connection.`);
 
-    const erc20TxFactory = await ERC20TxFactory.create(this._owner, token);
-
-    const tokenApprovalTx = await erc20TxFactory.approve(
-      this._addressDriverTxFactory.driverAddress,
+    const tokenApprovalTx = await populateApproveTx(
+      token as OxString,
+      this._addressDriverTxFactory.driverAddress as OxString,
       MaxUint256,
     );
 

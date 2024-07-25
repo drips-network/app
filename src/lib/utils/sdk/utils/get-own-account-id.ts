@@ -6,7 +6,7 @@ import wallet from '$lib/stores/wallet/wallet.store';
 
 export default async function getOwnAccountId() {
   const { signer } = get(wallet);
-  assert(signer, `'getOwnAccountId' requires a signer but none was provided.`);
+  assert(signer, `'getOwnAccountId' requires a signer but it's missing.`);
 
   return (
     await addressDriverRead({

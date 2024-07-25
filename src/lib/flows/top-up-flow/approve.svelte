@@ -6,11 +6,12 @@
   import type { Writable } from 'svelte/store';
   import { createEventDispatcher } from 'svelte';
   import type { TopUpFlowState } from './top-up-flow-state';
-  import { getERC20TxFactory } from '$lib/utils/get-drips-clients';
   import { ethers, MaxUint256 } from 'ethers';
   import Button from '$lib/components/button/button.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import unreachable from '$lib/utils/unreachable';
+  import { populateApproveTx } from '$lib/utils/sdk/erc20/erc20';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -24,11 +25,13 @@
       dispatch,
       makeTransactPayload({
         transactions: async () => {
-          const txFactory = await getERC20TxFactory(tokenAddress ?? unreachable());
-
           return [
             {
-              transaction: await txFactory.approve(tokenAddress ?? unreachable(), MaxUint256),
+              transaction: await populateApproveTx(
+                (tokenAddress as OxString) ?? unreachable(),
+                (tokenAddress as OxString) ?? unreachable(),
+                MaxUint256,
+              ),
               applyGasBuffer: false,
             },
           ];
