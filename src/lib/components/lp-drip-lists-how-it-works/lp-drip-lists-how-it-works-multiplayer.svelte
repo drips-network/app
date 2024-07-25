@@ -38,13 +38,7 @@
 </script>
 
 <ResponsiveFlowChart bind:steps>
-  <svg
-    width="100%"
-    viewBox="0 0 1110 1584"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio
-  >
+  <svg width="100%" viewBox="0 0 1110 1584" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       bind:this={steps[0].path}
       d="M24 1.02039H479.5V305.52C479.5 318.499 468.979 329.02 456 329.02H24C11.0213 329.02 0.5 318.499 0.5 305.52V24.5204C0.5 11.5417 11.0213 1.02039 24 1.02039Z"
