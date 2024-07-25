@@ -1,8 +1,10 @@
 import ens from '$lib/stores/ens';
-import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import { isAddress } from 'ethers';
-import { AddressDriverClient, Utils } from 'radicle-drips';
+import { Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
+import extractAddressFromAccountId from './sdk/utils/extract-address-from-accountId';
+import { addressDriverRead } from './sdk/address-driver/address-driver';
+import type { OxString } from './sdk/sdk-types';
 
 interface AddressDriverResult {
   driver: 'address';
@@ -31,9 +33,12 @@ export default async function (
 ): Promise<AddressDriverResult | RepoDriverResult | NFTDriverResult> {
   if (isAddress(universalAcccountIdentifier)) {
     const address = universalAcccountIdentifier;
-    const dripsAccountId = await (
-      await getAddressDriverClient()
-    ).getAccountIdByAddress(universalAcccountIdentifier);
+    const dripsAccountId = (
+      await addressDriverRead({
+        functionName: 'calcAccountId',
+        args: [universalAcccountIdentifier as OxString],
+      })
+    ).toString();
 
     return {
       driver: 'address',
@@ -58,7 +63,12 @@ export default async function (
 
     const lookup = await ens.reverseLookup(universalAcccountIdentifier);
     if (lookup) {
-      const dripsAccountId = await (await getAddressDriverClient()).getAccountIdByAddress(lookup);
+      const dripsAccountId = (
+        await addressDriverRead({
+          functionName: 'calcAccountId',
+          args: [lookup as OxString],
+        })
+      ).toString();
       const address = lookup;
 
       return {
@@ -76,7 +86,7 @@ export default async function (
     const driver = Utils.AccountId.getDriver(dripsAccountId);
 
     if (driver === 'address') {
-      const address = AddressDriverClient.getUserAddress(universalAcccountIdentifier);
+      const address = extractAddressFromAccountId(universalAcccountIdentifier);
 
       return {
         driver: 'address',

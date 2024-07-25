@@ -19,7 +19,6 @@
   import Token from '$lib/components/token/token.svelte';
   import tokens from '$lib/stores/tokens';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import unreachable from '$lib/utils/unreachable';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
@@ -83,19 +82,13 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const assetDriverClient = await getAddressDriverClient();
-
           const MAX_INT_128 = 170141183460469231731687303715884105728n;
 
           const amountToWithdraw = $context.withdrawAll
             ? -MAX_INT_128
             : -(amountWei ?? unreachable());
 
-          const tx = await buildBalanceChangePopulatedTx(
-            assetDriverClient,
-            tokenInfo.info.address,
-            amountToWithdraw,
-          );
+          const tx = await buildBalanceChangePopulatedTx(tokenInfo.info.address, amountToWithdraw);
 
           return {
             tx,

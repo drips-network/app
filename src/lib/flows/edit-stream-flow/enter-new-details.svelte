@@ -42,7 +42,7 @@
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { constants } from 'radicle-drips';
-  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
+  import { getCallerClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
@@ -96,9 +96,7 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const addressDriverClient = await getAddressDriverClient();
-
-          const { newHash, batch } = await buildEditStreamBatch(addressDriverClient, stream.id, {
+          const { newHash, batch } = await buildEditStreamBatch(stream.id, {
             name: nameUpdated ? $context.newName : undefined,
             amountPerSecond: amountUpdated ? newAmountPerSecond : undefined,
           });

@@ -1,14 +1,12 @@
 import { JsonRpcProvider, JsonRpcSigner } from 'ethers';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { AddressDriverClient } from 'radicle-drips';
 import Onboard, { type EIP1193Provider } from '@web3-onboard/core';
 import injectedWallets from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
 
 import testnetMockProvider from './__test__/local-testnet-mock-provider';
 import isTest from '$lib/utils/is-test';
-import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
 import SafeAppsSDK from '@safe-global/safe-apps-sdk';
@@ -21,6 +19,9 @@ import network, { getNetwork, isConfiguredChainId, type Network } from './networ
 import { invalidateAll } from '../fetched-data-cache/invalidate';
 import { BrowserProvider, InfuraProvider } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
+import type { OxString } from '$lib/utils/sdk/sdk-types';
+import { addressDriverRead } from '$lib/utils/sdk/address-driver/address-driver';
+import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -227,7 +228,7 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0].address,
-      dripsAccountId: await (await AddressDriverClient.create(provider, signer)).getAccountId(),
+      dripsAccountId: await getOwnAccountId(),
       provider,
       signer,
       network: getNetwork(Number((await provider.getNetwork()).chainId)),
@@ -291,7 +292,12 @@ const mockWalletStore = () => {
   async function initialize() {
     const signer = await provider.getSigner();
 
-    const accountId = await (await getAddressDriverClient(signer)).getAccountId();
+    const ownAccountId = (
+      await addressDriverRead({
+        functionName: 'calcAccountId',
+        args: [signer.address as OxString],
+      })
+    ).toString();
 
     const chainId = Number((await provider.getNetwork()).chainId ?? unreachable());
 
@@ -301,7 +307,7 @@ const mockWalletStore = () => {
       provider,
       signer,
       network: getNetwork(chainId),
-      dripsAccountId: accountId,
+      dripsAccountId: ownAccountId,
     });
 
     initialized.set(true);

@@ -13,7 +13,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
-  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
+  import { getCallerClient } from '$lib/utils/get-drips-clients';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { buildStreamDeleteBatchTx } from '$lib/utils/streams/streams';
   import { gql } from 'graphql-request';
@@ -31,17 +31,12 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const addressDriverClient = await getAddressDriverClient();
           const callerClient = await getCallerClient();
 
           const { signer } = $walletStore;
           assert(signer);
 
-          const { batch, newHash } = await buildStreamDeleteBatchTx(
-            addressDriverClient,
-            signer,
-            stream.id,
-          );
+          const { batch, newHash } = await buildStreamDeleteBatchTx(signer, stream.id);
 
           return {
             callerClient,

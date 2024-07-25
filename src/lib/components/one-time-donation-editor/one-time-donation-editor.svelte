@@ -1,7 +1,6 @@
 <script lang="ts">
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { fetchBalance } from '$lib/utils/erc20';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
   import InputWalletAmount from '../input-wallet-amount/input-wallet-amount.svelte';

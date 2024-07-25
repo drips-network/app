@@ -1,18 +1,10 @@
 import {
-  getAddressDriverClient,
   getAddressDriverTxFactory,
   getCallerClient,
   getNFTDriverTxFactory,
 } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import {
-  NFTDriverTxFactory,
-  AddressDriverClient,
-  Utils,
-  AddressDriverTxFactory,
-  NFTDriverClient,
-  ERC20TxFactory,
-} from 'radicle-drips';
+import { NFTDriverTxFactory, Utils, AddressDriverTxFactory, ERC20TxFactory } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { SplitsReceiverStruct } from 'radicle-drips';
 import { ethers, MaxUint256, type Signer, toBigInt, Transaction } from 'ethers';
@@ -58,7 +50,6 @@ export default class DripListService {
   private _owner!: Signer | undefined;
   private _ownerAddress!: Address | undefined;
   private _nftDriverTxFactory!: NFTDriverTxFactory;
-  private _addressDriverClient!: AddressDriverClient;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
 
@@ -70,8 +61,6 @@ export default class DripListService {
    */
   public static async new(): Promise<DripListService> {
     const dripListService = new DripListService();
-
-    dripListService._addressDriverClient = await getAddressDriverClient();
 
     const { connected, signer } = get(wallet);
 
@@ -351,7 +340,6 @@ export default class DripListService {
     assert(this._owner, `This function requires an active wallet connection.`);
 
     return await buildStreamCreateBatchTx(
-      this._addressDriverClient,
       this._owner,
       {
         tokenAddress: token,

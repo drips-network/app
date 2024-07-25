@@ -54,11 +54,13 @@
   import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
-  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { isAddress } from 'ethers';
+  import { getCallerClient } from '$lib/utils/get-drips-clients';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
+  import { addressDriverRead } from '$lib/utils/sdk/address-driver/address-driver';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -185,7 +187,6 @@
       makeTransactPayload({
         before: async () => {
           const callerClient = await getCallerClient();
-          const addressDriverClient = await getAddressDriverClient();
           const { signer } = $wallet;
           assert(signer, 'No signer available');
 
@@ -196,11 +197,16 @@
             const recipientInputValue = $context.recipientInputValue ?? unreachable();
 
             recipientAccountId = isAddress(recipientInputValue)
-              ? await addressDriverClient.getAccountIdByAddress(recipientInputValue)
+              ? (
+                  await addressDriverRead({
+                    functionName: 'calcAccountId',
+                    args: [recipientInputValue as OxString],
+                  })
+                ).toString()
               : recipientInputValue;
           }
 
-          const { batch, newHash } = await buildStreamCreateBatchTx(addressDriverClient, signer, {
+          const { batch, newHash } = await buildStreamCreateBatchTx(signer, {
             tokenAddress: $context.selectedTokenAddress?.[0] ?? unreachable(),
             amountPerSecond: amountPerSecond ?? unreachable(),
             recipientAccountId,

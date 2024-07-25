@@ -2,7 +2,7 @@ import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
+import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
 import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
@@ -28,7 +28,6 @@ export default function (
     dispatch,
     makeTransactPayload({
       before: async () => {
-        const client = await getAddressDriverClient();
         const txFactory = await getAddressDriverTxFactory();
 
         const { address, signer } = get(walletStore);
@@ -42,7 +41,6 @@ export default function (
         const needApproval = tokenAllowance < amountToTopUp;
 
         const setStreamsPopulatedTx = await buildBalanceChangePopulatedTx(
-          client,
           tokenAddress,
           amountToTopUp,
         );

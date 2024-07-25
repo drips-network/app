@@ -37,8 +37,9 @@ import type {
   ProjectForVoteReceiverQuery,
   ProjectForVoteReceiverQueryVariables,
 } from './__generated__/gql.generated';
-import { getAddressDriverClient } from '../get-drips-clients';
 import unreachable from '../unreachable';
+import { addressDriverRead } from '../sdk/address-driver/address-driver';
+import type { OxString } from '../sdk/sdk-types';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -558,8 +559,6 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
     (v) => (v ? v : undefined),
   );
 
-  const addressDriverClient = await getAddressDriverClient();
-
   for (const receiver of receivers) {
     switch (receiver.type) {
       case 'project': {
@@ -575,7 +574,12 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
         break;
       }
       case 'address': {
-        const accountId = await addressDriverClient.getAccountIdByAddress(receiver.address);
+        const accountId = (
+          await addressDriverRead({
+            functionName: 'calcAccountId',
+            args: [receiver.address as OxString],
+          })
+        ).toString();
 
         items[accountId] = { type: 'address', address: receiver.address };
         weights[accountId] = receiver.weight;

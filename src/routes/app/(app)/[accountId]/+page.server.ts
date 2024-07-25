@@ -5,13 +5,14 @@ import { gql } from 'graphql-request';
 import { STREAMS_SECTION_STREAMS_FRAGMENT } from '../funds/sections/streams.section.svelte';
 import { USER_BALANCES_FRAGMENT } from '../funds/sections/balances.section.svelte';
 import network from '$lib/stores/wallet/network';
-import { AddressDriverClient, Utils } from 'radicle-drips';
+import { Utils } from 'radicle-drips';
 import query from '$lib/graphql/dripsQL';
 import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated__/gql.generated';
 import { getVotingRounds } from '$lib/utils/multiplayer';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
 import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
 import { isAddress, JsonRpcProvider } from 'ethers';
+import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
 
 const provider = new JsonRpcProvider(network.rpcUrl);
 
@@ -88,7 +89,7 @@ export const load = async ({ params, fetch }) => {
 
     switch (driver) {
       case 'address': {
-        address = AddressDriverClient.getUserAddress(universalAccountId);
+        address = extractAddressFromAccountId(universalAccountId);
         break;
       }
       case 'nft': {

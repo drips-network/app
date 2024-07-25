@@ -11,7 +11,6 @@ import { get } from 'svelte/store';
 import { addressDriverAbi, type AddressDriverAbi } from './address-driver-abi';
 import { erc20 } from '../erc20/erc20';
 import type { OxString } from '../sdk-types';
-import unreachable from '$lib/utils/unreachable';
 
 export async function addressDriverRead<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,

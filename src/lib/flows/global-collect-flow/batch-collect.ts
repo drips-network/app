@@ -1,15 +1,12 @@
 import type { StepComponentEvents } from '$lib/components/stepper/types';
 import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import {
-  getAddressDriverClient,
-  getCallerClient,
-  getNetworkConfig,
-} from '$lib/utils/get-drips-clients';
+import { getCallerClient, getNetworkConfig } from '$lib/utils/get-drips-clients';
 import { AddressDriverPresets } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
 
 export default function batchCollect(
   tokenAddresses: string[],
@@ -20,8 +17,7 @@ export default function batchCollect(
     makeTransactPayload({
       before: async () => {
         const callerClient = await getCallerClient();
-        const addressDriverClient = await getAddressDriverClient();
-        const accountId = await addressDriverClient.getAccountId();
+        const ownAccountId = await getOwnAccountId();
         const { address: userAddress, signer } = get(walletStore);
 
         assert(userAddress && signer);
@@ -40,7 +36,7 @@ export default function batchCollect(
             maxCycles: 1000,
             currentReceivers: [],
             transferToAddress: userAddress,
-            accountId,
+            accountId: ownAccountId,
           });
 
           flowsPromises.push(flow);
@@ -52,7 +48,7 @@ export default function batchCollect(
 
         return {
           tx,
-          accountId,
+          accountId: ownAccountId,
         };
       },
 

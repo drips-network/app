@@ -19,7 +19,6 @@
     GetProjectQuery,
     GetProjectQueryVariables,
   } from './__generated__/gql.generated';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripList from '$lib/components/icons/DripList.svelte';
   import List from '$lib/components/icons/List.svelte';
@@ -27,6 +26,8 @@
   import { slide } from 'svelte/transition';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
   import { isAddress } from 'ethers';
+  import { addressDriverRead } from '$lib/utils/sdk/address-driver/address-driver';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -142,8 +143,12 @@
       address = resolved;
     }
 
-    const addressDriverClient = await getAddressDriverClient();
-    const accountId = await addressDriverClient.getAccountIdByAddress(address);
+    const accountId = (
+      await addressDriverRead({
+        functionName: 'calcAccountId',
+        args: [address as OxString],
+      })
+    ).toString();
 
     checkCanAdd(accountId);
 

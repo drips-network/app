@@ -1,7 +1,6 @@
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import {
-  AddressDriverClient,
   AddressDriverTxFactory,
   CallerClient,
   DripsClient,
@@ -50,18 +49,6 @@ export function getERC20TxFactory(tokenAddress: string) {
   assert(signer);
 
   return ERC20TxFactory.create(signer, tokenAddress);
-}
-
-/**
- * Get an initialized Address Driver client.
- * @returns An initialized Address Driver client.
- */
-export function getAddressDriverClient(withSigner = get(wallet).signer) {
-  const { provider } = get(wallet);
-
-  const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
-
-  return AddressDriverClient.create(provider, withSigner, addressDriverAddress);
 }
 
 /**

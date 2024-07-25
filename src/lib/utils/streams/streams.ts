@@ -1,6 +1,6 @@
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
-import { AddressDriverClient, AddressDriverPresets, Utils } from 'radicle-drips';
+import { AddressDriverPresets, Utils } from 'radicle-drips';
 import randomBigintUntilUnique from '../random-bigint-until-unique';
 import { addressDriverAccountMetadataParser } from '../metadata/schemas';
 import type {
@@ -13,6 +13,8 @@ import type { Signer, Transaction } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
 import makeStreamId, { decodeStreamId } from './make-stream-id';
+import extractAddressFromAccountId from '../sdk/utils/extract-address-from-accountId';
+import getOwnAccountId from '../sdk/utils/get-own-account-id';
 
 type NewStreamOptions = {
   tokenAddress: string;
@@ -180,17 +182,16 @@ function _buildMetadata(
       };
     }),
     timestamp: Math.floor(new Date().getTime() / 1000),
-    writtenByAddress: AddressDriverClient.getUserAddress(accountId),
+    writtenByAddress: extractAddressFromAccountId(accountId),
   });
 }
 
 export async function buildStreamCreateBatchTx(
-  addressDriverClient: AddressDriverClient,
   signer: Signer,
   streamOptions: NewStreamOptions,
   topUpAmount?: bigint,
 ) {
-  const ownAccountId = await addressDriverClient.getAccountId();
+  const ownAccountId = await getOwnAccountId();
 
   const { currentStreams, currentReceivers } = await _getCurrentStreamsAndReceivers(
     ownAccountId,
@@ -243,17 +244,13 @@ export async function buildStreamCreateBatchTx(
         },
       ],
       balanceDelta: topUpAmount ?? 0,
-      transferToAddress: AddressDriverClient.getUserAddress(ownAccountId),
+      transferToAddress: extractAddressFromAccountId(ownAccountId),
     }),
   };
 }
 
-export async function buildStreamDeleteBatchTx(
-  addressDriverClient: AddressDriverClient,
-  signer: Signer,
-  streamId: string,
-) {
-  const ownAccountId = await addressDriverClient.getAccountId();
+export async function buildStreamDeleteBatchTx(signer: Signer, streamId: string) {
+  const ownAccountId = await getOwnAccountId();
 
   const { tokenAddress, dripId } = decodeStreamId(streamId);
 
@@ -291,17 +288,13 @@ export async function buildStreamDeleteBatchTx(
         },
       ],
       balanceDelta: 0,
-      transferToAddress: AddressDriverClient.getUserAddress(ownAccountId),
+      transferToAddress: extractAddressFromAccountId(ownAccountId),
     }),
   };
 }
 
-export async function buildBalanceChangePopulatedTx(
-  addressDriverClient: AddressDriverClient,
-  tokenAddress: string,
-  amount: bigint,
-) {
-  const ownAccountId = await addressDriverClient.getAccountId();
+export async function buildBalanceChangePopulatedTx(tokenAddress: string, amount: bigint) {
+  const ownAccountId = await getOwnAccountId();
   const txFactory = await getAddressDriverTxFactory();
 
   const { currentReceivers } = await _getCurrentStreamsAndReceivers(ownAccountId, tokenAddress);
@@ -313,7 +306,7 @@ export async function buildBalanceChangePopulatedTx(
     currentReceivers,
     0,
     0,
-    AddressDriverClient.getUserAddress(ownAccountId),
+    extractAddressFromAccountId(ownAccountId),
     /*
     Dirty hack to disable the SDK's built-in gas estimation, because
     it would fail if there's no token approval yet.
@@ -324,11 +317,9 @@ export async function buildBalanceChangePopulatedTx(
   );
 }
 
-export async function buildPauseStreamPopulatedTx(
-  addressDriverClient: AddressDriverClient,
-  streamId: string,
-) {
-  const ownAccountId = await addressDriverClient.getAccountId();
+export async function buildPauseStreamPopulatedTx(streamId: string) {
+  const ownAccountId = await getOwnAccountId();
+
   const txFactory = await getAddressDriverTxFactory();
 
   const { dripId, tokenAddress } = decodeStreamId(streamId);
@@ -347,15 +338,13 @@ export async function buildPauseStreamPopulatedTx(
     newReceivers,
     0,
     0,
-    AddressDriverClient.getUserAddress(ownAccountId),
+    extractAddressFromAccountId(ownAccountId),
   );
 }
 
-export async function buildUnpauseStreamPopulatedTx(
-  addressDriverClient: AddressDriverClient,
-  streamId: string,
-) {
-  const ownAccountId = await addressDriverClient.getAccountId();
+export async function buildUnpauseStreamPopulatedTx(streamId: string) {
+  const ownAccountId = await getOwnAccountId();
+
   const { dripId, tokenAddress } = decodeStreamId(streamId);
 
   const { currentStreams, currentReceivers } = await _getCurrentStreamsAndReceivers(
@@ -385,19 +374,19 @@ export async function buildUnpauseStreamPopulatedTx(
     newReceivers,
     0,
     0,
-    AddressDriverClient.getUserAddress(ownAccountId),
+    extractAddressFromAccountId(ownAccountId),
   );
 }
 
 export async function buildEditStreamBatch(
-  addressDriverClient: AddressDriverClient,
   streamId: string,
   newData: {
     name?: string;
     amountPerSecond?: bigint;
   },
 ) {
-  const ownAccountId = await addressDriverClient.getAccountId();
+  const ownAccountId = await getOwnAccountId();
+
   const { dripId, tokenAddress } = decodeStreamId(streamId);
 
   const { currentStreams, currentReceivers } = await _getCurrentStreamsAndReceivers(
@@ -468,7 +457,7 @@ export async function buildEditStreamBatch(
         newReceivers,
         0,
         0,
-        AddressDriverClient.getUserAddress(ownAccountId),
+        extractAddressFromAccountId(ownAccountId),
       ),
     );
   }
