@@ -216,7 +216,7 @@
   <svelte:fragment slot="actions">
     <Button on:click={modal.hide} variant="ghost">Cancel</Button>
     <Button on:click={submit} disabled={!isValid} icon={Wallet} variant="primary"
-      >Confirm changes in your wallet</Button
+      >Confirm changes</Button
     >
   </svelte:fragment>
 </StepLayout>

@@ -83,7 +83,7 @@ export const load = (async ({ params, fetch }) => {
     getVotingRoundForList(listId),
   ] as const);
 
-  if (!fetches[0]?.dripList && !fetches[1]) error(404);
+  if (!fetches[0]?.dripList && !fetches[1].current) throw error(404);
 
   return {
     dripList: fetches[0].dripList,

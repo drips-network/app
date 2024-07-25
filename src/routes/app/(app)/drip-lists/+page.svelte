@@ -17,10 +17,11 @@
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import Button from '$lib/components/button/button.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
-  import { goto } from '$app/navigation';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import { gql } from 'graphql-request';
   import type { PageData } from './$types';
+  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
+  import modal from '$lib/stores/modal';
 
   export let data: PageData;
 
@@ -53,8 +54,14 @@
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
-      <Button icon={DripListIcon} variant="primary" on:click={() => goto('/app/funder-onboarding')}
-        >Create a Drip List</Button
+      <Button
+        icon={DripListIcon}
+        variant="primary"
+        on:click={() =>
+          modal.show(CreateDripListStepper, undefined, {
+            skipWalletConnect: true,
+            isModal: true,
+          })}>Create a Drip List</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">

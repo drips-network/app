@@ -1,3 +1,4 @@
+import { sentrySvelteKit } from '@sentry/sveltekit';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
@@ -5,7 +6,7 @@ import { defineConfig } from 'vitest/config';
 const env = loadEnv(process.env['NODE_ENV'] ?? 'development', process.cwd(), 'BUILD_');
 
 const config = defineConfig({
-  plugins: [sveltekit()],
+  plugins: [sentrySvelteKit(), sveltekit()],
   test: {
     // Jest like globals
     globals: true,

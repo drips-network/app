@@ -204,7 +204,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, continuously, or add this to your Drip List.</p>
+  <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons

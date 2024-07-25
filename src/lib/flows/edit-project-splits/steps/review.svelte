@@ -106,9 +106,7 @@
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={submit}
-      >Confirm changes in your wallet</Button
-    >
+    <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm changes</Button>
   </svelte:fragment>
 </StepLayout>
 

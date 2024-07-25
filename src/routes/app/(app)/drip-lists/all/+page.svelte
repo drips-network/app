@@ -66,7 +66,6 @@
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
-  import { goto } from '$app/navigation';
   import DripListBadge, {
     DRIP_LIST_BADGE_FRAGMENT,
   } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
@@ -79,6 +78,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import onClickGoto from '$lib/utils/on-click-goto';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data: PageData;
@@ -171,7 +171,8 @@
 
   function onRowClick(event: CustomEvent<RowClickEventPayload>) {
     const { dripList } = tableData[event.detail.rowIndex].badge;
-    goto('/app/drip-lists/' + dripList.account.accountId);
+
+    onClickGoto('/app/drip-lists/' + dripList.account.accountId, event.detail.event);
   }
 </script>
 

@@ -117,7 +117,7 @@
       const project = response.projectByUrl;
 
       if (!project) {
-        throw new Error('Project not found');
+        throw new Error("Repo doesn't exist or is private");
       }
 
       const projectChainData = filterCurrentChainData(project.chainData);

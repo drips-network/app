@@ -128,7 +128,7 @@
   <ProjectCustomizer bind:valid project={projectWritable} />
   <svelte:fragment slot="actions">
     <Button on:click={submit} disabled={!changesMade || !valid} variant="primary" icon={Wallet}
-      >Confirm changes in your wallet</Button
+      >Confirm changes</Button
     >
   </svelte:fragment>
 </StepLayout>

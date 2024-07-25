@@ -82,7 +82,6 @@
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
-  import { goto } from '$app/navigation';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import ProjectBadge, {
@@ -95,6 +94,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { ProjectsListingsItemFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import onClickGoto from '$lib/utils/on-click-goto';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data: PageData;
@@ -195,7 +195,11 @@
     if (!chainData || !isClaimed(chainData)) return;
 
     const { source } = project;
-    goto(buildProjectUrl(source.forge, source.ownerName, source.repoName, true));
+
+    onClickGoto(
+      buildProjectUrl(source.forge, source.ownerName, source.repoName, true),
+      event.detail.event,
+    );
   }
 </script>
 

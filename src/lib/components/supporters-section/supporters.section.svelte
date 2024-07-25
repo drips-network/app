@@ -167,7 +167,6 @@
                       : undefined,
                 disableTooltip: true,
                 address: item.account.address,
-                disableLink: true,
               },
             }}
             subtitle={formatDate(item.date)}
@@ -213,7 +212,6 @@
               component: IdentityBadge,
               props: {
                 disableTooltip: true,
-                disableLink: true,
                 tag:
                   stream.sender.account.accountId === $walletStore.dripsAccountId
                     ? 'You'
