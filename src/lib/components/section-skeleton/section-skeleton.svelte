@@ -86,9 +86,13 @@
             contentTransitonedIn = true;
           }}
         >
-          <PaddedHorizontalScroll enabled={horizontalScroll}>
+          {#if horizontalScroll}
+            <PaddedHorizontalScroll>
+              <slot />
+            </PaddedHorizontalScroll>
+          {:else}
             <slot />
-          </PaddedHorizontalScroll>
+          {/if}
         </div>
       {/if}
     </div>

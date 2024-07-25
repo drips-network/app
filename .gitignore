@@ -17,3 +17,4 @@ static/twemoji/*
 !/src/e2e-tests/.tmp/.gitkeep
 .netlify/
 **/__generated__/
+.sentryclirc

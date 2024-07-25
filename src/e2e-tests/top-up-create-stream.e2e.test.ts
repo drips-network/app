@@ -589,7 +589,7 @@ describe('app', async () => {
       });
 
       it('advances the flow', async () => {
-        await page.locator('button', { hasText: 'Confirm changes in your wallet' }).click();
+        await page.locator('button', { hasText: 'Confirm changes' }).click();
         await page.locator('button', { hasText: 'Got it' }).click();
       });
 
