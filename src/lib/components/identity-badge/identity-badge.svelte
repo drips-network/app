@@ -22,9 +22,7 @@
   export let isReverse = false;
   export let tag: string | undefined = undefined;
 
-  const ensConnected = ensStore.connected;
-
-  $: $ensConnected && ensStore.lookup(address);
+  $: ensStore.lookup(address);
   $: ens = $ensStore[address];
 
   $: blockyUrl = `/api/blockies/${address}`;
