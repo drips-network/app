@@ -7,7 +7,6 @@ import {
   type NetworkConfig,
   NFTDriverTxFactory,
   RepoDriverTxFactory,
-  DripsTxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
@@ -49,18 +48,6 @@ export function getAddressDriverTxFactory() {
   const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
 
   return AddressDriverTxFactory.create(signer, addressDriverAddress);
-}
-
-/**
- * Get an initialized Drips transaction factory.
- * @returns An initialized Drips transaction factory.
- */
-export function getDripsTxFactory() {
-  const { provider } = get(wallet);
-
-  const dripsAddress = getNetworkConfig().DRIPS;
-
-  return DripsTxFactory.create(provider, dripsAddress);
 }
 
 /**

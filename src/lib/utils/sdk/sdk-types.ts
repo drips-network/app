@@ -4,3 +4,8 @@ export enum Forge {
 }
 
 export type OxString = `0x${string}`;
+
+export type SplitsReceiver = {
+  accountId: string;
+  weight: number;
+};

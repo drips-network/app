@@ -1,10 +1,5 @@
-import {
-  RepoDriverTxFactory,
-  Utils,
-  type SplitsReceiverStruct,
-  DripsTxFactory,
-} from 'radicle-drips';
-import { getDripsTxFactory, getRepoDriverTxFactory } from '../get-drips-clients';
+import { RepoDriverTxFactory, Utils } from 'radicle-drips';
+import { getRepoDriverTxFactory } from '../get-drips-clients';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
@@ -17,11 +12,13 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
-import { hexlify, toBigInt, toUtf8Bytes, type Transaction } from 'ethers';
-import type { BigNumberish } from 'ethers';
+import { hexlify, toUtf8Bytes, type Transaction } from 'ethers';
 import type { OxString } from '../sdk/sdk-types';
 import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
 import unreachable from '../unreachable';
+import { populateSplitTx } from '../sdk/drips/drips';
+import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
+import type { ContractTransaction } from 'ethers';
 
 interface ListEditorConfig {
   items: Items;
@@ -30,7 +27,6 @@ interface ListEditorConfig {
 
 export default class GitProjectService {
   private _github!: GitHub;
-  private _dripsTxFactory!: DripsTxFactory;
   private _repoDriverTxFactory!: RepoDriverTxFactory;
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
@@ -42,8 +38,6 @@ export default class GitProjectService {
 
     const octokit = new Octokit();
     gitProjectService._github = new GitHub(octokit);
-
-    gitProjectService._dripsTxFactory = await getDripsTxFactory();
 
     const { connected, signer, address } = get(wallet);
 
@@ -279,10 +273,10 @@ export default class GitProjectService {
       (wb) => BigInt(wb.collectableAmount) > 0n,
     );
 
-    const splitTxs: Promise<Transaction>[] = [];
+    const splitTxs: Promise<ContractTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
       splitTxs.push(
-        this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
+        populateSplitTx(accountId, tokenAddress as OxString, formatSplitReceivers(receivers)),
       );
     });
 
@@ -296,33 +290,6 @@ export default class GitProjectService {
     });
 
     return Promise.all([setSplitsTx, emitAccountMetadataTx, ...splitTxs, ...collectTxs]);
-  }
-
-  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
-  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
-
-    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
-      if (
-        !unique.some(
-          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
-        )
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    const sortedReceivers = uniqueReceivers.sort((a, b) =>
-      // Sort by user ID.
-      toBigInt(a.accountId as BigNumberish) > toBigInt(b.accountId as BigNumberish)
-        ? 1
-        : toBigInt(a.accountId as BigNumberish) < toBigInt(b.accountId as BigNumberish)
-          ? -1
-          : 0,
-    );
-
-    return sortedReceivers;
   }
 
   private async _buildSetSplitsTxAndMetadata(
