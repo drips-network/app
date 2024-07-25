@@ -4,7 +4,7 @@ import tokens from '$lib/stores/tokens';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { get } from 'svelte/store';
 import { isAddress } from 'ethers/lib/utils';
-import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
+import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 
 export enum SearchItemType {
@@ -74,7 +74,7 @@ export function updateSearchItems(accountId: string | undefined) {
 export default function search(input: string | undefined) {
   if (!input) return [];
 
-  if (isValidGitUrl(input)) {
+  if (isSupportedGitUrl(input)) {
     const { username, repoName } = GitProjectService.deconstructUrl(input);
 
     searchItems.push({
