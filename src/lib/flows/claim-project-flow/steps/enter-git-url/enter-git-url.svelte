@@ -27,7 +27,7 @@
   import UnclaimedProjectCard, {
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
+  import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
@@ -155,7 +155,7 @@
   function submitInput() {
     if (isSupportedGitUrl($context.gitUrl)) {
       fetchProject();
-    } else if (isValidGitUrl($context.gitUrl) && !isSupportedGitUrl($context.gitUrl)) {
+    } else {
       validationState = { type: 'invalid', message: 'Unsupported URL' };
     }
   }
