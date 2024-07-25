@@ -1,6 +1,5 @@
 import MetadataManagerBase from './MetadataManagerBase';
 import { nftDriverAccountMetadataParser } from './schemas';
-import type { NFTDriverClient } from 'radicle-drips';
 import type { AnyVersion, LatestVersion } from '@efstajas/versioned-parser';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';

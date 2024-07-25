@@ -12,7 +12,7 @@ import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
 
 const { provider, signer } = get(wallet);
-const nftDriverAddress = getNetworkConfig().REPO_DRIVER;
+const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
 
 const nftDriverContractRead = new Contract(nftDriverAddress, nftDriverAbi, provider);
 const nftDriverContractWrite = new Contract(nftDriverAddress, nftDriverAbi, signer);

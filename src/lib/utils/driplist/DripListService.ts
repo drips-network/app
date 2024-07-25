@@ -35,6 +35,7 @@ import { buildStreamCreateBatchTx } from '../streams/streams';
 import type { BigNumberish } from 'ethers';
 import { nftDriverRead, nftDriverWrite } from '../sdk/nft-driver/nft-driver';
 import type { OxString } from '../sdk/sdk-types';
+import { getAllowance } from '../sdk/address-driver/address-driver';
 
 type AccountId = string;
 
@@ -160,7 +161,7 @@ export default class DripListService {
     if (support?.type === 'continuous') {
       const { tokenAddress, amountPerSec, topUpAmount } = support;
 
-      const allowance = await this._addressDriverClient.getAllowance(tokenAddress);
+      const allowance = await getAllowance(tokenAddress as OxString);
       const needsApproval = allowance < topUpAmount;
 
       if (needsApproval) {
@@ -178,7 +179,7 @@ export default class DripListService {
     } else if (support?.type === 'one-time') {
       const { tokenAddress, donationAmount } = support;
 
-      const allowance = await this._addressDriverClient.getAllowance(tokenAddress);
+      const allowance = await getAllowance(tokenAddress as OxString);
       const needsApproval = allowance < donationAmount;
 
       if (needsApproval) {
