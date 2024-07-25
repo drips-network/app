@@ -3,7 +3,6 @@ import assert from '$lib/utils/assert';
 import {
   AddressDriverTxFactory,
   CallerClient,
-  DripsClient,
   Utils,
   type NetworkConfig,
   NFTDriverTxFactory,
@@ -62,18 +61,6 @@ export function getAddressDriverTxFactory() {
   const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
 
   return AddressDriverTxFactory.create(signer, addressDriverAddress);
-}
-
-/**
- * Get an initialized Drips Hub client.
- * @returns An initialized Drips Hub client.
- */
-export function getDripsClient() {
-  const { provider, signer } = get(wallet);
-
-  const dripsAddress = getNetworkConfig().DRIPS;
-
-  return DripsClient.create(provider, signer, dripsAddress);
 }
 
 /**
