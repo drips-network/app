@@ -44,6 +44,9 @@ export const load = (async ({ params, fetch }) => {
     };
   }
 
+  // It's not a voting round ID, so it must be a (numeric) Drip List ID.
+  if (!/^\d+$/.test(listId)) throw error(404);
+
   const dripListQuery = gql`
     ${DRIP_LIST_PAGE_FRAGMENT}
     query DripList($listId: ID!) {
