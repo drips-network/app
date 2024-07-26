@@ -14,7 +14,7 @@ import toSafeDripsTx from '../utils/to-safe-drips-tx';
 
 type Erc20Abi = typeof erc20Abi;
 
-export async function erc20Read<
+export async function executeErc20ReadMethod<
   functionName extends ExtractAbiFunctionNames<Erc20Abi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<Erc20Abi, functionName>,
 >(config: {
@@ -30,29 +30,11 @@ export async function erc20Read<
   return erc20[func](...args);
 }
 
-export async function erc20Write<
-  functionName extends ExtractAbiFunctionNames<Erc20Abi, 'nonpayable' | 'payable'>,
-  abiFunction extends AbiFunction = ExtractAbiFunction<Erc20Abi, functionName>,
->(config: {
-  token: OxString;
-  functionName: functionName | ExtractAbiFunctionNames<Erc20Abi, 'nonpayable' | 'payable'>;
-  args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
-}): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
-  const { signer } = get(wallet);
-  assert(signer, 'ERC20 contract call requires a signer but it is missing.');
-
-  const { token, functionName: func, args } = config;
-
-  const erc20 = new Contract(token, erc20Abi, signer);
-
-  return erc20[func](...args);
-}
-
 export function getAddressDriverAllowance(token: OxString) {
   const signer = get(wallet).signer?.address;
   assert(signer, 'ERC20 contract call requires a signer but it is missing.');
 
-  return erc20Read({
+  return executeErc20ReadMethod({
     token,
     functionName: 'allowance',
     args: [signer as OxString, getNetworkConfig().ADDRESS_DRIVER as OxString],

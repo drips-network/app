@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { addressDriverRead } from '../address-driver/address-driver';
+import { executeAddressDriverReadMethod } from '../address-driver/address-driver';
 import type { OxString } from '../sdk-types';
 import unreachable from '$lib/utils/unreachable';
 import wallet from '$lib/stores/wallet/wallet.store';
@@ -9,7 +9,7 @@ export default async function getOwnAccountId() {
   assert(signer, `'getOwnAccountId' requires a signer but it's missing.`);
 
   return (
-    await addressDriverRead({
+    await executeAddressDriverReadMethod({
       functionName: 'calcAccountId',
       args: [(signer.address as OxString) || unreachable()],
     })

@@ -12,7 +12,7 @@ import { dripsAbi, type DripsAbi } from './drips-abi';
 import toSafeDripsTx from '../utils/to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 
-export async function dripsRead<
+export async function executeDripsReadMethod<
   functionName extends ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<DripsAbi, functionName>,
 >(config: {

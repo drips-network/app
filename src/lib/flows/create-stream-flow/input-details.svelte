@@ -60,7 +60,7 @@
   import { isAddress } from 'ethers';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
-  import { addressDriverRead } from '$lib/utils/sdk/address-driver/address-driver';
+  import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -198,7 +198,7 @@
 
             recipientAccountId = isAddress(recipientInputValue)
               ? (
-                  await addressDriverRead({
+                  await executeAddressDriverReadMethod({
                     functionName: 'calcAccountId',
                     args: [recipientInputValue as OxString],
                   })

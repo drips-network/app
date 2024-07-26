@@ -32,16 +32,17 @@
   import { writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import { getRepoDriverTxFactory } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { gql } from 'graphql-request';
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
   import type { LatestVersion } from '@efstajas/versioned-parser';
   import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
-  import { Utils } from 'radicle-drips';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
+  import { toBigInt } from 'ethers';
+  import toContractAccountMetadata from '$lib/utils/sdk/utils/to-contract-account-metadata';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -92,11 +93,12 @@
               key: MetadataManagerBase.USER_METADATA_KEY,
               value: ipfsHash,
             },
-          ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
+          ].map(toContractAccountMetadata);
 
-          const txFactory = await getRepoDriverTxFactory();
-
-          const tx = await txFactory.emitAccountMetadata(accountId, accountMetadataAsBytes);
+          const tx = await populateRepoDriverWriteTx({
+            functionName: 'emitAccountMetadata',
+            args: [toBigInt(accountId), accountMetadataAsBytes],
+          });
 
           return { tx, ipfsHash, accountId };
         },

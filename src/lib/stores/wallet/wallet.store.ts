@@ -20,7 +20,7 @@ import { invalidateAll } from '../fetched-data-cache/invalidate';
 import { BrowserProvider, InfuraProvider } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
-import { addressDriverRead } from '$lib/utils/sdk/address-driver/address-driver';
+import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
 
 const appsSdk = new SafeAppsSDK();
@@ -293,7 +293,7 @@ const mockWalletStore = () => {
     const signer = await provider.getSigner();
 
     const ownAccountId = (
-      await addressDriverRead({
+      await executeAddressDriverReadMethod({
         functionName: 'calcAccountId',
         args: [signer.address as OxString],
       })

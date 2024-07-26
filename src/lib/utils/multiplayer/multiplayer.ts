@@ -38,7 +38,7 @@ import type {
   ProjectForVoteReceiverQueryVariables,
 } from './__generated__/gql.generated';
 import unreachable from '../unreachable';
-import { addressDriverRead } from '../sdk/address-driver/address-driver';
+import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-driver';
 import type { OxString } from '../sdk/sdk-types';
 
 async function _authenticatedCall<ST extends ZodSchema>(
@@ -575,7 +575,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
       }
       case 'address': {
         const accountId = (
-          await addressDriverRead({
+          await executeAddressDriverReadMethod({
             functionName: 'calcAccountId',
             args: [receiver.address as OxString],
           })

@@ -26,7 +26,7 @@
   import { slide } from 'svelte/transition';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
   import { isAddress } from 'ethers';
-  import { addressDriverRead } from '$lib/utils/sdk/address-driver/address-driver';
+  import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<{
@@ -144,7 +144,7 @@
     }
 
     const accountId = (
-      await addressDriverRead({
+      await executeAddressDriverReadMethod({
         functionName: 'calcAccountId',
         args: [address as OxString],
       })

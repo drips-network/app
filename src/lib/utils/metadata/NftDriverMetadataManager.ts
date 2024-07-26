@@ -7,12 +7,12 @@ import type {
   LatestDripListMetadataHashQuery,
   LatestDripListMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
-import type { nftDriverWrite } from '../sdk/nft-driver/nft-driver';
+import type { executeNftDriverWriteMethod } from '../sdk/nft-driver/nft-driver';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataParser
 > {
-  constructor(nftDriver?: typeof nftDriverWrite) {
+  constructor(nftDriver?: typeof executeNftDriverWriteMethod) {
     super(nftDriverAccountMetadataParser, nftDriver);
   }
 

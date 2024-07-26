@@ -1,6 +1,6 @@
 import ens from '$lib/stores/ens';
 import { Utils } from 'radicle-drips';
-import { addressDriverRead } from './sdk/address-driver/address-driver';
+import { executeAddressDriverReadMethod } from './sdk/address-driver/address-driver';
 import type { OxString } from './sdk/sdk-types';
 import extractAddressFromAccountId from './sdk/utils/extract-address-from-accountId';
 import { isAddress } from 'ethers';
@@ -33,7 +33,7 @@ export default async function (
   if (isAddress(universalAcccountIdentifier)) {
     const address = universalAcccountIdentifier;
     const dripsAccountId = (
-      await addressDriverRead({
+      await executeAddressDriverReadMethod({
         functionName: 'calcAccountId',
         args: [universalAcccountIdentifier as OxString],
       })
@@ -48,7 +48,7 @@ export default async function (
     const lookup = await ens.reverseLookup(universalAcccountIdentifier);
     if (lookup) {
       const dripsAccountId = (
-        await addressDriverRead({
+        await executeAddressDriverReadMethod({
           functionName: 'calcAccountId',
           args: [lookup as OxString],
         })

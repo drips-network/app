@@ -1,6 +1,6 @@
 import { toBigInt } from 'ethers';
 import mapFilterUndefined from '../map-filter-undefined';
-import { dripsRead } from '../sdk/drips/drips';
+import { executeDripsReadMethod } from '../sdk/drips/drips';
 import type { OxString } from '../sdk/sdk-types';
 import { single } from '../sdk/utils/single-or-default';
 
@@ -60,7 +60,7 @@ export default async function fetchBalancesForTokens(
 async function getSplittableBalanceForUser(accountId: string, ta: string) {
   return single(
     (
-      await dripsRead({
+      await executeDripsReadMethod({
         functionName: 'splittable',
         args: [toBigInt(accountId), ta as OxString],
       })
@@ -78,7 +78,7 @@ async function getReceivableBalanceForUser(
 ) {
   return single(
     (
-      await dripsRead({
+      await executeDripsReadMethod({
         functionName: 'receiveStreamsResult',
         args: [toBigInt(accountId), tokenAddress as OxString, maxCycles],
       })
@@ -92,7 +92,7 @@ async function getReceivableBalanceForUser(
 async function getCollectableBalanceForUser(accountId: string, tokenAddress: string) {
   return single(
     (
-      await dripsRead({
+      await executeDripsReadMethod({
         functionName: 'collectable',
         args: [toBigInt(accountId), tokenAddress as OxString],
       })

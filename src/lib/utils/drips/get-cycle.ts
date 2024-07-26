@@ -1,4 +1,4 @@
-import { dripsRead } from '../sdk/drips/drips';
+import { executeDripsReadMethod } from '../sdk/drips/drips';
 import { single } from '../sdk/utils/single-or-default';
 
 /**
@@ -7,7 +7,7 @@ import { single } from '../sdk/utils/single-or-default';
  */
 export default async function getCycle() {
   const cycleDurationMillis =
-    single(await dripsRead({ functionName: 'cycleSecs', args: [] })) * 1000;
+    single(await executeDripsReadMethod({ functionName: 'cycleSecs', args: [] })) * 1000;
   const currentCycleMillis = new Date().getTime() % cycleDurationMillis;
   const currentCycleStart = new Date().getTime() - currentCycleMillis;
 

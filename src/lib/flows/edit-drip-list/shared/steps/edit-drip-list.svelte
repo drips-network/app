@@ -99,7 +99,7 @@
     LIST_EDITOR_PROJECT_FRAGMENT,
     type Items,
   } from '$lib/components/list-editor/types';
-  import { nftDriverWrite } from '$lib/utils/sdk/nft-driver/nft-driver';
+  import { executeNftDriverWriteMethod } from '$lib/utils/sdk/nft-driver/nft-driver';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -168,7 +168,7 @@
 
           const setSplitsTx = await nftDriverTxFactory.setSplits(listId, receivers);
 
-          const metadataManager = new NftDriverMetadataManager(nftDriverWrite);
+          const metadataManager = new NftDriverMetadataManager(executeNftDriverWriteMethod);
 
           const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
           assert(currentMetadata);

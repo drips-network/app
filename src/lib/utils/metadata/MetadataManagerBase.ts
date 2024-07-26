@@ -4,9 +4,9 @@ import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser';
 import assert from '$lib/utils/assert';
-import type { nftDriverWrite } from '../sdk/nft-driver/nft-driver';
+import type { executeNftDriverWriteMethod } from '../sdk/nft-driver/nft-driver';
 import type { TransactionResponse } from 'ethers';
-import toContractMetadata from '../sdk/utils/to-contract-metadata';
+import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
 
 type IpfsHash = string;
 type AccountId = string;
@@ -40,11 +40,11 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
   public static readonly USER_METADATA_KEY = 'ipfs';
 
   private readonly _parser: TParser;
-  private readonly _emitMetadataFunc: typeof nftDriverWrite | undefined;
+  private readonly _emitMetadataFunc: typeof executeNftDriverWriteMethod | undefined;
 
   protected constructor(
     parser: TParser,
-    emitMetadataFunc?: typeof nftDriverWrite | typeof nftDriverWrite,
+    emitMetadataFunc?: typeof executeNftDriverWriteMethod | typeof executeNftDriverWriteMethod,
   ) {
     this._parser = parser;
     this._emitMetadataFunc = emitMetadataFunc;
@@ -168,7 +168,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
       },
-    ].map(toContractMetadata);
+    ].map(toContractAccountMetadata);
 
     const tx = await this._emitMetadataFunc({
       functionName: 'emitAccountMetadata',

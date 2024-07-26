@@ -10,9 +10,9 @@ import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 import { addressDriverAbi, type AddressDriverAbi } from './address-driver-abi';
 import type { OxString } from '../sdk-types';
-import { erc20Read } from '../erc20/erc20';
+import { executeErc20ReadMethod } from '../erc20/erc20';
 
-export async function addressDriverRead<
+export async function executeAddressDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<AddressDriverAbi, functionName>,
 >(config: {
@@ -35,7 +35,7 @@ export async function getAddressDriverAllowance(token: OxString): Promise<bigint
   const spender = getNetworkConfig().ADDRESS_DRIVER as OxString;
 
   return (
-    await erc20Read({
+    await executeErc20ReadMethod({
       token,
       functionName: 'allowance',
       args: [owner, spender],

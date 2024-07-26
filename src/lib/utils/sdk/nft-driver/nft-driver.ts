@@ -11,7 +11,7 @@ import { get } from 'svelte/store';
 import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
 
-export async function nftDriverRead<
+export async function executeNftDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<NftDriverAbi, functionName>,
 >(config: {
@@ -27,7 +27,7 @@ export async function nftDriverRead<
   return nftDriver[func](...args);
 }
 
-export async function nftDriverWrite<
+export async function executeNftDriverWriteMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'nonpayable' | 'payable'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<NftDriverAbi, functionName>,
 >(config: {

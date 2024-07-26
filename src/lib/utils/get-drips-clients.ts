@@ -6,23 +6,9 @@ import {
   Utils,
   type NetworkConfig,
   NFTDriverTxFactory,
-  RepoDriverTxFactory,
 } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-
-/**
- * Get an initialized Repo Driver transaction factory.
- * @returns An initialized Repo Driver transaction factory.
- */
-export function getRepoDriverTxFactory() {
-  const { signer } = get(wallet);
-  assert(signer);
-
-  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
-
-  return RepoDriverTxFactory.create(signer, repoDriverAddress);
-}
 
 /**
  * Get an initialized NFT Driver transaction factory.

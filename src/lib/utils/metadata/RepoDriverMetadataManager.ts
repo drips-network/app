@@ -11,7 +11,7 @@ import type {
 } from './__generated__/gql.generated';
 import { Forge, type OxString } from '../sdk/sdk-types';
 import { hexlify, toUtf8Bytes } from 'ethers';
-import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
+import { executeRepoDriverReadMethod } from '../sdk/repo-driver/repo-driver';
 
 type AccountId = string;
 
@@ -63,7 +63,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     const { url, repoName, ownerName, forge } = metadata.data.source;
 
-    const onChainAccountId = await repoDriverRead({
+    const onChainAccountId = await executeRepoDriverReadMethod({
       functionName: 'calcAccountId',
       args: [Forge.gitHub, hexlify(toUtf8Bytes(`${ownerName}/${repoName}`)) as OxString], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
     });

@@ -25,7 +25,10 @@ import type {
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
 import type { BigNumberish } from 'ethers';
-import { nftDriverRead, nftDriverWrite } from '../sdk/nft-driver/nft-driver';
+import {
+  executeNftDriverReadMethod,
+  executeNftDriverWriteMethod,
+} from '../sdk/nft-driver/nft-driver';
 import type { OxString } from '../sdk/sdk-types';
 import { getAddressDriverAllowance } from '../sdk/address-driver/address-driver';
 import type { ContractTransaction } from 'ethers';
@@ -74,7 +77,9 @@ export default class DripListService {
       dripListService._owner = signer;
       dripListService._ownerAddress = await signer.getAddress();
 
-      dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(nftDriverWrite);
+      dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(
+        executeNftDriverWriteMethod,
+      );
     } else {
       dripListService._nftDriverMetadataManager = new NftDriverMetadataManager();
     }
@@ -125,7 +130,7 @@ export default class DripListService {
     const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
 
     const listId = (
-      await nftDriverRead({
+      await executeNftDriverReadMethod({
         functionName: 'calcTokenIdWithSalt',
         args: [this._ownerAddress as OxString, salt],
       })
