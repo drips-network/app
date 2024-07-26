@@ -10,6 +10,8 @@ import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
+import type { ContractTransaction } from 'ethers';
+import toSafeDripsTx from '../utils/to-safe-drips-tx';
 
 export async function executeNftDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,
@@ -43,4 +45,22 @@ export async function executeNftDriverWriteMethod<
   const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, signer);
 
   return nftDriver[func](...args);
+}
+
+export async function populateNftDriverWriteTx<
+  functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'nonpayable' | 'payable'>,
+  abiFunction extends AbiFunction = ExtractAbiFunction<NftDriverAbi, functionName>,
+>(config: {
+  functionName: functionName | ExtractAbiFunctionNames<NftDriverAbi, 'nonpayable' | 'payable'>;
+  args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
+}): Promise<ContractTransaction> {
+  const { signer } = get(wallet);
+  assert(signer, 'NFT Driver contract call requires a signer but it is missing.');
+
+  const { functionName: func, args } = config;
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+  const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, signer);
+
+  return toSafeDripsTx(await nftDriver[func].populateTransaction(...args));
 }

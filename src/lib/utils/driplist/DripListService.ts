@@ -1,13 +1,8 @@
-import {
-  getAddressDriverTxFactory,
-  getCallerClient,
-  getNFTDriverTxFactory,
-} from '../get-drips-clients';
+import { getAddressDriverTxFactory, getCallerClient } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import { NFTDriverTxFactory, Utils, AddressDriverTxFactory } from 'radicle-drips';
+import { AddressDriverTxFactory } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { SplitsReceiverStruct } from 'radicle-drips';
-import { ethers, MaxUint256, type Signer, toBigInt, Transaction } from 'ethers';
+import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import type { Address, IpfsHash } from '../common-types';
@@ -24,15 +19,17 @@ import type {
 } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
-import type { BigNumberish } from 'ethers';
 import {
   executeNftDriverReadMethod,
   executeNftDriverWriteMethod,
+  populateNftDriverWriteTx,
 } from '../sdk/nft-driver/nft-driver';
-import type { OxString } from '../sdk/sdk-types';
+import type { OxString, SplitsReceiver } from '../sdk/sdk-types';
 import { getAddressDriverAllowance } from '../sdk/address-driver/address-driver';
 import type { ContractTransaction } from 'ethers';
 import { populateErc20WriteTx } from '../sdk/erc20/erc20';
+import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
+import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
 
 type AccountId = string;
 
@@ -54,7 +51,6 @@ export default class DripListService {
 
   private _owner!: Signer | undefined;
   private _ownerAddress!: Address | undefined;
-  private _nftDriverTxFactory!: NFTDriverTxFactory;
   private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
 
@@ -70,7 +66,6 @@ export default class DripListService {
     const { connected, signer } = get(wallet);
 
     if (connected) {
-      dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
       dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
 
       assert(signer, 'Signer address is undefined.');
@@ -146,13 +141,13 @@ export default class DripListService {
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
-    const setDripListSplitsTx = await this._nftDriverTxFactory.setSplits(
-      listId,
-      this._formatSplitReceivers(receivers),
-    );
+    const setDripListSplitsTx = await populateNftDriverWriteTx({
+      functionName: 'setSplits',
+      args: [toBigInt(listId), formatSplitReceivers(receivers)],
+    });
 
     let needsApprovalForToken: string | undefined;
-    let txs: Transaction[];
+    let txs: ContractTransaction[];
 
     if (support?.type === 'continuous') {
       const { tokenAddress, amountPerSec, topUpAmount } = support;
@@ -232,7 +227,7 @@ export default class DripListService {
   public async getProjectsSplitMetadataAndReceivers(weights: Weights, items: Items) {
     const projectsInput = Object.entries(weights);
 
-    const receivers: SplitsReceiverStruct[] = [];
+    const receivers: SplitsReceiver[] = [];
 
     const projectsSplitMetadata: ReturnType<
       typeof nftDriverAccountMetadataParser.parseLatest
@@ -294,46 +289,22 @@ export default class DripListService {
     };
   }
 
-  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
-  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
-
-    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
-      if (
-        !unique.some(
-          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
-        )
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    const sortedReceivers = uniqueReceivers.sort((a, b) =>
-      // Sort by user ID.
-      toBigInt(a.accountId as BigNumberish) > toBigInt(b.accountId as BigNumberish)
-        ? 1
-        : toBigInt(a.accountId as BigNumberish) < toBigInt(b.accountId as BigNumberish)
-          ? -1
-          : 0,
-    );
-
-    return sortedReceivers;
-  }
-
   private async _buildCreateDripListTx(salt: bigint, ipfsHash: IpfsHash) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
-    const createDripListTx = await this._nftDriverTxFactory.safeMintWithSalt(
-      salt,
-      this._ownerAddress,
-      [
-        {
-          key: MetadataManagerBase.USER_METADATA_KEY,
-          value: ipfsHash,
-        },
-      ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
-    );
+    const createDripListTx = await populateNftDriverWriteTx({
+      functionName: 'safeMintWithSalt',
+      args: [
+        salt,
+        this._ownerAddress as OxString,
+        [
+          {
+            key: MetadataManagerBase.USER_METADATA_KEY,
+            value: ipfsHash,
+          },
+        ].map(toContractAccountMetadata),
+      ],
+    });
 
     return createDripListTx;
   }

@@ -1,27 +1,8 @@
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
-import {
-  AddressDriverTxFactory,
-  CallerClient,
-  Utils,
-  type NetworkConfig,
-  NFTDriverTxFactory,
-} from 'radicle-drips';
+import { AddressDriverTxFactory, CallerClient, Utils, type NetworkConfig } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-
-/**
- * Get an initialized NFT Driver transaction factory.
- * @returns An initialized NFT Driver transaction factory.
- */
-export function getNFTDriverTxFactory() {
-  const { signer } = get(wallet);
-  assert(signer);
-
-  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
-
-  return NFTDriverTxFactory.create(signer, nftDriverAddress);
-}
 
 /**
  * Get an initialized Address Driver transaction factory.
