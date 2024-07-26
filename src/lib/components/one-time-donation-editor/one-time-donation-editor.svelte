@@ -9,7 +9,7 @@
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import type { Items } from '../list-select/list-select.types';
   import assert from '$lib/utils/assert';
-  import { getAllowance } from '$lib/utils/sdk/address-driver/address-driver';
+  import { getAddressDriverAllowance } from '$lib/utils/sdk/address-driver/address-driver';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   export let selectedTokenAddress: string[] = [];
@@ -67,7 +67,7 @@
     const { address, provider } = $walletStore;
     assert(address && tokenAddress);
 
-    selectedTokenAllowance = await getAllowance(tokenAddress as OxString);
+    selectedTokenAllowance = await getAddressDriverAllowance(tokenAddress as OxString);
     selectedTokenBalance = await fetchBalance(tokenAddress, address, provider);
     loadingToken = false;
     prevTokenAddress = tokenAddress;

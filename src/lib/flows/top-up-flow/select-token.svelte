@@ -16,7 +16,7 @@
   import assert from '$lib/utils/assert';
   import Plus from '$lib/components/icons/Plus.svelte';
   import addCustomTokenFlowSteps from '../add-custom-token/add-custom-token-flow-steps';
-  import { getAllowance } from '$lib/utils/sdk/address-driver/address-driver';
+  import { getAddressDriverAllowance } from '$lib/utils/sdk/address-driver/address-driver';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -67,7 +67,7 @@
     const { address, provider } = $wallet;
     assert(address);
 
-    const allowance = await getAllowance(tokenAddress as OxString);
+    const allowance = await getAddressDriverAllowance(tokenAddress as OxString);
     const balance = await fetchBalance(tokenAddress, address, provider);
 
     context.update((c) => ({

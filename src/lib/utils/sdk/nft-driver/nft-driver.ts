@@ -11,12 +11,6 @@ import { get } from 'svelte/store';
 import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
 
-const { provider, signer } = get(wallet);
-const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
-
-const nftDriverContractRead = new Contract(nftDriverAddress, nftDriverAbi, provider);
-const nftDriverContractWrite = new Contract(nftDriverAddress, nftDriverAbi, signer);
-
 export async function nftDriverRead<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<NftDriverAbi, functionName>,
@@ -24,7 +18,13 @@ export async function nftDriverRead<
   functionName: functionName | ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
-  return nftDriverContractRead[config.functionName](...config.args);
+  const { provider } = get(wallet);
+  const { functionName: func, args } = config;
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+  const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, provider);
+
+  return nftDriver[func](...args);
 }
 
 export async function nftDriverWrite<
@@ -34,7 +34,13 @@ export async function nftDriverWrite<
   functionName: functionName | ExtractAbiFunctionNames<NftDriverAbi, 'nonpayable' | 'payable'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<TransactionResponse> {
-  assert(signer, `'${config.functionName}' requires a signer but it's missing.`);
+  const { signer } = get(wallet);
+  assert(signer, 'NFT Driver contract call requires a signer but it is missing.');
 
-  return nftDriverContractWrite[config.functionName](...config.args);
+  const { functionName: func, args } = config;
+
+  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
+  const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, signer);
+
+  return nftDriver[func](...args);
 }

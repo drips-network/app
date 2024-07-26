@@ -12,11 +12,6 @@ import { dripsAbi, type DripsAbi } from './drips-abi';
 import safeDripsTx from '../utils/safe-drips-tx';
 import type { OxString, SplitsReceiver } from '../sdk-types';
 
-const { provider, signer } = get(wallet);
-const dripsAddress = getNetworkConfig().DRIPS;
-const dripsContractRead = new Contract(dripsAddress, dripsAbi, provider);
-const dripsContractWrite = new Contract(dripsAddress, dripsAbi, signer);
-
 export async function dripsRead<
   functionName extends ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<DripsAbi, functionName>,
@@ -24,7 +19,13 @@ export async function dripsRead<
   functionName: functionName | ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
-  return dripsContractRead[config.functionName](...config.args);
+  const { provider } = get(wallet);
+  const { functionName: func, args } = config;
+
+  const dripsAddress = getNetworkConfig().DRIPS;
+  const drips = new Contract(dripsAddress, dripsAbi, provider);
+
+  return drips[func](...args);
 }
 
 export async function populateSplitTx(
@@ -33,10 +34,10 @@ export async function populateSplitTx(
   currentReceivers: SplitsReceiver[],
 ) {
   const { signer } = get(wallet);
+  assert(signer, 'Drips contract call requires a signer but it is missing.');
 
-  assert(signer, `'populateSplitTx' requires a signer but it's missing.`);
+  const dripsAddress = getNetworkConfig().DRIPS;
+  const drips = new Contract(dripsAddress, dripsAbi, signer);
 
-  return safeDripsTx(
-    await dripsContractWrite.approve.populateTransaction(accountId, erc20, currentReceivers),
-  );
+  return safeDripsTx(await drips.approve.populateTransaction(accountId, erc20, currentReceivers));
 }

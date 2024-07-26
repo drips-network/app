@@ -10,11 +10,6 @@ import { Contract } from 'ethers';
 import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 
-const { provider } = get(wallet);
-const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
-
-const repoDriverContractRead = new Contract(repoDriverAddress, repoDriverAbi, provider);
-
 export async function repoDriverRead<
   functionName extends ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<RepoDriverAbi, functionName>,
@@ -22,5 +17,11 @@ export async function repoDriverRead<
   functionName: functionName | ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
-  return repoDriverContractRead[config.functionName](...config.args);
+  const { provider } = get(wallet);
+  const { functionName: func, args } = config;
+
+  const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
+  const repoDriver = new Contract(repoDriverAddress, repoDriverAbi, provider);
+
+  return repoDriver[func](...args);
 }

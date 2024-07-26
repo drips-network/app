@@ -20,15 +20,17 @@ export async function addressDriverRead<
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
   const { provider } = get(wallet);
-  const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
-  const addressDriverContractRead = new Contract(addressDriverAddress, addressDriverAbi, provider);
+  const { functionName: func, args } = config;
 
-  return addressDriverContractRead[config.functionName](...config.args);
+  const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
+  const addressDriver = new Contract(addressDriverAddress, addressDriverAbi, provider);
+
+  return addressDriver[func](...args);
 }
 
-export async function getAllowance(token: OxString): Promise<bigint> {
+export async function getAddressDriverAllowance(token: OxString): Promise<bigint> {
   const owner = get(wallet).signer?.address as OxString;
-  assert(owner, `'getAllowance' requires a signer but it's missing.`);
+  assert(owner, 'ERC20 contract call requires a signer but it is missing.');
 
   const spender = getNetworkConfig().ADDRESS_DRIVER as OxString;
 

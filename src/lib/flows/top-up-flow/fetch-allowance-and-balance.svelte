@@ -6,7 +6,7 @@
   import assert from '$lib/utils/assert';
   import type { Writable } from 'svelte/store';
   import type { TopUpFlowState } from './top-up-flow-state';
-  import { getAllowance } from '$lib/utils/sdk/address-driver/address-driver';
+  import { getAddressDriverAllowance } from '$lib/utils/sdk/address-driver/address-driver';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -19,7 +19,7 @@
     const { address, provider } = $wallet;
     assert(address && tokenAddress);
 
-    const allowance = await getAllowance(tokenAddress as OxString);
+    const allowance = await getAddressDriverAllowance(tokenAddress as OxString);
     const balance = await fetchBalance(tokenAddress, address, provider);
 
     context.update((c) => ({
