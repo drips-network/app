@@ -1,18 +1,12 @@
-import {
-  encodeBytes32String,
-  hexlify,
-  toBigInt,
-  toUtf8Bytes,
-  type ContractTransaction,
-} from 'ethers';
+import { toBigInt, type ContractTransaction } from 'ethers';
 import type { AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser';
 import assert from '$lib/utils/assert';
 import type { nftDriverWrite } from '../sdk/nft-driver/nft-driver';
-import type { OxString } from '../sdk/sdk-types';
 import type { TransactionResponse } from 'ethers';
+import toContractMetadata from '../sdk/utils/to-contract-metadata';
 
 type IpfsHash = string;
 type AccountId = string;
@@ -174,10 +168,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
       },
-    ].map((m) => ({
-      key: encodeBytes32String(m.key) as OxString,
-      value: hexlify(toUtf8Bytes(m.value)) as OxString,
-    }));
+    ].map(toContractMetadata);
 
     const tx = await this._emitMetadataFunc({
       functionName: 'emitAccountMetadata',

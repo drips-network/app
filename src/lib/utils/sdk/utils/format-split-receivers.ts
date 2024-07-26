@@ -1,3 +1,4 @@
+import { toBigInt } from 'ethers';
 import type { SplitsReceiver } from '../sdk-types';
 
 export function formatSplitReceivers(receivers: SplitsReceiver[]) {
@@ -24,5 +25,8 @@ export function formatSplitReceivers(receivers: SplitsReceiver[]) {
         : 0,
   );
 
-  return sortedReceivers;
+  return sortedReceivers.map((r) => ({
+    accountId: toBigInt(r.accountId),
+    weight: r.weight,
+  }));
 }

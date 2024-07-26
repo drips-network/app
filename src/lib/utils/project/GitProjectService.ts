@@ -12,13 +12,13 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
-import { hexlify, toUtf8Bytes, type Transaction } from 'ethers';
+import { hexlify, toBigInt, toUtf8Bytes, type Transaction } from 'ethers';
 import type { OxString } from '../sdk/sdk-types';
 import { repoDriverRead } from '../sdk/repo-driver/repo-driver';
 import unreachable from '../unreachable';
-import { populateSplitTx } from '../sdk/drips/drips';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
 import type { ContractTransaction } from 'ethers';
+import { populateDripsWriteTx } from '../sdk/drips/drips';
 
 interface ListEditorConfig {
   items: Items;
@@ -276,7 +276,10 @@ export default class GitProjectService {
     const splitTxs: Promise<ContractTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
       splitTxs.push(
-        populateSplitTx(accountId, tokenAddress as OxString, formatSplitReceivers(receivers)),
+        populateDripsWriteTx({
+          functionName: 'split',
+          args: [toBigInt(accountId), tokenAddress as OxString, formatSplitReceivers(receivers)],
+        }),
       );
     });
 

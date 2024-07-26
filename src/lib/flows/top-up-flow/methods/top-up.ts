@@ -8,8 +8,8 @@ import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
 import { MaxUint256 } from 'ethers';
-import { populateApproveTx } from '$lib/utils/sdk/erc20/erc20';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
+import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -48,11 +48,11 @@ export default function (
 
         delete setStreamsPopulatedTx.gasLimit;
 
-        const approvePopulatedTx = await populateApproveTx(
-          tokenAddress as OxString,
-          txFactory.driverAddress as OxString,
-          MaxUint256,
-        );
+        const approvePopulatedTx = await populateErc20WriteTx({
+          token: tokenAddress as OxString,
+          functionName: 'approve',
+          args: [txFactory.driverAddress as OxString, MaxUint256],
+        });
 
         return {
           setStreamsPopulatedTx,

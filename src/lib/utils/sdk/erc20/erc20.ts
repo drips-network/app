@@ -5,12 +5,12 @@ import type {
   ExtractAbiFunction,
   ExtractAbiFunctionNames,
 } from 'abitype';
-import { Contract } from 'ethers';
+import { Contract, type ContractTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import { erc20Abi } from 'abitype/abis';
 import type { OxString } from '../sdk-types';
 import { getNetworkConfig } from '$lib/utils/get-drips-clients';
-import safeDripsTx from '../utils/safe-drips-tx';
+import toSafeDripsTx from '../utils/to-safe-drips-tx';
 
 type Erc20Abi = typeof erc20Abi;
 
@@ -59,11 +59,20 @@ export function getAddressDriverAllowance(token: OxString) {
   });
 }
 
-export async function populateApproveTx(token: OxString, spender: OxString, amount: bigint) {
+export async function populateErc20WriteTx<
+  functionName extends ExtractAbiFunctionNames<Erc20Abi, 'nonpayable' | 'payable'>,
+  abiFunction extends AbiFunction = ExtractAbiFunction<Erc20Abi, functionName>,
+>(config: {
+  token: OxString;
+  functionName: functionName | ExtractAbiFunctionNames<Erc20Abi, 'nonpayable' | 'payable'>;
+  args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
+}): Promise<ContractTransaction> {
   const { signer } = get(wallet);
   assert(signer, 'ERC20 contract call requires a signer but it is missing.');
 
+  const { token, functionName: func, args } = config;
+
   const erc20 = new Contract(token, erc20Abi, signer);
 
-  return safeDripsTx(await erc20.approve.populateTransaction(spender, amount));
+  return toSafeDripsTx(await erc20[func].populateTransaction(...args));
 }

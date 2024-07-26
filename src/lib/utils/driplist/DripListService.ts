@@ -28,8 +28,8 @@ import type { BigNumberish } from 'ethers';
 import { nftDriverRead, nftDriverWrite } from '../sdk/nft-driver/nft-driver';
 import type { OxString } from '../sdk/sdk-types';
 import { getAddressDriverAllowance } from '../sdk/address-driver/address-driver';
-import { populateApproveTx } from '../sdk/erc20/erc20';
 import type { ContractTransaction } from 'ethers';
+import { populateErc20WriteTx } from '../sdk/erc20/erc20';
 
 type AccountId = string;
 
@@ -356,11 +356,11 @@ export default class DripListService {
   private async _buildTokenApprovalTx(token: Address): Promise<ContractTransaction> {
     assert(this._owner, `This function requires an active wallet connection.`);
 
-    const tokenApprovalTx = await populateApproveTx(
-      token as OxString,
-      this._addressDriverTxFactory.driverAddress as OxString,
-      MaxUint256,
-    );
+    const tokenApprovalTx = await populateErc20WriteTx({
+      token: token as OxString,
+      functionName: 'approve',
+      args: [this._addressDriverTxFactory.driverAddress as OxString, MaxUint256],
+    });
 
     return tokenApprovalTx;
   }
