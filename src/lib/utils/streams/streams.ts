@@ -8,13 +8,17 @@ import type {
   CurrentStreamsQueryVariables,
 } from './__generated__/gql.generated';
 import { pin } from '../ipfs';
-import { getAddressDriverTxFactory, getNetworkConfig } from '../get-drips-clients';
-import type { Signer, Transaction } from 'ethers';
+import { getNetworkConfig } from '../get-drips-clients';
+import { toBigInt, type ContractTransaction, type Signer } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
 import makeStreamId, { decodeStreamId } from './make-stream-id';
 import extractAddressFromAccountId from '../sdk/utils/extract-address-from-accountId';
 import getOwnAccountId from '../sdk/utils/get-own-account-id';
+import { populateAddressDriverWriteTx } from '../sdk/address-driver/address-driver';
+import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
+import type { OxString } from '../sdk/sdk-types';
+import { formatStreamReceivers } from '../sdk/utils/format-stream-receivers';
 
 type NewStreamOptions = {
   tokenAddress: string;
@@ -88,7 +92,10 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
 
   return {
     currentStreams,
-    currentReceivers,
+    currentReceivers: currentReceivers.map((r) => ({
+      accountId: toBigInt(r.accountId),
+      config: toBigInt(r.config),
+    })),
   };
 }
 
@@ -295,32 +302,25 @@ export async function buildStreamDeleteBatchTx(signer: Signer, streamId: string)
 
 export async function buildBalanceChangePopulatedTx(tokenAddress: string, amount: bigint) {
   const ownAccountId = await getOwnAccountId();
-  const txFactory = await getAddressDriverTxFactory();
 
   const { currentReceivers } = await _getCurrentStreamsAndReceivers(ownAccountId, tokenAddress);
 
-  return txFactory.setStreams(
-    tokenAddress,
-    currentReceivers,
-    amount,
-    currentReceivers,
-    0,
-    0,
-    extractAddressFromAccountId(ownAccountId),
-    /*
-    Dirty hack to disable the SDK's built-in gas estimation, because
-    it would fail if there's no token approval yet.
-
-    TODO: Introduce a more graceful method of disabling gas estimation.
-    */
-    amount > 0n ? { gasLimit: 1 } : undefined,
-  );
+  return populateAddressDriverWriteTx({
+    functionName: 'setStreams',
+    args: [
+      tokenAddress as OxString,
+      formatStreamReceivers(currentReceivers),
+      amount,
+      formatStreamReceivers(currentReceivers),
+      0,
+      0,
+      extractAddressFromAccountId(ownAccountId),
+    ],
+  });
 }
 
 export async function buildPauseStreamPopulatedTx(streamId: string) {
   const ownAccountId = await getOwnAccountId();
-
-  const txFactory = await getAddressDriverTxFactory();
 
   const { dripId, tokenAddress } = decodeStreamId(streamId);
 
@@ -331,15 +331,18 @@ export async function buildPauseStreamPopulatedTx(streamId: string) {
     return streamConfig.dripId.toString() !== dripId;
   });
 
-  return txFactory.setStreams(
-    tokenAddress,
-    currentReceivers,
-    0,
-    newReceivers,
-    0,
-    0,
-    extractAddressFromAccountId(ownAccountId),
-  );
+  return populateAddressDriverWriteTx({
+    functionName: 'setStreams',
+    args: [
+      tokenAddress as OxString,
+      currentReceivers,
+      0n,
+      newReceivers,
+      0,
+      0,
+      extractAddressFromAccountId(ownAccountId),
+    ],
+  });
 }
 
 export async function buildUnpauseStreamPopulatedTx(streamId: string) {
@@ -363,19 +366,22 @@ export async function buildUnpauseStreamPopulatedTx(streamId: string) {
   }
 
   const newReceivers = currentReceivers.concat({
-    accountId: streamToUnpause.receiver.account.accountId,
-    config: streamToUnpause.config.raw,
+    accountId: toBigInt(streamToUnpause.receiver.account.accountId),
+    config: toBigInt(streamToUnpause.config.raw),
   });
 
-  return (await getAddressDriverTxFactory()).setStreams(
-    tokenAddress,
-    currentReceivers,
-    0,
-    newReceivers,
-    0,
-    0,
-    extractAddressFromAccountId(ownAccountId),
-  );
+  return populateAddressDriverWriteTx({
+    functionName: 'setStreams',
+    args: [
+      tokenAddress as OxString,
+      currentReceivers,
+      0n,
+      newReceivers,
+      0,
+      0,
+      extractAddressFromAccountId(ownAccountId),
+    ],
+  });
 }
 
 export async function buildEditStreamBatch(
@@ -397,9 +403,7 @@ export async function buildEditStreamBatch(
   const streamToEdit = currentStreams.find((stream) => stream.id === streamId);
   assert(streamToEdit, `Stream ${streamId} not found`);
 
-  const batch: Transaction[] = [];
-
-  const addressDriverTxFactory = await getAddressDriverTxFactory();
+  const batch: ContractTransaction[] = [];
 
   let hash: string | undefined;
 
@@ -424,9 +428,10 @@ export async function buildEditStreamBatch(
     hash = await pin(metadata);
 
     batch.push(
-      await addressDriverTxFactory.emitAccountMetadata([
-        Utils.Metadata.createFromStrings(USER_METADATA_KEY, hash),
-      ]),
+      await populateAddressDriverWriteTx({
+        functionName: 'emitAccountMetadata',
+        args: [[toContractAccountMetadata({ key: USER_METADATA_KEY, value: hash })]],
+      }),
     );
   }
 
@@ -450,15 +455,18 @@ export async function buildEditStreamBatch(
     });
 
     batch.push(
-      await addressDriverTxFactory.setStreams(
-        tokenAddress,
-        currentReceivers,
-        0,
-        newReceivers,
-        0,
-        0,
-        extractAddressFromAccountId(ownAccountId),
-      ),
+      await populateAddressDriverWriteTx({
+        functionName: 'setStreams',
+        args: [
+          tokenAddress as OxString,
+          currentReceivers,
+          0n,
+          newReceivers,
+          0,
+          0,
+          extractAddressFromAccountId(ownAccountId),
+        ],
+      }),
     );
   }
 

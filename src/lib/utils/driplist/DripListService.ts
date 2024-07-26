@@ -1,6 +1,5 @@
-import { getAddressDriverTxFactory, getCallerClient } from '../get-drips-clients';
+import { getCallerClient, getNetworkConfig } from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import { AddressDriverTxFactory } from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
@@ -25,7 +24,10 @@ import {
   populateNftDriverWriteTx,
 } from '../sdk/nft-driver/nft-driver';
 import type { OxString, SplitsReceiver } from '../sdk/sdk-types';
-import { getAddressDriverAllowance } from '../sdk/address-driver/address-driver';
+import {
+  getAddressDriverAllowance,
+  populateAddressDriverWriteTx,
+} from '../sdk/address-driver/address-driver';
 import type { ContractTransaction } from 'ethers';
 import { populateErc20WriteTx } from '../sdk/erc20/erc20';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
@@ -51,7 +53,6 @@ export default class DripListService {
 
   private _owner!: Signer | undefined;
   private _ownerAddress!: Address | undefined;
-  private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
 
   private constructor() {}
@@ -66,8 +67,6 @@ export default class DripListService {
     const { connected, signer } = get(wallet);
 
     if (connected) {
-      dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
-
       assert(signer, 'Signer address is undefined.');
       dripListService._owner = signer;
       dripListService._ownerAddress = await signer.getAddress();
@@ -177,19 +176,10 @@ export default class DripListService {
         needsApprovalForToken = tokenAddress;
       }
 
-      const txFactory = await getAddressDriverTxFactory();
-      const giveTx = await txFactory.give(
-        listId,
-        tokenAddress,
-        donationAmount,
-        /*
-        Dirty hack to disable the SDK's built-in gas estimation, because
-        it would fail if there's no token approval yet.
-
-        TODO: Introduce a more graceful method of disabling gas estimation.
-        */
-        { gasLimit: 1 },
-      );
+      const giveTx = await populateAddressDriverWriteTx({
+        functionName: 'give',
+        args: [toBigInt(listId), tokenAddress as OxString, donationAmount],
+      });
 
       txs = [createDripListTx, setDripListSplitsTx, giveTx];
     } else {
@@ -335,7 +325,7 @@ export default class DripListService {
     const tokenApprovalTx = await populateErc20WriteTx({
       token: token as OxString,
       functionName: 'approve',
-      args: [this._addressDriverTxFactory.driverAddress as OxString, MaxUint256],
+      args: [getNetworkConfig().ADDRESS_DRIVER as OxString, MaxUint256],
     });
 
     return tokenApprovalTx;

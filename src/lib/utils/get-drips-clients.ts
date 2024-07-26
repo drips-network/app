@@ -1,21 +1,8 @@
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
-import { AddressDriverTxFactory, CallerClient, Utils, type NetworkConfig } from 'radicle-drips';
+import { CallerClient, Utils, type NetworkConfig } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from './is-test';
-
-/**
- * Get an initialized Address Driver transaction factory.
- * @returns An initialized Address Driver transaction factory.
- */
-export function getAddressDriverTxFactory() {
-  const { signer } = get(wallet);
-  assert(signer);
-
-  const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
-
-  return AddressDriverTxFactory.create(signer, addressDriverAddress);
-}
 
 /**
  * Get an initialized Caller client.

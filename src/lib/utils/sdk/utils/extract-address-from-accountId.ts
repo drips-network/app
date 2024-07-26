@@ -2,7 +2,7 @@ import { getAddress, MaxUint256 } from 'ethers';
 import isAddressDriverId from './is-address-driver-id';
 import type { OxString } from '../sdk-types';
 
-export default function extractAddressFromAccountId(accountId: string): string {
+export default function extractAddressFromAccountId(accountId: string): OxString {
   if (!accountId) {
     throw new Error(`Could not get user address: accountId is missing.`);
   }

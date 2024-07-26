@@ -9,3 +9,8 @@ export type SplitsReceiver = {
   accountId: string;
   weight: number;
 };
+
+export type StreamReceiver = {
+  accountId: bigint;
+  config: bigint;
+};
