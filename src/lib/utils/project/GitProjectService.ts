@@ -387,10 +387,7 @@ export default class GitProjectService {
     receivers = adjustWeights(receivers);
 
     return {
-      tx: await this._repoDriverTxFactory.setSplits(
-        accountId,
-        this._formatSplitReceivers(receivers),
-      ),
+      tx: await this._repoDriverTxFactory.setSplits(accountId, formatSplitReceivers(receivers)),
       dependenciesSplitMetadata: receivers.filter((v) => v.sublist === 'dependencies'),
       maintainersSplitsMetadata: receivers.filter(
         (v) => v.sublist === 'maintainers',

@@ -1,10 +1,9 @@
 import ens from '$lib/stores/ens';
-import { isAddress } from 'ethers';
 import { Utils } from 'radicle-drips';
-import { get } from 'svelte/store';
-import extractAddressFromAccountId from './sdk/utils/extract-address-from-accountId';
 import { addressDriverRead } from './sdk/address-driver/address-driver';
 import type { OxString } from './sdk/sdk-types';
+import extractAddressFromAccountId from './sdk/utils/extract-address-from-accountId';
+import { isAddress } from 'ethers';
 
 interface AddressDriverResult {
   driver: 'address';
@@ -23,7 +22,7 @@ interface NFTDriverResult {
 }
 
 /**
- * "universalAcccountIdentifier" is either an .ens name, an ETH address, or a Drips User ID (any supported driver).
+ * "universalAccountIdentifier" is either an .ens name, an ETH address, or a Drips User ID (any supported driver).
  * This utility takes such an identifier (which e.g. may be navigated to via drips.network/<universalAcccountIdentifier>),
  * figures out which of the options it is, and returns an object describing the target.
  * @param universalAcccountIdentifier
@@ -46,21 +45,6 @@ export default async function (
       dripsAccountId,
     };
   } else if ((universalAcccountIdentifier as string).endsWith('.eth')) {
-    // Subscribe to ens.connected store and wait until it's true
-
-    const ensConnected = ens.connected;
-
-    if (!get(ensConnected)) {
-      await new Promise((resolve) => {
-        const unsubscribe = ensConnected.subscribe((connected) => {
-          if (connected) {
-            unsubscribe();
-            resolve(undefined);
-          }
-        });
-      });
-    }
-
     const lookup = await ens.reverseLookup(universalAcccountIdentifier);
     if (lookup) {
       const dripsAccountId = (
