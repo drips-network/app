@@ -12,6 +12,7 @@ import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
 import { Forge } from 'radicle-drips';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
+import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
@@ -32,18 +33,15 @@ async function fetchDripsProject(repoUrl: string) {
 
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
 
-  return await cached(
-    redis,
-    cacheKey,
-    172800,
-    () => query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
+  return await cached(redis, cacheKey, 172800, () =>
+    query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
       getProjectsQuery,
       {
         url: repoUrl,
       },
       fetch,
     ),
-  )
+  );
 }
 
 export const load = (async ({ params, fetch, url }) => {
@@ -67,6 +65,8 @@ export const load = (async ({ params, fetch, url }) => {
   let repo: z.infer<typeof repoSchema>;
 
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
+
+  if (!isSupportedGitUrl(repoUrl)) throw error(404);
 
   const [repoRes, projectRes] = await Promise.all([
     fetch(`/api/github/${encodeURIComponent(repoUrl)}`),

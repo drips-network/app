@@ -33,6 +33,9 @@
 
   onMount(() => {
     // When launching within a Safe, we donʼt want to display the landing page.
+    // There's a real redirect in the load function for this page too, but we're keeping
+    // this client-side thing here just in case the Sec-Fetch-Dest header isn't set for
+    // some reason.
     if (isRunningInSafe()) goto('/app', { replaceState: true });
   });
 
