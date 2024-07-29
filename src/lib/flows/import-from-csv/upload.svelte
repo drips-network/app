@@ -15,6 +15,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   // import Table from '$lib/components/table/table.svelte';
   import CsvExample from './components/csv-example.svelte';
+  import DropZone from './components/drop-zone.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   // import validateUrl from '$lib/utils/validate-url';
@@ -31,7 +32,9 @@
 
   // $: urlValid = tokenLogoUrl ? validateUrl(tokenLogoUrl) : true;
 
-  $: formValid = true;
+  let file: File | undefined = undefined;
+
+  $: formValid = !!file;
   // $: formValid =
   //   tokenAddressValidationState.type === 'valid' &&
   //   tokenName &&
@@ -76,6 +79,10 @@
   //   }
   // }
 
+  function handleDropZoneInput({ file: dropZoneFile }: { file: File }) {
+    file = dropZoneFile;
+  }
+
   function submit() {
     // assert(tokenAddress && tokenName && tokenDecimals && tokenSymbol);
 
@@ -90,6 +97,8 @@
 
     dispatch('goForward');
   }
+
+  function handleImport() {}
 </script>
 
 <StepLayout>
@@ -98,6 +107,13 @@
     description="Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:"
   ></StepHeader>
   <CsvExample />
+  <form on:submit|preventDefault={handleImport}>
+    <DropZone
+      on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
+      filetypes={['text/csv']}
+      instructions="Drop a CSV here to upload"
+    />
+  </form>
   <!-- <FormField title="Token contract address*">
     <TextInput
       placeholder="0x0000"
