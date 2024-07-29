@@ -10,6 +10,8 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -19,6 +21,10 @@
   const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
 
   let listValid = false;
+
+  function handleImportCSV() {
+    dispatch('sidestep', importFromCSVSteps());
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -31,7 +37,11 @@
       bind:items={$context.dripList.items}
       bind:valid={listValid}
       addOnMount={urlToAdd}
-    />
+    >
+      <svelte:fragment slot="triggers">
+        <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+      </svelte:fragment>
+    </ListEditor>
   </FormField>
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
