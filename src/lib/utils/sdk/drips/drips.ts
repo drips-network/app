@@ -6,10 +6,10 @@ import type {
   ExtractAbiFunctionNames,
 } from 'abitype';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
+import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import { dripsAbi, type DripsAbi } from './drips-abi';
-import toSafeDripsTx from '../utils/to-safe-drips-tx';
+import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 
 export async function executeDripsReadMethod<
@@ -43,5 +43,5 @@ export async function populateDripsWriteTx<
   const dripsAddress = getNetworkConfig().DRIPS;
   const drips = new Contract(dripsAddress, dripsAbi, signer);
 
-  return toSafeDripsTx(await drips[func].populateTransaction(...args));
+  return txToSafeDripsTx(await drips[func].populateTransaction(...args));
 }

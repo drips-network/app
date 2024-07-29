@@ -42,7 +42,7 @@
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
   import { toBigInt } from 'ethers';
-  import toContractAccountMetadata from '$lib/utils/sdk/utils/to-contract-account-metadata';
+  import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -93,7 +93,7 @@
               key: MetadataManagerBase.USER_METADATA_KEY,
               value: ipfsHash,
             },
-          ].map(toContractAccountMetadata);
+          ].map(keyValueToMetatada);
 
           const tx = await populateRepoDriverWriteTx({
             functionName: 'emitAccountMetadata',

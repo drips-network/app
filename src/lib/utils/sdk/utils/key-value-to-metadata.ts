@@ -1,7 +1,7 @@
 import { encodeBytes32String, hexlify, toUtf8Bytes } from 'ethers';
 import type { OxString } from '../sdk-types';
 
-export default function toContractAccountMetadata({ key, value }: { key: string; value: string }): {
+export default function keyValueToMetatada({ key, value }: { key: string; value: string }): {
   key: OxString;
   value: OxString;
 } {

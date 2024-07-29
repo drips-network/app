@@ -12,11 +12,12 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
-  import { getCallerClient } from '$lib/utils/get-drips-clients';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -48,8 +49,10 @@
             $context.dependencySplits,
           );
 
-          const callerClient = await getCallerClient();
-          const tx = await callerClient.populateCallBatchedTx(batch);
+          const tx = await populateCallerWriteTx({
+            functionName: 'callBatched',
+            args: [batch.map(txToCallerCall)],
+          });
 
           return {
             tx,

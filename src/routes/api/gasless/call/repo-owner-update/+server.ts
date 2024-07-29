@@ -2,12 +2,12 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { ethers, toUtf8Bytes } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
 import { GELATO_API_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
 import { getNetwork, isSupportedChainId } from '$lib/stores/wallet/network';
+import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 
 const payloadSchema = z.object({
   forge: z.number(),

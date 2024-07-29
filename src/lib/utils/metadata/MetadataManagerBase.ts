@@ -6,7 +6,7 @@ import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-pars
 import assert from '$lib/utils/assert';
 import type { executeNftDriverWriteMethod } from '../sdk/nft-driver/nft-driver';
 import type { TransactionResponse } from 'ethers';
-import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 
 type IpfsHash = string;
 type AccountId = string;
@@ -168,7 +168,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
       },
-    ].map(toContractAccountMetadata);
+    ].map(keyValueToMetatada);
 
     const tx = await this._emitMetadataFunc({
       functionName: 'emitAccountMetadata',

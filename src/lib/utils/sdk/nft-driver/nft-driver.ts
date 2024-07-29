@@ -6,12 +6,12 @@ import type {
   ExtractAbiFunctionNames,
 } from 'abitype';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
+import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
 import type { ContractTransaction } from 'ethers';
-import toSafeDripsTx from '../utils/to-safe-drips-tx';
+import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 
 export async function executeNftDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,
@@ -62,5 +62,5 @@ export async function populateNftDriverWriteTx<
   const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
   const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, signer);
 
-  return toSafeDripsTx(await nftDriver[func].populateTransaction(...args));
+  return txToSafeDripsTx(await nftDriver[func].populateTransaction(...args));
 }

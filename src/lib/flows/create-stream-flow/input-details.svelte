@@ -58,9 +58,10 @@
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { isAddress } from 'ethers';
-  import { getCallerClient } from '$lib/utils/get-drips-clients';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
   import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -186,7 +187,6 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const callerClient = await getCallerClient();
           const { signer } = $wallet;
           assert(signer, 'No signer available');
 
@@ -219,15 +219,17 @@
           });
 
           return {
-            callerClient,
             batch,
             newHash,
           };
         },
 
-        transactions: async ({ callerClient, batch }) => [
+        transactions: async ({ batch }) => [
           {
-            transaction: await callerClient.populateCallBatchedTx(batch),
+            transaction: await populateCallerWriteTx({
+              functionName: 'callBatched',
+              args: [batch.map(txToCallerCall)],
+            }),
             applyGasBuffer: true,
           },
         ],

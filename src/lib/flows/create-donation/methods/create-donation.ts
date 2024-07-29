@@ -9,7 +9,7 @@ import { MaxUint256, toBigInt } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import { populateAddressDriverWriteTx } from '$lib/utils/sdk/address-driver/address-driver';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
+import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,

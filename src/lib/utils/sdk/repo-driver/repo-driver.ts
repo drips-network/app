@@ -7,10 +7,10 @@ import type {
 } from 'abitype';
 import { repoDriverAbi, type RepoDriverAbi } from './repo-driver-abi';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
+import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import type { ContractTransaction } from 'ethers';
-import toSafeDripsTx from '../utils/to-safe-drips-tx';
+import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 
 export async function executeRepoDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>,
@@ -41,5 +41,5 @@ export async function populateRepoDriverWriteTx<
   const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
   const repoDriver = new Contract(repoDriverAddress, repoDriverAbi, provider);
 
-  return toSafeDripsTx(await repoDriver[func].populateTransaction(...args));
+  return txToSafeDripsTx(await repoDriver[func].populateTransaction(...args));
 }

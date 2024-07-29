@@ -1,4 +1,4 @@
-import { getCallerClient, getNetworkConfig } from '../get-drips-clients';
+import { getNetworkConfig } from '../sdk/utils/get-network-config';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
@@ -31,7 +31,9 @@ import {
 import type { ContractTransaction } from 'ethers';
 import { populateErc20WriteTx } from '../sdk/erc20/erc20';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
-import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
+import { populateCallerWriteTx } from '../sdk/caller/caller';
+import txToCallerCall from '../sdk/utils/tx-to-caller-call';
 
 type AccountId = string;
 
@@ -187,8 +189,10 @@ export default class DripListService {
       txs = [createDripListTx, setDripListSplitsTx];
     }
 
-    const callerClient = await getCallerClient();
-    const batch = await callerClient.populateCallBatchedTx(txs);
+    const batch = await populateCallerWriteTx({
+      functionName: 'callBatched',
+      args: [txs.map(txToCallerCall)],
+    });
 
     return {
       txs: [
@@ -292,7 +296,7 @@ export default class DripListService {
             key: MetadataManagerBase.USER_METADATA_KEY,
             value: ipfsHash,
           },
-        ].map(toContractAccountMetadata),
+        ].map(keyValueToMetatada),
       ],
     });
 

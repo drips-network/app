@@ -8,7 +8,7 @@ import type {
   CurrentStreamsQueryVariables,
 } from './__generated__/gql.generated';
 import { pin } from '../ipfs';
-import { getNetworkConfig } from '../get-drips-clients';
+import { getNetworkConfig } from '../sdk/utils/get-network-config';
 import { toBigInt, type ContractTransaction, type Signer } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
@@ -16,7 +16,7 @@ import makeStreamId, { decodeStreamId } from './make-stream-id';
 import extractAddressFromAccountId from '../sdk/utils/extract-address-from-accountId';
 import getOwnAccountId from '../sdk/utils/get-own-account-id';
 import { populateAddressDriverWriteTx } from '../sdk/address-driver/address-driver';
-import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import type { OxString } from '../sdk/sdk-types';
 import { formatStreamReceivers } from '../sdk/utils/format-stream-receivers';
 
@@ -430,7 +430,7 @@ export async function buildEditStreamBatch(
     batch.push(
       await populateAddressDriverWriteTx({
         functionName: 'emitAccountMetadata',
-        args: [[toContractAccountMetadata({ key: USER_METADATA_KEY, value: hash })]],
+        args: [[keyValueToMetatada({ key: USER_METADATA_KEY, value: hash })]],
       }),
     );
   }

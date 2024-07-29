@@ -20,7 +20,7 @@ import unreachable from '../unreachable';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
 import type { ContractTransaction } from 'ethers';
 import { populateDripsWriteTx } from '../sdk/drips/drips';
-import toContractAccountMetadata from '../sdk/utils/to-contract-account-metadata';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 
 interface ListEditorConfig {
   items: Items;
@@ -177,7 +177,7 @@ export default class GitProjectService {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: ipfsHash,
       },
-    ].map(toContractAccountMetadata);
+    ].map(keyValueToMetatada);
 
     const emitAccountMetadataTx = await populateRepoDriverWriteTx({
       functionName: 'emitAccountMetadata',
@@ -254,7 +254,7 @@ export default class GitProjectService {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: ipfsHash,
       },
-    ].map(toContractAccountMetadata);
+    ].map(keyValueToMetatada);
 
     const emitAccountMetadataTx = await populateRepoDriverWriteTx({
       functionName: 'emitAccountMetadata',

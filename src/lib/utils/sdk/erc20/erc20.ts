@@ -9,8 +9,8 @@ import { Contract, type ContractTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import { erc20Abi } from 'abitype/abis';
 import type { OxString } from '../sdk-types';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
-import toSafeDripsTx from '../utils/to-safe-drips-tx';
+import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
+import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 
 type Erc20Abi = typeof erc20Abi;
 
@@ -56,5 +56,5 @@ export async function populateErc20WriteTx<
 
   const erc20 = new Contract(token, erc20Abi, signer);
 
-  return toSafeDripsTx(await erc20[func].populateTransaction(...args));
+  return txToSafeDripsTx(await erc20[func].populateTransaction(...args));
 }

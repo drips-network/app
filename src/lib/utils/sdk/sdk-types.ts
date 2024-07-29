@@ -14,3 +14,9 @@ export type StreamReceiver = {
   accountId: bigint;
   config: bigint;
 };
+
+export type CallerCall = {
+  target: OxString;
+  data: OxString;
+  value: bigint;
+};

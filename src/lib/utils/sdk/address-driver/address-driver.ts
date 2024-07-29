@@ -6,13 +6,14 @@ import type {
   ExtractAbiFunctionNames,
 } from 'abitype';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/get-drips-clients';
 import { get } from 'svelte/store';
 import { addressDriverAbi, type AddressDriverAbi } from './address-driver-abi';
 import type { OxString } from '../sdk-types';
 import { executeErc20ReadMethod } from '../erc20/erc20';
-import toSafeDripsTx from '../utils/to-safe-drips-tx';
+import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
+import { getNetworkConfig } from '../utils/get-network-config';
+import { single } from '../utils/single-or-default';
 
 export async function executeAddressDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,
@@ -37,13 +38,15 @@ export async function populateAddressDriverWriteTx<
   functionName: functionName | ExtractAbiFunctionNames<AddressDriverAbi, 'nonpayable' | 'payable'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<ContractTransaction> {
-  const { provider } = get(wallet);
+  const { signer } = get(wallet);
+  assert(signer, 'Address driver contract call requires a signer but it is missing.');
+
   const { functionName: func, args } = config;
 
   const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
-  const addressDriver = new Contract(addressDriverAddress, addressDriverAbi, provider);
+  const addressDriver = new Contract(addressDriverAddress, addressDriverAbi, signer);
 
-  return toSafeDripsTx(await addressDriver[func].populateTransaction(...args));
+  return txToSafeDripsTx(await addressDriver[func].populateTransaction(...args));
 }
 
 export async function getAddressDriverAllowance(token: OxString): Promise<bigint> {
@@ -52,11 +55,11 @@ export async function getAddressDriverAllowance(token: OxString): Promise<bigint
 
   const spender = getNetworkConfig().ADDRESS_DRIVER as OxString;
 
-  return (
+  return single(
     await executeErc20ReadMethod({
       token,
       functionName: 'allowance',
       args: [owner, spender],
-    })
-  )[0];
+    }),
+  );
 }

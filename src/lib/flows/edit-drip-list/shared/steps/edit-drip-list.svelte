@@ -75,7 +75,6 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { getCallerClient } from '$lib/utils/get-drips-clients';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -103,7 +102,9 @@
     populateNftDriverWriteTx,
   } from '$lib/utils/sdk/nft-driver/nft-driver';
   import { toBigInt } from 'ethers';
-  import toContractAccountMetadata from '$lib/utils/sdk/utils/to-contract-account-metadata';
+  import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -203,12 +204,14 @@
                   key: MetadataManagerBase.USER_METADATA_KEY,
                   value: hash,
                 },
-              ].map(toContractAccountMetadata),
+              ].map(keyValueToMetatada),
             ],
           });
 
-          const callerClient = await getCallerClient();
-          const tx = await callerClient.populateCallBatchedTx([setSplitsTx, metadataTx]);
+          const tx = await populateCallerWriteTx({
+            functionName: 'callBatched',
+            args: [[setSplitsTx, metadataTx].map(txToCallerCall)],
+          });
 
           return { tx };
         },
