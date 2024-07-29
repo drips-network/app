@@ -1,29 +1,39 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import BallotBox from '../illustrations/ballot-box.svelte';
+  import Collaborators from '../illustrations/collaborators.svelte';
+  import Envelope from '../illustrations/envelope.svelte';
+  import DripList from '../illustrations/drip-list.svelte';
   import ResponsiveFlowChart, { type Step } from './responsive-flow-chart.svelte';
+  import OneBalance from '../illustrations/one-balance.svelte';
 
   let steps: Step[] = [
     {
       heading: 'Choose collaborators',
       text: 'Add anyone with an Ethereum address. These collaborators will vote on the final recipients.',
+      illustration: Collaborators,
     },
     {
       heading: 'Nominate recipients',
       text: 'Each collaborator can nominate any Ethereum address or GitHub project.',
       customClasses: 'border-dashed',
+      illustration: Envelope,
       isOptional: true,
     },
     {
       heading: 'Vote on recipients',
       text: 'Decide what percent of funds each recipient should receive.',
+      illustration: BallotBox,
     },
     {
       heading: 'Publish the list',
       text: 'Once your list is published, you (or anyone) can send one-time or recurring funds to it.',
+      illustration: DripList,
     },
     {
       heading: 'Funds cascade down',
       text: 'Recipients split incoming funds among their maintainers and other projects.',
+      illustration: OneBalance,
     },
     {
       heading: 'Have an idea?',

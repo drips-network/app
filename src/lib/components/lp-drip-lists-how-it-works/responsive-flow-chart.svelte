@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   export interface Step {
     path?: SVGPathElement;
+    illustration?: ComponentType;
     heading: string;
     text: string;
     position?: Pick<DOMRect, 'top' | 'left' | 'width' | 'height'>;
@@ -14,7 +15,7 @@
 </script>
 
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, type ComponentType } from 'svelte';
   import Button from '../button/button.svelte';
 
   let wrapper: HTMLDivElement;
@@ -73,7 +74,11 @@
             Optional
           </div>
         {/if}
-        <figure class="h-30 w-30 bg-gray-100" />
+        {#if step.illustration}
+          <div class="h-30 w-30 illustration">
+            <svelte:component this={step.illustration} />
+          </div>
+        {/if}
         <h3 class="text-typo-header-1 font-pixelated leading-[1]">{step.heading}</h3>
         <p>{step.text}</p>
         {#if step.button}
