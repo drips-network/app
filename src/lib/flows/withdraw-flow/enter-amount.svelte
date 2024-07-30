@@ -22,7 +22,6 @@
   import unreachable from '$lib/utils/unreachable';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { constants } from 'radicle-drips';
   import type { Writable } from 'svelte/store';
   import type { WithdrawFlowState } from './withdraw-flow-state';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -37,6 +36,7 @@
     CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT,
     streamCurrentAmountsStore,
   } from '../../utils/current-amounts';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -60,7 +60,7 @@
       validationState = { type: 'valid' };
     } else if (amountWei && amountWei > 0n) {
       if (
-        amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) <
+        amountWei * BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER) <
         $currentAmountsStore.currentAmount.amount
       ) {
         validationState = { type: 'valid' };

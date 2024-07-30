@@ -1,5 +1,4 @@
 import { toBigInt, type ContractTransaction } from 'ethers';
-import type { AccountMetadata } from 'radicle-drips';
 import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser';
@@ -7,6 +6,7 @@ import assert from '$lib/utils/assert';
 import type { executeNftDriverWriteMethod } from '../sdk/nft-driver/nft-driver';
 import type { TransactionResponse } from 'ethers';
 import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
+import type { MetadataKeyValue } from '../sdk/sdk-types';
 
 type IpfsHash = string;
 type AccountId = string;
@@ -31,7 +31,7 @@ export interface IMetadataManager<TParser extends Parser> {
 
 export type EmitMetadataFunc = (
   accountId: string,
-  accountMetadata: AccountMetadata[],
+  accountMetadata: MetadataKeyValue[],
 ) => Promise<ContractTransaction>;
 
 export default abstract class MetadataManagerBase<TParser extends Parser>

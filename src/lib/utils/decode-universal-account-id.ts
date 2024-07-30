@@ -1,9 +1,9 @@
 import ens from '$lib/stores/ens';
-import { Utils } from 'radicle-drips';
 import { executeAddressDriverReadMethod } from './sdk/address-driver/address-driver';
 import type { OxString } from './sdk/sdk-types';
 import extractAddressFromAccountId from './sdk/utils/extract-address-from-accountId';
 import { isAddress } from 'ethers';
+import { extractDriverNameFromAccountId } from './sdk/utils/extract-driver-from-accountId';
 
 interface AddressDriverResult {
   driver: 'address';
@@ -67,7 +67,7 @@ export default async function (
     // User ID param has only numbers and is probably a drips user ID
     const dripsAccountId = universalAcccountIdentifier;
 
-    const driver = Utils.AccountId.getDriver(dripsAccountId);
+    const driver = extractDriverNameFromAccountId(dripsAccountId);
 
     if (driver === 'address') {
       const address = extractAddressFromAccountId(universalAcccountIdentifier);

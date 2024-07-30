@@ -1,8 +1,8 @@
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
-import { type NetworkConfig } from 'radicle-drips';
 import { get } from 'svelte/store';
 import isTest from '../../is-test';
+import type { NetworkConfig } from '../sdk-types';
 
 /**
  * NetworkConfig object that is aware of being ran in an E2E-test environment, so that
@@ -263,9 +263,7 @@ export const networkConfigs = isTest()
  * Get the networkConfig for the current network.
  * @returns The networkConfig for the current network.
  */
-export function getNetworkConfig(
-  chainId = get(wallet).network.chainId,
-): Omit<NetworkConfig, 'SUBGRAPH_URL'> {
+export function getNetworkConfig(chainId = get(wallet).network.chainId): NetworkConfig {
   const config = networkConfigs[chainId];
   assert(config, `No network config found for chainId ${chainId}`);
 

@@ -96,7 +96,6 @@
     "isomorphic-fetch": "^3.0.0",
     "jimp": "^0.22.12",
     "lodash": "^4.17.21",
-    "radicle-drips": "github:drips-network/sdk",
     "redis": "^4.6.14",
     "sanitize-html": "^2.13.0",
     "satori": "^0.10.13",

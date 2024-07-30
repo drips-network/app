@@ -5,7 +5,6 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
-  import { constants } from 'radicle-drips';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -16,6 +15,7 @@
   import unreachable from '$lib/utils/unreachable';
   import Token from '../token/token.svelte';
   import { formatUnits } from 'ethers';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   export let streamRateValueParsed: bigint | undefined = undefined;
   export let topUpAmountValueParsed: bigint | undefined = undefined;
@@ -34,7 +34,7 @@
       ? formatUnits(
           streamRateValueParsed,
           (tokensStore.getByAddress(selectedTokenAddress)?.info.decimals ?? unreachable()) +
-            constants.AMT_PER_SEC_EXTRA_DECIMALS,
+            contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
       : '';
   let topUpAmountValue =
@@ -106,7 +106,7 @@
         streamRateValue && selectedToken
           ? parseTokenAmount(
               streamRateValue,
-              selectedToken.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+              selectedToken.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
             )
           : undefined;
     }
@@ -200,7 +200,8 @@
     const { decimals } = selectedToken.info;
 
     topUpAmountValue = formatUnits(
-      ((streamRateValueParsed ?? 0n) / BigInt(constants.AMT_PER_SEC_MULTIPLIER)) * BigInt(months),
+      ((streamRateValueParsed ?? 0n) / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER)) *
+        BigInt(months),
       decimals,
     );
   }

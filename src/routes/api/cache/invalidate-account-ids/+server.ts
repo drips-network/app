@@ -1,6 +1,5 @@
 import { redis, type RedisClientType } from '../../redis';
 import query from '$lib/graphql/dripsQL';
-import { Utils } from 'radicle-drips';
 import isClaimed from '$lib/utils/project/is-claimed';
 import type {
   DripListAssociatedAccountIdsQuery,
@@ -13,6 +12,7 @@ import {
   projectAssociatedAccountIdsQuery,
 } from './queries/associated-account-ids-queries';
 import { error } from '@sveltejs/kit';
+import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
 const ENABLE_INVALIDATE_LOGS = true;
 
@@ -115,7 +115,7 @@ export const POST = async ({ request }) => {
 
   await Promise.all(
     validAccountIds.map((accountId) => {
-      const driver = Utils.AccountId.getDriver(accountId);
+      const driver = extractDriverNameFromAccountId(accountId);
 
       switch (driver) {
         case 'repo':

@@ -1,6 +1,5 @@
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
-import { AddressDriverPresets, Utils } from 'radicle-drips';
 import randomBigintUntilUnique from '../random-bigint-until-unique';
 import { addressDriverAccountMetadataParser } from '../metadata/schemas';
 import type {
@@ -8,7 +7,6 @@ import type {
   CurrentStreamsQueryVariables,
 } from './__generated__/gql.generated';
 import { pin } from '../ipfs';
-import { getNetworkConfig } from '../sdk/utils/get-network-config';
 import { toBigInt, type ContractTransaction, type Signer } from 'ethers';
 import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
@@ -16,9 +14,12 @@ import makeStreamId, { decodeStreamId } from './make-stream-id';
 import extractAddressFromAccountId from '../sdk/utils/extract-address-from-accountId';
 import getOwnAccountId from '../sdk/utils/get-own-account-id';
 import { populateAddressDriverWriteTx } from '../sdk/address-driver/address-driver';
-import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import type { OxString } from '../sdk/sdk-types';
 import { formatStreamReceivers } from '../sdk/utils/format-stream-receivers';
+import { streamConfigFromUint256, streamConfigToUint256 } from '../sdk/utils/stream-config-utils';
+import { extractDriverNameFromAccountId } from '../sdk/utils/extract-driver-from-accountId';
+import populateNewStreamFlowTxs from '../sdk/address-driver/populate-create-new-stream-flow-txs';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 
 type NewStreamOptions = {
   tokenAddress: string;
@@ -30,7 +31,6 @@ type NewStreamOptions = {
 };
 
 const METADATA_PARSER = addressDriverAccountMetadataParser;
-const { ADDRESS_DRIVER: ADDRESS_DRIVER_ADDRESS } = getNetworkConfig();
 const USER_METADATA_KEY = 'ipfs';
 
 export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: string) {
@@ -126,7 +126,7 @@ function _buildMetadata(
             id: makeStreamId(accountId, newStream.tokenAddress, newStream.dripId.toString()),
             name: newStream.name,
             config: {
-              raw: Utils.StreamConfiguration.toUint256({
+              raw: streamConfigToUint256({
                 dripId: newStream.dripId,
                 start: BigInt(newStream.startAt?.getTime() ?? 0) / 1000n,
                 duration: BigInt(newStream.durationSeconds ?? 0),
@@ -159,7 +159,7 @@ function _buildMetadata(
       return {
         tokenAddress,
         streams: streams.map((stream) => {
-          const recipientDriver = Utils.AccountId.getDriver(stream.receiver.account.accountId);
+          const recipientDriver = extractDriverNameFromAccountId(stream.receiver.account.accountId);
 
           let supportedDriver: 'address' | 'nft' | 'repo';
 
@@ -206,7 +206,7 @@ export async function buildStreamCreateBatchTx(
   );
 
   const newStreamDripId = randomBigintUntilUnique(
-    currentReceivers.map((r) => Utils.StreamConfiguration.fromUint256(r.config).dripId),
+    currentReceivers.map((r) => streamConfigFromUint256(r.config).dripId),
     4,
   );
 
@@ -216,7 +216,7 @@ export async function buildStreamCreateBatchTx(
     amountPerSecond: amountPerSec,
   } = streamOptions;
 
-  const newStreamConfig = Utils.StreamConfiguration.toUint256({
+  const newStreamConfig = streamConfigToUint256({
     dripId: newStreamDripId,
     start: BigInt(scheduleStartAt?.getTime() ?? 0) / 1000n,
     duration: BigInt(scheduleDurationSeconds ?? 0),
@@ -230,27 +230,30 @@ export async function buildStreamCreateBatchTx(
 
   const newHash = await pin(newMetadata);
 
+  const currentRec = currentReceivers.map((r) => ({
+    accountId: r.accountId,
+    config: streamConfigFromUint256(r.config),
+  }));
+
   return {
     newHash,
-    batch: await AddressDriverPresets.Presets.createNewStreamFlow({
-      signer,
-      driverAddress: ADDRESS_DRIVER_ADDRESS,
-      tokenAddress: streamOptions.tokenAddress,
-      currentReceivers,
+    batch: await populateNewStreamFlowTxs({
+      tokenAddress: streamOptions.tokenAddress as OxString,
+      currentReceivers: currentRec,
       newReceivers: [
-        ...currentReceivers,
+        ...currentRec,
         {
-          config: newStreamConfig,
-          accountId: streamOptions.recipientAccountId,
+          config: streamConfigFromUint256(newStreamConfig),
+          accountId: toBigInt(streamOptions.recipientAccountId),
         },
       ],
       accountMetadata: [
-        {
+        keyValueToMetatada({
           key: USER_METADATA_KEY,
           value: newHash,
-        },
+        }),
       ],
-      balanceDelta: topUpAmount ?? 0,
+      balanceDelta: topUpAmount ?? 0n,
       transferToAddress: extractAddressFromAccountId(ownAccountId),
     }),
   };
@@ -277,24 +280,28 @@ export async function buildStreamDeleteBatchTx(signer: Signer, streamId: string)
   const newHash = await pin(metadata);
 
   const newReceivers = currentReceivers.filter(
-    (r) => Utils.StreamConfiguration.fromUint256(r.config).dripId.toString() !== dripId,
+    (r) => streamConfigFromUint256(r.config).dripId.toString() !== dripId,
   );
 
   return {
     newHash,
-    batch: await AddressDriverPresets.Presets.createNewStreamFlow({
-      signer,
-      driverAddress: ADDRESS_DRIVER_ADDRESS,
-      tokenAddress,
-      currentReceivers,
-      newReceivers,
+    batch: await populateNewStreamFlowTxs({
+      tokenAddress: tokenAddress as OxString,
+      currentReceivers: currentReceivers.map((r) => ({
+        accountId: r.accountId,
+        config: streamConfigFromUint256(r.config),
+      })),
+      newReceivers: newReceivers.map((r) => ({
+        accountId: r.accountId,
+        config: streamConfigFromUint256(r.config),
+      })),
       accountMetadata: [
-        {
+        keyValueToMetatada({
           key: USER_METADATA_KEY,
           value: newHash,
-        },
+        }),
       ],
-      balanceDelta: 0,
+      balanceDelta: 0n,
       transferToAddress: extractAddressFromAccountId(ownAccountId),
     }),
   };
@@ -327,7 +334,7 @@ export async function buildPauseStreamPopulatedTx(streamId: string) {
   const { currentReceivers } = await _getCurrentStreamsAndReceivers(ownAccountId, tokenAddress);
 
   const newReceivers = currentReceivers.filter((r) => {
-    const streamConfig = Utils.StreamConfiguration.fromUint256(r.config);
+    const streamConfig = streamConfigFromUint256(r.config);
     return streamConfig.dripId.toString() !== dripId;
   });
 
@@ -437,12 +444,12 @@ export async function buildEditStreamBatch(
 
   if (newData.amountPerSecond) {
     const newReceivers = currentReceivers.map((r) => {
-      const streamConfig = Utils.StreamConfiguration.fromUint256(r.config);
+      const streamConfig = streamConfigFromUint256(r.config);
 
       if (streamConfig.dripId.toString() === dripId) {
         return {
           accountId: r.accountId,
-          config: Utils.StreamConfiguration.toUint256({
+          config: streamConfigToUint256({
             dripId: streamConfig.dripId,
             start: streamConfig.start,
             duration: streamConfig.duration,

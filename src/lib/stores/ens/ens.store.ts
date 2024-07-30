@@ -19,31 +19,38 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
-    const { provider } = get(walletStore);
+    try {
+      const { provider } = get(walletStore);
 
-    const saved = get(state)[address];
-    if (saved) return;
+      const saved = get(state)[address];
+      if (saved) return;
 
-    // Initially write an empty object to prevent multiple in-flight requests
-    // for the same name
-    state.update((s) => ({ ...s, [address]: {} }));
+      // Initially write an empty object to prevent multiple in-flight requests
+      // for the same name
+      state.update((s) => ({ ...s, [address]: {} }));
 
-    const lookups = [provider.lookupAddress(address), provider.getAvatar(address)];
+      const lookups = [provider.lookupAddress(address), provider.getAvatar(address)];
 
-    const [name, avatarUrl] = await Promise.all(lookups);
+      const [name, avatarUrl] = await Promise.all(lookups);
 
-    if (name || avatarUrl) {
-      const resolvedRecord = {
-        name: name ?? undefined,
-        avatarUrl: avatarUrl ?? undefined,
-      };
+      if (name || avatarUrl) {
+        const resolvedRecord = {
+          name: name ?? undefined,
+          avatarUrl: avatarUrl ?? undefined,
+        };
 
-      state.update((s) => ({
-        ...s,
-        [address]: resolvedRecord,
-      }));
+        state.update((s) => ({
+          ...s,
+          [address]: resolvedRecord,
+        }));
 
-      return resolvedRecord;
+        return resolvedRecord;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('Failed to resolve ENS name:', error); // eslint-disable-line no-console
+
+      return undefined;
     }
   }
 

@@ -41,7 +41,6 @@
   import unreachable from '$lib/utils/unreachable';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { constants } from 'radicle-drips';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
@@ -59,6 +58,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -73,7 +73,7 @@
   $: newAmountValueParsed = $context.newAmountValue
     ? parseTokenAmount(
         $context.newAmountValue,
-        token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+        token.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
       )
     : undefined;
 

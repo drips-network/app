@@ -26,7 +26,6 @@
   import tokens from '$lib/stores/tokens';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import Button from '$lib/components/button/button.svelte';
-  import { constants } from 'radicle-drips';
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet/wallet.store';
@@ -62,6 +61,7 @@
   import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -129,7 +129,7 @@
     $context.amountValue && selectedToken
       ? parseTokenAmount(
           $context.amountValue,
-          selectedToken?.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+          selectedToken?.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
       : undefined;
 
