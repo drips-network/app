@@ -1,5 +1,6 @@
 import { get, writable } from 'svelte/store';
-import walletStore from '../wallet/wallet.store';
+import assert from '$lib/utils/assert';
+import type { AbstractProvider } from 'ethers';
 
 export interface ResolvedRecord {
   name?: string;
@@ -12,6 +13,19 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
+  const connected = writable(false);
+
+  let provider: AbstractProvider | undefined;
+
+  /**
+   * Connect the store to a provider, which is needed in order to resolve ENS
+   * records.
+   * @param toProvider The provider to connect to.
+   */
+  function connect(toProvider: AbstractProvider) {
+    provider = toProvider;
+    connected.set(true);
+  }
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -19,17 +33,14 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
+    const saved = get(state)[address];
+    if (saved) return;
+
+    // Initially write an empty object to prevent multiple in-flight requests
+    // for the same name
+    state.update((s) => ({ ...s, [address]: {} }));
     try {
-      const { provider } = get(walletStore);
-
-      const saved = get(state)[address];
-      if (saved) return;
-
-      // Initially write an empty object to prevent multiple in-flight requests
-      // for the same name
-      state.update((s) => ({ ...s, [address]: {} }));
-
-      const lookups = [provider.lookupAddress(address), provider.getAvatar(address)];
+      const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
 
       const [name, avatarUrl] = await Promise.all(lookups);
 
@@ -63,7 +74,10 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
-    const { provider } = get(walletStore);
+    assert(
+      provider,
+      'You need to `connect` the store to a provider before being able to reverse lookup',
+    );
 
     const saved = Object.entries(get(state)).find((entry) => entry[1].name === name);
 
@@ -82,6 +96,8 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
+    connect,
+    connected: { subscribe: connected.subscribe },
     lookup,
     reverseLookup,
     clear,
