@@ -102,6 +102,7 @@
     "satori": "^0.10.13",
     "satori-html": "^0.3.2",
     "twemoji": "^14.0.2",
+    "udsv": "^0.5.3",
     "zod": "^3.23.8"
   },
   "overrides": {
