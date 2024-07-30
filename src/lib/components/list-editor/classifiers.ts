@@ -10,10 +10,10 @@ import {
 import { getAddress, getDripList, getProject } from './hydrators';
 import { isAddress } from 'ethers/lib/utils';
 import { buildRepositoryURL, isDripsProjectUrl } from '../../utils/build-repo-url';
+import type { RecipientClassification } from './types';
 
-export const classifyRecipient = (input: string) => {
+export const classifyRecipient = (input: string): RecipientClassification => {
   if (isSupportedGitUrl(input)) {
-    // await addProject(value);
     return {
       type: 'project',
       value: reformatUrl(input),
@@ -27,7 +27,6 @@ export const classifyRecipient = (input: string) => {
   }
 
   if (input.endsWith('.eth') || isAddress(input)) {
-    // await addAddress(value);
     return {
       type: 'address',
       value: input,
@@ -49,10 +48,8 @@ export const classifyRecipient = (input: string) => {
       },
       fetch() {
         return getDripList(this.value);
-        // return getDripList(this.value);
       },
     };
-    // await addDripList(value);
   }
 
   if (isDripsProjectUrl(input)) {
@@ -65,8 +62,6 @@ export const classifyRecipient = (input: string) => {
       fetch() {
         return getProject(this.value);
       },
-
-      // await addDripsProject(value);
     };
   }
 

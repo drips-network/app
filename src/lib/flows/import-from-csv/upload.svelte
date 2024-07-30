@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import CsvExample from './components/csv-example.svelte';
   import DropZone from './components/drop-zone.svelte';
@@ -32,7 +32,6 @@
   }
 
   function addItem(key: AccountId, item: ListEditorItem, weight: number) {
-    // $context.dripList.items
     context.update((c) => {
       c.dripList.items = {
         ...c.dripList.items,
@@ -59,6 +58,7 @@
       const data = (await parseFile(file)) as Array<[string, number]>;
       // clear the existing recipient entries
       clearItems();
+
       for (const [recipient, split] of data.slice(0, 200)) {
         // probably a header, skip it
         if (isNaN(split)) {
@@ -80,19 +80,17 @@
           continue;
         }
 
-        const { accountId, project, address, dripList } = await classification?.fetch();
-        addItem(
-          accountId,
-          {
-            type: classification.type,
-            project,
-            address,
-            dripList,
-          },
-          split,
-        );
-        console.log('We found the thing', recipient, split, accountId, project, address, dripList);
-        dispatch('conclude')
+        const recipientResult = await classification?.fetch();
+        if (!recipientResult) {
+          // TODO: add error for the line
+          continue
+        }
+
+        const { accountId, ...rest } = recipientResult
+        // TODO: kinda sus
+        const listEditorItem = { type: classification.type, ...rest } as ListEditorItem
+        console.log('We found the thing', recipient, split, listEditorItem);
+        addItem(accountId, listEditorItem, split);
 
         // Now go through the entries
         // determine what they area
@@ -103,6 +101,8 @@
 
         // console.log(recipient, split)
       }
+
+      dispatch('conclude');
     } catch (error) {
       console.error('Something bad happened', error);
     }

@@ -49,3 +49,17 @@ export type AccountId = string;
 
 export type Items = Record<AccountId, ListEditorItem>;
 export type Weights = Record<AccountId, number>;
+
+export type RecipientResult = {
+  accountId: string;
+  dripList?: ListEditorDripListFragment;
+  project?: ListEditorProjectFragment;
+  address?: string;
+} | null;
+
+export type RecipientClassification = {
+  type: 'project' | 'address' | 'drip-list';
+  value: string;
+  validate: () => Promise<boolean>;
+  fetch: () => Promise<RecipientResult>;
+} | null;

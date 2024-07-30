@@ -8,8 +8,9 @@ import query from '../../graphql/dripsQL';
 import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT } from './types';
 import { getAddressDriverClient } from '../../utils/get-drips-clients';
 import { gql } from 'graphql-request';
+import type { RecipientResult } from './types';
 
-export const getDripList = async (dripListId: string) => {
+export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(
     gql`
       ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
@@ -35,7 +36,7 @@ export const getDripList = async (dripListId: string) => {
   };
 };
 
-export const getProject = async (url: string) => {
+export const getProject = async (url: string): Promise<RecipientResult> => {
   const res = await query<GetProjectQuery, GetProjectQueryVariables>(
     gql`
       ${LIST_EDITOR_PROJECT_FRAGMENT}
@@ -68,7 +69,7 @@ export const getProject = async (url: string) => {
   };
 };
 
-export const getAddress = async (address: string) => {
+export const getAddress = async (address: string): Promise<RecipientResult> => {
   const addressDriverClient = await getAddressDriverClient();
   const accountId = await addressDriverClient.getAccountIdByAddress(address);
   return {
