@@ -171,10 +171,6 @@
 </script>
 
 <div class="list-editor" class:with-outline={outline}>
-  <!-- TODO: only display if the trigger slot has content-->
-  <div class="triggers mb-4">
-    <slot name="triggers" />
-  </div>
   <div class="inner">
     {#if isEditable}
       <ListEditorInput
@@ -258,14 +254,6 @@
   .items {
     max-height: 24rem;
     overflow: scroll;
-  }
-
-  .triggers {
-    display: flex;
-    justify-content: end;
-    /* position: absolute; */
-    right: 0;
-    top: 0;
   }
 
   @container (max-width: 600px) {

@@ -37,11 +37,10 @@
       bind:items={$context.dripList.items}
       bind:valid={listValid}
       addOnMount={urlToAdd}
-    >
-      <svelte:fragment slot="triggers">
-        <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
-      </svelte:fragment>
-    </ListEditor>
+    />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+    </svelte:fragment>
   </FormField>
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
