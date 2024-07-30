@@ -14,6 +14,7 @@ import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 import { getNetworkConfig } from '../utils/get-network-config';
 import { single } from '../utils/single';
+import assert from '$lib/utils/assert';
 
 export async function executeAddressDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,

@@ -11,6 +11,7 @@ import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import type { ContractTransaction } from 'ethers';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
+import assert from '$lib/utils/assert';
 
 export async function executeRepoDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>,
@@ -35,11 +36,13 @@ export async function populateRepoDriverWriteTx<
   functionName: functionName | ExtractAbiFunctionNames<RepoDriverAbi, 'nonpayable' | 'payable'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
 }): Promise<ContractTransaction> {
-  const { provider } = get(wallet);
+  const { signer } = get(wallet);
+  assert(signer, 'Repo Driver contract call requires a signer but it is missing.');
+
   const { functionName: func, args } = config;
 
   const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
-  const repoDriver = new Contract(repoDriverAddress, repoDriverAbi, provider);
+  const repoDriver = new Contract(repoDriverAddress, repoDriverAbi, signer);
 
   return txToSafeDripsTx(await repoDriver[func].populateTransaction(...args));
 }

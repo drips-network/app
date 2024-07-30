@@ -12,6 +12,7 @@ import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
 import type { ContractTransaction } from 'ethers';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
+import assert from '$lib/utils/assert';
 
 export async function executeNftDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,

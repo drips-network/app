@@ -11,6 +11,7 @@ import { get } from 'svelte/store';
 import { dripsAbi, type DripsAbi } from './drips-abi';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
+import assert from '$lib/utils/assert';
 
 export async function executeDripsReadMethod<
   functionName extends ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>,

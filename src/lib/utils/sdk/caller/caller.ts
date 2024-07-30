@@ -11,6 +11,7 @@ import { callerAbi, type CallerAbi } from './caller-abi';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 import { getNetworkConfig } from '../utils/get-network-config';
+import assert from '$lib/utils/assert';
 
 export async function populateCallerWriteTx<
   functionName extends ExtractAbiFunctionNames<CallerAbi, 'nonpayable' | 'payable'>,
