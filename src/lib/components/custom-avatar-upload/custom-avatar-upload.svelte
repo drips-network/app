@@ -160,7 +160,7 @@
       {:else if error === 'too-large'}
         File exceeds 5MB
       {:else if error === 'upload-failed'}
-        Upload failed. Pleae try again later.
+        Upload failed. Please try again later.
       {:else if error === 'too-many-files'}
         Only drop a single file
       {/if}
