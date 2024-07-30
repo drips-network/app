@@ -1,5 +1,5 @@
 import { executeDripsReadMethod } from '../sdk/drips/drips';
-import { single } from '../sdk/utils/single-or-default';
+import { single } from '../sdk/utils/single';
 
 /**
  * Fetches the current Drips cycle from on-chain and calculates the start and end dates.

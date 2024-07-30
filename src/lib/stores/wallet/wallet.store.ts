@@ -21,7 +21,6 @@ import { BrowserProvider, InfuraProvider } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
-import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -228,7 +227,12 @@ const walletStore = () => {
     state.set({
       connected: true,
       address: accounts[0].address,
-      dripsAccountId: await getOwnAccountId(),
+      dripsAccountId: (
+        await executeAddressDriverReadMethod({
+          functionName: 'calcAccountId',
+          args: [signer.address as OxString],
+        })
+      ).toString(),
       provider,
       signer,
       network: getNetwork(Number((await provider.getNetwork()).chainId)),

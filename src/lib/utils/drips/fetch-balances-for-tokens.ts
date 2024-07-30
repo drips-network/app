@@ -2,7 +2,7 @@ import { toBigInt } from 'ethers';
 import mapFilterUndefined from '../map-filter-undefined';
 import { executeDripsReadMethod } from '../sdk/drips/drips';
 import type { OxString } from '../sdk/sdk-types';
-import { single } from '../sdk/utils/single-or-default';
+import { single } from '../sdk/utils/single';
 
 interface Amount {
   tokenAddress: string;

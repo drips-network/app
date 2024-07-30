@@ -13,7 +13,7 @@ import { executeErc20ReadMethod } from '../erc20/erc20';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 import { getNetworkConfig } from '../utils/get-network-config';
-import { single } from '../utils/single-or-default';
+import { single } from '../utils/single';
 
 export async function executeAddressDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,
