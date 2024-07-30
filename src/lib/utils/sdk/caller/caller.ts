@@ -25,7 +25,7 @@ export async function populateCallerWriteTx<
 
   const { functionName: func, args } = config;
 
-  const callerAddress = getNetworkConfig().ADDRESS_DRIVER;
+  const callerAddress = getNetworkConfig().CALLER;
   const caller = new Contract(callerAddress, callerAbi, signer);
 
   return txToSafeDripsTx(await caller[func].populateTransaction(...args));
