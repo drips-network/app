@@ -23,7 +23,12 @@ function mapGhResponse(response: Awaited<ReturnType<(typeof github)['getRepoByUr
 }
 
 export const GET: RequestHandler = async ({ params }) => {
-  const { repoUrl } = uriDecodeParams(params);
+  let repoUrl: string;
+  try {
+    repoUrl = uriDecodeParams(params).repoUrl;
+  } catch {
+    throw error(400);
+  }
 
   try {
     const lowercaseRepoUrl = repoUrl.toLowerCase();
