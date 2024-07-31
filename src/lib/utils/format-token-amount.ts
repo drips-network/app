@@ -47,7 +47,7 @@ export default function formatTokenAmount(
   tokenDecimals: number,
   precisionMultiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
   preserveTrailingZeroes = true,
-  maxDecimals = Math.min(MAX_DECIMAL_ZEROES_IN_MOTION, tokenDecimals),
+  maxDecimals = Math.min(MAX_DECIMAL_ZEROES_IN_MOTION, Number(tokenDecimals)),
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 

@@ -12,6 +12,7 @@ import type { OxString, UnwrappedEthersResult } from '../sdk-types';
 import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import unwrapEthersResult from '../utils/unwrap-ethers-result';
+import assert from '$lib/utils/assert';
 
 type Erc20Abi = typeof erc20Abi;
 

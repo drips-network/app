@@ -3,6 +3,7 @@ import type { MetadataKeyValue, OxString, StreamConfig } from '../sdk-types';
 import contractConstants from '../utils/contract-constants';
 import { populateAddressDriverWriteTx } from './address-driver';
 import { streamConfigToUint256 } from '../utils/stream-config-utils';
+import { formatStreamReceivers } from '../utils/format-stream-receivers';
 
 type NewStreamFlowPayload = {
   tokenAddress: OxString;
@@ -35,15 +36,19 @@ export default async function populateNewStreamFlowTxs(
     functionName: 'setStreams',
     args: [
       tokenAddress,
-      currentReceivers.map((receiver) => ({
-        accountId: receiver.accountId,
-        config: streamConfigToUint256(receiver.config),
-      })),
+      formatStreamReceivers(
+        currentReceivers.map((receiver) => ({
+          accountId: receiver.accountId,
+          config: streamConfigToUint256(receiver.config),
+        })),
+      ),
       balanceDelta,
-      newReceivers.map((receiver) => ({
-        accountId: receiver.accountId,
-        config: streamConfigToUint256(receiver.config),
-      })),
+      formatStreamReceivers(
+        newReceivers.map((receiver) => ({
+          accountId: receiver.accountId,
+          config: streamConfigToUint256(receiver.config),
+        })),
+      ),
       0,
       0,
       transferToAddress,
