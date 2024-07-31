@@ -23,7 +23,7 @@ export const POST = async ({ request }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (stream as any)['path'] = 'avatar.png';
 
-  const pin = await pinata.pinFileToIPFS(stream);
+  const pin = await pinata.pinFileToIPFS(stream, { pinataMetadata: { name: 'avatar' } });
 
   return new Response(JSON.stringify(pin));
 };
