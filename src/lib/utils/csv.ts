@@ -13,16 +13,15 @@ export const parse = <T extends unknown[] = []>(csvString: string | undefined): 
   return parser.typedArrs(csvString);
 };
 
-export const parseFile = (file: File | undefined) => {
+export const parseFile = <T extends unknown[] = []>(file: File | undefined): Promise<T[]> => {
   return new Promise((resolve, reject) => {
     if (!file) {
-      return resolve(null);
+      return resolve([]);
     }
 
     const fileReader = new FileReader();
     fileReader.addEventListener('load', () => {
-      // TODO: not very cool and type scripty here.
-      const parsedContent = parse(fileReader.result as string);
+      const parsedContent = parse(fileReader.result as string) as T[];
       resolve(parsedContent);
     });
     fileReader.addEventListener('error', reject);

@@ -32,7 +32,7 @@
     }
   }
 
-  let uploading = false;
+  export let loading = false;
 
   let uploadSuccess = false;
   $: {
@@ -45,7 +45,7 @@
 
   function handleDrop(e: DragEvent) {
     e.preventDefault();
-    if (uploading) return;
+    if (loading) return;
 
     error = undefined;
     draggingOver = false;
@@ -69,7 +69,7 @@
 
   function handleDragOver(e: DragEvent) {
     e.preventDefault();
-    if (uploading) return;
+    if (loading) return;
 
     draggingOver = true;
   }
@@ -79,13 +79,13 @@
   }
 
   function handleSelectFileButtonClick() {
-    if (uploading) return;
+    if (loading) return;
 
     fileInput.click();
   }
 
   function handleFileSelected(e: Event & { currentTarget: HTMLInputElement }) {
-    if (uploading) return;
+    if (loading) return;
 
     error = undefined;
 
@@ -123,6 +123,7 @@
   aria-label={instructions}
   class="drop-zone"
   class:dragging-over={draggingOver}
+  class:loading={loading}
   class:error
   class:upload-success={uploadSuccess}
   on:drop={handleDrop}
@@ -133,23 +134,28 @@
     <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-primary-level-6)" />
     <p class="typo-text">Drop file to upload</p>
   {:else if error}
-    <p class="typo-text-small">
-      {#if error === 'wrong-filetype'}
-        File type is unsupported
-      {:else if error === 'too-large'}
-        File exceeds 5MB
-      {:else if error === 'upload-failed'}
-        Upload failed. Pleae try again later.
-      {:else if error === 'too-many-files'}
-        Only drop a single file
-      {/if}
-    </p>
+    <slot name="error" {error}>
+      <p class="typo-text">
+        {#if error === 'wrong-filetype'}
+          File type is unsupported
+        {:else if error === 'too-large'}
+          File exceeds 5MB
+        {:else if error === 'upload-failed'}
+          Upload failed. Pleae try again later.
+        {:else if error === 'too-many-files'}
+          Only drop a single file
+        {/if}
+      </p>
+    </slot>
+
   {:else if uploadSuccess}
     <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
-    <p class="typo-text-small">Upload successful</p>
-  {:else if uploading}
-    <Spinner />
-    <p class="typo-text-small">Uploading…</p>
+    <p class="typo-text">Upload successful</p>
+  {:else if loading}
+    <slot name="loading">
+      <Spinner />
+      <p class="typo-text">Loading…</p>
+    </slot>
   {:else}
     <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-foreground-level-6)}" />
     <!-- TODO: not super great to break this up -->
@@ -177,6 +183,7 @@
     border: 1px solid var(--color-foreground);
   }
 
+  .drop-zone.loading,
   .drop-zone.dragging-over {
     border-color: var(--color-primary);
     background-color: var(--color-primary-level-1);

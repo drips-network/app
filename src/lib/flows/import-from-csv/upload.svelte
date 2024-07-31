@@ -2,7 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import { createEventDispatcher, tick } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import CsvExample from './components/csv-example.svelte';
   import DropZone from './components/drop-zone.svelte';
@@ -13,13 +13,17 @@
   import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
+  const MAX_ENTRIES = 200
+  const WEIGHT_FACTOR = 10_000
 
   export let context: Writable<State>;
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
+  let loading: boolean = false;
 
   $: formValid = !!file;
 
@@ -38,7 +42,7 @@
         [key]: item,
       };
 
-      c.dripList.weights[key] = weight * 10_000;
+      c.dripList.weights[key] = weight * WEIGHT_FACTOR;
 
       return c;
     });
@@ -52,21 +56,24 @@
 
   async function submit() {
     try {
+      loading = true
       // parse the input file
       // TODO: only read 200 lines
       // TODO: add error handling for too many lines
       const data = (await parseFile(file)) as Array<[string, number]>;
+      const iterableData = data.slice(0, MAX_ENTRIES).filter(([, s]) => !isNaN(s))
       // clear the existing recipient entries
       clearItems();
 
-      for (const [recipient, split] of data.slice(0, 200)) {
+      for (const [recipient, split] of iterableData) {
         // probably a header, skip it
-        if (isNaN(split)) {
-          continue;
-        }
+        // if (isNaN(split)) {
+        //   continue;
+        // }
 
         console.log('Classifying', recipient);
         const classification = classifyRecipient(recipient);
+        // can't classify this input
         if (!classification) {
           // TODO: add an error for the line
           console.log('Not classifiable', classification);
@@ -74,6 +81,7 @@
         }
 
         const isValid = await classification?.validate();
+        // the input ain't valid
         if (!isValid) {
           // TODO: add and error for the line
           console.log('Not valid', classification.value);
@@ -81,9 +89,10 @@
         }
 
         const recipientResult = await classification?.fetch();
+        // for some reason, we didn't get a good response
         if (!recipientResult) {
           // TODO: add error for the line
-          continue
+          continue;
         }
 
         const { accountId, ...rest } = recipientResult
@@ -91,20 +100,13 @@
         const listEditorItem = { type: classification.type, ...rest } as ListEditorItem
         console.log('We found the thing', recipient, split, listEditorItem);
         addItem(accountId, listEditorItem, split);
-
-        // Now go through the entries
-        // determine what they area
-        // - validate the thing that they are
-        // - fetch their account id information
-        // if you can't determine what they are
-        // - add to some sort of list of errors
-
-        // console.log(recipient, split)
       }
 
       dispatch('conclude');
     } catch (error) {
       console.error('Something bad happened', error);
+    } finally {
+      loading = false
     }
   }
 </script>
@@ -118,9 +120,15 @@
   <form bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone
       on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
+      {loading}
       filetypes={['text/csv']}
       instructions="Drop a CSV here to upload"
-    />
+    >
+      <svelte:fragment slot="loading">
+        <Spinner />
+        <p class="typo-text">We’re parsing your CSV and building your list…</p>
+      </svelte:fragment>
+    </DropZone>
   </form>
   <svelte:fragment slot="left-actions">
     <Button variant="ghost" icon={ArrowLeft} on:click={() => dispatch('conclude')}>Back</Button>
