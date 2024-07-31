@@ -26,7 +26,7 @@
   import List from '$lib/components/icons/List.svelte';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
   import ListEditorInputError from './list-editor-input-error.svelte';
-  import { AddItemError } from '../errors';
+  import { AddItemError, AddItemSuberror } from '../errors';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -173,7 +173,16 @@
     }
   }
 
-  let currentError: AddItemError | undefined = new AddItemError(`You can't add this right now.`, 'error');
+  let currentError: AddItemError | undefined = new AddItemError(
+    `Some of your imported recipients`,
+    'error',
+    'They won’t be included in your splits.',
+    [
+      new AddItemSuberror('This isn’t a GitHub repo or isn’t public.', '…/drips-network/app', 21),
+      new AddItemSuberror('This isn’t a valid wallet address.', 'peepeepoopoo.eth', 29),
+      new AddItemSuberror('This isn’t a valid wallet address.', '0x47-9g40', 87)
+    ]
+  );
   function displayError(error: NonNullable<typeof currentError>) {
     currentError = error;
   }
@@ -221,6 +230,10 @@
         handleSubmit(inputValue);
       }
     });
+  }
+
+  function handleErrorDismiss() {
+    currentError = undefined;
   }
 
   async function handleSubmit(value: string) {
@@ -286,7 +299,7 @@
   >
 </div>
 
-<ListEditorInputError error={currentError}/>
+<ListEditorInputError error={currentError} on:dismiss={handleErrorDismiss}/>
 
 <style>
   .list-editor-input {
@@ -307,15 +320,5 @@
 
   input:focus {
     outline: none;
-  }
-
-  .error {
-    height: 3.5rem;
-    padding: 0.75rem;
-    padding-left: 1rem;
-    gap: 0.75rem;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid var(--color-foreground);
   }
 </style>
