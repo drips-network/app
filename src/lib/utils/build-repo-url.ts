@@ -1,5 +1,5 @@
 import { BASE_URL } from './base-url';
-import { isSupportedGitUrl } from './is-valid-git-url';
+import { isValidGitUrl } from './is-valid-git-url';
 
 export function isDripsProjectUrl(value: string): boolean {
   return value.includes(`${BASE_URL}/app/projects/`);
@@ -24,7 +24,7 @@ export function buildRepositoryURL(url: string): string {
     if (forge === 'github') {
       const githubUrl = `https://github.com/${repoPath}`;
 
-      if (isSupportedGitUrl(githubUrl)) {
+      if (isValidGitUrl(githubUrl)) {
         return `https://github.com/${repoPath}`;
       }
 

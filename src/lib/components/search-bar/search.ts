@@ -3,7 +3,7 @@ import fuzzysort from 'fuzzysort';
 import tokens from '$lib/stores/tokens';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { get } from 'svelte/store';
-import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
+import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
 import GitProjectService from '$lib/utils/project/GitProjectService';
 import { isAddress } from 'ethers';
 
@@ -74,7 +74,7 @@ export function updateSearchItems(accountId: string | undefined) {
 export default function search(input: string | undefined) {
   if (!input) return [];
 
-  if (isSupportedGitUrl(input)) {
+  if (isValidGitUrl(input)) {
     const { username, repoName } = GitProjectService.deconstructUrl(input);
 
     searchItems.push({

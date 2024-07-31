@@ -11,9 +11,8 @@ import { redis } from '../../../../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
-import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import { hexlify, toUtf8Bytes } from 'ethers';
-import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
+import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
@@ -67,8 +66,6 @@ export const load = (async ({ params, fetch, url }) => {
   let repo: z.infer<typeof repoSchema>;
 
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
-
-  if (!isSupportedGitUrl(repoUrl)) throw error(404);
 
   const [repoRes, projectRes] = await Promise.all([
     fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
