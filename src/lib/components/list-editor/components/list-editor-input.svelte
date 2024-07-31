@@ -26,7 +26,7 @@
   import List from '$lib/components/icons/List.svelte';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
   import ListEditorInputError from './list-editor-input-error.svelte';
-  import { AddItemError, AddItemSuberror } from '../errors';
+  import { AddItemError } from '../errors';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -45,6 +45,8 @@
   export let weightsMode: boolean;
 
   export let addOnMount: string | undefined;
+
+  export let errors: Array<AddItemError> = [];
 
   let inputElem: HTMLInputElement;
   let inputValue = addOnMount ?? '';
@@ -173,21 +175,11 @@
     }
   }
 
-  let currentError: AddItemError | undefined = new AddItemError(
-    `Some of your imported recipients`,
-    'error',
-    'They won’t be included in your splits.',
-    [
-      new AddItemSuberror('This isn’t a GitHub repo or isn’t public.', '…/drips-network/app', 21),
-      new AddItemSuberror('This isn’t a valid wallet address.', 'peepeepoopoo.eth', 29),
-      new AddItemSuberror('This isn’t a valid wallet address.', '0x47-9g40', 87)
-    ]
-  );
-  function displayError(error: NonNullable<typeof currentError>) {
-    currentError = error;
+  function displayError(error: NonNullable<(typeof errors)[0]>) {
+    errors = [error];
   }
   function clearError() {
-    currentError = undefined;
+    errors = [];
   }
   $: {
     inputValue;
@@ -233,7 +225,7 @@
   }
 
   function handleErrorDismiss() {
-    currentError = undefined;
+    clearError();
   }
 
   async function handleSubmit(value: string) {
@@ -259,7 +251,7 @@
         displayError(e);
       } else if (e instanceof Error) {
         // displayError({ message: e.message || 'Unknown error', severity: 'error' });
-        displayError(new AddItemError(e.message || 'Unknown error', 'error'))
+        displayError(new AddItemError(e.message || 'Unknown error', 'error'));
 
         // eslint-disable-next-line no-console
         console.error(e);
@@ -299,7 +291,7 @@
   >
 </div>
 
-<ListEditorInputError error={currentError} on:dismiss={handleErrorDismiss}/>
+<ListEditorInputError error={errors[0]} on:dismiss={handleErrorDismiss} />
 
 <style>
   .list-editor-input {

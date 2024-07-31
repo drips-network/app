@@ -7,10 +7,10 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher<{
-    dismiss: void,
+    dismiss: void;
   }>();
 
-  export let error: AddItemError | undefined = undefined
+  export let error: AddItemError | undefined = undefined;
   let expanded: boolean = false;
 </script>
 
@@ -39,16 +39,15 @@
         style:color={textColor}
       >
         <ExclamationCircle style="fill: {textColor}" />
-        <div class="error__detail">
+        <div class="detail">
           <span>{error.message}</span>
           <span class="typo-text">{error.submessage}</span>
         </div>
-        <div class="error__actions">
-          <span
-            class="expand-chevron"
-            style:transform="rotate({expanded ? 180 : 0}deg)"
-          >
-            <ChevronDown style="fill: var(--color-negative-level-2); width: 1.5rem; height: 1.5rem;" />
+        <div class="actions">
+          <span class="expand-chevron" style:transform="rotate({expanded ? 180 : 0}deg)">
+            <ChevronDown
+              style="fill: var(--color-negative-level-2); width: 1.5rem; height: 1.5rem;"
+            />
           </span>
           <Button variant="destructive" on:click={() => dispatch('dismiss')}>Dismiss</Button>
         </div>
@@ -63,7 +62,7 @@
             style:color={textColor}
           >
             <div>Line {suberror.lineNumber}</div>
-            <div class="suberror__detail">
+            <div class="detail">
               <span>{suberror.cause}</span>
               <span>{suberror.message}</span>
             </div>
@@ -94,19 +93,29 @@
   }
 
   .suberror {
-    /* TODO: this border is not the correct color.
-      I couldn't find the correct color in the colors
-      file  */
+    /* TODO: is the border too dark? */
     border-bottom: 1px solid var(--color-negative-level-2);
   }
 
-  .error__detail,
-  .suberror__detail {
-    display: flex;
-    flex-direction: column;
+  .suberror:last-child {
+    border-bottom: 1px solid var(--color-foreground);
   }
 
-  .error__actions {
+  .detail {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .detail > * {
+    display: block;
+    max-width: 430px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .actions {
     margin-left: auto;
     display: flex;
     align-items: center;
@@ -114,6 +123,7 @@
   }
 
   .expand-chevron {
+    /* TODO: is its color too dark? */
     transition:
       transform 0.3s,
       background-color 0.3s;

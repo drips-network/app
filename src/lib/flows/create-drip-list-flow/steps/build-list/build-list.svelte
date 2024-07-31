@@ -35,6 +35,7 @@
     <ListEditor
       bind:weights={$context.dripList.weights}
       bind:items={$context.dripList.items}
+      bind:inputErrors={$context.recipientErrors}
       bind:valid={listValid}
       addOnMount={urlToAdd}
     />

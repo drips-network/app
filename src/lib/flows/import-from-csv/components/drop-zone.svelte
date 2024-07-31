@@ -123,7 +123,7 @@
   aria-label={instructions}
   class="drop-zone"
   class:dragging-over={draggingOver}
-  class:loading={loading}
+  class:loading
   class:error
   class:upload-success={uploadSuccess}
   on:drop={handleDrop}
@@ -147,7 +147,6 @@
         {/if}
       </p>
     </slot>
-
   {:else if uploadSuccess}
     <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
     <p class="typo-text">Upload successful</p>

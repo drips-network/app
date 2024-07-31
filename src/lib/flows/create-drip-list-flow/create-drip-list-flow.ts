@@ -20,9 +20,22 @@ import ChooseCreationMode from './steps/choose-creation-mode/choose-creation-mod
 import ConfigureVotingRound from './steps/configure-voting-round/configure-voting-round.svelte';
 import type { Items } from '$lib/components/list-editor/types';
 import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
+import type { AddItemError } from '$lib/components/list-editor/errors';
+
+// let currentError: AddItemError | undefined = new AddItemError(
+//   `Some of your imported recipients`,
+//   'error',
+//   'They won’t be included in your splits.',
+//   [
+//     new AddItemSuberror('This isn’t a GitHub repo or isn’t public.', '…/drips-network/app', 21),
+//     new AddItemSuberror('This isn’t a valid wallet address.', 'peepeepoopoo.eth', 29),
+//     new AddItemSuberror('This isn’t a valid wallet address.', '0x47-9g40', 87)
+//   ]
+// );
 
 export interface State {
   dripList: DripListConfig;
+  recipientErrors: Array<AddItemError>;
   /** 1 is immediate DL creation, 2 is creating a draft / voting round */
   selectedCreationMode: 1 | 2 | undefined;
   /** 1 is Continuous Support, 2 is one-time donation */
@@ -50,6 +63,7 @@ export interface State {
 export const state = () =>
   writable<State>({
     dripList: { title: 'My Drip List', weights: {}, items: {}, description: undefined },
+    recipientErrors: [],
     selectedCreationMode: undefined,
     selectedSupportOption: undefined,
     continuousSupportConfig: {

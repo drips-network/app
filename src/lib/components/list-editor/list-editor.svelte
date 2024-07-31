@@ -9,6 +9,7 @@
     ListEditorProjectFragment,
   } from './__generated__/gql.generated';
   import { onMount, tick } from 'svelte';
+  import type { AddItemError } from './errors';
 
   const MAX_WEIGHT = 1000000;
 
@@ -30,6 +31,8 @@
   export let addOnMount: string | undefined = undefined;
 
   export let outline = true;
+
+  export let inputErrors: Array<AddItemError> = [];
 
   $: totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
 
@@ -175,6 +178,7 @@
     {#if isEditable}
       <ListEditorInput
         existingKeys={Object.keys(items)}
+        errors={inputErrors}
         {addOnMount}
         {weightsMode}
         {allowAddresses}

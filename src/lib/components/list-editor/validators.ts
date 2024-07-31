@@ -40,3 +40,16 @@ export const validateAddress = async (addressValue: string): Promise<boolean> =>
   const resolved = await ensStore.reverseLookup(addressValue);
   return !!resolved;
 };
+
+export const createInvalidMessage = (type: string): string => {
+  switch (type) {
+    case 'addresses':
+      return "This isn't a valid wallet address";
+    case 'project':
+      return "This isn't a GitHub repo or isn't public";
+    case 'drip-list':
+      return "This isn't a recognized Drip List";
+    default:
+      return "This isn't valid";
+  }
+};

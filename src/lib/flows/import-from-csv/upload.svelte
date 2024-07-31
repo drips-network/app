@@ -14,18 +14,19 @@
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { InvalidRecipientError, TooManyRecipientsError, UnrecognizedRecipientError } from './errors';
+  import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
+  import { createInvalidMessage } from '$lib/components/list-editor/validators';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
-  const MAX_ENTRIES = 200
-  const WEIGHT_FACTOR = 10_000
+  const MAX_ENTRIES = 200;
+  const WEIGHT_FACTOR = 10_000;
 
   export let context: Writable<State>;
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
   let loading: boolean = false;
-  let errors: Array<Error> = [];
+  let errors: Array<AddItemSuberror> = [];
 
   $: formValid = !!file;
 
@@ -58,16 +59,17 @@
 
   async function submit() {
     try {
-      loading = true
+      loading = true;
       // parse the input file
       // TODO: only read 200 lines
       // TODO: add error handling for too many lines
       const data = (await parseFile(file)) as Array<[string, number]>;
-      if (data.length > MAX_ENTRIES) {
-        errors.push(new TooManyRecipientsError())
-      }
+      // TODO: implement when dropping
+      // if (data.length > MAX_ENTRIES) {
+      //   errors.push(new TooManyRecipientsError())
+      // }
 
-      const iterableData = data.slice(0, MAX_ENTRIES).filter(([, s]) => !isNaN(s))
+      const iterableData = data.slice(0, MAX_ENTRIES).filter(([, s]) => !isNaN(s));
       // clear the existing recipient entries
       clearItems();
 
@@ -81,13 +83,8 @@
         const classification = classifyRecipient(recipient);
         // can't classify this input
         if (!classification) {
-          const error = new InvalidRecipientError(
-            recipient,
-            'unkown',
-            index + 1
-          )
-          errors.push(error)
-          // TODO: add an error for the line
+          const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
+          errors.push(error);
           console.log('Not classifiable', classification);
           continue;
         }
@@ -95,13 +92,12 @@
         const isValid = await classification?.validate();
         // the input ain't valid
         if (!isValid) {
-          const error = new InvalidRecipientError(
+          const error = new AddItemSuberror(
+            createInvalidMessage(classification.type),
             recipient,
-            classification.type,
-            index + 1
-          )
-          errors.push(error)
-          // TODO: add and error for the line
+            index + 1,
+          );
+          errors.push(error);
           console.log('Not valid', classification.value);
           continue;
         }
@@ -109,29 +105,42 @@
         const recipientResult = await classification?.fetch();
         // for some reason, we didn't get a good response
         if (!recipientResult) {
-          const error = new UnrecognizedRecipientError(
+          const error = new AddItemSuberror(
+            'We failed to get information for this.',
             recipient,
-            classification.type,
-            index + 1
-          )
-          errors.push(error)
-          // TODO: add error for the line
+            index + 1,
+          );
+          errors.push(error);
           continue;
         }
 
-        const { accountId, ...rest } = recipientResult
+        const { accountId, ...rest } = recipientResult;
         // TODO: kinda sus
-        const listEditorItem = { type: classification.type, ...rest } as ListEditorItem
+        const listEditorItem = { type: classification.type, ...rest } as ListEditorItem;
         console.log('We found the thing', recipient, split, listEditorItem, errors);
         addItem(accountId, listEditorItem, split);
       }
 
-      console.log('Errors ', errors)
+      if (errors.length) {
+        const bigError = new AddItemError(
+          'Some of your imported recipients',
+          'error',
+          'They won’t be included in your splits.',
+          errors,
+        );
+
+        context.update((c) => {
+          c.recipientErrors = [bigError];
+          return c;
+        });
+      }
+
+      console.log('Errors ', errors);
       dispatch('conclude');
     } catch (error) {
       console.error('Something bad happened', error);
     } finally {
-      loading = false
+      loading = false;
     }
   }
 </script>
