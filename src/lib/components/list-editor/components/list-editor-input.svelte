@@ -24,9 +24,9 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripList from '$lib/components/icons/DripList.svelte';
   import List from '$lib/components/icons/List.svelte';
-  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
-  import { slide } from 'svelte/transition';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
+  import ListEditorInputError from './list-editor-input-error.svelte';
+  import { AddItemError } from '../errors';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -59,15 +59,6 @@
     (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
     (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
     (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
-
-  class AddItemError extends Error {
-    constructor(
-      message: string,
-      public severity: 'warning' | 'error',
-    ) {
-      super(message);
-    }
-  }
 
   function checkCanAdd(accountId: string) {
     if (blockedAccountIds.includes(accountId)) {
@@ -182,7 +173,7 @@
     }
   }
 
-  let currentError: { message: string; severity: 'warning' | 'error' } | undefined = new AddItemError(`You can't add this right now.`, 'error');
+  let currentError: AddItemError | undefined = new AddItemError(`You can't add this right now.`, 'error');
   function displayError(error: NonNullable<typeof currentError>) {
     currentError = error;
   }
@@ -254,7 +245,8 @@
       if (e instanceof AddItemError) {
         displayError(e);
       } else if (e instanceof Error) {
-        displayError({ message: e.message || 'Unknown error', severity: 'error' });
+        // displayError({ message: e.message || 'Unknown error', severity: 'error' });
+        displayError(new AddItemError(e.message || 'Unknown error', 'error'))
 
         // eslint-disable-next-line no-console
         console.error(e);
@@ -294,19 +286,7 @@
   >
 </div>
 
-{#if currentError}
-  {@const color = currentError.severity === 'error' ? 'negative' : 'caution'}
-  {@const textColor = `var(--color-${color}-level-6)`}
-  <div
-    transition:slide|global={{ duration: 300 }}
-    class="error {currentError.severity}"
-    style:background-color="var(--color-{color}-level-1)"
-    style:color={textColor}
-  >
-    <ExclamationCircle style="fill: {textColor}" />
-    {currentError.message}
-  </div>
-{/if}
+<ListEditorInputError error={currentError}/>
 
 <style>
   .list-editor-input {
