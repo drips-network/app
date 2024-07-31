@@ -182,7 +182,7 @@
     }
   }
 
-  let currentError: { message: string; severity: 'warning' | 'error' } | undefined = undefined;
+  let currentError: { message: string; severity: 'warning' | 'error' } | undefined = new AddItemError(`You can't add this right now.`, 'error');
   function displayError(error: NonNullable<typeof currentError>) {
     currentError = error;
   }

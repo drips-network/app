@@ -14,6 +14,7 @@
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
+  import { InvalidRecipientError, TooManyRecipientsError, UnrecognizedRecipientError } from './errors';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_ENTRIES = 200
@@ -24,6 +25,7 @@
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
   let loading: boolean = false;
+  let errors: Array<Error> = [];
 
   $: formValid = !!file;
 
@@ -61,20 +63,30 @@
       // TODO: only read 200 lines
       // TODO: add error handling for too many lines
       const data = (await parseFile(file)) as Array<[string, number]>;
+      if (data.length > MAX_ENTRIES) {
+        errors.push(new TooManyRecipientsError())
+      }
+
       const iterableData = data.slice(0, MAX_ENTRIES).filter(([, s]) => !isNaN(s))
       // clear the existing recipient entries
       clearItems();
 
-      for (const [recipient, split] of iterableData) {
+      for (const [index, [recipient, split]] of iterableData.entries()) {
         // probably a header, skip it
-        // if (isNaN(split)) {
-        //   continue;
-        // }
+        if (isNaN(split)) {
+          continue;
+        }
 
         console.log('Classifying', recipient);
         const classification = classifyRecipient(recipient);
         // can't classify this input
         if (!classification) {
+          const error = new InvalidRecipientError(
+            recipient,
+            'unkown',
+            index + 1
+          )
+          errors.push(error)
           // TODO: add an error for the line
           console.log('Not classifiable', classification);
           continue;
@@ -83,6 +95,12 @@
         const isValid = await classification?.validate();
         // the input ain't valid
         if (!isValid) {
+          const error = new InvalidRecipientError(
+            recipient,
+            classification.type,
+            index + 1
+          )
+          errors.push(error)
           // TODO: add and error for the line
           console.log('Not valid', classification.value);
           continue;
@@ -91,6 +109,12 @@
         const recipientResult = await classification?.fetch();
         // for some reason, we didn't get a good response
         if (!recipientResult) {
+          const error = new UnrecognizedRecipientError(
+            recipient,
+            classification.type,
+            index + 1
+          )
+          errors.push(error)
           // TODO: add error for the line
           continue;
         }
@@ -98,10 +122,11 @@
         const { accountId, ...rest } = recipientResult
         // TODO: kinda sus
         const listEditorItem = { type: classification.type, ...rest } as ListEditorItem
-        console.log('We found the thing', recipient, split, listEditorItem);
+        console.log('We found the thing', recipient, split, listEditorItem, errors);
         addItem(accountId, listEditorItem, split);
       }
 
+      console.log('Errors ', errors)
       dispatch('conclude');
     } catch (error) {
       console.error('Something bad happened', error);
