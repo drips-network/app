@@ -3,7 +3,6 @@ import type { MetadataKeyValue, OxString, StreamConfig } from '../sdk-types';
 import contractConstants from '../utils/contract-constants';
 import { populateAddressDriverWriteTx } from './address-driver';
 import { streamConfigToUint256 } from '../utils/stream-config-utils';
-import keyValueToMetatada from '../utils/key-value-to-metadata';
 
 type NewStreamFlowPayload = {
   tokenAddress: OxString;
@@ -51,11 +50,9 @@ export default async function populateNewStreamFlowTxs(
     ],
   });
 
-  const accountMetadataAsBytes = accountMetadata.map(keyValueToMetatada);
-
   const emitAccountMetadataTx = await populateAddressDriverWriteTx({
     functionName: 'emitAccountMetadata',
-    args: [accountMetadataAsBytes],
+    args: [accountMetadata],
   });
   return [setStreamsTx, emitAccountMetadataTx];
 }

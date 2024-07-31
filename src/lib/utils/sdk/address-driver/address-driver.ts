@@ -8,13 +8,13 @@ import type {
 import { Contract } from 'ethers';
 import { get } from 'svelte/store';
 import { addressDriverAbi, type AddressDriverAbi } from './address-driver-abi';
-import type { OxString } from '../sdk-types';
+import type { OxString, UnwrappedEthersResult } from '../sdk-types';
 import { executeErc20ReadMethod } from '../erc20/erc20';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 import { getNetworkConfig } from '../utils/get-network-config';
-import { single } from '../utils/single';
 import assert from '$lib/utils/assert';
+import unwrapEthersResult from '../utils/unwrap-ethers-result';
 
 export async function executeAddressDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,
@@ -22,14 +22,16 @@ export async function executeAddressDriverReadMethod<
 >(config: {
   functionName: functionName | ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
-}): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
+}): Promise<
+  UnwrappedEthersResult<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>>
+> {
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
   const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
   const addressDriver = new Contract(addressDriverAddress, addressDriverAbi, provider);
 
-  return addressDriver[func](...args);
+  return unwrapEthersResult(await addressDriver[func](...args));
 }
 
 export async function populateAddressDriverWriteTx<
@@ -56,11 +58,9 @@ export async function getAddressDriverAllowance(token: OxString): Promise<bigint
 
   const spender = getNetworkConfig().ADDRESS_DRIVER as OxString;
 
-  return single(
-    await executeErc20ReadMethod({
-      token,
-      functionName: 'allowance',
-      args: [owner, spender],
-    }),
-  );
+  return executeErc20ReadMethod({
+    token,
+    functionName: 'allowance',
+    args: [owner, spender],
+  });
 }

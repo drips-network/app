@@ -5,7 +5,6 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
-  import { fetchInfo } from '$lib/utils/erc20';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import assert from '$lib/utils/assert';
@@ -13,6 +12,8 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import validateUrl from '$lib/utils/validate-url';
   import { isAddress } from 'ethers';
+  import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -37,11 +38,27 @@
   async function updateTokenInfo() {
     tokenAddressValidationState = { type: 'pending' };
     try {
-      const info = await fetchInfo(tokenAddress, $wallet.provider);
+      const name = await executeErc20ReadMethod({
+        functionName: 'name',
+        token: tokenAddress as OxString,
+        args: [],
+      });
 
-      tokenName = info.name;
-      tokenSymbol = info.symbol;
-      tokenDecimals = info.decimals;
+      const symbol = await executeErc20ReadMethod({
+        functionName: 'symbol',
+        token: tokenAddress as OxString,
+        args: [],
+      });
+
+      const decimals = await executeErc20ReadMethod({
+        functionName: 'decimals',
+        token: tokenAddress as OxString,
+        args: [],
+      });
+
+      tokenName = name;
+      tokenSymbol = symbol;
+      tokenDecimals = decimals;
 
       tokenAddressValidationState = { type: 'valid' };
     } catch {

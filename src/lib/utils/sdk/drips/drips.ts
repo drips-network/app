@@ -12,6 +12,8 @@ import { dripsAbi, type DripsAbi } from './drips-abi';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
 import assert from '$lib/utils/assert';
+import unwrapEthersResult from '../utils/unwrap-ethers-result';
+import type { UnwrappedEthersResult } from '../sdk-types';
 
 export async function executeDripsReadMethod<
   functionName extends ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>,
@@ -19,14 +21,16 @@ export async function executeDripsReadMethod<
 >(config: {
   functionName: functionName | ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
-}): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
+}): Promise<
+  UnwrappedEthersResult<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>>
+> {
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
   const dripsAddress = getNetworkConfig().DRIPS;
   const drips = new Contract(dripsAddress, dripsAbi, provider);
 
-  return drips[func](...args);
+  return unwrapEthersResult(await drips[func](...args));
 }
 
 export async function populateDripsWriteTx<

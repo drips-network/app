@@ -2,7 +2,6 @@ import { toBigInt } from 'ethers';
 import mapFilterUndefined from '../map-filter-undefined';
 import { executeDripsReadMethod } from '../sdk/drips/drips';
 import type { OxString } from '../sdk/sdk-types';
-import { single } from '../sdk/utils/single';
 
 interface Amount {
   tokenAddress: string;
@@ -58,17 +57,15 @@ export default async function fetchBalancesForTokens(
   return mapFilterUndefined(await Promise.all(promises), (v) => v);
 }
 async function getSplittableBalanceForUser(accountId: string, ta: string) {
-  return single(
-    (
+  return {
+    tokenAddress: ta,
+    splittableAmount: toBigInt(
       await executeDripsReadMethod({
         functionName: 'splittable',
         args: [toBigInt(accountId), ta as OxString],
-      })
-    ).map((sb) => ({
-      tokenAddress: ta,
-      splittableAmount: toBigInt(sb),
-    })),
-  );
+      }),
+    ),
+  };
 }
 
 async function getReceivableBalanceForUser(
@@ -76,29 +73,25 @@ async function getReceivableBalanceForUser(
   tokenAddress: string,
   maxCycles: number,
 ) {
-  return single(
-    (
+  return {
+    tokenAddress,
+    receivableAmount: toBigInt(
       await executeDripsReadMethod({
         functionName: 'receiveStreamsResult',
         args: [toBigInt(accountId), tokenAddress as OxString, maxCycles],
-      })
-    ).map((rb) => ({
-      tokenAddress,
-      receivableAmount: toBigInt(rb),
-    })),
-  );
+      }),
+    ),
+  };
 }
 
 async function getCollectableBalanceForUser(accountId: string, tokenAddress: string) {
-  return single(
-    (
+  return {
+    tokenAddress,
+    collectableAmount: toBigInt(
       await executeDripsReadMethod({
         functionName: 'collectable',
         args: [toBigInt(accountId), tokenAddress as OxString],
-      })
-    ).map((cb) => ({
-      tokenAddress,
-      collectableAmount: toBigInt(cb),
-    })),
-  );
+      }),
+    ),
+  };
 }

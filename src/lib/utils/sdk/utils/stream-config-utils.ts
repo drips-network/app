@@ -1,5 +1,5 @@
-import unreachable from '$lib/utils/unreachable';
 import type { StreamConfig } from '../sdk-types';
+import unreachable from '$lib/utils/unreachable';
 
 export const validateStreamConfig = (streamConfig: StreamConfig): void => {
   const { dripId, start, duration, amountPerSec } = streamConfig;
@@ -22,6 +22,26 @@ export const validateStreamConfig = (streamConfig: StreamConfig): void => {
 };
 
 export function streamConfigToUint256(streamConfig: StreamConfig): bigint {
+  const configAsBigInt = toUint256(streamConfig);
+
+  const { dripId, start, duration, amountPerSec } = streamConfig;
+  if (dripId !== fromUint256(configAsBigInt).dripId) {
+    unreachable();
+  }
+  if (start !== fromUint256(configAsBigInt).start) {
+    unreachable();
+  }
+  if (duration !== fromUint256(configAsBigInt).duration) {
+    unreachable();
+  }
+  if (amountPerSec !== fromUint256(configAsBigInt).amountPerSec) {
+    unreachable();
+  }
+
+  return configAsBigInt;
+}
+
+export function toUint256(streamConfig: StreamConfig): bigint {
   validateStreamConfig(streamConfig);
 
   const { dripId, start, duration, amountPerSec } = streamConfig;
@@ -31,14 +51,20 @@ export function streamConfigToUint256(streamConfig: StreamConfig): bigint {
   config = (config << 32n) | BigInt(start);
   config = (config << 32n) | BigInt(duration);
 
-  if (streamConfigFromUint256(config) === streamConfig) {
-    throw unreachable();
+  return config;
+}
+
+export function streamConfigFromUint256(streamConfig: bigint): StreamConfig {
+  const config = fromUint256(streamConfig);
+
+  if (toUint256(config) !== streamConfig) {
+    unreachable();
   }
 
   return config;
 }
 
-export function streamConfigFromUint256(streamConfig: bigint): StreamConfig {
+export function fromUint256(streamConfig: bigint): StreamConfig {
   const mask32 = (1n << 32n) - 1n;
   const mask160 = (1n << 160n) - 1n;
 
@@ -55,9 +81,6 @@ export function streamConfigFromUint256(streamConfig: bigint): StreamConfig {
   };
 
   validateStreamConfig(config);
-  if (streamConfigToUint256(config) === streamConfig) {
-    throw unreachable();
-  }
 
   return config;
 }

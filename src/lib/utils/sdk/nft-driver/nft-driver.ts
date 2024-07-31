@@ -13,6 +13,8 @@ import type { TransactionResponse } from 'ethers';
 import type { ContractTransaction } from 'ethers';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import assert from '$lib/utils/assert';
+import unwrapEthersResult from '../utils/unwrap-ethers-result';
+import type { UnwrappedEthersResult } from '../sdk-types';
 
 export async function executeNftDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,
@@ -20,14 +22,16 @@ export async function executeNftDriverReadMethod<
 >(config: {
   functionName: functionName | ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
-}): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
+}): Promise<
+  UnwrappedEthersResult<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>>
+> {
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
   const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
   const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, provider);
 
-  return nftDriver[func](...args);
+  return unwrapEthersResult(await nftDriver[func](...args));
 }
 
 export async function executeNftDriverWriteMethod<

@@ -89,3 +89,9 @@ export type SqueezeArgs = {
   historyHash: string;
   streamsHistory: StreamsHistory[];
 };
+
+export type UnwrappedEthersResult<T> = T extends [infer U]
+  ? U
+  : T extends readonly [infer U]
+    ? U
+    : T;

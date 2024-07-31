@@ -1,5 +1,4 @@
 import { executeDripsReadMethod } from '../sdk/drips/drips';
-import { single } from '../sdk/utils/single';
 
 /**
  * Fetches the current Drips cycle from on-chain and calculates the start and end dates.
@@ -7,7 +6,7 @@ import { single } from '../sdk/utils/single';
  */
 export default async function getCycle() {
   const cycleDurationMillis =
-    single(await executeDripsReadMethod({ functionName: 'cycleSecs', args: [] })) * 1000;
+    (await executeDripsReadMethod({ functionName: 'cycleSecs', args: [] })) * 1000;
   const currentCycleMillis = new Date().getTime() % cycleDurationMillis;
   const currentCycleStart = new Date().getTime() - currentCycleMillis;
 

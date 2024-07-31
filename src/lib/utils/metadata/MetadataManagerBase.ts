@@ -164,11 +164,11 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
     assert(this._emitMetadataFunc, 'emitAccountMetadata called without emitMetadataFunc');
 
     const accountMetadata = [
-      {
+      keyValueToMetatada({
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
-      },
-    ].map(keyValueToMetatada);
+      }),
+    ];
 
     const tx = await this._emitMetadataFunc({
       functionName: 'emitAccountMetadata',

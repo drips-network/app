@@ -12,6 +12,8 @@ import { get } from 'svelte/store';
 import type { ContractTransaction } from 'ethers';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import assert from '$lib/utils/assert';
+import unwrapEthersResult from '../utils/unwrap-ethers-result';
+import type { UnwrappedEthersResult } from '../sdk-types';
 
 export async function executeRepoDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>,
@@ -19,14 +21,16 @@ export async function executeRepoDriverReadMethod<
 >(config: {
   functionName: functionName | ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>;
   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
-}): Promise<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>> {
+}): Promise<
+  UnwrappedEthersResult<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>>
+> {
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
   const repoDriverAddress = getNetworkConfig().REPO_DRIVER;
   const repoDriver = new Contract(repoDriverAddress, repoDriverAbi, provider);
 
-  return repoDriver[func](...args);
+  return unwrapEthersResult(await repoDriver[func](...args));
 }
 
 export async function populateRepoDriverWriteTx<

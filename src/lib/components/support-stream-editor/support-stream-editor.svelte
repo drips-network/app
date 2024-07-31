@@ -8,7 +8,6 @@
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { fetchBalance } from '$lib/utils/erc20';
   import assert from '$lib/utils/assert';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import Button from '../button/button.svelte';
@@ -16,6 +15,8 @@
   import Token from '../token/token.svelte';
   import { formatUnits } from 'ethers';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   export let streamRateValueParsed: bigint | undefined = undefined;
   export let topUpAmountValueParsed: bigint | undefined = undefined;
@@ -78,10 +79,14 @@
   let fetchedBalances: { [tokenAddress: string]: bigint } = {};
 
   function fetchSelectedErc20Balance() {
-    const { address, provider } = $walletStore;
+    const { address } = $walletStore;
     assert(selectedToken && address);
 
-    return fetchBalance(selectedToken.info.address, address, provider);
+    return executeErc20ReadMethod({
+      functionName: 'balanceOf',
+      token: selectedToken.info.address as OxString,
+      args: [address as OxString],
+    });
   }
 
   $: {
