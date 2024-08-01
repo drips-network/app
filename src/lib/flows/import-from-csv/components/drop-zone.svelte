@@ -16,6 +16,7 @@
   export let instructions = 'Drop a file here to upload';
   export let filetypes = ['text/plain'];
   export let maxFileSize = 1024 * 1024 * 5; // 5MB
+  export let validateCustom: (file: File) => Promise<string | false> = () => Promise.resolve(false);
 
   let draggingOver = false;
 
@@ -23,7 +24,15 @@
     return filetypes.includes(file.type);
   }
 
-  let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | 'upload-failed' | undefined;
+  let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | 'upload-failed' | string | undefined;
+  // TODO: could be more rigorous and refer to the typeof error
+  let errorMessages: { [key: string]: string } = {
+    'wrong-filetype': 'File type is unsupported',
+    'too-large': 'File exceeds 5MB',
+    'too-many-files': 'Only drop a single file',
+    'upload-failed': 'Upload failed. Pleae try again later.'
+  }
+
   $: {
     if (error) {
       setTimeout(() => {
@@ -106,6 +115,12 @@
       return;
     }
 
+    const validationResult = await validateCustom(file)
+    if (validationResult) {
+      error = validationResult
+      return;
+    }
+
     dispatch('input', { file });
   }
 </script>
@@ -134,18 +149,9 @@
     <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-primary-level-6)" />
     <p class="typo-text">Drop file to upload</p>
   {:else if error}
-    <slot name="error" {error}>
-      <p class="typo-text">
-        {#if error === 'wrong-filetype'}
-          File type is unsupported
-        {:else if error === 'too-large'}
-          File exceeds 5MB
-        {:else if error === 'upload-failed'}
-          Upload failed. Pleae try again later.
-        {:else if error === 'too-many-files'}
-          Only drop a single file
-        {/if}
-      </p>
+    {@const defaultContent = `<p class="typo-text">${errorMessages[error]}</p>`}
+    <slot name="error" {error} {defaultContent}>
+      {@html defaultContent}
     </slot>
   {:else if uploadSuccess}
     <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />

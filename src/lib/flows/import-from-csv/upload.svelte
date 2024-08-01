@@ -25,8 +25,12 @@
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
+  let parsedFile: Array<[string, number]> = []
   let loading: boolean = false;
   let errors: Array<AddItemSuberror> = [];
+  let errorMessages: { [key: string]: string } = {
+    'too-many-entries': 'There are more than 200 entries in the CSV.'
+  }
 
   $: formValid = !!file;
 
@@ -57,31 +61,37 @@
     uploadForm?.requestSubmit();
   }
 
+  async function validateFile (file: File): Promise<string | false> {
+    const parsedFile = (await parseFile(file)) as Array<[string, number]>;
+    let headerAdjustment = 0
+    if (isNaN(parsedFile[0][1])) {
+      headerAdjustment = 1
+    }
+
+    return parsedFile.length > MAX_ENTRIES + headerAdjustment
+      ? 'too-many-entries'
+      : false
+  }
+
   async function submit() {
     try {
       loading = true;
-      // parse the input file
-      // TODO: only read 200 lines
-      // TODO: add error handling for too many lines
-      const data = (await parseFile(file)) as Array<[string, number]>;
-      // TODO: implement when dropping
-      // if (data.length > MAX_ENTRIES) {
-      //   errors.push(new TooManyRecipientsError())
-      // }
 
-      const iterableData = data.slice(0, MAX_ENTRIES).filter(([, s]) => !isNaN(s));
       // clear the existing recipient entries
       clearItems();
 
-      for (const [index, [recipient, split]] of iterableData.entries()) {
-        // probably a header, skip it
-        if (isNaN(split)) {
+      for (const [index, [recipient, split]] of parsedFile.entries()) {
+        // a non-header entry with an invalid split should
+        // produce an error
+        if (isNaN(split) && index !== 0) {
+          const error = new AddItemSuberror('This has an invalid split value', recipient, index + 1);
+          errors.push(error);
           continue;
         }
 
         console.log('Classifying', recipient);
         const classification = classifyRecipient(recipient);
-        // can't classify this input
+        // can't classify this input as something we recognize
         if (!classification) {
           const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
           errors.push(error);
@@ -153,14 +163,22 @@
   <CsvExample />
   <form bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone
-      on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
-      {loading}
+      validateCustom={validateFile}
       filetypes={['text/csv']}
       instructions="Drop a CSV here to upload"
+      {loading}
+      on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
     >
       <svelte:fragment slot="loading">
         <Spinner />
         <p class="typo-text">We’re parsing your CSV and building your list…</p>
+      </svelte:fragment>
+      <svelte:fragment slot="error" let:error let:defaultContent>
+        {#if error === 'too-many-entries'}
+          <p class="typo-text">{errorMessages[error]}</p>
+        {:else}
+          {@html defaultContent}
+        {/if}
       </svelte:fragment>
     </DropZone>
   </form>
