@@ -250,7 +250,6 @@
       if (e instanceof AddItemError) {
         displayError(e);
       } else if (e instanceof Error) {
-        // displayError({ message: e.message || 'Unknown error', severity: 'error' });
         displayError(new AddItemError(e.message || 'Unknown error', 'error'));
 
         // eslint-disable-next-line no-console

@@ -37,7 +37,7 @@
     loading = false;
   }
 
-  export let success = true;
+  export let success = false;
   $: {
     if (success) {
       setTimeout(() => {
