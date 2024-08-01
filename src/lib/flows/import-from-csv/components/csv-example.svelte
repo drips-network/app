@@ -70,7 +70,7 @@
     border-top: var(--border);
     border-right: var(--border);
     text-wrap: nowrap;
-    background-color: var(--color-foreground-level-3);
+    background-color: var(--color-foreground-level-1);
   }
 
   tbody > tr > td:first-child {
