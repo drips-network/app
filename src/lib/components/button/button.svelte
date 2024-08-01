@@ -15,6 +15,8 @@
   export let href: string | undefined = undefined;
   export let target: string | undefined = undefined;
   export let rel: string | undefined = undefined;
+  export let type: 'submit' | 'reset' | 'button' = 'button';
+  export let form: string | undefined = undefined;
 
   $: isDisabled = disabled || loading;
 
@@ -32,10 +34,6 @@
       textColor = 'var(--color-foreground)';
     }
   }
-  // $: textColor =
-  //   primaryColor && (variant === 'destructive' || variant === 'primary')
-  //     ? getContrastColor(primaryColor)
-  //     : 'var(--color-foreground)';
 </script>
 
 <svelte:element
@@ -45,6 +43,7 @@
   {href}
   {target}
   {rel}
+  {form}
   class="button size-{size}"
   class:disabled={isDisabled}
   class:loading
@@ -57,6 +56,7 @@
   on:focus
   role={href ? 'link' : 'button'}
   style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}
+  type={href ? null : type}
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
@@ -160,10 +160,6 @@
   .button .inner.with-text {
     padding: 0 0.75rem;
   }
-
-  /* .button .inner.error {
-    color: var(--color-negative-level-6) !important;
-  } */
 
   .button:not(.disabled):hover .inner,
   .button:not(.disabled):focus-visible .inner {

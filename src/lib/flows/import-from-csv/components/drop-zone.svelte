@@ -31,7 +31,6 @@
     | 'upload-failed'
     | string
     | undefined;
-  // TODO: could be more rigorous and refer to the typeof error
   let errorMessages: { [key: string]: string } = {
     'wrong-filetype': 'File type is unsupported',
     'too-large': 'File exceeds 5MB',
@@ -40,6 +39,10 @@
   } as const;
 
   export let loading = false;
+
+  $: if (error) {
+    loading = false;
+  }
 
   let uploadSuccess = false;
   $: {

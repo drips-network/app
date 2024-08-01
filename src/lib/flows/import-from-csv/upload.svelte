@@ -33,7 +33,7 @@
   const customErrors: Array<string> = ['too-many-entries', 'wrong-filetype'] as const;
   let customErrorMessages: { [key: string]: string } = {
     'too-many-entries': 'There are more than 200 entries in the CSV.',
-    'wrong-filetype': "That's not a CSV",
+    'wrong-filetype': 'That’s not a CSV',
   };
 
   $: formValid = !!file;
@@ -179,7 +179,7 @@
     description="Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:"
   ></StepHeader>
   <CsvExample />
-  <form bind:this={uploadForm} on:submit|preventDefault={submit}>
+  <form id="upload-form" bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone
       validateCustom={validateFile}
       filetypes={['text/csv']}
@@ -209,6 +209,8 @@
       icon={ArrowDown}
       variant="primary"
       disabled={!formValid}
+      type="submit"
+      form="upload-form"
       on:click={() => uploadForm?.requestSubmit()}>Import</Button
     >
   </svelte:fragment>
