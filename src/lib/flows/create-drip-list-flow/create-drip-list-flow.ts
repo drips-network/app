@@ -22,17 +22,6 @@ import type { Items } from '$lib/components/list-editor/types';
 import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
 import type { AddItemError } from '$lib/components/list-editor/errors';
 
-// let currentError: AddItemError | undefined = new AddItemError(
-//   `Some of your imported recipients`,
-//   'error',
-//   'They won’t be included in your splits.',
-//   [
-//     new AddItemSuberror('This isn’t a GitHub repo or isn’t public.', '…/drips-network/app', 21),
-//     new AddItemSuberror('This isn’t a valid wallet address.', 'peepeepoopoo.eth', 29),
-//     new AddItemSuberror('This isn’t a valid wallet address.', '0x47-9g40', 87)
-//   ]
-// );
-
 export interface State {
   dripList: DripListConfig;
   recipientErrors: Array<AddItemError>;
