@@ -5,7 +5,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import CsvExample from './components/csv-example.svelte';
-  import DropZone from './components/drop-zone.svelte';
+  import DropZone from '../../components/drop-zone/drop-zone.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import { parseFile } from '$lib/utils/csv';
