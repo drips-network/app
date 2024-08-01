@@ -24,18 +24,11 @@
     return filetypes.includes(file.type);
   }
 
-  let error:
-    | 'wrong-filetype'
-    | 'too-large'
-    | 'too-many-files'
-    | 'upload-failed'
-    | string
-    | undefined;
+  export let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | string | undefined;
   let errorMessages: { [key: string]: string } = {
     'wrong-filetype': 'File type is unsupported',
     'too-large': 'File exceeds 5MB',
     'too-many-files': 'Only drop a single file',
-    'upload-failed': 'Upload failed. Pleae try again later.',
   } as const;
 
   export let loading = false;
@@ -44,11 +37,11 @@
     loading = false;
   }
 
-  let uploadSuccess = false;
+  export let success = true;
   $: {
-    if (uploadSuccess) {
+    if (success) {
       setTimeout(() => {
-        uploadSuccess = false;
+        success = false;
       }, 2000);
     }
   }
@@ -141,7 +134,7 @@
   class:dragging-over={draggingOver}
   class:loading
   class:error
-  class:upload-success={uploadSuccess}
+  class:success
   on:drop={handleDrop}
   on:dragover={handleDragOver}
   on:dragleave={handleDragLeave}
@@ -149,9 +142,11 @@
   {#if draggingOver}
     <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-primary-level-6)" />
     <p class="typo-text">Drop file to upload</p>
-  {:else if uploadSuccess}
-    <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
-    <p class="typo-text">Upload successful</p>
+  {:else if success}
+    <slot name="success">
+      <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
+      <p class="typo-text">Operation successful</p>
+    </slot>
   {:else if loading}
     <slot name="loading">
       <Spinner />
@@ -214,7 +209,7 @@
     color: var(--color-negative-level-6);
   }
 
-  .drop-zone:not(.dragging-over).upload-success {
+  .drop-zone:not(.dragging-over).success {
     border-color: var(--color-positive);
     background-color: var(--color-positive-level-1);
     color: var(--color-positive-level-6);
