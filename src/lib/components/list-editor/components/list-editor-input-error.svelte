@@ -53,21 +53,23 @@
         </div>
       </button>
       {#key expanded}
-        {#each error.suberrors as suberror, index (index)}
-          <div
-            transition:slide={{ duration: 300 }}
-            class:hidden={!expanded}
-            class="suberror error {error.severity} typo-text"
-            style:background-color="var(--color-{color}-level-1)"
-            style:color={textColor}
-          >
-            <div>Line {suberror.lineNumber}</div>
-            <div class="detail">
-              <span>{suberror.cause}</span>
-              <span>{suberror.message}</span>
+        <div
+          class:hidden={!expanded}
+          transition:slide|global={{ duration: 300 }}>
+          {#each error.suberrors as suberror, index (index)}
+            <div
+              class="suberror error {error.severity} typo-text"
+              style:background-color="var(--color-{color}-level-1)"
+              style:color={textColor}
+            >
+              <div>Line {suberror.lineNumber}</div>
+              <div class="detail">
+                <span>{suberror.cause}</span>
+                <span>{suberror.message}</span>
+              </div>
             </div>
-          </div>
-        {/each}
+          {/each}
+        </div>
       {/key}
     </div>
   {/if}
