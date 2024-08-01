@@ -20,19 +20,24 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_ENTRIES = 200;
   const WEIGHT_FACTOR = 10_000;
+  const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
-  let parsedFile: Array<[string, number]> = []
+  let parsedFile: Array<[string, number]> = [];
   let loading: boolean = false;
   let errors: Array<AddItemSuberror> = [];
   let errorMessages: { [key: string]: string } = {
-    'too-many-entries': 'There are more than 200 entries in the CSV.'
-  }
+    'too-many-entries': 'There are more than 200 entries in the CSV.',
+  };
 
   $: formValid = !!file;
+
+  function roundToX(num: number | string, decimals: number | string): number {
+    return +(Math.round(Number(num + 'e' + decimals)) + 'e-' + decimals);
+  }
 
   function clearItems() {
     context.update((c) => {
@@ -56,21 +61,18 @@
   }
 
   function handleDropZoneInput({ file: dropZoneFile }: { file: File }) {
-    console.log('hello world', $context, dropZoneFile);
     file = dropZoneFile;
     uploadForm?.requestSubmit();
   }
 
-  async function validateFile (file: File): Promise<string | false> {
-    const parsedFile = (await parseFile(file)) as Array<[string, number]>;
-    let headerAdjustment = 0
+  async function validateFile(file: File): Promise<string | false> {
+    parsedFile = (await parseFile(file)) as Array<[string, number]>;
+    let headerAdjustment = 0;
     if (isNaN(parsedFile[0][1])) {
-      headerAdjustment = 1
+      headerAdjustment = 1;
     }
 
-    return parsedFile.length > MAX_ENTRIES + headerAdjustment
-      ? 'too-many-entries'
-      : false
+    return parsedFile.length > MAX_ENTRIES + headerAdjustment ? 'too-many-entries' : false;
   }
 
   async function submit() {
@@ -81,21 +83,28 @@
       clearItems();
 
       for (const [index, [recipient, split]] of parsedFile.entries()) {
+        // assume header, skip
+        if (isNaN(split) && index === 0) {
+          continue;
+        }
+
         // a non-header entry with an invalid split should
         // produce an error
-        if (isNaN(split) && index !== 0) {
-          const error = new AddItemSuberror('This has an invalid split value', recipient, index + 1);
+        if (!Number.isFinite(split)) {
+          const error = new AddItemSuberror(
+            'This has an invalid split value',
+            recipient,
+            index + 1,
+          );
           errors.push(error);
           continue;
         }
 
-        console.log('Classifying', recipient);
         const classification = classifyRecipient(recipient);
         // can't classify this input as something we recognize
         if (!classification) {
           const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
           errors.push(error);
-          console.log('Not classifiable', classification);
           continue;
         }
 
@@ -108,7 +117,6 @@
             index + 1,
           );
           errors.push(error);
-          console.log('Not valid', classification.value);
           continue;
         }
 
@@ -125,14 +133,14 @@
         }
 
         const { accountId, ...rest } = recipientResult;
-        // TODO: kinda sus
         const listEditorItem = { type: classification.type, ...rest } as ListEditorItem;
-        console.log('We found the thing', recipient, split, listEditorItem, errors);
-        addItem(accountId, listEditorItem, split);
+        addItem(accountId, listEditorItem, roundToX(split, MAX_DECIMALS));
       }
 
+      // something happened during processing,
+      // add a representative error
       if (errors.length) {
-        const bigError = new AddItemError(
+        const recipientError = new AddItemError(
           'Some of your imported recipients',
           'error',
           'They won’t be included in your splits.',
@@ -140,15 +148,22 @@
         );
 
         context.update((c) => {
-          c.recipientErrors = [bigError];
+          c.recipientErrors = [recipientError];
           return c;
         });
       }
 
-      console.log('Errors ', errors);
       dispatch('conclude');
     } catch (error) {
-      console.error('Something bad happened', error);
+      const fatalError = new AddItemError(
+        'Something terrible happened',
+        'error',
+        (error as Error).message,
+      );
+      context.update((c) => {
+        c.recipientErrors = [fatalError];
+        return c;
+      });
     } finally {
       loading = false;
     }
@@ -197,14 +212,4 @@
 </StepLayout>
 
 <style>
-  /* .form-row {
-    display: flex;
-    gap: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    .form-row {
-      flex-direction: column;
-    }
-  } */
 </style>

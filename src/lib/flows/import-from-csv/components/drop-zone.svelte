@@ -24,14 +24,20 @@
     return filetypes.includes(file.type);
   }
 
-  let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | 'upload-failed' | string | undefined;
+  let error:
+    | 'wrong-filetype'
+    | 'too-large'
+    | 'too-many-files'
+    | 'upload-failed'
+    | string
+    | undefined;
   // TODO: could be more rigorous and refer to the typeof error
   let errorMessages: { [key: string]: string } = {
     'wrong-filetype': 'File type is unsupported',
     'too-large': 'File exceeds 5MB',
     'too-many-files': 'Only drop a single file',
-    'upload-failed': 'Upload failed. Pleae try again later.'
-  }
+    'upload-failed': 'Upload failed. Pleae try again later.',
+  };
 
   $: {
     if (error) {
@@ -115,9 +121,9 @@
       return;
     }
 
-    const validationResult = await validateCustom(file)
+    const validationResult = await validateCustom(file);
     if (validationResult) {
-      error = validationResult
+      error = validationResult;
       return;
     }
 
