@@ -4,7 +4,8 @@
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
+  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' =
+    'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
@@ -21,10 +22,20 @@
 
   $: primaryColor = el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined;
 
-  $: textColor =
-    primaryColor && (variant === 'destructive' || variant === 'primary')
-      ? getContrastColor(primaryColor)
-      : 'var(--color-foreground)';
+  let textColor = 'var(--color-foreground)';
+  $: {
+    if (variant === 'destructive-outline') {
+      textColor = 'var(--color-negative-level-6)';
+    } else if (primaryColor && (variant === 'destructive' || variant === 'primary')) {
+      textColor = getContrastColor(primaryColor);
+    } else {
+      textColor = 'var(--color-foreground)';
+    }
+  }
+  // $: textColor =
+  //   primaryColor && (variant === 'destructive' || variant === 'primary')
+  //     ? getContrastColor(primaryColor)
+  //     : 'var(--color-foreground)';
 </script>
 
 <svelte:element
@@ -45,6 +56,7 @@
   on:mouseleave
   on:focus
   role={href ? 'link' : 'button'}
+  style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
@@ -130,7 +142,7 @@
   }
 
   .button .inner:not(.ghost) {
-    box-shadow: var(--elevation-low);
+    box-shadow: 0px 0px 0px 1px var(--color-foreground);
   }
 
   .button:not(.loading) .inner.primary {
@@ -148,6 +160,10 @@
   .button .inner.with-text {
     padding: 0 0.75rem;
   }
+
+  /* .button .inner.error {
+    color: var(--color-negative-level-6) !important;
+  } */
 
   .button:not(.disabled):hover .inner,
   .button:not(.disabled):focus-visible .inner {

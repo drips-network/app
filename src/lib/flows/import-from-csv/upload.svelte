@@ -29,8 +29,11 @@
   let parsedFile: Array<[string, number]> = [];
   let loading: boolean = false;
   let errors: Array<AddItemSuberror> = [];
-  let errorMessages: { [key: string]: string } = {
+
+  const customErrors: Array<string> = ['too-many-entries', 'wrong-filetype'] as const;
+  let customErrorMessages: { [key: string]: string } = {
     'too-many-entries': 'There are more than 200 entries in the CSV.',
+    'wrong-filetype': "That's not a CSV",
   };
 
   $: formValid = !!file;
@@ -189,8 +192,8 @@
         <p class="typo-text">We’re parsing your CSV and building your list…</p>
       </svelte:fragment>
       <svelte:fragment slot="error" let:error let:defaultContent>
-        {#if error === 'too-many-entries'}
-          <p class="typo-text">{errorMessages[error]}</p>
+        {#if error && customErrors.includes(error)}
+          <p class="typo-text-bold">{customErrorMessages[error]}</p>
         {:else}
           {@html defaultContent}
         {/if}

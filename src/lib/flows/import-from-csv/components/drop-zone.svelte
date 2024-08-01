@@ -37,15 +37,7 @@
     'too-large': 'File exceeds 5MB',
     'too-many-files': 'Only drop a single file',
     'upload-failed': 'Upload failed. Pleae try again later.',
-  };
-
-  $: {
-    if (error) {
-      setTimeout(() => {
-        error = undefined;
-      }, 2000);
-    }
-  }
+  } as const;
 
   export let loading = false;
 
@@ -154,11 +146,6 @@
   {#if draggingOver}
     <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-primary-level-6)" />
     <p class="typo-text">Drop file to upload</p>
-  {:else if error}
-    {@const defaultContent = `<p class="typo-text">${errorMessages[error]}</p>`}
-    <slot name="error" {error} {defaultContent}>
-      {@html defaultContent}
-    </slot>
   {:else if uploadSuccess}
     <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
     <p class="typo-text">Upload successful</p>
@@ -168,10 +155,27 @@
       <p class="typo-text">Loading…</p>
     </slot>
   {:else}
-    <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-foreground-level-6)}" />
-    <!-- TODO: not super great to break this up -->
-    <p class="typo-text">{instructions}, or…</p>
-    <Button on:click={handleSelectFileButtonClick}>Select file</Button>
+    <FileIcon
+      style={`
+      height: 2rem;
+      width: 2rem;
+      fill: ${error ? 'var(--color-negative-level-6)' : 'var(--color-foreground-level-6)'}
+    `}
+    />
+    <div>
+      {#if error}
+        {@const defaultContent = `<p class="typo-text-bold">${errorMessages[error]}</p>`}
+        <slot name="error" {error} {defaultContent}>
+          {@html defaultContent}
+        </slot>
+      {/if}
+      <!-- TODO: not super great to break this up -->
+      <p class="typo-text">{instructions}, or…</p>
+    </div>
+    <Button
+      variant={error ? 'destructive-outline' : 'normal'}
+      on:click={handleSelectFileButtonClick}>Select file</Button
+    >
   {/if}
 </div>
 
