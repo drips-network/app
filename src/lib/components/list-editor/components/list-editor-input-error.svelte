@@ -19,7 +19,7 @@
   {@const textColor = `var(--color-${color}-level-6)`}
   {#if !error.suberrors?.length}
     <div
-      transition:slide|global={{ duration: 300 }}
+      transition:slide={{ duration: 300 }}
       class="error {error.severity}"
       style:background-color="var(--color-{color}-level-1)"
       style:color={textColor}
@@ -30,7 +30,7 @@
   {:else}
     <div>
       <button
-        transition:slide|global={{ duration: 300 }}
+        transition:slide={{ duration: 300 }}
         on:click={() => (expanded = !expanded)}
         aria-expanded={expanded}
         class="error {error.severity} has-suberrors"
@@ -55,7 +55,7 @@
       {#key expanded}
         {#each error.suberrors as suberror, index (index)}
           <div
-            transition:slide|global={{ duration: 300 }}
+            transition:slide={{ duration: 300 }}
             class:hidden={!expanded}
             class="suberror error {error.severity} typo-text"
             style:background-color="var(--color-{color}-level-1)"
