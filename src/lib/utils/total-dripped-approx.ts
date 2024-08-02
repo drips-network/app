@@ -79,6 +79,10 @@ export const cachedTotalDrippedPrices = (
       const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
       const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
+    try {
+      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+      const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+
       return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
         acc[getAddress(address)] = parsedRes[idMap[address]];
         return acc;
