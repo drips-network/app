@@ -74,11 +74,17 @@ export const cachedTotalDrippedPrices = (
     const idMap = z.record(z.string(), z.number()).parse(idMapRes);
     const tokenIdsString = tokenAddresses.map((address) => idMap[address.toLowerCase()]).join(',');
 
-    const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
-    const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+    try {
+      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+      const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
-    return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
-      acc[getAddress(address)] = parsedRes[idMap[address]];
-      return acc;
-    }, {});
+      return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
+        acc[getAddress(address)] = parsedRes[idMap[address]];
+        return acc;
+      }, {});
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      return {};
+    }
   });
