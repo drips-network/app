@@ -1,6 +1,5 @@
 <script lang="ts">
-  export let caption: string =
-    'A recipient can be a wallet address, GitHub repo URL, or Drip List URL.';
+  export let caption: string | undefined;
   export let headers: Array<string> = ['Recipients', 'Split(%)'];
   export let data: Array<Array<unknown>> = [
     ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],

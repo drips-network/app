@@ -29,6 +29,8 @@
         headline: 'Import recipients from CSV',
         description:
           'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
+        exampleTableCaption:
+          'A recipient can be a wallet address, GitHub repo URL, or Drip List URL.',
       }),
     );
   }

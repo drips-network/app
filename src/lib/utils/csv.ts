@@ -1,19 +1,14 @@
-import { inferSchema, initParser } from 'udsv';
+import { default as parseCSV } from 'csv-simple-parser';
 
-export const parse = <T extends unknown[] = []>(csvString: string | undefined): T[] => {
+export const parse = (csvString: string | undefined): unknown[][] | Record<string, unknown>[] => {
   if (!csvString) {
     return [];
   }
 
-  const schema = inferSchema(csvString, {
-    // don't ignore first row as headers
-    header: () => [],
-  });
-  const parser = initParser(schema);
-  return parser.typedArrs(csvString);
+  return parseCSV(csvString)
 };
 
-export const parseFile = <T extends unknown[] = []>(file: File | undefined): Promise<T[]> => {
+export const parseFile = (file: File | undefined): Promise<Array<Array<string>>> => {
   return new Promise((resolve, reject) => {
     if (!file) {
       return resolve([]);
@@ -21,7 +16,7 @@ export const parseFile = <T extends unknown[] = []>(file: File | undefined): Pro
 
     const fileReader = new FileReader();
     fileReader.addEventListener('load', () => {
-      const parsedContent = parse(fileReader.result as string) as T[];
+      const parsedContent = parse(fileReader.result as string) as Array<Array<string>>;
       resolve(parsedContent);
     });
     fileReader.addEventListener('error', reject);

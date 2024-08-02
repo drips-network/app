@@ -34,7 +34,7 @@
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
-  let parsedFile: Array<[string, number]> = [];
+  let parsedFile: Array<Array<string>> = [];
   let loading: boolean = false;
   let errors: Array<AddItemSuberror> = [];
 
@@ -58,14 +58,17 @@
     });
   }
 
-  function addItem(key: AccountId, item: ListEditorItem, weight: number) {
+  function addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
+    console.log($context);
     context.update((c) => {
       c.dripList.items = {
         ...c.dripList.items,
         [key]: item,
       };
 
-      c.dripList.weights[key] = weight * WEIGHT_FACTOR;
+      if (weight) {
+        c.dripList.weights[key] = weight * WEIGHT_FACTOR;
+      }
 
       return c;
     });
@@ -77,9 +80,19 @@
   }
 
   async function validateFile(file: File): Promise<string | false> {
-    parsedFile = (await parseFile(file)) as Array<[string, number]>;
+    parsedFile = (await parseFile(file)) as Array<[string, string]>;
+    console.log(parsedFile);
+    const recipient = parsedFile[0][0];
+    const classification = classifyRecipient(recipient, {
+      allowProjects,
+      allowAddresses,
+      allowDripLists,
+    });
+
     let headerAdjustment = 0;
-    if (isNaN(parsedFile[0][1])) {
+    // if we don't recognize the first value, let's
+    // assume it's a header
+    if (!classification) {
       headerAdjustment = 1;
     }
 
@@ -93,33 +106,38 @@
       // clear the existing recipient entries
       clearItems();
 
-      for (const [index, [recipient, split]] of parsedFile.entries()) {
-        // assume header, skip
-        if (isNaN(split) && index === 0) {
-          continue;
-        }
-
-        // a non-header entry with an invalid split should
-        // produce an error
-        // TODO: consider making some sort of custom validate row function
-        if (!Number.isFinite(split)) {
-          const error = new AddItemSuberror(
-            'This has an invalid split value',
-            recipient,
-            index + 1,
-          );
-          errors.push(error);
-          continue;
-        }
-
+      for (const [index, [recipient, rawSplit]] of parsedFile.entries()) {
+        console.log('About to classify', recipient);
         const classification = classifyRecipient(recipient, {
           allowProjects,
           allowAddresses,
           allowDripLists,
         });
+        console.log('What is this?', classification);
+
+        // assume header, skip it
+        if (!classification && index === 0) {
+          continue;
+        }
+
         // can't classify this input as something we recognize
         if (!classification) {
           const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
+          errors.push(error);
+          continue;
+        }
+
+        // a non-header entry with an invalid split should
+        // produce an error. split will be undefined when there's no second
+        // column in the file and null if there is a second column but the
+        // value is not present.
+        const split = parseFloat(rawSplit);
+        if (typeof rawSplit !== 'undefined' && !Number.isFinite(split)) {
+          const error = new AddItemSuberror(
+            'This has an invalid split value',
+            recipient,
+            index + 1,
+          );
           errors.push(error);
           continue;
         }
@@ -150,7 +168,8 @@
 
         const { accountId, ...rest } = recipientResult;
         const listEditorItem = { type: classification.type, ...rest } as ListEditorItem;
-        addItem(accountId, listEditorItem, roundToX(split, MAX_DECIMALS));
+        const weight = typeof split === 'undefined' ? undefined : roundToX(split, MAX_DECIMALS);
+        addItem(accountId, listEditorItem, weight);
       }
 
       // something happened during processing,
@@ -191,7 +210,7 @@
   <CsvExample
     headers={exampleTableHeaders ? exampleTableHeaders : undefined}
     data={exampleTableData ? exampleTableData : undefined}
-    caption={exampleTableCaption ? exampleTableCaption : undefined}
+    caption={exampleTableCaption}
   />
   <form id="upload-form" bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone
