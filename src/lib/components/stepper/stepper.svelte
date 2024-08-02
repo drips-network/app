@@ -175,6 +175,9 @@
     */
     internalSteps = [steps[currentStepIndex], ...event.detail.steps];
     currentStepIndex = 0;
+    // move relies on resolvedSteps, so allow that computed property
+    // to update
+    await tick();
 
     // Animate to the first side-step
     await move(1);

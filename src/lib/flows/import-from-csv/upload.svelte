@@ -23,11 +23,14 @@
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
+  export let headline: string = 'Import from CSV';
+  export let description: string = 'Your CSV should be properly formatted.';
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
   export let exampleTableHeaders: Array<string> | undefined = undefined;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
+  export let exampleTableCaption: string | undefined = undefined;
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
@@ -98,6 +101,7 @@
 
         // a non-header entry with an invalid split should
         // produce an error
+        // TODO: consider making some sort of custom validate row function
         if (!Number.isFinite(split)) {
           const error = new AddItemSuberror(
             'This has an invalid split value',
@@ -183,13 +187,11 @@
 </script>
 
 <StepLayout>
-  <StepHeader
-    headline="Import recipients from CSV"
-    description="Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:"
-  ></StepHeader>
+  <StepHeader {headline} {description}></StepHeader>
   <CsvExample
     headers={exampleTableHeaders ? exampleTableHeaders : undefined}
     data={exampleTableData ? exampleTableData : undefined}
+    caption={exampleTableCaption ? exampleTableCaption : undefined}
   />
   <form id="upload-form" bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone

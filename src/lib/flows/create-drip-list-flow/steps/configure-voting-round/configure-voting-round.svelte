@@ -25,6 +25,9 @@
     dispatch(
       'sidestep',
       importFromCSVSteps({
+        headline: 'Import collaborators from CSV',
+        description:
+          'Your CSV file should simply be a list of collaborator wallet addresses. For example:',
         allowProjects: false,
         allowAddresses: true,
         allowDripLists: false,
@@ -34,6 +37,7 @@
           ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
           ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
         ],
+        exampleTableCaption: ' ',
       }),
     );
   }

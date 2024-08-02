@@ -23,7 +23,14 @@
   let listValid = false;
 
   function handleImportCSV() {
-    dispatch('sidestep', importFromCSVSteps({}));
+    dispatch(
+      'sidestep',
+      importFromCSVSteps({
+        headline: 'Import recipients from CSV',
+        description:
+          'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
+      }),
+    );
   }
 </script>
 
