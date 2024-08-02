@@ -23,6 +23,11 @@
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
+  export let allowProjects: boolean = true;
+  export let allowAddresses: boolean = true;
+  export let allowDripLists: boolean = true;
+  export let exampleTableHeaders: Array<string> | undefined = undefined;
+  export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
@@ -103,7 +108,11 @@
           continue;
         }
 
-        const classification = classifyRecipient(recipient);
+        const classification = classifyRecipient(recipient, {
+          allowProjects,
+          allowAddresses,
+          allowDripLists,
+        });
         // can't classify this input as something we recognize
         if (!classification) {
           const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
@@ -178,7 +187,10 @@
     headline="Import recipients from CSV"
     description="Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:"
   ></StepHeader>
-  <CsvExample />
+  <CsvExample
+    headers={exampleTableHeaders ? exampleTableHeaders : undefined}
+    data={exampleTableData ? exampleTableData : undefined}
+  />
   <form id="upload-form" bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone
       validateCustom={validateFile}

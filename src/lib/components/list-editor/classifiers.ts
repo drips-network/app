@@ -12,8 +12,19 @@ import { isAddress } from 'ethers/lib/utils';
 import { buildRepositoryURL, isDripsProjectUrl } from '../../utils/build-repo-url';
 import type { RecipientClassification } from './types';
 
-export const classifyRecipient = (input: string): RecipientClassification => {
-  if (isSupportedGitUrl(input)) {
+export const classifyRecipient = (
+  input: string,
+  {
+    allowProjects = true,
+    allowAddresses = true,
+    allowDripLists = true,
+  }: {
+    allowProjects?: boolean;
+    allowAddresses?: boolean;
+    allowDripLists?: boolean;
+  } = {},
+): RecipientClassification => {
+  if (allowProjects && isSupportedGitUrl(input)) {
     return {
       type: 'project',
       value: reformatUrl(input),
@@ -26,7 +37,7 @@ export const classifyRecipient = (input: string): RecipientClassification => {
     };
   }
 
-  if (input.endsWith('.eth') || isAddress(input)) {
+  if (allowAddresses && (input.endsWith('.eth') || isAddress(input))) {
     return {
       type: 'address',
       value: input,
@@ -39,7 +50,7 @@ export const classifyRecipient = (input: string): RecipientClassification => {
     };
   }
 
-  if (input.includes(`${BASE_URL}/app/drip-lists/`)) {
+  if (allowDripLists && input.includes(`${BASE_URL}/app/drip-lists/`)) {
     return {
       type: 'drip-list',
       value: getDripListId(input),
@@ -52,7 +63,7 @@ export const classifyRecipient = (input: string): RecipientClassification => {
     };
   }
 
-  if (isDripsProjectUrl(input)) {
+  if (allowProjects && isDripsProjectUrl(input)) {
     return {
       type: 'project',
       value: buildRepositoryURL(input),

@@ -23,7 +23,7 @@
   let listValid = false;
 
   function handleImportCSV() {
-    dispatch('sidestep', importFromCSVSteps());
+    dispatch('sidestep', importFromCSVSteps({}));
   }
 </script>
 

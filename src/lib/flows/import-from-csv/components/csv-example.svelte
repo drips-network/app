@@ -1,28 +1,38 @@
+<script lang="ts">
+  export let caption: string =
+    'A recipient can be a wallet address, GitHub repo URL, or Drip List URL.';
+  export let headers: Array<string> = ['Recipients', 'Split(%)'];
+  export let data: Array<Array<unknown>> = [
+    ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
+    ['https://github.com/graphdeco-inria/hierarchical-3d-gaussians', 75],
+    [
+      'https://www.drips.network/app/drip-lists/31017209032870028068280040871339261037749177808773684797297972107972',
+      5,
+    ],
+  ];
+</script>
+
 <table>
-  <caption class="typo-text-small mt-4">
-    A recipient can be a wallet address, GitHub repo URL, or Drip List URL.
-  </caption>
+  {#if caption}
+    <caption class="typo-text-small mt-4">
+      {caption}
+    </caption>
+  {/if}
   <thead>
     <tr>
-      <th class="typo-text-bold"> Recipient </th>
-      <th class="typo-text-bold"> Split (%) </th>
+      {#each headers as header}
+        <th class="typo-text-bold">{header}</th>
+      {/each}
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>0x79756b6C2f913271fc0ee29A877fbd98258972BF</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <td>https://github.com/graphdeco-inria/hierarchical-3d-gaussians</td>
-      <td>75</td>
-    </tr>
-    <tr>
-      <td
-        >https://www.drips.network/app/drip-lists/31017209032870028068280040871339261037749177808773684797297972107972</td
-      >
-      <td>5</td>
-    </tr>
+    {#each data as row}
+      <tr>
+        {#each row as column}
+          <td>{column}</td>
+        {/each}
+      </tr>
+    {/each}
   </tbody>
 </table>
 

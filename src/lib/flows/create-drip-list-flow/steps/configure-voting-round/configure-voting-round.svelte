@@ -11,6 +11,8 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -18,6 +20,23 @@
 
   let listValid = false;
   $: isValid = listValid && $context.votingRoundConfig.votingEnds;
+
+  function handleImportCSV() {
+    dispatch(
+      'sidestep',
+      importFromCSVSteps({
+        allowProjects: false,
+        allowAddresses: true,
+        allowDripLists: false,
+        exampleTableHeaders: ['Collaborator'],
+        exampleTableData: [
+          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+        ],
+      }),
+    );
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -32,6 +51,9 @@
       bind:valid={listValid}
       weightsMode={false}
     />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+    </svelte:fragment>
   </FormField>
 
   <FormField
