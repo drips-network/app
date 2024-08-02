@@ -98,6 +98,7 @@
   <div class="search-bar-input-wrapper">
     <SearchIcon style="fill: var(--color-foreground)" />
     <input
+      data-testid="search-bar"
       type="text"
       placeholder="Search addresses, accounts, streams..."
       bind:this={searchElem}

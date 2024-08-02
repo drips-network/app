@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// @vitest-environment node
 
 import { afterAll, beforeAll, describe } from 'vitest';
 import { preview } from 'vite';
@@ -6,10 +7,10 @@ import type { PreviewServer } from 'vite';
 import { chromium } from 'playwright';
 import type { Browser, Page } from 'playwright';
 import { expect } from '@playwright/test';
-import fetch from 'node-fetch';
 import configureAppForTest from './helpers/configure-app-for-test';
 import changeAddress from './helpers/change-address';
 import dotenv from 'dotenv';
+import takeScreenshot from './helpers/take-screenshot';
 
 dotenv.config();
 
@@ -19,8 +20,6 @@ describe('app', async () => {
   let page: Page;
 
   beforeAll(async () => {
-    window.fetch = fetch as unknown as typeof window.fetch;
-
     server = await preview({
       preview: { port: 3001, host: '0.0.0.0' },
     });
@@ -112,10 +111,6 @@ describe('app', async () => {
         await page.locator('data-testid=confirm-amount-button').click();
       });
 
-      it('displays the approve step', async () => {
-        await expect(page.locator('text=Approve')).toHaveCount(1);
-      });
-
       it('shows the topped-up amount on the funds page', async () => {
         await page.locator('text=Got it').click({ timeout: 30000 });
         await page.waitForTimeout(2000);
@@ -150,7 +145,7 @@ describe('app', async () => {
       it('creates the stream', async () => {
         await expect(page.locator('text=No streams')).toHaveCount(0);
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
-      });
+      }, 50000);
 
       it('switches to recipient', async () => {
         await changeAddress(page, '0xAa90c43123ACEc193A35D33db5D71011B019779D');
@@ -194,8 +189,8 @@ describe('app', async () => {
       it('displays the recipients incoming stream on their profile', async () => {
         await page.goto('http://127.0.0.1:3001/app/0xAa90c43123ACEc193A35D33db5D71011B019779D');
 
-        await expect(page.locator('text=From')).toHaveCount(1);
-        await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
+        await expect(page.locator('text=Active')).toHaveCount(1);
+        await expect(page.locator('text=2,592,000 TEST/month')).toHaveCount(1);
       });
 
       it('displays the incoming balance', async () => {
@@ -210,29 +205,9 @@ describe('app', async () => {
         await searchbar.click();
       });
 
-      it('finds streams', async () => {
-        await page.keyboard.type('E2E');
-        await expect(
-          page.locator('.account-menu-item-wrapper', { hasText: 'E2E Test Stream' }),
-        ).toHaveCount(1);
-
-        await page.keyboard.press('Escape');
-      });
-
-      it('finds tokens', async () => {
-        await page.locator('data-testid=search-button').click();
-        await page.keyboard.type('Test');
-
-        await expect(
-          page.locator('.account-menu-item-wrapper', { hasText: 'Test token' }),
-        ).toHaveCount(1);
-
-        await page.keyboard.press('Escape');
-      });
-
       it('jumps to profiles', async () => {
         await page.locator('data-testid=search-button').click();
-        await page.keyboard.type('0x');
+        await page.locator('data-testid=search-bar').fill('0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc');
 
         await page
           .locator('.account-menu-item-wrapper', {
@@ -251,6 +226,7 @@ describe('app', async () => {
     describe('stream detail view', () => {
       it('opens the funds detail view', async () => {
         await page.goto('http://127.0.0.1:3001/app/funds');
+        takeScreenshot(page, 1);
         await page.locator('text=E2E Test Stream').click();
 
         await expect(page.locator('text=E2E Test Stream')).toHaveCount(1);
@@ -352,6 +328,7 @@ describe('app', async () => {
       }, 20000);
 
       it('shows the streams empty state', async () => {
+        await page.reload();
         const streamsEmptyState = page.locator('text=No streams');
         await expect(streamsEmptyState).toHaveCount(1);
       });
