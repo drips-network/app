@@ -19,7 +19,6 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_ENTRIES = 200;
-  const WEIGHT_FACTOR = 10_000;
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
@@ -28,9 +27,16 @@
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
+  export let maxEntries: number = MAX_ENTRIES;
   export let exampleTableHeaders: Array<string> | undefined = undefined;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
   export let exampleTableCaption: string | undefined = undefined;
+  export let addItem: (
+    key: AccountId,
+    item: ListEditorItem,
+    weight: number | undefined,
+  ) => undefined = () => undefined;
+  export let clearItems: () => undefined = () => undefined;
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let file: File | undefined = undefined;
@@ -50,30 +56,6 @@
     return +(Math.round(Number(num + 'e' + decimals)) + 'e-' + decimals);
   }
 
-  function clearItems() {
-    context.update((c) => {
-      c.dripList.items = {};
-      c.dripList.weights = {};
-      return c;
-    });
-  }
-
-  function addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
-    console.log($context);
-    context.update((c) => {
-      c.dripList.items = {
-        ...c.dripList.items,
-        [key]: item,
-      };
-
-      if (weight) {
-        c.dripList.weights[key] = weight * WEIGHT_FACTOR;
-      }
-
-      return c;
-    });
-  }
-
   function handleDropZoneInput({ file: dropZoneFile }: { file: File }) {
     file = dropZoneFile;
     uploadForm?.requestSubmit();
@@ -81,7 +63,6 @@
 
   async function validateFile(file: File): Promise<string | false> {
     parsedFile = (await parseFile(file)) as Array<[string, string]>;
-    console.log(parsedFile);
     const recipient = parsedFile[0][0];
     const classification = classifyRecipient(recipient, {
       allowProjects,
@@ -96,7 +77,7 @@
       headerAdjustment = 1;
     }
 
-    return parsedFile.length > MAX_ENTRIES + headerAdjustment ? 'too-many-entries' : false;
+    return parsedFile.length > maxEntries + headerAdjustment ? 'too-many-entries' : false;
   }
 
   async function submit() {
@@ -107,13 +88,11 @@
       clearItems();
 
       for (const [index, [recipient, rawSplit]] of parsedFile.entries()) {
-        console.log('About to classify', recipient);
         const classification = classifyRecipient(recipient, {
           allowProjects,
           allowAddresses,
           allowDripLists,
         });
-        console.log('What is this?', classification);
 
         // assume header, skip it
         if (!classification && index === 0) {

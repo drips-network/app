@@ -13,6 +13,7 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -31,6 +32,7 @@
         allowProjects: false,
         allowAddresses: true,
         allowDripLists: false,
+        maxEntries: 5000,
         exampleTableHeaders: ['Collaborator'],
         exampleTableData: [
           ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
@@ -38,6 +40,22 @@
           ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
         ],
         exampleTableCaption: ' ',
+        addItem(key: AccountId, item: ListEditorItem) {
+          context.update((c) => {
+            c.votingRoundConfig.collaborators = {
+              ...c.votingRoundConfig.collaborators,
+              [key]: item,
+            };
+
+            return c;
+          });
+        },
+        clearItems() {
+          context.update((c) => {
+            c.votingRoundConfig.collaborators = {};
+            return c;
+          });
+        },
       }),
     );
   }
@@ -53,6 +71,7 @@
       allowDripLists={false}
       bind:items={$context.votingRoundConfig.collaborators}
       bind:valid={listValid}
+      bind:inputErrors={$context.recipientErrors}
       weightsMode={false}
     />
     <svelte:fragment slot="action">

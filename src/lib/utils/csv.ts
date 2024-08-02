@@ -5,7 +5,7 @@ export const parse = (csvString: string | undefined): unknown[][] | Record<strin
     return [];
   }
 
-  return parseCSV(csvString)
+  return parseCSV(csvString);
 };
 
 export const parseFile = (file: File | undefined): Promise<Array<Array<string>>> => {
