@@ -125,6 +125,23 @@
     </svelte:fragment>
   </FormField>
 
+  <FormField title="Allowed recipients">
+    {#if $context.votingRoundConfig.areRecipientsRestricted}
+      <ListEditor
+        items={$context.votingRoundConfig.allowedRecipients}
+        weightsMode={false}
+        isEditable={false}
+      />
+    {:else}
+      <span class="typo-text" style:color="var(--color-foreground-level-4)">Any recipient</span>
+    {/if}
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
+        >Edit</Button
+      >
+    </svelte:fragment>
+  </FormField>
+
   <div class="whats-next text-left">
     <div class="card">
       <h4>Once confirmed…</h4>

@@ -9,6 +9,7 @@
     ListEditorProjectFragment,
   } from './__generated__/gql.generated';
   import { onMount, tick } from 'svelte';
+  import VirtualList from 'svelte-tiny-virtual-list';
 
   const MAX_WEIGHT = 1000000;
 
@@ -19,23 +20,28 @@
   onMount(() => (weights = adjustWeights(weights)));
 
   export let isEditable = true;
+  export let canDeleteItems = true;
   export let maxItems = 200;
 
   export let allowDripLists = true;
   export let allowProjects = true;
   export let allowAddresses = true;
 
+  export let allowEmptyPercentages = false;
+
   export let blockedAccountIds: string[] = [];
 
   export let addOnMount: string | undefined = undefined;
 
   export let outline = true;
+  export let forceBottomBorderOnItems = false;
 
   $: totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
 
   export let valid = false;
   $: valid = weightsMode
-    ? totalWeight === MAX_WEIGHT && !Object.values(weights).some((v) => v === 0)
+    ? totalWeight === MAX_WEIGHT &&
+      (allowEmptyPercentages || !Object.values(weights).some((v) => v === 0))
     : Object.keys(items).length > 0;
 
   let percentagesManuallyChanged = false;
@@ -140,7 +146,8 @@
   }
 
   $: distributeEquallyActionAvailable = Object.keys(items).length > 0;
-  $: distributeRemainingActionAvailable = Object.values(weights).some((v) => v === 0);
+  $: distributeRemainingActionAvailable =
+    Object.values(weights).some((v) => v > 0) && Object.values(weights).some((v) => v === 0);
   $: clearAllActionAvailable = Object.keys(items).length > 0;
 
   function handleDistributeEquallyAction() {
@@ -172,7 +179,7 @@
 
 <div class="list-editor" class:with-outline={outline}>
   <div class="inner">
-    {#if isEditable}
+    {#if isEditable && (allowAddresses || allowProjects || allowDripLists)}
       <ListEditorInput
         existingKeys={Object.keys(items)}
         {addOnMount}
@@ -189,19 +196,32 @@
     {/if}
 
     {#if Object.keys(items).length > 0}
+      {@const itemArray = Object.entries(items)}
       <div class="items" bind:this={itemsContainer}>
-        {#each Object.entries(items) as [key, item]}
-          <ListEditorItemComponent
-            {key}
-            highlight={highlightedItemKey === key}
-            {weightsMode}
-            {isEditable}
-            on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
-            on:deleteItem={() => handleItemDelete(key)}
-            {item}
-            weight={weights[key]}
-          />
-        {/each}
+        <VirtualList
+          height={Math.min(itemArray.length * 56, 384)}
+          width="100%"
+          itemCount={itemArray.length}
+          itemSize={56}
+          getKey={(index) => itemArray[index][0]}
+        >
+          <div slot="item" let:index let:style {style}>
+            {@const [key, item] = itemArray[index]}
+            <ListEditorItemComponent
+              hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
+              allowEmptyPercentage={allowEmptyPercentages}
+              {canDeleteItems}
+              {key}
+              highlight={highlightedItemKey === key}
+              {weightsMode}
+              {isEditable}
+              on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
+              on:deleteItem={() => handleItemDelete(key)}
+              {item}
+              weight={weights[key]}
+            />
+          </div>
+        </VirtualList>
       </div>
     {/if}
   </div>
@@ -228,7 +248,10 @@
         </Button>
       </div>
 
-      <ListEditorPie {totalWeight} hasEmptyInputs={Object.values(weights).some((v) => v === 0)} />
+      <ListEditorPie
+        {totalWeight}
+        hasEmptyInputs={allowEmptyPercentages ? false : Object.values(weights).some((v) => v === 0)}
+      />
     </div>
   {/if}
 </div>

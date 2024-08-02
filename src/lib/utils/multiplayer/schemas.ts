@@ -34,6 +34,7 @@ export const pendingVoteSchema = z.object({
 });
 
 export const submittedVoteSchema = pendingVoteSchema.extend({
+  collaboratorAddress: z.string(),
   latestVote: z.array(voteReceiverSchema),
 });
 

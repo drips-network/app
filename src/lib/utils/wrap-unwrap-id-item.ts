@@ -15,7 +15,7 @@ export function wrapItems<K extends string, T extends Record<K, string>>(array: 
  * of all values of the object, with each having an added `id` key corresponding to their key in
  * the original input object.
  * @param items The object to process.
- * @returns The procssed object as an array.
+ * @returns The processed object as an array.
  */
 export function unwrapIdItems<T>(items: { [id: string]: T }): ({ id: string } & T)[] {
   return Object.entries(items).map(([id, value]) => ({ ...value, id }));

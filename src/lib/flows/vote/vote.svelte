@@ -73,7 +73,7 @@
   <StepHeader
     emoji="🗳️"
     headline="Cast your vote"
-    description="Add recipients and rank them based on which ones you think are most important."
+    description="Vote for which recipients of this Drip List should receive what percentage of funds."
   />
 
   <FormField title="Recipients*">

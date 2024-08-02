@@ -94,10 +94,30 @@
       votingRound.id,
     );
 
-    revealedVotes = await multiplayer.getVotingRoundVotes(votingRound.id, {
-      signature,
-      date: timestamp,
-    });
+    function generateRandomEthAddress() {
+      const randomHex =
+        '0x' + [...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+      return randomHex.toLowerCase();
+    }
+
+    function generateRandomEthAddresses(count: number) {
+      const addresses = [];
+      for (let i = 0; i < count; i++) {
+        addresses.push(generateRandomEthAddress());
+      }
+      return addresses;
+    }
+
+    revealedVotes = [
+      ...(await multiplayer.getVotingRoundVotes(votingRound.id, {
+        signature,
+        date: timestamp,
+      })),
+      ...generateRandomEthAddresses(2000).map((a) => ({
+        collaboratorAddress: a,
+        latestVote: null,
+      })),
+    ];
   }
 
   let collaborator: Collaborator | undefined = undefined;
@@ -130,6 +150,7 @@
         isEditable={false}
         weightsMode={false}
         outline={false}
+        forceBottomBorderOnItems={Boolean(votingRound.votes || revealedVotes)}
         items={{
           [$walletStore.address]: {
             type: 'address',
@@ -160,7 +181,14 @@
         weightsMode={false}
         outline={false}
         items={Object.fromEntries(
-          sortVotes($walletStore.address, votingRound.votes || revealedVotes || []).map((v) => [
+          sortVotes(
+            $walletStore.address,
+            votingRound.votes ||
+              revealedVotes?.filter(
+                (v) => v.collaboratorAddress.toLowerCase() !== $walletStore.address?.toLowerCase(),
+              ) ||
+              [],
+          ).map((v) => [
             v.collaboratorAddress,
             {
               type: 'address',
