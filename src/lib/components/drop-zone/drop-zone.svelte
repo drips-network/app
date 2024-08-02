@@ -24,7 +24,8 @@
     return filetypes.includes(file.type);
   }
 
-  export let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | string | undefined;
+  export let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | string | undefined =
+    undefined;
   let errorMessages: { [key: string]: string } = {
     'wrong-filetype': 'File type is unsupported',
     'too-large': 'File exceeds 5MB',

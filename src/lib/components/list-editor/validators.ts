@@ -43,7 +43,7 @@ export const validateAddress = async (addressValue: string): Promise<boolean> =>
 
 export const createInvalidMessage = (type: string): string => {
   switch (type) {
-    case 'addresses':
+    case 'address':
       return "This isn't a valid wallet address";
     case 'project':
       return "This isn't a GitHub repo or isn't public";

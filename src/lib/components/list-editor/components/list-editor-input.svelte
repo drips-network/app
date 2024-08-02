@@ -8,25 +8,15 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import { BASE_URL } from '$lib/utils/base-url';
-  import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
-  import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT } from '../types';
-  import ensStore from '$lib/stores/ens/ens.store';
-  import assert from '$lib/utils/assert';
-  import type {
-    GetDripListQuery,
-    GetDripListQueryVariables,
-    GetProjectQuery,
-    GetProjectQueryVariables,
-  } from './__generated__/gql.generated';
+  import { type RecipientResult } from '../types';
   import { isAddress } from 'ethers/lib/utils';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripList from '$lib/components/icons/DripList.svelte';
   import List from '$lib/components/icons/List.svelte';
-  import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
+  import { isDripsProjectUrl } from '$lib/utils/build-repo-url';
   import ListEditorInputError from './list-editor-input-error.svelte';
   import { AddItemError } from '../errors';
+  import { classifyRecipient } from '$lib/components/list-editor/classifiers';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -62,6 +52,24 @@
     (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
     (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
 
+  function createInvalidMessage(type: string, value: string): string {
+    switch (type) {
+      case 'address': {
+        if (isAddress(value)) {
+          return "This isn't a valid wallet address";
+        }
+
+        return 'Invalid ENS name';
+      }
+      case 'project':
+        return "Couldn't find that Git project. Is it private?";
+      case 'drip-list':
+        return "This isn't a recognized Drip List";
+      default:
+        return "This isn't valid";
+    }
+  }
+
   function checkCanAdd(accountId: string) {
     if (blockedAccountIds.includes(accountId)) {
       throw new AddItemError(`You can't add this right now.`, 'warning');
@@ -72,105 +80,27 @@
     }
   }
 
-  async function addDripsProject(urlValue: string) {
-    return addProject(buildRepositoryURL(urlValue));
-  }
-
-  async function addProject(urlValue: string) {
-    let url = urlValue;
-
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
+  function dispatchUpdate(recipientResult: RecipientResult) {
+    if (recipientResult?.address) {
+      dispatch('addAddress', {
+        accountId: recipientResult.accountId,
+        address: recipientResult.address,
+      });
+      return;
     }
 
-    if (url.endsWith('/')) {
-      url = url.slice(0, -1);
+    if (recipientResult?.project) {
+      dispatch('addProject', {
+        accountId: recipientResult.accountId,
+        project: recipientResult.project,
+      });
+      return;
     }
 
-    const repoInfoRes = await fetch(`/api/github/${encodeURIComponent(url)}`);
-    const repoInfo = await repoInfoRes.json();
-    const normalizedUrl = repoInfo.url;
-
-    if (!normalizedUrl) {
-      throw new AddItemError("Couldn't find that Git project. Is it private?", 'warning');
-    }
-
-    const res = await query<GetProjectQuery, GetProjectQueryVariables>(
-      gql`
-        ${LIST_EDITOR_PROJECT_FRAGMENT}
-        query GetProject($url: String!) {
-          project: projectByUrl(url: $url) {
-            ...ListEditorProject
-            ... on ClaimedProject {
-              account {
-                accountId
-              }
-            }
-            ... on UnclaimedProject {
-              account {
-                accountId
-              }
-            }
-          }
-        }
-      `,
-      { url: normalizedUrl },
-    );
-
-    if (res.project) {
-      checkCanAdd(res.project.account.accountId);
-      dispatch('addProject', { accountId: res.project.account.accountId, project: res.project });
-    }
-  }
-
-  async function addAddress(addressValue: string) {
-    let address: string;
-
-    if (isAddress(addressValue)) {
-      address = addressValue;
-    } else {
-      const resolved = await ensStore.reverseLookup(inputValue);
-      if (!resolved) throw new AddItemError('Invalid ENS name', 'error');
-
-      address = resolved;
-    }
-
-    const addressDriverClient = await getAddressDriverClient();
-    const accountId = await addressDriverClient.getAccountIdByAddress(address);
-
-    checkCanAdd(accountId);
-
-    dispatch('addAddress', {
-      accountId,
-      address,
-    });
-  }
-
-  async function addDripList(dripListUrlValue: string) {
-    const dripListId = dripListUrlValue.substring(inputValue.lastIndexOf('/') + 1);
-    assert(dripListId);
-
-    const res = await query<GetDripListQuery, GetDripListQueryVariables>(
-      gql`
-        ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-        query GetDripList($id: ID!) {
-          dripList: dripList(id: $id) {
-            ...ListEditorDripList
-            account {
-              accountId
-            }
-          }
-        }
-      `,
-      { id: dripListId },
-    );
-
-    if (res.dripList) {
-      checkCanAdd(res.dripList.account.accountId);
-
+    if (recipientResult?.dripList) {
       dispatch('addDripList', {
-        accountId: res.dripList.account.accountId,
-        dripList: res.dripList,
+        accountId: recipientResult.accountId,
+        dripList: recipientResult.dripList,
       });
     }
   }
@@ -237,15 +167,23 @@
     loading = true;
 
     try {
-      if (isSupportedGitUrl(value)) {
-        await addProject(value);
-      } else if (value.endsWith('.eth') || isAddress(value)) {
-        await addAddress(value);
-      } else if (value.includes(`${BASE_URL}/app/drip-lists/`)) {
-        await addDripList(value);
-      } else if (value.includes(`${BASE_URL}/app/projects/`)) {
-        await addDripsProject(value);
+      const classification = classifyRecipient(value);
+      // if classification is null, we don't do anything for now
+      const isValid = await classification?.validate();
+      const type = classification?.type || 'unknown';
+      // the input ain't valid
+      if (!isValid) {
+        throw new AddItemError(createInvalidMessage(type, value), 'error');
       }
+
+      const recipientResult = await classification?.fetch();
+      // for some reason, we didn't get a good response
+      if (!recipientResult) {
+        throw new AddItemError('We failed to get information for this.', 'error');
+      }
+
+      checkCanAdd(recipientResult.accountId);
+      dispatchUpdate(recipientResult);
     } catch (e) {
       if (e instanceof AddItemError) {
         displayError(e);
