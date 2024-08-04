@@ -37,8 +37,15 @@ export const validateAddress = async (addressValue: string): Promise<boolean> =>
     return true;
   }
 
-  const resolved = await ensStore.reverseLookup(addressValue);
-  return !!resolved;
+  try {
+    console.log('about to look up')
+    const resolved = await ensStore.reverseLookup(addressValue);
+    console.log('about to look up', addressValue, resolved);
+    return !!resolved;
+  } catch (error) {
+    console.error('validation', error)
+    return false
+  }
 };
 
 export const createInvalidMessage = (type: string): string => {

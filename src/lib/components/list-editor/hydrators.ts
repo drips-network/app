@@ -70,10 +70,18 @@ export const getProject = async (url: string): Promise<RecipientResult> => {
 };
 
 export const getAddress = async (address: string): Promise<RecipientResult> => {
-  const addressDriverClient = await getAddressDriverClient();
-  const accountId = await addressDriverClient.getAccountIdByAddress(address);
-  return {
-    accountId,
-    address,
-  };
+  try {
+    const addressDriverClient = await getAddressDriverClient();
+    const accountId = await addressDriverClient.getAccountIdByAddress(address);
+    return {
+      accountId,
+      address,
+    };
+  } catch (error) {
+    if ((error as Error).message.includes('Address validation')) {
+      return null
+    }
+
+    throw error
+  }
 };

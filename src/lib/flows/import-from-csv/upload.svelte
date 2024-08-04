@@ -63,6 +63,7 @@
 
   async function validateFile(file: File): Promise<string | false> {
     parsedFile = (await parseFile(file)) as Array<[string, string]>;
+    console.log(parsedFile)
     const recipient = parsedFile[0][0];
     const classification = classifyRecipient(recipient, {
       allowProjects,
@@ -88,6 +89,11 @@
       clearItems();
 
       for (const [index, [recipient, rawSplit]] of parsedFile.entries()) {
+        console.log('foo!', !recipient.trim())
+        if (!recipient.trim()) {
+          continue
+        }
+
         const classification = classifyRecipient(recipient, {
           allowProjects,
           allowAddresses,
@@ -101,6 +107,7 @@
 
         // can't classify this input as something we recognize
         if (!classification) {
+          console.log('!classification', recipient)
           const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
           errors.push(error);
           continue;
@@ -133,6 +140,7 @@
           continue;
         }
 
+        console.log('We are fetching')
         const recipientResult = await classification?.fetch();
         // for some reason, we didn't get a good response
         if (!recipientResult) {
@@ -154,6 +162,7 @@
       // something happened during processing,
       // add a representative error
       if (errors.length) {
+        // TODO: this error needs to be customizable
         const recipientError = new AddItemError(
           'Some of your imported recipients',
           'error',
@@ -166,9 +175,10 @@
           return c;
         });
       }
-
+      console.log('We are dispatching!')
       dispatch('conclude');
     } catch (error) {
+      console.error(error)
       const fatalError = new AddItemError(
         'Something terrible happened',
         'error',
