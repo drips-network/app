@@ -41,11 +41,17 @@ export const classifyRecipient = (
     return {
       type: 'address',
       value: input,
-      validate() {
-        return validateAddress(this.value);
+      resolvedAddress: undefined,
+      async validate () {
+        const validation = await validateAddress(this.value)
+        // we've resolved a .eth address
+        if (typeof validation === 'string' && input.endsWith('.eth')) {
+          this.resolvedAddress = validation as string
+        }
+        return validation
       },
       fetch() {
-        return getAddress(this.value);
+        return getAddress(this.resolvedAddress || this.value);
       },
     };
   }

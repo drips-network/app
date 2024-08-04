@@ -32,20 +32,13 @@ export const validateDripList = async (url: string): Promise<boolean> => {
   return !!dripListId;
 };
 
-export const validateAddress = async (addressValue: string): Promise<boolean> => {
+export const validateAddress = async (addressValue: string): Promise<boolean | string | undefined> => {
   if (isAddress(addressValue)) {
     return true;
   }
 
-  try {
-    console.log('about to look up')
-    const resolved = await ensStore.reverseLookup(addressValue);
-    console.log('about to look up', addressValue, resolved);
-    return !!resolved;
-  } catch (error) {
-    console.error('validation', error)
-    return false
-  }
+  const resolved = await ensStore.reverseLookup(addressValue);
+  return resolved
 };
 
 export const createInvalidMessage = (type: string): string => {

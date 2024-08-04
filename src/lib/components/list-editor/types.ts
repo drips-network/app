@@ -60,6 +60,7 @@ export type RecipientResult = {
 export type RecipientClassification = {
   type: 'project' | 'address' | 'drip-list';
   value: string;
-  validate: () => Promise<boolean>;
+  resolvedAddress?: string | undefined;
+  validate: () => Promise<boolean | string | undefined>;
   fetch: () => Promise<RecipientResult>;
 } | null;
