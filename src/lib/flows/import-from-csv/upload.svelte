@@ -172,8 +172,6 @@
           return c;
         });
       }
-
-      dispatch('conclude');
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error processing csv', error);
@@ -188,6 +186,7 @@
       });
     } finally {
       loading = false;
+      dispatch('conclude');
     }
   }
 </script>
