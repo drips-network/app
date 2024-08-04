@@ -14,6 +14,7 @@
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import { AddItemError } from '$lib/components/list-editor/errors';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -55,6 +56,14 @@
             c.votingRoundConfig.collaborators = {};
             return c;
           });
+        },
+        onItemsError(errors) {
+          return new AddItemError(
+            'Some of your imported collaborators',
+            'error',
+            'They won’t be included',
+            errors,
+          );
         },
       }),
     );

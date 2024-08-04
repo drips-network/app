@@ -79,9 +79,9 @@ export const getAddress = async (address: string): Promise<RecipientResult> => {
     };
   } catch (error) {
     if ((error as Error).message.includes('Address validation')) {
-      return null
+      return null;
     }
 
-    throw error
+    throw error;
   }
 };

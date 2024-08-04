@@ -42,13 +42,13 @@ export const classifyRecipient = (
       type: 'address',
       value: input,
       resolvedAddress: undefined,
-      async validate () {
-        const validation = await validateAddress(this.value)
+      async validate() {
+        const validation = await validateAddress(this.value);
         // we've resolved a .eth address
         if (typeof validation === 'string' && input.endsWith('.eth')) {
-          this.resolvedAddress = validation as string
+          this.resolvedAddress = validation as string;
         }
-        return validation
+        return validation;
       },
       fetch() {
         return getAddress(this.resolvedAddress || this.value);

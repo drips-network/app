@@ -1,6 +1,7 @@
 import { makeStep } from '$lib/components/stepper/types';
 import Upload from './upload.svelte';
 import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+import type { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
 
 type UploadProps = {
   headline?: string;
@@ -14,6 +15,7 @@ type UploadProps = {
   exampleTableCaption?: string | undefined;
   addItem: (key: AccountId, item: ListEditorItem, weight: number | undefined) => undefined;
   clearItems: () => undefined;
+  onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
 };
 
 export default (props: UploadProps) => ({
