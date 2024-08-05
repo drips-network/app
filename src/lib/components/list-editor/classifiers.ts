@@ -44,7 +44,7 @@ export const classifyRecipient = (
       resolvedAddress: undefined,
       async validate() {
         const validation = await validateAddress(this.value);
-        // we've resolved a .eth address, save it's resolution
+        // we've resolved a .eth address, save its resolution
         // so we can use it later when fetching. We assume that
         // validate is always called before.
         if (typeof validation === 'string' && input.endsWith('.eth')) {
