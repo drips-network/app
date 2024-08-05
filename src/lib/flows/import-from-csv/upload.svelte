@@ -18,7 +18,7 @@
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
-  const MAX_ENTRIES = 200;
+  const DEFAULT_MAX_ENTRIES = 200;
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
@@ -27,7 +27,7 @@
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
-  export let maxEntries: number = MAX_ENTRIES;
+  export let maxEntries: number = DEFAULT_MAX_ENTRIES;
   export let exampleTableHeaders: Array<string> | undefined = undefined;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
   export let exampleTableCaption: string | undefined = undefined;

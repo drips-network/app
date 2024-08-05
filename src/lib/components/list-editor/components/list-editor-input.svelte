@@ -22,6 +22,7 @@
     addAddress: { accountId: string; address: string };
     addProject: { accountId: string; project: ListEditorProjectFragment };
     addDripList: { accountId: string; dripList: ListEditorDripListFragment };
+    errorDismissed: void;
   }>();
 
   export let maxItemsReached: boolean;
@@ -108,9 +109,11 @@
   function displayError(error: NonNullable<(typeof errors)[0]>) {
     errors = [error];
   }
+
   function clearError() {
     errors = [];
   }
+
   $: {
     inputValue;
     if (inputValue !== '') clearError();
@@ -156,6 +159,7 @@
 
   function handleErrorDismiss() {
     clearError();
+    dispatch('errorDismissed');
   }
 
   async function handleSubmit(value: string) {

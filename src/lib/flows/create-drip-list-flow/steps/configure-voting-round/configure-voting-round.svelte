@@ -68,6 +68,13 @@
       }),
     );
   }
+
+  function handleErrorDismissed() {
+    context.update((c) => {
+      c.recipientErrors = [];
+      return c;
+    });
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -81,6 +88,7 @@
       bind:items={$context.votingRoundConfig.collaborators}
       bind:valid={listValid}
       bind:inputErrors={$context.recipientErrors}
+      on:errorDismissed={handleErrorDismissed}
       weightsMode={false}
     />
     <svelte:fragment slot="action">

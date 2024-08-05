@@ -19,7 +19,7 @@
   {@const textColor = `var(--color-${color}-level-6)`}
   {#if !error.suberrors?.length}
     <div
-      transition:slide={{ duration: 300 }}
+      transition:slide|global={{ duration: 300 }}
       class="error {error.severity}"
       style:background-color="var(--color-{color}-level-1)"
       style:color={textColor}

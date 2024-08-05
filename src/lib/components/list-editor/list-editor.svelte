@@ -189,6 +189,7 @@
         on:addAddress={(e) => handleAddAddress(e.detail.accountId, e.detail.address)}
         on:addProject={(e) => handleAddProject(e.detail.accountId, e.detail.project)}
         on:addDripList={(e) => handleAddDripList(e.detail.accountId, e.detail.dripList)}
+        on:errorDismissed
       />
     {/if}
 
