@@ -20,6 +20,7 @@
   import formatDate from '$lib/utils/format-date';
   import * as multiplayer from '$lib/utils/multiplayer';
   import assert from '$lib/utils/assert';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -66,6 +67,8 @@
         });
 
         $context.newVotingRoundId = newVotingRoundId;
+
+        await invalidateAll();
       },
       message: 'Confirm in your wallet...',
     });

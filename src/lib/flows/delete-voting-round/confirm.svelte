@@ -9,6 +9,7 @@
   import assert from '$lib/utils/assert';
   import { goto } from '$app/navigation';
   import Wallet from '$lib/components/icons/Wallet.svelte';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,7 +36,8 @@
 
         await multiplayer.deleteVotingRound(signature, timestamp, address, votingRoundId);
 
-        goto('/app/drip-lists');
+        await invalidateAll();
+        await goto('/app/drip-lists');
       },
       message: 'Waiting for you to confirm in your wallet... ',
     });

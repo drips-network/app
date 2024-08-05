@@ -23,6 +23,7 @@
   import DripList from '$lib/components/icons/DripList.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -90,6 +91,8 @@
           await multiplayer.linkVotingRoundToDripList(votingRoundId, dripListId);
 
           $context.publishedDripListId = dripListId;
+
+          await invalidateAll();
         },
       }),
     );
