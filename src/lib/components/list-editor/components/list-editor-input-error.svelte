@@ -93,7 +93,6 @@
   }
 
   .suberror {
-    /* TODO: is the border too dark? */
     border-bottom: 1px solid var(--color-negative-level-2);
   }
 
