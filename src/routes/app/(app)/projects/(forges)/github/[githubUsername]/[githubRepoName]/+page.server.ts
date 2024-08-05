@@ -8,10 +8,11 @@ import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
 import { redis } from '../../../../../../../api/redis';
-import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
-import { Forge } from 'radicle-drips';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
+import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
+import { hexlify, toUtf8Bytes } from 'ethers';
+import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
@@ -26,24 +27,22 @@ async function fetchDripsProject(repoUrl: string) {
   const url = new URL(repoUrl);
   const [, owner, repo] = url.pathname.split('/');
 
-  const repoDriverClient = await getRepoDriverClient();
-
-  const accountId = await repoDriverClient.getAccountId(Forge.GitHub, `${owner}/${repo}`);
+  const accountId = await executeRepoDriverReadMethod({
+    functionName: 'calcAccountId',
+    args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as OxString],
+  });
 
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
 
-  return await cached(
-    redis,
-    cacheKey,
-    172800,
-    () => query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
+  return await cached(redis, cacheKey, 172800, () =>
+    query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
       getProjectsQuery,
       {
         url: repoUrl,
       },
       fetch,
     ),
-  )
+  );
 }
 
 export const load = (async ({ params, fetch, url }) => {

@@ -4,11 +4,11 @@
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
   import Toggle from '../toggle/toggle.svelte';
-  import { formatUnits } from 'ethers/lib/utils';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import Token from '../token/token.svelte';
   import Spinner from '../spinner/spinner.svelte';
+  import { formatUnits } from 'ethers';
 
   export let tokenAddress: string | undefined;
   export let tokenBalance: bigint | undefined;

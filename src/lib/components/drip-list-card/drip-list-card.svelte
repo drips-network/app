@@ -105,10 +105,10 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
-  import { constants } from 'radicle-drips';
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -176,7 +176,7 @@
 
         return {
           tokenAddress: amount.tokenAddress,
-          amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+          amount: amount.amount / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
         };
       }),
     );

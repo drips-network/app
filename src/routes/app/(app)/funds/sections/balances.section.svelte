@@ -24,7 +24,6 @@
   import { goto } from '$app/navigation';
   import ChevronRightCell from '$lib/components/table/cells/chevron-right-cell.svelte';
   import unreachable from '$lib/utils/unreachable';
-  import { AddressDriverClient } from 'radicle-drips';
   import wallet from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
   import type { ComponentProps } from 'svelte';
@@ -35,6 +34,7 @@
   import getTopUpFlowSteps from '$lib/flows/top-up-flow/top-up-flow-steps';
   import modal from '$lib/stores/modal';
   import Plus from '$lib/components/icons/Plus.svelte';
+  import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
 
   interface TokenTableRow {
     token: ComponentProps<Token>;
@@ -118,7 +118,7 @@
     // go to token page by address
     const tokenAddress = tableData[event.detail.rowIndex].token.address;
     assert(accountId);
-    const address = AddressDriverClient.getUserAddress(accountId);
+    const address = extractAddressFromAccountId(accountId);
     goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
   }
 </script>

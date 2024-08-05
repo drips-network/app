@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { randomBytes, toBigInt } from 'ethers';
 
 /**
  * Keeps generating a random bigint with a length of `bytes`, until the result
@@ -11,7 +11,7 @@ export default function (existing: bigint[], bytes: number) {
   let result: bigint | undefined = undefined;
 
   while (!result || existing.includes(result)) {
-    result = ethers.BigNumber.from(ethers.utils.randomBytes(bytes)).toBigInt();
+    result = toBigInt(randomBytes(bytes));
   }
 
   return result;

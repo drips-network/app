@@ -19,14 +19,15 @@
     GetProjectQuery,
     GetProjectQueryVariables,
   } from './__generated__/gql.generated';
-  import { isAddress } from 'ethers/lib/utils';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripList from '$lib/components/icons/DripList.svelte';
   import List from '$lib/components/icons/List.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import { slide } from 'svelte/transition';
   import { buildRepositoryURL, isDripsProjectUrl } from '$lib/utils/build-repo-url';
+  import { isAddress } from 'ethers';
+  import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -142,8 +143,12 @@
       address = resolved;
     }
 
-    const addressDriverClient = await getAddressDriverClient();
-    const accountId = await addressDriverClient.getAccountIdByAddress(address);
+    const accountId = (
+      await executeAddressDriverReadMethod({
+        functionName: 'calcAccountId',
+        args: [address as OxString],
+      })
+    ).toString();
 
     checkCanAdd(accountId);
 
@@ -245,9 +250,9 @@
         await addProject(value);
       } else if (value.endsWith('.eth') || isAddress(value)) {
         await addAddress(value);
-      } else if (value.includes(`${BASE_URL}/app/drip-lists/`)) {
+      } else if ((value as string).includes(`${BASE_URL}/app/drip-lists/`)) {
         await addDripList(value);
-      } else if (value.includes(`${BASE_URL}/app/projects/`)) {
+      } else if ((value as string).includes(`${BASE_URL}/app/projects/`)) {
         await addDripsProject(value);
       }
     } catch (e) {

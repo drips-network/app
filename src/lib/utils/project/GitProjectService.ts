@@ -1,19 +1,6 @@
-import {
-  type RepoDriverClient,
-  RepoDriverTxFactory,
-  Utils,
-  type SplitsReceiverStruct,
-  DripsTxFactory,
-} from 'radicle-drips';
-import {
-  getDripsTxFactory,
-  getRepoDriverClient,
-  getRepoDriverTxFactory,
-} from '../get-drips-clients';
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
-import { BigNumber, type PopulatedTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
@@ -23,6 +10,17 @@ import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
 import type { Items, Weights } from '$lib/components/list-editor/types';
+import { hexlify, toBigInt, toUtf8Bytes } from 'ethers';
+import type { OxString } from '../sdk/sdk-types';
+import {
+  populateRepoDriverWriteTx,
+  executeRepoDriverReadMethod,
+} from '../sdk/repo-driver/repo-driver';
+import unreachable from '../unreachable';
+import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
+import type { ContractTransaction } from 'ethers';
+import { populateDripsWriteTx } from '../sdk/drips/drips';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 
 interface ListEditorConfig {
   items: Items;
@@ -31,9 +29,6 @@ interface ListEditorConfig {
 
 export default class GitProjectService {
   private _github!: GitHub;
-  private _dripsTxFactory!: DripsTxFactory;
-  private _repoDriverClient!: RepoDriverClient;
-  private _repoDriverTxFactory!: RepoDriverTxFactory;
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
 
@@ -45,15 +40,10 @@ export default class GitProjectService {
     const octokit = new Octokit();
     gitProjectService._github = new GitHub(octokit);
 
-    gitProjectService._repoDriverClient = await getRepoDriverClient();
-    gitProjectService._dripsTxFactory = await getDripsTxFactory();
-
     const { connected, signer, address } = get(wallet);
 
     if (connected) {
       assert(signer, 'Signer address is undefined.');
-
-      gitProjectService._repoDriverTxFactory = await getRepoDriverTxFactory();
 
       gitProjectService._connectedAddress = address;
     }
@@ -155,9 +145,7 @@ export default class GitProjectService {
     highLevelPercentages: { [slug: string]: number },
     maintainers: ListEditorConfig,
     dependencies: ListEditorConfig,
-  ): Promise<{ newMetadataHash: string; batch: PopulatedTransaction[] }> {
-    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
-
+  ): Promise<{ newMetadataHash: string; batch: ContractTransaction[] }> {
     const {
       tx: setSplitsTx,
       dependenciesSplitMetadata,
@@ -189,25 +177,28 @@ export default class GitProjectService {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: ipfsHash,
       },
-    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
+    ].map(keyValueToMetatada);
 
-    const emitAccountMetadataTx = await this._repoDriverTxFactory.emitAccountMetadata(
-      accountId,
-      accountMetadataAsBytes,
-    );
+    const emitAccountMetadataTx = await populateRepoDriverWriteTx({
+      functionName: 'emitAccountMetadata',
+      args: [toBigInt(accountId), accountMetadataAsBytes],
+    });
 
     return { batch: [setSplitsTx, emitAccountMetadataTx], newMetadataHash: ipfsHash };
   }
 
-  public async buildBatchTx(context: State): Promise<PopulatedTransaction[]> {
-    assert(this._repoDriverTxFactory, `This function requires an active wallet connection.`);
-
+  public async buildBatchTx(context: State): Promise<ContractTransaction[]> {
     const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-    const numericForgeValue = forge === Forge.GitHub ? 0 : 1;
-    const accountId = await this._repoDriverClient.getAccountId(
-      numericForgeValue,
-      `${username}/${repoName}`,
-    );
+
+    const accountId = (
+      await executeRepoDriverReadMethod({
+        functionName: 'calcAccountId',
+        args: [
+          forge === Forge.GitHub ? 0 : unreachable(),
+          hexlify(toUtf8Bytes(`${username}/${repoName}`)) as OxString,
+        ], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
+      })
+    ).toString();
 
     const {
       tx: setSplitsTx,
@@ -263,12 +254,12 @@ export default class GitProjectService {
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: ipfsHash,
       },
-    ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
+    ].map(keyValueToMetatada);
 
-    const emitAccountMetadataTx = await this._repoDriverTxFactory.emitAccountMetadata(
-      accountId,
-      accountMetadataAsBytes,
-    );
+    const emitAccountMetadataTx = await populateRepoDriverWriteTx({
+      functionName: 'emitAccountMetadata',
+      args: [toBigInt(accountId), accountMetadataAsBytes],
+    });
 
     const splittableAmounts = context.project?.withdrawableBalances.filter(
       (wb) => BigInt(wb.splittableAmount) > 0n,
@@ -277,50 +268,29 @@ export default class GitProjectService {
       (wb) => BigInt(wb.collectableAmount) > 0n,
     );
 
-    const splitTxs: Promise<PopulatedTransaction>[] = [];
+    const splitTxs: Promise<ContractTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
       splitTxs.push(
-        this._dripsTxFactory.split(accountId, tokenAddress, this._formatSplitReceivers(receivers)),
+        populateDripsWriteTx({
+          functionName: 'split',
+          args: [toBigInt(accountId), tokenAddress as OxString, formatSplitReceivers(receivers)],
+        }),
       );
     });
 
-    const collectTxs: Promise<PopulatedTransaction>[] = [];
+    const collectTxs: Promise<ContractTransaction>[] = [];
     collectableAmounts?.forEach(({ tokenAddress }) => {
       assert(this._connectedAddress);
 
       collectTxs.push(
-        this._repoDriverTxFactory.collect(accountId, tokenAddress, this._connectedAddress),
+        populateRepoDriverWriteTx({
+          functionName: 'collect',
+          args: [toBigInt(accountId), tokenAddress as OxString, this._connectedAddress as OxString],
+        }),
       );
     });
 
     return Promise.all([setSplitsTx, emitAccountMetadataTx, ...splitTxs, ...collectTxs]);
-  }
-
-  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
-  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
-
-    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
-      if (
-        !unique.some(
-          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
-        )
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    const sortedReceivers = uniqueReceivers.sort((a, b) =>
-      // Sort by user ID.
-      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
-        ? 1
-        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-          ? -1
-          : 0,
-    );
-
-    return sortedReceivers;
   }
 
   private async _buildSetSplitsTxAndMetadata(
@@ -418,10 +388,10 @@ export default class GitProjectService {
     receivers = adjustWeights(receivers);
 
     return {
-      tx: await this._repoDriverTxFactory.setSplits(
-        accountId,
-        this._formatSplitReceivers(receivers),
-      ),
+      tx: await populateRepoDriverWriteTx({
+        functionName: 'setSplits',
+        args: [toBigInt(accountId), formatSplitReceivers(receivers)],
+      }),
       dependenciesSplitMetadata: receivers.filter((v) => v.sublist === 'dependencies'),
       maintainersSplitsMetadata: receivers.filter(
         (v) => v.sublist === 'maintainers',

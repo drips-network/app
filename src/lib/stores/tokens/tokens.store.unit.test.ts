@@ -1,8 +1,8 @@
-import { Utils } from 'radicle-drips';
 import { get } from 'svelte/store';
 import tokens from '.';
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 import network from '../wallet/network';
+import { toBigInt } from 'ethers';
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -41,9 +41,8 @@ describe('tokens store', () => {
       'RAD',
     );
     expect(
-      tokens.getByDripsAssetId(
-        Utils.Asset.getIdFromAddress('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3').toString(),
-      )?.info.address,
+      tokens.getByDripsAssetId(toBigInt('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3').toString())
+        ?.info.address,
     ).toBe('0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3');
   });
 

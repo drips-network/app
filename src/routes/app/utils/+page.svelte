@@ -3,20 +3,22 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { Utils, constants } from 'radicle-drips';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import { streamConfigFromUint256 } from '$lib/utils/sdk/utils/stream-config-utils';
+  import { toBigInt } from 'ethers';
 
   let streamConfigValue = '';
   let tokenAddresssValue = '';
 
   $: token = tokensStore.getByAddress(tokenAddresssValue);
 
-  const decode = Utils.StreamConfiguration.fromUint256;
+  const decode = streamConfigFromUint256;
 
   let decoded: ReturnType<typeof decode> | undefined;
 
   $: {
     try {
-      decoded = decode(streamConfigValue);
+      decoded = decode(toBigInt(streamConfigValue));
     } catch {
       decoded = undefined;
     }
@@ -42,7 +44,8 @@
       <div class="result">
         <h4>Result</h4>
         <p>
-          Stream Rate (wei / sec including extra {constants.AMT_PER_SEC_EXTRA_DECIMALS} decimals of precision):
+          Stream Rate (wei / sec including extra {contractConstants.AMT_PER_SEC_EXTRA_DECIMALS} decimals
+          of precision):
           <span class="typo-text tabular-nums">{decoded?.amountPerSec}</span>
         </p>
         <p class="indented">

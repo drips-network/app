@@ -4,9 +4,9 @@ import type { TokenInfo } from '@uniswap/token-lists';
 import { get, writable } from 'svelte/store';
 import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
-import { Utils } from 'radicle-drips';
 import { browser } from '$app/environment';
 import network, { isSupportedChainId } from '../wallet/network';
+import { getAddress, toBigInt } from 'ethers';
 
 interface DefaultTokenInfoWrapper {
   info: TokenInfo;
@@ -95,7 +95,7 @@ export default (() => {
     if (!tokens) return;
 
     return tokens.find((t) => {
-      const assetAddress = Utils.Asset.getAddressFromId(BigInt(dripsAssetId));
+      const assetAddress = getAddress(toBigInt(dripsAssetId).toString(16));
 
       const addressMatch = t.info.address.toLowerCase() === assetAddress.toLowerCase();
       const chainIdMatch = t.info.chainId === chain;

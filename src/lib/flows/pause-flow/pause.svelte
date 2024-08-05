@@ -15,7 +15,6 @@
 
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
@@ -37,9 +36,7 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const addressDriverClient = await getAddressDriverClient();
-
-          const tx = await buildPauseStreamPopulatedTx(addressDriverClient, stream.id);
+          const tx = await buildPauseStreamPopulatedTx(stream.id);
 
           return { tx, accountId: stream.sender.account.accountId };
         },

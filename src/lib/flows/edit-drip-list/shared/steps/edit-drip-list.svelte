@@ -75,17 +75,11 @@
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import {
-    getCallerClient,
-    getNFTDriverClient,
-    getNFTDriverTxFactory,
-  } from '$lib/utils/get-drips-clients';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import { Utils } from 'radicle-drips';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import DripListEditor, {
     type DripListConfig,
@@ -103,6 +97,14 @@
     LIST_EDITOR_PROJECT_FRAGMENT,
     type Items,
   } from '$lib/components/list-editor/types';
+  import {
+    executeNftDriverWriteMethod,
+    populateNftDriverWriteTx,
+  } from '$lib/utils/sdk/nft-driver/nft-driver';
+  import { toBigInt } from 'ethers';
+  import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -158,7 +160,6 @@
       dispatch,
       makeTransactPayload({
         before: async () => {
-          const nftDriverTxFactory = await getNFTDriverTxFactory();
           const dripListService = await DripListService.new();
 
           const { receivers, projectsSplitMetadata } =
@@ -169,10 +170,18 @@
 
           const listId = $selectedDripListState.dripList?.account.accountId ?? unreachable();
 
-          const setSplitsTx = await nftDriverTxFactory.setSplits(listId, receivers);
+          const setSplitsTx = await populateNftDriverWriteTx({
+            functionName: 'setSplits',
+            args: [
+              toBigInt(listId),
+              receivers.map((r) => ({
+                accountId: toBigInt(r.accountId),
+                weight: r.weight,
+              })),
+            ],
+          });
 
-          const nftDriverClient = await getNFTDriverClient();
-          const metadataManager = new NftDriverMetadataManager(nftDriverClient);
+          const metadataManager = new NftDriverMetadataManager(executeNftDriverWriteMethod);
 
           const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
           assert(currentMetadata);
@@ -186,18 +195,23 @@
 
           const hash = await metadataManager.pinAccountMetadata(newMetadata);
 
-          const metadataTx = await nftDriverTxFactory.emitAccountMetadata(
-            listId,
-            [
-              {
-                key: MetadataManagerBase.USER_METADATA_KEY,
-                value: hash,
-              },
-            ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
-          );
+          const metadataTx = await populateNftDriverWriteTx({
+            functionName: 'emitAccountMetadata',
+            args: [
+              toBigInt(listId),
+              [
+                {
+                  key: MetadataManagerBase.USER_METADATA_KEY,
+                  value: hash,
+                },
+              ].map(keyValueToMetatada),
+            ],
+          });
 
-          const callerClient = await getCallerClient();
-          const tx = await callerClient.populateCallBatchedTx([setSplitsTx, metadataTx]);
+          const tx = await populateCallerWriteTx({
+            functionName: 'callBatched',
+            args: [[setSplitsTx, metadataTx].map(txToCallerCall)],
+          });
 
           return { tx };
         },

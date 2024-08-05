@@ -1,12 +1,12 @@
 <script lang="ts">
   import tokens from '$lib/stores/tokens';
   import assert from '$lib/utils/assert';
-  import { constants } from 'radicle-drips';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import amtDeltaUnitStore, {
     FRIENDLY_NAMES,
     MULTIPLIERS,
   } from '$lib/stores/amt-delta-unit/amt-delta-unit.store';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   interface Amount {
     amount: bigint;
@@ -17,7 +17,7 @@
   export let amountPerSecond: Amount | undefined = undefined;
   export let showSymbol = true;
   export let showPlusMinus = true;
-  export let multiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+  export let multiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER);
 
   export let amountClasses = 'typo-text tabular-nums';
   export let amountPerSecClasses = 'typo-text-small tabular-nums text-foreground-level-4';

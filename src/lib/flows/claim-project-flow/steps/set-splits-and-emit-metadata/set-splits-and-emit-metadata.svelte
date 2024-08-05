@@ -5,7 +5,6 @@
   import type { State } from '../../claim-project-flow';
   import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
-  import { getCallerClient } from '$lib/utils/get-drips-clients';
   import { gql } from 'graphql-request';
   import unreachable from '$lib/utils/unreachable';
   import query from '$lib/graphql/dripsQL';
@@ -16,6 +15,8 @@
   import expect from '$lib/utils/expect';
   import isClaimed from '$lib/utils/project/is-claimed';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -30,8 +31,10 @@
 
           const setSplitsAndEmitMetadataBatch = await gitProjectService.buildBatchTx($context);
 
-          const callerClient = await getCallerClient();
-          const tx = await callerClient.populateCallBatchedTx(setSplitsAndEmitMetadataBatch);
+          const tx = await populateCallerWriteTx({
+            functionName: 'callBatched',
+            args: [setSplitsAndEmitMetadataBatch.map(txToCallerCall)],
+          });
 
           return { tx };
         },

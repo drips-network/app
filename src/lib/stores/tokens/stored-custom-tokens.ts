@@ -1,5 +1,5 @@
 import type { TokenInfo } from '@uniswap/token-lists';
-import { ethers } from 'ethers';
+import { isAddress } from 'ethers';
 import { z } from 'zod';
 import type { CustomTokenInfoWrapper } from './tokens.store';
 import assert from '$lib/utils/assert';
@@ -64,7 +64,7 @@ export function readCustomTokensList(): CustomTokenInfoWrapper[] {
         chainId: z.number(),
         address: z
           .string()
-          .refine((val) => ethers.utils.isAddress(val), 'Address must be a valid Ethereum address'),
+          .refine((val) => isAddress(val), 'Address must be a valid Ethereum address'),
         name: z.string(),
         decimals: z.number(),
         symbol: z.string(),

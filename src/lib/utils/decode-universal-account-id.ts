@@ -1,8 +1,10 @@
 import ens from '$lib/stores/ens';
-import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
-import { isAddress } from 'ethers/lib/utils';
-import { AddressDriverClient, Utils } from 'radicle-drips';
+import { isAddress } from 'ethers';
 import { get } from 'svelte/store';
+import { executeAddressDriverReadMethod } from './sdk/address-driver/address-driver';
+import type { OxString } from './sdk/sdk-types';
+import { extractDriverNameFromAccountId } from './sdk/utils/extract-driver-from-accountId';
+import extractAddressFromAccountId from './sdk/utils/extract-address-from-accountId';
 
 interface AddressDriverResult {
   driver: 'address';
@@ -21,7 +23,7 @@ interface NFTDriverResult {
 }
 
 /**
- * "universalAcccountIdentifier" is either an .ens name, an ETH address, or a Drips User ID (any supported driver).
+ * "universalAccountIdentifier" is either an .ens name, an ETH address, or a Drips User ID (any supported driver).
  * This utility takes such an identifier (which e.g. may be navigated to via drips.network/<universalAcccountIdentifier>),
  * figures out which of the options it is, and returns an object describing the target.
  * @param universalAcccountIdentifier
@@ -31,16 +33,19 @@ export default async function (
 ): Promise<AddressDriverResult | RepoDriverResult | NFTDriverResult> {
   if (isAddress(universalAcccountIdentifier)) {
     const address = universalAcccountIdentifier;
-    const dripsAccountId = await (
-      await getAddressDriverClient()
-    ).getAccountIdByAddress(universalAcccountIdentifier);
+    const dripsAccountId = (
+      await executeAddressDriverReadMethod({
+        functionName: 'calcAccountId',
+        args: [universalAcccountIdentifier as OxString],
+      })
+    ).toString();
 
     return {
       driver: 'address',
       address,
       dripsAccountId,
     };
-  } else if (universalAcccountIdentifier.endsWith('.eth')) {
+  } else if ((universalAcccountIdentifier as string).endsWith('.eth')) {
     // Subscribe to ens.connected store and wait until it's true
 
     const ensConnected = ens.connected;
@@ -58,7 +63,12 @@ export default async function (
 
     const lookup = await ens.reverseLookup(universalAcccountIdentifier);
     if (lookup) {
-      const dripsAccountId = await (await getAddressDriverClient()).getAccountIdByAddress(lookup);
+      const dripsAccountId = (
+        await executeAddressDriverReadMethod({
+          functionName: 'calcAccountId',
+          args: [lookup as OxString],
+        })
+      ).toString();
       const address = lookup;
 
       return {
@@ -73,10 +83,10 @@ export default async function (
     // User ID param has only numbers and is probably a drips user ID
     const dripsAccountId = universalAcccountIdentifier;
 
-    const driver = Utils.AccountId.getDriver(dripsAccountId);
+    const driver = extractDriverNameFromAccountId(dripsAccountId);
 
     if (driver === 'address') {
-      const address = AddressDriverClient.getUserAddress(universalAcccountIdentifier);
+      const address = extractAddressFromAccountId(universalAcccountIdentifier);
 
       return {
         driver: 'address',

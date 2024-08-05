@@ -3,7 +3,7 @@
   import Section from '../section/section.svelte';
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
   import Copyable from '../copyable/copyable.svelte';
-  import { constants } from 'radicle-drips';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   export let amtPerSec: bigint | undefined = undefined;
   export let tokenAddress: string | undefined = undefined;
@@ -41,7 +41,9 @@
       {/if}
 
       {#if amtPerSec}
-        {@const amtPerSecondWei = String(amtPerSec / BigInt(constants.AMT_PER_SEC_MULTIPLIER))}
+        {@const amtPerSecondWei = String(
+          amtPerSec / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
+        )}
         <div class="key-value">
           <h5 class="key">Amount per sec (with extra precision)</h5>
           <Copyable value={amtPerSec.toString()} alwaysVisible>

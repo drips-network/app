@@ -3,8 +3,8 @@
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
   import tokensStore from '$lib/stores/tokens/tokens.store';
-  import { constants } from 'radicle-drips';
   import formatDate from '$lib/utils/format-date';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   export let streamRateValueParsed: bigint, topUpAmountValueParsed: bigint;
   export let tokenAddress: string;
@@ -16,7 +16,7 @@
     if (streamRateValueParsed !== undefined && topUpAmountValueParsed !== undefined) {
       const durationSeconds =
         (topUpAmountValueParsed /
-          (streamRateValueParsed / BigInt(constants.AMT_PER_SEC_MULTIPLIER))) *
+          (streamRateValueParsed / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER))) *
         86400n *
         30n;
 

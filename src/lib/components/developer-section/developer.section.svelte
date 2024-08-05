@@ -6,8 +6,8 @@
   import Coin from '$lib/components/icons/Coin.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import Box from '$lib/components/icons/Box.svelte';
-  import { Utils } from 'radicle-drips';
   import Splits from '$lib/components/icons/Splits.svelte';
+  import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
   export let accountId: string | undefined = undefined;
 
@@ -25,7 +25,7 @@
     immutableSplits: Splits,
   } as const;
 
-  $: driver = accountId && Utils.AccountId.getDriver(accountId);
+  $: driver = accountId && extractDriverNameFromAccountId(accountId);
 </script>
 
 {#if $developerModeStore}

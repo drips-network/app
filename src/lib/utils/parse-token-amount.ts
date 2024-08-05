@@ -1,4 +1,4 @@
-import { parseUnits } from 'ethers/lib/utils';
+import { parseUnits } from 'ethers';
 
 /**
  * Attempts parsing a given input as wei with a given amount of decimal precision.
@@ -8,7 +8,7 @@ import { parseUnits } from 'ethers/lib/utils';
  */
 export default function (input: string, decimals: number): bigint | undefined {
   try {
-    return parseUnits(input, decimals).toBigInt();
+    return parseUnits(input, decimals);
   } catch {
     return undefined;
   }
