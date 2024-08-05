@@ -75,6 +75,7 @@
           weightsMode={false}
           bind:items={$context.votingRoundConfig.allowedRecipients}
           bind:valid={restrictedRecipientsListValid}
+          maxItems={5000}
         />
       </div>
     {/if}
