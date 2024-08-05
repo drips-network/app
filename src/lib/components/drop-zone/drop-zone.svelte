@@ -168,7 +168,6 @@
           {@html defaultContent}
         </slot>
       {/if}
-      <!-- TODO: not super great to break this up -->
       <p class="typo-text">{instructions}, or…</p>
     </div>
     <Button

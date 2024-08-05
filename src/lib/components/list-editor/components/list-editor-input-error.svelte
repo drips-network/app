@@ -123,7 +123,6 @@
   }
 
   .expand-chevron {
-    /* TODO: is its color too dark? */
     transition:
       transform 0.3s,
       background-color 0.3s;
