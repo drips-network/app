@@ -11,6 +11,10 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import { AddItemError } from '$lib/components/list-editor/errors';
   import { slide } from 'svelte/transition';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -23,6 +27,59 @@
     collaboratorsListValid &&
     $context.votingRoundConfig.votingEnds &&
     (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid);
+
+  function handleImportCSV() {
+    dispatch(
+      'sidestep',
+      importFromCSVSteps({
+        headline: 'Import collaborators from CSV',
+        description:
+          'Your CSV file should simply be a list of collaborator wallet addresses. For example:',
+        allowProjects: false,
+        allowAddresses: true,
+        allowDripLists: false,
+        maxEntries: 5000,
+        exampleTableHeaders: ['Collaborator'],
+        exampleTableData: [
+          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+        ],
+        exampleTableCaption: ' ',
+        addItem(key: AccountId, item: ListEditorItem) {
+          context.update((c) => {
+            c.votingRoundConfig.collaborators = {
+              ...c.votingRoundConfig.collaborators,
+              [key]: item,
+            };
+
+            return c;
+          });
+        },
+        clearItems() {
+          context.update((c) => {
+            c.votingRoundConfig.collaborators = {};
+            return c;
+          });
+        },
+        onItemsError(errors) {
+          return new AddItemError(
+            'Some of your imported collaborators',
+            'error',
+            'They won’t be included',
+            errors,
+          );
+        },
+      }),
+    );
+  }
+
+  function handleErrorDismissed() {
+    context.update((c) => {
+      c.recipientErrors = [];
+      return c;
+    });
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -35,9 +92,14 @@
       allowDripLists={false}
       bind:items={$context.votingRoundConfig.collaborators}
       bind:valid={collaboratorsListValid}
+      bind:inputErrors={$context.recipientErrors}
+      on:errorDismissed={handleErrorDismissed}
       weightsMode={false}
       maxItems={5000}
     />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+    </svelte:fragment>
   </FormField>
 
   <FormField

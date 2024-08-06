@@ -87,6 +87,7 @@
     "@web3-onboard/core": "^2.22.1",
     "@web3-onboard/injected-wallets": "^2.10.17",
     "@web3-onboard/walletconnect": "^2.5.5",
+    "csv-simple-parser": "^1.0.3",
     "cupertino-pane": "^1.4.21",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.7.2",

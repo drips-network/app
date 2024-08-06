@@ -10,6 +10,7 @@
   } from './__generated__/gql.generated';
   import { onMount, tick } from 'svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
+  import type { AddItemError } from './errors';
 
   const MAX_WEIGHT = 1000000;
 
@@ -35,6 +36,8 @@
 
   export let outline = true;
   export let forceBottomBorderOnItems = false;
+
+  export let inputErrors: Array<AddItemError> = [];
 
   $: totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
 
@@ -182,6 +185,7 @@
     {#if isEditable && (allowAddresses || allowProjects || allowDripLists)}
       <ListEditorInput
         existingKeys={Object.keys(items)}
+        errors={inputErrors}
         {addOnMount}
         {weightsMode}
         {allowAddresses}
@@ -192,6 +196,7 @@
         on:addAddress={(e) => handleAddAddress(e.detail.accountId, e.detail.address)}
         on:addProject={(e) => handleAddProject(e.detail.accountId, e.detail.project)}
         on:addDripList={(e) => handleAddDripList(e.detail.accountId, e.detail.dripList)}
+        on:errorDismissed
       />
     {/if}
 
@@ -259,6 +264,7 @@
 <style>
   .list-editor {
     container-type: inline-size;
+    position: relative;
   }
 
   .list-editor.with-outline .inner {
