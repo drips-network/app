@@ -19,19 +19,23 @@
   {/if}
   <thead>
     <tr>
-      {#each headers as header}
-        <th class="typo-text-bold">{header}</th>
-      {/each}
+      {#if headers}
+        {#each headers as header}
+          <th class="typo-text-bold">{header}</th>
+        {/each}
+      {/if}
     </tr>
   </thead>
   <tbody>
-    {#each data as row}
-      <tr>
-        {#each row as column}
-          <td>{column}</td>
-        {/each}
-      </tr>
-    {/each}
+    {#if data}
+      {#each data as row}
+        <tr>
+          {#each row as column}
+            <td>{column}</td>
+          {/each}
+        </tr>
+      {/each}
+    {/if}
   </tbody>
 </table>
 
