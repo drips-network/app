@@ -6,9 +6,9 @@ import type {
 } from './components/__generated__/gql.generated';
 import query from '../../graphql/dripsQL';
 import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT } from './types';
-import { getAddressDriverClient } from '../../utils/get-drips-clients';
 import { gql } from 'graphql-request';
 import type { RecipientResult } from './types';
+import { isAddress } from 'ethers/lib/utils';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(
@@ -69,10 +69,27 @@ export const getProject = async (url: string): Promise<RecipientResult> => {
   };
 };
 
+function calcAccountId(addr: string): bigint {
+  if (!isAddress(addr)) {
+    throw new Error('Invalid Ethereum address format');
+  }
+
+  const driverId = 0;
+
+  const addrBigInt = BigInt(addr);
+
+  // Shift left by 224 bits to make space for the address
+  let accountId = BigInt(driverId) << 224n;
+
+  // Combine the shifted driverId and the address BigInt
+  accountId |= addrBigInt;
+
+  return accountId;
+}
+
 export const getAddress = async (address: string): Promise<RecipientResult> => {
   try {
-    const addressDriverClient = await getAddressDriverClient();
-    const accountId = await addressDriverClient.getAccountIdByAddress(address);
+    const accountId = String(calcAccountId(address));
     return {
       accountId,
       address,
