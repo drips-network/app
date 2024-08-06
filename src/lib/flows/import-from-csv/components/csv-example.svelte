@@ -11,35 +11,41 @@
   ];
 </script>
 
-<table>
-  {#if caption}
-    <caption class="typo-text-small mt-4">
-      {caption}
-    </caption>
-  {/if}
-  <thead>
-    <tr>
-      {#if headers}
-        {#each headers as header}
-          <th class="typo-text-bold">{header}</th>
+<div class="wrapper">
+  <table>
+    {#if caption}
+      <caption class="typo-text-small mt-4">
+        {caption}
+      </caption>
+    {/if}
+    <thead>
+      <tr>
+        {#if headers}
+          {#each headers as header}
+            <th class="typo-text-bold">{header}</th>
+          {/each}
+        {/if}
+      </tr>
+    </thead>
+    <tbody>
+      {#if data}
+        {#each data as row}
+          <tr>
+            {#each row as column}
+              <td>{column}</td>
+            {/each}
+          </tr>
         {/each}
       {/if}
-    </tr>
-  </thead>
-  <tbody>
-    {#if data}
-      {#each data as row}
-        <tr>
-          {#each row as column}
-            <td>{column}</td>
-          {/each}
-        </tr>
-      {/each}
-    {/if}
-  </tbody>
-</table>
+    </tbody>
+  </table>
+</div>
 
 <style>
+  .wrapper {
+    overflow-x: scroll;
+  }
+
   table {
     border-collapse: separate;
     border-spacing: 0;
