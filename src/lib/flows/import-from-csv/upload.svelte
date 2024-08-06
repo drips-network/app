@@ -22,8 +22,8 @@
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
-  export let headline: string = 'Import from CSV';
-  export let description: string = 'Your CSV should be properly formatted.';
+  export let headline: string;
+  export let description: string;
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
@@ -39,7 +39,7 @@
   export let clearItems: () => undefined = () => undefined;
   export let onItemsError: (errors: Array<AddItemSuberror>) => AddItemError = (errors) => {
     return new AddItemError(
-      'Some of your imported recipients',
+      'Some of your imported recipients were invalid',
       'error',
       'They won’t be included in your splits.',
       errors,

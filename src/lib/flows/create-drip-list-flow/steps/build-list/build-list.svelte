@@ -33,7 +33,7 @@
         description:
           'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
-          'A recipient can be a wallet address, GitHub repo URL, or Drip List URL.',
+          'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
         addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
           context.update((c) => {
             c.dripList.items = {

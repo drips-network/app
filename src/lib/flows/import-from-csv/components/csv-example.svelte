@@ -1,6 +1,6 @@
 <script lang="ts">
   export let caption: string | undefined;
-  export let headers: Array<string> = ['Recipients', 'Split(%)'];
+  export let headers: Array<string> = ['recipient', 'percentage'];
   export let data: Array<Array<unknown>> = [
     ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
     ['https://github.com/graphdeco-inria/hierarchical-3d-gaussians', 75],

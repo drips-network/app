@@ -4,8 +4,8 @@ import type { ListEditorItem, AccountId } from '$lib/components/list-editor/type
 import type { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
 
 type UploadProps = {
-  headline?: string;
-  description?: string;
+  headline: string;
+  description: string;
   allowProjects?: boolean;
   allowAddresses?: boolean;
   allowDripLists?: boolean;
