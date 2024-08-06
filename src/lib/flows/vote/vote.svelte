@@ -81,6 +81,11 @@
       bind:valid
       bind:items={$context.listEditorConfig.items}
       bind:weights={$context.listEditorConfig.weights}
+      canDeleteItems={!votingRound.allowedReceivers}
+      allowDripLists={!votingRound.allowedReceivers}
+      allowProjects={!votingRound.allowedReceivers}
+      allowAddresses={!votingRound.allowedReceivers}
+      allowEmptyPercentages={!!votingRound.allowedReceivers}
     />
   </FormField>
 

@@ -25,9 +25,7 @@
           $context.listEditorConfig =
             await multiplayer.mapVoteReceiversToListEditorConfig(latestVote);
           return;
-        }
-
-        if (collaborator?.hasVoted === true && !collaborator.latestVote) {
+        } else if (collaborator?.hasVoted === true && !collaborator.latestVote) {
           // Private voting round
           const { signer, address } = $walletStore;
           assert(signer);
@@ -55,6 +53,26 @@
 
           $context.listEditorConfig = await multiplayer.mapVoteReceiversToListEditorConfig(
             revealedCollaborator.latestVote ?? unreachable(),
+          );
+
+          // if also allowedReceivers is set, override the items with the allowed receivers but keep the weights
+          // from previous vote
+          if (votingRound.allowedReceivers) {
+            const allowedReceivers = await multiplayer.mapVoteReceiversToListEditorConfig(
+              votingRound.allowedReceivers,
+            );
+
+            $context.listEditorConfig.items = allowedReceivers.items;
+
+            Object.keys($context.listEditorConfig.items).forEach((key) => {
+              if (!$context.listEditorConfig.weights[key]) {
+                $context.listEditorConfig.weights[key] = 0;
+              }
+            });
+          }
+        } else if (votingRound.allowedReceivers) {
+          $context.listEditorConfig = await multiplayer.mapVoteReceiversToListEditorConfig(
+            votingRound.allowedReceivers,
           );
         }
       },
