@@ -42,6 +42,8 @@ export interface State {
     collaborators: Items;
     votingEnds: Date | undefined;
     areVotesPrivate: boolean;
+    areRecipientsRestricted: boolean;
+    allowedRecipients: Items;
   };
   newVotingRoundId: string | undefined;
   dripListId: string | undefined;
@@ -65,6 +67,8 @@ export const state = () =>
       collaborators: {},
       votingEnds: undefined,
       areVotesPrivate: false,
+      areRecipientsRestricted: false,
+      allowedRecipients: {},
     },
     newVotingRoundId: undefined,
     dripListId: undefined,

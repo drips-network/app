@@ -94,10 +94,12 @@
       votingRound.id,
     );
 
-    revealedVotes = await multiplayer.getVotingRoundVotes(votingRound.id, {
-      signature,
-      date: timestamp,
-    });
+    revealedVotes = [
+      ...(await multiplayer.getVotingRoundVotes(votingRound.id, {
+        signature,
+        date: timestamp,
+      })),
+    ];
   }
 
   let collaborator: Collaborator | undefined = undefined;
@@ -118,6 +120,9 @@
     return votes.sort((a, b) => {
       if (a.collaboratorAddress === connectedAddress) return -1;
       if (b.collaboratorAddress === connectedAddress) return 1;
+
+      if (a.latestVote && !b.latestVote) return -1;
+
       return 0;
     });
   }
@@ -130,6 +135,7 @@
         isEditable={false}
         weightsMode={false}
         outline={false}
+        forceBottomBorderOnItems={Boolean(votingRound.votes || revealedVotes)}
         items={{
           [$walletStore.address]: {
             type: 'address',
@@ -160,7 +166,14 @@
         weightsMode={false}
         outline={false}
         items={Object.fromEntries(
-          sortVotes($walletStore.address, votingRound.votes || revealedVotes || []).map((v) => [
+          sortVotes(
+            $walletStore.address,
+            votingRound.votes ||
+              revealedVotes?.filter(
+                (v) => v.collaboratorAddress.toLowerCase() !== $walletStore.address?.toLowerCase(),
+              ) ||
+              [],
+          ).map((v) => [
             v.collaboratorAddress,
             {
               type: 'address',

@@ -28,12 +28,28 @@ export const voteReceiverSchema = z.union([
   dripListVoteReceiverSchema,
 ]);
 
+export const addressSchema = z.object({
+  type: z.literal('address'),
+  address: z.string(),
+});
+
+export const projectSchema = z.object({
+  type: z.literal('project'),
+  url: z.string(),
+});
+
+export const dripListSchema = z.object({
+  type: z.literal('dripList'),
+  accountId: z.string(),
+});
+
 export const pendingVoteSchema = z.object({
   collaboratorAddress: z.string(),
   latestVote: z.null(),
 });
 
 export const submittedVoteSchema = pendingVoteSchema.extend({
+  collaboratorAddress: z.string(),
   latestVote: z.array(voteReceiverSchema),
 });
 
@@ -75,6 +91,7 @@ export const getVotingRoundResponseSchema = z.object({
   publisherAddress: z.string(),
   result: z.array(voteReceiverSchema).nullable(),
   votes: z.array(voteSchema).nullable(),
+  allowedReceivers: z.array(z.union([addressSchema, projectSchema, dripListSchema])),
 });
 
 export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;

@@ -18,6 +18,10 @@
 
   export let weightsMode: boolean;
   export let isEditable: boolean;
+  export let canDeleteItems: boolean;
+  export let hasBottomBorder: boolean;
+
+  export let allowEmptyPercentage = false;
 
   export let highlight: boolean;
   $: {
@@ -87,7 +91,12 @@
   }
 </script>
 
-<div class="item typo-text tabular-nums" class:highlight data-testid={`item-${key}`}>
+<div
+  class="item typo-text tabular-nums"
+  class:has-bottom-border={hasBottomBorder}
+  class:highlight
+  data-testid={`item-${key}`}
+>
   <div class="left">
     <div class="inner">
       {#if item.type === 'project'}
@@ -110,7 +119,8 @@
         style:width={editingPercentage ? inputWidth : 'auto'}
         on:click={startEditing}
         class:editing-percentage={editingPercentage}
-        class:error={(weight === 0) !== weight > 1000000}
+        class:error={(!allowEmptyPercentage && weight === 0) || weight > 1000000}
+        class:zero={allowEmptyPercentage && weight === 0}
       >
         <span class="percentage">
           {formatPercentage(percentage)}
@@ -132,7 +142,7 @@
       <svelte:component this={item.rightComponent.component} {...item.rightComponent.props} />
     {/if}
 
-    {#if isEditable}
+    {#if isEditable && canDeleteItems}
       <Button
         dataTestId={`remove-${key}`}
         icon={Trash}
@@ -146,6 +156,7 @@
 
 <style>
   .item {
+    height: 56px;
     padding: 0.75rem;
     container-type: inline-size;
     background-color: var(--color-background);
@@ -156,13 +167,14 @@
     background-color: var(--color-primary-level-1);
   }
 
-  .item:not(:last-child) {
+  .item.has-bottom-border {
     border-bottom: 1px solid var(--color-foreground);
   }
 
   .left {
     flex: 1;
     width: 100%;
+    min-width: 0;
   }
 
   .left .inner {
@@ -173,10 +185,9 @@
   .item,
   .right {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
     gap: 0.5rem;
-    flex-wrap: wrap;
+    min-width: 0;
   }
 
   .percentage-editor {
@@ -200,6 +211,11 @@
   .percentage-editor.error {
     box-shadow: 0 0 0 1px var(--color-negative);
     color: var(--color-negative);
+  }
+
+  .percentage-editor.zero {
+    color: var(--color-foreground-level-5);
+    box-shadow: 0 0 0 1px var(--color-foreground-level-5);
   }
 
   .percentage-editor.editing-percentage {

@@ -11,13 +11,18 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import { slide } from 'svelte/transition';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
 
-  let listValid = false;
-  $: isValid = listValid && $context.votingRoundConfig.votingEnds;
+  let collaboratorsListValid = false;
+  let restrictedRecipientsListValid = false;
+  $: isValid =
+    collaboratorsListValid &&
+    $context.votingRoundConfig.votingEnds &&
+    (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid);
 </script>
 
 <StandaloneFlowStepLayout
@@ -29,8 +34,9 @@
       allowProjects={false}
       allowDripLists={false}
       bind:items={$context.votingRoundConfig.collaborators}
-      bind:valid={listValid}
+      bind:valid={collaboratorsListValid}
       weightsMode={false}
+      maxItems={5000}
     />
   </FormField>
 
@@ -52,6 +58,27 @@
     <svelte:fragment slot="action">
       <Toggle bind:checked={$context.votingRoundConfig.areVotesPrivate} />
     </svelte:fragment>
+  </FormField>
+
+  <FormField
+    title="Restrict to specific recipients"
+    description="By default, any collaborator can suggest any recipient. Enable this to configure a list of ETH addresses, GitHub repos, or other Drip Lists that can be voted for."
+  >
+    <svelte:fragment slot="action">
+      <Toggle bind:checked={$context.votingRoundConfig.areRecipientsRestricted} />
+    </svelte:fragment>
+    {#if $context.votingRoundConfig.areRecipientsRestricted}
+      <div transition:slide={{ duration: 300 }}>
+        <ListEditor
+          allowAddresses={true}
+          allowDripLists={true}
+          allowProjects={true}
+          weightsMode={false}
+          bind:items={$context.votingRoundConfig.allowedRecipients}
+          bind:valid={restrictedRecipientsListValid}
+        />
+      </div>
+    {/if}
   </FormField>
 
   <svelte:fragment slot="left-actions">

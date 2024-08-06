@@ -64,6 +64,27 @@
           },
           publisherAddress: $walletStore.address ?? unreachable(),
           areVotesPrivate: $context.votingRoundConfig.areVotesPrivate,
+          allowedReceivers: $context.votingRoundConfig.areRecipientsRestricted
+            ? Object.values($context.votingRoundConfig.allowedRecipients).map((v) => {
+                switch (v.type) {
+                  case 'drip-list':
+                    return {
+                      type: 'dripList',
+                      accountId: v.dripList.account.accountId,
+                    };
+                  case 'address':
+                    return {
+                      type: 'address',
+                      address: v.address,
+                    };
+                  case 'project':
+                    return {
+                      type: 'project',
+                      url: v.project.source.url,
+                    };
+                }
+              })
+            : undefined,
         });
 
         $context.newVotingRoundId = newVotingRoundId;
@@ -121,6 +142,23 @@
     <p class="typo-text-small">
       That's {formatDate($context.votingRoundConfig.votingEnds ?? unreachable(), 'verbose')} your time.
     </p>
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
+        >Edit</Button
+      >
+    </svelte:fragment>
+  </FormField>
+
+  <FormField title="Allowed recipients">
+    {#if $context.votingRoundConfig.areRecipientsRestricted}
+      <ListEditor
+        items={$context.votingRoundConfig.allowedRecipients}
+        weightsMode={false}
+        isEditable={false}
+      />
+    {:else}
+      <span class="typo-text" style:color="var(--color-foreground-level-4)">Any recipient</span>
+    {/if}
     <svelte:fragment slot="action">
       <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
         >Edit</Button
