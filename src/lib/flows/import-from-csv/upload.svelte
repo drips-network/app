@@ -7,7 +7,6 @@
   import CsvExample from './components/csv-example.svelte';
   import DropZone from '../../components/drop-zone/drop-zone.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import { parseFile } from '$lib/utils/csv';
   import type { Writable } from 'svelte/store';
   import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
@@ -47,7 +46,6 @@
   };
 
   let uploadForm: HTMLFormElement | undefined = undefined;
-  let file: File | undefined = undefined;
   let parsedFile: Array<Array<string>> = [];
   let loading: boolean = false;
   let errors: Array<AddItemSuberror> = [];
@@ -58,14 +56,11 @@
     'wrong-filetype': 'That’s not a CSV',
   };
 
-  $: formValid = !!file;
-
   function roundToX(num: number | string, decimals: number | string): number {
     return +(Math.round(Number(num + 'e' + decimals)) + 'e-' + decimals);
   }
 
-  function handleDropZoneInput({ file: dropZoneFile }: { file: File }) {
-    file = dropZoneFile;
+  function handleDropZoneInput() {
     uploadForm?.requestSubmit();
   }
 
@@ -204,7 +199,7 @@
       filetypes={['text/csv']}
       instructions="Drop a CSV here to upload"
       {loading}
-      on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
+      on:input={handleDropZoneInput}
     >
       <svelte:fragment slot="loading">
         <Spinner />
@@ -220,17 +215,11 @@
     </DropZone>
   </form>
   <svelte:fragment slot="left-actions">
-    <Button variant="ghost" icon={ArrowLeft} on:click={() => dispatch('conclude')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button
-      icon={ArrowDown}
-      variant="primary"
-      disabled={!formValid}
-      type="submit"
-      form="upload-form"
-      on:click={() => uploadForm?.requestSubmit()}>Import</Button
+      disabled={loading}
+      variant="ghost"
+      icon={ArrowLeft}
+      on:click={() => dispatch('conclude')}>Back</Button
     >
   </svelte:fragment>
 </StepLayout>
