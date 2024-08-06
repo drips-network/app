@@ -138,6 +138,9 @@
     return votes.sort((a, b) => {
       if (a.collaboratorAddress === connectedAddress) return -1;
       if (b.collaboratorAddress === connectedAddress) return 1;
+
+      if (a.latestVote && !b.latestVote) return -1;
+
       return 0;
     });
   }
