@@ -36,6 +36,7 @@
       bind:items={$context.votingRoundConfig.collaborators}
       bind:valid={collaboratorsListValid}
       weightsMode={false}
+      maxItems={5000}
     />
   </FormField>
 
@@ -75,7 +76,6 @@
           weightsMode={false}
           bind:items={$context.votingRoundConfig.allowedRecipients}
           bind:valid={restrictedRecipientsListValid}
-          maxItems={5000}
         />
       </div>
     {/if}
