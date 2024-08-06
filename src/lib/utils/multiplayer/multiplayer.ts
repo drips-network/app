@@ -85,19 +85,8 @@ export async function signVotingRound(
   const chainId = await signer.getChainId();
 
   const message = dripListId
-    ? START_VOTING_ROUND_MESSAGE_TEMPLATE(
-        currentTime,
-        chainId,
-        publisherAddress,
-        dripListId,
-        collaborators,
-      )
-    : CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE(
-        currentTime,
-        chainId,
-        publisherAddress,
-        collaborators,
-      );
+    ? START_VOTING_ROUND_MESSAGE_TEMPLATE(currentTime, chainId, publisherAddress, dripListId)
+    : CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE(currentTime, chainId, publisherAddress);
 
   return signer.signMessage(message);
 }
