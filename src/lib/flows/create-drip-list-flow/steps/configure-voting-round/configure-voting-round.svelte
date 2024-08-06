@@ -39,13 +39,14 @@
         allowAddresses: true,
         allowDripLists: false,
         maxEntries: 5000,
-        exampleTableHeaders: ['Collaborator'],
+        exampleTableHeaders: ['collaborator'],
         exampleTableData: [
-          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
-          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
-          ['0x79756b6C2f913271fc0ee29A877fbd98258972BF'],
+          ['0xa404a9258A2240d6f2FDa871a7Fbd71bb6523570'],
+          ['0x38493bA0F8a15D81985bF5438bc6f90C6C5418C1'],
+          ['0xf4daa8E2213889656af3278c6F44E118a0B7CDcd'],
         ],
-        exampleTableCaption: ' ',
+        exampleTableCaption:
+          'Importing a new CSV will overwrite any previously configured recipients.',
         addItem(key: AccountId, item: ListEditorItem) {
           context.update((c) => {
             c.votingRoundConfig.collaborators = {
