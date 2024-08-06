@@ -63,6 +63,27 @@
           },
           publisherAddress: $walletStore.address ?? unreachable(),
           areVotesPrivate: $context.votingRoundConfig.areVotesPrivate,
+          allowedReceivers: $context.votingRoundConfig.areRecipientsRestricted
+            ? Object.values($context.votingRoundConfig.allowedRecipients).map((v) => {
+                switch (v.type) {
+                  case 'drip-list':
+                    return {
+                      type: 'dripList',
+                      accountId: v.dripList.account.accountId,
+                    };
+                  case 'address':
+                    return {
+                      type: 'address',
+                      address: v.address,
+                    };
+                  case 'project':
+                    return {
+                      type: 'project',
+                      url: v.project.source.url,
+                    };
+                }
+              })
+            : undefined,
         });
 
         $context.newVotingRoundId = newVotingRoundId;

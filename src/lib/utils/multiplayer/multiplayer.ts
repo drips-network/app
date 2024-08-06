@@ -10,6 +10,9 @@ import {
   getCollaboratorResponseSchema,
   type ProjectVoteReceiver,
   type DripListVoteReceiver,
+  addressSchema,
+  projectSchema,
+  dripListSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -111,6 +114,9 @@ export function startVotingRound(
     /** Signature previously created with `signVotingRound` */
     signature: string;
     areVotesPrivate: boolean;
+    allowedReceivers?: z.infer<
+      typeof addressSchema | typeof projectSchema | typeof dripListSchema
+    >[];
   } & ({ dripListId: string } | { name: string; description?: string }),
   fetch = window.fetch,
 ) {
