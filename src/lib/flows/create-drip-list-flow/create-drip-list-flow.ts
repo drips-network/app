@@ -20,9 +20,11 @@ import ChooseCreationMode from './steps/choose-creation-mode/choose-creation-mod
 import ConfigureVotingRound from './steps/configure-voting-round/configure-voting-round.svelte';
 import type { Items } from '$lib/components/list-editor/types';
 import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
+import type { AddItemError } from '$lib/components/list-editor/errors';
 
 export interface State {
   dripList: DripListConfig;
+  recipientErrors: Array<AddItemError>;
   /** 1 is immediate DL creation, 2 is creating a draft / voting round */
   selectedCreationMode: 1 | 2 | undefined;
   /** 1 is Continuous Support, 2 is one-time donation */
@@ -52,6 +54,7 @@ export interface State {
 export const state = () =>
   writable<State>({
     dripList: { title: 'My Drip List', weights: {}, items: {}, description: undefined },
+    recipientErrors: [],
     selectedCreationMode: undefined,
     selectedSupportOption: undefined,
     continuousSupportConfig: {

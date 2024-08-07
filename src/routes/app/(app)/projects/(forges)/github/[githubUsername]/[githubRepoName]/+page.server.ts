@@ -32,18 +32,15 @@ async function fetchDripsProject(repoUrl: string) {
 
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
 
-  return await cached(
-    redis,
-    cacheKey,
-    172800,
-    () => query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
+  return await cached(redis, cacheKey, 172800, () =>
+    query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
       getProjectsQuery,
       {
         url: repoUrl,
       },
       fetch,
     ),
-  )
+  );
 }
 
 export const load = (async ({ params, fetch, url }) => {
