@@ -318,13 +318,8 @@
             {#if votingRound}
               <div class="flex flex-col gap-1.5">
                 <div class="splits">
-                  {#if votingRound.result}
-                    <div class="drip-icon">
-                      <Drip fill="var(--color-foreground-level-5)" />
-                    </div>
-                  {/if}
                   <div class="splits-component">
-                    <VotingRoundSplits maxRows={votingRound.description ? 3 : 4} {votingRound} />
+                    <VotingRoundSplits {listingMode} maxRows={listingMode ? votingRound.description ? 3 : 4 : undefined} {votingRound} />
                   </div>
                 </div>
               </div>
