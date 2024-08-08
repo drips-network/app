@@ -91,7 +91,7 @@ export const getVotingRoundResponseSchema = z.object({
   publisherAddress: z.string(),
   result: z.array(voteReceiverSchema).nullable(),
   votes: z.array(voteSchema).nullable(),
-  allowedReceivers: z.array(z.union([addressSchema, projectSchema, dripListSchema])),
+  allowedReceivers: z.array(z.union([addressSchema, projectSchema, dripListSchema])).nullable(),
 });
 
 export type VotingRound = z.infer<typeof getVotingRoundResponseSchema>;
