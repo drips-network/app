@@ -57,7 +57,7 @@
 
           // if also allowedReceivers is set, override the items with the allowed receivers but keep the weights
           // from previous vote
-          if (votingRound.allowedReceivers) {
+          if (votingRound.allowedReceivers?.length) {
             const allowedReceivers = await multiplayer.mapVoteReceiversToListEditorConfig(
               votingRound.allowedReceivers,
             );
