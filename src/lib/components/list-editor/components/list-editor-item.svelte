@@ -100,11 +100,17 @@
   <div class="left">
     <div class="inner">
       {#if item.type === 'project'}
-        <ProjectBadge linkTo={'nothing'} project={item.project} />
+        <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab project={item.project} />
       {:else if item.type === 'address'}
-        <IdentityBadge disableLink={true} size="medium" showFullAddress address={item.address} />
+        <IdentityBadge
+          disableTooltip={true}
+          linkToNewTab
+          size="medium"
+          showFullAddress
+          address={item.address}
+        />
       {:else if item.type === 'drip-list'}
-        <DripListBadge isLinked={false} dripList={item.dripList} />
+        <DripListBadge linkToNewTab dripList={item.dripList} />
       {/if}
     </div>
   </div>
