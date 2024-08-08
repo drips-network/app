@@ -60,11 +60,9 @@
   let collabVisible = true;
 
   const heroTexts = [
-    'Continuously support your critical dependencies',
-    'Reward contributions to your ecosystem',
-    'Empower open-source builders',
-    'Retroactively reward important projects',
-    'Support the people driving impact',
+    'Continuously support your dependencies',
+    'Retroactively reward open-source projects',
+    'Incentivize developers within your ecosystem',
   ];
   let heroTextsIndex = 0;
 </script>
@@ -114,7 +112,7 @@
           </h1>
           <div class="flex flex-wrap gap-1 justify-center w-full">
             <Button icon={DripListIcon} variant="primary">Start a Drip List</Button>
-            <Button icon={Registered} variant="primary">Claim your repo</Button>
+            <Button icon={Registered} variant="primary">Claim your project</Button>
           </div>
         </div>
       </div>
@@ -170,8 +168,8 @@
 
           <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
             <p>
-              Work with a group or build a list by yourself to build a list of recipients to fund
-              for any purpose you can think of.
+              Work with your community, or build a list by yourself to fund any project, developer,
+              or purpose you can think of.
             </p>
           </div>
 
