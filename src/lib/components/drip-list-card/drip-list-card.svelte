@@ -109,10 +109,18 @@
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
+  import ListEditor from '../list-editor/list-editor.svelte';
+  import type { Items } from '../list-editor/types';
+  import FormField from '../form-field/form-field.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
-    votingRound?: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null;
+    votingRound?:
+      | (VotingRound & {
+          splits?: SplitsComponentSplitsReceiver[];
+          allowedReceiversListEditorItems?: Items;
+        })
+      | null;
   };
   $: {
     assert(
@@ -319,12 +327,26 @@
               <div class="flex flex-col gap-1.5">
                 <div class="splits">
                   <div class="splits-component">
-                    <VotingRoundSplits {listingMode} maxRows={listingMode ? votingRound.description ? 3 : 4 : undefined} {votingRound} />
+                    <VotingRoundSplits
+                      {listingMode}
+                      maxRows={listingMode ? (votingRound.description ? 3 : 4) : undefined}
+                      {votingRound}
+                    />
                   </div>
                 </div>
               </div>
 
               {#if !listingMode}
+                {#if votingRound.allowedReceivers && $votingRoundStatus === 'Started'}
+                  <FormField title="Possible recipients" type="div">
+                    <ListEditor
+                      items={votingRound.allowedReceiversListEditorItems}
+                      weightsMode={false}
+                      isEditable={false}
+                    />
+                  </FormField>
+                {/if}
+
                 <VotingRoundCollaborators {votingRound} />
 
                 <VotingRoundCountdown {votingRound} />
