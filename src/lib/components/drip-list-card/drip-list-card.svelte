@@ -337,7 +337,7 @@
               </div>
 
               {#if !listingMode}
-                {#if votingRound.allowedReceivers && $votingRoundStatus === 'Started'}
+                {#if votingRound.allowedReceivers?.length && $votingRoundStatus === 'Started'}
                   <FormField title="Possible recipients" type="div">
                     <ListEditor
                       items={votingRound.allowedReceiversListEditorItems}
