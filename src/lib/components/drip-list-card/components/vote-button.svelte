@@ -24,7 +24,7 @@
   {#if collaborator.hasVoted}
     <div style:display="flex" style:align-items="center" style:gap="0.125rem">
       <Registered style="fill: var(--color-positive)" />
-      <span style:color="var(--color-positive)">Voted</span>
+      <span class="hide-on-mobile" style:color="var(--color-positive)">Voted</span>
     </div>
   {/if}
 
@@ -58,3 +58,11 @@
     </Button>
   {/if}
 </div>
+
+<style>
+  @media (max-width: 768px) {
+    .hide-on-mobile {
+      display: none;
+    }
+  }
+</style>
