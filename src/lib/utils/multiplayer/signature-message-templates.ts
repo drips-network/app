@@ -64,3 +64,11 @@ export const REVEAL_MY_VOTE_MESSAGE_TEMPLATE = (
   votingRoundId: string,
 ) =>
   `Reveal my vote for the voting round with ID ${votingRoundId}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;
+
+export const REVEAL_RESULT_MESSAGE_TEMPLATE = (
+  publisherAddress: string,
+  votingRoundId: string,
+  chainId: number,
+  currentTime: Date,
+) =>
+  `Reveal the result for voting round with ID ${votingRoundId}, owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;

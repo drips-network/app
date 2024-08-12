@@ -14,12 +14,14 @@ import {
   projectSchema,
   dripListSchema,
   voteReceiverSchema,
+  revealResultsResponseSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
   CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE,
   DELETE_VOTING_ROUND_MESSAGE_TEMPLATE,
   REVEAL_MY_VOTE_MESSAGE_TEMPLATE,
+  REVEAL_RESULT_MESSAGE_TEMPLATE,
   REVEAL_VOTES_MESSAGE_TEMPLATE,
   START_VOTING_ROUND_MESSAGE_TEMPLATE,
   VOTE_MESSAGE_TEMPLATE,
@@ -426,6 +428,38 @@ export async function getCollaborator(
           }&date=${collaboratorSignature.date.toISOString()}`
         : ''),
     getCollaboratorResponseSchema,
+  );
+}
+
+export async function signRevealResults(
+  signer: ethers.Signer,
+  currentTime: Date,
+  publisherAddress: string,
+  votingRoundId: string,
+) {
+  const chainId = await signer.getChainId();
+
+  const message = REVEAL_RESULT_MESSAGE_TEMPLATE(
+    publisherAddress,
+    votingRoundId,
+    chainId,
+    currentTime,
+  );
+
+  return signer.signMessage(message);
+}
+
+export async function revealResults(
+  votingRoundId: string,
+  adminSignature?: { signature: string; date: Date },
+) {
+  return _authenticatedCall(
+    'GET',
+    `/votingRounds/${votingRoundId}/result` +
+      (adminSignature
+        ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+        : ''),
+    revealResultsResponseSchema,
   );
 }
 
