@@ -16,5 +16,11 @@ function fetchFromGQLEndpoint(body: string) {
 export const POST: RequestHandler = async ({ request }: RequestEvent) => {
   const body = await request.text();
 
-  return await fetchFromGQLEndpoint(body);
+  const res = await fetchFromGQLEndpoint(body);
+
+  return new Response(await res.text(), {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
