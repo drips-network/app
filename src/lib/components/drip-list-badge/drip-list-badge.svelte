@@ -28,6 +28,7 @@
   export let avatarSize: 'tiny' | 'small' = 'small';
   export let disabled = false;
   export let outline = false;
+  export let linkToNewTab = false;
 
   const ensConnected = ensStore.connected;
 
@@ -42,6 +43,7 @@
   this={isLinked ? 'a' : 'div'}
   href={isLinked ? `/app/drip-lists/${dripList?.account.accountId}` : undefined}
   tabindex={isLinked ? 0 : -1}
+  target={linkToNewTab ? '_blank' : undefined}
   class="drip-list-badge outline-none flex gap-2 items-center"
   class:disabled
 >

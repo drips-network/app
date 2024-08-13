@@ -5,26 +5,16 @@ export const START_VOTING_ROUND_MESSAGE_TEMPLATE = (
   chainId: number,
   publisherAddress: string,
   dripListId: string,
-  collaborators: string[],
 ) => {
-  const sortedCollaborators = collaborators.sort();
-
-  return `Create a new voting round for the Drip List with ID ${dripListId}, owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}. The voters for this round are: ${JSON.stringify(
-    sortedCollaborators,
-  )}`;
+  return `Create a new voting round for the Drip List with ID ${dripListId}, owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;
 };
 
 export const CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE = (
   currentTime: Date,
   chainId: number,
   publisherAddress: string,
-  collaborators: string[],
 ) => {
-  const sortedCollaborators = collaborators.sort();
-
-  return `Create a new collaborative Drip List owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}. The voters for this list are: ${JSON.stringify(
-    sortedCollaborators,
-  )}`;
+  return `Create a new collaborative Drip List owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;
 };
 
 export const DELETE_VOTING_ROUND_MESSAGE_TEMPLATE = (
@@ -73,4 +63,12 @@ export const REVEAL_MY_VOTE_MESSAGE_TEMPLATE = (
   chainId: number,
   votingRoundId: string,
 ) =>
-  `Reveal my vote for the voting round with ID ${votingRoundId}, on chain ${chainId}. The current time is ${currentTime.toISOString()}.`;
+  `Reveal my vote for the voting round with ID ${votingRoundId}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;
+
+export const REVEAL_RESULT_MESSAGE_TEMPLATE = (
+  publisherAddress: string,
+  votingRoundId: string,
+  chainId: number,
+  currentTime: Date,
+) =>
+  `Reveal the result for voting round with ID ${votingRoundId}, owned by ${publisherAddress}, on chain ID ${chainId}. The current time is ${currentTime.toISOString()}.`;

@@ -108,11 +108,19 @@
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
+  import ListEditor from '../list-editor/list-editor.svelte';
+  import type { Items } from '../list-editor/types';
+  import FormField from '../form-field/form-field.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   export let data: {
     dripList?: DripListCardFragment | null;
-    votingRound?: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null;
+    votingRound?:
+      | (VotingRound & {
+          splits?: SplitsComponentSplitsReceiver[];
+          allowedReceiversListEditorItems?: Items;
+        })
+      | null;
   };
   $: {
     assert(
@@ -318,18 +326,27 @@
             {#if votingRound}
               <div class="flex flex-col gap-1.5">
                 <div class="splits">
-                  {#if votingRound.result}
-                    <div class="drip-icon">
-                      <Drip fill="var(--color-foreground-level-5)" />
-                    </div>
-                  {/if}
                   <div class="splits-component">
-                    <VotingRoundSplits maxRows={votingRound.description ? 3 : 4} {votingRound} />
+                    <VotingRoundSplits
+                      {listingMode}
+                      maxRows={listingMode ? (votingRound.description ? 3 : 4) : undefined}
+                      {votingRound}
+                    />
                   </div>
                 </div>
               </div>
 
               {#if !listingMode}
+                {#if votingRound.allowedReceivers?.length && $votingRoundStatus === 'Started'}
+                  <FormField title="Possible recipients" type="div">
+                    <ListEditor
+                      items={votingRound.allowedReceiversListEditorItems}
+                      weightsMode={false}
+                      isEditable={false}
+                    />
+                  </FormField>
+                {/if}
+
                 <VotingRoundCollaborators {votingRound} />
 
                 <VotingRoundCountdown {votingRound} />

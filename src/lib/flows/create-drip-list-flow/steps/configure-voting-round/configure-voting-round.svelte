@@ -11,13 +11,76 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import { AddItemError } from '$lib/components/list-editor/errors';
+  import { slide } from 'svelte/transition';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
 
-  let listValid = false;
-  $: isValid = listValid && $context.votingRoundConfig.votingEnds;
+  let collaboratorsListValid = false;
+  let restrictedRecipientsListValid = false;
+  $: isValid =
+    collaboratorsListValid &&
+    $context.votingRoundConfig.votingEnds &&
+    (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid);
+
+  function handleImportCSV() {
+    dispatch(
+      'sidestep',
+      importFromCSVSteps({
+        headline: 'Import collaborators from CSV',
+        description:
+          'Your CSV file should simply be a list of collaborator wallet addresses. For example:',
+        allowProjects: false,
+        allowAddresses: true,
+        allowDripLists: false,
+        maxEntries: 5000,
+        exampleTableHeaders: ['collaborator'],
+        exampleTableData: [
+          ['0xa404a9258A2240d6f2FDa871a7Fbd71bb6523570'],
+          ['0x38493bA0F8a15D81985bF5438bc6f90C6C5418C1'],
+          ['0xf4daa8E2213889656af3278c6F44E118a0B7CDcd'],
+        ],
+        exampleTableCaption:
+          'Importing a new CSV will overwrite any previously configured recipients.',
+        addItem(key: AccountId, item: ListEditorItem) {
+          context.update((c) => {
+            c.votingRoundConfig.collaborators = {
+              ...c.votingRoundConfig.collaborators,
+              [key]: item,
+            };
+
+            return c;
+          });
+        },
+        clearItems() {
+          context.update((c) => {
+            c.votingRoundConfig.collaborators = {};
+            return c;
+          });
+        },
+        onItemsError(errors) {
+          return new AddItemError(
+            'Some of your imported collaborators',
+            'error',
+            'They won’t be included',
+            errors,
+          );
+        },
+      }),
+    );
+  }
+
+  function handleErrorDismissed() {
+    context.update((c) => {
+      c.recipientErrors = [];
+      return c;
+    });
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -29,9 +92,15 @@
       allowProjects={false}
       allowDripLists={false}
       bind:items={$context.votingRoundConfig.collaborators}
-      bind:valid={listValid}
+      bind:valid={collaboratorsListValid}
+      bind:inputErrors={$context.recipientErrors}
+      on:errorDismissed={handleErrorDismissed}
       weightsMode={false}
+      maxItems={5000}
     />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+    </svelte:fragment>
   </FormField>
 
   <FormField
@@ -52,6 +121,27 @@
     <svelte:fragment slot="action">
       <Toggle bind:checked={$context.votingRoundConfig.areVotesPrivate} />
     </svelte:fragment>
+  </FormField>
+
+  <FormField
+    title="Restrict to specific recipients"
+    description="By default, any collaborator can suggest any recipient. Enable this to configure a list of ETH addresses, GitHub repos, or other Drip Lists that can be voted for."
+  >
+    <svelte:fragment slot="action">
+      <Toggle bind:checked={$context.votingRoundConfig.areRecipientsRestricted} />
+    </svelte:fragment>
+    {#if $context.votingRoundConfig.areRecipientsRestricted}
+      <div transition:slide={{ duration: 300 }}>
+        <ListEditor
+          allowAddresses={true}
+          allowDripLists={true}
+          allowProjects={true}
+          weightsMode={false}
+          bind:items={$context.votingRoundConfig.allowedRecipients}
+          bind:valid={restrictedRecipientsListValid}
+        />
+      </div>
+    {/if}
   </FormField>
 
   <svelte:fragment slot="left-actions">

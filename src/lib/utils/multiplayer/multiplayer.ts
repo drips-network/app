@@ -10,12 +10,18 @@ import {
   getCollaboratorResponseSchema,
   type ProjectVoteReceiver,
   type DripListVoteReceiver,
+  addressSchema,
+  projectSchema,
+  dripListSchema,
+  voteReceiverSchema,
+  revealResultsResponseSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
   CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE,
   DELETE_VOTING_ROUND_MESSAGE_TEMPLATE,
   REVEAL_MY_VOTE_MESSAGE_TEMPLATE,
+  REVEAL_RESULT_MESSAGE_TEMPLATE,
   REVEAL_VOTES_MESSAGE_TEMPLATE,
   START_VOTING_ROUND_MESSAGE_TEMPLATE,
   VOTE_MESSAGE_TEMPLATE,
@@ -87,19 +93,8 @@ export async function signVotingRound(
   const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = dripListId
-    ? START_VOTING_ROUND_MESSAGE_TEMPLATE(
-        currentTime,
-        Number(chainId),
-        publisherAddress,
-        dripListId,
-        collaborators,
-      )
-    : CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE(
-        currentTime,
-        Number(chainId),
-        publisherAddress,
-        collaborators,
-      );
+    ? START_VOTING_ROUND_MESSAGE_TEMPLATE(currentTime, chainId, publisherAddress, dripListId)
+    : CREATE_COLLABORATIVE_LIST_MESSAGE_TEMPLATE(currentTime, chainId, publisherAddress);
 
   return signer.signMessage(message);
 }
@@ -124,6 +119,9 @@ export function startVotingRound(
     /** Signature previously created with `signVotingRound` */
     signature: string;
     areVotesPrivate: boolean;
+    allowedReceivers?: z.infer<
+      typeof addressSchema | typeof projectSchema | typeof dripListSchema
+    >[];
   } & ({ dripListId: string } | { name: string; description?: string }),
   fetch = window.fetch,
 ) {
@@ -435,6 +433,38 @@ export async function getCollaborator(
   );
 }
 
+export async function signRevealResults(
+  signer: ethers.Signer,
+  currentTime: Date,
+  publisherAddress: string,
+  votingRoundId: string,
+) {
+  const chainId = await signer.getChainId();
+
+  const message = REVEAL_RESULT_MESSAGE_TEMPLATE(
+    publisherAddress,
+    votingRoundId,
+    chainId,
+    currentTime,
+  );
+
+  return signer.signMessage(message);
+}
+
+export async function revealResults(
+  votingRoundId: string,
+  adminSignature?: { signature: string; date: Date },
+) {
+  return _authenticatedCall(
+    'GET',
+    `/votingRounds/${votingRoundId}/result` +
+      (adminSignature
+        ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+        : ''),
+    revealResultsResponseSchema,
+  );
+}
+
 /**
  * In an array of voting rounds, find the one that is associated with a given dripListId.
  * @param votingRounds The voting rounds to search in.
@@ -459,6 +489,8 @@ export function mapListEditorStateToVoteReceivers(items: Items, weights: Weights
 
   for (const [accountId, item] of Object.entries(items)) {
     const weight = weights[accountId];
+
+    if (weight === 0) continue;
 
     switch (item.type) {
       case 'project':
@@ -493,7 +525,11 @@ export function mapListEditorStateToVoteReceivers(items: Items, weights: Weights
  * @param receivers The vote receivers.
  * @returns The list editor configuration.
  */
-export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver[]) {
+export async function mapVoteReceiversToListEditorConfig(
+  receivers: z.infer<
+    typeof addressSchema | typeof projectSchema | typeof dripListSchema | typeof voteReceiverSchema
+  >[],
+) {
   const items: Items = {};
   const weights: Weights = {};
 
@@ -570,7 +606,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
 
         const { accountId } = project.account;
         items[accountId] = { type: 'project', project };
-        weights[accountId] = receiver.weight;
+        weights[accountId] = 'weight' in receiver ? receiver.weight : 0;
         break;
       }
       case 'address': {
@@ -582,7 +618,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
         ).toString();
 
         items[accountId] = { type: 'address', address: receiver.address };
-        weights[accountId] = receiver.weight;
+        weights[accountId] = 'weight' in receiver ? receiver.weight : 0;
 
         break;
       }
@@ -594,7 +630,7 @@ export async function mapVoteReceiversToListEditorConfig(receivers: VoteReceiver
         if (!dripList) throw new Error(`DripList not found for ID: ${receiver.accountId}`);
 
         items[receiver.accountId] = { type: 'drip-list', dripList: dripList };
-        weights[receiver.accountId] = receiver.weight;
+        weights[receiver.accountId] = 'weight' in receiver ? receiver.weight : 0;
 
         break;
       }

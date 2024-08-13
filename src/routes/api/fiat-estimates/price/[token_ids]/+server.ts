@@ -52,7 +52,14 @@ export const GET: RequestHandler = async ({ params }) => {
       `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}&id=${tokenIdsToFetch}&convert=usd`,
     );
 
-    const parsedRes = cmcResponseSchema.parse(await priceRes.json());
+    let parsedRes: z.infer<typeof cmcResponseSchema>;
+    try {
+      parsedRes = cmcResponseSchema.parse(await priceRes.json());
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      return error(500);
+    }
 
     prices = {
       ...prices,

@@ -2,15 +2,10 @@
   import type { Collaborator, Vote, VotingRound } from '$lib/utils/multiplayer/schemas';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
-  import Proposals from '$lib/components/icons/Proposals.svelte';
-  import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import voteFlowSteps from '$lib/flows/vote/vote-flow-steps';
-  import viewVoteFlowSteps from '$lib/flows/view-vote/view-vote-flow-steps';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import Button from '$lib/components/button/button.svelte';
   import * as multiplayer from '$lib/utils/multiplayer';
+  import VoteButton from './vote-button.svelte';
 
   export let votingRound: VotingRound;
 
@@ -18,65 +13,6 @@
 
   $: isOwnVotingRound =
     votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
-
-  function getCollaboratorRightButton(connectedAddress: string | undefined, vote: Vote) {
-    if (noButtons) return undefined;
-
-    const { collaboratorAddress } = vote;
-
-    const isOwnVote = collaboratorAddress.toLowerCase() === connectedAddress?.toLowerCase();
-
-    const collaborator: Collaborator = {
-      isCollaborator: true,
-      hasVoted: Boolean(vote.latestVote),
-      latestVote: vote.latestVote,
-    };
-
-    if (vote.latestVote) {
-      // Ballot already submitted
-
-      return isOwnVote && votingRound.status === 'Started'
-        ? {
-            component: PropsOnlyButton,
-            props: {
-              label: 'Change your vote',
-              onClick: () =>
-                modal.show(Stepper, undefined, voteFlowSteps(votingRound, collaborator)),
-              buttonProps: {
-                variant: 'primary',
-                icon: Proposals,
-              },
-            },
-          }
-        : {
-            component: PropsOnlyButton,
-            props: {
-              label: 'View vote',
-              onClick: () => modal.show(Stepper, undefined, viewVoteFlowSteps(vote)),
-              buttonProps: {
-                variant: 'secondary',
-                icon: Proposals,
-              },
-            },
-          };
-    }
-
-    if (isOwnVote && votingRound.status === 'Started') {
-      return {
-        component: PropsOnlyButton,
-        props: {
-          label: 'Cast your vote',
-          onClick: () => modal.show(Stepper, undefined, voteFlowSteps(votingRound)),
-          buttonProps: {
-            variant: 'primary',
-            icon: Proposals,
-          },
-        },
-      };
-    }
-
-    return undefined;
-  }
 
   let revealedVotes: Vote[] | undefined = undefined;
 
@@ -94,10 +30,12 @@
       votingRound.id,
     );
 
-    revealedVotes = await multiplayer.getVotingRoundVotes(votingRound.id, {
-      signature,
-      date: timestamp,
-    });
+    revealedVotes = [
+      ...(await multiplayer.getVotingRoundVotes(votingRound.id, {
+        signature,
+        date: timestamp,
+      })),
+    ];
   }
 
   let collaborator: Collaborator | undefined = undefined;
@@ -118,6 +56,9 @@
     return votes.sort((a, b) => {
       if (a.collaboratorAddress === connectedAddress) return -1;
       if (b.collaboratorAddress === connectedAddress) return 1;
+
+      if (a.latestVote && !b.latestVote) return -1;
+
       return 0;
     });
   }
@@ -130,26 +71,21 @@
         isEditable={false}
         weightsMode={false}
         outline={false}
+        forceBottomBorderOnItems={Boolean(votingRound.votes || revealedVotes)}
         items={{
           [$walletStore.address]: {
             type: 'address',
             address: $walletStore.address,
-            rightComponent: {
-              component: PropsOnlyButton,
-              props: {
-                label: collaborator.hasVoted ? 'Change your vote' : 'Cast your vote',
-                onClick: () =>
-                  modal.show(
-                    Stepper,
-                    undefined,
-                    voteFlowSteps(votingRound, collaborator ?? undefined),
-                  ),
-                buttonProps: {
-                  variant: 'primary',
-                  icon: Proposals,
+            rightComponent: noButtons
+              ? undefined
+              : {
+                  component: VoteButton,
+                  props: {
+                    votingRound,
+                    collaboratorAddress: $walletStore.address,
+                    collaborator,
+                  },
                 },
-              },
-            },
           },
         }}
       />
@@ -160,12 +96,31 @@
         weightsMode={false}
         outline={false}
         items={Object.fromEntries(
-          sortVotes($walletStore.address, votingRound.votes || revealedVotes || []).map((v) => [
+          sortVotes(
+            $walletStore.address,
+            votingRound.votes ||
+              revealedVotes?.filter(
+                (v) => v.collaboratorAddress.toLowerCase() !== $walletStore.address?.toLowerCase(),
+              ) ||
+              [],
+          ).map((v) => [
             v.collaboratorAddress,
             {
               type: 'address',
               address: v.collaboratorAddress,
-              rightComponent: getCollaboratorRightButton($walletStore.address, v),
+              rightComponent: noButtons
+                ? undefined
+                : {
+                    component: VoteButton,
+                    props: {
+                      votingRound,
+                      collaboratorAddress: v.collaboratorAddress,
+                      collaborator: {
+                        hasVoted: Boolean(v.latestVote),
+                        latestVote: v.latestVote,
+                      },
+                    },
+                  },
             },
           ]),
         )}
@@ -173,7 +128,12 @@
     {:else if votingRound.areVotesPrivate}
       <div class="empty-state">
         <h4>Collaborators hidden</h4>
-        <p>The owner of this list chose to hide collaborators and their votes.</p>
+        <p>
+          The owner of this list chose to hide the full list of collaborators and their votes.<br />
+          {#if !$walletStore.connected}
+            Connect your wallet to check if you're eligible to vote.
+          {/if}
+        </p>
         {#if isOwnVotingRound}
           <div style:margin-top="0.25rem">
             <Button on:click={handleRevealVotes}>Reveal collaborators</Button>
@@ -200,6 +160,7 @@
     text-align: center;
     min-height: 10rem;
     justify-content: center;
+    padding: 0.5rem;
   }
 
   .empty-state:not(:only-child) {

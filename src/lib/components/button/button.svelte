@@ -4,7 +4,8 @@
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  export let variant: 'normal' | 'primary' | 'destructive' | 'ghost' = 'normal';
+  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' =
+    'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
@@ -14,6 +15,8 @@
   export let href: string | undefined = undefined;
   export let target: string | undefined = undefined;
   export let rel: string | undefined = undefined;
+  export let type: 'submit' | 'reset' | 'button' = 'button';
+  export let form: string | undefined = undefined;
 
   $: isDisabled = disabled || loading;
 
@@ -21,10 +24,16 @@
 
   $: primaryColor = el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined;
 
-  $: textColor =
-    primaryColor && (variant === 'destructive' || variant === 'primary')
-      ? getContrastColor(primaryColor)
-      : 'var(--color-foreground)';
+  let textColor = 'var(--color-foreground)';
+  $: {
+    if (variant === 'destructive-outline') {
+      textColor = 'var(--color-negative-level-6)';
+    } else if (primaryColor && (variant === 'destructive' || variant === 'primary')) {
+      textColor = getContrastColor(primaryColor);
+    } else {
+      textColor = 'var(--color-foreground)';
+    }
+  }
 </script>
 
 <svelte:element
@@ -34,6 +43,7 @@
   {href}
   {target}
   {rel}
+  {form}
   class="button size-{size}"
   class:disabled={isDisabled}
   class:loading
@@ -45,6 +55,8 @@
   on:mouseleave
   on:focus
   role={href ? 'link' : 'button'}
+  style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}
+  type={href ? null : type}
 >
   <div
     class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
@@ -130,7 +142,7 @@
   }
 
   .button .inner:not(.ghost) {
-    box-shadow: var(--elevation-low);
+    box-shadow: 0px 0px 0px 1px var(--color-foreground);
   }
 
   .button:not(.loading) .inner.primary {

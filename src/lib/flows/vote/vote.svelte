@@ -73,7 +73,7 @@
   <StepHeader
     emoji="🗳️"
     headline="Cast your vote"
-    description="Add recipients and rank them based on which ones you think are most important."
+    description="Vote for which recipients of this Drip List should receive what percentage of funds."
   />
 
   <FormField title="Recipients*">
@@ -81,6 +81,11 @@
       bind:valid
       bind:items={$context.listEditorConfig.items}
       bind:weights={$context.listEditorConfig.weights}
+      canDeleteItems={!votingRound.allowedReceivers?.length}
+      allowDripLists={!votingRound.allowedReceivers?.length}
+      allowProjects={!votingRound.allowedReceivers?.length}
+      allowAddresses={!votingRound.allowedReceivers?.length}
+      allowEmptyPercentages={!!votingRound.allowedReceivers?.length}
     />
   </FormField>
 

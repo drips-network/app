@@ -70,15 +70,22 @@ export const cachedTotalDrippedPrices = (
 
     const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
 
-    const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
-    const idMap = z.record(z.string(), z.number()).parse(idMapRes);
-    const tokenIdsString = tokenAddresses.map((address) => idMap[address.toLowerCase()]).join(',');
+    try {
+      const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
+      const idMap = z.record(z.string(), z.number()).parse(idMapRes);
+      const tokenIdsString = tokenAddresses
+        .map((address) => idMap[address.toLowerCase()])
+        .join(',');
+      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+      const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
-    const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
-    const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
-
-    return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
-      acc[getAddress(address)] = parsedRes[idMap[address]];
-      return acc;
-    }, {});
+      return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
+        acc[getAddress(address)] = parsedRes[idMap[address]];
+        return acc;
+      }, {});
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      return {};
+    }
   });
