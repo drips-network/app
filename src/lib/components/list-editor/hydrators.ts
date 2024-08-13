@@ -2,13 +2,13 @@ import query from '../../graphql/dripsQL';
 import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT } from './types';
 import { gql } from 'graphql-request';
 import type { RecipientResult } from './types';
-import { isAddress } from 'ethers/lib/utils';
 import type {
   GetDripListQuery,
   GetDripListQueryVariables,
   GetProjectQuery,
   GetProjectQueryVariables,
 } from './__generated__/gql.generated';
+import { isAddress } from 'ethers';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(

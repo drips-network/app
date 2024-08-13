@@ -87,10 +87,9 @@ export async function signVotingRound(
   signer: ethers.Signer,
   currentTime: Date,
   publisherAddress: string,
-  collaborators: string[],
   dripListId?: string,
 ) {
-  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
+  const chainId = Number((await signer.provider?.getNetwork())?.chainId ?? unreachable());
 
   const message = dripListId
     ? START_VOTING_ROUND_MESSAGE_TEMPLATE(currentTime, chainId, publisherAddress, dripListId)
@@ -156,11 +155,11 @@ export async function signDeleteVotingRound(
   votingRoundId: string,
   signer: ethers.Signer,
 ) {
-  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
+  const chainId = Number((await signer.provider?.getNetwork())?.chainId ?? unreachable());
 
   const message = DELETE_VOTING_ROUND_MESSAGE_TEMPLATE(
     currentTime,
-    Number(chainId),
+    chainId,
     publisherAddress,
     votingRoundId,
   );
@@ -439,12 +438,12 @@ export async function signRevealResults(
   publisherAddress: string,
   votingRoundId: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = REVEAL_RESULT_MESSAGE_TEMPLATE(
     publisherAddress,
     votingRoundId,
-    chainId,
+    Number(chainId),
     currentTime,
   );
 

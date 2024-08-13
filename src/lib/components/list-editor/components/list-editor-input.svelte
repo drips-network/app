@@ -9,7 +9,6 @@
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import { BASE_URL } from '$lib/utils/base-url';
   import { type RecipientResult } from '../types';
-  import { isAddress } from 'ethers/lib/utils';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import DripList from '$lib/components/icons/DripList.svelte';
   import List from '$lib/components/icons/List.svelte';
@@ -17,6 +16,7 @@
   import ListEditorInputError from './list-editor-input-error.svelte';
   import { AddItemError } from '../errors';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
+  import { isAddress } from 'ethers';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
