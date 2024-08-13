@@ -16,5 +16,5 @@ export const fallback: RequestHandler = async ({ request, params, url, fetch }) 
     },
   });
 
-  return response;
+  return new Response(await response.text());
 };
