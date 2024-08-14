@@ -93,8 +93,6 @@
   import VotingRoundCountdown from './components/voting-round-countdown.svelte';
   import Wallet from '../icons/Wallet.svelte';
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
-  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer/multiplayer';
-  import { writable } from 'svelte/store';
   import { BASE_URL } from '$lib/utils/base-url';
   import twemoji from '$lib/utils/twemoji';
   import {
@@ -112,6 +110,7 @@
   import ListEditor from '../list-editor/list-editor.svelte';
   import type { Items } from '../list-editor/types';
   import FormField from '../form-field/form-field.svelte';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -160,10 +159,6 @@
   }
 
   $: isOwnVotingRound = votingRound?.publisherAddress === $walletStore?.address;
-
-  $: votingRoundStatus = votingRound
-    ? getVotingRoundStatusReadable(votingRound)
-    : writable(undefined);
 
   let incomingStreamsTotalStreamed: { tokenAddress: string; amount: bigint }[];
   function updateIncomingStreamsTotalStreamed() {
@@ -337,7 +332,7 @@
               </div>
 
               {#if !listingMode}
-                {#if votingRound.allowedReceivers?.length && $votingRoundStatus === 'Started'}
+                {#if votingRound.allowedReceivers?.length && votingRound.status === 'Started'}
                   <FormField title="Possible recipients" type="div">
                     <ListEditor
                       items={votingRound.allowedReceiversListEditorItems}
@@ -349,7 +344,7 @@
 
                 <VotingRoundCollaborators {votingRound} />
 
-                <VotingRoundCountdown {votingRound} />
+                <VotingRoundCountdown {votingRound} on:end={invalidateAll} />
 
                 {#if isOwnVotingRound}
                   <div class="actions">
@@ -365,7 +360,7 @@
                       >
                     </div>
 
-                    {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
+                    {#if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}
                       <div>
                         <Button
                           variant="primary"

@@ -19,8 +19,6 @@
   export let maxRows: number | undefined = undefined;
   export let listingMode: boolean;
 
-  const status = multiplayer.getVotingRoundStatusReadable(votingRound);
-
   $: isOwnVotingRound =
     votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
 
@@ -64,7 +62,7 @@
         {/if}
       </div>
     {:else if resultsToShow.length === 0}
-      {#if $status === 'Completed'}
+      {#if votingRound.status === 'Completed'}
         <!-- No-one voted at end of vote -->
         <div class="empty-state" in:fade>
           <Emoji emoji="🫙" size="huge" />
