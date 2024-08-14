@@ -2,7 +2,7 @@ import { PUBLIC_NETWORK } from '$env/static/public';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 
-const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532] as const;
+const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type Network = {
@@ -22,6 +22,7 @@ const NETWORK_NAMES: ValueForEachSupportedChain<string> = {
   [11155420]: 'optimism-sepolia',
   [11155111]: 'sepolia',
   [84532]: 'base-sepolia',
+  [314]: 'filecoin',
 };
 
 const NETWORK_LABELS: ValueForEachSupportedChain<string> = {
@@ -30,6 +31,7 @@ const NETWORK_LABELS: ValueForEachSupportedChain<string> = {
   [11155420]: 'OP Sepolia',
   [11155111]: 'Sepolia',
   [84532]: 'Base Sepolia',
+  [314]: 'Filecoin',
 };
 
 const NETWORK_TOKENS: ValueForEachSupportedChain<string> = {
@@ -38,6 +40,7 @@ const NETWORK_TOKENS: ValueForEachSupportedChain<string> = {
   [11155420]: 'ETH',
   [11155111]: 'ETH',
   [84532]: 'ETH',
+  [314]: 'FIL',
 };
 
 const NETWORK_ID: ValueForEachSupportedChain<string> = {
@@ -46,6 +49,7 @@ const NETWORK_ID: ValueForEachSupportedChain<string> = {
   [11155420]: '0xaa37dc',
   [11155111]: '0xaa36a7',
   [84532]: '0x14a34',
+  [314]: '0x13a',
 };
 
 const RPC_URLS: ValueForEachSupportedChain<string> = {
@@ -54,6 +58,7 @@ const RPC_URLS: ValueForEachSupportedChain<string> = {
   [11155420]: `${BASE_URL}/api/infura/optimism-sepolia`,
   [11155111]: `${BASE_URL}/api/infura/sepolia`,
   [84532]: `${BASE_URL}/api/infura/base-sepolia`,
+  [314]: `https://api.node.glif.io/`,
 } as const;
 
 export function isSupportedChainId(chainId: number): chainId is ChainId {

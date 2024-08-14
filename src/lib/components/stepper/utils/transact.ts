@@ -209,7 +209,9 @@ export default function transact(
       // simulate the entire batch. This is because the transactions may be inter-dependent,
       // meaning they cannot always be independently simulated.
       // In E2E tests, we can't simulate with Tenderly, so we don't.
-      const needToSimulate = isTest() ? false : wrappersWithGas.some((tx) => tx.applyGasBuffer);
+      // const needToSimulate = isTest() ? false : wrappersWithGas.some((tx) => tx.applyGasBuffer);
+      // TODO(filecoin): add real logic to skip simulation
+      const needToSimulate = false;
 
       if (needToSimulate) {
         try {
