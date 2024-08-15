@@ -1,6 +1,7 @@
 import { ethers, JsonRpcProvider } from 'ethers';
 import { readable } from 'svelte/store';
 import type { ConnectedWalletStoreState } from '../wallet.store';
+import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 
 const NETWORK = {
   chainId: 11155111 as const,
@@ -9,6 +10,10 @@ const NETWORK = {
   token: 'ETH',
   id: '0xaa36a7',
   rpcUrl: 'http://127.0.0.1:8545',
+  icon: Ethereum,
+  color: '#627EEA',
+  isTestnet: true,
+  subdomain: 'sepolia.drips.network',
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {

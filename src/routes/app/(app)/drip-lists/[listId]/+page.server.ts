@@ -52,6 +52,7 @@ export const load = (async ({ params, fetch }) => {
       votingRounds: { current: votingRound, past: [] },
       incomingSplitsTotal: [],
       blockWhileInitializing: false,
+      preservePathOnNetworkChange: false,
     };
   }
 
@@ -108,5 +109,6 @@ export const load = (async ({ params, fetch }) => {
     dripList: fetches[0].dripList,
     votingRounds: fetches[1],
     blockWhileInitializing: false,
+    preservePathOnNetworkChange: false,
   };
 }) satisfies PageServerLoad;
