@@ -1,5 +1,5 @@
 ---
-title: 'Scroll uses Drips to to empower LatAm developers with transparent voting and funding'
+title: 'Scroll uses Drips to empower LatAm developers with transparent voting and funding'
 date: '2024-08-20'
 coverImage: '/assets/blog-images/scroll.jpg'
 coverImageAlt: 'Drips x Scroll logo'
