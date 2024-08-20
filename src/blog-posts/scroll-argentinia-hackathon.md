@@ -6,11 +6,13 @@ coverImageAlt: 'Drips x Scroll logo'
 excerpt: 'Scroll is using Drips to power the voting and funding process for the Level Up hackathon in Argentina.'
 ---
 
-Recently, we had a conversation with our friends at Scroll, and it sparked an exciting opportunity: Scroll has chosen to use Drips to power the voting and funding process for the Level Up hackathon in Argentina. This collaboration is a huge step forward in our shared mission to **incentivise and reward open source developers**.
+Recently, we had a conversation with our friends at [Scroll](https://scroll.io/), and it sparked an exciting opportunity: Scroll has chosen to use Drips to power the voting and funding process for the Level Up hackathon in Argentina. This collaboration is a huge step forward in our shared mission to **incentivise and reward open source developers**.
 
 Our collaboration started with a simple question: What are your current initiatives & challenges?
 
 We learned that Scroll has been deeply involved in supporting the LatAm developer community, working closely with ETH LatAm and Ethereum Argentina to host local meetups, workshops and hackathons. The Level Up hackathon, co-organized with Ethereum Argentina, is a prime example of these efforts. It’s designed to help developers in the region hone their skills and connect with the Scroll ecosystem. The Scroll team wanted to involve their community to select the winners, but didn't have an easy way to do this, given that they wanted to be able to **allow up to 2500 community wallets to vote** on short notice.
+
+![Screenshot of Scroll's Collaborative Drip List in voting](/assets/blog-images/scroll-list.png)
 
 This is where Drips' **new Collaborative Drip Lists feature** comes in! Collaborative Drip Lists are a new way to engage your community to vote on a Drip List's recipients before it gets published on-chain. Voting is simple, entirely gasless, and only requires an Ethereum address. And all Scroll had to do is upload a list of voters and configure which open-source GitHub repos can be voted for. Read more about this new feature [here](https://docs.drips.network/support-your-dependencies/collaborative-drip-lists/creating-a-collaborative-drip-list).
 
