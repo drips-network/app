@@ -49,7 +49,7 @@ const NETWORK_ID: ValueForEachSupportedChain<string> = {
 };
 
 const RPC_URLS: ValueForEachSupportedChain<string> = {
-  [1]: `${BASE_URL}/api/infura/mainnet`,
+  [1]: `https://eth-mainnet.g.alchemy.com/v2/hUeaFJW9MOJYaGIzEHxMgwpKYYiQzHGL`,
   [80002]: `${BASE_URL}/api/infura/polygon-amoy`,
   [11155420]: `${BASE_URL}/api/infura/optimism-sepolia`,
   [11155111]: `${BASE_URL}/api/infura/sepolia`,
