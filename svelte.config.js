@@ -35,7 +35,7 @@ const config = {
   kit: {
     adapter: adapter(),
     prerender: {
-      origin: process.env.DEPLOY_URL,
+      origin: process.env.PUBLIC_BASE_URL,
     },
   },
 };

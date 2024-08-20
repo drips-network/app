@@ -1,9 +1,6 @@
 import { sentrySvelteKit } from '@sentry/sveltekit';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
-
-const env = loadEnv(process.env['NODE_ENV'] ?? 'development', process.cwd(), 'BUILD_');
 
 const config = defineConfig({
   plugins: [sentrySvelteKit(), sveltekit()],
@@ -41,9 +38,6 @@ const config = defineConfig({
       // Required for octokit.
       'node-fetch': 'isomorphic-fetch',
     },
-  },
-  define: {
-    INJECTED_DEPLOY_URL: `${env.BUILD_DEPLOY_URL}`,
   },
 });
 
