@@ -14,7 +14,7 @@ We learned that Scroll has been deeply involved in supporting the LatAm develope
 
 ![Screenshot of Scroll's Collaborative Drip List in voting](/assets/blog-images/scroll-list.png)
 
-This is where Drips' **new Collaborative Drip Lists feature** comes in! Collaborative Drip Lists are a new way to engage your community to vote on a Drip List's recipients before it gets published on-chain. Voting is simple, entirely gasless, and only requires an Ethereum address. And all Scroll had to do is upload a list of voters and configure which open-source GitHub repos can be voted for. Read more about this new feature [here](https://docs.drips.network/support-your-dependencies/collaborative-drip-lists/creating-a-collaborative-drip-list).
+This is where Drips' **new Collaborative Drip Lists feature** comes in! Collaborative Drip Lists are a new way to engage your community to vote on a Drip List's recipients before it gets published on-chain. Voting is simple, entirely gasless, and only requires an Ethereum address. And all Scroll had to do is upload a list of voters and configure which open-source GitHub repos can be voted for. Check out [Scroll's Drip List](https://www.drips.network/app/drip-lists/0270e337-047d-46a0-a55a-99d6030c285e), and read more about Collaborative Drip Lists [here](https://docs.drips.network/support-your-dependencies/collaborative-drip-lists/creating-a-collaborative-drip-list).
 
 ![Overview over collaborative Drip Lists](/assets/blog-images/collab-drip-list-hiw.png)
 
