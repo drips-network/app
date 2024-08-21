@@ -5,7 +5,7 @@
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { Writable } from 'svelte/store';
-  import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
+  import Splits from '$lib/components/splits/splits.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { State } from '../edit-project-splits-steps';
@@ -18,6 +18,7 @@
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

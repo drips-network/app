@@ -59,12 +59,7 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
-  import Splits, {
-    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
-    type SplitsComponentSplitsReceiver,
-  } from '../splits/splits.svelte';
+  import Splits from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
@@ -113,6 +108,12 @@
   import type { Items } from '../list-editor/types';
   import FormField from '../form-field/form-field.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import {
+    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
+    type SplitsComponentSplitsReceiver,
+  } from '../splits/types';
 
   export let data: {
     dripList?: DripListCardFragment | null;

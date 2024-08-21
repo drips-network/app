@@ -3,10 +3,6 @@ import { redirect } from '@sveltejs/kit';
 import { gql } from 'graphql-request';
 import { DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT } from './+page.svelte';
 import { getVotingRounds } from '$lib/utils/multiplayer';
-import {
-  mapSplitsFromMultiplayerResults,
-  type SplitsComponentSplitsReceiver,
-} from '$lib/components/splits/splits.svelte';
 import type {
   DripListsPageQuery,
   DripListsPageQueryVariables,
@@ -16,6 +12,8 @@ import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 import network from '$lib/stores/wallet/network';
+import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
+import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 

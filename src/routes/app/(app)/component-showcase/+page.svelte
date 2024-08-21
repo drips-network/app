@@ -20,7 +20,7 @@
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
+  import SplitsComponent from '$lib/components/splits/splits.svelte';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
@@ -42,6 +42,7 @@
   import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
   import User from '$lib/components/icons/User.svelte';
   import network from '$lib/stores/wallet/network';
+  import type { Splits } from '$lib/components/splits/types';
 
   // Button
   let disabled = false;

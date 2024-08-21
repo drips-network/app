@@ -28,7 +28,7 @@
   import UnclaimedProjectCard, {
     UNCLAIMED_PROJECT_CARD_FRAGMENT,
   } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import Splits, { mapSplitsFromListEditorData } from '$lib/components/splits/splits.svelte';
+  import Splits from '$lib/components/splits/splits.svelte';
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import Drip from '$lib/components/illustrations/drip.svelte';
   import modal from '$lib/stores/modal';
@@ -40,6 +40,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
+  import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

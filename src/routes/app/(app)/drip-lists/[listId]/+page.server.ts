@@ -6,12 +6,10 @@ import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.
 import { DRIP_LIST_PAGE_FRAGMENT } from './+page.svelte';
 import * as multiplayer from '$lib/utils/multiplayer';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-import {
-  mapSplitsFromMultiplayerResults,
-  type SplitsComponentSplitsReceiver,
-} from '$lib/components/splits/splits.svelte';
 import type { Items } from '$lib/components/list-editor/types';
 import network from '$lib/stores/wallet/network';
+import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
+import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;

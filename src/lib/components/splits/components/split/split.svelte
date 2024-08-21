@@ -5,8 +5,7 @@
   import getContrastColor from '$lib/utils/get-contrast-text-color';
   import { getSplitPercent } from '$lib/utils/splits/get-split-percent';
   import { fade } from 'svelte/transition';
-  import SplitsListComponent, { type Splits } from '../../splits.svelte';
-  import type { SplitsComponentSplitsReceiver, SplitGroup } from '../../splits.svelte';
+  import SplitsListComponent from '../../splits.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import { tick, type SvelteComponent, onMount } from 'svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
@@ -19,6 +18,7 @@
   import { browser } from '$app/environment';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import unreachable from '$lib/utils/unreachable';
+  import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;

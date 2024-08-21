@@ -50,7 +50,7 @@ export const getProject = async (url: string): Promise<RecipientResult> => {
         }
       }
     `,
-    { url },
+    { url, chains: [network.gqlName] },
   );
 
   if (!res.project) {

@@ -8,7 +8,7 @@ import network from '$lib/stores/wallet/network';
 import query from '$lib/graphql/dripsQL';
 import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated__/gql.generated';
 import { getVotingRounds } from '$lib/utils/multiplayer';
-import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
+import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
 import { isAddress, JsonRpcProvider } from 'ethers';
 import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';

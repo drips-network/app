@@ -1,9 +1,5 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
-  import Splits, {
-    mapSplitsFromMultiplayerResults,
-    type SplitsComponentSplitsReceiver,
-  } from '$lib/components/splits/splits.svelte';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
@@ -12,6 +8,9 @@
   import * as multiplayer from '$lib/utils/multiplayer';
   import unreachable from '$lib/utils/unreachable';
   import Drip from '$lib/components/illustrations/drip.svelte';
+  import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
+  import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
+  import Splits from '$lib/components/splits/splits.svelte';
 
   export let votingRound: VotingRound & {
     splits?: SplitsComponentSplitsReceiver[];

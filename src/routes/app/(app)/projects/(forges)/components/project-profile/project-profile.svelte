@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import { PROJECT_PROFILE_HEADER_FRAGMENT } from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/splits.svelte';
+  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/types';
   import { SUPPORT_CARD_PROJECT_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
   import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
   import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
@@ -55,6 +55,24 @@
           totalEarned {
             tokenAddress
             amount
+          }
+          splits {
+            dependencies {
+              ... on AddressReceiver {
+                ...EditProjectSplitsFlowAddressReceiver
+              }
+              ... on ProjectReceiver {
+                ...EditProjectSplitsFlowProjectReceiver
+              }
+              ... on DripListReceiver {
+                ...EditProjectSplitsFlowDripListReceiver
+              }
+            }
+            maintainers {
+              ... on AddressReceiver {
+                ...EditProjectSplitsFlowAddressReceiver
+              }
+            }
           }
         }
       }
