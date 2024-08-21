@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export const REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT = gql`
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
-    fragment ReviewStepUnclaimedProject on UnclaimedProject {
+    fragment ReviewStepUnclaimedProject on Project {
       ...UnclaimedProjectCard
     }
   `;
@@ -33,10 +33,13 @@
   import Drip from '$lib/components/illustrations/drip.svelte';
   import modal from '$lib/stores/modal';
   import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
-  import type { ProjectProfileHeader_ClaimedProject_Fragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
+  import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
   import { gql } from 'graphql-request';
   import Download from '$lib/components/icons/Download.svelte';
   import ProjectCustomizerStep from './components/project-customizer-step.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -47,25 +50,31 @@
   $: project = $context.project ?? unreachable();
 
   // For previewing what the project will look like after claiming
-  let fakeClaimedProject: ProjectProfileHeader_ClaimedProject_Fragment;
+  let fakeClaimedProject: ProjectProfileHeaderFragment;
   $: fakeClaimedProject = {
-    __typename: 'ClaimedProject',
+    __typename: 'Project',
     source: { ...project.source },
-    owner: {
-      __typename: 'AddressDriverAccount',
-      address: $walletStore.address ?? unreachable(),
-    },
-    color: $context.projectColor,
-    avatar:
-      $context.avatar.type === 'emoji'
-        ? {
-            __typename: 'EmojiAvatar',
-            emoji: $context.avatar.emoji,
-          }
-        : {
-            __typename: 'ImageAvatar',
-            cid: $context.avatar.cid,
-          },
+    chainData: [
+      {
+        owner: {
+          __typename: 'AddressDriverAccount',
+          address: $walletStore.address ?? unreachable(),
+        },
+        __typename: 'ClaimedProjectData',
+        chain: network.gqlName,
+        color: $context.projectColor,
+        avatar:
+          $context.avatar.type === 'emoji'
+            ? {
+                __typename: 'EmojiAvatar',
+                emoji: $context.avatar.emoji,
+              }
+            : {
+                __typename: 'ImageAvatar',
+                cid: $context.avatar.cid,
+              },
+      },
+    ],
   };
 
   $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
@@ -107,7 +116,9 @@
       modal.show(
         ProjectCustomizerModal,
         () => {
-          const { avatar, color } = get(projectWritable);
+          const { avatar, color } = filterCurrentChainData(
+            get(projectWritable).chainData,
+          ) as ClaimedProjectData;
 
           $context.avatar =
             avatar.__typename === 'EmojiAvatar'
@@ -120,10 +131,14 @@
     }
   }
 
+  $: projectChainData = filterCurrentChainData(project.chainData) as ClaimedProjectData;
+
   $: hasCollectableAmount =
-    project.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length > 0;
+    projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
+    0;
   $: hasSplittableAmount =
-    project.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length > 0;
+    projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
+    0;
 </script>
 
 <StandaloneFlowStepLayout

@@ -27,21 +27,11 @@
 
   export const SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT = gql`
     fragment SelectDripListProjectToAdd on Project {
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-        source {
-          url
-        }
+      account {
+        accountId
       }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
-        source {
-          url
-        }
+      source {
+        url
       }
     }
   `;

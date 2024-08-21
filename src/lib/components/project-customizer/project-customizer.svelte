@@ -1,17 +1,23 @@
 <script lang="ts" context="module">
+  import { PROJECT_PROFILE_HEADER_FRAGMENT } from '../project-profile-header/project-profile-header.svelte';
+
   export const PROJECT_CUSTOMIZER_FRAGMENT = gql`
     ${PROJECT_PROFILE_HEADER_FRAGMENT}
-    fragment ProjectCustomizer on ClaimedProject {
+    fragment ProjectCustomizer on Project {
       ...ProjectProfileHeader
-      avatar {
-        ... on EmojiAvatar {
-          emoji
-        }
-        ... on ImageAvatar {
-          cid
+      chainData {
+        ... on ClaimedProjectData {
+          avatar {
+            ... on EmojiAvatar {
+              emoji
+            }
+            ... on ImageAvatar {
+              cid
+            }
+          }
+          color
         }
       }
-      color
     }
   `;
 </script>
@@ -21,18 +27,21 @@
   import possibleColors from '$lib/utils/project/possible-colors';
   import type { Writable } from 'svelte/store';
   import FormField from '../form-field/form-field.svelte';
-  import ProjectProfileHeader, {
-    PROJECT_PROFILE_HEADER_FRAGMENT,
-  } from '../project-profile-header/project-profile-header.svelte';
+  import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectCustomizerFragment } from './__generated__/gql.generated';
   import FileUpload from '../custom-avatar-upload/custom-avatar-upload.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import twemoji from '$lib/utils/twemoji';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
   export let project: Writable<ProjectCustomizerFragment>;
 
-  let selectedEmoji = $project.avatar.__typename === 'EmojiAvatar' ? $project.avatar.emoji : '💧';
+  const projectChainData = filterCurrentChainData($project.chainData) as ClaimedProjectData;
+
+  let selectedEmoji =
+    projectChainData.avatar.__typename === 'EmojiAvatar' ? projectChainData.avatar.emoji : '💧';
 
   let searchTerm = '';
   $: filteredEmoji = emoji.filter((e) => {
@@ -44,12 +53,10 @@
   });
 
   let lastUploadedAvatarCid: string | undefined =
-    $project.__typename === 'ClaimedProject' && $project.avatar.__typename === 'ImageAvatar'
-      ? $project.avatar.cid
-      : undefined;
+    projectChainData.avatar.__typename === 'ImageAvatar' ? projectChainData.avatar.cid : undefined;
   $: {
     if (lastUploadedAvatarCid && activeTab === 'tab-2') {
-      $project.avatar = {
+      projectChainData.avatar = {
         __typename: 'ImageAvatar',
         cid: lastUploadedAvatarCid,
       };
@@ -64,11 +71,11 @@
     lastUploadedAvatarCid = e.detail.ipfsCid;
   }
 
-  let activeTab = $project.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
+  let activeTab = projectChainData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
 
   $: {
     if (activeTab === 'tab-1') {
-      $project.avatar = {
+      projectChainData.avatar = {
         __typename: 'EmojiAvatar',
         emoji: selectedEmoji,
       };
@@ -78,8 +85,8 @@
   export let valid = false;
   $: valid = Boolean(activeTab === 'tab-1' || lastUploadedAvatarCid);
 
-  let selectedColor = $project.color;
-  $: $project.color = selectedColor;
+  let selectedColor = projectChainData.color;
+  $: projectChainData.color = selectedColor;
 </script>
 
 <div class="project-customizer">

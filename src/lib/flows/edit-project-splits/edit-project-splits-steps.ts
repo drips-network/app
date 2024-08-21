@@ -36,15 +36,8 @@ export const EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT = gql`
     weight
     project {
       ...ListEditorProject
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
+      account {
+        accountId
       }
     }
   }

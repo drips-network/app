@@ -10,20 +10,29 @@
   import { gql } from 'graphql-request';
 
   export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
-    fragment SplitsComponentProjectSplits on Project {
-      ... on ClaimedProject {
+    ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
+    ${PROJECT_AVATAR_FRAGMENT}
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    fragment SplitsComponentProjectSplits on ProjectData {
+      ... on ClaimedProjectData {
         splits {
           dependencies {
             ... on AddressReceiver {
               ...EditProjectSplitsFlowAddressReceiver
               account {
                 address
+                driver
               }
+              driver
             }
             ... on ProjectReceiver {
               ...EditProjectSplitsFlowProjectReceiver
               project {
-                ...ProjectAvatar
+                chainData {
+                  ...ProjectAvatar
+                }
               }
             }
             ... on DripListReceiver {
@@ -31,6 +40,11 @@
               dripList {
                 ...DripListBadge
               }
+              account {
+                accountId
+                driver
+              }
+              driver
             }
           }
           maintainers {
@@ -38,7 +52,9 @@
               ...EditProjectSplitsFlowAddressReceiver
               account {
                 address
+                driver
               }
+              driver
             }
           }
         }
@@ -50,21 +66,18 @@
     ${PROJECT_BADGE_FRAGMENT}
     fragment SplitsComponentProject on Project {
       ...ProjectBadge
-      ... on UnclaimedProject {
-        source {
-          repoName
-          ownerName
-        }
+      source {
+        repoName
+        ownerName
       }
-      ... on ClaimedProject {
-        owner {
-          address
+      chainData {
+        ... on ClaimedProjectData {
+          chain
+          owner {
+            address
+          }
+          color
         }
-        source {
-          repoName
-          ownerName
-        }
-        color
       }
     }
   `;
@@ -96,6 +109,7 @@
     fragment SplitsComponentDripListReceiver on DripListReceiver {
       weight
       dripList {
+        chain
         ...SplitsComponentDripList
       }
     }
@@ -174,8 +188,8 @@
         receiversToFetchDataFor.map(async (v) => {
           const projectQuery = gql`
             ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
-            query ProjectForVoteReceiver($url: String!) {
-              projectByUrl(url: $url) {
+            query ProjectForVoteReceiver($url: String!, $chains: [SupportedChain!]) {
+              projectByUrl(url: $url, chains: $chains) {
                 ...SplitsComponentProject
               }
             }
@@ -183,8 +197,9 @@
 
           const dripListQuery = gql`
             ${SPLITS_COMPONENT_DRIP_LIST_FRAGMENT}
-            query DripListForVoteReceiver($id: ID!) {
-              dripList(id: $id) {
+            query DripListForVoteReceiver($id: ID!, $chain: SupportedChain!) {
+              dripList(id: $id, chain: $chain) {
+                chain
                 ...SplitsComponentDripList
               }
             }
@@ -196,6 +211,7 @@
                 dripListQuery,
                 {
                   id: v.accountId,
+                  chain: network.gqlName,
                 },
                 f,
               )
@@ -204,7 +220,7 @@
             return (
               await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
                 projectQuery,
-                { url: v.url },
+                { url: v.url, chains: [network.gqlName] },
                 f,
               )
             ).projectByUrl;
@@ -227,8 +243,12 @@
           };
         case 'project': {
           const project = receiversData.find(
-            (p): p is Extract<typeof p, { __typename: 'ClaimedProject' | 'UnclaimedProject' }> =>
-              p.__typename !== 'DripList' && p.source.url === v.url,
+            (
+              p,
+            ): p is Extract<
+              typeof p,
+              { __typename: 'ClaimedProjectData' | 'UnclaimedProjectData' }
+            > => p.__typename !== 'DripList' && p.source.url === v.url,
           );
           if (!project) throw new Error(`Project not found for url: ${v.url}`);
 
@@ -270,6 +290,14 @@
     DripListVoteReceiver,
   } from '$lib/utils/multiplayer/schemas';
   import query from '$lib/graphql/dripsQL';
+  import {
+    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
+  import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
+  import network from '$lib/stores/wallet/network';
 
   export let disableLinks = true;
 

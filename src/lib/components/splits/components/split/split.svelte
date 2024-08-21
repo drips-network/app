@@ -17,6 +17,8 @@
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { browser } from '$app/environment';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import unreachable from '$lib/utils/unreachable';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -94,7 +96,7 @@
           return {
             component: ProjectAvatar,
             props: {
-              project: s.project,
+              project: filterCurrentChainData(s.project.chainData),
               outline: true,
             },
           } as ComponentAndProps;
@@ -182,7 +184,15 @@
       {:else if split.__typename === 'DripListReceiver'}
         <DripListBadge isLinked={!disableLink} dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
-        <PrimaryColorThemer colorHex={isClaimed(split.project) ? split.project.color : undefined}>
+        {@const projectReceiverChainData =
+          split.__typename === 'ProjectReceiver'
+            ? filterCurrentChainData(split.project.chainData)
+            : unreachable()}
+        <PrimaryColorThemer
+          colorHex={isClaimed(projectReceiverChainData)
+            ? projectReceiverChainData.color
+            : undefined}
+        >
           <ProjectBadge
             linkTo={disableLink ? 'nothing' : undefined}
             {linkToNewTab}

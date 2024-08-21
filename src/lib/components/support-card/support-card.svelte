@@ -24,22 +24,14 @@
     fragment SupportCardProject on Project {
       ...CreateDonationFlowProject
       ...AddDripListMemberFlowProjectToAdd
-      ...ProjectAvatar
-      ... on ClaimedProject {
-        owner {
-          accountId
-        }
-        account {
-          accountId
-        }
-        source {
-          url
-        }
+      account {
+        accountId
       }
-      ... on UnclaimedProject {
-        source {
-          url
-        }
+      source {
+        url
+      }
+      chainData {
+        ...ProjectAvatar
       }
     }
   `;
@@ -81,6 +73,8 @@
   import SupportButtons from './components/support-buttons.svelte';
   import { BASE_URL } from '$lib/utils/base-url';
   import awaitStoreValue from '$lib/utils/await-store-value';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -120,8 +114,8 @@
 
     const ownDripListsQuery = gql`
       ${ADD_DRIP_LIST_MEMBER_FLOW_LISTS_FRAGMENT}
-      query OwnDripLists($ownerAddress: String!) {
-        dripLists(where: { ownerAddress: $ownerAddress }) {
+      query OwnDripLists($ownerAddress: String!, $chains: [SupportedChain!]) {
+        dripLists(chains: $chains, where: { ownerAddress: $ownerAddress }) {
           ...AddDripListMemberFlowLists
           account {
             accountId
@@ -135,6 +129,7 @@
       ownDripListsQuery,
       {
         ownerAddress: address,
+        chains: [network.gqlName],
       },
     );
 
@@ -203,7 +198,7 @@
       </div>
       {#if project}
         <div>
-          <ProjectAvatar {project} size="large" outline />
+          <ProjectAvatar project={filterCurrentChainData(project.chainData)} size="large" outline />
         </div>
       {/if}
     </div>

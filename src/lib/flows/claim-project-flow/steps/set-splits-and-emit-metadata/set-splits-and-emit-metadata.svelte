@@ -17,6 +17,9 @@
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -58,11 +61,14 @@
           const projectId = $context.project?.account.accountId ?? unreachable();
 
           const projectClaimedQuery = gql`
-            query ProjectIsClaimed($id: ID!) {
-              projectById(id: $id) {
-                ... on ClaimedProject {
-                  account {
-                    accountId
+            query ProjectIsClaimed($id: ID!, $chains: [SupportedChain!]) {
+              projectById(id: $id, chains: $chains) {
+                chainData {
+                  ... on ClaimedProjectData {
+                    chain
+                  }
+                  ... on UnClaimedProjectData {
+                    chain
                   }
                 }
               }
@@ -73,8 +79,13 @@
             () =>
               query<ProjectIsClaimedQuery, ProjectIsClaimedQueryVariables>(projectClaimedQuery, {
                 id: projectId,
+                chains: [network.gqlName],
               }),
-            (result) => Boolean(result.projectById && isClaimed(result.projectById)),
+            (result) =>
+              Boolean(
+                result.projectById &&
+                  isClaimed(filterCurrentChainData(result.projectById.chainData)),
+              ),
             300000,
             2000,
           );
@@ -82,6 +93,7 @@
           // Invalidate cached project page (if any). This should happen automatically, but without
           // awaiting it here in addition, there could be a race condition. Better safe than sorry!
           await invalidateAccountCache(projectId);
+          await invalidateAll();
         },
       }),
     ),

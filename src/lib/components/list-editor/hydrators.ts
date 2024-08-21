@@ -9,13 +9,14 @@ import type {
   GetProjectQueryVariables,
 } from './__generated__/gql.generated';
 import { isAddress } from 'ethers';
+import network from '$lib/stores/wallet/network';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(
     gql`
       ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-      query GetDripList($id: ID!) {
-        dripList: dripList(id: $id) {
+      query GetDripList($id: ID!, $chain: SupportedChain!) {
+        dripList: dripList(id: $id, chain: $chain) {
           ...ListEditorDripList
           account {
             accountId
@@ -23,7 +24,7 @@ export const getDripList = async (dripListId: string): Promise<RecipientResult> 
         }
       }
     `,
-    { id: dripListId },
+    { id: dripListId, chain: network.gqlName },
   );
 
   if (!res.dripList) {
@@ -40,18 +41,11 @@ export const getProject = async (url: string): Promise<RecipientResult> => {
   const res = await query<GetProjectQuery, GetProjectQueryVariables>(
     gql`
       ${LIST_EDITOR_PROJECT_FRAGMENT}
-      query GetProject($url: String!) {
-        project: projectByUrl(url: $url) {
+      query GetProject($url: String!, $chains: [SupportedChain!]!) {
+        project: projectByUrl(url: $url, chains: $chains) {
           ...ListEditorProject
-          ... on ClaimedProject {
-            account {
-              accountId
-            }
-          }
-          ... on UnclaimedProject {
-            account {
-              accountId
-            }
+          account {
+            accountId
           }
         }
       }

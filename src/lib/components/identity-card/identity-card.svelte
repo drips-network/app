@@ -12,18 +12,15 @@
     ${PROJECT_AVATAR_FRAGMENT}
     fragment IdentityCardProject on Project {
       ...ProjectBadge
-      ...ProjectAvatar
-      ... on ClaimedProject {
-        owner {
-          address
-        }
-        source {
-          repoName
-        }
+      source {
+        repoName
       }
-      ... on UnclaimedProject {
-        source {
-          repoName
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
         }
       }
     }
@@ -45,6 +42,7 @@
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import Github from '$lib/components/icons/Github.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
@@ -93,7 +91,7 @@
       <div class="flex">
         {#if 'owner' in project}
           <div class="-mr-[5%]">
-            <ProjectAvatar {project} size="large" />
+            <ProjectAvatar project={filterCurrentChainData(project.chainData)} size="large" />
           </div>
         {/if}
         <div class="h-16 w-16 bg-foreground-level-1 flex items-center justify-center rounded-full">

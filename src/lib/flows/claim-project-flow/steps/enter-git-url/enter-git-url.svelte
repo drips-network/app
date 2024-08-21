@@ -3,10 +3,12 @@
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     fragment EnterGitUrlStepProject on Project {
       ...UnclaimedProjectCard
-      ... on UnclaimedProject {
-        verificationStatus
-        account {
-          accountId
+      account {
+        accountId
+      }
+      chainData {
+        ... on UnClaimedProjectData {
+          verificationStatus
         }
       }
     }
@@ -38,6 +40,8 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import possibleColors from '$lib/utils/project/possible-colors';
   import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -98,8 +102,8 @@
 
       const projectQuery = gql`
         ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
-        query Project($url: String!) {
-          projectByUrl(url: $url) {
+        query Project($url: String!, $chains: [SupportedChain!]) {
+          projectByUrl(url: $url, chains: $chains) {
             ...ClaimProjectFlowProject
           }
         }
@@ -107,6 +111,7 @@
 
       const response = await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
         url: $context.gitUrl,
+        chains: [network.gqlName],
       });
 
       const project = response.projectByUrl;
@@ -115,13 +120,15 @@
         throw new Error("Repo doesn't exist or is private");
       }
 
-      if (project.__typename === 'ClaimedProject') {
+      const projectChainData = filterCurrentChainData(project.chainData);
+
+      if (projectChainData.__typename === 'ClaimedProjectData') {
         throw new Error('Project already claimed');
       }
 
       if (
-        project.__typename === 'UnclaimedProject' &&
-        project.verificationStatus === ProjectVerificationStatus.PendingMetadata
+        projectChainData.__typename === 'UnClaimedProjectData' &&
+        projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata
       ) {
         $context.isPartiallyClaimed = true;
       }

@@ -4,6 +4,7 @@ import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 import Filecoin from '$lib/components/icons/networks/Filecoin.svelte';
 import Optimism from '$lib/components/icons/networks/Optimism.svelte';
 import Polygon from '$lib/components/icons/networks/Polygon.svelte';
+import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 import type { ComponentType } from 'svelte';
@@ -22,6 +23,7 @@ export type Network = {
   color: string;
   isTestnet: boolean;
   subdomain: string;
+  gqlName: SupportedChain;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -60,6 +62,15 @@ const NETWORK_COLORS: ValueForEachSupportedChain<string> = {
   [11155111]: '#627EEA',
   [84532]: '#627EEA',
   [314]: '#627EEA',
+};
+
+const NETWORK_GQL_NAMES: ValueForEachSupportedChain<SupportedChain> = {
+  [1]: SupportedChain.Mainnet,
+  [80002]: SupportedChain.PolygonAmoy,
+  [11155420]: SupportedChain.OptimismSepolia,
+  [11155111]: SupportedChain.Sepolia,
+  [84532]: SupportedChain.BaseSepolia,
+  [314]: SupportedChain.Filecoin,
 };
 
 const NETWORK_NAMES: ValueForEachSupportedChain<string> = {
@@ -135,6 +146,7 @@ export function getNetwork(chainId: number): Network {
     color: NETWORK_COLORS[chainId],
     isTestnet: NETWORK_IS_TESTNET[chainId],
     subdomain: NETWORK_SUBDOMAIN[chainId],
+    gqlName: NETWORK_GQL_NAMES[chainId],
   };
 }
 

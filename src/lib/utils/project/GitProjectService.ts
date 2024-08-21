@@ -16,11 +16,13 @@ import {
   populateRepoDriverWriteTx,
   executeRepoDriverReadMethod,
 } from '../sdk/repo-driver/repo-driver';
-import unreachable from '../unreachable';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
 import type { ContractTransaction } from 'ethers';
 import { populateDripsWriteTx } from '../sdk/drips/drips';
 import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
+import filterCurrentChainData from '../filter-current-chain-data';
+import unreachable from '../unreachable';
+import network from '$lib/stores/wallet/network';
 
 interface ListEditorConfig {
   items: Items;
@@ -213,29 +215,33 @@ export default class GitProjectService {
     );
 
     const project = {
-      __typename: 'ClaimedProject' as const,
+      __typename: 'Project' as const,
       account: {
         __typename: 'RepoDriverAccount' as const,
         accountId,
         driver: Driver.Repo,
       },
-      color: context.projectColor,
-      avatar:
-        context.avatar.type === 'emoji'
-          ? {
-              __typename: 'EmojiAvatar' as const,
-              emoji: context.avatar.emoji,
-            }
-          : {
-              __typename: 'ImageAvatar' as const,
-              cid: context.avatar.cid,
-            },
       source: {
         __typename: 'Source' as const,
         forge: forge,
         ownerName: username,
         repoName: repoName,
         url: context.gitUrl,
+      },
+      chainData: {
+        __typename: 'ClaimedProjectData',
+        chain: network.gqlName,
+        color: context.projectColor,
+        avatar:
+          context.avatar.type === 'emoji'
+            ? {
+                __typename: 'EmojiAvatar' as const,
+                emoji: context.avatar.emoji,
+              }
+            : {
+                __typename: 'ImageAvatar' as const,
+                cid: context.avatar.cid,
+              },
       },
     };
 
@@ -261,12 +267,18 @@ export default class GitProjectService {
       args: [toBigInt(accountId), accountMetadataAsBytes],
     });
 
-    const splittableAmounts = context.project?.withdrawableBalances.filter(
-      (wb) => BigInt(wb.splittableAmount) > 0n,
-    );
-    const collectableAmounts = context.project?.withdrawableBalances.filter(
-      (wb) => BigInt(wb.collectableAmount) > 0n,
-    );
+    const projectChainData = context.project?.chainData
+      ? filterCurrentChainData(context.project.chainData)
+      : unreachable();
+
+    const splittableAmounts =
+      'withdrawableBalances' in projectChainData
+        ? projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n)
+        : undefined;
+    const collectableAmounts =
+      'withdrawableBalances' in projectChainData
+        ? projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n)
+        : undefined;
 
     const splitTxs: Promise<ContractTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {

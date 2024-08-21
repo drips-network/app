@@ -2,6 +2,7 @@ import { ethers, JsonRpcProvider } from 'ethers';
 import { readable } from 'svelte/store';
 import type { ConnectedWalletStoreState } from '../wallet.store';
 import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
+import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
 const NETWORK = {
   chainId: 11155111 as const,
@@ -14,6 +15,7 @@ const NETWORK = {
   color: '#627EEA',
   isTestnet: true,
   subdomain: 'sepolia.drips.network',
+  gqlName: SupportedChain.Sepolia,
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {

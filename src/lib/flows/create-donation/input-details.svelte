@@ -24,15 +24,8 @@
     ${DRIP_VISUAL_PROJECT_FRAGMENT}
     fragment CreateDonationDetailsStepProject on Project {
       ...DripVisualProject
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
+      account {
+        accountId
       }
     }
   `;
@@ -81,8 +74,7 @@
       case 'NftDriverAccount':
         recipientAccountId = receiver.accountId;
         break;
-      case 'ClaimedProject':
-      case 'UnclaimedProject':
+      case 'Project':
         recipientAccountId = receiver.account.accountId;
         break;
     }

@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   export const DRIP_LIST_BADGE_FRAGMENT = gql`
     fragment DripListBadge on DripList {
+      chain
       account {
         accountId
       }

@@ -22,26 +22,29 @@ const PROFILE_PAGE_QUERY = gql`
   ${STREAMS_SECTION_STREAMS_FRAGMENT}
   ${USER_BALANCES_FRAGMENT}
   ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
-  query ProfilePage($address: String!) {
-    userByAddress(address: $address) {
+  query ProfilePage($address: String!, $chains: [SupportedChain!]) {
+    userByAddress(address: $address, chains: $chains) {
       account {
         address
         accountId
       }
-      balances {
-        ...UserBalances
-      }
-      dripLists {
-        ...DripListsSectionDripList
-      }
-      projects {
-        ...ProjectsSectionProject
-      }
-      streams {
-        ...StreamsSectionStreams
-      }
-      support {
-        ...SupportersSectionSupportItem
+      chainData {
+        chain
+        balances {
+          ...UserBalances
+        }
+        dripLists {
+          ...DripListsSectionDripList
+        }
+        projects {
+          ...ProjectsSectionProject
+        }
+        streams {
+          ...StreamsSectionStreams
+        }
+        support {
+          ...SupportersSectionSupportItem
+        }
       }
     }
   }
@@ -110,7 +113,11 @@ export const load = async ({ params, fetch }) => {
 
   const [votingRounds, userRes, ensData] = await Promise.all([
     await getVotingRounds({ publisherAddress: address }, fetch),
-    query<ProfilePageQuery, ProfilePageQueryVariables>(PROFILE_PAGE_QUERY, { address }, fetch),
+    query<ProfilePageQuery, ProfilePageQueryVariables>(
+      PROFILE_PAGE_QUERY,
+      { address, chains: [network.gqlName] },
+      fetch,
+    ),
     resolveEnsFields(address),
   ]);
 

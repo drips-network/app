@@ -15,6 +15,7 @@ import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+import network from '$lib/stores/wallet/network';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
@@ -32,8 +33,8 @@ export const load = async ({ fetch }) => {
 
   const dripListsPageQuery = gql`
     ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
-    query DripListsPage($ownerAddress: String) {
-      dripLists(where: { ownerAddress: $ownerAddress }) {
+    query DripListsPage($ownerAddress: String, $chains: [SupportedChain!]) {
+      dripLists(chains: $chains, where: { ownerAddress: $ownerAddress }) {
         ...DripListsPageDripList
       }
     }
@@ -49,7 +50,7 @@ export const load = async ({ fetch }) => {
     await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
     await query<DripListsPageQuery, DripListsPageQueryVariables>(
       dripListsPageQuery,
-      { ownerAddress: connectedAddress },
+      { ownerAddress: connectedAddress, chains: [network.gqlName] },
       fetch,
     ),
   ]);

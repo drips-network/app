@@ -46,6 +46,7 @@ import type {
 import unreachable from '../unreachable';
 import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-driver';
 import type { OxString } from '../sdk/sdk-types';
+import network from '$lib/stores/wallet/network';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -543,18 +544,11 @@ export async function mapVoteReceiversToListEditorConfig(
       receiversToFetchDataFor.map(async (v) => {
         const projectQuery = gql`
           ${LIST_EDITOR_PROJECT_FRAGMENT}
-          query ProjectForVoteReceiver($url: String!) {
-            projectByUrl(url: $url) {
+          query ProjectForVoteReceiver($url: String!, $chains: [SupportedChain!]!) {
+            projectByUrl(url: $url, chains: $chains) {
               ...ListEditorProject
-              ... on ClaimedProject {
-                account {
-                  accountId
-                }
-              }
-              ... on UnclaimedProject {
-                account {
-                  accountId
-                }
+              account {
+                accountId
               }
             }
           }
@@ -562,8 +556,8 @@ export async function mapVoteReceiversToListEditorConfig(
 
         const dripListQuery = gql`
           ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-          query DripListForVoteReceiver($id: ID!) {
-            dripList(id: $id) {
+          query DripListForVoteReceiver($id: ID!, $chain: SupportedChain!) {
+            dripList(id: $id, chain: $chain) {
               ...ListEditorDripList
               account {
                 accountId
@@ -578,6 +572,7 @@ export async function mapVoteReceiversToListEditorConfig(
               dripListQuery,
               {
                 id: v.accountId,
+                chain: network.gqlName,
               },
             )
           ).dripList;
@@ -585,7 +580,7 @@ export async function mapVoteReceiversToListEditorConfig(
           return (
             await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
               projectQuery,
-              { url: v.url },
+              { url: v.url, chains: [network.gqlName] },
             )
           ).projectByUrl;
         }
@@ -598,7 +593,7 @@ export async function mapVoteReceiversToListEditorConfig(
     switch (receiver.type) {
       case 'project': {
         const project = receiversData.find(
-          (p): p is Extract<(typeof receiversData)[number], { __typename: 'ClaimedProject' }> =>
+          (p): p is Extract<(typeof receiversData)[number], { __typename: 'Project' }> =>
             p.__typename !== 'DripList' && p.source.url === receiver.url,
         );
         if (!project) throw new Error(`Project not found for url: ${receiver.url}`);

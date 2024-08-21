@@ -5,6 +5,7 @@ import type { UserQuery, UserQueryVariables } from './__generated__/gql.generate
 import getConnectedAddress from '$lib/utils/get-connected-address.js';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import { browser } from '$app/environment';
+import network from '$lib/stores/wallet/network';
 
 const fetchedDataCache = makeFetchedDataCache<UserQuery>('app-layout:user');
 
@@ -21,13 +22,13 @@ export const load = async ({ url: { pathname }, fetch, depends }) => {
       (await query<UserQuery, UserQueryVariables>(
         gql`
           ${HEADER_USER_FRAGMENT}
-          query User($connectedAddress: String!) {
-            userByAddress(address: $connectedAddress) {
+          query User($connectedAddress: String!, $chains: [SupportedChain!]) {
+            userByAddress(address: $connectedAddress, chains: $chains) {
               ...HeaderUser
             }
           }
         `,
-        { connectedAddress },
+        { connectedAddress, chains: [network.gqlName] },
         fetch,
       ));
 

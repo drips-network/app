@@ -20,6 +20,8 @@ import { streamConfigFromUint256, streamConfigToUint256 } from '../sdk/utils/str
 import { extractDriverNameFromAccountId } from '../sdk/utils/extract-driver-from-accountId';
 import populateNewStreamFlowTxs from '../sdk/address-driver/populate-create-new-stream-flow-txs';
 import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
+import filterCurrentChainData from '../filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 type NewStreamOptions = {
   tokenAddress: string;
@@ -36,34 +38,37 @@ const USER_METADATA_KEY = 'ipfs';
 export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: string) {
   const currentStreamsQueryRes = await query<CurrentStreamsQuery, CurrentStreamsQueryVariables>(
     gql`
-      query CurrentStreams($userAccountId: ID!) {
-        userById(accountId: $userAccountId) {
-          streams {
-            outgoing {
-              id
-              name
-              isPaused
-              config {
-                raw
-                amountPerSecond {
-                  tokenAddress
-                }
-                dripId
-                amountPerSecond {
-                  amount
-                }
-                durationSeconds
-                startDate
-              }
-              receiver {
-                ... on User {
-                  account {
-                    accountId
+      query CurrentStreams($userAccountId: ID!, $chains: [SupportedChain!]) {
+        userById(accountId: $userAccountId, chains: $chains) {
+          chainData {
+            chain
+            streams {
+              outgoing {
+                id
+                name
+                isPaused
+                config {
+                  raw
+                  amountPerSecond {
+                    tokenAddress
                   }
+                  dripId
+                  amountPerSecond {
+                    amount
+                  }
+                  durationSeconds
+                  startDate
                 }
-                ... on DripList {
-                  account {
-                    accountId
+                receiver {
+                  ... on User {
+                    account {
+                      accountId
+                    }
+                  }
+                  ... on DripList {
+                    account {
+                      accountId
+                    }
                   }
                 }
               }
@@ -74,10 +79,13 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
     `,
     {
       userAccountId: accountId,
+      chains: [network.gqlName],
     },
   );
 
-  const { outgoing: currentStreams } = currentStreamsQueryRes.userById.streams;
+  const chainData = filterCurrentChainData(currentStreamsQueryRes.userById.chainData);
+
+  const { outgoing: currentStreams } = chainData.streams;
 
   const currentReceivers = currentStreams
     .filter(
@@ -100,12 +108,15 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
 }
 
 function _buildMetadata(
-  streams: CurrentStreamsQuery['userById']['streams']['outgoing'],
+  streams: CurrentStreamsQuery['userById']['chainData'][number]['streams']['outgoing'],
   accountId: string,
   newStream?: NewStreamOptions & { dripId: bigint },
 ) {
   const streamsByTokenAddress = streams.reduce<
-    Record<string, CurrentStreamsQuery['userById']['streams']['outgoing'][number][]>
+    Record<
+      string,
+      CurrentStreamsQuery['userById']['chainData'][number]['streams']['outgoing'][number][]
+    >
   >(
     (acc, stream) => ({
       ...acc,

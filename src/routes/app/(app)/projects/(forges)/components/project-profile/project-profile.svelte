@@ -29,34 +29,33 @@
       ...UnclaimedProjectCard
       ...ProjectProfileHeader
       ...SupportCardProject
-      ...SplitsComponentProjectSplits
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
-        support {
-          ...SupportersSectionSupportItem
-          ...SupporterPile
-        }
-        withdrawableBalances {
-          ...MergeWithdrawableBalances
-        }
+      ...EditProjectMetadataFlow
+      account {
+        accountId
       }
-      ... on ClaimedProject {
-        ...EditProjectMetadataFlow
-        account {
-          accountId
+      chainData {
+        ...SplitsComponentProjectSplits
+        ... on UnClaimedProjectData {
+          support {
+            ...SupportersSectionSupportItem
+            ...SupporterPile
+          }
+          withdrawableBalances {
+            ...MergeWithdrawableBalances
+          }
         }
-        owner {
-          accountId
-        }
-        support {
-          ...SupportersSectionSupportItem
-          ...SupporterPile
-        }
-        totalEarned {
-          tokenAddress
-          amount
+        ... on ClaimedProjectData {
+          owner {
+            accountId
+          }
+          support {
+            ...SupportersSectionSupportItem
+            ...SupporterPile
+          }
+          totalEarned {
+            tokenAddress
+            amount
+          }
         }
       }
     }
@@ -97,10 +96,7 @@
   import { browser } from '$app/environment';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
-  import type {
-    ProjectProfileFragment,
-    ProjectProfile_ClaimedProject_Fragment,
-  } from './__generated__/gql.generated';
+  import type { ProjectProfileFragment } from './__generated__/gql.generated';
   import unreachable from '$lib/utils/unreachable';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import highlightStore from '$lib/stores/highlight/highlight.store';
@@ -119,6 +115,7 @@
   import getSupportersPile, {
     SUPPORTER_PILE_FRAGMENT,
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -133,12 +130,21 @@
   export let correctCasingRepo: RepoInfo | undefined;
 
   $: ownAccountId = $walletStore.dripsAccountId;
-  $: isOwnProject = ownAccountId === (isClaimed(project) ? project.owner.accountId : undefined);
+  $: chainData = filterCurrentChainData(project.chainData);
+  $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
+
+  type ExtractFragment<T, Condition> = T extends Condition ? T : never;
 
   function getSplitsPile(
     splitCollections: (
-      | ProjectProfile_ClaimedProject_Fragment['splits']['maintainers']
-      | ProjectProfile_ClaimedProject_Fragment['splits']['dependencies']
+      | ExtractFragment<
+          ProjectProfileFragment['chainData'][number],
+          { __typename: 'ClaimedProjectData' }
+        >['splits']['maintainers']
+      | ExtractFragment<
+          ProjectProfileFragment['chainData'][number],
+          { __typename: 'ClaimedProjectData' }
+        >['splits']['dependencies']
     )[],
   ) {
     const splits = splitCollections.flat();
@@ -159,7 +165,7 @@
           return {
             component: ProjectAvatar,
             props: {
-              project: v.project,
+              project: filterCurrentChainData(v.project.chainData),
               outline: true,
               isLinked: false,
             },
@@ -247,7 +253,7 @@
   />
 </svelte:head>
 
-<PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>
+<PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
   {#if newRepo}
     <div class="notice">
       <AnnotationBox>
@@ -284,13 +290,13 @@
       </AnnotationBox>
     </div>
   {/if}
-  {#if !isClaimed(project)}
+  {#if !isClaimed(chainData)}
     <div class="notice">
       <AnnotationBox type="info">
-        {#if project.withdrawableBalances.length > 0}This project has <span
+        {#if chainData.withdrawableBalances.length > 0}This project has <span
             class="typo-text-small-bold"
             ><AggregateFiatEstimate
-              amounts={mergeWithdrawableBalances(project.withdrawableBalances)}
+              amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
             /></span
           > in claimable funds! Project owners can collect by claiming their project.{:else}This
           project has not been claimed yet but can still receive funds that the owner can collect
@@ -317,13 +323,13 @@
     </div>
   {/if}
 
-  <article class="project-profile" class:claimed={isClaimed(project)}>
+  <article class="project-profile" class:claimed={isClaimed(chainData)}>
     <header class="header">
       <div>
         <ProjectProfileHeader
           {project}
           {description}
-          editButton={isClaimed(project) && isOwnProject ? 'Edit' : undefined}
+          editButton={isClaimed(chainData) && isOwnProject ? 'Edit' : undefined}
           shareButton={{
             url: `https://drips.network${buildProjectUrl(
               Forge.GitHub,
@@ -333,31 +339,32 @@
             )}`,
           }}
           on:editButtonClick={() =>
-            isClaimed(project) && modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
+            isClaimed(chainData) &&
+            modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
         />
       </div>
 
-      {#if isClaimed(project)}
+      {#if isClaimed(chainData)}
         <div class="stats" in:fade={{ duration: 300 }}>
           <div class="stat shadow-low rounded-drip-lg">
             <KeyValuePair key="Donations">
-              <AggregateFiatEstimate amounts={project.totalEarned} />
+              <AggregateFiatEstimate amounts={chainData.totalEarned} />
             </KeyValuePair>
           </div>
           <!-- ("Supporters" stat) -->
-          {#if [project.support].flat().length > 0}
+          {#if [chainData.support].flat().length > 0}
             <a
               class="stat btn-theme-outlined"
               href="#support"
               on:click={() => supportersSectionSkeleton?.highlightSection()}
             >
               <KeyValuePair key="Supporters">
-                <Pile maxItems={4} components={getSupportersPile(project.support)} />
+                <Pile maxItems={4} components={getSupportersPile(chainData.support)} />
               </KeyValuePair>
             </a>
           {/if}
           <!-- ("Splits with" stat) -->
-          {#if [project.splits.maintainers, project.splits.dependencies].flat().length > 0}
+          {#if [chainData.splits.maintainers, chainData.splits.dependencies].flat().length > 0}
             <a
               class="stat btn-theme-outlined"
               href="#splits"
@@ -367,8 +374,8 @@
                 <Pile
                   maxItems={4}
                   components={getSplitsPile([
-                    project.splits.maintainers ?? [],
-                    project.splits.dependencies ?? [],
+                    chainData.splits.maintainers ?? [],
+                    chainData.splits.dependencies ?? [],
                   ])}
                 />
               </KeyValuePair>
@@ -379,7 +386,7 @@
     </header>
     <div class="content">
       <Developer accountId={project.account.accountId} />
-      {#if isClaimed(project)}
+      {#if isClaimed(chainData)}
         <section id="splits" class="app-section">
           <SectionHeader
             icon={DripList}
@@ -388,15 +395,15 @@
               ? [
                   {
                     handler: () =>
-                      isClaimed(project) &&
+                      isClaimed(chainData) &&
                       modal.show(
                         Stepper,
                         undefined,
-                        isClaimed(project)
+                        isClaimed(chainData)
                           ? editProjectSplitsSteps(
                               project.account.accountId,
                               project.source.url,
-                              project.splits,
+                              chainData.splits,
                             )
                           : unreachable(),
                       ),
@@ -409,8 +416,8 @@
           <SectionSkeleton
             bind:this={splitsSectionSkeleton}
             loaded={true}
-            empty={project.splits.maintainers.length === 0 &&
-              project.splits.dependencies.length === 0}
+            empty={chainData.splits.maintainers.length === 0 &&
+              chainData.splits.dependencies.length === 0}
             emptyStateHeadline="No splits"
             emptyStateEmoji="🫧"
             emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
@@ -425,12 +432,12 @@
                       {
                         __typename: 'SplitGroup',
                         name: 'Maintainers',
-                        list: project.splits.maintainers,
+                        list: chainData.splits.maintainers,
                       },
                       {
                         __typename: 'SplitGroup',
                         name: 'Dependencies',
-                        list: project.splits.dependencies,
+                        list: chainData.splits.dependencies,
                       },
                     ]}
                   />
@@ -439,7 +446,7 @@
             </div>
           </SectionSkeleton>
         </section>
-      {:else if project.withdrawableBalances.length > 0}
+      {:else if chainData.withdrawableBalances.length > 0}
         <section class="app-section">
           <SectionHeader icon={Wallet} label="Claimable funds" />
           <SectionSkeleton loaded={true}>
@@ -447,7 +454,7 @@
               <UnclaimedProjectCard
                 {project}
                 unclaimedTokensExpandable={false}
-                unclaimedTokensExpanded={project.withdrawableBalances.length > 0}
+                unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
                 showClaimButton
                 on:claimButtonClick={() =>
                   goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
@@ -460,7 +467,7 @@
         <SupportersSection
           bind:sectionSkeleton={supportersSectionSkeleton}
           type="project"
-          supportItems={project.support}
+          supportItems={chainData.support}
         />
       </section>
     </div>

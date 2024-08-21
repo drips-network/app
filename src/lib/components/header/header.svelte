@@ -5,8 +5,11 @@
   export const HEADER_USER_FRAGMENT = gql`
     ${COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT}
     fragment HeaderUser on User {
-      withdrawableBalances {
-        ...CollectButtonWithdrawableBalance
+      chainData {
+        chain
+        withdrawableBalances {
+          ...CollectButtonWithdrawableBalance
+        }
       }
     }
   `;
@@ -30,8 +33,11 @@
   import NetworkPicker from '../network-picker/network-picker.svelte';
   import NetworkList from '../network-picker/components/network-list.svelte';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let user: HeaderUserFragment | null;
+
+  $: chainData = user?.chainData ? filterCurrentChainData(user.chainData) : undefined;
 
   $: elevated = $scroll.pos > 16;
 
@@ -65,7 +71,7 @@
   {#if connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
     <div data-highlightid="global-collect" class="collect mobile">
       <CollectButton
-        withdrawableBalances={user?.withdrawableBalances}
+        withdrawableBalances={chainData?.withdrawableBalances}
         peekAmount={true}
         bind:isPeeking={collectButtonPeeking}
       />
@@ -131,7 +137,7 @@
     </div>
     {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
       <div data-highlightid="global-collect" class="collect">
-        <CollectButton withdrawableBalances={user?.withdrawableBalances} />
+        <CollectButton withdrawableBalances={chainData?.withdrawableBalances} />
       </div>
     {/if}
   </div>

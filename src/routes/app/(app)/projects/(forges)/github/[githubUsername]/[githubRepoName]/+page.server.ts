@@ -13,12 +13,14 @@ import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
     ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!) {
-      projectByUrl(url: $url) {
+    query ProjectByUrl($url: String!, $chains: [SupportedChain!]!) {
+      projectByUrl(url: $url, chains: $chains) {
         ...ProjectProfile
       }
     }
@@ -39,6 +41,7 @@ async function fetchDripsProject(repoUrl: string) {
       getProjectsQuery,
       {
         url: repoUrl,
+        chains: [network.gqlName],
       },
       fetch,
     ),
@@ -84,6 +87,8 @@ export const load = (async ({ params, fetch, url }) => {
     throw error(404);
   }
 
+  const projectChainData = filterCurrentChainData(project.chainData);
+
   const repoResJson = await repoRes.json();
 
   if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
@@ -104,7 +109,7 @@ export const load = (async ({ params, fetch, url }) => {
     return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
   }
 
-  if (isClaimed(project) && !project.splits) {
+  if (isClaimed(projectChainData) && !projectChainData.splits) {
     throw new Error('Claimed project somehow does not have splits');
   }
 

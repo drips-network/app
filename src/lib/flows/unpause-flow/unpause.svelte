@@ -26,6 +26,8 @@
   import { buildUnpauseStreamPopulatedTx } from '$lib/utils/streams/streams';
   import query from '$lib/graphql/dripsQL';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -53,23 +55,33 @@
             () =>
               query<CheckUserStreamPausedQuery, CheckUserStreamPausedQueryVariables>(
                 gql`
-                  query CheckUserStreamPaused($accountId: ID!) {
-                    userById(accountId: $accountId) {
-                      streams {
-                        outgoing {
-                          id
-                          isPaused
+                  query CheckUserStreamPaused($accountId: ID!, $chains: [SupportedChain!]) {
+                    userById(accountId: $accountId, chains: $chains) {
+                      chainData {
+                        chain
+                        streams {
+                          outgoing {
+                            id
+                            isPaused
+                          }
                         }
                       }
                     }
                   }
                 `,
-                { accountId },
+                { accountId, chains: [network.gqlName] },
               ),
-            (res) =>
-              res.userById?.streams?.outgoing?.find(
-                (s) => s.id.toLowerCase() === stream.id.toLowerCase(),
-              )?.isPaused === false,
+            (res) => {
+              const chainData = res.userById?.chainData
+                ? filterCurrentChainData(res.userById.chainData)
+                : undefined;
+
+              return (
+                chainData?.streams?.outgoing?.find(
+                  (s) => s.id.toLowerCase() === stream.id.toLowerCase(),
+                )?.isPaused === false
+              );
+            },
             10000,
             1000,
           );

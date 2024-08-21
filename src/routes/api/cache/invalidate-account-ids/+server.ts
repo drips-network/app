@@ -1,17 +1,19 @@
 import { redis, type RedisClientType } from '../../redis';
 import query from '$lib/graphql/dripsQL';
 import isClaimed from '$lib/utils/project/is-claimed';
+import {
+  dripListAssociatedAccountIdsQuery,
+  projectAssociatedAccountIdsQuery,
+} from './queries/associated-account-ids-queries';
+import { error } from '@sveltejs/kit';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import type {
   DripListAssociatedAccountIdsQuery,
   DripListAssociatedAccountIdsQueryVariables,
   ProjectAssociatedAccountIdsQuery,
   ProjectAssociatedAccountIdsQueryVariables,
 } from './queries/__generated__/gql.generated';
-import {
-  dripListAssociatedAccountIdsQuery,
-  projectAssociatedAccountIdsQuery,
-} from './queries/associated-account-ids-queries';
-import { error } from '@sveltejs/kit';
+import network from '$lib/stores/wallet/network';
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
 const ENABLE_INVALIDATE_LOGS = true;
@@ -41,20 +43,22 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
   const associatedAccountIds = await query<
     ProjectAssociatedAccountIdsQuery,
     ProjectAssociatedAccountIdsQueryVariables
-  >(projectAssociatedAccountIdsQuery, { projectAccountId }, fetch);
+  >(projectAssociatedAccountIdsQuery, { projectAccountId, chains: [network.gqlName] }, fetch);
   const project = associatedAccountIds.projectById;
 
   if (project) {
+    const chainData = filterCurrentChainData(project.chainData);
+
     const accountIdsToClear = [
       projectAccountId,
-      ...project.support.map((support) => support.account.accountId),
-      ...(isClaimed(project)
-        ? project.splits.dependencies.map((dependency) => dependency.account.accountId)
+      ...chainData.support.map((support) => support.account.accountId),
+      ...(isClaimed(chainData)
+        ? chainData.splits.dependencies.map((dependency) => dependency.account.accountId)
         : []),
-      ...(isClaimed(project)
-        ? project.splits.maintainers.map((maintainer) => maintainer.account.accountId)
+      ...(isClaimed(chainData)
+        ? chainData.splits.maintainers.map((maintainer) => maintainer.account.accountId)
         : []),
-      ...(isClaimed(project) ? [project.owner.accountId] : []),
+      ...(isClaimed(chainData) ? [chainData.owner.accountId] : []),
     ];
 
     await Promise.all(
@@ -71,7 +75,7 @@ async function invalidateDripListCache(dripListAccountId: string, client: RedisC
   const associatedAccountIds = await query<
     DripListAssociatedAccountIdsQuery,
     DripListAssociatedAccountIdsQueryVariables
-  >(dripListAssociatedAccountIdsQuery, { dripListAccountId }, fetch);
+  >(dripListAssociatedAccountIdsQuery, { dripListAccountId, chain: network.gqlName }, fetch);
   const { dripList } = associatedAccountIds;
 
   if (dripList) {

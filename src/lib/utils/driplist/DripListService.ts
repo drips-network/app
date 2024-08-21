@@ -34,6 +34,7 @@ import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
 import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import { populateCallerWriteTx } from '../sdk/caller/caller';
 import txToCallerCall from '../sdk/utils/tx-to-caller-call';
+import network from '$lib/stores/wallet/network';
 
 type AccountId = string;
 
@@ -112,18 +113,22 @@ export default class DripListService {
     );
 
     const mintedNftAccountsCountQuery = gql`
-      query MintedNftAccountsCount($ownerAddress: String!) {
-        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress)
+      query MintedNftAccountsCount($ownerAddress: String!, $chain: SupportedChain!) {
+        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress, chain: $chain) {
+          total
+        }
       }
     `;
 
     const mintedNftAccountsCountRes = await query<
       MintedNftAccountsCountQuery,
       MintedNftAccountsCountQueryVariables
-    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress });
-    const mintedNftAccountsCount = mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress ?? 0;
+    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress, chain: network.gqlName });
 
-    const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
+    const salt = this._calcSaltFromAddress(
+      this._ownerAddress,
+      mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress.total ?? 0,
+    );
 
     const listId = (
       await executeNftDriverReadMethod({

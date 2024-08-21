@@ -8,6 +8,8 @@
   import { createEventDispatcher } from 'svelte';
   import { get, type Writable } from 'svelte/store';
   import type { State } from '../../../claim-project-flow';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
   export let context: Writable<State>;
   export let project: Writable<ProjectCustomizerFragment>;
@@ -15,7 +17,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   function handleConfirm() {
-    const { avatar, color } = get(project);
+    const { avatar, color } = filterCurrentChainData(get(project).chainData) as ClaimedProjectData;
 
     $context.avatar =
       avatar.__typename === 'EmojiAvatar'
