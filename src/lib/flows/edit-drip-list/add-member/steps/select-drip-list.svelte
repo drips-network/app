@@ -1,10 +1,10 @@
 <script context="module">
   export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
     ${DRIP_LIST_BADGE_FRAGMENT}
-    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
+    ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
     fragment SelectDripListStepLists on DripList {
       ...DripListBadge
-      ...EditDripListStepSelectedDripList
+      ...EditDripListFlowDripList
       splits {
         ... on AddressReceiver {
           account {
@@ -79,15 +79,22 @@
     SelectDripListProjectToAddFragment,
     SelectDripListStepListsFragment,
   } from './__generated__/gql.generated';
-  import type { EditDripListStepSelectedDripListFragment } from '../../shared/steps/__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '../../shared/steps/edit-drip-list.svelte';
+  import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '../../edit-members/edit-drip-list-steps';
+  import type { Items, Weights } from '$lib/components/list-editor/types';
+  import { mapSplitReceiversToEditorConfig } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let dripLists: SelectDripListStepListsFragment[];
 
-  export let selectedDripListState: Writable<{
-    dripList: EditDripListStepSelectedDripListFragment | undefined;
+  export let state: Writable<{
+    listEditorConfig: {
+      items: Items;
+      weights: Weights;
+    };
+    name: string;
+    description: string | undefined;
+    dripListAccountId: string | undefined;
   }>;
 
   export let projectOrDripListToAdd:
@@ -111,14 +118,14 @@
     const selectedDripList =
       dripLists.find((dl) => dl.account.accountId === selected[0]) ?? unreachable();
 
-    dispatch('await', {
-      message: 'Getting ready…',
-      promise: async () => {
-        $selectedDripListState = {
-          dripList: selectedDripList,
-        };
-      },
-    });
+    $state = {
+      listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits),
+      name: selectedDripList.name,
+      description: selectedDripList.description || undefined,
+      dripListAccountId: selectedDripList.account.accountId,
+    };
+
+    dispatch('goForward');
   }
 
   $: subjectName =
