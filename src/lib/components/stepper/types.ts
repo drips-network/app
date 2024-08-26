@@ -1,4 +1,47 @@
+import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
+import type { ContractReceipt, PopulatedTransaction } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
+import type { Nullable } from 'vitest';
+
+export interface TransactPayload<T> {
+  before?: T;
+  transactions: (context: Context<T>) => TransactionWrapper[] | Promise<TransactionWrapper[]>;
+  after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
+  afterSafe?: (
+    sendTransactionsResponse: SendTransactionsResponse,
+    context: Context<T>,
+  ) => PromiseLike<void>;
+  headline: string;
+  description?: string;
+  icon?: {
+    component: ComponentType;
+    props: Record<string, unknown>;
+  };
+  messages?: {
+    duringBefore?: string;
+    duringAfter?: string;
+  };
+}
+
+export type SomeTransactPayload = <R>(
+  payload: <T extends Nullable<BeforeFunc>>(transactPayload: TransactPayload<T>) => R,
+) => R;
+
+export type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
+
+type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
+
+export type TransactionWrapper = {
+  title: string;
+  transaction: PopulatedTransaction;
+  applyGasBuffer: boolean;
+};
+
+export function makeTransactPayload<T extends Nullable<BeforeFunc>>(
+  i: TransactPayload<T>,
+): SomeTransactPayload {
+  return (cb) => cb(i);
+}
 
 export interface UpdateAwaitStepParams {
   message?: string;
@@ -59,6 +102,8 @@ export type StepComponentEvents = {
    * is currently active, or closes the stepper modal.
    */
   conclude: void;
+  // TODO: add description.
+  transact: SomeTransactPayload;
 };
 
 type OmitContext<T> = Omit<T, 'context'>;
