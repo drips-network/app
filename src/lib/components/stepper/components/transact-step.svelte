@@ -649,6 +649,7 @@
     margin-right: 2rem;
     margin-top: 2px;
     justify-content: space-between;
+    max-height: 1rem;
   }
 
   .title-and-action h3 {
