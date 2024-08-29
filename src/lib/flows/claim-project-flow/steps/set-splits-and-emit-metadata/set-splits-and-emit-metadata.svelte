@@ -1,9 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import { getCallerClient } from '$lib/utils/get-drips-clients';
   import { gql } from 'graphql-request';
@@ -22,9 +21,10 @@
   export let context: Writable<State>;
 
   onMount(() =>
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Claim your project',
         before: async () => {
           const gitProjectService = await GitProjectService.new();
 
@@ -36,19 +36,13 @@
           return { tx };
         },
         messages: {
-          duringBefore: {
-            message: 'Preparing to claim project...',
-          },
+          duringBefore: 'Preparing to claim project...',
         },
         transactions: ({ tx }) => [
           {
             transaction: tx,
             applyGasBuffer: false,
-            waitingSignatureMessage: {
-              message: 'Waiting for you to confirm the transaction in your wallet…',
-              subtitle:
-                "This transaction applies your project's splits, sets metadata, and concludes the claiming process.",
-            },
+            title: "Apply project's splits and set metadata",
           },
         ],
         after: async () => {
