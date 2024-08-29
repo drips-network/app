@@ -71,6 +71,14 @@
   let error: Error | undefined;
   let transactionsTimeline: TransactionTimelineItem[] = [];
 
+  $: {
+    if (transactionsTimeline.some((tx) => tx.status === 'pending')) {
+      modal.setHideable(false);
+    } else {
+      modal.setHideable(true);
+    }
+  }
+
   onMount(async () => {
     await executeTransactions();
   });
@@ -119,8 +127,6 @@
     }
 
     let safeSendTransactionResponse: SendTransactionsResponse | undefined;
-
-    modal.setHideable(false);
 
     if (safeAppMode) {
       safeSendTransactionResponse = await handleSafeAppTransactions(
@@ -186,8 +192,6 @@
 
     isRetrying = false;
     isExecutionCompleted = true;
-
-    modal.setHideable(true);
   }
 
   async function handleEoaTransactions(
