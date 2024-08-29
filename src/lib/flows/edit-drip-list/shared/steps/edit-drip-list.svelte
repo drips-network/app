@@ -72,9 +72,8 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { createEventDispatcher } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import {
     getCallerClient,
     getNFTDriverClient,
@@ -103,6 +102,7 @@
     LIST_EDITOR_PROJECT_FRAGMENT,
     type Items,
   } from '$lib/components/list-editor/types';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -154,9 +154,14 @@
 
   // TODO: Auto-refresh UI when splits change
   function submit() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        icon: {
+          component: Emoji,
+          props: { emoji: '✏️', size: 'huge' },
+        },
+        headline: 'Edit your Drip List',
         before: async () => {
           const nftDriverTxFactory = await getNFTDriverTxFactory();
           const dripListService = await DripListService.new();
@@ -206,6 +211,7 @@
           {
             transaction: tx,
             applyGasBuffer: false,
+            title: 'Editing Drip List',
           },
         ],
       }),
