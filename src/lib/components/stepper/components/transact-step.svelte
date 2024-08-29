@@ -40,6 +40,7 @@
     status:
       | 'awaitingPrevious'
       | 'awaitingSignature'
+      | 'submittedToSafe'
       | 'pending'
       | 'confirmed'
       | 'failed'
@@ -50,6 +51,7 @@
       | null;
   }
 
+  let isSafe = false;
   let isRetrying = false;
   let failedTxIndex = -1;
   let headline: string = '';
@@ -111,6 +113,7 @@
     assert(address);
 
     const safeAppMode = Boolean(safe);
+    isSafe = safeAppMode;
 
     const contractReceipts: ContractReceipt[] = [];
 
@@ -174,17 +177,7 @@
       assert(safeSendTransactionResponse, 'Expected SafeSendTransactionResponse to be defined.');
 
       try {
-        updateTransactionTimelineStatus(transactionWrappers[transactionWrappers.length - 1], {
-          status: 'finalizing',
-          message: 'Transactions submitted. Waiting for Safe to confirm...',
-        });
-
         await afterSafe?.(safeSendTransactionResponse, beforeResult);
-
-        updateTransactionTimelineStatus(transactionWrappers[transactionWrappers.length - 1], {
-          status: 'confirmed',
-          message: 'Transactions confirmed by Safe',
-        });
       } catch (e) {
         dispatchResult('result', { success: false, error: e as Error });
       }
@@ -339,27 +332,48 @@
       throw new Error('Unable to estimate gas for Safe Batch operation.');
     }
 
+    assert(transactionWrappers.length === 1, 'Expected only one transaction in Safe mode.');
+    const safeTx = transactionWrappers[0];
+
     const txs = transactionWrappers.map(({ transaction: tx }) => ({
       to: tx.to ?? unreachable(),
       data: tx.data ?? unreachable(),
       value: '0',
     }));
 
-    const response = await safeAppsSdk.txs.send({
-      txs,
-      params: {
-        safeTxGas: estimatedGasWithBuffer,
-      },
-    });
-
-    transactionsTimeline.forEach((item, index) => {
-      updateTransactionTimelineStatus(transactionWrappers[index], {
-        status: 'awaitingSignature',
-        message: 'Transaction submitted to Safe. Waiting for confirmation...',
+    try {
+      const response = await safeAppsSdk.txs.send({
+        txs,
+        params: {
+          safeTxGas: estimatedGasWithBuffer,
+        },
       });
-    });
 
-    return response;
+      updateTransactionTimelineStatus(safeTx, {
+        status: 'submittedToSafe',
+        message: 'Transaction submitted to Safe',
+      });
+
+      return response;
+    } catch (e) {
+      const isRejection = (e as Error).message.toLowerCase().includes('user rejected transaction');
+
+      if (isRejection) {
+        updateTransactionTimelineStatus(safeTx, {
+          status: 'rejected',
+          message: 'You rejected the transaction',
+        });
+      } else {
+        updateTransactionTimelineStatus(safeTx, {
+          status: 'failed',
+          message: 'Transaction failed',
+        });
+
+        error = e as Error;
+
+        failedTxIndex = 0;
+      }
+    }
   }
 
   function cancelSubsequentTransactions(
@@ -390,6 +404,7 @@
         return item;
       }
 
+      // Case for Safe also.
       if (index === retryIndex) {
         return {
           ...item,
@@ -427,26 +442,19 @@
 
   function initTransactionsTimelineItems(
     transactionWrappers: TransactionWrapper[],
-    safeAppMode: boolean,
+    isSafe: boolean,
   ) {
-    if (safeAppMode) {
-      transactionsTimeline = transactionWrappers.map((tx) => ({
-        title: tx.title,
-        estimatedGas: 'Unknown gas',
-        message: 'Waiting for Safe to confirm the transaction...',
-        status: 'pending', // Initial status reflects that we're waiting for Safe confirmation.
-      }));
-    } else {
-      transactionsTimeline = transactionWrappers.map((tx, index) => ({
-        title: tx.title,
-        estimatedGas: 'Unknown gas',
-        message:
-          index === 0
-            ? 'Waiting for you to confirm the transaction in your wallet'
-            : 'Waiting on previous transaction',
-        status: index === 0 ? 'awaitingSignature' : 'awaitingPrevious',
-      }));
-    }
+    transactionsTimeline = transactionWrappers.map((tx, index) => ({
+      title: tx.title,
+      estimatedGas: 'Unknown gas',
+      message:
+        index === 0
+          ? isSafe
+            ? 'Waiting for you to submit the transaction in your Safe'
+            : 'Waiting for you to confirm the transaction in your wallet'
+          : 'Waiting on previous transaction',
+      status: index === 0 ? 'awaitingSignature' : 'awaitingPrevious',
+    }));
   }
 
   function getGasBuffer(gasLimit: number) {
@@ -501,7 +509,7 @@
                 <div><Spinner /></div>
               {/if}
 
-              {#if transactionStatusItem.status === 'confirmed'}
+              {#if transactionStatusItem.status === 'confirmed' || transactionStatusItem.status === 'submittedToSafe'}
                 <div class="button">
                   <Button
                     icon={ArrowBoxUpRight}
@@ -572,7 +580,7 @@
   {#if transactionsTimeline.length}
     <div class:actions={isExecutionCompleted}>
       {#if isExecutionCompleted}
-        <div>All transactions complete!</div>
+        <div>{!isSafe ? 'All transactions complete!' : 'Transaction submitted to Safe!'}</div>
         <Button
           icon={ArrowRight}
           variant="primary"
