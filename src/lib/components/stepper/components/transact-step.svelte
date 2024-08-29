@@ -63,7 +63,7 @@
   let icon:
     | {
         component: ComponentType;
-        props: Record<string, unknown>;
+        props?: Record<string, unknown>;
       }
     | undefined;
 
@@ -119,6 +119,8 @@
     }
 
     let safeSendTransactionResponse: SendTransactionsResponse | undefined;
+
+    modal.setHideable(false);
 
     if (safeAppMode) {
       safeSendTransactionResponse = await handleSafeAppTransactions(
@@ -457,7 +459,9 @@
   {#if transactionsTimeline.length}
     <!-- Header -->
     {#if icon}
-      <svelte:component this={icon.component} {...icon.props} />
+      <div class="icon">
+        <svelte:component this={icon.component} class="icon" {...icon.props} />
+      </div>
     {/if}
     <StepHeader {headline} {description} />
 
@@ -582,7 +586,7 @@
 
 <style>
   .transact-step {
-    gap: 2rem;
+    gap: 1rem;
     display: flex;
     flex-direction: column;
   }
@@ -730,6 +734,10 @@
     display: flex;
     align-items: center;
     justify-content: end;
+  }
+
+  .icon {
+    margin: auto;
   }
 
   @media (max-width: 577px) {

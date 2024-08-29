@@ -15,7 +15,7 @@ export interface TransactPayload<T> {
   description?: string;
   icon?: {
     component: ComponentType;
-    props: Record<string, unknown>;
+    props?: Record<string, unknown>;
   };
   messages?: {
     duringBefore?: string;
