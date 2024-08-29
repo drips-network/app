@@ -120,8 +120,6 @@
 
     let safeSendTransactionResponse: SendTransactionsResponse | undefined;
 
-    modal.setHideable(false);
-
     if (safeAppMode) {
       safeSendTransactionResponse = await handleSafeAppTransactions(
         transactionWrappers,
