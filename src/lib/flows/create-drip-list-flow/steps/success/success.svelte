@@ -5,12 +5,10 @@
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
-
-  const dispatch = createEventDispatcher<StepComponentEvents>();
+  import modal from '$lib/stores/modal';
 
   export let context: Writable<State>;
 
@@ -26,7 +24,7 @@
 
     await goto(`/app/drip-lists/${listId}`).then(() => {
       loading = false;
-      dispatch('conclude');
+      modal.hide();
     });
   }
 
