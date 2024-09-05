@@ -16,6 +16,7 @@ const NETWORK = {
   isTestnet: true,
   subdomain: 'sepolia.drips.network',
   gqlName: SupportedChain.Sepolia,
+  autoUnwrapPairs: undefined,
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {

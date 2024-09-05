@@ -8,8 +8,8 @@ import assert from '$lib/utils/assert';
 import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
 import { MaxUint256 } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
-import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
+import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 
 const WAITING_WALLET_ICON = {
   component: Emoji,
@@ -46,7 +46,7 @@ export default function (
 
         delete setStreamsPopulatedTx.gasLimit;
 
-        const approvePopulatedTx = await populateErc20WriteTx({
+        const tokenApprovalTx = await populateErc20WriteTx({
           token: tokenAddress as OxString,
           functionName: 'approve',
           args: [getNetworkConfig().ADDRESS_DRIVER as OxString, MaxUint256],
@@ -54,17 +54,17 @@ export default function (
 
         return {
           setStreamsPopulatedTx,
-          approvePopulatedTx,
+          tokenApprovalTx,
           needApproval,
           tokenAddress,
         };
       },
 
-      transactions: ({ setStreamsPopulatedTx, approvePopulatedTx, needApproval }) => [
+      transactions: ({ setStreamsPopulatedTx, tokenApprovalTx, needApproval }) => [
         ...(needApproval
           ? [
               {
-                transaction: approvePopulatedTx,
+                transaction: tokenApprovalTx,
                 waitingSignatureMessage: {
                   message:
                     'Waiting for you to approve access to the ERC-20 token in your wallet...',

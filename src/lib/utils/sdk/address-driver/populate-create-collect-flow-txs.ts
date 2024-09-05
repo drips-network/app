@@ -3,6 +3,10 @@ import type { OxString, SplitsReceiver, SqueezeArgs } from '../sdk-types';
 import { populateDripsWriteTx } from '../drips/drips';
 import contractConstants from '../utils/contract-constants';
 import { populateAddressDriverWriteTx } from './address-driver';
+import { populateNativeTokenUnwrapperWriteTx } from '../native-token-unrapper/native-token-unwrapper';
+import { get } from 'svelte/store';
+import walletStore from '$lib/stores/wallet/wallet.store';
+import { getNetworkConfig } from '../utils/get-network-config';
 
 export type CollectFlowPayload = {
   accountId: string;
@@ -17,6 +21,7 @@ export default async function populateCreateCollectFlowTxs(
   payload: CollectFlowPayload,
   skipReceive: boolean = false,
   skipSplit: boolean = false,
+  shouldAutoUnwrap: boolean = false,
 ): Promise<ContractTransaction[]> {
   const { accountId, tokenAddress, maxCycles, currentReceivers, transferToAddress, squeezeArgs } =
     payload;
@@ -69,12 +74,34 @@ export default async function populateCreateCollectFlowTxs(
     flow.push(splitTx);
   }
 
-  const collectTx = await populateAddressDriverWriteTx({
-    functionName: 'collect',
-    args: [tokenAddress, transferToAddress],
-  });
+  if (shouldAutoUnwrap) {
+    const { address: userAddress } = get(walletStore);
 
-  flow.push(collectTx);
+    if (userAddress !== transferToAddress) {
+      throw new Error('User address and transfer to address must match when auto unwrapping.');
+    }
+
+    // Collect funds to the `NativeTokenUnwrapper` contract address.
+    const collectTx = await populateAddressDriverWriteTx({
+      functionName: 'collect',
+      args: [tokenAddress, getNetworkConfig().NATIVE_TOKEN_UNWRAPPER as OxString],
+    });
+
+    // Unwrap the collected wrapped token to native and transfer it to user address.
+    const unwrapTx = await populateNativeTokenUnwrapperWriteTx({
+      functionName: 'unwrap',
+      args: [userAddress],
+    });
+
+    flow.push(collectTx, unwrapTx); // Order matters.
+  } else {
+    const collectTx = await populateAddressDriverWriteTx({
+      functionName: 'collect',
+      args: [tokenAddress, transferToAddress],
+    });
+
+    flow.push(collectTx);
+  }
 
   return flow;
 }

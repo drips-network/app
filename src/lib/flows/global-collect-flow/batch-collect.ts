@@ -13,6 +13,7 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 export default function batchCollect(
   tokenAddresses: string[],
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
+  shouldAutoUnwrap: boolean,
 ) {
   transact(
     dispatch,
@@ -25,13 +26,18 @@ export default function batchCollect(
 
         const flowsPromises: ReturnType<typeof populateCreateCollectFlowTxs>[] = [];
         for (const tokenAddress of tokenAddresses) {
-          const flow = populateCreateCollectFlowTxs({
-            tokenAddress: tokenAddress as OxString,
-            maxCycles: 1000,
-            currentReceivers: [],
-            transferToAddress: userAddress as OxString,
-            accountId: ownAccountId,
-          });
+          const flow = populateCreateCollectFlowTxs(
+            {
+              tokenAddress: tokenAddress as OxString,
+              maxCycles: 1000,
+              currentReceivers: [],
+              transferToAddress: userAddress as OxString,
+              accountId: ownAccountId,
+            },
+            false,
+            false,
+            shouldAutoUnwrap,
+          );
 
           flowsPromises.push(flow);
         }

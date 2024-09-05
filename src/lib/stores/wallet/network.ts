@@ -12,6 +12,12 @@ import type { ComponentType } from 'svelte';
 export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
+export type AutoUnwrapPair = {
+  name: string;
+  nativeSymbol: string;
+  wrappedSymbol: string;
+};
+
 export type Network = {
   chainId: ChainId;
   name: string;
@@ -24,6 +30,7 @@ export type Network = {
   isTestnet: boolean;
   subdomain: string;
   gqlName: SupportedChain;
+  autoUnwrapPairs: AutoUnwrapPair[] | undefined;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -100,6 +107,11 @@ const NETWORK_TOKENS: ValueForEachSupportedChain<string> = {
   [314]: 'FIL',
 };
 
+const NETWORK_AUTO_WRAPPED_PAIRS: Partial<ValueForEachSupportedChain<AutoUnwrapPair[] | []>> = {
+  [1]: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
+  [314]: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
+};
+
 const NETWORK_ID: ValueForEachSupportedChain<string> = {
   [1]: '0x1',
   [80002]: '0x13882',
@@ -140,6 +152,7 @@ export function getNetwork(chainId: number): Network {
     name: NETWORK_NAMES[chainId],
     label: NETWORK_LABELS[chainId],
     token: NETWORK_TOKENS[chainId],
+    autoUnwrapPairs: NETWORK_AUTO_WRAPPED_PAIRS[chainId],
     id: NETWORK_ID[chainId],
     rpcUrl: RPC_URLS[chainId],
     icon: NETWORK_ICONS[chainId],
