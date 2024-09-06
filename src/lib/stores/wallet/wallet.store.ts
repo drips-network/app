@@ -192,18 +192,19 @@ const walletStore = () => {
     const connectedToNetwork = await provider.getNetwork();
 
     if (!isConfiguredChainId(Number(connectedToNetwork.chainId))) {
-      const clearAdvisory = globalAdvisoryStore.add({
+      clearAdvisory = globalAdvisoryStore.add({
         fatal: false,
         headline: 'Unsupported network',
-        description: `Please switch your connected wallet to ${network.label}.`,
+        description: `Please switch your connected wallet to ${network.label}, or disconnect the wallet.`,
         emoji: '🔌',
+        button: {
+          label: 'Disconnect wallet',
+          handler: () => {
+            disconnect();
+            clearAdvisory?.();
+          },
+        },
       });
-
-      await provider.send('wallet_switchEthereumChain', [
-        { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
-      ]);
-
-      clearAdvisory();
     }
 
     await _setConnectedState(provider, safeInfo);
