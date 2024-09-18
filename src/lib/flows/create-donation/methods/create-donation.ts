@@ -65,7 +65,7 @@ export default function (
               {
                 transaction: approvePopulatedTx,
                 applyGasBuffer: false,
-                title: `Approving access to the ERC-20`,
+                title: `Approve Drips to withdraw the ERC-20`,
               },
             ]
           : []),
@@ -73,7 +73,7 @@ export default function (
         {
           transaction: givePopulatedTx,
           applyGasBuffer: false,
-          title: 'Approving donation',
+          title: 'Make the one-time donation',
         },
       ],
 

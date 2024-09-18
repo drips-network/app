@@ -211,7 +211,7 @@
           {
             transaction: tx,
             applyGasBuffer: false,
-            title: 'Editing Drip List',
+            title: 'Update your Drip List',
           },
         ],
       }),

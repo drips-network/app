@@ -59,7 +59,7 @@
           {
             transaction: await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: true,
-            title: 'Delete stream',
+            title: 'Delete the stream',
           },
         ],
 

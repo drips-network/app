@@ -20,11 +20,16 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import type { Result } from './await-step.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import StepLayout from '$lib/components/step-layout/step-layout.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import { fade } from 'svelte/transition';
+  import EtherscanLink from './etherscan-link.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
   const dispatchResult = createEventDispatcher<{ result: Result }>();
   const dispatchStartOver = createEventDispatcher<{ startOver: void }>();
@@ -51,7 +56,6 @@
       | null;
   }
 
-  let isSafe = false;
   let isRetrying = false;
   let failedTxIndex = -1;
   let headline: string = '';
@@ -72,14 +76,6 @@
   let isErrorDetailsVisible = false;
   let error: Error | undefined;
   let transactionsTimeline: TransactionTimelineItem[] = [];
-
-  $: {
-    if (transactionsTimeline.some((tx) => tx.status === 'pending')) {
-      modal.setHideable(false);
-    } else {
-      modal.setHideable(true);
-    }
-  }
 
   onMount(async () => {
     await executeTransactions();
@@ -113,7 +109,6 @@
     assert(address);
 
     const safeAppMode = Boolean(safe);
-    isSafe = safeAppMode;
 
     const contractReceipts: ContractReceipt[] = [];
 
@@ -250,7 +245,7 @@
       try {
         updateTransactionTimelineStatus(executingTx, {
           status: 'awaitingSignature',
-          message: 'Waiting for you to confirm the transaction in your wallet',
+          message: 'Waiting for you to confirm in your wallet',
         });
 
         const txResponse = await (signer ?? unreachable()).sendTransaction({
@@ -260,7 +255,8 @@
 
         updateTransactionTimelineStatus(executingTx, {
           status: 'pending',
-          message: 'Waiting for confirmations',
+          message: 'Waiting for confirmation',
+          etherscanUrl: etherscanLink(network.name, txResponse.hash),
         });
 
         const receipt = await txResponse.wait();
@@ -290,7 +286,6 @@
           error = e as Error;
         }
 
-        cancelSubsequentTransactions(executingTx, txWrappersWithGas, isRejection);
         failedTxIndex = i;
 
         break;
@@ -376,23 +371,6 @@
     }
   }
 
-  function cancelSubsequentTransactions(
-    executingTx: TransactionWrapperWithGasLimit,
-    txWrappersWithGas: TransactionWrapperWithGasLimit[],
-    isRejection: boolean,
-  ) {
-    for (const tx of txWrappersWithGas) {
-      const timelineItem = transactionsTimeline.find((item) => item.title === tx.title);
-
-      if (tx !== executingTx && timelineItem?.status === 'awaitingPrevious') {
-        updateTransactionTimelineStatus(tx, {
-          status: 'cancelled',
-          message: `This transaction was cancelled due to a previous ${isRejection ? 'rejection' : 'failure'}`,
-        });
-      }
-    }
-  }
-
   function recalculateTimelineStatuses(retryIndex: number) {
     error = undefined;
     isRetrying = false;
@@ -465,10 +443,18 @@
     failedTxIndex = index;
     isErrorDetailsVisible = !isErrorDetailsVisible;
   }
+
+  onMount(() => {
+    modal.setHideable(false);
+
+    return () => {
+      modal.setHideable(true);
+    };
+  });
 </script>
 
-<div class="transact-step">
-  {#if transactionsTimeline.length}
+<StepLayout>
+  <div class="transact-step">
     <!-- Header -->
     {#if icon}
       <div class="icon">
@@ -478,123 +464,136 @@
     <StepHeader {headline} {description} />
 
     <!-- Timeline -->
-    <div class="timeline">
-      <h5>Transactions</h5>
-
-      <!-- Tx "rows" -->
-      {#each transactionsTimeline as transactionStatusItem, index}
-        <div
-          class="row"
-          class:grayed={transactionStatusItem.status === 'awaitingPrevious' ||
-            transactionStatusItem.status === 'cancelled'}
-        >
-          <!-- Index "column" -->
-          <div
-            class="index"
-            class:index-grayed={transactionStatusItem.status === 'awaitingPrevious' ||
-              transactionStatusItem.status === 'cancelled'}
-            class:index-errored={transactionStatusItem.status === 'failed' ||
-              transactionStatusItem.status === 'rejected'}
-          >
-            {index + 1}
+    <TransitionedHeight transitionHeightChanges>
+      <div class="timeline">
+        <h5>Transactions</h5>
+        {#if transactionsTimeline.length === 0}
+          <div class="loading-txs-spinner">
+            <Spinner />
+            <p>{duringBeforeMsg ?? 'Preparing transactions...'}</p>
           </div>
-
-          <!-- Content "column" -->
-          <div class="content">
-            <!-- Title and action row -->
-            <div class="title-and-action">
-              <h3>{transactionStatusItem.title}</h3>
-
-              {#if transactionStatusItem.status === 'pending' || transactionStatusItem.status === 'finalizing' || transactionStatusItem.status === 'retrying'}
-                <div><Spinner /></div>
-              {/if}
-
-              {#if transactionStatusItem.status === 'confirmed' || transactionStatusItem.status === 'submittedToSafe'}
-                <div class="button">
-                  <Button
-                    icon={ArrowBoxUpRight}
-                    href={transactionStatusItem.etherscanUrl}
-                    target="_blank"
-                  >
-                    View on Etherscan</Button
-                  >
+        {:else}
+          <!-- Tx "rows" -->
+          <div in:fade={{ duration: 300 }}>
+            {#each transactionsTimeline as transactionStatusItem, index}
+              <div
+                class="row"
+                class:grayed={transactionStatusItem.status === 'awaitingPrevious' ||
+                  transactionStatusItem.status === 'cancelled'}
+              >
+                <!-- Index "column" -->
+                <div
+                  class="index"
+                  class:index-grayed={transactionStatusItem.status === 'awaitingPrevious' ||
+                    transactionStatusItem.status === 'cancelled'}
+                  class:index-errored={transactionStatusItem.status === 'failed' ||
+                    transactionStatusItem.status === 'rejected'}
+                >
+                  {index + 1}
                 </div>
-              {:else if transactionStatusItem.status === 'failed' || transactionStatusItem.status === 'rejected' || (transactionStatusItem.status === 'retrying' && index === failedTxIndex)}
-                <div class="button">
-                  <Button
-                    variant="primary"
-                    disabled={isRetrying}
-                    on:click={async () => await retryFailedTransaction()}>Try again</Button
-                  >
-                </div>
-              {/if}
-            </div>
 
-            <!-- Status message row -->
-            <div class="tx-info">
-              {#if transactionStatusItem.status === 'awaitingSignature'}
-                <div class="status">
-                  <div class="wallet">
-                    <Wallet style="fill: var(--color-primary);" />
+                <!-- Content "column" -->
+                <div class="content">
+                  <!-- Title and action row -->
+                  <div class="title-and-action">
+                    <h3>{transactionStatusItem.title}</h3>
+
+                    {#if transactionStatusItem.status === 'pending' || transactionStatusItem.status === 'finalizing' || transactionStatusItem.status === 'retrying'}
+                      <div><Spinner /></div>
+                    {/if}
+
+                    {#if transactionStatusItem.status === 'failed' || transactionStatusItem.status === 'rejected' || (transactionStatusItem.status === 'retrying' && index === failedTxIndex)}
+                      <div class="button">
+                        <Button
+                          variant="primary"
+                          disabled={isRetrying}
+                          on:click={async () => await retryFailedTransaction()}>Try again</Button
+                        >
+                      </div>
+                    {/if}
                   </div>
-                  <div>{transactionStatusItem.message}</div>
-                </div>
-              {:else if transactionStatusItem.status === 'failed'}
-                <div class="status errored">
-                  <ExclamationCircle style="fill: var(--color-negative); display: inline-block;" />
-                  {transactionStatusItem.message}
-                  <button style="margin-left: 0.5rem;" on:click={() => toggleErrorDetails(index)}>
-                    <span class="button" style="text-decoration: underline;">
-                      {failedTxIndex === index ? 'Show' : 'Hide'} error
-                    </span>
-                  </button>
-                </div>
-              {:else if transactionStatusItem.status === 'rejected'}
-                <div class="status errored">
-                  <CrossCircle style="fill: var(--color-negative); display: inline-block;" />
-                  {transactionStatusItem.message}
-                </div>
-              {:else}
-                <div class="status-message grayed">
-                  {transactionStatusItem.message}
-                </div>
-              {/if}
-            </div>
 
-            <!-- Error details row -->
-            {#if failedTxIndex === index && isErrorDetailsVisible}
-              <div class="error-container">{error}</div>
-            {/if}
+                  <!-- Status message row -->
+                  <div class="tx-info">
+                    {#if transactionStatusItem.status === 'awaitingSignature'}
+                      <div class="status">
+                        <div class="icon highlight">
+                          <Wallet style="fill: var(--color-primary-level-6);" />
+                        </div>
+                        <div>{transactionStatusItem.message}</div>
+                      </div>
+                    {:else if transactionStatusItem.status === 'failed'}
+                      <div class="status errored">
+                        <div class="icon failure">
+                          <ExclamationCircle style="fill: var(--color-negative)" />
+                        </div>
+                        {transactionStatusItem.message}
+                        <EtherscanLink url={transactionStatusItem.etherscanUrl} />
+                        <button
+                          style="margin-left: 0.5rem;"
+                          on:click={() => toggleErrorDetails(index)}
+                        >
+                          <span class="button" style="text-decoration: underline;">
+                            {isErrorDetailsVisible ? 'Hide' : 'Show'} error
+                          </span>
+                        </button>
+                      </div>
+                    {:else if transactionStatusItem.status === 'rejected'}
+                      <div class="status errored">
+                        <div class="icon failure">
+                          <CrossCircle style="fill: var(--color-negative)" />
+                        </div>
+                        {transactionStatusItem.message}
+                      </div>
+                    {:else if transactionStatusItem.status === 'confirmed'}
+                      <div class="status success">
+                        <div class="icon success">
+                          <CheckCircle style="fill: var(--color-positive-level-6)" />
+                        </div>
+                        {transactionStatusItem.message}
+                        <EtherscanLink url={transactionStatusItem.etherscanUrl} />
+                      </div>
+                    {:else}
+                      <div class="status grayed">
+                        {transactionStatusItem.message}
+                        <EtherscanLink url={transactionStatusItem.etherscanUrl} />
+                      </div>
+                    {/if}
+                  </div>
+
+                  <!-- Error details row -->
+                  {#if failedTxIndex === index && isErrorDetailsVisible}
+                    <div class="error-container typo-text-mono">{error}</div>
+                  {/if}
+                </div>
+              </div>
+            {/each}
           </div>
-        </div>
-      {/each}
-    </div>
-  {:else}
-    <div class="loading-txs-spinner">
-      <Spinner />
-      <p>{duringBeforeMsg ?? 'Preparing transactions...'}</p>
-    </div>
-  {/if}
-
-  <!-- Footer -->
-  {#if transactionsTimeline.length}
-    <div class:actions={isExecutionCompleted}>
-      {#if isExecutionCompleted}
-        <div>{!isSafe ? 'All transactions complete!' : 'Transaction submitted to Safe!'}</div>
-        <Button
-          icon={ArrowRight}
-          variant="primary"
-          on:click={() => dispatchResult('result', { success: true })}>Continue</Button
-        >
-      {:else}
-        These transactions will trigger automatically. Not working? <button
-          style="text-decoration: underline; cursor: pointer"
-          on:click={() => dispatchStartOver('startOver')}>Try again</button
-        >
-      {/if}
-    </div>
-  {/if}
-</div>
+        {/if}
+      </div>
+    </TransitionedHeight>
+  </div>
+  <svelte:fragment slot="left-actions">
+    <Button
+      icon={ArrowLeft}
+      variant="ghost"
+      disabled={!!failedTxIndex}
+      on:click={() => dispatchStartOver('startOver')}
+    >
+      Back
+    </Button>
+  </svelte:fragment>
+  <svelte:fragment slot="actions">
+    <Button
+      icon={ArrowRight}
+      variant="primary"
+      disabled={!isExecutionCompleted}
+      on:click={() => dispatchResult('result', { success: true })}
+    >
+      Continue
+    </Button>
+  </svelte:fragment>
+</StepLayout>
 
 <style>
   .transact-step {
@@ -607,6 +606,7 @@
     width: 100%;
     border: 1px solid var(--color-foreground);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
+    position: relative;
   }
 
   .timeline > h5 {
@@ -635,7 +635,7 @@
     justify-content: center;
     background: var(--color-background);
     border-radius: 0.5rem 0 0.5rem 0.5rem;
-    margin: calc(2rem + 4px) 1rem 0rem 2rem;
+    margin: 2.375rem 1rem 0rem 2rem;
     border: 1px solid var(--color-foreground);
   }
 
@@ -646,14 +646,11 @@
 
   .title-and-action {
     display: flex;
-    margin-right: 2rem;
-    margin-top: 2px;
+    align-items: center;
     justify-content: space-between;
-    max-height: 1rem;
-  }
-
-  .title-and-action h3 {
-    margin-left: 3px;
+    min-height: 2.125rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .row::before {
@@ -661,7 +658,7 @@
     content: '';
     height: 100%;
     position: absolute;
-    top: calc(2rem + 4px);
+    top: 2.5rem;
     left: calc((2rem + 1.5rem / 2) - 1px);
     border: 1px dashed var(--color-foreground-level-4);
   }
@@ -670,15 +667,15 @@
     content: none;
   }
 
-  .row:last-child {
-    margin-bottom: 2rem;
+  .row:last-child .content {
+    padding-bottom: 2rem;
   }
 
   .error-container {
     padding: 1rem;
     max-width: 100%;
-    margin-right: 2rem;
-    margin-left: 3px;
+    max-height: 11rem;
+    overflow: scroll;
     white-space: normal;
     word-wrap: break-word;
     flex-direction: column;
@@ -689,34 +686,108 @@
   }
 
   .content {
-    gap: 1rem;
+    gap: 0.25rem;
+    overflow: auto;
     flex-grow: 1;
     display: flex;
-    overflow: auto;
     text-align: start;
     flex-direction: column;
-    margin: 2rem 0rem 0rem 1rem;
+    padding: 2rem 2rem 0rem 1rem;
   }
 
   .status {
     display: flex;
     align-items: center;
+    min-height: 2rem;
+    gap: 0.25rem;
   }
 
-  .status .wallet {
-    padding: 0.5rem;
+  .status .icon {
     border-radius: 50%;
-    margin-right: 0.5rem;
-    background-color: var(--color-primary-level-2);
+    padding: 0.125rem;
+    position: relative;
   }
 
-  .status-message {
-    margin-left: 3px;
+  .status .icon.failure {
+    animation: shake-head 1s;
   }
 
-  .errored {
+  .status .icon.highlight {
+    background-color: var(--color-primary-level-1);
+    animation: wiggle 1s;
+  }
+
+  /* outline that grows from the round icon ever 1s */
+  .icon.highlight::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    animation: pulsing 2s infinite;
+  }
+
+  @keyframes wiggle {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(5deg);
+    }
+    50% {
+      transform: rotate(-5deg);
+    }
+    75% {
+      transform: rotate(5deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  @keyframes shake-head {
+    0% {
+      transform: translateX(0);
+    }
+    16.67% {
+      transform: translateX(-0.125rem);
+    }
+    33.33% {
+      transform: translateX(0.125rem);
+    }
+    50% {
+      transform: translateX(-0.125rem);
+    }
+    66.67% {
+      transform: translateX(0.125rem);
+    }
+    83.33% {
+      transform: translateX(-0.125rem);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pulsing {
+    0% {
+      box-shadow: 0 0 0 0px var(--color-primary-level-1);
+    }
+    50% {
+      box-shadow: 0 0 0 0.5rem transparent;
+    }
+  }
+
+  .status.errored {
     flex-wrap: wrap;
     color: var(--color-negative);
+  }
+
+  .status.success {
+    flex-wrap: wrap;
+    color: var(--color-positive-level-6);
   }
 
   .index-errored {
@@ -736,40 +807,23 @@
   .loading-txs-spinner {
     gap: 1rem;
     display: flex;
-    min-height: 16rem;
+    min-height: 8.375rem;
     align-items: center;
     flex-direction: column;
     justify-content: center;
   }
 
-  .actions {
-    gap: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: end;
-  }
-
-  .icon {
-    margin: auto;
-  }
-
   @media (max-width: 577px) {
-    .title-and-action {
-      gap: 0.5rem;
-      flex-direction: column;
-      align-items: flex-start;
+    .index {
+      margin: calc(1rem + 4px) 0.5rem 0rem 1rem;
     }
 
-    .title-and-action h3 {
-      width: 100%;
-      margin-left: 0;
-      margin-bottom: 0.5rem;
+    .content {
+      padding: 1rem 1rem 0rem 1rem;
     }
 
-    .title-and-action .button {
-      width: 100%;
-      margin-left: 0;
-      text-align: left;
+    .row::before {
+      left: calc((1rem + 1.5rem / 2) - 1px);
     }
   }
 </style>

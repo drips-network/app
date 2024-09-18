@@ -68,7 +68,7 @@ export default function batchCollect(
         {
           transaction: tx,
           applyGasBuffer: true,
-          title: 'Collecting funds',
+          title: 'Collect funds',
         },
       ],
     }),

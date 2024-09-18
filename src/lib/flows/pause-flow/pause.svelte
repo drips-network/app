@@ -48,7 +48,7 @@
           {
             transaction: tx,
             applyGasBuffer: true,
-            title: 'Pausing stream',
+            title: 'Pause stream',
           },
         ],
 

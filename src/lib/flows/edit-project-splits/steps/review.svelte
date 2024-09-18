@@ -61,7 +61,7 @@
           {
             transaction: tx,
             applyGasBuffer: false,
-            title: 'Updating project splits',
+            title: 'Update project splits',
           },
         ],
 

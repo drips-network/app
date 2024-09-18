@@ -102,7 +102,7 @@
         },
 
         transactions: ({ tx }) => [
-          { transaction: tx, applyGasBuffer: false, title: 'Updating project metadata' },
+          { transaction: tx, applyGasBuffer: false, title: 'Update project metadata' },
         ],
 
         after: async (_, { accountId, ipfsHash }) => {

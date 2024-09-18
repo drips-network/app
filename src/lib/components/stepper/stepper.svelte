@@ -179,7 +179,6 @@
     }
 
     direction = 'forward';
-
     transacting = event.detail;
   }
 
@@ -268,6 +267,7 @@
     currentStep;
     awaitError;
     awaiting;
+    transacting;
     updateMutationObserver();
   }
 
@@ -286,7 +286,7 @@
   style:height={`${$wrapperHeight}px`}
   style:overflow={transitioning ? 'hidden' : 'visible'}
 >
-  {#key `${awaiting}${awaitError}${currentStepIndex}`}
+  {#key `${awaiting}${transacting}${awaitError}${currentStepIndex}`}
     <div
       in:fly={(() => getTransition('in'))()}
       out:fly={(() => getTransition('out'))()}

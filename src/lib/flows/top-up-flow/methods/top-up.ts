@@ -73,14 +73,14 @@ export default function (
           ? [
               {
                 transaction: approvePopulatedTx,
-                title: `Approving ${tokenInfo.symbol}`,
+                title: `Approve Drips to withdraw ${tokenInfo.symbol}`,
                 applyGasBuffer: false,
               },
             ]
           : []),
         {
           transaction: setStreamsPopulatedTx,
-          title: 'Setting Streams',
+          title: `Top up ${tokenInfo.symbol}`,
           applyGasBuffer: true,
         },
       ],

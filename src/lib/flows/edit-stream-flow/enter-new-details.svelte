@@ -118,7 +118,7 @@
             transaction:
               batch.length === 1 ? batch[0] : await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: needGasBuffer,
-            title: 'Editing stream',
+            title: 'Edit the stream',
           },
         ],
 

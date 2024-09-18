@@ -223,7 +223,7 @@
           {
             transaction: await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: true,
-            title: 'Creating stream',
+            title: 'Create the stream',
           },
         ],
 

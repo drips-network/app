@@ -42,7 +42,7 @@
           {
             transaction: tx,
             applyGasBuffer: false,
-            title: "Apply project's splits and set metadata",
+            title: 'Set project splits and metadata',
           },
         ],
         after: async () => {

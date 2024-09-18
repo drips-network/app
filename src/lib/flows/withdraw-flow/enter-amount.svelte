@@ -114,7 +114,7 @@
           {
             transaction: tx,
             applyGasBuffer: true,
-            title: `Withdrawing ${tokenInfo?.info.symbol}`,
+            title: `Withdraw ${tokenInfo?.info.symbol}`,
           },
         ],
       }),

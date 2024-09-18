@@ -48,7 +48,7 @@
           {
             transaction: tx,
             applyGasBuffer: true,
-            title: 'Unpausing stream',
+            title: 'Unpause stream',
           },
         ],
 
