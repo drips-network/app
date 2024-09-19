@@ -9,12 +9,15 @@
     BlogDripListQueryVariables,
   } from './__generated__/gql.generated';
   import query from '$lib/graphql/dripsQL';
+  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
 
   export let dripListId: string;
 
   let dripList: BlogDripListQuery['dripList'] | undefined = undefined;
 
   onMount(async () => {
+    await fiatEstimates.start();
+
     const blogDripListQuery = gql`
       ${DRIP_LIST_CARD_FRAGMENT}
       query blogDripList($dripListId: ID!) {
