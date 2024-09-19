@@ -29,7 +29,7 @@ Once everything is set up, the publisher sets an end date for voting, reviews th
 
 After voting concludes, the publisher finalizes and publishes the list as a full, on-chain Drip List that can then be funded by anyone!
 
-<BlogVideoPlayer src="https://www.youtube.com/watch?v=OGrdgh1jaas" />
+<BlogVideoPlayer src="https://www.youtube-nocookie.com/embed/OGrdgh1jaas?si=8h1hRmxg6utCtKA1" />
 
 # Case Study: Scroll Level Up Hackathon
 
