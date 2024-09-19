@@ -10,6 +10,9 @@
   } from './__generated__/gql.generated';
   import query from '$lib/graphql/dripsQL';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import Spinner from '$lib/components/spinner/spinner.svelte';
+  import { fade } from 'svelte/transition';
 
   export let dripListId: string;
 
@@ -35,9 +38,13 @@
 
 <div data-custom-blog-component>
   <div class="wrapper">
-    {#if dripList}
-      <DripListCard listingMode data={{ dripList }} />
-    {/if}
+    <TransitionedHeight transitionHeightChanges>
+      {#if dripList}
+        <div in:fade><DripListCard listingMode data={{ dripList }} /></div>
+      {:else}
+        <div class="loading"><Spinner /></div>
+      {/if}
+    </TransitionedHeight>
   </div>
 </div>
 
@@ -49,6 +56,13 @@
     margin: 2.5rem -2rem;
     padding: 0.5rem;
     overflow: hidden;
+  }
+
+  .loading {
+    height: 22.765rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   @media (max-width: 797px) {
