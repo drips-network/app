@@ -25,7 +25,6 @@
     PROJECT_CUSTOMIZER_FRAGMENT,
   } from '$lib/components/project-customizer/project-customizer.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import RepoDriverMetadataManager from '$lib/utils/metadata/RepoDriverMetadataManager';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { createEventDispatcher } from 'svelte';
@@ -33,7 +32,7 @@
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
   import { getRepoDriverTxFactory } from '$lib/utils/get-drips-clients';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { gql } from 'graphql-request';
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
   import type { LatestVersion } from '@efstajas/versioned-parser';
@@ -57,9 +56,10 @@
   function submit() {
     const metadataManager = new RepoDriverMetadataManager();
 
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Update project metadata',
         before: async () => {
           const { accountId } = project.account;
 
@@ -101,7 +101,9 @@
           return { tx, ipfsHash, accountId };
         },
 
-        transactions: ({ tx }) => [{ transaction: tx, applyGasBuffer: false }],
+        transactions: ({ tx }) => [
+          { transaction: tx, applyGasBuffer: false, title: 'Update project metadata' },
+        ],
 
         after: async (_, { accountId, ipfsHash }) => {
           await waitForAccountMetadata(accountId, ipfsHash);
