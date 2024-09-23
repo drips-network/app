@@ -42,11 +42,10 @@
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { createEventDispatcher } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import modal from '$lib/stores/modal';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
   import Wallet from '$lib/components/icons/Wallet.svelte';
@@ -93,9 +92,10 @@
     amountValidationState?.type === 'valid';
 
   function updateStream() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Edit stream',
         before: async () => {
           const { newHash, batch } = await buildEditStreamBatch(stream.id, {
             name: nameUpdated ? $context.newName : undefined,
@@ -119,6 +119,7 @@
                     args: [batch.map(txToCallerCall)],
                   }),
             applyGasBuffer: needGasBuffer,
+            title: 'Edit the stream',
           },
         ],
 

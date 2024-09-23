@@ -24,11 +24,10 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { Writable } from 'svelte/store';
   import type { WithdrawFlowState } from './withdraw-flow-state';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import Toggle from '$lib/components/toggle/toggle.svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
   import { gql } from 'graphql-request';
@@ -78,9 +77,18 @@
   }
 
   function triggerWithdraw() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: `Withdraw ${tokenInfo?.info.symbol}`,
+        icon: {
+          component: EmojiAndToken,
+          props: {
+            emoji: '💰',
+            tokenAddress: tokenInfo.info.address,
+            animateTokenOnMount: true,
+          },
+        },
         before: async () => {
           const MAX_INT_128 = 170141183460469231731687303715884105728n;
 
@@ -99,6 +107,7 @@
           {
             transaction: tx,
             applyGasBuffer: true,
+            title: `Withdraw ${tokenInfo?.info.symbol}`,
           },
         ],
       }),

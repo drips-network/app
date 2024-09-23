@@ -204,6 +204,7 @@ export default class DripListService {
         ...(needsApprovalForToken
           ? [
               {
+                title: `Approve Drips to withdraw ${needsApprovalForToken}`,
                 transaction: await this._buildTokenApprovalTx(needsApprovalForToken),
                 waitingSignatureMessage: {
                   message: `Waiting for you to approve Drips access to the ERC-20 token in your wallet...`,
@@ -215,6 +216,7 @@ export default class DripListService {
             ]
           : []),
         {
+          title: 'Creating the Drip List',
           transaction: batch,
           applyGasBuffer: true,
         },

@@ -1,6 +1,4 @@
-import Emoji from '$lib/components/emoji/emoji.svelte';
-import type { StepComponentEvents } from '$lib/components/stepper/types';
-import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
@@ -11,14 +9,6 @@ import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import { populateAddressDriverWriteTx } from '$lib/utils/sdk/address-driver/address-driver';
 import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 
-const WAITING_WALLET_ICON = {
-  component: Emoji,
-  props: {
-    emoji: '👛',
-    size: 'huge',
-  },
-};
-
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   recipientAccountId: string,
@@ -26,9 +16,10 @@ export default function (
   amountToGive: bigint,
   tokenAllowance: bigint,
 ) {
-  transact(
-    dispatch,
+  dispatch(
+    'transact',
     makeTransactPayload({
+      headline: 'Donate Instantly',
       before: async () => {
         const { address } = get(walletStore);
 
@@ -64,24 +55,16 @@ export default function (
           ? [
               {
                 transaction: approvePopulatedTx,
-                waitingSignatureMessage: {
-                  message:
-                    'Waiting for you to approve Drips access to the ERC-20 token in your wallet...',
-                  subtitle: 'You only have to do this once per token.',
-                  icon: WAITING_WALLET_ICON,
-                },
                 applyGasBuffer: false,
+                title: `Approve Drips to withdraw the ERC-20`,
               },
             ]
           : []),
 
         {
           transaction: givePopulatedTx,
-          waitingSignatureMessage: {
-            message: 'Waiting for you to approve the donation transaction in your wallet...',
-            icon: WAITING_WALLET_ICON,
-          },
           applyGasBuffer: false,
+          title: 'Make the one-time donation',
         },
       ],
 

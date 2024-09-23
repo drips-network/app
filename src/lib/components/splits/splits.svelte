@@ -12,6 +12,8 @@
 
   export let draft = false;
 
+  export let disableTooltips = false;
+
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
     list.sort((a, b) => {
@@ -45,6 +47,7 @@
   {#each sortedList as listItem, index}
     <li class="split">
       <SplitComponent
+        disableTooltip={disableTooltips}
         disableLink={disableLinks}
         {groupsExpandable}
         isFirst={index === 0}

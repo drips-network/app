@@ -192,18 +192,71 @@ const walletStore = () => {
     const connectedToNetwork = await provider.getNetwork();
 
     if (!isConfiguredChainId(Number(connectedToNetwork.chainId))) {
-      const clearAdvisory = globalAdvisoryStore.add({
-        fatal: false,
-        headline: 'Unsupported network',
-        description: `Please switch your connected wallet to ${network.label}.`,
-        emoji: '🔌',
-      });
+      // Try connecting to the default network to see if the network is already added.
+      try {
+        await provider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
+        ]);
+        // Network is already added, we can proceed.
+        await _setConnectedState(provider, safeInfo);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        // Error code 4902 means that the network is not added to the wallet.
+        if (error.error?.code === 4902) {
+          // In this case, we also show the option to add the network to the wallet.
+          clearAdvisory = globalAdvisoryStore.add({
+            fatal: false,
+            headline: 'Unsupported network',
+            description: `Please add ${network.label} network to your connected wallet and switch to it, or disconnect the wallet.`,
+            emoji: '🔌',
+            button: {
+              label: 'Disconnect wallet',
+              handler: () => {
+                disconnect();
+                clearAdvisory?.();
+              },
+            },
+            secondaryButton: {
+              label: `Add ${network.label} to wallet`,
+              handler: async () => {
+                await provider.send('wallet_addEthereumChain', [
+                  {
+                    chainId: '0x13a',
+                    blockExplorerUrls: ['https://filecoin.blockscout.com/'],
+                    chainName: 'Filecoin',
+                    nativeCurrency: {
+                      decimals: 18,
+                      name: 'Filecoin',
+                      symbol: 'FIL',
+                    },
+                    rpcUrls: [
+                      'https://api.node.glif.io/rpc/v1',
+                      'https://filecoin.chainup.net/rpc/v1',
+                      'https://rpc.ankr.com/filecoin',
+                    ],
+                  },
+                ]);
 
-      await provider.send('wallet_switchEthereumChain', [
-        { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
-      ]);
-
-      clearAdvisory();
+                clearAdvisory?.();
+              },
+            },
+          });
+        } else {
+          clearAdvisory = globalAdvisoryStore.add({
+            fatal: false,
+            headline: 'Unsupported network',
+            description: `Please switch your connected wallet to ${network.label}, or disconnect the wallet.`,
+            emoji: '🔌',
+            button: {
+              label: 'Disconnect wallet',
+              handler: () => {
+                disconnect();
+                clearAdvisory?.();
+              },
+            },
+          });
+        }
+      }
     }
 
     await _setConnectedState(provider, safeInfo);

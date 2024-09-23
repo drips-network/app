@@ -15,9 +15,8 @@
 
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import expect from '$lib/utils/expect';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type {
     CheckUserStreamPausedQuery,
     CheckUserStreamPausedQueryVariables,
@@ -34,9 +33,10 @@
   export let stream: UnpauseFlowStreamFragment;
 
   onMount(() => {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Unpause stream',
         before: async () => {
           const tx = await buildUnpauseStreamPopulatedTx(stream.id);
 
@@ -47,6 +47,7 @@
           {
             transaction: tx,
             applyGasBuffer: true,
+            title: 'Unpause stream',
           },
         ],
 

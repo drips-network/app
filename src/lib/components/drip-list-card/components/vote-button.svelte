@@ -7,15 +7,12 @@
   import voteFlowSteps from '$lib/flows/vote/vote-flow-steps';
   import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
   import type { Collaborator, VotingRound } from '$lib/utils/multiplayer/schemas';
   import unreachable from '$lib/utils/unreachable';
 
   export let votingRound: VotingRound;
   export let collaboratorAddress: string;
   export let collaborator: Collaborator;
-
-  const status = getVotingRoundStatusReadable(votingRound);
 
   $: isOwnVote = collaboratorAddress.toLowerCase() === $walletStore.address?.toLowerCase();
 </script>
@@ -28,7 +25,7 @@
     </div>
   {/if}
 
-  {#if isOwnVote && $status === 'Started'}
+  {#if isOwnVote && votingRound.status === 'Started'}
     <Button
       icon={collaborator.hasVoted ? undefined : Proposals}
       variant="primary"

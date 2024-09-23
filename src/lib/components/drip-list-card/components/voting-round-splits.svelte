@@ -18,8 +18,6 @@
   export let maxRows: number | undefined = undefined;
   export let listingMode: boolean;
 
-  const status = multiplayer.getVotingRoundStatusReadable(votingRound);
-
   $: isOwnVotingRound =
     votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
 
@@ -47,43 +45,13 @@
     revealedResultsSplits = await mapSplitsFromMultiplayerResults(revealedResults.result);
   }
 
-  $: resultsToShow = votingRound.result ?? revealedResultsSplits;
+  $: resultsToShow = votingRound.result ?? revealedResultsSplits ?? [];
 </script>
 
 <TransitionedHeight transitionHeightChanges>
   <div class="results" style:min-height={!resultsToShow ? '16rem' : undefined} out:fade>
-    {#if resultsToShow}
-      {#if resultsToShow.length === 0}
-        {#if $status === 'Completed'}
-          <!-- No-one voted at end of vote -->
-          <div class="empty-state" in:fade>
-            <Emoji emoji="🫙" size="huge" />
-            <h4>No recipients</h4>
-            <p>No collaborators voted.</p>
-          </div>
-        {:else}
-          <!-- No-one voted yet, but still ongoing -->
-          <div class="empty-state" in:fade>
-            <Emoji emoji="🫙" size="huge" />
-            <h4>Awaiting votes</h4>
-            <p>No-one has voted yet.</p>
-          </div>
-        {/if}
-      {:else}
-        <!-- Voting results -->
-        <div class="splits" in:fade>
-          <div style:transform="translateX(-10px)" class="drip-icon">
-            <Drip fill="var(--color-foreground-level-5)" />
-          </div>
-          <Splits
-            draft
-            list={votingRound.splits ?? revealedResultsSplits ?? unreachable()}
-            {maxRows}
-          />
-        </div>
-      {/if}
-    {:else if votingRound.areVotesPrivate}
-      <!-- Private voting round, results not revealed -->
+    {#if votingRound.areVotesPrivate && resultsToShow.length === 0}
+      <!-- Private voting round, results not revealed, and vote is ongoing -->
       <div class="empty-state" in:fade>
         <Emoji emoji="🗳️" size="huge" />
         <h4>Awaiting votes</h4>
@@ -91,6 +59,35 @@
         {#if isOwnVotingRound && !listingMode}
           <Button on:click={handleRevealResults}>Preview results</Button>
         {/if}
+      </div>
+    {:else if resultsToShow.length === 0}
+      {#if votingRound.status === 'Completed'}
+        <!-- No-one voted at end of vote -->
+        <div class="empty-state" in:fade>
+          <Emoji emoji="🫙" size="huge" />
+          <h4>No recipients</h4>
+          <p>No collaborators voted.</p>
+        </div>
+      {:else}
+        <!-- No-one voted yet, but still ongoing -->
+        <div class="empty-state" in:fade>
+          <Emoji emoji="🫙" size="huge" />
+          <h4>Awaiting votes</h4>
+          <p>No-one has voted yet.</p>
+        </div>
+      {/if}
+    {:else if resultsToShow.length > 0}
+      <!-- Voting results -->
+      <div class="splits" in:fade>
+        <div style:transform="translateX(-10px)" class="drip-icon">
+          <Drip fill="var(--color-foreground-level-5)" />
+        </div>
+        <Splits
+          disableTooltips={listingMode}
+          draft
+          list={votingRound.splits ?? revealedResultsSplits ?? unreachable()}
+          {maxRows}
+        />
       </div>
     {/if}
   </div>

@@ -32,8 +32,6 @@ import {
   type Weights,
   LIST_EDITOR_DRIP_LIST_FRAGMENT,
 } from '$lib/components/list-editor/types';
-import { readable, type Readable } from 'svelte/store';
-import { onDestroy } from 'svelte';
 import mapFilterUndefined from '../map-filter-undefined';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
@@ -637,34 +635,6 @@ export async function mapVoteReceiversToListEditorConfig(
     items,
     weights,
   };
-}
-
-/**
- * Get a readable that matches the status of a given voting round. Automatically switches from `Started` to `Completed` when voting ends.
- * @param votingRound The voting round.
- * @returns The readable store.
- */
-export function getVotingRoundStatusReadable(
-  votingRound: VotingRound,
-): Readable<VotingRound['status']> {
-  if (['Completed', 'Linked', 'PendingLinkCompletion'].includes(votingRound.status)) {
-    return readable(votingRound.status);
-  }
-
-  let interval: NodeJS.Timeout;
-
-  const statusReadable = readable(votingRound.status, (set) => {
-    interval = setInterval(() => {
-      if (new Date(votingRound.schedule.voting.endsAt) < new Date()) {
-        set('Completed');
-        clearInterval(interval);
-      }
-    }, 1000);
-  });
-
-  onDestroy(() => clearInterval(interval));
-
-  return statusReadable;
 }
 
 /**

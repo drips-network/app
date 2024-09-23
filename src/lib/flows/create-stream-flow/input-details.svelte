@@ -27,7 +27,7 @@
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import Button from '$lib/components/button/button.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet/wallet.store';
   import DripVisual, {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
@@ -51,7 +51,6 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
   import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
@@ -183,9 +182,10 @@
     timeRangeValid;
 
   function submit() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Create stream',
         before: async () => {
           const { signer } = $wallet;
           assert(signer, 'No signer available');
@@ -231,6 +231,7 @@
               args: [batch.map(txToCallerCall)],
             }),
             applyGasBuffer: true,
+            title: 'Create the stream',
           },
         ],
 
