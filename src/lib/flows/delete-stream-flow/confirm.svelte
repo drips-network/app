@@ -10,9 +10,8 @@
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { buildStreamDeleteBatchTx } from '$lib/utils/streams/streams';
   import { gql } from 'graphql-request';
@@ -22,15 +21,21 @@
   import { goto } from '$app/navigation';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import SkullIcon from '$lib/components/icons/💀.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let stream: DeleteStreamConfirmStepFragment;
 
   function startDeleting() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Deleting stream',
+        icon: {
+          component: SkullIcon,
+          props: { size: 48 },
+        },
         before: async () => {
           const { signer } = $walletStore;
           assert(signer);
@@ -50,6 +55,7 @@
               args: [batch.map(txToCallerCall)],
             }),
             applyGasBuffer: true,
+            title: 'Delete the stream',
           },
         ],
 

@@ -34,6 +34,8 @@
   /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
   export let isFirst = false;
 
+  export let disableTooltip = false;
+
   let element: HTMLDivElement;
 
   let groupExpanded = false;
@@ -180,7 +182,13 @@
     </div>
     <div class="receiver">
       {#if split.__typename === 'AddressReceiver'}
-        <IdentityBadge {disableLink} {linkToNewTab} address={split.account.address} size="medium" />
+        <IdentityBadge
+          {disableTooltip}
+          {disableLink}
+          {linkToNewTab}
+          address={split.account.address}
+          size="medium"
+        />
       {:else if split.__typename === 'DripListReceiver'}
         <DripListBadge isLinked={!disableLink} dripList={split.dripList} />
       {:else if split.__typename === 'ProjectReceiver'}
@@ -194,6 +202,7 @@
             : undefined}
         >
           <ProjectBadge
+            tooltip={!disableTooltip}
             linkTo={disableLink ? 'nothing' : undefined}
             {linkToNewTab}
             project={split.project}
@@ -229,6 +238,7 @@
           {#if groupExpanded}
             <div transition:fade={{ duration: GROUP_EXPAND_DURATION }} class="members">
               <SplitsListComponent
+                disableTooltips={disableTooltip}
                 disableLinks={disableLink}
                 {draft}
                 {linkToNewTab}

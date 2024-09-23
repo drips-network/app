@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import { createEventDispatcher } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { Writable } from 'svelte/store';
@@ -10,7 +10,6 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { State } from '../edit-project-splits-steps';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import GitProjectService from '$lib/utils/project/GitProjectService';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
@@ -37,9 +36,10 @@
   );
 
   function submit() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Update project splits',
         before: async () => {
           const gitProjectService = await GitProjectService.new();
 
@@ -65,6 +65,7 @@
           {
             transaction: tx,
             applyGasBuffer: false,
+            title: 'Update project splits',
           },
         ],
 

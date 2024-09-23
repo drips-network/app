@@ -11,19 +11,16 @@
   import modal from '$lib/stores/modal';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { BASE_URL } from '$lib/utils/base-url';
-  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import unreachable from '$lib/utils/unreachable';
 
   export let votingRound: VotingRound;
 
-  const status = getVotingRoundStatusReadable(votingRound);
-
   $: isPublisher =
     $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase();
 </script>
 
-{#if $status === 'Started'}
+{#if votingRound.status === 'Started'}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       This list is in voting.
@@ -37,7 +34,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if ($status === 'Completed' || $status === 'PendingLinkCompletion') && !votingRound.result}
+{:else if (votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion') && !votingRound.result}
   <div class="wrapper">
     <AnnotationBox type="error" icon={Proposals}>
       Voting has ended but no collaborators voted.
@@ -57,7 +54,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if ($status === 'Completed' || $status === 'PendingLinkCompletion') && isPublisher}
+{:else if (votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion') && isPublisher}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. You can now publish.
@@ -79,7 +76,7 @@
       </svelte:fragment>
     </AnnotationBox>
   </div>
-{:else if $status === 'Completed' || $status === 'PendingLinkCompletion'}
+{:else if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. Waiting for the owner to publish this Drip List on-chain.

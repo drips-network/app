@@ -8,7 +8,6 @@ import type { Nullable } from 'vitest';
 import type { StepComponentEvents, UpdateAwaitStepFn, UpdateAwaitStepParams } from '../types';
 import unreachable from '$lib/utils/unreachable';
 import assert from '$lib/utils/assert';
-import isTest from '$lib/utils/is-test';
 import SafeAppsSDK, { type SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
 import type { TransactionReceipt, ContractTransaction } from 'ethers';
 
@@ -46,7 +45,7 @@ export type TransactPayload<T extends Nullable<BeforeFunc>> = {
    */
   after?: (receipts: TransactionReceipt[], context: Context<T>) => PromiseLike<void>;
   /**
-   * Function to run after transctions have been proposed to a Safe. This function will ONLY run if the app is
+   * Function to run after transactions have been proposed to a Safe. This function will ONLY run if the app is
    * connected to a Safe.
    * @param sendTransactionsResponse The response from the Safe Apps SDK after proposing the transactions.
    * @returns A promise that will be awaited before moving on in the flow.

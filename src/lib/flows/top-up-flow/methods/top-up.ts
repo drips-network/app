@@ -1,6 +1,4 @@
-import Emoji from '$lib/components/emoji/emoji.svelte';
-import type { StepComponentEvents } from '$lib/components/stepper/types';
-import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
@@ -10,14 +8,9 @@ import { MaxUint256 } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
-
-const WAITING_WALLET_ICON = {
-  component: Emoji,
-  props: {
-    emoji: '👛',
-    size: 'huge',
-  },
-};
+import tokensStore from '$lib/stores/tokens/tokens.store';
+import unreachable from '$lib/utils/unreachable';
+import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -25,9 +18,21 @@ export default function (
   amountToTopUp: bigint,
   tokenAllowance: bigint,
 ) {
-  transact(
-    dispatch,
+  const tokenInfo = tokensStore.getByAddress(tokenAddress)?.info || unreachable();
+
+  dispatch(
+    'transact',
     makeTransactPayload({
+      icon: {
+        component: EmojiAndToken,
+        props: {
+          emoji: '💰',
+          tokenAddress: tokenInfo.address,
+          animateTokenOnMount: true,
+        },
+      },
+      headline: `Add ${tokenInfo?.symbol}`,
+      description: `Add funds to your Drips account’s outgoing balance`,
       before: async () => {
         const { address } = get(walletStore);
 
@@ -65,22 +70,14 @@ export default function (
           ? [
               {
                 transaction: approvePopulatedTx,
-                waitingSignatureMessage: {
-                  message:
-                    'Waiting for you to approve access to the ERC-20 token in your wallet...',
-                  subtitle: 'You only have to do this once per token.',
-                  icon: WAITING_WALLET_ICON,
-                },
+                title: `Approve Drips to withdraw ${tokenInfo.symbol}`,
                 applyGasBuffer: false,
               },
             ]
           : []),
         {
           transaction: setStreamsPopulatedTx,
-          waitingSignatureMessage: {
-            message: 'Waiting for you to approve the top-up transaction in your wallet...',
-            icon: WAITING_WALLET_ICON,
-          },
+          title: `Top up ${tokenInfo.symbol}`,
           applyGasBuffer: true,
         },
       ],

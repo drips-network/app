@@ -1,9 +1,9 @@
-import type { StepComponentEvents } from '$lib/components/stepper/types';
-import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import Emoji from '$lib/components/emoji/emoji.svelte';
 import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
 import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
 import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
@@ -14,9 +14,17 @@ export default function batchCollect(
   tokenAddresses: string[],
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
 ) {
-  transact(
-    dispatch,
+  dispatch(
+    'transact',
     makeTransactPayload({
+      headline: 'Collect Funds',
+      icon: {
+        component: Emoji,
+        props: {
+          emoji: '🫗',
+          size: 'huge',
+        },
+      },
       before: async () => {
         const ownAccountId = await getOwnAccountId();
         const { address: userAddress, signer } = get(walletStore);
@@ -53,6 +61,7 @@ export default function batchCollect(
         {
           transaction: tx,
           applyGasBuffer: true,
+          title: 'Collect funds',
         },
       ],
     }),
