@@ -44,11 +44,10 @@
   import { constants } from 'radicle-drips';
   import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import { validateAmtPerSecInput } from '$lib/utils/validate-amt-per-sec';
   import modal from '$lib/stores/modal';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
   import Wallet from '$lib/components/icons/Wallet.svelte';
@@ -92,9 +91,10 @@
     amountValidationState?.type === 'valid';
 
   function updateStream() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Edit stream',
         before: async () => {
           const addressDriverClient = await getAddressDriverClient();
 
@@ -118,6 +118,7 @@
             transaction:
               batch.length === 1 ? batch[0] : await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: needGasBuffer,
+            title: 'Edit the stream',
           },
         ],
 
