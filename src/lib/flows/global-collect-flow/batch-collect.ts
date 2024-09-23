@@ -1,5 +1,4 @@
-import type { StepComponentEvents } from '$lib/components/stepper/types';
-import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
+import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import {
   getAddressDriverClient,
@@ -10,14 +9,23 @@ import { AddressDriverPresets } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import Emoji from '$lib/components/emoji/emoji.svelte';
 
 export default function batchCollect(
   tokenAddresses: string[],
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
 ) {
-  transact(
-    dispatch,
+  dispatch(
+    'transact',
     makeTransactPayload({
+      headline: 'Collect Funds',
+      icon: {
+        component: Emoji,
+        props: {
+          emoji: '🫗',
+          size: 'huge',
+        },
+      },
       before: async () => {
         const callerClient = await getCallerClient();
         const addressDriverClient = await getAddressDriverClient();
@@ -60,6 +68,7 @@ export default function batchCollect(
         {
           transaction: tx,
           applyGasBuffer: true,
+          title: 'Collect funds',
         },
       ],
     }),
