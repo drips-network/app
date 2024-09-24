@@ -12,7 +12,7 @@
   import unreachable from '$lib/utils/unreachable';
   import modal from '$lib/stores/modal';
   import SafeAppsSDK, { type SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-  import type { ContractReceipt, Signer } from 'ethers';
+  import type { TransactionReceipt, Signer } from 'ethers';
   import isTest from '$lib/utils/is-test';
   import type { Nullable } from 'vitest';
   import etherscanLink from '$lib/utils/etherscan-link';
@@ -110,7 +110,7 @@
 
     const safeAppMode = Boolean(safe);
 
-    const contractReceipts: ContractReceipt[] = [];
+    const TransactionReceipts: TransactionReceipt[] = [];
 
     const beforeResult = await before?.();
 
@@ -138,7 +138,7 @@
         address,
         transactionWrappers,
         signer,
-        contractReceipts,
+        TransactionReceipts,
         retryIndex,
       );
     }
@@ -159,7 +159,7 @@
           message: `Transaction confirmed. ${duringAfterMsg ?? 'Wrapping up...'}`,
         });
 
-        await after?.(contractReceipts, beforeResult);
+        await after?.(TransactionReceipts, beforeResult);
 
         updateTransactionTimelineStatus(transactionWrappers[transactionsTimeline.length - 1], {
           status: 'confirmed',
@@ -187,7 +187,7 @@
     address: string,
     transactionWrappers: TransactionWrapper[],
     signer: Signer,
-    contractReceipts: ContractReceipt[],
+    TransactionReceipts: TransactionReceipt[],
     startIndex: number,
   ) {
     // If we are connected to an EOA wallet, we simply trigger all the transactions in sequence.
@@ -260,13 +260,15 @@
         });
 
         const receipt = await txResponse.wait();
-        contractReceipts.push(receipt);
+        if (receipt) {
+          TransactionReceipts.push(receipt);
 
-        updateTransactionTimelineStatus(executingTx, {
-          status: 'confirmed',
-          message: 'Transaction confirmed',
-          etherscanUrl: etherscanLink(network.name, receipt.transactionHash),
-        });
+          updateTransactionTimelineStatus(executingTx, {
+            status: 'confirmed',
+            message: 'Transaction confirmed',
+            etherscanUrl: etherscanLink(network.name, receipt.hash),
+          });
+        }
       } catch (e) {
         const isRejection = (e as Error).message
           .toLowerCase()

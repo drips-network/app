@@ -5,7 +5,11 @@
  * @returns The full link to the transaction's Etherscan detail page.
  */
 export default function (networkName: string, txHash: string) {
-  if (networkName === 'homestead') return `https://etherscan.io/tx/${txHash}`;
-
-  return `https://${networkName}.etherscan.io/tx/${txHash}`;
+  if (networkName === 'homestead') {
+    return `https://etherscan.io/tx/${txHash}`;
+  } else if (networkName === 'filecoin') {
+    return `https://filecoin.blockscout.com/tx/${txHash}`;
+  } else {
+    return `https://${networkName}.etherscan.io/tx/${txHash}`;
+  }
 }
