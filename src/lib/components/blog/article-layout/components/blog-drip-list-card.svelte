@@ -13,6 +13,7 @@
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
+  import network from '$lib/stores/wallet/network';
 
   export let dripListId: string;
 
@@ -23,15 +24,18 @@
 
     const blogDripListQuery = gql`
       ${DRIP_LIST_CARD_FRAGMENT}
-      query blogDripList($dripListId: ID!) {
-        dripList(id: $dripListId) {
+      query blogDripList($dripListId: ID!, $chain: SupportedChain!) {
+        dripList(id: $dripListId, chain: $chain) {
           ...DripListCard
         }
       }
     `;
 
     dripList = (
-      await query<BlogDripListQuery, BlogDripListQueryVariables>(blogDripListQuery, { dripListId })
+      await query<BlogDripListQuery, BlogDripListQueryVariables>(blogDripListQuery, {
+        dripListId,
+        chain: network.gqlName,
+      })
     ).dripList;
   });
 </script>
