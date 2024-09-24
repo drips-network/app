@@ -417,7 +417,7 @@
           >
             <div class="card">
               <div class="p-6">
-                <ProjectBadge {project} />
+                <ProjectBadge {project} linkTo="nothing" tooltip={false} />
                 <div class="pl-3.5 mt-2.5">
                   <SplitsComponent
                     disableLinks={false}
