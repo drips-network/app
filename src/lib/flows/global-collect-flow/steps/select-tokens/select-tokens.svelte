@@ -62,7 +62,6 @@
               component: Token,
               props: {
                 address: s.tokenAddress,
-                showWrappedAsNative: shouldAutoUnwrap,
               },
             },
           },

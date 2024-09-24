@@ -7,14 +7,12 @@
   import { onMount } from 'svelte';
   import CoinAnimation from '../coin-animation/coin-animation.svelte';
   import FitText from '../fit-text/fit-text.svelte';
-  import network from '$lib/stores/wallet/network';
 
   export let address: string;
   export let show: 'name' | 'symbol' | 'none' = 'name';
   export let size: 'small' | 'normal' | 'huge' = 'normal';
   export let fontSize = 'typo-text';
   export let animateOnMount = false;
-  export let showWrappedAsNative = false;
 
   /** Manually set token information to display. Used on the landing page's mock dashboard. */
   export let overrideToDisplay:
@@ -34,22 +32,6 @@
   $: token = $tokens ? tokens.getByAddress(address) : undefined;
   $: tokenInfo = overrideToDisplay ?? ($tokens ? token?.info : undefined);
   $: src = tokenInfo?.logoURI ? convertIpfsUri(adjustSrcSize(tokenInfo.logoURI)) : undefined;
-
-  // If auto unwrap is enabled, show the native name instead of the wrapped token's name.
-  $: {
-    const autoUnwrappedTokenPair = network.autoUnwrapPairs?.find(
-      (p) => p.wrappedSymbol === token?.info.symbol,
-    );
-
-    if (autoUnwrappedTokenPair && showWrappedAsNative && tokenInfo) {
-      tokenInfo = {
-        ...tokenInfo,
-        name: autoUnwrappedTokenPair.name,
-      };
-    } else {
-      tokenInfo = overrideToDisplay ?? ($tokens ? token?.info : undefined);
-    }
-  }
 
   function adjustSrcSize(src: string) {
     // Most token URLs are Coingecko assets using the "thumb" quality, which is very low-res.
