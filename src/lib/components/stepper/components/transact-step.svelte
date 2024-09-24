@@ -110,7 +110,7 @@
 
     const safeAppMode = Boolean(safe);
 
-    const TransactionReceipts: TransactionReceipt[] = [];
+    const contractReceipts: TransactionReceipt[] = [];
 
     const beforeResult = await before?.();
 
@@ -138,7 +138,7 @@
         address,
         transactionWrappers,
         signer,
-        TransactionReceipts,
+        contractReceipts,
         retryIndex,
       );
     }
@@ -159,7 +159,7 @@
           message: `Transaction confirmed. ${duringAfterMsg ?? 'Wrapping up...'}`,
         });
 
-        await after?.(TransactionReceipts, beforeResult);
+        await after?.(contractReceipts, beforeResult);
 
         updateTransactionTimelineStatus(transactionWrappers[transactionsTimeline.length - 1], {
           status: 'confirmed',
@@ -187,7 +187,7 @@
     address: string,
     transactionWrappers: TransactionWrapper[],
     signer: Signer,
-    TransactionReceipts: TransactionReceipt[],
+    contractReceipts: TransactionReceipt[],
     startIndex: number,
   ) {
     // If we are connected to an EOA wallet, we simply trigger all the transactions in sequence.
@@ -261,7 +261,7 @@
 
         const receipt = await txResponse.wait();
         if (receipt) {
-          TransactionReceipts.push(receipt);
+          contractReceipts.push(receipt);
 
           updateTransactionTimelineStatus(executingTx, {
             status: 'confirmed',
