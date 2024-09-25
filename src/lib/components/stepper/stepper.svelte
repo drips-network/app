@@ -1,7 +1,13 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
   import { createEventDispatcher, onDestroy, onMount, tick } from 'svelte';
-  import type { AwaitPendingPayload, Steps, MovePayload, SidestepPayload } from './types';
+  import type {
+    AwaitPendingPayload,
+    Steps,
+    MovePayload,
+    SidestepPayload,
+    SomeTransactPayload,
+  } from './types';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
@@ -9,6 +15,7 @@
   import type { Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
+  import TransactStep from './components/transact-step.svelte';
 
   const dispatch = createEventDispatcher<{ stepChange: void }>();
 
@@ -133,14 +140,18 @@
     firstHeightUpdate = false;
   }
 
-  let awaiting: AwaitPendingPayload | undefined;
-  let awaitError: Error | undefined;
-
   function handleGoForward(event: CustomEvent<MovePayload>) {
     move(event.detail?.by ?? 1);
   }
 
+  let awaiting: AwaitPendingPayload | undefined;
+  let awaitError: Error | undefined;
+
   function handleAwait(event: CustomEvent<AwaitPendingPayload>) {
+    if (transacting) {
+      throw new Error('Cannot await while transacting.');
+    }
+
     direction = 'forward';
     awaiting = event.detail;
   }
@@ -160,6 +171,34 @@
     awaitError = undefined;
   }
 
+  let transacting: SomeTransactPayload | undefined;
+
+  function handleTransact(event: CustomEvent<SomeTransactPayload>) {
+    if (awaiting) {
+      throw new Error('Cannot transact while awaiting.');
+    }
+
+    direction = 'forward';
+    transacting = event.detail;
+  }
+
+  function handleTransactResult(event: CustomEvent<Result>) {
+    if (event.detail.success) {
+      move(1);
+    } else {
+      // Handling transact errors as await errors.
+      awaitError = event.detail.error;
+    }
+
+    transacting = undefined;
+  }
+
+  function handleTransactStartOver() {
+    direction = 'backward';
+    transacting = undefined;
+    move(0);
+  }
+
   let sidestepConfig: SidestepPayload | undefined = undefined;
   let originalSteps: Steps | undefined = undefined;
   let originalStepIndex: number | undefined = undefined;
@@ -175,6 +214,9 @@
     */
     internalSteps = [steps[currentStepIndex], ...event.detail.steps];
     currentStepIndex = 0;
+    // move relies on resolvedSteps, so allow that computed property
+    // to update
+    await tick();
 
     // Animate to the first side-step
     await move(1);
@@ -225,6 +267,7 @@
     currentStep;
     awaitError;
     awaiting;
+    transacting;
     updateMutationObserver();
   }
 
@@ -243,7 +286,7 @@
   style:height={`${$wrapperHeight}px`}
   style:overflow={transitioning ? 'hidden' : 'visible'}
 >
-  {#key `${awaiting}${awaitError}${currentStepIndex}`}
+  {#key `${awaiting}${transacting}${awaitError}${currentStepIndex}`}
     <div
       in:fly={(() => getTransition('in'))()}
       out:fly={(() => getTransition('out'))()}
@@ -256,10 +299,17 @@
           <AwaitStep {...awaiting} on:result={handleAwaitResult} />
         {:else if awaitError}
           <AwaitErrorStep message={awaitError.message} on:retry={handleAwaitErrorRetry} />
+        {:else if transacting}
+          <TransactStep
+            transactPayload={transacting}
+            on:result={handleTransactResult}
+            on:startOver={handleTransactStartOver}
+          />
         {:else}
           <svelte:component
             this={currentStep.component}
             on:await={handleAwait}
+            on:transact={handleTransact}
             on:goForward={handleGoForward}
             on:goBackward={(e) => move(e.detail?.by ?? -1)}
             on:conclude={handleConclusion}

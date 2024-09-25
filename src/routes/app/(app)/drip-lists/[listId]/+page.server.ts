@@ -10,12 +10,16 @@ import {
   mapSplitsFromMultiplayerResults,
   type SplitsComponentSplitsReceiver,
 } from '$lib/components/splits/splits.svelte';
+import type { Items } from '$lib/components/list-editor/types';
 
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;
 
   if (multiplayer.isVotingRoundId(listId)) {
-    let votingRound: VotingRound & { splits?: SplitsComponentSplitsReceiver[] };
+    let votingRound: VotingRound & {
+      splits?: SplitsComponentSplitsReceiver[];
+      allowedReceiversListEditorItems?: Items;
+    };
     try {
       const votingRoundRes = await multiplayer.getVotingRound(listId, fetch);
 
@@ -36,6 +40,13 @@ export const load = (async ({ params, fetch }) => {
       votingRound.splits = await mapSplitsFromMultiplayerResults(votingRound.result, fetch);
     }
 
+    if (votingRound?.allowedReceivers) {
+      const { items } = await multiplayer.mapVoteReceiversToListEditorConfig(
+        votingRound.allowedReceivers,
+      );
+      votingRound.allowedReceiversListEditorItems = items;
+    }
+
     return {
       dripList: undefined,
       votingRounds: { current: votingRound, past: [] },
@@ -43,6 +54,9 @@ export const load = (async ({ params, fetch }) => {
       blockWhileInitializing: false,
     };
   }
+
+  // It's not a voting round ID, so it must be a (numeric) Drip List ID.
+  if (!/^\d+$/.test(listId)) throw error(404);
 
   const dripListQuery = gql`
     ${DRIP_LIST_PAGE_FRAGMENT}
@@ -57,7 +71,10 @@ export const load = (async ({ params, fetch }) => {
     const res = await multiplayer.getVotingRounds({ dripListId: listId }, fetch);
 
     const currentVotingRound:
-      | (VotingRound & { splits?: SplitsComponentSplitsReceiver[] })
+      | (VotingRound & {
+          splits?: SplitsComponentSplitsReceiver[];
+          allowedReceiversListEditorItems?: Items;
+        })
       | undefined = multiplayer.matchVotingRoundToDripList(res, listId);
 
     if (currentVotingRound?.result) {
@@ -65,6 +82,13 @@ export const load = (async ({ params, fetch }) => {
         currentVotingRound.result,
         fetch,
       );
+    }
+
+    if (currentVotingRound?.allowedReceivers) {
+      const { items } = await multiplayer.mapVoteReceiversToListEditorConfig(
+        currentVotingRound.allowedReceivers,
+      );
+      currentVotingRound.allowedReceiversListEditorItems = items;
     }
 
     return {

@@ -5,7 +5,7 @@
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import ListIcon from '$lib/components/icons/DripList.svelte';
   import TransactionsIcon from '$lib/components/icons/Transactions.svelte';
@@ -17,7 +17,6 @@
   import CoinIcon from '$lib/components/icons/Coin.svelte';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
@@ -45,9 +44,13 @@
   });
 
   async function createDripList() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Create your Drip List',
+        messages: {
+          duringBefore: 'Preparing Drip List creation transactions…',
+        },
         before: async () => {
           return await dripListService.buildTransactContext({
             listTitle: $context.dripList.title,

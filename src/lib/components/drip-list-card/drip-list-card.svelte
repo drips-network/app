@@ -2,7 +2,7 @@
   import { gql } from 'graphql-request';
 
   export const DRIP_LIST_CARD_FRAGMENT = gql`
-    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
+    ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
     ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
@@ -10,7 +10,7 @@
     ${SUPPORTER_PILE_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
-      ...EditDripListStepSelectedDripList
+      ...EditDripListFlowDripList
       name
       account {
         accountId
@@ -68,7 +68,9 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
-  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
+  import editDripListSteps, {
+    EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT,
+  } from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -76,7 +78,6 @@
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import type { DripListCardFragment } from './__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
   import getSupportersPile, { SUPPORTER_PILE_FRAGMENT } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
@@ -93,8 +94,6 @@
   import VotingRoundCountdown from './components/voting-round-countdown.svelte';
   import Wallet from '../icons/Wallet.svelte';
   import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
-  import { getVotingRoundStatusReadable } from '$lib/utils/multiplayer/multiplayer';
-  import { writable } from 'svelte/store';
   import { BASE_URL } from '$lib/utils/base-url';
   import twemoji from '$lib/utils/twemoji';
   import {
@@ -109,10 +108,19 @@
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
+  import ListEditor from '../list-editor/list-editor.svelte';
+  import type { Items } from '../list-editor/types';
+  import FormField from '../form-field/form-field.svelte';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   export let data: {
     dripList?: DripListCardFragment | null;
-    votingRound?: (VotingRound & { splits?: SplitsComponentSplitsReceiver[] }) | null;
+    votingRound?:
+      | (VotingRound & {
+          splits?: SplitsComponentSplitsReceiver[];
+          allowedReceiversListEditorItems?: Items;
+        })
+      | null;
   };
   $: {
     assert(
@@ -156,10 +164,6 @@
   }
 
   $: isOwnVotingRound = votingRound?.publisherAddress === $walletStore?.address;
-
-  $: votingRoundStatus = votingRound
-    ? getVotingRoundStatusReadable(votingRound)
-    : writable(undefined);
 
   let incomingStreamsTotalStreamed: { tokenAddress: string; amount: bigint }[];
   function updateIncomingStreamsTotalStreamed() {
@@ -328,14 +332,10 @@
             {#if votingRound}
               <div class="flex flex-col gap-1.5">
                 <div class="splits">
-                  {#if votingRound.result}
-                    <div class="drip-icon">
-                      <Drip fill="var(--color-foreground-level-5)" />
-                    </div>
-                  {/if}
                   <div class="splits-component">
                     <VotingRoundSplits
-                      maxRows={votingRound.description && !hideDescription ? 3 : 4}
+                      {listingMode}
+                      maxRows={listingMode ? (votingRound.description ? 3 : 4) : undefined}
                       {votingRound}
                     />
                   </div>
@@ -343,9 +343,19 @@
               </div>
 
               {#if !listingMode}
+                {#if votingRound.allowedReceivers?.length && votingRound.status === 'Started'}
+                  <FormField title="Possible recipients" type="div">
+                    <ListEditor
+                      items={votingRound.allowedReceiversListEditorItems}
+                      weightsMode={false}
+                      isEditable={false}
+                    />
+                  </FormField>
+                {/if}
+
                 <VotingRoundCollaborators {votingRound} />
 
-                <VotingRoundCountdown {votingRound} />
+                <VotingRoundCountdown {votingRound} on:end={invalidateAll} />
 
                 {#if isOwnVotingRound}
                   <div class="actions">
@@ -361,7 +371,7 @@
                       >
                     </div>
 
-                    {#if $votingRoundStatus === 'Completed' || $votingRoundStatus === 'PendingLinkCompletion'}
+                    {#if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}
                       <div>
                         <Button
                           variant="primary"

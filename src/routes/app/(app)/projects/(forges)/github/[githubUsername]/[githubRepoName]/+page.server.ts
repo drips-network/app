@@ -44,7 +44,14 @@ async function fetchDripsProject(repoUrl: string) {
 }
 
 export const load = (async ({ params, fetch, url }) => {
-  const { githubUsername, githubRepoName } = uriDecodeParams(params);
+  let githubUsername, githubRepoName: string;
+  try {
+    const p = uriDecodeParams(params);
+    githubRepoName = p.githubRepoName;
+    githubUsername = p.githubUsername;
+  } catch {
+    throw error(400);
+  }
 
   // `exact` param disables the redirect to the "real" github repo URL.
   // For example, after a repo has been renamed, it would usually automatically redirect

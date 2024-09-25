@@ -2,14 +2,13 @@
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from './publish-voting-round-list-flow-steps';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import DripListService from '$lib/utils/driplist/DripListService';
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
@@ -23,6 +22,7 @@
   import DripList from '$lib/components/icons/DripList.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -30,9 +30,10 @@
   export let votingRoundId: string;
 
   function submit() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Publish Drip List',
         before: async () => {
           const dripListService = await DripListService.new();
 
@@ -90,6 +91,8 @@
           await multiplayer.linkVotingRoundToDripList(votingRoundId, dripListId);
 
           $context.publishedDripListId = dripListId;
+
+          await invalidateAll();
         },
       }),
     );

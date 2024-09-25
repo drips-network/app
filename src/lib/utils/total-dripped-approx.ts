@@ -5,22 +5,6 @@ import isTest from './is-test';
 import type { RedisClientType } from '../../routes/api/redis';
 
 const STREAMS = [
-  // Radworks USDC
-  {
-    token: {
-      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    },
-    started: new Date('September 4, 2023, 12:50 AM').getTime(),
-    amtPerSec: '15854895991882',
-  },
-  // Radworks RAD
-  {
-    token: {
-      address: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
-    },
-    started: new Date('September 4, 2023, 12:50 AM').getTime(),
-    amtPerSec: '11832001522070015220700152',
-  },
   // ENS USDC
   {
     token: {
@@ -42,6 +26,18 @@ const GIVES = [
   {
     tokenAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     amount: BigInt('34529995660000000000'),
+  },
+  // Radworks USDC https://www.drips.network/app/808735843097274646438052281344003835551042056378/tokens/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/streams/0
+  // Total of the stream which is now stopped
+  {
+    tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    amount: BigInt('499999999999'),
+  },
+  // Radworks RAD https://www.drips.network/app/808735843097274646438052281344003835551042056378/tokens/0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3/streams/0
+  // Total of the stream which is now stopped
+  {
+    tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
+    amount: BigInt('373134000000000000000000'),
   },
 ];
 
@@ -70,15 +66,22 @@ export const cachedTotalDrippedPrices = (
 
     const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
 
-    const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
-    const idMap = z.record(z.string(), z.number()).parse(idMapRes);
-    const tokenIdsString = tokenAddresses.map((address) => idMap[address.toLowerCase()]).join(',');
+    try {
+      const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
+      const idMap = z.record(z.string(), z.number()).parse(idMapRes);
+      const tokenIdsString = tokenAddresses
+        .map((address) => idMap[address.toLowerCase()])
+        .join(',');
+      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+      const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
-    const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
-    const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
-
-    return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
-      acc[getAddress(address)] = parsedRes[idMap[address]];
-      return acc;
-    }, {});
+      return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
+        acc[getAddress(address)] = parsedRes[idMap[address]];
+        return acc;
+      }, {});
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      return {};
+    }
   });

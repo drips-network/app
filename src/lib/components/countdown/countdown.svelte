@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+
+  const dispatch = createEventDispatcher<{ end: void }>();
 
   export let targetDate: Date;
 
@@ -10,12 +12,18 @@
   $: {
     if (timeLeft <= 0) {
       clearInterval(interval);
+      timeLeft = 0;
     }
   }
 
   onMount(() => {
     interval = setInterval(() => {
       timeLeft = targetDate.getTime() - Date.now();
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        timeLeft = 0;
+        dispatch('end');
+      }
     }, 1000);
   });
 

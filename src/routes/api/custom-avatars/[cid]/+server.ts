@@ -1,4 +1,5 @@
 import { fetchIpfs } from '$lib/utils/ipfs.js';
+import { error } from '@sveltejs/kit';
 import Jimp from 'jimp';
 
 export const GET = async ({ params, fetch }) => {
@@ -6,6 +7,8 @@ export const GET = async ({ params, fetch }) => {
 
   const file = await fetchIpfs(cid, fetch);
   const blob = await file.arrayBuffer();
+
+  if (!file.ok) throw error(404);
 
   // We read the file into Jimp to resize it when fetching it even though we already resize it when
   // uploading via the /upload route. The reason for that is that theoretically any
