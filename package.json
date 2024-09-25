@@ -94,7 +94,7 @@
     "fuzzysort": "^2.0.3",
     "globals": "^15.6.0",
     "graphql": "^16.8.2",
-    "graphql-request": "^7.0.1",
+    "graphql-request": "^7.1.0",
     "isomorphic-fetch": "^3.0.0",
     "jimp": "^0.22.12",
     "lodash": "^4.17.21",
