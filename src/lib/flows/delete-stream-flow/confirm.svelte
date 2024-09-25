@@ -10,9 +10,8 @@
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import transact, { makeTransactPayload } from '$lib/components/stepper/utils/transact';
   import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { buildStreamDeleteBatchTx } from '$lib/utils/streams/streams';
@@ -21,15 +20,21 @@
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { goto } from '$app/navigation';
+  import SkullIcon from '$lib/components/icons/💀.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let stream: DeleteStreamConfirmStepFragment;
 
   function startDeleting() {
-    transact(
-      dispatch,
+    dispatch(
+      'transact',
       makeTransactPayload({
+        headline: 'Deleting stream',
+        icon: {
+          component: SkullIcon,
+          props: { size: 48 },
+        },
         before: async () => {
           const addressDriverClient = await getAddressDriverClient();
           const callerClient = await getCallerClient();
@@ -54,6 +59,7 @@
           {
             transaction: await callerClient.populateCallBatchedTx(batch),
             applyGasBuffer: true,
+            title: 'Delete the stream',
           },
         ],
 
