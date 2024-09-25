@@ -25,6 +25,7 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
+  fallbackRpcUrl?: string;
   icon: ComponentType;
   color: string;
   isTestnet: boolean;
@@ -130,6 +131,10 @@ const RPC_URLS: ValueForEachSupportedChain<string> = {
   [314]: `https://api.node.glif.io/`,
 } as const;
 
+const FALLBACK_RPC_URLS: Partial<ValueForEachSupportedChain<string>> = {
+  // TODO: add fallbacks
+};
+
 export function isSupportedChainId(chainId: number): chainId is ChainId {
   return SUPPORTED_CHAIN_IDS.includes(chainId as ChainId);
 }
@@ -155,6 +160,7 @@ export function getNetwork(chainId: number): Network {
     autoUnwrapPairs: NETWORK_AUTO_WRAPPED_PAIRS[chainId],
     id: NETWORK_ID[chainId],
     rpcUrl: RPC_URLS[chainId],
+    fallbackRpcUrl: FALLBACK_RPC_URLS[chainId],
     icon: NETWORK_ICONS[chainId],
     color: NETWORK_COLORS[chainId],
     isTestnet: NETWORK_IS_TESTNET[chainId],
