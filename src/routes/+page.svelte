@@ -6,19 +6,11 @@
   import { onMount } from 'svelte';
   import Button from '$lib/components/button/button.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
-  import LpInterstitialIllustration1 from '$lib/components/illustrations/lp-interstitial-illustration-1.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
-  import LpCard from './components/lp-card/lp-card.svelte';
-  import ImageAndCaption from './components/image-and-caption.svelte';
-  import MultiToken from '$lib/components/illustrations/multi-token.svelte';
-  import GasOptimized from '$lib/components/illustrations/gas-optimized.svelte';
-  import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
-  import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import buildUrl from '$lib/utils/build-url';
-  import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import LpFooter from './components/lp-footer.svelte';
   import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
   import type { PageData } from './$types';
@@ -32,8 +24,12 @@
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import AnimateTypeWords from '$lib/components/animate-type-words/animate-type-words.svelte';
-  import DripListCarousel from './components/drip-list-carousel.svelte';
   import DripListsBgLeft from './components/svgs/drip-lists-bg-left.svelte';
+  import Github from '$lib/components/icons/Github.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
+  import Splits from '$lib/components/icons/Splits.svelte';
+  import CaseStudyCard from './components/case-study-card.svelte';
 
   export let data: PageData;
 
@@ -44,18 +40,6 @@
     // some reason.
     if (isRunningInSafe()) goto('/app', { replaceState: true });
   });
-
-  let millis = 0;
-
-  setInterval(() => {
-    millis += 10;
-  }, 10);
-
-  function getTokenStreamsVisualAmount(amtPerSec: number, startValue: number) {
-    const secondsSinceStart = millis / 1000;
-
-    return (startValue + amtPerSec * secondsSinceStart).toFixed(6);
-  }
 
   let claimProjectInput = '';
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
@@ -121,38 +105,115 @@
       </div>
     </div>
 
+    <h4 class="opener">
+      Drips is a decentralized toolkit for rewarding open source projects within your ecosystem.
+    </h4>
+
+    <section class="usps">
+      <div class="usp">
+        <div class="icon">
+          <Github style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The easiest way to fund any GitHub repo</h4>
+          <p>
+            Instantly support any repo on GitHub, even if you don't know their Ethereum address.
+          </p>
+        </div>
+      </div>
+      <div class="usp">
+        <div class="icon">
+          <DripList style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The most flexible way to distribute funds</h4>
+          <p>
+            Distribute any ERC-20, continuously or as a one-time donation, without platform fees.
+          </p>
+        </div>
+      </div>
+      <div class="usp">
+        <div class="icon">
+          <Proposals style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The simplest way for communities to allocate funds</h4>
+          <p>Collectively decide on which projects and people receive what percentage of funds.</p>
+        </div>
+      </div>
+      <div class="usp">
+        <div class="icon">
+          <Splits style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The widest impact, by default</h4>
+          <p>
+            Funds sent to projects are also split with their dependencies, amplifying your impact
+            within the open-source community.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-spacer" />
+
     <div class="relative pt-24 mlg:pt-12 pb-18">
       <section>
         <div class="flex flex-col items-center gap-10">
           <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
             <LpQuadsparkle />
-            <h2 class="typo-header-1">Introducing Drips Lists</h2>
+            <h2 class="typo-header-1">Drips in Use</h2>
             <LpQuadsparkle />
           </header>
 
-          <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
-            <p class="text-typo-header-3">Send money to a curated list of recipients</p>
-            <p>
-              Imagine giving back to your favorite projects or curating a list of people you want to
-              support or sustainably distributing tokens over time or even streaming salaries in
-              real time — this is all possible with Drip Lists.
-            </p>
-          </div>
-
-          <div
-            class="lists"
-            style:display="flex"
-            style:flex-direction="column"
-            style:max-width="500px"
-          >
-            <DripListCarousel dripLists={data.dripLists} />
+          <div class="case-studies">
+            <div class="case-study">
+              <CaseStudyCard
+                dripList={data.featuredLists[
+                  '31017209032870028068280040871339261037749177808773684797297972107972'
+                ]}
+                orgName="ENS"
+                logoSrc="/assets/lp/ens-avatar.png"
+                logoAlt="ENS logo"
+                description="ENS streamed $50,000 USDC over six months to seven essential projects through its Drip List."
+                blogPost={data.blogPosts.find(
+                  (p) => p.slug === 'ens-funds-its-critical-open-source-dependencies',
+                )}
+              />
+            </div>
+            <div class="case-study">
+              <CaseStudyCard
+                dripList={data.featuredLists[
+                  '41971962915943119138973997144514496143454239023249281594792952267407'
+                ]}
+                orgName="Scroll"
+                logoSrc="/assets/lp/scroll-avatar.png"
+                logoAlt="Scroll logo"
+                description="Scroll used a Collaborative Drip List to vote on and fund their Level Up hackathon in Argentina."
+                blogPost={data.blogPosts.find((p) => p.slug === 'scroll-argentinia-hackathon')}
+              />
+            </div>
+            <div class="case-study">
+              <CaseStudyCard
+                dripList={data.featuredLists[
+                  '30178668158349445547603108732480118476541651095408979232800331391215'
+                ]}
+                orgName="Octant"
+                logoSrc="/assets/lp/octant-avatar.png"
+                logoAlt="Octant logo"
+                description="Octant committed a total of 23.2 ETH from its first two public goods funding rounds to fund its dependencies."
+                blogPost={data.blogPosts.find(
+                  (p) => p.slug === 'octant-teams-up-with-drips-to-fund-its-dependencies',
+                )}
+              />
+            </div>
           </div>
         </div>
       </section>
 
       <!-- flying coins foreground -->
       <div
-        class="absolute z-10 bottom-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
+        class="absolute z-10 top-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
       >
         <div style="flex:0 0 1750px; perspective:1px; transform: translateZ(-1px); ">
           <LpIllustrationFlyingCoins />
@@ -313,94 +374,6 @@
       </div>
     </section>
 
-    <section class="one-column">
-      <div class="section-inner">
-        <div class="text">
-          <h3>Stream funds by the second</h3>
-          <p>Drips enables token streams of any ERC-20 to any Ethereum address by the second.</p>
-          <div class="token-streams-visuals">
-            <div class="token-streams-visual">
-              <div class="token">
-                <CoinAnimation playSound>
-                  <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
-                </CoinAnimation>
-                <p>USD Coin</p>
-              </div>
-              <p>
-                <span class="green tabular-nums">+1.037574 USDC</span><span class="muted">/sec</span
-                >
-              </p>
-              <p>
-                <span class="fat tabular-nums"
-                  >{millis && getTokenStreamsVisualAmount(1.037574, 4968.3241)} USDC</span
-                >
-              </p>
-            </div>
-            <div class="token-streams-visual">
-              <div class="token">
-                <CoinAnimation playSound>
-                  <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
-                </CoinAnimation>
-                <p>Wrapped Bitcoin</p>
-              </div>
-              <p>
-                <span class="green tabular-nums">+0.00181397 WBTC</span><span class="muted"
-                  >/sec</span
-                >
-              </p>
-              <p>
-                <span class="fat tabular-nums"
-                  >{millis && getTokenStreamsVisualAmount(0.00181397, 2.81065)} WBTC</span
-                >
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="background-illustration">
-          <LpInterstitialIllustration1 />
-        </div>
-      </div>
-    </section>
-
-    <section class="grid">
-      <LpCard
-        ><ImageAndCaption background>
-          <MultiToken slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>No platform fees</h4>
-            <p>Free to use beyond covering the cost of gas.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <GasOptimized slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>User controlled data</h4>
-            <p>Fully sovereign infrastructure for maximum data security.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <NoWrappedTokens slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>No need to wrap tokens</h4>
-            <p>Stream native tokens. No need to trust third-parties with funds.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <OneContract slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>Open-source</h4>
-            <p>The entire Drips stack is a public good, and fully open-source.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-    </section>
-
     <div class="section-spacer" />
     <div class="section-spacer" />
 
@@ -492,24 +465,6 @@
     line-height: 36px;
   }
 
-  h4 {
-    font-family: 'Redaction 50', Times, serif;
-    font-size: 24px;
-    line-height: 24px;
-  }
-
-  span.green {
-    color: var(--color-positive);
-  }
-
-  span.muted {
-    color: var(--color-foreground-level-4);
-  }
-
-  span.fat {
-    font-weight: 900;
-  }
-
   @media (max-width: 819px) {
     .section-header-huge {
       font-size: 36px;
@@ -522,6 +477,71 @@
     width: 100vw;
     min-width: 900px;
     height: 100%;
+  }
+
+  .opener {
+    text-align: center;
+    max-width: 48rem;
+    margin: 2rem auto 4rem auto;
+  }
+
+  /* USPs */
+  .usps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .usps .usp {
+    background-color: var(--color-background);
+    text-align: left;
+    padding: 1.5rem;
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  .usps .usp h4 {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 1130px) {
+    .usps {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 819px) {
+    .usps {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* CASE STUDIES */
+
+  .case-studies {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    width: 100%;
+  }
+
+  .case-studies .case-study {
+    width: 80%;
+  }
+
+  .case-studies .case-study:nth-child(2n) {
+    align-self: flex-end;
+  }
+
+  @media (max-width: 882px) {
+    .case-studies .case-study {
+      width: 100%;
+    }
   }
 
   /* SECTIONS */
@@ -606,25 +626,8 @@
     border-radius: 2rem 0 0 2rem;
   }
 
-  section.one-column .section-inner {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    padding: 7rem 0;
-    text-align: center;
-  }
-
   section.one-column .section-inner .text {
     align-items: center;
-  }
-
-  section .section-inner .background-illustration {
-    position: absolute;
-    padding-left: 2rem;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    pointer-events: none;
   }
 
   section .section-inner .card {
@@ -652,12 +655,6 @@
     height: 12rem;
     border-radius: 0 0 1.5rem 1.5rem;
     background-color: var(--color-primary-level-1);
-  }
-
-  section.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 1.5rem;
   }
 
   @media (max-width: 1023px) {
@@ -705,48 +702,6 @@
     section .section-inner .card .text {
       padding: 1rem;
     }
-
-    section.grid {
-      grid-template-columns: 1fr;
-    }
-
-    section.one-column .section-inner {
-      padding: 4rem 0;
-    }
-  }
-
-  /* TOKEN STREAMS VISUALS */
-
-  .token-streams-visuals {
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .token-streams-visuals .token-streams-visual {
-    display: flex;
-    gap: min(2vw, 1rem);
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  .token-streams-visual p {
-    font-size: min(1.5rem, 2.5vw);
-  }
-
-  .token-streams-visuals .token-streams-visual .token {
-    display: flex;
-    flex-shrink: 0;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .token-streams-visuals .token-streams-visual .token .token-image {
-    height: clamp(0.5rem, 6vw, 2rem);
-    width: clamp(0.5rem, 6vw, 2rem);
-    border-radius: 1rem;
   }
 
   /* FOOTER */
@@ -805,23 +760,11 @@
     }
   }
 
-  .text-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   /* TWEAKS */
 
   .claim-input {
     display: flex;
     gap: 0.5rem;
-  }
-
-  @media (max-width: 1024px) {
-    .background-illustration {
-      transform: translateX(-124px);
-    }
   }
 
   @media (max-width: 819px) {

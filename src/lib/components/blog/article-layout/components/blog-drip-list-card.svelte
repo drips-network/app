@@ -40,7 +40,7 @@
   <div class="wrapper">
     <TransitionedHeight transitionHeightChanges>
       {#if dripList}
-        <div in:fade><DripListCard listingMode data={{ dripList }} /></div>
+        <div in:fade><DripListCard openInNewTab listingMode data={{ dripList }} /></div>
       {:else}
         <div class="loading"><Spinner /></div>
       {/if}

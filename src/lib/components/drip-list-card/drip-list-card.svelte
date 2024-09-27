@@ -135,6 +135,8 @@
   export let hideTotal = false;
   export let hideSupporterPile = false;
   export let hideDescription = false;
+  export let clampTitle = true;
+  export let openInNewTab = false;
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
@@ -214,12 +216,17 @@
 <svelte:element
   this={listingMode ? 'a' : 'section'}
   href={dripListUrl}
+  target={openInNewTab ? '_blank' : undefined}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
-        <h1 class="line-clamp-1 title rounded twemoji-text">
+        <h1
+          class:line-clamp-1={clampTitle}
+          class=" title rounded twemoji-text"
+          style:font-size={listingMode ? '28px' : undefined}
+        >
           {@html twemoji(title)}
         </h1>
         {#if listingMode && votingRound}
