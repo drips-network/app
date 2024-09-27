@@ -34,7 +34,7 @@
     transform: translateX(-50%);
     border-radius: 2.5rem 0 2.5rem 2.5rem;
     position: fixed;
-    width: calc(78rem - 3px);
+    width: calc(86rem - 3px);
     max-width: calc(100vw - 2rem);
     z-index: 50;
     background-color: var(--color-background);

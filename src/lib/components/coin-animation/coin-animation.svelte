@@ -75,8 +75,8 @@
   .coin-animation {
     position: relative;
     overflow: visible;
-    width: 100%;
-    height: 100%;
+    width: fit-content;
+    height: fit-content;
   }
 
   .content {
