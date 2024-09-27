@@ -114,5 +114,8 @@
       }
     }
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": "v22.6.0"
+  }
 }
