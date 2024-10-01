@@ -30,6 +30,7 @@
   import { fade } from 'svelte/transition';
   import EtherscanLink from './etherscan-link.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import networkConfig from '$lib/stores/wallet/network';
 
   const dispatchResult = createEventDispatcher<{ result: Result }>();
   const dispatchStartOver = createEventDispatcher<{ startOver: void }>();
@@ -201,7 +202,10 @@
     // simulate the entire batch. This is because the transactions may be inter-dependent,
     // meaning they cannot always be independently simulated.
     // In E2E tests, we can't simulate with Tenderly, so we don't.
-    const needToSimulate = isTest() ? false : txWrappersWithGas.some((tx) => tx.applyGasBuffer);
+    const needToSimulate =
+      !isTest() &&
+      networkConfig.applyGasBuffers &&
+      txWrappersWithGas.some((tx) => tx.applyGasBuffer);
 
     if (needToSimulate) {
       try {

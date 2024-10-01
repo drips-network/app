@@ -32,6 +32,7 @@ export type Network = {
   gqlName: SupportedChain;
   autoUnwrapPairs: AutoUnwrapPair[] | undefined;
   displayNetworkPicker: boolean;
+  applyGasBuffers: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -51,6 +52,7 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.Mainnet,
     autoUnwrapPairs: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
     displayNetworkPicker: false,
+    applyGasBuffers: true,
   },
   [80002]: {
     chainId: 80002,
@@ -66,6 +68,7 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.PolygonAmoy,
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
+    applyGasBuffers: true,
   },
   [11155420]: {
     chainId: 11155420,
@@ -81,6 +84,7 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.OptimismSepolia,
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
+    applyGasBuffers: true,
   },
   [11155111]: {
     chainId: 11155111,
@@ -96,6 +100,7 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.Sepolia,
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
+    applyGasBuffers: true,
   },
   [84532]: {
     chainId: 84532,
@@ -111,6 +116,7 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.BaseSepolia,
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
+    applyGasBuffers: true,
   },
   [314]: {
     chainId: 314,
@@ -126,6 +132,7 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.Filecoin,
     autoUnwrapPairs: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
     displayNetworkPicker: true,
+    applyGasBuffers: false,
   },
 };
 
