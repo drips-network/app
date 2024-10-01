@@ -9,10 +9,10 @@ import { Contract, type ContractTransaction } from 'ethers';
 import { get } from 'svelte/store';
 import { erc20Abi } from 'abitype/abis';
 import type { OxString, UnwrappedEthersResult } from '../sdk-types';
-import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import unwrapEthersResult from '../utils/unwrap-ethers-result';
 import assert from '$lib/utils/assert';
+import network from '$lib/stores/wallet/network';
 
 type Erc20Abi = typeof erc20Abi;
 
@@ -41,7 +41,7 @@ export function getAddressDriverAllowance(token: OxString) {
   return executeErc20ReadMethod({
     token,
     functionName: 'allowance',
-    args: [signer as OxString, getNetworkConfig().ADDRESS_DRIVER as OxString],
+    args: [signer as OxString, network.contracts.ADDRESS_DRIVER as OxString],
   });
 }
 
