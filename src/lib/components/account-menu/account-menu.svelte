@@ -14,6 +14,7 @@
   import NetworkPicker from '../network-picker/network-picker.svelte';
   import NetworkList from '../network-picker/components/network-list.svelte';
   import { slide } from 'svelte/transition';
+  import network from '$lib/stores/wallet/network';
 
   $: $navigating && cupertinoPaneStore.closeSheet();
 
@@ -44,11 +45,14 @@
           disableTooltip
         /></svelte:fragment
       >
-      <svelte:fragment slot="right"
-        ><NetworkPicker
-          bind:toggled={shouldShowNetworkList}
-          on:click={() => (shouldShowNetworkList = !shouldShowNetworkList)}
-        />
+      <svelte:fragment slot="right">
+        {#if network.displayNetworkPicker}
+          <NetworkPicker
+            bind:toggled={shouldShowNetworkList}
+            on:click={() => (shouldShowNetworkList = !shouldShowNetworkList)}
+          />
+        {/if}
+
         <Button
           disabled={safeAppMode}
           variant="ghost"
