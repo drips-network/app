@@ -6,7 +6,6 @@ import type {
   ExtractAbiFunctionNames,
 } from 'abitype';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import { dripsAbi, type DripsAbi } from './drips-abi';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
@@ -14,6 +13,7 @@ import type { ContractTransaction } from 'ethers';
 import assert from '$lib/utils/assert';
 import unwrapEthersResult from '../utils/unwrap-ethers-result';
 import type { UnwrappedEthersResult } from '../sdk-types';
+import network from '$lib/stores/wallet/network';
 
 export async function executeDripsReadMethod<
   functionName extends ExtractAbiFunctionNames<DripsAbi, 'pure' | 'view'>,
@@ -27,8 +27,7 @@ export async function executeDripsReadMethod<
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
-  const dripsAddress = getNetworkConfig().DRIPS;
-  const drips = new Contract(dripsAddress, dripsAbi, provider);
+  const drips = new Contract(network.contracts.DRIPS, dripsAbi, provider);
 
   return unwrapEthersResult(await drips[func](...args));
 }
@@ -45,8 +44,7 @@ export async function populateDripsWriteTx<
 
   const { functionName: func, args } = config;
 
-  const dripsAddress = getNetworkConfig().DRIPS;
-  const drips = new Contract(dripsAddress, dripsAbi, signer);
+  const drips = new Contract(network.contracts.DRIPS, dripsAbi, signer);
 
   return txToSafeDripsTx(await drips[func].populateTransaction(...args));
 }

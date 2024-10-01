@@ -6,7 +6,6 @@ import type {
   ExtractAbiFunctionNames,
 } from 'abitype';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import type { ContractTransaction } from 'ethers';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
@@ -15,6 +14,7 @@ import {
   nativeTokenUnwrapperAbi,
   type NativeTokenUnwrapperAbi,
 } from './native-token-unwrapper-abi';
+import network from '$lib/stores/wallet/network';
 
 export async function populateNativeTokenUnwrapperWriteTx<
   functionName extends ExtractAbiFunctionNames<NativeTokenUnwrapperAbi, 'nonpayable' | 'payable'>,
@@ -30,7 +30,9 @@ export async function populateNativeTokenUnwrapperWriteTx<
 
   const { functionName: func, args } = config;
 
-  const nativeTokenUnwrapperAddress = getNetworkConfig().NATIVE_TOKEN_UNWRAPPER;
+  const nativeTokenUnwrapperAddress = network.contracts.NATIVE_TOKEN_UNWRAPPER;
+  assert(nativeTokenUnwrapperAddress, 'Native Token Unwrapper address is missing.');
+
   const nativeTokenUnwrapper = new Contract(
     nativeTokenUnwrapperAddress,
     nativeTokenUnwrapperAbi,

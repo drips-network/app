@@ -6,7 +6,8 @@ import { populateAddressDriverWriteTx } from './address-driver';
 import { populateNativeTokenUnwrapperWriteTx } from '../native-token-unrapper/native-token-unwrapper';
 import { get } from 'svelte/store';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { getNetworkConfig } from '../utils/get-network-config';
+import network from '$lib/stores/wallet/network';
+import assert from '$lib/utils/assert';
 
 export type CollectFlowPayload = {
   accountId: string;
@@ -81,10 +82,16 @@ export default async function populateCreateCollectFlowTxs(
       throw new Error('User address and transfer to address must match when auto unwrapping.');
     }
 
+    const nativeTokenUnwrapperAddress = network.contracts.NATIVE_TOKEN_UNWRAPPER;
+    assert(
+      nativeTokenUnwrapperAddress,
+      'Native token unwrapper address undefined, but auto unwrap enabled',
+    );
+
     // Collect funds to the `NativeTokenUnwrapper` contract address.
     const collectTx = await populateAddressDriverWriteTx({
       functionName: 'collect',
-      args: [tokenAddress, getNetworkConfig().NATIVE_TOKEN_UNWRAPPER as OxString],
+      args: [tokenAddress, nativeTokenUnwrapperAddress as OxString],
     });
 
     // Unwrap the collected wrapped token to native and transfer it to user address.

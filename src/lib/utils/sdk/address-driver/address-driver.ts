@@ -12,9 +12,9 @@ import type { OxString, UnwrappedEthersResult } from '../sdk-types';
 import { executeErc20ReadMethod } from '../erc20/erc20';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
-import { getNetworkConfig } from '../utils/get-network-config';
 import assert from '$lib/utils/assert';
 import unwrapEthersResult from '../utils/unwrap-ethers-result';
+import network from '$lib/stores/wallet/network';
 
 export async function executeAddressDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<AddressDriverAbi, 'pure' | 'view'>,
@@ -28,8 +28,7 @@ export async function executeAddressDriverReadMethod<
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
-  const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
-  const addressDriver = new Contract(addressDriverAddress, addressDriverAbi, provider);
+  const addressDriver = new Contract(network.contracts.ADDRESS_DRIVER, addressDriverAbi, provider);
 
   return unwrapEthersResult(await addressDriver[func](...args));
 }
@@ -46,8 +45,7 @@ export async function populateAddressDriverWriteTx<
 
   const { functionName: func, args } = config;
 
-  const addressDriverAddress = getNetworkConfig().ADDRESS_DRIVER;
-  const addressDriver = new Contract(addressDriverAddress, addressDriverAbi, signer);
+  const addressDriver = new Contract(network.contracts.ADDRESS_DRIVER, addressDriverAbi, signer);
 
   return txToSafeDripsTx(await addressDriver[func].populateTransaction(...args));
 }
@@ -56,7 +54,7 @@ export async function getAddressDriverAllowance(token: OxString): Promise<bigint
   const owner = get(wallet).signer?.address as OxString;
   assert(owner, 'ERC20 contract call requires a signer but it is missing.');
 
-  const spender = getNetworkConfig().ADDRESS_DRIVER as OxString;
+  const spender = network.contracts.ADDRESS_DRIVER as OxString;
 
   return executeErc20ReadMethod({
     token,

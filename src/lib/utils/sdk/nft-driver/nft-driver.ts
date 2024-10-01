@@ -6,7 +6,6 @@ import type {
   ExtractAbiFunctionNames,
 } from 'abitype';
 import { Contract } from 'ethers';
-import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { get } from 'svelte/store';
 import { nftDriverAbi, type NftDriverAbi } from './nft-driver-abi';
 import type { TransactionResponse } from 'ethers';
@@ -15,6 +14,7 @@ import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import assert from '$lib/utils/assert';
 import unwrapEthersResult from '../utils/unwrap-ethers-result';
 import type { UnwrappedEthersResult } from '../sdk-types';
+import network from '$lib/stores/wallet/network';
 
 export async function executeNftDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<NftDriverAbi, 'pure' | 'view'>,
@@ -28,8 +28,7 @@ export async function executeNftDriverReadMethod<
   const { provider } = get(wallet);
   const { functionName: func, args } = config;
 
-  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
-  const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, provider);
+  const nftDriver = new Contract(network.contracts.NFT_DRIVER, nftDriverAbi, provider);
 
   return unwrapEthersResult(await nftDriver[func](...args));
 }
@@ -46,8 +45,7 @@ export async function executeNftDriverWriteMethod<
 
   const { functionName: func, args } = config;
 
-  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
-  const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, signer);
+  const nftDriver = new Contract(network.contracts.NFT_DRIVER, nftDriverAbi, signer);
 
   return nftDriver[func](...args);
 }
@@ -64,8 +62,7 @@ export async function populateNftDriverWriteTx<
 
   const { functionName: func, args } = config;
 
-  const nftDriverAddress = getNetworkConfig().NFT_DRIVER;
-  const nftDriver = new Contract(nftDriverAddress, nftDriverAbi, signer);
+  const nftDriver = new Contract(network.contracts.NFT_DRIVER, nftDriverAbi, signer);
 
   return txToSafeDripsTx(await nftDriver[func].populateTransaction(...args));
 }
