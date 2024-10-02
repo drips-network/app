@@ -29,13 +29,22 @@ let idMap: { [tokenAddress: TokenAddress]: DataProviderTokenId } | undefined = u
 
 const started = writable(false);
 
-const SUBSTITUTIONS = {
+const SUBSTITUTIONS: Record<string, string> = {
   // Map "WEENUS" testnet token to WETH mainnet
   ['0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   // Map "XEENUS" testnet token to WETH mainnet
   ['0xc21d97673B9E0B3AA53a06439F71fDc1facE393B']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   // Map WETH sepolia token to WETH mainnet
   ['0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9']: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+};
+
+/**
+ * For alt L1/L2 tokens that don't have an equivalent value token on Eth Mainnet.
+ * Keys are token contract addresses on the L1/L2, values are coinmarket cap unique asset IDs to map to.
+ * */
+const MANUAL_IDS: Record<string, string> = {
+  /* Map Wrapped Filecoin to Filecoin */
+  '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A': '2280',
 };
 
 /** Establish a connection to the data provider. */
@@ -94,7 +103,9 @@ export async function track(addresses: TokenAddress[]) {
   addresses.forEach((address) => {
     assert(idMap);
 
-    const id: number | undefined = idMap[address];
+    const id: number | undefined =
+      idMap[address] ??
+      Object.entries(MANUAL_IDS).find(([a]) => a.toLowerCase() === address.toLowerCase())?.[1];
 
     ids.push([address, id]);
   });
