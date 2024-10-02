@@ -15,7 +15,6 @@
   import type { TransactionReceipt, Signer } from 'ethers';
   import isTest from '$lib/utils/is-test';
   import type { Nullable } from 'vitest';
-  import etherscanLink from '$lib/utils/etherscan-link';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -28,7 +27,7 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
-  import EtherscanLink from './etherscan-link.svelte';
+  import TxLink from './tx-link.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import networkConfig from '$lib/stores/wallet/network';
 
@@ -42,7 +41,7 @@
   interface TransactionTimelineItem {
     title: string;
     message: string;
-    etherscanUrl?: string;
+    txUrl?: string;
     status:
       | 'awaitingPrevious'
       | 'awaitingSignature'
@@ -260,7 +259,7 @@
         updateTransactionTimelineStatus(executingTx, {
           status: 'pending',
           message: 'Waiting for confirmation',
-          etherscanUrl: etherscanLink(network.name, txResponse.hash),
+          txUrl: networkConfig.explorer.linkTemplate(txResponse.hash, network.name),
         });
 
         const receipt = await txResponse.wait();
@@ -270,7 +269,7 @@
           updateTransactionTimelineStatus(executingTx, {
             status: 'confirmed',
             message: 'Transaction confirmed',
-            etherscanUrl: etherscanLink(network.name, receipt.hash),
+            txUrl: networkConfig.explorer.linkTemplate(receipt.hash, network.name),
           });
         }
       } catch (e) {
@@ -534,7 +533,10 @@
                           <ExclamationCircle style="fill: var(--color-negative)" />
                         </div>
                         {transactionStatusItem.message}
-                        <EtherscanLink url={transactionStatusItem.etherscanUrl} />
+                        <TxLink
+                          explorerName={networkConfig.explorer.name}
+                          url={transactionStatusItem.txUrl}
+                        />
                         <button
                           style="margin-left: 0.5rem;"
                           on:click={() => toggleErrorDetails(index)}
@@ -557,12 +559,18 @@
                           <CheckCircle style="fill: var(--color-positive-level-6)" />
                         </div>
                         {transactionStatusItem.message}
-                        <EtherscanLink url={transactionStatusItem.etherscanUrl} />
+                        <TxLink
+                          explorerName={networkConfig.explorer.name}
+                          url={transactionStatusItem.txUrl}
+                        />
                       </div>
                     {:else}
                       <div class="status grayed">
                         {transactionStatusItem.message}
-                        <EtherscanLink url={transactionStatusItem.etherscanUrl} />
+                        <TxLink
+                          explorerName={networkConfig.explorer.name}
+                          url={transactionStatusItem.txUrl}
+                        />
                       </div>
                     {/if}
                   </div>
