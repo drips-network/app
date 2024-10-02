@@ -141,5 +141,6 @@ export const load = (async ({ params, fetch, url }) => {
     newRepo,
     correctCasingRepo,
     blockWhileInitializing: false,
+    preservePathOnNetworkChange: true,
   };
 }) satisfies PageServerLoad;

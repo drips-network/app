@@ -140,6 +140,6 @@ export const load = async ({ params, fetch }) => {
       ...userRes.userByAddress,
       votingRounds: votingRoundsWithSplits,
     },
-    preservePathOnNetworkChange: false,
+    preservePathOnNetworkChange: true,
   };
 };
