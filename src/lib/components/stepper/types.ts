@@ -1,12 +1,12 @@
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-import type { ContractReceipt, PopulatedTransaction } from 'ethers';
+import type { ContractTransaction, TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
 import type { Nullable } from 'vitest';
 
 export interface TransactPayload<T> {
   before?: T;
   transactions: (context: Context<T>) => TransactionWrapper[] | Promise<TransactionWrapper[]>;
-  after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
+  after?: (receipts: TransactionReceipt[], context: Context<T>) => PromiseLike<void>;
   afterSafe?: (
     sendTransactionsResponse: SendTransactionsResponse,
     context: Context<T>,
@@ -33,7 +33,7 @@ type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
 
 export type TransactionWrapper = {
   title: string;
-  transaction: PopulatedTransaction;
+  transaction: ContractTransaction;
   applyGasBuffer: boolean;
 };
 

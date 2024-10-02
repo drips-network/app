@@ -33,6 +33,10 @@ export type Network = {
   autoUnwrapPairs: AutoUnwrapPair[] | undefined;
   displayNetworkPicker: boolean;
   applyGasBuffers: boolean;
+  explorer: {
+    name: string;
+    linkTemplate: (txHash: string, networkName: string) => string;
+  };
   contracts: {
     ADDRESS_DRIVER: string;
     DRIPS: string;
@@ -44,6 +48,11 @@ export type Network = {
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
+
+const etherscanLinkTemplate = (txHash: string, networkName: string) =>
+  networkName === 'homestead'
+    ? `https://etherscan.io/tx/${txHash}`
+    : `https://${networkName}.etherscan.io/tx/${txHash}`;
 
 const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [1]: {
@@ -61,6 +70,10 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     autoUnwrapPairs: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
     displayNetworkPicker: false,
     applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
     contracts: {
       ADDRESS_DRIVER: '0x1455d9bD6B98f95dd8FEB2b3D60ed825fcef0610',
       DRIPS: '0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4',
@@ -85,6 +98,10 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
     applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
     contracts: {
       ADDRESS_DRIVER: '0x004310a6d47893Dd6e443cbE471c24aDA1e6c619',
       DRIPS: '0xeebCd570e50fa31bcf6eF10f989429C87C3A6981',
@@ -109,6 +126,10 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
     applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
     contracts: {
       ADDRESS_DRIVER: '0x70E1E1437AeFe8024B6780C94490662b45C3B567',
       DRIPS: '0x74A32a38D945b9527524900429b083547DeB9bF4',
@@ -133,6 +154,10 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
     applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
     contracts: {
       ADDRESS_DRIVER: '0x70E1E1437AeFe8024B6780C94490662b45C3B567',
       DRIPS: '0x74A32a38D945b9527524900429b083547DeB9bF4',
@@ -157,6 +182,10 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     autoUnwrapPairs: [],
     displayNetworkPicker: false,
     applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
     contracts: {
       ADDRESS_DRIVER: '0x004310a6d47893Dd6e443cbE471c24aDA1e6c619',
       DRIPS: '0xeebCd570e50fa31bcf6eF10f989429C87C3A6981',
@@ -181,6 +210,10 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     autoUnwrapPairs: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
     displayNetworkPicker: true,
     applyGasBuffers: false,
+    explorer: {
+      name: 'Blockscout',
+      linkTemplate: (txHash: string) => `https://filecoin.blockscout.com/tx/${txHash}`,
+    },
     contracts: {
       ADDRESS_DRIVER: '0xEFcd912a5a67C3a7Cc70a2Fb9aa17781bf1cE68F',
       DRIPS: '0x0B71C2a08d27E86d3841A6772332DEde0bc8DCa5',

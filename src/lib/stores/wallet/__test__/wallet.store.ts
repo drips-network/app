@@ -17,6 +17,20 @@ const NETWORK = {
   subdomain: 'sepolia.drips.network',
   gqlName: SupportedChain.Sepolia,
   autoUnwrapPairs: undefined,
+  displayNetworkPicker: false,
+  applyGasBuffers: false,
+  explorer: {
+    name: 'Etherscan',
+    linkTemplate: () => '',
+  },
+  contracts: {
+    ADDRESS_DRIVER: '0xcc137285FD4D8914Dae08629086309B89aA6FDef',
+    DRIPS: '0xa0523b86472561f0859d84C094cc04e6c4B33169',
+    CALLER: '0xaBf7431BFC75BAD19AA98911c4dd7165b619771F',
+    REPO_DRIVER: '0xb9C8e18E82687a564Ac4D26E22D28a4C95057CE9',
+    NFT_DRIVER: '0xc95eb214845d5693abc750692161CB008796ae5C',
+    NATIVE_TOKEN_UNWRAPPER: undefined,
+  },
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {
