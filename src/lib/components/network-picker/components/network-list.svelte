@@ -2,12 +2,17 @@
   import { page } from '$app/stores';
   import Check from '$lib/components/icons/Check.svelte';
   import TestnetFrame from '$lib/components/icons/networks/TestnetFrame.svelte';
-  import network, { getNetwork, SUPPORTED_CHAIN_IDS } from '$lib/stores/wallet/network';
+  import currentNetwork, {
+    getNetwork,
+    NETWORK_CONFIG,
+    SUPPORTED_CHAIN_IDS,
+  } from '$lib/stores/wallet/network';
   import hexToRgb from '$lib/utils/hex-to-rgb';
 
-  const networks = SUPPORTED_CHAIN_IDS.map(getNetwork);
+  const networks = Object.values(NETWORK_CONFIG);
+  const networksToShow = networks.filter((n) => (currentNetwork.isTestnet ? true : !n.isTestnet));
 
-  const selectedChainId = network.chainId;
+  const selectedChainId = currentNetwork.chainId;
 
   function getUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]) {
     const path = $page.url.pathname;
@@ -23,7 +28,7 @@
 </script>
 
 <div class="network-list">
-  {#each networks as { chainId, label, icon, color, isTestnet }}
+  {#each networksToShow as { chainId, label, icon, color, isTestnet }}
     {@const colorRgb = hexToRgb(color)}
     <a href={getUrl(chainId)} class="network-item">
       <div

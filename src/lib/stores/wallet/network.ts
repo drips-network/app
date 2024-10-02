@@ -59,7 +59,7 @@ const etherscanLinkTemplate = (txHash: string, networkName: string) =>
     ? `https://etherscan.io/tx/${txHash}`
     : `https://${networkName}.etherscan.io/tx/${txHash}`;
 
-const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
+export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [1]: {
     chainId: 1,
     name: 'homestead',
