@@ -7,6 +7,7 @@ import Polygon from '$lib/components/icons/networks/Polygon.svelte';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
+import { nextFilecoinSettlementDate, nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
 export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
@@ -33,6 +34,10 @@ export type Network = {
   autoUnwrapPairs: AutoUnwrapPair[] | undefined;
   displayNetworkPicker: boolean;
   applyGasBuffers: boolean;
+  settlement: {
+    nextSettlementDate: () => Date;
+    explainerText: string;
+  };
   explorer: {
     name: string;
     linkTemplate: (txHash: string, networkName: string) => string;
@@ -82,6 +87,11 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       NFT_DRIVER: '0xcf9c49B0962EDb01Cdaa5326299ba85D72405258',
       NATIVE_TOKEN_UNWRAPPER: undefined,
     },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
   },
   [80002]: {
     chainId: 80002,
@@ -109,6 +119,11 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0x54372850Db72915Fd9C5EC745683EB607b4a8642',
       NFT_DRIVER: '0xDafd9Ab96E62941808caa115D184D30A200FA777',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
   },
   [11155420]: {
@@ -138,6 +153,11 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
       NATIVE_TOKEN_UNWRAPPER: undefined,
     },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
   },
   [11155111]: {
     chainId: 11155111,
@@ -165,6 +185,11 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
       NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
   },
   [84532]: {
@@ -194,6 +219,11 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       NFT_DRIVER: '0xDafd9Ab96E62941808caa115D184D30A200FA777',
       NATIVE_TOKEN_UNWRAPPER: undefined,
     },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
   },
   [314]: {
     chainId: 314,
@@ -221,6 +251,11 @@ const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xf3aE6ADDeEE195e91380F5F9Ce73698460BAdf79',
       NFT_DRIVER: '0x1397579E87AB255C8474907183B074947eBa7338',
       NATIVE_TOKEN_UNWRAPPER: '0x8A388BE3fb93C28b66365DCbf3eAc344690BD1C4',
+    },
+    settlement: {
+      nextSettlementDate: nextFilecoinSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable daily.',
     },
   },
 };
