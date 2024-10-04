@@ -6,11 +6,11 @@ import assert from '$lib/utils/assert';
 import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
 import { MaxUint256 } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
-import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import unreachable from '$lib/utils/unreachable';
 import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
+import network from '$lib/stores/wallet/network';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -54,7 +54,7 @@ export default function (
         const tokenApprovalTx = await populateErc20WriteTx({
           token: tokenAddress as OxString,
           functionName: 'approve',
-          args: [getNetworkConfig().ADDRESS_DRIVER as OxString, MaxUint256],
+          args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
         });
 
         return {

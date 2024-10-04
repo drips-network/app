@@ -1,4 +1,4 @@
-export default function nextSettlementDate() {
+export function nextMainnetSettlementDate() {
   const currentDate = new Date();
 
   let lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -18,4 +18,9 @@ export default function nextSettlementDate() {
   }
 
   return lastDay;
+}
+
+export function nextFilecoinSettlementDate() {
+  // Filecoin settlement happens daily
+  return new Date();
 }

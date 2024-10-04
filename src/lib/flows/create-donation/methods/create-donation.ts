@@ -7,7 +7,7 @@ import { MaxUint256, toBigInt } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import { populateAddressDriverWriteTx } from '$lib/utils/sdk/address-driver/address-driver';
-import { getNetworkConfig } from '$lib/utils/sdk/utils/get-network-config';
+import network from '$lib/stores/wallet/network';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -39,7 +39,7 @@ export default function (
         const approvePopulatedTx = await populateErc20WriteTx({
           token: tokenAddress as OxString,
           functionName: 'approve',
-          args: [getNetworkConfig().ADDRESS_DRIVER as OxString, MaxUint256],
+          args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
         });
 
         return {

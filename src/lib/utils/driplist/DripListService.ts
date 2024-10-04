@@ -1,4 +1,3 @@
-import { getNetworkConfig } from '../sdk/utils/get-network-config';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
@@ -336,7 +335,7 @@ export default class DripListService {
     const tokenApprovalTx = await populateErc20WriteTx({
       token: token as OxString,
       functionName: 'approve',
-      args: [getNetworkConfig().ADDRESS_DRIVER as OxString, MaxUint256],
+      args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
     });
 
     return tokenApprovalTx;

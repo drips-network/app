@@ -36,7 +36,7 @@ export const load = async ({ fetch }) => {
 
   fetchedDataCache.write(res);
 
-  return { projects: res.projects };
+  return { projects: res.projects, preservePathOnNetworkChange: true };
 };
 
 export const ssr = false;

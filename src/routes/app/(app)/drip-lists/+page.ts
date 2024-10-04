@@ -69,7 +69,11 @@ export const load = async ({ fetch }) => {
     votingRounds: votingRoundsWithSplits,
   });
 
-  return { dripLists: dripListsRes.dripLists, votingRounds: votingRoundsWithSplits };
+  return {
+    dripLists: dripListsRes.dripLists,
+    votingRounds: votingRoundsWithSplits,
+    preservePathOnNetworkChange: true,
+  };
 };
 
 export const ssr = false;

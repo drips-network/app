@@ -7,6 +7,7 @@ import Polygon from '$lib/components/icons/networks/Polygon.svelte';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
+import { nextFilecoinSettlementDate, nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
 export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
@@ -25,114 +26,238 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
-  fallbackRpcUrl?: string;
   icon: ComponentType;
   color: string;
   isTestnet: boolean;
   subdomain: string;
   gqlName: SupportedChain;
   autoUnwrapPairs: AutoUnwrapPair[] | undefined;
+  displayNetworkPicker: boolean;
+  applyGasBuffers: boolean;
+  settlement: {
+    nextSettlementDate: () => Date;
+    explainerText: string;
+  };
+  explorer: {
+    name: string;
+    linkTemplate: (txHash: string, networkName: string) => string;
+  };
+  contracts: {
+    ADDRESS_DRIVER: string;
+    DRIPS: string;
+    CALLER: string;
+    REPO_DRIVER: string;
+    NFT_DRIVER: string;
+    NATIVE_TOKEN_UNWRAPPER: string | undefined;
+  };
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
 
-const NETWORK_IS_TESTNET: ValueForEachSupportedChain<boolean> = {
-  [1]: false,
-  [80002]: true,
-  [11155420]: true,
-  [11155111]: true,
-  [84532]: true,
-  [314]: false,
-};
+const etherscanLinkTemplate = (txHash: string, networkName: string) =>
+  networkName === 'homestead'
+    ? `https://etherscan.io/tx/${txHash}`
+    : `https://${networkName}.etherscan.io/tx/${txHash}`;
 
-const NETWORK_SUBDOMAIN: ValueForEachSupportedChain<string> = {
-  [1]: 'drips.network',
-  [80002]: 'amoy.drips.network',
-  [11155420]: 'optimism-sepolia.drips.network',
-  [11155111]: 'sepolia.drips.network',
-  [84532]: 'base-sepolia.drips.network',
-  [314]: 'filecoin.drips.network',
-};
-
-const NETWORK_ICONS: ValueForEachSupportedChain<ComponentType> = {
-  [1]: Ethereum,
-  [80002]: Polygon,
-  [11155420]: Optimism,
-  [11155111]: Ethereum,
-  [84532]: Base,
-  [314]: Filecoin,
-};
-
-const NETWORK_COLORS: ValueForEachSupportedChain<string> = {
-  [1]: '#627EEA',
-  [80002]: '#627EEA',
-  [11155420]: '#627EEA',
-  [11155111]: '#627EEA',
-  [84532]: '#627EEA',
-  [314]: '#627EEA',
-};
-
-const NETWORK_GQL_NAMES: ValueForEachSupportedChain<SupportedChain> = {
-  [1]: SupportedChain.Mainnet,
-  [80002]: SupportedChain.PolygonAmoy,
-  [11155420]: SupportedChain.OptimismSepolia,
-  [11155111]: SupportedChain.Sepolia,
-  [84532]: SupportedChain.BaseSepolia,
-  [314]: SupportedChain.Filecoin,
-};
-
-const NETWORK_NAMES: ValueForEachSupportedChain<string> = {
-  [1]: 'homestead',
-  [80002]: 'amoy',
-  [11155420]: 'optimism-sepolia',
-  [11155111]: 'sepolia',
-  [84532]: 'base-sepolia',
-  [314]: 'filecoin',
-};
-
-const NETWORK_LABELS: ValueForEachSupportedChain<string> = {
-  [1]: 'Ethereum Mainnet',
-  [80002]: 'Polygon Amoy',
-  [11155420]: 'OP Sepolia',
-  [11155111]: 'Sepolia',
-  [84532]: 'Base Sepolia',
-  [314]: 'Filecoin',
-};
-
-const NETWORK_TOKENS: ValueForEachSupportedChain<string> = {
-  [1]: 'ETH',
-  [80002]: 'MATIC',
-  [11155420]: 'ETH',
-  [11155111]: 'ETH',
-  [84532]: 'ETH',
-  [314]: 'FIL',
-};
-
-const NETWORK_AUTO_WRAPPED_PAIRS: Partial<ValueForEachSupportedChain<AutoUnwrapPair[] | []>> = {
-  [1]: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
-  [314]: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
-};
-
-const NETWORK_ID: ValueForEachSupportedChain<string> = {
-  [1]: '0x1',
-  [80002]: '0x13882',
-  [11155420]: '0xaa37dc',
-  [11155111]: '0xaa36a7',
-  [84532]: '0x14a34',
-  [314]: '0x13a',
-};
-
-const RPC_URLS: ValueForEachSupportedChain<string> = {
-  [1]: `${BASE_URL}/api/infura/mainnet`,
-  [80002]: `${BASE_URL}/api/infura/polygon-amoy`,
-  [11155420]: `${BASE_URL}/api/infura/optimism-sepolia`,
-  [11155111]: `${BASE_URL}/api/infura/sepolia`,
-  [84532]: `${BASE_URL}/api/infura/base-sepolia`,
-  [314]: `https://api.node.glif.io/`,
-} as const;
-
-const FALLBACK_RPC_URLS: Partial<ValueForEachSupportedChain<string>> = {
-  // TODO: add fallbacks
+export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
+  [1]: {
+    chainId: 1,
+    name: 'homestead',
+    label: 'Ethereum Mainnet',
+    token: 'ETH',
+    id: '0x1',
+    rpcUrl: `${BASE_URL}/api/infura/mainnet`,
+    icon: Ethereum,
+    color: '#627EEA',
+    isTestnet: false,
+    subdomain: 'drips.network',
+    gqlName: SupportedChain.Mainnet,
+    autoUnwrapPairs: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
+    displayNetworkPicker: false,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x1455d9bD6B98f95dd8FEB2b3D60ed825fcef0610',
+      DRIPS: '0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4',
+      CALLER: '0x60F25ac5F289Dc7F640f948521d486C964A248e5',
+      REPO_DRIVER: '0x770023d55D09A9C110694827F1a6B32D5c2b373E',
+      NFT_DRIVER: '0xcf9c49B0962EDb01Cdaa5326299ba85D72405258',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
+  },
+  [80002]: {
+    chainId: 80002,
+    name: 'amoy',
+    label: 'Polygon Amoy',
+    token: 'MATIC',
+    id: '0x13882',
+    rpcUrl: `${BASE_URL}/api/infura/polygon-amoy`,
+    icon: Polygon,
+    color: '#627EEA',
+    isTestnet: true,
+    subdomain: 'amoy.drips.network',
+    gqlName: SupportedChain.PolygonAmoy,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: false,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x004310a6d47893Dd6e443cbE471c24aDA1e6c619',
+      DRIPS: '0xeebCd570e50fa31bcf6eF10f989429C87C3A6981',
+      CALLER: '0x5C7c5AA20b15e13229771CB7De36Fe1F54238372',
+      REPO_DRIVER: '0x54372850Db72915Fd9C5EC745683EB607b4a8642',
+      NFT_DRIVER: '0xDafd9Ab96E62941808caa115D184D30A200FA777',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
+  },
+  [11155420]: {
+    chainId: 11155420,
+    name: 'optimism-sepolia',
+    label: 'OP Sepolia',
+    token: 'ETH',
+    id: '0xaa37dc',
+    rpcUrl: `${BASE_URL}/api/infura/optimism-sepolia`,
+    icon: Optimism,
+    color: '#627EEA',
+    isTestnet: true,
+    subdomain: 'optimism-sepolia.drips.network',
+    gqlName: SupportedChain.OptimismSepolia,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: false,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x70E1E1437AeFe8024B6780C94490662b45C3B567',
+      DRIPS: '0x74A32a38D945b9527524900429b083547DeB9bF4',
+      CALLER: '0x09e04Cb8168bd0E8773A79Cc2099f19C46776Fee',
+      REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
+      NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
+  },
+  [11155111]: {
+    chainId: 11155111,
+    name: 'sepolia',
+    label: 'Sepolia',
+    token: 'ETH',
+    id: '0xaa36a7',
+    rpcUrl: `${BASE_URL}/api/infura/sepolia`,
+    icon: Ethereum,
+    color: '#627EEA',
+    isTestnet: true,
+    subdomain: 'sepolia.drips.network',
+    gqlName: SupportedChain.Sepolia,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: false,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x70E1E1437AeFe8024B6780C94490662b45C3B567',
+      DRIPS: '0x74A32a38D945b9527524900429b083547DeB9bF4',
+      CALLER: '0x09e04Cb8168bd0E8773A79Cc2099f19C46776Fee',
+      REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
+      NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
+  },
+  [84532]: {
+    chainId: 84532,
+    name: 'base-sepolia',
+    label: 'Base Sepolia',
+    token: 'ETH',
+    id: '0x14a34',
+    rpcUrl: `${BASE_URL}/api/infura/base-sepolia`,
+    icon: Base,
+    color: '#627EEA',
+    isTestnet: true,
+    subdomain: 'base-sepolia.drips.network',
+    gqlName: SupportedChain.BaseSepolia,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: false,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x004310a6d47893Dd6e443cbE471c24aDA1e6c619',
+      DRIPS: '0xeebCd570e50fa31bcf6eF10f989429C87C3A6981',
+      CALLER: '0x5C7c5AA20b15e13229771CB7De36Fe1F54238372',
+      REPO_DRIVER: '0x54372850Db72915Fd9C5EC745683EB607b4a8642',
+      NFT_DRIVER: '0xDafd9Ab96E62941808caa115D184D30A200FA777',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
+  },
+  [314]: {
+    chainId: 314,
+    name: 'filecoin',
+    label: 'Filecoin',
+    token: 'FIL',
+    id: '0x13a',
+    rpcUrl: 'https://api.node.glif.io/',
+    icon: Filecoin,
+    color: '#627EEA',
+    isTestnet: false,
+    subdomain: 'filecoin.drips.network',
+    gqlName: SupportedChain.Filecoin,
+    autoUnwrapPairs: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
+    displayNetworkPicker: true,
+    applyGasBuffers: false,
+    explorer: {
+      name: 'Blockscout',
+      linkTemplate: (txHash: string) => `https://filecoin.blockscout.com/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0xEFcd912a5a67C3a7Cc70a2Fb9aa17781bf1cE68F',
+      DRIPS: '0x0B71C2a08d27E86d3841A6772332DEde0bc8DCa5',
+      CALLER: '0x7f2457421718A541B9Ee01E2F77F8BA749055F3b',
+      REPO_DRIVER: '0xf3aE6ADDeEE195e91380F5F9Ce73698460BAdf79',
+      NFT_DRIVER: '0x1397579E87AB255C8474907183B074947eBa7338',
+      NATIVE_TOKEN_UNWRAPPER: '0x8A388BE3fb93C28b66365DCbf3eAc344690BD1C4',
+    },
+    settlement: {
+      nextSettlementDate: nextFilecoinSettlementDate,
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable daily.',
+    },
+  },
 };
 
 export function isSupportedChainId(chainId: number): chainId is ChainId {
@@ -152,21 +277,7 @@ export function isConfiguredChainId(chainId: number): boolean {
 export function getNetwork(chainId: number): Network {
   assert(isSupportedChainId(chainId), 'Unsupported chain id');
 
-  return {
-    chainId,
-    name: NETWORK_NAMES[chainId],
-    label: NETWORK_LABELS[chainId],
-    token: NETWORK_TOKENS[chainId],
-    autoUnwrapPairs: NETWORK_AUTO_WRAPPED_PAIRS[chainId],
-    id: NETWORK_ID[chainId],
-    rpcUrl: RPC_URLS[chainId],
-    fallbackRpcUrl: FALLBACK_RPC_URLS[chainId],
-    icon: NETWORK_ICONS[chainId],
-    color: NETWORK_COLORS[chainId],
-    isTestnet: NETWORK_IS_TESTNET[chainId],
-    subdomain: NETWORK_SUBDOMAIN[chainId],
-    gqlName: NETWORK_GQL_NAMES[chainId],
-  };
+  return NETWORK_CONFIG[chainId];
 }
 
 export default getNetwork(configuredChainId);

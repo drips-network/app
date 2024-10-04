@@ -10,8 +10,8 @@ import { get } from 'svelte/store';
 import { callerAbi, type CallerAbi } from './caller-abi';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import type { ContractTransaction } from 'ethers';
-import { getNetworkConfig } from '../utils/get-network-config';
 import assert from '$lib/utils/assert';
+import network from '$lib/stores/wallet/network';
 
 export async function populateCallerWriteTx<
   functionName extends ExtractAbiFunctionNames<CallerAbi, 'nonpayable' | 'payable'>,
@@ -25,8 +25,7 @@ export async function populateCallerWriteTx<
 
   const { functionName: func, args } = config;
 
-  const callerAddress = getNetworkConfig().CALLER;
-  const caller = new Contract(callerAddress, callerAbi, signer);
+  const caller = new Contract(network.contracts.CALLER, callerAbi, signer);
 
   return txToSafeDripsTx(await caller[func].populateTransaction(...args));
 }

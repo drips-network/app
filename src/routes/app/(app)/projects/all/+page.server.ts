@@ -40,5 +40,6 @@ export const load = (async ({ fetch }) => {
       fetch,
     ),
     blockWhileInitializing: false,
+    preservePathOnNetworkChange: true,
   };
 }) satisfies PageServerLoad;

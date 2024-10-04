@@ -2,7 +2,6 @@
   import { getNetwork } from '$lib/stores/wallet/network';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ChevronDown from '../icons/ChevronDown.svelte';
-  import ChevronUp from '../icons/ChevronUp.svelte';
   import TestnetFrame from '../icons/networks/TestnetFrame.svelte';
 
   $: network = getNetwork($walletStore.network.chainId);
@@ -19,11 +18,9 @@
       <div class="testnet-frame"><TestnetFrame /></div>
     {/if}
   </div>
-  {#if toggled}
-    <ChevronUp />
-  {:else}
+  <div class="chevron" class:upside-down={toggled}>
     <ChevronDown />
-  {/if}
+  </div>
 </button>
 
 <style>
@@ -50,5 +47,13 @@
     justify-content: center;
     gap: 8px;
     position: relative;
+  }
+
+  .chevron {
+    transition: transform 0.3s;
+  }
+
+  .chevron.upside-down {
+    transform: rotate(-180deg);
   }
 </style>
