@@ -1,4 +1,4 @@
-import { JsonRpcProvider, JsonRpcSigner } from 'ethers';
+import { JsonRpcSigner } from 'ethers';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import Onboard, { type EIP1193Provider } from '@web3-onboard/core';
@@ -17,10 +17,12 @@ import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { getNetwork, isConfiguredChainId, type Network } from './network';
 import { invalidateAll } from '../fetched-data-cache/invalidate';
-import { BrowserProvider, InfuraProvider } from 'ethers';
+import { BrowserProvider } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
+import { FailoverJsonRpcProvider } from '$lib/utils/FailoverProvider';
+import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -73,7 +75,7 @@ export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
   dripsAccountId: string;
-  provider: BrowserProvider | JsonRpcProvider;
+  provider: BrowserProvider | FailoverJsonRpcProvider;
   signer: JsonRpcSigner;
   network: Network;
   safe?: SafeInfo;
@@ -82,7 +84,7 @@ export interface ConnectedWalletStoreState {
 export interface DisconnectedWalletStoreState {
   connected: false;
   network: Network;
-  provider: BrowserProvider | InfuraProvider | JsonRpcProvider;
+  provider: BrowserProvider | FailoverJsonRpcProvider;
   dripsAccountId?: undefined;
   address?: undefined;
   signer?: undefined;
@@ -94,7 +96,10 @@ type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
   network: DEFAULT_NETWORK,
-  provider: new JsonRpcProvider(network.rpcUrl, DEFAULT_NETWORK),
+  provider: new FailoverJsonRpcProvider(
+    mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
+    DEFAULT_NETWORK,
+  ),
 };
 
 const walletStore = () => {

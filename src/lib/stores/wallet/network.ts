@@ -26,6 +26,7 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
+  fallbackRpcUrl?: string;
   icon: ComponentType;
   color: string;
   isTestnet: boolean;
@@ -66,7 +67,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Ethereum Mainnet',
     token: 'ETH',
     id: '0x1',
-    rpcUrl: `${BASE_URL}/api/infura/mainnet`,
+    rpcUrl: `${BASE_URL}/api/rpc/infura/mainnet`,
+    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/mainnet`,
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: false,
@@ -99,7 +101,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Polygon Amoy',
     token: 'MATIC',
     id: '0x13882',
-    rpcUrl: `${BASE_URL}/api/infura/polygon-amoy`,
+    rpcUrl: `${BASE_URL}/api/rpc/infura/polygon-amoy`,
+    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/polygon-amoy`,
     icon: Polygon,
     color: '#627EEA',
     isTestnet: true,
@@ -132,7 +135,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'OP Sepolia',
     token: 'ETH',
     id: '0xaa37dc',
-    rpcUrl: `${BASE_URL}/api/infura/optimism-sepolia`,
+    rpcUrl: `${BASE_URL}/api/rpc/infura/optimism-sepolia`,
+    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/optimism-sepolia`,
     icon: Optimism,
     color: '#627EEA',
     isTestnet: true,
@@ -165,7 +169,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Sepolia',
     token: 'ETH',
     id: '0xaa36a7',
-    rpcUrl: `${BASE_URL}/api/infura/sepolia`,
+    rpcUrl: `${BASE_URL}/api/rpc/infura/sepolia`,
+    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/sepolia`,
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -198,7 +203,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Base Sepolia',
     token: 'ETH',
     id: '0x14a34',
-    rpcUrl: `${BASE_URL}/api/infura/base-sepolia`,
+    rpcUrl: `${BASE_URL}/api/rpc/infura/base-sepolia`,
+    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/base-sepolia`,
     icon: Base,
     color: '#627EEA',
     isTestnet: true,
@@ -231,7 +237,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Filecoin',
     token: 'FIL',
     id: '0x13a',
-    rpcUrl: 'https://api.node.glif.io/',
+    rpcUrl: `${BASE_URL}/api/rpc/glif/filecoin-mainnet`,
     icon: Filecoin,
     color: '#627EEA',
     isTestnet: false,
