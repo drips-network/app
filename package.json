@@ -78,7 +78,7 @@
     "@safe-global/safe-apps-provider": "^0.18.3",
     "@safe-global/safe-apps-sdk": "^9.1.0",
     "@sentry/node": "^8.19.0",
-    "@sentry/profiling-node": "^8.19.0",
+    "@sentry/profiling-node": "^8.33.1",
     "@sentry/sveltekit": "^8.19.0",
     "@sveltejs/adapter-node": "^5.2.0",
     "@tanstack/svelte-table": "^8.17.3",
