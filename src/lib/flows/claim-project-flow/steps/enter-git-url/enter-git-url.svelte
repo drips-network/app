@@ -175,11 +175,11 @@
       const project = response.projectByUrl;
 
       if (!project) {
-        throw new Error("Repo doesn't exist or is private");
+        throw new InvalidUrlError("Repo doesn't exist or is private");
       }
 
       if (project.__typename === 'ClaimedProject') {
-        throw new Error('Project already claimed');
+        throw new InvalidUrlError('Project already claimed');
       }
 
       if (
