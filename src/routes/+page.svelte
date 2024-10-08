@@ -62,7 +62,7 @@
   <div class="wrapper">
     <div class="hero">
       <div class="text">
-        <h1>Funding that flows</h1>
+        <h1>TEST</h1>
         <p>A decentralized toolkit for funding your critical software dependencies.</p>
         <div class="actions">
           <Button href="#fund-projects" icon={TokenStreams}>Fund your dependencies</Button>
