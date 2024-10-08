@@ -51,3 +51,5 @@ export const GET: RequestHandler = async ({ params }) => {
     error(status);
   }
 };
+
+export type GetRepoResponse = ReturnType<typeof mapGhResponse>;

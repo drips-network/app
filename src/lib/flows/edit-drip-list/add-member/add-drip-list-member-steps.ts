@@ -13,7 +13,6 @@ import SelectDripList, {
 } from './steps/select-drip-list.svelte';
 import assert from '$lib/utils/assert';
 import unreachable from '$lib/utils/unreachable';
-import type { EditDripListStepSelectedDripListFragment } from '../shared/steps/__generated__/gql.generated';
 import { gql } from 'graphql-request';
 import type {
   AddDripListMemberFlowDripListToAddFragment,
@@ -52,14 +51,20 @@ export default (
   projectToAdd?: AddDripListMemberFlowProjectToAddFragment,
   dripListToAdd?: AddDripListMemberFlowDripListToAddFragment,
 ) => {
-  const selectedDripListState = writable<{
-    dripList: EditDripListStepSelectedDripListFragment;
-  }>(undefined);
-
   assert(
     projectToAdd || dripListToAdd,
     'Must provide either a project or a drip list to add to the drip list.',
   );
+
+  const state = writable({
+    listEditorConfig: {
+      items: {},
+      weights: {},
+    },
+    name: 'Unnamed Drip List',
+    description: undefined,
+    dripListAccountId: undefined,
+  });
 
   return {
     context: undefined,
@@ -68,7 +73,7 @@ export default (
         component: SelectDripList,
         props: {
           dripLists,
-          selectedDripListState,
+          state,
           projectOrDripListToAdd: projectToAdd ?? dripListToAdd ?? unreachable(),
         },
       }),
@@ -77,7 +82,7 @@ export default (
         props: {
           projectToAdd,
           dripListToAdd,
-          selectedDripListState,
+          state,
         },
       }),
       makeStep({

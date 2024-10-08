@@ -2,7 +2,7 @@
   import { gql } from 'graphql-request';
 
   export const DRIP_LIST_CARD_FRAGMENT = gql`
-    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
+    ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
     ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
@@ -11,7 +11,7 @@
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
       chain
-      ...EditDripListStepSelectedDripList
+      ...EditDripListFlowDripList
       name
       account {
         accountId
@@ -64,7 +64,9 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
-  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
+  import editDripListSteps, {
+    EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT,
+  } from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -72,7 +74,6 @@
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import type { DripListCardFragment } from './__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
   import getSupportersPile, { SUPPORTER_PILE_FRAGMENT } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
