@@ -244,7 +244,7 @@
       {/if}
       {#if !listingMode}
         <div class="flex gap-2">
-          Owned by <IdentityBadge
+          Managed by <IdentityBadge
             showAvatar={true}
             showIdentity={true}
             address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
