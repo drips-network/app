@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import { z } from 'zod';
 import { redis } from '../redis.js';
 import { formatUnits } from 'ethers';
+import network from '$lib/stores/wallet/network.js';
 
 const etherscanTokensResponseSchema = z.array(
   z.object({
@@ -11,8 +12,10 @@ const etherscanTokensResponseSchema = z.array(
   }),
 );
 
+const CACHE_KEY = `${network.name}-explore.tlv-estimate`;
+
 export const GET = async ({ fetch }) => {
-  const cached = redis && (await redis.get('explore.tlv-estimate'));
+  const cached = redis && (await redis.get(CACHE_KEY));
 
   if (cached) {
     return new Response(cached);
@@ -62,7 +65,7 @@ export const GET = async ({ fetch }) => {
         value;
   }
 
-  await redis?.set('explore.tlv-estimate', total.toString(), {
+  await redis?.set(CACHE_KEY, total.toString(), {
     EX: 86400,
   });
 
