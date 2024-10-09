@@ -185,8 +185,10 @@
             [key]: item,
           };
 
+          const MAX_WEIGHT = 1000000;
+
           if (weight) {
-            $state.listEditorConfig.weights[key] = (weight * constants.TOTAL_SPLITS_WEIGHT) / 100;
+            $state.listEditorConfig.weights[key] = (weight * MAX_WEIGHT) / 100;
           }
         },
         clearItems() {

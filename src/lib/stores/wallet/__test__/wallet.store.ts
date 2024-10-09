@@ -3,6 +3,7 @@ import { readable } from 'svelte/store';
 import type { ConnectedWalletStoreState } from '../wallet.store';
 import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
+import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 
 const NETWORK = {
   chainId: 11155111 as const,
@@ -30,6 +31,10 @@ const NETWORK = {
     REPO_DRIVER: '0xb9C8e18E82687a564Ac4D26E22D28a4C95057CE9',
     NFT_DRIVER: '0xc95eb214845d5693abc750692161CB008796ae5C',
     NATIVE_TOKEN_UNWRAPPER: undefined,
+  },
+  settlement: {
+    nextSettlementDate: nextMainnetSettlementDate,
+    explainerText: '',
   },
 };
 
