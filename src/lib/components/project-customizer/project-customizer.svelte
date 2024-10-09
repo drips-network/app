@@ -34,14 +34,16 @@
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import twemoji from '$lib/utils/twemoji';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
-  export let project: Writable<ProjectCustomizerFragment>;
+  export let originalProject: ProjectCustomizerFragment;
+  export let newProjectData: Writable<
+    ReturnType<
+      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+    >
+  >;
 
-  const projectChainData = filterCurrentChainData($project.chainData) as ClaimedProjectData;
-
-  let selectedEmoji =
-    projectChainData.avatar.__typename === 'EmojiAvatar' ? projectChainData.avatar.emoji : '💧';
+  let activeTab: 'tab-1' | 'tab-2' =
+    $newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
 
   let searchTerm = '';
   $: filteredEmoji = emoji.filter((e) => {
@@ -52,49 +54,72 @@
     );
   });
 
-  let lastUploadedAvatarCid: string | undefined =
-    projectChainData.avatar.__typename === 'ImageAvatar' ? projectChainData.avatar.cid : undefined;
-  $: {
-    if (lastUploadedAvatarCid && activeTab === 'tab-2') {
-      projectChainData.avatar = {
-        __typename: 'ImageAvatar',
-        cid: lastUploadedAvatarCid,
-      };
-    }
+  let selectedEmoji =
+    $newProjectData.avatar.__typename === 'EmojiAvatar' ? $newProjectData.avatar.emoji : '💧';
+  function handleEmojiChange(newEmoji: string) {
+    $newProjectData.avatar = {
+      __typename: 'EmojiAvatar',
+      emoji: newEmoji,
+    };
   }
+  $: handleEmojiChange(selectedEmoji);
 
+  let selectedColor = $newProjectData.color;
+  function handleColorChange(newColor: string) {
+    $newProjectData.color = newColor;
+  }
+  $: handleColorChange(selectedColor);
+
+  let lastUploadedCid =
+    $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined;
   function handleFileUpload(e: CustomEvent<{ ipfsCid: string }>) {
     if (activeTab !== 'tab-2') {
       return;
     }
 
-    lastUploadedAvatarCid = e.detail.ipfsCid;
+    lastUploadedCid = e.detail.ipfsCid;
+
+    $newProjectData.avatar = {
+      __typename: 'ImageAvatar',
+      cid: lastUploadedCid,
+    };
   }
 
-  let activeTab = projectChainData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
-
-  $: {
-    if (activeTab === 'tab-1') {
-      projectChainData.avatar = {
+  function handleTabChange(newTab: 'tab-1' | 'tab-2', lastUploadedCid: string | undefined) {
+    if (newTab === 'tab-1') {
+      $newProjectData.avatar = {
         __typename: 'EmojiAvatar',
         emoji: selectedEmoji,
       };
+    } else if (newTab === 'tab-2' && lastUploadedCid) {
+      $newProjectData = {
+        ...$newProjectData,
+        avatar: {
+          __typename: 'ImageAvatar',
+          cid: lastUploadedCid,
+        },
+      };
+    } else {
+      return;
     }
   }
+  $: handleTabChange(activeTab, lastUploadedCid);
 
   export let valid = false;
-  $: valid = Boolean(activeTab === 'tab-1' || lastUploadedAvatarCid);
-
-  let selectedColor = projectChainData.color;
-  $: projectChainData.color = selectedColor;
+  $: valid = Boolean(activeTab === 'tab-1' || lastUploadedCid);
 </script>
 
 <div class="project-customizer">
   <FormField type="div">
-    <ProjectProfileHeader
-      pendingAvatar={activeTab === 'tab-2' && !lastUploadedAvatarCid}
-      project={$project}
-    />
+    <div style:pointer-events="none">
+      <ProjectProfileHeader
+        pendingAvatar={activeTab === 'tab-2' && !lastUploadedCid}
+        project={{
+          ...originalProject,
+          chainData: [$newProjectData],
+        }}
+      />
+    </div>
   </FormField>
 
   <TabbedBox bind:activeTab ariaLabel="Avatar settings" border={true}>

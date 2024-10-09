@@ -49,7 +49,7 @@
 
   export let pendingAvatar = false;
 
-  let projectChainData = filterCurrentChainData(project.chainData);
+  $: projectChainData = filterCurrentChainData(project.chainData);
 
   const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>

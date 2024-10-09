@@ -47,21 +47,13 @@
   import { toBigInt } from 'ethers';
   import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let project: SetNewMetadataStepFragment;
-  let projectChainData = filterCurrentChainData(project.chainData) as ClaimedProjectData;
+  $: projectChainData = filterCurrentChainData(project.chainData, 'claimed');
 
-  let projectWritable = writable(structuredClone(project));
-  let projectWritableChainData = filterCurrentChainData(
-    $projectWritable.chainData,
-  ) as ClaimedProjectData;
-
-  $: changesMade =
-    projectChainData.avatar !== projectWritableChainData.avatar ||
-    projectChainData.color !== projectWritableChainData.color;
+  $: projectDataWritable = writable(structuredClone(projectChainData));
 
   let valid = false;
 
@@ -83,21 +75,19 @@
           const newMetadata: LatestVersion<typeof repoDriverAccountMetadataParser> = {
             ...upgraded,
             avatar:
-              projectWritableChainData.avatar.__typename === 'EmojiAvatar'
+              $projectDataWritable.avatar.__typename === 'EmojiAvatar'
                 ? {
                     type: 'emoji',
-                    emoji: projectWritableChainData.avatar.emoji,
+                    emoji: $projectDataWritable.avatar.emoji,
                   }
                 : {
                     type: 'image',
-                    cid: projectWritableChainData.avatar.cid,
+                    cid: $projectDataWritable.avatar.cid,
                   },
-            color: projectWritableChainData.color,
+            color: $projectDataWritable.color,
           };
 
-          const upgradedMetadata = metadataManager.upgradeAccountMetadata(newMetadata);
-
-          const ipfsHash = await metadataManager.pinAccountMetadata(upgradedMetadata);
+          const ipfsHash = await metadataManager.pinAccountMetadata(newMetadata);
 
           const accountMetadataAsBytes = [
             {
@@ -129,9 +119,9 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer bind:valid project={projectWritable} />
+  <ProjectCustomizer bind:valid originalProject={project} newProjectData={projectDataWritable} />
   <svelte:fragment slot="actions">
-    <Button on:click={submit} disabled={!changesMade || !valid} variant="primary" icon={Wallet}
+    <Button on:click={submit} disabled={!valid} variant="primary" icon={Wallet}
       >Confirm changes</Button
     >
   </svelte:fragment>
