@@ -57,6 +57,7 @@
   import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import { formatSplitReceivers } from '$lib/utils/sdk/utils/format-split-receivers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -115,13 +116,7 @@
 
           const setSplitsTx = await populateNftDriverWriteTx({
             functionName: 'setSplits',
-            args: [
-              toBigInt(listId),
-              receivers.map((r) => ({
-                accountId: toBigInt(r.accountId),
-                weight: r.weight,
-              })),
-            ],
+            args: [toBigInt(listId), formatSplitReceivers(receivers)],
           });
 
           const metadataManager = new NftDriverMetadataManager(executeNftDriverWriteMethod);

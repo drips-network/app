@@ -8,6 +8,7 @@ import { get } from 'svelte/store';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import network from '$lib/stores/wallet/network';
 import assert from '$lib/utils/assert';
+import { formatSplitReceivers } from '../utils/format-split-receivers';
 
 export type CollectFlowPayload = {
   accountId: string;
@@ -62,14 +63,7 @@ export default async function populateCreateCollectFlowTxs(
 
     const splitTx = await populateDripsWriteTx({
       functionName: 'split',
-      args: [
-        toBigInt(accountId),
-        tokenAddress,
-        currentReceivers.map((r) => ({
-          accountId: toBigInt(r.accountId),
-          weight: r.weight,
-        })),
-      ],
+      args: [toBigInt(accountId), tokenAddress, formatSplitReceivers(currentReceivers)],
     });
 
     flow.push(splitTx);
