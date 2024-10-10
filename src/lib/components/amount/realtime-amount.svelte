@@ -11,11 +11,11 @@
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import { fade } from 'svelte/transition';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import { constants } from 'radicle-drips';
   import type {
     CurrentAmountsTimelineItemFragment,
     CurrentAmountsUserBalanceTimelineItemFragment,
   } from '$lib/utils/__generated__/gql.generated';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   export let timeline: (
     | CurrentAmountsTimelineItemFragment
@@ -55,7 +55,7 @@
               tokenAddress: $currentAmountsStore.currentAmount.tokenAddress,
               amount:
                 $currentAmountsStore.currentAmount.amount /
-                BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+                BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
             },
           ]}
         />

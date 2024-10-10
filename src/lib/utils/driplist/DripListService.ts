@@ -1,22 +1,6 @@
-import {
-  getAddressDriverClient,
-  getAddressDriverTxFactory,
-  getCallerClient,
-  getNFTDriverClient,
-  getNFTDriverTxFactory,
-} from '../get-drips-clients';
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
-import {
-  NFTDriverTxFactory,
-  AddressDriverClient,
-  Utils,
-  AddressDriverTxFactory,
-  NFTDriverClient,
-  ERC20TxFactory,
-} from 'radicle-drips';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { SplitsReceiverStruct } from 'radicle-drips';
-import { constants, ethers, type PopulatedTransaction, Signer, BigNumber } from 'ethers';
+import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import type { Address, IpfsHash } from '../common-types';
@@ -33,6 +17,23 @@ import type {
 } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
+import {
+  executeNftDriverReadMethod,
+  executeNftDriverWriteMethod,
+  populateNftDriverWriteTx,
+} from '../sdk/nft-driver/nft-driver';
+import type { OxString, SplitsReceiver } from '../sdk/sdk-types';
+import {
+  getAddressDriverAllowance,
+  populateAddressDriverWriteTx,
+} from '../sdk/address-driver/address-driver';
+import type { ContractTransaction } from 'ethers';
+import { populateErc20WriteTx } from '../sdk/erc20/erc20';
+import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
+import { populateCallerWriteTx } from '../sdk/caller/caller';
+import txToCallerCall from '../sdk/utils/tx-to-caller-call';
+import network from '$lib/stores/wallet/network';
 
 type AccountId = string;
 
@@ -54,10 +55,6 @@ export default class DripListService {
 
   private _owner!: Signer | undefined;
   private _ownerAddress!: Address | undefined;
-  private _nftDriverClient!: NFTDriverClient | undefined;
-  private _nftDriverTxFactory!: NFTDriverTxFactory;
-  private _addressDriverClient!: AddressDriverClient;
-  private _addressDriverTxFactory!: AddressDriverTxFactory;
   private _nftDriverMetadataManager!: NftDriverMetadataManager;
 
   private constructor() {}
@@ -69,23 +66,19 @@ export default class DripListService {
   public static async new(): Promise<DripListService> {
     const dripListService = new DripListService();
 
-    dripListService._addressDriverClient = await getAddressDriverClient();
-
     const { connected, signer } = get(wallet);
 
     if (connected) {
-      dripListService._nftDriverClient = await getNFTDriverClient();
-      dripListService._nftDriverTxFactory = await getNFTDriverTxFactory();
-      dripListService._addressDriverTxFactory = await getAddressDriverTxFactory();
-
       assert(signer, 'Signer address is undefined.');
       dripListService._owner = signer;
       dripListService._ownerAddress = await signer.getAddress();
-    }
 
-    dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(
-      dripListService._nftDriverClient,
-    );
+      dripListService._nftDriverMetadataManager = new NftDriverMetadataManager(
+        executeNftDriverWriteMethod,
+      );
+    } else {
+      dripListService._nftDriverMetadataManager = new NftDriverMetadataManager();
+    }
 
     return dripListService;
   }
@@ -109,10 +102,7 @@ export default class DripListService {
         };
     latestVotingRoundId?: string;
   }) {
-    assert(
-      this._ownerAddress && this._nftDriverClient,
-      `This function requires an active wallet connection.`,
-    );
+    assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
     const { listTitle, listDescription, weights, items, support, latestVotingRoundId } = config;
 
@@ -122,20 +112,29 @@ export default class DripListService {
     );
 
     const mintedNftAccountsCountQuery = gql`
-      query MintedNftAccountsCount($ownerAddress: String!) {
-        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress)
+      query MintedNftAccountsCount($ownerAddress: String!, $chain: SupportedChain!) {
+        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress, chain: $chain) {
+          total
+        }
       }
     `;
 
     const mintedNftAccountsCountRes = await query<
       MintedNftAccountsCountQuery,
       MintedNftAccountsCountQueryVariables
-    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress });
-    const mintedNftAccountsCount = mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress ?? 0;
+    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress, chain: network.gqlName });
 
-    const salt = this._calcSaltFromAddress(this._ownerAddress, mintedNftAccountsCount);
+    const salt = this._calcSaltFromAddress(
+      this._ownerAddress,
+      mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress.total ?? 0,
+    );
 
-    const listId = await this._nftDriverClient.calcTokenIdWithSalt(this._ownerAddress, salt); // This is the `NftDriver` user ID.
+    const listId = (
+      await executeNftDriverReadMethod({
+        functionName: 'calcTokenIdWithSalt',
+        args: [this._ownerAddress as OxString, salt],
+      })
+    ).toString();
 
     const ipfsHash = await this._publishMetadataToIpfs(
       listId,
@@ -147,18 +146,18 @@ export default class DripListService {
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
 
-    const setDripListSplitsTx = await this._nftDriverTxFactory.setSplits(
-      listId,
-      this._formatSplitReceivers(receivers),
-    );
+    const setDripListSplitsTx = await populateNftDriverWriteTx({
+      functionName: 'setSplits',
+      args: [toBigInt(listId), formatSplitReceivers(receivers)],
+    });
 
     let needsApprovalForToken: string | undefined;
-    let txs: PopulatedTransaction[];
+    let txs: ContractTransaction[];
 
     if (support?.type === 'continuous') {
       const { tokenAddress, amountPerSec, topUpAmount } = support;
 
-      const allowance = await this._addressDriverClient.getAllowance(tokenAddress);
+      const allowance = await getAddressDriverAllowance(tokenAddress as OxString);
       const needsApproval = allowance < topUpAmount;
 
       if (needsApproval) {
@@ -176,26 +175,17 @@ export default class DripListService {
     } else if (support?.type === 'one-time') {
       const { tokenAddress, donationAmount } = support;
 
-      const allowance = await this._addressDriverClient.getAllowance(tokenAddress);
+      const allowance = await getAddressDriverAllowance(tokenAddress as OxString);
       const needsApproval = allowance < donationAmount;
 
       if (needsApproval) {
         needsApprovalForToken = tokenAddress;
       }
 
-      const txFactory = await getAddressDriverTxFactory();
-      const giveTx = await txFactory.give(
-        listId,
-        tokenAddress,
-        donationAmount,
-        /*
-        Dirty hack to disable the SDK's built-in gas estimation, because
-        it would fail if there's no token approval yet.
-
-        TODO: Introduce a more graceful method of disabling gas estimation.
-        */
-        { gasLimit: 1 },
-      );
+      const giveTx = await populateAddressDriverWriteTx({
+        functionName: 'give',
+        args: [toBigInt(listId), tokenAddress as OxString, donationAmount],
+      });
 
       txs = [createDripListTx, setDripListSplitsTx, giveTx];
     } else {
@@ -203,8 +193,10 @@ export default class DripListService {
       txs = [createDripListTx, setDripListSplitsTx];
     }
 
-    const callerClient = await getCallerClient();
-    const batch = await callerClient.populateCallBatchedTx(txs);
+    const batch = await populateCallerWriteTx({
+      functionName: 'callBatched',
+      args: [txs.map(txToCallerCall)],
+    });
 
     return {
       txs: [
@@ -235,7 +227,7 @@ export default class DripListService {
   public async getProjectsSplitMetadataAndReceivers(weights: Weights, items: Items) {
     const projectsInput = Object.entries(weights);
 
-    const receivers: SplitsReceiverStruct[] = [];
+    const receivers: SplitsReceiver[] = [];
 
     const projectsSplitMetadata: ReturnType<
       typeof nftDriverAccountMetadataParser.parseLatest
@@ -297,46 +289,22 @@ export default class DripListService {
     };
   }
 
-  // TODO: Copied from the SDK. Replace this when the SDK makes this function public.
-  private _formatSplitReceivers(receivers: SplitsReceiverStruct[]): SplitsReceiverStruct[] {
-    // Splits receivers must be sorted by user ID, deduplicated, and without weights <= 0.
-
-    const uniqueReceivers = receivers.reduce((unique: SplitsReceiverStruct[], o) => {
-      if (
-        !unique.some(
-          (obj: SplitsReceiverStruct) => obj.accountId === o.accountId && obj.weight === o.weight,
-        )
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    const sortedReceivers = uniqueReceivers.sort((a, b) =>
-      // Sort by user ID.
-      BigNumber.from(a.accountId).gt(BigNumber.from(b.accountId))
-        ? 1
-        : BigNumber.from(a.accountId).lt(BigNumber.from(b.accountId))
-          ? -1
-          : 0,
-    );
-
-    return sortedReceivers;
-  }
-
   private async _buildCreateDripListTx(salt: bigint, ipfsHash: IpfsHash) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
-    const createDripListTx = await this._nftDriverTxFactory.safeMintWithSalt(
-      salt,
-      this._ownerAddress,
-      [
-        {
-          key: MetadataManagerBase.USER_METADATA_KEY,
-          value: ipfsHash,
-        },
-      ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
-    );
+    const createDripListTx = await populateNftDriverWriteTx({
+      functionName: 'safeMintWithSalt',
+      args: [
+        salt,
+        this._ownerAddress as OxString,
+        [
+          {
+            key: MetadataManagerBase.USER_METADATA_KEY,
+            value: ipfsHash,
+          },
+        ].map(keyValueToMetatada),
+      ],
+    });
 
     return createDripListTx;
   }
@@ -350,7 +318,6 @@ export default class DripListService {
     assert(this._owner, `This function requires an active wallet connection.`);
 
     return await buildStreamCreateBatchTx(
-      this._addressDriverClient,
       this._owner,
       {
         tokenAddress: token,
@@ -362,15 +329,14 @@ export default class DripListService {
     );
   }
 
-  private async _buildTokenApprovalTx(token: Address): Promise<PopulatedTransaction> {
+  private async _buildTokenApprovalTx(token: Address): Promise<ContractTransaction> {
     assert(this._owner, `This function requires an active wallet connection.`);
 
-    const erc20TxFactory = await ERC20TxFactory.create(this._owner, token);
-
-    const tokenApprovalTx = await erc20TxFactory.approve(
-      this._addressDriverTxFactory.driverAddress,
-      constants.MaxUint256,
-    );
+    const tokenApprovalTx = await populateErc20WriteTx({
+      token: token as OxString,
+      functionName: 'approve',
+      args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
+    });
 
     return tokenApprovalTx;
   }
@@ -400,10 +366,10 @@ export default class DripListService {
   // We use the count of *all* NFT sub-accounts to generate the salt for the Drip List ID.
   // This is because we want to avoid making HTTP requests to the subgraph for each NFT sub-account to check if it's a Drip List.
   private _calcSaltFromAddress = (address: string, listCount: number): bigint /* 64bit */ => {
-    const hash = ethers.utils.keccak256(
-      ethers.utils.defaultAbiCoder.encode(['string'], [this.SEED_CONSTANT + address]),
+    const hash = ethers.keccak256(
+      ethers.AbiCoder.defaultAbiCoder().encode(['string'], [this.SEED_CONSTANT + address]),
     );
-    const randomBigInt = ethers.BigNumber.from('0x' + hash.slice(26));
+    const randomBigInt = ethers.toBigInt('0x' + hash.slice(26));
 
     let random64BitBigInt = BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
 

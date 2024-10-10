@@ -19,7 +19,7 @@ import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
-import type { ClaimProjectFlowProject_UnclaimedProject_Fragment } from './__generated__/gql.generated';
+import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
@@ -29,9 +29,7 @@ export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   fragment ClaimProjectFlowProject on Project {
     ...EnterGitUrlStepProject
     ...AddEthereumAddressStepProject
-    ... on UnclaimedProject {
-      ...ReviewStepUnclaimedProject
-    }
+    ...ReviewStepUnclaimedProject
   }
 `;
 
@@ -44,7 +42,7 @@ export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
   isPartiallyClaimed: boolean;
-  project: ClaimProjectFlowProject_UnclaimedProject_Fragment | undefined;
+  project: ClaimProjectFlowProjectFragment | undefined;
   projectMetadata:
     | {
         starCount: number;

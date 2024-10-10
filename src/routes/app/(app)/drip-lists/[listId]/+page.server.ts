@@ -6,11 +6,10 @@ import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.
 import { DRIP_LIST_PAGE_FRAGMENT } from './+page.svelte';
 import * as multiplayer from '$lib/utils/multiplayer';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-import {
-  mapSplitsFromMultiplayerResults,
-  type SplitsComponentSplitsReceiver,
-} from '$lib/components/splits/splits.svelte';
 import type { Items } from '$lib/components/list-editor/types';
+import network from '$lib/stores/wallet/network';
+import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
+import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 
 export const load = (async ({ params, fetch }) => {
   const { listId } = params;
@@ -52,6 +51,7 @@ export const load = (async ({ params, fetch }) => {
       votingRounds: { current: votingRound, past: [] },
       incomingSplitsTotal: [],
       blockWhileInitializing: false,
+      preservePathOnNetworkChange: false,
     };
   }
 
@@ -60,8 +60,8 @@ export const load = (async ({ params, fetch }) => {
 
   const dripListQuery = gql`
     ${DRIP_LIST_PAGE_FRAGMENT}
-    query DripList($listId: ID!) {
-      dripList(id: $listId) {
+    query DripList($listId: ID!, $chain: SupportedChain!) {
+      dripList(id: $listId, chain: $chain) {
         ...DripListPage
       }
     }
@@ -98,7 +98,11 @@ export const load = (async ({ params, fetch }) => {
   }
 
   const fetches = await Promise.all([
-    query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch),
+    query<DripListQuery, DripListQueryVariables>(
+      dripListQuery,
+      { listId, chain: network.gqlName },
+      fetch,
+    ),
     getVotingRoundForList(listId),
   ] as const);
 
@@ -108,5 +112,6 @@ export const load = (async ({ params, fetch }) => {
     dripList: fetches[0].dripList,
     votingRounds: fetches[1],
     blockWhileInitializing: false,
+    preservePathOnNetworkChange: false,
   };
 }) satisfies PageServerLoad;

@@ -1,15 +1,16 @@
 import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { getAddressDriverClient, getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-import { constants } from 'ethers';
-import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
+import { MaxUint256 } from 'ethers';
+import type { OxString } from '$lib/utils/sdk/sdk-types';
+import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import unreachable from '$lib/utils/unreachable';
 import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
+import network from '$lib/stores/wallet/network';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -33,10 +34,7 @@ export default function (
       headline: `Add ${tokenInfo?.symbol}`,
       description: `Add funds to your Drips account’s outgoing balance`,
       before: async () => {
-        const client = await getAddressDriverClient();
-        const txFactory = await getAddressDriverTxFactory();
-
-        const { address, signer } = get(walletStore);
+        const { address } = get(walletStore);
 
         assert(address, 'User is not connected to wallet');
         assert(
@@ -47,32 +45,31 @@ export default function (
         const needApproval = tokenAllowance < amountToTopUp;
 
         const setStreamsPopulatedTx = await buildBalanceChangePopulatedTx(
-          client,
           tokenAddress,
           amountToTopUp,
         );
 
         delete setStreamsPopulatedTx.gasLimit;
 
-        const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
-        const approvePopulatedTx = await erc20TxFactory.approve(
-          txFactory.driverAddress,
-          constants.MaxUint256,
-        );
+        const tokenApprovalTx = await populateErc20WriteTx({
+          token: tokenAddress as OxString,
+          functionName: 'approve',
+          args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
+        });
 
         return {
           setStreamsPopulatedTx,
-          approvePopulatedTx,
+          tokenApprovalTx,
           needApproval,
           tokenAddress,
         };
       },
 
-      transactions: ({ setStreamsPopulatedTx, approvePopulatedTx, needApproval }) => [
+      transactions: ({ setStreamsPopulatedTx, tokenApprovalTx, needApproval }) => [
         ...(needApproval
           ? [
               {
-                transaction: approvePopulatedTx,
+                transaction: tokenApprovalTx,
                 title: `Approve Drips to withdraw ${tokenInfo.symbol}`,
                 applyGasBuffer: false,
               },

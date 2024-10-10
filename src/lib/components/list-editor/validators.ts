@@ -1,4 +1,4 @@
-import { isAddress } from 'ethers/lib/utils';
+import { isAddress } from 'ethers';
 import ensStore from '../../stores/ens/ens.store';
 
 export const reformatUrl = (url: string): string => {

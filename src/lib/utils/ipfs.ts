@@ -2,10 +2,13 @@ import { PUBLIC_PINATA_GATEWAY_URL } from '$env/static/public';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import expect from './expect';
+import filterCurrentChainData from './filter-current-chain-data';
+import unreachable from './unreachable';
 import type {
   LatestAccountMetadataHashQuery,
   LatestAccountMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
+import network from '$lib/stores/wallet/network';
 
 /**
  * Fetch the given hash from IPFS.
@@ -63,17 +66,22 @@ export async function waitForAccountMetadata(
         LatestAccountMetadataHashQueryVariables
       >(
         gql`
-          query LatestAccountMetadataHash($accountId: ID!) {
-            userById(accountId: $accountId) {
-              latestMetadataIpfsHash
+          query LatestAccountMetadataHash($accountId: ID!, $chains: [SupportedChain!]) {
+            userById(accountId: $accountId, chains: $chains) {
+              chainData {
+                chain
+                latestMetadataIpfsHash
+              }
             }
           }
         `,
-        { accountId },
+        { accountId, chains: [network.gqlName] },
         f,
       );
 
-      return res.userById?.latestMetadataIpfsHash;
+      const chainData = filterCurrentChainData(res.userById?.chainData || unreachable());
+
+      return chainData.latestMetadataIpfsHash;
     },
     (result) => expectedIpfsHash === result,
   );

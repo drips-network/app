@@ -3,7 +3,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/splits.svelte';
+  import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
   import type { State } from './view-voting-round-flow-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();

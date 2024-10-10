@@ -19,11 +19,9 @@
   import Token from '$lib/components/token/token.svelte';
   import tokens from '$lib/stores/tokens';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import unreachable from '$lib/utils/unreachable';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { constants } from 'radicle-drips';
   import type { Writable } from 'svelte/store';
   import type { WithdrawFlowState } from './withdraw-flow-state';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
@@ -37,6 +35,7 @@
     CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT,
     streamCurrentAmountsStore,
   } from '../../utils/current-amounts';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -60,7 +59,7 @@
       validationState = { type: 'valid' };
     } else if (amountWei && amountWei > 0n) {
       if (
-        amountWei * BigInt(constants.AMT_PER_SEC_MULTIPLIER) <
+        amountWei * BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER) <
         $currentAmountsStore.currentAmount.amount
       ) {
         validationState = { type: 'valid' };
@@ -91,19 +90,13 @@
           },
         },
         before: async () => {
-          const assetDriverClient = await getAddressDriverClient();
-
           const MAX_INT_128 = 170141183460469231731687303715884105728n;
 
           const amountToWithdraw = $context.withdrawAll
             ? -MAX_INT_128
             : -(amountWei ?? unreachable());
 
-          const tx = await buildBalanceChangePopulatedTx(
-            assetDriverClient,
-            tokenInfo.info.address,
-            amountToWithdraw,
-          );
+          const tx = await buildBalanceChangePopulatedTx(tokenInfo.info.address, amountToWithdraw);
 
           return {
             tx,

@@ -15,7 +15,8 @@
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import AddCustomTokenButton from './components/add-custom-token-button.svelte';
-  import nextSettlementDate from '$lib/utils/settlement-date';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher();
 
@@ -69,6 +70,19 @@
 
   $: canCollect = Object.values(selectorItems ?? {}).length > 0;
 
+  $: shouldAutoUnwrap = shouldShowAutoUnwrapToggle;
+
+  $: shouldShowAutoUnwrapToggle = splittable.some((s) => {
+    // Not all chains have the unwrapping helper contract deployed
+    if (!network.contracts.NATIVE_TOKEN_UNWRAPPER) return false;
+
+    const token = tokensStore.getByAddress(s.tokenAddress);
+
+    return network.autoUnwrapPairs?.find(
+      (p) => p.nativeSymbol === token?.info.symbol || p.wrappedSymbol === token?.info.symbol,
+    );
+  });
+
   let selected =
     mapFilterUndefined(splittable, (s) => {
       const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
@@ -77,7 +91,7 @@
     }) ?? [];
 
   function submit() {
-    batchCollect(selected, dispatch);
+    batchCollect(selected, dispatch, shouldAutoUnwrap);
   }
 </script>
 
@@ -107,8 +121,7 @@
         <InfoCircle />
         <svelte:fragment slot="tooltip-content">
           <p>
-            Funds from projects, streams and Drip Lists settle and become collectable on the last
-            Thursday of each month.
+            {network.settlement.explainerText}
             <a
               target="_blank"
               rel="noreferrer"
@@ -119,8 +132,17 @@
         </svelte:fragment>
       </Tooltip>
     </div>
-    <p class="typo-text-bold">{formatDate(nextSettlementDate(), 'onlyDay')}</p>
+    <p class="typo-text-bold">{formatDate(network.settlement.nextSettlementDate(), 'onlyDay')}</p>
   </div>
+  {#if shouldShowAutoUnwrapToggle}
+    <div class="unwrap-toggle">
+      <Toggle bind:checked={shouldAutoUnwrap} />
+      <div class="unwrap-description">
+        <p>Unwrap supported tokens upon collection</p>
+        <p>For example WETH -> ETH</p>
+      </div>
+    </div>
+  {/if}
   <svelte:fragment slot="actions">
     {#if canCollect}
       <Button on:click={modal.hide} variant="ghost">Never mind</Button>
@@ -158,5 +180,26 @@
   .learn-more {
     color: var(--color-foreground-level-6);
     text-decoration: underline;
+  }
+
+  .unwrap-toggle {
+    display: flex;
+    align-items: center;
+  }
+
+  .unwrap-description {
+    display: flex;
+    align-items: baseline;
+    flex-direction: column;
+    margin-left: 1rem;
+    gap: 0.25rem;
+  }
+
+  .unwrap-description p {
+    line-height: 22px;
+  }
+
+  .unwrap-description p:last-child {
+    color: var(--color-foreground-level-5);
   }
 </style>

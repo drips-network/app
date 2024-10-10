@@ -1,4 +1,5 @@
 import { type Items, type Weights } from '$lib/components/list-editor/types';
+import { gql } from 'graphql-request';
 import { makeStep } from '$lib/components/stepper/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
@@ -7,7 +8,6 @@ import EditDependencyList from './steps/edit-dependency-list.svelte';
 import Review from './steps/review.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { gql } from 'graphql-request';
 import type {
   EditProjectSplitsFlowAddressReceiverFragment,
   EditProjectSplitsFlowDripListReceiverFragment,
@@ -30,6 +30,13 @@ export const EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT = gql`
 export const EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT = gql`
   ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT}
   fragment EditProjectSplitsFlowProjectReceiver on ProjectReceiver {
+    weight
+    project {
+      ...ListEditorProject
+      account {
+        accountId
+      }
+    }
     ...SplitReceiversToListEditorConfigProjectReceiver
   }
 `;

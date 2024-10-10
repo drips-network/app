@@ -6,9 +6,11 @@ import {
 import query from '$lib/graphql/dripsQL';
 import type { TokenPageQuery, TokenPageQueryVariables } from './__generated__/gql.generated';
 import { error, redirect } from '@sveltejs/kit';
-import { isAddress } from 'ethers/lib/utils';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
+import { isAddress } from 'ethers';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 export const load = async ({ fetch, params }) => {
   const connectedAddress = getConnectedAddress();
@@ -24,13 +26,16 @@ export const load = async ({ fetch, params }) => {
   const tokenPageQuery = gql`
     ${TOKEN_PAGE_USER_BALANCES_FRAGMENT}
     ${TOKEN_PAGE_USER_STREAMS_FRAGMENT}
-    query TokenPage($address: String!) {
-      userByAddress(address: $address) {
-        balances {
-          ...TokenPageUserBalances
-        }
-        streams {
-          ...TokenPageUserStreams
+    query TokenPage($address: String!, $chains: [SupportedChain!]) {
+      userByAddress(address: $address, chains: $chains) {
+        chainData {
+          chain
+          balances {
+            ...TokenPageUserBalances
+          }
+          streams {
+            ...TokenPageUserStreams
+          }
         }
       }
     }
@@ -38,13 +43,15 @@ export const load = async ({ fetch, params }) => {
 
   const res = await query<TokenPageQuery, TokenPageQueryVariables>(
     tokenPageQuery,
-    { address: connectedAddress },
+    { address: connectedAddress, chains: [network.gqlName] },
     fetch,
   );
 
+  const chainData = filterCurrentChainData(res.userByAddress.chainData);
+
   return {
-    balances: res.userByAddress.balances,
-    streams: res.userByAddress.streams,
+    balances: chainData.balances,
+    streams: chainData.streams,
   };
 };
 

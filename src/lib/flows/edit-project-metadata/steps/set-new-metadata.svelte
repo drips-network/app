@@ -1,19 +1,23 @@
 <script lang="ts" context="module">
   export const SET_NEW_METADATA_STEP_FRAGMENT = gql`
     ${PROJECT_CUSTOMIZER_FRAGMENT}
-    fragment SetNewMetadataStep on ClaimedProject {
+    fragment SetNewMetadataStep on Project {
       ...ProjectCustomizer
-      avatar {
-        ... on EmojiAvatar {
-          emoji
-        }
-        ... on ImageAvatar {
-          cid
-        }
-      }
-      color
       account {
         accountId
+      }
+      chainData {
+        ... on ClaimedProjectData {
+          avatar {
+            ... on EmojiAvatar {
+              emoji
+            }
+            ... on ImageAvatar {
+              cid
+            }
+          }
+          color
+        }
       }
     }
   `;
@@ -31,25 +35,25 @@
   import { writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import { getRepoDriverTxFactory } from '$lib/utils/get-drips-clients';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { gql } from 'graphql-request';
   import type { SetNewMetadataStepFragment } from './__generated__/gql.generated';
   import type { LatestVersion } from '@efstajas/versioned-parser';
   import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
-  import { Utils } from 'radicle-drips';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
+  import { toBigInt } from 'ethers';
+  import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let project: SetNewMetadataStepFragment;
+  $: projectChainData = filterCurrentChainData(project.chainData, 'claimed');
 
-  let projectWritable = writable(structuredClone(project));
-
-  $: changesMade =
-    project.avatar !== $projectWritable.avatar || project.color !== $projectWritable.color;
+  $: projectDataWritable = writable(structuredClone(projectChainData));
 
   let valid = false;
 
@@ -71,32 +75,31 @@
           const newMetadata: LatestVersion<typeof repoDriverAccountMetadataParser> = {
             ...upgraded,
             avatar:
-              $projectWritable.avatar.__typename === 'EmojiAvatar'
+              $projectDataWritable.avatar.__typename === 'EmojiAvatar'
                 ? {
                     type: 'emoji',
-                    emoji: $projectWritable.avatar.emoji,
+                    emoji: $projectDataWritable.avatar.emoji,
                   }
                 : {
                     type: 'image',
-                    cid: $projectWritable.avatar.cid,
+                    cid: $projectDataWritable.avatar.cid,
                   },
-            color: $projectWritable.color,
+            color: $projectDataWritable.color,
           };
 
-          const upgradedMetadata = metadataManager.upgradeAccountMetadata(newMetadata);
-
-          const ipfsHash = await metadataManager.pinAccountMetadata(upgradedMetadata);
+          const ipfsHash = await metadataManager.pinAccountMetadata(newMetadata);
 
           const accountMetadataAsBytes = [
             {
               key: MetadataManagerBase.USER_METADATA_KEY,
               value: ipfsHash,
             },
-          ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value));
+          ].map(keyValueToMetatada);
 
-          const txFactory = await getRepoDriverTxFactory();
-
-          const tx = await txFactory.emitAccountMetadata(accountId, accountMetadataAsBytes);
+          const tx = await populateRepoDriverWriteTx({
+            functionName: 'emitAccountMetadata',
+            args: [toBigInt(accountId), accountMetadataAsBytes],
+          });
 
           return { tx, ipfsHash, accountId };
         },
@@ -116,9 +119,9 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer bind:valid project={projectWritable} />
+  <ProjectCustomizer bind:valid originalProject={project} newProjectData={projectDataWritable} />
   <svelte:fragment slot="actions">
-    <Button on:click={submit} disabled={!changesMade || !valid} variant="primary" icon={Wallet}
+    <Button on:click={submit} disabled={!valid} variant="primary" icon={Wallet}
       >Confirm changes</Button
     >
   </svelte:fragment>

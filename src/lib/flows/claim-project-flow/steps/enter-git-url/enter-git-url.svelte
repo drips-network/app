@@ -6,13 +6,15 @@
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     fragment EnterGitUrlStepProject on Project {
       ...UnclaimedProjectCard
-      ... on UnclaimedProject {
-        verificationStatus
-        account {
-          accountId
-        }
-        withdrawableBalances {
-          tokenAddress
+      account {
+        accountId
+      }
+      chainData {
+        ... on UnClaimedProjectData {
+          verificationStatus
+          withdrawableBalances {
+            tokenAddress
+          }
         }
       }
     }
@@ -41,6 +43,8 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import possibleColors from '$lib/utils/project/possible-colors';
   import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
   import type { GetRepoResponse } from '../../../../../routes/api/github/[repoUrl]/+server';
   import isClaimed from '$lib/utils/project/is-claimed';
 
@@ -67,8 +71,8 @@
 
   const projectQuery = gql`
     ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
-    query Project($url: String!) {
-      projectByUrl(url: $url) {
+    query Project($url: String!, $chains: [SupportedChain!]) {
+      projectByUrl(url: $url, chains: $chains) {
         ...ClaimProjectFlowProject
       }
     }
@@ -126,17 +130,19 @@
         await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
           url: gitUrl,
         })
-      ).projectByUrl;
+      ).projectByUrl?.chainData;
 
       if (!wronglyCasedProject) {
         return { result: realUrl };
       }
 
-      if (isClaimed(wronglyCasedProject)) {
+      const wronglyCasedProjectChainData = filterCurrentChainData(wronglyCasedProject);
+      if (isClaimed(wronglyCasedProjectChainData)) {
         return { result: realUrl };
       }
 
-      const wronglyCasedProjectHasFunds = wronglyCasedProject.withdrawableBalances.length > 0;
+      const wronglyCasedProjectHasFunds =
+        wronglyCasedProjectChainData.withdrawableBalances.length > 0;
 
       return wronglyCasedProjectHasFunds ? { result: gitUrl } : { result: realUrl };
     }
@@ -170,6 +176,7 @@
 
       const response = await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
         url: $context.gitUrl,
+        chains: [network.gqlName],
       });
 
       const project = response.projectByUrl;
@@ -178,13 +185,15 @@
         throw new InvalidUrlError("Repo doesn't exist or is private");
       }
 
-      if (project.__typename === 'ClaimedProject') {
+      const projectChainData = filterCurrentChainData(project.chainData);
+
+      if (projectChainData.__typename === 'ClaimedProjectData') {
         throw new InvalidUrlError('Project already claimed');
       }
 
       if (
-        project.__typename === 'UnclaimedProject' &&
-        project.verificationStatus === ProjectVerificationStatus.PendingMetadata
+        projectChainData.__typename === 'UnClaimedProjectData' &&
+        projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata
       ) {
         $context.isPartiallyClaimed = true;
       }

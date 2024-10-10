@@ -8,12 +8,17 @@ import {
   ProjectVerificationStatus,
   SortDirection,
 } from '$lib/graphql/__generated__/base-types';
+import network from '$lib/stores/wallet/network';
 
 export const load = (async ({ fetch }) => {
   const projectsQuery = gql`
     ${PROJECTS_LISTINGS_ITEM_FRAGMENT}
-    query Projects($where: ProjectWhereInput, $sort: ProjectSortInput) {
-      projects(where: $where, sort: $sort) {
+    query Projects(
+      $where: ProjectWhereInput
+      $sort: ProjectSortInput
+      $chains: [SupportedChain!]!
+    ) {
+      projects(chains: $chains, where: $where, sort: $sort) {
         ...ProjectsListingsItem
       }
     }
@@ -30,9 +35,11 @@ export const load = (async ({ fetch }) => {
           direction: SortDirection.Desc,
           field: ProjectSortField.ClaimedAt,
         },
+        chains: [network.gqlName],
       },
       fetch,
     ),
     blockWhileInitializing: false,
+    preservePathOnNetworkChange: true,
   };
 }) satisfies PageServerLoad;

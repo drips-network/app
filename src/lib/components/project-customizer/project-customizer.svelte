@@ -1,17 +1,23 @@
 <script lang="ts" context="module">
+  import { PROJECT_PROFILE_HEADER_FRAGMENT } from '../project-profile-header/project-profile-header.svelte';
+
   export const PROJECT_CUSTOMIZER_FRAGMENT = gql`
     ${PROJECT_PROFILE_HEADER_FRAGMENT}
-    fragment ProjectCustomizer on ClaimedProject {
+    fragment ProjectCustomizer on Project {
       ...ProjectProfileHeader
-      avatar {
-        ... on EmojiAvatar {
-          emoji
-        }
-        ... on ImageAvatar {
-          cid
+      chainData {
+        ... on ClaimedProjectData {
+          avatar {
+            ... on EmojiAvatar {
+              emoji
+            }
+            ... on ImageAvatar {
+              cid
+            }
+          }
+          color
         }
       }
-      color
     }
   `;
 </script>
@@ -21,18 +27,23 @@
   import possibleColors from '$lib/utils/project/possible-colors';
   import type { Writable } from 'svelte/store';
   import FormField from '../form-field/form-field.svelte';
-  import ProjectProfileHeader, {
-    PROJECT_PROFILE_HEADER_FRAGMENT,
-  } from '../project-profile-header/project-profile-header.svelte';
+  import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectCustomizerFragment } from './__generated__/gql.generated';
   import FileUpload from '../custom-avatar-upload/custom-avatar-upload.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import twemoji from '$lib/utils/twemoji';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let project: Writable<ProjectCustomizerFragment>;
+  export let originalProject: ProjectCustomizerFragment;
+  export let newProjectData: Writable<
+    ReturnType<
+      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+    >
+  >;
 
-  let selectedEmoji = $project.avatar.__typename === 'EmojiAvatar' ? $project.avatar.emoji : '💧';
+  let activeTab: 'tab-1' | 'tab-2' =
+    $newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
 
   let searchTerm = '';
   $: filteredEmoji = emoji.filter((e) => {
@@ -43,51 +54,72 @@
     );
   });
 
-  let lastUploadedAvatarCid: string | undefined =
-    $project.__typename === 'ClaimedProject' && $project.avatar.__typename === 'ImageAvatar'
-      ? $project.avatar.cid
-      : undefined;
-  $: {
-    if (lastUploadedAvatarCid && activeTab === 'tab-2') {
-      $project.avatar = {
-        __typename: 'ImageAvatar',
-        cid: lastUploadedAvatarCid,
-      };
-    }
+  let selectedEmoji =
+    $newProjectData.avatar.__typename === 'EmojiAvatar' ? $newProjectData.avatar.emoji : '💧';
+  function handleEmojiChange(newEmoji: string) {
+    $newProjectData.avatar = {
+      __typename: 'EmojiAvatar',
+      emoji: newEmoji,
+    };
   }
+  $: handleEmojiChange(selectedEmoji);
 
+  let selectedColor = $newProjectData.color;
+  function handleColorChange(newColor: string) {
+    $newProjectData.color = newColor;
+  }
+  $: handleColorChange(selectedColor);
+
+  let lastUploadedCid =
+    $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined;
   function handleFileUpload(e: CustomEvent<{ ipfsCid: string }>) {
     if (activeTab !== 'tab-2') {
       return;
     }
 
-    lastUploadedAvatarCid = e.detail.ipfsCid;
+    lastUploadedCid = e.detail.ipfsCid;
+
+    $newProjectData.avatar = {
+      __typename: 'ImageAvatar',
+      cid: lastUploadedCid,
+    };
   }
 
-  let activeTab = $project.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
-
-  $: {
-    if (activeTab === 'tab-1') {
-      $project.avatar = {
+  function handleTabChange(newTab: 'tab-1' | 'tab-2', lastUploadedCid: string | undefined) {
+    if (newTab === 'tab-1') {
+      $newProjectData.avatar = {
         __typename: 'EmojiAvatar',
         emoji: selectedEmoji,
       };
+    } else if (newTab === 'tab-2' && lastUploadedCid) {
+      $newProjectData = {
+        ...$newProjectData,
+        avatar: {
+          __typename: 'ImageAvatar',
+          cid: lastUploadedCid,
+        },
+      };
+    } else {
+      return;
     }
   }
+  $: handleTabChange(activeTab, lastUploadedCid);
 
   export let valid = false;
-  $: valid = Boolean(activeTab === 'tab-1' || lastUploadedAvatarCid);
-
-  let selectedColor = $project.color;
-  $: $project.color = selectedColor;
+  $: valid = Boolean(activeTab === 'tab-1' || lastUploadedCid);
 </script>
 
 <div class="project-customizer">
   <FormField type="div">
-    <ProjectProfileHeader
-      pendingAvatar={activeTab === 'tab-2' && !lastUploadedAvatarCid}
-      project={$project}
-    />
+    <div style:pointer-events="none">
+      <ProjectProfileHeader
+        pendingAvatar={activeTab === 'tab-2' && !lastUploadedCid}
+        project={{
+          ...originalProject,
+          chainData: [$newProjectData],
+        }}
+      />
+    </div>
   </FormField>
 
   <TabbedBox bind:activeTab ariaLabel="Avatar settings" border={true}>

@@ -24,10 +24,13 @@
           ...DripVisualAddressDriverAccount
           accountId
         }
-        balances {
-          tokenAddress
-          outgoing {
-            ...CurrentAmountsUserBalanceTimelineItem
+        chainData {
+          chain
+          balances {
+            tokenAddress
+            outgoing {
+              ...CurrentAmountsUserBalanceTimelineItem
+            }
           }
         }
       }
@@ -100,10 +103,12 @@
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data: PageData;
   let stream: StreamPageStreamFragment;
   $: stream = data.stream;
+  $: streamChainData = filterCurrentChainData(stream.sender.chainData);
 
   $: currentStreamAmounts = streamCurrentAmountsStore(
     stream.timeline,
@@ -139,7 +144,7 @@
     return () => clearInterval(interval);
   });
 
-  $: senderOutgoingBalanceTimeline = stream.sender.balances.find(
+  $: senderOutgoingBalanceTimeline = streamChainData.balances.find(
     (b) => b.tokenAddress.toLowerCase() === tokenAddress,
   )?.outgoing;
   $: senderOutgoingBalance = senderOutgoingBalanceTimeline

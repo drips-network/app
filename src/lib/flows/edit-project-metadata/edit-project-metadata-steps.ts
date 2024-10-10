@@ -8,7 +8,7 @@ import type { EditProjectMetadataFlowFragment } from './__generated__/gql.genera
 
 export const EDIT_PROJECT_METADATA_FLOW_FRAGMENT = gql`
   ${SET_NEW_METADATA_STEP_FRAGMENT}
-  fragment EditProjectMetadataFlow on ClaimedProject {
+  fragment EditProjectMetadataFlow on Project {
     ...SetNewMetadataStep
   }
 `;

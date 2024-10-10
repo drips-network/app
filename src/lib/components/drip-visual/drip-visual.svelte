@@ -17,17 +17,9 @@
     ${IDENTITY_CARD_PROJECT_FRAGMENT}
     fragment DripVisualProject on Project {
       ...IdentityCardProject
-      ... on UnclaimedProject {
-        account {
-          driver
-          accountId
-        }
-      }
-      ... on ClaimedProject {
-        account {
-          driver
-          accountId
-        }
+      account {
+        driver
+        accountId
       }
     }
   `;
@@ -73,6 +65,7 @@
     DripVisualUserFragment,
   } from './__generated__/gql.generated';
   import { browser } from '$app/environment';
+  import network from '$lib/stores/wallet/network';
 
   export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
   export let to:
@@ -109,8 +102,8 @@
   async function fetchDripList(accountId: string) {
     const dripListNameQuery = gql`
       ${IDENTITY_CARD_DRIP_LIST_FRAGMENT}
-      query DripListName($id: ID!) {
-        dripList(id: $id) {
+      query DripListName($id: ID!, $chain: SupportedChain!) {
+        dripList(id: $id, chain: $chain) {
           ...IdentityCardDripList
         }
       }
@@ -118,6 +111,7 @@
 
     const result = await query<DripListNameQuery, DripListNameQueryVariables>(dripListNameQuery, {
       id: accountId,
+      chain: network.gqlName,
     });
 
     return result.dripList;
@@ -164,7 +158,7 @@
           <IdentityCard dripList={result} title="To" />
         {/if}
       {/await}
-    {:else if (to && to.__typename === 'ClaimedProject') || (to && to.__typename === 'UnclaimedProject')}
+    {:else if to && to.__typename === 'Project'}
       <IdentityCard disableLink={disableLinks} project={to} title="To" />
     {:else if to && to.__typename === 'DripList'}
       <IdentityCard disableLink={disableLinks} dripList={to} title="To" />

@@ -1,7 +1,6 @@
-import type { BaseProvider } from '@ethersproject/providers';
-import type { ethers } from 'ethers';
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import type { AbstractProvider } from 'ethers';
 
 export interface ResolvedRecord {
   name?: string;
@@ -16,14 +15,14 @@ export default (() => {
   const state = writable<State>({});
   const connected = writable(false);
 
-  let provider: ethers.providers.BaseProvider | undefined;
+  let provider: AbstractProvider | undefined;
 
   /**
    * Connect the store to a provider, which is needed in order to resolve ENS
    * records.
    * @param toProvider The provider to connect to.
    */
-  function connect(toProvider: BaseProvider) {
+  function connect(toProvider: AbstractProvider) {
     provider = toProvider;
     connected.set(true);
   }
@@ -40,23 +39,29 @@ export default (() => {
     // Initially write an empty object to prevent multiple in-flight requests
     // for the same name
     state.update((s) => ({ ...s, [address]: {} }));
+    try {
+      const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
 
-    const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
+      const [name, avatarUrl] = await Promise.all(lookups);
 
-    const [name, avatarUrl] = await Promise.all(lookups);
+      if (name || avatarUrl) {
+        const resolvedRecord = {
+          name: name ?? undefined,
+          avatarUrl: avatarUrl ?? undefined,
+        };
 
-    if (name || avatarUrl) {
-      const resolvedRecord = {
-        name: name ?? undefined,
-        avatarUrl: avatarUrl ?? undefined,
-      };
+        state.update((s) => ({
+          ...s,
+          [address]: resolvedRecord,
+        }));
 
-      state.update((s) => ({
-        ...s,
-        [address]: resolvedRecord,
-      }));
+        return resolvedRecord;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('Failed to resolve ENS name:', error); // eslint-disable-line no-console
 
-      return resolvedRecord;
+      return undefined;
     }
   }
 

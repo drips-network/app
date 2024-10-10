@@ -1,5 +1,5 @@
-import { constants } from 'radicle-drips';
 import type { TextInputValidationState } from '$lib/components/text-input/text-input';
+import contractConstants from './sdk/utils/contract-constants';
 
 /**
  * Constant representation of Drips's cycle_secs value. This value
@@ -19,7 +19,7 @@ const CYCLE_SECS = 604800;
  */
 export default function validateAmtPerSec(amtPerSec: bigint) {
   const amtPerCycle = amtPerSec * BigInt(CYCLE_SECS);
-  const weiPerCycle = amtPerCycle / BigInt(constants.AMT_PER_SEC_MULTIPLIER);
+  const weiPerCycle = amtPerCycle / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER);
 
   return weiPerCycle >= 1n;
 }

@@ -8,16 +8,19 @@ import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
 import { redis } from '../../../../../../../api/redis';
-import { getRepoDriverClient } from '$lib/utils/get-drips-clients';
-import { Forge } from 'radicle-drips';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
+import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
+import { hexlify, toUtf8Bytes } from 'ethers';
+import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
     ${PROJECT_PROFILE_FRAGMENT}
-    query ProjectByUrl($url: String!) {
-      projectByUrl(url: $url) {
+    query ProjectByUrl($url: String!, $chains: [SupportedChain!]!) {
+      projectByUrl(url: $url, chains: $chains) {
         ...ProjectProfile
       }
     }
@@ -26,9 +29,10 @@ async function fetchDripsProject(repoUrl: string) {
   const url = new URL(repoUrl);
   const [, owner, repo] = url.pathname.split('/');
 
-  const repoDriverClient = await getRepoDriverClient();
-
-  const accountId = await repoDriverClient.getAccountId(Forge.GitHub, `${owner}/${repo}`);
+  const accountId = await executeRepoDriverReadMethod({
+    functionName: 'calcAccountId',
+    args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as OxString],
+  });
 
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
 
@@ -37,6 +41,7 @@ async function fetchDripsProject(repoUrl: string) {
       getProjectsQuery,
       {
         url: repoUrl,
+        chains: [network.gqlName],
       },
       fetch,
     ),
@@ -82,6 +87,8 @@ export const load = (async ({ params, fetch, url }) => {
     throw error(404);
   }
 
+  const projectChainData = filterCurrentChainData(project.chainData);
+
   const repoResJson = await repoRes.json();
 
   if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
@@ -102,7 +109,7 @@ export const load = (async ({ params, fetch, url }) => {
     return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
   }
 
-  if (isClaimed(project) && !project.splits) {
+  if (isClaimed(projectChainData) && !projectChainData.splits) {
     throw new Error('Claimed project somehow does not have splits');
   }
 
@@ -134,5 +141,6 @@ export const load = (async ({ params, fetch, url }) => {
     newRepo,
     correctCasingRepo,
     blockWhileInitializing: false,
+    preservePathOnNetworkChange: true,
   };
 }) satisfies PageServerLoad;

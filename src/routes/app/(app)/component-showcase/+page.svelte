@@ -20,7 +20,7 @@
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import SplitsComponent, { type Splits } from '$lib/components/splits/splits.svelte';
+  import SplitsComponent from '$lib/components/splits/splits.svelte';
   import VisualPercentageEditor from '$lib/components/visual-percentage-editor/visual-percentage-editor.svelte';
   import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
@@ -41,6 +41,8 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
   import User from '$lib/components/icons/User.svelte';
+  import network from '$lib/stores/wallet/network';
+  import type { Splits } from '$lib/components/splits/types';
 
   // Button
   let disabled = false;
@@ -103,22 +105,36 @@
   let draftMode = false;
 
   const MOCK_PROJECT_1: Project = {
-    __typename: 'ClaimedProject',
-    latestMetadataIpfsHash: '',
-    totalEarned: [],
-    withdrawableBalances: [],
-    support: [],
-    verificationStatus: ProjectVerificationStatus.Claimed,
+    __typename: 'Project',
+    chainData: [
+      {
+        __typename: 'ClaimedProjectData',
+        chain: network.gqlName,
+        latestMetadataIpfsHash: '',
+        totalEarned: [],
+        withdrawableBalances: [],
+        support: [],
+        verificationStatus: ProjectVerificationStatus.Claimed,
+        owner: {
+          __typename: 'AddressDriverAccount',
+          driver: Driver.Address,
+          accountId: '0',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        },
+        avatar: {
+          __typename: 'EmojiAvatar',
+          emoji: '🚶',
+        },
+        emoji: '🚶',
+        color: '#fcc842',
+        splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
+        claimedAt: 1234,
+      },
+    ],
     account: {
       __typename: 'RepoDriverAccount',
       accountId: '0',
       driver: Driver.Repo,
-    },
-    owner: {
-      __typename: 'AddressDriverAccount',
-      driver: Driver.Address,
-      accountId: '0',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
       __typename: 'Source',
@@ -127,33 +143,40 @@
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
-    avatar: {
-      __typename: 'EmojiAvatar',
-      emoji: '🚶',
-    },
-    emoji: '🚶',
-    color: '#fcc842',
-    splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
-    claimedAt: 1234,
   };
 
   const MOCK_PROJECT_2: Project = {
-    __typename: 'ClaimedProject',
-    latestMetadataIpfsHash: '',
-    totalEarned: [],
-    withdrawableBalances: [],
-    support: [],
-    verificationStatus: ProjectVerificationStatus.Claimed,
+    __typename: 'Project',
+    chainData: [
+      {
+        __typename: 'ClaimedProjectData',
+        chain: network.gqlName,
+        latestMetadataIpfsHash: '',
+        totalEarned: [],
+        withdrawableBalances: [],
+        support: [],
+        verificationStatus: ProjectVerificationStatus.Claimed,
+
+        owner: {
+          __typename: 'AddressDriverAccount',
+          driver: Driver.Address,
+          accountId: '0',
+          address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+        },
+        avatar: {
+          __typename: 'EmojiAvatar',
+          emoji: '💾',
+        },
+        emoji: '💾',
+        color: '#FF0000',
+        splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
+        claimedAt: 1234,
+      },
+    ],
     account: {
       __typename: 'RepoDriverAccount',
       accountId: '0',
       driver: Driver.Repo,
-    },
-    owner: {
-      __typename: 'AddressDriverAccount',
-      driver: Driver.Address,
-      accountId: '0',
-      address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
     },
     source: {
       __typename: 'Source',
@@ -162,14 +185,6 @@
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
-    avatar: {
-      __typename: 'EmojiAvatar',
-      emoji: '💾',
-    },
-    emoji: '💾',
-    color: '#FF0000',
-    splits: { __typename: 'Splits', maintainers: [], dependencies: [] },
-    claimedAt: 1234,
   };
 
   const mockSplits: Splits = [
@@ -182,6 +197,7 @@
       __typename: 'DripListReceiver',
       dripList: {
         __typename: 'DripList',
+        chain: network.gqlName,
         account: {
           __typename: 'NftDriverAccount',
           accountId: '1234',
@@ -219,6 +235,7 @@
               __typename: 'DripListReceiver',
               dripList: {
                 __typename: 'DripList',
+                chain: network.gqlName,
                 name: 'A different Drip List',
                 owner: {
                   __typename: 'AddressDriverAccount',
@@ -507,13 +524,19 @@
   <PrimaryColorThemer colorHex="#fcc842">
     <ProjectCard
       project={{
-        __typename: 'ClaimedProject',
+        __typename: 'Project',
         source: SOURCE_CONFIGS.github,
-        avatar: {
-          __typename: 'EmojiAvatar',
-          emoji: '🚶',
-        },
-        color: '#fcc842',
+        chainData: [
+          {
+            chain: network.gqlName,
+            __typename: 'ClaimedProjectData',
+            avatar: {
+              __typename: 'EmojiAvatar',
+              emoji: '🚶',
+            },
+            color: '#fcc842',
+          },
+        ],
       }}
     />
   </PrimaryColorThemer>
@@ -541,21 +564,33 @@
     <ProjectBadge
       project={projectVerified
         ? {
-            __typename: 'ClaimedProject',
-            owner: {
-              __typename: 'AddressDriverAccount',
-              address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
-            },
+            __typename: 'Project',
             source: SOURCE_CONFIGS[sourceType],
-            avatar: {
-              __typename: 'EmojiAvatar',
-              emoji: '🚶',
-            },
-            color: '#fcc842',
+            chainData: [
+              {
+                chain: network.gqlName,
+                __typename: 'ClaimedProjectData',
+                owner: {
+                  __typename: 'AddressDriverAccount',
+                  address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
+                },
+                avatar: {
+                  __typename: 'EmojiAvatar',
+                  emoji: '🚶',
+                },
+                color: '#fcc842',
+              },
+            ],
           }
         : {
-            __typename: 'UnclaimedProject',
+            __typename: 'Project',
             source: SOURCE_CONFIGS[sourceType],
+            chainData: [
+              {
+                chain: network.gqlName,
+                __typename: 'UnClaimedProjectData',
+              },
+            ],
           }}
     />
   </PrimaryColorThemer>

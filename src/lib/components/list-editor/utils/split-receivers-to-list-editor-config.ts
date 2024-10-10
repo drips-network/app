@@ -29,15 +29,8 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT = g
     weight
     project {
       ...ListEditorProject
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
+      account {
+        accountId
       }
     }
   }

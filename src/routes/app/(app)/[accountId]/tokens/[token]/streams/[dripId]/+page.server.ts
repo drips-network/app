@@ -5,6 +5,7 @@ import { STREAM_PAGE_STREAM_FRAGMENT } from './+page.svelte';
 import query from '$lib/graphql/dripsQL';
 import type { StreamPageQuery, StreamPageQueryVariables } from './__generated__/gql.generated';
 import makeStreamId from '$lib/utils/streams/make-stream-id';
+import network from '$lib/stores/wallet/network';
 
 export const load = async ({ params, fetch }) => {
   const { accountId, token, dripId } = params;
@@ -17,8 +18,8 @@ export const load = async ({ params, fetch }) => {
 
   const streamPageQuery = gql`
     ${STREAM_PAGE_STREAM_FRAGMENT}
-    query StreamPage($senderAccountId: ID!) {
-      streams(where: { senderId: $senderAccountId }) {
+    query StreamPage($senderAccountId: ID!, $chains: [SupportedChain!]) {
+      streams(chains: $chains, where: { senderId: $senderAccountId }) {
         ...StreamPageStream
         id
       }
@@ -29,6 +30,7 @@ export const load = async ({ params, fetch }) => {
     streamPageQuery,
     {
       senderAccountId: decodedId.dripsAccountId,
+      chains: [network.gqlName],
     },
     fetch,
   );
@@ -41,5 +43,9 @@ export const load = async ({ params, fetch }) => {
     error(404);
   }
 
-  return { stream: matchingStream, blockWhileInitializing: false };
+  return {
+    stream: matchingStream,
+    blockWhileInitializing: false,
+    preservePathOnNetworkChange: false,
+  };
 };

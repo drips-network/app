@@ -13,15 +13,8 @@
     ${LIST_EDITOR_PROJECT_FRAGMENT}
     fragment EditDripListStepProjectToAdd on Project {
       ...ListEditorProject
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
+      account {
+        accountId
       }
     }
   `;
@@ -34,17 +27,11 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { createEventDispatcher } from 'svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
-  import {
-    getCallerClient,
-    getNFTDriverClient,
-    getNFTDriverTxFactory,
-  } from '$lib/utils/get-drips-clients';
   import modal from '$lib/stores/modal';
   import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
   import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
   import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import { constants, Utils } from 'radicle-drips';
   import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import DripListEditor from '$lib/components/drip-list-editor/drip-list-editor.svelte';
   import type { Writable } from 'svelte/store';
@@ -62,6 +49,15 @@
   import importFromCsvSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import type { ListEditorItem, AccountId, Weights } from '$lib/components/list-editor/types';
   import Emoji from '$lib/components/emoji/emoji.svelte';
+  import {
+    executeNftDriverWriteMethod,
+    populateNftDriverWriteTx,
+  } from '$lib/utils/sdk/nft-driver/nft-driver';
+  import { toBigInt } from 'ethers';
+  import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import { formatSplitReceivers } from '$lib/utils/sdk/utils/format-split-receivers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -107,7 +103,6 @@
         },
         headline: 'Edit your Drip List',
         before: async () => {
-          const nftDriverTxFactory = await getNFTDriverTxFactory();
           const dripListService = await DripListService.new();
 
           const { receivers, projectsSplitMetadata } =
@@ -119,10 +114,12 @@
           const listId = $state.dripListAccountId;
           assert(listId, 'Drip List account ID is not set');
 
-          const setSplitsTx = await nftDriverTxFactory.setSplits(listId, receivers);
+          const setSplitsTx = await populateNftDriverWriteTx({
+            functionName: 'setSplits',
+            args: [toBigInt(listId), formatSplitReceivers(receivers)],
+          });
 
-          const nftDriverClient = await getNFTDriverClient();
-          const metadataManager = new NftDriverMetadataManager(nftDriverClient);
+          const metadataManager = new NftDriverMetadataManager(executeNftDriverWriteMethod);
 
           const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
           assert(currentMetadata);
@@ -136,18 +133,23 @@
 
           const hash = await metadataManager.pinAccountMetadata(newMetadata);
 
-          const metadataTx = await nftDriverTxFactory.emitAccountMetadata(
-            listId,
-            [
-              {
-                key: MetadataManagerBase.USER_METADATA_KEY,
-                value: hash,
-              },
-            ].map((m) => Utils.Metadata.createFromStrings(m.key, m.value)),
-          );
+          const metadataTx = await populateNftDriverWriteTx({
+            functionName: 'emitAccountMetadata',
+            args: [
+              toBigInt(listId),
+              [
+                {
+                  key: MetadataManagerBase.USER_METADATA_KEY,
+                  value: hash,
+                },
+              ].map(keyValueToMetatada),
+            ],
+          });
 
-          const callerClient = await getCallerClient();
-          const tx = await callerClient.populateCallBatchedTx([setSplitsTx, metadataTx]);
+          const tx = await populateCallerWriteTx({
+            functionName: 'callBatched',
+            args: [[setSplitsTx, metadataTx].map(txToCallerCall)],
+          });
 
           return { tx };
         },
@@ -178,8 +180,10 @@
             [key]: item,
           };
 
+          const MAX_WEIGHT = 1000000;
+
           if (weight) {
-            $state.listEditorConfig.weights[key] = (weight * constants.TOTAL_SPLITS_WEIGHT) / 100;
+            $state.listEditorConfig.weights[key] = (weight * MAX_WEIGHT) / 100;
           }
         },
         clearItems() {

@@ -5,12 +5,18 @@
   import modal from '$lib/stores/modal';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import type { Writable } from 'svelte/store';
+  import type filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let project: Writable<ProjectCustomizerFragment>;
+  export let originalProject: ProjectCustomizerFragment;
+  export let newProjectData: Writable<
+    ReturnType<
+      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+    >
+  >;
 </script>
 
 <div class="project-customizer-modal">
-  <ProjectCustomizer {project} />
+  <ProjectCustomizer {originalProject} {newProjectData} />
   <div class="actions">
     <Button icon={CheckCircle} on:click={modal.hide}>Confirm</Button>
   </div>

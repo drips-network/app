@@ -33,8 +33,8 @@ jobs:
           envkey_GELATO_API_KEY: 1234
           envkey_COINMARKETCAP_API_KEY: 1234
           envkey_PUBLIC_NETWORK: 5
-          envkey_GQL_URL: https://drips-api-mainnet-s2.up.railway.app/
-          envkey_GQL_ACCESS_TOKEN: afdb8b7e-8fa7-4de9-bd95-b650b839e745 # public token
+          envkey_GQL_URL: https://drips-multichain-api.up.railway.app/
+          envkey_GQL_ACCESS_TOKEN: 7f82c43a-e7f4-47e9-a623-db7066f8bea2 # public token
           envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
           envkey_INFURA_KEY: 1234
           envkey_MULTIPLAYER_API_ACCESS_TOKEN: 1234

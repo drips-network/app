@@ -12,6 +12,7 @@ import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 import * as multiplayer from '$lib/utils/multiplayer';
 import twemoji from '$lib/utils/twemoji';
+import network from '$lib/stores/wallet/network';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const listId = params.listId;
@@ -31,8 +32,8 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
     }
   } else {
     const dripListQuery = gql`
-      query DripList($listId: ID!) {
-        dripList(id: $listId) {
+      query DripList($listId: ID!, $chain: SupportedChain!) {
+        dripList(id: $listId, chain: $chain) {
           name
           splits {
             __typename
@@ -43,7 +44,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
     const res = await query<DripListQuery, DripListQueryVariables>(
       dripListQuery,
-      { listId },
+      { listId, chain: network.gqlName },
       fetch,
     );
     const { dripList } = res;

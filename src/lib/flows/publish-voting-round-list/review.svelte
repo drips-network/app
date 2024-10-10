@@ -23,6 +23,7 @@
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -59,8 +60,8 @@
 
         after: async (_, { dripListId }) => {
           const dripListExistsQuery = gql`
-            query DripListExists($id: ID!) {
-              dripList(id: $id) {
+            query DripListExists($id: ID!, $chain: SupportedChain!) {
+              dripList(id: $id, chain: $chain) {
                 account {
                   accountId
                 }
@@ -74,6 +75,7 @@
                 dripListExistsQuery,
                 {
                   id: listId,
+                  chain: network.gqlName,
                 },
               );
             } catch {
