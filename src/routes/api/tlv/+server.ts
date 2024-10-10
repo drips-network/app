@@ -61,7 +61,9 @@ export const GET = async ({ fetch }) => {
 
     total =
       total +
-      Number(formatUnits(tokenHoldingRecord.TokenQuantity, tokenHoldingRecord.TokenDivisor)) *
+      Number(
+        formatUnits(tokenHoldingRecord.TokenQuantity, Number(tokenHoldingRecord.TokenDivisor)),
+      ) *
         value;
   }
 
