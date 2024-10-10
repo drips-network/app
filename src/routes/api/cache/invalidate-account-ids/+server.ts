@@ -104,7 +104,9 @@ export const POST = async ({ request }) => {
     throw error(400);
   }
 
-  const validAccountIds: string[] = accountIds.filter((v) => {
+  const accountIdStrings = accountIds.map((v) => String(v));
+
+  const validAccountIds: string[] = accountIdStrings.filter((v) => {
     if (typeof v === 'string' && /^[0-9]+$/.test(v)) {
       return true;
     } else {
