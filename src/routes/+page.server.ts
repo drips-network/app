@@ -19,6 +19,7 @@ const FEATURED_DRIP_LISTS =
     ],
   }[PUBLIC_NETWORK] ?? [];
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import network from '$lib/stores/wallet/network';
 
 export const load = (async ({ fetch, request }) => {
   const isIframe = request.headers.get('Sec-Fetch-Dest') === 'iframe';
@@ -40,8 +41,8 @@ export const load = (async ({ fetch, request }) => {
 
   const dripListQuery = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
-    query DripList($listId: ID!) {
-      dripList(id: $listId) {
+    query DripList($listId: ID!, $chain: SupportedChain!) {
+      dripList(id: $listId, chain: $chain) {
         account {
           accountId
         }
@@ -55,7 +56,11 @@ export const load = (async ({ fetch, request }) => {
   > => {
     const results = await Promise.all(
       FEATURED_DRIP_LISTS.map((listId) =>
-        query<DripListQuery, DripListQueryVariables>(dripListQuery, { listId }, fetch),
+        query<DripListQuery, DripListQueryVariables>(
+          dripListQuery,
+          { listId, chain: network.gqlName },
+          fetch,
+        ),
       ),
     );
 
