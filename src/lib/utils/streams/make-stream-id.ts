@@ -1,5 +1,5 @@
 import assert from '$lib/utils/assert';
-import { isAddress } from 'ethers/lib/utils';
+import { isAddress } from 'ethers';
 
 const numericTest = /^\d+$/;
 

@@ -3,10 +3,6 @@ import { redirect } from '@sveltejs/kit';
 import { gql } from 'graphql-request';
 import { DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT } from './+page.svelte';
 import { getVotingRounds } from '$lib/utils/multiplayer';
-import {
-  mapSplitsFromMultiplayerResults,
-  type SplitsComponentSplitsReceiver,
-} from '$lib/components/splits/splits.svelte';
 import type {
   DripListsPageQuery,
   DripListsPageQueryVariables,
@@ -15,6 +11,9 @@ import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+import network from '$lib/stores/wallet/network';
+import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
+import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
@@ -32,8 +31,8 @@ export const load = async ({ fetch }) => {
 
   const dripListsPageQuery = gql`
     ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
-    query DripListsPage($ownerAddress: String) {
-      dripLists(where: { ownerAddress: $ownerAddress }) {
+    query DripListsPage($ownerAddress: String, $chains: [SupportedChain!]) {
+      dripLists(chains: $chains, where: { ownerAddress: $ownerAddress }) {
         ...DripListsPageDripList
       }
     }
@@ -49,7 +48,7 @@ export const load = async ({ fetch }) => {
     await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
     await query<DripListsPageQuery, DripListsPageQueryVariables>(
       dripListsPageQuery,
-      { ownerAddress: connectedAddress },
+      { ownerAddress: connectedAddress, chains: [network.gqlName] },
       fetch,
     ),
   ]);
@@ -70,7 +69,11 @@ export const load = async ({ fetch }) => {
     votingRounds: votingRoundsWithSplits,
   });
 
-  return { dripLists: dripListsRes.dripLists, votingRounds: votingRoundsWithSplits };
+  return {
+    dripLists: dripListsRes.dripLists,
+    votingRounds: votingRoundsWithSplits,
+    preservePathOnNetworkChange: true,
+  };
 };
 
 export const ssr = false;

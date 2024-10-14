@@ -1,19 +1,10 @@
 <script lang="ts" context="module">
   export const ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT = gql`
     fragment AddEthereumAddressStepProject on Project {
-      ... on ClaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
-      }
-      ... on UnclaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        forge
+        ownerName
+        repoName
       }
     }
   `;

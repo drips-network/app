@@ -1,7 +1,5 @@
 <script lang="ts">
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { fetchBalance } from '$lib/utils/erc20';
-  import { getAddressDriverClient } from '$lib/utils/get-drips-clients';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
   import InputWalletAmount from '../input-wallet-amount/input-wallet-amount.svelte';
@@ -10,6 +8,9 @@
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import type { Items } from '../list-select/list-select.types';
   import assert from '$lib/utils/assert';
+  import { getAddressDriverAllowance } from '$lib/utils/sdk/address-driver/address-driver';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
+  import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
 
   export let selectedTokenAddress: string[] = [];
 
@@ -63,11 +64,16 @@
     loadingToken = true;
     selectedTokenBalance = undefined;
 
-    const { address, provider } = $walletStore;
+    const { address } = $walletStore;
     assert(address && tokenAddress);
 
-    selectedTokenAllowance = await (await getAddressDriverClient()).getAllowance(tokenAddress);
-    selectedTokenBalance = await fetchBalance(tokenAddress, address, provider);
+    selectedTokenAllowance = await getAddressDriverAllowance(tokenAddress as OxString);
+    selectedTokenBalance = await executeErc20ReadMethod({
+      functionName: 'balanceOf',
+      token: tokenAddress as OxString,
+      args: [address as OxString],
+    });
+
     loadingToken = false;
     prevTokenAddress = tokenAddress;
   }

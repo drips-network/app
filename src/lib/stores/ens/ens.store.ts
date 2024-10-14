@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
-import walletStore from '../wallet/wallet.store';
+import type { AbstractProvider } from 'ethers';
 
 export interface ResolvedRecord {
   name?: string;
@@ -13,7 +13,19 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
-  const provider = get(walletStore).provider;
+  const connected = writable(false);
+
+  let provider: AbstractProvider | undefined;
+
+  /**
+   * Connect the store to a provider, which is needed in order to resolve ENS
+   * records.
+   * @param toProvider The provider to connect to.
+   */
+  function connect(toProvider: AbstractProvider) {
+    provider = toProvider;
+    connected.set(true);
+  }
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -27,23 +39,29 @@ export default (() => {
     // Initially write an empty object to prevent multiple in-flight requests
     // for the same name
     state.update((s) => ({ ...s, [address]: {} }));
+    try {
+      const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
 
-    const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
+      const [name, avatarUrl] = await Promise.all(lookups);
 
-    const [name, avatarUrl] = await Promise.all(lookups);
+      if (name || avatarUrl) {
+        const resolvedRecord = {
+          name: name ?? undefined,
+          avatarUrl: avatarUrl ?? undefined,
+        };
 
-    if (name || avatarUrl) {
-      const resolvedRecord = {
-        name: name ?? undefined,
-        avatarUrl: avatarUrl ?? undefined,
-      };
+        state.update((s) => ({
+          ...s,
+          [address]: resolvedRecord,
+        }));
 
-      state.update((s) => ({
-        ...s,
-        [address]: resolvedRecord,
-      }));
+        return resolvedRecord;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('Failed to resolve ENS name:', error); // eslint-disable-line no-console
 
-      return resolvedRecord;
+      return undefined;
     }
   }
 
@@ -78,6 +96,8 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
+    connect,
+    connected: { subscribe: connected.subscribe },
     lookup,
     reverseLookup,
     clear,

@@ -1,33 +1,27 @@
 <script lang="ts" context="module">
-  import type {
-    ProjectBadgeFragment,
-    ProjectBadge_UnclaimedProject_Fragment,
-  } from './__generated__/gql.generated';
+  import type { ProjectBadgeFragment } from './__generated__/gql.generated';
   import { gql } from 'graphql-request';
+  import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
+  import { PROJECT_TOOLTIP_FRAGMENT } from './components/project-tooltip.svelte';
 
   export const PROJECT_BADGE_FRAGMENT = gql`
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_TOOLTIP_FRAGMENT}
     fragment ProjectBadge on Project {
-      ...ProjectAvatar
       ...ProjectTooltip
-      ... on ClaimedProject {
-        owner {
-          address
-        }
-        source {
-          url
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        url
+        forge
+        ownerName
+        repoName
       }
-      ... on UnclaimedProject {
-        source {
-          url
-          ownerName
-          repoName
-          forge
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          chain
+          owner {
+            address
+          }
         }
       }
     }
@@ -35,17 +29,17 @@
 </script>
 
 <script lang="ts">
-  import ProjectAvatar, {
-    PROJECT_AVATAR_FRAGMENT,
-  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
-  import ProjectTooltip, { PROJECT_TOOLTIP_FRAGMENT } from './components/project-tooltip.svelte';
+  import ProjectTooltip from './components/project-tooltip.svelte';
   import ProjectName from './components/project-name.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
+  import { ProjectVerificationStatus, type Project } from '$lib/graphql/__generated__/base-types';
+  import network from '$lib/stores/wallet/network';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let project: ProjectBadgeFragment;
 
@@ -56,17 +50,24 @@
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
 
-  let unclaimedProject: ProjectBadge_UnclaimedProject_Fragment;
+  let unclaimedProject: Project;
   $: unclaimedProject = {
-    __typename: 'UnclaimedProject',
     source: { ...project.source },
-    verificationStatus: ProjectVerificationStatus.Unclaimed,
-  };
+    chainData: [
+      {
+        chain: network.gqlName,
+        __typename: 'UnClaimedProjectData',
+        verificationStatus: ProjectVerificationStatus.Unclaimed,
+      },
+    ],
+  } as Project;
 
   $: processedProject = forceUnclaimed ? unclaimedProject : project;
+
+  $: chainData = filterCurrentChainData(processedProject.chainData);
 </script>
 
-<PrimaryColorThemer colorHex={isClaimed(processedProject) ? processedProject.color : undefined}>
+<PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
@@ -82,12 +83,12 @@
     >
       {#if !hideAvatar}
         <div class="avatar-and-forge">
-          {#if !forceUnclaimed && isClaimed(processedProject)}
+          {#if !forceUnclaimed && isClaimed(chainData)}
             <div>
-              <ProjectAvatar {size} project={unclaimedProject} />
+              <ProjectAvatar {size} project={filterCurrentChainData(unclaimedProject.chainData)} />
             </div>
           {/if}
-          <div><ProjectAvatar {size} project={processedProject} /></div>
+          <div><ProjectAvatar {size} project={chainData} /></div>
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">

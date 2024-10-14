@@ -11,6 +11,8 @@
     CheckProjectVerificationStatusQuery,
     CheckProjectVerificationStatusQueryVariables,
   } from './__generated__/gql.generated';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -28,13 +30,17 @@
     const projectAccountId = $context.project?.account.accountId ?? unreachable();
 
     const checkProjectVerificationStatusQuery = gql`
-      query CheckProjectVerificationStatus($projectId: ID!) {
-        projectById(id: $projectId) {
-          ... on UnclaimedProject {
-            verificationStatus
-          }
-          ... on ClaimedProject {
-            verificationStatus
+      query CheckProjectVerificationStatus($projectId: ID!, $chains: [SupportedChain!]) {
+        projectById(id: $projectId, chains: $chains) {
+          chainData {
+            ... on UnClaimedProjectData {
+              chain
+              verificationStatus
+            }
+            ... on ClaimedProjectData {
+              chain
+              verificationStatus
+            }
           }
         }
       }
@@ -46,11 +52,19 @@
           checkProjectVerificationStatusQuery,
           {
             projectId: projectAccountId,
+            chains: [network.gqlName],
           },
         ),
-      (response) =>
-        response.projectById?.verificationStatus === 'PendingMetadata' ||
-        response.projectById?.verificationStatus === 'OwnerUpdated',
+      (response) => {
+        if (!response.projectById?.chainData) return false;
+
+        const projectChainData = filterCurrentChainData(response.projectById.chainData);
+
+        return (
+          projectChainData.verificationStatus === 'PendingMetadata' ||
+          projectChainData.verificationStatus === 'OwnerUpdated'
+        );
+      },
       300000,
       2000,
     );

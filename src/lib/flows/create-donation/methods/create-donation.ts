@@ -1,11 +1,13 @@
 import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { getAddressDriverTxFactory } from '$lib/utils/get-drips-clients';
-import { constants } from 'ethers';
-import { ERC20TxFactory } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import { MaxUint256, toBigInt } from 'ethers';
+import type { OxString } from '$lib/utils/sdk/sdk-types';
+import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
+import { populateAddressDriverWriteTx } from '$lib/utils/sdk/address-driver/address-driver';
+import network from '$lib/stores/wallet/network';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -19,9 +21,7 @@ export default function (
     makeTransactPayload({
       headline: 'Donate Instantly',
       before: async () => {
-        const txFactory = await getAddressDriverTxFactory();
-
-        const { address, signer } = get(walletStore);
+        const { address } = get(walletStore);
 
         assert(address, 'User is not connected to wallet');
         assert(
@@ -31,25 +31,16 @@ export default function (
 
         const needApproval = tokenAllowance < amountToGive;
 
-        const givePopulatedTx = await txFactory.give(
-          recipientAccountId,
-          tokenAddress,
-          amountToGive,
-          /*
-          Dirty hack to disable the SDK's built-in gas estimation, because
-          it would fail if there's no token approval yet.
+        const givePopulatedTx = await populateAddressDriverWriteTx({
+          functionName: 'give',
+          args: [toBigInt(recipientAccountId), tokenAddress as OxString, amountToGive],
+        });
 
-          TODO: Introduce a more graceful method of disabling gas estimation.
-          */
-          { gasLimit: 1 },
-        );
-        delete givePopulatedTx.gasLimit;
-
-        const erc20TxFactory = await ERC20TxFactory.create(signer, tokenAddress);
-        const approvePopulatedTx = await erc20TxFactory.approve(
-          txFactory.driverAddress,
-          constants.MaxUint256,
-        );
+        const approvePopulatedTx = await populateErc20WriteTx({
+          token: tokenAddress as OxString,
+          functionName: 'approve',
+          args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
+        });
 
         return {
           givePopulatedTx,

@@ -14,6 +14,7 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
   import unreachable from '$lib/utils/unreachable';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data;
 
@@ -85,39 +86,46 @@
     <Developer accountId={data.profileData.account.accountId} />
     <ProjectsSection
       collapsable
-      collapsed={mapFilterUndefined(data.profileData.projects, (v) => (v === null ? undefined : v))
-        .length === 0}
-      projects={mapFilterUndefined(data.profileData.projects, (v) => (v === null ? undefined : v))}
+      collapsed={mapFilterUndefined([filterCurrentChainData(data.profileData.chainData)], (v) =>
+        v === null ? undefined : v,
+      ).length === 0}
+      projects={mapFilterUndefined(
+        filterCurrentChainData(data.profileData.chainData).projects,
+        (v) => (v === null ? undefined : v),
+      )}
     />
     <DripListsSection
       collapsable
       collapsed={[
         ...data.profileData.votingRounds,
-        ...mapFilterUndefined(data.profileData.dripLists, (v) => (v === null ? undefined : v)),
+        ...mapFilterUndefined(filterCurrentChainData(data.profileData.chainData).dripLists, (v) =>
+          v === null ? undefined : v,
+        ),
       ].length === 0}
       votingRounds={data.profileData.votingRounds}
-      dripLists={mapFilterUndefined(data.profileData.dripLists, (v) =>
-        v === null ? undefined : v,
+      dripLists={mapFilterUndefined(
+        filterCurrentChainData(data.profileData.chainData).dripLists,
+        (v) => (v === null ? undefined : v),
       )}
     />
     <Supporters
       collapsable
-      collapsed={data.profileData.support.length === 0}
+      collapsed={filterCurrentChainData(data.profileData.chainData).support.length === 0}
       type="address"
-      supportItems={data.profileData.support}
+      supportItems={filterCurrentChainData(data.profileData.chainData).support}
     />
     <Streams
       hideIncoming
       collapsable
-      collapsed={data.profileData.streams.outgoing.length === 0}
-      userStreams={data.profileData.streams}
+      collapsed={filterCurrentChainData(data.profileData.chainData).streams.outgoing.length === 0}
+      userStreams={filterCurrentChainData(data.profileData.chainData).streams}
       disableActions={!isSelf}
       accountId={data.profileData.account.accountId}
     />
     <Balances
       collapsable
-      collapsed={data.profileData.balances.length === 0}
-      userBalances={data.profileData.balances}
+      collapsed={filterCurrentChainData(data.profileData.chainData).balances.length === 0}
+      userBalances={filterCurrentChainData(data.profileData.chainData).balances}
       accountId={data.profileData.account.accountId}
     />
   </article>

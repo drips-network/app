@@ -18,14 +18,24 @@ const FEATURED_DRIP_LISTS =
       '30178668158349445547603108732480118476541651095408979232800331391215',
     ],
   }[PUBLIC_NETWORK] ?? [];
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 
 export const load = (async ({ fetch, request }) => {
   const isIframe = request.headers.get('Sec-Fetch-Dest') === 'iframe';
+
+  const isAlternativeChain = getOptionalEnvVar('PUBLIC_ALTERNATIVE_CHAIN_MODE');
+
   if (isIframe) {
     // Only valid use for iFrame is running the app as a Safe App within the Safe UI.
     // In that case, we want to skip the LP and go straight to the app, which will then try
     // to auto-connect the Safe.
+
     return redirect(307, '/app');
+  }
+
+  // TODO: Remove when we go full multi-chain.
+  if (isAlternativeChain) {
+    return redirect(308, '/app');
   }
 
   const dripListQuery = gql`

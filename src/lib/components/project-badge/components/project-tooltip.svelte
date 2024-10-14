@@ -7,25 +7,23 @@
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_NAME_FRAGMENT}
     fragment ProjectTooltip on Project {
-      ...ProjectAvatar
       ...ProjectName
-      ... on ClaimedProject {
-        owner {
-          address
-        }
-        source {
-          url
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        url
+        ownerName
+        repoName
+        forge
       }
-      ... on UnclaimedProject {
-        source {
-          url
-          ownerName
-          repoName
-          forge
+      chainData {
+        ...ProjectAvatar
+        ... on ClaimedProjectData {
+          chain
+          owner {
+            address
+          }
+        }
+        ... on UnClaimedProjectData {
+          chain
         }
       }
     }
@@ -41,8 +39,11 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import ProjectName from './project-name.svelte';
   import type { ProjectTooltipFragment } from './__generated__/gql.generated';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let project: ProjectTooltipFragment;
+
+  $: chainData = filterCurrentChainData(project.chainData);
 
   const SOURCE_TYPE_STRINGS: { [K in Forge]: string } = {
     GitHub: 'on GitHub',
@@ -53,12 +54,12 @@
 <div class="project-tooltip">
   <div
     class="background"
-    style:background-color={isClaimed(project)
+    style:background-color={isClaimed(chainData)
       ? 'var(--color-primary-level-2)'
       : 'var(--color-foreground-level-1)'}
   />
   <div class="header">
-    <ProjectAvatar {project} size="large" outline />
+    <ProjectAvatar project={chainData} size="large" outline />
     <a
       class="name typo-header-4"
       href={buildProjectUrl(
@@ -67,10 +68,10 @@
         project.source.repoName,
       )}><ProjectName {project} /></a
     >
-    {#if isClaimed(project)}
+    {#if isClaimed(chainData)}
       <div class="owner typo-text-small">
         <span>Owned by </span>
-        <IdentityBadge linkToNewTab address={project.owner.address} disableTooltip size="small" />
+        <IdentityBadge linkToNewTab address={chainData.owner.address} disableTooltip size="small" />
       </div>
     {/if}
   </div>

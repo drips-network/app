@@ -40,12 +40,7 @@
           v.type === 'address' ? v.address : unreachable(),
         );
 
-        const signature = await multiplayer.signVotingRound(
-          signer,
-          timestamp,
-          address,
-          collaborators,
-        );
+        const signature = await multiplayer.signVotingRound(signer, timestamp, address);
 
         updateAwaitStep({
           message: 'Creating your collaborative Drip List...',

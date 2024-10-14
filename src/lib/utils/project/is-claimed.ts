@@ -1,8 +1,23 @@
-import type { Project } from '$lib/graphql/__generated__/base-types';
-import type { PickGQLF } from '$lib/graphql/utils/pick-gql-fields';
+export default function isClaimed<
+  IT extends
+    | {
+        __typename: 'ClaimedProjectData';
+      }
+    | {
+        __typename: 'UnClaimedProjectData';
+      },
+>(chainData: IT): chainData is IT & { __typename: 'ClaimedProjectData' } {
+  return chainData.__typename === 'ClaimedProjectData';
+}
 
-export default function isClaimed<T extends PickGQLF<Project>>(
-  project: T,
-): project is Extract<T, { __typename: 'ClaimedProject' }> {
-  return project.__typename === 'ClaimedProject';
+export function isUnclaimed(
+  chainData:
+    | {
+        __typename: 'ClaimedProjectData';
+      }
+    | {
+        __typename: 'UnClaimedProjectData';
+      },
+): chainData is { __typename: 'UnClaimedProjectData' } {
+  return chainData.__typename === 'UnClaimedProjectData';
 }

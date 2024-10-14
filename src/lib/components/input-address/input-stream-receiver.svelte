@@ -6,7 +6,7 @@
   import { createEventDispatcher } from 'svelte';
   import { BASE_URL } from '$lib/utils/base-url';
   import assert from '$lib/utils/assert';
-  import { Utils } from 'radicle-drips';
+  import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
   export let value: string | undefined = undefined;
   export let validatedValue: string | undefined = undefined;
@@ -37,7 +37,7 @@
       const dripListId = input.substring(input.lastIndexOf('/') + 1);
       assert(dripListId);
 
-      if (Utils.AccountId.getDriver(dripListId) !== 'nft') {
+      if (extractDriverNameFromAccountId(dripListId) !== 'nft') {
         inputValidationState = {
           type: 'invalid',
           message: 'Invalid Drip List URL',
@@ -82,7 +82,7 @@
           message: 'Unable to resolve ENS name',
         };
       }
-    } else if (input && ethers.utils.isAddress(input)) {
+    } else if (input && ethers.isAddress(input)) {
       // is address
       validatedValue = input;
 

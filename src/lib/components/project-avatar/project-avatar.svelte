@@ -2,8 +2,9 @@
   import { gql } from 'graphql-request';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
-    fragment ProjectAvatar on Project {
-      ... on ClaimedProject {
+    fragment ProjectAvatar on ProjectData {
+      ... on ClaimedProjectData {
+        chain
         color
         avatar {
           ... on EmojiAvatar {
@@ -35,7 +36,7 @@
 
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
-  export let outline = project.__typename === 'ClaimedProject';
+  export let outline = project.__typename === 'ClaimedProjectData';
 
   const CONTAINER_SIZES: Record<Size, string> = {
     tiny: '1.5rem',
@@ -56,7 +57,7 @@
   let prevAvatarCid: string | undefined = undefined;
   $: {
     if (
-      project.__typename === 'ClaimedProject' &&
+      project.__typename === 'ClaimedProjectData' &&
       project.avatar.__typename === 'ImageAvatar' &&
       project.avatar.cid !== prevAvatarCid
     ) {

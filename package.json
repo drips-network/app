@@ -25,13 +25,14 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/near-operation-file-preset": "^3.0.0",
+    "@graphql-codegen/schema-ast": "^4.1.0",
     "@graphql-codegen/typescript": "^4.0.7",
-    "@graphql-codegen/typescript-operations": "^4.2.1",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
     "@playwright/test": "^1.44.1",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/adapter-netlify": "^4.2.1",
     "@sveltejs/kit": "^2.5.17",
-    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/svelte": "^5.1.0",
     "@testing-library/user-event": "^14.5.2",
@@ -90,7 +91,7 @@
     "csv-simple-parser": "^1.0.3",
     "cupertino-pane": "^1.4.21",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.1",
     "fuzzysort": "^2.0.3",
     "globals": "^15.6.0",
     "graphql": "^16.8.2",
@@ -98,7 +99,6 @@
     "isomorphic-fetch": "^3.0.0",
     "jimp": "^0.22.12",
     "lodash": "^4.17.21",
-    "radicle-drips": "github:drips-network/sdk",
     "redis": "^4.6.14",
     "sanitize-html": "^2.13.0",
     "satori": "^0.10.13",
@@ -114,6 +114,9 @@
         "rxjs": "^7.8.1"
       }
     }
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.5"
   },
   "type": "module"
 }

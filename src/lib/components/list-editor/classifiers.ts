@@ -8,9 +8,9 @@ import {
   validateProject,
 } from './validators';
 import { getAddress, getDripList, getProject } from './hydrators';
-import { isAddress } from 'ethers/lib/utils';
 import { buildRepositoryURL, isDripsProjectUrl } from '../../utils/build-repo-url';
 import type { RecipientClassification } from './types';
+import { isAddress } from 'ethers';
 
 export const classifyRecipient = (
   input: string,

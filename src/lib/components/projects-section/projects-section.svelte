@@ -18,6 +18,7 @@
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import Plus from '../icons/Plus.svelte';
   import modal from '$lib/stores/modal';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -59,9 +60,10 @@
   {#if projects}
     <div class="projects">
       {#each projects as project}
-        {#if isClaimed(project)}
+        {@const projectChainData = filterCurrentChainData(project.chainData)}
+        {#if isClaimed(projectChainData)}
           <div>
-            <PrimaryColorThemer colorHex={project.color}>
+            <PrimaryColorThemer colorHex={projectChainData.color}>
               <ProjectCard {project} />
             </PrimaryColorThemer>
           </div>

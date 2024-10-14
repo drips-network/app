@@ -1,5 +1,5 @@
-import { utils } from 'ethers';
-import { constants } from 'radicle-drips';
+import { formatUnits } from 'ethers';
+import contractConstants from './sdk/utils/contract-constants';
 
 const MAX_DECIMAL_ZEROES_IN_MOTION = 8;
 
@@ -45,15 +45,15 @@ export function localDecimal(
 export default function formatTokenAmount(
   amount: Amount | bigint,
   tokenDecimals: number,
-  precisionMultiplier = BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+  precisionMultiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
   preserveTrailingZeroes = true,
-  maxDecimals = Math.min(MAX_DECIMAL_ZEROES_IN_MOTION, tokenDecimals),
+  maxDecimals = Math.min(MAX_DECIMAL_ZEROES_IN_MOTION, Number(tokenDecimals)),
 ) {
   amount = typeof amount === 'bigint' ? amount : amount.amount;
 
   if (amount === 0n) return localDecimal(0, { min: 2 });
 
-  const parsedAmount = parseFloat(utils.formatUnits(amount / precisionMultiplier, tokenDecimals));
+  const parsedAmount = parseFloat(formatUnits(amount / precisionMultiplier, tokenDecimals));
 
   const paddedAmount = localDecimal(parsedAmount, { min: maxDecimals });
 

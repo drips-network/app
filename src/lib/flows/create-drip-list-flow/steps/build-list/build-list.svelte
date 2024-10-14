@@ -13,7 +13,8 @@
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
-  import { constants } from 'radicle-drips';
+
+  const WEIGHT_FACTOR = 10_000;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -41,7 +42,7 @@
             };
 
             if (weight) {
-              c.dripList.weights[key] = (weight * constants.TOTAL_SPLITS_WEIGHT) / 100;
+              c.dripList.weights[key] = weight * WEIGHT_FACTOR;
             }
 
             return c;

@@ -25,6 +25,8 @@
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -74,6 +76,16 @@
     totalDrippedAmounts = totalDrippedApproximation();
   }
   update();
+
+  function setColor(project: (typeof featuredProjects)[number]) {
+    const chainData = filterCurrentChainData(project.chainData);
+
+    if (!isClaimed(chainData)) {
+      return;
+    }
+
+    return chainData.color;
+  }
 
   let tickHandle: number;
   onMount(async () => {
@@ -144,8 +156,8 @@
       <div class="projects-grid featured-projects">
         {#each featuredProjects as project}
           <div>
-            {#if project.__typename === 'ClaimedProject'}
-              <PrimaryColorThemer colorHex={project.color}>
+            {#if isClaimed(filterCurrentChainData(project.chainData))}
+              <PrimaryColorThemer colorHex={setColor(project)}>
                 <ProjectCard {project} />
               </PrimaryColorThemer>
             {/if}
@@ -195,8 +207,8 @@
     <div class="projects-grid">
       {#each recentlyClaimedProjects as project}
         <div>
-          {#if project.__typename === 'ClaimedProject'}
-            <PrimaryColorThemer colorHex={project.color}>
+          {#if isClaimed(filterCurrentChainData(project.chainData))}
+            <PrimaryColorThemer colorHex={setColor(project)}>
               <ProjectCard {project} />
             </PrimaryColorThemer>
           {/if}

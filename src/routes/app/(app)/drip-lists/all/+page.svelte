@@ -14,7 +14,15 @@
         }
         ... on ProjectReceiver {
           project {
-            ...ProjectAvatar
+            chainData {
+              ...ProjectAvatar
+              ... on ClaimedProjectData {
+                chain
+              }
+              ... on UnClaimedProjectData {
+                chain
+              }
+            }
           }
         }
         ... on DripListReceiver {
@@ -31,7 +39,15 @@
         }
         ... on ProjectSupport {
           project {
-            ...ProjectAvatar
+            chainData {
+              ... on ClaimedProjectData {
+                chain
+              }
+              ... on UnClaimedProjectData {
+                chain
+              }
+              ...ProjectAvatar
+            }
           }
         }
         ... on OneTimeDonationSupport {
@@ -63,6 +79,7 @@
   import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import onClickGoto from '$lib/utils/on-click-goto';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let data: PageData;
 
@@ -86,8 +103,9 @@
             switch (s.__typename) {
               case 'DripListReceiver':
                 return dripListIcon(s.dripList);
-              case 'ProjectReceiver':
-                return projectIcon(s.project);
+              case 'ProjectReceiver': {
+                return projectIcon(filterCurrentChainData(s.project.chainData));
+              }
               case 'AddressReceiver':
                 return addressIcon(s.account.address);
             }
@@ -100,7 +118,7 @@
               case 'DripListSupport':
                 return dripListIcon(s.dripList);
               case 'ProjectSupport':
-                return projectIcon(s.project);
+                return projectIcon(filterCurrentChainData(s.project.chainData));
               case 'OneTimeDonationSupport':
                 return addressIcon(s.account.address);
             }

@@ -10,6 +10,7 @@
     ${SUPPORTER_PILE_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
+      chain
       ...EditDripListFlowDripList
       name
       account {
@@ -58,12 +59,7 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
-  import Splits, {
-    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
-    type SplitsComponentSplitsReceiver,
-  } from '../splits/splits.svelte';
+  import Splits from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
@@ -104,13 +100,19 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
-  import { constants } from 'radicle-drips';
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import ListEditor from '../list-editor/list-editor.svelte';
   import type { Items } from '../list-editor/types';
   import FormField from '../form-field/form-field.svelte';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import {
+    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
+    type SplitsComponentSplitsReceiver,
+  } from '../splits/types';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   export let data: {
@@ -186,7 +188,7 @@
 
         return {
           tokenAddress: amount.tokenAddress,
-          amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+          amount: amount.amount / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
         };
       }),
     );

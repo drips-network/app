@@ -3,9 +3,9 @@ import fuzzysort from 'fuzzysort';
 import tokens from '$lib/stores/tokens';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { get } from 'svelte/store';
-import { isAddress } from 'ethers/lib/utils';
 import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
 import GitProjectService from '$lib/utils/project/GitProjectService';
+import { isAddress } from 'ethers';
 
 export enum SearchItemType {
   PROFILE,
