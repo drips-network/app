@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { RequestHandler } from './$types';
-import { ALCHEMY_KEY, INFURA_KEY, FILECOIN_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 
 const providers = ['infura', 'alchemy', 'glif'] as const;
 const networkNames = [
@@ -40,21 +40,23 @@ export const fallback: RequestHandler = async ({ request, params, fetch }) => {
   let rpcUrl: string;
   const headers = new Headers();
 
-  switch (provider) {
-    case 'infura':
-      rpcUrl = `https://${network}.infura.io/v3/${INFURA_KEY}`;
-      break;
-    case 'alchemy':
-      rpcUrl = `https://${alchemyNetworkMap[network as keyof typeof alchemyNetworkMap]}.g.alchemy.com/v2/${ALCHEMY_KEY}`;
-      headers.set('accept-encoding', 'identity');
-      break;
-    case 'glif':
-      rpcUrl = 'https://node.glif.io/fvm-archive/lotus/rpc/v1';
-      headers.set('Authorization', `Bearer ${FILECOIN_KEY}`);
-      headers.set('Content-Type', 'application/json');
-      break;
-    default:
-      throw new Error(`Unsupported network for provider: ${provider}`);
+  if (provider === 'infura') {
+    const infuraKey = getOptionalEnvVar('INFURA_KEY');
+    assert(infuraKey, 'INFURA_KEY is required');
+    rpcUrl = `https://${network}.infura.io/v3/${infuraKey}`;
+  } else if (provider === 'alchemy') {
+    const alchemyKey = getOptionalEnvVar('ALCHEMY_KEY');
+    assert(alchemyKey, 'ALCHEMY_KEY is required');
+    rpcUrl = `https://${alchemyNetworkMap[network as keyof typeof alchemyNetworkMap]}.g.alchemy.com/v2/${alchemyKey}`;
+    headers.set('accept-encoding', 'identity');
+  } else if (provider === 'glif') {
+    const filecoinKey = getOptionalEnvVar('FILECOIN_KEY');
+    assert(filecoinKey, 'FILECOIN_KEY is required');
+    rpcUrl = 'https://node.glif.io/fvm-archive/lotus/rpc/v1';
+    headers.set('Authorization', `Bearer ${filecoinKey}`);
+    headers.set('Content-Type', 'application/json');
+  } else {
+    throw new Error(`Unsupported network for provider: ${provider}`);
   }
 
   try {
