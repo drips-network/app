@@ -9,7 +9,8 @@ type UploadProps = {
   allowProjects?: boolean;
   allowAddresses?: boolean;
   allowDripLists?: boolean;
-  maxEntries?: number;
+  csvHeaders?: Array<string> | undefined;
+  csvMaxEntries?: number;
   exampleTableHeaders?: Array<string> | undefined;
   exampleTableData?: Array<Array<unknown>> | undefined;
   exampleTableCaption?: string | undefined;

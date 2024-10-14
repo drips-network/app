@@ -26,8 +26,9 @@
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
-  export let maxEntries: number = DEFAULT_MAX_ENTRIES;
-  export let exampleTableHeaders: Array<string> | undefined = undefined;
+  export let csvHeaders: Array<string> | undefined = ['recipient', 'percentage'];
+  export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
+  export let exampleTableHeaders: Array<string> | undefined = csvHeaders;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
   export let exampleTableCaption: string | undefined = undefined;
   export let addItem: (

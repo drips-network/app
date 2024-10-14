@@ -38,8 +38,8 @@
         allowProjects: false,
         allowAddresses: true,
         allowDripLists: false,
-        maxEntries: 5000,
-        exampleTableHeaders: ['collaborator'],
+        csvMaxEntries: 5000,
+        csvHeaders: ['collaborator'],
         exampleTableData: [
           ['0xa404a9258A2240d6f2FDa871a7Fbd71bb6523570'],
           ['0x38493bA0F8a15D81985bF5438bc6f90C6C5418C1'],
