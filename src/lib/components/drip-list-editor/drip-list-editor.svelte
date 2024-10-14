@@ -15,52 +15,54 @@
   import TextInput from '../text-input/text-input.svelte';
   import TextArea from '../text-area/text-area.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
+  import type { AddItemError } from '../list-editor/errors';
 
-  export let dripList: DripListConfig = {
-    title: 'My Drip List',
-    weights: {},
-    items: {},
-    description: undefined,
-  };
+  export let name: string;
+  export let description: string | undefined;
+  export let items: Items;
+  export let weights: Weights;
+
   export let urlToAdd: string | undefined = undefined;
 
-  // validation
+  let recipientErrors: AddItemError[] = [];
+
   let listValid = false;
-  $: titleValid = dripList.title.length > 0;
+  $: titleValid = name.length > 0;
   $: descriptionValid = textAreaValidationState.type === 'valid';
 
   export let isValid = false;
   $: isValid = listValid && titleValid && descriptionValid;
 
   let textAreaValidationState: TextInputValidationState;
-  $: textAreaValidationState = !dripList.description
+  $: textAreaValidationState = !description
     ? { type: 'valid' }
-    : dripList.description.length >= 1000
+    : description.length >= 1000
       ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
-      : /<[^>]+>/gi.test(dripList.description)
+      : /<[^>]+>/gi.test(description)
         ? { type: 'invalid', message: 'HTML currently not allowed.' }
         : { type: 'valid' };
 </script>
 
 <section class="flex flex-col gap-8">
   <FormField title="Title*">
-    <TextInput bind:value={dripList.title} />
+    <TextInput bind:value={name} />
   </FormField>
 
   <FormField title="Description">
-    <TextArea
-      bind:value={dripList.description}
-      resizable={true}
-      validationState={textAreaValidationState}
-    />
+    <TextArea bind:value={description} resizable={true} validationState={textAreaValidationState} />
   </FormField>
 
   <FormField title="Recipients*">
     <ListEditor
-      bind:weights={dripList.weights}
-      bind:items={dripList.items}
+      bind:weights
+      bind:items
       bind:valid={listValid}
+      bind:inputErrors={recipientErrors}
+      on:errorDismissed={() => (recipientErrors = [])}
       addOnMount={urlToAdd}
     />
+    <svelte:fragment slot="action">
+      <slot name="list-editor-action" />
+    </svelte:fragment>
   </FormField>
 </section>

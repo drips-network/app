@@ -38,7 +38,6 @@
   import Download from '$lib/components/icons/Download.svelte';
   import ProjectCustomizerStep from './components/project-customizer-step.svelte';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
   import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';
 
@@ -100,7 +99,9 @@
   }
 
   function customize() {
-    const projectWritable = writable(fakeClaimedProject);
+    const newProjectDataWritable = writable(
+      filterCurrentChainData(fakeClaimedProject.chainData, 'claimed'),
+    );
 
     if (isModal) {
       dispatch('sidestep', {
@@ -108,7 +109,8 @@
           makeStep({
             component: ProjectCustomizerStep,
             props: {
-              project: projectWritable,
+              originalProject: project,
+              newProjectData: newProjectDataWritable,
             },
           }),
         ],
@@ -117,9 +119,7 @@
       modal.show(
         ProjectCustomizerModal,
         () => {
-          const { avatar, color } = filterCurrentChainData(
-            get(projectWritable).chainData,
-          ) as ClaimedProjectData;
+          const { avatar, color } = get(newProjectDataWritable);
 
           $context.avatar =
             avatar.__typename === 'EmojiAvatar'
@@ -127,12 +127,12 @@
               : { type: 'image', cid: avatar.cid };
           $context.projectColor = color;
         },
-        { project: projectWritable },
+        { originalProject: project, newProjectData: newProjectDataWritable },
       );
     }
   }
 
-  $: projectChainData = filterCurrentChainData(project.chainData) as ClaimedProjectData;
+  $: projectChainData = filterCurrentChainData(project.chainData, 'unclaimed');
 
   $: hasCollectableAmount =
     projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >

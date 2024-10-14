@@ -10,15 +10,11 @@ import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated_
 import { getVotingRounds } from '$lib/utils/multiplayer';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
-import { isAddress } from 'ethers';
+import { isAddress, JsonRpcProvider } from 'ethers';
 import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
-import { FailoverJsonRpcProvider } from '$lib/utils/FailoverProvider';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
-const provider = new FailoverJsonRpcProvider(
-  mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
-);
+const provider = new JsonRpcProvider(network.rpcUrl);
 
 const PROFILE_PAGE_QUERY = gql`
   ${PROJECTS_SECTION_PROJECT_FRAGMENT}
@@ -107,7 +103,6 @@ export const load = async ({ params, fetch }) => {
         return { error: true, type: 'is-repo-driver-account-id' as const };
         break;
       }
-
       default: {
         error(404, 'Not Found');
       }

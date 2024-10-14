@@ -50,11 +50,13 @@
         args: [],
       });
 
-      const decimals = await executeErc20ReadMethod({
-        functionName: 'decimals',
-        token: tokenAddress as OxString,
-        args: [],
-      });
+      const decimals = Number(
+        await executeErc20ReadMethod({
+          functionName: 'decimals',
+          token: tokenAddress as OxString,
+          args: [],
+        }),
+      );
 
       tokenName = name;
       tokenSymbol = symbol;

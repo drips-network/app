@@ -1,11 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { JsonRpcApiProviderOptions, JsonRpcPayload, JsonRpcResult, Networkish } from 'ethers';
 import { JsonRpcProvider, FetchRequest } from 'ethers';
+
+class AggregatedRpcError extends Error {
+  public readonly errors: { rpcEndpoint: string; error: unknown }[];
+
+  constructor(errors: { rpcEndpoint: string; error: unknown }[]) {
+    super(
+      `All RPC endpoints failed:\n${errors.map((e) => `Endpoint '${e.rpcEndpoint}' failed with error: ${(e.error as Error).message}.`).join('\n')}`,
+    );
+
+    this.name = 'AggregatedRpcError';
+    this.errors = errors;
+  }
+}
 
 /**
  * A `JsonRpcProvider` that transparently fails over to a list of backup JSON-RPC endpoints.
  */
-export class FailoverJsonRpcProvider extends JsonRpcProvider {
+export default class FailoverJsonRpcProvider extends JsonRpcProvider {
   private readonly _rpcEndpoints: (string | FetchRequest)[];
 
   /**
@@ -34,7 +46,7 @@ export class FailoverJsonRpcProvider extends JsonRpcProvider {
     // The only difference is that we're creating a new `FetchRequest` for each endpoint,
     // instead of getting the `request` from `_getConnection()`, which will return the *primary* (first) endpoint.
 
-    const errors: { rpcEndpoint: string; error: any }[] = [];
+    const errors: { rpcEndpoint: string; error: unknown }[] = [];
 
     // Try each endpoint, in order.
     for (const rpcEndpoint of this._rpcEndpoints) {
@@ -58,24 +70,13 @@ export class FailoverJsonRpcProvider extends JsonRpcProvider {
         }
 
         return resp;
-      } catch (error: any) {
+      } catch (error: unknown) {
         const endpointUrl = this._getRpcEndpointUrl(rpcEndpoint);
         errors.push({ rpcEndpoint: endpointUrl, error });
       }
     }
 
-    // All endpoints failed. Throw an error containing the details.
-    const errorMessages = errors
-      .map((e) => `Endpoint '${e.rpcEndpoint}' failed with error: ${e.error.message}.`)
-      .join('\n');
-
-    const aggregatedError = new Error(`All RPC endpoints failed:\n${errorMessages}`) as Error & {
-      errors: { rpcEndpoint: string; error: any }[];
-    };
-
-    aggregatedError.errors = errors;
-
-    throw aggregatedError;
+    throw new AggregatedRpcError(errors);
   }
 
   /**

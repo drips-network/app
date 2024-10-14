@@ -26,7 +26,6 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
-  fallbackRpcUrl?: string;
   icon: ComponentType;
   color: string;
   isTestnet: boolean;
@@ -67,8 +66,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Ethereum Mainnet',
     token: 'ETH',
     id: '0x1',
-    rpcUrl: `${BASE_URL}/api/rpc/infura/mainnet`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/mainnet`,
+    rpcUrl: `${BASE_URL}/api/infura/mainnet`,
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: false,
@@ -101,8 +99,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Polygon Amoy',
     token: 'MATIC',
     id: '0x13882',
-    rpcUrl: `${BASE_URL}/api/rpc/infura/polygon-amoy`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/polygon-amoy`,
+    rpcUrl: `${BASE_URL}/api/infura/polygon-amoy`,
     icon: Polygon,
     color: '#627EEA',
     isTestnet: true,
@@ -135,8 +132,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'OP Sepolia',
     token: 'ETH',
     id: '0xaa37dc',
-    rpcUrl: `${BASE_URL}/api/rpc/infura/optimism-sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/optimism-sepolia`,
+    rpcUrl: `${BASE_URL}/api/infura/optimism-sepolia`,
     icon: Optimism,
     color: '#627EEA',
     isTestnet: true,
@@ -169,8 +165,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Sepolia',
     token: 'ETH',
     id: '0xaa36a7',
-    rpcUrl: `${BASE_URL}/api/rpc/infura/sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/sepolia`,
+    rpcUrl: `${BASE_URL}/api/infura/sepolia`,
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -203,8 +198,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Base Sepolia',
     token: 'ETH',
     id: '0x14a34',
-    rpcUrl: `${BASE_URL}/api/rpc/infura/base-sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/base-sepolia`,
+    rpcUrl: `${BASE_URL}/api/infura/base-sepolia`,
     icon: Base,
     color: '#627EEA',
     isTestnet: true,
@@ -237,7 +231,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Filecoin',
     token: 'FIL',
     id: '0x13a',
-    rpcUrl: `${BASE_URL}/api/rpc/glif/filecoin-mainnet`,
+    rpcUrl: 'https://api.node.glif.io/',
     icon: Filecoin,
     color: '#627EEA',
     isTestnet: false,
@@ -251,12 +245,12 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       linkTemplate: (txHash: string) => `https://filecoin.blockscout.com/tx/${txHash}`,
     },
     contracts: {
-      ADDRESS_DRIVER: '0xEFcd912a5a67C3a7Cc70a2Fb9aa17781bf1cE68F',
-      DRIPS: '0x0B71C2a08d27E86d3841A6772332DEde0bc8DCa5',
-      CALLER: '0x7f2457421718A541B9Ee01E2F77F8BA749055F3b',
-      REPO_DRIVER: '0xf3aE6ADDeEE195e91380F5F9Ce73698460BAdf79',
-      NFT_DRIVER: '0x1397579E87AB255C8474907183B074947eBa7338',
-      NATIVE_TOKEN_UNWRAPPER: '0x8A388BE3fb93C28b66365DCbf3eAc344690BD1C4',
+      ADDRESS_DRIVER: '0x04693D13826a37dDdF973Be4275546Ad978cb9EE',
+      DRIPS: '0xd320F59F109c618b19707ea5C5F068020eA333B3',
+      CALLER: '0xd6Ab8e72dE3742d45AdF108fAa112Cd232718828',
+      REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
+      NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
+      NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
     },
     settlement: {
       nextSettlementDate: nextFilecoinSettlementDate,
