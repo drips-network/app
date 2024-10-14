@@ -69,7 +69,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@apollo/client": "^3.10.5",
+    "@apollo/client": "^3.11.8",
     "@efstajas/svelte-stored-writable": "^0.3.0",
     "@efstajas/versioned-parser": "^0.1.4",
     "@gelatonetwork/relay-sdk": "^5.5.6",
