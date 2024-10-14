@@ -71,7 +71,9 @@ export const fallback: RequestHandler = async ({ request, params, fetch }) => {
     const resBody = await response.text();
 
     return new Response(resBody, {
-      status: response.status,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error: any) {
     return new Response(`Error: ${error.message}`, { status: 500 });
