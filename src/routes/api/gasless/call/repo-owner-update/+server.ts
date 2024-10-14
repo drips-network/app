@@ -7,6 +7,8 @@ import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk
 import { GELATO_API_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
 import network, { getNetwork, isSupportedChainId } from '$lib/stores/wallet/network';
+import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
+import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
 const payloadSchema = z.object({
   forge: z.number(),
@@ -41,7 +43,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
   assert(isSupportedChainId(chainId), 'Unsupported chain id');
 
-  const provider = new ethers.JsonRpcProvider(getNetwork(chainId).rpcUrl);
+  const { rpcUrl, fallbackRpcUrl } = getNetwork(chainId);
+  const provider = new FailoverJsonRpcProvider(
+    mapFilterUndefined([rpcUrl, fallbackRpcUrl], (url) => url),
+  );
   const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
 
   const tx = await contract.requestUpdateOwner.populateTransaction(
