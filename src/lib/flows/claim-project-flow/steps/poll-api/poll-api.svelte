@@ -13,6 +13,7 @@
   } from './__generated__/gql.generated';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import assert from '$lib/utils/assert';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -46,6 +47,38 @@
       }
     `;
 
+    assert($context.gaslessOwnerUpdateTaskId, 'Gasless owner update task ID is missing');
+
+    // First, wait for Gelato Relay to resolve the update task.
+    await expect(
+      async () => {
+        const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
+        if (!res.ok) throw new Error('Failed to track gasless owner update task');
+
+        const { task } = await res.json();
+        assert(typeof task === 'object', 'Invalid task');
+        const { taskState } = task;
+        assert(typeof taskState === 'string', 'Invalid task state');
+
+        return taskState;
+      },
+      (taskState) => {
+        switch (taskState) {
+          case 'ExecSuccess':
+            return true;
+          case 'Cancelled':
+            throw new Error(
+              'Failed to gaslessly update the repository owner on-chain. Please reach out to us on Discord.',
+            );
+          default:
+            return false;
+        }
+      },
+      300000,
+      2000,
+    );
+
+    // Next, wait for the new owner to be indexed by our infra.
     await expect(
       () =>
         query<CheckProjectVerificationStatusQuery, CheckProjectVerificationStatusQueryVariables>(
