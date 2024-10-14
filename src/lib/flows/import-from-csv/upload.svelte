@@ -26,7 +26,8 @@
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
-  export let csvHeaders: Array<string> | undefined = ['recipient', 'percentage'];
+  // csvHeaders[0] should always be an address
+  export let csvHeaders: Array<string> = ['recipient', 'percentage'];
   export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
   export let exampleTableHeaders: Array<string> | undefined = csvHeaders;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
@@ -67,21 +68,45 @@
 
   async function validateFile(file: File): Promise<string | false> {
     parsedFile = (await parseFile(file)) as Array<[string, string]>;
-    const recipient = parsedFile[0][0];
-    const classification = classifyRecipient(recipient, {
-      allowProjects,
-      allowAddresses,
-      allowDripLists,
-    });
 
     let headerAdjustment = 0;
-    // if we don't recognize the first value, let's
-    // assume it's a header
-    if (!classification) {
+    // if we detect one of our header fields in the first row
+    // assume it's the header.
+    if (hasHeader(parsedFile, csvHeaders)) {
       headerAdjustment = 1;
     }
 
-    return parsedFile.length > maxEntries + headerAdjustment ? 'too-many-entries' : false;
+    return parsedFile.length > csvMaxEntries + headerAdjustment ? 'too-many-entries' : false;
+  }
+
+  function hasHeader(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): boolean {
+    const row = parsedFile[0];
+    // TODO: every?
+    return row.some((column) => csvHeaders.includes(column.toLowerCase()));
+  }
+
+  function getFileLayout(
+    parsedFile: Array<Array<string>>,
+    csvHeaders: Array<string>,
+  ): Array<number> {
+    const row = parsedFile[0];
+
+    if (!hasHeader(parsedFile, csvHeaders)) {
+      return [0, 1];
+    }
+
+    let result = [];
+    for (const csvHeader of csvHeaders) {
+      const csvHeaderIndex = row.findIndex((column) => csvHeader === column.toLowerCase());
+      // TODO: do we care?
+      // if (csvHeaderIndex < 0) {
+      //   return []
+      // }
+
+      result.push(csvHeaderIndex);
+    }
+
+    return result;
   }
 
   async function submit() {
@@ -91,7 +116,13 @@
       // clear the existing recipient entries
       clearItems();
 
-      for (const [index, [recipient, rawSplit]] of parsedFile.entries()) {
+      // determine which columns represent the data we want
+      const [recipientIndex, rawSplitIndex] = getFileLayout(parsedFile, csvHeaders);
+
+      for (const [index, row] of parsedFile.entries()) {
+        const recipient = row[recipientIndex];
+        const rawSplit = row[rawSplitIndex];
+
         if (!recipient.trim()) {
           continue;
         }
@@ -119,6 +150,7 @@
         // column in the file and null if there is a second column but the
         // value is not present.
         const split = parseFloat(rawSplit);
+        // in the case of a list of collaborators, rawSplit will be undefined
         if (typeof rawSplit !== 'undefined' && !Number.isFinite(split)) {
           const error = new AddItemSuberror(
             'This has an invalid split value',
