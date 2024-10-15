@@ -38,6 +38,7 @@
   {#if dripList}
     <div class="list">
       <DripListCard
+        hideSupporterPile
         openInNewTab
         clampTitle={false}
         hideDescription
