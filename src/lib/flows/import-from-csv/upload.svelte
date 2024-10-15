@@ -14,10 +14,10 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
-  import { parseFile } from '$lib/flows/import-from-csv/parse-csv';
+  import { parseFile } from '$lib/flows/import-from-csv/parse-upload';
+  import { DEFAULT_CSV_HEADERS, DEFAULT_MAX_ENTRIES } from './import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
-  const DEFAULT_MAX_ENTRIES = 200;
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
@@ -27,7 +27,7 @@
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
   // csvHeaders[0] should always be an address
-  export let csvHeaders: Array<string> = ['recipient', 'percentage'];
+  export let csvHeaders: Array<string> = DEFAULT_CSV_HEADERS;
   export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
   export let exampleTableHeaders: Array<string> | undefined = csvHeaders;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;

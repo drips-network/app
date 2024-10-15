@@ -19,6 +19,9 @@ type UploadProps = {
   onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
 };
 
+export const DEFAULT_CSV_HEADERS = ['recipient', 'percentage'];
+export const DEFAULT_MAX_ENTRIES = 200;
+
 export default (props: UploadProps) => ({
   context: undefined,
   steps: [

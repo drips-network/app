@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { DEFAULT_CSV_HEADERS } from '../import-from-csv-steps';
+
   export let caption: string | undefined;
-  export let headers: Array<string> = ['recipient', 'percentage'];
+  export let headers: Array<string> = DEFAULT_CSV_HEADERS;
   export let data: Array<Array<unknown>> = [
     ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
     ['https://github.com/graphdeco-inria/hierarchical-3d-gaussians', 75],

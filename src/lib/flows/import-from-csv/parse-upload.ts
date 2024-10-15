@@ -39,6 +39,10 @@ export async function parseFile(
   const [recipientIndex, percentageIndex, startRowIndex] = getFileLayout(parsedFile, csvHeaders);
   const result = [];
   for (const row of parsedFile.slice(startRowIndex)) {
+    if (!row[recipientIndex] && !row[percentageIndex]) {
+      continue;
+    }
+
     result.push([row[recipientIndex], row[percentageIndex]]);
   }
 
