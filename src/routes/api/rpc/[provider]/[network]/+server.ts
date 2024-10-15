@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { RequestHandler } from './$types';
 import assert from '$lib/utils/assert';
-import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 
 const providers = ['infura', 'alchemy', 'glif'] as const;
 const networkNames = [
