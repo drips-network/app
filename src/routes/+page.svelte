@@ -468,6 +468,7 @@
     text-align: center;
     max-width: 48rem;
     margin: 2rem auto 4rem auto;
+    padding: 1rem;
   }
 
   /* USPs */
