@@ -215,7 +215,7 @@
 
       <!-- flying coins foreground -->
       <div
-        class="absolute z-10 top-1.5 left-0 w-full flex justify-center overflow-visible pointer-events-none"
+        class="absolute z-10 top-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
       >
         <div style="flex:0 0 1750px; perspective:1px; transform: translateZ(-1px); ">
           <LpIllustrationFlyingCoins />
