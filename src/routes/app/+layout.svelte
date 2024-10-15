@@ -33,7 +33,9 @@
     await wallet.initialize();
     loaded = true;
 
-    const { connected, network, address, safe } = $wallet;
+    const { connected, network, provider, address, safe } = $wallet;
+
+    ens.connect(provider);
 
     themeStore.subscribe((v) => {
       const onboardTheme = v.currentTheme === 'h4x0r' ? 'dark' : v.currentTheme;
