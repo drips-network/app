@@ -95,11 +95,11 @@
             </div>
           </h1>
           <div class="flex flex-wrap gap-2 justify-center w-full">
-            <a href="#drip-list-hiw"
-              ><Button icon={DripListIcon} variant="primary">Start funding</Button></a
+            <Button href="#drip-list-hiw" icon={DripListIcon} variant="primary"
+              >Start funding</Button
             >
-            <a href="#get-funding"
-              ><Button icon={Registered} variant="primary">Claim your project</Button></a
+            <Button href="#get-funding" icon={Registered} variant="primary"
+              >Claim your project</Button
             >
           </div>
         </div>

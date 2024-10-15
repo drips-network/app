@@ -1,4 +1,11 @@
 <script lang="ts" context="module">
+  type ButtonConfig = {
+    text: string;
+    icon?: ComponentType;
+    href?: string;
+    handler?: () => void;
+  };
+
   export interface Step {
     path?: SVGPathElement;
     illustration?: ComponentType;
@@ -7,10 +14,8 @@
     position?: Pick<DOMRect, 'top' | 'left' | 'width' | 'height'>;
     customClasses?: string;
     isOptional?: boolean;
-    button?: {
-      text: string;
-      handler: () => void;
-    };
+    button?: ButtonConfig;
+    secondaryButton?: ButtonConfig;
   }
 </script>
 
@@ -81,9 +86,26 @@
         {/if}
         <h3 class="text-typo-header-1 font-pixelated leading-[1]">{step.heading}</h3>
         <p>{step.text}</p>
-        {#if step.button}
-          <Button variant="primary" on:click={step.button.handler}>{step.button.text}</Button>
-        {/if}
+        <div class="flex gap-2">
+          {#if step.secondaryButton}
+            <Button
+              href={step.secondaryButton.href}
+              target="_blank"
+              variant="normal"
+              icon={step.secondaryButton.icon}
+              on:click={step.secondaryButton.handler}>{step.secondaryButton.text}</Button
+            >
+          {/if}
+          {#if step.button}
+            <Button
+              href={step.button.href}
+              target="_blank"
+              variant="primary"
+              icon={step.button.icon}
+              on:click={step.button.handler}>{step.button.text}</Button
+            >
+          {/if}
+        </div>
       </li>
     {/each}
   </ol>

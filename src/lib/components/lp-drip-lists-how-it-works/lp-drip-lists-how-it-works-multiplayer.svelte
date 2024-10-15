@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import BallotBox from '../illustrations/ballot-box.svelte';
   import Collaborators from '../illustrations/collaborators.svelte';
   import Envelope from '../illustrations/envelope.svelte';
   import DripList from '../illustrations/drip-list.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
   import ResponsiveFlowChart, { type Step } from './responsive-flow-chart.svelte';
   import OneBalance from '../illustrations/one-balance.svelte';
 
@@ -43,7 +43,12 @@
       customClasses: 'bg-primary-level-1 lg:bg-transparent',
       button: {
         text: 'Create a Drip List',
-        handler: () => goto('/app/funder-onboarding'),
+        icon: DripListIcon,
+        href: '/app/funder-onboarding',
+      },
+      secondaryButton: {
+        text: 'Learn more',
+        href: 'https://docs.drips.network/support-your-dependencies/overview',
       },
     },
   ];
