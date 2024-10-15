@@ -58,6 +58,8 @@
     justify-content: space-between;
     gap: 1.5rem;
     background-color: var(--color-background);
+    min-height: 461px;
+    align-items: stretch;
   }
 
   .list {
@@ -66,7 +68,6 @@
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
     max-width: 32rem;
-    height: 100%;
   }
 
   .case-study-card .left {
@@ -119,6 +120,7 @@
 
     .list {
       flex: initial;
+      max-width: none;
     }
   }
 </style>

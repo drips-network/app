@@ -18,8 +18,6 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Registered from '$lib/components/icons/Registered.svelte';
   import LpQuadsparkle from '$lib/components/illustrations/lp-quadsparkle.svelte';
-  import Toggle from '$lib/components/toggle/toggle.svelte';
-  import LpDripListsHowItWorksSolo from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-solo.svelte';
   import LpDripListsHowItWorksMultiplayer from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-multiplayer.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
@@ -30,6 +28,7 @@
   import Proposals from '$lib/components/icons/Proposals.svelte';
   import Splits from '$lib/components/icons/Splits.svelte';
   import CaseStudyCard from './components/case-study-card.svelte';
+  import DripListsBgRight from './components/svgs/drip-lists-bg-right.svelte';
 
   export let data: PageData;
 
@@ -43,8 +42,6 @@
 
   let claimProjectInput = '';
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
-
-  let collabVisible = true;
 
   const heroTexts = [
     'Continuously support your dependencies',
@@ -97,9 +94,13 @@
               </div>
             </div>
           </h1>
-          <div class="flex flex-wrap gap-1 justify-center w-full">
-            <Button icon={DripListIcon} variant="primary">Start a Drip List</Button>
-            <Button icon={Registered} variant="primary">Claim your project</Button>
+          <div class="flex flex-wrap gap-2 justify-center w-full">
+            <a href="#drip-list-hiw"
+              ><Button icon={DripListIcon} variant="primary">Start funding</Button></a
+            >
+            <a href="#get-funding"
+              ><Button icon={Registered} variant="primary">Claim your project</Button></a
+            >
           </div>
         </div>
       </div>
@@ -222,7 +223,16 @@
     </div>
 
     <div class="relative">
+      <div id="drip-list-hiw" class="anchor" />
+
       <section>
+        <div class="drip-list-hiw-bg-left">
+          <DripListsBgLeft />
+        </div>
+        <div class="drip-list-hiw-bg-right">
+          <DripListsBgRight />
+        </div>
+
         <div class="flex flex-col items-center gap-10 pt-9">
           <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
             <LpQuadsparkle />
@@ -237,42 +247,17 @@
             </p>
           </div>
 
-          <div class="flex gap-4 items-center">
-            By yourself
-            <Toggle bind:checked={collabVisible} />
-            Collaborative
-          </div>
-
           <TransitionedHeight transitionHeightChanges>
             <!-- mobile: no fade, height transitions -->
             <!-- laptop (lg): cross-fade -->
             <section class="relative">
-              <div
-                class="{!collabVisible
-                  ? 'hidden lg:block opacity-0 pointer-events-none '
-                  : ''} transition duration-200"
-              >
+              <div class="transition duration-200">
                 <LpDripListsHowItWorksMultiplayer />
-              </div>
-
-              <div
-                class="{collabVisible
-                  ? 'hidden lg:block opacity-0 pointer-events-none '
-                  : ''} transition duration-200 lg:absolute overlay"
-              >
-                <LpDripListsHowItWorksSolo />
               </div>
             </section>
           </TransitionedHeight>
         </div>
       </section>
-
-      <!-- background (upper) -->
-      <div class="absolute top-0 left-0 w-full flex justify-center overflow-hidden">
-        <div class="min-w-[340vw] sm:min-w-[200vw] mlg:min-w-full">
-          <DripListsBgLeft />
-        </div>
-      </div>
     </div>
 
     <div class="section-spacer" />
@@ -584,6 +569,7 @@
     gap: 1.5rem;
     padding: min(3rem, 3vw);
     padding-right: 0;
+    text-align: left;
   }
 
   section .section-inner > .text:last-child {
@@ -761,16 +747,39 @@
   }
 
   /* TWEAKS */
+  .drip-list-hiw-bg-left {
+    position: absolute;
+    top: -1rem;
+    left: calc(-330px + 15%);
+    width: 330px;
+    overflow: hidden;
+  }
+
+  .drip-list-hiw-bg-right {
+    position: absolute;
+    top: -20rem;
+    right: calc(-177px + 15%);
+    width: 177px;
+    overflow: hidden;
+  }
 
   .claim-input {
     display: flex;
     gap: 0.5rem;
+    width: 100%;
   }
 
   @media (max-width: 819px) {
     .claim-input {
       flex-direction: column;
       align-items: flex-end;
+    }
+  }
+
+  @media (max-width: 1117px) {
+    .drip-list-hiw-bg-left,
+    .drip-list-hiw-bg-right {
+      display: none;
     }
   }
 </style>

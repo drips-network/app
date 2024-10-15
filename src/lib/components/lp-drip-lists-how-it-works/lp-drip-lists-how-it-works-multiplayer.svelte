@@ -12,6 +12,7 @@
       heading: 'Choose collaborators',
       text: 'Add anyone with an Ethereum address. These collaborators will vote on the final recipients.',
       illustration: Collaborators,
+      isOptional: true,
     },
     {
       heading: 'Nominate recipients',
@@ -24,6 +25,7 @@
       heading: 'Vote on recipients',
       text: 'Decide what percent of funds each recipient should receive.',
       illustration: BallotBox,
+      isOptional: true,
     },
     {
       heading: 'Publish the list',
@@ -40,7 +42,7 @@
       text: 'Get your personalized Drip List started now.',
       customClasses: 'bg-primary-level-1 lg:bg-transparent',
       button: {
-        text: 'Start a Drip List',
+        text: 'Create a Drip List',
         handler: () => goto('/app/funder-onboarding'),
       },
     },
@@ -86,8 +88,6 @@
       d="M530.5 1395.14H233C219.745 1395.14 209 1384.4 209 1371.14V1291.5"
       stroke="var(--color-foreground)"
     />
-    <rect x="432.5" y="1371.5" width="47" height="47" rx="23.5" fill="#DCFAC8" />
-    <rect x="432.5" y="1371.5" width="47" height="47" rx="23.5" stroke="var(--color-foreground)" />
     <path
       d="M480 80.6433H799C807.837 80.6433 815 87.8068 815 96.6433V183.643"
       stroke="var(--color-foreground)"
