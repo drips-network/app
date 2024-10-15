@@ -32,7 +32,7 @@
     });
   });
 
-  const COIN_POS_MULTIPLIERS = [1.6, 1.3, 0.8, 0.3, 1.5];
+  const COIN_POS_MULTIPLIERS = [1.9, 0.5, 0.6, 0.3, 1.7];
 
   $: {
     if (!isTouchscreenDevice) {
