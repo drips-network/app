@@ -87,15 +87,6 @@
         <h3 class="text-typo-header-1 font-pixelated leading-[1]">{step.heading}</h3>
         <p>{step.text}</p>
         <div class="flex gap-2">
-          {#if step.secondaryButton}
-            <Button
-              href={step.secondaryButton.href}
-              target="_blank"
-              variant="normal"
-              icon={step.secondaryButton.icon}
-              on:click={step.secondaryButton.handler}>{step.secondaryButton.text}</Button
-            >
-          {/if}
           {#if step.button}
             <Button
               href={step.button.href}
@@ -103,6 +94,15 @@
               variant="primary"
               icon={step.button.icon}
               on:click={step.button.handler}>{step.button.text}</Button
+            >
+          {/if}
+          {#if step.secondaryButton}
+            <Button
+              href={step.secondaryButton.href}
+              target="_blank"
+              variant="normal"
+              icon={step.secondaryButton.icon}
+              on:click={step.secondaryButton.handler}>{step.secondaryButton.text}</Button
             >
           {/if}
         </div>
