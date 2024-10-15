@@ -28,6 +28,9 @@ const isValidProvider = (provider: any): provider is (typeof providers)[number] 
   providers.includes(provider);
 const isValidNetwork = (network: any): network is (typeof networkNames)[number] =>
   networkNames.includes(network);
+const isAlchemyNetwork = (network: string): network is keyof typeof alchemyNetworkMap => {
+  return network in alchemyNetworkMap;
+};
 
 /** Proxies all requests to the RPC provider and injects API access token */
 export const fallback: RequestHandler = async ({ request, params, fetch }) => {
@@ -47,7 +50,8 @@ export const fallback: RequestHandler = async ({ request, params, fetch }) => {
   } else if (provider === 'alchemy') {
     const alchemyKey = getOptionalEnvVar('ALCHEMY_KEY');
     assert(alchemyKey, 'ALCHEMY_KEY is required');
-    rpcUrl = `https://${alchemyNetworkMap[network as keyof typeof alchemyNetworkMap]}.g.alchemy.com/v2/${alchemyKey}`;
+    assert(isAlchemyNetwork(network), `Invalid network for Alchemy provider: ${network}`);
+    rpcUrl = `https://${alchemyNetworkMap[network]}.g.alchemy.com/v2/${alchemyKey}`;
     headers.set('accept-encoding', 'identity');
   } else if (provider === 'glif') {
     const filecoinKey = getOptionalEnvVar('FILECOIN_KEY');
