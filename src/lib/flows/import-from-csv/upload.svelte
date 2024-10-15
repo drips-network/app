@@ -7,7 +7,6 @@
   import CsvExample from './components/csv-example.svelte';
   import DropZone from '../../components/drop-zone/drop-zone.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import { parseFile } from '$lib/utils/csv';
   import type { Writable } from 'svelte/store';
   import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
@@ -15,6 +14,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
+  import { parseFile } from '$lib/flows/import-from-csv/parse-csv';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const DEFAULT_MAX_ENTRIES = 200;
@@ -67,46 +67,9 @@
   }
 
   async function validateFile(file: File): Promise<string | false> {
-    parsedFile = (await parseFile(file)) as Array<[string, string]>;
-
-    let headerAdjustment = 0;
-    // if we detect one of our header fields in the first row
-    // assume it's the header.
-    if (hasHeader(parsedFile, csvHeaders)) {
-      headerAdjustment = 1;
-    }
-
-    return parsedFile.length > csvMaxEntries + headerAdjustment ? 'too-many-entries' : false;
-  }
-
-  function hasHeader(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): boolean {
-    const row = parsedFile[0];
-    // TODO: every?
-    return row.some((column) => csvHeaders.includes(column.toLowerCase()));
-  }
-
-  function getFileLayout(
-    parsedFile: Array<Array<string>>,
-    csvHeaders: Array<string>,
-  ): Array<number> {
-    const row = parsedFile[0];
-
-    if (!hasHeader(parsedFile, csvHeaders)) {
-      return [0, 1];
-    }
-
-    let result = [];
-    for (const csvHeader of csvHeaders) {
-      const csvHeaderIndex = row.findIndex((column) => csvHeader === column.toLowerCase());
-      // TODO: do we care?
-      // if (csvHeaderIndex < 0) {
-      //   return []
-      // }
-
-      result.push(csvHeaderIndex);
-    }
-
-    return result;
+    // sets global data used later in submit()
+    parsedFile = await parseFile(file, csvHeaders);
+    return parsedFile.length > csvMaxEntries ? 'too-many-entries' : false;
   }
 
   async function submit() {
@@ -116,13 +79,7 @@
       // clear the existing recipient entries
       clearItems();
 
-      // determine which columns represent the data we want
-      const [recipientIndex, rawSplitIndex] = getFileLayout(parsedFile, csvHeaders);
-
-      for (const [index, row] of parsedFile.entries()) {
-        const recipient = row[recipientIndex];
-        const rawSplit = row[rawSplitIndex];
-
+      for (const [index, [recipient, rawSplit]] of parsedFile.entries()) {
         if (!recipient.trim()) {
           continue;
         }
