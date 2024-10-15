@@ -14,6 +14,7 @@
   export let logoAlt: string;
   export let description: string;
   export let dripList: DripListCardFragment | undefined;
+  export let maxSplitRows: number | undefined = undefined;
 
   onMount(fiatEstimates.start);
 </script>
@@ -38,6 +39,7 @@
   {#if dripList}
     <div class="list">
       <DripListCard
+        {maxSplitRows}
         hideSupporterPile
         openInNewTab
         clampTitle={false}

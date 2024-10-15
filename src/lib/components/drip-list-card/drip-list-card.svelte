@@ -139,6 +139,7 @@
   export let hideDescription = false;
   export let clampTitle = true;
   export let openInNewTab = false;
+  export let maxSplitRows: number | undefined = undefined;
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
@@ -319,11 +320,12 @@
                   >
                     <Splits
                       disableLinks={listingMode}
-                      maxRows={listingMode
-                        ? dripList.description && !hideDescription
-                          ? 3
-                          : 4
-                        : undefined}
+                      maxRows={maxSplitRows ??
+                        (listingMode
+                          ? dripList.description && !hideDescription
+                            ? 3
+                            : 4
+                          : undefined)}
                       groupsExpandable={!listingMode}
                       list={dripList.splits}
                     />
