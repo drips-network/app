@@ -665,21 +665,24 @@
     d="M540.994 739.25L505.05 739.25C496.213 739.25 489.05 732.087 489.05 723.25L489.05 656.25"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M357.05 727.251L306.05 727.251C297.213 727.251 290.05 720.087 290.05 711.251L290.05 641.25"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M275.05 841.25L275.05 751.25C275.05 742.414 267.887 735.25 259.05 735.25L243.05 735.25"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M156.05 735.251L101.55 735.251C92.7134 735.251 85.55 728.087 85.55 719.251L85.55 580.123"
     stroke="var(--color-foreground-level-2)"
-    data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M392.05 152.25L211.05 152.25C202.213 152.25 195.05 159.414 195.05 168.25L195.05 232.25"
@@ -701,11 +704,17 @@
     stroke="var(--color-foreground-level-2)"
     data-drip-path
   />
-  <path d="M884.05 606.821V221.251" stroke="var(--color-foreground-level-2)" data-drip-path />
+  <path
+    d="M884.05 606.821V221.251"
+    stroke="var(--color-foreground-level-2)"
+    data-drip-path
+    data-drip-path-reverse
+  />
   <path
     d="M1002.55 333.751V472.009C1002.55 480.846 1009.71 488.009 1018.55 488.009H1042.89C1051.72 488.009 1058.89 495.173 1058.89 504.009V549.13"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M1045.05 275.918L1375.05 275.918C1383.89 275.918 1391.05 283.082 1391.05 291.918L1391.05 304.25"
@@ -732,7 +741,12 @@
     stroke="var(--color-foreground-level-2)"
     data-drip-path
   />
-  <path d="M1356.05 558.25L1356.05 510.75" stroke="var(--color-foreground-level-3)" />
+  <path
+    d="M1356.05 558.25L1356.05 510.75"
+    stroke="var(--color-foreground-level-3)"
+    data-drip-path
+    data-drip-path-reverse
+  />
   <path
     d="M415.494 127.996V44.4961C415.494 35.6595 422.658 28.4961 431.494 28.4961H1169.99C1178.83 28.4961 1185.99 35.6595 1185.99 44.4961V121.496C1185.99 130.333 1193.16 137.496 1201.99 137.496H1252.49"
     stroke="var(--color-foreground-level-2)"
@@ -742,18 +756,25 @@
     d="M779.05 797.25L779.05 767.715C779.05 758.878 786.213 751.715 795.05 751.715L869.05 751.715C877.887 751.715 885.05 744.552 885.05 735.715L885.05 687.25"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M958.05 275.918L900.05 275.918C891.213 275.918 884.05 268.755 884.05 259.918L884.05 207.25"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
+    data-drip-path-reverse
   />
   <path
     d="M930.05 628.25H962.05C970.887 628.25 978.05 635.414 978.05 644.25V728.25"
     stroke="var(--color-foreground-level-2)"
     data-drip-path
   />
-  <path d="M755.05 628.25H842.05" stroke="var(--color-foreground-level-2)" data-drip-path />
+  <path
+    d="M755.05 628.25H842.05"
+    stroke="var(--color-foreground-level-2)"
+    data-drip-path
+    data-drip-path-reverse
+  />
   <rect
     x="331.05"
     y="275.75"
