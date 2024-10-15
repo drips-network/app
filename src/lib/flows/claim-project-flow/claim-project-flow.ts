@@ -55,6 +55,7 @@ export interface State {
   maintainerSplits: ListEditorConfig;
   dependencySplits: ListEditorConfig;
   dependenciesAutoImported: boolean;
+  gaslessOwnerUpdateTaskId: string | undefined;
   avatar:
     | {
         type: 'emoji';
@@ -84,6 +85,7 @@ export const state = () =>
       weights: {},
     },
     dependenciesAutoImported: false,
+    gaslessOwnerUpdateTaskId: undefined,
     avatar: {
       type: 'emoji',
       emoji: '💧',
