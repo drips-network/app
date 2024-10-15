@@ -161,7 +161,7 @@
     <div class="relative pt-24 mlg:pt-12 pb-18">
       <section>
         <div class="flex flex-col items-center gap-10">
-          <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+          <header class="flex gap-8 justify-between items-center max-w-full w-[500px] mx-auto">
             <LpQuadsparkle />
             <h2 class="typo-header-1">Drips in Use</h2>
             <LpQuadsparkle />
