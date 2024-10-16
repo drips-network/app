@@ -37,11 +37,10 @@ else
   while true; do
     # Send the introspection query to the API and capture the output
     response=$(curl -s -H "Content-Type: application/json" -H "Authorization: Bearer $access_token" -d "$introspection_query" "$api_url")
-    response_code=$(echo "$response" | jq -r '.data."__schema"."queryType"."name"')
 
-    echo "- Got $response_code"
+    echo "- Got $response"
 
-    if [ "$response_code" = "Query" ]; then
+    if [ "$response" = "$expected_response" ]; then
       printf "\n"
       echo "✅ API is up! Building types..."
       printf "\n"
