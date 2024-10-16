@@ -39,8 +39,16 @@ export const validateAddress = async (
     return true;
   }
 
-  const resolved = await ensStore.reverseLookup(addressValue);
-  return resolved;
+  try {
+    const resolved = await ensStore.reverseLookup(addressValue);
+    return resolved;
+  } catch (error) {
+    if ((error as Error).message.includes('invalid ENS name')) {
+      return false;
+    }
+
+    throw error;
+  }
 };
 
 export const createInvalidMessage = (type: string): string => {
