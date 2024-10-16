@@ -1,5 +1,4 @@
-pwd
-source .env
+
 
 # Wait for API at env var GQL_URL to be up by repeatedly pining /health for max 5 minutes
 max_wait_time=300
