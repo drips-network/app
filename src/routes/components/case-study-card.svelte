@@ -22,7 +22,9 @@
 <div class="case-study-card">
   <div class="left">
     <div class="description typo-text">
-      <CoinAnimation playSound><img src={logoSrc} alt={logoAlt} /></CoinAnimation>
+      <div class="logo-wrapper">
+        <CoinAnimation playSound><img src={logoSrc} alt={logoAlt} /></CoinAnimation>
+      </div>
       <h3 class="typo-header-1">{orgName}</h3>
       <p>{description}</p>
     </div>
@@ -63,6 +65,11 @@
     background-color: var(--color-background);
     min-height: 461px;
     align-items: stretch;
+  }
+
+  .logo-wrapper {
+    width: 3rem;
+    height: 3rem;
   }
 
   .list {
