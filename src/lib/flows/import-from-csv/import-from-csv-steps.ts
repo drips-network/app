@@ -9,7 +9,8 @@ type UploadProps = {
   allowProjects?: boolean;
   allowAddresses?: boolean;
   allowDripLists?: boolean;
-  maxEntries?: number;
+  csvHeaders?: Array<string>;
+  csvMaxEntries?: number;
   exampleTableHeaders?: Array<string> | undefined;
   exampleTableData?: Array<Array<unknown>> | undefined;
   exampleTableCaption?: string | undefined;
@@ -17,6 +18,9 @@ type UploadProps = {
   clearItems: () => undefined;
   onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
 };
+
+export const DEFAULT_CSV_HEADERS = ['recipient', 'percentage'];
+export const DEFAULT_MAX_ENTRIES = 200;
 
 export default (props: UploadProps) => ({
   context: undefined,
