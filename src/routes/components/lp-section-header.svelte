@@ -19,18 +19,14 @@
 
 <style>
   .section-header {
-    padding: 0 var(--spacing-m);
     display: flex;
-    gap: var(--spacing-m);
-    margin-top: var(--spacing-m);
     justify-content: center;
-    margin-bottom: var(--spacing-m);
   }
 
   .illus {
     display: flex;
     align-items: center;
-    gap: var(--spacing-m);
+    gap: 1rem;
   }
 
   @media (max-width: 577px) {

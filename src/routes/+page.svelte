@@ -1,33 +1,34 @@
 <script lang="ts">
   import LpHeader from './components/lp-header.svelte';
-
   import isRunningInSafe from '$lib/utils/is-running-in-safe';
   import { goto } from '$app/navigation';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { onMount } from 'svelte';
-  import LpHero from '$lib/components/illustrations/lp-hero.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Globe from '$lib/components/icons/Globe.svelte';
-  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import OneBalance from '$lib/components/illustrations/one-balance.svelte';
-  import LpInterstitialIllustration1 from '$lib/components/illustrations/lp-interstitial-illustration-1.svelte';
-  import LpDripListIllustration from '$lib/components/illustrations/lp-drip-list-illustration.svelte';
   import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
-  import LpCard from './components/lp-card/lp-card.svelte';
-  import ImageAndCaption from './components/image-and-caption.svelte';
-  import MultiToken from '$lib/components/illustrations/multi-token.svelte';
-  import GasOptimized from '$lib/components/illustrations/gas-optimized.svelte';
-  import NoWrappedTokens from '$lib/components/illustrations/no-wrapped-tokens.svelte';
-  import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
   import buildUrl from '$lib/utils/build-url';
-  import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
-  import DripList from '$lib/components/illustrations/drip-list.svelte';
   import LpFooter from './components/lp-footer.svelte';
   import LpTotalDrippedBadge from './components/lp-total-dripped-badge.svelte';
   import type { PageData } from './$types';
+  import LpHeroBigGraph from '$lib/components/illustrations/lp-hero-big-graph.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import Registered from '$lib/components/icons/Registered.svelte';
+  import LpQuadsparkle from '$lib/components/illustrations/lp-quadsparkle.svelte';
+  import LpDripListsHowItWorksMultiplayer from '$lib/components/lp-drip-lists-how-it-works/lp-drip-lists-how-it-works-multiplayer.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
+  import AnimateTypeWords from '$lib/components/animate-type-words/animate-type-words.svelte';
+  import DripListsBgLeft from './components/svgs/drip-lists-bg-left.svelte';
+  import Github from '$lib/components/icons/Github.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
+  import Splits from '$lib/components/icons/Splits.svelte';
+  import CaseStudyCard from './components/case-study-card.svelte';
+  import DripListsBgRight from './components/svgs/drip-lists-bg-right.svelte';
 
   export let data: PageData;
 
@@ -39,20 +40,15 @@
     if (isRunningInSafe()) goto('/app', { replaceState: true });
   });
 
-  let millis = 0;
-
-  setInterval(() => {
-    millis += 10;
-  }, 10);
-
-  function getTokenStreamsVisualAmount(amtPerSec: number, startValue: number) {
-    const secondsSinceStart = millis / 1000;
-
-    return (startValue + amtPerSec * secondsSinceStart).toFixed(6);
-  }
-
   let claimProjectInput = '';
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
+
+  const heroTexts = [
+    'Continuously support your dependencies',
+    'Retroactively reward open-source projects',
+    'Incentivize developers within your ecosystem',
+  ];
+  let heroTextsIndex = 0;
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
@@ -60,32 +56,239 @@
 <LpHeader />
 <div class="page">
   <div class="wrapper">
-    <div class="hero">
-      <div class="text">
-        <h1>Funding that flows</h1>
-        <p>A decentralized toolkit for funding your critical software dependencies.</p>
-        <div class="actions">
-          <Button href="#fund-projects" icon={TokenStreams}>Fund your dependencies</Button>
-          <Button href="#get-funding" icon={Globe}>Get support for your project</Button>
+    <!-- hero graph -->
+    <div style:position="relative">
+      <div
+        style:display="flex"
+        style:justify-content="center"
+        style:overflow="hidden"
+        style:width="100%"
+      >
+        <div class="big-hero-graph">
+          <LpHeroBigGraph />
         </div>
       </div>
-      <figure class="relative flex-1">
-        <div class="illustration">
-          <LpHero />
-        </div>
-        {#if data.prices}
-          <div class="absolute overlay z-10 flex items-center justify-center">
+      <div
+        style:transform="translateY(-2rem)"
+        class="absolute overlay flex items-center justify-center"
+      >
+        <div class="flex flex-col gap-4 mlg:gap-7">
+          <div class="flex w-full justify-center">
             <LpTotalDrippedBadge prices={data.prices} />
           </div>
-        {/if}
-      </figure>
+          <h1 class="w-full relative font-pixelated text-center leading-[1.15] px-2">
+            <div class="invisible">
+              {heroTexts.slice(0).sort((a, b) => b.length - a.length)[0]}|
+            </div>
+            <div class="absolute overlay flex items-center justify-center">
+              <div class="w-full text-center">
+                {#key heroTextsIndex}<AnimateTypeWords
+                    text={heroTexts[heroTextsIndex]}
+                    wordClasses="bg-background"
+                    on:done={() => {
+                      setTimeout(() => {
+                        heroTextsIndex = (heroTextsIndex + 1) % heroTexts.length;
+                      }, 2500);
+                    }}
+                  />{/key}
+              </div>
+            </div>
+          </h1>
+          <div class="flex flex-wrap gap-2 justify-center w-full">
+            <Button href="#drip-list-hiw" icon={DripListIcon} variant="primary"
+              >Start funding</Button
+            >
+            <Button href="#get-funding" icon={Registered} variant="primary"
+              >Claim your project</Button
+            >
+          </div>
+        </div>
+      </div>
     </div>
+
+    <h4 class="opener">
+      Drips is a decentralized toolkit for rewarding open source projects within your ecosystem.
+    </h4>
+
+    <section class="usps">
+      <div class="usp">
+        <div class="icon">
+          <Github style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The easiest way to fund any GitHub repo</h4>
+          <p>
+            Instantly support any repo on GitHub, even if you don't know their Ethereum address.
+          </p>
+        </div>
+      </div>
+      <div class="usp">
+        <div class="icon">
+          <DripList style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The most flexible way to distribute funds</h4>
+          <p>
+            Distribute any ERC-20, continuously or as a one-time donation, without platform fees.
+          </p>
+        </div>
+      </div>
+      <div class="usp">
+        <div class="icon">
+          <Proposals style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The simplest way for communities to allocate funds</h4>
+          <p>Collectively decide on which projects and people receive what percentage of funds.</p>
+        </div>
+      </div>
+      <div class="usp">
+        <div class="icon">
+          <Splits style="fill: var(--color-primary); width: 2rem; height: 2rem;" />
+        </div>
+        <div>
+          <h4>The widest impact, by default</h4>
+          <p>
+            Funds sent to projects are also split with their dependencies, amplifying your impact
+            within the open-source community.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-spacer" />
+
+    <div class="relative pt-24 mlg:pt-12 pb-18">
+      <section>
+        <div class="flex flex-col items-center gap-10">
+          <header class="flex gap-8 justify-between items-center max-w-full w-[500px] mx-auto">
+            <LpQuadsparkle />
+            <h2 class="typo-header-1">Drips in Use</h2>
+            <LpQuadsparkle />
+          </header>
+
+          <div class="case-studies">
+            <div class="case-study">
+              <CaseStudyCard
+                maxSplitRows={5}
+                dripList={data.featuredLists[
+                  '31017209032870028068280040871339261037749177808773684797297972107972'
+                ]}
+                orgName="ENS"
+                logoSrc="/assets/lp/ens-avatar.png"
+                logoAlt="ENS logo"
+                description="ENS streamed $50,000 USDC over six months to seven essential projects through its Drip List."
+                blogPost={data.blogPosts.find(
+                  (p) => p.slug === 'ens-funds-its-critical-open-source-dependencies',
+                )}
+              />
+            </div>
+            <div class="case-study">
+              <CaseStudyCard
+                dripList={data.featuredLists[
+                  '41971962915943119138973997144514496143454239023249281594792952267407'
+                ]}
+                orgName="Scroll"
+                logoSrc="/assets/lp/scroll-avatar.png"
+                logoAlt="Scroll logo"
+                description="Scroll used a Collaborative Drip List to vote on and fund their Level Up hackathon in Argentina."
+                blogPost={data.blogPosts.find((p) => p.slug === 'scroll-argentinia-hackathon')}
+              />
+            </div>
+            <div class="case-study">
+              <CaseStudyCard
+                dripList={data.featuredLists[
+                  '30178668158349445547603108732480118476541651095408979232800331391215'
+                ]}
+                orgName="Octant"
+                logoSrc="/assets/lp/octant-avatar.png"
+                logoAlt="Octant logo"
+                description="Octant committed a total of 23.2 ETH from its first two public goods funding rounds to fund its dependencies."
+                blogPost={data.blogPosts.find(
+                  (p) => p.slug === 'octant-teams-up-with-drips-to-fund-its-dependencies',
+                )}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- flying coins foreground -->
+      <div
+        class="absolute z-10 top-0 left-0 w-full flex justify-center overflow-visible pointer-events-none"
+      >
+        <div style="flex:0 0 1750px; perspective:1px; transform: translateZ(-1px); ">
+          <LpIllustrationFlyingCoins />
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div id="drip-list-hiw" class="anchor" />
+
+      <section>
+        <div class="drip-list-hiw-bg-left">
+          <DripListsBgLeft />
+        </div>
+        <div class="drip-list-hiw-bg-right">
+          <DripListsBgRight />
+        </div>
+
+        <div class="flex flex-col items-center gap-10 pt-9">
+          <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+            <LpQuadsparkle />
+            <h2 class="typo-header-1">How Drip Lists work</h2>
+            <LpQuadsparkle />
+          </header>
+
+          <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+            <p>
+              Work with your community, or build a list by yourself to fund any project, developer,
+              or purpose you can think of.
+            </p>
+          </div>
+
+          <TransitionedHeight transitionHeightChanges>
+            <!-- mobile: no fade, height transitions -->
+            <!-- laptop (lg): cross-fade -->
+            <section class="relative">
+              <div class="transition duration-200">
+                <LpDripListsHowItWorksMultiplayer />
+              </div>
+            </section>
+          </TransitionedHeight>
+        </div>
+      </section>
+    </div>
+
+    <div class="section-spacer" />
+
+    <section>
+      <div class="flex flex-col gap-10">
+        <header class="flex gap-8 justify-between items-center max-w-full w-[740px] mx-auto">
+          <LpQuadsparkle />
+          <h2 class="typo-header-1 text-center" style="max-width: calc(454/36 * 1em)">
+            An ecosystem for supporting any repo on GitHub
+          </h2>
+          <LpQuadsparkle />
+        </header>
+
+        <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
+          <p>
+            Empower your contributions by supporting any GitHub repository with Drips, effortlessly
+            directing funds to projects you believe in.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-spacer" />
 
     <section class="card two-column">
       <div class="anchor" id="get-funding" />
       <div class="section-inner">
         <div class="text">
-          <h2>Get the funds you need for your project</h2>
+          <h2 class="section-header-huge">Get the funds you need for your project</h2>
           <p>
             On Drips, your open-source projects earn funds from direct supporters, as well as other
             projects that depend on yours.
@@ -156,170 +359,13 @@
       </div>
     </section>
 
-    <section class="one-column">
-      <div class="section-inner">
-        <div class="text">
-          <h3>Stream funds by the second</h3>
-          <p>Drips enables token streams of any ERC-20 to any Ethereum address by the second.</p>
-          <div class="token-streams-visuals">
-            <div class="token-streams-visual">
-              <div class="token">
-                <CoinAnimation playSound>
-                  <img class="token-image" src="/assets/usdc-coin.webp" alt="USDC" />
-                </CoinAnimation>
-                <p>USD Coin</p>
-              </div>
-              <p>
-                <span class="green tabular-nums">+1.037574 USDC</span><span class="muted">/sec</span
-                >
-              </p>
-              <p>
-                <span class="fat tabular-nums"
-                  >{millis && getTokenStreamsVisualAmount(1.037574, 4968.3241)} USDC</span
-                >
-              </p>
-            </div>
-            <div class="token-streams-visual">
-              <div class="token">
-                <CoinAnimation playSound>
-                  <img class="token-image" src="/assets/wbtc-coin.png" alt="WBTC" />
-                </CoinAnimation>
-                <p>Wrapped Bitcoin</p>
-              </div>
-              <p>
-                <span class="green tabular-nums">+0.00181397 WBTC</span><span class="muted"
-                  >/sec</span
-                >
-              </p>
-              <p>
-                <span class="fat tabular-nums"
-                  >{millis && getTokenStreamsVisualAmount(0.00181397, 2.81065)} WBTC</span
-                >
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="background-illustration">
-          <LpInterstitialIllustration1 />
-        </div>
-      </div>
-    </section>
-
-    <section class="card two-column">
-      <div class="anchor" id="fund-projects" />
-      <div class="section-inner">
-        <div class="illustration framed">
-          <LpDripListIllustration />
-        </div>
-        <div class="text">
-          <h2>Pass it on: Support your software dependencies</h2>
-          <p>
-            Create your Drip List to fund the projects you depend on. Ensure their sustainable
-            development, stability, security and continuous improvement.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <div class="section-spacer" />
-
-    <section class="two-column">
-      <div class="section-inner">
-        <div class="text centered">
-          <h3>How Drip Lists work</h3>
-          <div class="how-it-works">
-            <div class="item">
-              <div class="count">1</div>
-              <h5>Make a list</h5>
-              <p class="typo-text-small">
-                Find and support any GitHub project or Ethereum address.
-              </p>
-            </div>
-            <div class="item">
-              <div class="count">2</div>
-              <h5>Set your splits</h5>
-              <p class="typo-text-small">
-                Decide on what projects receive what percentage of your budget.
-              </p>
-            </div>
-            <div class="item">
-              <div class="count">3</div>
-              <h5>Support it</h5>
-              <p class="typo-text-small">
-                Send a continuous stream of any ERC-20 token to your Drip List.
-              </p>
-            </div>
-            <div class="item">
-              <div class="count">4</div>
-              <h5>Show it off</h5>
-              <p class="typo-text-small">Drip Lists are public on your profile. Be proud!</p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="illustration-background top" />
-          <div class="illustration">
-            <DripList />
-          </div>
-          <div class="text">
-            <h3>Start your Drip List</h3>
-            <p>Give to a personalized list of GitHub projects or Ethereum addresses.</p>
-            <Button variant="primary" size="large" href="/app/funder-onboarding" target="_blank"
-              >Create your Drip List</Button
-            >
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="section-spacer" />
-
-    <section class="grid">
-      <LpCard
-        ><ImageAndCaption background>
-          <MultiToken slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>No platform fees</h4>
-            <p>Free to use beyond covering the cost of gas.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <GasOptimized slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>User controlled data</h4>
-            <p>Fully sovereign infrastructure for maximum data security.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <NoWrappedTokens slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>No need to wrap tokens</h4>
-            <p>Stream native tokens. No need to trust third-parties with funds.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-      <LpCard
-        ><ImageAndCaption background>
-          <OneContract slot="image" />
-          <div slot="caption" class="text-container">
-            <h4>One contract</h4>
-            <p>Drips uses one smart contract for streaming and splitting.</p>
-          </div>
-        </ImageAndCaption></LpCard
-      >
-    </section>
-
     <div class="section-spacer" />
     <div class="section-spacer" />
 
     <section>
       <LpSectionHeader>
         <div class="socials">
-          <h2>Stay up to date</h2>
+          <h2 class="section-header-huge">Stay up to date</h2>
           <div class="flex gap-4">
             <Button
               variant="primary"
@@ -374,11 +420,25 @@
   /* TYPOGRAPHY */
 
   h1 {
-    font-size: 80px;
-    line-height: 80px;
+    font-size: 2.25rem;
+  }
+  @media (min-width: 726px) {
+    h1 {
+      font-size: 5.2vw;
+    }
+  }
+  @media (min-width: 896px) {
+    h1 {
+      font-size: 3.88vw;
+    }
+  }
+  @media (min-width: 1440px) {
+    h1 {
+      font-size: 3.5rem;
+    }
   }
 
-  h2 {
+  .section-header-huge {
     font-family: 'Redaction 50', Times, serif;
     line-height: min(60px, 5vw);
     font-size: min(60px, 5vw);
@@ -390,87 +450,90 @@
     line-height: 36px;
   }
 
-  h4 {
-    font-family: 'Redaction 50', Times, serif;
-    font-size: 24px;
-    line-height: 24px;
-  }
-
-  span.green {
-    color: var(--color-positive);
-  }
-
-  span.muted {
-    color: var(--color-foreground-level-4);
-  }
-
-  span.fat {
-    font-weight: 900;
-  }
-
   @media (max-width: 819px) {
-    h2 {
+    .section-header-huge {
       font-size: 36px;
       line-height: 36px;
     }
   }
 
   /* HERO */
-
-  .hero {
-    position: relative;
-    display: flex;
-    align-items: center;
+  .big-hero-graph {
+    width: 100vw;
+    min-width: 900px;
+    height: 100%;
   }
 
-  .hero .illustration {
-    pointer-events: none;
-    width: calc(100% + 14rem);
-    margin-top: -4rem;
-    margin-left: -14rem;
+  .opener {
+    text-align: center;
+    max-width: 48rem;
+    margin: 2rem auto 4rem auto;
+    padding: 1rem;
   }
 
-  .hero .text {
-    padding-left: 6rem;
-    max-width: 32rem;
-    display: flex;
-    flex-direction: column;
+  /* USPs */
+  .usps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 1rem;
+    justify-content: center;
   }
 
-  .hero .text .actions {
+  .usps .usp {
+    background-color: var(--color-background);
+    text-align: left;
+    padding: 1.5rem;
+    gap: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    align-items: start;
+    justify-content: space-between;
+    border: 1px solid var(--color-foreground);
+    border-radius: 1rem 0 1rem 1rem;
   }
 
-  @media (max-width: 1023px) {
-    .hero {
-      flex-direction: column-reverse;
-      align-items: flex-start;
-      margin-bottom: 2rem;
-    }
+  .usps .usp h4 {
+    margin-bottom: 0.5rem;
+  }
 
-    .hero figure {
+  @media (max-width: 1130px) {
+    .usps {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 819px) {
+    .usps {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* CASE STUDIES */
+
+  .case-studies {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    width: 100%;
+  }
+
+  .case-studies .case-study {
+    width: 80%;
+  }
+
+  .case-studies .case-study:nth-child(2n) {
+    align-self: flex-end;
+  }
+
+  @media (max-width: 882px) {
+    .case-studies .case-study {
       width: 100%;
-    }
-
-    .hero .illustration {
-      width: 125%;
-      margin: -40% 0 0 -30%;
-    }
-
-    .hero .text {
-      max-width: 64rem;
-      padding-left: 1.5rem;
     }
   }
 
   /* SECTIONS */
 
   .section-spacer {
-    height: 3rem;
+    height: 4.5rem;
   }
 
   section {
@@ -480,6 +543,7 @@
     padding: 0 1rem;
     margin: 0 auto;
     position: relative;
+    text-align: center;
   }
 
   section .section-inner {
@@ -506,6 +570,7 @@
     gap: 1.5rem;
     padding: min(3rem, 3vw);
     padding-right: 0;
+    text-align: left;
   }
 
   section .section-inner > .text:last-child {
@@ -537,19 +602,6 @@
     z-index: 1;
   }
 
-  section.two-column .section-inner .illustration.framed {
-    height: fit-content;
-    width: 100%;
-    max-width: 28rem;
-    z-index: 1;
-    margin: 4rem 0;
-    margin-right: 1rem;
-    padding: 2rem;
-    padding-left: 4rem;
-    border-radius: 0 0 1rem 0;
-    box-shadow: var(--elevation-medium);
-  }
-
   section.two-column .section-inner > .illustration-background {
     position: absolute;
     right: 0;
@@ -561,25 +613,8 @@
     border-radius: 2rem 0 0 2rem;
   }
 
-  section.one-column .section-inner {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    padding: 7rem 0;
-    text-align: center;
-  }
-
   section.one-column .section-inner .text {
     align-items: center;
-  }
-
-  section .section-inner .background-illustration {
-    position: absolute;
-    padding-left: 2rem;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    pointer-events: none;
   }
 
   section .section-inner .card {
@@ -607,12 +642,6 @@
     height: 12rem;
     border-radius: 0 0 1.5rem 1.5rem;
     background-color: var(--color-primary-level-1);
-  }
-
-  section.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 1.5rem;
   }
 
   @media (max-width: 1023px) {
@@ -660,54 +689,6 @@
     section .section-inner .card .text {
       padding: 1rem;
     }
-
-    section.two-column .section-inner .illustration.framed {
-      padding-left: 30%;
-      max-width: 100%;
-      margin: 0 3rem 2rem 0;
-    }
-
-    section.grid {
-      grid-template-columns: 1fr;
-    }
-
-    section.one-column .section-inner {
-      padding: 4rem 0;
-    }
-  }
-
-  /* TOKEN STREAMS VISUALS */
-
-  .token-streams-visuals {
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .token-streams-visuals .token-streams-visual {
-    display: flex;
-    gap: min(2vw, 1rem);
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  .token-streams-visual p {
-    font-size: min(1.5rem, 2.5vw);
-  }
-
-  .token-streams-visuals .token-streams-visual .token {
-    display: flex;
-    flex-shrink: 0;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .token-streams-visuals .token-streams-visual .token .token-image {
-    height: clamp(0.5rem, 6vw, 2rem);
-    width: clamp(0.5rem, 6vw, 2rem);
-    border-radius: 1rem;
   }
 
   /* FOOTER */
@@ -766,23 +747,27 @@
     }
   }
 
-  .text-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  /* TWEAKS */
+  .drip-list-hiw-bg-left {
+    position: absolute;
+    top: -1rem;
+    left: calc(-330px + 15%);
+    width: 330px;
+    overflow: hidden;
   }
 
-  /* TWEAKS */
+  .drip-list-hiw-bg-right {
+    position: absolute;
+    top: -20rem;
+    right: calc(-177px + 15%);
+    width: 177px;
+    overflow: hidden;
+  }
 
   .claim-input {
     display: flex;
     gap: 0.5rem;
-  }
-
-  @media (max-width: 1024px) {
-    .background-illustration {
-      transform: translateX(-124px);
-    }
+    width: 100%;
   }
 
   @media (max-width: 819px) {
@@ -792,10 +777,10 @@
     }
   }
 
-  @media (max-width: 600px) {
-    .hero .illustration {
-      margin-top: -10%;
-      margin-bottom: -2%;
+  @media (max-width: 1117px) {
+    .drip-list-hiw-bg-left,
+    .drip-list-hiw-bg-right {
+      display: none;
     }
   }
 </style>

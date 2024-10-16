@@ -134,6 +134,13 @@
   /** Minimal version w/ link to Drip List page for listing contexts */
   export let listingMode = false;
 
+  export let hideTotal = false;
+  export let hideSupporterPile = false;
+  export let hideDescription = false;
+  export let clampTitle = true;
+  export let openInNewTab = false;
+  export let maxSplitRows: number | undefined = undefined;
+
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
 
@@ -212,12 +219,17 @@
 <svelte:element
   this={listingMode ? 'a' : 'section'}
   href={dripListUrl}
+  target={openInNewTab ? '_blank' : undefined}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
-        <h1 class="title rounded twemoji-text">
+        <h1
+          class:line-clamp-1={clampTitle}
+          class=" title rounded twemoji-text"
+          style:font-size={listingMode ? '28px' : undefined}
+        >
           {@html twemoji(title)}
         </h1>
         {#if listingMode && votingRound}
@@ -237,7 +249,7 @@
           </div>
         {/if}
       </div>
-      {#if description.length > 0}
+      {#if !hideDescription && description.length > 0}
         <div class="description twemoji-text">
           <TextExpandable numberOfLines={listingMode ? 2 : 4} isExpandable={!listingMode}>
             {@html twemoji(description)}
@@ -279,13 +291,15 @@
                   <div class="drip-icon">
                     <Drip />
                   </div>
-                  <div class="typo-text tabular-nums total-streamed-badge">
-                    {#if browser}
-                      <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
-                    {/if}
-                    <span class="muted">&nbsp;total</span>
-                  </div>
-                  {#if supportersPile && supportersPile.length > 0}
+                  {#if !hideTotal}
+                    <div class="typo-text tabular-nums total-streamed-badge">
+                      {#if browser}
+                        <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
+                      {/if}
+                      <span class="muted">&nbsp;total</span>
+                    </div>
+                  {/if}
+                  {#if !hideSupporterPile && supportersPile && supportersPile.length > 0}
                     <div
                       in:fade={{ duration: 300 }}
                       class="hide-on-mobile flex items-center gap-1.5 min-w-0"
@@ -306,7 +320,12 @@
                   >
                     <Splits
                       disableLinks={listingMode}
-                      maxRows={listingMode ? (dripList.description ? 3 : 4) : undefined}
+                      maxRows={maxSplitRows ??
+                        (listingMode
+                          ? dripList.description && !hideDescription
+                            ? 3
+                            : 4
+                          : undefined)}
                       groupsExpandable={!listingMode}
                       list={dripList.splits}
                     />
@@ -402,6 +421,7 @@
       transform 0.2s,
       box-shadow 0.2s;
     position: relative;
+    background: var(--color-background);
   }
 
   a.drip-list-card:hover,
@@ -414,6 +434,7 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    text-align: left;
   }
 
   .drip-list-card .title-and-actions {
