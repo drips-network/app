@@ -20,7 +20,7 @@
     "format": "prettier --write .",
     "prepare": "husky install",
     "postinstall": "./scripts/install-twemoji-assets.sh",
-    "build:graphql": "find . -regex './src/.*__generated__.*' -type d -prune -exec rm -r  \"{}\" \\; && graphql-codegen"
+    "build:graphql": "./scripts/build-gql-types.sh"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
