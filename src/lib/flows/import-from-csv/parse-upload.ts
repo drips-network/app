@@ -9,7 +9,7 @@ import { parseFile as parseCsv } from '$lib/utils/csv';
  * @returns True if at least on the specified header names exists in the
  *  header, false otherwise.
  */
-function hasHeader(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): boolean {
+function hasHeader(parsedFile: string[][], csvHeaders: string[]): boolean {
   const row = parsedFile[0];
   return row.some((column) => csvHeaders.includes(column.toLowerCase()));
 }
@@ -23,7 +23,7 @@ function hasHeader(parsedFile: Array<Array<string>>, csvHeaders: Array<string>):
  * @returns An array containing the indicies of the columns followed finally
  *  by the row index in which to start reading values.
  */
-function getFileLayout(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): Array<number> {
+function getFileLayout(parsedFile: string[][], csvHeaders: string[]): number[] {
   const firstRow = parsedFile[0];
 
   // if there's no detected header, just return all the column
@@ -49,10 +49,7 @@ function getFileLayout(parsedFile: Array<Array<string>>, csvHeaders: Array<strin
  * @param csvHeaders The headers to be extracted
  * @returns A promise that resolves into the extracted data.
  */
-export async function parseFile(
-  file: File,
-  csvHeaders: Array<string>,
-): Promise<Array<Array<string>>> {
+export async function parseFile(file: File, csvHeaders: string[]): Promise<string[][]> {
   const parsedFile = await parseCsv(file);
 
   const fileLayout = getFileLayout(parsedFile, csvHeaders);
