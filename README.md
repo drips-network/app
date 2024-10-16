@@ -1,4 +1,4 @@
-![Drips Logo illustration](/docs/assets/drips-logo-illustration.png)
+Test ![Drips Logo illustration](/docs/assets/drips-logo-illustration.png)
 
 # Drips App
 
