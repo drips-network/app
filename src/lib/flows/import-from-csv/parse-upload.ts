@@ -1,27 +1,24 @@
 import { parseFile as parseCsv } from '$lib/utils/csv';
 
-export function hasHeader(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): boolean {
+function hasHeader(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): boolean {
   const row = parsedFile[0];
-  // console.log(row, csvHeaders)
   // TODO: every?
   return row.some((column) => csvHeaders.includes(column.toLowerCase()));
 }
 
-export function getFileLayout(
-  parsedFile: Array<Array<string>>,
-  csvHeaders: Array<string>,
-): Array<number> {
+function getFileLayout(parsedFile: Array<Array<string>>, csvHeaders: Array<string>): Array<number> {
   const firstRow = parsedFile[0];
 
+  // if there's no detected header, just return all the column
+  // indicies
   if (!hasHeader(parsedFile, csvHeaders)) {
-    return [0, 1, 0];
+    return [...Array.from(firstRow.keys()), 0];
   }
 
-  const dataIndicesLength = Math.max(csvHeaders.length, 2);
-  const dataIndices = Array(dataIndicesLength).fill(-1);
-  for (const [index, csvHeader] of csvHeaders.entries()) {
+  const dataIndices = [];
+  for (const csvHeader of csvHeaders) {
     const csvHeaderIndex = firstRow.findIndex((column) => csvHeader === column.toLowerCase());
-    dataIndices[index] = csvHeaderIndex;
+    dataIndices.push(csvHeaderIndex);
   }
 
   return [...dataIndices, 1];
@@ -33,17 +30,20 @@ export async function parseFile(
 ): Promise<Array<Array<string>>> {
   const parsedFile = await parseCsv(file);
 
-  const [recipientOrCollaboratorIndex, percentageIndex, startRowIndex] = getFileLayout(
-    parsedFile,
-    csvHeaders,
-  );
+  const fileLayout = getFileLayout(parsedFile, csvHeaders);
+  const startRowIndex = fileLayout.pop();
+  const dataIndices = fileLayout;
   const result = [];
   for (const row of parsedFile.slice(startRowIndex)) {
-    if (!row[recipientOrCollaboratorIndex] && !row[percentageIndex]) {
-      continue;
-    }
+    const columns = dataIndices.map((index) => row[index]);
+    result.push(columns);
+  }
 
-    result.push([row[recipientOrCollaboratorIndex], row[percentageIndex]]);
+  // underlying parsing lib loves to add a blank
+  // row. remove it if present.
+  const lastRow = result.at(-1);
+  if (lastRow?.every((column) => !column)) {
+    result.pop();
   }
 
   return result;
