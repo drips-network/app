@@ -9,6 +9,11 @@ else
 
   api_url=$GQL_URL
 
+  if [ -z "$api_url" ]; then
+    echo "❌ GQL_URL is not set in .env. Must be set to Drips GQL deployment URL."
+    exit 1
+  fi
+
   # Remove trailing slash if present
   api_url=${api_url%/}
 
