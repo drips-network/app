@@ -32,14 +32,16 @@ else
 
   # Introspection query
   introspection_query='{"query":"{ __schema { queryType { name } } }"}'
+  expected_response='{"data":{"__schema":{"queryType":{"name":"Query"}}}}'
 
   while true; do
-    # Send the introspection query to the API
-    response=$(curl -s -o /dev/null -w "%{http_code}" -H "Content-Type: application/json" -H "Authorization: Bearer $access_token" -d "$introspection_query" "$api_url")
+    # Send the introspection query to the API and capture the output
+    response=$(curl -s -H "Content-Type: application/json" -H "Authorization: Bearer $access_token" -d "$introspection_query" "$api_url")
+    response_code=$(echo "$response" | jq -r '.data."__schema"."queryType"."name"')
 
-    echo "- Got $response"
+    echo "- Got $response_code"
 
-    if [ "$response" -eq 200 ]; then
+    if [ "$response_code" = "Query" ]; then
       printf "\n"
       echo "✅ API is up! Building types..."
       printf "\n"
