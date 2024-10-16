@@ -274,7 +274,6 @@
         </header>
 
         <div class="flex flex-col gap-6 text-center mx-auto" style="max-width:calc(600/16 * 1em)">
-          <p class="text-typo-header-3">Effortlessly supporting open source</p>
           <p>
             Empower your contributions by supporting any GitHub repository with Drips, effortlessly
             directing funds to projects you believe in.
