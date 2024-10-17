@@ -1,6 +1,12 @@
-import { error } from '@sveltejs/kit';
+import network from '$lib/stores/wallet/network';
+import { error, redirect } from '@sveltejs/kit';
 
-export const load = async ({ params }) => {
+export const load = async ({ url, params }) => {
+  if (network.alternativeChainMode) {
+    // Serve from the `mainnet` instance
+    return redirect(308, `https://drips.network${url.pathname}`);
+  }
+
   try {
     const post = await import(`../../../../blog-posts/${params.slug}.md`);
 
