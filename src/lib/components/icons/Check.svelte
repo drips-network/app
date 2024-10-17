@@ -1,10 +1,11 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
   import IconWrapper from './IconWrapper.svelte';
 
-  export let style: string | undefined = undefined;
+  export let iconWrapperProps: ComponentProps<IconWrapper>;
 </script>
 
-<IconWrapper on:click {style}>
+<IconWrapper on:click {...iconWrapperProps}>
   <path
     fill-rule="evenodd"
     clip-rule="evenodd"
