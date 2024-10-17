@@ -141,6 +141,10 @@
     font-size: 14px;
   }
 
+  .button .inner.normal {
+    background-color: var(--color-background);
+  }
+
   .button .inner:not(.ghost) {
     box-shadow: 0px 0px 0px 1px var(--color-foreground);
   }

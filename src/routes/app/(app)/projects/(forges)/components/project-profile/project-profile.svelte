@@ -240,10 +240,12 @@
 
   let splitsSectionSkeleton: SectionSkeleton | undefined;
   let supportersSectionSkeleton: SectionSkeleton | undefined;
+
+  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 </script>
 
+<!-- TODO remove -->
 {#if true}
-  {@const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`}
   <HeadMeta
     title="{project.source.ownerName}/{project.source.repoName}"
     description="Support {project.source
@@ -355,6 +357,7 @@
               project.source.repoName,
               false,
             )}`,
+            downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }}
           on:editButtonClick={() =>
             isClaimed(chainData) &&
