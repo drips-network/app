@@ -4,7 +4,7 @@
   import Download from '$lib/components/icons/Download.svelte';
   import downloadUrl from '$lib/utils/download-url';
   import Link from '$lib/components/icons/Link.svelte';
-  import Twitter from '$lib/components/icons/Twitter.svelte';
+  import X from '$lib/components/icons/X.svelte';
   import Facebook from '$lib/components/icons/Facebook.svelte';
   import Threads from '$lib/components/icons/Threads.svelte';
   import Telegram from '$lib/components/icons/Telegram.svelte';
@@ -26,7 +26,7 @@
     },
     {
       name: 'X (Twitter)',
-      icon: Twitter,
+      icon: X,
       onClick: () => {},
     },
     {
