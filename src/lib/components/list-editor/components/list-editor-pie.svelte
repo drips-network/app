@@ -61,7 +61,7 @@
         in:scale={{ duration: 300, start: 1.5 }}
         out:scale={{ duration: 300, start: 0.8 }}
       >
-        <Check style="fill: var(--color-background);" />
+        <Check iconWrapperProps={{ fill: 'var(--color-background);' }} />
       </div>
     {/if}
   </div>

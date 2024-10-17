@@ -45,7 +45,7 @@
       </div>
       <span class="network-label">{label}</span>
       {#if chainId === selectedChainId}
-        <Check />
+        <Check iconWrapperProps={{ fill: 'var(--color-foreground)' }} />
       {/if}
     </a>
   {/each}
@@ -66,7 +66,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    border: 2px solid transparent;
+    border: 1px solid transparent;
   }
 
   .network-icon.selected {
@@ -78,6 +78,7 @@
     white-space: nowrap;
     text-align: left;
     overflow: hidden;
+    color: var(--color-foreground);
     text-overflow: ellipsis;
   }
 
