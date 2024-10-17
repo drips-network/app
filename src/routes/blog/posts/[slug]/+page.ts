@@ -19,4 +19,4 @@ export const load = async ({ url, params }) => {
   }
 };
 
-export const prerender = true;
+export const prerender = !network.alternativeChainMode;
