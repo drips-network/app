@@ -6,14 +6,16 @@
   <div class="content">
     <slot />
   </div>
-  <footer class="flex justify-between gap-4">
-    <div class="flex gap-2">
-      <slot name="left-actions" />
-    </div>
-    <div class="flex gap-2">
-      <slot name="actions" />
-    </div>
-  </footer>
+  {#if $$slots['left-actions'] || $$slots.actions}
+    <footer class="flex justify-between gap-4">
+      <div class="flex gap-2">
+        <slot name="left-actions" />
+      </div>
+      <div class="flex gap-2">
+        <slot name="actions" />
+      </div>
+    </footer>
+  {/if}
 </div>
 
 <style>
