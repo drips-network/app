@@ -7,9 +7,14 @@
   import { fade } from 'svelte/transition';
   import Button from '../button/button.svelte';
   import type { ComponentProps } from 'svelte';
+  import modal from '$lib/stores/modal';
+  import shareSteps from '$lib/flows/share/share-steps';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { onMount } from 'svelte';
 
   export let text: string | undefined = undefined;
   export let url: string;
+  export let downloadableImageUrl: string = '';
   export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
 
   export let copyLinkLabel = 'Copy link';
@@ -18,22 +23,43 @@
   let shareSupported = browser && navigator.share;
 
   function handleClick() {
-    if (shareSupported) {
-      navigator.share({
+    // if (shareSupported) {
+    //   navigator.share({
+    //     text,
+    //     url,
+    //   });
+    // } else {
+    //   // Copy URL to clipboard
+    //   navigator.clipboard.writeText(url);
+
+    //   copySuccess = true;
+    //   setTimeout(() => (copySuccess = false), 1000);
+    // }
+    modal.show(
+      Stepper,
+      undefined,
+      shareSteps({
         text,
         url,
-      });
-    } else {
-      // Copy URL to clipboard
-      navigator.clipboard.writeText(url);
-
-      copySuccess = true;
-      setTimeout(() => (copySuccess = false), 1000);
-    }
+        downloadableImageUrl,
+      }),
+    );
   }
 
   let hovering = false;
   let copySuccess = false;
+
+  onMount(() => {
+    modal.show(
+      Stepper,
+      undefined,
+      shareSteps({
+        text,
+        url,
+        downloadableImageUrl,
+      }),
+    );
+  });
 </script>
 
 {#if shareSupported}
