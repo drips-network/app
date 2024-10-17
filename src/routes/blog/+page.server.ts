@@ -1,7 +1,14 @@
+import network from '$lib/stores/wallet/network';
 import assert from '$lib/utils/assert';
+import { redirect } from '@sveltejs/kit';
 import { metadataSchema } from '../api/blog/posts/schema';
 
-export const load = async () => {
+export const load = async ({ route }) => {
+  if (network.alternativeChainMode) {
+    // Serve from the `mainnet` instance
+    return redirect(308, `https://drips.network${route.id}`);
+  }
+
   const posts = await Promise.all(
     Object.entries(import.meta.glob('/src/blog-posts/*.md')).map(async ([path, resolver]) => {
       const resolved = await resolver();

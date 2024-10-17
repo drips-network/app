@@ -51,6 +51,11 @@ export type Network = {
     NFT_DRIVER: string;
     NATIVE_TOKEN_UNWRAPPER: string | undefined;
   };
+  /**
+   * If enabled, LP, blog, and legal routes are redirected to https://drips.network/<path>.
+   * This will be obsolete once the app goes fully multi-chain, without separate deployments per network.
+   */
+  alternativeChainMode: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -94,6 +99,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
+    alternativeChainMode: false,
   },
   [80002]: {
     chainId: 80002,
@@ -128,6 +134,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
+    alternativeChainMode: true,
   },
   [11155420]: {
     chainId: 11155420,
@@ -162,6 +169,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
+    alternativeChainMode: true,
   },
   [11155111]: {
     chainId: 11155111,
@@ -196,6 +204,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
+    alternativeChainMode: false,
   },
   [84532]: {
     chainId: 84532,
@@ -230,6 +239,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
+    alternativeChainMode: true,
   },
   [314]: {
     chainId: 314,
@@ -263,6 +273,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable daily.',
     },
+    alternativeChainMode: true,
   },
 };
 
