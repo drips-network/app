@@ -332,14 +332,14 @@
       throw new Error('Unable to estimate gas for Safe Batch operation.');
     }
 
-    assert(transactionWrappers.length === 1, 'Expected only one transaction in Safe mode.');
-    const safeTx = transactionWrappers[0];
-
     const txs = transactionWrappers.map(({ transaction: tx }) => ({
       to: tx.to ?? unreachable(),
       data: tx.data ?? unreachable(),
       value: '0',
     }));
+
+    // In case of a batch transaction, we display the last TX in the batch to the user.
+    const safeTx = transactionWrappers[transactionWrappers.length - 1];
 
     try {
       const response = await safeAppsSdk.txs.send({
@@ -427,17 +427,29 @@
     transactionWrappers: TransactionWrapper[],
     isSafe: boolean,
   ) {
-    transactionsTimeline = transactionWrappers.map((tx, index) => ({
-      title: tx.title,
-      estimatedGas: 'Unknown gas',
-      message:
-        index === 0
-          ? isSafe
-            ? 'Waiting for you to submit the transaction in your Safe'
-            : 'Waiting for you to confirm the transaction in your wallet'
-          : 'Waiting on previous transaction',
-      status: index === 0 ? 'awaitingSignature' : 'awaitingPrevious',
-    }));
+    if (isSafe) {
+      // If there's multiple transactions that get proposed to a safe, they are batched.
+      // The last transaction is the one that usually describes the ultimate outcome of
+      // such a batch, so we display that one.
+      const lastTransaction = transactionWrappers[transactionWrappers.length - 1];
+
+      transactionsTimeline = [
+        {
+          title: lastTransaction.title,
+          message: 'Waiting for you to submit the transaction in your Safe',
+          status: 'awaitingSignature',
+        },
+      ];
+    } else {
+      transactionsTimeline = transactionWrappers.map((tx, index) => ({
+        title: tx.title,
+        message:
+          index === 0
+            ? 'Waiting for you to confirm the transaction in your wallet'
+            : 'Waiting on previous transaction',
+        status: index === 0 ? 'awaitingSignature' : 'awaitingPrevious',
+      }));
+    }
   }
 
   function getGasBuffer(gasLimit: number) {
