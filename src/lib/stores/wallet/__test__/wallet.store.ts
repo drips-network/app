@@ -36,6 +36,7 @@ const NETWORK = {
     nextSettlementDate: nextMainnetSettlementDate,
     explainerText: '',
   },
+  alternativeChainMode: false,
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {
