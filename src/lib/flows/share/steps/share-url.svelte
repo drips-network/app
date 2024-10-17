@@ -3,10 +3,63 @@
   import Button from '$lib/components/button/button.svelte';
   import Download from '$lib/components/icons/Download.svelte';
   import downloadUrl from '$lib/utils/download-url';
+  import Link from '$lib/components/icons/Link.svelte';
+  import Twitter from '$lib/components/icons/Twitter.svelte';
+  import Facebook from '$lib/components/icons/Facebook.svelte';
+  import Threads from '$lib/components/icons/Threads.svelte';
+  import Telegram from '$lib/components/icons/Telegram.svelte';
+  import WhatsApp from '$lib/components/icons/WhatsApp.svelte';
+  import Signal from '$lib/components/icons/Signal.svelte';
+  import Ellipsis from '$lib/components/icons/Ellipsis.svelte';
 
   export let url = '';
   export let downloadableImageUrl = '';
   export let text = '';
+
+  const shareOptions = [
+    {
+      name: 'Copy Link',
+      icon: Link,
+      onClick: () => {
+        navigator.clipboard.writeText(url);
+      },
+    },
+    {
+      name: 'X (Twitter)',
+      icon: Twitter,
+      onClick: () => {},
+    },
+    {
+      name: 'Facebook',
+      icon: Facebook,
+      onClick: () => {},
+    },
+    {
+      name: 'Threads',
+      icon: Threads,
+      onClick: () => {},
+    },
+    {
+      name: 'Telegram',
+      icon: Telegram,
+      onClick: () => {},
+    },
+    {
+      name: 'WhatsApp',
+      icon: WhatsApp,
+      onClick: () => {},
+    },
+    {
+      name: 'Signal',
+      icon: Signal,
+      onClick: () => {},
+    },
+    {
+      name: 'More',
+      icon: Ellipsis,
+      onClick: () => {},
+    },
+  ];
 
   function downloadImage() {
     const segments = new URL(window.location.origin + downloadableImageUrl + text).pathname.split(
@@ -28,6 +81,13 @@
     <div class="share-options pixelated">
       <h2 class="pixelated">Share</h2>
       <p>Share this project on a network of your choice below.</p>
+      <div class="share-options__options">
+        {#each shareOptions as option}
+          <Button on:click={option.onClick} variant="normal" icon={option.icon}
+            >{option.name}</Button
+          >
+        {/each}
+      </div>
     </div>
   </div>
 </StepLayout>
@@ -57,5 +117,21 @@
 
   .share-options {
     text-align: left;
+  }
+
+  .share-options__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .share-options__options :global(button) {
+    width: calc(50% - 1rem);
+  }
+
+  .share-options__options :global(button .inner) {
+    /* yoiks */
+    justify-content: start !important;
   }
 </style>
