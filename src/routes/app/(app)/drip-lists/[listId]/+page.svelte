@@ -70,7 +70,7 @@
 
 <article class="drip-list-page">
   <main class="list">
-    <DripListCard data={{ dripList, votingRound }} />
+    <DripListCard clampTitle={false} data={{ dripList, votingRound }} />
   </main>
 
   <aside class="support">

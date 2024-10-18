@@ -19,7 +19,7 @@
     {/if}
   </div>
   <div class="chevron" class:upside-down={toggled}>
-    <ChevronDown />
+    <ChevronDown style="fill: var(--color-foreground)" />
   </div>
 </button>
 
