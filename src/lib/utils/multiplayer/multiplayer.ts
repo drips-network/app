@@ -44,7 +44,7 @@ import type {
 import unreachable from '../unreachable';
 import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-driver';
 import type { OxString } from '../sdk/sdk-types';
-import network from '$lib/stores/wallet/network';
+import network, { type ChainId } from '$lib/stores/wallet/network';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -110,6 +110,7 @@ export function startVotingRound(
         endsAt: Date;
       };
     };
+    chainId: ChainId;
     publisherAddress: string;
     /** Timestamp for replay prevention. Must match timestamp in `signature`. */
     date: Date;
