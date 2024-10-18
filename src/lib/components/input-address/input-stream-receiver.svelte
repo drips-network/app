@@ -7,6 +7,7 @@
   import { BASE_URL } from '$lib/utils/base-url';
   import assert from '$lib/utils/assert';
   import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
+  import network from '$lib/stores/wallet/network';
 
   export let value: string | undefined = undefined;
   export let validatedValue: string | undefined = undefined;
@@ -60,7 +61,7 @@
           message: 'Unable to resolve Drip List URL',
         };
       }
-    } else if (input.endsWith('.eth')) {
+    } else if (network.ensSupported && input.endsWith('.eth')) {
       // lookup ENS
       inputValidationState = {
         type: 'pending',
@@ -107,7 +108,7 @@
       validatedValue = undefined;
       inputValidationState = {
         type: 'invalid',
-        message: 'Enter a valid Ethereum address, ENS name, or Drip List URL.',
+        message: `Enter a valid Ethereum address${network.ensSupported ? ', ENS name,' : ''} or Drip List URL.`,
       };
     }
   }
@@ -128,5 +129,5 @@
   showSuccessCheck
   validationState={inputValidationState}
   bind:value
-  placeholder="Ethereum address, ENS name, or Drip List URL"
+  placeholder="Ethereum address{network.ensSupported ? ', ENS name,' : ''} or Drip List URL"
 />

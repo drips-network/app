@@ -1,6 +1,7 @@
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import type { AbstractProvider } from 'ethers';
+import network from '../wallet/network';
 
 export interface ResolvedRecord {
   name?: string;
@@ -33,6 +34,8 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
+    if (!network.ensSupported) return;
+
     const saved = get(state)[address];
     if (saved) return;
 
@@ -74,6 +77,8 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
+    if (!network.ensSupported) return;
+
     assert(
       provider,
       'You need to `connect` the store to a provider before being able to reverse lookup',
