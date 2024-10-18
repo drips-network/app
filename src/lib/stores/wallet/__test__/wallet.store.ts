@@ -37,6 +37,7 @@ const NETWORK = {
     explainerText: '',
   },
   alternativeChainMode: false,
+  ensSupported: false,
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {
