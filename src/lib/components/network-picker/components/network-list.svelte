@@ -45,7 +45,7 @@
       </div>
       <span class="network-label">{label}</span>
       {#if chainId === selectedChainId}
-        <Check iconWrapperProps={{ fill: 'var(--color-foreground)' }} />
+        <Check style="fill: var(--color-foreground);" />
       {/if}
     </a>
   {/each}
