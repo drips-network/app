@@ -11,53 +11,100 @@
   import WhatsApp from '$lib/components/icons/WhatsApp.svelte';
   import Signal from '$lib/components/icons/Signal.svelte';
   import Ellipsis from '$lib/components/icons/Ellipsis.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import { browser } from '$app/environment';
+  // TODO: why no SvelteComponent?
+  import { type ComponentType } from 'svelte';
 
   export let url = '';
   export let downloadableImageUrl = '';
   export let text = '';
 
-  const shareOptions = [
+  const shareSupported = browser && navigator.share;
+
+  type ShareOption = {
+    name: string;
+    icon: ComponentType;
+    href?: string;
+    onClick?: (this: ShareOption) => undefined;
+  };
+
+  function doAnchorClick(url: string) {
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style.display = 'none';
+    a.target = '_blank';
+    a.href = url;
+    a.click();
+    a.remove();
+  }
+
+  function copyShareLink() {
+    navigator.clipboard.writeText(url);
+    shareOptions[0].icon = CheckCircle;
+    setTimeout(() => {
+      shareOptions[0].icon = Link;
+    }, 1000);
+  }
+
+  const shareOptions: Array<ShareOption> = [
     {
       name: 'Copy Link',
       icon: Link,
-      onClick: () => {
-        navigator.clipboard.writeText(url);
+      onClick() {
+        copyShareLink();
       },
     },
     {
       name: 'X (Twitter)',
       icon: X,
-      onClick: () => {},
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
     },
     {
       name: 'Facebook',
       icon: Facebook,
-      onClick: () => {},
+      href: `http://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`,
     },
     {
       name: 'Threads',
       icon: Threads,
-      onClick: () => {},
+      href: `https://threads.net/intent/post?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
     },
     {
       name: 'Telegram',
       icon: Telegram,
-      onClick: () => {},
+      href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
     },
     {
       name: 'WhatsApp',
       icon: WhatsApp,
-      onClick: () => {},
+      href: `https://wa.me/?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
     },
     {
       name: 'Signal',
       icon: Signal,
-      onClick: () => {},
+      onClick() {
+        copyShareLink();
+        doAnchorClick('sgnl://signal.me');
+        // Signal.me/something.
+        // just opens the app really, could copy to clipboard beforehand
+        // sgnl://signal.me
+      },
     },
     {
       name: 'More',
       icon: Ellipsis,
-      onClick: () => {},
+      onClick() {
+        if (shareSupported) {
+          navigator.share({
+            text,
+            url,
+          });
+        } else {
+          // copy the link
+          copyShareLink();
+        }
+      },
     },
   ];
 
@@ -82,9 +129,13 @@
       <h2 class="pixelated">Share</h2>
       <p>Share this project on a network of your choice below.</p>
       <div class="share-options__options">
-        {#each shareOptions as option}
-          <Button on:click={option.onClick} variant="normal" icon={option.icon}
-            >{option.name}</Button
+        {#each shareOptions as option (option.icon)}
+          <Button
+            target="_blank"
+            href={option.href}
+            on:click={option?.onClick?.bind(option)}
+            variant="normal"
+            icon={option.icon}>{option.name}</Button
           >
         {/each}
       </div>
@@ -126,11 +177,13 @@
     margin-top: 2rem;
   }
 
-  .share-options__options :global(button) {
+  .share-options__options :global(button),
+  .share-options__options :global(a) {
     width: calc(50% - 1rem);
   }
 
-  .share-options__options :global(button .inner) {
+  .share-options__options :global(button .inner),
+  .share-options__options :global(a .inner) {
     /* yoiks */
     justify-content: start !important;
   }
