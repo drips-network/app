@@ -2,7 +2,7 @@
   import { browser } from '$app/environment';
   import ShareIcon from '$lib/components/icons/Sharrow.svelte';
   import Button from '../button/button.svelte';
-  import type { ComponentProps } from 'svelte';
+  import { onMount, type ComponentProps } from 'svelte';
   import modal from '$lib/stores/modal';
   import shareSteps from '$lib/flows/share/share-steps';
   import Stepper from '$lib/components/stepper/stepper.svelte';
@@ -17,6 +17,18 @@
 
   let shareSupported = browser && navigator.share;
   let isTouchDevice = (browser && 'ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+  async function preloadImage(url: string) {
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+    } catch (error) {
+      // we don't really care to make a big fuss about this
+      // eslint-disable-next-line no-console
+      console.error('Error preloading image', error);
+    }
+  }
 
   function handleClick() {
     if (isTouchDevice && shareSupported) {
@@ -39,6 +51,12 @@
       }),
     );
   }
+
+  onMount(() => {
+    if (downloadableImageUrl) {
+      preloadImage(downloadableImageUrl);
+    }
+  });
 </script>
 
 <Button variant={buttonVariant} on:click={handleClick}>
