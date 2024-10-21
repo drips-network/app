@@ -35,27 +35,27 @@
 
   const shareOptions: Array<ShareOption> = [
     {
-      name: 'XIcon (Twitter)',
+      name: 'X (Twitter)',
       icon: XIcon,
       href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
     },
     {
-      name: 'FacebookIcon',
+      name: 'Facebook',
       icon: FacebookIcon,
       href: `http://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     },
     {
-      name: 'ThreadsIcon',
+      name: 'Threads',
       icon: ThreadsIcon,
       href: `https://threads.net/intent/post?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
     },
     {
-      name: 'TelegramIcon',
+      name: 'Telegram',
       icon: TelegramIcon,
       href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
     },
     {
-      name: 'WhatsAppIcon',
+      name: 'WhatsApp',
       icon: WhatsAppIcon,
       href: `https://wa.me/?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
     },
@@ -96,7 +96,7 @@
         <div class="downloadable-image__card">
           <img src={downloadableImageUrl} alt="downloadable header" />
         </div>
-        <Button on:click={downloadImage} variant="normal" icon={DownloadIcon}>DownloadIcon</Button>
+        <Button on:click={downloadImage} variant="normal" icon={DownloadIcon}>Download</Button>
       </div>
     {/if}
     <div class="share-options pixelated">
