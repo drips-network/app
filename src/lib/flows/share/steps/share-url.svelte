@@ -42,7 +42,7 @@
     {
       name: 'FacebookIcon',
       icon: FacebookIcon,
-      href: `http://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`,
+      href: `http://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     },
     {
       name: 'ThreadsIcon',
