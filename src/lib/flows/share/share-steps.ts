@@ -1,10 +1,18 @@
 import { makeStep } from '$lib/components/stepper/types';
 import ShareUrl from './steps/share-url.svelte';
+import { type ComponentType } from 'svelte';
 
 type ShareUrlProps = {
   url: string;
   downloadableImageUrl?: string;
   text?: string;
+};
+
+export type ShareOption = {
+  name: string;
+  icon: ComponentType;
+  href?: string;
+  onClick?: (this: ShareOption) => undefined;
 };
 
 // import SuccessStep from '$lib/components/success-step/success-step.svelte';

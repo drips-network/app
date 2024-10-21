@@ -15,25 +15,16 @@
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
   // TODO: why no SvelteComponent?
-  import { type ComponentType } from 'svelte';
+  import { type ShareOption } from '../share-steps';
 
   export let url = '';
   export let downloadableImageUrl = '';
   export let text = '';
-  // export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
-  export let copyLinkLabel = 'Copy link';
 
   const shareSupported = browser && navigator.share;
 
   let hovering = false;
   let copySuccess = false;
-
-  type ShareOption = {
-    name: string;
-    icon: ComponentType;
-    href?: string;
-    onClick?: (this: ShareOption) => undefined;
-  };
 
   function copyShareLink() {
     navigator.clipboard.writeText(url);
@@ -105,6 +96,7 @@
     {/if}
     <div class="share-options pixelated">
       <h2 class="pixelated">Share</h2>
+      <!-- TODO: this text needs to change based on the thing that's being shared -->
       <p>Share this project on a network of your choice below.</p>
       <div class="share-options__options">
         <Button
@@ -128,7 +120,7 @@
                 <span transition:fade={{ duration: 200 }}><Link style="fill: currentColor" /></span>
               {/if}
             </div>
-            {copyLinkLabel}
+            Copy link
           </div>
         </Button>
 
@@ -145,49 +137,6 @@
     </div>
   </div>
 </StepLayout>
-
-<!-- {:else}
-
-  .button-inner .icon {
-    height: 2rem;
-    width: 2rem;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border-radius: 1rem;
-  }
-
-  .button-inner .icon > * {
-    position: absolute;
-  }
-
-  <Button
-    on:mouseenter={() => (hovering = true)}
-    on:focus={() => (hovering = true)}
-    on:mouseleave={() => (hovering = false)}
-    on:blur={() => (hovering = false)}
-    on:click={handleClick}
-    variant={buttonVariant}
-  >
-    <div class="button-inner">
-      <div class="icon">
-        {#if copySuccess}
-          <span transition:fade={{ duration: 200 }}>
-            <CheckCircle style="fill: var(--color-positive)" />
-          </span>
-        {:else if hovering}
-          <span transition:fade={{ duration: 200 }}>
-            <CopyIcon style="fill: currentColor" />
-          </span>
-        {:else}
-          <span transition:fade={{ duration: 200 }}><LinkIcon style="fill: currentColor" /></span>
-        {/if}
-      </div>
-      {copyLinkLabel}
-    </div>
-  </Button>
-{/if} -->
 
 <style>
   .downloadable-image {
