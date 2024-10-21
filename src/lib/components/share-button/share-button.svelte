@@ -10,6 +10,7 @@
   export let text: string | undefined = undefined;
   export let url: string;
   export let downloadableImageUrl: string = '';
+  export let shareModalText: string | undefined = undefined;
   export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
 
   export let shareLabel = 'Share';
@@ -34,6 +35,7 @@
         text,
         url,
         downloadableImageUrl,
+        shareModalText,
       }),
     );
   }
