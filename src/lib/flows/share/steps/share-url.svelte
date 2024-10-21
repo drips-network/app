@@ -14,12 +14,12 @@
   import CopyIcon from '$lib/components/icons/Copy.svelte';
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
-  // TODO: why no SvelteComponent?
   import { type ShareOption } from '../share-steps';
 
-  export let url = '';
-  export let downloadableImageUrl = '';
-  export let text = '';
+  export let url: string = '';
+  export let downloadableImageUrl: string = '';
+  export let text: string = '';
+  export let shareModalText: string = 'Share this on a network of your choice below.';
 
   const shareSupported = browser && navigator.share;
 
@@ -96,8 +96,7 @@
     {/if}
     <div class="share-options pixelated">
       <h2 class="pixelated">Share</h2>
-      <!-- TODO: this text needs to change based on the thing that's being shared -->
-      <p>Share this project on a network of your choice below.</p>
+      <p>{shareModalText}</p>
       <div class="share-options__options">
         <Button
           on:mouseenter={() => (hovering = true)}

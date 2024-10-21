@@ -6,6 +6,7 @@ type ShareUrlProps = {
   url: string;
   downloadableImageUrl?: string;
   text?: string;
+  shareModalText?: string | undefined;
 };
 
 export type ShareOption = {
