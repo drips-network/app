@@ -2,6 +2,7 @@
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
+  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
 
   export let data: PageData;
 
@@ -15,6 +16,8 @@
   description={data.meta.excerpt}
   twitterCardType="summary"
 />
+
+<ModalLayout />
 
 <article>
   <PostCard shareButton {imageUrl} {...data.meta} first={true} link={false} />

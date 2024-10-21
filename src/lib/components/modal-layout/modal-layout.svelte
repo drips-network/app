@@ -69,6 +69,8 @@
     position: fixed;
     z-index: 10000;
     display: flex;
+    top: 0;
+    left: 0;
   }
 
   .overlay {
