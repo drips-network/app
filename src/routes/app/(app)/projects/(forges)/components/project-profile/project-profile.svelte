@@ -244,16 +244,13 @@
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 </script>
 
-<!-- TODO remove -->
-{#if true}
-  <HeadMeta
-    title="{project.source.ownerName}/{project.source.repoName}"
-    description="Support {project.source
-      .repoName} on Drips and help make Open-Source Software sustainable."
-    image="{imageBaseUrl}?target=og"
-    twitterImage="{imageBaseUrl}?target=twitter"
-  />
-{/if}
+<HeadMeta
+  title="{project.source.ownerName}/{project.source.repoName}"
+  description="Support {project.source
+    .repoName} on Drips and help make Open-Source Software sustainable."
+  image="{imageBaseUrl}?target=og"
+  twitterImage="{imageBaseUrl}?target=twitter"
+/>
 
 <svelte:head>
   <!--
@@ -323,7 +320,10 @@
           later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <ShareButton url={browser ? window.location.href : ''} />
+            <ShareButton
+              url={browser ? window.location.href : ''}
+              downloadableImageUrl="{imageBaseUrl}?target=og"
+            />
             <Button
               size="small"
               icon={Registered}
