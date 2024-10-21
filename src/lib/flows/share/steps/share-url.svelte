@@ -14,7 +14,7 @@
   import { type ShareOption } from '../share-steps';
   import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
 
-  export let url: string = '';
+  export let url: string;
   export let downloadableImageUrl: string | undefined = undefined;
   export let text: string | undefined = undefined;
   export let shareModalText: string = 'Share this on a network of your choice below.';

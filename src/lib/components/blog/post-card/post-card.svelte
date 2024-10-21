@@ -8,7 +8,7 @@
   export let slug: string;
   export let coverImage: string;
   export let coverImageAlt: string;
-  export let imageUrl: string;
+  export let imageUrl: string | undefined = undefined;
 
   export let compact = false;
   export let newTab = false;
