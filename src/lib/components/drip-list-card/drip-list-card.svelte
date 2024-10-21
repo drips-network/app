@@ -241,7 +241,8 @@
           <div class="flex items-center gap-2 -my-1">
             <ShareButton
               buttonVariant="normal"
-              url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
+              url="{BASE_URL}{dripListUrl}"
+              downloadableImageUrl="{BASE_URL}{dripListUrl}.png?target=og"
             />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>

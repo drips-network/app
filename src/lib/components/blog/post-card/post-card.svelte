@@ -8,6 +8,7 @@
   export let slug: string;
   export let coverImage: string;
   export let coverImageAlt: string;
+  export let imageUrl: string = '';
 
   export let compact = false;
   export let newTab = false;
@@ -47,7 +48,11 @@
     </div>
     {#if shareButton}
       <div style:width="fit-content">
-        <ShareButton buttonVariant="normal" url={$page.url.toString()} />
+        <ShareButton
+          buttonVariant="normal"
+          url={$page.url.toString()}
+          downloadableImageUrl={imageUrl}
+        />
       </div>
     {/if}
   </div>
