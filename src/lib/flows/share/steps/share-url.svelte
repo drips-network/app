@@ -123,7 +123,7 @@
           </div>
         </Button>
 
-        {#each shareOptions as option (option.icon)}
+        {#each shareOptions as option}
           <Button
             target="_blank"
             href={option.href}
