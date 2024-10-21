@@ -5,7 +5,7 @@
 
   export let data: PageData;
 
-  let imageUrl = '/api/share-images/blog-post/og/{encodeURIComponent(data.meta.slug)}.png';
+  let imageUrl = `/api/share-images/blog-post/og/${encodeURIComponent(data.meta.slug)}.png`;
 </script>
 
 <HeadMeta
