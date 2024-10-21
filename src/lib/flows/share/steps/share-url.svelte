@@ -9,9 +9,10 @@
   import Threads from '$lib/components/icons/Threads.svelte';
   import Telegram from '$lib/components/icons/Telegram.svelte';
   import WhatsApp from '$lib/components/icons/WhatsApp.svelte';
-  import Signal from '$lib/components/icons/Signal.svelte';
   import Ellipsis from '$lib/components/icons/Ellipsis.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import CopyIcon from '$lib/components/icons/Copy.svelte';
+  import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
   // TODO: why no SvelteComponent?
   import { type ComponentType } from 'svelte';
@@ -19,8 +20,13 @@
   export let url = '';
   export let downloadableImageUrl = '';
   export let text = '';
+  // export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
+  export let copyLinkLabel = 'Copy link';
 
   const shareSupported = browser && navigator.share;
+
+  let hovering = false;
+  let copySuccess = false;
 
   type ShareOption = {
     name: string;
@@ -29,32 +35,13 @@
     onClick?: (this: ShareOption) => undefined;
   };
 
-  function doAnchorClick(url: string) {
-    const a = document.createElement('a');
-    document.body.appendChild(a);
-    a.style.display = 'none';
-    a.target = '_blank';
-    a.href = url;
-    a.click();
-    a.remove();
-  }
-
   function copyShareLink() {
     navigator.clipboard.writeText(url);
-    shareOptions[0].icon = CheckCircle;
-    setTimeout(() => {
-      shareOptions[0].icon = Link;
-    }, 1000);
+    copySuccess = true;
+    setTimeout(() => (copySuccess = false), 1000);
   }
 
   const shareOptions: Array<ShareOption> = [
-    {
-      name: 'Copy Link',
-      icon: Link,
-      onClick() {
-        copyShareLink();
-      },
-    },
     {
       name: 'X (Twitter)',
       icon: X,
@@ -79,17 +66,6 @@
       name: 'WhatsApp',
       icon: WhatsApp,
       href: `https://wa.me/?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
-    },
-    {
-      name: 'Signal',
-      icon: Signal,
-      onClick() {
-        copyShareLink();
-        doAnchorClick('sgnl://signal.me');
-        // Signal.me/something.
-        // just opens the app really, could copy to clipboard beforehand
-        // sgnl://signal.me
-      },
     },
     {
       name: 'More',
@@ -119,16 +95,43 @@
 
 <StepLayout>
   <div class="share-url">
-    <div class="downloadable-image">
-      <div class="downloadable-image__card">
-        <img src={downloadableImageUrl || url} alt="downloadable header" />
+    {#if downloadableImageUrl}
+      <div class="downloadable-image">
+        <div class="downloadable-image__card">
+          <img src={downloadableImageUrl} alt="downloadable header" />
+        </div>
+        <Button on:click={downloadImage} variant="normal" icon={Download}>Download</Button>
       </div>
-      <Button on:click={downloadImage} variant="normal" icon={Download}>Download</Button>
-    </div>
+    {/if}
     <div class="share-options pixelated">
       <h2 class="pixelated">Share</h2>
       <p>Share this project on a network of your choice below.</p>
       <div class="share-options__options">
+        <Button
+          on:mouseenter={() => (hovering = true)}
+          on:focus={() => (hovering = true)}
+          on:mouseleave={() => (hovering = false)}
+          on:blur={() => (hovering = false)}
+          on:click={copyShareLink}
+        >
+          <div class="button-inner">
+            <div class="icon">
+              {#if copySuccess}
+                <span transition:fade={{ duration: 200 }}>
+                  <CheckCircle style="fill: var(--color-positive)" />
+                </span>
+              {:else if hovering}
+                <span transition:fade={{ duration: 200 }}>
+                  <CopyIcon style="fill: currentColor" />
+                </span>
+              {:else}
+                <span transition:fade={{ duration: 200 }}><Link style="fill: currentColor" /></span>
+              {/if}
+            </div>
+            {copyLinkLabel}
+          </div>
+        </Button>
+
         {#each shareOptions as option (option.icon)}
           <Button
             target="_blank"
@@ -142,6 +145,49 @@
     </div>
   </div>
 </StepLayout>
+
+<!-- {:else}
+
+  .button-inner .icon {
+    height: 2rem;
+    width: 2rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 1rem;
+  }
+
+  .button-inner .icon > * {
+    position: absolute;
+  }
+
+  <Button
+    on:mouseenter={() => (hovering = true)}
+    on:focus={() => (hovering = true)}
+    on:mouseleave={() => (hovering = false)}
+    on:blur={() => (hovering = false)}
+    on:click={handleClick}
+    variant={buttonVariant}
+  >
+    <div class="button-inner">
+      <div class="icon">
+        {#if copySuccess}
+          <span transition:fade={{ duration: 200 }}>
+            <CheckCircle style="fill: var(--color-positive)" />
+          </span>
+        {:else if hovering}
+          <span transition:fade={{ duration: 200 }}>
+            <CopyIcon style="fill: currentColor" />
+          </span>
+        {:else}
+          <span transition:fade={{ duration: 200 }}><LinkIcon style="fill: currentColor" /></span>
+        {/if}
+      </div>
+      {copyLinkLabel}
+    </div>
+  </Button>
+{/if} -->
 
 <style>
   .downloadable-image {
@@ -158,6 +204,7 @@
     gap: 1rem;
     position: relative;
     overflow: hidden;
+    aspect-ratio: 16/9;
   }
 
   .downloadable-image :global(button) {
@@ -186,5 +233,26 @@
   .share-options__options :global(a .inner) {
     /* yoiks */
     justify-content: start !important;
+  }
+
+  .button-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    margin-left: -0.25rem;
+  }
+
+  .button-inner .icon {
+    height: 2rem;
+    width: 2rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 1rem;
+  }
+
+  .button-inner .icon > * {
+    position: absolute;
   }
 </style>
