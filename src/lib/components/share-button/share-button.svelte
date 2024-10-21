@@ -16,7 +16,7 @@
   export let shareLabel = 'Share';
 
   let shareSupported = browser && navigator.share;
-  let isTouchDevice = (browser && 'ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  let isTouchDevice = browser && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   async function preloadImage(url: string) {
     try {
