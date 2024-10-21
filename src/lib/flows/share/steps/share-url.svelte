@@ -33,7 +33,7 @@
     setTimeout(() => (copySuccess = false), 1000);
   }
 
-  const shareOptions: Array<ShareOption> = [
+  const shareOptions: ShareOption[] = [
     {
       name: 'X (Twitter)',
       icon: XIcon,
