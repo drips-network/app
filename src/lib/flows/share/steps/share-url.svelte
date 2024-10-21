@@ -68,7 +68,6 @@
             url,
           });
         } else {
-          // copy the link
           copyShareLink();
         }
       },
