@@ -6,7 +6,6 @@
   import modal from '$lib/stores/modal';
   import shareSteps from '$lib/flows/share/share-steps';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { onMount } from 'svelte';
 
   export let text: string | undefined = undefined;
   export let url: string;
@@ -38,19 +37,6 @@
       }),
     );
   }
-
-  // TODO: remove
-  onMount(() => {
-    modal.show(
-      Stepper,
-      undefined,
-      shareSteps({
-        text,
-        url,
-        downloadableImageUrl,
-      }),
-    );
-  });
 </script>
 
 <Button variant={buttonVariant} on:click={handleClick}>
