@@ -18,9 +18,11 @@
   import { type ShareOption } from '../share-steps';
 
   export let url: string = '';
-  export let downloadableImageUrl: string = '';
-  export let text: string = '';
+  export let downloadableImageUrl: string | undefined = undefined;
+  export let text: string | undefined = undefined;
   export let shareModalText: string = 'Share this on a network of your choice below.';
+
+  $: shareText = text || '';
 
   const shareSupported = browser && navigator.share;
 
@@ -37,7 +39,7 @@
     {
       name: 'X (Twitter)',
       icon: XIcon,
-      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,
     },
     {
       name: 'Facebook',
@@ -47,17 +49,17 @@
     {
       name: 'Threads',
       icon: ThreadsIcon,
-      href: `https://threads.net/intent/post?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
+      href: `https://threads.net/intent/post?text=${encodeURIComponent(shareText)}${encodeURIComponent(url)}`,
     },
     {
       name: 'Telegram',
       icon: TelegramIcon,
-      href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+      href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`,
     },
     {
       name: 'WhatsApp',
       icon: WhatsAppIcon,
-      href: `https://wa.me/?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
+      href: `https://wa.me/?text=${encodeURIComponent(shareText)}${encodeURIComponent(url)}`,
     },
     {
       name: 'Email',
@@ -81,6 +83,10 @@
   ];
 
   function downloadImage() {
+    if (!downloadableImageUrl) {
+      return;
+    }
+
     const segments = new URL(window.location.origin + downloadableImageUrl + text).pathname.split(
       '/',
     );
