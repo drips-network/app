@@ -17,6 +17,7 @@
   export let rel: string | undefined = undefined;
   export let type: 'submit' | 'reset' | 'button' = 'button';
   export let form: string | undefined = undefined;
+  export let justify: 'left' | 'right' | 'center' = 'center';
 
   $: isDisabled = disabled || loading;
 
@@ -44,7 +45,7 @@
   {target}
   {rel}
   {form}
-  class="button size-{size}"
+  class="button size-{size} justify-{justify}"
   class:disabled={isDisabled}
   class:loading
   disabled={isDisabled}
@@ -195,5 +196,13 @@
   .button.disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .button.justify-left .inner {
+    justify-content: start;
+  }
+
+  .button.justify-right .inner {
+    justify-content: end;
   }
 </style>
