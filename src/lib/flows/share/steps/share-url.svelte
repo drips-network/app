@@ -1,17 +1,18 @@
 <script lang="ts">
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Download from '$lib/components/icons/Download.svelte';
+  import DownloadIcon from '$lib/components/icons/Download.svelte';
   import downloadUrl from '$lib/utils/download-url';
-  import Link from '$lib/components/icons/Link.svelte';
-  import X from '$lib/components/icons/X.svelte';
-  import Facebook from '$lib/components/icons/Facebook.svelte';
-  import Threads from '$lib/components/icons/Threads.svelte';
-  import Telegram from '$lib/components/icons/Telegram.svelte';
-  import WhatsApp from '$lib/components/icons/WhatsApp.svelte';
-  import Ellipsis from '$lib/components/icons/Ellipsis.svelte';
-  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import LinkIcon from '$lib/components/icons/Link.svelte';
+  import XIcon from '$lib/components/icons/X.svelte';
+  import FacebookIcon from '$lib/components/icons/Facebook.svelte';
+  import ThreadsIcon from '$lib/components/icons/Threads.svelte';
+  import TelegramIcon from '$lib/components/icons/Telegram.svelte';
+  import WhatsAppIcon from '$lib/components/icons/WhatsApp.svelte';
+  import EllipsisIcon from '$lib/components/icons/Ellipsis.svelte';
+  import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
   import CopyIcon from '$lib/components/icons/Copy.svelte';
+  import EmailIcon from '$lib/components/icons/Email.svelte';
   import { fade } from 'svelte/transition';
   import { browser } from '$app/environment';
   import { type ShareOption } from '../share-steps';
@@ -34,33 +35,38 @@
 
   const shareOptions: Array<ShareOption> = [
     {
-      name: 'X (Twitter)',
-      icon: X,
+      name: 'XIcon (Twitter)',
+      icon: XIcon,
       href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
     },
     {
-      name: 'Facebook',
-      icon: Facebook,
+      name: 'FacebookIcon',
+      icon: FacebookIcon,
       href: `http://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`,
     },
     {
-      name: 'Threads',
-      icon: Threads,
+      name: 'ThreadsIcon',
+      icon: ThreadsIcon,
       href: `https://threads.net/intent/post?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
     },
     {
-      name: 'Telegram',
-      icon: Telegram,
+      name: 'TelegramIcon',
+      icon: TelegramIcon,
       href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
     },
     {
-      name: 'WhatsApp',
-      icon: WhatsApp,
+      name: 'WhatsAppIcon',
+      icon: WhatsAppIcon,
       href: `https://wa.me/?text=${encodeURIComponent(text)}${encodeURIComponent(url)}`,
     },
     {
+      name: 'Email',
+      icon: EmailIcon,
+      href: `mailto:?body=${encodeURIComponent(url)}`,
+    },
+    {
       name: 'More',
-      icon: Ellipsis,
+      icon: EllipsisIcon,
       onClick() {
         if (shareSupported) {
           navigator.share({
@@ -90,7 +96,7 @@
         <div class="downloadable-image__card">
           <img src={downloadableImageUrl} alt="downloadable header" />
         </div>
-        <Button on:click={downloadImage} variant="normal" icon={Download}>Download</Button>
+        <Button on:click={downloadImage} variant="normal" icon={DownloadIcon}>DownloadIcon</Button>
       </div>
     {/if}
     <div class="share-options pixelated">
@@ -108,14 +114,16 @@
             <div class="icon">
               {#if copySuccess}
                 <span transition:fade={{ duration: 200 }}>
-                  <CheckCircle style="fill: var(--color-positive)" />
+                  <CheckCircleIcon style="fill: var(--color-positive)" />
                 </span>
               {:else if hovering}
                 <span transition:fade={{ duration: 200 }}>
                   <CopyIcon style="fill: currentColor" />
                 </span>
               {:else}
-                <span transition:fade={{ duration: 200 }}><Link style="fill: currentColor" /></span>
+                <span transition:fade={{ duration: 200 }}
+                  ><LinkIcon style="fill: currentColor" /></span
+                >
               {/if}
             </div>
             Copy link
