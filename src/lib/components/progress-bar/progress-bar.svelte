@@ -46,15 +46,14 @@
     </div>
   </div>
   {#if remainingText}
-    <p class="typo-text-small" transition:slide={{ duration: 300 }}>{remainingText}</p>
+    <p style:margin-top="1rem" class="typo-text-small" transition:slide={{ duration: 300 }}>
+      {remainingText}
+    </p>
   {/if}
 </div>
 
 <style>
   .progress-bar-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
     color: var(--color-foreground-level-6);
   }
 
