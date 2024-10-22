@@ -19,7 +19,7 @@
   export let text: string | undefined = undefined;
   export let shareModalText: string = 'Share this on a network of your choice below.';
 
-  $: shareText = text || '';
+  const shareText = text || '';
 
   const shareSupported = browser && navigator.share;
 
