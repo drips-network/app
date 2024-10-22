@@ -10,7 +10,6 @@
   import Button from '$lib/components/button/button.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Amount from '$lib/components/amount/amount.svelte';
-  import ExampleTable from './examples/example-table.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { makeStep } from '$lib/components/stepper/types';
   import Step_1 from './examples/example-stepper-steps/step-1.svelte';
@@ -43,6 +42,8 @@
   import User from '$lib/components/icons/User.svelte';
   import network from '$lib/stores/wallet/network';
   import type { Splits } from '$lib/components/splits/types';
+  import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
+  import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
 
   // Button
   let disabled = false;
@@ -340,11 +341,50 @@
   let allowAddresses = true;
   let allowProjects = true;
   let allowDripLists = true;
+
+  // Progress bar
+  let running = false;
+  let startTime = Date.now();
+  let durationMs = 30000;
+  let expectedDurationText = 'Usually < 30 seconds';
+  let progressFn = () => ({ progressFraction: 0 });
 </script>
 
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Progress bar</h2>
+
+  <div>
+    <p>Duration MS</p>
+    <TextInput disabled={running} bind:value={durationMs} variant={{ type: 'number', min: 0 }} />
+    <p>Expected duration text</p>
+    <TextInput disabled={running} bind:value={expectedDurationText} />
+  </div>
+
+  <Button
+    disabled={running}
+    on:click={() => {
+      startTime = Date.now();
+      running = true;
+      progressFn = () =>
+        predefinedDurationProgress(startTime, durationMs, false, expectedDurationText);
+    }}>Start</Button
+  >
+
+  <Button
+    disabled={!running}
+    on:click={() => {
+      progressFn = () =>
+        predefinedDurationProgress(startTime, durationMs, true, expectedDurationText);
+      running = false;
+    }}>End</Button
+  >
+
+  <ProgressBar {progressFn} />
+</div>
 
 <div class="showcase-item">
   <h2>Date input</h2>
@@ -689,11 +729,6 @@
       tokenAddress,
     }}
   />
-</div>
-
-<div class="showcase-item">
-  <h2>Table</h2>
-  <ExampleTable />
 </div>
 
 <style>
