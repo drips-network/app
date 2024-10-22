@@ -70,16 +70,24 @@
     },
   ];
 
+  function getUrlExtension(urlStr: string): string {
+    const url = new URL(urlStr);
+    const filename = url.pathname.split('/').at(-1);
+    if (!filename) {
+      return '';
+    }
+
+    return filename.split('.').at(-1) || '';
+  }
+
   function downloadImage() {
     if (!downloadableImageUrl) {
       return;
     }
 
-    const segments = new URL(window.location.origin + downloadableImageUrl + text).pathname.split(
-      '/',
-    );
-    const last = segments.pop() || segments.pop(); // Handle potential trailing slash
-    downloadUrl(downloadableImageUrl, last);
+    const title = document.title.split(/\s?\|\s?/)[0];
+    const extension = getUrlExtension(window.location.origin + downloadableImageUrl);
+    downloadUrl(downloadableImageUrl, `${title}.${extension}`);
   }
 </script>
 
