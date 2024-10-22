@@ -5,7 +5,7 @@
   import CopyIcon from '$lib/components/icons/Copy.svelte';
   import { fade } from 'svelte/transition';
 
-  export let url: string = '';
+  export let url: string;
 
   let hovering = false;
   let copySuccess = false;
