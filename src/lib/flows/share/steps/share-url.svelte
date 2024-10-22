@@ -85,7 +85,7 @@
       return;
     }
 
-    const title = document.title.split(/\s?\|\s?/)[0];
+    const title = document.title.split(/\s?\|\s?/)[0].replace('/', ' ');
     const extension = getUrlExtension(window.location.origin + downloadableImageUrl);
     downloadUrl(downloadableImageUrl, `${title}.${extension}`);
   }
