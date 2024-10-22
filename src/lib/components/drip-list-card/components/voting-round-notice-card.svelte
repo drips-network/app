@@ -16,6 +16,8 @@
 
   export let votingRound: VotingRound;
 
+  let votingRoundUrl = `${BASE_URL}/app/drip-lists/${votingRound.id}`;
+
   $: isPublisher =
     $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase();
 </script>
@@ -26,10 +28,10 @@
       This list is in voting.
       <svelte:fragment slot="actions">
         <ShareButton
-          copyLinkLabel="Share with collaborators"
           shareLabel="Share with collaborators"
           buttonVariant="primary"
-          url="{BASE_URL}/app/drip-lists/{votingRound.id}"
+          url={votingRoundUrl}
+          downloadableImageUrl="{votingRoundUrl}.png?target=og"
         />
       </svelte:fragment>
     </AnnotationBox>
