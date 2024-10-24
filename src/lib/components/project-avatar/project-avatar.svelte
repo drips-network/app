@@ -34,11 +34,12 @@
 
   export let pendingAvatar = false;
 
-  type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
+  type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
   export let outline = project.__typename === 'ClaimedProjectData';
 
   const CONTAINER_SIZES: Record<Size, string> = {
+    micro: '0.8rem',
     tiny: '1.5rem',
     small: '2rem',
     medium: '3rem',

@@ -1,36 +1,37 @@
 <script lang="ts">
-  import Drip from "$lib/components/illustrations/drip.svelte";
-  import { BadgeStat, BadgeText, type BadgeData, type BadgeOptions } from "./badge";
+  import Drip from '$lib/components/illustrations/drip.svelte';
+  import { BadgeStat, BadgeText, type BadgeData, type BadgeOptions } from './badge';
+  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
 
   export let options: BadgeOptions;
   export let data: BadgeData;
 
-  $: dripFill = options.background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)'
-  $: dripStroke = options.background === 'blue' ? 'var(--color-primary)' : 'white'
-  $: dependencies = data?.dependencies || 0
-  $: dependenciesString = dependencies && dependencies === 1 ?
-    `Splitting to ${dependencies} Dependency` :
-    `Splitting to ${dependencies} Dependencies`
+  $: dripFill = options.background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)';
+  $: dripStroke = options.background === 'blue' ? 'var(--color-primary)' : 'white';
+  $: dependencies = data?.dependencies || 0;
+  $: dependenciesString =
+    dependencies && dependencies === 1
+      ? `Splitting to ${dependencies} Dependency`
+      : `Splitting to ${dependencies} Dependencies`;
 </script>
 
 <div
   class={`embed-badge embed-badge--github embed-badge--${options.background} embed-badge--${options.text} embed-badge--${options.stat}`}
-  >
+>
   <span class="embed-badge__icon">
-    <Drip
-      fill={dripFill}
-      stroke={dripStroke}
-      strokeWidth="4px"/>
+    <Drip fill={dripFill} stroke={dripStroke} strokeWidth="4px" />
   </span>
 
   <span class="embed-badge__text">
-  {#if options.text === BadgeText.me}
-    Drip to me
-  {:else if options.text === BadgeText.us}
-    Support us on Drips
-  {:else if options.text === BadgeText.project}
-    Support <img class="embed-badge__avatar" src={data.projectImageUrl} alt="{data.projectName} avatar"/><strong>{data.projectName}</strong> on Drips
-  {/if}
+    {#if options.text === BadgeText.me}
+      Drip to me
+    {:else if options.text === BadgeText.us}
+      Support us on Drips
+    {:else if options.text === BadgeText.project}
+      Support <ProjectAvatar project={data.projectAvatar} size="micro" /><strong
+        >{data.projectName}</strong
+      > on Drips
+    {/if}
   </span>
 
   {#if options.stat === BadgeStat.support}
@@ -51,7 +52,7 @@
     font-size: 11px;
     font-family: Verdana, sans-serif;
     gap: 3px;
-    background: linear-gradient(0deg, #425160 0%, #5A6B7C 100%);
+    background: linear-gradient(0deg, #425160 0%, #5a6b7c 100%);
     height: 20px;
     padding: 0 4px;
     color: white;
@@ -69,12 +70,6 @@
     display: flex;
     gap: 3px;
     align-items: center;
-  }
-
-  .embed-badge__avatar {
-    width: 9px;
-    height: 9px;
-    border-radius: 100%;
   }
 
   .embed-badge--github.embed-badge--dependencies,
