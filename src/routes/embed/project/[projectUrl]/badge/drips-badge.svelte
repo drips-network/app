@@ -1,32 +1,36 @@
 <script lang="ts">
-  import Drip from "$lib/components/illustrations/drip.svelte";
-  import { BadgeStat, BadgeText, type BadgeData, type BadgeOptions } from "./badge";
+  import Drip from '$lib/components/illustrations/drip.svelte';
+  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import { BadgeStat, BadgeText, type BadgeData, type BadgeOptions } from './badge';
 
   export let options: BadgeOptions;
   export let data: BadgeData;
 
-  $: dripFill = options.background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)'
-  $: dependencies = data?.dependencies || 0
-  $: dependenciesString = dependencies && dependencies === 1 ?
-    `Splitting to ${dependencies} Dependency` :
-    `Splitting to ${dependencies} Dependencies`
+  $: dripFill = options.background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)';
+  $: dependencies = data?.dependencies || 0;
+  $: dependenciesString =
+    dependencies && dependencies === 1
+      ? `Splitting to ${dependencies} Dependency`
+      : `Splitting to ${dependencies} Dependencies`;
 </script>
 
 <div
   class={`embed-badge embed-badge--drips embed-badge--${options.background} embed-badge--${options.text} embed-badge--${options.stat}`}
-  >
+>
   <span class="embed-badge__icon">
-    <Drip fill={dripFill}/>
+    <Drip fill={dripFill} />
   </span>
 
   <span class="embed-badge__text">
-  {#if options.text === BadgeText.me}
-    Drip to me
-  {:else if options.text === BadgeText.us}
-    Support us on Drips
-  {:else if options.text === BadgeText.project}
-    Support <img class="embed-badge__avatar" src={data.projectImageUrl} alt="{data.projectName} avatar"/><strong>{data.projectName}</strong> on Drips
-  {/if}
+    {#if options.text === BadgeText.me}
+      Drip to me
+    {:else if options.text === BadgeText.us}
+      Support us on Drips
+    {:else if options.text === BadgeText.project}
+      Support <ProjectAvatar project={data.projectAvatar} size="tiny" /><strong
+        >{data.projectName}</strong
+      > on Drips
+    {/if}
   </span>
 
   {#if options.stat === BadgeStat.support}

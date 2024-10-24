@@ -2,11 +2,17 @@
 // import DripsBadge from './drips-badge';
 // import GithubBadge from './github-badge';
 
-import { BadgeBackground, BadgeStat, BadgeStyle, BadgeText, type BadgeData, type BadgeOptions } from "./badge.js"
+import {
+  BadgeBackground,
+  BadgeStat,
+  BadgeStyle,
+  BadgeText,
+  type BadgeData,
+  type BadgeOptions,
+} from './badge.js';
 
-
-// import assert from '$lib/utils/assert';
-// import { error } from '@sveltejs/kit';
+import assert from '$lib/utils/assert';
+import { error } from '@sveltejs/kit';
 // import loadImage from '../../loadImage';
 // import getContrastColor from '$lib/utils/get-contrast-text-color';
 // import satori from 'satori';
@@ -14,105 +20,135 @@ import { BadgeBackground, BadgeStat, BadgeStyle, BadgeText, type BadgeData, type
 // import loadFonts from '../../loadFonts';
 // import { Resvg } from '@resvg/resvg-js';
 // import getBackgroundImage from '../../getBackgroundImage';
-// import { gql } from 'graphql-request';
-// import query from '$lib/graphql/dripsQL';
-// import isClaimed from '$lib/utils/project/is-claimed';
-// import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import isClaimed from '$lib/utils/project/is-claimed';
+import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
 // import sanitize from 'sanitize-html';
 // import twemoji from '$lib/utils/twemoji';
-// import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-// import network from '$lib/stores/wallet/network';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 export async function load({ params }): Promise<{
-	badgeData: BadgeData,
-	badgeOptions: BadgeOptions
+  badgeData: BadgeData;
+  badgeOptions: BadgeOptions;
 }> {
-	return {
-		badgeData: {
-			support: 12456,
-			dependencies: 15,
-			projectName: 'cached_resource',
-			projectImageUrl: 'http://localhost:5173/api/blockies/0xe2E9b9B5d0757c26aB477A754788B19b60f2ed83'
-		},
-		badgeOptions: {
-			style: BadgeStyle.drips,
-			text: BadgeText.project,
-			background: BadgeBackground.light,
-			stat: BadgeStat.support,
-		}
-	}
+  const { projectUrl } = params;
+  assert(projectUrl, 'Missing projectUrl param');
+
+  // TODO: same as PROJECT_AVATAR_FRAGMENT from project-avatar.svelte
+  const projectQuery = gql`
+    query Project($url: String!, $chains: [SupportedChain!]) {
+      projectByUrl(url: $url, chains: $chains) {
+        source {
+          ownerName
+          repoName
+        }
+        chainData {
+          ... on UnClaimedProjectData {
+            chain
+          }
+          ... on ClaimedProjectData {
+            chain
+            color
+            avatar {
+              ... on ImageAvatar {
+                cid
+              }
+              ... on EmojiAvatar {
+                emoji
+              }
+            }
+            splits {
+              dependencies {
+                __typename
+              }
+            }
+            totalEarned {
+              amount
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const res = await query<ProjectQuery, ProjectQueryVariables>(
+    projectQuery,
+    { url: projectUrl, chains: [network.gqlName] },
+    fetch,
+  );
+  const { projectByUrl: project } = res;
+  try {
+    assert(project);
+  } catch {
+    error(404);
+  }
+
+  const projectName = `${project.source.repoName}`;
+
+  const projectData = filterCurrentChainData(project.chainData);
+
+  const dependencies = isClaimed(projectData)
+    ? projectData.splits.dependencies.length.toString()
+    : '0';
+
+  console.log(projectName, projectData);
+
+  return {
+    badgeData: {
+      support: 12456,
+      dependencies,
+      projectName,
+      projectAvatar: projectData,
+    },
+    badgeOptions: {
+      style: BadgeStyle.drips,
+      text: BadgeText.project,
+      background: BadgeBackground.light,
+      stat: BadgeStat.support,
+    },
+  };
 }
-
-// export const GET: RequestHandler = async ({ url, fetch, params }) => {
-//   const renderedComponent = DripsBadge.render({
-//     background: 'cool',
-//     text: 'mcdonalds',
-//     stat: 'micro!'
-//   })
-
-//   const element = toReactElement(renderedComponent.html)
-
-//   const svg = await satori(element, {
-//     height: 32,
-//     width: 172,
-//     fonts: await loadFonts(fetch),
-//   })
-
-//   const resvg = new Resvg(svg, {
-//     fitTo: {
-//       mode: 'width',
-//       value: 1200,
-//     },
-//   });
-
-//   const image = resvg.render().asPng();
-
-//   return new Response(image, {
-//     headers: {
-//       'content-type': 'image/png',
-//       'cache-control': 'public, max-age=86400', // 24 hours
-//     },
-//   });
-// }
 
 // embeds/project/whatever.com?background=light&buttonText=me&style=drips&stat=dependencies
 
 // export const GET: RequestHandler = async ({ url, fetch, params }) => {
-//   const { projectUrl } = params;
-//   assert(projectUrl, 'Missing projectUrl param');
+// const { projectUrl } = params;
+// assert(projectUrl, 'Missing projectUrl param');
 
-//   const projectQuery = gql`
-//     query Project($url: String!, $chains: [SupportedChain!]) {
-//       projectByUrl(url: $url, chains: $chains) {
-//         source {
-//           ownerName
-//           repoName
+// const projectQuery = gql`
+//   query Project($url: String!, $chains: [SupportedChain!]) {
+//     projectByUrl(url: $url, chains: $chains) {
+//       source {
+//         ownerName
+//         repoName
+//       }
+//       chainData {
+//         ... on UnClaimedProjectData {
+//           chain
 //         }
-//         chainData {
-//           ... on UnClaimedProjectData {
-//             chain
-//           }
-//           ... on ClaimedProjectData {
-//             chain
-//             avatar {
-//               ... on ImageAvatar {
-//                 cid
-//               }
-//               ... on EmojiAvatar {
-//                 emoji
-//               }
+//         ... on ClaimedProjectData {
+//           chain
+//           avatar {
+//             ... on ImageAvatar {
+//               cid
 //             }
-//             color
-//             splits {
-//               dependencies {
-//                 __typename
-//               }
+//             ... on EmojiAvatar {
+//               emoji
+//             }
+//           }
+//           color
+//           splits {
+//             dependencies {
+//               __typename
 //             }
 //           }
 //         }
 //       }
 //     }
-//   `;
+//   }
+// `;
 
 //   const res = await query<ProjectQuery, ProjectQueryVariables>(
 //     projectQuery,

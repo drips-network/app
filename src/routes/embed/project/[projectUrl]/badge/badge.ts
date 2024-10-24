@@ -1,3 +1,5 @@
+import type { ProjectAvatarFragment } from '$lib/components/project-avatar/__generated__/gql.generated';
+
 export enum BadgeStyle {
   github = 'github',
   drips = 'drips',
@@ -22,15 +24,15 @@ export enum BadgeStat {
 }
 
 export type BadgeOptions = {
-  style: BadgeStyle
-  text: BadgeText
-  background: BadgeBackground
-  stat: BadgeStat
-}
+  style: BadgeStyle;
+  text: BadgeText;
+  background: BadgeBackground;
+  stat: BadgeStat;
+};
 
 export type BadgeData = {
   support?: number;
-  dependencies?: number;
+  dependencies?: string;
   projectName?: string;
-  projectImageUrl?: string;
-}
+  projectAvatar: ProjectAvatarFragment;
+};
