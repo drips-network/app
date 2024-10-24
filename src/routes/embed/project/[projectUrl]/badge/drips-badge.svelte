@@ -1,13 +1,11 @@
 <script lang="ts">
   import Drip from "$lib/components/illustrations/drip.svelte";
-  import { type BadgeData } from "./badge";
+  import { BadgeStat, BadgeText, type BadgeData, type BadgeOptions } from "./badge";
 
-  export let text: 'project' | 'me' | 'us' = 'me';
-  export let background: 'dark' | 'light' | 'blue' = 'light';
-  export let stat: 'support' | 'dependencies' | 'none' = 'none';
+  export let options: BadgeOptions;
   export let data: BadgeData;
 
-  $: dripFill = background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)'
+  $: dripFill = options.background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)'
   $: dependencies = data?.dependencies || 0
   $: dependenciesString = dependencies && dependencies === 1 ?
     `Splitting to ${dependencies} Dependency` :
@@ -15,25 +13,25 @@
 </script>
 
 <div
-  class={`embed-badge embed-badge--drips embed-badge--${background} embed-badge--${text} embed-badge--${stat}`}
+  class={`embed-badge embed-badge--drips embed-badge--${options.background} embed-badge--${options.text} embed-badge--${options.stat}`}
   >
   <span class="embed-badge__icon">
     <Drip fill={dripFill}/>
   </span>
 
   <span class="embed-badge__text">
-  {#if text === 'me'}
+  {#if options.text === BadgeText.me}
     Drip to me
-  {:else if text === 'us'}
+  {:else if options.text === BadgeText.us}
     Support on Drips
-  {:else if text === 'project'}
+  {:else if options.text === BadgeText.project}
     Support on <img src={data.projectImageUrl} alt="{data.projectName} avatar"/><em>{data.projectName}</em> on Drips
   {/if}
   </span>
 
-  {#if stat === 'support'}
+  {#if options.stat === BadgeStat.support}
     <span class="embed-badge__support">{data.support}</span>
-  {:else if stat === 'dependencies'}
+  {:else if options.stat === BadgeStat.dependencies}
     <span class="embed-badge__dependencies">{dependenciesString}</span>
   {/if}
 </div>
