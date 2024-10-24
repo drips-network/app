@@ -29,7 +29,23 @@ import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.ge
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 
-export async function load({ params }): Promise<{
+// const DEFAULT_BADGE_OPTIONS: BadgeOptions = {
+// 	style: BadgeStyle.drips,
+// 	text: BadgeText.me,
+// 	background: BadgeBackground.light,
+// 	stat: BadgeStat.none,
+// } as const
+
+const getBadgeOptions = (url: URL): BadgeOptions => {
+	return {
+		style: BadgeStyle[url.searchParams.get('style') as BadgeStyle] || BadgeStyle.default,
+		text: BadgeText[url.searchParams.get('text') as BadgeText] || BadgeText.default,
+		background: BadgeBackground[url.searchParams.get('background') as BadgeBackground] || BadgeBackground.default,
+		stat: BadgeStat[url.searchParams.get('stat') as BadgeStat] || BadgeStat.default,
+	}
+}
+
+export async function load({ url, params }): Promise<{
   badgeData: BadgeData;
   badgeOptions: BadgeOptions;
 }> {
@@ -95,6 +111,8 @@ export async function load({ params }): Promise<{
 
   console.log(projectName, projectData);
 
+	const badgeOptions = getBadgeOptions(url)
+
   return {
     badgeData: {
       support: 12456,
@@ -102,12 +120,7 @@ export async function load({ params }): Promise<{
       projectName,
       projectAvatar: projectData,
     },
-    badgeOptions: {
-      style: BadgeStyle.drips,
-      text: BadgeText.project,
-      background: BadgeBackground.light,
-      stat: BadgeStat.support,
-    },
+    badgeOptions,
   };
 }
 
