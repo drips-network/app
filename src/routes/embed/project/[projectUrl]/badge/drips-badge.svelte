@@ -23,9 +23,9 @@
   {#if options.text === BadgeText.me}
     Drip to me
   {:else if options.text === BadgeText.us}
-    Support on Drips
+    Support us on Drips
   {:else if options.text === BadgeText.project}
-    Support on <img src={data.projectImageUrl} alt="{data.projectName} avatar"/><em>{data.projectName}</em> on Drips
+    Support <img class="embed-badge__avatar" src={data.projectImageUrl} alt="{data.projectName} avatar"/><strong>{data.projectName}</strong> on Drips
   {/if}
   </span>
 
@@ -37,6 +37,10 @@
 </div>
 
 <style>
+  .embed-badge strong {
+    font-weight: 600;
+  }
+
   .embed-badge--drips {
     border: 1px solid var(--color-foreground);
     padding: 0 10px;
@@ -48,12 +52,6 @@
     background: var(--color-background);
   }
 
-  .embed-badge__icon {
-    width: 12px;
-    display: flex;
-    align-items: center;
-  }
-
   .embed-badge--drips.embed-badge--dark {
     background: var(--color-foreground);
     color: var(--color-background);
@@ -62,5 +60,34 @@
   .embed-badge--drips.embed-badge--blue {
     background: var(--color-primary);
     color: var(--color-background);
+  }
+
+  .embed-badge__icon {
+    width: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .embed-badge__text {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+
+  .embed-badge__avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 100%;
+  }
+
+  .embed-badge__dependencies,
+  .embed-badge__support {
+    color: var(--color-background);
+    font-weight: 600;
+  }
+
+  .embed-badge--drips.embed-badge--light .embed-badge__dependencies,
+  .embed-badge--drips.embed-badge--light .embed-badge__support {
+    color: var(--color-primary);
   }
 </style>

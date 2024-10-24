@@ -36,9 +36,9 @@ export async function load({ params }): Promise<{
 		},
 		badgeOptions: {
 			style: BadgeStyle.drips,
-			text: BadgeText.me,
+			text: BadgeText.project,
 			background: BadgeBackground.light,
-			stat: BadgeStat.none
+			stat: BadgeStat.support,
 		}
 	}
 }

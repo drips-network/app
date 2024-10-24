@@ -4,7 +4,4 @@
   export let data;
 </script>
 
-<div>
-  Hello World {data}
-  <Badge data={data.badgeData} options={data.badgeOptions}/>
-</div>
+<Badge data={data.badgeData} options={data.badgeOptions}/>
