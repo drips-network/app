@@ -1,15 +1,10 @@
 <script>
-  import DripsBadge from './drips-badge.svelte'
-  import GithubBadge from './github-badge.svelte'
+  import Badge from './badge.svelte'
 
   export let data;
 </script>
 
-<div data-theme='none'>
+<div>
   Hello World {data}
-  <DripsBadge/>
-  <GithubBadge/>
+  <Badge data={data.badgeData} options={data.badgeOptions}/>
 </div>
-
-<style>
-</style>

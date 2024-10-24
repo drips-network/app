@@ -2,6 +2,8 @@
 // import DripsBadge from './drips-badge';
 // import GithubBadge from './github-badge';
 
+import { BadgeBackground, BadgeStat, BadgeStyle, BadgeText, type BadgeData, type BadgeOptions } from "./badge.js"
+
 
 // import assert from '$lib/utils/assert';
 // import { error } from '@sveltejs/kit';
@@ -21,9 +23,24 @@
 // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 // import network from '$lib/stores/wallet/network';
 
-
-export async function load({ params }) {
-	return { params }
+export async function load({ params }): Promise<{
+	badgeData: BadgeData,
+	badgeOptions: BadgeOptions
+}> {
+	return {
+		badgeData: {
+			support: 12456,
+			dependencies: 15,
+			projectName: 'cached_resource',
+			projectImageUrl: 'http://localhost:5173/api/blockies/0xe2E9b9B5d0757c26aB477A754788B19b60f2ed83'
+		},
+		badgeOptions: {
+			style: BadgeStyle.drips,
+			text: BadgeText.me,
+			background: BadgeBackground.light,
+			stat: BadgeStat.none
+		}
+	}
 }
 
 // export const GET: RequestHandler = async ({ url, fetch, params }) => {
