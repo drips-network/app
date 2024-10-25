@@ -1,11 +1,16 @@
 import { MockProvider } from '@rsksmart/mock-web3-provider';
 import { get } from 'svelte/store';
 import ens from '.';
+import walletStore from '../wallet/wallet.store';
+
+vi.mock('$lib/stores/wallet/wallet.store');
 
 vi.mock('@rsksmart/mock-web3-provider', () => ({
   MockProvider: vi.fn().mockImplementation(() => ({
     lookupAddress: vi.fn(() => 'test.ens'),
-    getAvatar: vi.fn(() => 'foo.com/bar'),
+    getResolver: vi.fn(() => ({
+      getAvatar: vi.fn(() => 'avatar.png'),
+    })),
   })),
 }));
 
@@ -16,28 +21,32 @@ afterEach(() => {
 });
 
 describe('ens store', () => {
-  it('resolves records', async () => {
-    ens.connect(provider);
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (walletStore as any).mockSetSubscribeValue({
+      ...get(walletStore),
+      provider,
+    });
+  });
 
+  it('resolves records', async () => {
     await ens.lookup('0x1234');
 
     const expectedResult = {
       name: 'test.ens',
-      avatarUrl: 'foo.com/bar',
+      avatarUrl: 'avatar.png',
     };
 
     expect(get(ens)['0x1234']).toStrictEqual(expectedResult);
   });
 
   it('deduplicates requests', async () => {
-    ens.connect(provider);
-
     ens.lookup('0x1234');
     ens.lookup('0x1234');
     ens.lookup('0x1234');
     ens.lookup('0x1234');
 
     expect(provider.lookupAddress).toHaveBeenCalledTimes(2);
-    expect(provider.getAvatar).toHaveBeenCalledTimes(2);
+    expect(provider.getResolver).toHaveBeenCalledTimes(1);
   });
 });

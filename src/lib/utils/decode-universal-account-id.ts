@@ -1,6 +1,5 @@
 import ens from '$lib/stores/ens';
 import { isAddress } from 'ethers';
-import { get } from 'svelte/store';
 import { executeAddressDriverReadMethod } from './sdk/address-driver/address-driver';
 import type { OxString } from './sdk/sdk-types';
 import { extractDriverNameFromAccountId } from './sdk/utils/extract-driver-from-accountId';
@@ -47,20 +46,6 @@ export default async function (
     };
   } else if ((universalAcccountIdentifier as string).endsWith('.eth')) {
     // Subscribe to ens.connected store and wait until it's true
-
-    const ensConnected = ens.connected;
-
-    if (!get(ensConnected)) {
-      await new Promise((resolve) => {
-        const unsubscribe = ensConnected.subscribe((connected) => {
-          if (connected) {
-            unsubscribe();
-            resolve(undefined);
-          }
-        });
-      });
-    }
-
     const lookup = await ens.reverseLookup(universalAcccountIdentifier);
     if (lookup) {
       const dripsAccountId = (
