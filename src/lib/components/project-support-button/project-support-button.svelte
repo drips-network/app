@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { BadgeStyle, type BadgeData, type BadgeOptions } from './badge';
-  import DripsBadge from './drips-badge.svelte';
-  import GithubBadge from './github-badge.svelte';
+  import { BadgeStyle, type BadgeData, type BadgeOptions } from './project-support-button';
+  import DripsBadge from './drips-style-button.svelte';
+  import GithubBadge from './github-style-button.svelte';
 
   export let data: BadgeData;
   export let options: BadgeOptions;

@@ -9,7 +9,7 @@ import {
   BadgeText,
   type BadgeData,
   type BadgeOptions,
-} from './badge.js';
+} from '$lib/components/project-support-button/project-support-button';
 
 import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
@@ -37,13 +37,15 @@ import network from '$lib/stores/wallet/network';
 // } as const
 
 const getBadgeOptions = (url: URL): BadgeOptions => {
-	return {
-		style: BadgeStyle[url.searchParams.get('style') as BadgeStyle] || BadgeStyle.default,
-		text: BadgeText[url.searchParams.get('text') as BadgeText] || BadgeText.default,
-		background: BadgeBackground[url.searchParams.get('background') as BadgeBackground] || BadgeBackground.default,
-		stat: BadgeStat[url.searchParams.get('stat') as BadgeStat] || BadgeStat.default,
-	}
-}
+  return {
+    style: BadgeStyle[url.searchParams.get('style') as BadgeStyle] || BadgeStyle.default,
+    text: BadgeText[url.searchParams.get('text') as BadgeText] || BadgeText.default,
+    background:
+      BadgeBackground[url.searchParams.get('background') as BadgeBackground] ||
+      BadgeBackground.default,
+    stat: BadgeStat[url.searchParams.get('stat') as BadgeStat] || BadgeStat.default,
+  };
+};
 
 export async function load({ url, params }): Promise<{
   badgeData: BadgeData;
@@ -109,9 +111,7 @@ export async function load({ url, params }): Promise<{
     ? projectData.splits.dependencies.length.toString()
     : '0';
 
-  console.log(projectName, projectData);
-
-	const badgeOptions = getBadgeOptions(url)
+  const badgeOptions = getBadgeOptions(url);
 
   return {
     badgeData: {
