@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BadgeData, BadgeOptions } from './badge';
+  import { BadgeStyle, type BadgeData, type BadgeOptions } from './badge';
   import DripsBadge from './drips-badge.svelte';
   import GithubBadge from './github-badge.svelte';
 
@@ -8,8 +8,11 @@
 </script>
 
 <div data-theme="none">
-  <DripsBadge {data} {options} />
-  <GithubBadge {data} {options} />
+  {#if options.style === BadgeStyle.github}
+    <GithubBadge {data} {options} />
+  {:else}
+    <DripsBadge {data} {options} />
+  {/if}
 </div>
 
 <style>
