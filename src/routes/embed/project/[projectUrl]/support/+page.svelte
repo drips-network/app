@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Badge from '$lib/components/project-support-button/project-support-button.svelte';
+  import ProjectSupportButton from '$lib/components/project-support-button/project-support-button.svelte';
   import wait from '$lib/utils/wait';
 
   export let data;
@@ -24,5 +24,5 @@
 </script>
 
 {#if ready}
-  <Badge data={data.supportButtonData} options={data.supportButtonOptions} />
+  <ProjectSupportButton data={data.supportButtonData} options={data.supportButtonOptions} />
 {/if}

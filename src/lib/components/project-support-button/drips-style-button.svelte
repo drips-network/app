@@ -20,13 +20,13 @@
 </script>
 
 <div
-  class={`embed-badge embed-badge--drips embed-badge--${options.background} embed-badge--${options.text} embed-badge--${options.stat}`}
+  class={`support-button support-button--drips support-button--${options.background} support-button--${options.text} support-button--${options.stat}`}
 >
-  <span class="embed-badge__icon">
+  <span class="support-button__icon">
     <Drip fill={dripFill} />
   </span>
 
-  <span class="embed-badge__text">
+  <span class="support-button__text">
     {#if options.text === SupportButtonText.me}
       Drip to me
     {:else if options.text === SupportButtonText.us}
@@ -39,18 +39,18 @@
   </span>
 
   {#if options.stat === SupportButtonStat.support}
-    <span class="embed-badge__support">{data.support}</span>
+    <span class="support-button__support">{data.support}</span>
   {:else if options.stat === SupportButtonStat.dependencies}
-    <span class="embed-badge__dependencies">{dependenciesString}</span>
+    <span class="support-button__dependencies">{dependenciesString}</span>
   {/if}
 </div>
 
 <style>
-  .embed-badge strong {
+  .support-button strong {
     font-weight: 600;
   }
 
-  .embed-badge--drips {
+  .support-button--drips {
     border: 1px solid #28333d;
     padding: 0 10px;
     border-radius: 1rem 0 1rem 1rem;
@@ -62,42 +62,42 @@
     color: #28333d;
   }
 
-  .embed-badge--drips.embed-badge--dark {
+  .support-button--drips.support-button--dark {
     background-color: #28333d;
     color: #ffffff;
   }
 
-  .embed-badge--drips.embed-badge--blue {
+  .support-button--drips.support-button--blue {
     background-color: #5555ff;
     color: #ffffff;
   }
 
-  .embed-badge__icon {
+  .support-button__icon {
     width: 12px;
     display: flex;
     align-items: center;
   }
 
-  .embed-badge__text {
+  .support-button__text {
     display: flex;
     gap: 7px;
     align-items: center;
   }
 
-  .embed-badge__avatar {
+  .support-button__avatar {
     width: 24px;
     height: 24px;
     border-radius: 100%;
   }
 
-  .embed-badge__dependencies,
-  .embed-badge__support {
+  .support-button__dependencies,
+  .support-button__support {
     color: #ffffff;
     font-weight: 600;
   }
 
-  .embed-badge--drips.embed-badge--light .embed-badge__dependencies,
-  .embed-badge--drips.embed-badge--light .embed-badge__support {
+  .support-button--drips.support-button--light .support-button__dependencies,
+  .support-button--drips.support-button--light .support-button__support {
     color: #5555ff;
   }
 </style>

@@ -5,10 +5,8 @@ import puppeteer from 'puppeteer';
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
 
 export const GET: RequestHandler = async ({ url }) => {
-  // drips.network/embed/project.png/badge.png
-  // drips.network/embed/project.png/badge.png?background=dark
-  // drips.network/embed/project.png/badge.png/?background=dark
-  // ==> drips.network/embed/project.png/badge
+  // drips.network/embed/project.png/support.png/?background=dark
+  // ==> drips.network/embed/project.png/support?background=dark
   const imageUrl = url.href.replace(REPLACE_PNG_REGEX, '$2');
   // TODO: handle invalid href
 

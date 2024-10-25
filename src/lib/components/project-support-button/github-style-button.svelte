@@ -21,13 +21,13 @@
 </script>
 
 <div
-  class={`embed-badge embed-badge--github embed-badge--${options.background} embed-badge--${options.text} embed-badge--${options.stat}`}
+  class={`support-button support-button--github support-button--${options.background} support-button--${options.text} support-button--${options.stat}`}
 >
-  <span class="embed-badge__icon">
+  <span class="support-button__icon">
     <Drip fill={dripFill} stroke={dripStroke} strokeWidth="4px" />
   </span>
 
-  <span class="embed-badge__text">
+  <span class="support-button__text">
     {#if options.text === SupportButtonText.me}
       Drip to me
     {:else if options.text === SupportButtonText.us}
@@ -40,18 +40,18 @@
   </span>
 
   {#if options.stat === SupportButtonStat.support}
-    <span class="embed-badge__support">{data.support}</span>
+    <span class="support-button__support">{data.support}</span>
   {:else if options.stat === SupportButtonStat.dependencies}
-    <span class="embed-badge__dependencies">{dependenciesString}</span>
+    <span class="support-button__dependencies">{dependenciesString}</span>
   {/if}
 </div>
 
 <style>
-  .embed-badge strong {
+  .support-button strong {
     font-weight: 600;
   }
 
-  .embed-badge--github {
+  .support-button--github {
     display: inline-flex;
     align-items: center;
     font-size: 11px;
@@ -65,25 +65,25 @@
     overflow: hidden;
   }
 
-  .embed-badge__icon {
+  .support-button__icon {
     width: 6px;
     display: flex;
     align-items: center;
   }
 
-  .embed-badge__text {
+  .support-button__text {
     display: flex;
     gap: 3px;
     align-items: center;
   }
 
-  .embed-badge--github.embed-badge--dependencies,
-  .embed-badge--github.embed-badge--support {
+  .support-button--github.support-button--dependencies,
+  .support-button--github.support-button--support {
     padding-right: 0;
   }
 
-  .embed-badge__support,
-  .embed-badge__dependencies {
+  .support-button__support,
+  .support-button__dependencies {
     background: #5555ff;
     height: 20px;
     padding: 0 4px;
