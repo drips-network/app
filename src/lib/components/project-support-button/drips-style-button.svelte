@@ -7,6 +7,7 @@
     type SupportButtonData,
     type SupportButtonOptions,
   } from './project-support-button';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   export let options: SupportButtonOptions;
   export let data: SupportButtonData;
@@ -19,7 +20,8 @@
       : `Splitting to ${dependencies} Dependencies`;
 </script>
 
-<div
+<a
+  href={data.projectUrl}
   class={`support-button support-button--drips support-button--${options.background} support-button--${options.text} support-button--${options.stat}`}
 >
   <span class="support-button__icon">
@@ -39,17 +41,15 @@
   </span>
 
   {#if options.stat === SupportButtonStat.support}
-    <span class="support-button__support">{data.support}</span>
+    <span class="support-button__support"
+      ><AggregateFiatEstimate amounts={data.projectAvatar.totalEarned} /></span
+    >
   {:else if options.stat === SupportButtonStat.dependencies}
     <span class="support-button__dependencies">{dependenciesString}</span>
   {/if}
-</div>
+</a>
 
 <style>
-  .support-button strong {
-    font-weight: 600;
-  }
-
   .support-button--drips {
     border: 1px solid #28333d;
     padding: 0 10px;
@@ -99,5 +99,9 @@
   .support-button--drips.support-button--light .support-button__dependencies,
   .support-button--drips.support-button--light .support-button__support {
     color: #5555ff;
+  }
+
+  .support-button strong {
+    font-weight: 600;
   }
 </style>

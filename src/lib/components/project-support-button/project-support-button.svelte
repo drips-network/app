@@ -6,9 +6,15 @@
   } from './project-support-button';
   import DripsSupportButton from './drips-style-button.svelte';
   import GithubSupportButton from './github-style-button.svelte';
+  import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
+  import { onMount } from 'svelte';
 
   export let data: SupportButtonData;
   export let options: SupportButtonOptions;
+
+  onMount(() => {
+    fiatEstimates.start();
+  });
 </script>
 
 <div>

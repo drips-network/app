@@ -1,4 +1,5 @@
 import type { ProjectAvatarFragment } from '$lib/components/project-avatar/__generated__/gql.generated';
+import type { Amount } from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
 
 export enum SupportButtonStyle {
   github = 'github',
@@ -38,5 +39,7 @@ export type SupportButtonData = {
   support?: number;
   dependencies?: string;
   projectName?: string;
-  projectAvatar: ProjectAvatarFragment;
+  projectUrl?: string;
+  // TODO: a more appropriate type
+  projectAvatar: ProjectAvatarFragment & { totalEarned?: Amount[] };
 };

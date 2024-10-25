@@ -15,6 +15,7 @@ import isClaimed from '$lib/utils/project/is-claimed';
 import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
+import buildProjectUrl from '$lib/utils/build-project-url';
 
 const getSupportButtonOptions = (url: URL): SupportButtonOptions => {
   return {
@@ -47,6 +48,7 @@ export async function load({ url, params }): Promise<{
         source {
           ownerName
           repoName
+          forge
         }
         chainData {
           ... on UnClaimedProjectData {
@@ -69,6 +71,7 @@ export async function load({ url, params }): Promise<{
               }
             }
             totalEarned {
+              tokenAddress
               amount
             }
           }
@@ -89,8 +92,10 @@ export async function load({ url, params }): Promise<{
     error(404);
   }
 
-  const projectName = `${project.source.repoName}`;
+  const { forge, ownerName, repoName } = project.source;
+  const appProjectUrl = `${url.origin}${buildProjectUrl(forge, ownerName, repoName)}`;
 
+  const projectName = `${project.source.repoName}`;
   const projectData = filterCurrentChainData(project.chainData);
 
   const dependencies = isClaimed(projectData)
@@ -99,11 +104,17 @@ export async function load({ url, params }): Promise<{
 
   const supportButtonOptions = getSupportButtonOptions(url);
 
+  // const tokenAddresses = projectData.totalEarned?.map((a) => a.tokenAddress);
+  // await fiatEstimates.start(url.origin)
+  // const priceStore = fiatEstimates.price(tokenAddresses)
+  // const result = aggregateFiatEstimate(priceStore, projectData.totalEarned);
+  // console.log(projectData);
+
   return {
     supportButtonData: {
-      support: 12456,
       dependencies,
       projectName,
+      projectUrl: appProjectUrl,
       projectAvatar: projectData,
     },
     supportButtonOptions,
