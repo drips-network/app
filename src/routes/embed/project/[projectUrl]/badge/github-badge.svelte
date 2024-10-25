@@ -79,7 +79,7 @@
 
   .embed-badge__support,
   .embed-badge__dependencies {
-    background: var(--color-primary);
+    background: #5555ff;
     height: 20px;
     padding: 0 4px;
     display: flex;

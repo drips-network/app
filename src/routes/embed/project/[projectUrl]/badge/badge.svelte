@@ -7,7 +7,7 @@
   export let options: BadgeOptions;
 </script>
 
-<div data-theme="none">
+<div>
   {#if options.style === BadgeStyle.github}
     <GithubBadge {data} {options} />
   {:else}

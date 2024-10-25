@@ -46,24 +46,25 @@
   }
 
   .embed-badge--drips {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid #28333d;
     padding: 0 10px;
     border-radius: 1rem 0 1rem 1rem;
     display: inline-flex;
     gap: 7px;
     align-items: center;
     height: 32px;
-    background: var(--color-background);
+    background-color: #ffffff;
+    color: #28333d;
   }
 
   .embed-badge--drips.embed-badge--dark {
-    background: var(--color-foreground);
-    color: var(--color-background);
+    background-color: #28333d;
+    color: #ffffff;
   }
 
   .embed-badge--drips.embed-badge--blue {
-    background: var(--color-primary);
-    color: var(--color-background);
+    background-color: #5555ff;
+    color: #ffffff;
   }
 
   .embed-badge__icon {
@@ -86,12 +87,12 @@
 
   .embed-badge__dependencies,
   .embed-badge__support {
-    color: var(--color-background);
+    color: #ffffff;
     font-weight: 600;
   }
 
   .embed-badge--drips.embed-badge--light .embed-badge__dependencies,
   .embed-badge--drips.embed-badge--light .embed-badge__support {
-    color: var(--color-primary);
+    color: #5555ff;
   }
 </style>
