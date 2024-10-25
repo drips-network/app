@@ -24,5 +24,5 @@
 </script>
 
 {#if ready}
-  <Badge data={data.badgeData} options={data.badgeOptions} />
+  <Badge data={data.supportButtonData} options={data.supportButtonOptions} />
 {/if}

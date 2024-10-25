@@ -1,17 +1,21 @@
 <script lang="ts">
-  import { BadgeStyle, type BadgeData, type BadgeOptions } from './project-support-button';
-  import DripsBadge from './drips-style-button.svelte';
-  import GithubBadge from './github-style-button.svelte';
+  import {
+    SupportButtonStyle,
+    type SupportButtonData,
+    type SupportButtonOptions,
+  } from './project-support-button';
+  import DripsSupportButton from './drips-style-button.svelte';
+  import GithubSupportButton from './github-style-button.svelte';
 
-  export let data: BadgeData;
-  export let options: BadgeOptions;
+  export let data: SupportButtonData;
+  export let options: SupportButtonOptions;
 </script>
 
 <div>
-  {#if options.style === BadgeStyle.github}
-    <GithubBadge {data} {options} />
+  {#if options.style === SupportButtonStyle.github}
+    <GithubSupportButton {data} {options} />
   {:else}
-    <DripsBadge {data} {options} />
+    <DripsSupportButton {data} {options} />
   {/if}
 </div>
 

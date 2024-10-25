@@ -1,10 +1,10 @@
 import {
-  BadgeBackground,
-  BadgeStat,
-  BadgeStyle,
-  BadgeText,
-  type BadgeData,
-  type BadgeOptions,
+  SupportButtonBackground,
+  SupportButtonStat,
+  SupportButtonStyle,
+  SupportButtonText,
+  type SupportButtonData,
+  type SupportButtonOptions,
 } from '$lib/components/project-support-button/project-support-button';
 
 import assert from '$lib/utils/assert';
@@ -16,20 +16,26 @@ import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.ge
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 
-const getBadgeOptions = (url: URL): BadgeOptions => {
+const getSupportButtonOptions = (url: URL): SupportButtonOptions => {
   return {
-    style: BadgeStyle[url.searchParams.get('style') as BadgeStyle] || BadgeStyle.default,
-    text: BadgeText[url.searchParams.get('text') as BadgeText] || BadgeText.default,
+    style:
+      SupportButtonStyle[url.searchParams.get('style') as SupportButtonStyle] ||
+      SupportButtonStyle.default,
+    text:
+      SupportButtonText[url.searchParams.get('text') as SupportButtonText] ||
+      SupportButtonText.default,
     background:
-      BadgeBackground[url.searchParams.get('background') as BadgeBackground] ||
-      BadgeBackground.default,
-    stat: BadgeStat[url.searchParams.get('stat') as BadgeStat] || BadgeStat.default,
+      SupportButtonBackground[url.searchParams.get('background') as SupportButtonBackground] ||
+      SupportButtonBackground.default,
+    stat:
+      SupportButtonStat[url.searchParams.get('stat') as SupportButtonStat] ||
+      SupportButtonStat.default,
   };
 };
 
 export async function load({ url, params }): Promise<{
-  badgeData: BadgeData;
-  badgeOptions: BadgeOptions;
+  supportButtonData: SupportButtonData;
+  supportButtonOptions: SupportButtonOptions;
 }> {
   const { projectUrl } = params;
   assert(projectUrl, 'Missing projectUrl param');
@@ -91,15 +97,15 @@ export async function load({ url, params }): Promise<{
     ? projectData.splits.dependencies.length.toString()
     : '0';
 
-  const badgeOptions = getBadgeOptions(url);
+  const supportButtonOptions = getSupportButtonOptions(url);
 
   return {
-    badgeData: {
+    supportButtonData: {
       support: 12456,
       dependencies,
       projectName,
       projectAvatar: projectData,
     },
-    badgeOptions,
+    supportButtonOptions,
   };
 }

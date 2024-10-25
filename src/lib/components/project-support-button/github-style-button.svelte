@@ -1,15 +1,15 @@
 <script lang="ts">
   import Drip from '$lib/components/illustrations/drip.svelte';
   import {
-    BadgeStat,
-    BadgeText,
-    type BadgeData,
-    type BadgeOptions,
+    SupportButtonStat,
+    SupportButtonText,
+    type SupportButtonData,
+    type SupportButtonOptions,
   } from './project-support-button';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
 
-  export let options: BadgeOptions;
-  export let data: BadgeData;
+  export let options: SupportButtonOptions;
+  export let data: SupportButtonData;
 
   $: dripFill = options.background === 'blue' ? 'var(--color-background)' : 'var(--color-primary)';
   $: dripStroke = options.background === 'blue' ? 'var(--color-primary)' : 'white';
@@ -28,20 +28,20 @@
   </span>
 
   <span class="embed-badge__text">
-    {#if options.text === BadgeText.me}
+    {#if options.text === SupportButtonText.me}
       Drip to me
-    {:else if options.text === BadgeText.us}
+    {:else if options.text === SupportButtonText.us}
       Support us on Drips
-    {:else if options.text === BadgeText.project}
+    {:else if options.text === SupportButtonText.project}
       Support <ProjectAvatar project={data.projectAvatar} size="micro" /><strong
         >{data.projectName}</strong
       > on Drips
     {/if}
   </span>
 
-  {#if options.stat === BadgeStat.support}
+  {#if options.stat === SupportButtonStat.support}
     <span class="embed-badge__support">{data.support}</span>
-  {:else if options.stat === BadgeStat.dependencies}
+  {:else if options.stat === SupportButtonStat.dependencies}
     <span class="embed-badge__dependencies">{dependenciesString}</span>
   {/if}
 </div>
