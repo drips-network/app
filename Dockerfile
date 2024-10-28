@@ -70,8 +70,8 @@ RUN npm run build:graphql
 # Expose the port your app runs on
 EXPOSE 8080
 
-# Build Next.js project
-CMD npm run build
+# Build project
+RUN npm run build
 
 # Expose the port your app runs on
 # EXPOSE 3000
