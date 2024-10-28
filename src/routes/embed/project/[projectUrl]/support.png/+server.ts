@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
   // https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
   const browser = await puppeteer.launch({
-    executablePath: 'google-chrome-stable',
+    executablePath: '/usr/bin/google-chrome-stable',
     // @ts-expect-error: uses undocumented option
     headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
