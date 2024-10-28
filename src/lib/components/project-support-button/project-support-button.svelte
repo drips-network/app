@@ -17,13 +17,11 @@
   });
 </script>
 
-<div>
-  {#if options.style === SupportButtonStyle.github}
-    <GithubSupportButton {data} {options} />
-  {:else}
-    <DripsSupportButton {data} {options} />
-  {/if}
-</div>
+{#if options.style === SupportButtonStyle.github}
+  <GithubSupportButton {data} {options} />
+{:else}
+  <DripsSupportButton {data} {options} />
+{/if}
 
 <style>
 </style>
