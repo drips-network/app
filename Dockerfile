@@ -9,8 +9,6 @@ ENV NODE_ENV production
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
 
-RUN apt-get update && apt-get install -y apt-transport-https
-
 # Install necessary dependencies for Puppeteer's Chrome
 # These dependencies are required to run Puppeteer/Chrome in a headless environment
 RUN apt-get update && \
