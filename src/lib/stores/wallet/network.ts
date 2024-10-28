@@ -82,7 +82,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     subdomain: 'drips.network',
     gqlName: SupportedChain.Mainnet,
     autoUnwrapPairs: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
-    displayNetworkPicker: false,
+    displayNetworkPicker: true,
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
