@@ -45,7 +45,8 @@ COPY package*.json ./
 RUN ls -laR
 
 # Install dependencies, including 'puppeteer'
-RUN npm ci --ignore-scripts
+# RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 
 # Copy the rest of your application's code into the container
 COPY . .
@@ -58,7 +59,8 @@ RUN npm run prepare
 # Set up robots
 RUN mv robots-disallow.txt ./static/robots.txt
 
-RUN npm install @graphql-codegen/cli@5 @graphql-codegen/near-operation-file-preset@3 -g
+RUN npm install @graphql-codegen/cli@5 -g
+RUN graphql-codegen init
 
 # Build graphql types
 RUN npm run build:graphql
