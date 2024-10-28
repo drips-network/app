@@ -59,11 +59,11 @@ RUN npm run prepare
 # Set up robots
 RUN mv robots-disallow.txt ./static/robots.txt
 
-RUN npm install @graphql-codegen/cli@5 -g
-RUN graphql-codegen init
+# RUN npm install @graphql-codegen/cli@5 -g
 
 # Build graphql types
-RUN npm run build:graphql
+# RUN npm run build:graphql
+RUN npm run build:mb-graphql
 
 # Expose the port your app runs on
 EXPOSE 8080
