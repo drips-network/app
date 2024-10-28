@@ -58,7 +58,7 @@ RUN npm run prepare
 # Set up robots
 RUN mv robots-disallow.txt ./static/robots.txt
 
-RUN npm install @graphql-codegen/cli@5 -g
+RUN npm install @graphql-codegen/cli@5 @graphql-codegen/near-operation-file-preset@3 -g
 
 # Build graphql types
 RUN npm run build:graphql
