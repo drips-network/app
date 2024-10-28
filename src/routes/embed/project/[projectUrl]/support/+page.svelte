@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import ProjectSupportButton from '$lib/components/project-support-button/project-support-button.svelte';
-  import wait from '$lib/utils/wait';
+  // import wait from '$lib/utils/wait';
 
   export let data;
 
@@ -18,7 +18,7 @@
       main.style.background = 'transparent';
     }
 
-    await wait(200);
+    // await wait(200);
     ready = true;
   });
 </script>
