@@ -10,7 +10,13 @@ export const GET: RequestHandler = async ({ url }) => {
   const imageUrl = url.href.replace(REPLACE_PNG_REGEX, '$2');
   // TODO: handle invalid href
 
-  const browser = await puppeteer.launch({ headless: true });
+  // https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
+  const browser = await puppeteer.launch({
+    executablePath: 'google-chrome-stable',
+    // @ts-expect-error: uses undocumented option
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
   const page = await browser.newPage();
 
   await page.goto(imageUrl);
