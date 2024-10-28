@@ -7,7 +7,7 @@ export const load = async ({ fetch }) => {
     case 314: {
       return {
         explorePageVersion: 'filecoin' as const,
-        ...(await loadFilecoinExporePageData()),
+        ...(await loadFilecoinExporePageData(fetch)),
       };
     }
     default: {

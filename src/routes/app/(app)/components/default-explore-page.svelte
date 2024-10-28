@@ -27,7 +27,6 @@
 
 <script lang="ts">
   import BoxIcon from '$lib/components/icons/Box.svelte';
-  import PenIcon from '$lib/components/icons/Pen.svelte';
   import TrophyIcon from '$lib/components/icons/Trophy.svelte';
   import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
@@ -36,14 +35,8 @@
     PROJECT_CARD_FRAGMENT,
   } from '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import PostCard from '$lib/components/blog/post-card/post-card.svelte';
-  import { goto } from '$app/navigation';
   import { PUBLIC_NETWORK } from '$env/static/public';
-  import EduCard from '$lib/components/edu-card/edu-card.svelte';
-  import Button from '$lib/components/button/button.svelte';
-  import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import OneContract from '$lib/components/illustrations/one-contract.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import totalDrippedApproximation, {
     cachedTotalDrippedPrices,
@@ -51,7 +44,6 @@
   import { onDestroy, onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import Box from '$lib/components/icons/Box.svelte';
-  import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import DripListCard, {
     DRIP_LIST_CARD_FRAGMENT,
@@ -65,6 +57,8 @@
   } from './__generated__/gql.generated';
   import type { z } from 'zod';
   import type { postsListingSchema } from '../../../api/blog/posts/schema';
+  import LatestNewsSection from './latest-news-section.svelte';
+  import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
 
   const FEATURED_PROJECT_ACCOUNT_IDS =
     {
@@ -179,7 +173,7 @@
       actions: [
         {
           label: 'See all',
-          handler: () => goto('/app/projects/all'),
+          href: '/app/projects/all',
           icon: Box,
         },
       ],
@@ -210,7 +204,7 @@
       actions: [
         {
           label: 'See all',
-          handler: () => goto('/app/drip-lists/all'),
+          href: '/app/drip-lists/all',
           icon: DripList,
         },
       ],
@@ -219,7 +213,7 @@
       loaded: true,
     }}
   >
-    <div class="posts-grid">
+    <div class="drip-list-cards-grid">
       {#each featuredDripLists as dripList}
         <DripListCard listingMode data={{ dripList: dripList }} />
       {/each}
@@ -233,7 +227,7 @@
       actions: [
         {
           label: 'See all',
-          handler: () => goto('/app/projects/all'),
+          handler: '/app/projects/all',
           icon: Box,
         },
       ],
@@ -253,49 +247,10 @@
     </div>
   </Section>
 
-  <Section
-    header={{
-      icon: PenIcon,
-      label: 'Latest news',
-      actions: [
-        {
-          label: 'Read the blog',
-          handler: () => goto('/blog'),
-          icon: EyeOpen,
-        },
-      ],
-    }}
-    skeleton={{ loaded: true, horizontalScroll: false }}
-  >
-    <div class="posts-grid">
-      {#each blogPosts as post}
-        <PostCard newTab compact {...post} />
-      {/each}
-    </div>
-  </Section>
+  <LatestNewsSection {blogPosts} />
 
   {#if !$walletStore.connected}
-    <EduCard>
-      <svelte:fragment slot="text">
-        <p>
-          Connect your Ethereum wallet to claim your open-source project, create a Drip List, and
-          more.
-        </p>
-      </svelte:fragment>
-      <svelte:fragment slot="buttons">
-        <Button icon={WalletIcon} variant="primary" on:click={() => walletStore.connect()}
-          >Connect your wallet</Button
-        >
-      </svelte:fragment>
-      <svelte:fragment slot="illustration">
-        <div class="edu-card-illustration-bg" />
-        <div class="edu-card-illustration-wrapper">
-          <div class="inner">
-            <OneContract />
-          </div>
-        </div>
-      </svelte:fragment>
-    </EduCard>
+    <ConnectWalletPrompt />
   {/if}
 </div>
 
@@ -304,37 +259,6 @@
     display: flex;
     gap: 3rem;
     flex-direction: column;
-  }
-
-  .edu-card-illustration-bg {
-    display: none;
-  }
-
-  .edu-card-illustration-wrapper {
-    position: absolute;
-    max-width: 20rem;
-    z-index: 1;
-    right: -10%;
-    top: -10%;
-  }
-
-  @media (max-width: 768px) {
-    .edu-card-illustration-bg {
-      position: absolute;
-      top: 0;
-      background-color: var(--color-primary-level-1);
-      width: 100%;
-      height: 25%;
-      border-radius: 0;
-      display: block;
-    }
-
-    .edu-card-illustration-wrapper {
-      position: relative;
-      max-width: 8rem;
-      right: 0%;
-      top: 0%;
-    }
   }
 
   .stats {
@@ -398,7 +322,7 @@
     }
   }
 
-  .posts-grid {
+  .drip-list-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
     gap: 1rem;
@@ -406,7 +330,7 @@
   }
 
   @media (max-width: 767px) {
-    .posts-grid {
+    .drip-list-cards-grid {
       grid-template-columns: 1fr;
     }
   }
