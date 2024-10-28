@@ -193,7 +193,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     subdomain: 'sepolia.drips.network',
     gqlName: SupportedChain.Sepolia,
     autoUnwrapPairs: [],
-    displayNetworkPicker: false,
+    displayNetworkPicker: true,
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
