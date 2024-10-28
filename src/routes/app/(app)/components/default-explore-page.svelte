@@ -227,7 +227,7 @@
       actions: [
         {
           label: 'See all',
-          handler: '/app/projects/all',
+          href: '/app/projects/all',
           icon: Box,
         },
       ],
