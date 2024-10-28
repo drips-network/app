@@ -38,17 +38,22 @@ COPY package*.json ./
 
 # Copy scripts which will be executed when npm install is called
 # RUN mkdir -p ./scripts
-COPY ./scripts ./scripts
-COPY ./static ./static
+# COPY ./scripts ./scripts
+# COPY ./static ./static
 
 # TODO: remove debug
 RUN ls -laR
 
 # Install dependencies, including 'puppeteer'
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Copy the rest of your application's code into the container
 COPY . .
+
+RUN npm run postinstall
+
+RUN npm run install husky@9 -g
+RUN npm run prepare
 
 # Set up robots
 RUN mv robots-disallow.txt ./static/robots.txt
