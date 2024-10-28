@@ -13,15 +13,14 @@ export const GET: RequestHandler = async ({ url }) => {
   // https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
   const browser = await puppeteer.launch({
     executablePath: '/usr/bin/google-chrome-stable',
-    // @ts-expect-error: uses undocumented option
-    headless: 'new',
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
   await page.setViewport({
     width: 640,
     height: 480,
-    deviceScaleFactor: 2,
+    deviceScaleFactor: 1,
   });
 
   await page.goto(imageUrl);
