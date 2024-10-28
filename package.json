@@ -21,7 +21,6 @@
     "prepare": "husky install",
     "postinstall": "./scripts/install-twemoji-assets.sh",
     "build:graphql": "./scripts/build-gql-types.sh",
-    "mb-graphql": "graphql-codegen",
     "analyze-unused-code": "knip"
   },
   "devDependencies": {
