@@ -46,7 +46,7 @@ RUN ls -laR
 
 # Install dependencies, including 'puppeteer'
 # RUN npm ci --ignore-scripts
-RUN npm install --ignore-scripts
+RUN npm ci --ignore-scripts --include=dev
 
 # Copy the rest of your application's code into the container
 COPY . .
