@@ -42,7 +42,10 @@
 
   {#if options.stat === SupportButtonStat.support}
     <span class="support-button__support"
-      ><AggregateFiatEstimate amounts={data.projectAvatar.totalEarned} /></span
+      ><AggregateFiatEstimate
+        amounts={data.projectAvatar.totalEarned}
+        supressUnknownAmountsWarning={true}
+      /></span
     >
   {:else if options.stat === SupportButtonStat.dependencies}
     <span class="support-button__dependencies">{dependenciesString}</span>
