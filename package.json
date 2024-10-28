@@ -83,7 +83,7 @@
     "@sentry/node": "^8.19.0",
     "@sentry/profiling-node": "^8.19.0",
     "@sentry/sveltekit": "^8.19.0",
-    "@sveltejs/adapter-node": "^5.2.0",
+    "@sveltejs/adapter-node": "^5.2.9",
     "@tanstack/svelte-table": "^8.17.3",
     "@uniswap/default-token-list": "^11.19.0",
     "@uniswap/token-lists": "^1.0.0-beta.34",
