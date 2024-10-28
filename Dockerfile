@@ -72,13 +72,7 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Copy scripts which will be executed when npm install is called
-# RUN mkdir -p ./scripts
-# COPY ./scripts ./scripts
-# COPY ./static ./static
-
 # Install dependencies, including 'puppeteer'
-# RUN npm ci --ignore-scripts
 RUN npm ci --ignore-scripts --include=dev
 
 # Copy the rest of your application's code into the container
@@ -106,8 +100,5 @@ EXPOSE 8080
 # Build project
 RUN npm run build
 
-# Expose the port your app runs on
-# EXPOSE 3000
-
 # Specify the command to run your app
-# CMD ["npm", "run", "production"]
+CMD ["npm", "run", "preview"]
