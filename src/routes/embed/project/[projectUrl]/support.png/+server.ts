@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ url }) => {
   const page = await browser.newPage();
 
   await page.goto(imageUrl);
-  const selector = '.embed-badge';
+  const selector = '.support-button';
   await page.waitForSelector(selector);
   const element = await page.$(selector);
   // if there's no element for any reason, that's
