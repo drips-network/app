@@ -52,7 +52,7 @@ COPY . .
 
 RUN npm run postinstall
 
-RUN npm run install husky@9 -g
+RUN npm install husky@9 -g
 RUN npm run prepare
 
 # Set up robots
