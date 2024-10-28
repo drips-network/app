@@ -41,9 +41,6 @@ COPY package*.json ./
 # COPY ./scripts ./scripts
 # COPY ./static ./static
 
-# TODO: remove debug
-RUN ls -laR
-
 # Install dependencies, including 'puppeteer'
 # RUN npm ci --ignore-scripts
 RUN npm ci --ignore-scripts --include=dev
@@ -51,15 +48,17 @@ RUN npm ci --ignore-scripts --include=dev
 # Copy the rest of your application's code into the container
 COPY . .
 
+# Run the post install script
 RUN npm run postinstall
 
+# Install husky globally to run the prepare script
 RUN npm install husky@9 -g
 RUN npm run prepare
 
 # Set up robots
 RUN mv robots-disallow.txt ./static/robots.txt
 
-# RUN npm install @graphql-codegen/cli@5 -g
+RUN echo $GQL_URL
 
 # Build graphql types
 RUN npm run build:graphql
