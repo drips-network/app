@@ -37,7 +37,11 @@ WORKDIR /app
 COPY package*.json ./
 
 # Copy scripts which will be executed when npm install is called
-COPY scripts ./
+RUN mkdir -p ./scripts
+COPY ./scripts/ ./scripts/
+
+# TODO: remove debug
+RUN ls -la
 
 # Install dependencies, including 'puppeteer'
 RUN npm ci
