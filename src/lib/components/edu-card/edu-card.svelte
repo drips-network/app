@@ -13,7 +13,7 @@
     <div out:fade={{ duration: 300 }} class="edu-card">
       <div class="text">
         <slot name="text" />
-        <div class="flex gap-1">
+        <div class="flex gap-2">
           <slot name="buttons" />
           {#if dismissableId}
             <Button
@@ -34,7 +34,7 @@
 <style>
   .edu-card {
     border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
     display: flex;
     gap: 3rem;
     padding: 2rem;
