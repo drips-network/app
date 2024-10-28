@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url }) => {
   await page.setViewport({
     width: 640,
     height: 480,
-    deviceScaleFactor: 1,
+    deviceScaleFactor: 2,
   });
 
   await page.goto(imageUrl);
