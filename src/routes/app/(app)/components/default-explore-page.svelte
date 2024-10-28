@@ -99,18 +99,20 @@
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 2);
 
-  // Last 4 projects. TODO: sort by claim date
   $: recentlyClaimedProjects = projects.slice(-4);
-
-  function numberWithCommas(input: number) {
-    return input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
 
   let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {
     totalDrippedAmounts = totalDrippedApproximation();
   }
   update();
+
+  $: formattedTlv = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Math.round(tlv));
 
   function getProjectColor(project: (typeof featuredProjects)[number]) {
     const chainData = filterCurrentChainData(project.chainData);
@@ -161,7 +163,7 @@
           <h5>Total value on Drips</h5>
           <EtherscanIcon />
         </a>
-        <span class="large-number pixelated">${numberWithCommas(Math.round(tlv))}</span>
+        <span class="large-number pixelated">{formattedTlv}</span>
       </div>
     </div>
   </Section>
