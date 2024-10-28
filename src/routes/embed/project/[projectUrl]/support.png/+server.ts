@@ -18,6 +18,11 @@ export const GET: RequestHandler = async ({ url }) => {
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
+  await page.setViewport({
+    width: 640,
+    height: 480,
+    deviceScaleFactor: 1,
+  });
 
   await page.goto(imageUrl);
   const selector = '.support-button';

@@ -2,6 +2,7 @@
 FROM node:22
 
 # Set host environment variables
+# https://docs.railway.app/guides/dockerfiles#using-variables-at-build-time
 ARG PUBLIC_PINATA_GATEWAY_URL
 
 ARG INFURA_KEY
