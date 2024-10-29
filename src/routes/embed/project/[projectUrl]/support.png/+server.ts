@@ -8,7 +8,10 @@ export const GET: RequestHandler = async ({ url }) => {
   // drips.network/embed/project.png/support.png/?background=dark
   // ==> drips.network/embed/project.png/support?background=dark
   const imageUrl = url.href.replace(REPLACE_PNG_REGEX, '$2');
-  // TODO: handle invalid href
+  // the URL should always be re-written
+  if (imageUrl === url.href) {
+    return error(400);
+  }
 
   // https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
   const browser = await puppeteer.launch({
