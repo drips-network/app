@@ -13,14 +13,17 @@
   export let options: SupportButtonOptions;
 
   onMount(() => {
+    // TODO:
+    // - ensure that we have the prices first if we are rendering a button with a money amount
+    // - the button components could be DRY-er
     fiatEstimates.start();
   });
 </script>
 
 {#if options.style === SupportButtonStyle.github}
-  <GithubSupportButton {data} {options} />
+  <GithubSupportButton {data} {options} on:load />
 {:else}
-  <DripsSupportButton {data} {options} />
+  <DripsSupportButton {data} {options} on:load />
 {/if}
 
 <style>

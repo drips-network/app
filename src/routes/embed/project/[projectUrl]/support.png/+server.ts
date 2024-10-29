@@ -12,7 +12,9 @@ export const GET: RequestHandler = async ({ url }) => {
 
   // https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/google-chrome-stable',
+    ...(process.env.NODE_ENV === 'production' && {
+      executablePath: '/usr/bin/google-chrome-stable',
+    }),
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
@@ -40,15 +42,14 @@ export const GET: RequestHandler = async ({ url }) => {
 
   await page.goto(imageUrl);
   const selector = '.support-button';
-  await page.waitForSelector(selector);
-  const element = await page.$(selector);
+  const element = await page.waitForSelector(selector, { visible: true });
   // if there's no element for any reason, that's
   // very unexpected and we're toast
   if (!element) {
     return error(500);
   }
-  const imageBuffer = await element.screenshot({ omitBackground: true });
 
+  const imageBuffer = await element.screenshot({ omitBackground: true });
   return new Response(imageBuffer, {
     status: 200,
     headers: new Headers({ 'Content-Type': 'image/png' }),

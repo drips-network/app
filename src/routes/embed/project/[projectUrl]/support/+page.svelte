@@ -4,7 +4,12 @@
 
   export let data;
 
-  let ready = false;
+  let backgroundPrepared = false;
+  let buttonLoaded = false;
+
+  function onLoad() {
+    buttonLoaded = true;
+  }
 
   onMount(async () => {
     // Ensure the background is transparent, so that puppeteer can capture
@@ -19,10 +24,14 @@
       main.style.background = 'transparent';
     }
 
-    ready = true;
+    backgroundPrepared = true;
   });
 </script>
 
-{#if ready}
-  <ProjectSupportButton data={data.supportButtonData} options={data.supportButtonOptions} />
-{/if}
+<div style:visibility={backgroundPrepared && buttonLoaded ? 'visible' : 'hidden'}>
+  <ProjectSupportButton
+    on:load={onLoad}
+    data={data.supportButtonData}
+    options={data.supportButtonOptions}
+  />
+</div>
