@@ -9,6 +9,7 @@ import query from '$lib/graphql/dripsQL';
 import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
 import { gql } from 'graphql-request';
 import { PUBLIC_NETWORK } from '$env/static/public';
+import network from '$lib/stores/wallet/network';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -18,7 +19,6 @@ const FEATURED_DRIP_LISTS =
       '30178668158349445547603108732480118476541651095408979232800331391215',
     ],
   }[PUBLIC_NETWORK] ?? [];
-import network from '$lib/stores/wallet/network';
 
 export const load = (async ({ fetch, request }) => {
   const isIframe = request.headers.get('Sec-Fetch-Dest') === 'iframe';
