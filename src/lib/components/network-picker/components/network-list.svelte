@@ -1,36 +1,20 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import Check from '$lib/components/icons/Check.svelte';
   import TestnetFrame from '$lib/components/icons/networks/TestnetFrame.svelte';
-  import currentNetwork, {
-    getNetwork,
-    NETWORK_CONFIG,
-    SUPPORTED_CHAIN_IDS,
-  } from '$lib/stores/wallet/network';
+  import currentNetwork, { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import hexToRgb from '$lib/utils/hex-to-rgb';
+  import getChainDeploymentUrl from '../get-chain-deployment-url';
 
   const networks = Object.values(NETWORK_CONFIG);
   const networksToShow = networks.filter((n) => (currentNetwork.isTestnet ? true : !n.isTestnet));
 
   const selectedChainId = currentNetwork.chainId;
-
-  function getUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]) {
-    const path = $page.url.pathname;
-
-    const url = new URL(`https://${getNetwork(chainId).subdomain}${path}`);
-
-    if (!$page.data.preservePathOnNetworkChange) {
-      url.pathname = '/app';
-    }
-
-    return url.href;
-  }
 </script>
 
 <div class="network-list">
   {#each networksToShow as { chainId, label, icon, color, isTestnet }}
     {@const colorRgb = hexToRgb(color)}
-    <a href={getUrl(chainId)} class="network-item">
+    <a href={getChainDeploymentUrl(chainId)} class="network-item">
       <div
         class="network-icon"
         class:selected={chainId === selectedChainId}

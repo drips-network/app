@@ -1,6 +1,7 @@
 import { derived, get, writable } from 'svelte/store';
 import type { ComponentType, SvelteComponent } from 'svelte';
 import scroll from '../scroll';
+import { browser } from '$app/environment';
 
 type OnHide = () => void;
 
@@ -14,6 +15,7 @@ const overlayStore = writable<ModalLayout | null>(null);
 
 const hideable = writable<boolean>(true);
 const focusTrapped = writable<boolean>(true);
+const warnOnNavigate = writable<boolean>(false);
 
 export const store = derived(
   [overlayStore, hideable, focusTrapped],
@@ -71,6 +73,24 @@ export const setFocusTrapped = (value: boolean): void => {
   focusTrapped.set(value);
 };
 
+/**
+ * If value is true, navigating away from the current page will trigger a native browser warning dialog.
+ * @param value The value to set warnOnNavigate to.
+ */
+export const setWarnOnNavigate = (value: boolean): void => {
+  warnOnNavigate.set(value);
+};
+
+warnOnNavigate.subscribe((value) => {
+  if (!browser) return;
+
+  if (value) {
+    window.onbeforeunload = () => true;
+  } else {
+    window.onbeforeunload = null;
+  }
+});
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T> = new (...args: any[]) => T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,9 +107,9 @@ export const show = <T extends SvelteComponent>(
   modalComponent: Constructor<T>,
   onHide: OnHide = doNothing,
   modalComponentProps: Props<T>,
+  warnOnNavigate = true,
 ): void => {
   scroll.lock();
   overlayStore.set({ modalComponent, onHide, modalComponentProps });
-
-  window.onbeforeunload = () => true;
+  setWarnOnNavigate(warnOnNavigate);
 };
