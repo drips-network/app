@@ -2,20 +2,25 @@
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
+  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
 
   export let data: PageData;
+
+  let imageUrl = `/api/share-images/blog-post/og/${encodeURIComponent(data.meta.slug)}.png`;
 </script>
 
 <HeadMeta
   title="{data.meta.title} | Drips Blog"
-  image="/api/share-images/blog-post/og/{encodeURIComponent(data.meta.slug)}.png"
+  image={imageUrl}
   twitterImage="/api/share-images/blog-post/twitter/{encodeURIComponent(data.meta.slug)}.png"
   description={data.meta.excerpt}
   twitterCardType="summary"
 />
 
+<ModalLayout />
+
 <article>
-  <PostCard shareButton {...data.meta} first={true} link={false} />
+  <PostCard shareButton {imageUrl} {...data.meta} first={true} link={false} />
   <div class="content">
     <svelte:component this={data.PostContent} />
   </div>

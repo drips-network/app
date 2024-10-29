@@ -41,7 +41,7 @@
           {
             handler: () =>
               window
-                .open('https://docs.drips.network/support-your-dependencies', '_blank')
+                .open('https://docs.drips.network/support-your-dependencies/overview', '_blank')
                 ?.focus(),
             label: 'Learn more',
             primary: true,

@@ -100,40 +100,41 @@
           <SearchIcon style="fill: var(--color-foreground)" />
         </button>
       {/if}
+
       {#if !connected}
-        <a class="header-button" href="/app/settings">
+        <a class="desktop-only header-button" href="/app/settings">
           <SettingsIcon style="fill: var(--color-foreground)" />
         </a>
+      {/if}
 
-        {#if network.displayNetworkPicker}
-          <div class="network-picker">
-            <div class="desktop-only">
-              <div class="network-picker-flyout">
-                <Flyout width="16rem" bind:visible={networkPickerExpanded}>
-                  <div slot="trigger">
-                    <NetworkPicker
-                      toggled={networkPickerExpanded}
-                      on:click={() => (networkPickerExpanded = !networkPickerExpanded)}
-                    />
-                  </div>
-                  <div slot="content">
-                    <NetworkList />
-                  </div>
-                </Flyout>
-              </div>
-            </div>
-
-            <div
-              class="mobile-only"
-              role="button"
-              tabindex="0"
-              on:click={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
-              on:keydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
-            >
-              <NetworkPicker />
+      {#if network.displayNetworkPicker}
+        <div class="network-picker">
+          <div class="desktop-only">
+            <div class="network-picker-flyout">
+              <Flyout width="16rem" bind:visible={networkPickerExpanded}>
+                <div slot="trigger">
+                  <NetworkPicker
+                    toggled={networkPickerExpanded}
+                    on:click={() => (networkPickerExpanded = !networkPickerExpanded)}
+                  />
+                </div>
+                <div slot="content">
+                  <NetworkList />
+                </div>
+              </Flyout>
             </div>
           </div>
-        {/if}
+
+          <div
+            class="mobile-only"
+            role="button"
+            tabindex="0"
+            on:click={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+            on:keydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+          >
+            <NetworkPicker />
+          </div>
+        </div>
       {/if}
     </div>
     <div class="connect">
@@ -269,7 +270,7 @@
 
   @media (max-width: 768px) {
     .desktop-only {
-      display: none;
+      display: none !important;
     }
 
     .mobile-only {

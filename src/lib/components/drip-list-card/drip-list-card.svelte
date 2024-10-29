@@ -206,6 +206,11 @@
     : votingRound
       ? `/app/drip-lists/${votingRound.id}`
       : undefined;
+  $: downloadableImageUrl = dripList
+    ? `/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
+    : votingRound
+      ? `/api/share-images/drip-list/${votingRound.id}.png?target=og`
+      : undefined;
 
   $: votingEnded = votingRound
     ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
@@ -241,7 +246,8 @@
           <div class="flex items-center gap-2 -my-1">
             <ShareButton
               buttonVariant="normal"
-              url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
+              url="{BASE_URL}{dripListUrl}"
+              {downloadableImageUrl}
             />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>

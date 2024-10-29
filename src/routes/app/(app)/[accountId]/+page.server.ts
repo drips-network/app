@@ -83,7 +83,7 @@ export const load = async ({ params, fetch }) => {
 
   if (isAddress(universalAccountId)) {
     address = universalAccountId;
-  } else if ((universalAccountId as string).endsWith('.eth')) {
+  } else if ((universalAccountId as string).endsWith('.eth') && network.ensSupported) {
     const lookupRes = await provider.resolveName(universalAccountId);
 
     if (!lookupRes) {
@@ -100,12 +100,10 @@ export const load = async ({ params, fetch }) => {
         break;
       }
       case 'nft': {
-        redirect(301, `/app/drip-lists/${universalAccountId}`);
-        break;
+        return redirect(301, `/app/drip-lists/${universalAccountId}`);
       }
       case 'repo': {
         return { error: true, type: 'is-repo-driver-account-id' as const };
-        break;
       }
       default: {
         error(404, 'Not Found');

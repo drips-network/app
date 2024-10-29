@@ -240,18 +240,17 @@
 
   let splitsSectionSkeleton: SectionSkeleton | undefined;
   let supportersSectionSkeleton: SectionSkeleton | undefined;
+
+  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 </script>
 
-{#if true}
-  {@const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`}
-  <HeadMeta
-    title="{project.source.ownerName}/{project.source.repoName}"
-    description="Support {project.source
-      .repoName} on Drips and help make Open-Source Software sustainable."
-    image="{imageBaseUrl}?target=og"
-    twitterImage="{imageBaseUrl}?target=twitter"
-  />
-{/if}
+<HeadMeta
+  title="{project.source.ownerName}/{project.source.repoName}"
+  description="Support {project.source
+    .repoName} on Drips and help make Open-Source Software sustainable."
+  image="{imageBaseUrl}?target=og"
+  twitterImage="{imageBaseUrl}?target=twitter"
+/>
 
 <svelte:head>
   <!--
@@ -321,7 +320,10 @@
           later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <ShareButton url={browser ? window.location.href : ''} />
+            <ShareButton
+              url={browser ? window.location.href : ''}
+              downloadableImageUrl="{imageBaseUrl}?target=og"
+            />
             <Button
               size="small"
               icon={Registered}
@@ -355,6 +357,7 @@
               project.source.repoName,
               false,
             )}`,
+            downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }}
           on:editButtonClick={() =>
             isClaimed(chainData) &&
