@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import puppeteer from 'puppeteer';
+import { redis } from '$lib/../routes/api/redis';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
 
@@ -13,6 +14,18 @@ export const GET: RequestHandler = async ({ url }) => {
     // the URL should always be re-written
     if (imageUrl === url.href) {
       return error(400);
+    }
+
+    // Try to fetch the pre-rendered image from cache
+    // TODO: don't cache buttons with any stat? Or cache them for a shorter amount of time?
+    const cacheKey = `support-button-${encodeURI(url.href)}`;
+    const cachedImageBase64 = redis && (await redis.get(cacheKey));
+    if (cachedImageBase64) {
+      const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
+      return new Response(cachedImageBuffer, {
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'image/png' }),
+      });
     }
 
     browser = await puppeteer.launch({
@@ -60,6 +73,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
     // Take a screenshot of the button
     const imageBuffer = await element.screenshot({ omitBackground: true });
+    // Cache the result
+    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+    redis?.set(cacheKey, imageBase64, { EX: 10 });
+
     return new Response(imageBuffer, {
       status: 200,
       headers: new Headers({ 'Content-Type': 'image/png' }),
