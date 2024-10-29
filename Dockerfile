@@ -1,8 +1,9 @@
-# Use the official Node.js 20 image as a base
+# Use the official Node.js 22 image as a base
 FROM node:22
 
 # Set host environment variables
-# https://docs.railway.app/guides/dockerfiles#using-variables-at-build-time
+# Based on .env.template
+# See https://docs.railway.app/guides/dockerfiles#using-variables-at-build-time
 ARG PUBLIC_PINATA_GATEWAY_URL
 
 ARG INFURA_KEY
@@ -54,19 +55,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
-# TODO: try this
-# Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
-# Note: this installs the necessary libs to make the bundled version of Chrome for Testing that Puppeteer
-# installs, work.
-# RUN apt-get update \
-#     && apt-get install -y wget gnupg \
-#     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-#     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-#     && apt-get update \
-#     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
-#       --no-install-recommends \
-#     && rm -rf /var/lib/apt/lists/*
-
 # Set working directory inside the container
 WORKDIR /app
 
@@ -76,7 +64,7 @@ COPY package*.json ./
 # Install dependencies, including 'puppeteer'
 RUN npm ci --ignore-scripts --include=dev
 
-# Copy the rest of your application's code into the container
+# Copy the rest of the application's code into the container
 COPY . .
 
 # Run the post install script
@@ -89,17 +77,14 @@ RUN npm run prepare
 # Set up robots
 RUN mv robots-disallow.txt ./static/robots.txt
 
-RUN echo $GQL_URL
-
 # Build graphql types
 RUN npm run build:graphql
-# RUN npm run build:mb-graphql
 
-# Expose the port your app runs on
+# Expose the app port
 EXPOSE 8080
 
 # Build project
 RUN npm run build
 
-# Specify the command to run your app
+# Specify the command to run the app
 CMD ["npm", "run", "preview"]
