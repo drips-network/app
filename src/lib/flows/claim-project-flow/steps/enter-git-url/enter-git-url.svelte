@@ -47,6 +47,8 @@
   import network from '$lib/stores/wallet/network';
   import type { GetRepoResponse } from '../../../../../routes/api/github/[repoUrl]/+server';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import modal from '$lib/stores/modal';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -251,6 +253,10 @@
     await new Promise((resolve) => setTimeout(resolve, 100));
     submitInput();
   }
+
+  onMount(() => {
+    modal.setWarnOnNavigate(true);
+  });
 </script>
 
 <StandaloneFlowStepLayout
@@ -298,5 +304,8 @@
         on:click={() => submitInput()}>Search</Button
       >
     {/if}
+  </svelte:fragment>
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
 </StandaloneFlowStepLayout>

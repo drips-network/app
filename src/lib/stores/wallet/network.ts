@@ -71,7 +71,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [1]: {
     chainId: 1,
     name: 'homestead',
-    label: 'Ethereum Mainnet',
+    label: 'Ethereum',
     token: 'ETH',
     id: '0x1',
     rpcUrl: `${BASE_URL}/api/rpc/infura/mainnet`,
