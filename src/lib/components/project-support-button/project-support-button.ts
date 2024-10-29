@@ -41,6 +41,8 @@ export type SupportButtonData = {
   projectName?: string;
   projectUrl?: string;
   // TODO: a more appropriate type
+  // This is basically a base type of Project, but after calling filterChainData the returned type doesn't
+  // have totalEarned for some reason?
   projectAvatar: ProjectAvatarFragment & { totalEarned?: Amount[] };
 };
 

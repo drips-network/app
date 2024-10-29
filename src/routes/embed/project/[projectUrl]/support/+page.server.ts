@@ -41,7 +41,6 @@ export async function load({ url, params }): Promise<{
   const { projectUrl } = params;
   assert(projectUrl, 'Missing projectUrl param');
 
-  // TODO: same as PROJECT_AVATAR_FRAGMENT from project-avatar.svelte
   const projectQuery = gql`
     query Project($url: String!, $chains: [SupportedChain!]) {
       projectByUrl(url: $url, chains: $chains) {
@@ -103,12 +102,6 @@ export async function load({ url, params }): Promise<{
     : '0';
 
   const supportButtonOptions = getSupportButtonOptions(url);
-
-  // const tokenAddresses = projectData.totalEarned?.map((a) => a.tokenAddress);
-  // await fiatEstimates.start(url.origin)
-  // const priceStore = fiatEstimates.price(tokenAddresses)
-  // const result = aggregateFiatEstimate(priceStore, projectData.totalEarned);
-  // console.log(projectData);
 
   return {
     supportButtonData: {
