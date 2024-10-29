@@ -1,3 +1,6 @@
+# Based on the solution posted further down from
+# https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
+
 # Use the official Node.js 22 image as a base
 FROM node:22
 

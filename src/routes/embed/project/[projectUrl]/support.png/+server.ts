@@ -13,20 +13,23 @@ export const GET: RequestHandler = async ({ url }) => {
     return error(400);
   }
 
-  // https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
   const browser = await puppeteer.launch({
+    // Dockerfile deployment requires different executablePath
     ...(process.env.NODE_ENV === 'production' && {
       executablePath: '/usr/bin/google-chrome-stable',
     }),
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
+
+  // Set up the page
   const page = await browser.newPage();
   await page.setViewport({
     width: 640,
     height: 480,
     deviceScaleFactor: 2,
   });
+  // Remove transition of body, html, and main elements
   page.on('load', () => {
     const content = `
       *,
@@ -43,6 +46,7 @@ export const GET: RequestHandler = async ({ url }) => {
     page.addStyleTag({ content });
   });
 
+  // Navigate to the page rendering the button
   await page.goto(imageUrl);
   const selector = '.support-button';
   const element = await page.waitForSelector(selector, { visible: true });
@@ -52,6 +56,7 @@ export const GET: RequestHandler = async ({ url }) => {
     return error(500);
   }
 
+  // Take a screenshot of the button
   const imageBuffer = await element.screenshot({ omitBackground: true });
   return new Response(imageBuffer, {
     status: 200,
