@@ -1,6 +1,8 @@
 <script lang="ts">
   import Drip from '$lib/components/illustrations/drip.svelte';
   import {
+    getDependenciesStatement,
+    getDripFill,
     SupportButtonBackground,
     SupportButtonStat,
     SupportButtonText,
@@ -16,13 +18,9 @@
   export let options: SupportButtonOptions;
   export let data: SupportButtonData;
 
-  $: dripFill = options.background === SupportButtonBackground.blue ? 'white' : '#5555ff';
+  $: dripFill = getDripFill(options);
   $: dripStroke = options.background === SupportButtonBackground.blue ? '#5555ff' : 'white';
-  $: dependencies = data?.dependencies || 0;
-  $: dependenciesString =
-    dependencies && dependencies === 1
-      ? `Splitting to ${dependencies} Dependency`
-      : `Splitting to ${dependencies} Dependencies`;
+  $: dependenciesStatement = getDependenciesStatement(data?.dependencies);
 
   function emitLoad() {
     dispatch('load');
@@ -64,7 +62,7 @@
       /></span
     >
   {:else if options.stat === SupportButtonStat.dependencies}
-    <span class="support-button__dependencies">{dependenciesString}</span>
+    <span class="support-button__dependencies">{dependenciesStatement}</span>
   {/if}
 </a>
 

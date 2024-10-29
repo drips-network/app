@@ -43,3 +43,13 @@ export type SupportButtonData = {
   // TODO: a more appropriate type
   projectAvatar: ProjectAvatarFragment & { totalEarned?: Amount[] };
 };
+
+export function getDripFill(options: SupportButtonOptions): string {
+  return options.background === SupportButtonBackground.blue ? 'white' : '#5555ff';
+}
+
+export function getDependenciesStatement(dependencies: string | undefined): string {
+  return dependencies && dependencies === '1'
+    ? `Splitting to ${dependencies} Dependency`
+    : `Splitting to ${dependencies} Dependencies`;
+}
