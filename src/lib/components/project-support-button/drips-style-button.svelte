@@ -6,27 +6,24 @@
     getDripFill,
     SupportButtonStat,
     SupportButtonText,
+    type SupportButtonContext,
     type SupportButtonData,
     type SupportButtonOptions,
   } from './project-support-button';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
-
-  const dispatch = createEventDispatcher<{ load: void }>();
+  import { getContext, onMount } from 'svelte';
 
   export let options: SupportButtonOptions;
   export let data: SupportButtonData;
 
+  const context = getContext<SupportButtonContext>('supportButton');
+
   $: dripFill = getDripFill(options);
   $: dependenciesStatement = getDependenciesStatement(data?.dependencies);
 
-  function emitLoad() {
-    dispatch('load');
-  }
-
   onMount(() => {
     if (options.stat !== SupportButtonStat.support) {
-      emitLoad();
+      context.emitLoad();
     }
   });
 </script>
@@ -54,7 +51,7 @@
   {#if options.stat === SupportButtonStat.support}
     <span class="support-button__support"
       ><AggregateFiatEstimate
-        on:loaded={emitLoad}
+        on:loaded={context.emitLoad}
         amounts={data.projectAvatar.totalEarned}
         supressUnknownAmountsWarning={true}
       /></span

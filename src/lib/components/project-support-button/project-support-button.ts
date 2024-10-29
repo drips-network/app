@@ -44,6 +44,10 @@ export type SupportButtonData = {
   projectAvatar: ProjectAvatarFragment & { totalEarned?: Amount[] };
 };
 
+export type SupportButtonContext = {
+  emitLoad: () => void;
+};
+
 export function getDripFill(options: SupportButtonOptions): string {
   return options.background === SupportButtonBackground.blue ? 'white' : '#5555ff';
 }
