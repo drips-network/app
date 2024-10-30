@@ -5,6 +5,7 @@ import { redis } from '$lib/../routes/api/redis';
 import {
   getSupportButtonOptions,
   SupportButtonStat,
+  SupportButtonText,
   type SupportButtonOptions,
 } from '$lib/components/project-support-button/project-support-button';
 
@@ -24,7 +25,7 @@ const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string
   // buttons without project details and $ support or dependencies can be cached
   // for all projects to use.
   let key = `${CACHE_KEY_PREFIX}-${options.style}-${options.background}-${options.text}`;
-  if (options.text === 'project') {
+  if (options.text === SupportButtonText.project) {
     key += `-${encodeURIComponent(params.projectUrl)}`;
   }
 
