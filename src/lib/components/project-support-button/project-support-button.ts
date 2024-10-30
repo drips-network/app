@@ -44,10 +44,7 @@ export type SupportButtonData = {
   // This is basically a base type of Project, but after calling filterChainData the returned type doesn't
   // have totalEarned for some reason?
   projectAvatar: ProjectAvatarFragment & { totalEarned?: Amount[] };
-};
-
-export type SupportButtonContext = {
-  emitLoad: () => void;
+  prices?: Record<string, number>;
 };
 
 export function getDripFill(options: SupportButtonOptions): string {

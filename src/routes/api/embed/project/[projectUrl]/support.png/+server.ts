@@ -59,7 +59,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const imageBuffer = await element.screenshot({ omitBackground: true });
     // Cache the result
     const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-    redis?.set(cacheKey, imageBase64, { EX: 10 });
+    redis?.set(cacheKey, imageBase64, { EX: 1 });
 
     return new Response(imageBuffer, {
       status: 200,

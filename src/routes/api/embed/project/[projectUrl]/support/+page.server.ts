@@ -16,6 +16,7 @@ import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.ge
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import buildProjectUrl from '$lib/utils/build-project-url';
+import { totalDrippedPrices } from '$lib/utils/total-dripped-approx';
 
 const getSupportButtonOptions = (url: URL): SupportButtonOptions => {
   return {
@@ -34,7 +35,7 @@ const getSupportButtonOptions = (url: URL): SupportButtonOptions => {
   };
 };
 
-export async function load({ url, params }): Promise<{
+export async function load({ url, params, fetch }): Promise<{
   supportButtonData: SupportButtonData;
   supportButtonOptions: SupportButtonOptions;
 }> {
@@ -79,11 +80,15 @@ export async function load({ url, params }): Promise<{
     }
   `;
 
-  const res = await query<ProjectQuery, ProjectQueryVariables>(
-    projectQuery,
-    { url: projectUrl, chains: [network.gqlName] },
-    fetch,
-  );
+  const [res, prices] = await Promise.all([
+    query<ProjectQuery, ProjectQueryVariables>(
+      projectQuery,
+      { url: projectUrl, chains: [network.gqlName] },
+      fetch,
+    ),
+    totalDrippedPrices(fetch),
+  ]);
+
   const { projectByUrl: project } = res;
   try {
     assert(project);
@@ -109,6 +114,7 @@ export async function load({ url, params }): Promise<{
       projectName,
       projectUrl: appProjectUrl,
       projectAvatar: projectData,
+      prices,
     },
     supportButtonOptions,
   };
