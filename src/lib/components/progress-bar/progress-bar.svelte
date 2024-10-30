@@ -6,9 +6,11 @@
   import { tweened } from 'svelte/motion';
   import { fade, slide } from 'svelte/transition';
   import CheckCircle from '../icons/CheckCircle.svelte';
+  import CrossCircle from '../icons/CrossCircle.svelte';
 
   export let progressFn: ProgressFn;
   export let updateFrequencyMs = 10;
+  export let errorMessage: string | undefined = undefined;
 
   let interval: ReturnType<typeof setInterval> | undefined;
 
@@ -34,7 +36,29 @@
     $progressFraction < 0.8 ? 0.5 : 0.5 - (0.5 * Math.max(0, $progressFraction - 0.8)) / 0.2;
 
   $: started = progressFractionRaw > 0;
-  $: done = progressFractionRaw >= 1;
+  $: done = errorMessage || progressFractionRaw >= 1;
+
+  let progressBarColor: string;
+  $: {
+    if (errorMessage) {
+      progressBarColor = 'var(--color-negative)';
+    } else if (done) {
+      progressBarColor = 'var(--color-positive)';
+    } else {
+      progressBarColor = 'var(--color-primary)';
+    }
+  }
+
+  let textColor: string;
+  $: {
+    if (errorMessage) {
+      textColor = 'var(--color-negative-level-6)';
+    } else if (done) {
+      textColor = 'var(--color-positive-level-6)';
+    } else {
+      textColor = 'var(--color-foreground-level-5)';
+    }
+  }
 </script>
 
 <div class="progress-bar-wrapper">
@@ -47,10 +71,10 @@
     <div
       class="progress-bar-inner"
       style:border-radius="0.5rem {progressBorderRadius}rem 0.5rem 0.5rem"
-      style:width="{$progressFraction * 100}%"
-      style:background={done ? 'var(--color-positive)' : 'var(--color-primary)'}
+      style:width="{errorMessage ? 100 : $progressFraction * 100}%"
+      style:background={progressBarColor}
     >
-      {#if progressFractionRaw < 1 && progressFractionRaw > 0}
+      {#if progressFractionRaw < 1 && progressFractionRaw > 0 && !errorMessage}
         <div transition:fade={{ duration: 200 }} class="progress-bar-wave-animation-overlay" />
       {/if}
     </div>
@@ -58,16 +82,23 @@
   {#if remainingText || done}
     <p
       style:margin-top="0.25rem"
-      style:height="2rem"
+      style:min-height="2rem"
       style:display="flex"
       style:align-items="center"
       style:gap="0.125rem"
       class="typo-text"
-      style:color={done ? 'var(--color-positive-level-6)' : 'var(--color-foreground-level-5)'}
+      style:color={textColor}
       transition:slide={{ duration: 300 }}
     >
-      {#if done}<CheckCircle style="fill: var(--color-positive-level-6)" />{/if}
-      {done ? 'Success' : remainingText}
+      {#if errorMessage}
+        <CrossCircle style="fill: var(--color-negative-level-6)" />
+        {errorMessage}
+      {:else if done}
+        <CheckCircle style="fill: var(--color-positive-level-6)" />
+        Success
+      {:else}
+        {remainingText}
+      {/if}
     </p>
   {/if}
 </div>
@@ -91,6 +122,7 @@
     height: 100%;
     position: relative;
     overflow: hidden;
+    transition: background 0.3s;
   }
 
   .progress-bar-wave-animation-overlay {

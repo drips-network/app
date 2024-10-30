@@ -280,19 +280,32 @@
             ),
         });
 
-        await executingTx.promise();
+        try {
+          await executingTx.promise();
 
-        updateTransactionTimelineStatus(executingTx, {
-          external: true,
-          status: 'confirmed',
-          progressFn: () =>
-            predefinedDurationProgress(
-              executingTxStartMs,
-              executingTx.expectedDurationMs,
-              true,
-              undefined,
-            ),
-        });
+          updateTransactionTimelineStatus(executingTx, {
+            external: true,
+            status: 'confirmed',
+            progressFn: () =>
+              predefinedDurationProgress(
+                executingTxStartMs,
+                executingTx.expectedDurationMs,
+                true,
+                undefined,
+              ),
+          });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+
+          updateTransactionTimelineStatus(executingTx, {
+            status: 'failed',
+          });
+
+          error = e as Error;
+
+          break;
+        }
 
         continue;
       }
@@ -645,7 +658,7 @@
                     <div><Spinner /></div>
                   {/if}
 
-                  {#if transactionStatusItem.status === 'failed' || transactionStatusItem.status === 'rejected' || (transactionStatusItem.status === 'retrying' && index === failedTxIndex)}
+                  {#if (transactionStatusItem.external === false && transactionStatusItem.status === 'failed') || transactionStatusItem.status === 'rejected' || (transactionStatusItem.status === 'retrying' && index === failedTxIndex)}
                     <div class="button">
                       <Button
                         variant="primary"
@@ -712,7 +725,12 @@
                     </div>
                   {:else if transactionStatusItem.external === true}
                     <div out:slide={{ duration: 300 }}>
-                      <ProgressBar progressFn={transactionStatusItem.progressFn} />
+                      <ProgressBar
+                        progressFn={transactionStatusItem.progressFn}
+                        errorMessage={transactionStatusItem.status === 'failed'
+                          ? 'Something went wrong. Please reach out to us on Discord.'
+                          : undefined}
+                      />
                     </div>
                   {/if}
                 </div>
