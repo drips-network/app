@@ -1,4 +1,4 @@
-import type { ProjectAvatarFragment } from '$lib/components/project-avatar/__generated__/gql.generated';
+import type { ProjectData } from '$lib/graphql/__generated__/base-types';
 import type { Amount } from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
 
 export enum SupportButtonStyle {
@@ -36,15 +36,11 @@ export type SupportButtonOptions = {
 };
 
 export type SupportButtonData = {
-  support?: number;
-  dependencies?: string;
-  projectName?: string;
-  projectUrl?: string;
-  // TODO: a more appropriate type
-  // This is basically a base type of Project, but after calling filterChainData the returned type doesn't
-  // have totalEarned for some reason?
-  projectAvatar: ProjectAvatarFragment & { totalEarned?: Amount[] };
-  prices?: Record<string, number>;
+  dependencies: string;
+  projectName: string;
+  projectUrl: string;
+  projectData: ProjectData & { totalEarned?: Amount[] };
+  prices: Record<string, number>;
 };
 
 export function getDripFill(options: SupportButtonOptions): string {

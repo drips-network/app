@@ -34,7 +34,7 @@
     {:else if options.text === SupportButtonText.us}
       Support us on Drips
     {:else if options.text === SupportButtonText.project}
-      Support <ProjectAvatar project={data.projectAvatar} size="micro" /><strong
+      Support <ProjectAvatar project={data.projectData} size="micro" /><strong
         >{data.projectName}</strong
       > on Drips
     {/if}
@@ -43,7 +43,7 @@
   {#if options.stat === SupportButtonStat.support}
     <span class="support-button__support"
       ><AggregateFiatEstimate
-        amounts={data.projectAvatar.totalEarned}
+        amounts={data.projectData.totalEarned}
         prices={data.prices}
         supressUnknownAmountsWarning={true}
       /></span

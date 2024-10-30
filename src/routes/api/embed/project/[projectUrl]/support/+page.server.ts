@@ -14,6 +14,7 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import buildProjectUrl from '$lib/utils/build-project-url';
 import { totalDrippedPrices } from '$lib/utils/total-dripped-approx';
+import type { ProjectData } from '$lib/graphql/__generated__/base-types';
 
 export async function load({ url, params, fetch }): Promise<{
   supportButtonData: SupportButtonData;
@@ -80,7 +81,7 @@ export async function load({ url, params, fetch }): Promise<{
   const appProjectUrl = `${url.origin}${buildProjectUrl(forge, ownerName, repoName)}`;
 
   const projectName = `${project.source.repoName}`;
-  const projectData = filterCurrentChainData(project.chainData);
+  const projectData = filterCurrentChainData(project.chainData) as ProjectData;
 
   const dependencies = isClaimed(projectData)
     ? projectData.splits.dependencies.length.toString()
@@ -93,7 +94,8 @@ export async function load({ url, params, fetch }): Promise<{
       dependencies,
       projectName,
       projectUrl: appProjectUrl,
-      projectAvatar: projectData,
+      // projectAvatar: projectData,
+      projectData,
       prices,
     },
     supportButtonOptions,

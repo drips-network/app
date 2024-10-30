@@ -34,9 +34,6 @@ const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string
   }
 
   return key;
-
-  // if text = project, include the project name / url
-  // if support != none, include the support in the key and ensure that the thing expires in 6 hours
 };
 
 export const GET: RequestHandler = async ({ url, params }) => {
