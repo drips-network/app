@@ -7,7 +7,7 @@ import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generate
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
-import { redis } from '../../../../../../../api/redis';
+import { redis } from '../../../../../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';

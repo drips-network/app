@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { z } from 'zod';
-  import type { postsListingSchema } from '../../../api/blog/posts/schema';
+  import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import Section from '$lib/components/section/section.svelte';
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import EyeOpenIcon from '$lib/components/icons/EyeOpen.svelte';

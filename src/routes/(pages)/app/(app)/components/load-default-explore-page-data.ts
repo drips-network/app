@@ -4,10 +4,10 @@ import {
   DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT,
   DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT,
 } from './default-explore-page.svelte';
-import { postsListingSchema } from '../../../api/blog/posts/schema';
+import { postsListingSchema } from '../../../../api/blog/posts/schema';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
-import { redis } from '../../../api/redis';
+import { redis } from '../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import query from '$lib/graphql/dripsQL';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';

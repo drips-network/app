@@ -56,7 +56,7 @@
     DefaultExplorePageFeaturedProjectFragment,
   } from './__generated__/gql.generated';
   import type { z } from 'zod';
-  import type { postsListingSchema } from '../../../api/blog/posts/schema';
+  import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
 
