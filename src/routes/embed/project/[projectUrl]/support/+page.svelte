@@ -5,7 +5,8 @@
   export let data;
 
   let backgroundPrepared = false;
-  let buttonLoaded = false;
+  // TODO: remove
+  let buttonLoaded = true;
 
   function onLoad() {
     buttonLoaded = true;
