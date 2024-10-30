@@ -94,7 +94,6 @@ export async function load({ url, params, fetch }): Promise<{
       dependencies,
       projectName,
       projectUrl: appProjectUrl,
-      // projectAvatar: projectData,
       projectData,
       prices,
     },
