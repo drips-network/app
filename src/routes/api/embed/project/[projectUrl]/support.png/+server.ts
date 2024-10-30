@@ -17,7 +17,7 @@ const getCacheExpiration = (options: SupportButtonOptions): number => {
     return 60 * 60 * 6;
   }
 
-  return 0;
+  return Infinity;
 };
 
 const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string => {
@@ -90,7 +90,10 @@ export const GET: RequestHandler = async ({ url, params }) => {
     const imageBuffer = await element.screenshot({ omitBackground: true });
     // Cache the result
     const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-    redis?.set(cacheKey, imageBase64, { EX: getCacheExpiration(buttonOptions) });
+    const cacheExpiration = getCacheExpiration(buttonOptions);
+    redis?.set(cacheKey, imageBase64, {
+      ...(cacheExpiration !== Infinity && { EX: cacheExpiration }),
+    });
 
     return new Response(imageBuffer, {
       status: 200,
