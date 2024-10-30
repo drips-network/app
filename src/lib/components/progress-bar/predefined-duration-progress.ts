@@ -8,7 +8,7 @@ export default (
   startTimeMs: number,
   durationMs: number,
   ended: boolean,
-  expectedDurationText: string,
+  expectedDurationText: string | undefined,
 ): ReturnType<ProgressFn> => {
   if (ended) {
     return {

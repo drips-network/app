@@ -5,6 +5,7 @@
 <script lang="ts">
   import { tweened } from 'svelte/motion';
   import { fade, slide } from 'svelte/transition';
+  import CheckCircle from '../icons/CheckCircle.svelte';
 
   export let progressFn: ProgressFn;
   export let updateFrequencyMs = 10;
@@ -31,23 +32,42 @@
   // Should be 0.5 all the way until 80% progress, then start interpolating towards 0 at 100%
   $: progressBorderRadius =
     $progressFraction < 0.8 ? 0.5 : 0.5 - (0.5 * Math.max(0, $progressFraction - 0.8)) / 0.2;
+
+  $: started = progressFractionRaw > 0;
+  $: done = progressFractionRaw >= 1;
 </script>
 
 <div class="progress-bar-wrapper">
-  <div class="progress-bar-container">
+  <div
+    class="progress-bar-container"
+    style:border="1px solid {started
+      ? 'var(--color-foreground)'
+      : 'var(--color-foreground-level-5)'}"
+  >
     <div
       class="progress-bar-inner"
       style:border-radius="0.5rem {progressBorderRadius}rem 0.5rem 0.5rem"
       style:width="{$progressFraction * 100}%"
+      style:background={done ? 'var(--color-positive)' : 'var(--color-primary)'}
     >
       {#if progressFractionRaw < 1 && progressFractionRaw > 0}
         <div transition:fade={{ duration: 200 }} class="progress-bar-wave-animation-overlay" />
       {/if}
     </div>
   </div>
-  {#if remainingText}
-    <p style:margin-top="1rem" class="typo-text-small" transition:slide={{ duration: 300 }}>
-      {remainingText}
+  {#if remainingText || done}
+    <p
+      style:margin-top="0.25rem"
+      style:height="2rem"
+      style:display="flex"
+      style:align-items="center"
+      style:gap="0.125rem"
+      class="typo-text"
+      style:color={done ? 'var(--color-positive-level-6)' : 'var(--color-foreground-level-5)'}
+      transition:slide={{ duration: 300 }}
+    >
+      {#if done}<CheckCircle style="fill: var(--color-positive-level-6)" />{/if}
+      {done ? 'Success' : remainingText}
     </p>
   {/if}
 </div>
@@ -69,7 +89,6 @@
 
   .progress-bar-inner {
     height: 100%;
-    background: var(--color-primary);
     position: relative;
     overflow: hidden;
   }

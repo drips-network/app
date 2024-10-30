@@ -11,6 +11,9 @@
       }
       chainData {
         ... on UnClaimedProjectData {
+          owner {
+            address
+          }
           verificationStatus
           withdrawableBalances {
             tokenAddress
@@ -39,7 +42,6 @@
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   import query from '$lib/graphql/dripsQL';
   import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
-  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import possibleColors from '$lib/utils/project/possible-colors';
   import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
@@ -47,6 +49,7 @@
   import network from '$lib/stores/wallet/network';
   import type { GetRepoResponse } from '../../../../../routes/api/github/[repoUrl]/+server';
   import isClaimed from '$lib/utils/project/is-claimed';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -193,8 +196,9 @@
 
       if (
         projectChainData.__typename === 'UnClaimedProjectData' &&
-        projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata
+        projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
       ) {
+        // The correct owner was already set previously for whatever reason. We can skip updating the owner.
         $context.isPartiallyClaimed = true;
       }
 

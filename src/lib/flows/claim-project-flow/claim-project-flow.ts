@@ -13,7 +13,6 @@ import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
 import Review, { REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT } from './steps/review/review.svelte';
-import PollApi from './steps/poll-api/poll-api.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
@@ -180,10 +179,6 @@ export const steps = (
       canEditWalletConnection: !skipWalletConnect,
       isModal,
     },
-  }),
-  makeStep({
-    component: PollApi,
-    props: undefined,
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,

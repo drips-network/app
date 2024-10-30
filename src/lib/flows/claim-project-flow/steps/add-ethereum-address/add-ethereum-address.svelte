@@ -70,6 +70,11 @@
 
         const numericForgeValue = forge === 'GitHub' ? 0 : 1;
 
+        if ($context.isPartiallyClaimed) {
+          // If the project already has the right owner, we don't need to kick off a repo owner update again
+          return;
+        }
+
         try {
           // Kick off repo owner update using gasless TX
 
