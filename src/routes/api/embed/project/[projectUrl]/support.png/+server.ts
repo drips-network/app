@@ -1,11 +1,45 @@
-import type { RequestHandler } from './$types';
+import type { RequestHandler, RouteParams } from './$types';
 import { error } from '@sveltejs/kit';
 import puppeteer from 'puppeteer';
 import { redis } from '$lib/../routes/api/redis';
+import {
+  getSupportButtonOptions,
+  SupportButtonStat,
+  type SupportButtonOptions,
+} from '$lib/components/project-support-button/project-support-button';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
+const CACHE_KEY_PREFIX = 'support-button';
 
-export const GET: RequestHandler = async ({ url }) => {
+const getCacheExpiration = (options: SupportButtonOptions): number => {
+  // Cache dynamic data for 6 hours
+  if (options.stat !== SupportButtonStat.none) {
+    return 60 * 60 * 6;
+  }
+
+  return 0;
+};
+
+const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string => {
+  // buttons without project details and $ support or dependencies can be cached
+  // for all projects to use.
+  let key = `${CACHE_KEY_PREFIX}-${options.style}-${options.background}-${options.text}`;
+  if (options.text === 'project') {
+    key += `-${encodeURIComponent(params.projectUrl)}`;
+  }
+
+  // AND the button will only be cached for 6 hours
+  if (options.stat !== SupportButtonStat.none) {
+    key += `-${options.stat}`;
+  }
+
+  return key;
+
+  // if text = project, include the project name / url
+  // if support != none, include the support in the key and ensure that the thing expires in 6 hours
+};
+
+export const GET: RequestHandler = async ({ url, params }) => {
   let browser;
   try {
     // drips.network/embed/project.png/support.png/?background=dark
@@ -16,9 +50,9 @@ export const GET: RequestHandler = async ({ url }) => {
       return error(400);
     }
 
+    const buttonOptions = getSupportButtonOptions(url);
     // Try to fetch the pre-rendered image from cache
-    // TODO: don't cache buttons with any stat? Or cache them for a shorter amount of time?
-    const cacheKey = `support-button-${encodeURI(url.href)}`;
+    const cacheKey = getCacheKey(buttonOptions, params);
     const cachedImageBase64 = redis && (await redis.get(cacheKey));
     if (cachedImageBase64) {
       const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
@@ -48,7 +82,7 @@ export const GET: RequestHandler = async ({ url }) => {
     // Navigate to the page rendering the button
     await page.goto(imageUrl);
     const selector = '.support-button';
-    const element = await page.waitForSelector(selector, { visible: true });
+    const element = await page.waitForSelector(selector);
     // if there's no element for any reason, that's
     // very unexpected and we're toast
     if (!element) {
@@ -59,7 +93,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const imageBuffer = await element.screenshot({ omitBackground: true });
     // Cache the result
     const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-    redis?.set(cacheKey, imageBase64, { EX: 1 });
+    redis?.set(cacheKey, imageBase64, { EX: getCacheExpiration(buttonOptions) });
 
     return new Response(imageBuffer, {
       status: 200,

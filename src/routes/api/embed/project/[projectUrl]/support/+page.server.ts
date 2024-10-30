@@ -1,8 +1,5 @@
 import {
-  SupportButtonBackground,
-  SupportButtonStat,
-  SupportButtonStyle,
-  SupportButtonText,
+  getSupportButtonOptions,
   type SupportButtonData,
   type SupportButtonOptions,
 } from '$lib/components/project-support-button/project-support-button';
@@ -17,23 +14,6 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import buildProjectUrl from '$lib/utils/build-project-url';
 import { totalDrippedPrices } from '$lib/utils/total-dripped-approx';
-
-const getSupportButtonOptions = (url: URL): SupportButtonOptions => {
-  return {
-    style:
-      SupportButtonStyle[url.searchParams.get('style') as SupportButtonStyle] ||
-      SupportButtonStyle.default,
-    text:
-      SupportButtonText[url.searchParams.get('text') as SupportButtonText] ||
-      SupportButtonText.default,
-    background:
-      SupportButtonBackground[url.searchParams.get('background') as SupportButtonBackground] ||
-      SupportButtonBackground.default,
-    stat:
-      SupportButtonStat[url.searchParams.get('stat') as SupportButtonStat] ||
-      SupportButtonStat.default,
-  };
-};
 
 export async function load({ url, params, fetch }): Promise<{
   supportButtonData: SupportButtonData;

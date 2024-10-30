@@ -56,3 +56,20 @@ export function getDependenciesStatement(dependencies: string | undefined): stri
     ? `Splitting to ${dependencies} Dependency`
     : `Splitting to ${dependencies} Dependencies`;
 }
+
+export const getSupportButtonOptions = (url: URL): SupportButtonOptions => {
+  return {
+    style:
+      SupportButtonStyle[url.searchParams.get('style') as SupportButtonStyle] ||
+      SupportButtonStyle.default,
+    text:
+      SupportButtonText[url.searchParams.get('text') as SupportButtonText] ||
+      SupportButtonText.default,
+    background:
+      SupportButtonBackground[url.searchParams.get('background') as SupportButtonBackground] ||
+      SupportButtonBackground.default,
+    stat:
+      SupportButtonStat[url.searchParams.get('stat') as SupportButtonStat] ||
+      SupportButtonStat.default,
+  };
+};
