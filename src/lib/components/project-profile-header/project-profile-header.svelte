@@ -44,6 +44,7 @@
   export let shareButton:
     | {
         url: string;
+        downloadableImageUrl?: string;
       }
     | undefined = undefined;
 
@@ -79,7 +80,11 @@
     {#if editButton || shareButton}
       <div class="actions">
         {#if shareButton}
-          <ShareButton buttonVariant="normal" url={shareButton.url} />
+          <ShareButton
+            buttonVariant="normal"
+            url={shareButton.url}
+            downloadableImageUrl={shareButton.downloadableImageUrl}
+          />
         {/if}
         {#if editButton}
           <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>

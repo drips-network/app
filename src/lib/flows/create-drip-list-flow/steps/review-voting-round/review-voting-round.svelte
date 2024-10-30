@@ -47,6 +47,7 @@
         });
 
         const { newVotingRoundId } = await multiplayer.startVotingRound({
+          chainId: $walletStore.network.chainId ?? unreachable(),
           signature,
           date: timestamp,
           name: $context.dripList.title,

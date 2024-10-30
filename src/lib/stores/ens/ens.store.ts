@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
-import type { AbstractProvider } from 'ethers';
 import network from '../wallet/network';
+import walletStore from '../wallet/wallet.store';
 
 export interface ResolvedRecord {
   name?: string;
@@ -14,19 +14,6 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
-  const connected = writable(false);
-
-  let provider: AbstractProvider | undefined;
-
-  /**
-   * Connect the store to a provider, which is needed in order to resolve ENS
-   * records.
-   * @param toProvider The provider to connect to.
-   */
-  function connect(toProvider: AbstractProvider) {
-    provider = toProvider;
-    connected.set(true);
-  }
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -36,6 +23,8 @@ export default (() => {
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
     if (!network.ensSupported) return;
 
+    const { provider } = get(walletStore);
+
     const saved = get(state)[address];
     if (saved) return;
 
@@ -43,9 +32,15 @@ export default (() => {
     // for the same name
     state.update((s) => ({ ...s, [address]: {} }));
     try {
-      const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
+      const name = await provider.lookupAddress(address);
 
-      const [name, avatarUrl] = await Promise.all(lookups);
+      let avatarUrl: string | null = null;
+      if (name) {
+        const resolver = await provider.getResolver(name);
+        assert(resolver, 'Failed to get resolver');
+
+        avatarUrl = resolver ? await resolver.getAvatar() : null;
+      }
 
       if (name || avatarUrl) {
         const resolvedRecord = {
@@ -79,6 +74,8 @@ export default (() => {
   async function reverseLookup(name: string): Promise<string | undefined> {
     if (!network.ensSupported) return;
 
+    const { provider } = get(walletStore);
+
     assert(
       provider,
       'You need to `connect` the store to a provider before being able to reverse lookup',
@@ -101,8 +98,6 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
-    connect,
-    connected: { subscribe: connected.subscribe },
     lookup,
     reverseLookup,
     clear,

@@ -8,7 +8,9 @@
   export let icon: ComponentType | undefined = undefined;
   export let label: string;
   export let actions: {
-    handler: (event: MouseEvent) => void;
+    handler?: (event: MouseEvent) => void;
+    href?: string;
+    target?: string;
     label?: string;
     icon?: ComponentType;
     variant?: 'primary';
@@ -56,6 +58,8 @@
         disabled={actionsDisabled}
         variant={action.variant}
         icon={action.icon}
+        href={action.href}
+        target={action.target}
         on:click={action.handler}>{action.label}</Button
       >
     {/each}

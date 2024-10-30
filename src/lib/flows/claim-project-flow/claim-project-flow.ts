@@ -20,6 +20,7 @@ import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
+import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
@@ -118,10 +119,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   };
 
   switch (stepIndex) {
-    case 1:
-      return [projectSlot];
     case 2:
-      return [projectSlot, walletSlot];
+      return [projectSlot];
     case 3:
       return [projectSlot, walletSlot];
     case 4:
@@ -129,6 +128,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     case 5:
       return [projectSlot, walletSlot];
     case 6:
+      return [projectSlot, walletSlot];
+    case 7:
       return [];
     default:
       return [];
@@ -141,6 +142,10 @@ export const steps = (
   isModal = false,
   projectUrl: string | undefined = undefined,
 ) => [
+  makeStep({
+    component: ChooseNetwork,
+    props: undefined,
+  }),
   makeStep({
     component: EnterGitUrl,
     props: {

@@ -31,10 +31,8 @@
   export let outline = false;
   export let linkToNewTab = false;
 
-  const ensConnected = ensStore.connected;
-
   // lookup ens name if owner is provided
-  $: showOwner && dripList && $ensConnected && ensStore.lookup(dripList.owner.address);
+  $: showOwner && dripList && ensStore.lookup(dripList.owner.address);
   $: ens = showOwner && dripList ? $ensStore[dripList.owner.address] : {};
   $: username =
     ens?.name ?? (dripList && showOwner && formatAddress(dripList.owner.address)) ?? undefined;

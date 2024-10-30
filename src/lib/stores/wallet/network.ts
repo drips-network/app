@@ -57,6 +57,7 @@ export type Network = {
    */
   alternativeChainMode: boolean;
   ensSupported: boolean;
+  ensAddress: string | undefined;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -70,7 +71,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [1]: {
     chainId: 1,
     name: 'homestead',
-    label: 'Ethereum Mainnet',
+    label: 'Ethereum',
     token: 'ETH',
     id: '0x1',
     rpcUrl: `${BASE_URL}/api/rpc/infura/mainnet`,
@@ -81,7 +82,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     subdomain: 'drips.network',
     gqlName: SupportedChain.Mainnet,
     autoUnwrapPairs: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
-    displayNetworkPicker: false,
+    displayNetworkPicker: true,
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
@@ -102,6 +103,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: false,
     ensSupported: true,
+    ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
   },
   [80002]: {
     chainId: 80002,
@@ -138,6 +140,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     ensSupported: false,
+    ensAddress: undefined,
   },
   [11155420]: {
     chainId: 11155420,
@@ -174,6 +177,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     ensSupported: false,
+    ensAddress: undefined,
   },
   [11155111]: {
     chainId: 11155111,
@@ -189,7 +193,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     subdomain: 'sepolia.drips.network',
     gqlName: SupportedChain.Sepolia,
     autoUnwrapPairs: [],
-    displayNetworkPicker: false,
+    displayNetworkPicker: true,
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
@@ -210,6 +214,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: false,
     ensSupported: true,
+    ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
   },
   [84532]: {
     chainId: 84532,
@@ -246,6 +251,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     ensSupported: false,
+    ensAddress: undefined,
   },
   [314]: {
     chainId: 314,
@@ -281,6 +287,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     ensSupported: false,
+    ensAddress: undefined,
   },
 };
 
