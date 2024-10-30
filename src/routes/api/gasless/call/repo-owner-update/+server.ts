@@ -9,6 +9,13 @@ import assert from '$lib/utils/assert';
 import network, { getNetwork, isSupportedChainId } from '$lib/stores/wallet/network';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import type {
+  IsProjectUnclaimedQuery,
+  IsProjectUnclaimedQueryVariables,
+} from './__generated__/gql.generated';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
 const payloadSchema = z.object({
   forge: z.number(),
@@ -29,7 +36,22 @@ const REPO_DRIVER_ABI = `[
   }
 ]`;
 
-export const POST: RequestHandler = async ({ request }) => {
+const projectUnclaimedQuery = gql`
+  query isProjectUnclaimed($projectUrl: String!, $chains: [SupportedChain!]!) {
+    projectByUrl(url: $projectUrl, chains: $chains) {
+      chainData {
+        ... on UnClaimedProjectData {
+          chain
+        }
+        ... on ClaimedProjectData {
+          chain
+        }
+      }
+    }
+  }
+`;
+
+export const POST: RequestHandler = async ({ request, fetch }) => {
   let payload: z.infer<typeof payloadSchema>;
 
   try {
@@ -42,6 +64,28 @@ export const POST: RequestHandler = async ({ request }) => {
   const { forge, projectName, chainId } = payload;
 
   assert(isSupportedChainId(chainId), 'Unsupported chain id');
+
+  const isProjectUnclaimedQueryResponse = await query<
+    IsProjectUnclaimedQuery,
+    IsProjectUnclaimedQueryVariables
+  >(
+    projectUnclaimedQuery,
+    {
+      projectUrl: `https://github.com/${projectName}`,
+      chains: [network.gqlName],
+    },
+    fetch,
+  );
+
+  if (!isProjectUnclaimedQueryResponse.projectByUrl) {
+    return error(400, 'Project not found on GitHub');
+  }
+
+  const chainData = filterCurrentChainData(isProjectUnclaimedQueryResponse.projectByUrl.chainData);
+
+  if (chainData.__typename === 'ClaimedProjectData') {
+    return error(400, 'Project already claimed');
+  }
 
   const { rpcUrl, fallbackRpcUrl } = getNetwork(chainId);
   const provider = new FailoverJsonRpcProvider(
