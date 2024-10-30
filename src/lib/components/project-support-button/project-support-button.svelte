@@ -16,6 +16,3 @@
 {:else}
   <DripsSupportButton {data} {options} />
 {/if}
-
-<style>
-</style>
