@@ -1,0 +1,9 @@
+* {
+  transition: none;
+}
+
+html,
+body,
+.main {
+  background-color: transparent;
+}
