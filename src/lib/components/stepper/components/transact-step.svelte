@@ -2,8 +2,10 @@
   import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
   import type {
     BeforeFunc,
+    ExternalTransaction,
     SomeTransactPayload,
     TransactionWrapper,
+    TransactionWrapperOrExternalTransaction,
     TransactPayload,
   } from '../types';
   import { get } from 'svelte/store';
@@ -25,11 +27,13 @@
   import type { Result } from './await-step.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
-  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
   import TxLink from './tx-link.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import networkConfig from '$lib/stores/wallet/network';
+  import type { ProgressFn } from '$lib/components/progress-bar/progress-bar.svelte';
+  import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
+  import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
 
   const dispatchResult = createEventDispatcher<{ result: Result }>();
   const dispatchStartOver = createEventDispatcher<{ startOver: void }>();
@@ -38,23 +42,30 @@
 
   type TransactionWrapperWithGasLimit = TransactionWrapper & { gasLimit: number | undefined };
 
-  interface TransactionTimelineItem {
-    title: string;
-    message: string;
-    txUrl?: string;
-    status:
-      | 'awaitingPrevious'
-      | 'awaitingSignature'
-      | 'submittedToSafe'
-      | 'pending'
-      | 'confirmed'
-      | 'failed'
-      | 'cancelled'
-      | 'rejected'
-      | 'retrying'
-      | 'finalizing'
-      | null;
-  }
+  type TransactionTimelineItem =
+    | {
+        external: false;
+        title: string;
+        message: string;
+        txUrl?: string;
+        status:
+          | 'awaitingPrevious'
+          | 'awaitingSignature'
+          | 'submittedToSafe'
+          | 'pending'
+          | 'confirmed'
+          | 'failed'
+          | 'cancelled'
+          | 'rejected'
+          | 'retrying'
+          | 'finalizing';
+      }
+    | {
+        external: true;
+        title: string;
+        progressFn: ProgressFn;
+        status: 'awaitingPrevious' | 'pending' | 'failed' | 'confirmed';
+      };
 
   let isRetrying = false;
   let failedTxIndex = -1;
@@ -185,17 +196,22 @@
   async function handleEoaTransactions(
     network: { chainId: number; name: string },
     address: string,
-    transactionWrappers: TransactionWrapper[],
+    transactionWrappers: TransactionWrapperOrExternalTransaction[],
     signer: Signer,
     contractReceipts: TransactionReceipt[],
     startIndex: number,
   ) {
     // If we are connected to an EOA wallet, we simply trigger all the transactions in sequence.
 
-    const txWrappersWithGas: TransactionWrapperWithGasLimit[] = transactionWrappers.map((tx) => ({
-      ...tx,
-      gasLimit: undefined,
-    }));
+    const txWrappersWithGas: (TransactionWrapperWithGasLimit | ExternalTransaction)[] =
+      transactionWrappers.map((txOrExternalTx) =>
+        'transaction' in txOrExternalTx
+          ? {
+              ...txOrExternalTx,
+              gasLimit: undefined,
+            }
+          : txOrExternalTx,
+      );
 
     // If at least one of the transactions has `applyGasBuffer` set to `true`, we need to
     // simulate the entire batch. This is because the transactions may be inter-dependent,
@@ -204,15 +220,17 @@
     const needToSimulate =
       !isTest() &&
       networkConfig.applyGasBuffers &&
-      txWrappersWithGas.some((tx) => tx.applyGasBuffer);
+      txWrappersWithGas.some((tx) => 'transaction' in tx && tx.applyGasBuffer);
 
     if (needToSimulate) {
       try {
+        const onlyNonExternalTransactions = txWrappersWithGas.filter((tx) => 'transaction' in tx);
+
         const simulationRes = await (
           await fetch('/api/tenderly/simulate', {
             method: 'POST',
             body: JSON.stringify({
-              simulations: txWrappersWithGas.map((tx) => ({
+              simulations: onlyNonExternalTransactions.map((tx) => ({
                 network_id: String(network.chainId),
                 save: true,
                 save_if_fails: true,
@@ -226,7 +244,7 @@
           })
         ).json();
 
-        txWrappersWithGas.forEach((txWrapper, i) => {
+        onlyNonExternalTransactions.forEach((txWrapper, i) => {
           if (!txWrapper.applyGasBuffer) return;
 
           const { estimatedGas } = simulationRes[i];
@@ -244,6 +262,53 @@
 
     for (let i = startIndex; i < txWrappersWithGas.length; i++) {
       const executingTx = txWrappersWithGas[i];
+
+      if ('external' in executingTx) {
+        // It's an "external" tx, where we just have to wait for some arbitrary work to resolve. Once `progressFn` returns full progress, we move on.
+
+        const executingTxStartMs = Date.now();
+
+        updateTransactionTimelineStatus(executingTx, {
+          external: true,
+          status: 'pending',
+          progressFn: () =>
+            predefinedDurationProgress(
+              executingTxStartMs,
+              executingTx.expectedDurationMs,
+              false,
+              executingTx.expectedDurationText,
+            ),
+        });
+
+        try {
+          await executingTx.promise();
+
+          updateTransactionTimelineStatus(executingTx, {
+            external: true,
+            status: 'confirmed',
+            progressFn: () =>
+              predefinedDurationProgress(
+                executingTxStartMs,
+                executingTx.expectedDurationMs,
+                true,
+                undefined,
+              ),
+          });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+
+          updateTransactionTimelineStatus(executingTx, {
+            status: 'failed',
+          });
+
+          error = e as Error;
+
+          break;
+        }
+
+        continue;
+      }
 
       try {
         updateTransactionTimelineStatus(executingTx, {
@@ -299,11 +364,47 @@
   }
 
   async function handleSafeAppTransactions(
-    transactionWrappers: TransactionWrapper[],
+    transactionWrappers: TransactionWrapperOrExternalTransaction[],
     network: { chainId: number },
     address: string,
   ) {
-    // If we're in a Safe and need to process more than one transaction, we send them to the Safe as a batch.
+    // First, wait for any external transactions.
+
+    const externalTransactions = transactionWrappers.filter((tx) => 'external' in tx);
+
+    for (const executingTx of externalTransactions) {
+      const executingTxStartMs = Date.now();
+
+      updateTransactionTimelineStatus(executingTx, {
+        external: true,
+        status: 'pending',
+        progressFn: () =>
+          predefinedDurationProgress(
+            executingTxStartMs,
+            executingTx.expectedDurationMs,
+            false,
+            executingTx.expectedDurationText,
+          ),
+      });
+
+      await executingTx.promise();
+
+      updateTransactionTimelineStatus(executingTx, {
+        external: true,
+        status: 'confirmed',
+        progressFn: () =>
+          predefinedDurationProgress(
+            executingTxStartMs,
+            executingTx.expectedDurationMs,
+            true,
+            undefined,
+          ),
+      });
+    }
+
+    // Next, we batch together all the real transactions and propose them to the safe as one batch.
+
+    const onlyNonExternalTransactions = transactionWrappers.filter((tx) => 'transaction' in tx);
 
     const safeAppsSdk = new SafeAppsSDK();
 
@@ -313,7 +414,7 @@
         await fetch('/api/tenderly/simulate', {
           method: 'POST',
           body: JSON.stringify({
-            simulations: transactionWrappers.map((tx) => ({
+            simulations: onlyNonExternalTransactions.map((tx) => ({
               network_id: String(network.chainId),
               save: true,
               save_if_fails: true,
@@ -332,7 +433,7 @@
       throw new Error('Unable to estimate gas for Safe Batch operation.');
     }
 
-    const txs = transactionWrappers.map(({ transaction: tx }) => ({
+    const txs = onlyNonExternalTransactions.map(({ transaction: tx }) => ({
       to: tx.to ?? unreachable(),
       data: tx.data ?? unreachable(),
       value: '0',
@@ -383,11 +484,17 @@
     isErrorDetailsVisible = false;
 
     transactionsTimeline = transactionsTimeline.map((item, index) => {
+      if (item.external) {
+        return {
+          ...item,
+          status: 'awaitingPrevious',
+        };
+      }
+
       if (item.status === 'confirmed') {
         return item;
       }
 
-      // Case for Safe also.
       if (index === retryIndex) {
         return {
           ...item,
@@ -410,45 +517,77 @@
   }
 
   function updateTransactionTimelineStatus(
-    txWrapper: TransactionWrapper,
+    txWrapper: TransactionWrapperOrExternalTransaction,
     updates: Partial<TransactionTimelineItem>,
   ) {
-    transactionsTimeline = transactionsTimeline.map((item) =>
-      item.title === txWrapper.title
-        ? {
-            ...item,
-            ...updates,
-          }
-        : item,
-    );
+    transactionsTimeline = transactionsTimeline.map((item) => {
+      const isItemToUpdate = item.title === txWrapper.title;
+      if (!isItemToUpdate) return item;
+
+      // Technically unsafe type-cast here but we assume that the titles are unique,
+      // so we could never accidentally update e.g. an external transaction timeline item
+      // with data for a regular transaction timeline item.
+      return {
+        ...item,
+        ...updates,
+      } as TransactionTimelineItem;
+    });
   }
 
   function initTransactionsTimelineItems(
-    transactionWrappers: TransactionWrapper[],
+    transactionWrappers: TransactionWrapperOrExternalTransaction[],
     isSafe: boolean,
   ) {
     if (isSafe) {
       // If there's multiple transactions that get proposed to a safe, they are batched.
       // The last transaction is the one that usually describes the ultimate outcome of
-      // such a batch, so we display that one.
+      // such a batch, so we display that one. But we do include any "external" transactions.
+      // We presume here that external TXs happen at the beginning of the batch, because
+      // anything other than that doesn't really make any sense in the context of a Safe.
+
+      const externalTxs = transactionWrappers.filter((tx) => 'external' in tx);
+
       const lastTransaction = transactionWrappers[transactionWrappers.length - 1];
 
       transactionsTimeline = [
+        ...externalTxs.map((etx) => ({
+          external: true as const,
+          title: etx.title,
+          progressFn: () => ({
+            progressFraction: 0,
+            remainingText: 'Waiting on previous transaction',
+          }),
+          status: 'awaitingPrevious' as const,
+        })),
         {
+          external: false,
           title: lastTransaction.title,
           message: 'Waiting for you to submit the transaction in your Safe',
-          status: 'awaitingSignature',
+          status: externalTxs.length > 0 ? 'awaitingPrevious' : 'awaitingSignature',
         },
       ];
     } else {
-      transactionsTimeline = transactionWrappers.map((tx, index) => ({
-        title: tx.title,
-        message:
-          index === 0
-            ? 'Waiting for you to confirm the transaction in your wallet'
-            : 'Waiting on previous transaction',
-        status: index === 0 ? 'awaitingSignature' : 'awaitingPrevious',
-      }));
+      transactionsTimeline = transactionWrappers.map((tx, index) =>
+        'external' in tx
+          ? {
+              external: true as const,
+              title: tx.title,
+              progressFn: () => ({
+                progressFraction: 0,
+                remainingText: 'Waiting on previous transaction',
+              }),
+              status: 'awaitingPrevious',
+            }
+          : {
+              external: false,
+              title: tx.title,
+              message:
+                index === 0
+                  ? 'Waiting for you to confirm the transaction in your wallet'
+                  : 'Waiting on previous transaction',
+              status: index === 0 ? 'awaitingSignature' : 'awaitingPrevious',
+            },
+      );
     }
   }
 
@@ -481,123 +620,132 @@
     <StepHeader {headline} {description} />
 
     <!-- Timeline -->
-    <TransitionedHeight transitionHeightChanges>
-      <div class="timeline">
-        <h5>Transactions</h5>
-        {#if transactionsTimeline.length === 0}
-          <div class="loading-txs-spinner">
-            <Spinner />
-            <p>{duringBeforeMsg ?? 'Preparing transactions...'}</p>
-          </div>
-        {:else}
-          <!-- Tx "rows" -->
-          <div in:fade={{ duration: 300 }}>
-            {#each transactionsTimeline as transactionStatusItem, index}
+    <!-- <TransitionedHeight transitionHeightChanges> -->
+    <div class="timeline">
+      <h5>Transactions</h5>
+      {#if transactionsTimeline.length === 0}
+        <div class="loading-txs-spinner">
+          <Spinner />
+          <p>{duringBeforeMsg ?? 'Preparing transactions...'}</p>
+        </div>
+      {:else}
+        <!-- Tx "rows" -->
+        <div in:fade={{ duration: 300 }}>
+          {#each transactionsTimeline as transactionStatusItem, index}
+            <div
+              class="row"
+              class:grayed={transactionStatusItem.status === 'awaitingPrevious' ||
+                transactionStatusItem.status === 'cancelled'}
+            >
+              <!-- Index "column" -->
               <div
-                class="row"
-                class:grayed={transactionStatusItem.status === 'awaitingPrevious' ||
+                class="index"
+                class:index-grayed={transactionStatusItem.status === 'awaitingPrevious' ||
                   transactionStatusItem.status === 'cancelled'}
+                class:index-errored={transactionStatusItem.status === 'failed' ||
+                  transactionStatusItem.status === 'rejected'}
               >
-                <!-- Index "column" -->
-                <div
-                  class="index"
-                  class:index-grayed={transactionStatusItem.status === 'awaitingPrevious' ||
-                    transactionStatusItem.status === 'cancelled'}
-                  class:index-errored={transactionStatusItem.status === 'failed' ||
-                    transactionStatusItem.status === 'rejected'}
-                >
-                  {index + 1}
-                </div>
+                {index + 1}
+              </div>
 
-                <!-- Content "column" -->
-                <div class="content">
-                  <!-- Title and action row -->
-                  <div class="title-and-action">
-                    <h3>{transactionStatusItem.title}</h3>
+              <!-- Content "column" -->
+              <div class="content">
+                <!-- Title and action row -->
+                <div class="title-and-action">
+                  <h3>{transactionStatusItem.title}</h3>
 
-                    {#if transactionStatusItem.status === 'pending' || transactionStatusItem.status === 'finalizing' || transactionStatusItem.status === 'retrying'}
-                      <div><Spinner /></div>
-                    {/if}
+                  {#if transactionStatusItem.external === false && (transactionStatusItem.status === 'pending' || transactionStatusItem.status === 'finalizing' || transactionStatusItem.status === 'retrying')}
+                    <div><Spinner /></div>
+                  {/if}
 
-                    {#if transactionStatusItem.status === 'failed' || transactionStatusItem.status === 'rejected' || (transactionStatusItem.status === 'retrying' && index === failedTxIndex)}
-                      <div class="button">
-                        <Button
-                          variant="primary"
-                          disabled={isRetrying}
-                          on:click={async () => await retryFailedTransaction()}>Try again</Button
-                        >
-                      </div>
-                    {/if}
-                  </div>
-
-                  <!-- Status message row -->
-                  <div class="tx-info">
-                    {#if transactionStatusItem.status === 'awaitingSignature'}
-                      <div class="status">
-                        <div class="icon highlight">
-                          <Wallet style="fill: var(--color-primary-level-6);" />
-                        </div>
-                        <div>{transactionStatusItem.message}</div>
-                      </div>
-                    {:else if transactionStatusItem.status === 'failed'}
-                      <div class="status errored">
-                        <div class="icon failure">
-                          <ExclamationCircle style="fill: var(--color-negative)" />
-                        </div>
-                        {transactionStatusItem.message}
-                        <TxLink
-                          explorerName={networkConfig.explorer.name}
-                          url={transactionStatusItem.txUrl}
-                        />
-                        <button
-                          style="margin-left: 0.5rem;"
-                          on:click={() => toggleErrorDetails(index)}
-                        >
-                          <span class="button" style="text-decoration: underline;">
-                            {isErrorDetailsVisible ? 'Hide' : 'Show'} error
-                          </span>
-                        </button>
-                      </div>
-                    {:else if transactionStatusItem.status === 'rejected'}
-                      <div class="status errored">
-                        <div class="icon failure">
-                          <CrossCircle style="fill: var(--color-negative)" />
-                        </div>
-                        {transactionStatusItem.message}
-                      </div>
-                    {:else if transactionStatusItem.status === 'confirmed'}
-                      <div class="status success">
-                        <div class="icon success">
-                          <CheckCircle style="fill: var(--color-positive-level-6)" />
-                        </div>
-                        {transactionStatusItem.message}
-                        <TxLink
-                          explorerName={networkConfig.explorer.name}
-                          url={transactionStatusItem.txUrl}
-                        />
-                      </div>
-                    {:else}
-                      <div class="status grayed">
-                        {transactionStatusItem.message}
-                        <TxLink
-                          explorerName={networkConfig.explorer.name}
-                          url={transactionStatusItem.txUrl}
-                        />
-                      </div>
-                    {/if}
-                  </div>
-
-                  <!-- Error details row -->
-                  {#if failedTxIndex === index && isErrorDetailsVisible}
-                    <div class="error-container typo-text-mono">{error}</div>
+                  {#if (transactionStatusItem.external === false && transactionStatusItem.status === 'failed') || transactionStatusItem.status === 'rejected' || (transactionStatusItem.status === 'retrying' && index === failedTxIndex)}
+                    <div class="button">
+                      <Button
+                        variant="primary"
+                        disabled={isRetrying}
+                        on:click={async () => await retryFailedTransaction()}>Try again</Button
+                      >
+                    </div>
                   {/if}
                 </div>
+
+                <!-- Status message row -->
+                <div class="tx-info typo-text">
+                  {#if transactionStatusItem.status === 'awaitingSignature'}
+                    <div class="status">
+                      <div class="icon highlight">
+                        <Wallet style="fill: var(--color-primary-level-6);" />
+                      </div>
+                      <div>{transactionStatusItem.message}</div>
+                    </div>
+                  {:else if transactionStatusItem.external === false && transactionStatusItem.status === 'failed'}
+                    <div class="status errored">
+                      <div class="icon failure">
+                        <ExclamationCircle style="fill: var(--color-negative)" />
+                      </div>
+                      {transactionStatusItem.message}
+                      <TxLink
+                        explorerName={networkConfig.explorer.name}
+                        url={transactionStatusItem.txUrl}
+                      />
+                      <button
+                        style="margin-left: 0.5rem;"
+                        on:click={() => toggleErrorDetails(index)}
+                      >
+                        <span class="button" style="text-decoration: underline;">
+                          {isErrorDetailsVisible ? 'Hide' : 'Show'} error
+                        </span>
+                      </button>
+                    </div>
+                  {:else if transactionStatusItem.status === 'rejected'}
+                    <div class="status errored">
+                      <div class="icon failure">
+                        <CrossCircle style="fill: var(--color-negative)" />
+                      </div>
+                      {transactionStatusItem.message}
+                    </div>
+                  {:else if transactionStatusItem.external === false && transactionStatusItem.status === 'confirmed'}
+                    <div class="status success">
+                      <div class="icon success">
+                        <CheckCircle style="fill: var(--color-positive-level-6)" />
+                      </div>
+                      {transactionStatusItem.message}
+                      <TxLink
+                        explorerName={networkConfig.explorer.name}
+                        url={transactionStatusItem.txUrl}
+                      />
+                    </div>
+                  {:else if transactionStatusItem.external === false}
+                    <div class="status grayed">
+                      {transactionStatusItem.message}
+                      <TxLink
+                        explorerName={networkConfig.explorer.name}
+                        url={transactionStatusItem.txUrl}
+                      />
+                    </div>
+                  {:else if transactionStatusItem.external === true}
+                    <div out:slide={{ duration: 300 }}>
+                      <ProgressBar
+                        progressFn={transactionStatusItem.progressFn}
+                        errorMessage={transactionStatusItem.status === 'failed'
+                          ? 'Something went wrong. Please reach out to us on Discord.'
+                          : undefined}
+                      />
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Error details row -->
+                {#if failedTxIndex === index && isErrorDetailsVisible}
+                  <div class="error-container typo-text-mono">{error}</div>
+                {/if}
               </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    </TransitionedHeight>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
+    <!-- </TransitionedHeight> -->
   </div>
   <svelte:fragment slot="left-actions">
     <Button

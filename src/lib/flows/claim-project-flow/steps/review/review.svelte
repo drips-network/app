@@ -90,11 +90,6 @@
   );
 
   async function submit() {
-    if ($context.isPartiallyClaimed) {
-      dispatch('goForward', { by: 2 });
-      return;
-    }
-
     dispatch('goForward');
   }
 
