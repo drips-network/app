@@ -10,7 +10,6 @@
   import Button from '$lib/components/button/button.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Amount from '$lib/components/amount/amount.svelte';
-  import ExampleTable from './examples/example-table.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { makeStep } from '$lib/components/stepper/types';
   import Step_1 from './examples/example-stepper-steps/step-1.svelte';
@@ -43,6 +42,10 @@
   import User from '$lib/components/icons/User.svelte';
   import network from '$lib/stores/wallet/network';
   import type { Splits } from '$lib/components/splits/types';
+  import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
+  import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
+  import modal from '$lib/stores/modal';
+  import ExampleTransactStep from './examples/example-transact/example-transact-step.svelte';
 
   // Button
   let disabled = false;
@@ -340,11 +343,71 @@
   let allowAddresses = true;
   let allowProjects = true;
   let allowDripLists = true;
+
+  // Progress bar
+  let running = false;
+  let startTime = Date.now();
+  let durationMs = 30000;
+  let expectedDurationText = 'Usually < 30 seconds';
+  let progressFn = () => ({ progressFraction: 0 });
+
+  // Transact step
+  function startTransact() {
+    modal.show(Stepper, undefined, {
+      steps: [
+        makeStep({
+          component: ExampleTransactStep,
+          props: undefined,
+        }),
+      ],
+    });
+  }
 </script>
 
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Transact step</h2>
+  <p>
+    Testing transact config willf first await a fake external TX that resolves after 1 minute, and
+    then will send a zero value transaction on-chain
+  </p>
+  <Button on:click={startTransact}>Start</Button>
+</div>
+
+<div class="showcase-item">
+  <h2>Progress bar</h2>
+
+  <div>
+    <p>Duration MS</p>
+    <TextInput disabled={running} bind:value={durationMs} variant={{ type: 'number', min: 0 }} />
+    <p>Expected duration text</p>
+    <TextInput disabled={running} bind:value={expectedDurationText} />
+  </div>
+
+  <Button
+    disabled={running}
+    on:click={() => {
+      startTime = Date.now();
+      running = true;
+      progressFn = () =>
+        predefinedDurationProgress(startTime, durationMs, false, expectedDurationText);
+    }}>Start</Button
+  >
+
+  <Button
+    disabled={!running}
+    on:click={() => {
+      progressFn = () =>
+        predefinedDurationProgress(startTime, durationMs, true, expectedDurationText);
+      running = false;
+    }}>End</Button
+  >
+
+  <ProgressBar {progressFn} />
+</div>
 
 <div class="showcase-item">
   <h2>Date input</h2>
@@ -689,11 +752,6 @@
       tokenAddress,
     }}
   />
-</div>
-
-<div class="showcase-item">
-  <h2>Table</h2>
-  <ExampleTable />
 </div>
 
 <style>
