@@ -28,6 +28,7 @@
     CheckProjectVerificationStatusQueryVariables,
   } from './__generated__/gql.generated';
   import assert from '$lib/utils/assert';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -41,10 +42,16 @@
           chainData {
             ... on UnClaimedProjectData {
               chain
+              owner {
+                address
+              }
               verificationStatus
             }
             ... on ClaimedProjectData {
               chain
+              owner {
+                address
+              }
               verificationStatus
             }
           }
@@ -64,8 +71,9 @@
     const projectChainData = filterCurrentChainData(res.projectById.chainData);
 
     return (
-      projectChainData.verificationStatus === 'PendingMetadata' ||
-      projectChainData.verificationStatus === 'OwnerUpdated'
+      (projectChainData.verificationStatus === 'PendingMetadata' ||
+        projectChainData.verificationStatus === 'OwnerUpdated') &&
+      projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
     );
   }
 
