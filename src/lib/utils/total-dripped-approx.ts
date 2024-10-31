@@ -56,19 +56,36 @@ export default function totalDrippedApproximation() {
 
 const TOTAL_DRIPPED_PRICES_CACHE_KEY = 'total-dripped-prices';
 
-export const totalDrippedPrices = async (fetch = window.fetch) => {
+export const totalDrippedPrices = async (fetch = window.fetch, tokenAddresses?: string[]) => {
   // In test env, we can't fetch prices from CMC, so we don't.
   if (isTest()) return {};
 
-  const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
+  if (!tokenAddresses) {
+    tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
+  }
 
   try {
+    // get response of known token address => token id
     const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
+    // produce map of response
     const idMap = z.record(z.string(), z.number()).parse(idMapRes);
-    const tokenIdsString = tokenAddresses.map((address) => idMap[address.toLowerCase()]).join(',');
+    // create parameter for /api/fiat-estimates/price endpoint, removing unknown token ids
+    const tokenIdsString = tokenAddresses
+      .reduce((memo, address) => {
+        const id = idMap[address.toLowerCase()];
+        if (id !== undefined) {
+          memo.push(id);
+        }
+
+        return memo;
+      }, [] as number[])
+      .join(',');
+    // get response of prices for token ids
     const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+    // get parsed map of response, token id => token fiat price
     const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
 
+    // return tokend address => amount in fiat
     return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
       acc[getAddress(address)] = parsedRes[idMap[address]];
       return acc;

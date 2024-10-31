@@ -14,7 +14,6 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import buildProjectUrl from '$lib/utils/build-project-url';
 import { totalDrippedPrices } from '$lib/utils/total-dripped-approx';
-import type { ProjectData } from '$lib/graphql/__generated__/base-types';
 
 export async function load({ url, params, fetch }): Promise<{
   supportButtonData: SupportButtonData;
@@ -61,14 +60,11 @@ export async function load({ url, params, fetch }): Promise<{
     }
   `;
 
-  const [res, prices] = await Promise.all([
-    query<ProjectQuery, ProjectQueryVariables>(
-      projectQuery,
-      { url: projectUrl, chains: [network.gqlName] },
-      fetch,
-    ),
-    totalDrippedPrices(fetch),
-  ]);
+  const res = await query<ProjectQuery, ProjectQueryVariables>(
+    projectQuery,
+    { url: projectUrl, chains: [network.gqlName] },
+    fetch,
+  );
 
   const { projectByUrl: project } = res;
   try {
@@ -81,13 +77,18 @@ export async function load({ url, params, fetch }): Promise<{
   const appProjectUrl = `${url.origin}${buildProjectUrl(forge, ownerName, repoName)}`;
 
   const projectName = `${project.source.repoName}`;
-  const projectData = filterCurrentChainData(project.chainData) as ProjectData;
+  const projectData = filterCurrentChainData(project.chainData) as SupportButtonData['projectData'];
 
   const dependencies = isClaimed(projectData)
     ? projectData.splits.dependencies.length.toString()
     : '0';
 
   const supportButtonOptions = getSupportButtonOptions(url);
+
+  const tokenAdresses = (projectData.totalEarned || []).map((amount) =>
+    amount.tokenAddress.toLowerCase(),
+  );
+  const prices = await totalDrippedPrices(fetch, tokenAdresses);
 
   return {
     supportButtonData: {
