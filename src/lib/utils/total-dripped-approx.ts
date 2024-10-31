@@ -80,10 +80,14 @@ export const totalDrippedPrices = async (fetch = window.fetch, tokenAddresses?: 
         return memo;
       }, [] as number[])
       .join(',');
-    // get response of prices for token ids
-    const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
-    // get parsed map of response, token id => token fiat price
-    const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+
+    let parsedRes: Record<string, number> = {};
+    if (tokenIdsString.length) {
+      // get response of prices for token ids
+      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
+      // get parsed map of response, token id => token fiat price
+      parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
+    }
 
     // return tokend address => amount in fiat
     return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
