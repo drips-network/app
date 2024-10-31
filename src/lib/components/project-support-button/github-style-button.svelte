@@ -2,8 +2,6 @@
   import Drip from '$lib/components/illustrations/drip.svelte';
   import {
     getDependenciesStatement,
-    getDripFill,
-    SupportButtonBackground,
     SupportButtonStat,
     SupportButtonText,
     type SupportButtonData,
@@ -15,8 +13,9 @@
   export let options: SupportButtonOptions;
   export let data: SupportButtonData;
 
-  $: dripFill = getDripFill(options);
-  $: dripStroke = options.background === SupportButtonBackground.blue ? '#5555ff' : 'white';
+  const dripFill = '#5555ff';
+  const dripStroke = 'white';
+
   $: dependenciesStatement = getDependenciesStatement(data?.dependencies);
 </script>
 
