@@ -64,6 +64,10 @@ export const totalDrippedPrices = async (fetch = window.fetch, tokenAddresses?: 
     tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
   }
 
+  if (!tokenAddresses.length) {
+    return {};
+  }
+
   try {
     // get response of known token address => token id
     const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
@@ -89,7 +93,7 @@ export const totalDrippedPrices = async (fetch = window.fetch, tokenAddresses?: 
       parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
     }
 
-    // return tokend address => amount in fiat
+    // return token address => amount in fiat
     return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
       acc[getAddress(address)] = parsedRes[idMap[address]];
       return acc;

@@ -78,6 +78,8 @@ export async function load({ url, params, fetch }): Promise<{
 
   const projectName = `${project.source.repoName}`;
   const projectData = filterCurrentChainData(project.chainData) as SupportButtonData['projectData'];
+  // normalize totalEarned to empty array when there are no amounts
+  projectData.totalEarned = projectData.totalEarned || [];
 
   const dependencies = isClaimed(projectData)
     ? projectData.splits.dependencies.length.toString()
@@ -85,9 +87,7 @@ export async function load({ url, params, fetch }): Promise<{
 
   const supportButtonOptions = getSupportButtonOptions(url);
 
-  const tokenAdresses = (projectData.totalEarned || []).map((amount) =>
-    amount.tokenAddress.toLowerCase(),
-  );
+  const tokenAdresses = projectData.totalEarned.map((amount) => amount.tokenAddress.toLowerCase());
   const prices = await totalDrippedPrices(fetch, tokenAdresses);
 
   return {
