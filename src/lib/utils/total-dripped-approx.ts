@@ -1,8 +1,7 @@
-import { z } from 'zod';
 import cached from './cache/remote/cached';
 import isTest from './is-test';
 import type { RedisClientType } from '../../routes/api/redis';
-import { getAddress } from 'ethers';
+import { getCmcPrices } from './cmc';
 
 const STREAMS = [
   // ENS USDC
@@ -56,59 +55,18 @@ export default function totalDrippedApproximation() {
 
 const TOTAL_DRIPPED_PRICES_CACHE_KEY = 'total-dripped-prices';
 
-export const totalDrippedPrices = async (fetch = window.fetch, tokenAddresses?: string[]) => {
+export const totalDrippedPrices = (fetch = window.fetch) => {
   // In test env, we can't fetch prices from CMC, so we don't.
   if (isTest()) return {};
 
-  if (!tokenAddresses) {
-    tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
-  }
-
-  if (!tokenAddresses.length) {
-    return {};
-  }
-
-  try {
-    // get response of known token address => token id
-    const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
-    // produce map of response
-    const idMap = z.record(z.string(), z.number()).parse(idMapRes);
-    // create parameter for /api/fiat-estimates/price endpoint, removing unknown token ids
-    const tokenIdsString = tokenAddresses
-      .reduce((memo, address) => {
-        const id = idMap[address.toLowerCase()];
-        if (id !== undefined) {
-          memo.push(id);
-        }
-
-        return memo;
-      }, [] as number[])
-      .join(',');
-
-    let parsedRes: Record<string, number> = {};
-    if (tokenIdsString.length) {
-      // get response of prices for token ids
-      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
-      // get parsed map of response, token id => token fiat price
-      parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
-    }
-
-    // return token address => amount in fiat
-    return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
-      acc[getAddress(address)] = parsedRes[idMap[address]];
-      return acc;
-    }, {});
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    return {};
-  }
+  const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
+  return getCmcPrices(tokenAddresses, fetch);
 };
 
 export const cachedTotalDrippedPrices = (
   redis: RedisClientType | undefined,
   fetch = window.fetch,
 ) =>
-  cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, () => {
-    return totalDrippedPrices(fetch);
+  cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {
+    return await totalDrippedPrices(fetch);
   });

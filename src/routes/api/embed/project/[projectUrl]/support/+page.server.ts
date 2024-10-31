@@ -13,7 +13,7 @@ import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.ge
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import buildProjectUrl from '$lib/utils/build-project-url';
-import { totalDrippedPrices } from '$lib/utils/total-dripped-approx';
+import { getCmcPrices } from '$lib/utils/cmc';
 
 export async function load({ url, params, fetch }): Promise<{
   supportButtonData: SupportButtonData;
@@ -88,7 +88,7 @@ export async function load({ url, params, fetch }): Promise<{
   const supportButtonOptions = getSupportButtonOptions(url);
 
   const tokenAdresses = projectData.totalEarned.map((amount) => amount.tokenAddress.toLowerCase());
-  const prices = await totalDrippedPrices(fetch, tokenAdresses);
+  const prices = await getCmcPrices(tokenAdresses, fetch);
 
   return {
     supportButtonData: {
