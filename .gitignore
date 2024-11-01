@@ -18,3 +18,4 @@ static/twemoji/*
 .netlify/
 **/__generated__/
 .sentryclirc
+.idea
