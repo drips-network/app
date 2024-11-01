@@ -134,6 +134,8 @@
     SUPPORTER_PILE_FRAGMENT,
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
+  import Settings from '$lib/components/icons/Settings.svelte';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -242,6 +244,10 @@
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
+
+  function handleClick() {
+    modal.show(Stepper, undefined, configureProjectSupportButtonSteps());
+  }
 </script>
 
 <HeadMeta
@@ -403,6 +409,12 @@
             </a>
           {/if}
         </div>
+        <AnnotationBox type="info">
+          Embed a support button on your website.
+          <svelte:fragment slot="actions">
+            <Button icon={Settings} on:click={handleClick}>Configure</Button>
+          </svelte:fragment>
+        </AnnotationBox>
       {/if}
     </header>
     <div class="content">
