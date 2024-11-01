@@ -64,7 +64,7 @@
 
         const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
 
-        await github.verifyFundingJson(ownerName, repoName);
+        await github.verifyFundingJson(ownerName, repoName, address);
 
         $context.linkedToRepo = true;
 
