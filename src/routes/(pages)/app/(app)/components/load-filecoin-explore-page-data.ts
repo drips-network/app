@@ -1,4 +1,4 @@
-import { postsListingSchema } from '../../../api/blog/posts/schema';
+import { postsListingSchema } from '../../../../api/blog/posts/schema';
 
 export default async function loadFilecoinExporePageData(f: typeof fetch) {
   const fetchBlogPosts = async () => {

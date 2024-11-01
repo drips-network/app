@@ -1,8 +1,8 @@
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { redis } from './api/redis';
-import { metadataSchema } from './api/blog/posts/schema';
+import { redis } from '../api/redis';
+import { metadataSchema } from '../api/blog/posts/schema';
 import assert from '$lib/utils/assert';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 import query from '$lib/graphql/dripsQL';

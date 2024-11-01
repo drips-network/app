@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { z } from 'zod';
-  import type { postsListingSchema } from '../../../api/blog/posts/schema';
+  import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import LatestNewsSection from './latest-news-section.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';

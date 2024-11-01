@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { z } from 'zod';
-  import type { metadataSchema } from '../api/blog/posts/schema';
+  import type { metadataSchema } from '../../api/blog/posts/schema';
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import type { DripListCardFragment } from '$lib/components/drip-list-card/__generated__/gql.generated';
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';

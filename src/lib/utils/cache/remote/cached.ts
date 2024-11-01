@@ -14,7 +14,6 @@ function log(...content: unknown[]) {
  * Caches the result of a fetcher function using Redis.
  * @param redis - The Redis instance. If undefined, caching is disabled.
  * @param key - The cache key.
- * @param schema - The Zod schema.
  * @param EX - The expiration time in seconds.
  * @param fetcher - The fetcher function.
  * @returns The result, either cached or freshly fetched.

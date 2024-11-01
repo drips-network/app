@@ -1,8 +1,7 @@
-import { z } from 'zod';
 import cached from './cache/remote/cached';
 import isTest from './is-test';
 import type { RedisClientType } from '../../routes/api/redis';
-import { getAddress } from 'ethers';
+import { getCmcPrices } from './cmc';
 
 const STREAMS = [
   // ENS USDC
@@ -56,32 +55,18 @@ export default function totalDrippedApproximation() {
 
 const TOTAL_DRIPPED_PRICES_CACHE_KEY = 'total-dripped-prices';
 
+export const totalDrippedPrices = (fetch = window.fetch) => {
+  // In test env, we can't fetch prices from CMC, so we don't.
+  if (isTest()) return {};
+
+  const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
+  return getCmcPrices(tokenAddresses, fetch);
+};
+
 export const cachedTotalDrippedPrices = (
   redis: RedisClientType | undefined,
   fetch = window.fetch,
 ) =>
   cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {
-    // In test env, we can't fetch prices from CMC, so we don't.
-    if (isTest()) return {};
-
-    const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
-
-    try {
-      const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
-      const idMap = z.record(z.string(), z.number()).parse(idMapRes);
-      const tokenIdsString = tokenAddresses
-        .map((address) => idMap[address.toLowerCase()])
-        .join(',');
-      const priceRes = await fetch(`/api/fiat-estimates/price/${tokenIdsString}`);
-      const parsedRes = z.record(z.string(), z.number()).parse(await priceRes.json());
-
-      return tokenAddresses.reduce<Record<string, number>>((acc, address) => {
-        acc[getAddress(address)] = parsedRes[idMap[address]];
-        return acc;
-      }, {});
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      return {};
-    }
+    return await totalDrippedPrices(fetch);
   });
