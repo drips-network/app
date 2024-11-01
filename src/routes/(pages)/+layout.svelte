@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '../styles/app.css';
+  import '../../styles/app.css';
 
   import '$lib/stores/theme/theme.store';
 
@@ -13,7 +13,7 @@
   });
 
   /*
-  Smoothscroll class adds global smooth scrolling, but we donʼt want it 
+  Smoothscroll class adds global smooth scrolling, but we donʼt want it
   while navigating, because that's nauseating.
   */
 

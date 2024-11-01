@@ -1,0 +1,10 @@
+* {
+  transition: none;
+}
+
+html,
+body,
+.main {
+  /* this file is included before app.css in the production build */
+  background-color: transparent !important;
+}

@@ -1,7 +1,7 @@
 import network from '$lib/stores/wallet/network';
 import assert from '$lib/utils/assert';
 import { redirect } from '@sveltejs/kit';
-import { metadataSchema } from '../api/blog/posts/schema';
+import { metadataSchema } from '../../api/blog/posts/schema';
 
 export const load = async ({ route }) => {
   if (network.alternativeChainMode) {

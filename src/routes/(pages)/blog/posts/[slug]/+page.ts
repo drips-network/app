@@ -8,7 +8,7 @@ export const load = async ({ url, params }) => {
   }
 
   try {
-    const post = await import(`../../../../blog-posts/${params.slug}.md`);
+    const post = await import(`../../../../../blog-posts/${params.slug}.md`);
 
     return {
       PostContent: post.default,

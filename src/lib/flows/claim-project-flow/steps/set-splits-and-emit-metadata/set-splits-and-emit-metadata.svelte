@@ -28,6 +28,7 @@
     CheckProjectVerificationStatusQueryVariables,
   } from './__generated__/gql.generated';
   import assert from '$lib/utils/assert';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -41,10 +42,16 @@
           chainData {
             ... on UnClaimedProjectData {
               chain
+              owner {
+                address
+              }
               verificationStatus
             }
             ... on ClaimedProjectData {
               chain
+              owner {
+                address
+              }
               verificationStatus
             }
           }
@@ -64,14 +71,15 @@
     const projectChainData = filterCurrentChainData(res.projectById.chainData);
 
     return (
-      projectChainData.verificationStatus === 'PendingMetadata' ||
-      projectChainData.verificationStatus === 'OwnerUpdated'
+      (projectChainData.verificationStatus === 'PendingMetadata' ||
+        projectChainData.verificationStatus === 'OwnerUpdated') &&
+      projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
     );
   }
 
   async function waitForGaslessOwnerUpdate() {
     // First, wait for Gelato Relay to resolve the update task.
-    await expect(
+    const gaslessOwnerUpdateExpectation = await expect(
       async () => {
         const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
         if (!res.ok) throw new Error('Failed to track gasless owner update task');
@@ -99,15 +107,25 @@
       2000,
     );
 
+    if (gaslessOwnerUpdateExpectation.failed) {
+      throw new Error(
+        "The gasless owner update transaction didn't resolve in the expected timeframe.",
+      );
+    }
+
     // Next, wait for the new owner to be indexed by our infra.
     // The project will be either in `PendingMetadata` or `OwnerUpdated` state, at which point
     // it's ready for the final claim TX that sets splits and metadata.
-    await expect(
+    const ownerIndexedExpectation = await expect(
       () => checkProjectInExpectedStateForClaiming(),
       (response) => response,
       300000,
       2000,
     );
+
+    if (ownerIndexedExpectation.failed) {
+      throw new Error('The new owner was not indexed in the expected timeframe.');
+    }
   }
 
   onMount(() =>
