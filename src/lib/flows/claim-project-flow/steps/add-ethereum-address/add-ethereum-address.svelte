@@ -95,7 +95,6 @@
           }
 
           const { taskId } = await gaslessCall.json();
-          assert(typeof taskId === 'string', 'Invalid task ID');
 
           $context.gaslessOwnerUpdateTaskId = taskId;
         } catch (e) {
