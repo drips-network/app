@@ -12,9 +12,13 @@
     SupportButtonStat,
     SupportButtonStyle,
     SupportButtonText,
+    type SupportButtonData,
     type SupportButtonOptions,
   } from '$lib/components/project-support-button/project-support-button';
   import toTitleCase from '$lib/utils/title-case';
+  import modal from '$lib/stores/modal/index';
+
+  export let supportButtonData: SupportButtonData
 
   const headline = 'Configure your embed code';
   const description = 'Choose how you want your support button to be displayed.';
@@ -56,7 +60,9 @@
 
   function onClickCopy() {}
 
-  function onClickCancel() {}
+  function onClickCancel() {
+    modal.hide()
+  }
 </script>
 
 <StepLayout>
