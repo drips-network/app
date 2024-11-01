@@ -4,6 +4,7 @@ date: '2024-09-30'
 coverImage: '/assets/blog-images/open-source-collective.png'
 coverImageAlt: 'Collaborative Drip List illustration'
 excerpt: 'Bridging the gap between Web3 and traditional OSS communities'
+announcementBannerCopy: 'Drips partners with Open Source Collective ✨'
 ---
 
 In May something special happened. [Svelte](https://github.com/sveltejs/svelte), a popular open source JavaScript framework with over 75k stars on GitHub, [received more than $30k in funding](https://www.drips.network/app/projects/github/sveltejs/svelte). It’s not the size of the donation that was exceptional \- large grants to Open Source Software (OSS) developers are increasingly common. What made the donation unique was the way it was handled. Thanks to a collaboration between [Drips](https://www.drips.network/) and [Open Source Collective](https://oscollective.org/), **although the donation was made in cryptocurrency, the Svelte developers received it without ever needing to interact with crypto themselves.**

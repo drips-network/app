@@ -6,6 +6,7 @@ export const metadataSchema = z.object({
   date: z.string(),
   coverImage: z.string(),
   coverImageAlt: z.string(),
+  announcementBannerCopy: z.string().optional(),
 });
 
 export const postsListingSchema = z.array(
