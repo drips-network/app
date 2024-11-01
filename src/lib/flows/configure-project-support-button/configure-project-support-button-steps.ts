@@ -1,24 +1,17 @@
+import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
 import { makeStep } from '$lib/components/stepper/types';
 import ConfigureProjectSupportButton from './steps/configure-project-support-button.svelte';
 
-// type ConfigureProjectSupportButtonProps = {
+type ConfigureProjectSupportButtonProps = {
+  supportButtonData: SupportButtonData
+};
 
-// };
-
-// export type ShareOption = {
-//   name: string;
-//   icon: ComponentType;
-//   href?: string;
-//   onClick?: (this: ShareOption) => undefined;
-// };
-
-// export default (props: ConfigureProjectSupportButtonProps) => ({
-export default () => ({
+export default (props: ConfigureProjectSupportButtonProps) => ({
   context: undefined,
   steps: [
     makeStep({
       component: ConfigureProjectSupportButton,
-      props: undefined,
+      props
     }),
   ],
 });
