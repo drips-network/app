@@ -104,6 +104,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import StreamDeveloper from '$lib/components/developer-section/stream-developer.section.svelte';
 
   export let data: PageData;
   let stream: StreamPageStreamFragment;
@@ -325,6 +326,11 @@
           </div>
         {/if}
       </div>
+      <StreamDeveloper
+        amtPerSec={BigInt(stream.config.amountPerSecond.amount)}
+        {tokenAddress}
+        tokenDecimals={token?.info.decimals}
+      />
     </div>
   {/if}
 </div>

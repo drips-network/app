@@ -60,14 +60,14 @@
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
 
-  const FEATURED_PROJECT_ACCOUNT_IDS =
+  const FEATURED_WEB_3_PROJECTS_ACCOUNT_IDS =
     {
       1: [
-        '80921576051643469277397866636792942368647018452892810554457309839360',
-        '80928956806149918791864723629668437820661066502202314166815319654400',
-        '80989205010981758696261160004449877944077887004065826078532843448906',
-        '80921140646830818724035150101819719966329403614944137690624336855040',
-        '80912096692731427285642748238291568975884076216206760523486136893440', // nice-node
+        '80921576051643469277397866636792942368647018452892810554457309839360', // ethers.js
+        '80928956806149918791864723629668437820661066502202314166815319654400', // wagmi
+        '80989205010981758696261160004449877944077887004065826078532843448906', // openzeppelin-contracts
+        '80921140646830818724035150101819719966329403614944137690624336855040', // typechain
+        '80921576051643464144625531318112867710912704239101372541354551279616', // web3.py
         '80927335273972468167722947750338907267861671542981060844246982983680', // starknet.js
         '80927325632295926773992520689210905998818993360029926329589912567808', // snapshot
         '80922395546375089598655709477693009806793075640399849243804470083584', // graph-node
@@ -84,14 +84,32 @@
       ],
     }[PUBLIC_NETWORK] ?? [];
 
+  const FEATURED_PROJECTS_ACCOUNT_IDS =
+    {
+      1: [
+        '80927338512810702724070905882237017022089417038277884279346528518144', // svelte
+        '80924437970685862336445237697146051810361983738382071874368862945280', // libgit2
+        '80926915932044874567662239576164593128211047641556385561345492254720', // rollup
+        '80926893484859255783823398448697429050946431358357802763937929756672', // ratatui
+        '80907185984472938178947231143934051564334108789056821384881454972928', // gitoxide
+        '80914552162673449833728329632154702021826817315592132431697405804544', // tanstack-query
+        '80928551845018914533911124940323675679718022636490642073491274203136', // vitest
+        '80928956680761126169933069488824219882230509123653596947248123478016', // websockets
+      ],
+    }[PUBLIC_NETWORK] ?? [];
+
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let featuredDripLists: DefaultExplorePageFeaturedDripListsFragment[];
   export let totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
   export let tlv: number;
 
+  $: featuredWeb3Projects = projects.filter((p) =>
+    FEATURED_WEB_3_PROJECTS_ACCOUNT_IDS.includes(p.account.accountId),
+  );
+
   $: featuredProjects = projects.filter((p) =>
-    FEATURED_PROJECT_ACCOUNT_IDS.includes(p.account.accountId),
+    FEATURED_PROJECTS_ACCOUNT_IDS.includes(p.account.accountId),
   );
 
   // 2 latest posts. Sort by date
@@ -99,7 +117,12 @@
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 2);
 
-  $: recentlyClaimedProjects = projects.slice(-4);
+  // I (jason) sometimes claim projects for testing purposes. crude way to get rid of those
+  $: projectsWithoutJasonTests = projects.filter(
+    (p) => !p.source.repoName.includes('drips-test-repo'),
+  );
+
+  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4);
 
   let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {
@@ -114,7 +137,7 @@
     maximumFractionDigits: 0,
   }).format(Math.round(tlv));
 
-  function getProjectColor(project: (typeof featuredProjects)[number]) {
+  function getProjectColor(project: (typeof featuredWeb3Projects)[number]) {
     const chainData = filterCurrentChainData(project.chainData);
 
     if (!isClaimed(chainData)) {
@@ -219,6 +242,37 @@
       {#each featuredDripLists as dripList}
         <DripListCard listingMode data={{ dripList: dripList }} />
       {/each}
+    </div>
+  </Section>
+
+  <Section
+    header={{
+      icon: BoxIcon,
+      label: 'Featured web3 projects',
+      actions: [
+        {
+          label: 'See all',
+          href: '/app/projects/all',
+          icon: Box,
+        },
+      ],
+    }}
+    skeleton={{
+      loaded: true,
+    }}
+  >
+    <div class="horizontal-scroll">
+      <div class="projects-grid featured-projects">
+        {#each featuredWeb3Projects as project}
+          <div>
+            {#if isClaimed(filterCurrentChainData(project.chainData))}
+              <PrimaryColorThemer colorHex={getProjectColor(project)}>
+                <ProjectCard {project} />
+              </PrimaryColorThemer>
+            {/if}
+          </div>
+        {/each}
+      </div>
     </div>
   </Section>
 

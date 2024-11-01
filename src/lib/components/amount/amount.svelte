@@ -34,7 +34,12 @@
   $: amountPerSecondTokenInfo =
     $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
 
-  function format(amount: Amount, perSec = false) {
+  function format(
+    amount: Amount,
+    perSec = false,
+    multiplier: bigint,
+    perSecTimeUnitMultiplier: number,
+  ) {
     let amountToShow = { ...amount };
 
     const tokenDecimals =
@@ -45,7 +50,6 @@
     );
 
     if (perSec) {
-      const perSecTimeUnitMultiplier = MULTIPLIERS[$amtDeltaUnitStore];
       amountToShow.amount = amountToShow.amount * BigInt(perSecTimeUnitMultiplier);
     }
 
@@ -59,7 +63,7 @@
       <div class="amount">
         <span class="amount-wrapper {amountClasses}">
           <span class="amount">
-            {format(amount)}
+            {format(amount, false, multiplier, MULTIPLIERS[$amtDeltaUnitStore])}
           </span>
           {#if showSymbol}
             <span class="symbol">
@@ -82,6 +86,8 @@
           >{#if showPlusMinus}{amountPerSecond.amount > 0 ? '+' : ''}{/if}{format(
             amountPerSecond,
             true,
+            multiplier,
+            MULTIPLIERS[$amtDeltaUnitStore],
           )}{#if showSymbol}
             {' ' + (overrideToDisplay?.symbol ?? amountPerSecondTokenInfo?.info.symbol)}
           {/if}</span
