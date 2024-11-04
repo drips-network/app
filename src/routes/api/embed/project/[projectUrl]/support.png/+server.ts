@@ -71,8 +71,8 @@ export const GET: RequestHandler = async ({ url, params }) => {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--font-render-hinting=none',
-        '--disable-web-security',
+        // '--font-render-hinting=none',
+        // '--disable-web-security',
       ],
     });
 
@@ -85,7 +85,8 @@ export const GET: RequestHandler = async ({ url, params }) => {
     });
 
     // Navigate to the page rendering the button
-    await page.goto(imageUrl);
+    // await page.goto(imageUrl);
+    await page.goto(imageUrl, { waitUntil: 'networkidle0' });
     // await page.goto(imageUrl, { waitUntil: 'domcontentloaded' });
     // Wait until all images and fonts have loaded
     // await page.evaluate(async () => {
