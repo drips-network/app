@@ -77,11 +77,7 @@
     const imgAlt = `Support ${supportButtonData.projectName} on drips.network`;
     const imgHeight = selection.style === SupportButtonStyle.github ? 20 : 32;
 
-    return `
-      <a href="${supportButtonData.projectUrl}">
-        <img src="${supportPngUrl}" alt="${imgAlt}" height="${imgHeight}">
-      </a>
-    `;
+    return `<a href="${supportButtonData.projectUrl}" target="_blank"><img src="${supportPngUrl}" alt="${imgAlt}" height="${imgHeight}"></a>`;
   }
 
   function onClickCancel() {
@@ -90,8 +86,6 @@
 
   $: backgroundDisabled = selection.style === SupportButtonStyle.github;
   $: embedCode = generateEmbedCode(selection, projectSourceUrl, supportButtonData);
-
-  // console.log(supportButtonData, projectSourceUrl);
 </script>
 
 <StepLayout>
@@ -136,7 +130,6 @@
     </div>
     <div class="configure-project-support-button__section section">
       <h4 class="typo-all-caps">Preview</h4>
-      {embedCode}
       <div class="configure-project-support-button_preview">
         <ProjectSupportButton data={supportButtonData} options={selection} />
       </div>
