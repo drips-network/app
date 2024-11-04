@@ -18,11 +18,14 @@
   import toTitleCase from '$lib/utils/title-case';
   import modal from '$lib/stores/modal/index';
   import ProjectSupportButton from '$lib/components/project-support-button/project-support-button.svelte';
+  import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
 
   export let supportButtonData: SupportButtonData;
+  export let projectSourceUrl: string;
 
   const headline = 'Configure your embed code';
   const description = 'Choose how you want your support button to be displayed.';
+  const url = 'https://';
 
   type Options<T> = Array<{ title: string; value: T[keyof T] }>;
   function createOptions<T extends { [key: string]: string }>(
@@ -61,11 +64,22 @@
     };
   }
 
-  function onClickCopy() {}
+  function getSupportPngUrl() {
+    const params = new URLSearchParams(selection);
+    return `${window.location.origin}/api/embed/project/${encodeURIComponent(projectSourceUrl)}/support.png?${params}`;
+  }
+
+  function onClickCopy() {
+    const supportPngUrl = getSupportPngUrl();
+    const markdown = `[![Support ${supportButtonData.projectName} on Drips](${supportPngUrl})](${supportButtonData.projectUrl})`;
+    navigator.clipboard.writeText(markdown);
+  }
 
   function onClickCancel() {
     modal.hide();
   }
+
+  // console.log(supportButtonData, projectSourceUrl)
 </script>
 
 <StepLayout>
@@ -122,6 +136,7 @@
 
   <svelte:fragment slot="actions">
     <Button variant="primary" icon={CopyIcon} on:click={onClickCopy}>Copy embed code</Button>
+    <CopyLinkButton {url} />
   </svelte:fragment>
 </StepLayout>
 

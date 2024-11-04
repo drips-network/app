@@ -251,6 +251,7 @@
       Stepper,
       undefined,
       configureProjectSupportButtonSteps({
+        projectSourceUrl: project.source.url,
         supportButtonData: {
           dependencies: isClaimed(chainData)
             ? chainData.splits.dependencies.length.toString()
