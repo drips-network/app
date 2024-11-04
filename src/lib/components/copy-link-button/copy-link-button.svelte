@@ -4,8 +4,10 @@
   import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
   import CopyIcon from '$lib/components/icons/Copy.svelte';
   import { fade } from 'svelte/transition';
+  import type { ComponentProps } from 'svelte';
 
   export let url: string;
+  export let variant: ComponentProps<Button>['variant'] = 'normal';
 
   let hovering = false;
   let copySuccess = false;
@@ -24,22 +26,31 @@
   on:blur={() => (hovering = false)}
   on:click={copyShareLink}
   justify="left"
+  {variant}
 >
   <div class="button-inner">
     <div class="icon">
       {#if copySuccess}
         <span transition:fade={{ duration: 200 }}>
-          <CheckCircleIcon style="fill: var(--color-positive)" />
+          <slot name="success">
+            <CheckCircleIcon style="fill: var(--color-positive)" />
+          </slot>
         </span>
       {:else if hovering}
         <span transition:fade={{ duration: 200 }}>
-          <CopyIcon style="fill: currentColor" />
+          <slot name="hover">
+            <CopyIcon style="fill: currentColor" />
+          </slot>
         </span>
       {:else}
-        <span transition:fade={{ duration: 200 }}><LinkIcon style="fill: currentColor" /></span>
+        <span transition:fade={{ duration: 200 }}>
+          <slot name="idle">
+            <LinkIcon style="fill: currentColor" />
+          </slot>
+        </span>
       {/if}
     </div>
-    Copy link
+    <slot>Copy link</slot>
   </div>
 </Button>
 
