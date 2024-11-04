@@ -68,7 +68,12 @@ export const GET: RequestHandler = async ({ url, params }) => {
         executablePath: '/usr/bin/google-chrome-stable',
       }),
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--font-render-hinting=none'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--font-render-hinting=none',
+        '--disable-web-security',
+      ],
     });
 
     // Set up the page
