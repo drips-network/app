@@ -24,6 +24,7 @@ describe('NftDriverMetadataManager', () => {
 
       const context = {
         forAccountId: '1',
+        isVisible: false,
         projects: [
           {
             weight: 1,

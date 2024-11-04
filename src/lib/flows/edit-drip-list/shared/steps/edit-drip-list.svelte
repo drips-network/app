@@ -69,6 +69,7 @@
     name: string;
     description: string | undefined;
     dripListAccountId: string | undefined;
+    isHidden: boolean;
   }>;
 
   export let projectToAdd: EditDripListStepProjectToAddFragment | undefined = undefined;
@@ -129,6 +130,7 @@
             name: $state.name,
             description: $state.description,
             projects: projectsSplitMetadata,
+            isVisible: !$state.isHidden,
           };
 
           const hash = await metadataManager.pinAccountMetadata(newMetadata);
@@ -209,6 +211,7 @@
     bind:description={$state.description}
     bind:weights={$state.listEditorConfig.weights}
     bind:items={$state.listEditorConfig.items}
+    bind:isHidden={$state.isHidden}
   >
     <svelte:fragment slot="list-editor-action">
       <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>

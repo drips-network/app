@@ -22,6 +22,7 @@
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
   import type { SplitsComponentSplitsReceiver } from '../splits/types';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -33,10 +34,22 @@
 
   let error = false;
 
+  let showHidden: boolean = false;
+  $: hiddenProjectsCount = dripLists?.filter((dl) => !dl.isVisible).length ?? 0;
+
   $: dripListsAndVotingRounds = [
-    ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []),
-    ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
-  ];
+    ...(showHidden
+      ? dripLists.map((dl) => ({ ...dl, type: 'drip-list' as const }))
+      : dripLists
+          .filter((dl) => dl.isVisible)
+          .map((dl) => ({ ...dl, type: 'drip-list' as const }))),
+    ...votingRounds.map((vr) => ({ ...vr, type: 'voting-round' as const })),
+  ].sort((a, b) => {
+    if (showHidden && 'isVisible' in a && 'isVisible' in b) {
+      return a.isVisible === b.isVisible ? 0 : a.isVisible ? -1 : 1;
+    }
+    return 0;
+  });
 </script>
 
 <Section
@@ -72,6 +85,15 @@
     horizontalScroll: false,
   }}
 >
+  <svelte:fragment slot="custom-actions">
+    {#if hiddenProjectsCount}
+      <div class="toggle-visibility">
+        <Toggle bind:checked={showHidden} />
+        <p>Show hidden projects {hiddenProjectsCount}</p>
+      </div>
+    {/if}
+  </svelte:fragment>
+
   {#if dripListsAndVotingRounds}
     <div
       class="grid gap-6 grid-cols-1 padding pt-px {dripListsAndVotingRounds.length > 0
@@ -84,9 +106,13 @@
             ? votingRounds.find((vr) => vr.dripListId === list.account.accountId)
             : undefined}
         {#if list.type === 'drip-list' && matchingVotingRound}
-          <DripListCard listingMode data={{ dripList: list, votingRound: matchingVotingRound }} />
+          <DripListCard
+            isHidden={!list.isVisible}
+            listingMode
+            data={{ dripList: list, votingRound: matchingVotingRound }}
+          />
         {:else if list.type === 'drip-list'}
-          <DripListCard listingMode data={{ dripList: list }} />
+          <DripListCard isHidden={!list.isVisible} listingMode data={{ dripList: list }} />
         {:else if list.type === 'voting-round' && !dripLists.find((dl) => dl.account.accountId === list.dripListId)}
           <DripListCard listingMode data={{ votingRound: list }} />
         {/if}
@@ -107,8 +133,9 @@
                   modal.show(CreateDripListStepper, undefined, {
                     skipWalletConnect: true,
                     isModal: true,
-                  })}>Create a new Drip List</Button
-              >
+                  })}
+                >Create a new Drip List
+              </Button>
             </div>
           </div>
         </div>
@@ -116,3 +143,11 @@
     </div>
   {/if}
 </Section>
+
+<style>
+  .toggle-visibility {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+</style>

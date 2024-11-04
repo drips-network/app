@@ -64,6 +64,7 @@ export default (
     name: 'Unnamed Drip List',
     description: undefined,
     dripListAccountId: undefined,
+    isHidden: false,
   });
 
   return {

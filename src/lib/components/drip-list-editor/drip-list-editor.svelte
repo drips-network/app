@@ -16,6 +16,7 @@
   import TextArea from '../text-area/text-area.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import type { AddItemError } from '../list-editor/errors';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let name: string;
   export let description: string | undefined;
@@ -23,6 +24,8 @@
   export let weights: Weights;
 
   export let urlToAdd: string | undefined = undefined;
+
+  export let isHidden: boolean;
 
   let recipientErrors: AddItemError[] = [];
 
@@ -65,4 +68,16 @@
       <slot name="list-editor-action" />
     </svelte:fragment>
   </FormField>
+
+  <div class="visibility-toggle">
+    <h4>Hide this list from my profile</h4>
+    <Toggle bind:checked={isHidden} />
+  </div>
 </section>
+
+<style>
+  .visibility-toggle {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>

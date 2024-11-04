@@ -45,6 +45,7 @@
             items: $context.dripListConfig.items,
             support: undefined,
             latestVotingRoundId: votingRoundId,
+            isVisible: true,
           });
         },
 
