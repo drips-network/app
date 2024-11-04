@@ -1,5 +1,4 @@
 import type { ProjectData } from '$lib/graphql/__generated__/base-types';
-import type filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import type { Amount } from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
 
 export enum SupportButtonStyle {
@@ -41,7 +40,7 @@ export type SupportButtonData = {
   projectName: string;
   projectUrl: string;
   projectData: ProjectData & { totalEarned?: Amount[] };
-  prices: Record<string, number>;
+  prices?: Record<string, number>;
 };
 
 export function getDripFill(options: SupportButtonOptions): string {
