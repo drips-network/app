@@ -4,6 +4,7 @@ import ConfigureProjectSupportButton from './steps/configure-project-support-but
 
 type ConfigureProjectSupportButtonProps = {
   supportButtonData: SupportButtonData;
+  projectSourceUrl: string;
 };
 
 export default (props: ConfigureProjectSupportButtonProps) => ({
