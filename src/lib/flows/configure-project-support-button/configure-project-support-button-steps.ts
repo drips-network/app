@@ -3,7 +3,7 @@ import { makeStep } from '$lib/components/stepper/types';
 import ConfigureProjectSupportButton from './steps/configure-project-support-button.svelte';
 
 type ConfigureProjectSupportButtonProps = {
-  supportButtonData: SupportButtonData
+  supportButtonData: SupportButtonData;
 };
 
 export default (props: ConfigureProjectSupportButtonProps) => ({
@@ -11,7 +11,7 @@ export default (props: ConfigureProjectSupportButtonProps) => ({
   steps: [
     makeStep({
       component: ConfigureProjectSupportButton,
-      props
+      props,
     }),
   ],
 });

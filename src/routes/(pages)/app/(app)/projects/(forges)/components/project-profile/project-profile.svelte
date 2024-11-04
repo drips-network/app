@@ -136,6 +136,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
   import Settings from '$lib/components/icons/Settings.svelte';
+  import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -247,15 +248,21 @@
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 
   function handleClick() {
-    modal.show(Stepper, undefined, configureProjectSupportButtonSteps({
-      supportButtonData: {
-        dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
-        projectName: project.source.repoName,
-        projectUrl: `https://drips.network${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
-        projectData: chainData,
-        prices: {}
-      }
-    }));
+    modal.show(
+      Stepper,
+      undefined,
+      configureProjectSupportButtonSteps({
+        supportButtonData: {
+          dependencies: isClaimed(chainData)
+            ? chainData.splits.dependencies.length.toString()
+            : '0',
+          projectName: project.source.repoName,
+          projectUrl: `https://drips.network${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
+          projectData: chainData as SupportButtonData['projectData'],
+          prices: {},
+        },
+      }),
+    );
   }
 </script>
 
