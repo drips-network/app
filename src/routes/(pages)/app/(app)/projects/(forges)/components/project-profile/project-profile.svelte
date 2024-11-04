@@ -152,7 +152,6 @@
 
   $: ownAccountId = $walletStore.dripsAccountId;
   $: chainData = filterCurrentChainData(project.chainData);
-  $: chainData, console.log(chainData);
   $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
 
   type ExtractFragment<T, Condition> = T extends Condition ? T : never;
@@ -259,7 +258,6 @@
           projectName: project.source.repoName,
           projectUrl: `https://drips.network${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
           projectData: chainData as SupportButtonData['projectData'],
-          prices: {},
         },
       }),
     );

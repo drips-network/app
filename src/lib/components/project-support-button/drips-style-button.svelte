@@ -62,6 +62,7 @@
     height: 32px;
     background-color: #ffffff;
     color: #28333d;
+    white-space: nowrap;
   }
 
   .support-button--drips.support-button--dark {

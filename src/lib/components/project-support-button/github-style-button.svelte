@@ -69,6 +69,7 @@
     color: white;
     border-radius: 4px;
     overflow: hidden;
+    white-space: nowrap;
   }
 
   .support-button__icon {

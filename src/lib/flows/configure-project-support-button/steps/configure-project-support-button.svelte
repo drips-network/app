@@ -17,6 +17,7 @@
   } from '$lib/components/project-support-button/project-support-button';
   import toTitleCase from '$lib/utils/title-case';
   import modal from '$lib/stores/modal/index';
+  import ProjectSupportButton from '$lib/components/project-support-button/project-support-button.svelte';
 
   export let supportButtonData: SupportButtonData;
 
@@ -109,7 +110,9 @@
     </div>
     <div class="configure-project-support-button__section section">
       <h4 class="typo-all-caps">Preview</h4>
-      <div class="configure-project-support-button_preview">insert the button here</div>
+      <div class="configure-project-support-button_preview">
+        <ProjectSupportButton data={supportButtonData} options={selection} />
+      </div>
     </div>
   </div>
 
@@ -146,9 +149,9 @@
     align-items: center;
     justify-content: center;
     border-radius: 1rem 0px 1rem 1rem;
-    border: 1px 0px 0px 0px;
-    padding: 44px 46px;
-    background-color: var(--color-foreground);
+    border: 1px solid var(--color-foreground);
+    background-color: var(--color-foreground-level-1);
     color: var(--color-background);
+    height: 120px;
   }
 </style>
