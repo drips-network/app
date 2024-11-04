@@ -19,13 +19,13 @@
   import modal from '$lib/stores/modal/index';
   import ProjectSupportButton from '$lib/components/project-support-button/project-support-button.svelte';
   import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
+  import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
 
   export let supportButtonData: SupportButtonData;
   export let projectSourceUrl: string;
 
   const headline = 'Configure your embed code';
   const description = 'Choose how you want your support button to be displayed.';
-  const url = 'https://';
 
   type Options<T> = Array<{ title: string; value: T[keyof T] }>;
   function createOptions<T extends { [key: string]: string }>(
@@ -56,30 +56,42 @@
     stat: SupportButtonStat.default,
   };
 
-  $: backgroundDisabled = selection.style === SupportButtonStyle.github;
-
   function makeOnSelect<K extends keyof SupportButtonOptions>(prop: K) {
     return function <T extends CustomEvent>(event: T) {
       selection[prop] = event.detail;
     };
   }
 
-  function getSupportPngUrl() {
+  function getSupportPngUrl(selection: SupportButtonOptions, projectSourceUrl: string) {
     const params = new URLSearchParams(selection);
     return `${window.location.origin}/api/embed/project/${encodeURIComponent(projectSourceUrl)}/support.png?${params}`;
   }
 
-  function onClickCopy() {
-    const supportPngUrl = getSupportPngUrl();
-    const markdown = `[![Support ${supportButtonData.projectName} on Drips](${supportPngUrl})](${supportButtonData.projectUrl})`;
-    navigator.clipboard.writeText(markdown);
+  function generateEmbedCode(
+    selection: SupportButtonOptions,
+    projectSourceUrl: string,
+    supportButtonData: SupportButtonData,
+  ) {
+    const supportPngUrl = getSupportPngUrl(selection, projectSourceUrl);
+    // TODO: better matching alt? "Drip to me" is maybe too vague though.
+    const imgAlt = `Support ${supportButtonData.projectName} on drips.network`;
+    const imgHeight = selection.style === SupportButtonStyle.github ? 20 : 32;
+
+    return `
+      <a href="${supportButtonData.projectUrl}">
+        <img src="${supportPngUrl}" alt="${imgAlt}" height="${imgHeight}">
+      </a>
+    `;
   }
 
   function onClickCancel() {
     modal.hide();
   }
 
-  // console.log(supportButtonData, projectSourceUrl)
+  $: backgroundDisabled = selection.style === SupportButtonStyle.github;
+  $: embedCode = generateEmbedCode(selection, projectSourceUrl, supportButtonData);
+
+  // console.log(supportButtonData, projectSourceUrl);
 </script>
 
 <StepLayout>
@@ -124,6 +136,7 @@
     </div>
     <div class="configure-project-support-button__section section">
       <h4 class="typo-all-caps">Preview</h4>
+      {embedCode}
       <div class="configure-project-support-button_preview">
         <ProjectSupportButton data={supportButtonData} options={selection} />
       </div>
@@ -135,8 +148,16 @@
   </svelte:fragment>
 
   <svelte:fragment slot="actions">
-    <Button variant="primary" icon={CopyIcon} on:click={onClickCopy}>Copy embed code</Button>
-    <CopyLinkButton {url} />
+    <CopyLinkButton url={embedCode} variant="primary">
+      Copy embed code
+      <svelte:fragment slot="idle">
+        <CopyIcon style="fill: currentColor" />
+      </svelte:fragment>
+      <!-- hover is the same as idle in this case -->
+      <svelte:fragment slot="success">
+        <CheckCircleIcon style="fill: currentColor" />
+      </svelte:fragment>
+    </CopyLinkButton>
   </svelte:fragment>
 </StepLayout>
 
