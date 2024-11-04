@@ -18,7 +18,7 @@
   import toTitleCase from '$lib/utils/title-case';
   import modal from '$lib/stores/modal/index';
 
-  export let supportButtonData: SupportButtonData
+  export let supportButtonData: SupportButtonData;
 
   const headline = 'Configure your embed code';
   const description = 'Choose how you want your support button to be displayed.';
@@ -52,6 +52,8 @@
     stat: SupportButtonStat.default,
   };
 
+  $: backgroundDisabled = selection.style === SupportButtonStyle.github;
+
   function makeOnSelect<K extends keyof SupportButtonOptions>(prop: K) {
     return function <T extends CustomEvent>(event: T) {
       selection[prop] = event.detail;
@@ -61,7 +63,7 @@
   function onClickCopy() {}
 
   function onClickCancel() {
-    modal.hide()
+    modal.hide();
   }
 </script>
 
@@ -74,8 +76,16 @@
     <Divider />
     <div class="configure-project-support-button__section section">
       <h4 class="typo-all-caps">Style</h4>
-      <Setting title="Background" subtitle="The background">
+      <Setting title="Style" subtitle="The general styling">
         <SegmentedControl
+          active={selection.style}
+          on:select={makeOnSelect('style')}
+          options={styles}
+        />
+      </Setting>
+      <Setting disabled={backgroundDisabled} title="Background" subtitle="The background">
+        <SegmentedControl
+          disabled={backgroundDisabled}
           active={selection.background}
           on:select={makeOnSelect('background')}
           options={backgrounds}
@@ -86,13 +96,6 @@
           active={selection.text}
           on:select={makeOnSelect('text')}
           options={texts}
-        />
-      </Setting>
-      <Setting title="Style" subtitle="The general styling">
-        <SegmentedControl
-          active={selection.style}
-          on:select={makeOnSelect('style')}
-          options={styles}
         />
       </Setting>
       <Setting title="Stat" subtitle="The live-updated stat">
@@ -120,17 +123,22 @@
 </StepLayout>
 
 <style>
+  .configure-project-support-button {
+    display: flex;
+    gap: 1.5rem;
+    flex-direction: column;
+  }
+
   .configure-project-support-button .icon {
     display: flex;
     justify-content: center;
-    margin-bottom: 1.5rem;
   }
 
   .configure-project-support-button__section {
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 1.5rem;
   }
 
   .configure-project-support-button_preview {

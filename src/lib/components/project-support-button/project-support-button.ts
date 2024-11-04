@@ -1,4 +1,5 @@
 import type { ProjectData } from '$lib/graphql/__generated__/base-types';
+import type filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import type { Amount } from '../aggregate-fiat-estimate/aggregate-fiat-estimate';
 
 export enum SupportButtonStyle {
