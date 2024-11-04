@@ -21,7 +21,9 @@
     "prepare": "husky install",
     "postinstall": "./scripts/install-twemoji-assets.sh",
     "build:graphql": "./scripts/build-gql-types.sh",
-    "analyze-unused-code": "knip"
+    "analyze-unused-code": "knip",
+    "docker:build": "./scripts/docker-build.sh",
+    "docker:run": "docker run -t -i -p 4173:4173 drips-app"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
