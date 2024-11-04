@@ -84,7 +84,7 @@ RUN mv robots-disallow.txt ./static/robots.txt
 RUN npm run build:graphql
 
 # Expose the app port
-EXPOSE 8080
+EXPOSE 4173
 
 # Build project
 RUN npm run build
