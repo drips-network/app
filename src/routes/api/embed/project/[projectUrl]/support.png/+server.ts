@@ -85,8 +85,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
     });
 
     // Navigate to the page rendering the button
-    // await page.goto(imageUrl);
-    await page.goto(imageUrl, { waitUntil: 'networkidle0' });
+    await page.goto(imageUrl);
     // await page.goto(imageUrl, { waitUntil: 'domcontentloaded' });
     // Wait until all images and fonts have loaded
     // await page.evaluate(async () => {
