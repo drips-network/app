@@ -63,6 +63,7 @@
     background-color: #ffffff;
     color: #28333d;
     white-space: nowrap;
+    font-family: var(--typeface-regular);
   }
 
   .support-button--drips.support-button--dark {
