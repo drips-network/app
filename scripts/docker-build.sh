@@ -7,7 +7,7 @@ cd "$(dirname "$(realpath -- "$0")")"
 pwd
 
 # echo the command we're about to run
-CMD="docker build $(./docker-buildargs.sh ../.env) ../. -f ../Dockerfile.dev -t drips-app --platform=linux/amd64"
+CMD="docker build $(./docker-buildargs.sh ../.env) ../. -f ../Dockerfile.dev -t drips-app-dev --platform=linux/amd64"
 echo $CMD
 
 # run the command

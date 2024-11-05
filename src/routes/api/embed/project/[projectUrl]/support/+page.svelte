@@ -4,6 +4,7 @@
   export let data;
 </script>
 
-<div>
+<div class="typo-text">
+  <!-- typo-text required for puppeteer headless chrome -->
   <ProjectSupportButton data={data.supportButtonData} options={data.supportButtonOptions} />
 </div>
