@@ -52,15 +52,14 @@ export const GET: RequestHandler = async ({ url, params }) => {
     const buttonOptions = getSupportButtonOptions(url);
     // Try to fetch the pre-rendered image from cache
     const cacheKey = getCacheKey(buttonOptions, params);
-    // TODO: re-add
-    // const cachedImageBase64 = redis && (await redis.get(cacheKey));
-    // if (cachedImageBase64) {
-    //   const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
-    //   return new Response(cachedImageBuffer, {
-    //     status: 200,
-    //     headers: new Headers({ 'Content-Type': 'image/png' }),
-    //   });
-    // }
+    const cachedImageBase64 = redis && (await redis.get(cacheKey));
+    if (cachedImageBase64) {
+      const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
+      return new Response(cachedImageBuffer, {
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'image/png' }),
+      });
+    }
 
     browser = await puppeteer.launch({
       // Dockerfile deployment requires different executablePath
