@@ -82,6 +82,8 @@
     display: flex;
     gap: 3px;
     align-items: center;
+    /* adjustment for puppeteer png render */
+    padding-top: 1px;
   }
 
   .support-button--github.support-button--dependencies,
@@ -96,5 +98,7 @@
     padding: 0 4px;
     display: flex;
     align-items: center;
+    /* adjustment for puppeteer png render */
+    padding-top: 1px;
   }
 </style>
