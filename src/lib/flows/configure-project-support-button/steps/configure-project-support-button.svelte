@@ -73,7 +73,6 @@
     supportButtonData: SupportButtonData,
   ) {
     const supportPngUrl = getSupportPngUrl(selection, projectSourceUrl);
-    // TODO: better matching alt? "Drip to me" is maybe too vague though.
     const imgAlt = `Support ${supportButtonData.projectName} on drips.network`;
     const imgHeight = selection.style === SupportButtonStyle.github ? 20 : 32;
 
