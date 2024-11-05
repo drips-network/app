@@ -4,7 +4,7 @@
   export let data;
 </script>
 
+<!-- class typo-text required for correct font when rendering png via puppeteer headless chrome -->
 <div class="typo-text">
-  <!-- typo-text required for puppeteer headless chrome -->
   <ProjectSupportButton data={data.supportButtonData} options={data.supportButtonOptions} />
 </div>
