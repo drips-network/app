@@ -23,7 +23,7 @@
     "build:graphql": "./scripts/build-gql-types.sh",
     "analyze-unused-code": "knip",
     "docker:build": "./scripts/docker-build.sh",
-    "docker:run": "docker run -t -i -p 4173:4173 drips-app"
+    "docker:run": "docker run --env-file .env -it -p 5173:5173 -v /app/node_modules -v .:/app drips-app"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
@@ -121,7 +121,7 @@
     }
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.9.5"
+    "@rollup/rollup-linux-x64-gnu": "*"
   },
   "type": "module"
 }
