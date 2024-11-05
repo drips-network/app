@@ -424,12 +424,14 @@
             </a>
           {/if}
         </div>
-        <AnnotationBox type="info">
-          Embed a support button on your website.
-          <svelte:fragment slot="actions">
-            <Button icon={Settings} on:click={handleClick}>Configure</Button>
-          </svelte:fragment>
-        </AnnotationBox>
+        {#if isOwnProject}
+          <AnnotationBox type="info">
+            Embed a support button on your website.
+            <svelte:fragment slot="actions">
+              <Button icon={Settings} on:click={handleClick}>Configure</Button>
+            </svelte:fragment>
+          </AnnotationBox>
+        {/if}
       {/if}
     </header>
     <div class="content">
