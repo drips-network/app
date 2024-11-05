@@ -22,8 +22,8 @@
     "postinstall": "./scripts/install-twemoji-assets.sh",
     "build:graphql": "./scripts/build-gql-types.sh",
     "analyze-unused-code": "knip",
-    "docker:build": "./scripts/docker-build.sh",
-    "docker:run": "docker run --env-file .env -it -p 5173:5173 -v /app/node_modules -v .:/app drips-app-dev"
+    "build:docker": "./scripts/docker-build.sh",
+    "dev:docker": "docker run --env-file .env -it -p 5173:5173 -v /app/node_modules -v .:/app drips-app-dev"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
