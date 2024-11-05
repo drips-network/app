@@ -11,7 +11,7 @@ import {
 import network from '$lib/stores/wallet/network';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
-const CACHE_KEY_PREFIX = 'support-button-v0';
+const CACHE_KEY_PREFIX = 'support-button-v1';
 
 const getCacheExpiration = (options: SupportButtonOptions): number => {
   // Cache dynamic data for 6 hours
