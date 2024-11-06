@@ -428,7 +428,7 @@
           <AnnotationBox type="info">
             Embed a support button on your website.
             <svelte:fragment slot="actions">
-              <Button icon={Settings} on:click={handleClick}>Configure</Button>
+              <Button variant="primary" icon={Settings} on:click={handleClick}>Configure</Button>
             </svelte:fragment>
           </AnnotationBox>
         {/if}

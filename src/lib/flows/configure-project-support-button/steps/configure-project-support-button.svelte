@@ -20,12 +20,17 @@
   import ProjectSupportButton from '$lib/components/project-support-button/project-support-button.svelte';
   import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
   import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
+  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
+  import isClaimed from '$lib/utils/project/is-claimed';
 
   export let supportButtonData: SupportButtonData;
   export let projectSourceUrl: string;
 
   const headline = 'Configure your embed code';
   const description = 'Choose how you want your support button to be displayed.';
+  const projectColor = isClaimed(supportButtonData.projectData)
+    ? supportButtonData.projectData.color
+    : undefined;
 
   type Options<T> = Array<{ title: string; value: T[keyof T] }>;
   function createOptions<T extends { [key: string]: string }>(
@@ -87,71 +92,73 @@
   $: embedCode = generateEmbedCode(selection, projectSourceUrl, supportButtonData);
 </script>
 
-<StepLayout>
-  <div class="configure-project-support-button">
-    <div class="icon">
-      <Pencil size={48} />
-    </div>
-    <StepHeader {headline} {description} />
-    <Divider />
-    <div class="configure-project-support-button__section section">
-      <h4 class="typo-all-caps">Style</h4>
-      <Setting title="Style" subtitle="The general styling">
-        <SegmentedControl
-          active={selection.style}
-          on:select={makeOnSelect('style')}
-          options={styles}
-        />
-      </Setting>
-      <Setting disabled={backgroundDisabled} title="Background" subtitle="The background">
-        <SegmentedControl
-          disabled={backgroundDisabled}
-          active={selection.background}
-          on:select={makeOnSelect('background')}
-          options={backgrounds}
-        />
-      </Setting>
-      <Setting title="Button text" subtitle="Show project, me, or us">
-        <SegmentedControl
-          active={selection.text}
-          on:select={makeOnSelect('text')}
-          options={texts}
-        />
-      </Setting>
-      <Setting title="Stat" subtitle="The live-updated stat">
-        <SegmentedControl
-          active={selection.stat}
-          on:select={makeOnSelect('stat')}
-          options={stats}
-        />
-      </Setting>
+<PrimaryColorThemer colorHex={projectColor}>
+  <StepLayout>
+    <div class="configure-project-support-button">
+      <div class="icon">
+        <Pencil size={48} />
+      </div>
+      <StepHeader {headline} {description} />
       <Divider />
-    </div>
-    <div class="configure-project-support-button__section section">
-      <h4 class="typo-all-caps">Preview</h4>
-      <div class="configure-project-support-button_preview">
-        <ProjectSupportButton data={supportButtonData} options={selection} />
+      <div class="configure-project-support-button__section section">
+        <h4 class="typo-all-caps">Style</h4>
+        <Setting title="Style" subtitle="The general styling">
+          <SegmentedControl
+            active={selection.style}
+            on:select={makeOnSelect('style')}
+            options={styles}
+          />
+        </Setting>
+        <Setting disabled={backgroundDisabled} title="Background" subtitle="The background">
+          <SegmentedControl
+            disabled={backgroundDisabled}
+            active={selection.background}
+            on:select={makeOnSelect('background')}
+            options={backgrounds}
+          />
+        </Setting>
+        <Setting title="Button text" subtitle="Show project, me, or us">
+          <SegmentedControl
+            active={selection.text}
+            on:select={makeOnSelect('text')}
+            options={texts}
+          />
+        </Setting>
+        <Setting title="Stat" subtitle="The live-updated stat">
+          <SegmentedControl
+            active={selection.stat}
+            on:select={makeOnSelect('stat')}
+            options={stats}
+          />
+        </Setting>
+        <Divider />
+      </div>
+      <div class="configure-project-support-button__section section">
+        <h4 class="typo-all-caps">Preview</h4>
+        <div class="configure-project-support-button_preview">
+          <ProjectSupportButton data={supportButtonData} options={selection} />
+        </div>
       </div>
     </div>
-  </div>
 
-  <svelte:fragment slot="left-actions">
-    <Button on:click={onClickCancel}>Never mind</Button>
-  </svelte:fragment>
+    <svelte:fragment slot="left-actions">
+      <Button on:click={onClickCancel}>Never mind</Button>
+    </svelte:fragment>
 
-  <svelte:fragment slot="actions">
-    <CopyLinkButton url={embedCode} variant="primary">
-      Copy embed code
-      <svelte:fragment slot="idle">
-        <CopyIcon style="fill: currentColor" />
-      </svelte:fragment>
-      <!-- hover is the same as idle in this case -->
-      <svelte:fragment slot="success">
-        <CheckCircleIcon style="fill: currentColor" />
-      </svelte:fragment>
-    </CopyLinkButton>
-  </svelte:fragment>
-</StepLayout>
+    <svelte:fragment slot="actions">
+      <CopyLinkButton url={embedCode} variant="primary">
+        Copy embed code
+        <svelte:fragment slot="idle">
+          <CopyIcon style="fill: currentColor" />
+        </svelte:fragment>
+        <!-- hover is the same as idle in this case -->
+        <svelte:fragment slot="success">
+          <CheckCircleIcon style="fill: currentColor" />
+        </svelte:fragment>
+      </CopyLinkButton>
+    </svelte:fragment>
+  </StepLayout>
+</PrimaryColorThemer>
 
 <style>
   .configure-project-support-button {
