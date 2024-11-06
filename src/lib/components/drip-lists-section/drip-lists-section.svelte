@@ -22,7 +22,7 @@
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
   import type { SplitsComponentSplitsReceiver } from '../splits/types';
-  import Toggle from '$lib/components/toggle/toggle.svelte';
+  import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -35,7 +35,7 @@
   let error = false;
 
   let showHidden: boolean = false;
-  $: hiddenProjectsCount = dripLists?.filter((dl) => !dl.isVisible).length ?? 0;
+  $: hiddenListsCount = dripLists.filter((dl) => !dl.isVisible).length ?? 0;
 
   $: dripListsAndVotingRounds = [
     ...(showHidden
@@ -44,6 +44,7 @@
           .filter((dl) => dl.isVisible)
           .map((dl) => ({ ...dl, type: 'drip-list' as const }))),
     ...votingRounds.map((vr) => ({ ...vr, type: 'voting-round' as const })),
+    // Show hidden lists last.
   ].sort((a, b) => {
     if (showHidden && 'isVisible' in a && 'isVisible' in b) {
       return a.isVisible === b.isVisible ? 0 : a.isVisible ? -1 : 1;
@@ -85,13 +86,8 @@
     horizontalScroll: false,
   }}
 >
-  <svelte:fragment slot="custom-actions">
-    {#if hiddenProjectsCount}
-      <div class="toggle-visibility">
-        <Toggle bind:checked={showHidden} />
-        <p>Show hidden projects {hiddenProjectsCount}</p>
-      </div>
-    {/if}
+  <svelte:fragment slot="left-actions">
+    <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenListsCount} />
   </svelte:fragment>
 
   {#if dripListsAndVotingRounds}
@@ -143,11 +139,3 @@
     </div>
   {/if}
 </Section>
-
-<style>
-  .toggle-visibility {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
-</style>

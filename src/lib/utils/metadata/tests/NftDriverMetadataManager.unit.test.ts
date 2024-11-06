@@ -50,6 +50,7 @@ describe('NftDriverMetadataManager', () => {
           accountId: '1',
         },
         isDripList: true,
+        isVisible: false,
         projects: mapFilterUndefined(context.projects, (listProj) => ({
           accountId: '1',
           weight: listProj.weight,

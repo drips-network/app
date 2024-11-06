@@ -21,7 +21,6 @@
 
   export let collapsed = true;
   export let collapsable = false;
-  export let customActionsPosition: 'before' | 'after' = 'before';
 </script>
 
 <!--svelte-ignore a11y-click-events-have-key-events -->
@@ -54,9 +53,7 @@
     {/if}
   </div>
   <div class="actions">
-    {#if customActionsPosition === 'before'}
-      <slot name="custom-actions"></slot>
-    {/if}
+    <slot name="left-actions"></slot>
 
     {#each actions as action}
       <Button
@@ -68,10 +65,6 @@
         on:click={action.handler}>{action.label}</Button
       >
     {/each}
-
-    {#if customActionsPosition === 'after'}
-      <slot name="custom-actions"></slot>
-    {/if}
   </div>
 </div>
 

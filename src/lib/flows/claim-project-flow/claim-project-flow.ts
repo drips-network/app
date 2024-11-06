@@ -30,6 +30,7 @@ export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
     ...EnterGitUrlStepProject
     ...AddEthereumAddressStepProject
     ...ReviewStepUnclaimedProject
+    isVisible
   }
 `;
 

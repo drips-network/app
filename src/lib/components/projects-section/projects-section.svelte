@@ -19,6 +19,7 @@
   import Plus from '../icons/Plus.svelte';
   import modal from '$lib/stores/modal';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -27,6 +28,20 @@
 
   export let collapsed = false;
   export let collapsable = false;
+
+  let showHidden: boolean = false;
+  $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
+
+  $: projectsToShow = [
+    ...(showHidden ? projects : projects.filter((p) => p.isVisible))
+      // Show hidden projects last.
+      .sort((a, b) => {
+        if (showHidden && 'isVisible' in a && 'isVisible' in b) {
+          return a.isVisible === b.isVisible ? 0 : a.isVisible ? -1 : 1;
+        }
+        return 0;
+      }),
+  ];
 </script>
 
 <Section
@@ -57,20 +72,24 @@
       : 'This user hasnʼt claimed any software projects yet.',
   }}
 >
-  {#if projects}
+  {#if projectsToShow}
     <div class="projects">
-      {#each projects as project}
+      {#each projectsToShow as project}
         {@const projectChainData = filterCurrentChainData(project.chainData)}
         {#if isClaimed(projectChainData)}
           <div>
             <PrimaryColorThemer colorHex={projectChainData.color}>
-              <ProjectCard {project} />
+              <ProjectCard {project} isHidden={!project.isVisible} />
             </PrimaryColorThemer>
           </div>
         {/if}
       {/each}
     </div>
   {/if}
+
+  <svelte:fragment slot="left-actions">
+    <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount}></VisibilityToggle>
+  </svelte:fragment>
 </Section>
 
 <style>

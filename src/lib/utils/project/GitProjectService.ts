@@ -243,6 +243,7 @@ export default class GitProjectService {
                 cid: context.avatar.cid,
               },
       },
+      isVisible: true,
     };
 
     const metadata = this._repoDriverMetadataManager.buildAccountMetadata({

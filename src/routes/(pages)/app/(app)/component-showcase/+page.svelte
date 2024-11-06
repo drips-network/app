@@ -111,6 +111,7 @@
 
   const MOCK_PROJECT_1: Project = {
     __typename: 'Project',
+    isVisible: true,
     chainData: [
       {
         __typename: 'ClaimedProjectData',
@@ -152,6 +153,7 @@
 
   const MOCK_PROJECT_2: Project = {
     __typename: 'Project',
+    isVisible: true,
     chainData: [
       {
         __typename: 'ClaimedProjectData',
@@ -591,6 +593,7 @@
       project={{
         __typename: 'Project',
         source: SOURCE_CONFIGS.github,
+        isVisible: true,
         chainData: [
           {
             chain: network.gqlName,

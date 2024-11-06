@@ -18,6 +18,7 @@
           color
         }
       }
+      isVisible
     }
   `;
 </script>
@@ -34,12 +35,13 @@
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import twemoji from '$lib/utils/twemoji';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let originalProject: ProjectCustomizerFragment;
   export let newProjectData: Writable<
     ReturnType<
       typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    >
+    > & { isProjectHidden: boolean }
   >;
 
   let activeTab: 'tab-1' | 'tab-2' =
@@ -69,6 +71,12 @@
     $newProjectData.color = newColor;
   }
   $: handleColorChange(selectedColor);
+
+  let isHidden = $newProjectData.isProjectHidden;
+  function handleIsHiddenChange(isHidden: boolean) {
+    $newProjectData.isProjectHidden = isHidden;
+  }
+  $: handleIsHiddenChange(isHidden);
 
   let lastUploadedCid =
     $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined;
@@ -163,6 +171,19 @@
       {/each}
     </div>
   </FormField>
+
+  <div class="visibility-toggle">
+    <h4>Hide this project from my profile</h4>
+    <Toggle bind:checked={isHidden} />
+  </div>
+  <div class="hide-info">
+    <p>This will only hide the project from your public profile</p>
+    <ul>
+      <li><p>· It will remain claimed by you on the blockchain</p></li>
+      <li><p>· Any existing funding will continue to flow to and from it</p></li>
+      <li><p>· It will be visible from a direct link</p></li>
+    </ul>
+  </div>
 </div>
 
 <style>
@@ -259,5 +280,25 @@
   .color.selected .color-label {
     transform: scale(1);
     box-shadow: var(--elevation-low);
+  }
+
+  .visibility-toggle {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .hide-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hide-info > p {
+    margin-bottom: 1rem;
+  }
+
+  .hide-info li {
+    display: flex;
+    margin-left: 0.5rem;
   }
 </style>
