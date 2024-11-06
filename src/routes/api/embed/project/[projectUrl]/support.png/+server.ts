@@ -62,9 +62,8 @@ export const GET: RequestHandler = async ({ url, params }) => {
     }
 
     // see hooks.server.ts for configuration details
-    const browser = await PuppeteerManager.launch()
+    const browser = await PuppeteerManager.launch();
 
-    console.time('render2')
     // Set up the page
     page = await browser.newPage();
     await page.setViewport({
@@ -75,9 +74,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
 
     // Navigate to the page rendering the button
     await page.goto(imageUrl);
-    console.timeEnd('render2')
 
-    console.time('render3')
     // Get the button
     const selector = '.support-button';
     const element = await page.waitForSelector(selector);
@@ -86,8 +83,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
     if (!element) {
       return error(500);
     }
-    console.timeEnd('render3')
-    console.time('render4')
+
     // Take a screenshot of the button
     const imageBuffer = await element.screenshot({ omitBackground: true });
     // Cache the result
@@ -96,7 +92,6 @@ export const GET: RequestHandler = async ({ url, params }) => {
     redis?.set(cacheKey, imageBase64, {
       ...(cacheExpiration !== Infinity && { EX: cacheExpiration }),
     });
-    console.timeEnd('render4')
 
     return new Response(imageBuffer, {
       status: 200,
