@@ -28,13 +28,13 @@
 
   <span class="support-button__text">
     {#if options.text === SupportButtonText.me}
-      Drip to me
+      Support me
     {:else if options.text === SupportButtonText.us}
-      Support us on Drips
+      Support us
     {:else if options.text === SupportButtonText.project}
       Support <ProjectAvatar project={data.projectData} size="tiny" /><strong
         >{data.projectName}</strong
-      > on Drips
+      >
     {/if}
   </span>
 

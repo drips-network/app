@@ -102,14 +102,18 @@
       <Divider />
       <div class="configure-project-support-button__section section">
         <h4 class="typo-all-caps">Style</h4>
-        <Setting title="Style" subtitle="The general styling">
+        <Setting title="Type" subtitle="The basic shape and style of the button">
           <SegmentedControl
             active={selection.style}
             on:select={makeOnSelect('style')}
             options={styles}
           />
         </Setting>
-        <Setting disabled={backgroundDisabled} title="Background" subtitle="The background">
+        <Setting
+          disabled={backgroundDisabled}
+          title="Background"
+          subtitle="Choose a good background for where the button will be placed"
+        >
           <SegmentedControl
             disabled={backgroundDisabled}
             active={selection.background}
@@ -117,14 +121,14 @@
             options={backgrounds}
           />
         </Setting>
-        <Setting title="Button text" subtitle="Show project, me, or us">
+        <Setting title="Button text" subtitle="What best describes your project">
           <SegmentedControl
             active={selection.text}
             on:select={makeOnSelect('text')}
             options={texts}
           />
         </Setting>
-        <Setting title="Stat" subtitle="The live-updated stat">
+        <Setting title="Stat" subtitle="Live-updated statistic">
           <SegmentedControl
             active={selection.stat}
             on:select={makeOnSelect('stat')}
