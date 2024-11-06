@@ -247,6 +247,9 @@
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 
   function handleClick() {
+    // don't focus the first selectable element
+    // restored when modal is hidden
+    modal.setFocusTrapped(false);
     modal.show(
       Stepper,
       undefined,
