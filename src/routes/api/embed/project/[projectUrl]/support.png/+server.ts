@@ -1,6 +1,5 @@
 import type { RequestHandler, RouteParams } from './$types';
 import { error } from '@sveltejs/kit';
-import puppeteer from 'puppeteer';
 import { redis } from '$lib/../routes/api/redis';
 import {
   getSupportButtonOptions,
@@ -9,6 +8,7 @@ import {
   type SupportButtonOptions,
 } from '$lib/components/project-support-button/project-support-button';
 import network from '$lib/stores/wallet/network';
+import { PuppeteerManager } from '$lib/utils/puppeteer';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
 const CACHE_KEY_PREFIX = 'support-button-v2';
@@ -39,7 +39,7 @@ const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string
 };
 
 export const GET: RequestHandler = async ({ url, params }) => {
-  let browser;
+  let page;
   try {
     // drips.network/embed/project.png/support.png/?background=dark
     // ==> drips.network/embed/project.png/support?background=dark
@@ -61,17 +61,12 @@ export const GET: RequestHandler = async ({ url, params }) => {
       });
     }
 
-    browser = await puppeteer.launch({
-      // Dockerfile deployment requires different executablePath
-      ...(process.env.NODE_ENV === 'production' && {
-        executablePath: '/usr/bin/google-chrome-stable',
-      }),
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    // see hooks.server.ts for configuration details
+    const browser = await PuppeteerManager.launch()
 
+    console.time('render2')
     // Set up the page
-    const page = await browser.newPage();
+    page = await browser.newPage();
     await page.setViewport({
       width: 640,
       height: 480,
@@ -80,6 +75,9 @@ export const GET: RequestHandler = async ({ url, params }) => {
 
     // Navigate to the page rendering the button
     await page.goto(imageUrl);
+    console.timeEnd('render2')
+
+    console.time('render3')
     // Get the button
     const selector = '.support-button';
     const element = await page.waitForSelector(selector);
@@ -88,7 +86,8 @@ export const GET: RequestHandler = async ({ url, params }) => {
     if (!element) {
       return error(500);
     }
-
+    console.timeEnd('render3')
+    console.time('render4')
     // Take a screenshot of the button
     const imageBuffer = await element.screenshot({ omitBackground: true });
     // Cache the result
@@ -97,12 +96,13 @@ export const GET: RequestHandler = async ({ url, params }) => {
     redis?.set(cacheKey, imageBase64, {
       ...(cacheExpiration !== Infinity && { EX: cacheExpiration }),
     });
+    console.timeEnd('render4')
 
     return new Response(imageBuffer, {
       status: 200,
       headers: new Headers({ 'Content-Type': 'image/png' }),
     });
   } finally {
-    browser?.close();
+    page?.close();
   }
 };
