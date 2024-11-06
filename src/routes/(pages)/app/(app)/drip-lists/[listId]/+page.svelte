@@ -41,6 +41,13 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import viewVotingRoundFlowSteps from '$lib/flows/view-voting-round/view-voting-round-flow-steps';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
+  import Registered from '$lib/components/icons/Registered.svelte';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import checkIsUser from '$lib/utils/check-is-user';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
 
   export let data: PageData;
 
@@ -50,6 +57,8 @@
   function handleVotingRoundClick(votingRound: VotingRound) {
     modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));
   }
+
+  $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
 </script>
 
 {#if dripList?.name || votingRound?.name}
@@ -68,7 +77,32 @@
   />
 {/if}
 
-<article class="drip-list-page">
+{#if dripList && !dripList.isVisible}
+  <div class="notice">
+    <AnnotationBox type="info" icon={EyeClosed}>
+      <span class="typo-text-small-bold">{dripList.name}</span> is hidden and cannot receive new
+      funds. {isOwnList
+        ? 'You can unhide it to start receiving funds again.'
+        : 'If this is your project, unhide it by connecting the wallet that claimed it with.'}
+      <svelte:fragment slot="actions">
+        {#if isOwnList}
+          <div class="flex gap-3">
+            <Button
+              size="small"
+              icon={Registered}
+              variant="primary"
+              on:click={() => {
+                modal.show(Stepper, undefined, editDripListSteps(dripList));
+              }}>Unhide it</Button
+            >
+          </div>
+        {/if}
+      </svelte:fragment>
+    </AnnotationBox>
+  </div>
+{/if}
+
+<article class="drip-list-page" class:hiddenByUser={!dripList?.isVisible}>
   <main class="list">
     <DripListCard clampTitle={false} data={{ dripList, votingRound }} />
   </main>
@@ -212,6 +246,14 @@
   .voting-rounds .voting-round .left {
     display: flex;
     flex-direction: column;
+  }
+
+  .notice {
+    margin-bottom: 2rem;
+  }
+
+  .hiddenByUser {
+    opacity: 0.5;
   }
 
   @media (max-width: 1080px) {

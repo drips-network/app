@@ -134,6 +134,7 @@
     SUPPORTER_PILE_FRAGMENT,
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -342,8 +343,36 @@
       </AnnotationBox>
     </div>
   {/if}
+  {#if !project.isVisible}
+    <div class="notice">
+      <AnnotationBox type="info" icon={EyeClosed}>
+        <span class="typo-text-small-bold">{project.source.repoName}</span> is hidden and cannot
+        receive new funds. {isOwnProject
+          ? 'You can unhide it to start receiving funds again.'
+          : 'If this is your project, unhide it by connecting the wallet that claimed it with.'}
+        <svelte:fragment slot="actions">
+          {#if isOwnProject}
+            <div class="flex gap-3">
+              <Button
+                size="small"
+                icon={Registered}
+                variant="primary"
+                on:click={() => {
+                  modal.show(Stepper, undefined, editProjectMetadataSteps(project));
+                }}>Unhide it</Button
+              >
+            </div>
+          {/if}
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
 
-  <article class="project-profile" class:claimed={isClaimed(chainData)}>
+  <article
+    class="project-profile"
+    class:claimed={isClaimed(chainData)}
+    class:hiddenByUser={!project.isVisible}
+  >
     <header class="header">
       <div>
         <ProjectProfileHeader
@@ -583,6 +612,10 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .hiddenByUser {
+    opacity: 0.5;
   }
 
   @media (max-width: 1080px) {
