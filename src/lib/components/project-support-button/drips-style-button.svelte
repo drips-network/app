@@ -32,9 +32,9 @@
     {:else if options.text === SupportButtonText.us}
       Support us
     {:else if options.text === SupportButtonText.project}
-      Support <ProjectAvatar project={data.projectData} size="tiny" /><strong
-        >{data.projectName}</strong
-      >
+      Support <span class="support-button__text__avatar"
+        ><ProjectAvatar project={data.projectData} size="tiny" /></span
+      ><strong>{data.projectName}</strong>
     {/if}
   </span>
 
@@ -107,5 +107,9 @@
 
   .support-button strong {
     font-weight: 600;
+  }
+
+  .support-button__text__avatar {
+    margin-right: -3.5px;
   }
 </style>
