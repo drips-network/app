@@ -11,7 +11,7 @@ import network from '$lib/stores/wallet/network';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
-const CACHE_KEY_PREFIX = 'support-button-v2';
+const CACHE_KEY_PREFIX = 'support-button-v3';
 
 const getCacheExpiration = (options: SupportButtonOptions): number => {
   // Cache dynamic data for 6 hours
