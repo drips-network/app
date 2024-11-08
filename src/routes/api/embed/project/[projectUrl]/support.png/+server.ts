@@ -39,8 +39,9 @@ const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string
 };
 
 export const GET: RequestHandler = async ({ url, params }) => {
-  let page;
+  // let page, pageReturner
   try {
+
     // drips.network/embed/project.png/support.png/?background=dark
     // ==> drips.network/embed/project.png/support?background=dark
     const imageUrl = url.href.replace(REPLACE_PNG_REGEX, '$2');
@@ -62,30 +63,70 @@ export const GET: RequestHandler = async ({ url, params }) => {
     }
 
     // see hooks.server.ts for configuration details
-    const browser = await PuppeteerManager.launch();
+    // const page = await PuppeteerManager.launchPage()
+    // [page, pageReturner] = await PuppeteerManager.rentPage()
+    // console.log('page got', page)
 
-    // Set up the page
-    page = await browser.newPage();
-    await page.setViewport({
-      width: 640,
-      height: 480,
-      deviceScaleFactor: 2,
-    });
+    // // Navigate to the page rendering the button
+    // await page.goto(imageUrl);
 
-    // Navigate to the page rendering the button
-    await page.goto(imageUrl);
+    // // Get the button
+    // const selector = '.support-button';
+    // const element = await page.waitForSelector(selector);
+    // // if there's no element for any reason, that's
+    // // very unexpected and we're toast
+    // if (!element) {
+    //   return error(500);
+    // }
 
-    // Get the button
-    const selector = '.support-button';
-    const element = await page.waitForSelector(selector);
-    // if there's no element for any reason, that's
-    // very unexpected and we're toast
-    if (!element) {
-      return error(500);
-    }
+    // // Take a screenshot of the button
+    // const imageBuffer = await element.screenshot({ omitBackground: true });
+    // console.log('imageBuffer')
 
-    // Take a screenshot of the button
-    const imageBuffer = await element.screenshot({ omitBackground: true });
+    // // Take a screenshot of the button
+    // const imageBuffer = await element.screenshot({ omitBackground: true });
+    const imageBuffer = await new Promise((resolve) => {
+      PuppeteerManager.rentPage(async (page) => {
+        console.time(imageUrl)
+        // Navigate to the page rendering the button
+        console.log('going to', imageUrl);
+        await page.goto(imageUrl);
+
+        // Get the button
+        const selector = '.support-button';
+        console.log('waitForSelector');
+        const element = await page.waitForSelector(selector);
+        // if there's no element for any reason, that's
+        // very unexpected and we're toast
+        if (!element) {
+          return error(500);
+        }
+
+        console.log('screenshot');
+        // Take a screenshot of the button
+        const imageBuffer = await element.screenshot({ omitBackground: true });
+        // return imageBuffer
+        resolve(imageBuffer)
+      })
+    })
+    // const imageBuffer = PuppeteerManager.rentPage(async (page) => {
+    //   // Navigate to the page rendering the button
+    //   await page.goto(imageUrl);
+
+    //   // Get the button
+    //   const selector = '.support-button';
+    //   const element = await page.waitForSelector(selector);
+    //   // if there's no element for any reason, that's
+    //   // very unexpected and we're toast
+    //   if (!element) {
+    //     return error(500);
+    //   }
+
+    //   // Take a screenshot of the button
+    //   const imageBuffer = await element.screenshot({ omitBackground: true });
+    //   return imageBuffer
+    // })
+
     // Cache the result
     const imageBase64 = Buffer.from(imageBuffer).toString('base64');
     const cacheExpiration = getCacheExpiration(buttonOptions);
@@ -93,11 +134,17 @@ export const GET: RequestHandler = async ({ url, params }) => {
       ...(cacheExpiration !== Infinity && { EX: cacheExpiration }),
     });
 
+    // console.log('page returned')
+    // pageReturner(page)
+    console.timeEnd(imageUrl)
     return new Response(imageBuffer, {
       status: 200,
       headers: new Headers({ 'Content-Type': 'image/png' }),
     });
   } finally {
-    page?.close();
+    // if(pageReturner) {
+    //   pageReturner(page)
+    // }
+    // pageReturner(page)
   }
 };

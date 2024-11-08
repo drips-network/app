@@ -16,14 +16,34 @@ if (dsn) {
   });
 }
 
-PuppeteerManager.launch({
-  // Dockerfile deployment requires different executablePath
-  ...(process.env.NODE_ENV === 'production' && {
-    executablePath: '/usr/bin/google-chrome-stable',
-  }),
-  headless: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
-})
+// PuppeteerManager.launchPage({
+//   // Dockerfile deployment requires different executablePath
+//   ...(process.env.NODE_ENV === 'production' && {
+//     executablePath: '/usr/bin/google-chrome-stable',
+//   }),
+//   headless: true,
+//   args: ['--no-sandbox', '--disable-setuid-sandbox'],
+// }, {
+//   width: 640,
+//   height: 480,
+//   deviceScaleFactor: 2,
+// })
+
+PuppeteerManager.prepare(
+  {
+    // Dockerfile deployment requires different executablePath
+    ...(process.env.NODE_ENV === 'production' && {
+      executablePath: '/usr/bin/google-chrome-stable',
+    }),
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  },
+  {
+    width: 640,
+    height: 480,
+    deviceScaleFactor: 2,
+  },
+);
 
 export const handle = sequence(sentryHandle());
 export const handleError = handleErrorWithSentry();
