@@ -38,29 +38,21 @@ const getCacheKey = (options: SupportButtonOptions, params: RouteParams): string
   return key;
 };
 
-export const GET: RequestHandler = async ({ url, params }) => {
+const getMetaCacheKey = (cacheKey: string) => {
+  return cacheKey + '-meta';
+};
+
+const cacheImageBuffer = (cacheKey: string, imageBuffer: Uint8Array) => {
+  const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+  return Promise.all([
+    redis?.set(cacheKey, imageBase64),
+    redis?.hSet(getMetaCacheKey(cacheKey), 'updatedAt', Date.now()),
+  ]);
+};
+
+const captureScreenshot = async (imageUrl: string) => {
   let page;
   try {
-    // drips.network/embed/project.png/support.png/?background=dark
-    // ==> drips.network/embed/project.png/support?background=dark
-    const imageUrl = url.href.replace(REPLACE_PNG_REGEX, '$2');
-    // the URL should always be re-written
-    if (imageUrl === url.href) {
-      return error(400);
-    }
-
-    const buttonOptions = getSupportButtonOptions(url);
-    // Try to fetch the pre-rendered image from cache
-    const cacheKey = getCacheKey(buttonOptions, params);
-    const cachedImageBase64 = redis && (await redis.get(cacheKey));
-    if (cachedImageBase64) {
-      const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
-      return new Response(cachedImageBuffer, {
-        status: 200,
-        headers: new Headers({ 'Content-Type': 'image/png' }),
-      });
-    }
-
     // see hooks.server.ts for configuration details
     const browser = await PuppeteerManager.launch();
 
@@ -84,20 +76,64 @@ export const GET: RequestHandler = async ({ url, params }) => {
       return error(500);
     }
 
-    // Take a screenshot of the button
     const imageBuffer = await element.screenshot({ omitBackground: true });
-    // Cache the result
-    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-    const cacheExpiration = getCacheExpiration(buttonOptions);
-    redis?.set(cacheKey, imageBase64, {
-      ...(cacheExpiration !== Infinity && { EX: cacheExpiration }),
-    });
-
-    return new Response(imageBuffer, {
-      status: 200,
-      headers: new Headers({ 'Content-Type': 'image/png' }),
-    });
+    return imageBuffer;
   } finally {
     page?.close();
   }
+};
+
+const updateCachedImageBuffer = async (
+  cacheKey: string,
+  buttonOptions: SupportButtonOptions,
+  imageUrl: string,
+) => {
+  const result = await redis?.hGet(getMetaCacheKey(cacheKey), 'updatedAt');
+  const now = Date.now();
+  const then = parseInt(result || '', 10);
+
+  const cacheExpiration = getCacheExpiration(buttonOptions);
+  if (cacheExpiration === Infinity) {
+    return;
+  }
+
+  if (now - then < cacheExpiration * 1000) {
+    return;
+  }
+
+  const imageBuffer = await captureScreenshot(imageUrl);
+  cacheImageBuffer(cacheKey, imageBuffer);
+};
+
+export const GET: RequestHandler = async ({ url, params }) => {
+  // drips.network/embed/project.png/support.png/?background=dark
+  // ==> drips.network/embed/project.png/support?background=dark
+  const imageUrl = url.href.replace(REPLACE_PNG_REGEX, '$2');
+  // the URL should always be re-written
+  if (imageUrl === url.href) {
+    return error(400);
+  }
+
+  const buttonOptions = getSupportButtonOptions(url);
+  // Try to fetch the pre-rendered image from cache
+  const cacheKey = getCacheKey(buttonOptions, params);
+  const cachedImageBase64 = redis && (await redis.get(cacheKey));
+  if (cachedImageBase64) {
+    updateCachedImageBuffer(cacheKey, buttonOptions, imageUrl);
+    const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
+    return new Response(cachedImageBuffer, {
+      status: 200,
+      headers: new Headers({ 'Content-Type': 'image/png' }),
+    });
+  }
+
+  // Take a screenshot of the button
+  const imageBuffer = await captureScreenshot(imageUrl);
+  // Cache the result
+  cacheImageBuffer(cacheKey, imageBuffer);
+
+  return new Response(imageBuffer, {
+    status: 200,
+    headers: new Headers({ 'Content-Type': 'image/png' }),
+  });
 };
