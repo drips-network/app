@@ -90,7 +90,7 @@ const updateCachedImageBuffer = async (
 ) => {
   const result = await redis?.hGet(getMetaCacheKey(cacheKey), 'updatedAt');
   const now = Date.now();
-  const then = parseInt(result || '', 10);
+  const then = parseInt(result || '0', 10);
 
   const cacheExpiration = getCacheExpiration(buttonOptions);
   if (cacheExpiration === Infinity) {
