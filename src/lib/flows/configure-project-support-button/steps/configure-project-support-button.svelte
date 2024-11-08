@@ -88,6 +88,11 @@
     modal.hide();
   }
 
+  function cacheInitialState() {
+    const pngUrl = getSupportPngUrl(selection, projectSourceUrl);
+    fetch(pngUrl);
+  }
+
   $: backgroundDisabled = selection.style === SupportButtonStyle.github;
   $: embedCode = generateEmbedCode(selection, projectSourceUrl, supportButtonData);
 </script>
@@ -150,7 +155,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="actions">
-      <CopyLinkButton url={embedCode} variant="primary">
+      <CopyLinkButton url={embedCode} variant="primary" on:linkCopied={cacheInitialState}>
         Copy embed code
         <svelte:fragment slot="idle">
           <CopyIcon style="fill: currentColor" />

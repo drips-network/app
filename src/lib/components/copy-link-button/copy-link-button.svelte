@@ -5,6 +5,13 @@
   import CopyIcon from '$lib/components/icons/Copy.svelte';
   import { fade } from 'svelte/transition';
   import type { ComponentProps } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher<{
+    linkCopied: {
+      url: string;
+    };
+  }>();
 
   export let url: string;
   export let variant: ComponentProps<Button>['variant'] = 'normal';
@@ -16,6 +23,7 @@
     navigator.clipboard.writeText(url);
     copySuccess = true;
     setTimeout(() => (copySuccess = false), 1000);
+    dispatch('linkCopied', { url });
   }
 </script>
 
