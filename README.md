@@ -1,4 +1,4 @@
-![Drips Logo illustration](/docs/assets/drips-logo-illustration.png)
+![Drips Logo illustration](/docs/assets/drips-logo-illustration.png) <a href="https://drips.network/app/projects/github/drips-network/app" target="_blank"><img src="https://drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fdrips-network%2Fapp/support.png?background=white&style=drips&text=us&stat=dependencies" alt="Support app on drips.network" height="32"></a>
 
 # Drips App
 
