@@ -29,13 +29,13 @@
 
   <span class="support-button__text">
     {#if options.text === SupportButtonText.me}
-      Drip to me
+      Support me
     {:else if options.text === SupportButtonText.us}
-      Support us on Drips
+      Support us
     {:else if options.text === SupportButtonText.project}
       Support <ProjectAvatar project={data.projectData} size="micro" /><strong
         >{data.projectName}</strong
-      > on Drips
+      >
     {/if}
   </span>
 
@@ -69,6 +69,7 @@
     color: white;
     border-radius: 4px;
     overflow: hidden;
+    white-space: nowrap;
   }
 
   .support-button__icon {
@@ -81,6 +82,8 @@
     display: flex;
     gap: 3px;
     align-items: center;
+    /* adjustment for puppeteer png render */
+    padding-top: 1px;
   }
 
   .support-button--github.support-button--dependencies,
@@ -95,5 +98,7 @@
     padding: 0 4px;
     display: flex;
     align-items: center;
+    /* adjustment for puppeteer png render */
+    padding-top: 1px;
   }
 </style>

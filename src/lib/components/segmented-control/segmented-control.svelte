@@ -6,6 +6,7 @@
 
   export let options: Option<keyof T>;
   export let active: keyof T;
+  export let disabled: boolean = false;
 
   export let containerRole = 'radiogroup';
   export let itemRole = 'radio';
@@ -45,7 +46,7 @@
   }
 </script>
 
-<div class="segmented-control" bind:this={containerElem}>
+<div class="segmented-control" class:disabled bind:this={containerElem}>
   <div class="options" role={containerRole} aria-label={ariaLabel}>
     {#each options as option}
       <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -83,6 +84,7 @@
     z-index: 0;
     user-select: none;
     background-color: var(--color-background);
+    transition: opacity 0.3s;
   }
 
   .segmented-control .options {
@@ -157,5 +159,10 @@
 
   .option:last-child .background {
     border-radius: 0.25rem 0 1rem 0.25rem;
+  }
+
+  .segmented-control.disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 </style>

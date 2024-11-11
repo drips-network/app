@@ -1,9 +1,10 @@
 <script lang="ts">
   export let title: string;
   export let subtitle: string;
+  export let disabled: boolean = false;
 </script>
 
-<div class="setting">
+<div class="setting" class:disabled>
   <div class="title">
     <h3>{title}</h3>
     <p>{subtitle}</p>
@@ -34,5 +35,13 @@
       flex-direction: column;
       align-items: flex-start;
     }
+  }
+
+  .setting.disabled .title {
+    transition: color 0.3s;
+  }
+
+  .setting.disabled .title {
+    color: color-mix(in srgb, currentColor 50%, transparent);
   }
 </style>
