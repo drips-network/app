@@ -39,6 +39,9 @@ export const POST: RequestHandler = async ({ request }) => {
     error(400, 'Invalid payload');
   }
 
+  // eslint-disable-next-line no-console
+  console.log('REPO_OWNER_UPDATE', payload);
+
   const { forge, projectName, chainId } = payload;
 
   assert(isSupportedChainId(chainId), 'Unsupported chain id');
@@ -63,6 +66,9 @@ export const POST: RequestHandler = async ({ request }) => {
   const relay = new GelatoRelay();
 
   const relayResponse = await relay.sponsoredCall(relayRequest, GELATO_API_KEY);
+
+  // eslint-disable-next-line no-console
+  console.log('RELAY_RESPONSE', payload, relayResponse);
 
   return new Response(JSON.stringify(relayResponse));
 };
