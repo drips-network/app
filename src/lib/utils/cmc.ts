@@ -1,18 +1,6 @@
-import { error } from '@sveltejs/kit';
 import { getAddress } from 'ethers';
 import { z } from 'zod';
-
-const ensureOk = async (responsePromise: Promise<Response>): Promise<Response> => {
-  const intermediateResponse = await responsePromise;
-  if (!intermediateResponse.ok) {
-    const text = await intermediateResponse.text();
-    throw error(intermediateResponse.status, {
-      message: `Fetch response was not ok: ${intermediateResponse.url} ${text}`,
-    });
-  }
-
-  return responsePromise;
-};
+import ensureOk from './fetch-ensure-ok';
 
 export const getCmcPrices = async (tokenAddresses: string[], fetch = window.fetch) => {
   if (!tokenAddresses.length) {
