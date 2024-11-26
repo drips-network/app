@@ -11,3 +11,9 @@ export default async function ensureOk(responsePromise: Promise<Response>): Prom
 
   return responsePromise;
 }
+
+export function fetchOk(fetcher: typeof window.fetch) {
+  return (...args: Parameters<typeof fetcher>) => {
+    return ensureOk(fetcher(...args));
+  };
+}
