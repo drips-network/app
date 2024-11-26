@@ -34,6 +34,7 @@ export const GET = async ({ fetch }) => {
   ).json();
   const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsRes.result);
 
+  // TODO: DRY this up with cmc.ts
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
   const cmcIdMap = z.record(z.number()).parse(cmcIdMapRes);
 
