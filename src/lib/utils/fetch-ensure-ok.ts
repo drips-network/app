@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-export default async function ensureOk(responsePromise: Promise<Response>): Promise<Response> {
+export async function ensureResponseOk(responsePromise: Promise<Response>): Promise<Response> {
   const intermediateResponse = await responsePromise;
   if (!intermediateResponse.ok) {
     const text = await intermediateResponse.text();
@@ -12,8 +12,8 @@ export default async function ensureOk(responsePromise: Promise<Response>): Prom
   return responsePromise;
 }
 
-export function fetchOk(fetcher: typeof window.fetch) {
+export default function createOkFetcher(fetcher: typeof window.fetch) {
   return (...args: Parameters<typeof fetcher>) => {
-    return ensureOk(fetcher(...args));
+    return ensureResponseOk(fetcher(...args));
   };
 }

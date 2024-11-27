@@ -109,6 +109,8 @@ export const cachedTotalDrippedPrices = (
   );
 
   return cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {
+    // In this instance, if the underlying cmcPrice function fails, {} is returned and thus becomes cached
+    // so here, no error would be cached, only no data.
     return totalDrippedPrices(fetch);
   });
 };

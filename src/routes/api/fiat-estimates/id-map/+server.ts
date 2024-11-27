@@ -4,6 +4,7 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
 import { redis } from '../../redis';
 import cached from '$lib/utils/cache/remote/cached';
+import { ensureResponseOk } from '$lib/utils/fetch-ensure-ok';
 
 const cmcResponseSchema = z.object({
   data: z.array(
@@ -27,10 +28,13 @@ const COINMARKETCAP_ETHEREUM_PLATFORM_ID = 1;
 // TODO: Find some way to not fetch and send back the entire list of all tokens on CoinMarketCap,
 // but only the ones currently needed for estimates.
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ fetch }) => {
   const cmcIdMapRes = await cached(redis, 'cmc-id-map', 24 * 60 * 60, async () => {
-    const idMapRes = await fetch(
-      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,
+    // Now throws
+    const idMapRes = await ensureResponseOk(
+      fetch(
+        `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,
+      ),
     );
 
     return cmcResponseSchema.parse(await idMapRes.json());
