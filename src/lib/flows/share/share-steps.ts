@@ -1,4 +1,5 @@
 import { makeStep } from '$lib/components/stepper/types';
+import type configureProjectSupportButtonSteps from '../configure-project-support-button/configure-project-support-button-steps';
 import ShareUrl from './steps/share-url.svelte';
 import { type ComponentType } from 'svelte';
 
@@ -7,6 +8,7 @@ type ShareUrlProps = {
   downloadableImageUrl?: string;
   text?: string;
   shareModalText?: string | undefined;
+  supportButtonOptions?: Parameters<typeof configureProjectSupportButtonSteps>[0];
 };
 
 export type ShareOption = {

@@ -27,7 +27,7 @@
   import ProjectBadge, {
     PROJECT_BADGE_FRAGMENT,
   } from '$lib/components/project-badge/project-badge.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, type ComponentProps } from 'svelte';
   import Button from '../button/button.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import { gql } from 'graphql-request';
@@ -41,12 +41,7 @@
   export let project: ProjectProfileHeaderFragment;
   export let description: string | undefined = undefined;
   export let editButton: string | undefined = undefined;
-  export let shareButton:
-    | {
-        url: string;
-        downloadableImageUrl?: string;
-      }
-    | undefined = undefined;
+  export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
 
   export let pendingAvatar = false;
 
@@ -80,11 +75,7 @@
     {#if editButton || shareButton}
       <div class="actions">
         {#if shareButton}
-          <ShareButton
-            buttonVariant="normal"
-            url={shareButton.url}
-            downloadableImageUrl={shareButton.downloadableImageUrl}
-          />
+          <ShareButton buttonVariant="normal" {...shareButton} />
         {/if}
         {#if editButton}
           <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
