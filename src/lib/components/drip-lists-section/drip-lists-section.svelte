@@ -39,20 +39,16 @@
   let showHidden: boolean = false;
   $: hiddenListsCount = dripLists.filter((dl) => !dl.isVisible).length ?? 0;
 
-  $: dripListsAndVotingRounds = [
-    ...(showHidden
-      ? dripLists.map((dl) => ({ ...dl, type: 'drip-list' as const }))
-      : dripLists
-          .filter((dl) => dl.isVisible)
-          .map((dl) => ({ ...dl, type: 'drip-list' as const }))),
-    ...votingRounds.map((vr) => ({ ...vr, type: 'voting-round' as const })),
-    // Show hidden lists last.
-  ].sort((a, b) => {
-    if (showHidden && 'isVisible' in a && 'isVisible' in b) {
-      return a.isVisible === b.isVisible ? 0 : a.isVisible ? -1 : 1;
-    }
-    return 0;
-  });
+  $: visibleDripListsAndVotingRounds = [
+    ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []).filter(
+      (dl) => dl.isVisible,
+    ),
+    ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
+  ];
+
+  $: hiddenDripListsAndVotingRounds = showHidden
+    ? dripLists.filter((dl) => !dl.isVisible).map((dl) => ({ ...dl, type: 'drip-list' as const }))
+    : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
 </script>
@@ -80,7 +76,7 @@
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
-    empty: dripListsAndVotingRounds.length === 0,
+    empty: visibleDripListsAndVotingRounds.length === 0,
     error,
     emptyStateEmoji: '🫗',
     emptyStateHeadline: 'No Drip Lists',
@@ -90,19 +86,13 @@
     horizontalScroll: false,
   }}
 >
-  <svelte:fragment slot="left-actions">
-    {#if isOwner}
-      <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenListsCount} />
-    {/if}
-  </svelte:fragment>
-
-  {#if dripListsAndVotingRounds}
+  {#if visibleDripListsAndVotingRounds}
     <div
-      class="grid gap-6 grid-cols-1 padding pt-px {dripListsAndVotingRounds.length > 0
+      class="grid gap-6 grid-cols-1 padding pt-px {visibleDripListsAndVotingRounds.length > 0
         ? 'lg:grid-cols-2'
         : ''}"
     >
-      {#each dripListsAndVotingRounds as list}
+      {#each visibleDripListsAndVotingRounds as list}
         {@const matchingVotingRound =
           list.type === 'drip-list'
             ? votingRounds.find((vr) => vr.dripListId === list.account.accountId)
@@ -142,6 +132,24 @@
           </div>
         </div>
       {/if}
+    </div>
+
+    <div>
+      {#if isOwner}
+        <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenListsCount} />
+      {/if}
+    </div>
+
+    <div
+      class="grid gap-6 grid-cols-1 padding pt-px {hiddenDripListsAndVotingRounds.length > 0
+        ? 'lg:grid-cols-2'
+        : ''}"
+    >
+      {#each hiddenDripListsAndVotingRounds as list}
+        {#if list.type === 'drip-list'}
+          <DripListCard isHidden={!list.isVisible} listingMode data={{ dripList: list }} />
+        {/if}
+      {/each}
     </div>
   {/if}
 </Section>

@@ -34,16 +34,9 @@
   let showHidden: boolean = false;
   $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
 
-  $: projectsToShow = [
-    ...(showHidden ? projects : projects.filter((p) => p.isVisible))
-      // Show hidden projects last.
-      .sort((a, b) => {
-        if (showHidden && 'isVisible' in a && 'isVisible' in b) {
-          return a.isVisible === b.isVisible ? 0 : a.isVisible ? -1 : 1;
-        }
-        return 0;
-      }),
-  ];
+  $: visibleProjects = projects.filter((p) => p.isVisible);
+
+  $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
 </script>
@@ -76,9 +69,9 @@
       : 'This user hasnʼt claimed any software projects yet.',
   }}
 >
-  {#if projectsToShow}
+  {#if visibleProjects}
     <div class="projects">
-      {#each projectsToShow as project}
+      {#each visibleProjects as project}
         {@const projectChainData = filterCurrentChainData(project.chainData)}
         {#if isClaimed(projectChainData)}
           <div>
@@ -91,11 +84,22 @@
     </div>
   {/if}
 
-  <svelte:fragment slot="left-actions">
-    {#if isOwner}
-      <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount} />
-    {/if}
-  </svelte:fragment>
+  {#if isOwner}
+    <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount} />
+  {/if}
+
+  <div class="projects">
+    {#each hiddenProjects as project}
+      {@const projectChainData = filterCurrentChainData(project.chainData)}
+      {#if isClaimed(projectChainData)}
+        <div>
+          <PrimaryColorThemer colorHex={projectChainData.color}>
+            <ProjectCard {project} isHidden={!project.isVisible} />
+          </PrimaryColorThemer>
+        </div>
+      {/if}
+    {/each}
+  </div>
 </Section>
 
 <style>

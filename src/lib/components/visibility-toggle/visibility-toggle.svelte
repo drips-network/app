@@ -7,7 +7,7 @@
 </script>
 
 {#if hiddenItemsCount}
-  <div class="visibility-toggle">
+  <div class="visibility-toggle" class:showHidden>
     <Toggle bind:checked={showHidden} />
     <p>{message}</p>
     <div class="count"><span>{hiddenItemsCount}</span></div>
@@ -17,8 +17,8 @@
 <style>
   .visibility-toggle {
     display: flex;
-    justify-content: space-between;
     gap: 8px;
+    margin-top: 2.5rem;
   }
 
   .count {
@@ -29,5 +29,9 @@
 
   .count span {
     padding: 0.5rem 0.5rem;
+  }
+
+  .showHidden {
+    margin-bottom: 2.5rem;
   }
 </style>

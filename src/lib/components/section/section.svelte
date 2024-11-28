@@ -19,9 +19,7 @@
     bind:collapsed
     {...header}
     actionsDisabled={collapsed || header.actionsDisabled}
-  >
-    <slot name="left-actions" slot="left-actions"></slot>
-  </SectionHeader>
+  ></SectionHeader>
   <div>
     <SectionSkeleton bind:this={skeletonInstance} bind:collapsed {...skeleton}>
       <slot />

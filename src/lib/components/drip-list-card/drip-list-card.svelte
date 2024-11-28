@@ -251,9 +251,12 @@
               buttonVariant="normal"
               url="{BASE_URL}{dripListUrl}"
               {downloadableImageUrl}
+              disabled={!dripList?.isVisible}
             />
             {#if isOwnList}
-              <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+              <Button disabled={!dripList?.isVisible} on:click={triggerEditModal} icon={Pen}
+                >Edit list</Button
+              >
             {/if}
           </div>
         {/if}

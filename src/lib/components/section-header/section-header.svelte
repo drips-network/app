@@ -53,8 +53,6 @@
     {/if}
   </div>
   <div class="actions">
-    <slot name="left-actions"></slot>
-
     {#each actions as action}
       <Button
         disabled={actionsDisabled}
