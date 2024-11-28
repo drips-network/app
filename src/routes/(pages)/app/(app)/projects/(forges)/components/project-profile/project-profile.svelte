@@ -246,12 +246,13 @@
 
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 
+  $: origin = browser ? window.location.origin : '';
   $: supportButtonStepConfig = {
     projectSourceUrl: project.source.url,
     supportButtonData: {
       dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
       projectName: project.source.repoName,
-      projectUrl: `https://drips.network${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
+      projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
       projectData: chainData as SupportButtonData['projectData'],
     },
   };
@@ -372,7 +373,7 @@
           {description}
           editButton={isClaimed(chainData) && isOwnProject ? 'Edit' : undefined}
           shareButton={{
-            url: `https://drips.network${buildProjectUrl(
+            url: `${origin}${buildProjectUrl(
               Forge.GitHub,
               project.source.ownerName,
               project.source.repoName,
