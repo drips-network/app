@@ -24,6 +24,7 @@ import {
 } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
+import { ensureResponseOk } from '$lib/utils/fetch';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -99,7 +100,7 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
   };
 
   const fetchTlv = async () => {
-    return (await f('/api/tlv')).json();
+    return (await ensureResponseOk(f('/api/tlv'))).json();
   };
 
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
@@ -108,18 +109,10 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     6 * 60 * 60, // Change the cache expiration time to 6 hours
     async () =>
       Promise.all([
-        // Certainly could fail, return a 500, but then it might not be parsable as json
         fetchBlogPosts(),
-        // Hopefully throws because of underlying client
         fetchProjects(),
-        // Hopefully throws because of underlying client
         fetchFeaturedLists(),
-        // Doesn't throw, but returns {} if underlying thing fails
         cachedTotalDrippedPrices(redis, f),
-        // Call to etherscan or call can fail and produce a 500, which would be cached
-        // Sub-call to id-map fails loudly, but then this would just return a 500, which would be cached
-        // Sub-call to prices can fail variously, which would produce a 500 and get cached
-        // Hopefully the json parsing would fail?
         fetchTlv(),
       ]),
   );
@@ -135,9 +128,3 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     blockWhileInitializing: false,
   };
 }
-
-// So yeah what do?
-// I'm trying not to unravel everything at this point
-// it's getting a little hard because of the call depth, it makes the visibility a bit difficult
-// If we move these things out to functions instead of calling the http methods then we get rid of at least some
-// level of fetch handling. The underlyinggggggg implementations can handle whatever they want

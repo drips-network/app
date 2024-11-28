@@ -4,7 +4,7 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
 import { redis } from '../../redis';
 import cached from '$lib/utils/cache/remote/cached';
-import { ensureResponseOk } from '$lib/utils/fetch-ensure-ok';
+import { ensureResponseOk } from '$lib/utils/fetch';
 
 const cmcResponseSchema = z.object({
   data: z.array(
