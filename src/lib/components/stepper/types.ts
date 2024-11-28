@@ -1,6 +1,4 @@
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-import type { TypedDataDomain } from 'ethers';
-import type { TypedDataField } from 'ethers';
 import type { TransactionLike } from 'ethers';
 import type { TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
@@ -8,10 +6,7 @@ import type { ComponentType, SvelteComponent } from 'svelte';
 export type TransactionWrapper = {
   title: string;
   transaction: TransactionLike;
-  gasless?: {
-    domain: TypedDataDomain;
-    types: Record<string, Array<TypedDataField>>;
-  } | undefined; // if passing domain and types, will attempt to relay TX gaslessly
+  gasless?: boolean;
   applyGasBuffer: boolean;
 };
 

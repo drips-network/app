@@ -34,6 +34,11 @@
   import type { ProgressFn } from '$lib/components/progress-bar/progress-bar.svelte';
   import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
   import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
+  import expect from '$lib/utils/expect';
+  import { Contract } from 'ethers';
+  import { callerAbi } from '$lib/utils/sdk/caller/caller-abi';
+  import Gas from '$lib/components/icons/Gas.svelte';
+  import Logo from '$lib/components/illustrations/logo.svelte';
 
   const dispatchResult = createEventDispatcher<{ result: Result }>();
   const dispatchStartOver = createEventDispatcher<{ startOver: void }>();
@@ -48,6 +53,7 @@
         title: string;
         message: string;
         txUrl?: string;
+        gasless?: boolean;
         status:
           | 'awaitingPrevious'
           | 'awaitingSignature'
@@ -65,6 +71,7 @@
         message?: string;
         title: string;
         progressFn: ProgressFn;
+        gasless?: boolean;
         status: 'awaitingPrevious' | 'pending' | 'failed' | 'confirmed';
       };
 
@@ -318,31 +325,118 @@
           message: 'Waiting for you to confirm in your wallet',
         });
 
-        // const domain = {
-        //   name: 'Caller',
-        //   version: '1',
-        //   chainId: 1, // Replace with the actual chain ID
-        //   verifyingContract: '0x...', // Address of the Caller contract
-        // };
-
-        // const types = {
-        //   CallSigned: [
-        //     { name: 'sender', type: 'address' },
-        //     { name: 'target', type: 'address' },
-        //     { name: 'data', type: 'bytes' },
-        //     { name: 'value', type: 'uint256' },
-        //     { name: 'nonce', type: 'uint256' },
-        //     { name: 'deadline', type: 'uint256' },
-        //   ],
-        // };
-
-        // executingTx.gasless
         if (executingTx.gasless) {
-          const { domain, types } = executingTx.gasless;
+          const domain = {
+            name: 'Caller',
+            version: '1',
+            chainId: network.chainId,
+            verifyingContract: networkConfig.contracts.CALLER,
+          };
 
-          console.log(domain, types, executingTx.transaction)
-          const sig = await signer.signTypedData(domain, types, executingTx.transaction);
-          console.log(sig);
+          const types = {
+            CallSigned: [
+              {
+                name: 'sender',
+                type: 'address',
+              },
+              {
+                name: 'target',
+                type: 'address',
+              },
+              {
+                name: 'data',
+                type: 'bytes',
+              },
+              {
+                name: 'value',
+                type: 'uint256',
+              },
+              {
+                name: 'nonce',
+                type: 'uint256',
+              },
+              {
+                name: 'deadline',
+                type: 'uint256',
+              },
+            ],
+          };
+
+          const { data, to } = executingTx.transaction;
+          assert(data, 'Expected data to be defined');
+
+          const { provider } = get(walletStore);
+          const caller = new Contract(networkConfig.contracts.CALLER, callerAbi, provider);
+
+          const nonce = await caller.nonce(address);
+
+          const payload = {
+            sender: address,
+            target: to,
+            data,
+            value: 0,
+            nonce: Number(nonce),
+            // 1 hour in seconds
+            deadline: Math.floor(Date.now() / 1000) + 3600,
+          };
+
+          const sig = await signer.signTypedData(domain, types, payload);
+
+          updateTransactionTimelineStatus(executingTx, {
+            status: 'pending',
+            message: 'Submitting transaction',
+          });
+
+          const gaslessCallRes = await fetch('/api/gasless/call', {
+            method: 'POST',
+            body: JSON.stringify({
+              targetContractAddress: to,
+              callData: data,
+              payload,
+              eip712Signature: sig,
+            }),
+          });
+          const body = await gaslessCallRes.json();
+          const { taskId } = body;
+
+          const gaslessCallExpectation = await expect(
+            async () => {
+              const res = await fetch(`/api/gasless/track/${taskId}`);
+              if (!res.ok) throw new Error('Failed to track gasless owner update task');
+
+              const { task } = await res.json();
+              assert(typeof task === 'object', 'Invalid task');
+              const { taskState, transactionHash } = task;
+              assert(typeof taskState === 'string', 'Invalid task state');
+
+              if (transactionHash) {
+                updateTransactionTimelineStatus(executingTx, {
+                  status: 'pending',
+                  message: 'Waiting for confirmation',
+                  txUrl: networkConfig.explorer.linkTemplate(transactionHash, network.name),
+                });
+              }
+
+              return { taskState, task };
+            },
+            ({ taskState, task }) => {
+              switch (taskState) {
+                case 'ExecSuccess':
+                  return true;
+                case 'Cancelled':
+                  throw new Error(`Gasless transaction failed: ${JSON.stringify(task)}`);
+                default:
+                  return false;
+              }
+            },
+            600000,
+            2000,
+          );
+
+          if (gaslessCallExpectation.failed) {
+            throw new Error('The gasless call did not resolve within the expected timeframe.');
+          }
+
           break;
         }
 
@@ -583,6 +677,7 @@
         ...externalTxs.map((etx) => ({
           external: true as const,
           title: etx.title,
+          gasless: true,
           progressFn: () => ({
             progressFraction: 0,
             remainingText: 'Waiting on previous transaction',
@@ -591,6 +686,7 @@
         })),
         {
           external: false,
+          gasless: false,
           title: lastTransaction.title,
           message: 'Waiting for you to submit the transaction in your Safe',
           status: externalTxs.length > 0 ? 'awaitingPrevious' : 'awaitingSignature',
@@ -602,6 +698,7 @@
           ? {
               external: true as const,
               title: tx.title,
+              gasless: true,
               progressFn: () => ({
                 progressFraction: 0,
                 remainingText: 'Waiting on previous transaction',
@@ -611,6 +708,7 @@
           : {
               external: false,
               title: tx.title,
+              gasless: tx.gasless,
               message:
                 index === 0
                   ? 'Waiting for you to confirm the transaction in your wallet'
@@ -698,6 +796,20 @@
                     </div>
                   {/if}
                 </div>
+
+                <!-- Gasless indicator -->
+                {#if transactionStatusItem.gasless}
+                  <div class="gasless-notice">
+                    <Gas />
+                    Gas fee $0.00
+                    <div class="gasless-badge">
+                      PAID FOR BY
+                      <div class="logo-wrapper">
+                        <Logo style="fill: var(--color-primary-level-6)" />
+                      </div>
+                    </div>
+                  </div>
+                {/if}
 
                 <!-- Status message row -->
                 <div class="tx-info typo-text">
@@ -1012,6 +1124,30 @@
     align-items: center;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .gasless-notice {
+    display: flex;
+    gap: 0.5rem;
+    color: var(--color-foreground-level-5);
+  }
+
+  .logo-wrapper {
+    display: flex;
+    width: 2.9rem;
+  }
+
+  .gasless-badge {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    background-color: var(--color-primary-level-1);
+    color: var(--color-foreground-level-6);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    height: 1.5rem;
   }
 
   @media (max-width: 577px) {
