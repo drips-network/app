@@ -1,12 +1,17 @@
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
+import type { TypedDataDomain } from 'ethers';
+import type { TypedDataField } from 'ethers';
 import type { TransactionLike } from 'ethers';
 import type { TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
-import type { Nullable } from 'vitest';
 
 export type TransactionWrapper = {
   title: string;
   transaction: TransactionLike;
+  gasless?: {
+    domain: TypedDataDomain;
+    types: Record<string, Array<TypedDataField>>;
+  } | undefined; // if passing domain and types, will attempt to relay TX gaslessly
   applyGasBuffer: boolean;
 };
 
@@ -50,14 +55,14 @@ export interface TransactPayload<T> {
 }
 
 export type SomeTransactPayload = <R>(
-  payload: <T extends Nullable<BeforeFunc>>(transactPayload: TransactPayload<T>) => R,
+  payload: <T extends BeforeFunc | undefined>(transactPayload: TransactPayload<T>) => R,
 ) => R;
 
 export type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
 type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
 
-export function makeTransactPayload<T extends Nullable<BeforeFunc>>(
+export function makeTransactPayload<T extends BeforeFunc | undefined>(
   i: TransactPayload<T>,
 ): SomeTransactPayload {
   return (cb) => cb(i);

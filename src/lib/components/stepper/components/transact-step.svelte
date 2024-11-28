@@ -316,6 +316,34 @@
           message: 'Waiting for you to confirm in your wallet',
         });
 
+        // const domain = {
+        //   name: 'Caller',
+        //   version: '1',
+        //   chainId: 1, // Replace with the actual chain ID
+        //   verifyingContract: '0x...', // Address of the Caller contract
+        // };
+
+        // const types = {
+        //   CallSigned: [
+        //     { name: 'sender', type: 'address' },
+        //     { name: 'target', type: 'address' },
+        //     { name: 'data', type: 'bytes' },
+        //     { name: 'value', type: 'uint256' },
+        //     { name: 'nonce', type: 'uint256' },
+        //     { name: 'deadline', type: 'uint256' },
+        //   ],
+        // };
+
+        // executingTx.gasless
+        if (executingTx.gasless) {
+          const { domain, types } = executingTx.gasless;
+
+          console.log(domain, types, executingTx.transaction)
+          const sig = await signer.signTypedData(domain, types, executingTx.transaction);
+          console.log(sig);
+          break;
+        }
+
         const txResponse = await (signer ?? unreachable()).sendTransaction({
           ...executingTx.transaction,
           gasLimit: executingTx.gasLimit ?? executingTx.transaction.gasLimit,

@@ -11,6 +11,7 @@ import tokensStore from '$lib/stores/tokens/tokens.store';
 import unreachable from '$lib/utils/unreachable';
 import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
 import network from '$lib/stores/wallet/network';
+import { addressDriverAbi } from '$lib/utils/sdk/address-driver/address-driver-abi';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
@@ -78,6 +79,20 @@ export default function (
         {
           transaction: setStreamsPopulatedTx,
           title: `Top up ${tokenInfo.symbol}`,
+          gasless: {
+            domain: {
+              name: 'Drips AddressDriver',
+              version: '1',
+              chainId: network.chainId,
+              verifyingContract: network.contracts.ADDRESS_DRIVER,
+            },
+            types: {
+              SetStreams: addressDriverAbi[30].inputs.map((v) => ({
+                name: v.name,
+                type: v.type,
+              })),
+            },
+          },
           applyGasBuffer: true,
         },
       ],
