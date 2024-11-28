@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
-import { fetchBlogPosts } from './posts';
+import { fetchRawBlogPosts } from '../../../../lib/utils/blog-posts';
 
 export const GET = async () => {
-  const posts = await fetchBlogPosts();
+  const posts = await fetchRawBlogPosts();
   return json(posts);
 };
 

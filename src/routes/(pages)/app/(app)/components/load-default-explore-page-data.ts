@@ -23,7 +23,7 @@ import {
   SortDirection,
 } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
-import { fetchBlogPosts } from '../../../../api/blog/posts/posts';
+import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 
 const FEATURED_DRIP_LISTS =
   {
