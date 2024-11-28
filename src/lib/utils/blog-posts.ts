@@ -2,7 +2,7 @@ import { compile } from 'mdsvex';
 import assert from '$lib/utils/assert';
 import { metadataSchema } from '../../routes/api/blog/posts/schema';
 
-const getSlug = (path: string): string => {
+export const getSlug = (path: string): string => {
   const slug = path.split('/').pop()?.slice(0, -3);
   assert(slug);
 
