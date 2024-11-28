@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
   import ShareIcon from '$lib/components/icons/Sharrow.svelte';
   import Button from '../button/button.svelte';
   import { onMount, type ComponentProps } from 'svelte';
@@ -12,11 +11,11 @@
   export let downloadableImageUrl: string = '';
   export let shareModalText: string | undefined = undefined;
   export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
+  export let supportButtonOptions:
+    | Parameters<typeof shareSteps>[0]['supportButtonOptions']
+    | undefined = undefined;
 
   export let shareLabel = 'Share';
-
-  let shareSupported = browser && navigator.share;
-  let isTouchDevice = browser && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   async function preloadImage(url: string) {
     try {
@@ -31,15 +30,6 @@
   }
 
   function handleClick() {
-    if (isTouchDevice && shareSupported) {
-      navigator.share({
-        text,
-        url,
-      });
-
-      return;
-    }
-
     modal.show(
       Stepper,
       undefined,
@@ -48,6 +38,7 @@
         url,
         downloadableImageUrl,
         shareModalText,
+        supportButtonOptions,
       }),
     );
   }

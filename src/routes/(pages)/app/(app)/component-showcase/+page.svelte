@@ -46,6 +46,7 @@
   import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
   import modal from '$lib/stores/modal';
   import ExampleTransactStep from './examples/example-transact/example-transact-step.svelte';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   // Button
   let disabled = false;
@@ -87,6 +88,7 @@
   // Amount
   let amount = '1000000000000000000';
   let tokenAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
+  let includeExtraStreamPrecisionMultiplier = false;
 
   // Project Badge
   let projectVerified = true;
@@ -744,6 +746,8 @@
     <TextInput bind:value={amount} />
     <p>Token Address</p>
     <TextInput bind:value={tokenAddress} />
+    <p>Include stream precision multiplier</p>
+    <input type="checkbox" bind:checked={includeExtraStreamPrecisionMultiplier} />
   </div>
   <p>Output:</p>
   <Amount
@@ -751,6 +755,9 @@
       amount: BigInt(amount),
       tokenAddress,
     }}
+    multiplier={includeExtraStreamPrecisionMultiplier
+      ? BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER)
+      : 1n}
   />
 </div>
 

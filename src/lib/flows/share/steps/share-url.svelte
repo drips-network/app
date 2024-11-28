@@ -13,11 +13,20 @@
   import { browser } from '$app/environment';
   import { type ShareOption } from '../share-steps';
   import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
+  import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
+  import Settings from '$lib/components/icons/Settings.svelte';
+  import { createEventDispatcher } from 'svelte';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
+
+  const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let url: string;
   export let downloadableImageUrl: string | undefined = undefined;
   export let text: string | undefined = undefined;
   export let shareModalText: string = 'Share this on a network of your choice below.';
+  export let supportButtonOptions:
+    | Parameters<typeof configureProjectSupportButtonSteps>[0]
+    | undefined = undefined;
 
   const shareText = text || '';
 
@@ -89,6 +98,12 @@
     const extension = getUrlExtension(window.location.origin + downloadableImageUrl);
     downloadUrl(downloadableImageUrl, `${title}.${extension}`);
   }
+
+  function handleEmbedButtonConfigureClick() {
+    if (!supportButtonOptions) return;
+
+    dispatch('sidestep', configureProjectSupportButtonSteps(supportButtonOptions));
+  }
 </script>
 
 <StepLayout>
@@ -103,7 +118,7 @@
         </span>
       </div>
     {/if}
-    <div class="share-options pixelated">
+    <div class="share-options">
       <h2 class="pixelated">Share</h2>
       <p>{shareModalText}</p>
       <div class="share-options__options">
@@ -121,13 +136,34 @@
         {/each}
       </div>
     </div>
+    {#if supportButtonOptions}
+      <div class="embed-options">
+        <div>
+          <h2 class="pixelated">Embed</h2>
+          <p>Embed a support button on your website or README.</p>
+        </div>
+        <div
+          style:display="flex"
+          style:justify-content="space-around"
+          style:flex-direction="column"
+        >
+          <Button icon={Settings} justify="left" on:click={handleEmbedButtonConfigureClick}
+            >Configure</Button
+          >
+        </div>
+      </div>
+    {/if}
   </div>
 </StepLayout>
 
 <style>
+  .share-url {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
   .downloadable-image {
     position: relative;
-    margin-bottom: 2rem;
   }
 
   .downloadable-image__card {
@@ -148,8 +184,15 @@
     bottom: -1rem;
   }
 
-  .share-options {
+  .share-options,
+  .embed-options {
     text-align: left;
+  }
+
+  .embed-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
   .share-options__options {
@@ -157,5 +200,11 @@
     grid-template-columns: auto auto;
     gap: 1rem;
     margin-top: 2rem;
+  }
+
+  @media (max-width: 600px) {
+    .embed-options {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

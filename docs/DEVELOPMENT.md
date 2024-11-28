@@ -49,6 +49,18 @@ npm run dev
 npm run dev -- --open
 ```
 
+You can also start the local development server with docker:
+
+```bash
+# build the image
+npm run build:docker
+
+# and then run it
+npm run dev:docker
+```
+
+The docker dev server supports hot-reloading and has the advantage of more closely emulating the deployment environment.
+
 ## 🏗️ Building
 
 To create a production version of the app:
@@ -108,7 +120,7 @@ Stop the local environment by running:
 Docker is configured to always build the Drips Event Processor and Drips GraphQL API images from the latest `main` branch commit. When you run the local env, it will automatically check for newer commits and rebuild the images if necessary. If you want to use a different branch of either of these services, you can customize the branch used by specifying environment variables:
 
 ```sh
-GQL_API_BRANCH=main EVENTS_PROCESSOR_BRANCH=main 
+GQL_API_BRANCH=main EVENTS_PROCESSOR_BRANCH=main
 ```
 
 ##### Connecting the app to the local mocked env

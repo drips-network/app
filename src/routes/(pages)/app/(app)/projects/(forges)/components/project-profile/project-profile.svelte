@@ -134,6 +134,9 @@
     SUPPORTER_PILE_FRAGMENT,
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
+  import Settings from '$lib/components/icons/Settings.svelte';
+  import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -242,6 +245,24 @@
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
+
+  $: origin = browser ? window.location.origin : '';
+  $: supportButtonStepConfig = {
+    projectSourceUrl: project.source.url,
+    supportButtonData: {
+      dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
+      projectName: project.source.repoName,
+      projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
+      projectData: chainData as SupportButtonData['projectData'],
+    },
+  };
+
+  function handleEmbedButtonConfigureClick() {
+    // don't focus the first selectable element
+    // restored when modal is hidden
+    modal.setFocusTrapped(false);
+    modal.show(Stepper, undefined, configureProjectSupportButtonSteps(supportButtonStepConfig));
+  }
 </script>
 
 <HeadMeta
@@ -323,6 +344,7 @@
             <ShareButton
               url={browser ? window.location.href : ''}
               downloadableImageUrl="{imageBaseUrl}?target=og"
+              supportButtonOptions={supportButtonStepConfig}
             />
             <Button
               size="small"
@@ -351,12 +373,13 @@
           {description}
           editButton={isClaimed(chainData) && isOwnProject ? 'Edit' : undefined}
           shareButton={{
-            url: `https://drips.network${buildProjectUrl(
+            url: `${origin}${buildProjectUrl(
               Forge.GitHub,
               project.source.ownerName,
               project.source.repoName,
               false,
             )}`,
+            supportButtonOptions: supportButtonStepConfig,
             downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }}
           on:editButtonClick={() =>
@@ -403,6 +426,16 @@
             </a>
           {/if}
         </div>
+        {#if isOwnProject}
+          <AnnotationBox type="info">
+            Embed a support button on your website.
+            <svelte:fragment slot="actions">
+              <Button variant="primary" icon={Settings} on:click={handleEmbedButtonConfigureClick}
+                >Configure</Button
+              >
+            </svelte:fragment>
+          </AnnotationBox>
+        {/if}
       {/if}
     </header>
     <div class="content">

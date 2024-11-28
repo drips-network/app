@@ -78,6 +78,9 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     error(400, 'Invalid payload');
   }
 
+  // eslint-disable-next-line no-console
+  console.log('REPO_OWNER_UPDATE', payload);
+
   const { forge, projectName, chainId } = payload;
 
   assert(network.chainId === chainId, 'Unsupported chain id');
@@ -153,12 +156,17 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     const relayResponse = await relay.sponsoredCall(relayRequest, GELATO_API_KEY);
     const { taskId } = relayResponse;
 
+    // eslint-disable-next-line no-console
+    console.log('RELAY_RESPONSE', payload, relayResponse);
+
     redis.set(blockKey, taskId, {
       EX: 60 * 60 * 24, // 1 day
     });
 
     return new Response(JSON.stringify(relayResponse));
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
     return error(500, e instanceof Error ? e : 'Unknown error');
   }
 };

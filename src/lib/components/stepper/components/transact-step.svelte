@@ -62,6 +62,7 @@
       }
     | {
         external: true;
+        message?: string;
         title: string;
         progressFn: ProgressFn;
         status: 'awaitingPrevious' | 'pending' | 'failed' | 'confirmed';
@@ -300,6 +301,7 @@
 
           updateTransactionTimelineStatus(executingTx, {
             status: 'failed',
+            message: 'Failed',
           });
 
           error = e as Error;
@@ -706,16 +708,18 @@
                       </div>
                       <div>{transactionStatusItem.message}</div>
                     </div>
-                  {:else if transactionStatusItem.external === false && transactionStatusItem.status === 'failed'}
+                  {:else if transactionStatusItem.status === 'failed'}
                     <div class="status errored">
                       <div class="icon failure">
                         <ExclamationCircle style="fill: var(--color-negative)" />
                       </div>
                       {transactionStatusItem.message}
-                      <TxLink
-                        explorerName={networkConfig.explorer.name}
-                        url={transactionStatusItem.txUrl}
-                      />
+                      {#if transactionStatusItem.external === false}
+                        <TxLink
+                          explorerName={networkConfig.explorer.name}
+                          url={transactionStatusItem.txUrl}
+                        />
+                      {/if}
                       <button
                         style="margin-left: 0.5rem;"
                         on:click={() => toggleErrorDetails(index)}
@@ -753,12 +757,7 @@
                     </div>
                   {:else if transactionStatusItem.external === true}
                     <div out:slide={{ duration: 300 }}>
-                      <ProgressBar
-                        progressFn={transactionStatusItem.progressFn}
-                        errorMessage={transactionStatusItem.status === 'failed'
-                          ? 'Something went wrong. Please reach out to us on Discord.'
-                          : undefined}
-                      />
+                      <ProgressBar progressFn={transactionStatusItem.progressFn} />
                     </div>
                   {/if}
                 </div>

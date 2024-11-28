@@ -35,6 +35,7 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import wallet from '$lib/stores/wallet/wallet.store';
 
   export let user: HeaderUserFragment | null;
 
@@ -50,6 +51,7 @@
 
   let networkPickerExpanded = false;
   $: connected = $walletStore.connected;
+  $: safeAppMode = Boolean($wallet.safe);
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
@@ -107,7 +109,7 @@
         </a>
       {/if}
 
-      {#if network.displayNetworkPicker}
+      {#if network.displayNetworkPicker && !safeAppMode}
         <div class="network-picker">
           <div class="desktop-only">
             <div class="network-picker-flyout">

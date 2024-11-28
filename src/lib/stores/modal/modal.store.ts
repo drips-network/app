@@ -51,6 +51,8 @@ export const hide = (): void => {
   overlayStore.set(null);
 
   window.onbeforeunload = null;
+  // restore focus trap setting
+  setFocusTrapped(true);
 };
 
 /**
