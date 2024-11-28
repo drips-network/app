@@ -30,7 +30,6 @@ const COINMARKETCAP_ETHEREUM_PLATFORM_ID = 1;
 
 export const GET: RequestHandler = async ({ fetch }) => {
   const cmcIdMapRes = await cached(redis, 'cmc-id-map', 24 * 60 * 60, async () => {
-    // Now throws
     const idMapRes = await ensureResponseOk(
       fetch(
         `https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=${COINMARKETCAP_API_KEY}`,
