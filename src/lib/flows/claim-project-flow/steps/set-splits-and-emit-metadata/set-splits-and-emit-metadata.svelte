@@ -195,8 +195,11 @@
             });
           }
 
+          const { safe } = $walletStore;
+
           transactions.push({
             transaction: tx,
+            gasless: !safe,
             applyGasBuffer: false,
             title: 'Set project splits and metadata',
           });

@@ -78,7 +78,6 @@ export default function (
         {
           transaction: setStreamsPopulatedTx,
           title: `Top up ${tokenInfo.symbol}`,
-          gasless: true,
           applyGasBuffer: true,
         },
       ],

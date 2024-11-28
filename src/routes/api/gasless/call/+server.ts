@@ -133,6 +133,60 @@ function inferActionType(calldata: string, contractName: string): SupportedGasle
       break;
     }
     case 'CALLER': {
+      if (parseRes.name !== 'callBatched') return null;
+
+      const [calls] = parseRes.args;
+
+      const parseCallsResult = z
+        .array(z.tuple([z.string(), z.string(), z.bigint()]))
+        .safeParse(calls);
+      if (!parseCallsResult.success) return null;
+
+      const parsedCalls = parseCallsResult.data;
+
+      // Check whether the batch includes the expected:
+      // 1. Set splits
+      // 2. Emit account metadata
+      // 3 [...] x : Any number of split calls
+      // x [...] y : Any number of collect calls
+      for (const [index, [target, calldata]] of parsedCalls.entries()) {
+        // Ensure the call is to RepoDriver
+        if (
+          target.toLowerCase() !==
+          NETWORK_CONFIG[network.chainId].contracts.REPO_DRIVER.toLowerCase()
+        ) {
+          return null;
+        }
+
+        // Parse the calldata
+        const repoDriverIface = new Interface(repoDriverAbi);
+        const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
+
+        if (!repoDriverParseRes) return null;
+
+        switch (index) {
+          case 0: {
+            if (repoDriverParseRes.name !== 'setSplits') {
+              return null;
+            }
+            break;
+          }
+          case 1: {
+            if (repoDriverParseRes.name !== 'emitAccountMetadata') {
+              return null;
+            }
+            break;
+          }
+          default: {
+            if (!(repoDriverParseRes.name === 'split' || repoDriverParseRes.name === 'collect')) {
+              return null;
+            }
+          }
+        }
+
+        return SupportedGaslessAction.CLAIM_PROJECT;
+      }
+
       break;
     }
     default:
