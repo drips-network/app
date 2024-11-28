@@ -2,14 +2,13 @@ import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { redis } from '../api/redis';
-import { metadataSchema } from '../api/blog/posts/schema';
-import assert from '$lib/utils/assert';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
 import query from '$lib/graphql/dripsQL';
 import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
 import { gql } from 'graphql-request';
 import { PUBLIC_NETWORK } from '$env/static/public';
 import network from '$lib/stores/wallet/network';
+import { fetchBlogPosts } from '$lib/utils/blog-posts';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -72,22 +71,7 @@ export const load = (async ({ fetch, request }) => {
   const [prices, featuredLists, blogPosts] = await Promise.all([
     cachedTotalDrippedPrices(redis, fetch),
     fetchFeaturedLists(),
-    // TODO: dry with getBlogPosts
-    Promise.all(
-      Object.entries(import.meta.glob('/src/blog-posts/*.md')).map(async ([path, resolver]) => {
-        const resolved = await resolver();
-
-        assert(typeof resolved === 'object' && resolved && 'metadata' in resolved);
-
-        const metadata = metadataSchema.parse(resolved.metadata);
-
-        const slug = path.split('/').pop()?.slice(0, -3);
-
-        assert(slug);
-
-        return { ...metadata, slug };
-      }),
-    ),
+    fetchBlogPosts(),
   ]);
 
   return {
