@@ -246,25 +246,21 @@
 
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 
-  function handleClick() {
+  $: supportButtonStepConfig = {
+    projectSourceUrl: project.source.url,
+    supportButtonData: {
+      dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
+      projectName: project.source.repoName,
+      projectUrl: `https://drips.network${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
+      projectData: chainData as SupportButtonData['projectData'],
+    },
+  };
+
+  function handleEmbedButtonConfigureClick() {
     // don't focus the first selectable element
     // restored when modal is hidden
     modal.setFocusTrapped(false);
-    modal.show(
-      Stepper,
-      undefined,
-      configureProjectSupportButtonSteps({
-        projectSourceUrl: project.source.url,
-        supportButtonData: {
-          dependencies: isClaimed(chainData)
-            ? chainData.splits.dependencies.length.toString()
-            : '0',
-          projectName: project.source.repoName,
-          projectUrl: `https://drips.network${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
-          projectData: chainData as SupportButtonData['projectData'],
-        },
-      }),
-    );
+    modal.show(Stepper, undefined, configureProjectSupportButtonSteps(supportButtonStepConfig));
   }
 </script>
 
@@ -347,6 +343,7 @@
             <ShareButton
               url={browser ? window.location.href : ''}
               downloadableImageUrl="{imageBaseUrl}?target=og"
+              supportButtonOptions={supportButtonStepConfig}
             />
             <Button
               size="small"
@@ -381,6 +378,7 @@
               project.source.repoName,
               false,
             )}`,
+            supportButtonOptions: supportButtonStepConfig,
             downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }}
           on:editButtonClick={() =>
@@ -431,7 +429,9 @@
           <AnnotationBox type="info">
             Embed a support button on your website.
             <svelte:fragment slot="actions">
-              <Button variant="primary" icon={Settings} on:click={handleClick}>Configure</Button>
+              <Button variant="primary" icon={Settings} on:click={handleEmbedButtonConfigureClick}
+                >Configure</Button
+              >
             </svelte:fragment>
           </AnnotationBox>
         {/if}

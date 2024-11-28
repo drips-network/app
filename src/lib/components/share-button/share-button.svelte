@@ -12,6 +12,9 @@
   export let downloadableImageUrl: string = '';
   export let shareModalText: string | undefined = undefined;
   export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
+  export let supportButtonOptions:
+    | Parameters<typeof shareSteps>[0]['supportButtonOptions']
+    | undefined = undefined;
 
   export let shareLabel = 'Share';
 
@@ -48,6 +51,7 @@
         url,
         downloadableImageUrl,
         shareModalText,
+        supportButtonOptions,
       }),
     );
   }
