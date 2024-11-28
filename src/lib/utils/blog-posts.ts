@@ -9,7 +9,6 @@ export const getSlug = (path: string): string => {
   return slug;
 };
 
-// TODO: rename/move this file
 export const fetchRawBlogPosts = async () => {
   return Promise.all(
     Object.entries(import.meta.glob('/src/blog-posts/*.md', { as: 'raw' })).map(

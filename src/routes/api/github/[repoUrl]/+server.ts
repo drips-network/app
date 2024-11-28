@@ -34,7 +34,6 @@ export const GET: RequestHandler = async ({ params }) => {
     const lowercaseRepoUrl = repoUrl.toLowerCase();
 
     const repo = await cached(redis, lowercaseRepoUrl, 86400, async () => {
-      // Assuming github's client knows to throw an error if something happens
       const repo = await github.getRepoByUrl(repoUrl);
 
       return repo;

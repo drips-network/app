@@ -37,7 +37,6 @@ async function fetchDripsProject(repoUrl: string) {
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
 
   return await cached(redis, cacheKey, 172800, () =>
-    // should throw if underlying client knows what it's doing
     query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
       getProjectsQuery,
       {

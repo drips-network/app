@@ -1,13 +1,11 @@
 import { getAddress } from 'ethers';
 import { z } from 'zod';
-// import createOkFetcher from './fetch-ensure-ok';
 
 export const getCmcPrices = async (tokenAddresses: string[], fetch = window.fetch) => {
   if (!tokenAddresses.length) {
     return {};
   }
 
-  // fetch = createOkFetcher(fetch);
   try {
     // get id map and ensure the response does not indicate an error
     const idMapResponse = await fetch('/api/fiat-estimates/id-map');
