@@ -20,6 +20,8 @@
   import modal from '$lib/stores/modal';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
+  import checkIsUser from '$lib/utils/check-is-user';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -42,6 +44,8 @@
         return 0;
       }),
   ];
+
+  $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
 </script>
 
 <Section
@@ -88,7 +92,9 @@
   {/if}
 
   <svelte:fragment slot="left-actions">
-    <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount}></VisibilityToggle>
+    {#if isOwner}
+      <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount} />
+    {/if}
   </svelte:fragment>
 </Section>
 

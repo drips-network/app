@@ -23,6 +23,8 @@
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
   import type { SplitsComponentSplitsReceiver } from '../splits/types';
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
+  import checkIsUser from '$lib/utils/check-is-user';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -51,6 +53,8 @@
     }
     return 0;
   });
+
+  $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
 </script>
 
 <Section
@@ -87,7 +91,9 @@
   }}
 >
   <svelte:fragment slot="left-actions">
-    <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenListsCount} />
+    {#if isOwner}
+      <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenListsCount} />
+    {/if}
   </svelte:fragment>
 
   {#if dripListsAndVotingRounds}

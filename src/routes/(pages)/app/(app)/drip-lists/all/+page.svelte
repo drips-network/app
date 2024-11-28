@@ -6,6 +6,7 @@
     ${PROJECT_AVATAR_FRAGMENT}
     fragment DripListsListingsItem on DripList {
       ...DripListBadge
+      isVisible
       splits {
         ... on AddressReceiver {
           account {
@@ -91,6 +92,7 @@
   }
 
   const tableData: TableRow[] = data.content.dripLists
+    .filter((dripList) => dripList.isVisible)
     .map((dripList) => {
       return {
         badge: { dripList, showAvatar: false, showOwner: false },

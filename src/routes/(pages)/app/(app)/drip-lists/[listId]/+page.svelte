@@ -83,7 +83,7 @@
       <span class="typo-text-small-bold">{dripList.name}</span> is hidden and cannot receive new
       funds. {isOwnList
         ? 'You can unhide it to start receiving funds again.'
-        : 'If this is your project, unhide it by connecting the wallet that claimed it with.'}
+        : 'If this is your Drip List, unhide it by connecting the wallet that claimed it with.'}
       <svelte:fragment slot="actions">
         {#if isOwnList}
           <div class="flex gap-3">

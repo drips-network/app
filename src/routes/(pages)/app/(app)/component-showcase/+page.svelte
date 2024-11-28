@@ -597,6 +597,10 @@
         chainData: [
           {
             chain: network.gqlName,
+            owner: {
+              __typename: 'AddressDriverAccount',
+              accountId: '0',
+            },
             __typename: 'ClaimedProjectData',
             avatar: {
               __typename: 'EmojiAvatar',

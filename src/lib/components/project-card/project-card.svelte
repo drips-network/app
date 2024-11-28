@@ -13,9 +13,15 @@
       chainData {
         ... on ClaimedProjectData {
           chain
+          owner {
+            accountId
+          }
         }
         ... on UnClaimedProjectData {
           chain
+          owner {
+            accountId
+          }
         }
         ...ProjectAvatar
       }
