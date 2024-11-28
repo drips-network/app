@@ -72,6 +72,7 @@ export const load = (async ({ fetch, request }) => {
   const [prices, featuredLists, blogPosts] = await Promise.all([
     cachedTotalDrippedPrices(redis, fetch),
     fetchFeaturedLists(),
+    // TODO: dry with getBlogPosts
     Promise.all(
       Object.entries(import.meta.glob('/src/blog-posts/*.md')).map(async ([path, resolver]) => {
         const resolved = await resolver();
