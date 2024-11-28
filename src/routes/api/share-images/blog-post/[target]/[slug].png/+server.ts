@@ -49,11 +49,7 @@ export const prerender = true;
 export const entries: EntryGenerator = async () => {
   const allPosts = import.meta.glob('/src/blog-posts/*.md', { as: 'raw' });
 
-  const slugs = await Promise.all(
-    Object.entries(allPosts).map(async ([path]) => {
-      return getSlug(path);
-    }),
-  );
+  const slugs = await Promise.all(Object.entries(allPosts).map(async ([path]) => getSlug(path)));
 
   return slugs.reduce<{ slug: string; target: string }[]>((acc, slug) => {
     return [...acc, { slug, target: 'twitter' }, { slug, target: 'og' }];
