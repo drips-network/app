@@ -4,6 +4,4 @@
   export let data;
 </script>
 
-<div>
-  <ProjectSupportButton data={data.supportButtonData} options={data.supportButtonOptions} />
-</div>
+<ProjectSupportButton data={data.supportButtonData} options={data.supportButtonOptions} />

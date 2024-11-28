@@ -103,7 +103,7 @@
             return false;
         }
       },
-      300000,
+      600000,
       2000,
     );
 
@@ -119,7 +119,7 @@
     const ownerIndexedExpectation = await expect(
       () => checkProjectInExpectedStateForClaiming(),
       (response) => response,
-      300000,
+      600000,
       2000,
     );
 

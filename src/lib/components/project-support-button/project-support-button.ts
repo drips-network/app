@@ -40,7 +40,7 @@ export type SupportButtonData = {
   projectName: string;
   projectUrl: string;
   projectData: ProjectData & { totalEarned?: Amount[] };
-  prices: Record<string, number>;
+  prices?: Record<string, number>;
 };
 
 export function getDripFill(options: SupportButtonOptions): string {

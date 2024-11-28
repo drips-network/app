@@ -91,7 +91,7 @@
           <Question />
         </div>
       {:else if project.avatar.__typename === 'ImageAvatar'}
-        <div class="project-avatar" class:with-outline={outline}>
+        <div class="project-avatar">
           <img
             bind:this={customImageEl}
             on:load={() => (customImageLoading = false)}

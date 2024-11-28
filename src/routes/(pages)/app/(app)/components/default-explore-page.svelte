@@ -176,18 +176,20 @@
           ><AggregateFiatEstimate amounts={totalDrippedAmounts} prices={totalDrippedPrices} /></span
         >
       </div>
-      <div class="value-wrapper">
-        <a
-          href="https://etherscan.io/address/0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4"
-          target="_blank"
-          rel="noreferrer"
-          class="header"
-        >
-          <h5>Total value on Drips</h5>
-          <EtherscanIcon />
-        </a>
-        <span class="large-number pixelated">{formattedTlv}</span>
-      </div>
+      {#if typeof tlv === 'number'}
+        <div class="value-wrapper">
+          <a
+            href="https://etherscan.io/address/0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4"
+            target="_blank"
+            rel="noreferrer"
+            class="header"
+          >
+            <h5>Total value on Drips</h5>
+            <EtherscanIcon />
+          </a>
+          <span class="large-number pixelated">{formattedTlv}</span>
+        </div>
+      {/if}
     </div>
   </Section>
 
