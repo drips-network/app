@@ -677,7 +677,7 @@
         ...externalTxs.map((etx) => ({
           external: true as const,
           title: etx.title,
-          gasless: true,
+          gasless: false,
           progressFn: () => ({
             progressFraction: 0,
             remainingText: 'Waiting on previous transaction',
@@ -698,7 +698,7 @@
           ? {
               external: true as const,
               title: tx.title,
-              gasless: true,
+              gasless: false,
               progressFn: () => ({
                 progressFraction: 0,
                 remainingText: 'Waiting on previous transaction',
