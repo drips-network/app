@@ -6,16 +6,23 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import { createEventDispatcher } from 'svelte';
-  import { get, type Writable } from 'svelte/store';
+  import { type Writable } from 'svelte/store';
   import type { State } from '../../../claim-project-flow';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let context: Writable<State>;
-  export let project: Writable<ProjectCustomizerFragment>;
+
+  export let originalProject: ProjectCustomizerFragment;
+  export let newProjectData: Writable<
+    ReturnType<
+      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+    >
+  >;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   function handleConfirm() {
-    const { avatar, color } = get(project);
+    const { avatar, color } = $newProjectData;
 
     $context.avatar =
       avatar.__typename === 'EmojiAvatar'
@@ -34,7 +41,7 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer {project} />
+  <ProjectCustomizer {originalProject} {newProjectData} />
   <div class="flex justify-end">
     <Button icon={CheckCircle} on:click={handleConfirm}>Confirm</Button>
   </div>

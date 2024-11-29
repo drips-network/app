@@ -1,12 +1,23 @@
 <script lang="ts" context="module">
+  import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import { gql } from 'graphql-request';
+
   export const ENTER_GIT_URL_STEP_PROJECT_FRAGMENT = gql`
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     fragment EnterGitUrlStepProject on Project {
       ...UnclaimedProjectCard
-      ... on UnclaimedProject {
-        verificationStatus
-        account {
-          accountId
+      account {
+        accountId
+      }
+      chainData {
+        ... on UnClaimedProjectData {
+          owner {
+            address
+          }
+          verificationStatus
+          withdrawableBalances {
+            tokenAddress
+          }
         }
       }
     }
@@ -24,20 +35,23 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
-  import UnclaimedProjectCard, {
-    UNCLAIMED_PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import seededRandomElement from '$lib/utils/seeded-random-element';
   import { page } from '$app/stores';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
   import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
-  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import possibleColors from '$lib/utils/project/possible-colors';
   import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
+  import type { GetRepoResponse } from '../../../../../routes/api/github/[repoUrl]/+server';
+  import isClaimed from '$lib/utils/project/is-claimed';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import modal from '$lib/stores/modal';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -60,34 +74,103 @@
 
   let claimingRenamedRepoOriginalName: string | undefined;
 
+  const projectQuery = gql`
+    ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
+    query Project($url: String!, $chains: [SupportedChain!]) {
+      projectByUrl(url: $url, chains: $chains) {
+        ...ClaimProjectFlowProject
+      }
+    }
+  `;
+
+  class InvalidUrlError extends Error {}
+
+  function fixGitUrlFormat(gitUrl: string) {
+    let enteredUrlFixedFormat = gitUrl;
+
+    enteredUrlFixedFormat = enteredUrlFixedFormat.trim();
+
+    // format URL with "https://" (add, or replace "http://" since API error)
+    if (!/^https:\/\//.test(enteredUrlFixedFormat)) {
+      enteredUrlFixedFormat = 'https://' + enteredUrlFixedFormat.replace(/^http:\/\//, '');
+    }
+
+    // if url ends with /, remove it
+    if (enteredUrlFixedFormat.endsWith('/')) {
+      enteredUrlFixedFormat = enteredUrlFixedFormat.slice(0, -1);
+    }
+
+    return enteredUrlFixedFormat;
+  }
+
+  async function fetchRepoFromGitHub(gitUrl: string): Promise<GetRepoResponse> {
+    const repoInfoRes = await fetch(`/api/github/${encodeURIComponent(gitUrl)}`);
+
+    if (!repoInfoRes.ok) {
+      throw new InvalidUrlError(
+        'Repo not found. Make sure you enter a link to a public GitHub repository.',
+      );
+    }
+
+    return await repoInfoRes.json();
+  }
+
+  async function normalizeGitUrl(
+    gitUrl: string,
+    repoInfo: GetRepoResponse,
+  ): Promise<{ result: string; newRepoName?: string }> {
+    const { url: realUrl } = repoInfo;
+
+    if (realUrl === gitUrl) {
+      // Everything checks out.
+      return { result: gitUrl };
+    }
+
+    if (realUrl.toLowerCase() === gitUrl.toLowerCase()) {
+      // The casing is different. Normally, it should correct the casing, except in rare cases
+      // where the wrongly-cased project actually has some funds on Drips. This can happen if a split
+      // to the project was established before the Drips app properly fixed casing of projects.
+
+      const wronglyCasedProject = (
+        await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
+          url: gitUrl,
+        })
+      ).projectByUrl?.chainData;
+
+      if (!wronglyCasedProject) {
+        return { result: realUrl };
+      }
+
+      const wronglyCasedProjectChainData = filterCurrentChainData(wronglyCasedProject);
+      if (isClaimed(wronglyCasedProjectChainData)) {
+        return { result: realUrl };
+      }
+
+      const wronglyCasedProjectHasFunds =
+        wronglyCasedProjectChainData.withdrawableBalances.length > 0;
+
+      return wronglyCasedProjectHasFunds ? { result: gitUrl } : { result: realUrl };
+    }
+
+    // The URL is different. Can happen if the repo was renamed on GitHub. In this case, we want to let
+    // the user claim the "old" project, but warn them about it.
+    return { result: gitUrl, newRepoName: `${repoInfo.ownerName}/${repoInfo.repoName}` };
+  }
+
   async function fetchProject() {
     $context.linkedToRepo = false;
 
     try {
       validationState = { type: 'pending' };
 
-      // format URL with "https://" (add, or replace "http://" since API error)
-      if (!/^https:\/\//.test($context.gitUrl)) {
-        $context.gitUrl = 'https://' + $context.gitUrl.replace(/^http:\/\//, '');
-      }
+      const fixedGitUrl = fixGitUrlFormat($context.gitUrl);
 
-      // if url ends with /, remove it
-      if ($context.gitUrl.endsWith('/')) {
-        $context.gitUrl = $context.gitUrl.slice(0, -1);
-      }
+      const repoInfo = await fetchRepoFromGitHub(fixedGitUrl);
 
-      const repoInfoRes = await fetch(`/api/github/${encodeURIComponent($context.gitUrl)}`);
-      const repoInfo = await repoInfoRes.json();
-      const normalizedUrl = repoInfo.url;
+      const { result, newRepoName } = await normalizeGitUrl(fixedGitUrl, repoInfo);
 
-      // If the normalized URL is different from the original URL in lowercase, it means that the repo has likely
-      // been renamed on GitHub. In this case, we should let the user claim the outdated project too.
-      // In all other cases, we use the normalized URL to fix casing mismatches.
-      if (normalizedUrl?.toLowerCase() === $context.gitUrl.toLowerCase()) {
-        $context.gitUrl = normalizedUrl;
-      } else {
-        claimingRenamedRepoOriginalName = normalizedUrl;
-      }
+      $context.gitUrl = result;
+      if (newRepoName) claimingRenamedRepoOriginalName = newRepoName;
 
       $context.projectMetadata = {
         starCount: repoInfo.stargazersCount,
@@ -96,33 +179,28 @@
         defaultBranch: repoInfo.defaultBranch ?? undefined,
       };
 
-      const projectQuery = gql`
-        ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
-        query Project($url: String!) {
-          projectByUrl(url: $url) {
-            ...ClaimProjectFlowProject
-          }
-        }
-      `;
-
       const response = await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
         url: $context.gitUrl,
+        chains: [network.gqlName],
       });
 
       const project = response.projectByUrl;
 
       if (!project) {
-        throw new Error("Repo doesn't exist or is private");
+        throw new InvalidUrlError("Repo doesn't exist or is private");
       }
 
-      if (project.__typename === 'ClaimedProject') {
-        throw new Error('Project already claimed');
+      const projectChainData = filterCurrentChainData(project.chainData);
+
+      if (projectChainData.__typename === 'ClaimedProjectData') {
+        throw new InvalidUrlError('Project already claimed');
       }
 
       if (
-        project.__typename === 'UnclaimedProject' &&
-        project.verificationStatus === ProjectVerificationStatus.PendingMetadata
+        projectChainData.__typename === 'UnClaimedProjectData' &&
+        projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
       ) {
+        // The correct owner was already set previously for whatever reason. We can skip updating the owner.
         $context.isPartiallyClaimed = true;
       }
 
@@ -135,9 +213,18 @@
       $context.projectColor = seededRandomElement(possibleColors, project.account.accountId);
 
       validationState = { type: 'valid' };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      validationState = { type: 'invalid', message: error.message };
+    } catch (error: unknown) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      if (error instanceof InvalidUrlError) {
+        validationState = { type: 'invalid', message: error.message };
+      } else {
+        validationState = {
+          type: 'invalid',
+          message: 'An unexpected error occured. There may be more details in the console.',
+        };
+      }
     }
   }
 
@@ -170,6 +257,10 @@
     await new Promise((resolve) => setTimeout(resolve, 100));
     submitInput();
   }
+
+  onMount(() => {
+    modal.setWarnOnNavigate(true);
+  });
 </script>
 
 <StandaloneFlowStepLayout
@@ -217,5 +308,8 @@
         on:click={() => submitInput()}>Search</Button
       >
     {/if}
+  </svelte:fragment>
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
 </StandaloneFlowStepLayout>

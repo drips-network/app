@@ -40,18 +40,14 @@
           v.type === 'address' ? v.address : unreachable(),
         );
 
-        const signature = await multiplayer.signVotingRound(
-          signer,
-          timestamp,
-          address,
-          collaborators,
-        );
+        const signature = await multiplayer.signVotingRound(signer, timestamp, address);
 
         updateAwaitStep({
           message: 'Creating your collaborative Drip List...',
         });
 
         const { newVotingRoundId } = await multiplayer.startVotingRound({
+          chainId: $walletStore.network.chainId ?? unreachable(),
           signature,
           date: timestamp,
           name: $context.dripList.title,

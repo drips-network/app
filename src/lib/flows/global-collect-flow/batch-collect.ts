@@ -1,19 +1,19 @@
 import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import {
-  getAddressDriverClient,
-  getCallerClient,
-  getNetworkConfig,
-} from '$lib/utils/get-drips-clients';
-import { AddressDriverPresets } from 'radicle-drips';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import Emoji from '$lib/components/emoji/emoji.svelte';
+import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
+import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+import populateCreateCollectFlowTxs from '$lib/utils/sdk/address-driver/populate-create-collect-flow-txs';
+import type { OxString } from '$lib/utils/sdk/sdk-types';
 
 export default function batchCollect(
   tokenAddresses: string[],
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
+  shouldAutoUnwrap: boolean,
 ) {
   dispatch(
     'transact',
@@ -27,40 +27,39 @@ export default function batchCollect(
         },
       },
       before: async () => {
-        const callerClient = await getCallerClient();
-        const addressDriverClient = await getAddressDriverClient();
-        const accountId = await addressDriverClient.getAccountId();
+        const ownAccountId = await getOwnAccountId();
         const { address: userAddress, signer } = get(walletStore);
 
         assert(userAddress && signer);
 
-        const { DRIPS, ADDRESS_DRIVER } = getNetworkConfig();
-
-        const flowsPromises: ReturnType<
-          (typeof AddressDriverPresets.Presets)['createCollectFlow']
-        >[] = [];
+        const flowsPromises: ReturnType<typeof populateCreateCollectFlowTxs>[] = [];
         for (const tokenAddress of tokenAddresses) {
-          const flow = AddressDriverPresets.Presets.createCollectFlow({
-            signer,
-            driverAddress: ADDRESS_DRIVER,
-            dripsAddress: DRIPS,
-            tokenAddress,
-            maxCycles: 1000,
-            currentReceivers: [],
-            transferToAddress: userAddress,
-            accountId,
-          });
+          const flow = populateCreateCollectFlowTxs(
+            {
+              tokenAddress: tokenAddress as OxString,
+              maxCycles: 1000,
+              currentReceivers: [],
+              transferToAddress: userAddress as OxString,
+              accountId: ownAccountId,
+            },
+            false,
+            false,
+            shouldAutoUnwrap,
+          );
 
           flowsPromises.push(flow);
         }
 
         const flows = await Promise.all(flowsPromises);
         const transactions = flows.flat();
-        const tx = await callerClient.populateCallBatchedTx(transactions);
+        const tx = await populateCallerWriteTx({
+          functionName: 'callBatched',
+          args: [transactions.map(txToCallerCall)],
+        });
 
         return {
           tx,
-          accountId,
+          accountId: ownAccountId,
         };
       },
 

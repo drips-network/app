@@ -1,5 +1,6 @@
-import { isAddress } from 'ethers/lib/utils';
+import { isAddress } from 'ethers';
 import ensStore from '../../stores/ens/ens.store';
+import network from '$lib/stores/wallet/network';
 
 export const reformatUrl = (url: string): string => {
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -39,8 +40,20 @@ export const validateAddress = async (
     return true;
   }
 
-  const resolved = await ensStore.reverseLookup(addressValue);
-  return resolved;
+  if (!network.ensSupported) {
+    return false;
+  }
+
+  try {
+    const resolved = await ensStore.reverseLookup(addressValue);
+    return resolved;
+  } catch (error) {
+    if ((error as Error).message.includes('invalid ENS name')) {
+      return false;
+    }
+
+    throw error;
+  }
 };
 
 export const createInvalidMessage = (type: string): string => {

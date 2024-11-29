@@ -13,14 +13,14 @@ import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
 import Review, { REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT } from './steps/review/review.svelte';
-import PollApi from './steps/poll-api/poll-api.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
 import LinkedProject from './slots/linked-project.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
-import type { ClaimProjectFlowProject_UnclaimedProject_Fragment } from './__generated__/gql.generated';
+import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
+import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
@@ -29,9 +29,7 @@ export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   fragment ClaimProjectFlowProject on Project {
     ...EnterGitUrlStepProject
     ...AddEthereumAddressStepProject
-    ... on UnclaimedProject {
-      ...ReviewStepUnclaimedProject
-    }
+    ...ReviewStepUnclaimedProject
   }
 `;
 
@@ -44,7 +42,7 @@ export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
   isPartiallyClaimed: boolean;
-  project: ClaimProjectFlowProject_UnclaimedProject_Fragment | undefined;
+  project: ClaimProjectFlowProjectFragment | undefined;
   projectMetadata:
     | {
         starCount: number;
@@ -57,6 +55,7 @@ export interface State {
   maintainerSplits: ListEditorConfig;
   dependencySplits: ListEditorConfig;
   dependenciesAutoImported: boolean;
+  gaslessOwnerUpdateTaskId: string | undefined;
   avatar:
     | {
         type: 'emoji';
@@ -86,6 +85,7 @@ export const state = () =>
       weights: {},
     },
     dependenciesAutoImported: false,
+    gaslessOwnerUpdateTaskId: undefined,
     avatar: {
       type: 'emoji',
       emoji: '💧',
@@ -119,10 +119,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   };
 
   switch (stepIndex) {
-    case 1:
-      return [projectSlot];
     case 2:
-      return [projectSlot, walletSlot];
+      return [projectSlot];
     case 3:
       return [projectSlot, walletSlot];
     case 4:
@@ -130,6 +128,8 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     case 5:
       return [projectSlot, walletSlot];
     case 6:
+      return [projectSlot, walletSlot];
+    case 7:
       return [];
     default:
       return [];
@@ -142,6 +142,10 @@ export const steps = (
   isModal = false,
   projectUrl: string | undefined = undefined,
 ) => [
+  makeStep({
+    component: ChooseNetwork,
+    props: undefined,
+  }),
   makeStep({
     component: EnterGitUrl,
     props: {
@@ -180,10 +184,6 @@ export const steps = (
       canEditWalletConnection: !skipWalletConnect,
       isModal,
     },
-  }),
-  makeStep({
-    component: PollApi,
-    props: undefined,
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,

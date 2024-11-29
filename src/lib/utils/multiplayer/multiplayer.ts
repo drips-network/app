@@ -41,7 +41,10 @@ import type {
   ProjectForVoteReceiverQuery,
   ProjectForVoteReceiverQueryVariables,
 } from './__generated__/gql.generated';
-import { getAddressDriverClient } from '../get-drips-clients';
+import unreachable from '../unreachable';
+import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-driver';
+import type { OxString } from '../sdk/sdk-types';
+import network, { type ChainId } from '$lib/stores/wallet/network';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -83,10 +86,9 @@ export async function signVotingRound(
   signer: ethers.Signer,
   currentTime: Date,
   publisherAddress: string,
-  collaborators: string[],
   dripListId?: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = Number((await signer.provider?.getNetwork())?.chainId ?? unreachable());
 
   const message = dripListId
     ? START_VOTING_ROUND_MESSAGE_TEMPLATE(currentTime, chainId, publisherAddress, dripListId)
@@ -108,6 +110,7 @@ export function startVotingRound(
         endsAt: Date;
       };
     };
+    chainId: ChainId;
     publisherAddress: string;
     /** Timestamp for replay prevention. Must match timestamp in `signature`. */
     date: Date;
@@ -152,7 +155,7 @@ export async function signDeleteVotingRound(
   votingRoundId: string,
   signer: ethers.Signer,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = Number((await signer.provider?.getNetwork())?.chainId ?? unreachable());
 
   const message = DELETE_VOTING_ROUND_MESSAGE_TEMPLATE(
     currentTime,
@@ -245,11 +248,11 @@ export async function signGetVotingRoundVotes(
   publisherAddress: string,
   votingRoundId: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = REVEAL_VOTES_MESSAGE_TEMPLATE(
     currentTime,
-    chainId,
+    Number(chainId),
     publisherAddress,
     votingRoundId,
   );
@@ -317,10 +320,10 @@ export async function signVote(
   votingRoundId: string,
   receivers: VoteReceiver[],
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
   const message = VOTE_MESSAGE_TEMPLATE(
     currentTime,
-    chainId,
+    Number(chainId),
     collaboratorAddress,
     votingRoundId,
     receivers,
@@ -398,9 +401,9 @@ export async function signGetCollaborator(
   currentTime: Date,
   votingRoundId: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
-  const message = REVEAL_MY_VOTE_MESSAGE_TEMPLATE(currentTime, chainId, votingRoundId);
+  const message = REVEAL_MY_VOTE_MESSAGE_TEMPLATE(currentTime, Number(chainId), votingRoundId);
 
   return signer.signMessage(message);
 }
@@ -435,12 +438,12 @@ export async function signRevealResults(
   publisherAddress: string,
   votingRoundId: string,
 ) {
-  const chainId = await signer.getChainId();
+  const chainId = (await signer.provider?.getNetwork())?.chainId ?? unreachable();
 
   const message = REVEAL_RESULT_MESSAGE_TEMPLATE(
     publisherAddress,
     votingRoundId,
-    chainId,
+    Number(chainId),
     currentTime,
   );
 
@@ -540,18 +543,11 @@ export async function mapVoteReceiversToListEditorConfig(
       receiversToFetchDataFor.map(async (v) => {
         const projectQuery = gql`
           ${LIST_EDITOR_PROJECT_FRAGMENT}
-          query ProjectForVoteReceiver($url: String!) {
-            projectByUrl(url: $url) {
+          query ProjectForVoteReceiver($url: String!, $chains: [SupportedChain!]!) {
+            projectByUrl(url: $url, chains: $chains) {
               ...ListEditorProject
-              ... on ClaimedProject {
-                account {
-                  accountId
-                }
-              }
-              ... on UnclaimedProject {
-                account {
-                  accountId
-                }
+              account {
+                accountId
               }
             }
           }
@@ -559,8 +555,8 @@ export async function mapVoteReceiversToListEditorConfig(
 
         const dripListQuery = gql`
           ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-          query DripListForVoteReceiver($id: ID!) {
-            dripList(id: $id) {
+          query DripListForVoteReceiver($id: ID!, $chain: SupportedChain!) {
+            dripList(id: $id, chain: $chain) {
               ...ListEditorDripList
               account {
                 accountId
@@ -575,6 +571,7 @@ export async function mapVoteReceiversToListEditorConfig(
               dripListQuery,
               {
                 id: v.accountId,
+                chain: network.gqlName,
               },
             )
           ).dripList;
@@ -582,7 +579,7 @@ export async function mapVoteReceiversToListEditorConfig(
           return (
             await query<ProjectForVoteReceiverQuery, ProjectForVoteReceiverQueryVariables>(
               projectQuery,
-              { url: v.url },
+              { url: v.url, chains: [network.gqlName] },
             )
           ).projectByUrl;
         }
@@ -591,13 +588,11 @@ export async function mapVoteReceiversToListEditorConfig(
     (v) => (v ? v : undefined),
   );
 
-  const addressDriverClient = await getAddressDriverClient();
-
   for (const receiver of receivers) {
     switch (receiver.type) {
       case 'project': {
         const project = receiversData.find(
-          (p): p is Extract<(typeof receiversData)[number], { __typename: 'ClaimedProject' }> =>
+          (p): p is Extract<(typeof receiversData)[number], { __typename: 'Project' }> =>
             p.__typename !== 'DripList' && p.source.url === receiver.url,
         );
         if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
@@ -608,7 +603,12 @@ export async function mapVoteReceiversToListEditorConfig(
         break;
       }
       case 'address': {
-        const accountId = await addressDriverClient.getAccountIdByAddress(receiver.address);
+        const accountId = (
+          await executeAddressDriverReadMethod({
+            functionName: 'calcAccountId',
+            args: [receiver.address as OxString],
+          })
+        ).toString();
 
         items[accountId] = { type: 'address', address: receiver.address };
         weights[accountId] = 'weight' in receiver ? receiver.weight : 0;

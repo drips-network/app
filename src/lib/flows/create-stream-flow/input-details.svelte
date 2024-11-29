@@ -26,7 +26,6 @@
   import tokens from '$lib/stores/tokens';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import Button from '$lib/components/button/button.svelte';
-  import { constants } from 'radicle-drips';
   import { createEventDispatcher, onMount } from 'svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import wallet from '$lib/stores/wallet/wallet.store';
@@ -52,12 +51,16 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import RealtimeAmount from '$lib/components/amount/realtime-amount.svelte';
   import InputStreamReceiver from '$lib/components/input-address/input-stream-receiver.svelte';
-  import { isAddress } from 'ethers/lib/utils';
   import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
-  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { isAddress } from 'ethers';
+  import type { OxString } from '$lib/utils/sdk/sdk-types';
+  import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -125,7 +128,7 @@
     $context.amountValue && selectedToken
       ? parseTokenAmount(
           $context.amountValue,
-          selectedToken?.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+          selectedToken?.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
       : undefined;
 
@@ -184,8 +187,6 @@
       makeTransactPayload({
         headline: 'Create stream',
         before: async () => {
-          const callerClient = await getCallerClient();
-          const addressDriverClient = await getAddressDriverClient();
           const { signer } = $wallet;
           assert(signer, 'No signer available');
 
@@ -196,11 +197,16 @@
             const recipientInputValue = $context.recipientInputValue ?? unreachable();
 
             recipientAccountId = isAddress(recipientInputValue)
-              ? await addressDriverClient.getAccountIdByAddress(recipientInputValue)
+              ? (
+                  await executeAddressDriverReadMethod({
+                    functionName: 'calcAccountId',
+                    args: [recipientInputValue as OxString],
+                  })
+                ).toString()
               : recipientInputValue;
           }
 
-          const { batch, newHash } = await buildStreamCreateBatchTx(addressDriverClient, signer, {
+          const { batch, newHash } = await buildStreamCreateBatchTx(signer, {
             tokenAddress: $context.selectedTokenAddress?.[0] ?? unreachable(),
             amountPerSecond: amountPerSecond ?? unreachable(),
             recipientAccountId,
@@ -213,15 +219,17 @@
           });
 
           return {
-            callerClient,
             batch,
             newHash,
           };
         },
 
-        transactions: async ({ callerClient, batch }) => [
+        transactions: async ({ batch }) => [
           {
-            transaction: await callerClient.populateCallBatchedTx(batch),
+            transaction: await populateCallerWriteTx({
+              functionName: 'callBatched',
+              args: [batch.map(txToCallerCall)],
+            }),
             applyGasBuffer: true,
             title: 'Create the stream',
           },

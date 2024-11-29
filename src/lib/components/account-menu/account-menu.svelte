@@ -39,8 +39,8 @@
           disableTooltip
         /></svelte:fragment
       >
-      <svelte:fragment slot="right"
-        ><Button
+      <svelte:fragment slot="right">
+        <Button
           disabled={safeAppMode}
           variant="ghost"
           on:click={() => {

@@ -59,6 +59,10 @@ export default (() => {
     store.set({});
   }
 
+  function reCalcHeight() {
+    get(pane).calcFitHeight();
+  }
+
   function _setListeners() {
     const p = get(pane);
 
@@ -78,5 +82,6 @@ export default (() => {
     detach,
     openSheet,
     closeSheet,
+    reCalcHeight,
   };
 })();

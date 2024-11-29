@@ -1,8 +1,8 @@
-import { ethers } from 'ethers';
+import { isAddress } from 'ethers';
 import { z } from 'zod';
 
 const ethAddressSchema = z.preprocess((v) => {
-  if (typeof v !== 'string' || !ethers.utils.isAddress(v)) {
+  if (typeof v !== 'string' || !isAddress(v)) {
     throw new Error(`${v} is not a valid address`);
   }
 

@@ -45,8 +45,8 @@
 
   /** The earliest value the user can select */
   export let min = new Date(defaultDate.getFullYear() - 20, 0, 1);
-  /** The latest value the user can select */
-  export let max = new Date(defaultDate.getFullYear(), 11, 31, 23, 59, 59, 999);
+  /** The latest value the user can select. Default is in 5 years*/
+  export let max = new Date(defaultDate.getFullYear() + 5, 11, 31);
   /** Placeholder text to show when input field is empty */
   export let placeholder = 'YYYY-MM-DD HH:MM:SS';
   /** Whether the text is valid */

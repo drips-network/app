@@ -14,38 +14,40 @@ import isClaimed from '$lib/utils/project/is-claimed';
 import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
 import sanitize from 'sanitize-html';
 import twemoji from '$lib/utils/twemoji';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import network from '$lib/stores/wallet/network';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { projectUrl } = params;
   assert(projectUrl, 'Missing projectUrl param');
 
   const projectQuery = gql`
-    query Project($url: String!) {
-      projectByUrl(url: $url) {
-        ... on ClaimedProject {
-          source {
-            ownerName
-            repoName
-          }
-          avatar {
-            ... on ImageAvatar {
-              cid
-            }
-            ... on EmojiAvatar {
-              emoji
-            }
-          }
-          color
-          splits {
-            dependencies {
-              __typename
-            }
-          }
+    query Project($url: String!, $chains: [SupportedChain!]) {
+      projectByUrl(url: $url, chains: $chains) {
+        source {
+          ownerName
+          repoName
         }
-        ... on UnclaimedProject {
-          source {
-            ownerName
-            repoName
+        chainData {
+          ... on UnClaimedProjectData {
+            chain
+          }
+          ... on ClaimedProjectData {
+            chain
+            avatar {
+              ... on ImageAvatar {
+                cid
+              }
+              ... on EmojiAvatar {
+                emoji
+              }
+            }
+            color
+            splits {
+              dependencies {
+                __typename
+              }
+            }
           }
         }
       }
@@ -54,7 +56,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const res = await query<ProjectQuery, ProjectQueryVariables>(
     projectQuery,
-    { url: projectUrl },
+    { url: projectUrl, chains: [network.gqlName] },
     fetch,
   );
   const { projectByUrl: project } = res;
@@ -66,22 +68,26 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const projectName = `${project.source.ownerName}/${project.source.repoName}`;
 
+  const projectData = filterCurrentChainData(project.chainData);
+
   const emoji =
-    isClaimed(project) && project.avatar.__typename === 'EmojiAvatar'
-      ? sanitize(project.avatar.emoji, {
+    isClaimed(projectData) && projectData.avatar.__typename === 'EmojiAvatar'
+      ? sanitize(projectData.avatar.emoji, {
           allowedTags: [],
           allowedAttributes: {},
         })
       : 'none';
 
   const cid =
-    isClaimed(project) && project.avatar.__typename === 'ImageAvatar' ? project.avatar.cid : 'none';
+    isClaimed(projectData) && projectData.avatar.__typename === 'ImageAvatar'
+      ? projectData.avatar.cid
+      : 'none';
 
-  const dependenciesCount = isClaimed(project)
-    ? project.splits.dependencies.length.toString()
+  const dependenciesCount = isClaimed(projectData)
+    ? projectData.splits.dependencies.length.toString()
     : '0';
 
-  const color = isClaimed(project) ? project.color : 'none';
+  const color = isClaimed(projectData) ? projectData.color : 'none';
   const target = url.searchParams.get('target');
 
   try {
@@ -113,7 +119,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       : '';
 
   const avatarHtml =
-    isClaimed(project) && project.avatar.__typename === 'ImageAvatar'
+    isClaimed(projectData) && projectData.avatar.__typename === 'ImageAvatar'
       ? `<div style="display: flex; align-items: center; justify-content: center; height: 128px; width: 128px; border-radius: 64px; background-color: white; ">
         <img height="100%" width="100%" src="https://drips.network/api/custom-avatars/${cid}" style="border-radius: 50%; border: 1px solid black" />
       </div>`

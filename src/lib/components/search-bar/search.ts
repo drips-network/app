@@ -3,9 +3,10 @@ import fuzzysort from 'fuzzysort';
 import tokens from '$lib/stores/tokens';
 import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
 import { get } from 'svelte/store';
-import { isAddress } from 'ethers/lib/utils';
 import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
 import GitProjectService from '$lib/utils/project/GitProjectService';
+import { isAddress } from 'ethers';
+import network from '$lib/stores/wallet/network';
 
 export enum SearchItemType {
   PROFILE,
@@ -93,6 +94,7 @@ export default function search(input: string | undefined) {
 
   if (
     input?.endsWith('.eth') &&
+    network.ensSupported &&
     searchItems.findIndex((i) => i.type === SearchItemType.PROFILE && i.item.name === input) === -1
   ) {
     searchItems.push({

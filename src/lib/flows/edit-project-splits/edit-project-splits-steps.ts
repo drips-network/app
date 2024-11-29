@@ -1,10 +1,5 @@
-import {
-  LIST_EDITOR_DRIP_LIST_FRAGMENT,
-  LIST_EDITOR_PROJECT_FRAGMENT,
-  type Items,
-  type ListEditorItem,
-  type Weights,
-} from '$lib/components/list-editor/types';
+import { type Items, type Weights } from '$lib/components/list-editor/types';
+import { gql } from 'graphql-request';
 import { makeStep } from '$lib/components/stepper/types';
 import { get, writable } from 'svelte/store';
 import SetNewDependencyMaintainerSplit from './steps/set-new-dependency-maintainer-split.svelte';
@@ -13,53 +8,43 @@ import EditDependencyList from './steps/edit-dependency-list.svelte';
 import Review from './steps/review.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { gql } from 'graphql-request';
 import type {
   EditProjectSplitsFlowAddressReceiverFragment,
   EditProjectSplitsFlowDripListReceiverFragment,
   EditProjectSplitsFlowProjectReceiverFragment,
 } from './__generated__/gql.generated';
+import {
+  mapSplitReceiversToEditorConfig,
+  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT,
+  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT,
+  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT,
+} from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 
 export const EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT = gql`
+  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT}
   fragment EditProjectSplitsFlowAddressReceiver on AddressReceiver {
-    weight
-    account {
-      accountId
-      address
-    }
+    ...SplitReceiversToListEditorConfigAddressReceiver
   }
 `;
 
 export const EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT = gql`
-  ${LIST_EDITOR_PROJECT_FRAGMENT}
+  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT}
   fragment EditProjectSplitsFlowProjectReceiver on ProjectReceiver {
     weight
     project {
       ...ListEditorProject
-      ... on ClaimedProject {
-        account {
-          accountId
-        }
-      }
-      ... on UnclaimedProject {
-        account {
-          accountId
-        }
-      }
-    }
-  }
-`;
-
-export const EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT = gql`
-  ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
-  fragment EditProjectSplitsFlowDripListReceiver on DripListReceiver {
-    weight
-    dripList {
-      ...ListEditorDripList
       account {
         accountId
       }
     }
+    ...SplitReceiversToListEditorConfigProjectReceiver
+  }
+`;
+
+export const EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT = gql`
+  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT}
+  fragment EditProjectSplitsFlowDripListReceiver on DripListReceiver {
+    ...SplitReceiversToListEditorConfigDripListReceiver
   }
 `;
 
@@ -83,37 +68,6 @@ export interface State {
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: ListEditorConfig;
   dependencySplits: ListEditorConfig;
-}
-
-function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
-  switch (input.__typename) {
-    case 'AddressReceiver':
-      return { type: 'address', address: input.account.address };
-    case 'DripListReceiver':
-      return { type: 'drip-list', dripList: input.dripList };
-    case 'ProjectReceiver':
-      return { type: 'project', project: input.project };
-  }
-}
-
-function extractAccountId(input: SplitReceiver) {
-  switch (input.__typename) {
-    case 'AddressReceiver':
-      return input.account.accountId;
-    case 'DripListReceiver':
-      return input.dripList.account.accountId;
-    case 'ProjectReceiver':
-      return input.project.account.accountId;
-  }
-}
-
-function mapSplitReceiversToEditorConfig(input: SplitReceiver[]) {
-  return {
-    items: Object.fromEntries(
-      input.map((v) => [extractAccountId(v), mapSplitReceiverToEditorItem(v)]),
-    ),
-    weights: Object.fromEntries(input.map((v) => [extractAccountId(v), v.weight])),
-  };
 }
 
 const state = (projectAccountId: string, representationalSplits: Splits) => {

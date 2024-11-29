@@ -1,0 +1,3 @@
+schema: 'src/lib/graphql/__generated__/schema.graphql'
+documents: 'src/**/*.{graphql,js,ts,svelte}'
+ignoreNoDocuments: true

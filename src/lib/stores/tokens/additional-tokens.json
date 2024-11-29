@@ -15,6 +15,14 @@
       "symbol": "USDGLO",
       "decimals": 18,
       "logoURI": "https://etherscan.io/token/images/glo_32.png"
+    },
+    {
+      "chainId": 314,
+      "address": "0x60E1773636CF5E4A227d9AC24F20fEca034ee25A",
+      "name": "Wrapped Filecoin",
+      "symbol": "WFIL",
+      "decimals": 18,
+      "logoURI": "https://cryptologos.cc/logos/filecoin-fil-logo.png"
     }
   ]
 }

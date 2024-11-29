@@ -17,6 +17,9 @@ const config: CodegenConfig = {
     },
   ],
   generates: {
+    './src/lib/graphql/__generated__/schema.graphql': {
+      plugins: ['schema-ast'],
+    },
     './src/lib/graphql/__generated__/base-types.ts': {
       plugins: ['typescript'],
     },

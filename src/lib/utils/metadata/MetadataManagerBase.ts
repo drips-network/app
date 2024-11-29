@@ -1,9 +1,12 @@
-import type { ContractTransaction } from 'ethers';
-import type { AccountMetadata } from 'radicle-drips';
+import { toBigInt, type ContractTransaction } from 'ethers';
 import type { z } from 'zod';
 import { fetchIpfs as ipfsFetch } from '$lib/utils/ipfs';
 import type { AnyVersion, LatestVersion, Parser } from '@efstajas/versioned-parser';
 import assert from '$lib/utils/assert';
+import type { executeNftDriverWriteMethod } from '../sdk/nft-driver/nft-driver';
+import type { TransactionResponse } from 'ethers';
+import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
+import type { MetadataKeyValue } from '../sdk/sdk-types';
 
 type IpfsHash = string;
 type AccountId = string;
@@ -21,14 +24,14 @@ export interface IMetadataManager<TParser extends Parser> {
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
     schema: T,
-  ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }>;
+  ): Promise<{ newHash: IpfsHash; tx: TransactionResponse }>;
 
   buildAccountMetadata(context: unknown): LatestVersion<TParser>;
 }
 
 export type EmitMetadataFunc = (
   accountId: string,
-  accountMetadata: AccountMetadata[],
+  accountMetadata: MetadataKeyValue[],
 ) => Promise<ContractTransaction>;
 
 export default abstract class MetadataManagerBase<TParser extends Parser>
@@ -37,9 +40,12 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
   public static readonly USER_METADATA_KEY = 'ipfs';
 
   private readonly _parser: TParser;
-  private readonly _emitMetadataFunc: EmitMetadataFunc | undefined;
+  private readonly _emitMetadataFunc: typeof executeNftDriverWriteMethod | undefined;
 
-  protected constructor(parser: TParser, emitMetadataFunc?: EmitMetadataFunc) {
+  protected constructor(
+    parser: TParser,
+    emitMetadataFunc?: typeof executeNftDriverWriteMethod | typeof executeNftDriverWriteMethod,
+  ) {
     this._parser = parser;
     this._emitMetadataFunc = emitMetadataFunc;
   }
@@ -133,7 +139,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
   public async updateAccountMetadata<T extends z.ZodType>(
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
-  ): Promise<{ newHash: IpfsHash; tx: ContractTransaction }> {
+  ): Promise<{ newHash: IpfsHash; tx: TransactionResponse }> {
     const { accountId } = newData.describes;
     const currentOnChainHash = await this.fetchMetadataHashByAccountId(accountId);
 
@@ -158,13 +164,16 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
     assert(this._emitMetadataFunc, 'emitAccountMetadata called without emitMetadataFunc');
 
     const accountMetadata = [
-      {
+      keyValueToMetatada({
         key: MetadataManagerBase.USER_METADATA_KEY,
         value: newHash,
-      },
+      }),
     ];
 
-    const tx = await this._emitMetadataFunc(accountId, accountMetadata);
+    const tx = await this._emitMetadataFunc({
+      functionName: 'emitAccountMetadata',
+      args: [toBigInt(accountId), accountMetadata],
+    });
 
     return tx;
   }

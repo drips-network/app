@@ -19,9 +19,9 @@
   import modal from '$lib/stores/modal';
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-  import type { SplitsComponentSplitsReceiver } from '../splits/splits.svelte';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
+  import type { SplitsComponentSplitsReceiver } from '../splits/types';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];

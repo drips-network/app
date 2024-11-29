@@ -1,12 +1,38 @@
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-import type { ContractReceipt, PopulatedTransaction } from 'ethers';
+import type { TransactionLike } from 'ethers';
+import type { TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
 import type { Nullable } from 'vitest';
 
+export type TransactionWrapper = {
+  title: string;
+  transaction: TransactionLike;
+  applyGasBuffer: boolean;
+};
+
+/**
+ * Use this to display transactions that are handled off-chain (e.g. through Gelato Relay) but have to be awaited
+ * as part of a multi-transaction interaction.
+ */
+export type ExternalTransaction = {
+  title: string;
+  external: true;
+  expectedDurationMs: number;
+  expectedDurationText: string;
+  /** When this resolves, moves on to next transaction */
+  promise: () => Promise<void>;
+};
+
+export type TransactionWrapperOrExternalTransaction = TransactionWrapper | ExternalTransaction;
+
 export interface TransactPayload<T> {
   before?: T;
-  transactions: (context: Context<T>) => TransactionWrapper[] | Promise<TransactionWrapper[]>;
-  after?: (receipts: ContractReceipt[], context: Context<T>) => PromiseLike<void>;
+  transactions: (
+    context: Context<T>,
+  ) =>
+    | TransactionWrapperOrExternalTransaction[]
+    | Promise<TransactionWrapperOrExternalTransaction[]>;
+  after?: (receipts: TransactionReceipt[], context: Context<T>) => PromiseLike<void>;
   afterSafe?: (
     sendTransactionsResponse: SendTransactionsResponse,
     context: Context<T>,
@@ -30,12 +56,6 @@ export type SomeTransactPayload = <R>(
 export type BeforeFunc = () => PromiseLike<Record<string, unknown> | void>;
 
 type Context<T> = T extends BeforeFunc ? Awaited<ReturnType<T>> : undefined;
-
-export type TransactionWrapper = {
-  title: string;
-  transaction: PopulatedTransaction;
-  applyGasBuffer: boolean;
-};
 
 export function makeTransactPayload<T extends Nullable<BeforeFunc>>(
   i: TransactPayload<T>,

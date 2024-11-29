@@ -2,8 +2,9 @@
   import { gql } from 'graphql-request';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
-    fragment ProjectAvatar on Project {
-      ... on ClaimedProject {
+    fragment ProjectAvatar on ProjectData {
+      ... on ClaimedProjectData {
+        chain
         color
         avatar {
           ... on EmojiAvatar {
@@ -33,11 +34,12 @@
 
   export let pendingAvatar = false;
 
-  type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
+  type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
-  export let outline = project.__typename === 'ClaimedProject';
+  export let outline = project.__typename === 'ClaimedProjectData';
 
   const CONTAINER_SIZES: Record<Size, string> = {
+    micro: '0.8rem',
     tiny: '1.5rem',
     small: '2rem',
     medium: '3rem',
@@ -56,7 +58,7 @@
   let prevAvatarCid: string | undefined = undefined;
   $: {
     if (
-      project.__typename === 'ClaimedProject' &&
+      project.__typename === 'ClaimedProjectData' &&
       project.avatar.__typename === 'ImageAvatar' &&
       project.avatar.cid !== prevAvatarCid
     ) {
@@ -89,7 +91,7 @@
           <Question />
         </div>
       {:else if project.avatar.__typename === 'ImageAvatar'}
-        <div class="project-avatar" class:with-outline={outline}>
+        <div class="project-avatar">
           <img
             bind:this={customImageEl}
             on:load={() => (customImageLoading = false)}

@@ -1,19 +1,10 @@
 <script lang="ts" context="module">
   export const ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT = gql`
     fragment AddEthereumAddressStepProject on Project {
-      ... on ClaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
-      }
-      ... on UnclaimedProject {
-        source {
-          forge
-          ownerName
-          repoName
-        }
+      source {
+        forge
+        ownerName
+        repoName
       }
     }
   `;
@@ -49,6 +40,9 @@
     $context.linkedToRepo = false;
   });
 
+  const GASLESS_CALL_ERROR_MESSAGE =
+    'Something went wrong while trying to update the repo owner on-chain. Please try again in ten minutes or reach out on Discord if the error persists.';
+
   function verify() {
     dispatch('await', {
       promise: async () => {
@@ -76,10 +70,15 @@
 
         const numericForgeValue = forge === 'GitHub' ? 0 : 1;
 
+        if ($context.isPartiallyClaimed) {
+          // If the project already has the right owner, we don't need to kick off a repo owner update again
+          return;
+        }
+
         try {
           // Kick off repo owner update using gasless TX
 
-          await fetch('/api/gasless/call/repo-owner-update', {
+          const gaslessCall = await fetch('/api/gasless/call/repo-owner-update', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -90,10 +89,19 @@
               chainId: $walletStore.network.chainId,
             }),
           });
+
+          if (!gaslessCall.ok) {
+            throw new Error(GASLESS_CALL_ERROR_MESSAGE);
+          }
+
+          const { taskId } = await gaslessCall.json();
+          assert(typeof taskId === 'string', 'Invalid task ID');
+
+          $context.gaslessOwnerUpdateTaskId = taskId;
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error(e);
-          throw new Error('Failed to gasless-call repo-owner-update');
+          throw new Error(GASLESS_CALL_ERROR_MESSAGE);
         }
       },
       message: 'Verifying...',

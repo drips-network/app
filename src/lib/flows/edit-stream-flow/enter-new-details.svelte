@@ -41,8 +41,6 @@
   import unreachable from '$lib/utils/unreachable';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { constants } from 'radicle-drips';
-  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import { createEventDispatcher } from 'svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
@@ -57,6 +55,9 @@
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -71,7 +72,7 @@
   $: newAmountValueParsed = $context.newAmountValue
     ? parseTokenAmount(
         $context.newAmountValue,
-        token.info.decimals + constants.AMT_PER_SEC_EXTRA_DECIMALS,
+        token.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
       )
     : undefined;
 
@@ -96,27 +97,27 @@
       makeTransactPayload({
         headline: 'Edit stream',
         before: async () => {
-          const addressDriverClient = await getAddressDriverClient();
-
-          const { newHash, batch } = await buildEditStreamBatch(addressDriverClient, stream.id, {
+          const { newHash, batch } = await buildEditStreamBatch(stream.id, {
             name: nameUpdated ? $context.newName : undefined,
             amountPerSecond: amountUpdated ? newAmountPerSecond : undefined,
           });
-
-          const callerClient = await getCallerClient();
 
           return {
             batch,
             newHash,
             needGasBuffer: amountUpdated,
-            callerClient,
           };
         },
 
-        transactions: async ({ callerClient, batch, needGasBuffer }) => [
+        transactions: async ({ batch, needGasBuffer }) => [
           {
             transaction:
-              batch.length === 1 ? batch[0] : await callerClient.populateCallBatchedTx(batch),
+              batch.length === 1
+                ? batch[0]
+                : await populateCallerWriteTx({
+                    functionName: 'callBatched',
+                    args: [batch.map(txToCallerCall)],
+                  }),
             applyGasBuffer: needGasBuffer,
             title: 'Edit the stream',
           },

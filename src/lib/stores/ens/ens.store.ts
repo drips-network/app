@@ -1,7 +1,7 @@
-import type { BaseProvider } from '@ethersproject/providers';
-import type { ethers } from 'ethers';
 import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
+import network from '../wallet/network';
+import walletStore from '../wallet/wallet.store';
 
 export interface ResolvedRecord {
   name?: string;
@@ -14,19 +14,6 @@ type State = {
 
 export default (() => {
   const state = writable<State>({});
-  const connected = writable(false);
-
-  let provider: ethers.providers.BaseProvider | undefined;
-
-  /**
-   * Connect the store to a provider, which is needed in order to resolve ENS
-   * records.
-   * @param toProvider The provider to connect to.
-   */
-  function connect(toProvider: BaseProvider) {
-    provider = toProvider;
-    connected.set(true);
-  }
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -34,29 +21,45 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
+    if (!network.ensSupported) return;
+
+    const { provider } = get(walletStore);
+
     const saved = get(state)[address];
     if (saved) return;
 
     // Initially write an empty object to prevent multiple in-flight requests
     // for the same name
     state.update((s) => ({ ...s, [address]: {} }));
+    try {
+      const name = await provider.lookupAddress(address);
 
-    const lookups = [provider?.lookupAddress(address), provider?.getAvatar(address)];
+      let avatarUrl: string | null = null;
+      if (name) {
+        const resolver = await provider.getResolver(name);
+        assert(resolver, 'Failed to get resolver');
 
-    const [name, avatarUrl] = await Promise.all(lookups);
+        avatarUrl = resolver ? await resolver.getAvatar() : null;
+      }
 
-    if (name || avatarUrl) {
-      const resolvedRecord = {
-        name: name ?? undefined,
-        avatarUrl: avatarUrl ?? undefined,
-      };
+      if (name || avatarUrl) {
+        const resolvedRecord = {
+          name: name ?? undefined,
+          avatarUrl: avatarUrl ?? undefined,
+        };
 
-      state.update((s) => ({
-        ...s,
-        [address]: resolvedRecord,
-      }));
+        state.update((s) => ({
+          ...s,
+          [address]: resolvedRecord,
+        }));
 
-      return resolvedRecord;
+        return resolvedRecord;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('Failed to resolve ENS name:', error); // eslint-disable-line no-console
+
+      return undefined;
     }
   }
 
@@ -69,6 +72,10 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
+    if (!network.ensSupported) return;
+
+    const { provider } = get(walletStore);
+
     assert(
       provider,
       'You need to `connect` the store to a provider before being able to reverse lookup',
@@ -91,8 +98,6 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
-    connect,
-    connected: { subscribe: connected.subscribe },
     lookup,
     reverseLookup,
     clear,

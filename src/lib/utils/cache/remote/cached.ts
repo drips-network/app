@@ -1,3 +1,4 @@
+import network from '$lib/stores/wallet/network';
 import type { RedisClientType } from '../../../../routes/api/redis';
 
 const ENABLE_CACHE_LOGS = true;
@@ -13,7 +14,6 @@ function log(...content: unknown[]) {
  * Caches the result of a fetcher function using Redis.
  * @param redis - The Redis instance. If undefined, caching is disabled.
  * @param key - The cache key.
- * @param schema - The Zod schema.
  * @param EX - The expiration time in seconds.
  * @param fetcher - The fetcher function.
  * @returns The result, either cached or freshly fetched.
@@ -25,18 +25,20 @@ export default async function cached<T extends Record<string, any>>(
   EX: number,
   fetcher: () => Promise<T>,
 ) {
-  const cachedResponse = redis && (await redis.get(key));
+  const keyWithNetwork = `${network.name}-${key}`;
+
+  const cachedResponse = redis && (await redis.get(keyWithNetwork));
 
   if (cachedResponse) {
-    log('CACHE HIT', { key });
+    log('CACHE HIT', { keyWithNetwork });
 
     return JSON.parse(cachedResponse) as Awaited<ReturnType<typeof fetcher>>;
   } else {
-    log('CACHE MISS', { key });
+    log('CACHE MISS', { keyWithNetwork });
 
     const data = await fetcher();
 
-    redis?.set(key, JSON.stringify(data), {
+    redis?.set(keyWithNetwork, JSON.stringify(data), {
       EX,
     });
 

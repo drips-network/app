@@ -2,8 +2,8 @@ import { makeStep } from '$lib/components/stepper/types';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 import { writable } from 'svelte/store';
 import FetchData from './fetch-data.svelte';
-import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/splits.svelte';
 import ViewVotingRound from './view-voting-round.svelte';
+import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 
 export interface State {
   splits: SplitsComponentSplitsReceiver[];

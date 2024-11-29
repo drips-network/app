@@ -12,7 +12,6 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import { getAddressDriverClient, getCallerClient } from '$lib/utils/get-drips-clients';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { buildStreamDeleteBatchTx } from '$lib/utils/streams/streams';
   import { gql } from 'graphql-request';
@@ -20,6 +19,8 @@
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { goto } from '$app/navigation';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import SkullIcon from '$lib/components/icons/💀.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -36,28 +37,23 @@
           props: { size: 48 },
         },
         before: async () => {
-          const addressDriverClient = await getAddressDriverClient();
-          const callerClient = await getCallerClient();
-
           const { signer } = $walletStore;
           assert(signer);
 
-          const { batch, newHash } = await buildStreamDeleteBatchTx(
-            addressDriverClient,
-            signer,
-            stream.id,
-          );
+          const { batch, newHash } = await buildStreamDeleteBatchTx(signer, stream.id);
 
           return {
-            callerClient,
             batch,
             newHash,
           };
         },
 
-        transactions: async ({ callerClient, batch }) => [
+        transactions: async ({ batch }) => [
           {
-            transaction: await callerClient.populateCallBatchedTx(batch),
+            transaction: await populateCallerWriteTx({
+              functionName: 'callBatched',
+              args: [batch.map(txToCallerCall)],
+            }),
             applyGasBuffer: true,
             title: 'Delete the stream',
           },

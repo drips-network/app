@@ -7,7 +7,6 @@
   import CsvExample from './components/csv-example.svelte';
   import DropZone from '../../components/drop-zone/drop-zone.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import { parseFile } from '$lib/utils/csv';
   import type { Writable } from 'svelte/store';
   import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
@@ -15,9 +14,10 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
+  import { parseFile } from '$lib/flows/import-from-csv/parse-upload';
+  import { DEFAULT_CSV_HEADERS, DEFAULT_MAX_ENTRIES } from './import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
-  const DEFAULT_MAX_ENTRIES = 200;
   const MAX_DECIMALS = 4;
 
   export let context: Writable<State>;
@@ -26,8 +26,10 @@
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
-  export let maxEntries: number = DEFAULT_MAX_ENTRIES;
-  export let exampleTableHeaders: Array<string> | undefined = undefined;
+  // csvHeaders[0] should always be an address
+  export let csvHeaders: Array<string> = DEFAULT_CSV_HEADERS;
+  export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
+  export let exampleTableHeaders: Array<string> | undefined = csvHeaders;
   export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
   export let exampleTableCaption: string | undefined = undefined;
   export let addItem: (
@@ -65,22 +67,9 @@
   }
 
   async function validateFile(file: File): Promise<string | false> {
-    parsedFile = (await parseFile(file)) as Array<[string, string]>;
-    const recipient = parsedFile[0][0];
-    const classification = classifyRecipient(recipient, {
-      allowProjects,
-      allowAddresses,
-      allowDripLists,
-    });
-
-    let headerAdjustment = 0;
-    // if we don't recognize the first value, let's
-    // assume it's a header
-    if (!classification) {
-      headerAdjustment = 1;
-    }
-
-    return parsedFile.length > maxEntries + headerAdjustment ? 'too-many-entries' : false;
+    // sets global data used later in submit()
+    parsedFile = await parseFile(file, csvHeaders);
+    return parsedFile.length > csvMaxEntries ? 'too-many-entries' : false;
   }
 
   async function submit() {
@@ -118,6 +107,7 @@
         // column in the file and null if there is a second column but the
         // value is not present.
         const split = parseFloat(rawSplit);
+        // in the case of a list of collaborators, rawSplit will be undefined
         if (typeof rawSplit !== 'undefined' && !Number.isFinite(split)) {
           const error = new AddItemSuberror(
             'This has an invalid split value',

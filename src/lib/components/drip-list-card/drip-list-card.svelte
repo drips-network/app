@@ -2,7 +2,7 @@
   import { gql } from 'graphql-request';
 
   export const DRIP_LIST_CARD_FRAGMENT = gql`
-    ${EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT}
+    ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
     ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
@@ -10,7 +10,8 @@
     ${SUPPORTER_PILE_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment DripListCard on DripList {
-      ...EditDripListStepSelectedDripList
+      chain
+      ...EditDripListFlowDripList
       name
       account {
         accountId
@@ -58,17 +59,14 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
-  import Splits, {
-    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
-    type SplitsComponentSplitsReceiver,
-  } from '../splits/splits.svelte';
+  import Splits from '../splits/splits.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
-  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
+  import editDripListSteps, {
+    EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT,
+  } from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -76,7 +74,6 @@
   import { browser } from '$app/environment';
   import TextExpandable from '../text-expandable.svelte/text-expandable.svelte';
   import type { DripListCardFragment } from './__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_STEP_SELECTED_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/shared/steps/edit-drip-list.svelte';
   import getSupportersPile, { SUPPORTER_PILE_FRAGMENT } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
@@ -103,13 +100,19 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
-  import { constants } from 'radicle-drips';
   import StatusBadge from '../status-badge/status-badge.svelte';
   import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import ListEditor from '../list-editor/list-editor.svelte';
   import type { Items } from '../list-editor/types';
   import FormField from '../form-field/form-field.svelte';
+  import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import {
+    SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
+    type SplitsComponentSplitsReceiver,
+  } from '../splits/types';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 
   export let data: {
@@ -130,6 +133,13 @@
 
   /** Minimal version w/ link to Drip List page for listing contexts */
   export let listingMode = false;
+
+  export let hideTotal = false;
+  export let hideSupporterPile = false;
+  export let hideDescription = false;
+  export let clampTitle = true;
+  export let openInNewTab = false;
+  export let maxSplitRows: number | undefined = undefined;
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
@@ -179,7 +189,7 @@
 
         return {
           tokenAddress: amount.tokenAddress,
-          amount: amount.amount / BigInt(constants.AMT_PER_SEC_MULTIPLIER),
+          amount: amount.amount / BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
         };
       }),
     );
@@ -196,6 +206,11 @@
     : votingRound
       ? `/app/drip-lists/${votingRound.id}`
       : undefined;
+  $: downloadableImageUrl = dripList
+    ? `/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
+    : votingRound
+      ? `/api/share-images/drip-list/${votingRound.id}.png?target=og`
+      : undefined;
 
   $: votingEnded = votingRound
     ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
@@ -209,12 +224,17 @@
 <svelte:element
   this={listingMode ? 'a' : 'section'}
   href={dripListUrl}
+  target={openInNewTab ? '_blank' : undefined}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
 >
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
-        <h1 class="title rounded twemoji-text">
+        <h1
+          class:line-clamp-1={clampTitle}
+          class=" title rounded twemoji-text"
+          style:font-size={listingMode ? '28px' : undefined}
+        >
           {@html twemoji(title)}
         </h1>
         {#if listingMode && votingRound}
@@ -226,7 +246,8 @@
           <div class="flex items-center gap-2 -my-1">
             <ShareButton
               buttonVariant="normal"
-              url="{BASE_URL}/app/drip-lists/{dripList?.account.accountId || votingRound?.id}"
+              url="{BASE_URL}{dripListUrl}"
+              {downloadableImageUrl}
             />
             {#if isOwnList}
               <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
@@ -234,7 +255,7 @@
           </div>
         {/if}
       </div>
-      {#if description.length > 0}
+      {#if !hideDescription && description.length > 0}
         <div class="description twemoji-text">
           <TextExpandable numberOfLines={listingMode ? 2 : 4} isExpandable={!listingMode}>
             {@html twemoji(description)}
@@ -276,13 +297,15 @@
                   <div class="drip-icon">
                     <Drip />
                   </div>
-                  <div class="typo-text tabular-nums total-streamed-badge">
-                    {#if browser}
-                      <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
-                    {/if}
-                    <span class="muted">&nbsp;total</span>
-                  </div>
-                  {#if supportersPile && supportersPile.length > 0}
+                  {#if !hideTotal}
+                    <div class="typo-text tabular-nums total-streamed-badge">
+                      {#if browser}
+                        <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
+                      {/if}
+                      <span class="muted">&nbsp;total</span>
+                    </div>
+                  {/if}
+                  {#if !hideSupporterPile && supportersPile && supportersPile.length > 0}
                     <div
                       in:fade={{ duration: 300 }}
                       class="hide-on-mobile flex items-center gap-1.5 min-w-0"
@@ -303,7 +326,12 @@
                   >
                     <Splits
                       disableLinks={listingMode}
-                      maxRows={listingMode ? (dripList.description ? 3 : 4) : undefined}
+                      maxRows={maxSplitRows ??
+                        (listingMode
+                          ? dripList.description && !hideDescription
+                            ? 3
+                            : 4
+                          : undefined)}
                       groupsExpandable={!listingMode}
                       list={dripList.splits}
                     />
@@ -399,6 +427,7 @@
       transform 0.2s,
       box-shadow 0.2s;
     position: relative;
+    background: var(--color-background);
   }
 
   a.drip-list-card:hover,
@@ -411,6 +440,7 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    text-align: left;
   }
 
   .drip-list-card .title-and-actions {
