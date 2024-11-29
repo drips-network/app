@@ -8,15 +8,11 @@
 
   export let dismissableId: string = 'custodial';
 
-  let dismissed = browser ? dismissablesStore.isDismissed(dismissableId) : false;
+  $: dismissed = browser ? $dismissablesStore.includes(dismissableId) : false;
 
   async function handleDismiss() {
     dismissablesStore.dismiss(dismissableId);
   }
-
-  dismissablesStore.subscribe(() => {
-    dismissed = dismissablesStore.isDismissed(dismissableId);
-  });
 </script>
 
 {#if !dismissed}
