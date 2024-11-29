@@ -14,6 +14,7 @@
   import type { State } from './vote-flow-steps';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -76,6 +77,7 @@
     description="Vote for which recipients of this Drip List should receive what percentage of funds."
   />
 
+  <CustodialWarning dismissableId="custodial-warning-vote" />
   <FormField title="Recipients*">
     <ListEditor
       bind:valid
