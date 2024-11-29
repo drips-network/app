@@ -4,7 +4,7 @@
   import Button from '../button/button.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import { browser } from '$app/environment';
-  import { fly } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
 
   export let dismissableId: string = 'custodial';
 
@@ -20,7 +20,7 @@
 </script>
 
 {#if !dismissed}
-  <div transition:fly={{ y: 8 }}>
+  <div transition:slide={{ duration: 300 }}>
     <AnnotationBox type="error">
       <span class="warning-text typo-text"
         >Please ensure all addresses are self-custodial. Any funds sent to exchange-managed
