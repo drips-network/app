@@ -182,8 +182,6 @@ async function validateClaimProjectTx(txDescription: TransactionDescription): Pr
         if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
       }
     }
-
-    break;
   }
 
   // Validate that the project in question is currently unclaimed
@@ -353,6 +351,9 @@ export const POST = async ({ request }) => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    return error(500, e instanceof Error ? e : '{ "error": "Unknown error" }');
+    return error(
+      500,
+      e instanceof Error ? JSON.stringify({ error: e.message }) : `{ "error": "Unknown error" }`,
+    );
   }
 };
