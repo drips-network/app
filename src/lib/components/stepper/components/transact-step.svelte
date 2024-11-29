@@ -803,7 +803,7 @@
                 {#if transactionStatusItem.gasless}
                   <div class="gasless-notice">
                     <Gas />
-                    Gas fee $0.00
+                    <span class="hide-on-mobile">Gas fee $0.00</span>
                     <div class="gasless-badge">
                       PAID FOR BY
                       <div class="logo-wrapper">
@@ -1164,6 +1164,10 @@
 
     .row::before {
       left: calc((1rem + 1.5rem / 2) - 1px);
+    }
+
+    .hide-on-mobile {
+      display: none;
     }
   }
 </style>
