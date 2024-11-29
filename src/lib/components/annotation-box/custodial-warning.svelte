@@ -24,9 +24,9 @@
     <AnnotationBox type="error">
       <span class="warning-text typo-text"
         >Please ensure all addresses are self-custodial. Any funds sent to exchange-managed
-        addresses (e.g. Coinbase or Binance) <strong class="typo-text-bold">will be lost</strong
+        addresses (e.g. Coinbase or Binance) <strong class="typo-text-bold">will be lost.</strong
         ></span
-      >.
+      >
       <svelte:fragment slot="actions">
         <Button icon={ThumbsUpIcon} variant="destructive" on:click={handleDismiss}
           >I understand</Button
