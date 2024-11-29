@@ -9,6 +9,7 @@ import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
 import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
 import populateCreateCollectFlowTxs from '$lib/utils/sdk/address-driver/populate-create-collect-flow-txs';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
+import gaslessStore from '$lib/stores/gasless/gasless.store';
 
 export default function batchCollect(
   tokenAddresses: string[],
@@ -67,6 +68,7 @@ export default function batchCollect(
         {
           transaction: tx,
           applyGasBuffer: true,
+          gasless: get(gaslessStore),
           title: 'Collect funds',
         },
       ],

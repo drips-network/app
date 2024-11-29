@@ -1012,12 +1012,11 @@
     display: flex;
     align-items: center;
     min-height: 2rem;
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
 
   .status .icon {
     border-radius: 50%;
-    padding: 0.125rem;
     position: relative;
   }
 
@@ -1028,6 +1027,8 @@
   .status .icon.highlight {
     background-color: var(--color-primary-level-1);
     animation: wiggle 1s;
+    padding: 0.125rem;
+    margin: -0.125rem 0 -0.125rem -0.125rem;
   }
 
   /* outline that grows from the round icon ever 1s */
@@ -1142,7 +1143,7 @@
     gap: 0.25rem;
     align-items: center;
     background-color: var(--color-primary-level-1);
-    color: var(--color-foreground-level-6);
+    color: var(--color-primary-level-6);
     border-radius: 1rem 0 1rem 1rem;
     padding: 0 0.5rem;
     font-size: 0.8rem;

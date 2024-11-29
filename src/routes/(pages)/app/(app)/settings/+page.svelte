@@ -13,6 +13,8 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { goto } from '$app/navigation';
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
+  import gaslessStore from '$lib/stores/gasless/gasless.store';
+  import network from '$lib/stores/wallet/network';
 
   const { primaryColor } = themeStore;
 
@@ -131,15 +133,6 @@
   </div>
   <Divider />
   <div class="section">
-    <h4 class="typo-all-caps">Get in touch</h4>
-    <Setting title="Join the discussion" subtitle="Join our Discord to chat with the team.">
-      <a class="typo-link" target="_blank" rel="noreferrer" href="https://discord.gg/BakDKKDpHF"
-        >Open Discord Server</a
-      >
-    </Setting>
-  </div>
-  <Divider />
-  <div class="section">
     <h4 class="typo-all-caps">Advanced</h4>
     <Setting
       title="Custom tokens"
@@ -159,6 +152,20 @@
         icon={EyeOpen}>Reset hints</Button
       >
     </Setting>
+    {#if network.gaslessClaimAndCollect}
+      <Setting
+        title="Gasless claim & collect transactions"
+        subtitle="When enabled, sends transactions for claiming a project and collecting funds gaslessly using EIP-712. This isn't supported on all networks, and won't work with Safe multisigs."
+      >
+        <Toggle bind:checked={$gaslessStore} />
+      </Setting>
+    {/if}
+    <Setting
+      title="Developer mode"
+      subtitle="When enabled, shows developer-focused extra information on address profiles, project profiles and Drip Lists."
+    >
+      <Toggle bind:checked={$developerModeStore} />
+    </Setting>
     <Setting
       title="Build on Drips"
       subtitle="The Drips protocol is fully open-source and ready for you to build on."
@@ -167,11 +174,14 @@
         >Read the docs</a
       >
     </Setting>
-    <Setting
-      title="Developer mode"
-      subtitle="When enabled, shows developer-focused extra information on address profiles, project profiles and Drip Lists."
-    >
-      <Toggle bind:checked={$developerModeStore} />
+  </div>
+  <Divider />
+  <div class="section">
+    <h4 class="typo-all-caps">Get in touch</h4>
+    <Setting title="Join the discussion" subtitle="Join our Discord to chat with the team.">
+      <a class="typo-link" target="_blank" rel="noreferrer" href="https://discord.gg/BakDKKDpHF"
+        >Open Discord Server</a
+      >
     </Setting>
   </div>
   <Divider />

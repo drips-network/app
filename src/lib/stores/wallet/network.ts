@@ -58,6 +58,7 @@ export type Network = {
   alternativeChainMode: boolean;
   ensSupported: boolean;
   ensAddress: string | undefined;
+  gaslessClaimAndCollect: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -104,6 +105,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: false,
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    gaslessClaimAndCollect: false,
   },
   [80002]: {
     chainId: 80002,
@@ -141,6 +143,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -178,6 +181,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [11155111]: {
     chainId: 11155111,
@@ -215,6 +219,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: false,
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    gaslessClaimAndCollect: true,
   },
   [84532]: {
     chainId: 84532,
@@ -252,6 +257,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [314]: {
     chainId: 314,
@@ -288,6 +294,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: true,
   },
 };
 

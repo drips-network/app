@@ -1,4 +1,4 @@
-import network, { getNetwork, NETWORK_CONFIG } from '$lib/stores/wallet/network';
+import network from '$lib/stores/wallet/network';
 import { addressDriverAbi } from '$lib/utils/sdk/address-driver/address-driver-abi.js';
 import { repoDriverAbi } from '$lib/utils/sdk/repo-driver/repo-driver-abi.js';
 import { ethers, verifyTypedData } from 'ethers';
@@ -12,16 +12,15 @@ import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { GELATO_API_KEY } from '$env/static/private';
 import { error } from '@sveltejs/kit';
+import type { TransactionDescription } from 'ethers';
+import { nativeTokenUnwrapperAbi } from '$lib/utils/sdk/native-token-unrapper/native-token-unwrapper-abi.js';
+import { dripsAbi } from '$lib/utils/sdk/drips/drips-abi.js';
 
-const { rpcUrl, fallbackRpcUrl } = getNetwork(network.chainId);
+const { rpcUrl, fallbackRpcUrl } = network;
 const provider = new FailoverJsonRpcProvider(
   mapFilterUndefined([rpcUrl, fallbackRpcUrl], (url) => url),
 );
-const caller = new ethers.Contract(
-  NETWORK_CONFIG[network.chainId].contracts.CALLER,
-  callerAbi,
-  provider,
-);
+const caller = new ethers.Contract(network.contracts.CALLER, callerAbi, provider);
 
 const relay = new GelatoRelay();
 
@@ -42,19 +41,16 @@ const requestSchema = z.object({
 enum SupportedGaslessAction {
   CLAIM_PROJECT = 'CLAIM_PROJECT',
   COLLECT_EARNINGS = 'COLLECT_EARNINGS',
-  // TODO: remove
-  ADD_FUNDS = 'ADD_FUNDS',
 }
 
 const SUPPORTED_CONTRACT_ABIS = {
   REPO_DRIVER: repoDriverAbi,
-  ADDRESS_DRIVER: addressDriverAbi,
   CALLER: callerAbi,
 };
 
 function verifySupportedContract(targetContractAddress: string): string | null {
   const supportedContractNames = Object.keys(SUPPORTED_CONTRACT_ABIS);
-  const supportedContracts = Object.entries(NETWORK_CONFIG[network.chainId].contracts).filter(
+  const supportedContracts = Object.entries(network.contracts).filter(
     ([contractName, address]) => supportedContractNames.includes(contractName) && address,
   );
 
@@ -75,7 +71,7 @@ function verifySignature(
     name: 'Caller',
     version: '1',
     chainId: network.chainId,
-    verifyingContract: NETWORK_CONFIG[network.chainId].contracts.CALLER,
+    verifyingContract: network.contracts.CALLER,
   };
 
   const types = {
@@ -113,6 +109,118 @@ function verifySignature(
   );
 }
 
+function parseCallBatchedArgs(txDescription: TransactionDescription) {
+  return z.array(z.tuple([z.string(), z.string(), z.bigint()])).safeParse(txDescription.args.calls);
+}
+
+function validateClaimProjectTx(txDescription: TransactionDescription): boolean {
+  if (txDescription.name !== 'callBatched') return false;
+
+  const parseCallsResult = parseCallBatchedArgs(txDescription);
+  if (!parseCallsResult.success) return false;
+
+  const parsedCalls = parseCallsResult.data;
+
+  // Check whether the batch includes the expected:
+  // 1. Set splits
+  // 2. Emit account metadata
+  // 3 [...] x : Any number of split calls
+  // x [...] y : Any number of collect calls
+  for (const [index, [target, calldata]] of parsedCalls.entries()) {
+    // Ensure the call is to RepoDriver
+    if (target.toLowerCase() !== network.contracts.REPO_DRIVER.toLowerCase()) {
+      return false;
+    }
+
+    // Parse the calldata
+    const repoDriverIface = new Interface(repoDriverAbi);
+    const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
+
+    if (!repoDriverParseRes) return false;
+
+    switch (index) {
+      case 0: {
+        if (repoDriverParseRes.name !== 'setSplits') {
+          return false;
+        }
+        break;
+      }
+      case 1: {
+        if (repoDriverParseRes.name !== 'emitAccountMetadata') {
+          return false;
+        }
+        break;
+      }
+      default: {
+        if (!(repoDriverParseRes.name === 'split' || repoDriverParseRes.name === 'collect')) {
+          return false;
+        }
+      }
+    }
+
+    break;
+  }
+
+  return true;
+}
+
+function validateCollectEarningsTx(txDescription: TransactionDescription): boolean {
+  if (txDescription.name !== 'callBatched') return false;
+
+  const parseCallsResult = parseCallBatchedArgs(txDescription);
+  if (!parseCallsResult.success) return false;
+
+  const parsedCalls = parseCallsResult.data;
+
+  // Ensure all calls are either
+  // 1. Collect on drips,
+  // 2. ReceiveStreams on address driver,
+  // 3. SqueezeStreams on address driver,
+  // 4. Split on address driver, or
+  // 4. Unwrap on native token unwrapper
+
+  for (const [target, calldata] of parsedCalls) {
+    const targetIsDrips = target.toLowerCase() === network.contracts.DRIPS.toLowerCase();
+    const targetIsNativeTokenUnwrapper =
+      target.toLowerCase() === network.contracts.NATIVE_TOKEN_UNWRAPPER?.toLowerCase();
+    const targetIsAddressDriver =
+      target.toLowerCase() === network.contracts.ADDRESS_DRIVER.toLowerCase();
+
+    if (targetIsDrips) {
+      const dripsIface = new Interface(dripsAbi);
+      const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
+
+      if (!dripsParseRes) return false;
+
+      if (
+        dripsParseRes.name !== 'receiveStreams' &&
+        dripsParseRes.name !== 'squeezeStreams' &&
+        dripsParseRes.name !== 'split'
+      ) {
+        return false;
+      }
+    } else if (targetIsAddressDriver) {
+      const addressDriverIface = new Interface(addressDriverAbi);
+      const addressDriverParseRes = addressDriverIface.parseTransaction({ data: calldata });
+
+      if (!addressDriverParseRes) return false;
+
+      if (addressDriverParseRes.name !== 'collect') return false;
+    } else if (targetIsNativeTokenUnwrapper) {
+      const iface = new Interface(nativeTokenUnwrapperAbi);
+      const parseRes = iface.parseTransaction({ data: calldata });
+
+      if (!parseRes) return false;
+
+      if (parseRes.name !== 'unwrap') return false;
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /** Verify that the calldata corresponds to a supported gasless action. */
 function inferActionType(calldata: string, contractName: string): SupportedGaslessAction | null {
   const contractAbi = Object.entries(SUPPORTED_CONTRACT_ABIS).find(
@@ -126,67 +234,9 @@ function inferActionType(calldata: string, contractName: string): SupportedGasle
   assert(parseRes, 'Invalid calldata');
 
   switch (contractName) {
-    case 'ADDRESS_DRIVER': {
-      if (parseRes.name === 'setStreams') {
-        return SupportedGaslessAction.ADD_FUNDS;
-      }
-      break;
-    }
     case 'CALLER': {
-      if (parseRes.name !== 'callBatched') return null;
-
-      const [calls] = parseRes.args;
-
-      const parseCallsResult = z
-        .array(z.tuple([z.string(), z.string(), z.bigint()]))
-        .safeParse(calls);
-      if (!parseCallsResult.success) return null;
-
-      const parsedCalls = parseCallsResult.data;
-
-      // Check whether the batch includes the expected:
-      // 1. Set splits
-      // 2. Emit account metadata
-      // 3 [...] x : Any number of split calls
-      // x [...] y : Any number of collect calls
-      for (const [index, [target, calldata]] of parsedCalls.entries()) {
-        // Ensure the call is to RepoDriver
-        if (
-          target.toLowerCase() !==
-          NETWORK_CONFIG[network.chainId].contracts.REPO_DRIVER.toLowerCase()
-        ) {
-          return null;
-        }
-
-        // Parse the calldata
-        const repoDriverIface = new Interface(repoDriverAbi);
-        const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
-
-        if (!repoDriverParseRes) return null;
-
-        switch (index) {
-          case 0: {
-            if (repoDriverParseRes.name !== 'setSplits') {
-              return null;
-            }
-            break;
-          }
-          case 1: {
-            if (repoDriverParseRes.name !== 'emitAccountMetadata') {
-              return null;
-            }
-            break;
-          }
-          default: {
-            if (!(repoDriverParseRes.name === 'split' || repoDriverParseRes.name === 'collect')) {
-              return null;
-            }
-          }
-        }
-
-        return SupportedGaslessAction.CLAIM_PROJECT;
-      }
-
+      if (validateClaimProjectTx(parseRes)) return SupportedGaslessAction.CLAIM_PROJECT;
+      if (validateCollectEarningsTx(parseRes)) return SupportedGaslessAction.COLLECT_EARNINGS;
       break;
     }
     default:
@@ -197,6 +247,9 @@ function inferActionType(calldata: string, contractName: string): SupportedGasle
 }
 
 export const POST = async ({ request }) => {
+  if (!network.gaslessClaimAndCollect)
+    return error(400, 'Gasless actions are not supported on this network');
+
   const body = await request.json();
 
   const parsedBody = requestSchema.safeParse(body);
@@ -247,7 +300,7 @@ export const POST = async ({ request }) => {
     const relayResponse = await relay.sponsoredCall(relayRequest, GELATO_API_KEY);
 
     // eslint-disable-next-line no-console
-    console.log('RELAY_RESPONSE', payload, relayResponse);
+    console.log('GASLESS_ACTION_RELAY_RESPONSE', payload, relayResponse);
 
     return new Response(JSON.stringify(relayResponse));
   } catch (e) {
