@@ -93,7 +93,7 @@
   headline="Collaborative list"
   description="Configure who should be able to vote on your list's recipients."
 >
-  <CustodialWarning dismissableId="custodial-drip-list" />
+  <CustodialWarning dismissableId="custodial-warning-drip-list" />
   <FormField title="Collaborators*">
     <ListEditor
       allowProjects={false}

@@ -72,7 +72,7 @@
   headline="Create a Drip List"
   description="What projects, individuals, organizations, or other Drip Lists would you like to support with your Drip List?"
 >
-  <CustodialWarning dismissableId="custodial-drip-list" />
+  <CustodialWarning dismissableId="custodial-warning-drip-list" />
   <FormField title="Recipients*">
     <ListEditor
       bind:weights={$context.dripList.weights}

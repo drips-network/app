@@ -36,7 +36,7 @@
       'maintainers'
     ]}% you assigned to your project’s maintainers."
   />
-  <CustodialWarning dismissableId="custodial-project-splits" />
+  <CustodialWarning dismissableId="custodial-warning-project-splits" />
   <ListEditor
     bind:weights={$context.maintainerSplits.weights}
     bind:items={$context.maintainerSplits.items}

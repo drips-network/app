@@ -77,7 +77,7 @@
     description="Vote for which recipients of this Drip List should receive what percentage of funds."
   />
 
-  <CustodialWarning dismissableId="custodial-vote" />
+  <CustodialWarning dismissableId="custodial-warning-vote" />
   <FormField title="Recipients*">
     <ListEditor
       bind:valid

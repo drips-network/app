@@ -53,7 +53,7 @@
     <TextArea bind:value={description} resizable={true} validationState={textAreaValidationState} />
   </FormField>
 
-  <CustodialWarning dismissableId="custodial-drip-list" />
+  <CustodialWarning dismissableId="custodial-warning-drip-list" />
   <FormField title="Recipients*">
     <ListEditor
       bind:weights

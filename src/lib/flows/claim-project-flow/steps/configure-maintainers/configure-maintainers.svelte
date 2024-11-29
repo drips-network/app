@@ -25,7 +25,7 @@
     'maintainers'
   ]}% split to your project’s maintainers. In total, you can add up to 200 maintainers and dependencies, and change this list later anytime."
 >
-  <CustodialWarning dismissableId="custodial-claim-project" />
+  <CustodialWarning dismissableId="custodial-warning-claim-project" />
   <ListEditor
     bind:weights={$context.maintainerSplits.weights}
     bind:items={$context.maintainerSplits.items}

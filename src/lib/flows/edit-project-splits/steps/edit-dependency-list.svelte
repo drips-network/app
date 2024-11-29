@@ -26,7 +26,7 @@
     description="Decide which GitHub projects, Ethereum addresses, and other Drip Lists should receive the {$context
       .highLevelPercentages['dependencies']}% you assigned to your project’s dependencies."
   />
-  <CustodialWarning dismissableId="custodial-project-splits" />
+  <CustodialWarning dismissableId="custodial-warning-project-splits" />
   <ListEditor
     bind:weights={$context.dependencySplits.weights}
     bind:items={$context.dependencySplits.items}
