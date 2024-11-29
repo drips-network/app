@@ -6,7 +6,7 @@
   import { browser } from '$app/environment';
   import { slide } from 'svelte/transition';
 
-  export let dismissableId: string = 'custodial';
+  export let dismissableId: string;
 
   $: dismissed = browser ? $dismissablesStore.includes(dismissableId) : false;
 
