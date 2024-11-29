@@ -437,7 +437,7 @@
             throw new Error('The gasless call did not resolve within the expected timeframe.');
           }
 
-          break;
+          continue;
         }
 
         const txResponse = await (signer ?? unreachable()).sendTransaction({
