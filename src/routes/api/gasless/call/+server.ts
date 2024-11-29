@@ -51,7 +51,6 @@ enum SupportedGaslessAction {
 }
 
 const SUPPORTED_CONTRACT_ABIS = {
-  REPO_DRIVER: repoDriverAbi,
   CALLER: callerAbi,
 };
 
