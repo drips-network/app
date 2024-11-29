@@ -54,6 +54,7 @@
   $: fakeClaimedProject = {
     __typename: 'Project',
     source: { ...project.source },
+    isVisible: true,
     chainData: [
       {
         owner: {

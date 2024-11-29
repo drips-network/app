@@ -47,6 +47,7 @@
   import modal from '$lib/stores/modal';
   import ExampleTransactStep from './examples/example-transact/example-transact-step.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import { isVisible } from '@testing-library/user-event/dist/cjs/utils/index.js';
 
   // Button
   let disabled = false;
@@ -203,6 +204,7 @@
     {
       __typename: 'DripListReceiver',
       dripList: {
+        isVisible: true,
         __typename: 'DripList',
         chain: network.gqlName,
         account: {
@@ -241,6 +243,7 @@
             {
               __typename: 'DripListReceiver',
               dripList: {
+                isVisible: true,
                 __typename: 'DripList',
                 chain: network.gqlName,
                 name: 'A different Drip List',
@@ -638,6 +641,7 @@
         ? {
             __typename: 'Project',
             source: SOURCE_CONFIGS[sourceType],
+            isVisible: true,
             chainData: [
               {
                 chain: network.gqlName,
@@ -657,6 +661,7 @@
         : {
             __typename: 'Project',
             source: SOURCE_CONFIGS[sourceType],
+            isVisible: true,
             chainData: [
               {
                 chain: network.gqlName,
