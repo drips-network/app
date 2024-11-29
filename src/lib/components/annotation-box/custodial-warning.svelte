@@ -22,7 +22,7 @@
 {#if !dismissed}
   <div transition:fly={{ y: 8 }}>
     <AnnotationBox type="error">
-      <span class="typo-text"
+      <span class="warning-text typo-text"
         >Please ensure all addresses are self-custodial. Any funds sent to exchange-managed
         addresses (e.g. Coinbase or Binance) <strong class="typo-text-bold">will be lost</strong
         ></span
@@ -37,8 +37,9 @@
 {/if}
 
 <style>
-  strong {
-    /* TODO? */
-    /* color: var(--color-negative); */
+  /* re-align with icon because of larger font size */
+  .warning-text {
+    position: relative;
+    top: -3px;
   }
 </style>
