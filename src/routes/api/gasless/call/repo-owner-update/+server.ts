@@ -119,6 +119,8 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 
   if (blockRecordTaskId) {
     const taskStatusRes = await fetch(`/api/gasless/track/${blockRecordTaskId}`);
+    if (!taskStatusRes.ok)
+      throw new Error(`Failed to fetch task status: ${await taskStatusRes.text()}`);
 
     const { task } = await taskStatusRes.json();
     assert(typeof task === 'object', 'Invalid task');
