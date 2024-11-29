@@ -2,6 +2,7 @@
   export const DRIP_LIST_BADGE_FRAGMENT = gql`
     fragment DripListBadge on DripList {
       chain
+      isVisible
       account {
         accountId
       }
@@ -19,6 +20,7 @@
   import { gql } from 'graphql-request';
   import type { DripListBadgeFragment } from './__generated__/gql.generated';
   import DripListAvatar from '../drip-list-avatar/drip-list-avatar.svelte';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
   export let dripList: DripListBadgeFragment | undefined;
 
@@ -50,13 +52,21 @@
     <DripListAvatar size={avatarSize} {disabled} {outline} />
   {/if}
   {#if showName}
-    <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
+    <div
+      class="name typo-text text-foreground flex-1 min-w-0 truncate"
+      class:hiddenList={!dripList?.isVisible}
+    >
       <span
         >{#if username}<span class="text-foreground-level-5">{username}/</span
           >{/if}{#if !dripList}<span class="animate-pulse">...</span
           >{:else}{dripList.name}{/if}</span
       >
     </div>
+    {#if !dripList?.isVisible}
+      <WarningIcon
+        style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display:inline"
+      />
+    {/if}
   {/if}
 </svelte:element>
 
@@ -64,5 +74,9 @@
   a.drip-list-badge:focus-visible .name > span {
     background: var(--color-primary-level-1);
     border-radius: 0.25rem;
+  }
+
+  .hiddenList {
+    opacity: 0.3;
   }
 </style>
