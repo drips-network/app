@@ -3,12 +3,11 @@
   import ThumbsUpIcon from '$lib/components/icons/ThumbsUp.svelte';
   import Button from '../button/button.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import { browser } from '$app/environment';
   import { slide } from 'svelte/transition';
 
   export let dismissableId: string;
 
-  $: dismissed = browser ? $dismissablesStore.includes(dismissableId) : false;
+  $: dismissed = $dismissablesStore.includes(dismissableId);
 
   async function handleDismiss() {
     dismissablesStore.dismiss(dismissableId);
