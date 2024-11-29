@@ -188,7 +188,7 @@ async function validateClaimProjectTx(txDescription: TransactionDescription): Pr
 
   // Validate that the project in question is currently unclaimed
 
-  assert(projectAccountId, 'Project account ID not found');
+  if (!projectAccountId) return false;
   const isProjectUnclaimedQueryResponse = await query<
     IsProjectUnclaimedQuery,
     IsProjectUnclaimedQueryVariables
@@ -201,9 +201,11 @@ async function validateClaimProjectTx(txDescription: TransactionDescription): Pr
     fetch,
   );
 
-  if (!isProjectUnclaimedQueryResponse.projectById) return error(400, 'Project not found');
+  if (!isProjectUnclaimedQueryResponse.projectById)
+    return error(400, '{ "error": "Project not found" }');
   const chainData = filterCurrentChainData(isProjectUnclaimedQueryResponse.projectById.chainData);
-  if (chainData.__typename === 'ClaimedProjectData') return error(400, 'Project already claimed');
+  if (chainData.__typename === 'ClaimedProjectData')
+    return error(400, '{ "error": "Project already claimed" }');
 
   return true;
 }
@@ -286,8 +288,6 @@ async function inferActionType(
       if (await validateClaimProjectTx(parseRes)) return SupportedGaslessAction.CLAIM_PROJECT;
       break;
     }
-    default:
-      throw new Error('Unsupported contract name');
   }
 
   return null;
@@ -295,14 +295,14 @@ async function inferActionType(
 
 export const POST = async ({ request }) => {
   if (!network.gaslessClaimAndCollect)
-    return error(400, 'Gasless actions are not supported on this network');
+    return error(400, '{ "error": "Gasless actions are not supported on this network" }');
 
   const body = await request.json();
 
   const parsedBody = requestSchema.safeParse(body);
 
   if (!parsedBody.success) {
-    return new Response(JSON.stringify(parsedBody.error), { status: 400 });
+    return error(400, JSON.stringify(parsedBody.error));
   }
 
   const { targetContractAddress, payload, eip712Signature } = parsedBody.data;
@@ -310,18 +310,18 @@ export const POST = async ({ request }) => {
   const contractName = verifySupportedContract(targetContractAddress);
 
   if (!contractName) {
-    return new Response('Invalid contract address', { status: 400 });
+    return error(400, '{ "error": "Invalid contract address" }');
   }
 
   if (!verifySignature(eip712Signature, payload, targetContractAddress)) {
-    return new Response('Invalid signature', { status: 400 });
+    return error(400, '{ "error": "Invalid signature" }');
   }
 
   const { data } = payload;
   const actionType = await inferActionType(data, contractName);
 
   if (!actionType) {
-    return new Response('Unsupported gasless action', { status: 400 });
+    return error(400, '{ "error": "Unsupported gasless action" }');
   }
 
   const signature = Signature.from(eip712Signature);
@@ -353,6 +353,6 @@ export const POST = async ({ request }) => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    return error(500, e instanceof Error ? e : 'Unknown error');
+    return error(500, e instanceof Error ? e : '{ "error": "Unknown error" }');
   }
 };
