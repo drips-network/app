@@ -130,7 +130,6 @@
     </svelte:fragment>
   </FormField>
 
-  <CustodialWarning dismissableId="custodial-drip-list" />
   <FormField
     title="Restrict to specific recipients"
     description="By default, any collaborator can suggest any recipient. Enable this to configure a list of ETH addresses, GitHub repos, or other Drip Lists that can be voted for."
