@@ -9,6 +9,7 @@
   import Button from '$lib/components/button/button.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -35,6 +36,7 @@
       'maintainers'
     ]}% you assigned to your project’s maintainers."
   />
+  <CustodialWarning dismissableId="custodial-project-splits" />
   <ListEditor
     bind:weights={$context.maintainerSplits.weights}
     bind:items={$context.maintainerSplits.items}

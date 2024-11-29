@@ -18,6 +18,7 @@
   import { slide } from 'svelte/transition';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import network from '$lib/stores/wallet/network';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -92,6 +93,7 @@
   headline="Collaborative list"
   description="Configure who should be able to vote on your list's recipients."
 >
+  <CustodialWarning dismissableId="custodial-drip-list" />
   <FormField title="Collaborators*">
     <ListEditor
       allowProjects={false}
@@ -128,6 +130,7 @@
     </svelte:fragment>
   </FormField>
 
+  <CustodialWarning dismissableId="custodial-drip-list" />
   <FormField
     title="Restrict to specific recipients"
     description="By default, any collaborator can suggest any recipient. Enable this to configure a list of ETH addresses, GitHub repos, or other Drip Lists that can be voted for."

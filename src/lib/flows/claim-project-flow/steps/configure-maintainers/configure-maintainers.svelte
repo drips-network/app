@@ -8,6 +8,7 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -24,6 +25,7 @@
     'maintainers'
   ]}% split to your project’s maintainers. In total, you can add up to 200 maintainers and dependencies, and change this list later anytime."
 >
+  <CustodialWarning dismissableId="custodial-claim-project" />
   <ListEditor
     bind:weights={$context.maintainerSplits.weights}
     bind:items={$context.maintainerSplits.items}

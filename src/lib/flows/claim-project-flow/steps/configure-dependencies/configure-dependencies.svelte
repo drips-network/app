@@ -9,6 +9,7 @@
   import type { State } from '../../claim-project-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -37,6 +38,7 @@
       : ''
     : ''} In total, you can add up to 200 maintainers and dependencies, and change this list later anytime."
 >
+  <CustodialWarning dismissableId="custodial-claim-project" />
   <!-- TODO: Prevent splitting to the same project we're trying to claim. -->
   <ListEditor
     bind:weights={$context.dependencySplits.weights}
