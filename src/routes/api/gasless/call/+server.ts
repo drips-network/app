@@ -15,6 +15,13 @@ import { error } from '@sveltejs/kit';
 import type { TransactionDescription } from 'ethers';
 import { nativeTokenUnwrapperAbi } from '$lib/utils/sdk/native-token-unrapper/native-token-unwrapper-abi.js';
 import { dripsAbi } from '$lib/utils/sdk/drips/drips-abi.js';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL.js';
+import type {
+  IsProjectUnclaimedQuery,
+  IsProjectUnclaimedQueryVariables,
+} from './__generated__/gql.generated.js';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 
 const { rpcUrl, fallbackRpcUrl } = network;
 const provider = new FailoverJsonRpcProvider(
@@ -47,6 +54,21 @@ const SUPPORTED_CONTRACT_ABIS = {
   REPO_DRIVER: repoDriverAbi,
   CALLER: callerAbi,
 };
+
+const projectUnclaimedQuery = gql`
+  query isProjectUnclaimed($projectId: ID!, $chains: [SupportedChain!]!) {
+    projectById(id: $projectId, chains: $chains) {
+      chainData {
+        ... on UnClaimedProjectData {
+          chain
+        }
+        ... on ClaimedProjectData {
+          chain
+        }
+      }
+    }
+  }
+`;
 
 function verifySupportedContract(targetContractAddress: string): string | null {
   const supportedContractNames = Object.keys(SUPPORTED_CONTRACT_ABIS);
@@ -113,13 +135,15 @@ function parseCallBatchedArgs(txDescription: TransactionDescription) {
   return z.array(z.tuple([z.string(), z.string(), z.bigint()])).safeParse(txDescription.args.calls);
 }
 
-function validateClaimProjectTx(txDescription: TransactionDescription): boolean {
+async function validateClaimProjectTx(txDescription: TransactionDescription): Promise<boolean> {
   if (txDescription.name !== 'callBatched') return false;
 
   const parseCallsResult = parseCallBatchedArgs(txDescription);
   if (!parseCallsResult.success) return false;
 
   const parsedCalls = parseCallsResult.data;
+
+  let projectAccountId: string | undefined = undefined;
 
   // Check whether the batch includes the expected:
   // 1. Set splits
@@ -140,26 +164,46 @@ function validateClaimProjectTx(txDescription: TransactionDescription): boolean 
 
     switch (index) {
       case 0: {
-        if (repoDriverParseRes.name !== 'setSplits') {
-          return false;
-        }
+        if (repoDriverParseRes.name !== 'setSplits') return false;
+
+        projectAccountId = repoDriverParseRes.args[0].toString();
+
         break;
       }
       case 1: {
-        if (repoDriverParseRes.name !== 'emitAccountMetadata') {
-          return false;
-        }
+        if (repoDriverParseRes.name !== 'emitAccountMetadata') return false;
+        if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
+
         break;
       }
       default: {
-        if (!(repoDriverParseRes.name === 'split' || repoDriverParseRes.name === 'collect')) {
+        if (!(repoDriverParseRes.name === 'split' || repoDriverParseRes.name === 'collect'))
           return false;
-        }
+        if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
       }
     }
 
     break;
   }
+
+  // Validate that the project in question is currently unclaimed
+
+  assert(projectAccountId, 'Project account ID not found');
+  const isProjectUnclaimedQueryResponse = await query<
+    IsProjectUnclaimedQuery,
+    IsProjectUnclaimedQueryVariables
+  >(
+    projectUnclaimedQuery,
+    {
+      projectId: projectAccountId,
+      chains: [network.gqlName],
+    },
+    fetch,
+  );
+
+  if (!isProjectUnclaimedQueryResponse.projectById) return error(400, 'Project not found');
+  const chainData = filterCurrentChainData(isProjectUnclaimedQueryResponse.projectById.chainData);
+  if (chainData.__typename === 'ClaimedProjectData') return error(400, 'Project already claimed');
 
   return true;
 }
@@ -222,7 +266,10 @@ function validateCollectEarningsTx(txDescription: TransactionDescription): boole
 }
 
 /** Verify that the calldata corresponds to a supported gasless action. */
-function inferActionType(calldata: string, contractName: string): SupportedGaslessAction | null {
+async function inferActionType(
+  calldata: string,
+  contractName: string,
+): Promise<SupportedGaslessAction | null> {
   const contractAbi = Object.entries(SUPPORTED_CONTRACT_ABIS).find(
     ([name]) => name === contractName,
   )?.[1];
@@ -235,8 +282,8 @@ function inferActionType(calldata: string, contractName: string): SupportedGasle
 
   switch (contractName) {
     case 'CALLER': {
-      if (validateClaimProjectTx(parseRes)) return SupportedGaslessAction.CLAIM_PROJECT;
       if (validateCollectEarningsTx(parseRes)) return SupportedGaslessAction.COLLECT_EARNINGS;
+      if (await validateClaimProjectTx(parseRes)) return SupportedGaslessAction.CLAIM_PROJECT;
       break;
     }
     default:
@@ -271,7 +318,7 @@ export const POST = async ({ request }) => {
   }
 
   const { data } = payload;
-  const actionType = inferActionType(data, contractName);
+  const actionType = await inferActionType(data, contractName);
 
   if (!actionType) {
     return new Response('Unsupported gasless action', { status: 400 });
