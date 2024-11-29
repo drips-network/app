@@ -16,8 +16,8 @@
   <div transition:slide={{ duration: 300 }}>
     <AnnotationBox type="error">
       <span class="warning-text typo-text"
-        >Please ensure you only split funds to self-custodial ETH addresses. Funds sent to
-        custodial, exchange-managed addresses (e.g. Coinbase or Binance) will be lost.</span
+        >Please ensure you only split funds to self-custodial ETH addresses. Funds sent directly to
+        exchange-managed addresses (e.g. Coinbase) may be lost.</span
       >
       <svelte:fragment slot="actions">
         <Button
