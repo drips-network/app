@@ -16,11 +16,15 @@
   <div transition:slide={{ duration: 300 }}>
     <AnnotationBox type="error">
       <span class="warning-text typo-text"
-        >Please ensure all addresses are self-custodial. Any funds sent to exchange-managed
-        addresses (e.g. Coinbase or Binance) <strong class="typo-text-bold">will be lost.</strong
-        ></span
+        >Please ensure you only split funds to self-custodial ETH addresses. Funds sent to
+        custodial, exchange-managed addresses (e.g. Coinbase or Binance) will be lost.</span
       >
       <svelte:fragment slot="actions">
+        <Button
+          variant="ghost"
+          href="https://docs.drips.network/faq/#can-i-split-or-stream-funds-directly-to-exchange-managed-ethereum-addresses"
+          target="_blank">Learn more</Button
+        >
         <Button icon={ThumbsUpIcon} variant="destructive" on:click={handleDismiss}
           >I understand</Button
         >
