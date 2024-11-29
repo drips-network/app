@@ -7,14 +7,12 @@
 
   export let dismissableId: string;
 
-  $: dismissed = $dismissablesStore.includes(dismissableId);
-
   async function handleDismiss() {
     dismissablesStore.dismiss(dismissableId);
   }
 </script>
 
-{#if !dismissed}
+{#if !$dismissablesStore.includes(dismissableId)}
   <div transition:slide={{ duration: 300 }}>
     <AnnotationBox type="error">
       <span class="warning-text typo-text"
