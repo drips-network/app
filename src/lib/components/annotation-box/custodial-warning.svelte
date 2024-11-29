@@ -2,26 +2,43 @@
   import AnnotationBox from './annotation-box.svelte';
   import ThumbsUpIcon from '$lib/components/icons/ThumbsUp.svelte';
   import Button from '../button/button.svelte';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import { browser } from '$app/environment';
+  import { fly } from 'svelte/transition';
 
-  function handleUnderstanding() {
-    // eslint-disable-next-line no-console
-    console.log('I understand');
+  export let dismissableId: string = 'custodial';
+
+  let dismissed = browser ? dismissablesStore.isDismissed(dismissableId) : false;
+
+  async function handleDismiss() {
+    dismissablesStore.dismiss(dismissableId);
   }
+
+  dismissablesStore.subscribe(() => {
+    dismissed = dismissablesStore.isDismissed(dismissableId);
+  });
 </script>
 
-<AnnotationBox type="error">
-  <span class="typo-text"
-    >Please ensure all addresses are self-custodial. Any funds sent to exchange-managed addresses
-    (e.g. Coinbase or Binance) <strong class="typo-text-bold">will be lost</strong></span
-  >.
-  <svelte:fragment slot="actions">
-    <Button icon={ThumbsUpIcon} variant="destructive" on:click={handleUnderstanding}
-      >I understand</Button
-    >
-  </svelte:fragment>
-</AnnotationBox>
+{#if !dismissed}
+  <div transition:fly={{ y: 8 }}>
+    <AnnotationBox type="error">
+      <span class="typo-text"
+        >Please ensure all addresses are self-custodial. Any funds sent to exchange-managed
+        addresses (e.g. Coinbase or Binance) <strong class="typo-text-bold">will be lost</strong
+        ></span
+      >.
+      <svelte:fragment slot="actions">
+        <Button icon={ThumbsUpIcon} variant="destructive" on:click={handleDismiss}
+          >I understand</Button
+        >
+      </svelte:fragment>
+    </AnnotationBox>
+  </div>
+{/if}
 
 <style>
   strong {
+    /* TODO? */
+    /* color: var(--color-negative); */
   }
 </style>
