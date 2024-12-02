@@ -27,14 +27,20 @@ export const GET = async ({ fetch }) => {
     return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
   }
 
-  const dripsTokenHoldingsRes = await (
-    await fetch(
-      `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${etherscanApiKey}`,
-    )
-  ).json();
+  const driptsTokenHoldingRes = await fetch(
+    `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${etherscanApiKey}`,
+  );
+  if (!driptsTokenHoldingRes.ok) {
+    const errorContent = await driptsTokenHoldingRes.text();
+    // eslint-disable-next-line no-console
+    console.error('Response from etherscan not ok', errorContent);
+    return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
+  }
+  const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
+
   // eslint-disable-next-line no-console
-  console.log('dripsTokenHoldingsRes', dripsTokenHoldingsRes);
-  const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsRes.result);
+  console.log('dripsTokenHoldingsRes', dripsTokenHoldingsJson);
+  const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsJson.result);
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
   const cmcIdMap = z.record(z.number()).parse(cmcIdMapRes);
