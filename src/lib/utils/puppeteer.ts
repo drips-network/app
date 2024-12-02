@@ -6,15 +6,15 @@ import puppeteer, { type Browser, type PuppeteerNodeLaunchOptions } from 'puppet
  */
 export class PuppeteerManager {
   static browser: Browser | undefined;
-  static browserConfig: PuppeteerNodeLaunchOptions | undefined
+  static browserConfig: PuppeteerNodeLaunchOptions | undefined;
 
   static #onBrowserExit = () => {
     // eslint-disable-next-line no-console
-    console.warn('PuppeteerManager: browser exited')
+    console.warn('PuppeteerManager: browser exited');
     // if the browser process exits for any reason, mark the browser as dead
     // so that we can perform re-launch on the next call to this.launch
     this.browser = undefined;
-  }
+  };
 
   /**
    * Launch a Puppeteer Browser with the specified configuration. Subsequent calls to
@@ -28,20 +28,18 @@ export class PuppeteerManager {
    */
   static async launch(browserConfig?: PuppeteerNodeLaunchOptions): Promise<Browser> {
     if (browserConfig && this.browser) {
-      await this.browser.close()
+      await this.browser.close();
     }
 
     if (!this.browser) {
-      this.browserConfig = this.browserConfig && !browserConfig ? this.browserConfig : browserConfig
-      this.browser = await puppeteer.launch(this.browserConfig)
+      this.browserConfig =
+        this.browserConfig && !browserConfig ? this.browserConfig : browserConfig;
+      this.browser = await puppeteer.launch(this.browserConfig);
 
-      const childProcess = this.browser.process()
-      childProcess?.on('exit', this.#onBrowserExit)
+      const childProcess = this.browser.process();
+      childProcess?.on('exit', this.#onBrowserExit);
     }
 
-    return this.browser
+    return this.browser;
   }
 }
-
-
-

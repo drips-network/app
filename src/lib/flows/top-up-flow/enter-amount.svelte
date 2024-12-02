@@ -20,7 +20,7 @@
   export let backButton: boolean;
 
   $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? (tokens.getByAddress(tokenAddress) ?? unreachable()) : undefined;
+  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : undefined;
 
   let amount: bigint | undefined = undefined;
 
