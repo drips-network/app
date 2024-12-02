@@ -3,7 +3,6 @@ import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { EntryGenerator } from './$types.js';
 import Jimp from 'jimp';
-import { getSlug } from '$lib/utils/blog-posts.js';
 
 export const GET = async ({ params }) => {
   const { slug, target } = params;
@@ -49,7 +48,14 @@ export const prerender = true;
 export const entries: EntryGenerator = async () => {
   const allPosts = import.meta.glob('/src/blog-posts/*.md', { as: 'raw' });
 
-  const slugs = await Promise.all(Object.entries(allPosts).map(async ([path]) => getSlug(path)));
+  const slugs = await Promise.all(
+    Object.entries(allPosts).map(async ([path]) => {
+      const slug = path.split('/').pop()?.slice(0, -3);
+      assert(slug);
+
+      return slug;
+    }),
+  );
 
   return slugs.reduce<{ slug: string; target: string }[]>((acc, slug) => {
     return [...acc, { slug, target: 'twitter' }, { slug, target: 'og' }];
