@@ -373,7 +373,12 @@
     <div class="notice">
       <AnnotationBox type="info" icon={EyeClosed}>
         <span class="typo-text-small-bold">{project.source.repoName}</span> is hidden and cannot
-        receive new funds. {isOwnProject
+        receive new funds.
+        <a
+          style="text-decoration: underline;"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Read more</a
+        >
+        about this. {isOwnProject
           ? 'You can unhide it to start receiving funds again.'
           : 'If this is your project, unhide it by connecting the wallet that claimed it with.'}
         <svelte:fragment slot="actions">
