@@ -47,7 +47,6 @@
   import modal from '$lib/stores/modal';
   import ExampleTransactStep from './examples/example-transact/example-transact-step.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
-  import { isVisible } from '@testing-library/user-event/dist/cjs/utils/index.js';
 
   // Button
   let disabled = false;
