@@ -38,12 +38,6 @@ export const GET = async ({ fetch }) => {
   }
 
   const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
-  if (dripsTokenHoldingsJson.message === 'NOTOK') {
-    // eslint-disable-next-line no-console
-    console.error('Etherscan returned error message', dripsTokenHoldingsJson);
-    return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
-  }
-
   // eslint-disable-next-line no-console
   console.log(
     'dripsTokenHoldingsRes',
@@ -51,6 +45,12 @@ export const GET = async ({ fetch }) => {
     dripsTokenHoldingsJson.status,
     dripsTokenHoldingsJson.statusText,
   );
+  if (dripsTokenHoldingsJson.message === 'NOTOK') {
+    // eslint-disable-next-line no-console
+    console.error('Etherscan returned error message', dripsTokenHoldingsJson);
+    return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
+  }
+
   const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsJson.result);
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
