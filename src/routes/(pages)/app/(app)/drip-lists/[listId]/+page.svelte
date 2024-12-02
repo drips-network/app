@@ -113,7 +113,7 @@
   </div>
 {/if}
 
-<article class="drip-list-page" class:hiddenByUser={!dripList?.isVisible}>
+<article class="drip-list-page" class:hidden-by-user={!dripList?.isVisible}>
   <main class="list">
     <DripListCard clampTitle={false} data={{ dripList, votingRound }} />
   </main>
@@ -264,7 +264,7 @@
     margin-bottom: 2rem;
   }
 
-  .hiddenByUser {
+  .hidden-by-user {
     opacity: 0.5;
   }
 

@@ -89,7 +89,7 @@
       </div>
 
       <div>
-        <span class="typo-header-3 ellipsis" class:hiddenByUser={!dripList.isVisible}
+        <span class="typo-header-3 ellipsis" class:hidden-by-user={!dripList.isVisible}
           >{dripList.name}</span
         >
         {#if !dripList?.isVisible}
@@ -100,7 +100,7 @@
       </div>
     </div>
   {:else if project}
-    <div class="content-container" in:fade class:hiddenByUser={!project.isVisible}>
+    <div class="content-container" in:fade class:hidden-by-user={!project.isVisible}>
       <div class="flex">
         {#if 'owner' in project}
           <div class="-mr-[5%]">
@@ -197,7 +197,7 @@
     text-overflow: ellipsis;
   }
 
-  .hiddenByUser {
+  .hidden-by-user {
     opacity: 0.5;
   }
 </style>

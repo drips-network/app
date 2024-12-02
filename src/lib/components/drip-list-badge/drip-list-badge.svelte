@@ -54,7 +54,7 @@
   {#if showName}
     <div
       class="name typo-text text-foreground flex-1 min-w-0 truncate"
-      class:hiddenList={!dripList?.isVisible}
+      class:hidden-list={!dripList?.isVisible}
     >
       <span
         >{#if username}<span class="text-foreground-level-5">{username}/</span
@@ -76,7 +76,7 @@
     border-radius: 0.25rem;
   }
 
-  .hiddenList {
+  .hidden-list {
     opacity: 0.3;
   }
 </style>

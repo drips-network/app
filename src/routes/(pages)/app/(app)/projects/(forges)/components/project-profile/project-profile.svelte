@@ -402,7 +402,7 @@
   <article
     class="project-profile"
     class:claimed={isClaimed(chainData)}
-    class:hiddenByUser={!project.isVisible}
+    class:hidden-by-user={!project.isVisible}
   >
     <header class="header">
       <div>
@@ -656,7 +656,7 @@
     gap: 1rem;
   }
 
-  .hiddenByUser {
+  .hidden-by-user {
     opacity: 0.5;
   }
 
