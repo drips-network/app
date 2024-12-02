@@ -32,6 +32,8 @@ export const GET = async ({ fetch }) => {
       `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${etherscanApiKey}`,
     )
   ).json();
+  // eslint-disable-next-line no-console
+  console.log('dripsTokenHoldingsRes', dripsTokenHoldingsRes);
   const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsRes.result);
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
