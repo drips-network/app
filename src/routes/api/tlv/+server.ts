@@ -38,13 +38,6 @@ export const GET = async ({ fetch }) => {
   }
 
   const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
-  // eslint-disable-next-line no-console
-  console.log(
-    'dripsTokenHoldingsRes',
-    dripsTokenHoldingsJson,
-    dripsTokenHoldingsJson.status,
-    dripsTokenHoldingsJson.statusText,
-  );
   if (dripsTokenHoldingsJson.message === 'NOTOK') {
     // eslint-disable-next-line no-console
     console.error('Etherscan returned error message', dripsTokenHoldingsJson);
