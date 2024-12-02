@@ -565,7 +565,7 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo} />
+        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo || !project.isVisible} />
       </div>
     </aside>
   </article>

@@ -121,6 +121,7 @@
   <aside class="support">
     <div>
       <SupportCard
+        disabled={!dripList?.isVisible}
         dripList={dripList ?? undefined}
         draftListMode={Boolean(!dripList && votingRound)}
       />
