@@ -23,6 +23,8 @@ import {
   SortDirection,
 } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
+import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
+import { ensureResponseOk } from '$lib/utils/fetch';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -97,12 +99,8 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     return results.map((res) => res.dripList);
   };
 
-  const fetchBlogPosts = async () => {
-    return (await f('/api/blog/posts')).json();
-  };
-
   const fetchTlv = async () => {
-    return (await f('/api/tlv')).json();
+    return (await ensureResponseOk(f('/api/tlv'))).json();
   };
 
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(

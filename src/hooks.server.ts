@@ -23,7 +23,7 @@ PuppeteerManager.launch({
   }),
   headless: true,
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
-})
+});
 
 export const handle = sequence(sentryHandle());
 export const handleError = handleErrorWithSentry();
