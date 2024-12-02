@@ -58,6 +58,10 @@
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import { formatSplitReceivers } from '$lib/utils/sdk/utils/format-split-receivers';
+  import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import { invalidateAll } from '$app/navigation';
+  import unreachable from '$lib/utils/unreachable';
+  import { waitForAccountMetadata } from '$lib/utils/ipfs';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -153,7 +157,7 @@
             args: [[setSplitsTx, metadataTx].map(txToCallerCall)],
           });
 
-          return { tx };
+          return { tx, accountId: listId, ipfsHash: hash };
         },
 
         transactions: ({ tx }) => [
@@ -163,6 +167,12 @@
             title: 'Update your Drip List',
           },
         ],
+
+        after: async (_, { accountId, ipfsHash }) => {
+          await waitForAccountMetadata(accountId, ipfsHash);
+          await invalidateAccountCache(accountId);
+          await invalidateAll();
+        },
       }),
     );
   }
