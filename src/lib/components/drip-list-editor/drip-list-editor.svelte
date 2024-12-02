@@ -16,6 +16,7 @@
   import TextArea from '../text-area/text-area.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import type { AddItemError } from '../list-editor/errors';
+  import CustodialWarning from '../annotation-box/custodial-warning.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let name: string;
@@ -55,6 +56,7 @@
     <TextArea bind:value={description} resizable={true} validationState={textAreaValidationState} />
   </FormField>
 
+  <CustodialWarning dismissableId="custodial-warning-drip-list" />
   <FormField title="Recipients*">
     <ListEditor
       bind:weights
