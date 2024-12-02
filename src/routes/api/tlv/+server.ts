@@ -33,16 +33,23 @@ export const GET = async ({ fetch }) => {
   if (!driptsTokenHoldingRes.ok) {
     const errorContent = await driptsTokenHoldingRes.text();
     // eslint-disable-next-line no-console
-    console.error('Response from etherscan not ok', errorContent);
+    console.error('Etherscan returned error response', errorContent);
     return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
   }
+
   const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
+  if (dripsTokenHoldingsJson.message === 'NOTOK') {
+    // eslint-disable-next-line no-console
+    console.error('Etherscan returned error message', dripsTokenHoldingsJson);
+    return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
+  }
 
   // eslint-disable-next-line no-console
   console.log(
     'dripsTokenHoldingsRes',
     dripsTokenHoldingsJson,
-    JSON.stringify(driptsTokenHoldingRes),
+    dripsTokenHoldingsJson.status,
+    dripsTokenHoldingsJson.statusText,
   );
   const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsJson.result);
 
