@@ -372,15 +372,15 @@
   {#if !project.isVisible}
     <div class="notice">
       <AnnotationBox type="info" icon={EyeClosed}>
-        <span class="typo-text-small-bold">{project.source.repoName}</span> is hidden and cannot
-        receive new funds.
+        <span class="typo-text-small-bold"
+          >{project.source.ownerName}/{project.source.repoName}</span
+        >
+        has been hidden by its owner.
         <a
           style="text-decoration: underline;"
-          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Read more</a
-        >
-        about this. {isOwnProject
-          ? 'You can unhide it to start receiving funds again.'
-          : 'If this is your project, unhide it by connecting the wallet that claimed it with.'}
+          target="_blank"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+        >.
         <svelte:fragment slot="actions">
           {#if isOwnProject}
             <div class="flex gap-3">

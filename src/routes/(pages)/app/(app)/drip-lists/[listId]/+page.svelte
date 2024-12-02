@@ -86,15 +86,13 @@
 {#if dripList && !dripList.isVisible}
   <div class="notice">
     <AnnotationBox type="info" icon={EyeClosed}>
-      <span class="typo-text-small-bold">{dripList.name}</span> is hidden and cannot receive new
-      funds.
+      <span class="typo-text-small-bold">{dripList.name}</span> is hidden.
+      {isOwnList ? '' : "If you're the owner, connect your wallet to un-hide it."}
       <a
         style="text-decoration: underline;"
-        href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Read more</a
-      >
-      about this. {isOwnList
-        ? 'You can unhide it to start receiving funds again.'
-        : 'If this is your Drip List, unhide it by connecting the wallet that claimed it with.'}
+        target="_blank"
+        href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+      >.
       <svelte:fragment slot="actions">
         {#if isOwnList}
           <div class="flex gap-3">
