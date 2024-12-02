@@ -162,7 +162,8 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     console.log('RELAY_RESPONSE', payload, relayResponse);
 
     redis.set(blockKey, taskId, {
-      EX: 60 * 60 * 24, // 1 day
+      // 4 hours
+      EX: 4 * 60 * 60,
     });
 
     return new Response(JSON.stringify(relayResponse));
