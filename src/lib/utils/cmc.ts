@@ -7,12 +7,10 @@ export const getCmcPrices = async (tokenAddresses: string[], fetch = window.fetc
   }
 
   try {
-    // get id map and ensure the response does not indicate an error
-    const idMapResponse = await fetch('/api/fiat-estimates/id-map');
     // get response of known token address => token id
-    const idMapJson = await idMapResponse.json();
+    const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
     // produce map of response
-    const tokenAddressToId = z.record(z.string(), z.number()).parse(idMapJson);
+    const tokenAddressToId = z.record(z.string(), z.number()).parse(idMapRes);
     // create parameter for /api/fiat-estimates/price endpoint, removing unknown token ids
     const tokenIdsString = tokenAddresses
       .reduce((memo, address) => {
