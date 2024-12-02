@@ -290,6 +290,10 @@
       false,
     )}"
   />
+
+  {#if !project.isVisible}
+    <meta name="robots" content="noindex" />
+  {/if}
 </svelte:head>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>

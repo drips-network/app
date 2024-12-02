@@ -77,6 +77,12 @@
   />
 {/if}
 
+<svelte:head>
+  {#if !dripList?.isVisible}
+    <meta name="robots" content="noindex" />
+  {/if}
+</svelte:head>
+
 {#if dripList && !dripList.isVisible}
   <div class="notice">
     <AnnotationBox type="info" icon={EyeClosed}>
