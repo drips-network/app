@@ -25,7 +25,7 @@
     </div>
   </div>
   {#if $$slots.actions}
-    <div class="flex-1 flex justify-end">
+    <div class="flex-1 gap-1 flex justify-end">
       <slot name="actions" />
     </div>
   {/if}

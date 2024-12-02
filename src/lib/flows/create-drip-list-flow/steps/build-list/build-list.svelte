@@ -13,6 +13,7 @@
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const WEIGHT_FACTOR = 10_000;
 
@@ -71,6 +72,7 @@
   headline="Create a Drip List"
   description="What projects, individuals, organizations, or other Drip Lists would you like to support with your Drip List?"
 >
+  <CustodialWarning dismissableId="custodial-warning-drip-list" />
   <FormField title="Recipients*">
     <ListEditor
       bind:weights={$context.dripList.weights}

@@ -9,6 +9,7 @@
   import Button from '$lib/components/button/button.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -25,6 +26,7 @@
     description="Decide which GitHub projects, Ethereum addresses, and other Drip Lists should receive the {$context
       .highLevelPercentages['dependencies']}% you assigned to your project’s dependencies."
   />
+  <CustodialWarning dismissableId="custodial-warning-project-splits" />
   <ListEditor
     bind:weights={$context.dependencySplits.weights}
     bind:items={$context.dependencySplits.items}
