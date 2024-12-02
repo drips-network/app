@@ -89,7 +89,7 @@
     "@tanstack/svelte-table": "^8.17.3",
     "@uniswap/default-token-list": "^11.19.0",
     "@uniswap/token-lists": "^1.0.0-beta.34",
-    "@web3-onboard/core": "^2.22.1",
+    "@web3-onboard/core": "^2.23.0",
     "@web3-onboard/injected-wallets": "^2.10.17",
     "@web3-onboard/walletconnect": "^2.5.5",
     "csv-simple-parser": "^1.0.3",
