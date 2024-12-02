@@ -39,7 +39,11 @@ export const GET = async ({ fetch }) => {
   const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
 
   // eslint-disable-next-line no-console
-  console.log('dripsTokenHoldingsRes', dripsTokenHoldingsJson);
+  console.log(
+    'dripsTokenHoldingsRes',
+    dripsTokenHoldingsJson,
+    JSON.stringify(driptsTokenHoldingRes),
+  );
   const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsJson.result);
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
