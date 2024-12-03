@@ -81,6 +81,9 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
       f,
     );
 
+    // eslint-disable-next-line no-console
+    console.log('fetchProjects', projectsRes);
+
     return projectsRes.projects;
   };
 
