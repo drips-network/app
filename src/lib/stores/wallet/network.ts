@@ -283,7 +283,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     settlement: {
       nextSettlementDate: nextFilecoinSettlementDate,
       explainerText:
-        'Funds from projects, streams and Drip Lists settle and become collectable daily.',
+        'Funds from projects, streams and Drip Lists settle and become collectable weekly.',
     },
     alternativeChainMode: true,
     ensSupported: false,
