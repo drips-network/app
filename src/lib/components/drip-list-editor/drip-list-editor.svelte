@@ -72,7 +72,14 @@
   </FormField>
 
   <div class="visibility-toggle">
-    <h4>Hide this list from my profile</h4>
+    <div style="display: flex; gap: 0.5rem;">
+      <h4>Hide this list from my profile</h4>
+      <a
+        style="text-decoration: underline; display: inline;"
+        target="_blank"
+        href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+      >
+    </div>
     <Toggle bind:checked={isHidden} />
   </div>
 </section>

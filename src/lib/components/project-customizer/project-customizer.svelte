@@ -173,16 +173,15 @@
   </FormField>
 
   <div class="visibility-toggle">
-    <h4>Hide this project from my profile</h4>
+    <div style="display: flex; gap: 0.5rem;">
+      <h4>Hide this project from my profile</h4>
+      <a
+        style="text-decoration: underline; display: inline;"
+        target="_blank"
+        href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+      >
+    </div>
     <Toggle bind:checked={isHidden} />
-  </div>
-  <div class="hide-info">
-    <p>This will only hide the project from your public profile</p>
-    <ul>
-      <li><p>· It will remain claimed by you on the blockchain</p></li>
-      <li><p>· Any existing funding will continue to flow to and from it</p></li>
-      <li><p>· It will be visible from a direct link</p></li>
-    </ul>
   </div>
 </div>
 
@@ -285,20 +284,5 @@
   .visibility-toggle {
     display: flex;
     justify-content: space-between;
-  }
-
-  .hide-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .hide-info > p {
-    margin-bottom: 1rem;
-  }
-
-  .hide-info li {
-    display: flex;
-    margin-left: 0.5rem;
   }
 </style>
