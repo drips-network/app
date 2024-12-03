@@ -41,7 +41,7 @@
   export let newProjectData: Writable<
     ReturnType<
       typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectHidden: boolean }
+    > & { isProjectVisible: boolean }
   >;
 
   let activeTab: 'tab-1' | 'tab-2' =
@@ -72,11 +72,11 @@
   }
   $: handleColorChange(selectedColor);
 
-  let isHidden = $newProjectData.isProjectHidden;
-  function handleIsHiddenChange(isHidden: boolean) {
-    $newProjectData.isProjectHidden = isHidden;
+  let isVisible = $newProjectData.isProjectVisible;
+  function handleIsVisibleChange(isVisible: boolean) {
+    $newProjectData.isProjectVisible = isVisible;
   }
-  $: handleIsHiddenChange(isHidden);
+  $: handleIsVisibleChange(isVisible);
 
   let lastUploadedCid =
     $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined;
@@ -172,17 +172,21 @@
     </div>
   </FormField>
 
-  <div class="visibility-toggle">
-    <div style="display: flex; gap: 0.5rem;">
-      <h4>Hide this project from my profile</h4>
-      <a
-        style="text-decoration: underline; display: inline;"
-        target="_blank"
-        href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
-      >
+  <FormField type="div" title="Visibility">
+    <div class="visibility-toggle">
+      <div style="display: flex; gap: 0.5rem; ">
+        <p>Show this project on my profile</p>
+        <a
+          style="text-decoration: underline; display: inline;"
+          target="_blank"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility"
+        >
+          Learn more
+        </a>
+      </div>
+      <Toggle bind:checked={isVisible} />
     </div>
-    <Toggle bind:checked={isHidden} />
-  </div>
+  </FormField>
 </div>
 
 <style>

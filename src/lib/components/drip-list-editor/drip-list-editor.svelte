@@ -26,7 +26,7 @@
 
   export let urlToAdd: string | undefined = undefined;
 
-  export let isHidden: boolean;
+  export let isVisible: boolean;
 
   let recipientErrors: AddItemError[] = [];
 
@@ -71,17 +71,19 @@
     </svelte:fragment>
   </FormField>
 
-  <div class="visibility-toggle">
-    <div style="display: flex; gap: 0.5rem;">
-      <h4>Hide this list from my profile</h4>
-      <a
-        style="text-decoration: underline; display: inline;"
-        target="_blank"
-        href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
-      >
+  <FormField type="div" title="Visibility">
+    <div class="visibility-toggle">
+      <div style="display: flex; gap: 0.5rem;">
+        <p>Show this Drip List on my profile</p>
+        <a
+          style="text-decoration: underline; display: inline;"
+          target="_blank"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+        >
+      </div>
+      <Toggle bind:checked={isVisible} />
     </div>
-    <Toggle bind:checked={isHidden} />
-  </div>
+  </FormField>
 </section>
 
 <style>

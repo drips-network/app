@@ -33,6 +33,7 @@
   export let collapsed = false;
   export let collapsable = false;
   export let showCreateNewListCard = false;
+  export let showVisibilityToggle = false;
 
   let error = false;
 
@@ -76,7 +77,7 @@
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
-    empty: dripLists?.length === 0,
+    empty: visibleDripListsAndVotingRounds?.length === 0,
     error,
     emptyStateEmoji: '🫗',
     emptyStateHeadline: 'No Drip Lists',
@@ -135,7 +136,7 @@
     </div>
 
     <div>
-      {#if isOwner}
+      {#if isOwner && showVisibilityToggle}
         <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenListsCount} />
       {/if}
     </div>

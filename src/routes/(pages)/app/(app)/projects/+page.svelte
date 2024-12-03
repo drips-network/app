@@ -63,7 +63,11 @@
 
   <div class="section">
     {#if data.projects}
-      <ProjectsSection withClaimProjectButton projects={data.projects} />
+      <ProjectsSection
+        withClaimProjectButton
+        projects={data.projects}
+        showVisibilityToggle={true}
+      />
     {/if}
   </div>
 </div>

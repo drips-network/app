@@ -78,7 +78,7 @@
 {/if}
 
 <svelte:head>
-  {#if !dripList?.isVisible}
+  {#if dripList && !dripList.isVisible}
     <meta name="robots" content="noindex" />
   {/if}
 </svelte:head>
@@ -119,7 +119,7 @@
   <aside class="support">
     <div>
       <SupportCard
-        disabled={!dripList?.isVisible}
+        disabled={Boolean(dripList && !dripList.isVisible)}
         dripList={dripList ?? undefined}
         draftListMode={Boolean(!dripList && votingRound)}
       />

@@ -11,7 +11,7 @@
   export let newProjectData: Writable<
     ReturnType<
       typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectHidden: boolean }
+    > & { isProjectVisible: boolean }
   >;
 </script>
 

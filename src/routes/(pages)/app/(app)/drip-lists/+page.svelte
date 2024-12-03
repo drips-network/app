@@ -76,6 +76,7 @@
     {dripLists}
     showCreateNewListCard={true}
     withCreateButton={true}
+    showVisibilityToggle={true}
   />
 </div>
 

@@ -93,7 +93,7 @@
           <div><ProjectAvatar {size} project={chainData} /></div>
         </div>
       {/if}
-      <div class="name flex-1 min-w-0 truncate" class:hiddenProject={!processedProject.isVisible}>
+      <div class="name flex-1 min-w-0 truncate" class:hidden-project={!processedProject.isVisible}>
         <ProjectName project={processedProject} />
       </div>
       {#if !project?.isVisible}
@@ -131,7 +131,7 @@
     margin-left: -0.75rem;
   }
 
-  .hiddenProject {
+  .hidden-project {
     opacity: 0.3;
   }
 </style>

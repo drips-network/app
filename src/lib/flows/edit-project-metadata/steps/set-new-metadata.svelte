@@ -56,7 +56,7 @@
   $: projectChainData = filterCurrentChainData(project.chainData, 'claimed');
 
   $: projectDataWritable = writable(
-    structuredClone({ ...projectChainData, isProjectHidden: !project.isVisible }),
+    structuredClone({ ...projectChainData, isProjectVisible: project.isVisible }),
   );
 
   let valid = false;
@@ -89,7 +89,7 @@
                     cid: $projectDataWritable.avatar.cid,
                   },
             color: $projectDataWritable.color,
-            isVisible: !$projectDataWritable.isProjectHidden,
+            isVisible: $projectDataWritable.isProjectVisible,
           };
 
           const ipfsHash = await metadataManager.pinAccountMetadata(newMetadata);

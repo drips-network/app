@@ -25,6 +25,7 @@
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
+  export let showVisibilityToggle = false;
 
   let error = false;
 
@@ -60,7 +61,7 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: projects?.length === 0,
+    empty: visibleProjects?.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',
@@ -84,7 +85,7 @@
     </div>
   {/if}
 
-  {#if isOwner}
+  {#if isOwner && showVisibilityToggle}
     <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount} />
   {/if}
 

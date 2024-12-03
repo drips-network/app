@@ -60,7 +60,6 @@
   import { formatSplitReceivers } from '$lib/utils/sdk/utils/format-split-receivers';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$app/navigation';
-  import unreachable from '$lib/utils/unreachable';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -73,7 +72,7 @@
     name: string;
     description: string | undefined;
     dripListAccountId: string | undefined;
-    isHidden: boolean;
+    isVisible: boolean;
   }>;
 
   export let projectToAdd: EditDripListStepProjectToAddFragment | undefined = undefined;
@@ -134,7 +133,7 @@
             name: $state.name,
             description: $state.description,
             projects: projectsSplitMetadata,
-            isVisible: !$state.isHidden,
+            isVisible: $state.isVisible,
           };
 
           const hash = await metadataManager.pinAccountMetadata(newMetadata);
@@ -221,7 +220,7 @@
     bind:description={$state.description}
     bind:weights={$state.listEditorConfig.weights}
     bind:items={$state.listEditorConfig.items}
-    bind:isHidden={$state.isHidden}
+    bind:isVisible={$state.isVisible}
   >
     <svelte:fragment slot="list-editor-action">
       <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>

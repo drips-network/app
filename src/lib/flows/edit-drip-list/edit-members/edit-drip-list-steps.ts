@@ -43,7 +43,7 @@ export default (dripList: EditDripListFlowDripListFragment) => {
     name: dripList.name,
     description: dripList.description || undefined,
     dripListAccountId: dripList.account.accountId,
-    isHidden: !dripList.isVisible,
+    isVisible: dripList.isVisible,
   });
 
   return {

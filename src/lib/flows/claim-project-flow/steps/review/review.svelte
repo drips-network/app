@@ -97,7 +97,7 @@
   function customize() {
     const newProjectDataWritable = writable({
       ...filterCurrentChainData(fakeClaimedProject.chainData, 'claimed'),
-      isProjectHidden: false,
+      isProjectVisible: true,
     });
 
     if (isModal) {
