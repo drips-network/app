@@ -86,13 +86,20 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
 
   const fetchFeaturedLists = async () => {
     const results = await Promise.all(
-      FEATURED_DRIP_LISTS.map((id) =>
-        query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
-          featuredDripListQuery,
-          { id, chain: network.gqlName },
-          f,
-        ),
-      ),
+      FEATURED_DRIP_LISTS.map(async (id) => {
+        try {
+          const result = await query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
+            featuredDripListQuery,
+            { id, chain: network.gqlName },
+            f,
+          );
+          return result;
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('fetchFeaturedLists', error);
+          throw error;
+        }
+      }),
     );
 
     return results.map((res) => res.dripList);
@@ -107,6 +114,7 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     return response.json();
   };
 
+  // TODO: fetch is failing here for some reason!!!
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
     redis,
     cacheKey,
