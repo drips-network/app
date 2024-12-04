@@ -85,7 +85,11 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
     result.projects = result.projects.map(upgradeSplit);
 
-    const parsed = nftDriverAccountMetadataParser.parseLatest(result);
+    const newRes = result as LatestVersion<typeof nftDriverAccountMetadataParser>;
+
+    newRes.isVisible = 'isVisible' in result ? result.isVisible : true;
+
+    const parsed = nftDriverAccountMetadataParser.parseLatest(newRes);
 
     return parsed;
   }

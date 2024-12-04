@@ -184,6 +184,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       delete newRes.emoji;
     }
 
+    newRes.isVisible = 'isVisible' in result ? result.isVisible : true;
+
     const parsed = repoDriverAccountMetadataParser.parseLatest(result);
 
     return parsed;
