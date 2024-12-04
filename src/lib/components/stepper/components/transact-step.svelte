@@ -396,8 +396,10 @@
               eip712Signature: sig,
             }),
           });
-          if (!gaslessCallRes.ok)
+          if (!gaslessCallRes.ok) {
             throw new Error(`Failed to submit gasless call: ${await gaslessCallRes.text()}`);
+          }
+
           const body = await gaslessCallRes.json();
           const { taskId } = body;
 
