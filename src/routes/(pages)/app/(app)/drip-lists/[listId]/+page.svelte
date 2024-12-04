@@ -111,7 +111,7 @@
   </div>
 {/if}
 
-<article class="drip-list-page" class:hidden-by-user={!dripList?.isVisible}>
+<article class="drip-list-page" class:hidden-by-user={dripList && !dripList.isVisible}>
   <main class="list">
     <DripListCard clampTitle={false} data={{ dripList, votingRound }} />
   </main>
