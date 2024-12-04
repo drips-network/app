@@ -27,7 +27,7 @@ export function nextFilecoinSettlementDate() {
   today.setMinutes(0);
   today.setHours(0);
 
-  // Filecoin settlement happens weekly on thursday, local time
+  // Filecoin settlement happens weekly on thursday
   today.setDate(today.getDate() + ((4 + 7 - today.getDay()) % 7));
   return today;
 }
