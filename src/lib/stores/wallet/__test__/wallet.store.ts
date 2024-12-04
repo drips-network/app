@@ -34,6 +34,7 @@ const NETWORK = {
   },
   settlement: {
     nextSettlementDate: nextMainnetSettlementDate,
+    recipientsExplainerHtml: '<span>test</span>',
     explainerText: '',
   },
   alternativeChainMode: false,
