@@ -40,6 +40,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
   import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';
+  import sanitize from 'sanitize-html';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -249,8 +250,13 @@
           >You can <span class="typo-text-bold">collect your tokens</span> from your
           <span class="typo-text-bold">Drips dashboard</span>.</UlIconLi
         >
-        <UlIconLi icon={TokenStreamsIcon}
-          >{@html network.settlement.recipientsExplainerHtml}</UlIconLi
+        <UlIconLi icon={TokenStreamsIcon}>
+          {@html sanitize(network.settlement.recipientsExplainerHtml, {
+            allowedTags: ['span'],
+            allowedAttributes: {
+              span: ['class'],
+            },
+          })}</UlIconLi
         >
       </ul>
     </div>
