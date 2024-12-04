@@ -37,6 +37,7 @@ export type Network = {
   applyGasBuffers: boolean;
   settlement: {
     nextSettlementDate: () => Date;
+    recipientsExplainerHtml: string;
     explainerText: string;
   };
   explorer: {
@@ -98,6 +99,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
@@ -135,6 +138,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
@@ -172,6 +177,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
@@ -209,6 +216,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
@@ -246,6 +255,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
@@ -282,6 +293,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextFilecoinSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">weekly</span>, on Thursday.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable weekly.',
     },

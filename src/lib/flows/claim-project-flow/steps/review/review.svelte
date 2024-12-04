@@ -250,9 +250,7 @@
           <span class="typo-text-bold">Drips dashboard</span>.</UlIconLi
         >
         <UlIconLi icon={TokenStreamsIcon}
-          >Future incoming funds will be split to your recipients <span class="typo-text-bold"
-            >monthly</span
-          >, on the last Thursday of every month.</UlIconLi
+          >{@html network.settlement.recipientsExplainerHtml}</UlIconLi
         >
       </ul>
     </div>
