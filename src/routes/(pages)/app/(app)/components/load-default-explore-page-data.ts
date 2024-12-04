@@ -23,6 +23,7 @@ import {
   SortDirection,
 } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
+import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -80,31 +81,43 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
       f,
     );
 
+    // eslint-disable-next-line no-console
+    console.log('fetchProjects', projectsRes);
+
     return projectsRes.projects;
   };
 
   const fetchFeaturedLists = async () => {
     const results = await Promise.all(
-      FEATURED_DRIP_LISTS.map((id) =>
-        query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
-          featuredDripListQuery,
-          { id, chain: network.gqlName },
-          f,
-        ),
-      ),
+      FEATURED_DRIP_LISTS.map(async (id) => {
+        try {
+          const result = await query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
+            featuredDripListQuery,
+            { id, chain: network.gqlName },
+            f,
+          );
+          return result;
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('fetchFeaturedLists', error);
+          throw error;
+        }
+      }),
     );
 
     return results.map((res) => res.dripList);
   };
 
-  const fetchBlogPosts = async () => {
-    return (await f('/api/blog/posts')).json();
-  };
-
   const fetchTlv = async () => {
-    return (await f('/api/tlv')).json();
+    const response = await f('/api/tlv');
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
   };
 
+  // TODO: fetch is failing here for some reason!!!
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
     redis,
     cacheKey,
