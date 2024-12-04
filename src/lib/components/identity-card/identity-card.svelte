@@ -114,7 +114,7 @@
       <span class="typo-header-3 ellipsis"
         >{#if !project?.isVisible}
           <WarningIcon
-            style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display: inline"
+            style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display: inline"
           />
         {/if}{project.source.repoName}</span
       >

@@ -93,12 +93,12 @@
           <div><ProjectAvatar {size} project={chainData} /></div>
         </div>
       {/if}
-      <div class="name flex-1 min-w-0 truncate" class:hidden-project={!processedProject.isVisible}>
+      <div class="name flex-1 min-w-0 truncate">
         <ProjectName project={processedProject} />
       </div>
       {#if !project?.isVisible}
         <WarningIcon
-          style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display:inline"
+          style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"
         />
       {/if}
     </svelte:element>
@@ -129,9 +129,5 @@
 
   .avatar-and-forge > *:nth-child(2) {
     margin-left: -0.75rem;
-  }
-
-  .hidden-project {
-    opacity: 0.3;
   }
 </style>

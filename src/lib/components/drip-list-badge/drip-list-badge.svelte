@@ -52,10 +52,7 @@
     <DripListAvatar size={avatarSize} {disabled} {outline} />
   {/if}
   {#if showName}
-    <div
-      class="name typo-text text-foreground flex-1 min-w-0 truncate"
-      class:hidden-list={!dripList?.isVisible}
-    >
+    <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
       <span
         >{#if username}<span class="text-foreground-level-5">{username}/</span
           >{/if}{#if !dripList}<span class="animate-pulse">...</span
@@ -64,7 +61,7 @@
     </div>
     {#if !dripList?.isVisible}
       <WarningIcon
-        style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display:inline"
+        style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"
       />
     {/if}
   {/if}
@@ -74,9 +71,5 @@
   a.drip-list-badge:focus-visible .name > span {
     background: var(--color-primary-level-1);
     border-radius: 0.25rem;
-  }
-
-  .hidden-list {
-    opacity: 0.3;
   }
 </style>
