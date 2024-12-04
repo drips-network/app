@@ -53,7 +53,7 @@
         title: string;
         message: string;
         txUrl?: string;
-        gasless?: boolean;
+        displayAsGasless?: boolean;
         status:
           | 'awaitingPrevious'
           | 'awaitingSignature'
@@ -71,7 +71,7 @@
         message?: string;
         title: string;
         progressFn: ProgressFn;
-        gasless?: boolean;
+        displayAsGasless?: boolean;
         status: 'awaitingPrevious' | 'pending' | 'failed' | 'confirmed';
       };
 
@@ -681,7 +681,7 @@
         ...externalTxs.map((etx) => ({
           external: true as const,
           title: etx.title,
-          gasless: false,
+          displayAsGasless: false,
           progressFn: () => ({
             progressFraction: 0,
             remainingText: 'Waiting on previous transaction',
@@ -690,7 +690,7 @@
         })),
         {
           external: false,
-          gasless: false,
+          displayAsGasless: false,
           title: lastTransaction.title,
           message: 'Waiting for you to submit the transaction in your Safe',
           status: externalTxs.length > 0 ? 'awaitingPrevious' : 'awaitingSignature',
@@ -702,7 +702,7 @@
           ? {
               external: true as const,
               title: tx.title,
-              gasless: false,
+              displayAsGasless: false,
               progressFn: () => ({
                 progressFraction: 0,
                 remainingText: 'Waiting on previous transaction',
@@ -712,7 +712,7 @@
           : {
               external: false,
               title: tx.title,
-              gasless: tx.gasless,
+              displayAsGasless: tx.gasless,
               message:
                 index === 0
                   ? 'Waiting for you to confirm the transaction in your wallet'
@@ -802,7 +802,7 @@
                 </div>
 
                 <!-- Gasless indicator -->
-                {#if transactionStatusItem.gasless}
+                {#if transactionStatusItem.displayAsGasless}
                   <div class="gasless-notice">
                     <Gas />
                     <span class="hide-on-mobile">Gas fee $0.00</span>
