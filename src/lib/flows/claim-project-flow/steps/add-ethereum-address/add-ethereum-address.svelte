@@ -36,8 +36,18 @@
 
   export let context: Writable<State>;
 
+  let fundingJson: Awaited<ReturnType<typeof github.fetchFundingJson>>;
+
+  async function loadFundingJson() {
+    const { ownerName, repoName } = $context.project?.source ?? unreachable();
+    fundingJson = await github.fetchFundingJson(ownerName, repoName);
+    // eslint-disable-next-line no-console
+    console.log(fundingJson);
+  }
+
   onMount(() => {
     $context.linkedToRepo = false;
+    loadFundingJson();
   });
 
   const GASLESS_CALL_ERROR_MESSAGE =
