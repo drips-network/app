@@ -63,7 +63,7 @@
           const { dripsAccountId } = $walletStore;
           assert(dripsAccountId);
 
-          await waitForAccountMetadata(dripsAccountId, newHash);
+          await waitForAccountMetadata(dripsAccountId, newHash, 'address');
 
           await goto('/funds');
         },

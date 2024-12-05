@@ -168,7 +168,7 @@
         ],
 
         after: async (_, { accountId, ipfsHash }) => {
-          await waitForAccountMetadata(accountId, ipfsHash);
+          await waitForAccountMetadata(accountId, ipfsHash, 'dripList');
           await invalidateAccountCache(accountId);
           await invalidateAll();
         },

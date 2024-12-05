@@ -4,11 +4,15 @@ import { gql } from 'graphql-request';
 import expect from './expect';
 import filterCurrentChainData from './filter-current-chain-data';
 import unreachable from './unreachable';
+import network from '$lib/stores/wallet/network';
 import type {
+  DripListLastProcessedIpfsHashQuery,
+  DripListLastProcessedIpfsHashQueryVariables,
+  ProjectLastProcessedIpfsHashQuery,
+  ProjectLastProcessedIpfsHashQueryVariables,
   LatestAccountMetadataHashQuery,
   LatestAccountMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
-import network from '$lib/stores/wallet/network';
 
 /**
  * Fetch the given hash from IPFS.
@@ -57,32 +61,81 @@ export async function pin(data: Record<string, unknown>, f = fetch) {
 export async function waitForAccountMetadata(
   accountId: string,
   expectedIpfsHash: string,
+  entityType: 'project' | 'dripList' | 'address',
   f = fetch,
 ) {
   await expect(
     async () => {
-      const res = await query<
-        LatestAccountMetadataHashQuery,
-        LatestAccountMetadataHashQueryVariables
-      >(
-        gql`
-          query LatestAccountMetadataHash($accountId: ID!, $chains: [SupportedChain!]) {
-            userById(accountId: $accountId, chains: $chains) {
+      if (entityType === 'project') {
+        const projectLastProcessedIpfsHashQuery = gql`
+          query ProjectLastProcessedIpfsHash($projectId: ID!, $chains: [SupportedChain!]) {
+            projectById(id: $projectId, chains: $chains) {
               chainData {
-                chain
-                latestMetadataIpfsHash
+                ... on ClaimedProjectData {
+                  chain
+                  lastProcessedIpfsHash
+                }
+                ... on UnClaimedProjectData {
+                  chain
+                }
               }
             }
           }
-        `,
-        { accountId, chains: [network.gqlName] },
-        f,
-      );
+        `;
 
-      const chainData = filterCurrentChainData(res.userById?.chainData || unreachable());
+        const res = await query<
+          ProjectLastProcessedIpfsHashQuery,
+          ProjectLastProcessedIpfsHashQueryVariables
+        >(
+          projectLastProcessedIpfsHashQuery,
+          { projectId: accountId, chains: [network.gqlName] },
+          f,
+        );
 
-      return chainData.latestMetadataIpfsHash;
+        const chainData = filterCurrentChainData(res.projectById?.chainData || unreachable());
+
+        return 'lastProcessedIpfsHash' in chainData ? chainData.lastProcessedIpfsHash : null;
+      } else if (entityType === 'dripList') {
+        const dripListLastProcessedIpfsHashQuery = gql`
+          query DripListLastProcessedIpfsHash($dripListId: ID!, $chain: SupportedChain!) {
+            dripList(id: $dripListId, chain: $chain) {
+              chain
+              lastProcessedIpfsHash
+            }
+          }
+        `;
+
+        const res = await query<
+          DripListLastProcessedIpfsHashQuery,
+          DripListLastProcessedIpfsHashQueryVariables
+        >(dripListLastProcessedIpfsHashQuery, { dripListId: accountId, chain: network.gqlName }, f);
+
+        return res.dripList?.lastProcessedIpfsHash;
+      } else {
+        const res = await query<
+          LatestAccountMetadataHashQuery,
+          LatestAccountMetadataHashQueryVariables
+        >(
+          gql`
+            query LatestAccountMetadataHash($accountId: ID!, $chains: [SupportedChain!]) {
+              userById(accountId: $accountId, chains: $chains) {
+                chainData {
+                  chain
+                  latestMetadataIpfsHash
+                }
+              }
+            }
+          `,
+          { accountId, chains: [network.gqlName] },
+          f,
+        );
+
+        const chainData = filterCurrentChainData(res.userById?.chainData || unreachable());
+
+        return chainData.latestMetadataIpfsHash;
+      }
     },
+
     (result) => expectedIpfsHash === result,
   );
 }

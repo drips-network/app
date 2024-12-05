@@ -239,7 +239,7 @@
           const { dripsAccountId } = $wallet;
           assert(dripsAccountId);
 
-          await waitForAccountMetadata(dripsAccountId, newHash);
+          await waitForAccountMetadata(dripsAccountId, newHash, 'address');
 
           await invalidateAll();
         },
