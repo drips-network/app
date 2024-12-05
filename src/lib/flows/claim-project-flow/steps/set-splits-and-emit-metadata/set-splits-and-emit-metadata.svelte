@@ -29,6 +29,7 @@
   } from './__generated__/gql.generated';
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import gaslessStore from '$lib/stores/gasless/gasless.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -197,6 +198,7 @@
 
           transactions.push({
             transaction: tx,
+            gasless: $gaslessStore,
             applyGasBuffer: false,
             title: 'Set project splits and metadata',
           });

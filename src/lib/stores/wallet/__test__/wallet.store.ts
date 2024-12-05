@@ -40,6 +40,7 @@ const NETWORK = {
   alternativeChainMode: false,
   ensSupported: false,
   ensAddress: undefined,
+  gaslessClaimAndCollect: false,
 };
 
 const provider = new JsonRpcProvider('http://127.0.0.1:8545', NETWORK, {
