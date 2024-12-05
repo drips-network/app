@@ -21,6 +21,8 @@ export function nextMainnetSettlementDate() {
 }
 
 export function nextFilecoinSettlementDate() {
-  // Filecoin settlement happens daily
-  return new Date();
+  const today = new Date();
+  // Filecoin settlement happens weekly on thursday
+  today.setDate(today.getDate() + ((4 + 7 - today.getDay()) % 7));
+  return today;
 }

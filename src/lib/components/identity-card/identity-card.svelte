@@ -5,6 +5,7 @@
         accountId
       }
       name
+      isVisible
     }
   `;
   export const IDENTITY_CARD_PROJECT_FRAGMENT = gql`
@@ -15,6 +16,7 @@
       source {
         repoName
       }
+      isVisible
       chainData {
         ...ProjectAvatar
         ... on ClaimedProjectData {
@@ -43,6 +45,7 @@
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import Github from '$lib/components/icons/Github.svelte';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
   // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
@@ -84,10 +87,20 @@
       <div class="icon">
         <DripListIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
       </div>
-      <span class="typo-header-3 ellipsis">{dripList.name}</span>
+
+      <div>
+        <span class="typo-header-3 ellipsis" class:hidden-by-user={!dripList.isVisible}
+          >{dripList.name}</span
+        >
+        {#if !dripList?.isVisible}
+          <WarningIcon
+            style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display: inline"
+          />
+        {/if}
+      </div>
     </div>
   {:else if project}
-    <div class="content-container" in:fade>
+    <div class="content-container" in:fade class:hidden-by-user={!project.isVisible}>
       <div class="flex">
         {#if 'owner' in project}
           <div class="-mr-[5%]">
@@ -98,7 +111,13 @@
           <Github style="width:60%;height:60%" />
         </div>
       </div>
-      <span class="typo-header-3 ellipsis">{project.source.repoName}</span>
+      <span class="typo-header-3 ellipsis"
+        >{#if !project?.isVisible}
+          <WarningIcon
+            style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display: inline"
+          />
+        {/if}{project.source.repoName}</span
+      >
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>
@@ -176,5 +195,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .hidden-by-user {
+    opacity: 0.5;
   }
 </style>

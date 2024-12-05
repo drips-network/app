@@ -4,11 +4,11 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'xs': '440px', /* just above most phones in portrait-mode */
-        'sm': '540px',
-        'mlg': '896px',
+        xs: '440px' /* just above most phones in portrait-mode */,
+        sm: '540px',
+        mlg: '896px',
         '2xl': '1440px',
-        'mouse': { raw: '(hover:hover)' } // targets only browser with mouse hover
+        mouse: { raw: '(hover:hover)' }, // targets only browser with mouse hover
       },
       spacing: {
         18: '4.5rem',
@@ -65,17 +65,17 @@ module.exports = {
         hi: 'var(--elevation-high)',
       },
       translate: {
-        '2px': '2px'
+        '2px': '2px',
       },
       animation: {
-        'blink': 'blink 1000ms infinite linear',
+        blink: 'blink 1000ms infinite linear',
       },
       keyframes: {
-        'blink': {
+        blink: {
           '0%, 49%': { opacity: 0 },
-          '50%, 100%': { opacity: 1 }
-        }
-      }
+          '50%, 100%': { opacity: 1 },
+        },
+      },
     },
   },
   plugins: [],

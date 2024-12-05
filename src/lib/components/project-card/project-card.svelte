@@ -4,6 +4,7 @@
     ${PROJECT_NAME_FRAGMENT}
     fragment ProjectCard on Project {
       ...ProjectName
+      isVisible
       source {
         forge
         ownerName
@@ -12,9 +13,15 @@
       chainData {
         ... on ClaimedProjectData {
           chain
+          owner {
+            accountId
+          }
         }
         ... on UnClaimedProjectData {
           chain
+          owner {
+            accountId
+          }
         }
         ...ProjectAvatar
       }
@@ -36,6 +43,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   export let project: ProjectCardFragment;
+  export let isHidden = false;
   let projectChainData = filterCurrentChainData(project.chainData);
 </script>
 
@@ -43,7 +51,7 @@
   class="wrapper"
   href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
 >
-  <div class="project-card">
+  <div class="project-card" class:hidden-project={isHidden}>
     <div
       class="background"
       style:background-color={isClaimed(projectChainData)
@@ -119,5 +127,17 @@
     align-items: center;
     gap: 0.125rem;
     color: var(--color-foreground-level-6);
+  }
+
+  .hidden-project {
+    color: var(--color-foreground);
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 0.3;
+    }
   }
 </style>

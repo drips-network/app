@@ -34,6 +34,11 @@
   import type { ProgressFn } from '$lib/components/progress-bar/progress-bar.svelte';
   import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
   import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
+  import expect from '$lib/utils/expect';
+  import { Contract } from 'ethers';
+  import { callerAbi } from '$lib/utils/sdk/caller/caller-abi';
+  import Gas from '$lib/components/icons/Gas.svelte';
+  import Logo from '$lib/components/illustrations/logo.svelte';
 
   const dispatchResult = createEventDispatcher<{ result: Result }>();
   const dispatchStartOver = createEventDispatcher<{ startOver: void }>();
@@ -48,6 +53,7 @@
         title: string;
         message: string;
         txUrl?: string;
+        displayAsGasless?: boolean;
         status:
           | 'awaitingPrevious'
           | 'awaitingSignature'
@@ -62,8 +68,10 @@
       }
     | {
         external: true;
+        message?: string;
         title: string;
         progressFn: ProgressFn;
+        displayAsGasless?: boolean;
         status: 'awaitingPrevious' | 'pending' | 'failed' | 'confirmed';
       };
 
@@ -300,6 +308,7 @@
 
           updateTransactionTimelineStatus(executingTx, {
             status: 'failed',
+            message: 'Failed',
           });
 
           error = e as Error;
@@ -315,6 +324,125 @@
           status: 'awaitingSignature',
           message: 'Waiting for you to confirm in your wallet',
         });
+
+        if (executingTx.gasless) {
+          const domain = {
+            name: 'Caller',
+            version: '1',
+            chainId: network.chainId,
+            verifyingContract: networkConfig.contracts.CALLER,
+          };
+
+          const types = {
+            CallSigned: [
+              {
+                name: 'sender',
+                type: 'address',
+              },
+              {
+                name: 'target',
+                type: 'address',
+              },
+              {
+                name: 'data',
+                type: 'bytes',
+              },
+              {
+                name: 'value',
+                type: 'uint256',
+              },
+              {
+                name: 'nonce',
+                type: 'uint256',
+              },
+              {
+                name: 'deadline',
+                type: 'uint256',
+              },
+            ],
+          };
+
+          const { data, to } = executingTx.transaction;
+          assert(data, 'Expected data to be defined');
+
+          const { provider } = get(walletStore);
+          const caller = new Contract(networkConfig.contracts.CALLER, callerAbi, provider);
+
+          const nonce = await caller.nonce(address);
+
+          const payload = {
+            sender: address,
+            target: to,
+            data,
+            value: 0,
+            nonce: Number(nonce),
+            // 1 hour in seconds
+            deadline: Math.floor(Date.now() / 1000) + 3600,
+          };
+
+          const sig = await signer.signTypedData(domain, types, payload);
+
+          updateTransactionTimelineStatus(executingTx, {
+            status: 'pending',
+            message: 'Submitting transaction',
+          });
+
+          const gaslessCallRes = await fetch('/api/gasless/call', {
+            method: 'POST',
+            body: JSON.stringify({
+              targetContractAddress: to,
+              callData: data,
+              payload,
+              eip712Signature: sig,
+            }),
+          });
+          if (!gaslessCallRes.ok) {
+            throw new Error(`Failed to submit gasless call: ${await gaslessCallRes.text()}`);
+          }
+
+          const body = await gaslessCallRes.json();
+          const { taskId } = body;
+
+          const gaslessCallExpectation = await expect(
+            async () => {
+              const res = await fetch(`/api/gasless/track/${taskId}`);
+              if (!res.ok) throw new Error('Failed to track gasless owner update task');
+
+              const { task } = await res.json();
+              assert(typeof task === 'object', 'Invalid task');
+              const { taskState, transactionHash } = task;
+              assert(typeof taskState === 'string', 'Invalid task state');
+
+              if (transactionHash) {
+                updateTransactionTimelineStatus(executingTx, {
+                  status: 'pending',
+                  message: 'Waiting for confirmation',
+                  txUrl: networkConfig.explorer.linkTemplate(transactionHash, network.name),
+                });
+              }
+
+              return { taskState, task };
+            },
+            ({ taskState, task }) => {
+              switch (taskState) {
+                case 'ExecSuccess':
+                  return true;
+                case 'Cancelled':
+                  throw new Error(`Gasless transaction failed: ${JSON.stringify(task)}`);
+                default:
+                  return false;
+              }
+            },
+            600000,
+            2000,
+          );
+
+          if (gaslessCallExpectation.failed) {
+            throw new Error('The gasless call did not resolve within the expected timeframe.');
+          }
+
+          continue;
+        }
 
         const txResponse = await (signer ?? unreachable()).sendTransaction({
           ...executingTx.transaction,
@@ -553,6 +681,7 @@
         ...externalTxs.map((etx) => ({
           external: true as const,
           title: etx.title,
+          displayAsGasless: false,
           progressFn: () => ({
             progressFraction: 0,
             remainingText: 'Waiting on previous transaction',
@@ -561,6 +690,7 @@
         })),
         {
           external: false,
+          displayAsGasless: false,
           title: lastTransaction.title,
           message: 'Waiting for you to submit the transaction in your Safe',
           status: externalTxs.length > 0 ? 'awaitingPrevious' : 'awaitingSignature',
@@ -572,6 +702,7 @@
           ? {
               external: true as const,
               title: tx.title,
+              displayAsGasless: false,
               progressFn: () => ({
                 progressFraction: 0,
                 remainingText: 'Waiting on previous transaction',
@@ -581,6 +712,7 @@
           : {
               external: false,
               title: tx.title,
+              displayAsGasless: tx.gasless,
               message:
                 index === 0
                   ? 'Waiting for you to confirm the transaction in your wallet'
@@ -669,6 +801,20 @@
                   {/if}
                 </div>
 
+                <!-- Gasless indicator -->
+                {#if transactionStatusItem.displayAsGasless}
+                  <div class="gasless-notice">
+                    <Gas />
+                    <span class="hide-on-mobile">Gas fee $0.00</span>
+                    <div class="gasless-badge">
+                      PAID FOR BY
+                      <div class="logo-wrapper">
+                        <Logo style="fill: var(--color-primary-level-6)" />
+                      </div>
+                    </div>
+                  </div>
+                {/if}
+
                 <!-- Status message row -->
                 <div class="tx-info typo-text">
                   {#if transactionStatusItem.status === 'awaitingSignature'}
@@ -678,16 +824,18 @@
                       </div>
                       <div>{transactionStatusItem.message}</div>
                     </div>
-                  {:else if transactionStatusItem.external === false && transactionStatusItem.status === 'failed'}
+                  {:else if transactionStatusItem.status === 'failed'}
                     <div class="status errored">
                       <div class="icon failure">
                         <ExclamationCircle style="fill: var(--color-negative)" />
                       </div>
                       {transactionStatusItem.message}
-                      <TxLink
-                        explorerName={networkConfig.explorer.name}
-                        url={transactionStatusItem.txUrl}
-                      />
+                      {#if transactionStatusItem.external === false}
+                        <TxLink
+                          explorerName={networkConfig.explorer.name}
+                          url={transactionStatusItem.txUrl}
+                        />
+                      {/if}
                       <button
                         style="margin-left: 0.5rem;"
                         on:click={() => toggleErrorDetails(index)}
@@ -725,12 +873,7 @@
                     </div>
                   {:else if transactionStatusItem.external === true}
                     <div out:slide={{ duration: 300 }}>
-                      <ProgressBar
-                        progressFn={transactionStatusItem.progressFn}
-                        errorMessage={transactionStatusItem.status === 'failed'
-                          ? 'Something went wrong. Please reach out to us on Discord.'
-                          : undefined}
-                      />
+                      <ProgressBar progressFn={transactionStatusItem.progressFn} />
                     </div>
                   {/if}
                 </div>
@@ -873,12 +1016,11 @@
     display: flex;
     align-items: center;
     min-height: 2rem;
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
 
   .status .icon {
     border-radius: 50%;
-    padding: 0.125rem;
     position: relative;
   }
 
@@ -889,6 +1031,8 @@
   .status .icon.highlight {
     background-color: var(--color-primary-level-1);
     animation: wiggle 1s;
+    padding: 0.125rem;
+    margin: -0.125rem 0 -0.125rem -0.125rem;
   }
 
   /* outline that grows from the round icon ever 1s */
@@ -987,6 +1131,30 @@
     justify-content: center;
   }
 
+  .gasless-notice {
+    display: flex;
+    gap: 0.5rem;
+    color: var(--color-foreground-level-5);
+  }
+
+  .logo-wrapper {
+    display: flex;
+    width: 2.9rem;
+  }
+
+  .gasless-badge {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    background-color: var(--color-primary-level-1);
+    color: var(--color-primary-level-6);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    height: 1.5rem;
+  }
+
   @media (max-width: 577px) {
     .index {
       margin: calc(1rem + 4px) 0.5rem 0rem 1rem;
@@ -998,6 +1166,10 @@
 
     .row::before {
       left: calc((1rem + 1.5rem / 2) - 1px);
+    }
+
+    .hide-on-mobile {
+      display: none;
     }
   }
 </style>

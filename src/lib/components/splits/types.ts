@@ -62,6 +62,7 @@ export const SPLITS_COMPONENT_PROJECT_FRAGMENT = gql`
       repoName
       ownerName
     }
+    isVisible
     chainData {
       ... on ClaimedProjectData {
         chain
@@ -79,6 +80,7 @@ export const SPLITS_COMPONENT_DRIP_LIST_FRAGMENT = gql`
     account {
       accountId
     }
+    isVisible
     name
     owner {
       address

@@ -15,6 +15,7 @@
         ownerName
         repoName
       }
+      isVisible
       chainData {
         ...ProjectAvatar
         ... on ClaimedProjectData {
@@ -40,6 +41,7 @@
   import { ProjectVerificationStatus, type Project } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
   export let project: ProjectBadgeFragment;
 
@@ -94,6 +96,11 @@
       <div class="name flex-1 min-w-0 truncate">
         <ProjectName project={processedProject} />
       </div>
+      {#if !project?.isVisible}
+        <WarningIcon
+          style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"
+        />
+      {/if}
     </svelte:element>
     <svelte:fragment slot="tooltip-content">
       <ProjectTooltip project={processedProject} />

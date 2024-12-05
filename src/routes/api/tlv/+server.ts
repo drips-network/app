@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { redis } from '../redis.js';
 import { formatUnits } from 'ethers';
 import network from '$lib/stores/wallet/network.js';
+import { error } from '@sveltejs/kit';
 
 const etherscanTokensResponseSchema = z.array(
   z.object({
@@ -24,15 +25,29 @@ export const GET = async ({ fetch }) => {
   const etherscanApiKey = env.ETHERSCAN_API_KEY;
 
   if (!etherscanApiKey) {
-    return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
+    return new Response('null', { headers: { 'Content-Type': 'application/json' } });
   }
 
-  const dripsTokenHoldingsRes = await (
-    await fetch(
-      `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${etherscanApiKey}`,
-    )
-  ).json();
-  const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsRes.result);
+  const driptsTokenHoldingRes = await fetch(
+    `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${etherscanApiKey}`,
+  );
+  if (!driptsTokenHoldingRes.ok) {
+    const errorContent = await driptsTokenHoldingRes.text();
+    const message = `Etherscan returned error response: ${errorContent}`;
+    // eslint-disable-next-line no-console
+    console.error(message);
+    return error(500, message);
+  }
+
+  const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
+  if (dripsTokenHoldingsJson.message === 'NOTOK') {
+    const message = `Etherscan returned error message: ${JSON.stringify(dripsTokenHoldingsJson)}`;
+    // eslint-disable-next-line no-console
+    console.error(message);
+    return error(500, message);
+  }
+
+  const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsJson.result);
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
   const cmcIdMap = z.record(z.number()).parse(cmcIdMapRes);

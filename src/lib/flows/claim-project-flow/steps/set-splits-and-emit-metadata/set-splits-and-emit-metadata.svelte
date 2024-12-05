@@ -29,6 +29,7 @@
   } from './__generated__/gql.generated';
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import gaslessStore from '$lib/stores/gasless/gasless.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -103,7 +104,7 @@
             return false;
         }
       },
-      300000,
+      600000,
       2000,
     );
 
@@ -119,7 +120,7 @@
     const ownerIndexedExpectation = await expect(
       () => checkProjectInExpectedStateForClaiming(),
       (response) => response,
-      300000,
+      600000,
       2000,
     );
 
@@ -197,6 +198,7 @@
 
           transactions.push({
             transaction: tx,
+            gasless: $gaslessStore,
             applyGasBuffer: false,
             title: 'Set project splits and metadata',
           });

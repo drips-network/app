@@ -13,6 +13,7 @@
       chain
       ...EditDripListFlowDripList
       name
+      isVisible
       account {
         accountId
       }
@@ -134,6 +135,7 @@
   /** Minimal version w/ link to Drip List page for listing contexts */
   export let listingMode = false;
 
+  export let isHidden = false;
   export let hideTotal = false;
   export let hideSupporterPile = false;
   export let hideDescription = false;
@@ -226,6 +228,7 @@
   href={dripListUrl}
   target={openInNewTab ? '_blank' : undefined}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
+  class:hidden-list={isHidden}
 >
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
@@ -248,9 +251,12 @@
               buttonVariant="normal"
               url="{BASE_URL}{dripListUrl}"
               {downloadableImageUrl}
+              disabled={!dripList?.isVisible}
             />
             {#if isOwnList}
-              <Button on:click={triggerEditModal} icon={Pen}>Edit list</Button>
+              <Button disabled={!dripList?.isVisible} on:click={triggerEditModal} icon={Pen}
+                >Edit list</Button
+              >
             {/if}
           </div>
         {/if}
@@ -532,6 +538,18 @@
 
     .hide-on-mobile {
       display: none;
+    }
+  }
+
+  .hidden-list {
+    color: var(--color-foreground);
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 0.3;
     }
   }
 </style>

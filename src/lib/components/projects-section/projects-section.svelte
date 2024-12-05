@@ -19,14 +19,27 @@
   import Plus from '../icons/Plus.svelte';
   import modal from '$lib/stores/modal';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
+  import checkIsUser from '$lib/utils/check-is-user';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
+  export let showVisibilityToggle = false;
 
   let error = false;
 
   export let collapsed = false;
   export let collapsable = false;
+
+  let showHidden: boolean = false;
+  $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
+
+  $: visibleProjects = projects.filter((p) => p.isVisible);
+
+  $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
+
+  $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
 </script>
 
 <Section
@@ -48,7 +61,7 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: projects?.length === 0,
+    empty: visibleProjects?.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',
@@ -57,20 +70,37 @@
       : 'This user hasnʼt claimed any software projects yet.',
   }}
 >
-  {#if projects}
+  {#if visibleProjects}
     <div class="projects">
-      {#each projects as project}
+      {#each visibleProjects as project}
         {@const projectChainData = filterCurrentChainData(project.chainData)}
         {#if isClaimed(projectChainData)}
           <div>
             <PrimaryColorThemer colorHex={projectChainData.color}>
-              <ProjectCard {project} />
+              <ProjectCard {project} isHidden={!project.isVisible} />
             </PrimaryColorThemer>
           </div>
         {/if}
       {/each}
     </div>
   {/if}
+
+  {#if isOwner && showVisibilityToggle}
+    <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount} />
+  {/if}
+
+  <div class="projects">
+    {#each hiddenProjects as project}
+      {@const projectChainData = filterCurrentChainData(project.chainData)}
+      {#if isClaimed(projectChainData)}
+        <div>
+          <PrimaryColorThemer colorHex={projectChainData.color}>
+            <ProjectCard {project} isHidden={!project.isVisible} />
+          </PrimaryColorThemer>
+        </div>
+      {/if}
+    {/each}
+  </div>
 </Section>
 
 <style>

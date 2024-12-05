@@ -64,7 +64,7 @@
 
         const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
 
-        await github.verifyFundingJson(ownerName, repoName);
+        await github.verifyFundingJson(ownerName, repoName, address);
 
         $context.linkedToRepo = true;
 
@@ -95,7 +95,6 @@
           }
 
           const { taskId } = await gaslessCall.json();
-          assert(typeof taskId === 'string', 'Invalid task ID');
 
           $context.gaslessOwnerUpdateTaskId = taskId;
         } catch (e) {

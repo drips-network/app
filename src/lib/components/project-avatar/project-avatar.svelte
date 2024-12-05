@@ -34,11 +34,12 @@
 
   export let pendingAvatar = false;
 
-  type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
+  type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   export let size: Size = 'small';
   export let outline = project.__typename === 'ClaimedProjectData';
 
   const CONTAINER_SIZES: Record<Size, string> = {
+    micro: '0.8rem',
     tiny: '1.5rem',
     small: '2rem',
     medium: '3rem',
@@ -90,7 +91,7 @@
           <Question />
         </div>
       {:else if project.avatar.__typename === 'ImageAvatar'}
-        <div class="project-avatar" class:with-outline={outline}>
+        <div class="project-avatar">
           <img
             bind:this={customImageEl}
             on:load={() => (customImageLoading = false)}

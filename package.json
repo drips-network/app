@@ -21,7 +21,9 @@
     "prepare": "husky install",
     "postinstall": "./scripts/install-twemoji-assets.sh",
     "build:graphql": "./scripts/build-gql-types.sh",
-    "analyze-unused-code": "knip"
+    "analyze-unused-code": "knip",
+    "build:docker": "./scripts/docker-build.sh",
+    "dev:docker": "docker run --env-file .env -it -p 5173:5173 -v /app/node_modules -v .:/app drips-app-dev"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
@@ -49,13 +51,12 @@
     "husky": "^9.0.11",
     "jsdom": "^24.1.0",
     "knip": "^5.34.1",
-    "mdsvex": "^0.11.2",
     "mime-types": "^2.1.35",
     "node-fetch": "^3.3.2",
     "playwright": "^1.44.1",
     "postcss": "^8.4.38",
-    "prettier": "^3.3.2",
-    "prettier-plugin-svelte": "^3.2.6",
+    "prettier": "^3.3.3",
+    "prettier-plugin-svelte": "^3.3.2",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-external-links": "^3.0.0",
     "rehype-img-size": "^1.0.1",
@@ -101,6 +102,8 @@
     "isomorphic-fetch": "^3.0.0",
     "jimp": "^0.22.12",
     "lodash": "^4.17.21",
+    "mdsvex": "^0.11.2",
+    "puppeteer": "^23.6.0",
     "redis": "^4.6.14",
     "sanitize-html": "^2.13.0",
     "satori": "^0.10.13",
@@ -118,7 +121,7 @@
     }
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.9.5"
+    "@rollup/rollup-linux-x64-gnu": "*"
   },
   "type": "module"
 }

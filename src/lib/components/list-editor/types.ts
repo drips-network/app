@@ -11,6 +11,7 @@ export const LIST_EDITOR_PROJECT_FRAGMENT = gql`
   ${PROJECT_BADGE_FRAGMENT}
   fragment ListEditorProject on Project {
     ...ProjectBadge
+    isVisible
   }
 `;
 
@@ -18,6 +19,7 @@ export const LIST_EDITOR_DRIP_LIST_FRAGMENT = gql`
   ${DRIP_LIST_BADGE_FRAGMENT}
   fragment ListEditorDripList on DripList {
     ...DripListBadge
+    isVisible
   }
 `;
 

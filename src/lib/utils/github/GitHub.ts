@@ -1,8 +1,6 @@
 import network from '$lib/stores/wallet/network';
-import walletStore from '$lib/stores/wallet/wallet.store';
 import type { Octokit } from '@octokit/rest';
 import { Buffer } from 'buffer';
-import { get } from 'svelte/store';
 
 export default class GitHub {
   private octokit: Octokit;
@@ -32,7 +30,7 @@ export default class GitHub {
     return this.getRepoByOwnerAndName(owner, repo);
   }
 
-  public async verifyFundingJson(owner: string, repo: string): Promise<void> {
+  public async getFundingJsonAddress(owner: string, repo: string): Promise<string | null> {
     const { data } = await this.octokit.repos
       .getContent({
         owner,
@@ -41,22 +39,45 @@ export default class GitHub {
         request: {
           cache: 'reload',
         },
+        headers: {
+          'If-None-Match': '',
+        },
       })
       .catch(() => {
         throw new Error('FUNDING.json not found.');
       });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
 
-    const fundingJson = JSON.parse(fileContent);
+      const fundingJson = JSON.parse(fileContent);
+      return (
+        fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name].ownedBy ??
+        null
+      );
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
 
-    const fundingJsonOwner =
-      fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name].ownedBy;
+      throw new Error(
+        `Unable to parse the FUNDING.json file. Ensure it exists, is valid JSON, and includes an address for ${network.label}.`,
+      );
+    }
+  }
 
-    const { address: expectedOwner } = get(walletStore);
+  public async verifyFundingJson(
+    owner: string,
+    repo: string,
+    expectedAddress: string,
+  ): Promise<void> {
+    const fundingJsonOwner = await this.getFundingJsonAddress(owner, repo);
 
-    if (fundingJsonOwner.toLowerCase() !== expectedOwner?.toLowerCase()) {
+    if (!fundingJsonOwner) {
+      throw new Error('Invalid FUNDING.json file. Does it exist?');
+    }
+
+    if (fundingJsonOwner.toLowerCase() !== expectedAddress?.toLowerCase()) {
       throw new Error('Invalid FUNDING.json file. Does it have the correct Ethereum address?');
     }
   }

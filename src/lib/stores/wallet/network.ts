@@ -37,6 +37,7 @@ export type Network = {
   applyGasBuffers: boolean;
   settlement: {
     nextSettlementDate: () => Date;
+    recipientsExplainerHtml: string;
     explainerText: string;
   };
   explorer: {
@@ -58,6 +59,7 @@ export type Network = {
   alternativeChainMode: boolean;
   ensSupported: boolean;
   ensAddress: string | undefined;
+  gaslessClaimAndCollect: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -98,12 +100,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    gaslessClaimAndCollect: false,
   },
   [80002]: {
     chainId: 80002,
@@ -135,12 +140,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -172,12 +180,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [11155111]: {
     chainId: 11155111,
@@ -185,8 +196,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Sepolia',
     token: 'ETH',
     id: '0xaa36a7',
-    rpcUrl: `${BASE_URL}/api/rpc/infura/sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/sepolia`,
+    rpcUrl: `${BASE_URL}/api/rpc/alchemy/sepolia`,
+    fallbackRpcUrl: `${BASE_URL}/api/rpc/infura/sepolia`,
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -209,12 +220,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    gaslessClaimAndCollect: true,
   },
   [84532]: {
     chainId: 84532,
@@ -246,12 +260,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [314]: {
     chainId: 314,
@@ -282,12 +299,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextFilecoinSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">weekly</span>, on Thursday.',
       explainerText:
-        'Funds from projects, streams and Drip Lists settle and become collectable daily.',
+        'Funds from projects, streams and Drip Lists settle and become collectable weekly.',
     },
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gaslessClaimAndCollect: true,
   },
 };
 

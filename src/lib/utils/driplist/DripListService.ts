@@ -101,10 +101,12 @@ export default class DripListService {
           donationAmount: bigint;
         };
     latestVotingRoundId?: string;
+    isVisible: boolean;
   }) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
-    const { listTitle, listDescription, weights, items, support, latestVotingRoundId } = config;
+    const { listTitle, listDescription, weights, items, support, latestVotingRoundId, isVisible } =
+      config;
 
     const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
       weights,
@@ -139,6 +141,7 @@ export default class DripListService {
     const ipfsHash = await this._publishMetadataToIpfs(
       listId,
       projectsSplitMetadata,
+      isVisible,
       listTitle,
       listDescription,
       latestVotingRoundId,
@@ -344,6 +347,7 @@ export default class DripListService {
   private async _publishMetadataToIpfs(
     dripListId: string,
     projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
+    isVisible: boolean,
     name?: string,
     description?: string,
     latestVotingRoundId?: string,
@@ -356,6 +360,7 @@ export default class DripListService {
       name,
       description,
       latestVotingRoundId,
+      isVisible,
     });
 
     const ipfsHash = await this._nftDriverMetadataManager.pinAccountMetadata(dripListMetadata);

@@ -2,6 +2,7 @@
   export const DRIP_LIST_BADGE_FRAGMENT = gql`
     fragment DripListBadge on DripList {
       chain
+      isVisible
       account {
         accountId
       }
@@ -19,6 +20,7 @@
   import { gql } from 'graphql-request';
   import type { DripListBadgeFragment } from './__generated__/gql.generated';
   import DripListAvatar from '../drip-list-avatar/drip-list-avatar.svelte';
+  import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
   export let dripList: DripListBadgeFragment | undefined;
 
@@ -57,6 +59,11 @@
           >{:else}{dripList.name}{/if}</span
       >
     </div>
+    {#if !dripList?.isVisible}
+      <WarningIcon
+        style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"
+      />
+    {/if}
   {/if}
 </svelte:element>
 

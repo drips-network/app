@@ -243,6 +243,7 @@ export default class GitProjectService {
                 cid: context.avatar.cid,
               },
       },
+      isVisible: true,
     };
 
     const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
@@ -318,11 +319,12 @@ export default class GitProjectService {
 
     for (const [accountId, weight] of Object.entries(dependencyListEditorConfig.weights)) {
       const item = dependencyListEditorConfig.items[accountId];
-      if (weight === 0) continue;
 
       const scaledWeight = Math.floor(
         Math.floor(weight * (highLevelPercentages['dependencies'] / 100)),
       );
+
+      if (scaledWeight === 0) continue;
 
       switch (item.type) {
         case 'address': {
@@ -367,11 +369,11 @@ export default class GitProjectService {
     }
 
     for (const [accountId, weight] of Object.entries(maintainerListEditorConfig.weights)) {
-      if (weight === 0) continue;
-
       const scaledWeight = Math.floor(
         Math.floor(weight * (highLevelPercentages['maintainers'] / 100)),
       );
+
+      if (scaledWeight === 0) continue;
 
       const receiver = {
         sublist: 'maintainers' as const,
