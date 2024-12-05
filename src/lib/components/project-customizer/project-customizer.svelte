@@ -18,6 +18,7 @@
           color
         }
       }
+      isVisible
     }
   `;
 </script>
@@ -34,12 +35,13 @@
   import TabbedBox from '../tabbed-box/tabbed-box.svelte';
   import twemoji from '$lib/utils/twemoji';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let originalProject: ProjectCustomizerFragment;
   export let newProjectData: Writable<
     ReturnType<
       typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    >
+    > & { isProjectVisible: boolean }
   >;
 
   let activeTab: 'tab-1' | 'tab-2' =
@@ -69,6 +71,12 @@
     $newProjectData.color = newColor;
   }
   $: handleColorChange(selectedColor);
+
+  let isVisible = $newProjectData.isProjectVisible;
+  function handleIsVisibleChange(isVisible: boolean) {
+    $newProjectData.isProjectVisible = isVisible;
+  }
+  $: handleIsVisibleChange(isVisible);
 
   let lastUploadedCid =
     $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined;
@@ -161,6 +169,22 @@
           <label class="color-label" style:background-color={color} for={color} />
         </div>
       {/each}
+    </div>
+  </FormField>
+
+  <FormField type="div" title="Visibility">
+    <div class="visibility-toggle">
+      <div style="display: flex; gap: 0.5rem; ">
+        <p>Show this project on my profile</p>
+        <a
+          style="text-decoration: underline; display: inline;"
+          target="_blank"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility"
+        >
+          Learn more
+        </a>
+      </div>
+      <Toggle bind:checked={isVisible} />
     </div>
   </FormField>
 </div>
@@ -259,5 +283,10 @@
   .color.selected .color-label {
     transform: scale(1);
     box-shadow: var(--elevation-low);
+  }
+
+  .visibility-toggle {
+    display: flex;
+    justify-content: space-between;
   }
 </style>

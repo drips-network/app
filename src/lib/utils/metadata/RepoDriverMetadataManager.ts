@@ -100,7 +100,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
   }
 
   public buildAccountMetadata(context: {
-    forProject: PickGQLF<Project, 'account' | 'source'> & {
+    forProject: PickGQLF<Project, 'account' | 'source' | 'isVisible'> & {
       chainData: Pick<ClaimedProjectData, 'avatar' | 'color' | 'description'>;
     };
     forSplits: LatestVersion<typeof repoDriverAccountMetadataParser>['splits'];
@@ -119,6 +119,7 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
         ownerName: forProject.source.ownerName,
         url: forProject.source.url,
       },
+      isVisible: forProject.isVisible,
       avatar:
         forProject.chainData.avatar.__typename === 'EmojiAvatar'
           ? {
@@ -182,6 +183,8 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
       delete newRes.emoji;
     }
+
+    newRes.isVisible = 'isVisible' in result ? result.isVisible : true;
 
     const parsed = repoDriverAccountMetadataParser.parseLatest(result);
 

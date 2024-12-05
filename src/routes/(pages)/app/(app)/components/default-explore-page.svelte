@@ -122,7 +122,7 @@
     (p) => !p.source.repoName.includes('drips-test-repo'),
   );
 
-  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4);
+  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
 
   let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {

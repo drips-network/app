@@ -6,6 +6,7 @@
       account {
         accountId
       }
+      isVisible
       chainData {
         ... on ClaimedProjectData {
           avatar {
@@ -19,6 +20,7 @@
           color
         }
       }
+      isVisible
     }
   `;
 </script>
@@ -53,7 +55,9 @@
   export let project: SetNewMetadataStepFragment;
   $: projectChainData = filterCurrentChainData(project.chainData, 'claimed');
 
-  $: projectDataWritable = writable(structuredClone(projectChainData));
+  $: projectDataWritable = writable(
+    structuredClone({ ...projectChainData, isProjectVisible: project.isVisible }),
+  );
 
   let valid = false;
 
@@ -85,6 +89,7 @@
                     cid: $projectDataWritable.avatar.cid,
                   },
             color: $projectDataWritable.color,
+            isVisible: $projectDataWritable.isProjectVisible,
           };
 
           const ipfsHash = await metadataManager.pinAccountMetadata(newMetadata);

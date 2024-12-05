@@ -38,11 +38,12 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
   public buildAccountMetadata(context: {
     forAccountId: string;
     projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'];
+    isVisible: boolean;
     name?: string;
     description?: string;
     latestVotingRoundId?: string;
   }): LatestVersion<typeof nftDriverAccountMetadataParser> {
-    const { forAccountId, projects, name, description, latestVotingRoundId } = context;
+    const { forAccountId, projects, name, description, latestVotingRoundId, isVisible } = context;
 
     return {
       driver: 'nft',
@@ -55,6 +56,7 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       name,
       description,
       latestVotingRoundId,
+      isVisible,
     };
   }
 
@@ -83,7 +85,11 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
     result.projects = result.projects.map(upgradeSplit);
 
-    const parsed = nftDriverAccountMetadataParser.parseLatest(result);
+    const newRes = result as LatestVersion<typeof nftDriverAccountMetadataParser>;
+
+    newRes.isVisible = 'isVisible' in result ? result.isVisible : true;
+
+    const parsed = nftDriverAccountMetadataParser.parseLatest(newRes);
 
     return parsed;
   }

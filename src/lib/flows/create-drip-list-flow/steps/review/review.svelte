@@ -56,6 +56,7 @@
           return await dripListService.buildTransactContext({
             listTitle: $context.dripList.title,
             listDescription: $context.dripList.description,
+            isVisible: true,
             weights: $context.dripList.weights,
             items: $context.dripList.items,
             support: (() => {

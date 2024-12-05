@@ -134,6 +134,7 @@
     SUPPORTER_PILE_FRAGMENT,
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
   import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
   import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
@@ -289,6 +290,10 @@
       false,
     )}"
   />
+
+  {#if !project.isVisible}
+    <meta name="robots" content="noindex" />
+  {/if}
 </svelte:head>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
@@ -364,8 +369,41 @@
       </AnnotationBox>
     </div>
   {/if}
+  {#if !project.isVisible}
+    <div class="notice">
+      <AnnotationBox type="info" icon={EyeClosed}>
+        <span class="typo-text-small-bold"
+          >{project.source.ownerName}/{project.source.repoName}</span
+        >
+        has been hidden by its owner.
+        <a
+          style="text-decoration: underline;"
+          target="_blank"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+        >.
+        <svelte:fragment slot="actions">
+          {#if isOwnProject}
+            <div class="flex gap-3">
+              <Button
+                size="small"
+                icon={Registered}
+                variant="primary"
+                on:click={() => {
+                  modal.show(Stepper, undefined, editProjectMetadataSteps(project));
+                }}>Unhide it</Button
+              >
+            </div>
+          {/if}
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
 
-  <article class="project-profile" class:claimed={isClaimed(chainData)}>
+  <article
+    class="project-profile"
+    class:claimed={isClaimed(chainData)}
+    class:hidden-by-user={!project.isVisible}
+  >
     <header class="header">
       <div>
         <ProjectProfileHeader
@@ -527,7 +565,7 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo} />
+        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo || !project.isVisible} />
       </div>
     </aside>
   </article>
@@ -616,6 +654,10 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .hidden-by-user {
+    opacity: 0.5;
   }
 
   @media (max-width: 1080px) {

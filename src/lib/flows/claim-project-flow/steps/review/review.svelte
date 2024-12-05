@@ -55,6 +55,7 @@
   $: fakeClaimedProject = {
     __typename: 'Project',
     source: { ...project.source },
+    isVisible: true,
     chainData: [
       {
         owner: {
@@ -95,9 +96,10 @@
   }
 
   function customize() {
-    const newProjectDataWritable = writable(
-      filterCurrentChainData(fakeClaimedProject.chainData, 'claimed'),
-    );
+    const newProjectDataWritable = writable({
+      ...filterCurrentChainData(fakeClaimedProject.chainData, 'claimed'),
+      isProjectVisible: true,
+    });
 
     if (isModal) {
       dispatch('sidestep', {

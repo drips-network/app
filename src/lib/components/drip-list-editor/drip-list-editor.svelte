@@ -17,6 +17,7 @@
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import type { AddItemError } from '../list-editor/errors';
   import CustodialWarning from '../annotation-box/custodial-warning.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let name: string;
   export let description: string | undefined;
@@ -24,6 +25,8 @@
   export let weights: Weights;
 
   export let urlToAdd: string | undefined = undefined;
+
+  export let isVisible: boolean;
 
   let recipientErrors: AddItemError[] = [];
 
@@ -67,4 +70,25 @@
       <slot name="list-editor-action" />
     </svelte:fragment>
   </FormField>
+
+  <FormField type="div" title="Visibility">
+    <div class="visibility-toggle">
+      <div style="display: flex; gap: 0.5rem;">
+        <p>Show this Drip List on my profile</p>
+        <a
+          style="text-decoration: underline; display: inline;"
+          target="_blank"
+          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
+        >
+      </div>
+      <Toggle bind:checked={isVisible} />
+    </div>
+  </FormField>
 </section>
+
+<style>
+  .visibility-toggle {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>

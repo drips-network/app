@@ -16,7 +16,7 @@
   export let newProjectData: Writable<
     ReturnType<
       typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    >
+    > & { isProjectVisible: boolean }
   >;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();

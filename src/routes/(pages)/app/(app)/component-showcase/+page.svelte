@@ -111,6 +111,7 @@
 
   const MOCK_PROJECT_1: Project = {
     __typename: 'Project',
+    isVisible: true,
     chainData: [
       {
         __typename: 'ClaimedProjectData',
@@ -152,6 +153,7 @@
 
   const MOCK_PROJECT_2: Project = {
     __typename: 'Project',
+    isVisible: true,
     chainData: [
       {
         __typename: 'ClaimedProjectData',
@@ -201,6 +203,7 @@
     {
       __typename: 'DripListReceiver',
       dripList: {
+        isVisible: true,
         __typename: 'DripList',
         chain: network.gqlName,
         account: {
@@ -239,6 +242,7 @@
             {
               __typename: 'DripListReceiver',
               dripList: {
+                isVisible: true,
                 __typename: 'DripList',
                 chain: network.gqlName,
                 name: 'A different Drip List',
@@ -591,9 +595,14 @@
       project={{
         __typename: 'Project',
         source: SOURCE_CONFIGS.github,
+        isVisible: true,
         chainData: [
           {
             chain: network.gqlName,
+            owner: {
+              __typename: 'AddressDriverAccount',
+              accountId: '0',
+            },
             __typename: 'ClaimedProjectData',
             avatar: {
               __typename: 'EmojiAvatar',
@@ -631,6 +640,7 @@
         ? {
             __typename: 'Project',
             source: SOURCE_CONFIGS[sourceType],
+            isVisible: true,
             chainData: [
               {
                 chain: network.gqlName,
@@ -650,6 +660,7 @@
         : {
             __typename: 'Project',
             source: SOURCE_CONFIGS[sourceType],
+            isVisible: true,
             chainData: [
               {
                 chain: network.gqlName,

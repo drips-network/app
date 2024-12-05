@@ -6,6 +6,7 @@
     ${DRIP_LIST_BADGE_FRAGMENT}
     fragment ProjectsListingsItem on Project {
       ...ProjectBadge
+      isVisible
       chainData {
         ... on UnClaimedProjectData {
           chain
@@ -105,6 +106,7 @@
   }
 
   const projectsTableData: ProjectsTableRow[] = data.content.projects
+    .filter((project) => project.isVisible)
     .map((project) => {
       const projectChainData = filterCurrentChainData(project.chainData);
 

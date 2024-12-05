@@ -8,6 +8,7 @@
 
   export let text: string | undefined = undefined;
   export let url: string;
+  export let disabled = false;
   export let downloadableImageUrl: string = '';
   export let shareModalText: string | undefined = undefined;
   export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
@@ -50,7 +51,7 @@
   });
 </script>
 
-<Button variant={buttonVariant} on:click={handleClick}>
+<Button {disabled} variant={buttonVariant} on:click={handleClick}>
   <div class="button-inner">
     <ShareIcon style="fill:currentColor" />
     {shareLabel}

@@ -73,13 +73,27 @@
     }
   }
 
-  function checkCanAdd(accountId: string) {
+  function checkCanAdd(recipient: RecipientResult | undefined) {
+    if (!recipient) {
+      return;
+    }
+
+    const { accountId, dripList, project } = recipient;
+
     if (blockedAccountIds.includes(accountId)) {
       throw new AddItemError(`You can't add this right now.`, 'warning');
     }
 
     if (existingKeys.includes(accountId)) {
       throw new AddItemError('Already added', 'warning');
+    }
+
+    if (dripList && !dripList.isVisible) {
+      throw new AddItemError('Drip List is hidden and cannot be split to', 'warning');
+    }
+
+    if (project && !project.isVisible) {
+      throw new AddItemError('Project is hidden and cannot be split to', 'warning');
     }
   }
 
@@ -188,7 +202,7 @@
         throw new AddItemError('We failed to get information for this.', 'error');
       }
 
-      checkCanAdd(recipientResult.accountId);
+      checkCanAdd(recipientResult);
       dispatchUpdate(recipientResult);
     } catch (e) {
       if (e instanceof AddItemError) {

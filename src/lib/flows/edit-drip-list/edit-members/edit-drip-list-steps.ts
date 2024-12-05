@@ -19,6 +19,7 @@ export const EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT = gql`
   fragment EditDripListFlowDripList on DripList {
     name
     description
+    isVisible
     account {
       accountId
     }
@@ -42,6 +43,7 @@ export default (dripList: EditDripListFlowDripListFragment) => {
     name: dripList.name,
     description: dripList.description || undefined,
     dripListAccountId: dripList.account.accountId,
+    isVisible: dripList.isVisible,
   });
 
   return {
