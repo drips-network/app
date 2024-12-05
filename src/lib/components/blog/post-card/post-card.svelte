@@ -11,7 +11,7 @@
   export let coverImage: string;
   export let coverImageAlt: string;
   export let imageUrl: string | undefined = undefined;
-  export let author: z.infer<typeof authorSchema> | undefined;
+  export let author: z.infer<typeof authorSchema> | undefined = undefined;
 
   export let compact = false;
   export let newTab = false;
@@ -38,7 +38,7 @@
   href="/blog/posts/{slug}"
   target={newTab ? '_blank' : undefined}
 >
-  <img src={coverImage} alt={coverImageAlt} />
+  <img class="cover-image" src={coverImage} alt={coverImageAlt} />
   <div class="content">
     <div>
       {#if first}
@@ -139,17 +139,17 @@
     gap: 0.5rem;
   }
 
-  .post img {
+  .post .cover-image {
     width: 100%;
     height: 40vw;
     object-fit: cover;
   }
 
-  .post.first img {
+  .post.first .cover-image {
     height: auto;
   }
 
-  .post.compact img {
+  .post.compact .cover-image {
     height: 20vw;
   }
 
@@ -170,11 +170,11 @@
       padding: 2rem;
     }
 
-    .post img {
+    .post .cover-image {
       height: 20rem;
     }
 
-    .post.compact img {
+    .post.compact .cover-image {
       min-height: 10rem;
       max-height: 11rem;
     }

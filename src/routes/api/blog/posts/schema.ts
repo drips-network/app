@@ -18,5 +18,6 @@ export const authorSchema = z.object({
 export const postsListingSchema = z.array(
   metadataSchema.extend({
     slug: z.string(),
+    author: authorSchema.optional(),
   }),
 );

@@ -11,12 +11,12 @@ export const load = async ({ url, params }) => {
   }
 
   try {
-    const post = await import(`/src/blog-posts/${params.slug}.md`);
+    const post = await import(`../../../../../blog-posts/${params.slug}.md`);
     const metadata = metadataSchema.parse(post.metadata);
 
     let author: z.infer<typeof authorSchema> | undefined;
     if (post.metadata.author) {
-      const authorDesc = await import(`/src/blog-posts/authors/${metadata.author}.json`);
+      const authorDesc = await import(`../../../../../blog-posts/authors/${metadata.author}.json`);
       assert(
         authorDesc,
         `Unable to locate blog author with ID ${metadata.author}. Make sure the ID is present in /src/blog-posts/authors/`,

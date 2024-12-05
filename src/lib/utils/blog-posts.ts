@@ -21,7 +21,9 @@ export const fetchRawBlogPosts = async () => {
         const slug = getSlug(path);
 
         // Get the frontmatter
-        const fm = (compiled?.data && 'fm' in compiled.data && compiled.data.fm) ?? {};
+        const fm = metadataSchema.parse(
+          compiled?.data && 'fm' in compiled.data && compiled.data.fm,
+        );
 
         return { ...fm, slug };
       },
