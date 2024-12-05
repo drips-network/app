@@ -1,6 +1,7 @@
 import { compile } from 'mdsvex';
 import assert from '$lib/utils/assert';
-import { metadataSchema } from '../../routes/api/blog/posts/schema';
+import { authorSchema, metadataSchema } from '../../routes/api/blog/posts/schema';
+import type { z } from 'zod';
 
 export const getSlug = (path: string): string => {
   const slug = path.split('/').pop()?.slice(0, -3);
@@ -37,10 +38,21 @@ export const fetchBlogPosts = async () => {
 
       const metadata = metadataSchema.parse(resolved.metadata);
 
+      let author: z.infer<typeof authorSchema> | undefined;
+      if (metadata.author) {
+        const authorDesc = await import(`/src/blog-posts/authors/${metadata.author}.json`);
+        assert(
+          authorDesc,
+          `Unable to locate blog author with ID ${metadata.author}. Make sure the ID is present in /src/blog-posts/authors/`,
+        );
+
+        author = authorSchema.parse(authorDesc);
+      }
+
       // Get and assert slug
       const slug = getSlug(path);
 
-      return { ...metadata, slug };
+      return { ...metadata, author, slug };
     }),
   );
 };

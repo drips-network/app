@@ -1,6 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
+  import type { z } from 'zod';
+  import type { authorSchema } from '../../../../routes/api/blog/posts/schema';
 
   export let title: string;
   export let excerpt: string;
@@ -9,6 +11,7 @@
   export let coverImage: string;
   export let coverImageAlt: string;
   export let imageUrl: string | undefined = undefined;
+  export let author: z.infer<typeof authorSchema> | undefined;
 
   export let compact = false;
   export let newTab = false;
@@ -43,7 +46,19 @@
       {:else}
         <h2 class="pixelated">{title}</h2>
       {/if}
-      <p class="typo-text-small">{formattedDate}</p>
+      <p class="metadata typo-text-small" style:color="var(--color-foreground-level-5)">
+        {#if author}
+          <img
+            class="author-avatar"
+            src={author.avatarUrl}
+            alt={author.name}
+            style="width: 1.5rem; height: 1.5rem; border-radius: 50%"
+          />
+          <span>{author.name}</span>
+          <span>•</span>
+        {/if}
+        <span>{formattedDate}</span>
+      </p>
       <p>{excerpt}</p>
     </div>
     {#if shareButton}
@@ -73,6 +88,21 @@
       transform 0.2s,
       box-shadow 0.2s,
       opacity 0.3s;
+  }
+
+  .post .metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .post .metadata .author-avatar {
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid var(--color-foreground);
   }
 
   .post.link:hover,
@@ -115,6 +145,10 @@
     object-fit: cover;
   }
 
+  .post.first img {
+    height: auto;
+  }
+
   .post.compact img {
     height: 20vw;
   }
@@ -137,8 +171,7 @@
     }
 
     .post img {
-      min-height: 20rem;
-      height: auto;
+      height: 20rem;
     }
 
     .post.compact img {

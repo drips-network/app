@@ -2,6 +2,7 @@
   <span>N</span>
   <span>e</span>
   <span>w</span>
+  <span>s</span>
 </div>
 
 <style>
@@ -25,6 +26,11 @@
   }
 
   .new-animation span:nth-child(3) {
+    animation: flip3D 5s infinite;
+    animation-delay: 0.5s;
+  }
+
+  .new-animation span:nth-child(4) {
     animation: flip3D 5s infinite;
     animation-delay: 0.5s;
   }

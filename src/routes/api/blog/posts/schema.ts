@@ -7,6 +7,12 @@ export const metadataSchema = z.object({
   coverImage: z.string(),
   coverImageAlt: z.string(),
   announcementBannerCopy: z.string().optional(),
+  author: z.string().optional(),
+});
+
+export const authorSchema = z.object({
+  name: z.string(),
+  avatarUrl: z.string(),
 });
 
 export const postsListingSchema = z.array(
