@@ -1,3 +1,5 @@
+import type { FundingJson } from '$lib/utils/github/GitHub';
+
 const NUM_SPACES = 2;
 
 export const getChangedTemplate = (
@@ -26,7 +28,7 @@ export const getChangedTemplate = (
   return [asJSON, [start, end]];
 };
 
-export const objectTemplate = (address: string, network = 'ethereum') => {
+export const objectTemplate = (address: string, network = 'ethereum'): FundingJson => {
   return {
     drips: {
       [network]: {

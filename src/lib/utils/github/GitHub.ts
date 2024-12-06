@@ -2,7 +2,7 @@ import network from '$lib/stores/wallet/network';
 import type { Octokit } from '@octokit/rest';
 import { Buffer } from 'buffer';
 
-type DripsJson = {
+export type FundingJson = {
   drips?: {
     [key: string]: {
       ownedBy: string;
@@ -70,7 +70,7 @@ export default class GitHub {
     }
   }
 
-  public async fetchFundingJson(owner: string, repo: string): Promise<DripsJson | null> {
+  public async fetchFundingJson(owner: string, repo: string): Promise<FundingJson | null> {
     try {
       const { data } = await this.octokit.repos.getContent({
         owner,
