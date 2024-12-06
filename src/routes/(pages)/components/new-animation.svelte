@@ -8,10 +8,12 @@
 <style>
   .new-animation {
     display: flex;
+    align-items: center;
     gap: 0rem;
     border: 1px solid white;
     color: white;
     padding: 0 0.5rem;
+    height: 1.75rem;
     border-radius: 1rem 0 1rem 1rem;
   }
 

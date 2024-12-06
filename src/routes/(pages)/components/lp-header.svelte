@@ -54,22 +54,25 @@
   </div>
   {#if announcementBannerVisible && announcementBanner}
     <div transition:slide|global={{ duration: 300 }} class="announcement-banner typo-text-bold">
-      <a
-        href={announcementBanner.link}
-        target="_blank"
-        class="typo-text-bold"
-        style:display="flex"
-        style:gap="0.5rem"
-      >
+      <div style:display="flex" style:gap="0.5rem" style:align-items="center">
         <NewAnimation />
-        <span class="twemoji-text">{@html twemoji(announcementBanner.title)}</span>
-      </a>
+        <a
+          href={announcementBanner.link}
+          target="_blank"
+          class="typo-text-bold"
+          style:display="flex"
+          style:gap="0.5rem"
+        >
+          <span class="twemoji-text">{@html twemoji(announcementBanner.title)}</span>
+        </a>
+      </div>
       <div style:display="flex" style:gap="1rem">
         <a
           href={announcementBanner.link}
           target="_blank"
           class="typo-text"
-          style:text-decoration="underline">Learn more</a
+          style:text-decoration="underline"
+          style:white-space="nowrap">Learn more</a
         >
         <Cross on:click={dismissAnnouncement} style="fill: white; cursor: pointer;" />
       </div>
@@ -80,14 +83,13 @@
 <style>
   .announcement-banner {
     background-color: var(--color-primary);
-    height: 3rem;
     display: flex;
     justify-content: space-between;
     gap: 1rem;
     color: white;
     align-items: center;
     width: 100%;
-    padding: 0 1.5rem;
+    padding: 0.75rem 1.5rem;
   }
 
   header {
@@ -142,11 +144,13 @@
     gap: 0.5rem;
   }
 
-  @media (max-width: 577px) {
+  @media (max-width: 1024px) {
     .announcement-banner {
       display: none;
     }
+  }
 
+  @media (max-width: 577px) {
     header {
       border: none;
       border-bottom: 1px solid var(--color-foreground);
