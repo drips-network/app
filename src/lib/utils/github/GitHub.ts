@@ -39,23 +39,6 @@ export default class GitHub {
   }
 
   public async verifyFundingJson(owner: string, repo: string): Promise<void> {
-    // const { data } = await this.octokit.repos
-    //   .getContent({
-    //     owner,
-    //     repo,
-    //     path: 'FUNDING.json',
-    //     request: {
-    //       cache: 'reload',
-    //     },
-    //   })
-    //   .catch(() => {
-    //     throw new Error('FUNDING.json not found.');
-    //   });
-
-    // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
-
-    // const fundingJson = JSON.parse(fileContent);
     const fundingJson = await this.fetchFundingJson(owner, repo);
     if (!fundingJson) {
       throw new Error('FUNDING.json not found.');
