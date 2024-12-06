@@ -16,7 +16,7 @@
   import unreachable from '$lib/utils/unreachable';
   import { createEventDispatcher, onMount } from 'svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import dripsJsonTemplate from './drips-json-template';
+  import { getChangedTemplate } from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -37,10 +37,20 @@
   export let context: Writable<State>;
 
   let fundingJson: Awaited<ReturnType<typeof github.fetchFundingJson>>;
+  let code: string;
+  let highlight: [number | null, number | null];
+
+  $: address = $walletStore.address ?? unreachable();
+  $: network = $walletStore.network.name
+    ? $walletStore.network.name === 'homestead'
+      ? 'ethereum'
+      : $walletStore.network.name
+    : unreachable();
 
   async function loadFundingJson() {
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
-    fundingJson = await github.fetchFundingJson(ownerName, repoName);
+    fundingJson = (await github.fetchFundingJson(ownerName, repoName)) || {};
+    [code, highlight] = getChangedTemplate(fundingJson, address, network);
     // eslint-disable-next-line no-console
     console.log(fundingJson);
   }
@@ -131,14 +141,8 @@
     repoUrl={$context.gitUrl}
     defaultBranch={$context.projectMetadata?.defaultBranch}
     path="./FUNDING.json"
-    code={dripsJsonTemplate(
-      $walletStore.address ?? unreachable(),
-      $walletStore.network.name
-        ? $walletStore.network.name === 'homestead'
-          ? 'ethereum'
-          : $walletStore.network.name
-        : unreachable(),
-    )}
+    {code}
+    {highlight}
   />
   <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">

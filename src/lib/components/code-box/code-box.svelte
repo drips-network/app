@@ -5,11 +5,13 @@
   import CopyIcon from '$lib/components/icons/Copy.svelte';
   import Button from '../button/button.svelte';
   import sanitize from 'sanitize-html';
+  import insertTextAtIndices from '$lib/utils/insert-text-at-indicies';
 
   export let path: string;
   export let code: string;
   export let repoUrl: string;
   export let defaultBranch = 'main';
+  export let highlight: [number | null, number | null] = [null, null];
 
   let headerElem: HTMLElement | undefined;
 
@@ -18,6 +20,17 @@
     : undefined;
 
   $: textColor = primaryColor ? getContrastColor(primaryColor) : undefined;
+
+  $: sanitizedCode = sanitize(code, {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
+  $: displayCode = highlight.some((v) => v === null)
+    ? sanitizedCode
+    : insertTextAtIndices(sanitizedCode, {
+        [highlight[0] as number]: '<span>',
+        [highlight[1] as number]: '</span>',
+      });
 
   let copySuccess = false;
 
@@ -48,6 +61,7 @@
   </header>
   <div class="code-wrapper">
     <code class="typo-text-mono">
+      {@html displayCode}
       {@html sanitize(code, {
         allowedTags: [],
         allowedAttributes: {},
