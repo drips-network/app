@@ -4,6 +4,7 @@ date: '2024-09-19'
 coverImage: '/assets/blog-images/collaborative-drip-lists.png'
 coverImageAlt: 'Collaborative Drip List illustration'
 excerpt: 'We’re excited to introduce a powerful new feature to streamline and simplify the way communities manage funding and voting initiatives: Collaborative Drip Lists.'
+author: 'jason'
 ---
 
 <script>

@@ -3,10 +3,27 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
+  import sanitize from 'sanitize-html';
+  import { BASE_URL } from '$lib/utils/base-url';
 
   export let data: PageData;
 
   let imageUrl = `/api/share-images/blog-post/og/${encodeURIComponent(data.meta.slug)}.png`;
+
+  // Structured meta for SEO
+  const ldJsonMetadata = `{
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": "${sanitize(data.meta.title)}",
+    "image": [
+      "${BASE_URL}${sanitize(data.meta.coverImage)}"
+      ],
+    "datePublished": "${new Date(data.meta.date).toISOString()}",
+    "author": [{
+        "@type": "Person",
+        "name": "${sanitize(data.meta.author?.name ?? 'Drips Team')}"
+      }]
+  }`;
 </script>
 
 <HeadMeta
@@ -16,6 +33,10 @@
   description={data.meta.excerpt}
   twitterCardType="summary"
 />
+
+<svelte:head>
+  {@html '<script type="application/ld+json">' + ldJsonMetadata + '</script>'}
+</svelte:head>
 
 <ModalLayout />
 

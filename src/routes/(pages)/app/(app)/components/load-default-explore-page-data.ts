@@ -68,8 +68,12 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     chains: [network.gqlName],
   };
 
+  // Crude way of busting the cache if there's any breaking change in underlying data that might be
+  // cached after deployment. Just increment this by 1, and it'll ignore previously-cached data when deployed.
+  const CACHE_BUSTER = 1;
+
   const cacheKey = queryCacheKey(
-    getProjectsQuery + featuredDripListQuery,
+    getProjectsQuery + featuredDripListQuery + CACHE_BUSTER,
     [Object.entries(getProjectsVariables), FEATURED_DRIP_LISTS],
     'explore-page',
   );
