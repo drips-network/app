@@ -55,8 +55,6 @@
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
     fundingJson = (await github.fetchFundingJson(ownerName, repoName)) || {};
     [code, highlight] = getChangedTemplate(fundingJson, address, network);
-    // eslint-disable-next-line no-console
-    console.log(fundingJson);
   }
 
   onMount(() => {
