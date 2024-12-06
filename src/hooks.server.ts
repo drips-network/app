@@ -1,5 +1,5 @@
 import { sequence } from '@sveltejs/kit/hooks';
-import { handleErrorWithSentry, sentryHandle } from '@sentry/sveltekit';
+import { sentryHandle } from '@sentry/sveltekit';
 import * as Sentry from '@sentry/sveltekit';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
@@ -26,4 +26,7 @@ PuppeteerManager.launch({
 });
 
 export const handle = sequence(sentryHandle());
-export const handleError = handleErrorWithSentry();
+export const handleError = Sentry.handleErrorWithSentry(function (error: unknown) {
+  // eslint-disable-next-line no-console
+  console.error('Uncaught error', error);
+});
