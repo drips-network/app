@@ -16,7 +16,7 @@
   import unreachable from '$lib/utils/unreachable';
   import { createEventDispatcher, onMount } from 'svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import dripsJsonTemplate from './drips-json-template';
+  import { getChangedTemplate } from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -36,8 +36,30 @@
 
   export let context: Writable<State>;
 
+  let fundingJson: Awaited<ReturnType<typeof github.fetchFundingJson>>;
+  let code: string;
+  let highlight: [number | null, number | null];
+
+  $: address = $walletStore.address ?? unreachable();
+  $: network = $walletStore.network.name
+    ? $walletStore.network.name === 'homestead'
+      ? 'ethereum'
+      : $walletStore.network.name
+    : unreachable();
+  $: editing = fundingJson && Object.keys(fundingJson).length > 0;
+  $: description = editing
+    ? 'To verify you are the owner of this project, please edit your FUNDING.json file with your Ethereum address to the default branch of your repository.'
+    : 'To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. ';
+
+  async function loadFundingJson() {
+    const { ownerName, repoName } = $context.project?.source ?? unreachable();
+    fundingJson = (await github.fetchFundingJson(ownerName, repoName)) || {};
+    [code, highlight] = getChangedTemplate(fundingJson, address, network);
+  }
+
   onMount(() => {
     $context.linkedToRepo = false;
+    loadFundingJson();
   });
 
   const GASLESS_CALL_ERROR_MESSAGE =
@@ -113,22 +135,13 @@
   $: formValid = $walletStore.connected && checked;
 </script>
 
-<StandaloneFlowStepLayout
-  headline="Verify project ownership"
-  description="To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. "
->
+<StandaloneFlowStepLayout headline="Verify project ownership" {description}>
   <CodeBox
     repoUrl={$context.gitUrl}
     defaultBranch={$context.projectMetadata?.defaultBranch}
     path="./FUNDING.json"
-    code={dripsJsonTemplate(
-      $walletStore.address ?? unreachable(),
-      $walletStore.network.name
-        ? $walletStore.network.name === 'homestead'
-          ? 'ethereum'
-          : $walletStore.network.name
-        : unreachable(),
-    )}
+    {code}
+    {highlight}
   />
   <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">
