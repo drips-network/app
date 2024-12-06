@@ -9,7 +9,7 @@ const config: CodegenConfig = {
   },
   schema: [
     {
-      [process.env.GQL_URL]: {
+      [process.env.CODEGEN_GQL_URL ?? process.env.GQL_URL]: {
         headers: {
           Authorization: `Bearer ${process.env.GQL_ACCESS_TOKEN}`,
         },
