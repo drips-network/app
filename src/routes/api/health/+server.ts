@@ -1,6 +1,4 @@
 import query from '$lib/graphql/dripsQL';
-import { gql } from 'graphql-request';
-import type { TestQuery, TestQueryVariables } from './__generated__/gql.generated';
 import { error } from '@sveltejs/kit';
 
 export const GET = async () => {
@@ -9,14 +7,14 @@ export const GET = async () => {
   // checks whether the API can be reached. This is important because private IPV6 networking
   // in Railway needs a few seconds to start up after a deploy
 
-  const testQuery = gql`
+  const testQuery = `
     query Test {
       __typename
     }
   `;
 
   try {
-    await query<TestQuery, TestQueryVariables>(testQuery);
+    await query(testQuery);
     return new Response('OK');
   } catch (e) {
     // eslint-disable-next-line no-console
