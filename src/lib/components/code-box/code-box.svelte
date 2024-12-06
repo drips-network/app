@@ -28,7 +28,7 @@
   $: displayCode = highlight.some((v) => v === null)
     ? sanitizedCode
     : insertTextAtIndices(sanitizedCode, {
-        [highlight[0] as number]: '<span>',
+        [highlight[0] as number]: '<span class="typo-text-diff-additive">',
         [highlight[1] as number]: '</span>',
       });
 
@@ -62,10 +62,6 @@
   <div class="code-wrapper">
     <code class="typo-text-mono">
       {@html displayCode}
-      {@html sanitize(code, {
-        allowedTags: [],
-        allowedAttributes: {},
-      })}
     </code>
   </div>
   {#if repoUrl.includes('github')}

@@ -46,6 +46,10 @@
       ? 'ethereum'
       : $walletStore.network.name
     : unreachable();
+  $: editing = fundingJson && Object.keys(fundingJson).length > 0;
+  $: description = editing
+    ? 'To verify you are the owner of this project, please edit your FUNDING.json file with your Ethereum address to the default branch of your repository.'
+    : 'To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. ';
 
   async function loadFundingJson() {
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
@@ -133,10 +137,7 @@
   $: formValid = $walletStore.connected && checked;
 </script>
 
-<StandaloneFlowStepLayout
-  headline="Verify project ownership"
-  description="To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. "
->
+<StandaloneFlowStepLayout headline="Verify project ownership" {description}>
   <CodeBox
     repoUrl={$context.gitUrl}
     defaultBranch={$context.projectMetadata?.defaultBranch}
