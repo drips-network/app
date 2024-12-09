@@ -23,7 +23,7 @@ export const getChangedTemplate = (
   const end = asJSON.lastIndexOf('}');
   // TODO: can we make this magic string based of the actual content?
   const start =
-    end - '    "": {\n      "ownedBy": ""\n    }\n  }\n'.length - network.length - address.length;
+    end - '},    "": {\n      "ownedBy": ""\n    }\n  }\n'.length - network.length - address.length;
 
   return [asJSON, [start, end]];
 };

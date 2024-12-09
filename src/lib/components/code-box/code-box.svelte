@@ -12,6 +12,7 @@
   export let repoUrl: string;
   export let defaultBranch = 'main';
   export let highlight: [number | null, number | null] = [null, null];
+  export let ctaText: string = 'Add to your repo';
 
   let headerElem: HTMLElement | undefined;
 
@@ -28,10 +29,11 @@
   $: displayCode = highlight.some((v) => v === null)
     ? sanitizedCode
     : insertTextAtIndices(sanitizedCode, {
-        [highlight[0] as number]: '<span class="typo-text-diff-additive">',
-        [highlight[1] as number]: '</span>',
+        [highlight[0] as number]: '<mark class="typo-text-diff-additive">',
+        [highlight[1] as number]: '</mark>',
       });
 
+  // $: displayCode, console.log('displayCode', displayCode)
   let copySuccess = false;
 
   async function copyClipboard(text: string) {
@@ -67,7 +69,7 @@
   {#if repoUrl.includes('github')}
     <footer class="absolute bottom-4 right-4">
       <Button variant="primary" icon={ArrowBoxUpRight} href={gitHubProposalUrl} target="_blank">
-        Add to your repo</Button
+        {ctaText}</Button
       >
     </footer>
   {/if}
