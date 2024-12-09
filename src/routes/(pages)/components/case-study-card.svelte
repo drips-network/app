@@ -8,7 +8,11 @@
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
 
-  export let blogPost: (z.infer<typeof metadataSchema> & { slug: string }) | undefined;
+  export let blogPost:
+    | (Pick<z.infer<typeof metadataSchema>, 'title' | 'coverImage' | 'coverImageAlt'> & {
+        slug: string;
+      })
+    | undefined;
   export let orgName: string;
   export let logoSrc: string;
   export let logoAlt: string;

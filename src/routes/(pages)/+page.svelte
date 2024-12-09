@@ -49,11 +49,31 @@
     'Incentivize developers within your ecosystem',
   ];
   let heroTextsIndex = 0;
+
+  let announcementBannerConfig:
+    | {
+        title: string;
+        link: string;
+      }
+    | undefined;
+  $: {
+    const sortedPosts = data.blogPosts.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+    const latestPostWithAnnouncementConfig = sortedPosts.find((p) => p.announcementBannerCopy);
+
+    announcementBannerConfig = latestPostWithAnnouncementConfig?.announcementBannerCopy
+      ? {
+          title: latestPostWithAnnouncementConfig.announcementBannerCopy,
+          link: `/blog/posts/${latestPostWithAnnouncementConfig.slug}`,
+        }
+      : undefined;
+  }
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
 
-<LpHeader />
+<LpHeader announcementBanner={announcementBannerConfig} />
 <div class="page">
   <div class="wrapper">
     <!-- hero graph -->
@@ -63,6 +83,7 @@
         style:justify-content="center"
         style:overflow="hidden"
         style:width="100%"
+        style:margin-top="2.5rem"
       >
         <div class="big-hero-graph">
           <LpHeroBigGraph />
