@@ -34,7 +34,6 @@
       });
   $: ctaText = editing ? 'Edit on GitHub' : 'Add to your repo';
 
-  // $: displayCode, console.log('displayCode', displayCode)
   let copySuccess = false;
 
   async function copyClipboard(text: string) {
