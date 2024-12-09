@@ -21,9 +21,9 @@ export const getChangedTemplate = (
 
   const asJSON = JSON.stringify(existingJsonCopy, null, NUM_SPACES);
   const end = asJSON.lastIndexOf('}');
-  // TODO: can we make this magic string based of the actual content?
-  const start =
-    end - '},    "": {\n      "ownedBy": ""\n    }\n  }\n'.length - network.length - address.length;
+  // highlight should start where the drips object starts a second
+  // object listing...for now.
+  const start = asJSON.indexOf(',\n');
 
   return [asJSON, [start, end]];
 };
