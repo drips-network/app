@@ -50,6 +50,9 @@
   $: description = editing
     ? 'To verify you are the owner of this project, please edit your FUNDING.json file with your Ethereum address to the default branch of your repository.'
     : 'To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. ';
+  $: checkboxLabel = editing
+    ? 'I edited the FUNDING.json file'
+    : 'I added the FUNDING.json file to the root of my repo.';
 
   async function loadFundingJson() {
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
@@ -144,7 +147,7 @@
     {highlight}
     {editing}
   />
-  <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
+  <Checkbox bind:checked label={checkboxLabel} />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
