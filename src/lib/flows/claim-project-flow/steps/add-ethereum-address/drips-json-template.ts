@@ -21,9 +21,9 @@ export const getChangedTemplate = (
 
   const asJSON = JSON.stringify(existingJsonCopy, null, NUM_SPACES);
   const end = asJSON.lastIndexOf('}');
-  // highlight should start where the drips object starts a second
-  // object listing...for now.
-  const start = asJSON.indexOf(',\n');
+  // highlight should start where the drips object starts a final
+  // object listing.
+  const start = asJSON.lastIndexOf(',\n');
 
   return [asJSON, [start, end]];
 };
