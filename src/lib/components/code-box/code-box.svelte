@@ -12,7 +12,7 @@
   export let repoUrl: string;
   export let defaultBranch = 'main';
   export let highlight: [number | null, number | null] = [null, null];
-  export let ctaText: string = 'Add to your repo';
+  export let editing: boolean = false;
 
   let headerElem: HTMLElement | undefined;
 
@@ -32,6 +32,7 @@
         [highlight[0] as number]: '<mark class="typo-text-diff-additive">',
         [highlight[1] as number]: '</mark>',
       });
+  $: ctaText = editing ? 'Edit on GitHub' : 'Add to your repo';
 
   // $: displayCode, console.log('displayCode', displayCode)
   let copySuccess = false;
@@ -43,9 +44,9 @@
   }
 
   // TODO: add support for Gitlab.
-  $: gitHubProposalUrl = `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(
-    code,
-  )}`;
+  $: gitHubProposalUrl = editing
+    ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json?value=${encodeURIComponent(code)}`
+    : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`;
 </script>
 
 <section class="codebox relative text-left">

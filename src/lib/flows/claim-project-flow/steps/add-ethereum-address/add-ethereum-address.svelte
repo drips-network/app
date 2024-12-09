@@ -50,7 +50,6 @@
   $: description = editing
     ? 'To verify you are the owner of this project, please edit your FUNDING.json file with your Ethereum address to the default branch of your repository.'
     : 'To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. ';
-  $: codeBoxCta = editing ? 'Edit on GitHub' : undefined;
 
   async function loadFundingJson() {
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
@@ -143,7 +142,7 @@
     path="./FUNDING.json"
     {code}
     {highlight}
-    ctaText={codeBoxCta}
+    {editing}
   />
   <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
   <svelte:fragment slot="left-actions">
