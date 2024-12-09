@@ -12,7 +12,7 @@ export const getChangedTemplate = (
     return [JSON.stringify(objectTemplate(address, network), null, NUM_SPACES), [null, null]];
   }
 
-  // object are now iterated in order, so when we add the new network here, it will
+  // object string keys are iterated in insertion order, so when we add the new network here, it will
   // always appear last in the JSON representation.
   const existingJsonCopy = JSON.parse(JSON.stringify(existingJson));
   existingJsonCopy.drips[network] = {
