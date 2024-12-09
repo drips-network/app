@@ -44,7 +44,7 @@
 
   // TODO: add support for Gitlab.
   $: gitHubProposalUrl = editing
-    ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json?value=${encodeURIComponent(code)}`
+    ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json`
     : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`;
 </script>
 
