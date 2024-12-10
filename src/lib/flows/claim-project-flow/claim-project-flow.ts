@@ -21,6 +21,8 @@ import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import ChooseNetwork from './steps/choose-network/choose-network.svelte';
+import type { FundingJson } from '$lib/utils/github/GitHub';
+import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
@@ -67,6 +69,11 @@ export interface State {
         cid: string;
       };
   projectColor: string;
+  funding: {
+    json: string;
+    object: FundingJson;
+    highlight: TemplateHighlight;
+  };
 }
 
 export const state = () =>
@@ -92,6 +99,11 @@ export const state = () =>
       emoji: '💧',
     },
     projectColor: '#000000',
+    funding: {
+      json: '{}',
+      object: {},
+      highlight: [null, null],
+    },
   });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {

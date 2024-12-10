@@ -63,6 +63,8 @@
   onMount(() => {
     $context.linkedToRepo = false;
     loadFundingJson();
+    // eslint-disable-next-line no-console
+    console.log('add eth address', $context);
   });
 
   const GASLESS_CALL_ERROR_MESSAGE =

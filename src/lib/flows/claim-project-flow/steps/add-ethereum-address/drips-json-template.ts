@@ -2,11 +2,13 @@ import type { FundingJson } from '$lib/utils/github/GitHub';
 
 const NUM_SPACES = 2;
 
+export type TemplateHighlight = [number | null, number | null];
+
 export const getChangedTemplate = (
   existingJson: object,
   address: string,
   network: string,
-): [string, [number | null, number | null]] => {
+): [string, TemplateHighlight] => {
   // no change, so don't highlight anything
   if (Object.keys(existingJson).length === 0) {
     return [JSON.stringify(objectTemplate(address, network), null, NUM_SPACES), [null, null]];

@@ -8,13 +8,47 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
+  import unreachable from '$lib/utils/unreachable';
+  import { getChangedTemplate } from '../add-ethereum-address/drips-json-template';
+  import { Octokit } from '@octokit/rest';
+  import GitHub from '$lib/utils/github/GitHub';
+  import type { Writable } from 'svelte/store';
+  import type { State } from '../../claim-project-flow';
+
+  const octokit = new Octokit();
+  const github = new GitHub(octokit);
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  export let context: Writable<State>;
+
+  $: address = $walletStore.address ?? unreachable();
+  $: network = $walletStore.network.name
+    ? $walletStore.network.name === 'homestead'
+      ? 'ethereum'
+      : $walletStore.network.name
+    : unreachable();
 
   $: formValid = $walletStore.connected;
 
   function verifyProject() {
-    dispatch('goForward');
+    dispatch('await', {
+      message: 'Gathering project information…',
+      promise: async () => {
+        const { ownerName, repoName } = $context.project?.source ?? unreachable();
+        const fundingObject = (await github.fetchFundingJson(ownerName, repoName)) || {};
+        const [fundingJson, jsonHighlight] = getChangedTemplate(fundingObject, address, network);
+
+        context.update((c) => {
+          c.funding = {
+            object: fundingObject,
+            json: fundingJson,
+            highlight: jsonHighlight,
+          };
+          return c;
+        });
+      },
+    });
   }
 </script>
 
