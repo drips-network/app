@@ -1,11 +1,15 @@
 import type { State } from '../../claim-project-flow';
 import unreachable from '$lib/utils/unreachable';
 import { getChangedTemplate } from '../add-ethereum-address/drips-json-template';
-import type GitHub from '$lib/utils/github/GitHub';
+import GitHub from '$lib/utils/github/GitHub';
 import { get, type Writable } from 'svelte/store';
 import walletStore from '$lib/stores/wallet/wallet.store';
+import { Octokit } from '@octokit/rest';
 
-export async function loadingFundingInfo(context: Writable<State>, github: GitHub): Promise<void> {
+const octokit = new Octokit();
+const github = new GitHub(octokit);
+
+export async function loadingFundingInfo(context: Writable<State>): Promise<void> {
   const $walletStore = get(walletStore);
   const address = $walletStore.address ?? '';
   const network = $walletStore.network.name

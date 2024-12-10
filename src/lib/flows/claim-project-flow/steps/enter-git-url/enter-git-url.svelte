@@ -52,12 +52,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import modal from '$lib/stores/modal';
-  import { Octokit } from '@octokit/rest';
-  import GitHub from '$lib/utils/github/GitHub';
   import { loadingFundingInfo } from './enter-git-url';
-
-  const octokit = new Octokit();
-  const github = new GitHub(octokit);
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -219,7 +214,8 @@
       $context.projectColor = seededRandomElement(possibleColors, project.account.accountId);
 
       validationState = { type: 'valid' };
-      loadingFundingInfo(context, github);
+      // TODO: do before heading to next step?
+      loadingFundingInfo(context);
     } catch (error: unknown) {
       // eslint-disable-next-line no-console
       console.error(error);
