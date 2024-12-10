@@ -48,8 +48,8 @@
     : unreachable();
   $: editing = fundingJson && Object.keys(fundingJson).length > 0;
   $: description = editing
-    ? 'To verify you are the owner of this project, please edit your FUNDING.json file with your Ethereum address to the default branch of your repository.'
-    : 'To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. ';
+    ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
+    : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`;
   $: checkboxLabel = editing
     ? 'I edited the FUNDING.json file'
     : 'I added the FUNDING.json file to the root of my repo.';
