@@ -16,7 +16,6 @@
   import unreachable from '$lib/utils/unreachable';
   import { createEventDispatcher, onMount } from 'svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import { getChangedTemplate } from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -36,17 +35,12 @@
 
   export let context: Writable<State>;
 
-  let fundingJson: Awaited<ReturnType<typeof github.fetchFundingJson>>;
-  let code: string;
-  let highlight: [number | null, number | null];
-
-  $: address = $walletStore.address ?? unreachable();
   $: network = $walletStore.network.name
     ? $walletStore.network.name === 'homestead'
       ? 'ethereum'
       : $walletStore.network.name
     : unreachable();
-  $: editing = fundingJson && Object.keys(fundingJson).length > 0;
+  $: editing = $context.funding.object && Object.keys($context.funding.object).length > 0;
   $: description = editing
     ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
     : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`;
@@ -54,17 +48,8 @@
     ? 'I edited the FUNDING.json file'
     : 'I added the FUNDING.json file to the root of my repo.';
 
-  async function loadFundingJson() {
-    const { ownerName, repoName } = $context.project?.source ?? unreachable();
-    fundingJson = (await github.fetchFundingJson(ownerName, repoName)) || {};
-    [code, highlight] = getChangedTemplate(fundingJson, address, network);
-  }
-
   onMount(() => {
     $context.linkedToRepo = false;
-    loadFundingJson();
-    // eslint-disable-next-line no-console
-    console.log('add eth address', $context);
   });
 
   const GASLESS_CALL_ERROR_MESSAGE =
@@ -145,8 +130,8 @@
     repoUrl={$context.gitUrl}
     defaultBranch={$context.projectMetadata?.defaultBranch}
     path="./FUNDING.json"
-    {code}
-    {highlight}
+    code={$context.funding.json}
+    highlight={$context.funding.highlight}
     {editing}
   />
   <Checkbox bind:checked label={checkboxLabel} />

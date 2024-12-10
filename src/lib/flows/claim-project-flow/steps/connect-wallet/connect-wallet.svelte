@@ -22,19 +22,19 @@
 
   export let context: Writable<State>;
 
-  $: address = $walletStore.address ?? unreachable();
-  $: network = $walletStore.network.name
-    ? $walletStore.network.name === 'homestead'
-      ? 'ethereum'
-      : $walletStore.network.name
-    : unreachable();
-
   $: formValid = $walletStore.connected;
 
   function verifyProject() {
     dispatch('await', {
       message: 'Gathering project information…',
       promise: async () => {
+        const address = $walletStore.address ?? unreachable();
+        const network = $walletStore.network.name
+          ? $walletStore.network.name === 'homestead'
+            ? 'ethereum'
+            : $walletStore.network.name
+          : unreachable();
+
         const { ownerName, repoName } = $context.project?.source ?? unreachable();
         const fundingObject = (await github.fetchFundingJson(ownerName, repoName)) || {};
         const [fundingJson, jsonHighlight] = getChangedTemplate(fundingObject, address, network);
