@@ -18,7 +18,7 @@ export async function loadingFundingInfo(context: Writable<State>): Promise<void
       : $walletStore.network.name
     : '';
 
-  // We can't make a useful FUNDING.json with an address or network.
+  // We can't make a useful FUNDING.json without an address or network.
   if (!address || !network) {
     return;
   }
