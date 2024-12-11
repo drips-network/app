@@ -57,8 +57,6 @@
     );
   }
 
-  // TODO: shouldn't this be:
-  // $: maintainerKeys = Object.keys($context.dependencySplits.items);
   $: maintainerKeys = Object.keys($context.maintainerSplits.items);
 </script>
 
