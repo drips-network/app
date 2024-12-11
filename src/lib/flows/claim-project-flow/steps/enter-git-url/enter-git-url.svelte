@@ -52,7 +52,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import modal from '$lib/stores/modal';
-  import { loadingFundingInfo } from './enter-git-url';
+  import { loadFundingInfo } from './enter-git-url';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -263,7 +263,7 @@
     dispatch('await', {
       message: 'Gathering project information…',
       promise: async () => {
-        return loadingFundingInfo(context);
+        return loadFundingInfo(context);
       },
     });
   }

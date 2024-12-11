@@ -10,7 +10,7 @@
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-project-flow';
-  import { loadingFundingInfo } from '../enter-git-url/enter-git-url';
+  import { loadFundingInfo } from '../enter-git-url/enter-git-url';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -22,7 +22,7 @@
     dispatch('await', {
       message: 'Gathering project information…',
       promise: async () => {
-        return loadingFundingInfo(context);
+        return loadFundingInfo(context);
       },
     });
   }

@@ -9,7 +9,7 @@ import { Octokit } from '@octokit/rest';
 const octokit = new Octokit();
 const github = new GitHub(octokit);
 
-export async function loadingFundingInfo(context: Writable<State>): Promise<void> {
+export async function loadFundingInfo(context: Writable<State>): Promise<void> {
   const $walletStore = get(walletStore);
   const address = $walletStore.address ?? '';
   const network = $walletStore.network.name
