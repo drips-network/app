@@ -16,6 +16,8 @@
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -40,7 +42,15 @@
         description:
           'Your CSV file should be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
-          'A recipient can be a wallet address or ENS name. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
+          'A recipient can be a wallet address or ENS name if supported by the network. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
+        exampleTableData: mapFilterUndefined(
+          [
+            ['0xa404a9258A2240d6f2FDa871a7Fbd71bb6523570', 20],
+            ['0x38493bA0F8a15D81985bF5438bc6f90C6C5418C1', 75],
+            network.ensSupported ? ['vitalik.eth', 5] : undefined,
+          ],
+          (v) => v,
+        ),
         allowProjects: false,
         allowDripLists: false,
         addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
