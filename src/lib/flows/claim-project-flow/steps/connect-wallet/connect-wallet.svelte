@@ -8,13 +8,23 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
+  import type { Writable } from 'svelte/store';
+  import type { State } from '../../claim-project-flow';
+  import { loadFundingInfo } from '../enter-git-url/enter-git-url';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  export let context: Writable<State>;
 
   $: formValid = $walletStore.connected;
 
   function verifyProject() {
-    dispatch('goForward');
+    dispatch('await', {
+      message: 'Gathering project information…',
+      promise: () => {
+        return loadFundingInfo(context);
+      },
+    });
   }
 </script>
 

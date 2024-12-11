@@ -52,6 +52,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import modal from '$lib/stores/modal';
+  import { loadFundingInfo } from './enter-git-url';
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
@@ -258,6 +259,15 @@
     submitInput();
   }
 
+  function goForward() {
+    dispatch('await', {
+      message: 'Gathering project information…',
+      promise: () => {
+        return loadFundingInfo(context);
+      },
+    });
+  }
+
   onMount(() => {
     modal.setWarnOnNavigate(true);
   });
@@ -297,9 +307,7 @@
   {/if}
   <svelte:fragment slot="actions">
     {#if formValid}
-      <Button icon={ArrowRightIcon} variant="primary" on:click={() => dispatch('goForward')}
-        >Continue</Button
-      >
+      <Button icon={ArrowRightIcon} variant="primary" on:click={goForward}>Continue</Button>
     {:else}
       <Button
         disabled={!inputSubmittable}
