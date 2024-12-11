@@ -18,6 +18,7 @@ export async function loadingFundingInfo(context: Writable<State>): Promise<void
       : $walletStore.network.name
     : '';
 
+  // We can't make a useful FUNDING.json with an address or network.
   if (!address || !network) {
     return;
   }
@@ -28,6 +29,9 @@ export async function loadingFundingInfo(context: Writable<State>): Promise<void
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
     fundingObject = await github.fetchFundingJson(ownerName, repoName);
   } catch (error) {
+    // if the FUNDING.json is not found, that's fine. It means we need a new one, so
+    // we continue below. Otherwise (here), something is wrong and we should show
+    // an error.
     if (!(error as Error).message.includes('not found')) {
       throw error;
     }
