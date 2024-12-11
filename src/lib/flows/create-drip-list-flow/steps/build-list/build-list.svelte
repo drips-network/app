@@ -11,11 +11,11 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
-  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import importFromCSVSteps, {
+    WEIGHT_FACTOR,
+  } from '$lib/flows/import-from-csv/import-from-csv-steps';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
-
-  const WEIGHT_FACTOR = 10_000;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

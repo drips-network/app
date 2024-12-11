@@ -21,6 +21,7 @@ type UploadProps = {
 
 export const DEFAULT_CSV_HEADERS = ['recipient', 'percentage'];
 export const DEFAULT_MAX_ENTRIES = 200;
+export const WEIGHT_FACTOR = 10_000;
 
 export default (props: UploadProps) => ({
   context: undefined,
