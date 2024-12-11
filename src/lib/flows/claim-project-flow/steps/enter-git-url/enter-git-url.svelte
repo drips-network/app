@@ -214,8 +214,6 @@
       $context.projectColor = seededRandomElement(possibleColors, project.account.accountId);
 
       validationState = { type: 'valid' };
-      // TODO: do before heading to next step?
-      loadingFundingInfo(context);
     } catch (error: unknown) {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -261,6 +259,15 @@
     submitInput();
   }
 
+  function goForward() {
+    dispatch('await', {
+      message: 'Gathering project information…',
+      promise: async () => {
+        return loadingFundingInfo(context);
+      },
+    });
+  }
+
   onMount(() => {
     modal.setWarnOnNavigate(true);
   });
@@ -300,9 +307,7 @@
   {/if}
   <svelte:fragment slot="actions">
     {#if formValid}
-      <Button icon={ArrowRightIcon} variant="primary" on:click={() => dispatch('goForward')}
-        >Continue</Button
-      >
+      <Button icon={ArrowRightIcon} variant="primary" on:click={goForward}>Continue</Button>
     {:else}
       <Button
         disabled={!inputSubmittable}
