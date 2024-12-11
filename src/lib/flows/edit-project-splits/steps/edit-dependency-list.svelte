@@ -10,6 +10,12 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
+  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import importFromCSVSteps, {
+    WEIGHT_FACTOR,
+  } from '$lib/flows/import-from-csv/import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -17,6 +23,42 @@
 
   let formValid: boolean;
 
+  function handleImportCSV() {
+    dispatch(
+      'sidestep',
+      importFromCSVSteps({
+        headline: 'Import dependencies from CSV',
+        description:
+          'Your CSV file should be formatted by first listing the recipient, then listing the percentage allocation. For example:',
+        exampleTableCaption:
+          'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
+        addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
+          context.update((c) => {
+            c.dependencySplits.items = {
+              ...c.dependencySplits.items,
+              [key]: item,
+            };
+
+            if (weight) {
+              c.dependencySplits.weights[key] = weight * WEIGHT_FACTOR;
+            }
+
+            return c;
+          });
+        },
+        clearItems() {
+          context.update((c) => {
+            c.dependencySplits.items = {};
+            c.dependencySplits.weights = {};
+            return c;
+          });
+        },
+      }),
+    );
+  }
+
+  // TODO: shouldn't this be:
+  // $: maintainerKeys = Object.keys($context.dependencySplits.items);
   $: maintainerKeys = Object.keys($context.maintainerSplits.items);
 </script>
 
@@ -27,15 +69,20 @@
       .highLevelPercentages['dependencies']}% you assigned to your project’s dependencies."
   />
   <CustodialWarning dismissableId="custodial-warning-project-splits" />
-  <ListEditor
-    bind:weights={$context.dependencySplits.weights}
-    bind:items={$context.dependencySplits.items}
-    bind:valid={formValid}
-    blockedAccountIds={$context.projectAccountId
-      ? [$context.projectAccountId, ...maintainerKeys]
-      : maintainerKeys}
-    maxItems={200 - maintainerKeys.length}
-  />
+  <FormField title="Dependencies*">
+    <ListEditor
+      bind:weights={$context.dependencySplits.weights}
+      bind:items={$context.dependencySplits.items}
+      bind:valid={formValid}
+      blockedAccountIds={$context.projectAccountId
+        ? [$context.projectAccountId, ...maintainerKeys]
+        : maintainerKeys}
+      maxItems={200 - maintainerKeys.length}
+    />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+    </svelte:fragment>
+  </FormField>
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
