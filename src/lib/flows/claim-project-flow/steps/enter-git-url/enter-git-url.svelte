@@ -262,7 +262,7 @@
   function goForward() {
     dispatch('await', {
       message: 'Gathering project information…',
-      promise: async () => {
+      promise: () => {
         return loadFundingInfo(context);
       },
     });
