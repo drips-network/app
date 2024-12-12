@@ -16,7 +16,6 @@
   import unreachable from '$lib/utils/unreachable';
   import { createEventDispatcher, onMount } from 'svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
-  import dripsJsonTemplate from './drips-json-template';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -35,6 +34,19 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
+
+  $: network = $walletStore.network.name
+    ? $walletStore.network.name === 'homestead'
+      ? 'ethereum'
+      : $walletStore.network.name
+    : unreachable();
+  $: editing = $context.funding.object && Object.keys($context.funding.object).length > 0;
+  $: description = editing
+    ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
+    : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`;
+  $: checkboxLabel = editing
+    ? 'I edited the FUNDING.json file'
+    : 'I added the FUNDING.json file to the root of my repo.';
 
   onMount(() => {
     $context.linkedToRepo = false;
@@ -113,24 +125,16 @@
   $: formValid = $walletStore.connected && checked;
 </script>
 
-<StandaloneFlowStepLayout
-  headline="Verify project ownership"
-  description="To verify you are the owner of this project, please add a FUNDING.json file with your Ethereum address to the default branch of your repository. "
->
+<StandaloneFlowStepLayout headline="Verify project ownership" {description}>
   <CodeBox
     repoUrl={$context.gitUrl}
     defaultBranch={$context.projectMetadata?.defaultBranch}
     path="./FUNDING.json"
-    code={dripsJsonTemplate(
-      $walletStore.address ?? unreachable(),
-      $walletStore.network.name
-        ? $walletStore.network.name === 'homestead'
-          ? 'ethereum'
-          : $walletStore.network.name
-        : unreachable(),
-    )}
+    code={$context.funding.json}
+    highlight={$context.funding.highlight}
+    {editing}
   />
-  <Checkbox bind:checked label="I added the FUNDING.json file to the root of my repo." />
+  <Checkbox bind:checked label={checkboxLabel} />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
