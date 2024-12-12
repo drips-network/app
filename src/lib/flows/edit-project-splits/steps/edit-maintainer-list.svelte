@@ -32,6 +32,10 @@
     } else {
       dispatch('goForward');
     }
+
+    // dismiss any errors on this step, since they're shared
+    // with the next step
+    handleErrorDismissed();
   }
 
   function handleImportCSV() {
@@ -78,6 +82,13 @@
     );
   }
 
+  function handleErrorDismissed() {
+    context.update((c) => {
+      c.recipientErrors = [];
+      return c;
+    });
+  }
+
   $: dependencyKeys = Object.keys($context.dependencySplits.items);
 </script>
 
@@ -94,6 +105,8 @@
       bind:weights={$context.maintainerSplits.weights}
       bind:items={$context.maintainerSplits.items}
       bind:valid={formValid}
+      bind:inputErrors={$context.recipientErrors}
+      on:errorDismissed={handleErrorDismissed}
       blockedAccountIds={dependencyKeys}
       maxItems={200 - dependencyKeys.length}
       allowProjects={false}

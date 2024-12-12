@@ -57,6 +57,24 @@
     );
   }
 
+  function handleErrorDismissed() {
+    context.update((c) => {
+      c.recipientErrors = [];
+      return c;
+    });
+  }
+
+  function goForward() {
+    dispatch('goForward');
+  }
+
+  function goBackward() {
+    dispatch('goBackward');
+    // dismiss any errors on this step, since they're shared
+    // with the next step
+    handleErrorDismissed();
+  }
+
   $: maintainerKeys = Object.keys($context.maintainerSplits.items);
 </script>
 
@@ -72,6 +90,8 @@
       bind:weights={$context.dependencySplits.weights}
       bind:items={$context.dependencySplits.items}
       bind:valid={formValid}
+      bind:inputErrors={$context.recipientErrors}
+      on:errorDismissed={handleErrorDismissed}
       blockedAccountIds={$context.projectAccountId
         ? [$context.projectAccountId, ...maintainerKeys]
         : maintainerKeys}
@@ -82,14 +102,11 @@
     </svelte:fragment>
   </FormField>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeft} on:click={goBackward}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRight}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+    <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={goForward}
+      >Continue</Button
     >
   </svelte:fragment>
 </StepLayout>

@@ -19,6 +19,7 @@ import {
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT,
 } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
+import type { AddItemError } from '$lib/components/list-editor/errors';
 
 export const EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT = gql`
   ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT}
@@ -68,6 +69,7 @@ export interface State {
   highLevelPercentages: { [key: string]: number };
   maintainerSplits: ListEditorConfig;
   dependencySplits: ListEditorConfig;
+  recipientErrors: Array<AddItemError>;
 }
 
 const state = (projectAccountId: string, representationalSplits: Splits) => {
@@ -105,6 +107,7 @@ const state = (projectAccountId: string, representationalSplits: Splits) => {
     highLevelPercentages,
     maintainerSplits,
     dependencySplits,
+    recipientErrors: [],
   });
 };
 
