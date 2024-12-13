@@ -64,10 +64,6 @@
     });
   }
 
-  function goForward() {
-    dispatch('goForward');
-  }
-
   function goBackward() {
     dispatch('goBackward');
     // dismiss any errors on this step, since they're shared
@@ -105,8 +101,11 @@
     <Button icon={ArrowLeft} on:click={goBackward}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={goForward}
-      >Continue</Button
+    <Button
+      disabled={!formValid}
+      icon={ArrowRight}
+      variant="primary"
+      on:click={() => dispatch('goForward')}>Continue</Button
     >
   </svelte:fragment>
 </StepLayout>

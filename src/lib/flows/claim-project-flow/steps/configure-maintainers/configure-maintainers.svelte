@@ -76,6 +76,13 @@
       return c;
     });
   }
+
+  function goForward() {
+    dispatch('goForward');
+    // dismiss any errors on this step, since they're shared
+    // with the next step
+    handleErrorDismissed();
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -105,11 +112,8 @@
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRightIcon}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={goForward}
+      >Continue</Button
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>

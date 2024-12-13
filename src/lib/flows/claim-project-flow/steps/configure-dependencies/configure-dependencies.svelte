@@ -71,6 +71,15 @@
       return c;
     });
   }
+
+  function goBackward() {
+    dispatch('goForward', {
+      by: $context.highLevelPercentages['maintainers'] === 0 ? -2 : -1,
+    });
+    // dismiss any errors on this step, since they're shared
+    // with the next step
+    handleErrorDismissed();
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -105,13 +114,7 @@
     </svelte:fragment>
   </FormField>
   <svelte:fragment slot="left-actions">
-    <Button
-      icon={ArrowLeftIcon}
-      on:click={() =>
-        dispatch('goForward', {
-          by: $context.highLevelPercentages['maintainers'] === 0 ? -2 : -1,
-        })}>Back</Button
-    >
+    <Button icon={ArrowLeftIcon} on:click={goBackward}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button
