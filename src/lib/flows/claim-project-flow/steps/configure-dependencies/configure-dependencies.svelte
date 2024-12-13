@@ -10,6 +10,12 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+  import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import importFromCSVSteps, {
+    WEIGHT_FACTOR,
+  } from '$lib/flows/import-from-csv/import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -24,6 +30,47 @@
   });
 
   $: maintainerKeys = Object.keys($context.maintainerSplits.items);
+
+  function handleImportCSV() {
+    dispatch(
+      'sidestep',
+      importFromCSVSteps({
+        headline: 'Import dependencies from CSV',
+        description:
+          'Your CSV file should be formatted by first listing the recipient, then listing the percentage allocation. For example:',
+        exampleTableCaption:
+          'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
+        addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
+          context.update((c) => {
+            c.dependencySplits.items = {
+              ...c.dependencySplits.items,
+              [key]: item,
+            };
+
+            if (weight) {
+              c.dependencySplits.weights[key] = weight * WEIGHT_FACTOR;
+            }
+
+            return c;
+          });
+        },
+        clearItems() {
+          context.update((c) => {
+            c.dependencySplits.items = {};
+            c.dependencySplits.weights = {};
+            return c;
+          });
+        },
+      }),
+    );
+  }
+
+  function handleErrorDismissed() {
+    context.update((c) => {
+      c.recipientErrors = [];
+      return c;
+    });
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -40,16 +87,23 @@
 >
   <CustodialWarning dismissableId="custodial-warning-claim-project" />
   <!-- TODO: Prevent splitting to the same project we're trying to claim. -->
-  <ListEditor
-    bind:weights={$context.dependencySplits.weights}
-    bind:items={$context.dependencySplits.items}
-    bind:valid={formValid}
-    blockedAccountIds={mapFilterUndefined(
-      [$context.project?.account.accountId, ...maintainerKeys],
-      (v) => v,
-    )}
-    maxItems={200 - maintainerKeys.length}
-  />
+  <FormField title="Dependencies*">
+    <ListEditor
+      bind:weights={$context.dependencySplits.weights}
+      bind:items={$context.dependencySplits.items}
+      bind:valid={formValid}
+      bind:inputErrors={$context.recipientErrors}
+      on:errorDismissed={handleErrorDismissed}
+      blockedAccountIds={mapFilterUndefined(
+        [$context.project?.account.accountId, ...maintainerKeys],
+        (v) => v,
+      )}
+      maxItems={200 - maintainerKeys.length}
+    />
+    <svelte:fragment slot="action">
+      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+    </svelte:fragment>
+  </FormField>
   <svelte:fragment slot="left-actions">
     <Button
       icon={ArrowLeftIcon}
