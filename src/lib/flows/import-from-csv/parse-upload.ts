@@ -57,7 +57,14 @@ export async function parseFile(file: File, csvHeaders: string[]): Promise<strin
   const dataIndices = fileLayout;
   const result = [];
   for (const row of parsedFile.slice(startRowIndex)) {
-    const columns = dataIndices.map((index) => row[index]);
+    const columns = dataIndices.map((index) => {
+      const value = row[index];
+      if (typeof value !== 'string') {
+        return value;
+      }
+
+      return value.trim();
+    });
     result.push(columns);
   }
 
