@@ -44,6 +44,7 @@
   $: canSubmitProjectClaim = isSupportedGitUrl(claimProjectInput);
 
   const heroTexts = [
+    'The Value Graph of Open-Source',
     'Continuously support your dependencies',
     'Retroactively reward open-source projects',
     'Incentivize developers within your ecosystem',
