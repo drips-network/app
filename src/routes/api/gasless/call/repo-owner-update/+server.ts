@@ -7,7 +7,7 @@ import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk
 import { GELATO_API_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
 import network, { getNetwork } from '$lib/stores/wallet/network';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
+import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
