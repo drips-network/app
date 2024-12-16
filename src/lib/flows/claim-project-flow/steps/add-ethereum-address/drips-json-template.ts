@@ -17,6 +17,9 @@ export const getChangedTemplate = (
   // object string keys are iterated in insertion order, so when we add the new network here, it will
   // always appear last in the JSON representation.
   const existingJsonCopy = JSON.parse(JSON.stringify(existingJson));
+  // if there's already an entry for this network, delete it
+  // and replace it with the current value.
+  delete existingJsonCopy.drips[network];
   existingJsonCopy.drips[network] = {
     ownedBy: address,
   };
