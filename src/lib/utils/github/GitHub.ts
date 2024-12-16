@@ -55,6 +55,9 @@ export default class GitHub {
         request: {
           cache: 'reload',
         },
+        headers: {
+          'If-None-Match': '',
+        },
       }));
     } catch (error) {
       // eslint-disable-next-line no-console

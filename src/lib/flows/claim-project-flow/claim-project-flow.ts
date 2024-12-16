@@ -23,6 +23,7 @@ import type { Items, Weights } from '$lib/components/list-editor/types';
 import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 import type { FundingJson } from '$lib/utils/github/GitHub';
 import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';
+import type { AddItemError } from '$lib/components/list-editor/errors';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
@@ -74,6 +75,7 @@ export interface State {
     object: FundingJson;
     highlight: TemplateHighlight;
   };
+  recipientErrors: Array<AddItemError>;
 }
 
 export const state = () =>
@@ -104,6 +106,7 @@ export const state = () =>
       object: {},
       highlight: [null, null],
     },
+    recipientErrors: [],
   });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
