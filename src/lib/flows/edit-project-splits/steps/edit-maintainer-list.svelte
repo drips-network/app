@@ -11,6 +11,7 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
   import importFromCSVSteps, {
+    DEFAULT_MAX_ENTRIES,
     WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
@@ -108,7 +109,7 @@
       bind:inputErrors={$context.recipientErrors}
       on:errorDismissed={handleErrorDismissed}
       blockedAccountIds={dependencyKeys}
-      maxItems={200 - dependencyKeys.length}
+      maxItems={DEFAULT_MAX_ENTRIES - dependencyKeys.length}
       allowProjects={false}
       allowDripLists={false}
     />

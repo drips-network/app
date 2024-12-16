@@ -14,6 +14,7 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
   import importFromCSVSteps, {
+    DEFAULT_MAX_ENTRIES,
     WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
 
@@ -91,7 +92,7 @@
       blockedAccountIds={$context.projectAccountId
         ? [$context.projectAccountId, ...maintainerKeys]
         : maintainerKeys}
-      maxItems={200 - maintainerKeys.length}
+      maxItems={DEFAULT_MAX_ENTRIES - maintainerKeys.length}
     />
     <svelte:fragment slot="action">
       <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>

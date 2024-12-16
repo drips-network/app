@@ -10,6 +10,7 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
   import importFromCSVSteps, {
+    DEFAULT_MAX_ENTRIES,
     WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -99,7 +100,7 @@
       bind:valid={formValid}
       bind:inputErrors={$context.recipientErrors}
       on:errorDismissed={handleErrorDismissed}
-      maxItems={200 - dependencyKeys.length}
+      maxItems={DEFAULT_MAX_ENTRIES - dependencyKeys.length}
       allowProjects={false}
       allowDripLists={false}
       blockedAccountIds={dependencyKeys}
