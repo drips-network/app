@@ -157,28 +157,33 @@ async function validateClaimProjectTx(txDescription: TransactionDescription): Pr
 
     // Parse the calldata
     const repoDriverIface = new Interface(repoDriverAbi);
-    const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
+    const dripsIface = new Interface(dripsAbi);
 
-    if (!repoDriverParseRes) return false;
+    const repoDriverParseRes =
+      repoDriverIface.parseTransaction({ data: calldata }) ||
+      dripsIface.parseTransaction({ data: calldata });
+    const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
+    if (!(repoDriverParseRes || dripsParseRes)) return false;
 
     switch (index) {
       case 0: {
-        if (repoDriverParseRes.name !== 'setSplits') return false;
+        if (repoDriverParseRes?.name !== 'setSplits') return false;
 
         projectAccountId = repoDriverParseRes.args[0].toString();
 
         break;
       }
       case 1: {
-        if (repoDriverParseRes.name !== 'emitAccountMetadata') return false;
+        if (repoDriverParseRes?.name !== 'emitAccountMetadata') return false;
         if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
 
         break;
       }
       default: {
-        if (!(repoDriverParseRes.name === 'split' || repoDriverParseRes.name === 'collect'))
+        if (!(dripsParseRes?.name === 'split' || repoDriverParseRes?.name === 'collect'))
           return false;
-        if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
+        if ((repoDriverParseRes || dripsParseRes)?.args[0].toString() !== projectAccountId)
+          return false;
       }
     }
   }
