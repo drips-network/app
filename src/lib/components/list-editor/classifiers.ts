@@ -28,8 +28,14 @@ export const classifyRecipient = (
     return {
       type: 'project',
       value: reformatUrl(input),
-      validate() {
-        return validateProject(this.value);
+      async validate() {
+        const validationOrUrl = await validateProject(this.value);
+        if (!validationOrUrl) {
+          return false;
+        }
+
+        this.value = reformatUrl(validationOrUrl);
+        return true;
       },
       fetch() {
         return getProject(this.value);
@@ -75,8 +81,8 @@ export const classifyRecipient = (
     return {
       type: 'project',
       value: buildRepositoryURL(input),
-      validate() {
-        return validateProject(this.value);
+      async validate() {
+        return !!(await validateProject(this.value));
       },
       fetch() {
         return getProject(this.value);
