@@ -9,12 +9,6 @@ import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser';
-// import { gql } from 'graphql-request';
-// import query from '$lib/graphql/dripsQL';
-// import type {
-//   MintedNftAccountsCountQuery,
-//   MintedNftAccountsCountQueryVariables,
-// } from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
 import {
@@ -113,23 +107,7 @@ export default class DripListService {
       items,
     );
 
-    // const mintedNftAccountsCountQuery = gql`
-    //   query MintedNftAccountsCount($ownerAddress: String!, $chain: SupportedChain!) {
-    //     mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress, chain: $chain) {
-    //       total
-    //     }
-    //   }
-    // `;
-
-    // const mintedNftAccountsCountRes = await query<
-    //   MintedNftAccountsCountQuery,
-    //   MintedNftAccountsCountQueryVariables
-    // >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress, chain: network.gqlName });
-
-    const salt = this._calcSaltFromAddress(
-      this._ownerAddress,
-      // mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress.total ?? 0,
-    );
+    const salt = this._calcSaltFromAddress(this._ownerAddress);
 
     const listId = (
       await executeNftDriverReadMethod({
@@ -376,17 +354,5 @@ export default class DripListService {
     const randomBigInt = ethers.toBigInt('0x' + hash.slice(26));
 
     return BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
-    // let random64BitBigInt = BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
-
-    // const listCountBigInt = BigInt(listCount);
-    // random64BitBigInt = random64BitBigInt ^ listCountBigInt;
-
-    // return random64BitBigInt;
   };
-
-  // private _generateDripIdFromSalt = (salt: bigint): number /* 32bit */ => {
-  //   const random32BitNumber = Number(salt & BigInt(0xffffffff));
-
-  //   return random32BitNumber;
-  // };
 }
