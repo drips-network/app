@@ -7,7 +7,7 @@ import Polygon from '$lib/components/icons/networks/Polygon.svelte';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
-import { nextFilecoinSettlementDate, nextMainnetSettlementDate } from '$lib/utils/settlement-date';
+import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
 export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
@@ -36,7 +36,7 @@ export type Network = {
   displayNetworkPicker: boolean;
   applyGasBuffers: boolean;
   settlement: {
-    nextSettlementDate: () => Date;
+    nextSettlementDate: (() => Date) | 'daily';
     recipientsExplainerHtml: string;
     explainerText: string;
   };
@@ -103,7 +103,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
-        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+        'Funds from projects, streams and Drip Lists on Ethereum settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
     ensSupported: true,
@@ -298,11 +298,11 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
     },
     settlement: {
-      nextSettlementDate: nextFilecoinSettlementDate,
+      nextSettlementDate: 'daily',
       recipientsExplainerHtml:
-        'Future incoming funds will be split to your recipients <span class="typo-text-bold">weekly</span>, on Thursday.',
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
-        'Funds from projects, streams and Drip Lists settle and become collectable weekly.',
+        'Funds from projects, streams and Drip Lists on Filecoin settle and become collectablee once per day.',
     },
     alternativeChainMode: true,
     ensSupported: false,
