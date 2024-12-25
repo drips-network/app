@@ -302,7 +302,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
-        'Funds from projects, streams and Drip Lists on Filecoin settle and become collectablee once per day.',
+        'Funds from projects, streams and Drip Lists on Filecoin settle and become collectable once per day.',
     },
     alternativeChainMode: true,
     ensSupported: false,
