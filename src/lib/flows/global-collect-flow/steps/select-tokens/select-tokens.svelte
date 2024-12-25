@@ -132,7 +132,13 @@
         </svelte:fragment>
       </Tooltip>
     </div>
-    <p class="typo-text-bold">{formatDate(network.settlement.nextSettlementDate(), 'onlyDay')}</p>
+    <p class="typo-text-bold">
+      {#if network.settlement.nextSettlementDate === 'daily'}
+        Daily
+      {:else}
+        {formatDate(network.settlement.nextSettlementDate(), 'onlyDay')}
+      {/if}
+    </p>
   </div>
   {#if shouldShowAutoUnwrapToggle}
     <div class="unwrap-toggle">
