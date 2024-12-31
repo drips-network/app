@@ -13,7 +13,7 @@ import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/suppor
 import { isAddress } from 'ethers';
 import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
+import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
 const provider = new FailoverJsonRpcProvider(
