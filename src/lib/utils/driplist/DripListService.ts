@@ -1,6 +1,6 @@
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
+import { MaxUint256, type Signer, toBigInt } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import type { Address, IpfsHash } from '../common-types';
@@ -28,6 +28,7 @@ import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import { populateCallerWriteTx } from '../sdk/caller/caller';
 import txToCallerCall from '../sdk/utils/tx-to-caller-call';
 import network from '$lib/stores/wallet/network';
+import calculateSaltFromAddress from '../calc-salt';
 
 type AccountId = string;
 
@@ -348,11 +349,6 @@ export default class DripListService {
 
   // Create random salt from address
   private _calcSaltFromAddress = (address: string): bigint /* 64bit */ => {
-    const hash = ethers.keccak256(
-      ethers.AbiCoder.defaultAbiCoder().encode(['string'], [this.SEED_CONSTANT + address]),
-    );
-    const randomBigInt = ethers.toBigInt('0x' + hash.slice(26));
-
-    return BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
+    return calculateSaltFromAddress(this.SEED_CONSTANT, address);
   };
 }
