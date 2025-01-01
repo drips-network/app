@@ -4,7 +4,10 @@ export default function calculateSaltFromAddress(seedConstant: string, address: 
   const hash = ethers.keccak256(
     ethers.AbiCoder.defaultAbiCoder().encode(['string'], [seedConstant + address]),
   );
-  const randomBigInt = ethers.toBigInt('0x' + hash.slice(26));
+  const addressBigInt = ethers.toBigInt('0x' + hash.slice(26));
 
-  return BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
+  const randomBytes = ethers.randomBytes(32);
+  const randomBigInt = BigInt(ethers.hexlify(randomBytes));
+
+  return addressBigInt & randomBigInt & BigInt('0xFFFFFFFFFFFFFFFF');
 }
