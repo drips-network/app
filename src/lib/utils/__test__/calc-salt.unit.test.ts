@@ -18,7 +18,7 @@ describe('calculate salt', () => {
       calculateSaltFromAddress(SEED_CONSTANT, address),
     ];
 
-    const rejected = results.filter((result) => result === results[0]);
-    expect(rejected.length).toBe(1);
+    const set = new Set(results);
+    expect(set.size).toBe(results.length);
   });
 });
