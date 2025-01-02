@@ -108,7 +108,7 @@
 
           const { taskId } = await gaslessCall.json();
 
-          $context.gaslessOwnerUpdateTaskId = taskId;
+          $context.gaslessOwnerUpdateTaskId = taskId === null ? undefined : taskId;
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error(e);

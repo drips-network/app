@@ -111,7 +111,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   const currentFundingJsonAddress = await github.getFundingJsonAddress(owner, repo);
 
   if (chainData.owner.address.toLowerCase() === currentFundingJsonAddress?.toLowerCase()) {
-    return new Response('{ "taskId": undefined }');
+    return new Response('{ "taskId": null }');
   }
 
   const blockKey = `${network.name}-ownerUpdateRequest-${forge}-${projectName}`;
