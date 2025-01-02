@@ -1,10 +1,10 @@
 import network from '$lib/stores/wallet/network';
-import { addressDriverAbi } from '$lib/utils/sdk/address-driver/address-driver-abi.js';
-import { repoDriverAbi } from '$lib/utils/sdk/repo-driver/repo-driver-abi.js';
+// import { addressDriverAbi } from '$lib/utils/sdk/address-driver/address-driver-abi.js';
+// import { repoDriverAbi } from '$lib/utils/sdk/repo-driver/repo-driver-abi.js';
 import { ethers, verifyTypedData } from 'ethers';
 import { z } from 'zod';
-import assert from '$lib/utils/assert';
-import { Interface } from 'ethers';
+// import assert from '$lib/utils/assert';
+// import { Interface } from 'ethers';
 import { callerAbi } from '$lib/utils/sdk/caller/caller-abi.js';
 import { Signature } from 'ethers';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
@@ -12,16 +12,16 @@ import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { GELATO_API_KEY } from '$env/static/private';
 import { error } from '@sveltejs/kit';
-import type { TransactionDescription } from 'ethers';
-import { nativeTokenUnwrapperAbi } from '$lib/utils/sdk/native-token-unrapper/native-token-unwrapper-abi.js';
-import { dripsAbi } from '$lib/utils/sdk/drips/drips-abi.js';
-import { gql } from 'graphql-request';
-import query from '$lib/graphql/dripsQL.js';
-import type {
-  IsProjectUnclaimedQuery,
-  IsProjectUnclaimedQueryVariables,
-} from './__generated__/gql.generated.js';
-import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
+// import type { TransactionDescription } from 'ethers';
+// import { nativeTokenUnwrapperAbi } from '$lib/utils/sdk/native-token-unrapper/native-token-unwrapper-abi.js';
+// import { dripsAbi } from '$lib/utils/sdk/drips/drips-abi.js';
+// import { gql } from 'graphql-request';
+// import query from '$lib/graphql/dripsQL.js';
+// import type {
+//   IsProjectUnclaimedQuery,
+//   IsProjectUnclaimedQueryVariables,
+// } from './__generated__/gql.generated.js';
+// import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 
 const { rpcUrl, fallbackRpcUrl } = network;
 const provider = new FailoverJsonRpcProvider(
@@ -45,29 +45,29 @@ const requestSchema = z.object({
   eip712Signature: z.string(),
 });
 
-enum SupportedGaslessAction {
-  CLAIM_PROJECT = 'CLAIM_PROJECT',
-  COLLECT_EARNINGS = 'COLLECT_EARNINGS',
-}
+// enum SupportedGaslessAction {
+//   CLAIM_PROJECT = 'CLAIM_PROJECT',
+//   COLLECT_EARNINGS = 'COLLECT_EARNINGS',
+// }
 
 const SUPPORTED_CONTRACT_ABIS = {
   CALLER: callerAbi,
 };
 
-const projectUnclaimedQuery = gql`
-  query isProjectUnclaimed($projectId: ID!, $chains: [SupportedChain!]!) {
-    projectById(id: $projectId, chains: $chains) {
-      chainData {
-        ... on UnClaimedProjectData {
-          chain
-        }
-        ... on ClaimedProjectData {
-          chain
-        }
-      }
-    }
-  }
-`;
+// const projectUnclaimedQuery = gql`
+//   query isProjectUnclaimed($projectId: ID!, $chains: [SupportedChain!]!) {
+//     projectById(id: $projectId, chains: $chains) {
+//       chainData {
+//         ... on UnClaimedProjectData {
+//           chain
+//         }
+//         ... on ClaimedProjectData {
+//           chain
+//         }
+//       }
+//     }
+//   }
+// `;
 
 function verifySupportedContract(targetContractAddress: string): string | null {
   const supportedContractNames = Object.keys(SUPPORTED_CONTRACT_ABIS);
@@ -130,162 +130,162 @@ function verifySignature(
   );
 }
 
-function parseCallBatchedArgs(txDescription: TransactionDescription) {
-  return z.array(z.tuple([z.string(), z.string(), z.bigint()])).safeParse(txDescription.args.calls);
-}
+// function parseCallBatchedArgs(txDescription: TransactionDescription) {
+//   return z.array(z.tuple([z.string(), z.string(), z.bigint()])).safeParse(txDescription.args.calls);
+// }
 
-async function validateClaimProjectTx(txDescription: TransactionDescription): Promise<boolean> {
-  if (txDescription.name !== 'callBatched') return false;
+// async function validateClaimProjectTx(txDescription: TransactionDescription): Promise<boolean> {
+//   if (txDescription.name !== 'callBatched') return false;
 
-  const parseCallsResult = parseCallBatchedArgs(txDescription);
-  if (!parseCallsResult.success) return false;
+//   const parseCallsResult = parseCallBatchedArgs(txDescription);
+//   if (!parseCallsResult.success) return false;
 
-  const parsedCalls = parseCallsResult.data;
+//   const parsedCalls = parseCallsResult.data;
 
-  let projectAccountId: string | undefined = undefined;
+//   let projectAccountId: string | undefined = undefined;
 
-  // Check whether the batch includes the expected:
-  // 1. Set splits
-  // 2. Emit account metadata
-  // 3 [...] x : Any number of split calls
-  // x [...] y : Any number of collect calls
-  for (const [index, [target, calldata]] of parsedCalls.entries()) {
-    // Ensure the call is to RepoDriver
-    if (target.toLowerCase() !== network.contracts.REPO_DRIVER.toLowerCase()) {
-      return false;
-    }
+//   // Check whether the batch includes the expected:
+//   // 1. Set splits
+//   // 2. Emit account metadata
+//   // 3 [...] x : Any number of split calls
+//   // x [...] y : Any number of collect calls
+//   for (const [index, [target, calldata]] of parsedCalls.entries()) {
+//     // Ensure the call is to RepoDriver
+//     if (target.toLowerCase() !== network.contracts.REPO_DRIVER.toLowerCase()) {
+//       return false;
+//     }
 
-    // Parse the calldata
-    const repoDriverIface = new Interface(repoDriverAbi);
-    const dripsIface = new Interface(dripsAbi);
+//     // Parse the calldata
+//     const repoDriverIface = new Interface(repoDriverAbi);
+//     const dripsIface = new Interface(dripsAbi);
 
-    const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
-    const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
-    if (!(repoDriverParseRes || dripsParseRes)) return false;
+//     const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
+//     const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
+//     if (!(repoDriverParseRes || dripsParseRes)) return false;
 
-    switch (index) {
-      case 0: {
-        if (repoDriverParseRes?.name !== 'setSplits') return false;
+//     switch (index) {
+//       case 0: {
+//         if (repoDriverParseRes?.name !== 'setSplits') return false;
 
-        projectAccountId = repoDriverParseRes.args[0].toString();
+//         projectAccountId = repoDriverParseRes.args[0].toString();
 
-        break;
-      }
-      case 1: {
-        if (repoDriverParseRes?.name !== 'emitAccountMetadata') return false;
-        if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
+//         break;
+//       }
+//       case 1: {
+//         if (repoDriverParseRes?.name !== 'emitAccountMetadata') return false;
+//         if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
 
-        break;
-      }
-    }
-  }
+//         break;
+//       }
+//     }
+//   }
 
-  // Validate that the project in question is currently unclaimed
+//   // Validate that the project in question is currently unclaimed
 
-  if (!projectAccountId) return false;
-  const isProjectUnclaimedQueryResponse = await query<
-    IsProjectUnclaimedQuery,
-    IsProjectUnclaimedQueryVariables
-  >(
-    projectUnclaimedQuery,
-    {
-      projectId: projectAccountId,
-      chains: [network.gqlName],
-    },
-    fetch,
-  );
+//   if (!projectAccountId) return false;
+//   const isProjectUnclaimedQueryResponse = await query<
+//     IsProjectUnclaimedQuery,
+//     IsProjectUnclaimedQueryVariables
+//   >(
+//     projectUnclaimedQuery,
+//     {
+//       projectId: projectAccountId,
+//       chains: [network.gqlName],
+//     },
+//     fetch,
+//   );
 
-  if (!isProjectUnclaimedQueryResponse.projectById)
-    return error(400, '{ "error": "Project not found" }');
-  const chainData = filterCurrentChainData(isProjectUnclaimedQueryResponse.projectById.chainData);
-  if (chainData.__typename === 'ClaimedProjectData')
-    return error(400, '{ "error": "Project already claimed" }');
+//   if (!isProjectUnclaimedQueryResponse.projectById)
+//     return error(400, '{ "error": "Project not found" }');
+//   const chainData = filterCurrentChainData(isProjectUnclaimedQueryResponse.projectById.chainData);
+//   if (chainData.__typename === 'ClaimedProjectData')
+//     return error(400, '{ "error": "Project already claimed" }');
 
-  return true;
-}
+//   return true;
+// }
 
-function validateCollectEarningsTx(txDescription: TransactionDescription): boolean {
-  if (txDescription.name !== 'callBatched') return false;
+// function validateCollectEarningsTx(txDescription: TransactionDescription): boolean {
+//   if (txDescription.name !== 'callBatched') return false;
 
-  const parseCallsResult = parseCallBatchedArgs(txDescription);
-  if (!parseCallsResult.success) return false;
+//   const parseCallsResult = parseCallBatchedArgs(txDescription);
+//   if (!parseCallsResult.success) return false;
 
-  const parsedCalls = parseCallsResult.data;
+//   const parsedCalls = parseCallsResult.data;
 
-  // Ensure all calls are either
-  // 1. Collect on drips,
-  // 2. ReceiveStreams on address driver,
-  // 3. SqueezeStreams on address driver,
-  // 4. Split on address driver, or
-  // 4. Unwrap on native token unwrapper
+//   // Ensure all calls are either
+//   // 1. Collect on drips,
+//   // 2. ReceiveStreams on address driver,
+//   // 3. SqueezeStreams on address driver,
+//   // 4. Split on address driver, or
+//   // 4. Unwrap on native token unwrapper
 
-  for (const [target, calldata] of parsedCalls) {
-    const targetIsDrips = target.toLowerCase() === network.contracts.DRIPS.toLowerCase();
-    const targetIsNativeTokenUnwrapper =
-      target.toLowerCase() === network.contracts.NATIVE_TOKEN_UNWRAPPER?.toLowerCase();
-    const targetIsAddressDriver =
-      target.toLowerCase() === network.contracts.ADDRESS_DRIVER.toLowerCase();
+//   for (const [target, calldata] of parsedCalls) {
+//     const targetIsDrips = target.toLowerCase() === network.contracts.DRIPS.toLowerCase();
+//     const targetIsNativeTokenUnwrapper =
+//       target.toLowerCase() === network.contracts.NATIVE_TOKEN_UNWRAPPER?.toLowerCase();
+//     const targetIsAddressDriver =
+//       target.toLowerCase() === network.contracts.ADDRESS_DRIVER.toLowerCase();
 
-    if (targetIsDrips) {
-      const dripsIface = new Interface(dripsAbi);
-      const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
+//     if (targetIsDrips) {
+//       const dripsIface = new Interface(dripsAbi);
+//       const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
 
-      if (!dripsParseRes) return false;
+//       if (!dripsParseRes) return false;
 
-      if (
-        dripsParseRes.name !== 'receiveStreams' &&
-        dripsParseRes.name !== 'squeezeStreams' &&
-        dripsParseRes.name !== 'split'
-      ) {
-        return false;
-      }
-    } else if (targetIsAddressDriver) {
-      const addressDriverIface = new Interface(addressDriverAbi);
-      const addressDriverParseRes = addressDriverIface.parseTransaction({ data: calldata });
+//       if (
+//         dripsParseRes.name !== 'receiveStreams' &&
+//         dripsParseRes.name !== 'squeezeStreams' &&
+//         dripsParseRes.name !== 'split'
+//       ) {
+//         return false;
+//       }
+//     } else if (targetIsAddressDriver) {
+//       const addressDriverIface = new Interface(addressDriverAbi);
+//       const addressDriverParseRes = addressDriverIface.parseTransaction({ data: calldata });
 
-      if (!addressDriverParseRes) return false;
+//       if (!addressDriverParseRes) return false;
 
-      if (addressDriverParseRes.name !== 'collect') return false;
-    } else if (targetIsNativeTokenUnwrapper) {
-      const iface = new Interface(nativeTokenUnwrapperAbi);
-      const parseRes = iface.parseTransaction({ data: calldata });
+//       if (addressDriverParseRes.name !== 'collect') return false;
+//     } else if (targetIsNativeTokenUnwrapper) {
+//       const iface = new Interface(nativeTokenUnwrapperAbi);
+//       const parseRes = iface.parseTransaction({ data: calldata });
 
-      if (!parseRes) return false;
+//       if (!parseRes) return false;
 
-      if (parseRes.name !== 'unwrap') return false;
-    } else {
-      return false;
-    }
-  }
+//       if (parseRes.name !== 'unwrap') return false;
+//     } else {
+//       return false;
+//     }
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 /** Verify that the calldata corresponds to a supported gasless action. */
-async function inferActionType(
-  calldata: string,
-  contractName: string,
-): Promise<SupportedGaslessAction | null> {
-  const contractAbi = Object.entries(SUPPORTED_CONTRACT_ABIS).find(
-    ([name]) => name === contractName,
-  )?.[1];
-  assert(contractAbi, 'Invalid contract name');
+// async function inferActionType(
+//   calldata: string,
+//   contractName: string,
+// ): Promise<SupportedGaslessAction | null> {
+//   const contractAbi = Object.entries(SUPPORTED_CONTRACT_ABIS).find(
+//     ([name]) => name === contractName,
+//   )?.[1];
+//   assert(contractAbi, 'Invalid contract name');
 
-  const iface = new Interface(contractAbi);
+//   const iface = new Interface(contractAbi);
 
-  const parseRes = iface.parseTransaction({ data: calldata });
-  assert(parseRes, 'Invalid calldata');
+//   const parseRes = iface.parseTransaction({ data: calldata });
+//   assert(parseRes, 'Invalid calldata');
 
-  switch (contractName) {
-    case 'CALLER': {
-      if (validateCollectEarningsTx(parseRes)) return SupportedGaslessAction.COLLECT_EARNINGS;
-      if (await validateClaimProjectTx(parseRes)) return SupportedGaslessAction.CLAIM_PROJECT;
-      break;
-    }
-  }
+//   switch (contractName) {
+//     case 'CALLER': {
+//       if (validateCollectEarningsTx(parseRes)) return SupportedGaslessAction.COLLECT_EARNINGS;
+//       if (await validateClaimProjectTx(parseRes)) return SupportedGaslessAction.CLAIM_PROJECT;
+//       break;
+//     }
+//   }
 
-  return null;
-}
+//   return null;
+// }
 
 export const POST = async ({ request }) => {
   if (!network.gaslessClaimAndCollect)
@@ -311,12 +311,12 @@ export const POST = async ({ request }) => {
     return error(400, '{ "error": "Invalid signature" }');
   }
 
-  const { data } = payload;
-  const actionType = await inferActionType(data, contractName);
+  // const { data } = payload;
+  // const actionType = await inferActionType(data, contractName);
 
-  if (!actionType) {
-    return error(400, '{ "error": "Unsupported gasless action" }');
-  }
+  // if (!actionType) {
+  //   return error(400, '{ "error": "Unsupported gasless action" }');
+  // }
 
   const signature = Signature.from(eip712Signature);
   const r = signature.r;
