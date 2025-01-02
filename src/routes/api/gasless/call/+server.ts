@@ -159,9 +159,7 @@ async function validateClaimProjectTx(txDescription: TransactionDescription): Pr
     const repoDriverIface = new Interface(repoDriverAbi);
     const dripsIface = new Interface(dripsAbi);
 
-    const repoDriverParseRes =
-      repoDriverIface.parseTransaction({ data: calldata }) ||
-      dripsIface.parseTransaction({ data: calldata });
+    const repoDriverParseRes = repoDriverIface.parseTransaction({ data: calldata });
     const dripsParseRes = dripsIface.parseTransaction({ data: calldata });
     if (!(repoDriverParseRes || dripsParseRes)) return false;
 
@@ -178,12 +176,6 @@ async function validateClaimProjectTx(txDescription: TransactionDescription): Pr
         if (repoDriverParseRes.args[0].toString() !== projectAccountId) return false;
 
         break;
-      }
-      default: {
-        if (!(dripsParseRes?.name === 'split' || repoDriverParseRes?.name === 'collect'))
-          return false;
-        if ((repoDriverParseRes || dripsParseRes)?.args[0].toString() !== projectAccountId)
-          return false;
       }
     }
   }
