@@ -28,7 +28,7 @@ import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import { populateCallerWriteTx } from '../sdk/caller/caller';
 import txToCallerCall from '../sdk/utils/tx-to-caller-call';
 import network from '$lib/stores/wallet/network';
-import calculateSaltFromAddress from '../calc-salt';
+import calculateRandomSalt from '../calc-salt';
 
 type AccountId = string;
 
@@ -108,7 +108,7 @@ export default class DripListService {
       items,
     );
 
-    const salt = this._calcSaltFromAddress(this._ownerAddress);
+    const salt = this._calcSaltFromAddress();
 
     const listId = (
       await executeNftDriverReadMethod({
@@ -348,7 +348,7 @@ export default class DripListService {
   }
 
   // Create random salt from address
-  private _calcSaltFromAddress = (address: string): bigint /* 64bit */ => {
-    return calculateSaltFromAddress(this.SEED_CONSTANT, address);
+  private _calcSaltFromAddress = (): bigint /* 64bit */ => {
+    return calculateRandomSalt();
   };
 }
