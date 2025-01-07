@@ -108,7 +108,7 @@ export default class DripListService {
       items,
     );
 
-    const salt = this._calcSaltFromAddress();
+    const salt = calculateRandomSalt();
 
     const listId = (
       await executeNftDriverReadMethod({
@@ -346,9 +346,4 @@ export default class DripListService {
 
     return ipfsHash;
   }
-
-  // Create random salt from address
-  private _calcSaltFromAddress = (): bigint /* 64bit */ => {
-    return calculateRandomSalt();
-  };
 }
