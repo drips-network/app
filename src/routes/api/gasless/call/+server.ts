@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { callerAbi } from '$lib/utils/sdk/caller/caller-abi.js';
 import { Signature } from 'ethers';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
+import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { GELATO_API_KEY } from '$env/static/private';
 import { error } from '@sveltejs/kit';
