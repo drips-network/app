@@ -4,8 +4,8 @@ import { resultsSchema, type Result } from './types';
 import { z } from 'zod';
 import ensStore from '$lib/stores/ens/ens.store';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import { isAddress } from 'ethers';
 import { BASE_URL } from '$lib/utils/base-url';
+import network from '$lib/stores/wallet/network';
 
 const client = new MeiliSearch({
   host: `${BASE_URL}/api/search`,
@@ -47,16 +47,18 @@ async function getGitUrlResults(q: string, parsedHits: Result[]): Promise<Result
 }
 
 async function getEnsResult(q: string): Promise<Result | undefined> {
-  if (!isAddress(q)) return undefined;
+  try {
+    const lookup = await ensStore.reverseLookup(q);
 
-  const lookup = await ensStore.reverseLookup(q);
-
-  if (lookup) {
-    return {
-      type: 'ens',
-      name: q,
-      address: lookup,
-    };
+    if (lookup) {
+      return {
+        type: 'ens',
+        name: q,
+        address: lookup,
+      };
+    }
+  } catch {
+    return undefined;
   }
 
   return undefined;
@@ -74,11 +76,16 @@ export async function search(q: string): Promise<Result[]> {
       {
         indexUid: 'projects',
         q,
-        filter: ['name IS NOT NULL AND ownerAddress IS NOT NULL'],
+        filter: [`name IS NOT NULL AND ownerAddress IS NOT NULL AND chain = ${network.gqlName}`],
         federationOptions: { weight: 1.1 },
         ...commonOptions,
       },
-      { indexUid: 'drip_lists', filter: ['name IS NOT NULL'], q, ...commonOptions },
+      {
+        indexUid: 'drip_lists',
+        filter: [`name IS NOT NULL AND chain = ${network.gqlName}`],
+        q,
+        ...commonOptions,
+      },
     ],
   });
 
