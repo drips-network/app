@@ -1,116 +1,102 @@
 <script lang="ts">
-  import TokensIcon from '$lib/components/icons/Coin.svelte';
-  import UserIcon from '$lib/components/icons/User.svelte';
-  import sanitize from 'sanitize-html';
-
-  import AccountMenuItem from '$lib/components/account-menu/components/account-menu-item.svelte';
+  import type { ProjectResult, Result as ResultType } from '../types';
+  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
+  import network from '$lib/stores/wallet/network';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import Token from '$lib/components/token/token.svelte';
-  import { type Item, SearchItemType } from '../search';
-  import wallet from '$lib/stores/wallet/wallet.store';
-  import unreachable from '$lib/utils/unreachable';
-  import Folder from '$lib/components/icons/Folder.svelte';
 
-  export let item: Item;
-  export let highlighted: string;
+  export let item: ResultType;
 
-  $: highlightPlainText = highlighted.replace(/<\/?[^>]+(>|$)/g, '');
+  function splitGitHubUrl(url: string) {
+    const [owner, repo] = url.split('/').slice(-2);
+    return { owner, repo };
+  }
+
+  function makeFakeProjectAvatarType(item: ProjectResult) {
+    if (item.avatarCid && item.color) {
+      return {
+        __typename: 'ClaimedProjectData' as const,
+        chain: network.gqlName,
+        color: item.color,
+        avatar: {
+          __typename: 'ImageAvatar' as const,
+          cid: item.avatarCid,
+        },
+      };
+    } else if (item.emoji && item.color) {
+      return {
+        __typename: 'ClaimedProjectData' as const,
+        chain: network.gqlName,
+        color: item.color,
+        avatar: {
+          __typename: 'EmojiAvatar' as const,
+          emoji: item.emoji,
+        },
+      };
+    } else {
+      return {
+        __typename: 'UnClaimedProjectData' as const,
+      };
+    }
+  }
+
+  function pickLabel(item: ResultType) {
+    switch (item.type) {
+      case 'ens': {
+        return item.name;
+      }
+      default: {
+        return (item._formatted ?? item).name;
+      }
+    }
+  }
 </script>
 
-{#if item.type === SearchItemType.TOKEN}
-  <AccountMenuItem
-    on:click
-    href={`/app/${$wallet.address ?? unreachable()}/tokens/${item.item.info.address}`}
-  >
-    <div class="icon" slot="left">
-      <Token show="none" size="huge" address={item.item.info.address} />
-      <div class="badge"><TokensIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
+{#if item.type === 'project'}
+  {@const { owner, repo } = splitGitHubUrl(item.url)}
+  {@const avatarConfig = makeFakeProjectAvatarType(item)}
+  <a class="search-result typo-text" href={`/app/projects/github/${owner}/${repo}`}>
+    {#if avatarConfig.__typename === 'ClaimedProjectData'}
+      <div style:margin-right="-1.25rem">
+        <ProjectAvatar project={{ __typename: 'UnClaimedProjectData' }} />
+      </div>
+    {/if}
+    <ProjectAvatar project={avatarConfig} />
+    <div class="label">
+      {@html pickLabel(item)}
     </div>
-    <svelte:fragment slot="title">
-      <div class="highlighted">
-        {@html sanitize(highlighted, {
-          allowedTags: [],
-          allowedAttributes: {},
-        })}
-      </div>
-      {#if highlightPlainText !== item.item.info.name}<div class="typo-text-small">
-          {item.item.info.name}
-        </div>{/if}
-    </svelte:fragment>
-  </AccountMenuItem>
-{:else if item.type === SearchItemType.PROFILE}
-  <AccountMenuItem
-    icon={item.item.address ? undefined : UserIcon}
-    on:click
-    href={`/app/${item.item.name ?? item.item.address ?? item.item.dripsAccountId}`}
-  >
-    <div class="icon" slot="left">
-      {#if item.item.address}<IdentityBadge
-          disableLink={true}
-          size="big"
-          address={item.item.address}
-          showIdentity={false}
-          disableTooltip
-        />{/if}
-      <div class="badge"><UserIcon style="height: 1rem; fill: var(--color-foreground)" /></div>
+  </a>
+{:else if item.type === 'drip_list'}
+  <a class="search-result typo-text" href={`/app/drip-lists/${item.id}`}>
+    <DripListAvatar />
+    <div class="label">
+      {@html pickLabel(item)}
     </div>
-    <svelte:fragment slot="title">
-      <div class="highlighted">
-        <span style="color: var(--color-foreground)">
-          {#if !item.item.name && !item.item.address && item.item.dripsAccountId}
-            Jump to account ID:
-          {/if}
-        </span>
-        {@html sanitize(highlighted, {
-          allowedTags: [],
-          allowedAttributes: {},
-        })}
-      </div>
-      {#if highlightPlainText !== item.item.name && item.item.name}<div class="typo-text-small">
-          {item.item.name}
-        </div>{/if}
-    </svelte:fragment>
-  </AccountMenuItem>
-{:else if item.type === SearchItemType.REPO}
-  <AccountMenuItem
-    on:click
-    href={`/app/projects/${item.item.forge}/${item.item.username}/${item.item.repoName}`}
-    icon={Folder}
-  >
-    <svelte:fragment slot="title">
-      <div class="highlighted">
-        <span style="color: var(--color-foreground)"> Jump to GitHub repo on Drips: </span>
-        {@html sanitize(highlighted, {
-          allowedTags: [],
-          allowedAttributes: {},
-        })}
-      </div>
-    </svelte:fragment>
-  </AccountMenuItem>
+  </a>
+{:else if item.type === 'ens'}
+  <a class="search-result typo-text" href={`/app/${item.address}`}>
+    <IdentityBadge size="medium" disableTooltip={true} address={item.address} />
+  </a>
 {/if}
 
 <style>
-  .highlighted {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .badge {
+  a {
     display: flex;
-    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.25rem;
     align-items: center;
-    position: absolute;
-    height: 1.5rem;
-    width: 1.5rem;
-    background-color: var(--color-background);
-    box-shadow: var(--elevation-low);
-    border-radius: 0.75rem;
-    bottom: -0.25rem;
-    right: -0.25rem;
+    border-radius: 1.25rem 0 1.25rem 1.25rem;
   }
 
-  .icon {
-    position: relative;
+  a:hover,
+  a:focus-visible {
+    background-color: var(--color-foreground-level-1);
+  }
+
+  .search-result :global(em) {
+    font-style: normal;
+    background-color: var(--color-primary-level-2);
+    color: var(--color-foreground);
+    border-radius: 0.2rem;
   }
 </style>

@@ -238,7 +238,7 @@
     right: 0;
     bottom: 0;
     background-color: var(--color-background);
-    opacity: 0.75;
+    opacity: 0.9;
     z-index: 50;
   }
 

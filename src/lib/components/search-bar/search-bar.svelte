@@ -5,15 +5,14 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import { sineIn, sineInOut, sineOut } from 'svelte/easing';
   import { fade, fly } from 'svelte/transition';
-  import search, { updateSearchItems } from './search';
   import scroll from '$lib/stores/scroll';
-  import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet/wallet.store';
   import Results from './components/results.svelte';
+  import { search } from './search';
+  import type { Result } from './types';
 
   const dispatch = createEventDispatcher<{ dismiss: void }>();
 
-  let focus = false;
+  let focus = true;
 
   $: focus ? scroll.lock() : scroll.unlock();
 
@@ -25,25 +24,43 @@
     searchTerm = '';
     searchElem.blur();
     focus = false;
-
     dispatch('dismiss');
   }
 
   let loading = false;
+  let error = false;
 
-  let results: ReturnType<typeof search> = [];
-  $: results = search(searchTerm);
-
-  $: {
-    $tokens;
-    if (!loading) {
-      updateSearchItems($wallet.dripsAccountId);
-      results = search(searchTerm);
-    }
-  }
-
+  let results: Result[] = [];
   let resultElems: HTMLDivElement[] = [];
   $: accountMenuItemElems = resultElems.map((e) => e?.firstChild);
+
+  let searchTimeout: ReturnType<typeof setTimeout>;
+
+  function handleSearchTermChange(searchTerm: string | undefined) {
+    clearTimeout(searchTimeout);
+
+    if (!searchTerm) {
+      results = [];
+      loading = false;
+      return;
+    }
+
+    loading = true;
+
+    searchTimeout = setTimeout(async () => {
+      try {
+        results = await search(searchTerm);
+        loading = false;
+        error = false;
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        loading = false;
+        error = true;
+      }
+    }, 300);
+  }
+  $: handleSearchTermChange(searchTerm);
 
   function handleKeyboard(e: KeyboardEvent) {
     if (e.key === 'Escape') {
@@ -99,7 +116,7 @@
     <SearchIcon style="fill: var(--color-foreground)" />
     <input
       type="text"
-      placeholder="Search addresses, accounts, streams..."
+      placeholder="Search claimed projects and Drip Lists"
       bind:this={searchElem}
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
@@ -110,6 +127,15 @@
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
       </div>{/if}
   </div>
+  {#if focus}
+    <div
+      class="hint typo-text-small"
+      in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
+      out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+    >
+      💡 Paste a GitHub URL to jump to that project
+    </div>
+  {/if}
   {#if focus && searchTerm}
     <div
       in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
@@ -117,7 +143,7 @@
       class="results"
       on:focusout={handleSearchBlur}
     >
-      <Results bind:resultElems {results} {loading} on:click={closeSearch} />
+      <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
     </div>
   {/if}
 </div>
@@ -184,13 +210,22 @@
 
   .overlay {
     position: fixed;
-    /* top: 4rem; */
     right: 0;
     left: 0;
     bottom: 0;
     background-color: var(--color-background);
     opacity: 0.75;
     z-index: 1;
+  }
+
+  .hint {
+    position: absolute;
+    top: 4rem;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    color: var(--color-foreground-level-5);
   }
 
   .results {
@@ -227,12 +262,12 @@
     .results {
       border: none;
       box-shadow: none;
-      padding: 0 0.5rem;
+      padding: 0 0.5rem 2rem 0.5rem;
       top: 3.5rem;
       left: -1rem;
       right: -1rem;
       border-radius: 0;
-      min-height: 100vh;
+      min-height: calc(100vh - 4rem);
     }
   }
 </style>
