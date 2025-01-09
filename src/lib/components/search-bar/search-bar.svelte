@@ -35,6 +35,7 @@
   $: accountMenuItemElems = resultElems.map((e) => e?.firstChild);
 
   let searchTimeout: ReturnType<typeof setTimeout>;
+  let searchNumber = 0;
 
   function handleSearchTermChange(searchTerm: string | undefined) {
     clearTimeout(searchTimeout);
@@ -48,8 +49,15 @@
     loading = true;
 
     searchTimeout = setTimeout(async () => {
+      const currentSearchNumber = searchNumber;
+      searchNumber++;
+
       try {
         results = await search(searchTerm);
+
+        // prevent in-flight requests from overwriting the results
+        if (currentSearchNumber !== searchNumber - 1) return;
+
         loading = false;
         error = false;
       } catch (e) {
