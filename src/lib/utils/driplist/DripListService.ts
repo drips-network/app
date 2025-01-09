@@ -1,6 +1,6 @@
 import NftDriverMetadataManager from '../metadata/NftDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import { ethers, MaxUint256, type Signer, toBigInt } from 'ethers';
+import { MaxUint256, type Signer, toBigInt } from 'ethers';
 import GitProjectService from '../project/GitProjectService';
 import assert from '$lib/utils/assert';
 import type { Address, IpfsHash } from '../common-types';
@@ -9,12 +9,6 @@ import { get } from 'svelte/store';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import type { nftDriverAccountMetadataParser } from '../metadata/schemas';
 import type { LatestVersion } from '@efstajas/versioned-parser';
-import { gql } from 'graphql-request';
-import query from '$lib/graphql/dripsQL';
-import type {
-  MintedNftAccountsCountQuery,
-  MintedNftAccountsCountQueryVariables,
-} from './__generated__/gql.generated';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import { buildStreamCreateBatchTx } from '../streams/streams';
 import {
@@ -34,6 +28,7 @@ import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import { populateCallerWriteTx } from '../sdk/caller/caller';
 import txToCallerCall from '../sdk/utils/tx-to-caller-call';
 import network from '$lib/stores/wallet/network';
+import calculateRandomSalt from '../calc-salt';
 
 type AccountId = string;
 
@@ -113,23 +108,7 @@ export default class DripListService {
       items,
     );
 
-    const mintedNftAccountsCountQuery = gql`
-      query MintedNftAccountsCount($ownerAddress: String!, $chain: SupportedChain!) {
-        mintedTokensCountByOwnerAddress(ownerAddress: $ownerAddress, chain: $chain) {
-          total
-        }
-      }
-    `;
-
-    const mintedNftAccountsCountRes = await query<
-      MintedNftAccountsCountQuery,
-      MintedNftAccountsCountQueryVariables
-    >(mintedNftAccountsCountQuery, { ownerAddress: this._ownerAddress, chain: network.gqlName });
-
-    const salt = this._calcSaltFromAddress(
-      this._ownerAddress,
-      mintedNftAccountsCountRes.mintedTokensCountByOwnerAddress.total ?? 0,
-    );
+    const salt = calculateRandomSalt();
 
     const listId = (
       await executeNftDriverReadMethod({
@@ -367,26 +346,4 @@ export default class DripListService {
 
     return ipfsHash;
   }
-
-  // We use the count of *all* NFT sub-accounts to generate the salt for the Drip List ID.
-  // This is because we want to avoid making HTTP requests to the subgraph for each NFT sub-account to check if it's a Drip List.
-  private _calcSaltFromAddress = (address: string, listCount: number): bigint /* 64bit */ => {
-    const hash = ethers.keccak256(
-      ethers.AbiCoder.defaultAbiCoder().encode(['string'], [this.SEED_CONSTANT + address]),
-    );
-    const randomBigInt = ethers.toBigInt('0x' + hash.slice(26));
-
-    let random64BitBigInt = BigInt(randomBigInt.toString()) & BigInt('0xFFFFFFFFFFFFFFFF');
-
-    const listCountBigInt = BigInt(listCount);
-    random64BitBigInt = random64BitBigInt ^ listCountBigInt;
-
-    return random64BitBigInt;
-  };
-
-  private _generateDripIdFromSalt = (salt: bigint): number /* 32bit */ => {
-    const random32BitNumber = Number(salt & BigInt(0xffffffff));
-
-    return random32BitNumber;
-  };
 }
