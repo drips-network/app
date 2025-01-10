@@ -99,6 +99,12 @@
     e.preventDefault();
   }
 
+  function handleSearchBlur() {
+    if (!searchTerm?.length) {
+      closeSearch();
+    }
+  }
+
   onMount(() => {
     searchElem.focus();
   });
@@ -116,6 +122,7 @@
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
       autocomplete="off"
+      on:blur={handleSearchBlur}
     />
     {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
         <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
