@@ -7,15 +7,17 @@ import query from '$lib/graphql/dripsQL';
 import network from '$lib/stores/wallet/network';
 import { gql } from 'graphql-request';
 import type {
-  ExploreProjectsQuery,
-  ExploreProjectsQueryVariables,
+  ExploreFilecoinProjectsQuery,
+  ExploreFilecoinProjectsQueryVariables,
 } from './__generated__/gql.generated';
 import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from './default-explore-page.svelte';
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 
+// TODO: I guess it doesn't matter that this is duplicated
+// DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT
 const getProjectsQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
-  query ExploreProjects(
+  query ExploreFilecoinProjects(
     $where: ProjectWhereInput
     $sort: ProjectSortInput
     $chains: [SupportedChain!]!
@@ -33,11 +35,10 @@ const fetchProjects = async (f: typeof fetch) => {
     chains: [network.gqlName],
   };
 
-  const projectsRes = await query<ExploreProjectsQuery, ExploreProjectsQueryVariables>(
-    getProjectsQuery,
-    getProjectsVariables,
-    f,
-  );
+  const projectsRes = await query<
+    ExploreFilecoinProjectsQuery,
+    ExploreFilecoinProjectsQueryVariables
+  >(getProjectsQuery, getProjectsVariables, f);
 
   return projectsRes.projects;
 };
