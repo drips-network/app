@@ -10,7 +10,7 @@
   export let results: Result[];
   export let loading: boolean;
   export let error: boolean;
-  export let resultElems: HTMLDivElement[] = [];
+  export let resultElems: HTMLElement[] = [];
 </script>
 
 <TransitionedHeight transitionHeightChanges={true}>
@@ -31,8 +31,8 @@
       </div>
     {:else}
       {#each results as result, index}
-        <div class="result" bind:this={resultElems[index]}>
-          <ResultComponent on:click item={result} />
+        <div class="result">
+          <ResultComponent bind:element={resultElems[index]} on:click item={result} on:click />
         </div>
       {/each}
     {/if}

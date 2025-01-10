@@ -1,11 +1,13 @@
 <script lang="ts">
-  import type { ProjectResult, Result as ResultType } from '../types';
+  import type { DripListResult, ProjectResult, Result as ResultType } from '../types';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
   import network from '$lib/stores/wallet/network';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let item: ResultType;
+
+  export let element: HTMLElement;
 
   function splitGitHubUrl(url: string) {
     const [owner, repo] = url.split('/').slice(-2);
@@ -40,22 +42,20 @@
     }
   }
 
-  function pickLabel(item: ResultType) {
-    switch (item.type) {
-      case 'ens': {
-        return item.name;
-      }
-      default: {
-        return (item._formatted ?? item).name;
-      }
-    }
+  function pickLabel(item: DripListResult | ProjectResult) {
+    return (item._formatted ?? item).name;
   }
 </script>
 
 {#if item.type === 'project'}
   {@const { owner, repo } = splitGitHubUrl(item.url)}
   {@const avatarConfig = makeFakeProjectAvatarType(item)}
-  <a class="search-result typo-text" href={`/app/projects/github/${owner}/${repo}`}>
+  <a
+    bind:this={element}
+    class="search-result typo-text"
+    href={`/app/projects/github/${owner}/${repo}`}
+    on:click
+  >
     {#if avatarConfig.__typename === 'ClaimedProjectData'}
       <div style:margin-right="-1.25rem">
         <ProjectAvatar project={{ __typename: 'UnClaimedProjectData' }} />
@@ -67,14 +67,19 @@
     </div>
   </a>
 {:else if item.type === 'drip_list'}
-  <a class="search-result typo-text" href={`/app/drip-lists/${item.id}`}>
+  <a
+    bind:this={element}
+    class="search-result typo-text"
+    href={`/app/drip-lists/${item.id}`}
+    on:click
+  >
     <DripListAvatar />
     <div class="label">
       {@html pickLabel(item)}
     </div>
   </a>
 {:else if item.type === 'address'}
-  <a class="search-result typo-text" href={`/app/${item.address}`}>
+  <a bind:this={element} class="search-result typo-text" href={`/app/${item.address}`} on:click>
     <IdentityBadge size="medium" disableTooltip={true} address={item.address} />
   </a>
 {/if}
