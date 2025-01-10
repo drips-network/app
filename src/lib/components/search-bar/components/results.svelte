@@ -17,7 +17,9 @@
   <div class="results">
     {#if loading}
       <div class="loading-state" transition:fade={{ duration: 100 }}><Spinner /></div>
-    {:else if error}
+    {/if}
+
+    {#if error}
       <div class="empty-state">
         <Cross />
         <p class="typo-text">Sorry, something went wrong while searching.</p>
@@ -27,12 +29,13 @@
         <EyeClosed />
         <p class="typo-text">No results</p>
       </div>
+    {:else}
+      {#each results as result, index}
+        <div class="result" bind:this={resultElems[index]}>
+          <ResultComponent on:click item={result} />
+        </div>
+      {/each}
     {/if}
-    {#each results as result, index}
-      <div class="result" bind:this={resultElems[index]}>
-        <ResultComponent on:click item={result} />
-      </div>
-    {/each}
   </div>
 </TransitionedHeight>
 
@@ -52,7 +55,6 @@
     width: 100%;
   }
 
-  .empty-state,
   .loading-state {
     position: absolute;
     background: var(--color-background);
@@ -65,5 +67,13 @@
     color: var(--color-foreground);
     flex-direction: column;
     z-index: 10;
+  }
+
+  .empty-state {
+    height: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 </style>
