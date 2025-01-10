@@ -125,7 +125,7 @@
     <SearchIcon style="fill: var(--color-foreground)" />
     <input
       type="text"
-      placeholder="Search claimed projects and Drip Lists"
+      placeholder="Search claimed projects, Drip Lists and addresses"
       bind:this={searchElem}
       bind:value={searchTerm}
       on:focus={() => (focus = true)}
