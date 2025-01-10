@@ -13,8 +13,6 @@ import type {
 import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from './default-explore-page.svelte';
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 
-// TODO: I guess it doesn't matter that this is duplicated
-// DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT
 const getProjectsQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
   query ExploreFilecoinProjects(
