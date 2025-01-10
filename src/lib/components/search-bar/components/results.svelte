@@ -46,7 +46,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    max-height: 25.5rem;
+    max-height: 24rem;
     min-height: 3.5rem;
     padding: 0.5rem;
   }
@@ -75,5 +75,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .results {
+      max-height: initial;
+    }
   }
 </style>
