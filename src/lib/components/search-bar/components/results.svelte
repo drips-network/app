@@ -46,7 +46,6 @@
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    max-height: 24rem;
     min-height: 3.5rem;
     padding: 0.5rem;
   }

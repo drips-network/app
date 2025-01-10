@@ -237,6 +237,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    height: 100vh;
     background-color: var(--color-background);
     opacity: 0.9;
     z-index: 50;

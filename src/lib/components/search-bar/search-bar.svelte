@@ -215,7 +215,7 @@
     display: flex;
     justify-content: center;
     z-index: 2;
-    max-height: calc(100vh - 6rem);
+    max-height: calc(100dvh - 6rem);
     overflow: scroll;
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
@@ -235,14 +235,7 @@
     }
 
     .results {
-      border: none;
-      box-shadow: none;
-      padding: 0 0.5rem 2rem 0.5rem;
-      top: 3.5rem;
-      left: -1rem;
-      right: -1rem;
-      border-radius: 0;
-      min-height: calc(100vh - 4rem);
+      padding: 0;
     }
   }
 </style>

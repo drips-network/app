@@ -102,6 +102,12 @@
     background-color: var(--color-foreground-level-1);
   }
 
+  .label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .search-result :global(em) {
     font-style: normal;
     background-color: var(--color-primary-level-2);
