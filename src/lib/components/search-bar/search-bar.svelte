@@ -2,30 +2,42 @@
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import CloseIcon from '$lib/components/icons/CrossSmall.svelte';
 
-  import { createEventDispatcher, onMount } from 'svelte';
-  import { sineIn, sineOut } from 'svelte/easing';
+  import { tick } from 'svelte';
+  import { sineIn, sineInOut, sineOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import scroll from '$lib/stores/scroll';
   import Results from './components/results.svelte';
   import { search } from './search';
   import type { Result } from './types';
   import InfoCircle from '../icons/InfoCircle.svelte';
-
-  const dispatch = createEventDispatcher<{ dismiss: void }>();
-
-  let focus = true;
-
-  $: focus ? scroll.lock() : scroll.unlock();
+  import { browser } from '$app/environment';
 
   let searchTerm: string | undefined;
 
   let searchElem: HTMLDivElement;
 
+  export let searchOpen = false;
+
+  async function focusOnSearch() {
+    await tick();
+    searchElem.focus();
+  }
+
+  $: {
+    if (searchOpen && browser) {
+      scroll.lock();
+      focusOnSearch();
+    } else if (browser) {
+      scroll.unlock();
+    }
+  }
+
+  $: {
+    if (!searchOpen) searchTerm = undefined;
+  }
+
   function closeSearch() {
-    searchTerm = '';
-    searchElem.blur();
-    focus = false;
-    dispatch('dismiss');
+    searchOpen = false;
   }
 
   let loading = false;
@@ -98,55 +110,49 @@
 
     e.preventDefault();
   }
-
-  function handleSearchBlur() {
-    if (!searchTerm?.length) {
-      closeSearch();
-    }
-  }
-
-  onMount(() => {
-    searchElem.focus();
-  });
 </script>
 
 <svelte:window on:keydown={handleKeyboard} />
 
-<div class="search-bar" class:focus>
-  <div class="search-bar-input-wrapper">
-    <SearchIcon style="fill: var(--color-foreground)" />
-    <input
-      type="text"
-      placeholder="Search claimed projects, Drip Lists and addresses"
-      bind:this={searchElem}
-      bind:value={searchTerm}
-      on:focus={() => (focus = true)}
-      autocomplete="off"
-      on:blur={handleSearchBlur}
-    />
-    {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
-        <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
-      </div>{/if}
+{#if searchOpen}
+  <div
+    class="search-bar"
+    class:focus={searchOpen}
+    transition:fly={{ duration: 300, x: 64, easing: sineInOut }}
+  >
+    <div class="search-bar-input-wrapper">
+      <SearchIcon style="fill: var(--color-foreground)" />
+      <input
+        type="text"
+        placeholder="Search claimed projects, Drip Lists and addresses"
+        bind:this={searchElem}
+        bind:value={searchTerm}
+        autocomplete="off"
+      />
+      {#if searchOpen}<div transition:fly={{ duration: 300, y: 4 }}>
+          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
+        </div>{/if}
+    </div>
+    {#if searchOpen}
+      <div
+        class="hint typo-text-small"
+        in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
+        out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+      >
+        <InfoCircle /> Paste a GitHub URL to jump to that project
+      </div>
+    {/if}
+    {#if searchOpen && searchTerm}
+      <div
+        in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
+        out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+        class="results"
+      >
+        <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
+      </div>
+    {/if}
   </div>
-  {#if focus}
-    <div
-      class="hint typo-text-small"
-      in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
-      out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
-    >
-      <InfoCircle /> Paste a GitHub URL to jump to that project
-    </div>
-  {/if}
-  {#if focus && searchTerm}
-    <div
-      in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
-      out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
-      class="results"
-    >
-      <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
-    </div>
-  {/if}
-</div>
+{/if}
 
 <style>
   input {
