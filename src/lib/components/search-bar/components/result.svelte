@@ -73,7 +73,7 @@
       {@html pickLabel(item)}
     </div>
   </a>
-{:else if item.type === 'ens'}
+{:else if item.type === 'address'}
   <a class="search-result typo-text" href={`/app/${item.address}`}>
     <IdentityBadge size="medium" disableTooltip={true} address={item.address} />
   </a>

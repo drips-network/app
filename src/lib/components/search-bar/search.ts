@@ -6,6 +6,7 @@ import ensStore from '$lib/stores/ens/ens.store';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { BASE_URL } from '$lib/utils/base-url';
 import network from '$lib/stores/wallet/network';
+import { isAddress } from 'ethers';
 
 const client = new MeiliSearch({
   host: `${BASE_URL}/api/search`,
@@ -52,13 +53,23 @@ async function getEnsResult(q: string): Promise<Result | undefined> {
 
     if (lookup) {
       return {
-        type: 'ens',
-        name: q,
+        type: 'address',
         address: lookup,
       };
     }
   } catch {
     return undefined;
+  }
+
+  return undefined;
+}
+
+function getAddressResult(q: string): Result | undefined {
+  if (isAddress(q)) {
+    return {
+      type: 'address',
+      address: q,
+    };
   }
 
   return undefined;
@@ -91,10 +102,11 @@ export async function search(q: string): Promise<Result[]> {
 
   const parsedHits: Result[] = resultsSchema.parse(hits);
 
-  const [gitUrlResult, ensResult] = await Promise.all([
+  const [gitUrlResult, ensResult, addressResult] = await Promise.all([
     getGitUrlResults(q, parsedHits),
     getEnsResult(q),
+    getAddressResult(q),
   ]);
 
-  return mapFilterUndefined([ensResult, gitUrlResult, ...parsedHits], (v) => v);
+  return mapFilterUndefined([addressResult, ensResult, gitUrlResult, ...parsedHits], (v) => v);
 }
