@@ -9,6 +9,7 @@
   import Results from './components/results.svelte';
   import { search } from './search';
   import type { Result } from './types';
+  import InfoCircle from '../icons/InfoCircle.svelte';
 
   const dispatch = createEventDispatcher<{ dismiss: void }>();
 
@@ -141,7 +142,7 @@
       in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
       out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
     >
-      💡 Paste a GitHub URL to jump to that project
+      <InfoCircle /> Paste a GitHub URL to jump to that project
     </div>
   {/if}
   {#if focus && searchTerm}
@@ -233,6 +234,8 @@
     left: 0;
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
     color: var(--color-foreground-level-5);
   }
 
@@ -249,7 +252,6 @@
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    padding: 0.5rem;
     box-shadow: var(--elevation-medium);
   }
 

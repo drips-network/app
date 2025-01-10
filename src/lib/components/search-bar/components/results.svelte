@@ -5,6 +5,7 @@
   import type { Result } from '../types';
   import { fade } from 'svelte/transition';
   import Cross from '$lib/components/icons/Cross.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
 
   export let results: Result[];
   export let loading: boolean;
@@ -12,27 +13,28 @@
   export let resultElems: HTMLDivElement[] = [];
 </script>
 
-<div class="results">
-  {#if loading}
-    <div class="loading-state" transition:fade={{ duration: 100 }}><Spinner /></div>
-  {:else if error}
-    <div class="empty-state">
-      <Cross />
-      <p class="typo-text">Sorry, something went wrong while searching.</p>
-    </div>
-  {:else if results.length === 0}
-    <div class="empty-state">
-      <EyeClosed />
-      <p class="typo-text">No results</p>
-    </div>
-  {:else}
+<TransitionedHeight transitionHeightChanges={true}>
+  <div class="results">
+    {#if loading}
+      <div class="loading-state" transition:fade={{ duration: 100 }}><Spinner /></div>
+    {:else if error}
+      <div class="empty-state">
+        <Cross />
+        <p class="typo-text">Sorry, something went wrong while searching.</p>
+      </div>
+    {:else if results.length === 0}
+      <div class="empty-state">
+        <EyeClosed />
+        <p class="typo-text">No results</p>
+      </div>
+    {/if}
     {#each results as result, index}
       <div class="result" bind:this={resultElems[index]}>
         <ResultComponent on:click item={result} />
       </div>
     {/each}
-  {/if}
-</div>
+  </div>
+</TransitionedHeight>
 
 <style>
   .results {
@@ -41,7 +43,9 @@
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    height: 24rem;
+    max-height: 25.5rem;
+    min-height: 3.5rem;
+    padding: 0.5rem;
   }
 
   .result {
@@ -53,12 +57,13 @@
     position: absolute;
     background: var(--color-background);
     width: 100%;
-    height: 100%;
+    height: calc(100% - 1rem);
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
     color: var(--color-foreground);
     flex-direction: column;
+    z-index: 10;
   }
 </style>
