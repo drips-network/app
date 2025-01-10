@@ -4,6 +4,7 @@
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
   import network from '$lib/stores/wallet/network';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import sanitize from 'sanitize-html';
 
   export let item: ResultType;
 
@@ -43,7 +44,10 @@
   }
 
   function pickLabel(item: DripListResult | ProjectResult) {
-    return (item._formatted ?? item).name;
+    return sanitize((item._formatted ?? item).name ?? '', {
+      allowedTags: ['em'],
+      allowedAttributes: {},
+    });
   }
 </script>
 
