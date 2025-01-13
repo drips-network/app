@@ -83,6 +83,12 @@
   $: handleSearchTermChange(searchTerm);
 
   function handleKeyboard(e: KeyboardEvent) {
+    if (e.metaKey && e.key === 'k') {
+      searchOpen = true;
+      e.preventDefault();
+      return;
+    }
+
     if (e.key === 'Escape') {
       closeSearch();
       return;
