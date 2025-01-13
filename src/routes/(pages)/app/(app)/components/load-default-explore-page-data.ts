@@ -1,9 +1,6 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
 import { gql } from 'graphql-request';
-import {
-  DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT,
-  // DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT,
-} from './default-explore-page.svelte';
+import { DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT } from './default-explore-page.svelte';
 import { postsListingSchema } from '../../../../api/blog/posts/schema';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
@@ -12,16 +9,9 @@ import cached from '$lib/utils/cache/remote/cached';
 import query from '$lib/graphql/dripsQL';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import type {
-  // ExploreProjectsQuery,
-  // ExploreProjectsQueryVariables,
   FeaturedDripListQuery,
   FeaturedDripListQueryVariables,
 } from './__generated__/gql.generated';
-// import {
-//   ProjectSortField,
-//   ProjectVerificationStatus,
-//   SortDirection,
-// } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
@@ -40,19 +30,6 @@ const FEATURED_DRIP_LISTS =
     ],
   }[PUBLIC_NETWORK] ?? [];
 
-// const getProjectsQuery = gql`
-//   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
-//   query ExploreProjects(
-//     $where: ProjectWhereInput
-//     $sort: ProjectSortInput
-//     $chains: [SupportedChain!]!
-//   ) {
-//     projects(where: $where, sort: $sort, chains: $chains) {
-//       ...DefaultExplorePageFeaturedProject
-//     }
-//   }
-// `;
-
 const featuredDripListQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT}
   query FeaturedDripList($id: ID!, $chain: SupportedChain!) {
@@ -63,14 +40,7 @@ const featuredDripListQuery = gql`
 `;
 
 export default async function loadDefaultExplorePageData(f: typeof fetch) {
-  // const getProjectsVariables = {
-  //   where: { verificationStatus: ProjectVerificationStatus.Claimed },
-  //   sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
-  //   chains: [network.gqlName],
-  // };
-
   const fetchProjectsParameters = createFetchProjectsParameters();
-
   const cacheKey = queryCacheKey(
     fetchProjectsQuery + featuredDripListQuery,
     [Object.entries(fetchProjectsParameters), FEATURED_DRIP_LISTS],
@@ -107,7 +77,6 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     return response.json();
   };
 
-  // TODO: fetch is failing here for some reason!!!
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
     redis,
     cacheKey,
