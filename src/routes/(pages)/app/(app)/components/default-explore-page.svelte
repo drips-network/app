@@ -59,6 +59,7 @@
   import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
+  import getProjectColor from './project-color';
 
   const FEATURED_WEB_3_PROJECTS_ACCOUNT_IDS =
     {
@@ -136,16 +137,6 @@
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(Math.round(tlv));
-
-  function getProjectColor(project: (typeof featuredWeb3Projects)[number]) {
-    const chainData = filterCurrentChainData(project.chainData);
-
-    if (!isClaimed(chainData)) {
-      return;
-    }
-
-    return chainData.color;
-  }
 
   let tickHandle: number;
   onMount(async () => {
