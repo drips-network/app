@@ -40,12 +40,11 @@ export const dripListSchema = commonMeiliAttributes.extend({
 export const resultSchema = z.union([projectResultSchema, dripListSchema]);
 export const resultsSchema = z.array(resultSchema);
 
-export type EnsResult = {
-  type: 'ens';
-  name: string;
+export type AddressResult = {
+  type: 'address';
   address: string;
 };
 
 export type ProjectResult = z.infer<typeof projectResultSchema>;
 export type DripListResult = z.infer<typeof dripListSchema>;
-export type Result = z.infer<typeof resultSchema> | EnsResult;
+export type Result = z.infer<typeof resultSchema> | AddressResult;
