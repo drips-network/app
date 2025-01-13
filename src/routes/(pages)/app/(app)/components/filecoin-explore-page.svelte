@@ -1,21 +1,6 @@
 <script lang="ts" context="module">
-  export const DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT = gql`
-    ${PROJECT_CARD_FRAGMENT}
-    fragment DefaultExplorePageFeaturedProject on Project {
-      ...ProjectCard
-      account {
-        accountId
-      }
-      chainData {
-        ... on ClaimedProjectData {
-          chain
-        }
-        ... on UnClaimedProjectData {
-          chain
-        }
-      }
-    }
-  `;
+  // DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT
+  // shared with load-default-explore-page
 </script>
 
 <script lang="ts">
@@ -32,11 +17,12 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import Box from '$lib/components/icons/Box.svelte';
-  import ProjectCard, {
-    PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/project-card/project-card.svelte';
-  import { gql } from 'graphql-request';
+  // import ProjectCard, {
+  //   PROJECT_CARD_FRAGMENT,
+  // } from '$lib/components/project-card/project-card.svelte';
+  // import { gql } from 'graphql-request';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
+  import ProjectCard from '$lib/components/project-card/project-card.svelte';
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[];

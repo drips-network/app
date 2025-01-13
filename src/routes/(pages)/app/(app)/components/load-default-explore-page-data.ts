@@ -2,7 +2,7 @@ import { PUBLIC_NETWORK } from '$env/static/public';
 import { gql } from 'graphql-request';
 import {
   DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT,
-  DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT,
+  // DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT,
 } from './default-explore-page.svelte';
 import { postsListingSchema } from '../../../../api/blog/posts/schema';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -12,18 +12,19 @@ import cached from '$lib/utils/cache/remote/cached';
 import query from '$lib/graphql/dripsQL';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import type {
-  ExploreProjectsQuery,
-  ExploreProjectsQueryVariables,
+  // ExploreProjectsQuery,
+  // ExploreProjectsQueryVariables,
   FeaturedDripListQuery,
   FeaturedDripListQueryVariables,
 } from './__generated__/gql.generated';
-import {
-  ProjectSortField,
-  ProjectVerificationStatus,
-  SortDirection,
-} from '$lib/graphql/__generated__/base-types';
+// import {
+//   ProjectSortField,
+//   ProjectVerificationStatus,
+//   SortDirection,
+// } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
+import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -39,18 +40,18 @@ const FEATURED_DRIP_LISTS =
     ],
   }[PUBLIC_NETWORK] ?? [];
 
-const getProjectsQuery = gql`
-  ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
-  query ExploreProjects(
-    $where: ProjectWhereInput
-    $sort: ProjectSortInput
-    $chains: [SupportedChain!]!
-  ) {
-    projects(where: $where, sort: $sort, chains: $chains) {
-      ...DefaultExplorePageFeaturedProject
-    }
-  }
-`;
+// const getProjectsQuery = gql`
+//   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
+//   query ExploreProjects(
+//     $where: ProjectWhereInput
+//     $sort: ProjectSortInput
+//     $chains: [SupportedChain!]!
+//   ) {
+//     projects(where: $where, sort: $sort, chains: $chains) {
+//       ...DefaultExplorePageFeaturedProject
+//     }
+//   }
+// `;
 
 const featuredDripListQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT}
@@ -62,27 +63,19 @@ const featuredDripListQuery = gql`
 `;
 
 export default async function loadDefaultExplorePageData(f: typeof fetch) {
-  const getProjectsVariables = {
-    where: { verificationStatus: ProjectVerificationStatus.Claimed },
-    sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
-    chains: [network.gqlName],
-  };
+  // const getProjectsVariables = {
+  //   where: { verificationStatus: ProjectVerificationStatus.Claimed },
+  //   sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
+  //   chains: [network.gqlName],
+  // };
+
+  const fetchProjectsParameters = createFetchProjectsParameters();
 
   const cacheKey = queryCacheKey(
-    getProjectsQuery + featuredDripListQuery,
-    [Object.entries(getProjectsVariables), FEATURED_DRIP_LISTS],
+    fetchProjectsQuery + featuredDripListQuery,
+    [Object.entries(fetchProjectsParameters), FEATURED_DRIP_LISTS],
     'explore-page',
   );
-
-  const fetchProjects = async () => {
-    const projectsRes = await query<ExploreProjectsQuery, ExploreProjectsQueryVariables>(
-      getProjectsQuery,
-      getProjectsVariables,
-      f,
-    );
-
-    return projectsRes.projects;
-  };
 
   const fetchFeaturedLists = async () => {
     const results = await Promise.all(
@@ -122,7 +115,7 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
     async () =>
       Promise.all([
         fetchBlogPosts(),
-        fetchProjects(),
+        fetchProjects(f, fetchProjectsParameters),
         fetchFeaturedLists(),
         cachedTotalDrippedPrices(redis, f),
         fetchTlv(),
