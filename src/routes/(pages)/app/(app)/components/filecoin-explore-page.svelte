@@ -17,12 +17,9 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import Box from '$lib/components/icons/Box.svelte';
-  // import ProjectCard, {
-  //   PROJECT_CARD_FRAGMENT,
-  // } from '$lib/components/project-card/project-card.svelte';
-  // import { gql } from 'graphql-request';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
+  import getProjectColor from './project-color';
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
@@ -32,17 +29,6 @@
   );
 
   $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
-
-  // TODO: duplicated
-  function getProjectColor(project: (typeof projects)[number]) {
-    const chainData = filterCurrentChainData(project.chainData);
-
-    if (!isClaimed(chainData)) {
-      return;
-    }
-
-    return chainData.color;
-  }
 </script>
 
 <div class="explore">
