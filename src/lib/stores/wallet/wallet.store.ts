@@ -21,7 +21,7 @@ import { BrowserProvider } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverProvider';
+import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
 const appsSdk = new SafeAppsSDK();

@@ -70,7 +70,7 @@
         ],
 
         after: async (_, { newMetadataHash }) => {
-          await waitForAccountMetadata($context.projectAccountId, newMetadataHash);
+          await waitForAccountMetadata($context.projectAccountId, newMetadataHash, 'project');
           await invalidateAccountCache($context.projectAccountId);
           await invalidateAll();
         },

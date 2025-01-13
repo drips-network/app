@@ -215,3 +215,8 @@ p,
   hyphens: auto;
   overflow-wrap: break-word;
 }
+
+.typo-text-diff-additive {
+  background: var(--color-positive-level-1);
+  color: var(--color-positive-level-6);
+}

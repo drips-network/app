@@ -14,14 +14,14 @@ export const reformatUrl = (url: string): string => {
   return url;
 };
 
-export const validateProject = async (url: string): Promise<boolean> => {
+export const validateProject = async (url: string): Promise<string | null> => {
   const formattedUrl = reformatUrl(url);
 
   const repoInfoRes = await fetch(`/api/github/${encodeURIComponent(formattedUrl)}`);
   const repoInfo = await repoInfoRes.json();
   const normalizedUrl = repoInfo.url;
 
-  return !!normalizedUrl;
+  return normalizedUrl;
 };
 
 export const getDripListId = (url: string): string => {

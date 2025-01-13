@@ -2,6 +2,14 @@ import network from '$lib/stores/wallet/network';
 import type { Octokit } from '@octokit/rest';
 import { Buffer } from 'buffer';
 
+export type FundingJson = {
+  drips?: {
+    [key: string]: {
+      ownedBy: string;
+    };
+  };
+};
+
 export default class GitHub {
   private octokit: Octokit;
 
@@ -31,8 +39,16 @@ export default class GitHub {
   }
 
   public async getFundingJsonAddress(owner: string, repo: string): Promise<string | null> {
-    const { data } = await this.octokit.repos
-      .getContent({
+    const fundingJson = await this.fetchFundingJson(owner, repo);
+    return (
+      fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name].ownedBy ?? null
+    );
+  }
+
+  public async fetchFundingJson(owner: string, repo: string): Promise<FundingJson> {
+    let data;
+    try {
+      ({ data } = await this.octokit.repos.getContent({
         owner,
         repo,
         path: 'FUNDING.json',
@@ -42,24 +58,21 @@ export default class GitHub {
         headers: {
           'If-None-Match': '',
         },
-      })
-      .catch(() => {
-        throw new Error('FUNDING.json not found.');
-      });
+      }));
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('FUNDING.json not found', error);
+      throw new Error('FUNDING.json not found.');
+    }
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fileContent = Buffer.from((data as any).content, 'base64').toString('utf-8');
 
-      const fundingJson = JSON.parse(fileContent);
-      return (
-        fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name].ownedBy ??
-        null
-      );
-    } catch (e) {
+      return JSON.parse(fileContent);
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(e);
-
+      console.error('FUNDING.json not parseable', error);
       throw new Error(
         `Unable to parse the FUNDING.json file. Ensure it exists, is valid JSON, and includes an address for ${network.label}.`,
       );
