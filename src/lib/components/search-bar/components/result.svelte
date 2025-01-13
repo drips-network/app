@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { DripListResult, ProjectResult, Result as ResultType } from '../types';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
-  import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
   import network from '$lib/stores/wallet/network';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import sanitize from 'sanitize-html';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   export let item: ResultType;
 
@@ -43,6 +44,23 @@
     }
   }
 
+  function makeFakeDripListBadgeType(item: DripListResult) {
+    return {
+      __typename: 'DripList' as const,
+      chain: network.gqlName,
+      isVisible: true,
+      account: {
+        __typename: 'NftDriverAccount' as const,
+        accountId: item.id ?? unreachable(),
+      },
+      name: item.name ?? '',
+      owner: {
+        __typename: 'AddressDriverAccount' as const,
+        address: item.ownerAddress ?? unreachable(),
+      },
+    };
+  }
+
   function pickLabel(item: DripListResult | ProjectResult) {
     return sanitize((item._formatted ?? item).name ?? '', {
       allowedTags: ['em'],
@@ -77,10 +95,12 @@
     href={`/app/drip-lists/${item.id}`}
     on:click
   >
-    <DripListAvatar />
-    <div class="label">
-      {@html pickLabel(item)}
-    </div>
+    <span style:display="flex" style:align-items="center" style:min-width="0">
+      <DripListBadge showName={false} dripList={makeFakeDripListBadgeType(item)} />
+      <div class="label">
+        {@html pickLabel(item)}
+      </div>
+    </span>
   </a>
 {:else if item.type === 'address'}
   <a bind:this={element} class="search-result typo-text" href={`/app/${item.address}`} on:click>
