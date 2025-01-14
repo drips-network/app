@@ -23,23 +23,28 @@ async function getGitUrlResults(q: string, parsedHits: Result[]): Promise<Result
     (hit) => hit.type === 'project' && hit.url.toLowerCase() === q.toLowerCase(),
   );
 
-  if (!gitUrlInResults) {
-    const repoRes = await fetch(`/api/github/${encodeURIComponent(q)}`);
-    const repoResJson = await repoRes.json();
+  try {
+    if (!gitUrlInResults) {
+      const repoRes = await fetch(`/api/github/${encodeURIComponent(q)}`);
+      const repoResJson = await repoRes.json();
 
-    const is404 = 'message' in repoResJson && repoResJson.message === 'Error: 404';
+      const is404 = 'message' in repoResJson && repoResJson.message === 'Error: 404';
 
-    if (!is404) {
-      const { repoName, ownerName } = z
-        .object({ repoName: z.string(), ownerName: z.string() })
-        .parse(repoResJson);
+      if (!is404) {
+        const { repoName, ownerName } = z
+          .object({ repoName: z.string(), ownerName: z.string() })
+          .parse(repoResJson);
 
-      return {
-        type: 'project',
-        url: q,
-        name: `${ownerName}/${repoName}`,
-      };
+        return {
+          type: 'project',
+          url: q,
+          name: `${ownerName}/${repoName}`,
+        };
+      }
     }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
   }
 
   return undefined;
