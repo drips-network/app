@@ -51,19 +51,22 @@
   {#if showAvatar}
     <DripListAvatar size={avatarSize} {disabled} {outline} />
   {/if}
-  {#if showName}
-    <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
-      <span
-        >{#if username}<span class="text-foreground-level-5">{username}/</span
-          >{/if}{#if !dripList}<span class="animate-pulse">...</span
-          >{:else}{dripList.name}{/if}</span
-      >
-    </div>
-    {#if !dripList?.isVisible}
-      <WarningIcon
-        style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"
-      />
-    {/if}
+  <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
+    <span>
+      {#if username}
+        <span class="text-foreground-level-5">{username}/</span>
+      {/if}
+      {#if !dripList}
+        <span class="animate-pulse">...</span>
+      {:else if showName}
+        {dripList.name}
+      {/if}
+    </span>
+  </div>
+  {#if !dripList?.isVisible}
+    <WarningIcon
+      style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"
+    />
   {/if}
 </svelte:element>
 

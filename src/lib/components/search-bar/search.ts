@@ -1,149 +1,115 @@
-import fuzzysort from 'fuzzysort';
-
-import tokens from '$lib/stores/tokens';
-import type { TokenInfoWrapper } from '$lib/stores/tokens/tokens.store';
-import { get } from 'svelte/store';
-import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
-import GitProjectService from '$lib/utils/project/GitProjectService';
-import { isAddress } from 'ethers';
+import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
+import { MeiliSearch, type FederatedMultiSearchParams } from 'meilisearch';
+import { resultsSchema, type Result } from './types';
+import { z } from 'zod';
+import ensStore from '$lib/stores/ens/ens.store';
+import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { BASE_URL } from '$lib/utils/base-url';
 import network from '$lib/stores/wallet/network';
+import { isAddress } from 'ethers';
 
-export enum SearchItemType {
-  PROFILE,
-  TOKEN,
-  REPO,
+const client = new MeiliSearch({
+  host: `${BASE_URL}/api/search`,
+});
+
+/**
+ * Add a "fake" search result for an unclaimed project if a Git URL or owner/name pattern is entered
+ * for a repo not found in Drips DB
+ */
+async function getGitUrlResults(q: string, parsedHits: Result[]): Promise<Result | undefined> {
+  if (!isSupportedGitUrl(q)) return undefined;
+
+  const gitUrlInResults = parsedHits.some(
+    (hit) => hit.type === 'project' && hit.url.toLowerCase() === q.toLowerCase(),
+  );
+
+  try {
+    if (!gitUrlInResults) {
+      const repoRes = await fetch(`/api/github/${encodeURIComponent(q)}`);
+      const repoResJson = await repoRes.json();
+
+      const is404 = 'message' in repoResJson && repoResJson.message === 'Error: 404';
+
+      if (!is404) {
+        const { repoName, ownerName } = z
+          .object({ repoName: z.string(), ownerName: z.string() })
+          .parse(repoResJson);
+
+        return {
+          type: 'project',
+          url: q,
+          name: `${ownerName}/${repoName}`,
+        };
+      }
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+
+  return undefined;
 }
 
-interface MatchStrings {
-  primary?: string;
-  secondary?: string;
-  tertiary?: string;
+async function getEnsResult(q: string): Promise<Result | undefined> {
+  try {
+    const lookup = await ensStore.reverseLookup(q);
+
+    if (lookup) {
+      return {
+        type: 'address',
+        address: lookup,
+      };
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
 }
 
-export type Item =
-  | {
-      type: SearchItemType.PROFILE;
-      matchStrings: MatchStrings;
-      item: {
-        address?: string;
-        name?: string;
-        dripsAccountId?: string;
-      };
-    }
-  | {
-      type: SearchItemType.TOKEN;
-      matchStrings: MatchStrings;
-      item: TokenInfoWrapper;
-    }
-  | {
-      type: SearchItemType.REPO;
-      matchStrings: MatchStrings;
-      item: {
-        forge: string;
-        repoName: string;
-        username: string;
-        url: string;
-      };
+function getAddressResult(q: string): Result | undefined {
+  if (isAddress(q)) {
+    return {
+      type: 'address',
+      address: q,
     };
+  }
 
-function searchMatchStringsForToken(token: TokenInfoWrapper): MatchStrings {
-  const { name, symbol, address } = token.info;
+  return undefined;
+}
 
-  return {
-    primary: name,
-    secondary: symbol,
-    tertiary: address,
+export async function search(q: string): Promise<Result[]> {
+  const commonOptions: Partial<FederatedMultiSearchParams['queries'][number]> = {
+    attributesToHighlight: ['name'],
+    showMatchesPosition: true,
   };
-}
 
-let searchItems: Item[] = [];
-
-export function updateSearchItems(accountId: string | undefined) {
-  const tokensVal = get(tokens);
-
-  const currentTokens = (accountId && tokensVal) || [];
-
-  searchItems = [
-    ...currentTokens.map<Item>((token) => ({
-      type: SearchItemType.TOKEN,
-      matchStrings: searchMatchStringsForToken(token),
-      item: token,
-    })),
-  ];
-}
-
-export default function search(input: string | undefined) {
-  if (!input) return [];
-
-  if (isValidGitUrl(input)) {
-    const { username, repoName } = GitProjectService.deconstructUrl(input);
-
-    searchItems.push({
-      type: SearchItemType.REPO,
-      matchStrings: {
-        primary: input,
+  const { hits } = await client.multiSearch({
+    federation: {},
+    queries: [
+      {
+        indexUid: 'projects',
+        q,
+        filter: [`name IS NOT NULL AND ownerAddress IS NOT NULL AND chain = ${network.gqlName}`],
+        federationOptions: { weight: 1.1 },
+        ...commonOptions,
       },
-      item: {
-        forge: 'github',
-        username,
-        repoName,
-        url: input,
+      {
+        indexUid: 'drip_lists',
+        filter: [`name IS NOT NULL AND chain = ${network.gqlName}`],
+        q,
+        ...commonOptions,
       },
-    });
-  }
-
-  if (
-    input?.endsWith('.eth') &&
-    network.ensSupported &&
-    searchItems.findIndex((i) => i.type === SearchItemType.PROFILE && i.item.name === input) === -1
-  ) {
-    searchItems.push({
-      type: SearchItemType.PROFILE,
-      matchStrings: {
-        primary: input,
-      },
-      item: {
-        name: input,
-      },
-    });
-  }
-
-  if (
-    isAddress(input) &&
-    searchItems.findIndex((i) => i.type === SearchItemType.PROFILE && i.item.address === input) ===
-      -1
-  ) {
-    searchItems.push({
-      type: SearchItemType.PROFILE,
-      matchStrings: {
-        primary: input,
-      },
-      item: {
-        address: input,
-      },
-    });
-  }
-
-  // Input is exclusively numeric, which means it may be a drips user ID
-  if (
-    /^\d+$/.test(input) &&
-    searchItems.findIndex(
-      (i) => i.type === SearchItemType.PROFILE && i.item.dripsAccountId === input,
-    ) === -1
-  ) {
-    searchItems.push({
-      type: SearchItemType.PROFILE,
-      matchStrings: {
-        primary: input,
-      },
-      item: {
-        dripsAccountId: input,
-      },
-    });
-  }
-
-  return fuzzysort.go(input, searchItems, {
-    keys: ['matchStrings.primary', 'matchStrings.secondary', 'matchStrings.tertiary'],
-    limit: 20,
+    ],
   });
+
+  const parsedHits: Result[] = resultsSchema.parse(hits);
+
+  const [gitUrlResult, ensResult, addressResult] = await Promise.all([
+    getGitUrlResults(q, parsedHits),
+    getEnsResult(q),
+    getAddressResult(q),
+  ]);
+
+  return mapFilterUndefined([addressResult, ensResult, gitUrlResult, ...parsedHits], (v) => v);
 }

@@ -23,7 +23,7 @@
   import SettingsIcon from '$lib/components/icons/Settings.svelte';
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import { fade, fly } from 'svelte/transition';
-  import { quadInOut, sineInOut } from 'svelte/easing';
+  import { quadInOut } from 'svelte/easing';
   import Spinner from '../spinner/spinner.svelte';
   import CollectButton from '../collect-button/collect-button.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
@@ -84,11 +84,9 @@
     <!-- ensure nav items are right-aligned on mobile still even though nothing's on the left -->
     <div />
   {/if}
-  {#if searchMode}
-    <div class="search-bar" transition:fly={{ duration: 300, x: 64, easing: sineInOut }}>
-      <SearchBar on:dismiss={() => (searchMode = false)} />
-    </div>
-  {/if}
+  <div class="search-bar">
+    <SearchBar bind:searchOpen={searchMode} />
+  </div>
   <div class="right" class:collect-button-peeking={collectButtonPeeking}>
     <div class="header-buttons">
       {#if !searchMode}
@@ -151,7 +149,13 @@
 </header>
 
 {#if searchMode}
-  <div class="search-background" transition:fade={{ duration: 300 }} />
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
+    class="search-background"
+    transition:fade={{ duration: 300 }}
+    on:click={() => (searchMode = false)}
+  />
 {/if}
 
 <style>
@@ -237,8 +241,9 @@
     left: 0;
     right: 0;
     bottom: 0;
+    height: 100vh;
     background-color: var(--color-background);
-    opacity: 0.75;
+    opacity: 0.9;
     z-index: 50;
   }
 
