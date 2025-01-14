@@ -66,6 +66,6 @@ Learn more about visibility controls [here](https://docs.drips.network/advanced/
 
 Right after Devcon, the entire Drips team came together for an off-site — with the main question being: What's next?
 
-Suffice to say, after a long brainstorming session, we've got a lot of exciting new features and improvements planned for 2025. We'll focus on attracting more funding for more open-source projects, growing the depth of the Drips Dependency Tree, and focus on adding some AI-powered features with [Drips AI] [[inc link to twitter thread](https://x.com/dripsnetwork/status/1868664069449793997)]...
+Suffice to say, after a long brainstorming session, we've got a lot of exciting new features and improvements planned for 2025. We'll focus on attracting more funding for more open-source projects, growing the depth of the Drips Dependency Tree, and focus on adding some AI-powered features with [Drips AI](https://x.com/dripsnetwork/status/1868664069449793997)]...
 
 We also want to hear from you! What features would you love to see in Drips this quarter? Share your thoughts by [tweeting at us](https://x.com/dripsnetwork) or [joining our Discord](https://discord.gg/BakDKKDpHF).
