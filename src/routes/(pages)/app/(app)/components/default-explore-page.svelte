@@ -1,22 +1,4 @@
 <script lang="ts" context="module">
-  // export const DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT = gql`
-  //   ${PROJECT_CARD_FRAGMENT}
-  //   fragment DefaultExplorePageFeaturedProject on Project {
-  //     ...ProjectCard
-  //     account {
-  //       accountId
-  //     }
-  //     chainData {
-  //       ... on ClaimedProjectData {
-  //         chain
-  //       }
-  //       ... on UnClaimedProjectData {
-  //         chain
-  //       }
-  //     }
-  //   }
-  // `;
-
   export const DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
     fragment DefaultExplorePageFeaturedDripLists on DripList {
@@ -31,8 +13,7 @@
   import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
-  import ProjectCard from // PROJECT_CARD_FRAGMENT,
-  '$lib/components/project-card/project-card.svelte';
+  import ProjectCard from '$lib/components/project-card/project-card.svelte'; // PROJECT_CARD_FRAGMENT,
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import { PUBLIC_NETWORK } from '$env/static/public';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -117,13 +98,6 @@
   $: blogPosts = blogPosts
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 2);
-
-  // I (jason) sometimes claim projects for testing purposes. crude way to get rid of those
-  // $: projectsWithoutJasonTests = projects.filter(
-  //   (p) => !p.source.repoName.includes('drips-test-repo'),
-  // );
-
-  // $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
 
   let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {
@@ -271,33 +245,6 @@
 
   <RecentlyClaimedProjects {projects} />
 
-  <!-- <Section
-    header={{
-      icon: BoxIcon,
-      label: 'Recently claimed projects',
-      actions: [
-        {
-          label: 'See all',
-          href: '/app/projects/all',
-          icon: Box,
-        },
-      ],
-    }}
-    skeleton={{ loaded: true }}
-  >
-    <div class="projects-grid">
-      {#each recentlyClaimedProjects as project}
-        <div>
-          {#if isClaimed(filterCurrentChainData(project.chainData))}
-            <PrimaryColorThemer colorHex={getProjectColor(project)}>
-              <ProjectCard {project} />
-            </PrimaryColorThemer>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  </Section> -->
-
   <LatestNewsSection {blogPosts} />
 
   {#if !$walletStore.connected}
@@ -347,15 +294,6 @@
     line-height: min(12vw, 80px);
     color: var(--color-primary);
   }
-
-  /* .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-    gap: 1rem;
-    max-width: 100%;
-    position: relative;
-    padding: 4px;
-  } */
 
   .horizontal-scroll {
     overflow-x: auto;

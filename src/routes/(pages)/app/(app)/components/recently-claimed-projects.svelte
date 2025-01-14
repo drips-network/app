@@ -19,13 +19,6 @@
 </script>
 
 <script lang="ts">
-  // import type { z } from 'zod';
-  // import type { postsListingSchema } from '../../../../api/blog/posts/schema';
-  // import LatestNewsSection from './latest-news-section.svelte';
-  // import Button from '$lib/components/button/button.svelte';
-  // import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
-  // import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
-  // import walletStore from '$lib/stores/wallet/wallet.store';
   import Section from '$lib/components/section/section.svelte';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import isClaimed from '$lib/utils/project/is-claimed';
@@ -33,14 +26,12 @@
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
-  // import ProjectCard from '$lib/components/project-card/project-card.svelte';
   import getProjectColor from './project-color';
   import ProjectCard, {
     PROJECT_CARD_FRAGMENT,
   } from '$lib/components/project-card/project-card.svelte';
   import { gql } from 'graphql-request';
 
-  // export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
 
   $: projectsWithoutJasonTests = projects.filter(
