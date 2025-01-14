@@ -75,7 +75,7 @@
   <a
     bind:this={element}
     class="search-result typo-text"
-    href={`/app/projects/github/${owner}/${repo}`}
+    href={`/app/projects/github/${owner}/${repo}?exact`}
     on:click
   >
     {#if avatarConfig.__typename === 'ClaimedProjectData'}
