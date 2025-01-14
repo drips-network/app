@@ -1,4 +1,4 @@
-import { isValidGitUrl } from '$lib/utils/is-valid-git-url';
+import { isSupportedGitUrl } from '$lib/utils/is-valid-git-url';
 import { MeiliSearch, type FederatedMultiSearchParams } from 'meilisearch';
 import { resultsSchema, type Result } from './types';
 import { z } from 'zod';
@@ -17,16 +17,14 @@ const client = new MeiliSearch({
  * for a repo not found in Drips DB
  */
 async function getGitUrlResults(q: string, parsedHits: Result[]): Promise<Result | undefined> {
-  if (!isValidGitUrl(q)) return undefined;
-
-  const gitHubUrl = isValidGitUrl(q) ? q : `https://github.com/${q}`;
+  if (!isSupportedGitUrl(q)) return undefined;
 
   const gitUrlInResults = parsedHits.some(
-    (hit) => hit.type === 'project' && hit.url.toLowerCase() === gitHubUrl.toLowerCase(),
+    (hit) => hit.type === 'project' && hit.url.toLowerCase() === q.toLowerCase(),
   );
 
   if (!gitUrlInResults) {
-    const repoRes = await fetch(`/api/github/${encodeURIComponent(gitHubUrl)}`);
+    const repoRes = await fetch(`/api/github/${encodeURIComponent(q)}`);
     const repoResJson = await repoRes.json();
 
     const is404 = 'message' in repoResJson && repoResJson.message === 'Error: 404';
@@ -38,7 +36,7 @@ async function getGitUrlResults(q: string, parsedHits: Result[]): Promise<Result
 
       return {
         type: 'project',
-        url: gitHubUrl,
+        url: q,
         name: `${ownerName}/${repoName}`,
       };
     }
