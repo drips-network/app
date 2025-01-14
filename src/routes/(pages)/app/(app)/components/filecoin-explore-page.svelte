@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   // DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT
   // shared with load-default-explore-page
+  // TODO make the recent projects its own component
 </script>
 
 <script lang="ts">
@@ -11,24 +12,25 @@
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import Section from '$lib/components/section/section.svelte';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import isClaimed from '$lib/utils/project/is-claimed';
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import BoxIcon from '$lib/components/icons/Box.svelte';
-  import Box from '$lib/components/icons/Box.svelte';
+  // import Section from '$lib/components/section/section.svelte';
+  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  // import isClaimed from '$lib/utils/project/is-claimed';
+  // import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
+  // import BoxIcon from '$lib/components/icons/Box.svelte';
+  // import Box from '$lib/components/icons/Box.svelte';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
-  import ProjectCard from '$lib/components/project-card/project-card.svelte';
-  import getProjectColor from './project-color';
+  // import ProjectCard from '$lib/components/project-card/project-card.svelte';
+  // import getProjectColor from './project-color';
+  import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
 
-  $: projectsWithoutJasonTests = projects.filter(
-    (p) => !p.source.repoName.includes('drips-test-repo'),
-  );
+  // $: projectsWithoutJasonTests = projects.filter(
+  //   (p) => !p.source.repoName.includes('drips-test-repo'),
+  // );
 
-  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
+  // $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
 </script>
 
 <div class="explore">
@@ -52,7 +54,9 @@
     </div>
   </div>
 
-  <Section
+  <RecentlyClaimedProjects {projects} />
+
+  <!-- <Section
     header={{
       icon: BoxIcon,
       label: 'Recently claimed projects',
@@ -77,7 +81,7 @@
         </div>
       {/each}
     </div>
-  </Section>
+  </Section> -->
 
   <LatestNewsSection title="News from Drips" {blogPosts} />
 
@@ -138,12 +142,12 @@
     justify-content: center;
   }
 
-  .projects-grid {
+  /* .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
     gap: 1rem;
     max-width: 100%;
     position: relative;
     padding: 4px;
-  }
+  } */
 </style>

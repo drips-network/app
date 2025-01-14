@@ -1,21 +1,21 @@
 <script lang="ts" context="module">
-  export const DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT = gql`
-    ${PROJECT_CARD_FRAGMENT}
-    fragment DefaultExplorePageFeaturedProject on Project {
-      ...ProjectCard
-      account {
-        accountId
-      }
-      chainData {
-        ... on ClaimedProjectData {
-          chain
-        }
-        ... on UnClaimedProjectData {
-          chain
-        }
-      }
-    }
-  `;
+  // export const DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT = gql`
+  //   ${PROJECT_CARD_FRAGMENT}
+  //   fragment DefaultExplorePageFeaturedProject on Project {
+  //     ...ProjectCard
+  //     account {
+  //       accountId
+  //     }
+  //     chainData {
+  //       ... on ClaimedProjectData {
+  //         chain
+  //       }
+  //       ... on UnClaimedProjectData {
+  //         chain
+  //       }
+  //     }
+  //   }
+  // `;
 
   export const DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
@@ -31,9 +31,8 @@
   import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
-  import ProjectCard, {
-    PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/project-card/project-card.svelte';
+  import ProjectCard from // PROJECT_CARD_FRAGMENT,
+  '$lib/components/project-card/project-card.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import { PUBLIC_NETWORK } from '$env/static/public';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -60,6 +59,7 @@
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
   import getProjectColor from './project-color';
+  import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
 
   const FEATURED_WEB_3_PROJECTS_ACCOUNT_IDS =
     {
@@ -119,11 +119,11 @@
     .slice(0, 2);
 
   // I (jason) sometimes claim projects for testing purposes. crude way to get rid of those
-  $: projectsWithoutJasonTests = projects.filter(
-    (p) => !p.source.repoName.includes('drips-test-repo'),
-  );
+  // $: projectsWithoutJasonTests = projects.filter(
+  //   (p) => !p.source.repoName.includes('drips-test-repo'),
+  // );
 
-  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
+  // $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
 
   let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {
@@ -269,7 +269,9 @@
     </div>
   </Section>
 
-  <Section
+  <RecentlyClaimedProjects {projects} />
+
+  <!-- <Section
     header={{
       icon: BoxIcon,
       label: 'Recently claimed projects',
@@ -294,7 +296,7 @@
         </div>
       {/each}
     </div>
-  </Section>
+  </Section> -->
 
   <LatestNewsSection {blogPosts} />
 
@@ -346,14 +348,14 @@
     color: var(--color-primary);
   }
 
-  .projects-grid {
+  /* .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
     gap: 1rem;
     max-width: 100%;
     position: relative;
     padding: 4px;
-  }
+  } */
 
   .horizontal-scroll {
     overflow-x: auto;
