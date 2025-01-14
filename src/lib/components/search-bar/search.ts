@@ -90,13 +90,15 @@ export async function search(q: string): Promise<Result[]> {
       {
         indexUid: 'projects',
         q,
-        filter: [`name IS NOT NULL AND ownerAddress IS NOT NULL AND chain = ${network.gqlName}`],
+        filter: [
+          `name IS NOT NULL AND verificationStatus = Claimed AND chain = ${network.gqlName} AND isVisible = true`,
+        ],
         federationOptions: { weight: 1.1 },
         ...commonOptions,
       },
       {
         indexUid: 'drip_lists',
-        filter: [`name IS NOT NULL AND chain = ${network.gqlName}`],
+        filter: [`name IS NOT NULL AND chain = ${network.gqlName} AND isVisible = true`],
         q,
         ...commonOptions,
       },
