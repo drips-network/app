@@ -1,7 +1,7 @@
 ---
 title: 'Q4 Feature Roundup: Gasless claiming, Filecoin, Embeddable support buttons'
 date: '2024-12-18'
-coverImage: '/assets/blog-images/open-source-collective.png'
+coverImage: '/assets/blog-images/feature-roundup-q4-2024.png'
 coverImageAlt: 'Collaborative Drip List illustration'
 excerpt: "Let's review some of the exciting new features we shipped this quarter."
 author: 'jason'
