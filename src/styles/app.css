@@ -4,7 +4,6 @@
 @import 'colors.css';
 @import 'elevation.css';
 @import 'typography.css';
-@import 'projects.css';
 
 html.smoothscroll {
   scroll-behavior: smooth;

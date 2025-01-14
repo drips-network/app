@@ -20,17 +20,12 @@
 
 <script lang="ts">
   import Section from '$lib/components/section/section.svelte';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import isClaimed from '$lib/utils/project/is-claimed';
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
-  import getProjectColor from './project-color';
-  import ProjectCard, {
-    PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/project-card/project-card.svelte';
+  import { PROJECT_CARD_FRAGMENT } from '$lib/components/project-card/project-card.svelte';
   import { gql } from 'graphql-request';
+  import ProjectsGrid from './projects-grid.svelte';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
 
@@ -55,15 +50,5 @@
   }}
   skeleton={{ loaded: true }}
 >
-  <div class="projects-grid">
-    {#each recentlyClaimedProjects as project}
-      <div>
-        {#if isClaimed(filterCurrentChainData(project.chainData))}
-          <PrimaryColorThemer colorHex={getProjectColor(project)}>
-            <ProjectCard {project} />
-          </PrimaryColorThemer>
-        {/if}
-      </div>
-    {/each}
-  </div>
+  <ProjectsGrid projects={recentlyClaimedProjects} />
 </Section>

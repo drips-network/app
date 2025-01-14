@@ -13,8 +13,6 @@
   import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
-  import ProjectCard from '$lib/components/project-card/project-card.svelte'; // PROJECT_CARD_FRAGMENT,
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import { PUBLIC_NETWORK } from '$env/static/public';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
@@ -28,8 +26,6 @@
   import DripListCard, {
     DRIP_LIST_CARD_FRAGMENT,
   } from '$lib/components/drip-list-card/drip-list-card.svelte';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import type {
     DefaultExplorePageFeaturedDripListsFragment,
@@ -39,8 +35,8 @@
   import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
-  import getProjectColor from './project-color';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
+  import ProjectsGrid from './projects-grid.svelte';
 
   const FEATURED_WEB_3_PROJECTS_ACCOUNT_IDS =
     {
@@ -175,17 +171,7 @@
     }}
   >
     <div class="horizontal-scroll">
-      <div class="projects-grid featured-projects">
-        {#each featuredProjects as project}
-          <div>
-            {#if isClaimed(filterCurrentChainData(project.chainData))}
-              <PrimaryColorThemer colorHex={getProjectColor(project)}>
-                <ProjectCard {project} />
-              </PrimaryColorThemer>
-            {/if}
-          </div>
-        {/each}
-      </div>
+      <ProjectsGrid projects={featuredProjects} />
     </div>
   </Section>
 
@@ -229,17 +215,7 @@
     }}
   >
     <div class="horizontal-scroll">
-      <div class="projects-grid featured-projects">
-        {#each featuredWeb3Projects as project}
-          <div>
-            {#if isClaimed(filterCurrentChainData(project.chainData))}
-              <PrimaryColorThemer colorHex={getProjectColor(project)}>
-                <ProjectCard {project} />
-              </PrimaryColorThemer>
-            {/if}
-          </div>
-        {/each}
-      </div>
+      <ProjectsGrid projects={featuredWeb3Projects} />
     </div>
   </Section>
 
@@ -297,18 +273,6 @@
 
   .horizontal-scroll {
     overflow-x: auto;
-  }
-
-  @media (max-width: 767px) {
-    .featured-projects {
-      display: flex;
-      gap: 1rem;
-      padding: 4px;
-    }
-
-    .featured-projects > div {
-      width: 14rem;
-    }
   }
 
   .drip-list-cards-grid {
