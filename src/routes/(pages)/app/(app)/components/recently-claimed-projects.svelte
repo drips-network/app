@@ -67,14 +67,3 @@
     {/each}
   </div>
 </Section>
-
-<style>
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-    gap: 1rem;
-    max-width: 100%;
-    position: relative;
-    padding: 4px;
-  }
-</style>
