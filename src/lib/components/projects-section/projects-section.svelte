@@ -61,7 +61,7 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: visibleProjects?.length === 0,
+    empty: showVisibilityToggle ? projects.length === 0 : visibleProjects.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',
