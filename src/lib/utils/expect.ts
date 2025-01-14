@@ -27,7 +27,7 @@ interface MetExpectation<T> {
 export default async function expect<T extends (() => any) | (() => Promise<any>)>(
   func: T,
   toMatchCondition: (result: Awaited<ReturnType<T>>) => boolean,
-  within = 5000,
+  within = 300000,
   checkingEvery = 1000,
   debug = false,
 ): Promise<MetExpectation<Awaited<ReturnType<T>>> | FailedExpectation> {

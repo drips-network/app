@@ -2,50 +2,93 @@
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import CloseIcon from '$lib/components/icons/CrossSmall.svelte';
 
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { tick } from 'svelte';
   import { sineIn, sineInOut, sineOut } from 'svelte/easing';
-  import { fade, fly } from 'svelte/transition';
-  import search, { updateSearchItems } from './search';
+  import { fly } from 'svelte/transition';
   import scroll from '$lib/stores/scroll';
-  import tokens from '$lib/stores/tokens';
-  import wallet from '$lib/stores/wallet/wallet.store';
   import Results from './components/results.svelte';
-
-  const dispatch = createEventDispatcher<{ dismiss: void }>();
-
-  let focus = false;
-
-  $: focus ? scroll.lock() : scroll.unlock();
+  import { search } from './search';
+  import type { Result } from './types';
+  import InfoCircle from '../icons/InfoCircle.svelte';
+  import { browser } from '$app/environment';
 
   let searchTerm: string | undefined;
 
   let searchElem: HTMLDivElement;
 
-  function closeSearch() {
-    searchTerm = '';
-    searchElem.blur();
-    focus = false;
+  export let searchOpen = false;
 
-    dispatch('dismiss');
+  async function focusOnSearch() {
+    await tick();
+    searchElem.focus();
   }
 
-  let loading = false;
-
-  let results: ReturnType<typeof search> = [];
-  $: results = search(searchTerm);
-
   $: {
-    $tokens;
-    if (!loading) {
-      updateSearchItems($wallet.dripsAccountId);
-      results = search(searchTerm);
+    if (searchOpen && browser) {
+      scroll.lock();
+      focusOnSearch();
+    } else if (browser) {
+      scroll.unlock();
     }
   }
 
-  let resultElems: HTMLDivElement[] = [];
-  $: accountMenuItemElems = resultElems.map((e) => e?.firstChild);
+  $: {
+    if (!searchOpen) searchTerm = undefined;
+  }
+
+  function closeSearch() {
+    searchOpen = false;
+  }
+
+  let loading = false;
+  let error = false;
+
+  let results: Result[] = [];
+  let resultElems: HTMLElement[] = [];
+
+  let searchTimeout: ReturnType<typeof setTimeout>;
+  let searchNumber = 0;
+
+  function handleSearchTermChange(searchTerm: string | undefined) {
+    clearTimeout(searchTimeout);
+
+    if (!searchTerm) {
+      results = [];
+      loading = false;
+      return;
+    }
+
+    loading = true;
+
+    searchTimeout = setTimeout(async () => {
+      const currentSearchNumber = searchNumber;
+      searchNumber++;
+
+      try {
+        results = await search(searchTerm);
+
+        // prevent in-flight requests from overwriting the results
+        if (currentSearchNumber !== searchNumber - 1) return;
+
+        loading = false;
+        error = false;
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        loading = false;
+        error = true;
+      }
+    }, 300);
+  }
+  $: handleSearchTermChange(searchTerm);
 
   function handleKeyboard(e: KeyboardEvent) {
+    if (e.metaKey && e.key === 'k') {
+      searchOpen = true;
+      e.preventDefault();
+      return;
+    }
+
     if (e.key === 'Escape') {
       closeSearch();
       return;
@@ -56,104 +99,81 @@
     const focussedElem = document.activeElement;
 
     if (!focussedElem) return;
-    if (
-      !(
-        focussedElem === searchElem || accountMenuItemElems.includes(focussedElem as HTMLDivElement)
-      )
-    ) {
+    if (!(focussedElem === searchElem || resultElems.includes(focussedElem as HTMLDivElement))) {
       closeSearch();
       return;
     }
 
-    const selectedIndex = accountMenuItemElems.findIndex((e) => e === focussedElem);
+    const selectedIndex = resultElems.findIndex((e) => e === focussedElem);
     const changeIndexBy = e.key === 'ArrowDown' ? +1 : -1;
     const nextElem = resultElems[selectedIndex + changeIndexBy];
 
     if (nextElem) {
-      (nextElem.firstChild as HTMLElement)?.focus();
+      (nextElem as HTMLElement)?.focus();
     } else if (selectedIndex === 0 && changeIndexBy === -1) {
       searchElem.focus();
     }
 
     e.preventDefault();
   }
-
-  function handleSearchBlur(e: FocusEvent) {
-    const focussedElem = e.relatedTarget as HTMLElement;
-
-    if (!accountMenuItemElems.includes(focussedElem) && focussedElem !== searchElem) {
-      searchTerm = undefined;
-      closeSearch();
-    }
-  }
-
-  onMount(() => {
-    searchElem.focus();
-  });
 </script>
 
 <svelte:window on:keydown={handleKeyboard} />
 
-<div class="search-bar" class:focus>
-  <div class="search-bar-input-wrapper">
-    <SearchIcon style="fill: var(--color-foreground)" />
-    <input
-      type="text"
-      placeholder="Search addresses, accounts, streams..."
-      bind:this={searchElem}
-      bind:value={searchTerm}
-      on:focus={() => (focus = true)}
-      on:focusout={handleSearchBlur}
-      autocomplete="off"
-    />
-    {#if focus}<div transition:fly={{ duration: 300, y: 4 }}>
-        <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
-      </div>{/if}
-  </div>
-  {#if focus && searchTerm}
-    <div
-      in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
-      out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
-      class="results"
-      on:focusout={handleSearchBlur}
-    >
-      <Results bind:resultElems {results} {loading} on:click={closeSearch} />
+{#if searchOpen}
+  <div
+    class="search-bar"
+    class:focus={searchOpen}
+    transition:fly={{ duration: 300, x: 64, easing: sineInOut }}
+  >
+    <div class="search-bar-input-wrapper">
+      <SearchIcon style="fill: var(--color-foreground)" />
+      <input
+        type="text"
+        placeholder="Search claimed projects, Drip Lists and addresses"
+        bind:this={searchElem}
+        bind:value={searchTerm}
+        autocomplete="off"
+      />
+      {#if searchOpen}<div transition:fly={{ duration: 300, y: 4 }}>
+          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
+        </div>{/if}
     </div>
-  {/if}
-</div>
-
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-{#if focus}<div
-    class="overlay"
-    on:click={closeSearch}
-    on:keydown={closeSearch}
-    transition:fade={{ duration: 200, easing: sineInOut }}
-  />{/if}
+    {#if searchOpen}
+      <div
+        class="hint typo-text-small"
+        in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
+        out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+      >
+        <InfoCircle /> Paste a GitHub URL to jump to that project
+      </div>
+    {/if}
+    {#if searchOpen && searchTerm}
+      <div
+        in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
+        out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+        class="results"
+      >
+        <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <style>
-  .search-bar {
-    display: block;
-  }
-
-  .search-bar.focus {
-    background-color: var(--color-foreground-level-1);
-    box-shadow: var(--elevation-medium);
-  }
-
   input {
     height: 3rem;
     width: 100%;
+    text-overflow: ellipsis;
   }
 
   input:focus {
     outline: none;
-  }
-
-  input::placeholder {
-    color: var(--color-foreground-level-4);
+    text-overflow: ellipsis;
   }
 
   .search-bar {
+    display: block;
     display: flex;
     align-items: center;
     height: 3rem;
@@ -170,6 +190,11 @@
       box-shadow 0.3s;
   }
 
+  .search-bar.focus {
+    background-color: var(--color-foreground-level-1);
+    box-shadow: var(--elevation-medium);
+  }
+
   .search-bar:hover:not(.focus) {
     box-shadow: var(--elevation-low);
   }
@@ -182,15 +207,16 @@
     gap: 1rem;
   }
 
-  .overlay {
-    position: fixed;
-    /* top: 4rem; */
+  .hint {
+    position: absolute;
+    top: 4rem;
     right: 0;
     left: 0;
-    bottom: 0;
-    background-color: var(--color-background);
-    opacity: 0.75;
-    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-foreground-level-5);
   }
 
   .results {
@@ -201,38 +227,27 @@
     display: flex;
     justify-content: center;
     z-index: 2;
-    max-height: calc(100vh - 6rem);
+    max-height: calc(100dvh - 6rem);
     overflow: scroll;
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    padding: 0.5rem;
     box-shadow: var(--elevation-medium);
   }
 
   @media (max-width: 768px) {
     .search-bar {
-      width: calc(100vw - 2rem);
-      left: 1rem;
+      width: calc(100vw - 1rem);
+      left: 0.5rem;
     }
 
     .search-bar-input-wrapper {
-      padding: 1rem;
-    }
-
-    .overlay {
-      opacity: 1;
+      padding: 1rem 0.5rem;
+      gap: 0.25rem;
     }
 
     .results {
-      border: none;
-      box-shadow: none;
-      padding: 0 0.5rem;
-      top: 3.5rem;
-      left: -1rem;
-      right: -1rem;
-      border-radius: 0;
-      min-height: 100vh;
+      padding: 0;
     }
   }
 </style>

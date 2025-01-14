@@ -13,6 +13,7 @@ import type {
   LatestAccountMetadataHashQuery,
   LatestAccountMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
+import stripTrailingSlash from './strip-trailing-slash';
 
 /**
  * Fetch the given hash from IPFS.
@@ -21,7 +22,7 @@ import type {
  * gateway.
  */
 export async function fetchIpfs(hash: string, f = fetch) {
-  return f(`${PUBLIC_PINATA_GATEWAY_URL}/ipfs/${hash}`);
+  return f(`${stripTrailingSlash(PUBLIC_PINATA_GATEWAY_URL)}/ipfs/${hash}`);
 }
 
 /**
