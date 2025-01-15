@@ -59,7 +59,7 @@ export default (dripList: EditDripListFlowDripListFragment) => {
         component: SuccessStep,
         props: {
           safeAppMode: Boolean(get(walletStore).safe),
-          message: 'Your Drip List has been updated. Please refresh the page to see the changes.',
+          message: 'Your Drip List has been updated.',
         },
       }),
     ],
