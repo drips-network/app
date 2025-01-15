@@ -10,18 +10,24 @@
 
   let imageUrl = `/api/share-images/blog-post/og/${encodeURIComponent(data.meta.slug)}.png`;
 
+  const safeSanitize = (str: string) =>
+    sanitize(str, {
+      allowedTags: [],
+      allowedAttributes: {},
+    });
+
   // Structured meta for SEO
   const ldJsonMetadata = `{
     "@context": "https://schema.org",
     "@type": "NewsArticle",
-    "headline": "${sanitize(data.meta.title)}",
+    "headline": "${safeSanitize(data.meta.title)}",
     "image": [
-      "${BASE_URL}${sanitize(data.meta.coverImage)}"
+      "${BASE_URL}${safeSanitize(data.meta.coverImage)}"
       ],
     "datePublished": "${new Date(data.meta.date).toISOString()}",
     "author": [{
         "@type": "Person",
-        "name": "${sanitize(data.meta.author?.name ?? 'Drips Team')}"
+        "name": "${safeSanitize(data.meta.author?.name ?? 'Drips Team')}"
       }]
   }`;
 </script>
