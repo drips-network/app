@@ -11,7 +11,7 @@ import type {
   ExploreProjectsQuery,
   ExploreProjectsQueryVariables,
 } from './__generated__/gql.generated';
-import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from './default-explore-page.svelte';
+import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from './recently-claimed-projects.svelte';
 
 export const fetchProjectsQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}

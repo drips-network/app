@@ -1,22 +1,4 @@
 <script lang="ts" context="module">
-  export const DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT = gql`
-    ${PROJECT_CARD_FRAGMENT}
-    fragment DefaultExplorePageFeaturedProject on Project {
-      ...ProjectCard
-      account {
-        accountId
-      }
-      chainData {
-        ... on ClaimedProjectData {
-          chain
-        }
-        ... on UnClaimedProjectData {
-          chain
-        }
-      }
-    }
-  `;
-
   export const DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
     fragment DefaultExplorePageFeaturedDripLists on DripList {
@@ -31,10 +13,6 @@
   import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
-  import ProjectCard, {
-    PROJECT_CARD_FRAGMENT,
-  } from '$lib/components/project-card/project-card.svelte';
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import { PUBLIC_NETWORK } from '$env/static/public';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
@@ -48,8 +26,6 @@
   import DripListCard, {
     DRIP_LIST_CARD_FRAGMENT,
   } from '$lib/components/drip-list-card/drip-list-card.svelte';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import type {
     DefaultExplorePageFeaturedDripListsFragment,
@@ -59,7 +35,8 @@
   import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
-  import getProjectColor from './project-color';
+  import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
+  import ProjectsGrid from './projects-grid.svelte';
 
   const FEATURED_WEB_3_PROJECTS_ACCOUNT_IDS =
     {
@@ -117,13 +94,6 @@
   $: blogPosts = blogPosts
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 2);
-
-  // I (jason) sometimes claim projects for testing purposes. crude way to get rid of those
-  $: projectsWithoutJasonTests = projects.filter(
-    (p) => !p.source.repoName.includes('drips-test-repo'),
-  );
-
-  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
 
   let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
   function update() {
@@ -201,17 +171,7 @@
     }}
   >
     <div class="horizontal-scroll">
-      <div class="projects-grid featured-projects">
-        {#each featuredProjects as project}
-          <div>
-            {#if isClaimed(filterCurrentChainData(project.chainData))}
-              <PrimaryColorThemer colorHex={getProjectColor(project)}>
-                <ProjectCard {project} />
-              </PrimaryColorThemer>
-            {/if}
-          </div>
-        {/each}
-      </div>
+      <ProjectsGrid projects={featuredProjects} />
     </div>
   </Section>
 
@@ -255,46 +215,11 @@
     }}
   >
     <div class="horizontal-scroll">
-      <div class="projects-grid featured-projects">
-        {#each featuredWeb3Projects as project}
-          <div>
-            {#if isClaimed(filterCurrentChainData(project.chainData))}
-              <PrimaryColorThemer colorHex={getProjectColor(project)}>
-                <ProjectCard {project} />
-              </PrimaryColorThemer>
-            {/if}
-          </div>
-        {/each}
-      </div>
+      <ProjectsGrid projects={featuredWeb3Projects} />
     </div>
   </Section>
 
-  <Section
-    header={{
-      icon: BoxIcon,
-      label: 'Recently claimed projects',
-      actions: [
-        {
-          label: 'See all',
-          href: '/app/projects/all',
-          icon: Box,
-        },
-      ],
-    }}
-    skeleton={{ loaded: true }}
-  >
-    <div class="projects-grid">
-      {#each recentlyClaimedProjects as project}
-        <div>
-          {#if isClaimed(filterCurrentChainData(project.chainData))}
-            <PrimaryColorThemer colorHex={getProjectColor(project)}>
-              <ProjectCard {project} />
-            </PrimaryColorThemer>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  </Section>
+  <RecentlyClaimedProjects {projects} />
 
   <LatestNewsSection {blogPosts} />
 
@@ -346,29 +271,8 @@
     color: var(--color-primary);
   }
 
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-    gap: 1rem;
-    max-width: 100%;
-    position: relative;
-    padding: 4px;
-  }
-
   .horizontal-scroll {
     overflow-x: auto;
-  }
-
-  @media (max-width: 767px) {
-    .featured-projects {
-      display: flex;
-      gap: 1rem;
-      padding: 4px;
-    }
-
-    .featured-projects > div {
-      width: 14rem;
-    }
   }
 
   .drip-list-cards-grid {
