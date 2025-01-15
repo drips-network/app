@@ -32,6 +32,8 @@
   import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import network from '$lib/stores/wallet/network';
+  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -116,7 +118,8 @@
             1000,
           );
 
-          // TODO(streams): invalidate appropriate load function
+          await invalidateAccountCache(dripListId);
+          await invalidateAll();
 
           $context.dripListId = dripListId;
         },
