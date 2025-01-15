@@ -14,7 +14,7 @@ Q4 was a busy time for us at Drips — alongside our entire team [attending Devc
 
 # 💧 Drips drops on Filecoin
 
-We're immensely excited to partner with the Protocol Labs ecosystem as the distribution mechanism of choice for [FIL-RetroPGF-2](https://www.fil-retropgf.io/). In early January, the rewards for the second round of Filecoin's Retroactive Public Goods Funding program will be distributed through Drips — directly on Filecoin Mainnet.
+We're immensely excited to partner with the Protocol Labs ecosystem as the distribution mechanism of choice for [FIL-RetroPGF-2](https://www.fil-retropgf.io/). In January, the rewards for the second round of Filecoin's Retroactive Public Goods Funding program will be distributed through Drips — directly on Filecoin Mainnet.
 
 ![The Explore Page on Drips Filecoin](/assets/blog-images/drips-on-filecoin.png)
 
