@@ -4,6 +4,8 @@
 # Use the official Node.js 22 image as a base
 FROM node:22
 
+ARG ROBOTS_FILE=robots-disallow.txt
+
 # Set host environment variables
 # Based on .env.template
 # See https://docs.railway.app/guides/dockerfiles#using-variables-at-build-time
@@ -84,7 +86,7 @@ RUN npm install husky@9 -g
 RUN npm run prepare
 
 # Set up robots
-RUN mv robots-disallow.txt ./static/robots.txt
+RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
 # Build graphql types
 RUN npm run build:graphql
