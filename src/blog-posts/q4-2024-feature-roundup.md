@@ -1,14 +1,14 @@
 ---
-title: 'Q4 Feature Roundup: Gasless claiming, Filecoin, Embeddable support buttons'
-date: '2024-12-18'
+title: 'Q4 Roundup: Gasless claiming, Filecoin, Embeddable support buttons'
+date: '2025-01-15'
 coverImage: '/assets/blog-images/feature-roundup-q4-2024.png'
 coverImageAlt: 'Collaborative Drip List illustration'
-excerpt: "Let's review some of the exciting new features we shipped this quarter."
+excerpt: "Let's review some of the exciting new features we shipped last quarter."
 author: 'jason'
 announcementBannerCopy: 'Drips launches Gasless Claiming on Filecoin, embeddable support buttons, and more'
 ---
 
-Happy New Year from the Drips team & we’re kicking it off with a new tradition: quarterly blog updates to keep you in the loop about our latest features, achievements, and plans for the future.
+Happy New Year from the Drips team! We’re kicking it off with a new tradition: quarterly blog updates to keep you in the loop about our latest features, achievements, and plans for the future.
 
 Q4 was a busy time for us at Drips — alongside our entire team [attending Devcon SEA in Bangkok](https://x.com/dripsnetwork/status/1859174903133405211), we've also been hard at work launching Drips on an entirely new chain, and shipping a number of key improvements all across our platform. Let's dive a little deeper into some of the biggest new features launched in Q4!
 
