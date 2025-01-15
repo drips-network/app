@@ -233,7 +233,7 @@ const walletStore = () => {
 
                 await provider.send('wallet_addEthereumChain', [
                   {
-                    chainId: network.chainId,
+                    chainId: network.id,
                     blockExplorerUrls: network.addToWalletConfig.blockExplorerUrls,
                     chainName: network.name,
                     nativeCurrency: network.addToWalletConfig.nativeCurrency,
