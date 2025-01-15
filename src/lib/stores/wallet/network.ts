@@ -61,6 +61,17 @@ export type Network = {
   ensSupported: boolean;
   ensAddress: string | undefined;
   gaslessClaimAndCollect: boolean;
+  addToWalletConfig:
+    | {
+        blockExplorerUrls: string[];
+        nativeCurrency: {
+          decimals: number;
+          name: string;
+          symbol: string;
+        };
+        rpcUrls: string[];
+      }
+    | undefined;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -110,6 +121,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [80002]: {
     chainId: 80002,
@@ -150,6 +162,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [11155420]: {
     chainId: 11155420,
@@ -190,6 +203,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [11155111]: {
     chainId: 11155111,
@@ -230,6 +244,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gaslessClaimAndCollect: true,
+    addToWalletConfig: undefined,
   },
   [84532]: {
     chainId: 84532,
@@ -270,6 +285,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [314]: {
     chainId: 314,
@@ -309,6 +325,19 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://filecoin.blockscout.com/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Filecoin',
+        symbol: 'FIL',
+      },
+      rpcUrls: [
+        'https://api.node.glif.io/rpc/v1',
+        'https://filecoin.chainup.net/rpc/v1',
+        'https://rpc.ankr.com/filecoin',
+      ],
+    },
   },
   [1088]: {
     chainId: 1088,
@@ -348,6 +377,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://explorer.metis.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Metis',
+        symbol: 'METIS',
+      },
+      rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
   },
 };
 

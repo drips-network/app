@@ -23,6 +23,7 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import assert from '$lib/utils/assert';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -228,21 +229,15 @@ const walletStore = () => {
             secondaryButton: {
               label: `Add ${network.label} to wallet`,
               handler: async () => {
+                assert(network.addToWalletConfig, 'Network must have an addToWalletConfig');
+
                 await provider.send('wallet_addEthereumChain', [
                   {
-                    chainId: '0x13a',
-                    blockExplorerUrls: ['https://filecoin.blockscout.com/'],
-                    chainName: 'Filecoin',
-                    nativeCurrency: {
-                      decimals: 18,
-                      name: 'Filecoin',
-                      symbol: 'FIL',
-                    },
-                    rpcUrls: [
-                      'https://api.node.glif.io/rpc/v1',
-                      'https://filecoin.chainup.net/rpc/v1',
-                      'https://rpc.ankr.com/filecoin',
-                    ],
+                    chainId: network.chainId,
+                    blockExplorerUrls: network.addToWalletConfig.blockExplorerUrls,
+                    chainName: network.name,
+                    nativeCurrency: network.addToWalletConfig.nativeCurrency,
+                    rpcUrls: network.addToWalletConfig.rpcUrls,
                   },
                 ]);
 
