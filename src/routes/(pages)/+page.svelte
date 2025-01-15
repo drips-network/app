@@ -1,5 +1,5 @@
 <script lang="ts">
-  import LpHeader from './components/lp-header.svelte';
+  import LpHeader, { type AnnouncementBannerConfig } from './components/lp-header.svelte';
   import isRunningInSafe from '$lib/utils/is-running-in-safe';
   import { goto } from '$app/navigation';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -51,12 +51,7 @@
   ];
   let heroTextsIndex = 0;
 
-  let announcementBannerConfig:
-    | {
-        title: string;
-        link: string;
-      }
-    | undefined;
+  let announcementBannerConfig: AnnouncementBannerConfig | undefined;
   $: {
     const sortedPosts = data.blogPosts.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),

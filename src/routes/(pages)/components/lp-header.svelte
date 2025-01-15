@@ -1,3 +1,10 @@
+<script lang="ts" context="module">
+  export type AnnouncementBannerConfig = {
+    title: string;
+    link: string;
+  };
+</script>
+
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
@@ -11,12 +18,7 @@
 
   $: scrolledDown = $scrollStore.pos > 10;
 
-  export let announcementBanner:
-    | {
-        title: string;
-        link: string;
-      }
-    | undefined = undefined;
+  export let announcementBanner: AnnouncementBannerConfig | undefined = undefined;
 
   let firstRender = true;
   onMount(() => {
