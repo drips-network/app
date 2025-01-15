@@ -2,6 +2,7 @@ import { PUBLIC_NETWORK } from '$env/static/public';
 import Base from '$lib/components/icons/networks/Base.svelte';
 import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 import Filecoin from '$lib/components/icons/networks/Filecoin.svelte';
+import Metis from '$lib/components/icons/networks/Metis.svelte';
 import Optimism from '$lib/components/icons/networks/Optimism.svelte';
 import Polygon from '$lib/components/icons/networks/Polygon.svelte';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
@@ -10,7 +11,7 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
+export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314, 1088] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
@@ -303,6 +304,45 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
         'Funds from projects, streams and Drip Lists on Filecoin settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    ensSupported: false,
+    ensAddress: undefined,
+    gaslessClaimAndCollect: true,
+  },
+  [1088]: {
+    chainId: 1088,
+    name: 'metis',
+    label: 'Metis',
+    token: 'METIS',
+    id: '0x440',
+    rpcUrl: 'https://andromeda.metis.io/?owner=1088',
+    icon: Metis,
+    color: '#00D2FF',
+    isTestnet: false,
+    subdomain: 'metis.drips.network',
+    gqlName: SupportedChain.Metis,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: false,
+    explorer: {
+      name: 'Metis Explorer',
+      linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x749c34e4028c89c8308c78860C659E5909204d4a',
+      DRIPS: '0x6dc0d80E170B0f3AeB5b7354e5deE674F02202d7',
+      CALLER: '0x0a7f9CeeC82fDeDd262813FFbd9F913d6a25a4b5',
+      REPO_DRIVER: '0x2dA9a9322BC5FFE1DEE59Ae90f2E4656Cb552BB0',
+      NFT_DRIVER: '0xb112E3909901BC7D1Bf81f5384a76e75364C7e67',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on Metis settle and become collectable once per day.',
     },
     alternativeChainMode: true,
     ensSupported: false,
