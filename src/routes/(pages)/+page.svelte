@@ -1,5 +1,5 @@
 <script lang="ts">
-  import LpHeader from './components/lp-header.svelte';
+  import LpHeader, { type AnnouncementBannerConfig } from './components/lp-header.svelte';
   import isRunningInSafe from '$lib/utils/is-running-in-safe';
   import { goto } from '$app/navigation';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -50,11 +50,26 @@
     'Incentivize developers within your ecosystem',
   ];
   let heroTextsIndex = 0;
+
+  let announcementBannerConfig: AnnouncementBannerConfig | undefined;
+  $: {
+    const sortedPosts = data.blogPosts.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+    const latestPostWithAnnouncementConfig = sortedPosts.find((p) => p.announcementBannerCopy);
+
+    announcementBannerConfig = latestPostWithAnnouncementConfig?.announcementBannerCopy
+      ? {
+          title: latestPostWithAnnouncementConfig.announcementBannerCopy,
+          link: `/blog/posts/${latestPostWithAnnouncementConfig.slug}`,
+        }
+      : undefined;
+  }
 </script>
 
 <HeadMeta title="Drips | Funding that flows" />
 
-<LpHeader />
+<LpHeader announcementBanner={announcementBannerConfig} />
 <div class="page">
   <div class="wrapper">
     <!-- hero graph -->
@@ -64,6 +79,7 @@
         style:justify-content="center"
         style:overflow="hidden"
         style:width="100%"
+        style:margin-top="2.5rem"
       >
         <div class="big-hero-graph">
           <LpHeroBigGraph />

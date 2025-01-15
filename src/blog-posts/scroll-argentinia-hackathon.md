@@ -4,6 +4,7 @@ date: '2024-08-20'
 coverImage: '/assets/blog-images/scroll.jpg'
 coverImageAlt: 'Drips x Scroll logo'
 excerpt: 'Scroll is using Drips to power the voting and funding process for the Level Up hackathon in Argentina.'
+author: 'becca'
 ---
 
 Recently, we had a conversation with our friends at [Scroll](https://scroll.io/), and it sparked an exciting opportunity: Scroll has chosen to use Drips to power the voting and funding process for the Level Up hackathon in Argentina. This collaboration is a huge step forward in our shared mission to **incentivise and reward open source developers**.
