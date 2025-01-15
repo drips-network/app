@@ -7,26 +7,18 @@ import contractConstants from './sdk/utils/contract-constants';
 import network from '$lib/stores/wallet/network';
 import cacheKey from './cache/remote/cache-key';
 
-const STREAMS = [
-  // ENS USDC
-  {
-    token: {
-      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    },
-    started: new Date('May 20, 2024, 10:04 PM').getTime(),
-    amtPerSec: '3215277777777',
-  },
-  // Second FTC list USDGLO (they have two lists for some reason) https://www.drips.network/app/drip-lists/36167722434539895740687283110259945938004377627588501179309095983175
-  {
-    token: {
-      address: '0x4f604735c1cf31399c6e711d5962b2b3e0225ad3',
-    },
-    started: new Date('March 8, 2024, 11:34 PM').getTime(),
-    amtPerSec: '385802469135802469135802',
-  },
-];
+const STREAMS: {
+  token: { address: string };
+  started: number;
+  amtPerSec: string;
+}[] = [];
 
 const GIVES = [
+  // ENS USDC (total of the completed stream) https://www.drips.network/app/219944633562831898862545170897344561225692372227/tokens/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/streams/465197764
+  {
+    tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    amount: '50000000000',
+  },
   // Octant https://drips.network/app/drip-lists/30178668158349445547603108732480118476541651095408979232800331391215
   // Total of the stream which is now stopped
   {
@@ -57,12 +49,18 @@ const GIVES = [
     tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     amount: '22500800698',
   },
+  // FTC Hackathon https://www.drips.network/app/drip-lists/52160683947500777897245112345440145070270524255497353311432845427957
+  {
+    tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    amount: '9000000000',
+  },
   // First FTC list USD (they have two for some reason) https://drips.network/app/drip-lists/36167722434539895740687283110259945938004377627588501179309095983174
   // The 10k matching donation we did for their list
   {
     tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     amount: '10000000000',
   },
+
   // First FTC list WETH (they have two for some reason) https://drips.network/app/drip-lists/36167722434539895740687283110259945938004377627588501179309095983174
   // Total of the stream which is now stopped
   {
