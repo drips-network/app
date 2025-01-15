@@ -93,6 +93,7 @@
                 account {
                   accountId
                 }
+                isVisible
               }
             }
           `;
@@ -113,7 +114,8 @@
 
           await expect(
             () => tryFetchList(dripListId),
-            (result) => (typeof result === 'boolean' ? result : Boolean(result.dripList)),
+            (result) =>
+              typeof result === 'boolean' ? result : Boolean(result.dripList?.isVisible),
             120000,
             1000,
           );
