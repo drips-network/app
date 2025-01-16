@@ -20,12 +20,13 @@
   import modal from '$lib/stores/modal';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   // import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
-  import checkIsUser from '$lib/utils/check-is-user';
-  import walletStore from '$lib/stores/wallet/wallet.store';
-  import ProjectCard, { PROJECT_CARD_FRAGMENT } from '$lib/components/project-card/project-card.svelte';
+  // import checkIsUser from '$lib/utils/check-is-user';
+  // import walletStore from '$lib/stores/wallet/wallet.store';
+  // import ProjectCard, { PROJECT_CARD_FRAGMENT } from '$lib/components/project-card/project-card.svelte';
   import Section from '$lib/components/section/section.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import VisibilityToggle from '$lib/components/visibility-toggle/visibility-toggle.svelte';
+  // import VisibilityToggle from '$lib/components/visibility-toggle/visibility-toggle.svelte';
+  import EcosystemCard, { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -36,14 +37,14 @@
   export let collapsed = false;
   export let collapsable = false;
 
-  let showHidden: boolean = false;
-  $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
+  // let showHidden: boolean = false;
+  // $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
 
   $: visibleProjects = projects.filter((p) => p.isVisible);
 
-  $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
+  // $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
-  $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
+  // $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
 </script>
 
 <Section
@@ -81,7 +82,7 @@
         {#if isClaimed(projectChainData)}
           <div>
             <PrimaryColorThemer colorHex={projectChainData.color}>
-              <ProjectCard {project} isHidden={!project.isVisible} />
+              <EcosystemCard {project} isHidden={!project.isVisible} />
             </PrimaryColorThemer>
           </div>
         {/if}
@@ -89,22 +90,22 @@
     </div>
   {/if}
 
-  {#if isOwner && showVisibilityToggle}
+  <!-- {#if isOwner && showVisibilityToggle}
     <VisibilityToggle bind:showHidden hiddenItemsCount={hiddenProjectsCount} />
-  {/if}
+  {/if} -->
 
-  <div class="projects">
+  <!-- <div class="projects">
     {#each hiddenProjects as project}
       {@const projectChainData = filterCurrentChainData(project.chainData)}
       {#if isClaimed(projectChainData)}
         <div>
           <PrimaryColorThemer colorHex={projectChainData.color}>
-            <ProjectCard {project} isHidden={!project.isVisible} />
+            <EcosystemCard {project} isHidden={!project.isVisible} />
           </PrimaryColorThemer>
         </div>
       {/if}
     {/each}
-  </div>
+  </div> -->
 </Section>
 
 <style>
