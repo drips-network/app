@@ -14,7 +14,7 @@ export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
-    redirect(307, buildUrl('/app/connect', { backTo: '/app/projects' }));
+    redirect(307, buildUrl('/app/connect', { backTo: '/app/ecosystems' }));
   }
 
   const projectsQuery = gql`
