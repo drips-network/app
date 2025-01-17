@@ -35,15 +35,19 @@
 
   // import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   // import ProjectName, {
-    // PROJECT_NAME_FRAGMENT,
+  // PROJECT_NAME_FRAGMENT,
   // } from '../project-badge/components/project-name.svelte';
   import { gql } from 'graphql-request';
   // import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
-  import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
-  import ProjectName, { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
+  import ProjectAvatar, {
+    PROJECT_AVATAR_FRAGMENT,
+  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import ProjectName, {
+    PROJECT_NAME_FRAGMENT,
+  } from '$lib/components/project-badge/components/project-name.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -51,10 +55,10 @@
 </script>
 
 <a
-  class="wrapper"
+  class="ecosystem-card-wrapper"
   href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
 >
-  <div class="project-card" class:hidden-project={isHidden}>
+  <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div
       class="background"
       style:background-color={isClaimed(projectChainData)
@@ -79,12 +83,12 @@
 </a>
 
 <style>
-  .wrapper {
+  .ecosystem-card-wrapper {
     padding: 2px 0;
     margin: -2px 0;
   }
 
-  .project-card {
+  .ecosystem-card {
     box-shadow: var(--elevation-low);
     border-radius: 1rem 0 1rem 1rem;
     padding: 1rem 0.75rem 0.75rem 0.75rem;
@@ -96,15 +100,16 @@
       box-shadow 0.2s,
       backgorund-color 0.2s,
       transform 0.2s;
+    height: 403px;
   }
 
-  .wrapper:hover:not(:active) .project-card,
-  .wrapper:focus-visible .project-card {
+  .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
+  .ecosystem-card-wrapper:focus-visible .ecosystem-card {
     box-shadow: var(--elevation-medium);
     transform: translateY(-2px);
   }
 
-  .wrapper:focus-visible {
+  .ecosystem-card-wrapper:focus-visible {
     outline: none;
     background-color: var(--color-foreground-level-1);
   }
