@@ -31,7 +31,7 @@
 
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
-  import Github from '$lib/components/icons/Github.svelte';
+  // import Github from '$lib/components/icons/Github.svelte';
 
   // import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   // import ProjectName, {
@@ -45,9 +45,7 @@
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
-  import ProjectName, {
-    PROJECT_NAME_FRAGMENT,
-  } from '$lib/components/project-badge/components/project-name.svelte';
+  import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -61,19 +59,25 @@
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="header">
-      <div class="network">Network</div>
-      <div class="avatar">
-        <ProjectAvatar project={projectChainData} size="large" outline />
-      </div>
+      <div class="network">TODO Network</div>
     </div>
-    <div class="name-and-description">
-      <div class="source">
+    <div class="details">
+      <!-- <div class="source">
         <div class="icon">
           <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
         </div>
         <span class="owner-name">{project.source.ownerName}</span>
+      </div> -->
+      <h1 class="name">
+        <span class="pixelated">
+          {project.source.repoName}
+          <!-- <ProjectName showSource={false} {project} /> -->
+        </span>
+      </h1>
+      <p class="description">The essential Ethereum ecosystem.</p>
+      <div class="avatar">
+        <ProjectAvatar project={projectChainData} size="large" outline />
       </div>
-      <h4 class="name"><ProjectName showSource={false} {project} /></h4>
     </div>
   </div>
 </a>
@@ -132,18 +136,12 @@
     );
   }
 
-  .name-and-description {
+  .details {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     justify-content: center;
-  }
-
-  .source {
-    display: flex;
-    align-items: center;
-    gap: 0.125rem;
-    color: var(--color-foreground-level-6);
+    text-align: center;
   }
 
   .hidden-project {
