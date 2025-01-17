@@ -8,17 +8,15 @@
 </script>
 
 <script lang="ts">
-  import Button from '$lib/components/button/button.svelte';
+  // import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
-  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
-  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
-  import CrossIcon from '$lib/components/icons/Cross.svelte';
-  import { fade } from 'svelte/transition';
-  import ProjectsSection, {
-    PROJECTS_SECTION_PROJECT_FRAGMENT,
-  } from '$lib/components/projects-section/projects-section.svelte';
+  // import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  // import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
+  // import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  // import CrossIcon from '$lib/components/icons/Cross.svelte';
+  // import { fade } from 'svelte/transition';
+  import { PROJECTS_SECTION_PROJECT_FRAGMENT } from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { gql } from 'graphql-request';
   import YourEcosystemsSection from './components/your-ecosystems-section.svelte';
@@ -35,7 +33,6 @@
 <HeadMeta title="Ecosystems" />
 
 <div class="page">
-
   <div class="section">
     {#if data.projects}
       <YourEcosystemsSection
@@ -64,7 +61,7 @@
     gap: 4rem;
   }
 
-  .card {
+  /* .card {
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
@@ -119,5 +116,5 @@
     .splitting-graph-edu.card .content {
       padding: 1rem;
     }
-  }
+  } */
 </style>
