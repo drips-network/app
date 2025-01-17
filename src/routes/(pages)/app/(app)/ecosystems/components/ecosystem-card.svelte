@@ -59,13 +59,9 @@
   href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
-    <div
-      class="background"
-      style:background-color={isClaimed(projectChainData)
-        ? 'var(--color-primary-level-2)'
-        : 'var(--color-foreground-level-1)'}
-    />
+    <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="header">
+      <div class="network">Network</div>
       <div class="avatar">
         <ProjectAvatar project={projectChainData} size="large" outline />
       </div>
@@ -119,8 +115,21 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 3rem;
+    height: 50%;
     border-radius: 1rem 0 0 0;
+    background: linear-gradient(
+      180deg,
+      var(--color-primary-level-2) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .background.background--unclaimed {
+    background: linear-gradient(
+      180deg,
+      var(--color-foreground-level-1) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
   }
 
   .name-and-description {
