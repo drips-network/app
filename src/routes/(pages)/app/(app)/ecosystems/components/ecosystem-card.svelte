@@ -46,7 +46,7 @@
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
-  import EcosystemNetwork from './ecosystem-network.svelte';
+  import EcosystemNetwork from './ecosystem-network-cosmograph.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
