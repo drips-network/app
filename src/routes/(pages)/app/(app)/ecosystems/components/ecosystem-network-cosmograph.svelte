@@ -28,5 +28,3 @@
 </script>
 
 <div class="ecosystem-network" bind:this={networkContainer}></div>
-
-// @ts-expect-error: any
