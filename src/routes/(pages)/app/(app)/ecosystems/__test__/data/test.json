@@ -1,4 +1,75 @@
 {
-  "nodes": [],
-  "edges": []
+  "nodes": [
+    {
+      "id": "1",
+      "color": "#88C6FF"
+    },
+    {
+      "id": "2",
+      "color": "#FF99D2"
+    },
+    {
+      "id": "3",
+      "color": [
+        227,
+        17,
+        108,
+        1
+      ]
+    },
+    {
+      "id": "4",
+      "color": "#50E3C2"
+    },
+    {
+      "id": "5",
+      "color": "#F5A623"
+    },
+    {
+      "id": "6",
+      "color": "#7ED321"
+    },
+    {
+      "id": "7",
+      "color": "#BD10E0"
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "1",
+      "target": "3"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    },
+    {
+      "source": "3",
+      "target": "4"
+    },
+    {
+      "source": "6",
+      "target": "7"
+    },
+    {
+      "source": "5",
+      "target": "4"
+    },
+    {
+      "source": "3",
+      "target": "6"
+    },
+    {
+      "source": "7",
+      "target": "2"
+    },
+    {
+      "source": "6",
+      "target": "2"
+    }
+  ]
 }
