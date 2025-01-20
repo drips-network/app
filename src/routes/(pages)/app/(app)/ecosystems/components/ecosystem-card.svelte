@@ -46,6 +46,7 @@
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
+  import EcosystemNetwork from './ecosystem-network.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -59,7 +60,9 @@
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="header">
-      <div class="network">TODO Network</div>
+      <div class="network">
+        <EcosystemNetwork />
+      </div>
     </div>
     <div class="details">
       <!-- <div class="source">
@@ -142,6 +145,14 @@
     gap: 0.25rem;
     justify-content: center;
     text-align: center;
+  }
+
+  .header {
+    height: 50%;
+  }
+
+  .network {
+    height: 100%;
   }
 
   .hidden-project {
