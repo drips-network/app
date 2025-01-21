@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import testData from '../__test__/data/test.json';
+  import testData from '../__test__/data/test1.json';
   import Graph from 'graphology';
   import forceAtlas2 from 'graphology-layout-forceatlas2';
   import type Sigma from 'sigma';
@@ -24,7 +24,7 @@
     graph = new Graph();
     for (const node of nodes) {
       const isPrimary = Math.random() > 0.75;
-      graph.addNode(node.id, {
+      graph.addNode(node.key, {
         color: isPrimary ? nodeColorSPrimary : nodeColorSecondary,
         label: 'thing',
         x: Math.random(),
