@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import testData from '../__test__/data/test.json';
+  import testData from '../__test__/data/test0.json';
   import { Cosmograph, type CosmographInputConfig } from '@cosmograph/cosmograph';
   import type { CosmosInputNode, CosmosInputLink } from '@cosmograph/cosmos';
 
