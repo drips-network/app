@@ -4,11 +4,11 @@
   import { Cosmograph, type CosmographInputConfig } from '@cosmograph/cosmograph';
   import type { CosmosInputNode, CosmosInputLink } from '@cosmograph/cosmos';
 
-  let networkContainer: HTMLDivElement;
+  let graphContainer: HTMLDivElement;
 
   const { nodes, edges } = testData;
 
-  function initializeNetwork() {
+  function initializeGraph() {
     const config: CosmographInputConfig<CosmosInputNode, CosmosInputLink> = {
       // @ts-expect-error: any
       nodeColor: (d) => d.color,
@@ -20,14 +20,14 @@
       fitViewDelay: 0,
       // ...
     };
-    const cosmograph = new Cosmograph(networkContainer, config);
+    const cosmograph = new Cosmograph(graphContainer, config);
     cosmograph.setData(nodes, edges);
     // TODO:
     // Stop wiggling around?
     // Borders around nodes
   }
 
-  onMount(initializeNetwork);
+  onMount(initializeGraph);
 </script>
 
-<div class="ecosystem-network" bind:this={networkContainer}></div>
+<div class="ecosystem-graph" bind:this={graphContainer}></div>
