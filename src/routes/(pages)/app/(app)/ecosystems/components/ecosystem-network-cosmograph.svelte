@@ -22,6 +22,9 @@
     };
     const cosmograph = new Cosmograph(networkContainer, config);
     cosmograph.setData(nodes, edges);
+    // TODO:
+    // Stop wiggling around?
+    // Borders around nodes
   }
 
   onMount(initializeNetwork);
