@@ -7,12 +7,12 @@
 
   let graph: Graph;
   let sigmaInstance: Sigma;
-  let networkContainer: HTMLDivElement;
+  let graphContainer: HTMLDivElement;
 
   const { nodes, edges } = testData;
 
-  async function initializeNetwork() {
-    const networkStyle = window.getComputedStyle(networkContainer);
+  async function initializeGraph() {
+    const networkStyle = window.getComputedStyle(graphContainer);
     const nodeColorSPrimary = networkStyle.getPropertyValue('--color-primary');
     const nodeColorSecondary = networkStyle.getPropertyValue('--color-foreground');
     const edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
@@ -40,7 +40,7 @@
 
     forceAtlas2.assign(graph, 50);
 
-    sigmaInstance = new Sigma(graph, networkContainer, {
+    sigmaInstance = new Sigma(graph, graphContainer, {
       defaultNodeType: 'bordered',
       nodeProgramClasses: {
         bordered: NodeBorderProgram,
@@ -53,13 +53,13 @@
     // Zoom to reasonable size
   }
 
-  onMount(initializeNetwork);
+  onMount(initializeGraph);
 </script>
 
-<div class="ecosystem-network" bind:this={networkContainer}></div>
+<div class="ecosystem-graph" bind:this={graphContainer}></div>
 
 <style>
-  .ecosystem-network {
+  .ecosystem-graph {
     height: 100%;
   }
 </style>
