@@ -47,7 +47,7 @@
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   // import EcosystemNetworkCosmograph from './ecosystem-network-cosmograph.svelte';
-  import EcosystemNetworkSigma from './ecosystem-network-sigma.svelte';
+  import EcosystemGraphSigma from './ecosystem-graph-sigma.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -61,9 +61,9 @@
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="header">
-      <div class="network">
+      <div class="graph">
         <!-- <EcosystemNetworkCosmograph /> -->
-        <EcosystemNetworkSigma />
+        <EcosystemGraphSigma />
       </div>
     </div>
     <div class="details">
@@ -153,7 +153,7 @@
     height: 50%;
   }
 
-  .network {
+  .graph {
     height: 100%;
   }
 
