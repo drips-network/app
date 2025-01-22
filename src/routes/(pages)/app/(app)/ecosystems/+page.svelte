@@ -25,6 +25,7 @@
   import Button from '$lib/components/button/button.svelte';
   import Ecosystem from '$lib/components/illustrations/ecosystem.svelte';
   import LinkIcon from '$lib/components/icons/Link.svelte';
+  import EduCardIllustration from '$lib/components/edu-card/edu-card-illustration.svelte';
 
   export let data;
 
@@ -50,10 +51,9 @@
       <Button icon={LinkIcon}>Learn more</Button>
     </svelte:fragment>
     <svelte:fragment slot="illustration">
-      <div class="edu-card-illustration-bg" />
-      <div class="edu-card-illustration-wrapper">
+      <EduCardIllustration>
         <Ecosystem />
-      </div>
+      </EduCardIllustration>
     </svelte:fragment>
   </EduCard>
   <!-- <div class="section">
@@ -142,7 +142,7 @@
   } */
 
   /* TODO: put within educard */
-  .edu-card-illustration-bg {
+  /* .edu-card-illustration-bg {
     position: absolute;
     background-color: var(--color-primary-level-2);
     top: 0;
@@ -162,5 +162,5 @@
       height: 30%;
       border-radius: 0;
     }
-  }
+  } */
 </style>
