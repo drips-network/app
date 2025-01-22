@@ -78,7 +78,7 @@
   }}
 >
   {#if visibleProjects}
-    <EcosystemsGrid ecosystems={visibleProjects} />
+    <EcosystemsGrid big ecosystems={visibleProjects} />
     <!-- <div class="projects">
       {#each visibleProjects as project}
         {@const projectChainData = filterCurrentChainData(project.chainData)}
