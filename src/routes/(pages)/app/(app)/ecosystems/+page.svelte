@@ -19,8 +19,12 @@
   import { PROJECTS_SECTION_PROJECT_FRAGMENT } from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { gql } from 'graphql-request';
-  import YourEcosystemsSection from './components/your-ecosystems-section.svelte';
+  // import YourEcosystemsSection from './components/your-ecosystems-section.svelte';
   import AllEcosystemsSection from './components/all-ecosystems-section.svelte';
+  import EduCard from '$lib/components/edu-card/edu-card.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import Ecosystem from '$lib/components/illustrations/ecosystem.svelte';
+  import LinkIcon from '$lib/components/icons/Link.svelte';
 
   export let data;
 
@@ -33,7 +37,26 @@
 <HeadMeta title="Ecosystems" />
 
 <div class="page">
-  <div class="section">
+  <EduCard dismissableId="ecosystems-page-intro" negativeMarginWhileCollapsed="-4rem">
+    <svelte:fragment slot="text">
+      <h1 class="pixelated">Ecosystems</h1>
+      <p>
+        Ecosystems are large collections of claimed and unclaimed projects networked together using
+        Drips AI. Sending funds to a single ecosystem is an efficient way to easily fund hundreds of
+        projects at once, supporting a whole community in one go.
+      </p>
+    </svelte:fragment>
+    <svelte:fragment slot="buttons">
+      <Button icon={LinkIcon}>Learn more</Button>
+    </svelte:fragment>
+    <svelte:fragment slot="illustration">
+      <div class="edu-card-illustration-bg" />
+      <div class="edu-card-illustration-wrapper">
+        <Ecosystem />
+      </div>
+    </svelte:fragment>
+  </EduCard>
+  <!-- <div class="section">
     {#if data.projects}
       <YourEcosystemsSection
         withClaimProjectButton
@@ -41,7 +64,7 @@
         showVisibilityToggle={true}
       />
     {/if}
-  </div>
+  </div> -->
 
   <div class="section">
     {#if data.projects}
@@ -117,4 +140,27 @@
       padding: 1rem;
     }
   } */
+
+  /* TODO: put within educard */
+  .edu-card-illustration-bg {
+    position: absolute;
+    background-color: var(--color-primary-level-2);
+    top: 0;
+    width: 35%;
+    height: 50%;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .edu-card-illustration-wrapper {
+    max-width: 16rem;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .edu-card-illustration-bg {
+      width: 100%;
+      height: 30%;
+      border-radius: 0;
+    }
+  }
 </style>
