@@ -16,9 +16,10 @@
   import { gql } from 'graphql-request';
 
   export let ecosystems: ProjectsSectionProjectFragment[];
+  export let big: boolean = false;
 </script>
 
-<div class="ecosystems-grid">
+<div class="ecosystems-grid" class:ecosystems-grid--big={big}>
   {#each ecosystems as ecosystem}
     {@const projectChainData = filterCurrentChainData(ecosystem.chainData)}
     {#if isClaimed(projectChainData)}
@@ -43,6 +44,10 @@
     max-width: 100%;
     position: relative;
     padding: 2px;
+  }
+
+  .ecosystems-grid.ecosystems-grid--big {
+    grid-template-columns: 1fr;
   }
 
   /* .ecosystems-grid > * {
