@@ -51,6 +51,7 @@
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
+
   let projectChainData = filterCurrentChainData(project.chainData);
 </script>
 
@@ -105,7 +106,7 @@
       box-shadow 0.2s,
       backgorund-color 0.2s,
       transform 0.2s;
-    height: 403px;
+    aspect-ratio: 1.807;
   }
 
   .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
