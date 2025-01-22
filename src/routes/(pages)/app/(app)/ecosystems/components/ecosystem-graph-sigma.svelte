@@ -18,8 +18,12 @@
     const edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
 
     // Can't be imported server side
-    const { Sigma } = await import('sigma');
-    const { NodeBorderProgram } = await import('@sigma/node-border');
+    // const { Sigma } = await import('sigma');
+    // const { NodeBorderProgram } = await import('@sigma/node-border');
+    const [{ Sigma }, { NodeBorderProgram }] = await Promise.all([
+      import('sigma'),
+      import('@sigma/node-border'),
+    ]);
 
     graph = new Graph();
     for (const node of nodes) {
@@ -46,11 +50,12 @@
         bordered: NodeBorderProgram,
       },
     });
-    sigmaInstance.refresh();
+    sigmaInstance.scheduleRefresh();
     // TODO:
     // Too many webgl contexts
-    // Border / outline around nodes: possible with https://www.sigmajs.org/storybook/?path=/story/sigma-node-border--node-border
+    // - We'll render images for the ecosystems grid
     // Zoom to reasonable size
+    // -
   }
 
   onMount(initializeGraph);
