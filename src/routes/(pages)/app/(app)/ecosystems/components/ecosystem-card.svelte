@@ -82,7 +82,13 @@
       </h1>
       <p class="description">The essential Ethereum ecosystem.</p>
       <div class="avatar">
-        <ProjectAvatar project={projectChainData} size="large" outline />
+        <ProjectAvatar project={projectChainData} size="small" outline />
+        <span>with <span>Drips AI</span></span>
+      </div>
+      <div class="cubbies">
+        <div>2,618</div>
+        <div>17,491</div>
+        <div>$186,833.91</div>
       </div>
     </div>
   </div>
@@ -151,7 +157,7 @@
   }
 
   .header {
-    height: 50%;
+    flex-grow: 1;
   }
 
   .graph {
@@ -162,6 +168,38 @@
     color: var(--color-foreground);
     opacity: 0;
     animation: fadeIn 1s ease forwards;
+  }
+
+  .avatar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    /* margin-bottom: 12px; */
+  }
+
+  .cubbies {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    border-top: 1px solid var(--color-foreground-level-2);
+    position: relative;
+    top: 12px;
+    left: -12px;
+    width: calc(100% + 24px);
+  }
+
+  .cubbies > * {
+    flex-grow: 1;
+    border-right: 1px solid var(--color-foreground-level-2);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cubbies > *:last-child {
+    border-right: none;
   }
 
   @keyframes fadeIn {
