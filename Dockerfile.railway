@@ -42,8 +42,8 @@ RUN npm run gql:generate-schema
 # This relies on schema.graphql file being present in the root dir.
 RUN npm run gql:build-types
 
-# While building the app, we set dummy values for GQL_ACCESS_TOKEN and GQL_URL so that the build passes. When running the image these need to be set in env
-RUN npm run build:app
+# While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
+RUN GQL_URL="foo" npm run build:app
 
 EXPOSE 3000
 
