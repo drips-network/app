@@ -3,7 +3,7 @@
 FROM node:22
 
 # Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
-ARG GQL_URL
+ARG CODEGEN_GQL_URL
 ARG GQL_ACCESS_TOKEN
 
 # Pass robots-allow.txt to serve a permissive robots.txt file
