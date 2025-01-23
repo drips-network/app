@@ -2,11 +2,6 @@ FROM node:22
 
 ARG SKIP_BUILD=false
 
-# Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
-# When building the image for publishing, leave it empty and instead run npm run gql:generate-schema before building the image.
-ARG GQL_URL
-ARG GQL_ACCESS_TOKEN
-
 # Pass robots-allow.txt to serve a permissive robots.txt file
 ARG ROBOTS_FILE=robots-disallow.txt
 
@@ -35,10 +30,6 @@ RUN npm run postinstall
 
 # Set up robots
 RUN mv ${ROBOTS_FILE} ./static/robots.txt
-
-# If GQL_URL and GQL_ACCESS_TOKEN are set, AND schema.graphql is NOT present, fetch the schema from the server.
-# This allows building the app within Railway.
-RUN if ["$SKIP_BUILD" = "false"] && [ -n "$GQL_URL" ] && [ -n "$GQL_ACCESS_TOKEN" ] && [ ! -f schema.graphql ]; then npm run gql:generate-schema; fi
 
 # Check on schema.graphql file being present in root dir, if not print error
 RUN test -f schema.graphql || (echo "schema.graphql file not found in root directory. Run gql:generate-schema before trying to build the container." && exit 1)
