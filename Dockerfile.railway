@@ -35,8 +35,7 @@ RUN npm run postinstall
 # Set up robots
 RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
-# If GQL_URL and GQL_ACCESS_TOKEN are set, AND schema.graphql is NOT present, fetch the schema from the server.
-# This allows building the app within Railway.
+# Fetch GQL schema from API at `CODEGEN_GQL_URL` and save it to schema.graphql for type generation.
 RUN npm run gql:generate-schema
 
 # This relies on schema.graphql file being present in the root dir.
