@@ -2,6 +2,8 @@
 
 FROM node:22
 
+ENV NODE_ENV production
+
 # Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
 ARG CODEGEN_GQL_URL
 ARG GQL_ACCESS_TOKEN
@@ -25,7 +27,7 @@ RUN apt-get update \
 # Copies both package.json and package-lock.json
 COPY package*.json ./
 # Install dependencies
-RUN npm ci --ignore-scripts;
+RUN npm ci --ignore-scripts --include=dev;
 
 # Copy the rest of the application's code into the container
 COPY . .
