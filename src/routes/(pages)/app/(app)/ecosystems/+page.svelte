@@ -24,8 +24,8 @@
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Ecosystem from '$lib/components/illustrations/ecosystem.svelte';
-  import LinkIcon from '$lib/components/icons/Link.svelte';
   import EduCardIllustration from '$lib/components/edu-card/edu-card-illustration.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
 
   export let data;
 
@@ -48,7 +48,7 @@
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
-      <Button icon={LinkIcon}>Learn more</Button>
+      <Button icon={ArrowBoxUpRight}>Learn more</Button>
     </svelte:fragment>
     <svelte:fragment slot="illustration">
       <EduCardIllustration>
