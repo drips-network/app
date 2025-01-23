@@ -1,0 +1,51 @@
+# This Dockerfile is used for builds on Railway. For all other purposes, use the generic `Dockerfile` in root dir.
+
+FROM node:22
+
+# Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
+ARG GQL_URL
+ARG GQL_ACCESS_TOKEN
+
+# Pass robots-allow.txt to serve a permissive robots.txt file
+ARG ROBOTS_FILE=robots-disallow.txt
+
+ARG PUBLIC_NETWORK=1
+ENV PUBLIC_NETWORK=${PUBLIC_NETWORK}
+
+WORKDIR /app
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+RUN apt-get update \
+ && apt-get install -y chromium \
+    fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    --no-install-recommends
+
+# Copies both package.json and package-lock.json
+COPY package*.json ./
+# Install dependencies
+RUN npm ci --ignore-scripts;
+
+# Copy the rest of the application's code into the container
+COPY . .
+
+RUN npm run postinstall
+
+# Set up robots
+RUN mv ${ROBOTS_FILE} ./static/robots.txt
+
+# If GQL_URL and GQL_ACCESS_TOKEN are set, AND schema.graphql is NOT present, fetch the schema from the server.
+# This allows building the app within Railway.
+RUN npm run gql:generate-schema
+
+# This relies on schema.graphql file being present in the root dir.
+RUN npm run gql:build-types
+
+# While building the app, we set dummy values for GQL_ACCESS_TOKEN and GQL_URL so that the build passes. When running the image these need to be set in env
+RUN npm run build:app
+
+EXPOSE 3000
+
+# Run the app (this is not a build command, it runs /build/index.js)
+CMD ["node", "build"]
