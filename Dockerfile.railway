@@ -24,6 +24,8 @@ RUN apt-get update \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
     --no-install-recommends
 
+RUN apt-get clean
+
 # Copies both package.json and package-lock.json
 COPY package*.json ./
 # Install dependencies
