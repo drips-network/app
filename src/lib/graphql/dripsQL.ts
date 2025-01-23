@@ -15,8 +15,8 @@ export default async function query<TResponse, TVariables extends Variables = Va
   // If we're currently in a browser or dev mode, we use the app's base URL to construct the endpoint.
   // If we're on the server in prod, we use localhost in order for traffic to stay within the container
   // and avoid network overhead.
-  // IMPORTANT: This assumes the app is running on port 8080 in the container, which should usually be the case.
-  const endpointLocation = browser || dev ? `${BASE_URL}/api/gql` : 'http://localhost:8080/api/gql';
+  // IMPORTANT: This assumes the app is running on port 3000 in the container, which should usually be the case.
+  const endpointLocation = browser || dev ? `${BASE_URL}/api/gql` : 'http://localhost:3000/api/gql';
 
   const client = new GraphQLClient(endpointLocation, {
     fetch: customFetch,

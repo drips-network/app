@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+      - SKIP_BUILD=true
+    env_file: .env
+    environment:
+      - CACHE_REDIS_CONNECTION_STRING=redis://redis-app-cache:6379
+
+    entrypoint: npm run dev -- --host 0.0.0.0
+    volumes:
+    - .:/app
+    - /app/node_modules
+    ports:
+    - '5173:5173'
+    depends_on:
+    - redis-app-cache
+
+  redis-app-cache:
+    image: redis:latest
+    restart: unless-stopped

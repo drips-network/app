@@ -8,3 +8,4 @@ Dockerfile.dev
 .git
 .gitignore
 .env
+build

@@ -4,7 +4,6 @@ import { error } from '@sveltejs/kit';
 import { ethers, toUtf8Bytes } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
-import { GELATO_API_KEY } from '$env/static/private';
 import assert from '$lib/utils/assert';
 import network, { getNetwork } from '$lib/stores/wallet/network';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
@@ -19,8 +18,22 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import { Octokit } from '@octokit/rest';
 import GitHub from '$lib/utils/github/GitHub';
 import { redis } from '../../../redis';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 
-const octokit = new Octokit();
+const GELATO_API_KEY = getOptionalEnvVar(
+  'GELATO_API_KEY',
+  true,
+  "Gasless transactions won't work." +
+    "This means that claiming a project won't and collecting funds (on networks supporting gasless TXs and with gasless TXs enabled in settings) won't work.",
+);
+
+const GITHUB_PERSONAL_ACCESS_TOKEN = getOptionalEnvVar(
+  'GITHUB_PERSONAL_ACCESS_TOKEN',
+  true,
+  'Gasless repo-owner-update transactions may fail to plan due to severe GitHub API rate limits.',
+);
+
+const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
 
 const payloadSchema = z.object({

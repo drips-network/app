@@ -24,7 +24,7 @@ class MockProvider extends JsonRpcProvider {
 
   async getSigner(): Promise<JsonRpcSigner> {
     const tempProvider = new JsonRpcProvider(
-      `http://${getOptionalEnvVar('PUBLIC_TESTNET_MOCK_PROVIDER_HOST') ?? '127.0.0.1'}:8545`,
+      `http://${getOptionalEnvVar('PUBLIC_TESTNET_MOCK_PROVIDER_HOST', false, null) ?? '127.0.0.1'}:8545`,
       NETWORK,
       {
         staticNetwork: true,
@@ -41,11 +41,11 @@ export default (address: string) => {
   // eslint-disable-next-line no-console
   console.log(
     'Using mock provider',
-    `http://${getOptionalEnvVar('PUBLIC_TESTNET_MOCK_PROVIDER_HOST') ?? '127.0.0.1'}:8545`,
+    `http://${getOptionalEnvVar('PUBLIC_TESTNET_MOCK_PROVIDER_HOST', false, null) ?? '127.0.0.1'}:8545`,
   );
 
   const provider = new MockProvider(
-    `http://${getOptionalEnvVar('PUBLIC_TESTNET_MOCK_PROVIDER_HOST') ?? '127.0.0.1'}:8545`,
+    `http://${getOptionalEnvVar('PUBLIC_TESTNET_MOCK_PROVIDER_HOST', false, null) ?? '127.0.0.1'}:8545`,
     NETWORK,
     {
       staticNetwork: true,

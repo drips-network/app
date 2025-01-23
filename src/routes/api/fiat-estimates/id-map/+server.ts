@@ -1,10 +1,16 @@
-import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import type { RequestHandler } from './$types';
 import { redis } from '../../redis';
 import cached from '$lib/utils/cache/remote/cached';
 import { ensureResponseOk } from '$lib/utils/fetch';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+
+const COINMARKETCAP_API_KEY = getOptionalEnvVar(
+  'COINMARKETCAP_API_KEY',
+  true,
+  'Fiat estimates for supported tokens will not work.',
+);
 
 const cmcResponseSchema = z.object({
   data: z.array(

@@ -1,14 +1,24 @@
-import { PINATA_SDK_KEY, PINATA_SDK_SECRET } from '$env/static/private';
 import isTest from '$lib/utils/is-test';
 import { env } from '$env/dynamic/private';
 
 import pinataSdk from '@pinata/sdk';
 import { error, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+
+const missingEnvVarError =
+  "Uploading IPFS metadata won't work. This means all flows that edit metadata (creating streams, drip lists, claiming projects, etc.) will not work.";
+
+const PINATA_SDK_KEY = getOptionalEnvVar('PINATA_SDK_KEY', true, missingEnvVarError);
+const PINATA_SDK_SECRET = getOptionalEnvVar('PINATA_SDK_SECRET', true, missingEnvVarError);
 
 const pinata = new pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
 
 export const POST: RequestHandler = async ({ request }: RequestEvent) => {
+  if (!PINATA_SDK_KEY || !PINATA_SDK_SECRET) {
+    return error(500, 'PINATA_SDK_KEY and PINATA_SDK_SECRET env vars are required.');
+  }
+
   try {
     const json = await request.json();
 
