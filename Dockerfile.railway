@@ -17,10 +17,12 @@ ENV PUBLIC_NETWORK=${PUBLIC_NETWORK}
 WORKDIR /app
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
-RUN apt-get update
+RUN apt-get update \
+ && apt-get install -y chromium \
+    fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    --no-install-recommends
 
 # Install necessary dependencies for Puppeteer's Chrome
 # These dependencies are required to run Puppeteer/Chrome in a headless environment
