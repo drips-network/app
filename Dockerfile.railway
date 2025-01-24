@@ -11,42 +11,10 @@ ARG ROBOTS_FILE=robots-disallow.txt
 # See https://docs.railway.app/guides/dockerfiles#using-variables-at-build-time
 ARG PUBLIC_PINATA_GATEWAY_URL
 
-ARG INFURA_KEY
-ARG ALCHEMY_KEY
-ARG FILECOIN_KEY
-
-ARG E2E_HEADLESS
-
-ARG PINATA_SDK_KEY
-ARG PINATA_SDK_SECRET
-
-ARG TENDERLY_USER
-ARG TENDERLY_PROJECT
-ARG TENDERLY_ACCESS_SECRET
-
-ARG GELATO_API_KEY
-
 ARG PUBLIC_NETWORK
 
-ARG COINMARKETCAP_API_KEY
-
-ARG GITHUB_PERSONAL_ACCESS_TOKEN
-
-ARG ETHERSCAN_API_KEY
-
-ARG GQL_URL
-ARG GQL_ACCESS_TOKEN
 ARG CODEGEN_GQL_URL
-
-ARG CACHE_REDIS_CONNECTION_STRING
-
-ARG PUBLIC_BASE_URL
-
-ARG MULTIPLAYER_API_URL
-ARG MULTIPLAYER_API_ACCESS_TOKEN
-
-ARG MEILISEARCH_HOST
-ARG MEILISEARCH_API_KEY
+ARG GQL_ACCESS_TOKEN
 
 # Set environment variables to optimize the container
 ENV NODE_ENV production
@@ -89,13 +57,12 @@ RUN npm run prepare
 RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
 # Build graphql types
-RUN npm run build:graphql
+RUN npm run gql:build
 
 # Expose the app port
-EXPOSE 4173
+EXPOSE 3000
 
 # Build project
 RUN npm run build
 
-# Specify the command to run the app
-CMD ["npm", "run", "preview"]
+CMD ["node", "build"]
