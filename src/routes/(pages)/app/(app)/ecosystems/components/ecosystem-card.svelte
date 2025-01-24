@@ -48,11 +48,21 @@
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   // import EcosystemNetworkCosmograph from './ecosystem-network-cosmograph.svelte';
   import EcosystemGraphSigma from './ecosystem-graph-sigma.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
+  import User from '$lib/components/icons/User.svelte';
+  import Coin from '$lib/components/icons/Coin.svelte';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
 
   let projectChainData = filterCurrentChainData(project.chainData);
+
+  function handleViewEcosystemClick() {
+    // console.log('Doing a thing')
+  }
 </script>
 
 <a
@@ -61,6 +71,17 @@
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
+    <div class="banner">
+      <AnnotationBox type="info" overlay size="small">
+        We're launching ecosystems with funding from Vitalik, targeting the entire Ethereum
+        community.
+        <svelte:fragment slot="actions">
+          <Button variant="primary" icon={Ecosystem} on:click={handleViewEcosystemClick}
+            >View ecosystem</Button
+          >
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
     <div class="header">
       <div class="graph">
         <!-- <EcosystemNetworkCosmograph /> -->
@@ -86,9 +107,9 @@
         <span>with <span>Drips AI</span></span>
       </div>
       <div class="cubbies">
-        <div>2,618</div>
-        <div>17,491</div>
-        <div>$186,833.91</div>
+        <div><Box style="fill: var(--color-foreground)" />2,618</div>
+        <div><User style="fill: var(--color-foreground)" />17,491</div>
+        <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
       </div>
     </div>
   </div>
@@ -175,7 +196,6 @@
     gap: 0.5rem;
     align-items: center;
     justify-content: center;
-    /* margin-bottom: 12px; */
   }
 
   .cubbies {
@@ -184,9 +204,9 @@
     align-items: center;
     border-top: 1px solid var(--color-foreground-level-2);
     position: relative;
-    top: 12px;
-    left: -12px;
-    width: calc(100% + 24px);
+    top: 0.75rem;
+    left: -0.75rem;
+    width: calc(100% + 1.5rem);
   }
 
   .cubbies > * {
@@ -200,6 +220,14 @@
 
   .cubbies > *:last-child {
     border-right: none;
+  }
+
+  .banner {
+    position: absolute;
+    width: calc(100% - 4rem);
+    z-index: 1;
+    left: 2rem;
+    top: 2rem;
   }
 
   @keyframes fadeIn {

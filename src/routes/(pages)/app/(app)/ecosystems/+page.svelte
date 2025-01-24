@@ -81,7 +81,7 @@
   .page {
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 2rem;
   }
 
   /* .card {
