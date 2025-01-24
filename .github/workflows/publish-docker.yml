@@ -9,6 +9,16 @@ on:
       - main
 
 jobs:
+  define-vars:
+      name: Define variables
+      runs-on: ubuntu-latest
+      outputs:
+          docker_tag: ${{ steps.create-docker-tag.outputs.docker_tag }}
+      steps:
+      - uses: actions/checkout@v2
+      - id: create-docker-tag
+        run: echo "::set-output name=docker_tag::$(git rev-parse --abbrev-ref ${{ github.head_ref || github.ref || 'HEAD' }} | sed 's/[^a-z0-9_-]/__/gi')"
+
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -37,4 +47,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/drips-app:${{ github.head_ref || github.ref_name }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/drips-app:${{ needs.define-vars.outputs.docker_tag }}
