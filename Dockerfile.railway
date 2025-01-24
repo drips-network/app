@@ -63,6 +63,6 @@ RUN npm run gql:build
 EXPOSE 3000
 
 # Build project
-RUN npm run build
+RUN GQL_URL="foobar" npm run build
 
 CMD ["node", "build"]
