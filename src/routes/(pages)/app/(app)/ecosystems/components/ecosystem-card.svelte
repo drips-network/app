@@ -30,7 +30,7 @@
 </script>
 
 <script lang="ts">
-  import buildProjectUrl from '$lib/utils/build-project-url';
+  // import buildProjectUrl from '$lib/utils/build-project-url';
   // import Github from '$lib/components/icons/Github.svelte';
 
   // import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -53,6 +53,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
+  import { Forge } from '$lib/graphql/__generated__/base-types';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -62,11 +63,25 @@
   function handleViewEcosystemClick() {
     // console.log('Doing a thing')
   }
+
+  function buildEcosystemUrl(
+    forge: Forge,
+    ownerName: string,
+    repoName: string,
+    exact = true,
+  ): string {
+    switch (forge) {
+      case Forge.GitHub:
+        return `/app/ecosystems/github-${encodeURIComponent(ownerName)}-${encodeURIComponent(repoName)}${exact ? '?exact' : ''}`;
+      default:
+        throw new Error(`Unsupported forge: ${forge}`);
+    }
+  }
 </script>
 
 <a
   class="ecosystem-card-wrapper"
-  href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
+  href={buildEcosystemUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
