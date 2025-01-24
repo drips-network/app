@@ -37,4 +37,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/drips-app:${{ github.ref_name }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/drips-app:${{ github.head_ref || github.ref_name }}
