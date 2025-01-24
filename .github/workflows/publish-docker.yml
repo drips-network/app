@@ -15,6 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install deps. Unnecessary but cannot download the schema without this. Got a better idea? Open a PR!
+        run: npm ci
+
       - name: Download GQL schema from main
         run: GQL_URL=https://drips-multichain-api.up.railway.app/ GQL_ACCESS_TOKEN=${{ secrets.GQL_ACCESS_TOKEN }} ./scripts/generate-schema.sh
 
