@@ -10,14 +10,14 @@
 <script lang="ts">
   // import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   // import ProjectCard, { PROJECT_CARD_FRAGMENT } from '../project-card/project-card.svelte';
-  import Box from '$lib/components/icons/Box.svelte';
+  // import Box from '$lib/components/icons/Box.svelte';
   // import Section from '../section/section.svelte';
   // import { gql } from 'graphql-request';
   import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   // import isClaimed from '$lib/utils/project/is-claimed';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
-  import Plus from '$lib/components/icons/Plus.svelte';
-  import modal from '$lib/stores/modal';
+  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  // import Plus from '$lib/components/icons/Plus.svelte';
+  // import modal from '$lib/stores/modal';
   // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   // import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   // import checkIsUser from '$lib/utils/check-is-user';
@@ -52,19 +52,6 @@
 <Section
   bind:collapsed
   bind:collapsable
-  header={{
-    icon: Box,
-    label: 'All Ecosystems',
-    actions: withClaimProjectButton
-      ? [
-          {
-            label: 'Start an ecosystem',
-            icon: Plus,
-            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
-          },
-        ]
-      : [],
-  }}
   skeleton={{
     horizontalScroll: false,
     loaded: true,

@@ -4,11 +4,13 @@
   import type { ComponentType } from 'svelte';
   export let type: 'warning' | 'info' | 'error' = 'warning';
   export let size: 'normal' | 'small' = 'normal';
+  export let overlay: boolean = false;
   export let icon: ComponentType | undefined = undefined;
 </script>
 
 <div
   class="annotation-box typo-text-small {type} {size} flex flex-wrap items-center justify-between gap-3"
+  class:overlay
 >
   <div class="flex gap-2 items-start">
     {#if icon}
@@ -56,5 +58,10 @@
   .annotation-box.error {
     background-color: var(--color-negative-level-1);
     color: var(--color-negative-level-6);
+  }
+
+  .annotation-box.overlay {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-foreground);
   }
 </style>
