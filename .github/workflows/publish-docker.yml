@@ -25,6 +25,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/drips-app
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -46,5 +52,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/drips-app:${{ needs.define-vars.outputs.docker_tag }}
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
