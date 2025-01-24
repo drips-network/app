@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build Docker Image (and push to registry if main or staging)
 
 on:
   push:
