@@ -2,6 +2,7 @@ services:
   app:
     build:
       context: .
+      dockerfile: Dockerfile.dockerhub
       args:
       - SKIP_BUILD=true
     env_file: .env
