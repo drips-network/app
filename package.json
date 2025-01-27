@@ -4,11 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "dev:local-env": "GQL_URL=http://localhost:8080 MULTIPLAYER_API_URL=http://localhost:5002 MULTIPLAYER_API_ACCESS_TOKEN=1234 PUBLIC_PINATA_GATEWAY_URL=http://localhost:3000 GQL_ACCESS_TOKEN=afdb8b7e-8fa7-4de9-bd95-b650b839e745 PUBLIC_TEST_MODE=true VITE_TEST_MODE=true vite dev",
-    "local-env:start": "docker compose -f ./docker/env.docker-compose.yml -f ./docker/env-ports-exposed.docker-compose.yml up --build --always-recreate-deps --force-recreate -V",
-    "local-env:stop": "docker compose -f ./docker/env.docker-compose.yml -f ./docker/env-ports-exposed.docker-compose.yml down",
-    "build": "vite build",
-    "build:e2e": "PUBLIC_BASE_URL=http://localhost:3001 GQL_URL=http://localhost:8080 MULTIPLAYER_API_URL=http://localhost:5002 MULTIPLAYER_API_ACCESS_TOKEN=1234 PUBLIC_PINATA_GATEWAY_URL=http://localhost:3000 GQL_ACCESS_TOKEN=afdb8b7e-8fa7-4de9-bd95-b650b839e745 PUBLIC_TEST_MODE=true VITE_TEST_MODE=true npm run build",
+    "dev:docker": "docker compose up",
     "preview": "vite preview",
     "test:e2e": "PUBLIC_BASE_URL=http://localhost:3001 GQL_URL=http://localhost:8080 MULTIPLAYER_API_URL=http://localhost:5002 MULTIPLAYER_API_ACCESS_TOKEN=1234 PUBLIC_PINATA_GATEWAY_URL=http://localhost:3000 GQL_ACCESS_TOKEN=afdb8b7e-8fa7-4de9-bd95-b650b839e745 PUBLIC_TEST_MODE=true VITE_TEST_MODE=true vitest run e2e",
     "test:unit": "vitest run unit",
@@ -20,10 +16,13 @@
     "format": "prettier --write .",
     "prepare": "husky install",
     "postinstall": "./scripts/install-twemoji-assets.sh",
-    "build:graphql": "./scripts/build-gql-types.sh",
+    "gql:generate-schema": "./scripts/generate-schema.sh",
+    "gql:build-types": "./scripts/build-gql-types.sh",
+    "gql:build": "npm run gql:generate-schema && npm run gql:build-types",
     "analyze-unused-code": "knip",
-    "build:docker": "./scripts/docker-build.sh",
-    "dev:docker": "docker run --env-file .env -it -p 5173:5173 -v /app/node_modules -v .:/app drips-app-dev"
+    "build:app": "vite build",
+    "build": "npm run gql:build && npm run build:app",
+    "build:docker": "npm run gql:generate-schema && docker build -t drips-app ."
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
@@ -122,7 +121,8 @@
     }
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "*"
+    "@rollup/rollup-linux-arm64-gnu": "^4.31.0",
+    "@rollup/rollup-linux-x64-gnu": "^4.31.0"
   },
   "type": "module"
 }

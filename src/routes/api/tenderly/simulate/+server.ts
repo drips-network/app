@@ -1,8 +1,27 @@
-import { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_SECRET } from '$env/static/private';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+import { error } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
 
+const missingEnvVarError =
+  "Estimation of gas won't work, so transaction planning will fail on networks that have `applyGasBuffer` set to true.";
+
+const TENDERLY_USER = getOptionalEnvVar('TENDERLY_USER', true, missingEnvVarError);
+const TENDERLY_PROJECT = getOptionalEnvVar('TENDERLY_PROJECT', true, missingEnvVarError);
+const TENDERLY_ACCESS_SECRET = getOptionalEnvVar(
+  'TENDERLY_ACCESS_SECRET',
+  true,
+  missingEnvVarError,
+);
+
 export const POST: RequestHandler = async ({ request }) => {
+  if (!TENDERLY_USER || !TENDERLY_PROJECT || !TENDERLY_ACCESS_SECRET) {
+    return error(
+      500,
+      'TENDERLY_USER, TENDERLY_PROJECT, and TENDERLY_ACCESS_SECRET env vars are required.',
+    );
+  }
+
   try {
     const resp = await (
       await fetch(

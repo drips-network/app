@@ -1,9 +1,9 @@
-import { env } from '$env/dynamic/private';
 import { z } from 'zod';
 import { redis } from '../redis.js';
 import { formatUnits } from 'ethers';
 import network from '$lib/stores/wallet/network.js';
 import { error } from '@sveltejs/kit';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private.js';
 
 const etherscanTokensResponseSchema = z.array(
   z.object({
@@ -15,6 +15,12 @@ const etherscanTokensResponseSchema = z.array(
 
 const CACHE_KEY = `${network.name}-explore.tlv-estimate`;
 
+const ETHERSCAN_API_KEY = getOptionalEnvVar(
+  'ETHERSCAN_API_KEY',
+  true,
+  "Drips Contracts TLV won't appear on default explore page.",
+);
+
 export const GET = async ({ fetch }) => {
   const cached = redis && (await redis.get(CACHE_KEY));
 
@@ -22,14 +28,12 @@ export const GET = async ({ fetch }) => {
     return new Response(cached);
   }
 
-  const etherscanApiKey = env.ETHERSCAN_API_KEY;
-
-  if (!etherscanApiKey) {
+  if (!ETHERSCAN_API_KEY) {
     return new Response('null', { headers: { 'Content-Type': 'application/json' } });
   }
 
   const driptsTokenHoldingRes = await fetch(
-    `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${etherscanApiKey}`,
+    `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${ETHERSCAN_API_KEY}`,
   );
   if (!driptsTokenHoldingRes.ok) {
     const errorContent = await driptsTokenHoldingRes.text();

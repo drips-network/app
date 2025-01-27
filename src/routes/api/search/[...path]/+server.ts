@@ -1,14 +1,9 @@
-import { dev } from '$app/environment';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private.js';
 import stripTrailingSlash from '$lib/utils/strip-trailing-slash.js';
 import { error } from '@sveltejs/kit';
 
-const MEILISEARCH_HOST = getOptionalEnvVar('MEILISEARCH_HOST');
-const MEILISEARCH_API_KEY = getOptionalEnvVar('MEILISEARCH_API_KEY');
-
-if (!dev && !MEILISEARCH_HOST) {
-  throw new Error('MEILISEARCH_HOST env var is required in production!');
-}
+const MEILISEARCH_HOST = getOptionalEnvVar('MEILISEARCH_HOST', true, "Search won't work.");
+const MEILISEARCH_API_KEY = getOptionalEnvVar('MEILISEARCH_API_KEY', true, "Search won't work.");
 
 export const POST = async ({ request, url }) => {
   const path = url.pathname.replace('/api/search/', '');

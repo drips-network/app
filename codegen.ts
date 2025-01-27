@@ -7,19 +7,8 @@ const config: CodegenConfig = {
     nonOptionalTypename: true,
     dedupeFragments: true,
   },
-  schema: [
-    {
-      [process.env.CODEGEN_GQL_URL ?? process.env.GQL_URL]: {
-        headers: {
-          Authorization: `Bearer ${process.env.GQL_ACCESS_TOKEN}`,
-        },
-      },
-    },
-  ],
+  schema: './schema.graphql',
   generates: {
-    './src/lib/graphql/__generated__/schema.graphql': {
-      plugins: ['schema-ast'],
-    },
     './src/lib/graphql/__generated__/base-types.ts': {
       plugins: ['typescript'],
     },

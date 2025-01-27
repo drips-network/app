@@ -44,17 +44,29 @@ export const fallback: RequestHandler = async ({ request, params, fetch }) => {
   const headers = new Headers();
 
   if (provider === 'infura') {
-    const infuraKey = getOptionalEnvVar('INFURA_KEY');
+    const infuraKey = getOptionalEnvVar(
+      'INFURA_KEY',
+      true,
+      "App won't be able to use Infura RPC, but it might work with another fallback RPC.",
+    );
     assert(infuraKey, 'INFURA_KEY is required');
     rpcUrl = `https://${network}.infura.io/v3/${infuraKey}`;
   } else if (provider === 'alchemy') {
-    const alchemyKey = getOptionalEnvVar('ALCHEMY_KEY');
+    const alchemyKey = getOptionalEnvVar(
+      'ALCHEMY_KEY',
+      true,
+      "App won't be able to use Alchemy RPC, but it might work with another fallback RPC.",
+    );
     assert(alchemyKey, 'ALCHEMY_KEY is required');
     assert(isAlchemyNetwork(network), `Invalid network for Alchemy provider: ${network}`);
     rpcUrl = `https://${alchemyNetworkMap[network]}.g.alchemy.com/v2/${alchemyKey}`;
     headers.set('accept-encoding', 'identity');
   } else if (provider === 'glif') {
-    const filecoinKey = getOptionalEnvVar('FILECOIN_KEY');
+    const filecoinKey = getOptionalEnvVar(
+      'FILECOIN_KEY',
+      true,
+      "App won't be able to connect to Filecoin.",
+    );
     assert(filecoinKey, 'FILECOIN_KEY is required');
     rpcUrl = 'https://node.glif.io/fvm-archive/lotus/rpc/v1';
     headers.set('Authorization', `Bearer ${filecoinKey}`);

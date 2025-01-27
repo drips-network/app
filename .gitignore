@@ -19,3 +19,5 @@ static/twemoji/*
 **/__generated__/
 .sentryclirc
 .idea
+chrome/
+schema.graphql

@@ -3,11 +3,17 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import GitHub from '$lib/utils/github/GitHub';
 import { Octokit } from '@octokit/rest';
-import { env } from '$env/dynamic/private';
 import { redis } from '../../redis';
 import cached from '$lib/utils/cache/remote/cached';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 
-const octokit = new Octokit({ auth: env.GITHUB_PERSONAL_ACCESS_TOKEN });
+const GITHUB_PERSONAL_ACCESS_TOKEN = getOptionalEnvVar(
+  'GITHUB_PERSONAL_ACCESS_TOKEN',
+  true,
+  'Project profiles may fail to load due to severe GitHub API rate limits.',
+);
+
+const octokit = new Octokit({ auth: GITHUB_PERSONAL_ACCESS_TOKEN });
 const github = new GitHub(octokit);
 
 function mapGhResponse(response: Awaited<ReturnType<(typeof github)['getRepoByUrl']>>) {
