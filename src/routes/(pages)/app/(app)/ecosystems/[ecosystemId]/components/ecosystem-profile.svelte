@@ -84,7 +84,7 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
-  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
+  // import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -138,6 +138,7 @@
   import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
   import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
+  import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -406,7 +407,7 @@
   >
     <header class="header">
       <div>
-        <ProjectProfileHeader
+        <EcosystemProfileHeader
           {project}
           {description}
           editButton={isClaimed(chainData) && isOwnProject ? 'Edit' : undefined}
