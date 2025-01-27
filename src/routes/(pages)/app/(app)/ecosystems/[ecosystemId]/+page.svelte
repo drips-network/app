@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  import ProjectProfile from './components/project-profile.svelte';
+  import EcosytemProfile from './components/ecosystem-profile.svelte';
 
   export let data: PageData;
 </script>
 
-<ProjectProfile
+<EcosytemProfile
   project={data.project}
   description={data.description}
   newRepo={data.newRepo}
