@@ -78,6 +78,7 @@
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
+  // TODO: support ecosystems
 
   export let draftListMode = false;
 
