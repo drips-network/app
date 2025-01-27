@@ -46,7 +46,7 @@
 
   // $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
-  // $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
+  // $: isOwner = $walletStore.connected && checkIsUser(projec ts[0]?.chainData[0]?.owner?.accountId);
 </script>
 
 <Section
@@ -97,28 +97,3 @@
     {/each}
   </div> -->
 </Section>
-
-<style>
-  /* .projects {
-    display: flex;
-    gap: 1rem;
-    max-width: 100%;
-    position: relative;
-    padding: 2px;
-    flex-wrap: wrap;
-  }
-
-  .projects > * {
-    flex: 1;
-    min-width: 16rem;
-    max-width: calc(50% - 0.75rem);
-    width: calc(25% - 0.75rem);
-  }
-
-  @media (max-width: 560px) {
-    .projects > * {
-      width: 100%;
-      max-width: 100%;
-    }
-  } */
-</style>
