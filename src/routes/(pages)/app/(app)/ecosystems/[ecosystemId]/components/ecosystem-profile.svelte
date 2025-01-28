@@ -405,7 +405,7 @@
     class:claimed={isClaimed(chainData)}
     class:hidden-by-user={!project.isVisible}
   >
-    <header class="header">
+    <header class="header card">
       <div>
         <EcosystemProfileHeader
           {project}
@@ -566,7 +566,11 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo || !project.isVisible} />
+        <SupportCard
+          ecosystem={{}}
+          {project}
+          disabled={!!newRepo || !!correctCasingRepo || !project.isVisible}
+        />
       </div>
     </aside>
   </article>
@@ -605,6 +609,7 @@
     flex-direction: column;
     gap: 1.5rem;
     margin-bottom: 1rem;
+    padding: 1.5rem;
   }
 
   .stats {
