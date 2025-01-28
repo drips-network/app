@@ -14,6 +14,9 @@
   import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   import EcosystemCard, { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
   import { gql } from 'graphql-request';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
 
   export let ecosystems: ProjectsSectionProjectFragment[];
   export let big: boolean = false;
@@ -24,13 +27,17 @@
     {@const projectChainData = filterCurrentChainData(ecosystem.chainData)}
     {#if isClaimed(projectChainData)}
       <PrimaryColorThemer colorHex={projectChainData.color}>
-        <EcosystemCard project={ecosystem} isHidden={!ecosystem.isVisible} />
-      </PrimaryColorThemer>
-      <PrimaryColorThemer colorHex={projectChainData.color}>
-        <EcosystemCard project={ecosystem} isHidden={!ecosystem.isVisible} />
-      </PrimaryColorThemer>
-      <PrimaryColorThemer colorHex={projectChainData.color}>
-        <EcosystemCard project={ecosystem} isHidden={!ecosystem.isVisible} />
+        <EcosystemCard project={ecosystem} isHidden={!ecosystem.isVisible}>
+          <svelte:fragment slot="banner">
+            <AnnotationBox type="info" overlay size="small">
+              We're launching ecosystems with funding from Vitalik, targeting the entire Ethereum
+              community.
+              <svelte:fragment slot="actions">
+                <Button variant="primary" icon={Ecosystem}>View ecosystem</Button>
+              </svelte:fragment>
+            </AnnotationBox>
+          </svelte:fragment>
+        </EcosystemCard>
       </PrimaryColorThemer>
     {/if}
   {/each}
