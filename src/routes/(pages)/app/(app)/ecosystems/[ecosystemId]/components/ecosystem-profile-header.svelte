@@ -55,7 +55,9 @@
   const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>
 
-<div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
+<div
+  class="ecosystem-profile-header flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative"
+>
   <div class="max-w-full flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:gap-8 sm:items-center">
     <div class="avatar">
       <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
