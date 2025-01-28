@@ -1,0 +1,70 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import testData from '../__test__/data/test1.json';
+  import Graph from 'graphology';
+  import forceAtlas2 from 'graphology-layout-forceatlas2';
+  import type Sigma from 'sigma';
+
+  let graph: Graph;
+  let sigmaInstance: Sigma;
+  let graphContainer: HTMLDivElement;
+
+  const { nodes, edges } = testData;
+
+  async function initializeGraph() {
+    const networkStyle = window.getComputedStyle(graphContainer);
+    const nodeColorSPrimary = networkStyle.getPropertyValue('--color-primary');
+    const nodeColorSecondary = networkStyle.getPropertyValue('--color-foreground');
+    const edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
+
+    // Can't be imported server side
+    // const { Sigma } = await import('sigma');
+    // const { NodeBorderProgram } = await import('@sigma/node-border');
+    const [{ Sigma }, { NodeBorderProgram }] = await Promise.all([
+      import('sigma'),
+      import('@sigma/node-border'),
+    ]);
+
+    graph = new Graph();
+    for (const node of nodes) {
+      const isPrimary = Math.random() > 0.75;
+      graph.addNode(node.key, {
+        color: isPrimary ? nodeColorSPrimary : nodeColorSecondary,
+        label: 'thing',
+        x: Math.random(),
+        y: Math.random(),
+        size: isPrimary ? 16 : 8,
+        borderColor: 'black',
+      });
+    }
+
+    for (const edge of edges) {
+      graph.addEdge(edge.source, edge.target, { color: edgeColor, size: 3 });
+    }
+
+    forceAtlas2.assign(graph, 50);
+
+    sigmaInstance = new Sigma(graph, graphContainer, {
+      defaultNodeType: 'bordered',
+      nodeProgramClasses: {
+        bordered: NodeBorderProgram,
+      },
+    });
+    sigmaInstance.scheduleRefresh();
+    // TODO:
+    // Too many webgl contexts
+    // - We'll render images for the ecosystems grid
+    // Zoom to reasonable size
+    // -
+  }
+
+  onMount(initializeGraph);
+</script>
+
+<div class="ecosystem-graph" bind:this={graphContainer}></div>
+
+<style>
+  .ecosystem-graph {
+    height: 100%;
+  }
+</style>
