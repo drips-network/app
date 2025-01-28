@@ -50,19 +50,12 @@
   import Box from '$lib/components/icons/Box.svelte';
   import User from '$lib/components/icons/User.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
-  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  import Button from '$lib/components/button/button.svelte';
-  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
   import { Forge } from '$lib/graphql/__generated__/base-types';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
 
   let projectChainData = filterCurrentChainData(project.chainData);
-
-  function handleViewEcosystemClick() {
-    // console.log('Doing a thing')
-  }
 
   function buildEcosystemUrl(
     forge: Forge,
@@ -85,17 +78,11 @@
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
-    <div class="banner">
-      <AnnotationBox type="info" overlay size="small">
-        We're launching ecosystems with funding from Vitalik, targeting the entire Ethereum
-        community.
-        <svelte:fragment slot="actions">
-          <Button variant="primary" icon={Ecosystem} on:click={handleViewEcosystemClick}
-            >View ecosystem</Button
-          >
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
+    {#if $$slots.banner}
+      <div class="banner">
+        <slot name="banner" />
+      </div>
+    {/if}
     <div class="header">
       <div class="graph">
         <EcosystemGraphSigma />
