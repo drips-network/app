@@ -573,30 +573,14 @@
 </PrimaryColorThemer>
 
 <style>
-  .project-profile {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      'header'
-      'content';
-    gap: 3rem;
-  }
-
   .project-profile > * {
     min-width: 0;
   }
 
   .project-profile {
+    display: grid;
     grid-template-columns: 3fr minmax(auto, 18rem);
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      'header sidebar'
-      'content sidebar';
-  }
-
-  aside {
-    grid-area: sidebar;
+    gap: 3rem;
   }
 
   .project-profile > * {
@@ -604,11 +588,12 @@
   }
 
   .content {
-    grid-area: content;
     align-self: top;
     display: flex;
     flex-direction: column;
     gap: 3rem;
+    grid-row-start: 2;
+    grid-column: span 2;
   }
 
   .notice {
@@ -616,7 +601,6 @@
   }
 
   .header {
-    grid-area: header;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -641,7 +625,6 @@
   }
 
   .become-supporter-card {
-    position: sticky;
     top: 6rem;
   }
 
