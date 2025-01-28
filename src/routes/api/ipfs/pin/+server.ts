@@ -1,6 +1,3 @@
-import isTest from '$lib/utils/is-test';
-import { env } from '$env/dynamic/private';
-
 import pinataSdk from '@pinata/sdk';
 import { error, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -19,24 +16,23 @@ export const POST: RequestHandler = async ({ request }: RequestEvent) => {
     return error(500, 'PINATA_SDK_KEY and PINATA_SDK_SECRET env vars are required.');
   }
 
+  const E2E_FAKE_PINATA_URL = getOptionalEnvVar('E2E_FAKE_PINATA_URL', false, undefined);
+
   try {
     const json = await request.json();
 
-    if (isTest()) {
-      // During E2E tests, the "fake pinata" service runs at localhost:3000.
+    if (E2E_FAKE_PINATA_URL) {
+      // When running a local env, the "fake pinata" service runs at localhost:3000.
 
-      const res = await fetch(
-        `http://${env?.E2E_FAKE_PINATA_HOST ?? 'localhost'}:3000/pinning/pinJSONToIPFS`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            pinataContent: json,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const res = await fetch(`http://${E2E_FAKE_PINATA_URL}/pinning/pinJSONToIPFS`, {
+        method: 'POST',
+        body: JSON.stringify({
+          pinataContent: json,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       const resBody = z.object({ IpfsHash: z.string() }).parse(await res.json());
 

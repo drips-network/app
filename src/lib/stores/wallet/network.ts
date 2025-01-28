@@ -10,7 +10,7 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 84532, 314] as const;
+export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 11166111, 84532, 314] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
@@ -229,6 +229,45 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gaslessClaimAndCollect: true,
+  },
+  [11166111]: {
+    chainId: 11166111,
+    name: 'localtestnet',
+    label: 'Local Testnet',
+    token: 'ETH',
+    id: '0xaa619f',
+    rpcUrl: 'http://testnet:8545',
+    icon: Ethereum,
+    color: '#627EEA',
+    isTestnet: true,
+    subdomain: 'localtestnet.drips.network',
+    gqlName: SupportedChain.Localtestnet,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: etherscanLinkTemplate,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0xbb5799E5558406F892073850bb2BdCaE1303B5d0',
+      DRIPS: '0xC776EFe2B6EaA34AF16Bc01e98081775E51C7103',
+      CALLER: '0x88882E291F1B11E13a6Fc3Ab0CAcf1161EE81381',
+      REPO_DRIVER: '0x273Ef3B20D92a9C8F8941b0cbBCA4B0259e807Ee',
+      NFT_DRIVER: '0xF8AB9D746443898666693F1a56d88272980A2E4c',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: nextMainnetSettlementDate,
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
+    },
+    alternativeChainMode: false,
+    ensSupported: false,
+    ensAddress: undefined,
+    gaslessClaimAndCollect: false,
   },
   [84532]: {
     chainId: 84532,
