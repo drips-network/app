@@ -27,32 +27,19 @@
   import ProjectBadge, {
     PROJECT_BADGE_FRAGMENT,
   } from '$lib/components/project-badge/project-badge.svelte';
-  import { createEventDispatcher, type ComponentProps } from 'svelte';
-  // import Button from '../button/button.svelte';
-  import Pen from '$lib/components/icons/Pen.svelte';
   import { gql } from 'graphql-request';
-  // import type { ProjectProfileHeaderFragment } from './__generated__/gql.generated';
-  // import ShareButton from '../share-button/share-button.svelte';
   import twemoji from '$lib/utils/twemoji';
-  // import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
-  import ShareButton from '$lib/components/share-button/share-button.svelte';
-  import Button from '$lib/components/button/button.svelte';
-  // import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
 
   export let project: ProjectProfileHeaderFragment;
   export let description: string | undefined = undefined;
-  export let editButton: string | undefined = undefined;
-  export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
 
   export let pendingAvatar = false;
 
   $: projectChainData = filterCurrentChainData(project.chainData);
-
-  const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>
 
 <div
@@ -79,22 +66,8 @@
         </span>
       {/if}
     </div>
-    {#if editButton || shareButton}
-      <div class="actions">
-        {#if shareButton}
-          <ShareButton buttonVariant="normal" {...shareButton} />
-        {/if}
-        {#if editButton}
-          <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
-        {/if}
-      </div>
-    {/if}
   </div>
 </div>
 
 <style>
-  .actions {
-    display: flex;
-    gap: 1rem;
-  }
 </style>
