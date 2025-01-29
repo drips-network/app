@@ -247,11 +247,17 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
+    /* NEW */
+    justify-content: space-between;
   }
 
   .become-supporter-card.disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .become-supporter-card.become-supporter-card--ecosystem {
+    gap: auto;
   }
 
   .loading-overlay {
