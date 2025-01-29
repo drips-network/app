@@ -135,8 +135,8 @@
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
-  import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
-  import Settings from '$lib/components/icons/Settings.svelte';
+  // import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
+  // import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
 
@@ -258,13 +258,6 @@
       projectData: chainData as SupportButtonData['projectData'],
     },
   };
-
-  function handleEmbedButtonConfigureClick() {
-    // don't focus the first selectable element
-    // restored when modal is hidden
-    modal.setFocusTrapped(false);
-    modal.show(Stepper, undefined, configureProjectSupportButtonSteps(supportButtonStepConfig));
-  }
 </script>
 
 <HeadMeta
@@ -410,17 +403,6 @@
         <EcosystemProfileHeader
           {project}
           {description}
-          editButton={isClaimed(chainData) && isOwnProject ? 'Edit' : undefined}
-          shareButton={{
-            url: `${origin}${buildProjectUrl(
-              Forge.GitHub,
-              project.source.ownerName,
-              project.source.repoName,
-              false,
-            )}`,
-            supportButtonOptions: supportButtonStepConfig,
-            downloadableImageUrl: `${imageBaseUrl}?target=og`,
-          }}
           on:editButtonClick={() =>
             isClaimed(chainData) &&
             modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
@@ -465,16 +447,6 @@
             </a>
           {/if}
         </div>
-        {#if isOwnProject}
-          <AnnotationBox type="info">
-            Embed a support button on your website.
-            <svelte:fragment slot="actions">
-              <Button variant="primary" icon={Settings} on:click={handleEmbedButtonConfigureClick}
-                >Configure</Button
-              >
-            </svelte:fragment>
-          </AnnotationBox>
-        {/if}
       {/if}
     </header>
     <div class="content">
@@ -607,9 +579,9 @@
   .header {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
+    gap: 1rem;
     padding: 1.5rem;
+    justify-content: space-between;
   }
 
   .stats {
@@ -629,9 +601,9 @@
     margin-left: 0.5rem;
   }
 
-  .become-supporter-card {
+  /* .become-supporter-card {
     top: 6rem;
-  }
+  } */
 
   .card {
     border: 1px solid var(--color-foreground);
