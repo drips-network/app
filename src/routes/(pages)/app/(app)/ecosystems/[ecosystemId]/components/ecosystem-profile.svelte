@@ -82,40 +82,40 @@
 
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import SectionHeader from '$lib/components/section-header/section-header.svelte';
+  // import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   // import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import Wallet from '$lib/components/icons/Wallet.svelte';
+  // import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  // import Wallet from '$lib/components/icons/Wallet.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  import SplitsComponent from '$lib/components/splits/splits.svelte';
-  import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
+  // import SplitsComponent from '$lib/components/splits/splits.svelte';
+  // import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
+  // import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import Button from '$lib/components/button/button.svelte';
-  import Pen from '$lib/components/icons/Pen.svelte';
+  // import Pen from '$lib/components/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Registered from '$lib/components/icons/Registered.svelte';
   import buildUrl from '$lib/utils/build-url';
-  import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  // import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
-  import Developer from '$lib/components/developer-section/developer.section.svelte';
+  // import Developer from '$lib/components/developer-section/developer.section.svelte';
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import type { ProjectProfileFragment } from './__generated__/gql.generated';
-  import unreachable from '$lib/utils/unreachable';
+  // import unreachable from '$lib/utils/unreachable';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
@@ -126,7 +126,7 @@
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
-  import DripList from '$lib/components/icons/DripList.svelte';
+  // import DripList from '$lib/components/icons/DripList.svelte';
   import mergeWithdrawableBalances, {
     MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
   } from '$lib/utils/merge-withdrawable-balances';
@@ -139,6 +139,8 @@
   // import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
+  // import EcosystemCard from '../../components/ecosystem-card.svelte';
+  import EcosystemCardInteractive from '../../components/ecosystem-card-interactive.svelte';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -450,8 +452,16 @@
       {/if}
     </header>
     <div class="content">
-      <Developer accountId={project.account.accountId} />
-      {#if isClaimed(chainData)}
+      <section id="graph">
+        <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
+          <EcosystemCardInteractive {project} isHidden={!project.isVisible} isInteractive />
+        </PrimaryColorThemer>
+      </section>
+      <section id="metadata"></section>
+      <section id="distribution"></section>
+
+      <!-- <Developer accountId={project.account.accountId} /> -->
+      <!-- {#if isClaimed(chainData)}
         <section id="splits" class="app-section">
           <SectionHeader
             icon={DripList}
@@ -527,14 +537,14 @@
             </div>
           </SectionSkeleton>
         </section>
-      {/if}
-      <section id="support">
+      {/if} -->
+      <!-- <section id="support">
         <SupportersSection
           bind:sectionSkeleton={supportersSectionSkeleton}
           type="project"
           supportItems={chainData.support}
         />
-      </section>
+      </section> -->
     </div>
     <aside>
       <div class="become-supporter-card">
@@ -609,12 +619,6 @@
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
-  }
-
-  .unclaimed-funds-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
   }
 
   .hidden-by-user {
