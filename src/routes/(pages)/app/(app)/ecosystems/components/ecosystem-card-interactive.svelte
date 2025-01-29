@@ -41,7 +41,7 @@
   // import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
+  // import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
@@ -52,8 +52,9 @@
   import Coin from '$lib/components/icons/Coin.svelte';
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import Button from '$lib/components/button/button.svelte';
+  import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
 
-  export let project: ProjectCardFragment;
+  export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
