@@ -2,6 +2,7 @@ import { PUBLIC_NETWORK } from '$env/static/public';
 import Base from '$lib/components/icons/networks/Base.svelte';
 import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 import Filecoin from '$lib/components/icons/networks/Filecoin.svelte';
+import Metis from '$lib/components/icons/networks/Metis.svelte';
 import Optimism from '$lib/components/icons/networks/Optimism.svelte';
 import Polygon from '$lib/components/icons/networks/Polygon.svelte';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
@@ -10,7 +11,7 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 11166111, 84532, 314] as const;
+export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
@@ -60,6 +61,17 @@ export type Network = {
   ensSupported: boolean;
   ensAddress: string | undefined;
   gaslessClaimAndCollect: boolean;
+  addToWalletConfig:
+    | {
+        blockExplorerUrls: string[];
+        nativeCurrency: {
+          decimals: number;
+          name: string;
+          symbol: string;
+        };
+        rpcUrls: string[];
+      }
+    | undefined;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -109,6 +121,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [80002]: {
     chainId: 80002,
@@ -149,6 +162,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [11155420]: {
     chainId: 11155420,
@@ -189,6 +203,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [11155111]: {
     chainId: 11155111,
@@ -229,14 +244,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gaslessClaimAndCollect: true,
+    addToWalletConfig: undefined,
   },
-  [11166111]: {
-    chainId: 11166111,
+  [31337]: {
+    chainId: 31337,
     name: 'localtestnet',
     label: 'Local Testnet',
     token: 'ETH',
     id: '0xaa619f',
-    rpcUrl: 'http://testnet:8545',
+    rpcUrl: 'http://localhost:8545',
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -244,17 +260,17 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gqlName: SupportedChain.Localtestnet,
     autoUnwrapPairs: [],
     displayNetworkPicker: true,
-    applyGasBuffers: true,
+    applyGasBuffers: false,
     explorer: {
       name: 'Etherscan',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
-      ADDRESS_DRIVER: '0xbb5799E5558406F892073850bb2BdCaE1303B5d0',
-      DRIPS: '0xC776EFe2B6EaA34AF16Bc01e98081775E51C7103',
-      CALLER: '0x88882E291F1B11E13a6Fc3Ab0CAcf1161EE81381',
-      REPO_DRIVER: '0x273Ef3B20D92a9C8F8941b0cbBCA4B0259e807Ee',
-      NFT_DRIVER: '0xF8AB9D746443898666693F1a56d88272980A2E4c',
+      ADDRESS_DRIVER: '0x1707De7b41A3915F990A663d27AD3a952D50151d',
+      DRIPS: '0x7CBbD3FdF9E5eb359E6D9B12848c5Faa81629944',
+      CALLER: '0x2eac4218a453B1A52544Be315d2376B9A76614F1',
+      REPO_DRIVER: '0x971e08fc533d2A5f228c7944E511611dA3B56B24',
+      NFT_DRIVER: '0xf98e07d281Ff9b83612DBeF0A067d710716720eA',
       NATIVE_TOKEN_UNWRAPPER: undefined,
     },
     settlement: {
@@ -268,6 +284,15 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://wikipedia.org/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Ethereum',
+        symbol: 'ETH',
+      },
+      rpcUrls: ['http://localhost:8545'],
+    },
   },
   [84532]: {
     chainId: 84532,
@@ -308,6 +333,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: false,
+    addToWalletConfig: undefined,
   },
   [314]: {
     chainId: 314,
@@ -347,6 +373,67 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://filecoin.blockscout.com/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Filecoin',
+        symbol: 'FIL',
+      },
+      rpcUrls: [
+        'https://api.node.glif.io/rpc/v1',
+        'https://filecoin.chainup.net/rpc/v1',
+        'https://rpc.ankr.com/filecoin',
+      ],
+    },
+  },
+  [1088]: {
+    chainId: 1088,
+    name: 'metis',
+    label: 'Metis',
+    token: 'METIS',
+    id: '0x440',
+    rpcUrl: 'https://andromeda.metis.io/?owner=1088',
+    icon: Metis,
+    color: '#00D2FF',
+    isTestnet: false,
+    subdomain: 'metis.drips.network',
+    gqlName: SupportedChain.Metis,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: false,
+    explorer: {
+      name: 'Metis Explorer',
+      linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x749c34e4028c89c8308c78860C659E5909204d4a',
+      DRIPS: '0x6dc0d80E170B0f3AeB5b7354e5deE674F02202d7',
+      CALLER: '0x0a7f9CeeC82fDeDd262813FFbd9F913d6a25a4b5',
+      REPO_DRIVER: '0x2dA9a9322BC5FFE1DEE59Ae90f2E4656Cb552BB0',
+      NFT_DRIVER: '0xb112E3909901BC7D1Bf81f5384a76e75364C7e67',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on Metis settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    ensSupported: false,
+    ensAddress: undefined,
+    gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://explorer.metis.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Metis',
+        symbol: 'METIS',
+      },
+      rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
   },
 };
 

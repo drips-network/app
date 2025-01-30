@@ -7,7 +7,7 @@ services:
       - SKIP_BUILD=true
     env_file: .env
     environment:
-      - PUBLIC_NETWORK=11166111
+      - PUBLIC_NETWORK=31337
       - CACHE_REDIS_CONNECTION_STRING=redis://redis:6379
       - E2E_FAKE_PINATA_URL=http://fake-pinata:3000
       - GQL_URL=http://graphql-api:8080
@@ -31,6 +31,7 @@ services:
 
   event-processor:
     image: 'j537/event-processor:${BRANCH}-localtestnet'
+    pull_policy: always
     environment:
       - PUBLIC_IPFS_GATEWAY_URL=http://fake-pinata:3000
       - SHOULD_PROCESS_PAST_EVENTS=${EVENT_PROCESSOR_SHOULD_PROCESS_PAST_EVENTS}
@@ -53,6 +54,7 @@ services:
 
   graphql-api:
     image: 'j537/graphql-api:${BRANCH}'
+    pull_policy: always
     environment:
       - 'RPC_CONFIG={"LOCALTESTNET": { "url": "http://testnet:8545" }}'
       - NODE_ENV=development
@@ -68,12 +70,16 @@ services:
       - fake-pinata
 
   testnet:
-    image: 'j537/contracts:${BRANCH}'
+    image: 'j537/contracts:jason-docker-setup'
+    pull_policy: always
+    volumes:
+      - testnet_data:/contracts/anvil-state.json
     ports:
       - '8545:8545'
 
   fake-pinata:
     image: 'j537/fake-pinata:${BRANCH}'
+    pull_policy: always
 
   postgres:
     image: postgres:latest
@@ -85,3 +91,15 @@ services:
       POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
     ports:
       - 54320:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+volumes:
+  postgres_data:
+  testnet_data:

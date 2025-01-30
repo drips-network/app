@@ -23,6 +23,14 @@
       "symbol": "WFIL",
       "decimals": 18,
       "logoURI": "https://cryptologos.cc/logos/filecoin-fil-logo.png"
+    },
+    {
+      "chainId": 1088,
+      "address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+      "name": "Metis",
+      "symbol": "METIS",
+      "decimals": 18,
+      "logoURI": "https://cryptologos.cc/logos/metisdao-metis-logo.png"
     }
   ]
 }
