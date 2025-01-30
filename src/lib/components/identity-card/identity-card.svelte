@@ -192,6 +192,7 @@
   }
 
   .ellipsis {
+    display: inline-block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
