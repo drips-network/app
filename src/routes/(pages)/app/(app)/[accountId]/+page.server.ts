@@ -18,6 +18,11 @@ import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
 const provider = new FailoverJsonRpcProvider(
   mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
+  undefined,
+  undefined,
+  {
+    logger: console,
+  },
 );
 
 const PROFILE_PAGE_QUERY = gql`
