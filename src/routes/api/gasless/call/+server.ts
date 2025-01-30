@@ -26,6 +26,11 @@ import { error } from '@sveltejs/kit';
 const { rpcUrl, fallbackRpcUrl } = network;
 const provider = new FailoverJsonRpcProvider(
   mapFilterUndefined([rpcUrl, fallbackRpcUrl], (url) => url),
+  undefined,
+  undefined,
+  {
+    logger: console,
+  },
 );
 const caller = new ethers.Contract(network.contracts.CALLER, callerAbi, provider);
 
