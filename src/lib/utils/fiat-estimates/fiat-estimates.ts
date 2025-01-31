@@ -45,6 +45,8 @@ const SUBSTITUTIONS: Record<string, string> = {
 const MANUAL_IDS: Record<string, string> = {
   /* Map Wrapped Filecoin to Filecoin */
   '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A': '2280',
+  /* Map METIS to METIS */
+  '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000': '9640',
 };
 
 /** Establish a connection to the data provider. */
