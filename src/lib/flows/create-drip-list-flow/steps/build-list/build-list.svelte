@@ -43,7 +43,7 @@
             };
 
             if (weight) {
-              c.dripList.weights[key] = weight * WEIGHT_FACTOR;
+              c.dripList.weights[key] = Math.round(weight * WEIGHT_FACTOR);
             }
 
             return c;
