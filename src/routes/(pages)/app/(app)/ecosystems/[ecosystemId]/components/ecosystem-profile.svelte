@@ -143,7 +143,7 @@
   import EcosystemCardInteractive from '../../components/ecosystem-card-interactive.svelte';
   import EcosystemMetadata from './ecosystem-metadata.svelte';
   import EcosystemDistribution from './ecosystem-distribution.svelte';
-  import EcosystemSupport from './ecosystem-support.svelte';
+  import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -472,11 +472,6 @@
           <EcosystemDistribution />
         </PrimaryColorThemer>
       </section>
-      <section id="distribution">
-        <PrimaryColorThemer {colorHex}>
-          <EcosystemSupport />
-        </PrimaryColorThemer>
-      </section>
 
       <!-- <Developer accountId={project.account.accountId} /> -->
       <!-- {#if isClaimed(chainData)}
@@ -556,13 +551,15 @@
           </SectionSkeleton>
         </section>
       {/if} -->
-      <!-- <section id="support">
-        <SupportersSection
-          bind:sectionSkeleton={supportersSectionSkeleton}
-          type="project"
-          supportItems={chainData.support}
-        />
-      </section> -->
+      <section id="support">
+        <PrimaryColorThemer {colorHex}>
+          <SupportersSection
+            bind:sectionSkeleton={supportersSectionSkeleton}
+            type="project"
+            supportItems={chainData.support}
+          />
+        </PrimaryColorThemer>
+      </section>
     </div>
     <aside>
       <div class="become-supporter-card">
