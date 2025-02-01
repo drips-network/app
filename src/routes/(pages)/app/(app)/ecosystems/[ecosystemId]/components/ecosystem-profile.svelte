@@ -141,6 +141,9 @@
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
   // import EcosystemCard from '../../components/ecosystem-card.svelte';
   import EcosystemCardInteractive from '../../components/ecosystem-card-interactive.svelte';
+  import EcosystemMetadata from './ecosystem-metadata.svelte';
+  import EcosystemDistribution from './ecosystem-distribution.svelte';
+  import EcosystemSupport from './ecosystem-support.svelte';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -260,6 +263,8 @@
       projectData: chainData as SupportButtonData['projectData'],
     },
   };
+
+  $: colorHex = isClaimed(chainData) ? chainData.color : undefined;
 </script>
 
 <HeadMeta
@@ -453,12 +458,25 @@
     </header>
     <div class="content">
       <section id="graph">
-        <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
+        <PrimaryColorThemer {colorHex}>
           <EcosystemCardInteractive {project} isHidden={!project.isVisible} isInteractive />
         </PrimaryColorThemer>
       </section>
-      <section id="metadata"></section>
-      <section id="distribution"></section>
+      <section id="metadata">
+        <PrimaryColorThemer {colorHex}>
+          <EcosystemMetadata />
+        </PrimaryColorThemer>
+      </section>
+      <section id="distribution">
+        <PrimaryColorThemer {colorHex}>
+          <EcosystemDistribution />
+        </PrimaryColorThemer>
+      </section>
+      <section id="distribution">
+        <PrimaryColorThemer {colorHex}>
+          <EcosystemSupport />
+        </PrimaryColorThemer>
+      </section>
 
       <!-- <Developer accountId={project.account.accountId} /> -->
       <!-- {#if isClaimed(chainData)}
