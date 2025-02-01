@@ -49,7 +49,7 @@
     gap: 2rem;
   }
 
-  .ecosystem-metadata h4 {
+  h4 {
     color: var(--color-primary);
     margin-bottom: 1rem;
     display: flex;
