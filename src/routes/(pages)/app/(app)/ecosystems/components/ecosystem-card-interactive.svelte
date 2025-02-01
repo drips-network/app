@@ -53,6 +53,7 @@
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import Button from '$lib/components/button/button.svelte';
   import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
+  import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
 
   export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
@@ -117,7 +118,7 @@
       </div>
       <div class="surface top-left">Something</div>
       <div class="surface top-right">
-        <Button>Explore in full screen</Button>
+        <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
       </div>
       <div class="surface bottom-left">Something</div>
       <div class="surface bottom-right">Something</div>
@@ -248,6 +249,24 @@
     position: absolute;
     top: 1rem;
     left: 1rem;
+  }
+
+  .surface.top-right {
+    left: auto;
+    right: 1rem;
+  }
+
+  .surface.bottom-right {
+    left: auto;
+    top: auto;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .surface.bottom-left {
+    left: 1rem;
+    top: auto;
+    bottom: 1rem;
   }
 
   @keyframes fadeIn {
