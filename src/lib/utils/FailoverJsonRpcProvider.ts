@@ -110,7 +110,7 @@ export default class FailoverJsonRpcProvider extends JsonRpcProvider {
         // Check for RPC-level errors in the response.
         for (const item of resp) {
           if (item.error) {
-            throw new Error(`RPC error: ${JSON.stringify(item.error)}.`);
+            this._logger?.warn(`Ignored RPC error from '${endpointUrl}': ${item.error}`);
           }
         }
 

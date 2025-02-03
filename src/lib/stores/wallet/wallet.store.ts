@@ -104,6 +104,10 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
       name: network.name,
       ensAddress: network.ensAddress,
     },
+    undefined,
+    {
+      logger: console,
+    },
   ),
 };
 

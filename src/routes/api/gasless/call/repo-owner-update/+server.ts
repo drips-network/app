@@ -151,6 +151,11 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   const { rpcUrl, fallbackRpcUrl } = getNetwork(chainId);
   const provider = new FailoverJsonRpcProvider(
     mapFilterUndefined([rpcUrl, fallbackRpcUrl], (url) => url),
+    undefined,
+    undefined,
+    {
+      logger: console,
+    },
   );
   const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
 
