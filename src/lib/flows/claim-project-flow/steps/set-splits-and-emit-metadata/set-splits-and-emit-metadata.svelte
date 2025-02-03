@@ -30,6 +30,8 @@
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import gaslessStore from '$lib/stores/gasless/gasless.store';
+  import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
+  import { hexlify, toUtf8Bytes } from 'ethers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -78,40 +80,42 @@
     );
   }
 
-  async function waitForGaslessOwnerUpdate() {
-    // First, wait for Gelato Relay to resolve the update task.
-    const gaslessOwnerUpdateExpectation = await expect(
-      async () => {
-        const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
-        if (!res.ok) throw new Error('Failed to track gasless owner update task');
+  async function waitForRepoOwnerUpdate(gasless: boolean) {
+    if (gasless) {
+      // First, wait for Gelato Relay to resolve the update task.
+      const gaslessOwnerUpdateExpectation = await expect(
+        async () => {
+          const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
+          if (!res.ok) throw new Error('Failed to track gasless owner update task');
 
-        const { task } = await res.json();
-        assert(typeof task === 'object', 'Invalid task');
-        const { taskState } = task;
-        assert(typeof taskState === 'string', 'Invalid task state');
+          const { task } = await res.json();
+          assert(typeof task === 'object', 'Invalid task');
+          const { taskState } = task;
+          assert(typeof taskState === 'string', 'Invalid task state');
 
-        return taskState;
-      },
-      (taskState) => {
-        switch (taskState) {
-          case 'ExecSuccess':
-            return true;
-          case 'Cancelled':
-            throw new Error(
-              'Failed to gaslessly update the repository owner on-chain. Please reach out to us on Discord.',
-            );
-          default:
-            return false;
-        }
-      },
-      600000,
-      2000,
-    );
-
-    if (gaslessOwnerUpdateExpectation.failed) {
-      throw new Error(
-        "The gasless owner update transaction didn't resolve in the expected timeframe.",
+          return taskState;
+        },
+        (taskState) => {
+          switch (taskState) {
+            case 'ExecSuccess':
+              return true;
+            case 'Cancelled':
+              throw new Error(
+                'Failed to gaslessly update the repository owner on-chain. Please reach out to us on Discord.',
+              );
+            default:
+              return false;
+          }
+        },
+        600000,
+        2000,
       );
+
+      if (gaslessOwnerUpdateExpectation.failed) {
+        throw new Error(
+          "The gasless owner update transaction didn't resolve in the expected timeframe.",
+        );
+      }
     }
 
     // Next, wait for the new owner to be indexed by our infra.
@@ -127,6 +131,70 @@
     if (ownerIndexedExpectation.failed) {
       throw new Error('The new owner was not indexed in the expected timeframe.');
     }
+  }
+
+  async function generateOwnerUpdateTransactions(
+    gasslessOwnerUpdateTaskId: string | undefined,
+    gitUrl: string,
+  ) {
+    let transactions: TransactionWrapperOrExternalTransaction[] = [];
+    let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
+
+    switch (network.chainId) {
+      case 1: {
+        fakeProgressBarConfig = {
+          expectedDurationMs: 100000,
+          expectedDurationText: 'Usually less than a minute',
+        };
+        break;
+      }
+      case 314: {
+        fakeProgressBarConfig = {
+          expectedDurationMs: 500000,
+          expectedDurationText: 'Usually less than 5 minutes',
+        };
+        break;
+      }
+      default: {
+        fakeProgressBarConfig = {
+          expectedDurationMs: 100000,
+          expectedDurationText: 'Usually less than a minute',
+        };
+      }
+    }
+
+    if (gasslessOwnerUpdateTaskId) {
+      transactions.push({
+        external: true,
+        title: 'Finalizing verification...',
+        ...fakeProgressBarConfig,
+        promise: () => waitForRepoOwnerUpdate(true),
+      });
+    } else {
+      const { username, repoName } = GitProjectService.deconstructUrl(gitUrl);
+
+      const ownerUpdateTx = await populateRepoDriverWriteTx({
+        functionName: 'requestUpdateOwner',
+        args: [0, hexlify(toUtf8Bytes(`${username}/${repoName}`)) as `0x${string}`],
+      });
+
+      transactions.push(
+        {
+          title: 'Request update of repository owner',
+          transaction: ownerUpdateTx,
+          gasless: false,
+          applyGasBuffer: false,
+        },
+        {
+          external: true,
+          title: 'Finalizing verification...',
+          ...fakeProgressBarConfig,
+          promise: () => waitForRepoOwnerUpdate(false),
+        },
+      );
+    }
+
+    return transactions;
   }
 
   onMount(() =>
@@ -158,52 +226,22 @@
           duringBefore: 'Preparing to claim project...',
         },
 
-        transactions: ({ tx, projectAlreadyReadyForClaimTx }) => {
-          let transactions: TransactionWrapperOrExternalTransaction[] = [];
+        transactions: async ({ tx, projectAlreadyReadyForClaimTx }) => {
+          const ownerUpdateTransactionSteps = projectAlreadyReadyForClaimTx
+            ? []
+            : await generateOwnerUpdateTransactions(
+                $context.gaslessOwnerUpdateTaskId,
+                $context.gitUrl,
+              );
 
-          if (!projectAlreadyReadyForClaimTx && $context.gaslessOwnerUpdateTaskId) {
-            // The gasless owner update is still in progress and we should display a (fake) progress bar for it.
-
-            let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
-            switch (network.chainId) {
-              case 1: {
-                fakeProgressBarConfig = {
-                  expectedDurationMs: 100000,
-                  expectedDurationText: 'Usually less than a minute',
-                };
-                break;
-              }
-              case 314: {
-                fakeProgressBarConfig = {
-                  expectedDurationMs: 500000,
-                  expectedDurationText: 'Usually less than 5 minutes',
-                };
-                break;
-              }
-              default: {
-                fakeProgressBarConfig = {
-                  expectedDurationMs: 100000,
-                  expectedDurationText: 'Usually less than a minute',
-                };
-              }
-            }
-
-            transactions.push({
-              external: true,
-              title: 'Finalizing verification...',
-              ...fakeProgressBarConfig,
-              promise: waitForGaslessOwnerUpdate,
-            });
-          }
-
-          transactions.push({
+          const setSplitsAndMetadataTransactionStep = {
             transaction: tx,
             gasless: $gaslessStore,
             applyGasBuffer: false,
             title: 'Set project splits and metadata',
-          });
+          };
 
-          return transactions;
+          return [...ownerUpdateTransactionSteps, setSplitsAndMetadataTransactionStep];
         },
 
         after: async () => {

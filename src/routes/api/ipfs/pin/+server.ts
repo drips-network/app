@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request }: RequestEvent) => {
     if (E2E_FAKE_PINATA_URL) {
       // When running a local env, the "fake pinata" service runs at localhost:3000.
 
-      const res = await fetch(`http://${E2E_FAKE_PINATA_URL}/pinning/pinJSONToIPFS`, {
+      const res = await fetch(`${E2E_FAKE_PINATA_URL}/pinning/pinJSONToIPFS`, {
         method: 'POST',
         body: JSON.stringify({
           pinataContent: json,

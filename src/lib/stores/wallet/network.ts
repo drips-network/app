@@ -60,6 +60,7 @@ export type Network = {
   alternativeChainMode: boolean;
   ensSupported: boolean;
   ensAddress: string | undefined;
+  gelatoRelayAvailable: boolean;
   gaslessClaimAndCollect: boolean;
   addToWalletConfig:
     | {
@@ -120,6 +121,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: false,
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
   },
@@ -161,6 +163,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
   },
@@ -202,6 +205,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
   },
@@ -243,6 +247,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: false,
     ensSupported: true,
     ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: undefined,
   },
@@ -252,7 +257,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Local Testnet',
     token: 'ETH',
     id: '0xaa619f',
-    rpcUrl: 'http://localhost:8545',
+    rpcUrl: 'http://testnet:8545',
+    fallbackRpcUrl: 'http://localhost:8545',
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -283,6 +289,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: false,
     ensSupported: false,
     ensAddress: undefined,
+    gelatoRelayAvailable: false,
     gaslessClaimAndCollect: false,
     addToWalletConfig: {
       blockExplorerUrls: ['https://wikipedia.org/'],
@@ -332,6 +339,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
   },
@@ -372,6 +380,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: {
       blockExplorerUrls: ['https://filecoin.blockscout.com/'],
@@ -424,6 +433,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     alternativeChainMode: true,
     ensSupported: false,
     ensAddress: undefined,
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: {
       blockExplorerUrls: ['https://explorer.metis.io/'],

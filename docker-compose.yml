@@ -12,7 +12,7 @@ services:
       - E2E_FAKE_PINATA_URL=http://fake-pinata:3000
       - GQL_URL=http://graphql-api:8080
       - GQL_ACCESS_TOKEN=123
-    entrypoint: npm run dev -- --host 0.0.0.0
+    entrypoint: bash -c "npm run gql:build && npm run dev -- --host 0.0.0.0"
     volumes:
     - .:/app
     - /app/node_modules
@@ -26,14 +26,19 @@ services:
   redis:
     image: redis:latest
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
     ports:
     - 6379:6379
 
   event-processor:
-    image: 'j537/event-processor:${BRANCH}-localtestnet'
+    image: 'j537/event-processor:${EVENT_PROCESSOR_TAG-main}-localtestnet'
     pull_policy: always
     environment:
-      - PUBLIC_IPFS_GATEWAY_URL=http://fake-pinata:3000
+      - IPFS_GATEWAY_URL=http://fake-pinata:3000
       - SHOULD_PROCESS_PAST_EVENTS=${EVENT_PROCESSOR_SHOULD_PROCESS_PAST_EVENTS}
       - PRIMARY_RPC_URL=http://testnet:8545
       - NETWORK=localtestnet
@@ -48,12 +53,15 @@ services:
     ports:
       - 3001:3001
     depends_on:
-      - postgres
-      - redis
-      - fake-pinata
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fake-pinata:
+        condition: service_healthy
 
   graphql-api:
-    image: 'j537/graphql-api:${BRANCH}'
+    image: 'j537/graphql-api:${GRAPHQL_API_TAG-main}'
     pull_policy: always
     environment:
       - 'RPC_CONFIG={"LOCALTESTNET": { "url": "http://testnet:8545" }}'
@@ -66,20 +74,27 @@ services:
     ports:
       - '8080:8080'
     depends_on:
-      - postgres
-      - fake-pinata
+      postgres:
+        condition: service_healthy
+      fake-pinata:
+        condition: service_healthy
 
   testnet:
-    image: 'j537/contracts:jason-docker-setup'
+    image: 'j537/contracts:${CONTRACTS_API_TAG-main}'
     pull_policy: always
     volumes:
-      - testnet_data:/contracts/anvil-state.json
+      - anvil-data:/anvil-data
     ports:
       - '8545:8545'
 
   fake-pinata:
-    image: 'j537/fake-pinata:${BRANCH}'
+    image: 'j537/fake-pinata:main'
     pull_policy: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
 
   postgres:
     image: postgres:latest
@@ -92,7 +107,7 @@ services:
     ports:
       - 54320:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
       interval: 30s
@@ -100,6 +115,19 @@ services:
       retries: 5
       start_period: 80s
 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - 5050:80
+    volumes:
+      - ./docker/pgadmin-servers.json:/pgadmin4/servers.json
+      - ./docker/pgadmin-passwords:/pgpass
+
 volumes:
-  postgres_data:
-  testnet_data:
+  postgres-data:
+  anvil-data:

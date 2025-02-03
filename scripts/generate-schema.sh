@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source .env
-
 # GQL_ACCESS_TOKEN is always required, plus either GQL_URL or CODEGEN_GQL_URL. If these requirements aren't satisfied, exit with an error.
 # Again, this has to check that 1) GQL_ACCESS_TOKEN is set, AND THAT EITHER GQL_URL OR CODEGEN_GQL_URL is provided
 if [[ -z "$GQL_ACCESS_TOKEN" || (-z "$GQL_URL" && -z "$CODEGEN_GQL_URL") ]]; then
