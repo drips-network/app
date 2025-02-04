@@ -30,15 +30,7 @@
 </script>
 
 <script lang="ts">
-  // import buildProjectUrl from '$lib/utils/build-project-url';
-  // import Github from '$lib/components/icons/Github.svelte';
-
-  // import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
-  // import ProjectName, {
-  // PROJECT_NAME_FRAGMENT,
-  // } from '../project-badge/components/project-name.svelte';
   import { gql } from 'graphql-request';
-  // import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
@@ -46,12 +38,11 @@
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
-  import EcosystemGraphSigma from './ecosystem-graph.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import User from '$lib/components/icons/User.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import { Forge } from '$lib/graphql/__generated__/base-types';
-  import Button from '$lib/components/button/button.svelte';
+  import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden: boolean = false;
@@ -88,7 +79,8 @@
     {/if}
     <div class="header">
       <div class="graph">
-        <EcosystemGraphSigma />
+        <EcosystemGraph />
+        <!-- <EcosystemGraphSigma /> -->
       </div>
     </div>
     <div class="details">
@@ -114,12 +106,6 @@
         <div><User style="fill: var(--color-foreground)" />17,491</div>
         <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
       </div>
-      <div class="surface top-left">Something</div>
-      <div class="surface top-right">
-        <Button>Explore in full screen</Button>
-      </div>
-      <div class="surface bottom-left">Something</div>
-      <div class="surface bottom-right">Something</div>
     </div>
   </div>
 </a>
@@ -143,6 +129,12 @@
       backgorund-color 0.2s,
       transform 0.2s;
     aspect-ratio: 1.807;
+  }
+
+  @media (max-width: 768px) {
+    .ecosystem-card {
+      aspect-ratio: 0.786;
+    }
   }
 
   .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
@@ -191,7 +183,12 @@
   }
 
   .graph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
+    overflow: hidden;
   }
 
   .hidden-project {
@@ -225,6 +222,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-basis: 33%;
   }
 
   .cubbies > *:last-child {
@@ -241,12 +239,6 @@
     z-index: 1;
     left: 2rem;
     top: 2rem;
-  }
-
-  .surface {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
   }
 
   @keyframes fadeIn {
