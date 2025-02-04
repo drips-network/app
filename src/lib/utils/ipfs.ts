@@ -16,7 +16,7 @@ import stripTrailingSlash from './strip-trailing-slash';
 import getOptionalEnvVar from './get-optional-env-var/public';
 
 const PINATA_GATEWAY_URL =
-  getOptionalEnvVar('PUBLIC_IPFS_GATEWAY_URL', false, undefined) ?? 'https://drips.mypinata.cloud';
+  getOptionalEnvVar('PUBLIC_IPFS_GATEWAY_URL', false, null) ?? 'https://drips.mypinata.cloud';
 
 /**
  * Fetch the given hash from IPFS.
