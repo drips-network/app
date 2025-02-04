@@ -22,6 +22,17 @@ After this, create a new account and import the private key `ac0974bec39a17e36ba
 
 Head to Settings within the app and enable "Developer mode" to display helpful "Development" sections on screens like the Project Profile, Drip Lists, Streams etc.
 
+### 🌳 Running the staging branch of services
+
+If you need to develop with unreleased features of one more other services, you can set the tag to use for a particular service by passing an environment variable to the `dev:docker` command. Most services will build images for `main` and `staging` branches, by default the `main` tag is used.
+
+To switch to staging images, pass one or more of the following env vars:
+- `MULTIPLAYER_TAG=staging`
+- `EVENT_PROCESSOR_TAG=staging`
+- `GRAPHQL_API_TAG=staging`
+
+e.g. `MULTIPLAYER_TAG=staging EVENT_PROCESSOR_TAG=staging GRAPHQL_API_TAG=staging npm run dev:docker`
+
 ### 🥸 Claiming a project using the fake oracle
 
 Drips uses an on-chain oracle service to validate ownership of repositories by looking up a `FUNDING.json` file on the repo's default branch. On the local development testnet, a fake oracle that can be used to fake the contents of this file is available.
