@@ -9,6 +9,16 @@
           "Username": "user",
           "PassFile": "/pgpass",
           "SSLMode": "prefer"
+      },
+      "2": {
+          "Name": "Local Multiplayer DB",
+          "Group": "Servers",
+          "Host": "postgres-multiplayer",
+          "Port": 5432,
+          "MaintenanceDB": "postgres",
+          "Username": "user",
+          "PassFile": "/pgpass",
+          "SSLMode": "prefer"
       }
   }
 }

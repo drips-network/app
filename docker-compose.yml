@@ -12,6 +12,8 @@ services:
       - E2E_FAKE_PINATA_URL=http://fake-pinata:3000
       - GQL_URL=http://graphql-api:8080
       - GQL_ACCESS_TOKEN=123
+      - MULTIPLAYER_API_URL=http://multiplayer:5001
+      - MULTIPLAYER_API_ACCESS_TOKEN=123
     entrypoint: bash -c "npm run gql:build && npm run dev -- --host 0.0.0.0"
     volumes:
     - .:/app
@@ -78,6 +80,11 @@ services:
         condition: service_healthy
       fake-pinata:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
 
   testnet:
     image: 'j537/contracts:${CONTRACTS_API_TAG-main}'
@@ -96,6 +103,28 @@ services:
       timeout: 30s
       retries: 5
 
+  multiplayer:
+    image: 'j537/multiplayer:${MULTIPLAYER_TAG-main}'
+    pull_policy: always
+    environment:
+      - 'RPC_CONFIG={"localtestnet": { "url": "http://testnet:8545" }}'
+      - GRAPHQL_URL=http://graphql-api:8080
+      - GRAPHQL_ACCESS_TOKEN=123
+      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres-multiplayer:5432/dripsdb
+      - DB_SCHEMA_NAME=multiplayer
+      - AUTH_STRATEGY=dev
+      - API_KEY=123
+      - SHOULD_RUN_MIGRATIONS=true
+      - PORT=5001
+      - LOG_LEVEL=debug
+    ports:
+      - 5001:5001
+    depends_on:
+      postgres-multiplayer:
+        condition: service_healthy
+      graphql-api:
+        condition: service_healthy
+
   postgres:
     image: postgres:latest
     restart: unless-stopped
@@ -108,6 +137,25 @@ services:
       - 54320:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  postgres-multiplayer:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: dripsdb
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+    ports:
+      - 54321:5432
+    volumes:
+      - postgres-multiplayer-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
       interval: 30s
@@ -130,4 +178,5 @@ services:
 
 volumes:
   postgres-data:
+  postgres-multiplayer-data:
   anvil-data:
