@@ -31,6 +31,13 @@
       "symbol": "METIS",
       "decimals": 18,
       "logoURI": "https://cryptologos.cc/logos/metisdao-metis-logo.png"
+    },
+    {
+      "chainId": 31337,
+      "address": "0x700b6A60ce7EaaEA56F065753d8dcB9653dbAD35",
+      "name": "Test Token",
+      "symbol": "TEST",
+      "decimals": 18
     }
   ]
 }
