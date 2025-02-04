@@ -32,7 +32,7 @@ RUN npm run postinstall
 RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
 # Check on schema.graphql file being present in root dir, if not print error
-RUN test -f schema.graphql || (echo "schema.graphql file not found in root directory. Run gql:generate-schema before trying to build the container." && exit 1)
+RUN if [ "$SKIP_BUILD" = "false" ]; then test -f schema.graphql || (echo "schema.graphql file not found in root directory. Run gql:generate-schema before trying to build the container." && exit 1); fi
 
 # This relies on schema.graphql file being present in the root dir.
 RUN if [ "$SKIP_BUILD" = "false" ]; then npm run gql:build-types; fi
