@@ -15,7 +15,7 @@ This app enables user-friendly, simple management of a Drip List for funding up 
 
 ## 💦 Development
 
-Find instructions for running the app & tests locally in the [Development Guide](/docs/DEVELOPMENT.md).
+Find instructions for running the app locally in the [Development Guide](/docs/DEVELOPMENT.md).
 
 ## 📝 Submitting feedback
 
