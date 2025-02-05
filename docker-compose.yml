@@ -16,8 +16,9 @@ services:
       - PINATA_SDK_KEY=123
       - PINATA_SDK_SECRET=123
     volumes:
-    - ./src:/app/src
-    - /app/node_modules
+    - .:/app
+    - /app/node_modules/
+    - /app/.svelte-kit/
     ports:
     - 5173:5173
     depends_on:
