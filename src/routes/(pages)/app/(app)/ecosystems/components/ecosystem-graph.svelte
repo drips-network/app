@@ -5,6 +5,7 @@
   import forceAtlas2 from 'graphology-layout-forceatlas2';
   import noverlap from 'graphology-layout-noverlap';
   import type Sigma from 'sigma';
+  import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   // import type { LayoutMapping } from 'graphology-layout-forceatlas2'
 
   let graph: Graph;
@@ -14,6 +15,20 @@
   const { nodes, edges } = testData;
 
   type LayoutMapping = { [key: string]: { x: number; y: number } };
+  type Attributes = { [name: string]: unknown };
+
+  interface State {
+    hoveredNode?: string;
+    searchQuery: string;
+
+    // State derived from query:
+    selectedNode?: string;
+    suggestions?: Set<string>;
+
+    // State derived from hovered node:
+    hoveredNeighbors?: Set<string>;
+  }
+  const state: State = { searchQuery: '' };
 
   function setPositions(graph: Graph, positions: LayoutMapping) {
     graph.forEachNode((node) => {
@@ -27,6 +42,77 @@
     const camera = sigmaInstance.getCamera();
     const state = camera.getState();
     camera.setState({ ...state, ratio: 1 / zoom });
+  }
+
+  function setHoveredNode(node?: string) {
+    if (node) {
+      state.hoveredNode = node;
+      state.hoveredNeighbors = new Set(graph.neighbors(node));
+    }
+
+    if (!node) {
+      state.hoveredNode = undefined;
+      state.hoveredNeighbors = undefined;
+    }
+
+    // Refresh rendering
+    sigmaInstance.refresh({
+      // We don't touch the graph data so we can skip its reindexation
+      skipIndexation: true,
+    });
+  }
+
+  // Render nodes accordingly to the internal state:
+  // 1. If a node is selected, it is highlighted
+  // 2. If there is query, all non-matching nodes are greyed
+  // 3. If there is a hovered node, all non-neighbor nodes are greyed
+  function nodeReducer(node: string, data: Attributes): Partial<DisplayData> {
+    const res: Partial<NodeDisplayData> = { ...data };
+
+    if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
+      res.label = '';
+      res.color = '#f6f6f6';
+    }
+
+    if (state.selectedNode === node) {
+      res.highlighted = true;
+    } else if (state.suggestions) {
+      if (state.suggestions.has(node)) {
+        res.forceLabel = true;
+      } else {
+        res.label = '';
+        res.color = '#f6f6f6';
+      }
+    }
+
+    return res;
+  }
+
+  // Render edges accordingly to the internal state:
+  // 1. If a node is hovered, the edge is hidden if it is not connected to the
+  //    node
+  // 2. If there is a query, the edge is only visible if it connects two
+  //    suggestions
+  function edgeReducer(edge: string, data: Attributes): Partial<DisplayData> {
+    const res: Partial<EdgeDisplayData> = { ...data };
+
+    if (
+      state.hoveredNode &&
+      !graph
+        .extremities(edge)
+        .every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
+    ) {
+      res.hidden = true;
+    }
+
+    if (
+      state.suggestions &&
+      (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
+    ) {
+      res.hidden = true;
+    }
+
+    return res;
   }
 
   async function initializeGraph() {
@@ -67,7 +153,7 @@
       // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
       settings: {
         // spread nodes apart
-        gravity: 100,
+        gravity: 1,
         // take into account the size of the node when calculating
         // layout.the
         adjustSizes: true,
@@ -103,6 +189,17 @@
     });
 
     setZoom(sigmaInstance, 3);
+
+    // Bind graph interactions:
+    sigmaInstance.on('enterNode', ({ node }) => {
+      setHoveredNode(node);
+    });
+    sigmaInstance.on('leaveNode', () => {
+      setHoveredNode(undefined);
+    });
+
+    sigmaInstance.setSetting('nodeReducer', nodeReducer);
+    sigmaInstance.setSetting('edgeReducer', edgeReducer);
   }
 
   onMount(initializeGraph);
