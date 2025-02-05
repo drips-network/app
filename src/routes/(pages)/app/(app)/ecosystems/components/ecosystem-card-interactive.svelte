@@ -42,9 +42,7 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   // import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
-  import ProjectAvatar, {
-    PROJECT_AVATAR_FRAGMENT,
-  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import EcosystemGraph from './ecosystem-graph.svelte';
   import Box from '$lib/components/icons/Box.svelte';
@@ -54,6 +52,8 @@
   import Button from '$lib/components/button/button.svelte';
   import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
+  import Minus from '$lib/components/icons/Minus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
 
   export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
@@ -83,16 +83,17 @@
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
+    <div class="graph">
+      <EcosystemGraph />
+    </div>
     {#if $$slots.banner}
       <div class="banner">
         <slot name="banner" />
       </div>
     {/if}
-    <div class="header">
-      <div class="graph">
-        <EcosystemGraph />
-      </div>
-    </div>
+    <!-- <div class="header">
+
+    </div> -->
     <div class="details">
       <!-- <div class="source">
         <div class="icon">
@@ -100,17 +101,17 @@
         </div>
         <span class="owner-name">{project.source.ownerName}</span>
       </div> -->
-      <h1 class="name">
+      <!-- <h1 class="name">
         <span class="pixelated">
           {project.source.repoName}
-          <!-- <ProjectName showSource={false} {project} /> -->
+          <ProjectName showSource={false} {project} />
         </span>
-      </h1>
-      <p class="description">The essential Ethereum ecosystem.</p>
-      <div class="avatar">
+      </h1> -->
+      <!-- <p class="description">The essential Ethereum ecosystem.</p> -->
+      <!-- <div class="avatar">
         <ProjectAvatar project={projectChainData} size="small" outline />
         <span>with <span>Drips AI</span></span>
-      </div>
+      </div> -->
       <div class="cubbies">
         <div><Box style="fill: var(--color-foreground)" />2,618</div>
         <div><User style="fill: var(--color-foreground)" />17,491</div>
@@ -121,7 +122,10 @@
         <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
       </div>
       <div class="surface bottom-left">Something</div>
-      <div class="surface bottom-right">Something</div>
+      <div class="surface bottom-right">
+        <Button circular><Plus style="fill: var(--color-forground)" /></Button>
+        <Button circular><Minus style="fill: var(--color-forground)" /></Button>
+      </div>
     </div>
   </div>
 </a>
@@ -147,11 +151,11 @@
     aspect-ratio: 1.807;
   }
 
-  .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
+  /* .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
   .ecosystem-card-wrapper:focus-visible .ecosystem-card {
     box-shadow: var(--elevation-medium);
     transform: translateY(-2px);
-  }
+  } */
 
   .ecosystem-card-wrapper:focus-visible {
     outline: none;
@@ -188,11 +192,16 @@
     text-align: center;
   }
 
-  .header {
+  /* .header {
     flex-grow: 1;
-  }
+    position: relative;
+  } */
 
   .graph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
   }
 
@@ -202,12 +211,12 @@
     animation: fadeIn 1s ease forwards;
   }
 
-  .avatar {
+  /* .avatar {
     display: flex;
     gap: 0.5rem;
     align-items: center;
     justify-content: center;
-  }
+  } */
 
   .cubbies {
     display: flex;
@@ -261,6 +270,9 @@
     top: auto;
     right: 1rem;
     bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .surface.bottom-left {
