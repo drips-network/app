@@ -15,6 +15,7 @@
   let graphContainer: HTMLDivElement;
 
   const { nodes, edges } = testData;
+  let programaticZoom: boolean = false;
 
   type LayoutMapping = { [key: string]: { x: number; y: number } };
   type Attributes = { [name: string]: unknown };
@@ -41,9 +42,11 @@
   }
 
   function setZoom(sigmaInstance: Sigma, zoom: number) {
+    programaticZoom = true;
     const camera = sigmaInstance.getCamera();
     const state = camera.getState();
     camera.setState({ ...state, ratio: 1 / zoom });
+    programaticZoom = false;
   }
 
   // TODO: sync with wheel zoom state
@@ -120,6 +123,12 @@
     return res;
   }
 
+  function handleCameraUpdated({ ratio }: { ratio: number }) {
+    if (!programaticZoom) {
+      zoom = 1 / ratio;
+    }
+  }
+
   async function initializeGraph() {
     const networkStyle = window.getComputedStyle(graphContainer);
     const nodeColorSPrimary = networkStyle.getPropertyValue('--color-primary');
@@ -194,6 +203,9 @@
     });
 
     setZoom(sigmaInstance, zoom);
+
+    const camera = sigmaInstance.getCamera();
+    camera.on('updated', handleCameraUpdated);
 
     // Bind graph interactions:
     sigmaInstance.on('enterNode', ({ node }) => {
