@@ -9,3 +9,4 @@ Dockerfile.dev
 .gitignore
 .env
 build
+.svelte-kit

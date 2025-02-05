@@ -2,9 +2,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.dockerhub
-      args:
-      - SKIP_BUILD=true
+      dockerfile: Dockerfile.dev
     env_file: .env
     environment:
       - PUBLIC_NETWORK=31337
@@ -17,9 +15,8 @@ services:
       - MULTIPLAYER_API_ACCESS_TOKEN=123
       - PINATA_SDK_KEY=123
       - PINATA_SDK_SECRET=123
-    entrypoint: bash -c "npm run gql:build && npm run dev -- --host 0.0.0.0"
     volumes:
-    - .:/app
+    - ./src:/app/src
     - /app/node_modules
     ports:
     - 5173:5173
