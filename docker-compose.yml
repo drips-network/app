@@ -88,7 +88,7 @@ services:
       retries: 5
 
   testnet:
-    image: 'j537/contracts:${CONTRACTS_TAG-main}'
+    image: 'j537/contracts:${CONTRACTS_TAG-v2}'
     pull_policy: always
     volumes:
       - anvil-data:/anvil-data
