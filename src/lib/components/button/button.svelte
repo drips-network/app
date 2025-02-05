@@ -18,6 +18,7 @@
   export let type: 'submit' | 'reset' | 'button' = 'button';
   export let form: string | undefined = undefined;
   export let justify: 'left' | 'right' | 'center' = 'center';
+  export let circular: boolean = false;
 
   $: isDisabled = disabled || loading;
 
@@ -48,6 +49,7 @@
   class="button size-{size} justify-{justify}"
   class:disabled={isDisabled}
   class:loading
+  class:circular
   disabled={isDisabled}
   aria-disabled={isDisabled}
   on:click
@@ -204,5 +206,11 @@
 
   .button.justify-right .inner {
     justify-content: end;
+  }
+
+  .button.circular .inner {
+    border-radius: 100%;
+    padding: 0.25rem;
+    height: auto;
   }
 </style>
