@@ -4,10 +4,14 @@
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
   import Copyable from '../copyable/copyable.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import CodeBox from '../code-box/code-box.svelte';
 
   export let amtPerSec: bigint | undefined = undefined;
   export let tokenAddress: string | undefined = undefined;
   export let tokenDecimals: number | undefined = undefined;
+  export let startDate: Date | undefined = undefined;
+  export let createdAt: Date | undefined = undefined;
+  export let rawTimeline: string | undefined = undefined;
 </script>
 
 {#if $developerModeStore}
@@ -56,6 +60,31 @@
           <Copyable value={amtPerSecondWei} alwaysVisible>
             <span class="value">{amtPerSecondWei}</span>
           </Copyable>
+        </div>
+      {/if}
+
+      {#if createdAt}
+        <div class="key-value">
+          <h5 class="key">Created at (unix)</h5>
+          <Copyable value={String(createdAt.getTime() / 1000)} alwaysVisible>
+            <span class="value">{createdAt.getTime() / 1000}</span>
+          </Copyable>
+        </div>
+      {/if}
+
+      {#if startDate}
+        <div class="key-value">
+          <h5 class="key">Start date (unix)</h5>
+          <Copyable value={String(startDate.getTime() / 1000)} alwaysVisible>
+            <span class="value">{startDate.getTime() / 1000}</span>
+          </Copyable>
+        </div>
+      {/if}
+
+      {#if rawTimeline}
+        <div class="key-value">
+          <h5 class="key">Raw stream timeline</h5>
+          <CodeBox code={rawTimeline} />
         </div>
       {/if}
     </div>

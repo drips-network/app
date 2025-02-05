@@ -329,7 +329,10 @@
       <StreamDeveloper
         amtPerSec={BigInt(stream.config.amountPerSecond.amount)}
         {tokenAddress}
+        createdAt={new Date(stream.createdAt)}
+        startDate={stream.config.startDate ? new Date(stream.config.startDate) : undefined}
         tokenDecimals={token?.info.decimals}
+        rawTimeline={JSON.stringify(stream.timeline, null, 4)}
       />
     </div>
   {/if}
