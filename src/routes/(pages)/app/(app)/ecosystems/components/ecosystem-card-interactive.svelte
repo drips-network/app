@@ -93,7 +93,7 @@
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="graph">
-      <EcosystemGraph {zoom} />
+      <EcosystemGraph bind:zoom />
     </div>
     {#if $$slots.banner}
       <div class="banner">
