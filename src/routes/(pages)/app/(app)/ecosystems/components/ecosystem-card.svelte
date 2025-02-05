@@ -43,12 +43,29 @@
   import Coin from '$lib/components/icons/Coin.svelte';
   import { Forge } from '$lib/graphql/__generated__/base-types';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
 
   export let project: ProjectCardFragment;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
   let projectChainData = filterCurrentChainData(project.chainData);
+  const donations: number = 186_833.91;
+  const currencyFormatterShort = Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 1,
+  });
+  const currencyFormatterLong = Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
+  $: donationsFormatted =
+    $breakpointsStore?.breakpoint === 'mobile'
+      ? currencyFormatterShort.format(donations)
+      : currencyFormatterLong.format(donations);
 
   function buildEcosystemUrl(
     forge: Forge,
@@ -65,6 +82,9 @@
   }
 </script>
 
+<!-- TODO: revise for mobile
+ https://www.figma.com/design/vyI7f996JF8zwhnXwAwXdC/%F0%9F%92%A7-Drips?node-id=14154-27574&t=222o2fzNGWe88LkK-4
+ -->
 <a
   class="ecosystem-card-wrapper"
   class:ecosystem-card-wrapper--interactive={isInteractive}
@@ -104,7 +124,7 @@
       <div class="cubbies">
         <div><Box style="fill: var(--color-foreground)" />2,618</div>
         <div><User style="fill: var(--color-foreground)" />17,491</div>
-        <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
+        <div><Coin style="fill: var(--color-foreground)" />{donationsFormatted}</div>
       </div>
     </div>
   </div>
@@ -133,7 +153,7 @@
 
   @media (max-width: 768px) {
     .ecosystem-card {
-      aspect-ratio: 0.786;
+      aspect-ratio: 0.593;
     }
   }
 
@@ -239,6 +259,14 @@
     z-index: 1;
     left: 2rem;
     top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .banner {
+      width: calc(100% - 2rem);
+      left: 1rem;
+      top: 1rem;
+    }
   }
 
   @keyframes fadeIn {
