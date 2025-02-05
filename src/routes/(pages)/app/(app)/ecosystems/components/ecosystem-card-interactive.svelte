@@ -46,7 +46,7 @@
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
-  import EcosystemGraphSigma from './ecosystem-graph.svelte';
+  import EcosystemGraph from './ecosystem-graph.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import User from '$lib/components/icons/User.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
@@ -90,7 +90,7 @@
     {/if}
     <div class="header">
       <div class="graph">
-        <EcosystemGraphSigma />
+        <EcosystemGraph />
       </div>
     </div>
     <div class="details">

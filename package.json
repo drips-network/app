@@ -109,6 +109,7 @@
     "globals": "^15.6.0",
     "graphology": "^0.25.4",
     "graphology-layout-forceatlas2": "^0.10.1",
+    "graphology-layout-noverlap": "^0.4.2",
     "graphql": "^16.8.2",
     "graphql-request": "^7.1.0",
     "isomorphic-fetch": "^3.0.0",
