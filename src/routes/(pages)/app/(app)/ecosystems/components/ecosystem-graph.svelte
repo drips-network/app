@@ -23,6 +23,12 @@
     });
   }
 
+  function setZoom(sigmaInstance: Sigma, zoom: number) {
+    const camera = sigmaInstance.getCamera();
+    const state = camera.getState();
+    camera.setState({ ...state, ratio: 1 / zoom });
+  }
+
   async function initializeGraph() {
     const networkStyle = window.getComputedStyle(graphContainer);
     const nodeColorSPrimary = networkStyle.getPropertyValue('--color-primary');
@@ -95,14 +101,8 @@
         bordered: NodeBorderProgram,
       },
     });
-    sigmaInstance.scheduleRefresh();
 
-    // sigmaInstance.
-    // TODO:
-    // Too many webgl contexts
-    // - We'll render images for the ecosystems grid
-    // Zoom to reasonable size
-    // -
+    setZoom(sigmaInstance, 3);
   }
 
   onMount(initializeGraph);
