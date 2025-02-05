@@ -15,6 +15,8 @@ services:
       - GQL_ACCESS_TOKEN=123
       - MULTIPLAYER_API_URL=http://multiplayer:5001
       - MULTIPLAYER_API_ACCESS_TOKEN=123
+      - PINATA_SDK_KEY=123
+      - PINATA_SDK_SECRET=123
     entrypoint: bash -c "npm run gql:build && npm run dev -- --host 0.0.0.0"
     volumes:
     - .:/app
