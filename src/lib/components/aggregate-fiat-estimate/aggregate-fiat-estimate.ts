@@ -15,7 +15,7 @@ export default function aggregateFiatEstimate(prices: Prices, amounts: Amount[])
     fiatEstimateCents = 'pending';
   } else {
     fiatEstimateCents = amounts.reduce((sum, { tokenAddress, amount }) => {
-      const token = tokensStore.getByAddress(tokenAddress);
+      const token = tokensStore.getByAddress(tokenAddress, 'any');
 
       if (!token) {
         includesUnknownPrice = true;

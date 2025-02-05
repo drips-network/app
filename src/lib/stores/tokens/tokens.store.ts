@@ -1,7 +1,7 @@
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 
 import type { TokenInfo } from '@uniswap/token-lists';
-import { get, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
 import { browser } from '$app/environment';
@@ -29,18 +29,12 @@ export default (() => {
   function init() {
     chainId = network.chainId;
 
-    const customTokens = browser
-      ? storedTokens.readCustomTokensList().filter((t) => t.info.chainId === chainId)
-      : [];
-
-    const defaultTokens: TokenInfoWrapper[] = DRIPS_DEFAULT_TOKEN_LIST.filter(
-      (t) => t.chainId === chainId,
-    ).map((t) => ({
+    const defaultTokens: TokenInfoWrapper[] = DRIPS_DEFAULT_TOKEN_LIST.map((t) => ({
       info: t,
       source: 'default',
     }));
 
-    tokenList.set([...defaultTokens, ...customTokens]);
+    tokenList.set([...defaultTokens, ...(browser ? storedTokens.readCustomTokensList() : [])]);
   }
   init();
 
@@ -51,13 +45,16 @@ export default (() => {
    * chain the store is connected to.
    * @returns Token information, or undefined if not found.
    */
-  function getByAddress(address: string, chain = chainId): TokenInfoWrapper | undefined {
+  function getByAddress(
+    address: string,
+    chain: typeof chainId | 'any' = chainId,
+  ): TokenInfoWrapper | undefined {
     const tokens = get(tokenList);
     if (!tokens) return;
 
     return tokens.find((t) => {
       const addressMatch = t.info.address.toLowerCase() === address.toLowerCase();
-      const chainIdMatch = t.info.chainId === chain;
+      const chainIdMatch = chain === 'any' ? true : t.info.chainId === chain;
 
       return addressMatch && chainIdMatch;
     });
@@ -193,7 +190,9 @@ export default (() => {
 
   return {
     init,
-    subscribe: tokenList.subscribe,
+    subscribe: derived(tokenList, ($tokenList) =>
+      $tokenList?.filter((t) => t.info.chainId === chainId),
+    ).subscribe,
     customTokensLoaded,
     getByAddress,
     getBySymbol,
