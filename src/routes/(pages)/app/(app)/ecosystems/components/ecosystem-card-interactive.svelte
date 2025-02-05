@@ -48,7 +48,6 @@
   import Box from '$lib/components/icons/Box.svelte';
   import User from '$lib/components/icons/User.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
-  import { Forge } from '$lib/graphql/__generated__/base-types';
   import Button from '$lib/components/button/button.svelte';
   import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
@@ -59,32 +58,42 @@
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
+  let zoom: number = 3;
+
   let projectChainData = filterCurrentChainData(project.chainData);
 
-  function buildEcosystemUrl(
-    forge: Forge,
-    ownerName: string,
-    repoName: string,
-    exact = true,
-  ): string {
-    switch (forge) {
-      case Forge.GitHub:
-        return `/app/ecosystems/github-${encodeURIComponent(ownerName)}-${encodeURIComponent(repoName)}${exact ? '?exact' : ''}`;
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
+  // function buildEcosystemUrl(
+  //   forge: Forge,
+  //   ownerName: string,
+  //   repoName: string,
+  //   exact = true,
+  // ): string {
+  //   switch (forge) {
+  //     case Forge.GitHub:
+  //       return `/app/ecosystems/github-${encodeURIComponent(ownerName)}-${encodeURIComponent(repoName)}${exact ? '?exact' : ''}`;
+  //     default:
+  //       throw new Error(`Unsupported forge: ${forge}`);
+  //   }
+  // }
+
+  function zoomIn(event: MouseEvent) {
+    event.stopPropagation();
+
+    zoom = zoom + 1;
+  }
+
+  function zoomOut(event: MouseEvent) {
+    event.stopPropagation();
+
+    zoom = zoom - 1;
   }
 </script>
 
-<a
-  class="ecosystem-card-wrapper"
-  class:ecosystem-card-wrapper--interactive={isInteractive}
-  href={buildEcosystemUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
->
+<div class="ecosystem-card-wrapper" class:ecosystem-card-wrapper--interactive={isInteractive}>
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="graph">
-      <EcosystemGraph />
+      <EcosystemGraph {zoom} />
     </div>
     {#if $$slots.banner}
       <div class="banner">
@@ -123,12 +132,16 @@
       </div>
       <div class="surface bottom-left">Something</div>
       <div class="surface bottom-right">
-        <Button circular><Plus style="fill: var(--color-forground)" /></Button>
-        <Button circular><Minus style="fill: var(--color-forground)" /></Button>
+        <Button circular on:click={(event) => zoomIn(event)}
+          ><Plus style="fill: var(--color-forground)" /></Button
+        >
+        <Button circular on:click={(event) => zoomOut(event)}
+          ><Minus style="fill: var(--color-forground)" /></Button
+        >
       </div>
     </div>
   </div>
-</a>
+</div>
 
 <style>
   .ecosystem-card-wrapper {
@@ -203,6 +216,8 @@
     left: 0;
     width: 100%;
     height: 100%;
+    border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
   }
 
   .hidden-project {

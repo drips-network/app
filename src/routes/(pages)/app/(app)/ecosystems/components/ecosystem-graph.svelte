@@ -8,6 +8,8 @@
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   // import type { LayoutMapping } from 'graphology-layout-forceatlas2'
 
+  export let zoom: number = 3;
+
   let graph: Graph;
   let sigmaInstance: Sigma;
   let graphContainer: HTMLDivElement;
@@ -43,6 +45,9 @@
     const state = camera.getState();
     camera.setState({ ...state, ratio: 1 / zoom });
   }
+
+  // TODO: sync with wheel zoom state
+  $: zoom, sigmaInstance && setZoom(sigmaInstance, zoom);
 
   function setHoveredNode(node?: string) {
     if (node) {
@@ -188,7 +193,7 @@
       },
     });
 
-    setZoom(sigmaInstance, 3);
+    setZoom(sigmaInstance, zoom);
 
     // Bind graph interactions:
     sigmaInstance.on('enterNode', ({ node }) => {
