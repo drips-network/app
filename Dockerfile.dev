@@ -17,7 +17,9 @@ RUN npm ci --ignore-scripts;
 
 COPY ./scripts ./scripts
 COPY ./static ./static
-RUN pwd && ls && npm run postinstall
+COPY ./codegen.ts ./
+COPY ./generate-schema.codegen.ts ./
+RUN npm run postinstall
 
 EXPOSE 5173
 

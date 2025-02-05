@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "dev:docker": "docker compose up --attach app",
+    "dev:docker": "docker compose build && docker compose up --attach app",
     "dev:docker:clear": "docker compose down -v",
     "dev:docker:update-repo-owner": "./docker/update-repo-owner.sh",
     "preview": "vite preview",
