@@ -256,7 +256,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     name: 'localtestnet',
     label: 'Local Testnet',
     token: 'ETH',
-    id: '0xaa619f',
+    id: '0x7A69',
     rpcUrl: 'http://testnet:8545',
     fallbackRpcUrl: 'http://localhost:8545',
     icon: Ethereum,
