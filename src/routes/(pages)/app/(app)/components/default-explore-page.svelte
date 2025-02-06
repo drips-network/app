@@ -1,12 +1,3 @@
-<script lang="ts" context="module">
-  export const DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT = gql`
-    ${DRIP_LIST_CARD_FRAGMENT}
-    fragment DefaultExplorePageFeaturedDripLists on DripList {
-      ...DripListCard
-    }
-  `;
-</script>
-
 <script lang="ts">
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import TrophyIcon from '$lib/components/icons/Trophy.svelte';
@@ -23,13 +14,10 @@
   import tickStore from '$lib/stores/tick/tick.store';
   import Box from '$lib/components/icons/Box.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
-  import DripListCard, {
-    DRIP_LIST_CARD_FRAGMENT,
-  } from '$lib/components/drip-list-card/drip-list-card.svelte';
-  import { gql } from 'graphql-request';
+  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import type {
-    DefaultExplorePageFeaturedDripListsFragment,
     DefaultExplorePageFeaturedProjectFragment,
+    ExplorePageFeaturedDripListsFragment,
   } from './__generated__/gql.generated';
   import type { z } from 'zod';
   import type { postsListingSchema } from '../../../../api/blog/posts/schema';
@@ -78,7 +66,7 @@
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let blogPosts: z.infer<typeof postsListingSchema>;
-  export let featuredDripLists: DefaultExplorePageFeaturedDripListsFragment[];
+  export let featuredDripLists: ExplorePageFeaturedDripListsFragment[];
   export let totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
   export let tlv: number;
 
