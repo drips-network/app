@@ -84,7 +84,7 @@ RUN npm run gql:generate-schema
 RUN npm run gql:build-types
 
 # While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
-RUN GQL_URL="foo" npm run build:app
+RUN npm run build:app
 
 EXPOSE 8080
 
