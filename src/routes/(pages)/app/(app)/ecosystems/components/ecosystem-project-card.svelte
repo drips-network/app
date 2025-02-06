@@ -1,6 +1,9 @@
 <script lang="ts">
+  import Button from '$lib/components/button/button.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import Pie from '$lib/components/icons/Pie.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
   import User from '$lib/components/icons/User.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -47,11 +50,15 @@
       to 2 maintainers
     </div>
   </div>
+  <div class="actions">
+    <Button circular icon={Trash}></Button>
+    <Button circular icon={Pen}></Button>
+  </div>
 </div>
 
 <style>
   .ecosystem-project-card {
-    box-shadow: var(--elevation-low);
+    box-shadow: var(--elevation-medium);
     border-radius: 1rem 0 1rem 1rem;
     padding: 1.5rem;
     position: relative;
@@ -84,5 +91,16 @@
   .stats > * {
     white-space: nowrap;
     display: flex;
+  }
+
+  .actions {
+    position: absolute;
+    right: -1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 100%;
+    top: 0;
   }
 </style>
