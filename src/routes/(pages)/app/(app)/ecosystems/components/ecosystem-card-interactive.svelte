@@ -53,6 +53,7 @@
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
+  import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
 
   export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
@@ -126,11 +127,11 @@
         <div><User style="fill: var(--color-foreground)" />17,491</div>
         <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
       </div>
-      <div class="surface top-left">Something</div>
+      <div class="surface top-left"><SearchInput small placeholder="Search" /></div>
       <div class="surface top-right">
         <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
       </div>
-      <div class="surface bottom-left">Something</div>
+      <div class="surface bottom-left">Card baby</div>
       <div class="surface bottom-right">
         <Button circular on:click={(event) => zoomIn(event)}
           ><Plus style="fill: var(--color-forground)" /></Button
