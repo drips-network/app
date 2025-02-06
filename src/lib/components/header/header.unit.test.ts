@@ -4,12 +4,10 @@ import { render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import Header from './header.svelte';
 
-vi.mock('$env/dynamic/public', () => ({
-  env: {},
-}));
-
 vi.mock('$app/environment', () => ({
   browser: true,
+  dev: true,
+  building: false,
 }));
 
 beforeEach(() => {

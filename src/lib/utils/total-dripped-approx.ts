@@ -1,5 +1,4 @@
 import cached from './cache/remote/cached';
-import isTest from './is-test';
 import type { RedisClientType } from '../../routes/api/redis';
 import { getCmcPrices } from './cmc';
 import mergeAmounts from './amounts/merge-amounts';
@@ -90,9 +89,6 @@ export default function totalDrippedApproximation() {
 `${network.name}:total-dripped-prices`;
 
 export const totalDrippedPrices = (fetch = window.fetch) => {
-  // In test env, we can't fetch prices from CMC, so we don't.
-  if (isTest()) return {};
-
   const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
   return getCmcPrices(tokenAddresses, fetch);
 };

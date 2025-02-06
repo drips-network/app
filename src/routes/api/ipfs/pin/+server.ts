@@ -16,15 +16,15 @@ export const POST: RequestHandler = async ({ request }: RequestEvent) => {
     return error(500, 'PINATA_SDK_KEY and PINATA_SDK_SECRET env vars are required.');
   }
 
-  const E2E_FAKE_PINATA_URL = getOptionalEnvVar('E2E_FAKE_PINATA_URL', false, undefined);
+  const FAKE_PINATA_URL = getOptionalEnvVar('FAKE_PINATA_URL', false, undefined);
 
   try {
     const json = await request.json();
 
-    if (E2E_FAKE_PINATA_URL) {
+    if (FAKE_PINATA_URL) {
       // When running a local env, the "fake pinata" service runs at localhost:3000.
 
-      const res = await fetch(`${E2E_FAKE_PINATA_URL}/pinning/pinJSONToIPFS`, {
+      const res = await fetch(`${FAKE_PINATA_URL}/pinning/pinJSONToIPFS`, {
         method: 'POST',
         body: JSON.stringify({
           pinataContent: json,

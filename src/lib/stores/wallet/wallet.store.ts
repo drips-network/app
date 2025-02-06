@@ -5,8 +5,6 @@ import Onboard, { type EIP1193Provider } from '@web3-onboard/core';
 import injectedWallets from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
 
-import testnetMockProvider from './__test__/local-testnet-mock-provider';
-import isTest from '$lib/utils/is-test';
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
 import SafeAppsSDK from '@safe-global/safe-apps-sdk';
@@ -18,7 +16,6 @@ import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { getNetwork, isConfiguredChainId, type Network } from './network';
 import { invalidateAll } from '../fetched-data-cache/invalidate';
 import { BrowserProvider } from 'ethers';
-import unreachable from '$lib/utils/unreachable';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
@@ -340,53 +337,4 @@ const walletStore = () => {
   };
 };
 
-const mockWalletStore = () => {
-  const address =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (browser && (window as any))?.playwrightAddress ?? '0x433220a86126eFe2b8C98a723E73eBAd2D0CbaDc';
-  const provider = testnetMockProvider(address);
-  const initialized = writable(false);
-  const waitingForOnboard = writable(false);
-
-  const state = writable<WalletStoreState>({
-    connected: false,
-    network: getNetwork(Number(provider._network.chainId)),
-    provider,
-  });
-
-  async function initialize() {
-    const signer = await provider.getSigner();
-
-    const ownAccountId = (
-      await executeAddressDriverReadMethod({
-        functionName: 'calcAccountId',
-        args: [signer.address as OxString],
-      })
-    ).toString();
-
-    const chainId = Number((await provider.getNetwork()).chainId ?? unreachable());
-
-    state.set({
-      connected: true,
-      address,
-      provider,
-      signer,
-      network: getNetwork(chainId),
-      dripsAccountId: ownAccountId,
-    });
-
-    initialized.set(true);
-  }
-
-  return {
-    subscribe: state.subscribe,
-    initialized: { subscribe: initialized.subscribe },
-    waitingForOnboard: { subscribe: waitingForOnboard.subscribe },
-    initialize,
-    connect: () => undefined,
-    disconnect: () => undefined,
-    setOnboardTheme: () => undefined,
-  };
-};
-
-export default isTest() ? mockWalletStore() : walletStore();
+export default walletStore();

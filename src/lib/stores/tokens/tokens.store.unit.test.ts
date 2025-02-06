@@ -6,6 +6,8 @@ import { toBigInt } from 'ethers';
 
 vi.mock('$app/environment', () => ({
   browser: true,
+  dev: true,
+  building: false,
 }));
 
 afterEach(() => {

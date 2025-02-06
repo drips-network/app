@@ -109,6 +109,8 @@ function verifySignature(
 }
 
 export const POST = async ({ request }) => {
+  if (!GELATO_API_KEY)
+    return error(500, '{ "error": "GELATO_API_KEY is required for gasless transactions" }');
   if (!network.gaslessClaimAndCollect)
     return error(400, '{ "error": "Gasless actions are not supported on this network" }');
 
@@ -131,13 +133,6 @@ export const POST = async ({ request }) => {
   if (!verifySignature(eip712Signature, payload, targetContractAddress)) {
     return error(400, '{ "error": "Invalid signature" }');
   }
-
-  // const { data } = payload;
-  // const actionType = await inferActionType(data, contractName);
-
-  // if (!actionType) {
-  //   return error(400, '{ "error": "Unsupported gasless action" }');
-  // }
 
   const signature = Signature.from(eip712Signature);
   const r = signature.r;

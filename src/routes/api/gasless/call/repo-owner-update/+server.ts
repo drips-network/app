@@ -78,6 +78,11 @@ const projectUnclaimedQuery = gql`
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
   assert(
+    GELATO_API_KEY,
+    'GELATO_API_KEY is required. Gasless transactions will not work without it.',
+  );
+
+  assert(
     redis,
     'This endpoint requires a connected Redis instance. Ensure CACHE_REDIS_CONNECTION_STRING is set in env',
   );
