@@ -8,30 +8,40 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
+  import type { DripListCardFragment } from '$lib/components/drip-list-card/__generated__/gql.generated';
+  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
+  export let dripList: DripListCardFragment | null | undefined;
 </script>
 
 <div class="explore">
-  <div class="welcome-card">
-    <div class="illustration">
-      <div class="background" />
-      <div class="filecoin-logo-wrapper">
-        <img src="/assets/filecoin-logo.svg" alt="Filecoin logo" />
+  <div class="hero">
+    <div class="welcome-card">
+      <div class="illustration">
+        <div class="background" />
+        <div class="filecoin-logo-wrapper">
+          <img src="/assets/filecoin-logo.svg" alt="Filecoin logo" />
+        </div>
+      </div>
+      <div class="content">
+        <div style:display="flex" style:flex-direction="column" style:gap="1rem">
+          <h1>Welcome to Drips on Filecoin</h1>
+          <p>Drips on Filecoin is where rewards from Filecoin's RetroPGF are being distributed.</p>
+        </div>
+        <div>
+          <Button
+            href="https://fil-retropgf.notion.site/FIL-RetroPGF-4b6f5358440043c8bb1bf53f0297541e"
+            target="_blank"
+            icon={ArrowBoxUpRight}>Read the FIL-RetroPGF-2 docs</Button
+          >
+        </div>
       </div>
     </div>
-    <div class="content">
-      <h1>Welcome to Drips on Filecoin</h1>
-      <p>Drips on Filecoin is where rewards from Filecoin's RetroPGF will be distributed.</p>
-      <div>
-        <Button
-          href="https://fil-retropgf.notion.site/FIL-RetroPGF-4b6f5358440043c8bb1bf53f0297541e"
-          target="_blank"
-          icon={ArrowBoxUpRight}>Read the FIL-RetroPGF-2 docs</Button
-        >
-      </div>
-    </div>
+    {#if dripList}
+      <DripListCard listingMode={true} data={{ dripList }} maxSplitRows={5} />
+    {/if}
   </div>
 
   <RecentlyClaimedProjects {projects} />
@@ -48,6 +58,15 @@
     display: flex;
     gap: 3rem;
     flex-direction: column;
+  }
+
+  .hero {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .hero > * {
+    flex: 1 0 50%;
   }
 
   .welcome-card {
@@ -88,10 +107,17 @@
   }
 
   .welcome-card .content {
-    padding: 0 1rem 1rem 1rem;
+    padding: 1rem 1rem 1rem 1rem;
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    justify-content: center;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 1000px) {
+    .hero {
+      flex-direction: column;
+    }
   }
 </style>

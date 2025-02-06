@@ -1,20 +1,14 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
-import { gql } from 'graphql-request';
-import { DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT } from './default-explore-page.svelte';
 import { postsListingSchema } from '../../../../api/blog/posts/schema';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
 import { redis } from '../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
-import query from '$lib/graphql/dripsQL';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
-import type {
-  FeaturedDripListQuery,
-  FeaturedDripListQueryVariables,
-} from './__generated__/gql.generated';
-import network from '$lib/stores/wallet/network';
+
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
+import { featuredDripListQuery, fetchList } from './load-drip-list';
 
 const FEATURED_DRIP_LISTS =
   {
@@ -30,15 +24,6 @@ const FEATURED_DRIP_LISTS =
     ],
   }[PUBLIC_NETWORK] ?? [];
 
-const featuredDripListQuery = gql`
-  ${DEFAULT_EXPLORE_PAGE_FEATURED_DRIP_LISTS_FRAGMENT}
-  query FeaturedDripList($id: ID!, $chain: SupportedChain!) {
-    dripList(id: $id, chain: $chain) {
-      ...DefaultExplorePageFeaturedDripLists
-    }
-  }
-`;
-
 export default async function loadDefaultExplorePageData(f: typeof fetch) {
   const fetchProjectsParameters = createFetchProjectsParameters();
   const cacheKey = queryCacheKey(
@@ -48,24 +33,7 @@ export default async function loadDefaultExplorePageData(f: typeof fetch) {
   );
 
   const fetchFeaturedLists = async () => {
-    const results = await Promise.all(
-      FEATURED_DRIP_LISTS.map(async (id) => {
-        try {
-          const result = await query<FeaturedDripListQuery, FeaturedDripListQueryVariables>(
-            featuredDripListQuery,
-            { id, chain: network.gqlName },
-            f,
-          );
-          return result;
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error('fetchFeaturedLists', error);
-          throw error;
-        }
-      }),
-    );
-
-    return results.map((res) => res.dripList);
+    return await Promise.all(FEATURED_DRIP_LISTS.map(async (id) => await fetchList(id, f)));
   };
 
   const fetchTlv = async () => {
