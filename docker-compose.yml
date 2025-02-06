@@ -55,6 +55,7 @@ services:
       - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
       - LOG_LEVEL=debug
       - MONITORING_UI_PORT=3001
+      - CACHE_INVALIDATION_ENDPOINT=http://app:5173/api/cache/invalidate-account-ids
     ports:
       - 3001:3001
     depends_on:
