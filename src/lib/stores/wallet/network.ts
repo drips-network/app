@@ -10,7 +10,7 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088] as const;
+export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
