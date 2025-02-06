@@ -47,3 +47,9 @@ To claim a project during local dev mode:
 - After confirming the claim process, the app will prompt you to send a transaction to request an owner update on-chain. Sign and submit this transaction.
 - Right after, run `npm run dev:docker:update-repo-owner`. You will be prompted to submit the account ID of the project you want to claim, and the address that should be set as its owner. Enter the address you previously configured in `FUNDING.json` for `localtestnet`.
 - Submit, and the fake oracle will update the owner of the project to the address you specified. The claim flow will continue.
+
+## 😩 Running without Docker
+
+Of course, you can also run the app locally without relying on the local Drips stack via Docker. However, you'll need to supply your own environment variables based on `.env.template`.
+
+To start the app directly on your machine, run `npm run dev` to start the dev server.
