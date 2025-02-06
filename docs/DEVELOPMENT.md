@@ -41,7 +41,7 @@ Drips uses an on-chain oracle service to validate ownership of repositories by l
 
 To claim a project during local dev mode:
 - If you haven't already, enable "Developer mode" in the app settings.
-- Navigate to the project page of a repo you want to claim by typing out the URL (e.g. http://localhost:5173/app/projects/github/repoOwner/repoName).
+- Navigate to the project page of a repo you want to claim by pasting its GitHub URL into the app's search bar
 - Copy the project's Account ID.
 - Begin the claiming process, which will prompt you to add the FUNDING.json file with an entry for "localtestnet" to the repository.
 - After confirming the claim process, the app will prompt you to send a transaction to request an owner update on-chain. Sign and submit this transaction.
