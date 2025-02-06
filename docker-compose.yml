@@ -15,6 +15,8 @@ services:
       - MULTIPLAYER_API_ACCESS_TOKEN=123
       - PINATA_SDK_KEY=123
       - PINATA_SDK_SECRET=123
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_API_KEY=1234
     volumes:
     - .:/app
     - /app/node_modules/
@@ -163,6 +165,36 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.11.3
+    environment:
+      - MEILI_ENV=development
+      - MEILI_MASTER_KEY=1234
+      - MEILI_NO_ANAYLTICS=true
+    ports:
+      - 7700:7700
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
+
+  search-sync:
+    image: 'j537/search-sync:${SEARCH_SYNC_TAG-main}'
+    pull_policy: always
+    environment:
+      - DB_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
+      - DB_SCHEMAS=localtestnet
+      - DB_POLLING_INTERVAL=10000
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_API_KEY=1234
+      - LOG_LEVEL=debug
+    depends_on:
+      meilisearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   pgadmin:
     image: dpage/pgadmin4
