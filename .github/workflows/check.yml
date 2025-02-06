@@ -44,7 +44,7 @@ jobs:
         run: npm ci
       
       - name: Build GQL types
-        run: SKIP_API_CHECK=true npm run build:graphql
+        run: SKIP_API_CHECK=true npm run gql:build
 
       - name: Run svelte-check
         run: npm run check
