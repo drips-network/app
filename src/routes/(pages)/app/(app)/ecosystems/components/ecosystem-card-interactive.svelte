@@ -45,15 +45,16 @@
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import EcosystemGraph from './ecosystem-graph.svelte';
-  import Box from '$lib/components/icons/Box.svelte';
-  import User from '$lib/components/icons/User.svelte';
-  import Coin from '$lib/components/icons/Coin.svelte';
+  // import Box from '$lib/components/icons/Box.svelte';
+  // import User from '$lib/components/icons/User.svelte';
+  // import Coin from '$lib/components/icons/Coin.svelte';
   import Button from '$lib/components/button/button.svelte';
   import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
+  import EcosystemProjectCard from './ecosystem-project-card.svelte';
 
   export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
@@ -122,16 +123,16 @@
         <ProjectAvatar project={projectChainData} size="small" outline />
         <span>with <span>Drips AI</span></span>
       </div> -->
-      <div class="cubbies">
+      <!-- <div class="cubbies">
         <div><Box style="fill: var(--color-foreground)" />2,618</div>
         <div><User style="fill: var(--color-foreground)" />17,491</div>
         <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
-      </div>
+      </div> -->
       <div class="surface top-left"><SearchInput small placeholder="Search" /></div>
       <div class="surface top-right">
         <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
       </div>
-      <div class="surface bottom-left">Card baby</div>
+      <div class="surface bottom-left"><EcosystemProjectCard {project} /></div>
       <div class="surface bottom-right">
         <Button circular on:click={(event) => zoomIn(event)}
           ><Plus style="fill: var(--color-forground)" /></Button
@@ -234,7 +235,7 @@
     justify-content: center;
   } */
 
-  .cubbies {
+  /* .cubbies {
     display: flex;
     gap: 0.5rem;
     align-items: center;
@@ -260,7 +261,7 @@
 
   .ecosystem-card-wrapper.ecosystem-card-wrapper--interactive .cubbies {
     display: none;
-  }
+  } */
 
   .banner {
     position: absolute;
