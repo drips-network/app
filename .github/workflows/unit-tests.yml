@@ -32,4 +32,4 @@ jobs:
         run: npx svelte-kit sync
 
       - name: Run tests
-        run: npm run test:unit
+        run: PUBLIC_NETWORK=1 npm run test:unit
