@@ -13,7 +13,7 @@
   import Box from '$lib/components/icons/Box.svelte';
   // import Section from '../section/section.svelte';
   // import { gql } from 'graphql-request';
-  import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
+  // import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   // import isClaimed from '$lib/utils/project/is-claimed';
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
@@ -28,9 +28,10 @@
   // import VisibilityToggle from '$lib/components/visibility-toggle/visibility-toggle.svelte';
   // import EcosystemCard, { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
   import EcosystemsGrid from './ecosystems-grid.svelte';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   // import { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
 
-  export let projects: ProjectsSectionProjectFragment[];
+  export let ecosystems: Ecosystem[];
   export let withClaimProjectButton = false;
   export let showVisibilityToggle = false;
 
@@ -42,7 +43,7 @@
   // let showHidden: boolean = false;
   // $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
 
-  $: visibleProjects = projects.filter((p) => p.isVisible);
+  // $: visibleProjects = projects.filter((p) => p.isVisible);
 
   // $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
@@ -68,7 +69,7 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: showVisibilityToggle ? projects.length === 0 : visibleProjects.length === 0,
+    empty: showVisibilityToggle ? ecosystems.length === 0 : ecosystems.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',
@@ -77,8 +78,8 @@
       : 'This user hasnʼt claimed any software projects yet.',
   }}
 >
-  {#if visibleProjects}
-    <EcosystemsGrid ecosystems={visibleProjects} />
+  {#if ecosystems}
+    <EcosystemsGrid {ecosystems} />
     <!-- <div class="projects">
       {#each visibleProjects as project}
         {@const projectChainData = filterCurrentChainData(project.chainData)}
