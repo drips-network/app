@@ -31,25 +31,20 @@
 
 <script lang="ts">
   import { gql } from 'graphql-request';
-  import isClaimed from '$lib/utils/project/is-claimed';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
-  import ProjectAvatar, {
-    PROJECT_AVATAR_FRAGMENT,
-  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import User from '$lib/components/icons/User.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
-  import { Forge } from '$lib/graphql/__generated__/base-types';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
-  export let project: ProjectCardFragment;
+  export let ecosystem: Ecosystem;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
-  let projectChainData = filterCurrentChainData(project.chainData);
   const donations: number = 186_833.91;
   const currencyFormatterShort = Intl.NumberFormat('en-US', {
     notation: 'compact',
@@ -67,18 +62,8 @@
       ? currencyFormatterShort.format(donations)
       : currencyFormatterLong.format(donations);
 
-  function buildEcosystemUrl(
-    forge: Forge,
-    ownerName: string,
-    repoName: string,
-    exact = true,
-  ): string {
-    switch (forge) {
-      case Forge.GitHub:
-        return `/app/ecosystems/github-${encodeURIComponent(ownerName)}-${encodeURIComponent(repoName)}${exact ? '?exact' : ''}`;
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
+  function buildEcosystemUrl(ecosystem: Ecosystem, exact = true): string {
+    return `/app/ecosystems/${ecosystem.id}}${exact ? '?exact' : ''}`;
   }
 </script>
 
@@ -88,10 +73,10 @@
 <a
   class="ecosystem-card-wrapper"
   class:ecosystem-card-wrapper--interactive={isInteractive}
-  href={buildEcosystemUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
+  href={buildEcosystemUrl(ecosystem)}
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
-    <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
+    <div class="background" />
     {#if $$slots.banner}
       <div class="banner">
         <slot name="banner" />
@@ -100,25 +85,24 @@
     <div class="header">
       <div class="graph">
         <EcosystemGraph />
-        <!-- <EcosystemGraphSigma /> -->
       </div>
     </div>
     <div class="details">
-      <!-- <div class="source">
-        <div class="icon">
-          <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
-        </div>
-        <span class="owner-name">{project.source.ownerName}</span>
-      </div> -->
       <h1 class="name">
         <span class="pixelated">
-          {project.source.repoName}
-          <!-- <ProjectName showSource={false} {project} /> -->
+          {ecosystem.name}
         </span>
       </h1>
       <p class="description">The essential Ethereum ecosystem.</p>
       <div class="avatar">
-        <ProjectAvatar project={projectChainData} size="small" outline />
+        <!-- TODO: replace with person card -->
+        <IdentityBadge
+          disableLink
+          address="vitalic.eth"
+          disableTooltip
+          size="medium"
+          showFullAddress
+        />
         <span>with <span>Drips AI</span></span>
       </div>
       <div class="cubbies">
@@ -182,14 +166,6 @@
     );
   }
 
-  .background.background--unclaimed {
-    background: linear-gradient(
-      180deg,
-      var(--color-foreground-level-1) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  }
-
   .details {
     display: flex;
     flex-direction: column;
@@ -243,6 +219,7 @@
     align-items: center;
     justify-content: center;
     flex-basis: 33%;
+    gap: 0.25rem;
   }
 
   .cubbies > *:last-child {
