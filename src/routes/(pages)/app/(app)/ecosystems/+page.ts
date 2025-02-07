@@ -11,21 +11,62 @@ import * as ecosystemsApi from '$lib/utils/ecosystems';
 
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
-// const fetchEcosystems = async (fetch: typeof window.fetch) => {
-//   const ecosystems = await ecosystemsApi.getAll()
+// const chicken = {
+//   "name": "Chicken Sandwich",
+//   "chainId": "11155111",
+//   "ownerAccountId": "ownerAccountId",
+//   "metadata": {
+//       "icon": "icon",
+//       "title": "title",
+//       "text": "text",
+//       "link": {
+//           "href": "http://href.com",
+//           "label": "label"
+//       }
+//   },
+//   "graph": {
+//       "nodes": [
+//           {
+//               "projectName": "root"
+//           },
+//           {
+//               "projectName": "drips-network/app",
+//               "metadata": {
+//                   "icon": "icon",
+//                   "title": "title",
+//                   "text": "text",
+//                   "link": {
+//                       "href": "http://href.com",
+//                       "label": "label"
+//                   }
+//               }
+//           },
+//           {
+//               "projectName": "drips-network/multiplayer"
+//           },
+//           {
+//               "projectName": "drips-network/graphql-api"
+//           }
+//       ],
+//       "edges": [
+//           {
+//               "source": "root",
+//               "target": "drips-network/app",
+//               "weight": 100
+//           },
+//           {
+//               "source": "drips-network/app",
+//               "target": "drips-network/multiplayer",
+//               "weight": 0.1
+//           },
+//           {
+//               "source": "drips-network/app",
+//               "target": "drips-network/graphql-api",
+//               "weight": 0.1
+//           }
+//       ]
+//   }
 // }
-
-//  const response = await fetch(
-//    `${stripTrailingSlash(MULTIPLAYER_API_URL)}/${params.path}?${searchParams}`,
-//    {
-//      method: request.method,
-//      body: body || undefined,
-//      headers: {
-//        Authorization: `Bearer ${MULTIPLAYER_API_ACCESS_TOKEN}`,
-//        'Content-Type': 'application/json',
-//      },
-//    },
-//  );
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
@@ -54,6 +95,11 @@ export const load = async ({ fetch }) => {
   fetchedDataCache.write(res);
 
   const ecosystems = await ecosystemsApi.getAll();
+  // if (!ecosystems.length) {
+  //   console.log('Creating a chicken')
+  //   const eco = await ecosystemsApi.create(chicken);
+  //   ecosystems = await ecosystemsApi.getAll();
+  // }
   // eslint-disable-next-line no-console
   console.log(ecosystems);
 
