@@ -27,6 +27,7 @@ const graphSchema = z.object({
 });
 
 export const ecosystemSchema = z.object({
+  id: z.optional(z.string()),
   name: z.string(),
   description: z.optional(z.string().or(z.null())),
   chainId: z.optional(z.string()),
@@ -39,62 +40,7 @@ export const ecosystemSchema = z.object({
 });
 
 export const getAllSchema = z.array(ecosystemSchema);
-
-// {
-//   "name": "test",
-//   "chainId": "11155111",
-//   "ownerAccountId": "ownerAccountId",
-//   "metadata": {
-//       "icon": "icon",
-//       "title": "title",
-//       "text": "text",
-//       "link": {
-//           "href": "http://href.com",
-//           "label": "label"
-//       }
-//   },
-//   "graph": {
-//       "nodes": [
-//           {
-//               "projectName": "root"
-//           },
-//           {
-//               "projectName": "drips-network/app",
-//               "metadata": {
-//                   "icon": "icon",
-//                   "title": "title",
-//                   "text": "text",
-//                   "link": {
-//                       "href": "http://href.com",
-//                       "label": "label"
-//                   }
-//               }
-//           },
-//           {
-//               "projectName": "drips-network/multiplayer"
-//           },
-//           {
-//               "projectName": "drips-network/graphql-api"
-//           }
-//       ],
-//       "edges": [
-//           {
-//               "source": "root",
-//               "target": "drips-network/app",
-//               "weight": 100
-//           },
-//           {
-//               "source": "drips-network/app",
-//               "target": "drips-network/multiplayer",
-//               "weight": 0.1
-//           },
-//           {
-//               "source": "drips-network/app",
-//               "target": "drips-network/graphql-api",
-//               "weight": 0.1
-//           }
-//       ]
-//   }
-// }
+// UUID of newly created graph
+export const createSchema = z.string();
 
 export type Ecosystem = z.infer<typeof ecosystemSchema>;
