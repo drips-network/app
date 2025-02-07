@@ -67,10 +67,10 @@
   </div> -->
 
   <div class="section">
-    {#if data.projects}
+    {#if data.ecosystems}
       <AllEcosystemsSection
         withClaimProjectButton
-        projects={data.projects}
+        ecosystems={data.ecosystems}
         showVisibilityToggle={true}
       />
     {/if}
