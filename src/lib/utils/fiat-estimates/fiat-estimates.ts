@@ -42,7 +42,7 @@ const SUBSTITUTIONS: Record<string, string> = {
  * For alt L1/L2 tokens that don't have an equivalent value token on Eth Mainnet.
  * Keys are token contract addresses on the L1/L2, values are coinmarket cap unique asset IDs to map to.
  * */
-const MANUAL_IDS: Record<string, string> = {
+export const MANUAL_IDS: Record<string, string> = {
   /* Map Wrapped Filecoin to Filecoin */
   '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A': '2280',
   /* Map METIS to METIS */

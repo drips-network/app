@@ -7,9 +7,9 @@
   import sanitize from 'sanitize-html';
   import insertTextAtIndices from '$lib/utils/insert-text-at-indicies';
 
-  export let path: string;
+  export let path: string = 'Code';
   export let code: string;
-  export let repoUrl: string;
+  export let repoUrl: string | undefined = undefined;
   export let defaultBranch = 'main';
   export let highlight: [number | null, number | null] = [null, null];
   export let editing: boolean = false;
@@ -66,7 +66,7 @@
       {@html displayCode}
     </code>
   </div>
-  {#if repoUrl.includes('github')}
+  {#if repoUrl && repoUrl.includes('github')}
     <footer class="absolute bottom-4 right-4">
       <Button variant="primary" icon={ArrowBoxUpRight} href={gitHubProposalUrl} target="_blank">
         {ctaText}</Button

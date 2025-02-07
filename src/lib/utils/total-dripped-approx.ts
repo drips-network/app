@@ -9,10 +9,24 @@ import cacheKey from './cache/remote/cache-key';
 const STREAMS: {
   token: { address: string };
   started: number;
+  endsAt: number;
   amtPerSec: string;
-}[] = [];
+}[] = [
+  // Filecoin RPGF-2 PG donation https://filecoin.drips.network/app/976822925357514561093139105352740088169738576235/tokens/0x60E1773636CF5E4A227d9AC24F20fEca034ee25A/streams/4192296931
+  {
+    token: { address: '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A' },
+    started: 1738347480000,
+    endsAt: 1740939492000,
+    amtPerSec: '70062152777777777777777777',
+  },
+];
 
 const GIVES = [
+  // Radworks Grant https://www.drips.network/app/drip-lists/40866246603895578971810925870326321539836543960399385681839516039553
+  {
+    tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
+    amount: '500000000000000000000',
+  },
   // ENS USDC (total of the completed stream) https://www.drips.network/app/219944633562831898862545170897344561225692372227/tokens/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/streams/465197764
   {
     tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
@@ -59,7 +73,6 @@ const GIVES = [
     tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     amount: '10000000000',
   },
-
   // First FTC list WETH (they have two for some reason) https://drips.network/app/drip-lists/36167722434539895740687283110259945938004377627588501179309095983174
   // Total of the stream which is now stopped
   {
@@ -70,7 +83,8 @@ const GIVES = [
 
 export default function totalDrippedApproximation() {
   const streamedAmounts = STREAMS.map((stream) => {
-    const duration = (Date.now() - stream.started) / 1000;
+    const calcUntil = Math.min(Date.now(), stream.endsAt);
+    const duration = (calcUntil - stream.started) / 1000;
 
     return {
       tokenAddress: stream.token.address.toLowerCase(),
