@@ -12,9 +12,10 @@ import * as ecosystemsApi from '$lib/utils/ecosystems';
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 // const chicken = {
-//   "name": "Chicken Sandwich",
+//   "name": "Jumbalaya",
+//   "description": "It's not possible without the support of these wonderful ingredients",
 //   "chainId": "11155111",
-//   "ownerAccountId": "ownerAccountId",
+//   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
 //   "metadata": {
 //       "icon": "icon",
 //       "title": "title",
@@ -95,7 +96,7 @@ export const load = async ({ fetch }) => {
   fetchedDataCache.write(res);
 
   const ecosystems = await ecosystemsApi.getAll();
-  // if (!ecosystems.length) {
+  // if (ecosystems.length < 4) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();
