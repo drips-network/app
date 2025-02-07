@@ -421,7 +421,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       CALLER: '0xd6Ab8e72dE3742d45AdF108fAa112Cd232718828',
       REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
       NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
-      NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
     },
     settlement: {
       nextSettlementDate: 'daily',
