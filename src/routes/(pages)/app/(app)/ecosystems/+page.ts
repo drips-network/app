@@ -7,8 +7,6 @@ import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import network from '$lib/stores/wallet/network';
-// import { ECOSYSTEM_API_URL, ECOSYSTEM_API_ACCESS_TOKEN } from '$env/static/private';
-// import { ensureResponseOk } from '$lib/utils/fetch';
 import * as ecosystemsApi from '$lib/utils/ecosystems';
 
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
