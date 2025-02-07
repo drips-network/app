@@ -28,11 +28,17 @@ const graphSchema = z.object({
 
 export const ecosystemSchema = z.object({
   name: z.string(),
-  chainId: z.string(),
+  description: z.optional(z.string().or(z.null())),
+  chainId: z.optional(z.string()),
   ownerAccountId: z.string(),
-  metadata: z.array(metadatumSchema),
-  graph: graphSchema,
+  // TODO: should be array no?
+  // metadata: z.array(metadatumSchema),
+  metadata: metadatumSchema,
+  nodeCount: z.optional(z.number()),
+  graph: z.optional(graphSchema),
 });
+
+export const getAllSchema = z.array(ecosystemSchema);
 
 // {
 //   "name": "test",
@@ -91,4 +97,4 @@ export const ecosystemSchema = z.object({
 //   }
 // }
 
-export type Ecosytem = z.infer<typeof ecosystemSchema>;
+export type Ecosystem = z.infer<typeof ecosystemSchema>;

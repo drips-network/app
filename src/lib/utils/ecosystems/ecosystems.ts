@@ -1,6 +1,7 @@
 import type { HttpMethod } from '@sveltejs/kit';
 import { z, type ZodSchema } from 'zod';
-import { ecosystemSchema } from './schemas';
+import { getAllSchema } from './schemas';
+import type { Ecosystem } from './schemas';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: HttpMethod,
@@ -25,11 +26,17 @@ async function _authenticatedCall<ST extends ZodSchema>(
 
   if (!response.ok) throw new Error(parsed.error);
 
+  // console.log(parsed)
+
   if (!responseSchema) throw new Error('Missing zod schema for response');
   return responseSchema.parse(parsed);
 }
 
 // chainId: ChainId;?
 export function getAll() {
-  return _authenticatedCall('GET', '', ecosystemSchema, undefined);
+  return _authenticatedCall('GET', '', getAllSchema, undefined);
+}
+
+export function create(ecosystem: Ecosystem) {
+  return _authenticatedCall('POST', '', getAllSchema, ecosystem);
 }
