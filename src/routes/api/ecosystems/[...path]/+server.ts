@@ -5,9 +5,12 @@ import type { RequestHandler } from './$types';
 export const fallback: RequestHandler = async ({ request, params, url, fetch }) => {
   const body = await request.text();
 
-  const searchParams = url.searchParams.toString();
+  let searchParams = url.searchParams.toString();
+  searchParams = searchParams ? `?${searchParams}` : '';
 
-  const response = await fetch(`${ECOSYSTEM_API_URL}/${params.path}?${searchParams}`, {
+  const pathParams = params.path ? `/${params.path}` : '';
+
+  const response = await fetch(`${ECOSYSTEM_API_URL}/api/ecosystems${pathParams}${searchParams}`, {
     method: request.method,
     body: body || undefined,
     headers: {
