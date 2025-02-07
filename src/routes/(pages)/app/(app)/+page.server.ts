@@ -48,7 +48,7 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     featuredListId: null,
     welcomeCardConfig: {
       title: 'Welcome to Drips on Metis',
-      description: "Drips on Filecoin is where rewards from Metis' RetroPGF will be distributed.",
+      description: "Drips on Metis is where rewards from Metis' RetroPGF will be distributed.",
     },
   }),
 } as const;
