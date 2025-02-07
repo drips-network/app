@@ -1,6 +1,6 @@
 import type { HttpMethod } from '@sveltejs/kit';
 import { z, type ZodSchema } from 'zod';
-import { getAllSchema } from './schemas';
+import { getAllSchema, createSchema } from './schemas';
 import type { Ecosystem } from './schemas';
 
 async function _authenticatedCall<ST extends ZodSchema>(
@@ -38,5 +38,5 @@ export function getAll() {
 }
 
 export function create(ecosystem: Ecosystem) {
-  return _authenticatedCall('POST', '', getAllSchema, ecosystem);
+  return _authenticatedCall('POST', '', createSchema, ecosystem);
 }
