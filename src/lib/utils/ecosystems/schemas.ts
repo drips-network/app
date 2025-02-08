@@ -44,3 +44,6 @@ export const getAllSchema = z.array(ecosystemSchema);
 export const createSchema = z.string();
 
 export type Ecosystem = z.infer<typeof ecosystemSchema>;
+export type Graph = z.infer<typeof graphSchema>;
+export type Node = z.infer<typeof nodeSchema>;
+export type Edge = z.infer<typeof edgeSchema>;
