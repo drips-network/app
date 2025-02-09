@@ -392,9 +392,15 @@
             >
             <Button
               variant="primary"
-              href="https://twitter.com/dripsnetwork"
+              href="https://x.com/dripsnetwork"
               target="_blank"
-              rel="noreferrer">Twitter</Button
+              rel="noreferrer">X</Button
+            >
+            <Button
+              variant="primary"
+              href="https://bsky.app/profile/drips.network"
+              target="_blank"
+              rel="noreferrer">Bluesky</Button
             >
             <Button
               variant="primary"
