@@ -32,18 +32,14 @@ describe('csv-to-graph', () => {
     expect(graph.edges.length).toEqual(set.size);
   });
 
-  // TODO: doesn't pass with the OSO dataset yet
-  // Set(3) {
-  //   'chainsafe/lodestarchainsafe/lodestar',
-  //   'ethereum/remix-projectethereum/remix-project',
-  //   'ethereumjs/ethereumjs-monorepoethereumjs/ethereumjs-monorepo'
-  // }
-  // it('should produce a graph with no duplicate edges', () => {
-  //   const sourceEdges = new Set(graph.edges.map(e => `${e.source}${e.target}`));
-  //   const targetEdges = new Set(graph.edges.map(e => `${e.target}${e.source}`));
-  //   const intersection = sourceEdges.intersection(targetEdges);
-  //   expect(intersection.size).toEqual(0);
-  // })
+  // prevent edges whose source and target are the same
+  // ensure edges are unidreictional
+  it('should produce a graph with no duplicate edges', () => {
+    const sourceEdges = new Set(graph.edges.map((e) => `${e.source}${e.target}`));
+    const targetEdges = new Set(graph.edges.map((e) => `${e.target}${e.source}`));
+    const intersection = sourceEdges.intersection(targetEdges);
+    expect(intersection.size).toEqual(0);
+  });
 
   it('should produce a graph in which each nodes edges do not add up to 100', () => {
     for (const node of graph.nodes) {

@@ -10,8 +10,21 @@ function createEdge(
   weight: number,
   graph: Graph,
   edgeLibrary: EdgeLibrary,
-): GraphEdge {
+): GraphEdge | null {
+  // don't add edge to same node
+  if (target === source) {
+    return null;
+  }
+
   const key = `${source}${target}`;
+
+  // only permit edges in one direction
+  const dupKey = `${target}${source}`;
+  const dupEdge = edgeLibrary[dupKey];
+  if (dupEdge) {
+    return dupEdge;
+  }
+
   let edge = edgeLibrary[key];
   if (!edge) {
     edge = { source, target, weight };
