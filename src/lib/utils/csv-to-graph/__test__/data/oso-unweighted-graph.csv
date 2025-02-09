@@ -13805,3 +13805,4 @@
 13803,status-im/nimbus-eth2,status-im,pip-tools,nvie,nvie/pip-tools,PIP,True
 13804,status-im/nimbus-eth2,status-im,debugpy,microsoft,microsoft/debugpy,PIP,True
 13805,safe-global/safe-smart-account,safe-global,certora-cli,certora,certora/certoracli,PIP,True
+13806,certora/certoracli,certora,safe-smart-account,safe-global,safe-global/safe-smart-account,PIP,True,dripsbadrow
