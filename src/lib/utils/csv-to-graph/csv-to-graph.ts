@@ -46,8 +46,8 @@ function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary)
   return node;
 }
 
-function assignRandomRealisticWeights(graph: Graph) {
-  const total = 1;
+export function assignRandomRealisticWeights(graph: Graph) {
+  const total = 100;
   for (const node of graph.nodes) {
     const edges = graph.edges.filter((e) => e.source === node.projectName);
     const degree = edges.length;
@@ -59,7 +59,7 @@ function assignRandomRealisticWeights(graph: Graph) {
 
     for (const [index, rand] of rands.entries()) {
       rands[index] = forDependencies * (rand / randsSum);
-      edges[index].weight = rands[index] * 100;
+      edges[index].weight = rands[index];
     }
   }
 }
@@ -84,8 +84,6 @@ export async function csvToGraph(file: File): Promise<Graph> {
     createNode(target, graph, nodeLibrary);
     createEdge(source, target, weight, graph, edgeLibrary);
   }
-
-  assignRandomRealisticWeights(graph);
 
   return graph;
 }
