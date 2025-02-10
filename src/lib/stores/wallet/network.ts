@@ -408,12 +408,12 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     isTestnet: false,
     subdomain: 'metis.drips.network',
     gqlName: SupportedChain.Metis,
-    autoUnwrapPairs: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
+    autoUnwrapPairs: [],
     displayNetworkPicker: true,
     applyGasBuffers: false,
     explorer: {
       name: 'Blockscout',
-      linkTemplate: (txHash: string) => `https://filecoin.blockscout.com/tx/${txHash}`,
+      linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
     },
     contracts: {
       ADDRESS_DRIVER: '0x04693D13826a37dDdF973Be4275546Ad978cb9EE',
@@ -428,7 +428,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
-        'Funds from projects, streams and Drip Lists on Filecoin settle and become collectable once per day.',
+        'Funds from projects, streams and Drip Lists on Metis settle and become collectable once per day.',
     },
     alternativeChainMode: true,
     ensSupported: false,
