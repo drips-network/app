@@ -412,7 +412,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     displayNetworkPicker: true,
     applyGasBuffers: false,
     explorer: {
-      name: 'Blockscout',
+      name: 'Metis Explorer',
       linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
     },
     contracts: {
