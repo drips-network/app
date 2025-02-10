@@ -434,6 +434,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ensSupported: false,
     ensAddress: undefined,
     gelatoRelayAvailable: true,
+    gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: {
       blockExplorerUrls: ['https://explorer.metis.io/'],
@@ -443,6 +444,19 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         symbol: 'METIS',
       },
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://filecoin.blockscout.com/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Filecoin',
+        symbol: 'FIL',
+      },
+      rpcUrls: [
+        'https://api.node.glif.io/rpc/v1',
+        'https://filecoin.chainup.net/rpc/v1',
+        'https://rpc.ankr.com/filecoin',
+      ],
     },
   },
 };
