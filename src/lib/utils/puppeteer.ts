@@ -34,7 +34,11 @@ export class PuppeteerManager {
     if (!this.browser) {
       this.browserConfig =
         this.browserConfig && !browserConfig ? this.browserConfig : browserConfig;
-      this.browser = await puppeteer.launch(this.browserConfig);
+      this.browser = await puppeteer.launch({
+        args: ['--no-sandbox'], // Required.
+        headless: true,
+        ...this.browserConfig,
+      });
 
       const childProcess = this.browser.process();
       childProcess?.on('exit', this.#onBrowserExit);

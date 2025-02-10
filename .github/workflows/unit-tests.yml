@@ -22,25 +22,14 @@ jobs:
           key: npm-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
-      - name: Populate .env file
-        uses: SpicyPizza/create-envfile@v1.3
-        with:
-          envkey_PUBLIC_NETWORK: 1
-          envkey_GQL_URL: https://drips-multichain-api.up.railway.app/
-          envkey_GQL_ACCESS_TOKEN: 7f82c43a-e7f4-47e9-a623-db7066f8bea2 # public token
-          envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
-          envkey_INFURA_KEY: 1234
-          envkey_MULTIPLAYER_API_ACCESS_TOKEN: 1234
-          envkey_MULTIPLAYER_API_URL: http://foobar:3000/
-
       - name: Install dependencies
         run: npm ci
 
       - name: Build GQL types
-        run: SKIP_API_CHECK=true npm run build:graphql
+        run: GQL_URL=https://drips-multichain-api.up.railway.app GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 npm run gql:build  # public access token
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync
 
       - name: Run tests
-        run: npm run test:unit
+        run: PUBLIC_NETWORK=1 npm run test:unit

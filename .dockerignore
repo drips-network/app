@@ -1,10 +1,10 @@
 node_modules
 docs
 docker
-!docker/app-e2e-test-env
-!docker/scripts
 Dockerfile
 Dockerfile.dev
 .git
 .gitignore
 .env
+build
+.svelte-kit

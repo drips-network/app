@@ -1,21 +1,21 @@
-# Based on the solution posted further down from
-# https://www.answeroverflow.com/m/1210080779267481670#solution-1210102172117631027
+# This Dockerfile is used for builds on Railway. For all other purposes, use the generic `Dockerfile.dockerhub` in root dir.
 
-# Use the official Node.js 22 image as a base
 FROM node:22
 
+ENV NODE_ENV=production
+
+# Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
+ARG CODEGEN_GQL_URL
+ARG GQL_ACCESS_TOKEN
+
+# Pass robots-allow.txt to serve a permissive robots.txt file
 ARG ROBOTS_FILE=robots-disallow.txt
 
-# Set host environment variables
-# Based on .env.template
-# See https://docs.railway.app/guides/dockerfiles#using-variables-at-build-time
 ARG PUBLIC_PINATA_GATEWAY_URL
 
 ARG INFURA_KEY
 ARG ALCHEMY_KEY
 ARG FILECOIN_KEY
-
-ARG E2E_HEADLESS
 
 ARG PINATA_SDK_KEY
 ARG PINATA_SDK_SECRET
@@ -48,54 +48,45 @@ ARG MULTIPLAYER_API_ACCESS_TOKEN
 ARG MEILISEARCH_HOST
 ARG MEILISEARCH_API_KEY
 
-# Set environment variables to optimize the container
-ENV NODE_ENV production
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
-ENV PUPPETEER_EXECUTABLE_PATH "/usr/bin/google-chrome-stable"
+WORKDIR /app
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+RUN apt-get update \
+ && apt-get install -y chromium \
+    fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    --no-install-recommends
 
 # Install necessary dependencies for Puppeteer's Chrome
 # These dependencies are required to run Puppeteer/Chrome in a headless environment
 # The contrib.list changes for ttf-mscorefonts-installer
-RUN apt-get update && \
-    apt-get install -y wget gnupg2 ca-certificates apt-transport-https software-properties-common && \
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
-    echo "deb http://deb.debian.org/debian bookworm contrib non-free" > /etc/apt/sources.list.d/contrib.list && \
-    apt-get update && \
-    apt-get install -y google-chrome-stable ttf-mscorefonts-installer fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+RUN apt-get install -y wget chromium
+# Set the Chrome repo.
 
-# Set working directory inside the container
-WORKDIR /app
-
-# Copy package.json and package-lock.json to the working directory
+# Copies both package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies, including 'puppeteer'
-RUN npm ci --ignore-scripts --include=dev
+# Install dependencies
+RUN npm ci --ignore-scripts --include=dev;
 
 # Copy the rest of the application's code into the container
 COPY . .
 
-# Run the post install script
 RUN npm run postinstall
-
-# Install husky globally to run the prepare script
-RUN npm install husky@9 -g
-RUN npm run prepare
 
 # Set up robots
 RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
-# Build graphql types
-RUN npm run build:graphql
+# Fetch GQL schema from API at `CODEGEN_GQL_URL` and save it to schema.graphql for type generation.
+RUN npm run gql:generate-schema
 
-# Expose the app port
-EXPOSE 4173
+# This relies on schema.graphql file being present in the root dir.
+RUN npm run gql:build-types
 
-# Build project
-RUN npm run build
+# While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
+RUN npm run build:app
 
-# Specify the command to run the app
-CMD ["npm", "run", "preview"]
+EXPOSE 8080
+
+# Run the app (this is not a build command, it runs /build/index.js)
+CMD ["node", "build"]

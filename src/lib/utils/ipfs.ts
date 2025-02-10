@@ -1,4 +1,3 @@
-import { PUBLIC_PINATA_GATEWAY_URL } from '$env/static/public';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import expect from './expect';
@@ -14,6 +13,10 @@ import type {
   LatestAccountMetadataHashQueryVariables,
 } from './__generated__/gql.generated';
 import stripTrailingSlash from './strip-trailing-slash';
+import getOptionalEnvVar from './get-optional-env-var/public';
+
+const PINATA_GATEWAY_URL =
+  getOptionalEnvVar('PUBLIC_IPFS_GATEWAY_URL', false, null) ?? 'https://drips.mypinata.cloud';
 
 /**
  * Fetch the given hash from IPFS.
@@ -22,7 +25,7 @@ import stripTrailingSlash from './strip-trailing-slash';
  * gateway.
  */
 export async function fetchIpfs(hash: string, f = fetch) {
-  return f(`${stripTrailingSlash(PUBLIC_PINATA_GATEWAY_URL)}/ipfs/${hash}`);
+  return f(`${stripTrailingSlash(PINATA_GATEWAY_URL)}/ipfs/${hash}`);
 }
 
 /**
@@ -36,7 +39,7 @@ export function convertIpfsUri(uri: string) {
 
   const hash = uri.replace('ipfs://', '');
 
-  return `${PUBLIC_PINATA_GATEWAY_URL}/ipfs/${hash}`;
+  return `${PINATA_GATEWAY_URL}/ipfs/${hash}`;
 }
 
 /**

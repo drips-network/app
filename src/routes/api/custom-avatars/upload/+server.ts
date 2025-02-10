@@ -1,8 +1,13 @@
-import { PINATA_SDK_KEY, PINATA_SDK_SECRET } from '$env/static/private';
 import Jimp from 'jimp';
 import { Readable } from 'stream';
 
 import pinataSdk from '@pinata/sdk';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private.js';
+
+const missingEnvVarError = 'Uploading custom avatars will not work.';
+
+const PINATA_SDK_KEY = getOptionalEnvVar('PINATA_SDK_KEY', true, missingEnvVarError);
+const PINATA_SDK_SECRET = getOptionalEnvVar('PINATA_SDK_SECRET', true, missingEnvVarError);
 
 const pinata = new pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
 

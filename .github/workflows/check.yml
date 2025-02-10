@@ -25,26 +25,15 @@ jobs:
       - name: Populate .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
-          envkey_PINATA_SDK_KEY: 1234
-          envkey_PINATA_SDK_SECRET: 1234
-          envkey_TENDERLY_ACCESS_SECRET: 1234
-          envkey_TENDERLY_PROJECT: 1234
-          envkey_TENDERLY_USER: 1234
-          envkey_GELATO_API_KEY: 1234
-          envkey_COINMARKETCAP_API_KEY: 1234
           envkey_PUBLIC_NETWORK: 5
           envkey_GQL_URL: https://drips-multichain-api.up.railway.app/
-          envkey_GQL_ACCESS_TOKEN: 7f82c43a-e7f4-47e9-a623-db7066f8bea2 # public token
-          envkey_PUBLIC_PINATA_GATEWAY_URL: http://localhost:3000
-          envkey_INFURA_KEY: 1234
-          envkey_MULTIPLAYER_API_ACCESS_TOKEN: 1234
-          envkey_MULTIPLAYER_API_URL: http://foobar:3000/
+          envkey_GQL_ACCESS_TOKEN: 123
 
       - name: Install dependencies
         run: npm ci
       
       - name: Build GQL types
-        run: SKIP_API_CHECK=true npm run build:graphql
+        run: GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 GQL_URL=https://drips-multichain-api.up.railway.app/ npm run gql:build  # public access token
 
       - name: Run svelte-check
         run: npm run check

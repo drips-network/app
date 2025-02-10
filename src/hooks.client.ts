@@ -6,7 +6,7 @@ import {
 } from '@sentry/sveltekit';
 import * as Sentry from '@sentry/sveltekit';
 
-const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN');
+const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN', false, null);
 
 if (dsn) {
   Sentry.init({

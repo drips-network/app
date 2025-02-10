@@ -1,0 +1,216 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file: .env
+    environment:
+      - PUBLIC_NETWORK=31337
+      - CACHE_REDIS_CONNECTION_STRING=redis://redis:6379
+      - FAKE_PINATA_URL=http://fake-pinata:3000
+      - PUBLIC_IPFS_GATEWAY_URL=http://fake-pinata:3000
+      - GQL_URL=http://graphql-api:8080
+      - GQL_ACCESS_TOKEN=123
+      - MULTIPLAYER_API_URL=http://multiplayer:5001
+      - MULTIPLAYER_API_ACCESS_TOKEN=123
+      - PINATA_SDK_KEY=123
+      - PINATA_SDK_SECRET=123
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_API_KEY=1234
+    volumes:
+    - .:/app
+    - /app/node_modules/
+    - /app/.svelte-kit/
+    ports:
+    - 5173:5173
+    depends_on:
+    - redis
+    - graphql-api
+    - fake-pinata
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
+    ports:
+    - 6379:6379
+
+  event-processor:
+    image: 'j537/event-processor:${EVENT_PROCESSOR_TAG-main}-localtestnet'
+    pull_policy: always
+    environment:
+      - IPFS_GATEWAY_URL=http://fake-pinata:3000
+      - SHOULD_PROCESS_PAST_EVENTS=${EVENT_PROCESSOR_SHOULD_PROCESS_PAST_EVENTS}
+      - PRIMARY_RPC_URL=http://testnet:8545
+      - NETWORK=localtestnet
+      - POLLING_INTERVAL=${EVENT_PROCESSOR_POLLING_INTERVAL}
+      - CHUNK_SIZE=${EVENT_PROCESSOR_CHUNK_SIZE}
+      - CONFIRMATIONS=${EVENT_PROCESSOR_CONFIRMATIONS}
+      - SHOULD_START_MONITORING_UI=true
+      - REDIS_CONNECTION_STRING=redis://redis:6379
+      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
+      - LOG_LEVEL=debug
+      - MONITORING_UI_PORT=3001
+      - CACHE_INVALIDATION_ENDPOINT=http://app:5173/api/cache/invalidate-account-ids
+    ports:
+      - 3001:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fake-pinata:
+        condition: service_healthy
+
+  graphql-api:
+    image: 'j537/graphql-api:${GRAPHQL_API_TAG-main}'
+    pull_policy: always
+    environment:
+      - 'RPC_CONFIG={"LOCALTESTNET": { "url": "http://testnet:8545" }}'
+      - NODE_ENV=development
+      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
+      - PORT=8080
+      - PRETEND_ALL_REPOS_EXIST=false
+      - IPFS_GATEWAY_URL=http://fake-pinata:3000
+      - DRIPS_API_KEY=123
+    ports:
+      - '8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      fake-pinata:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
+
+  testnet:
+    image: 'j537/contracts:${CONTRACTS_TAG-sha-f1ee52c}'
+    pull_policy: always
+    volumes:
+      - anvil-data:/anvil-data
+    ports:
+      - '8545:8545'
+
+  fake-pinata:
+    image: 'j537/fake-pinata:main'
+    pull_policy: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
+
+  multiplayer:
+    image: 'j537/multiplayer:${MULTIPLAYER_TAG-main}'
+    pull_policy: always
+    environment:
+      - 'RPC_CONFIG={"localtestnet": { "url": "http://testnet:8545" }}'
+      - GRAPHQL_URL=http://graphql-api:8080
+      - GRAPHQL_ACCESS_TOKEN=123
+      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres-multiplayer:5432/dripsdb
+      - DB_SCHEMA_NAME=multiplayer
+      - AUTH_STRATEGY=dev
+      - API_KEY=123
+      - SHOULD_RUN_MIGRATIONS=true
+      - PORT=5001
+      - LOG_LEVEL=debug
+    ports:
+      - 5001:5001
+    depends_on:
+      postgres-multiplayer:
+        condition: service_healthy
+      graphql-api:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: dripsdb
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+    ports:
+      - 54320:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  postgres-multiplayer:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: dripsdb
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+    ports:
+      - 54321:5432
+    volumes:
+      - postgres-multiplayer-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.11.3
+    environment:
+      - MEILI_ENV=development
+      - MEILI_MASTER_KEY=1234
+      - MEILI_NO_ANAYLTICS=true
+    ports:
+      - 7700:7700
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 1s
+      timeout: 30s
+      retries: 5
+
+  search-sync:
+    image: 'j537/search-sync:${SEARCH_SYNC_TAG-main}'
+    pull_policy: always
+    environment:
+      - DB_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
+      - DB_SCHEMAS=localtestnet
+      - DB_POLLING_INTERVAL=10000
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_API_KEY=1234
+      - LOG_LEVEL=debug
+    depends_on:
+      meilisearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - 5050:80
+    volumes:
+      - ./docker/pgadmin-servers.json:/pgadmin4/servers.json
+      - ./docker/pgadmin-passwords:/pgpass
+
+volumes:
+  postgres-data:
+  postgres-multiplayer-data:
+  anvil-data:

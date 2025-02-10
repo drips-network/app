@@ -9,6 +9,8 @@ import wait from '$lib/utils/wait';
 
 vi.mock('$app/environment', () => ({
   browser: true,
+  dev: true,
+  building: false,
 }));
 
 class ResizeObserver {

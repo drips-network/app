@@ -87,6 +87,12 @@
           return;
         }
 
+        if (!$walletStore.network.gelatoRelayAvailable) {
+          // If Gelato Relay is not available for the gasless owner update in the background, the last step will
+          // instead include a transaction for manually updating the repo owner.
+          return;
+        }
+
         try {
           // Kick off repo owner update using gasless TX
 

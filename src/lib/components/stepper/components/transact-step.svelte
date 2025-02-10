@@ -15,8 +15,6 @@
   import modal from '$lib/stores/modal';
   import SafeAppsSDK, { type SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
   import type { TransactionReceipt, Signer } from 'ethers';
-  import isTest from '$lib/utils/is-test';
-  import type { Nullable } from 'vitest';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -80,7 +78,7 @@
   let headline: string = '';
   let isExecutionCompleted = false;
 
-  let resolvedPayload: TransactPayload<Nullable<BeforeFunc>> | undefined;
+  let resolvedPayload: TransactPayload<BeforeFunc | null | undefined> | undefined;
 
   let description: string | undefined;
   let duringAfterMsg: string | undefined;
@@ -224,9 +222,7 @@
     // If at least one of the transactions has `applyGasBuffer` set to `true`, we need to
     // simulate the entire batch. This is because the transactions may be inter-dependent,
     // meaning they cannot always be independently simulated.
-    // In E2E tests, we can't simulate with Tenderly, so we don't.
     const needToSimulate =
-      !isTest() &&
       networkConfig.applyGasBuffers &&
       txWrappersWithGas.some((tx) => 'transaction' in tx && tx.applyGasBuffer);
 

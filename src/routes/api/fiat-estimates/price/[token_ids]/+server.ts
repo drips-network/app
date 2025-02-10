@@ -1,8 +1,14 @@
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { COINMARKETCAP_API_KEY } from '$env/static/private';
 import { z } from 'zod';
 import { redis } from '../../../redis';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+
+const COINMARKETCAP_API_KEY = getOptionalEnvVar(
+  'COINMARKETCAP_API_KEY',
+  true,
+  'Fiat estimates for supported tokens will not work.',
+);
 
 const cmcResponseSchema = z.object({
   data: z.record(

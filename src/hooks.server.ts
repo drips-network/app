@@ -5,7 +5,7 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 
-const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN');
+const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN', false, null);
 
 if (dsn) {
   Sentry.init({
@@ -17,11 +17,6 @@ if (dsn) {
 }
 
 PuppeteerManager.launch({
-  // Dockerfile deployment requires different executablePath
-  ...(process.env.NODE_ENV === 'production' && {
-    executablePath: '/usr/bin/google-chrome-stable',
-  }),
-  headless: true,
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 
