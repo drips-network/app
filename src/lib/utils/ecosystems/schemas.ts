@@ -31,10 +31,8 @@ export const ecosystemSchema = z.object({
   name: z.string(),
   description: z.optional(z.string().or(z.null())),
   chainId: z.optional(z.string()),
-  ownerAccountId: z.string(),
-  // TODO: should be array no?
-  // metadata: z.array(metadatumSchema),
-  metadata: metadatumSchema,
+  ownerAccountId: z.optional(z.string()),
+  metadata: z.array(metadatumSchema),
   nodeCount: z.optional(z.number()),
   graph: z.optional(graphSchema),
 });
