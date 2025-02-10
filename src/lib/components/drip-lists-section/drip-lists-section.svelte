@@ -40,12 +40,15 @@
   let showHidden: boolean = false;
   $: hiddenListsCount = dripLists.filter((dl) => !dl.isVisible).length ?? 0;
 
-  $: visibleDripListsAndVotingRounds = [
-    ...(dripLists?.map((dl) => ({ ...dl, type: 'drip-list' as const })) ?? []).filter(
-      (dl) => dl.isVisible,
-    ),
-    ...(votingRounds?.map((dl) => ({ ...dl, type: 'voting-round' as const })) ?? []),
-  ];
+  $: items = [...dripLists, ...votingRounds];
+
+  $: visibleDripListsAndVotingRounds = items
+    .filter((i) => ('isVisible' in i ? i.isVisible : true))
+    .map((i) =>
+      '__typename' in i
+        ? { ...i, type: 'drip-list' as const }
+        : { ...i, type: 'voting-round' as const },
+    );
 
   $: hiddenDripListsAndVotingRounds = showHidden
     ? dripLists.filter((dl) => !dl.isVisible).map((dl) => ({ ...dl, type: 'drip-list' as const }))
@@ -77,7 +80,7 @@
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
-    empty: visibleDripListsAndVotingRounds?.length === 0,
+    empty: showVisibilityToggle ? items.length === 0 : visibleDripListsAndVotingRounds.length === 0,
     error,
     emptyStateEmoji: '🫗',
     emptyStateHeadline: 'No Drip Lists',
