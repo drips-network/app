@@ -1,4 +1,5 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
+import Metis from '$lib/components/icons/networks/Metis.svelte';
 import Base from '$lib/components/icons/networks/Base.svelte';
 import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 import Filecoin from '$lib/components/icons/networks/Filecoin.svelte';
@@ -10,7 +11,7 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314] as const;
+export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
@@ -395,6 +396,55 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       ],
     },
   },
+  [1088]: {
+    chainId: 1088,
+    name: 'metis',
+    label: 'Metis',
+    token: 'METIS',
+    id: '0x440',
+    rpcUrl: 'https://andromeda.metis.io/?owner=1088',
+    icon: Metis,
+    color: '#00D2FF',
+    isTestnet: false,
+    subdomain: 'metis.drips.network',
+    gqlName: SupportedChain.Metis,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: false,
+    explorer: {
+      name: 'Metis Explorer',
+      linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x04693D13826a37dDdF973Be4275546Ad978cb9EE',
+      DRIPS: '0xd320F59F109c618b19707ea5C5F068020eA333B3',
+      CALLER: '0xd6Ab8e72dE3742d45AdF108fAa112Cd232718828',
+      REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
+      NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on Metis settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    ensSupported: false,
+    ensAddress: undefined,
+    gelatoRelayAvailable: true,
+    gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://explorer.metis.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Metis',
+        symbol: 'METIS',
+      },
+      rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
+  },
 };
 
 export function isSupportedChainId(chainId: number): chainId is ChainId {
@@ -402,6 +452,7 @@ export function isSupportedChainId(chainId: number): chainId is ChainId {
 }
 
 const configuredChainId = Number(PUBLIC_NETWORK);
+
 assert(
   isSupportedChainId(configuredChainId),
   'Missing or invalid PUBLIC_NETWORK env variable. See DEVELOPMENT.md for more information.',
