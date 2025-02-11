@@ -7,6 +7,7 @@ type CsvLayout = {
   source: number;
   target: number;
   weight?: number;
+  startIndex: number;
 };
 
 function createEdge(
@@ -85,7 +86,7 @@ function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrar
 
 export async function csvToGraph(
   file: File,
-  layout: CsvLayout = { source: 1, target: 5 },
+  layout: CsvLayout = { source: 1, target: 5, startIndex: 0 },
 ): Promise<Graph> {
   const rootNode = { projectName: 'root' };
   const graph: Graph = { nodes: [rootNode], edges: [] };
@@ -93,7 +94,7 @@ export async function csvToGraph(
   const edgeLibrary: EdgeLibrary = {};
 
   const parsedFile = await parseCsv(file);
-  for (const line of parsedFile) {
+  for (const line of parsedFile.slice(layout.startIndex)) {
     const source = line[layout.source];
     const target = line[layout.target];
 
