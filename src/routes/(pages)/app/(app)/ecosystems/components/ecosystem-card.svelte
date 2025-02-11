@@ -61,9 +61,8 @@
       ? currencyFormatterShort.format(donations)
       : currencyFormatterLong.format(donations);
 
-  function buildEcosystemUrl(ecosystem: Ecosystem, exact = true): string {
-    return `/app/ecosystems/${ecosystem.id}}${exact ? '?exact' : ''}`;
-    // return `/app/ecosystems/github-mhgbrown-${encodeURIComponent('cached_resource')}`;
+  function buildEcosystemUrl(ecosystem: Ecosystem): string {
+    return `/app/ecosystems/${ecosystem.id}`;
   }
 </script>
 

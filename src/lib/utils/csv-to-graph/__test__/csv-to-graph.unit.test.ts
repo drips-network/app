@@ -15,7 +15,7 @@ describe('csv-to-graph', () => {
   });
 
   it('should produce a graph with non-empty nodes', () => {
-    expect(graph.nodes.every((n) => !!n.projectName)).toBeTruthy();
+    expect(graph.nodes.every((n) => !!n.githubUrl)).toBeTruthy();
   });
 
   it('should produce a graph with non-empty edges', () => {
@@ -23,7 +23,7 @@ describe('csv-to-graph', () => {
   });
 
   it('should produce a graph with no duplicate nodes', () => {
-    const set = new Set(graph.nodes.map((n) => n.projectName));
+    const set = new Set(graph.nodes.map((n) => n.githubUrl));
     expect(graph.nodes.length).toEqual(set.size);
   });
 
@@ -43,8 +43,8 @@ describe('csv-to-graph', () => {
 
   it('should produce a graph in which each nodes edges do not add up to 100', () => {
     for (const node of graph.nodes) {
-      const edges = graph.edges.filter((e: Edge) => e.source === node.projectName);
-      const sum = edges.reduce((sum: number, e: Edge) => sum + e.weight, 0);
+      const edges = graph.edges.filter((e: Edge) => e.source === node.githubUrl);
+      const sum = edges.reduce((sum: number, e: Edge) => sum + Number(e.weight), 0);
       expect(sum).toBeLessThan(100);
     }
   });

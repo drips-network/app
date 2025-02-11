@@ -6,7 +6,9 @@ export async function osoToGraphJson(path: string = 'oso-unweighted-graph-fake-w
   const graph = await csvToGraph(osoUnweightedFile);
 
   assignRandomRealisticWeights(graph);
-  graph.nodes.sort((a, b) => a.projectName.localeCompare(b.projectName));
+  // @ts-expect-error: githubUrl might be undefined
+  graph.nodes.sort((a, b) => a.githubUrl.localeCompare(b.githubUrl));
+  // @ts-expect-error: source might be undefined
   graph.edges.sort((a, b) => a.source.localeCompare(b.source));
 
   fs.writeFileSync(path, JSON.stringify(graph, null, 4));

@@ -11,14 +11,18 @@ const metadatumSchema = z.object({
 });
 
 const nodeSchema = z.object({
-  projectName: z.string(),
+  // TODO: githubUrl or projectName?
+  githubUrl: z.optional(z.string()),
+  projectName: z.optional(z.string()),
   metadata: z.optional(metadatumSchema),
 });
 
 const edgeSchema = z.object({
-  source: z.string(),
+  // TODO: null is not a valid source
+  source: z.string().or(z.null()),
   target: z.string(),
-  weight: z.number().positive(),
+  // TODO: should we standardize on a number or a string?
+  weight: z.string().or(z.number()),
 });
 
 const graphSchema = z.object({
@@ -38,6 +42,7 @@ export const ecosystemSchema = z.object({
 });
 
 export const getAllSchema = z.array(ecosystemSchema);
+export const getSchema = ecosystemSchema;
 // UUID of newly created graph
 export const createSchema = z.string();
 

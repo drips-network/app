@@ -1,6 +1,6 @@
 import type { HttpMethod } from '@sveltejs/kit';
 import { z, type ZodSchema } from 'zod';
-import { getAllSchema, createSchema } from './schemas';
+import { getAllSchema, getSchema, createSchema } from './schemas';
 import type { Ecosystem } from './schemas';
 
 async function _authenticatedCall<ST extends ZodSchema>(
@@ -35,6 +35,10 @@ async function _authenticatedCall<ST extends ZodSchema>(
 // chainId: ChainId;?
 export function getAll() {
   return _authenticatedCall('GET', '', getAllSchema, undefined);
+}
+
+export function get(id: string, fetch = window.fetch) {
+  return _authenticatedCall('GET', `/${id}`, getSchema, undefined, fetch);
 }
 
 export function create(ecosystem: Ecosystem) {
