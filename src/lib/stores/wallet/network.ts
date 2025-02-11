@@ -351,7 +351,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     id: '0x13a',
     rpcUrl: `${BASE_URL}/api/rpc/glif/filecoin-mainnet`,
     icon: Filecoin,
-    color: '#627EEA',
+    color: '#0090FF',
     isTestnet: false,
     subdomain: 'filecoin.drips.network',
     gqlName: SupportedChain.Filecoin,
