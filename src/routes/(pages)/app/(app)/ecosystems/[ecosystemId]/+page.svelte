@@ -6,6 +6,7 @@
 </script>
 
 <EcosytemProfile
+  ecosystem={data.ecosystem}
   project={data.project}
   description={data.description}
   newRepo={data.newRepo}
