@@ -3,6 +3,11 @@ import type { Graph, Node as GraphNode, Edge as GraphEdge } from '../ecosystems/
 
 type NodeLibrary = Record<string, GraphNode>;
 type EdgeLibrary = Record<string, GraphEdge>;
+type CsvLayout = {
+  source: number;
+  target: number;
+  weight?: number;
+};
 
 function createEdge(
   source: string,
@@ -35,11 +40,11 @@ function createEdge(
   return edge;
 }
 
-function createNode(githubUrl: string, graph: Graph, nodeLibrary: NodeLibrary): GraphNode {
-  let node = nodeLibrary[githubUrl];
+function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary): GraphNode {
+  let node = nodeLibrary[projectName];
   if (!node) {
-    node = { githubUrl };
-    nodeLibrary[githubUrl] = node;
+    node = { projectName };
+    nodeLibrary[projectName] = node;
     graph.nodes.push(node);
   }
 
@@ -49,7 +54,7 @@ function createNode(githubUrl: string, graph: Graph, nodeLibrary: NodeLibrary): 
 export function assignRandomRealisticWeights(graph: Graph) {
   const total = 100;
   for (const node of graph.nodes) {
-    const edges = graph.edges.filter((e) => e.source === node.githubUrl);
+    const edges = graph.edges.filter((e) => e.source === node.projectName);
     const degree = edges.length;
     const rands = Array.from({ length: degree }, () => Math.random());
     const randsSum = rands.reduce((sum, rand) => sum + rand, 0);
@@ -64,26 +69,51 @@ export function assignRandomRealisticWeights(graph: Graph) {
   }
 }
 
-export async function csvToGraph(file: File): Promise<Graph> {
-  const graph: Graph = { nodes: [], edges: [] };
-  const nodeLibrary: NodeLibrary = {};
+function addRootEdges(graph: Graph, edgeLibrary: EdgeLibrary) {
+  const rootNodes = [];
+  for (const node of graph.nodes) {
+    const edge = graph.edges.find((e) => e.target === node.projectName);
+    if (!edge) {
+      rootNodes.push(node);
+    }
+  }
+
+  for (const node of rootNodes) {
+    createEdge('root', node.projectName, 0, graph, edgeLibrary);
+  }
+}
+
+//
+
+// TODO:
+// - add root node
+// - add edges from root node
+export async function csvToGraph(
+  file: File,
+  layout: CsvLayout = { source: 1, target: 5 },
+): Promise<Graph> {
+  const rootNode = { projectName: 'root' };
+  const graph: Graph = { nodes: [rootNode], edges: [] };
+  const nodeLibrary: NodeLibrary = { root: rootNode };
   const edgeLibrary: EdgeLibrary = {};
 
   const parsedFile = await parseCsv(file);
   for (const line of parsedFile) {
-    const source = line[1];
-    const target = line[5];
+    const source = line[layout.source];
+    const target = line[layout.target];
 
     if (!source || !target) {
       continue;
     }
 
-    const weight = 0;
+    const weight = layout.weight === undefined ? 0 : Number(line[layout.weight]);
 
     createNode(source, graph, nodeLibrary);
     createNode(target, graph, nodeLibrary);
     createEdge(source, target, weight, graph, edgeLibrary);
   }
+
+  addRootEdges(graph, edgeLibrary);
 
   return graph;
 }
