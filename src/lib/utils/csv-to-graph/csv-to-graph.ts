@@ -69,7 +69,7 @@ export function assignRandomRealisticWeights(graph: Graph) {
   }
 }
 
-function addRootEdges(graph: Graph, edgeLibrary: EdgeLibrary) {
+function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrary) {
   const rootNodes = [];
   for (const node of graph.nodes) {
     const edge = graph.edges.find((e) => e.target === node.projectName);
@@ -79,22 +79,17 @@ function addRootEdges(graph: Graph, edgeLibrary: EdgeLibrary) {
   }
 
   for (const node of rootNodes) {
-    createEdge('root', node.projectName, 0, graph, edgeLibrary);
+    createEdge(rootNode.projectName, node.projectName, 0, graph, edgeLibrary);
   }
 }
 
-//
-
-// TODO:
-// - add root node
-// - add edges from root node
 export async function csvToGraph(
   file: File,
   layout: CsvLayout = { source: 1, target: 5 },
 ): Promise<Graph> {
   const rootNode = { projectName: 'root' };
   const graph: Graph = { nodes: [rootNode], edges: [] };
-  const nodeLibrary: NodeLibrary = { root: rootNode };
+  const nodeLibrary: NodeLibrary = { [rootNode.projectName]: rootNode };
   const edgeLibrary: EdgeLibrary = {};
 
   const parsedFile = await parseCsv(file);
@@ -113,7 +108,7 @@ export async function csvToGraph(
     createEdge(source, target, weight, graph, edgeLibrary);
   }
 
-  addRootEdges(graph, edgeLibrary);
+  addRootEdges(rootNode, graph, edgeLibrary);
 
   return graph;
 }
