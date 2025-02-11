@@ -33,7 +33,9 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
+  export let ecosystem: Ecosystem;
   export let project: ProjectProfileHeaderFragment;
   export let description: string | undefined = undefined;
 
@@ -50,7 +52,7 @@
       <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
-      <h1>{project.source.repoName}</h1>
+      <h1>{ecosystem.name}</h1>
       <div style:display="flex" style:gap="0.75rem" style:flex-wrap="wrap">
         {#if isClaimed(projectChainData)}
           <IdentityBadge address={projectChainData.owner.address} />

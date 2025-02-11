@@ -142,7 +142,7 @@ export const load = (async ({ params, fetch, url }) => {
       : undefined;
 
   const ecosystem = await ecosystemsApi.get(params.ecosystemId, fetch);
-  // console.log('MORGAN', ecosystem)
+  // console.log(JSON.stringify(ecosystem, null, 2))
 
   return {
     ecosystem,
