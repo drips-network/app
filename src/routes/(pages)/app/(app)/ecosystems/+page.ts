@@ -8,15 +8,16 @@ import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import network from '$lib/stores/wallet/network';
 import * as ecosystemsApi from '$lib/utils/ecosystems';
+// import osoJson from '$lib/utils/csv-to-graph/__test__/data/oso-unweighted-graph-fake-weighted.json';
 
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 // const chicken = {
-//   "name": "Jumbalaya",
-//   "description": "It's not possible without the support of these wonderful ingredients",
+//   "name": "OSO Ecosystem",
+//   "description": "It's wild and free",
 //   "chainId": "11155111",
 //   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
-//   "metadata": {
+//   "metadata": [{
 //       "icon": "icon",
 //       "title": "title",
 //       "text": "text",
@@ -24,49 +25,8 @@ const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:proj
 //           "href": "http://href.com",
 //           "label": "label"
 //       }
-//   },
-//   "graph": {
-//       "nodes": [
-//           {
-//               "projectName": "root"
-//           },
-//           {
-//               "projectName": "drips-network/app",
-//               "metadata": {
-//                   "icon": "icon",
-//                   "title": "title",
-//                   "text": "text",
-//                   "link": {
-//                       "href": "http://href.com",
-//                       "label": "label"
-//                   }
-//               }
-//           },
-//           {
-//               "projectName": "drips-network/multiplayer"
-//           },
-//           {
-//               "projectName": "drips-network/graphql-api"
-//           }
-//       ],
-//       "edges": [
-//           {
-//               "source": "root",
-//               "target": "drips-network/app",
-//               "weight": 100
-//           },
-//           {
-//               "source": "drips-network/app",
-//               "target": "drips-network/multiplayer",
-//               "weight": 0.1
-//           },
-//           {
-//               "source": "drips-network/app",
-//               "target": "drips-network/graphql-api",
-//               "weight": 0.1
-//           }
-//       ]
-//   }
+//   }],
+//   "graph": osoJson
 // }
 
 export const load = async ({ fetch }) => {
@@ -96,7 +56,8 @@ export const load = async ({ fetch }) => {
   fetchedDataCache.write(res);
 
   const ecosystems = await ecosystemsApi.getAll();
-  // if (ecosystems.length < 4) {
+  // console.log(chicken)
+  // if (ecosystems.length < 2) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();

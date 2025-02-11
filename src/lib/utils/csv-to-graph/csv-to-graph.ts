@@ -35,11 +35,11 @@ function createEdge(
   return edge;
 }
 
-function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary): GraphNode {
-  let node = nodeLibrary[projectName];
+function createNode(githubUrl: string, graph: Graph, nodeLibrary: NodeLibrary): GraphNode {
+  let node = nodeLibrary[githubUrl];
   if (!node) {
-    node = { projectName };
-    nodeLibrary[projectName] = node;
+    node = { githubUrl };
+    nodeLibrary[githubUrl] = node;
     graph.nodes.push(node);
   }
 
@@ -49,7 +49,7 @@ function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary)
 export function assignRandomRealisticWeights(graph: Graph) {
   const total = 100;
   for (const node of graph.nodes) {
-    const edges = graph.edges.filter((e) => e.source === node.projectName);
+    const edges = graph.edges.filter((e) => e.source === node.githubUrl);
     const degree = edges.length;
     const rands = Array.from({ length: degree }, () => Math.random());
     const randsSum = rands.reduce((sum, rand) => sum + rand, 0);
@@ -78,7 +78,7 @@ export async function csvToGraph(file: File): Promise<Graph> {
       continue;
     }
 
-    const weight = Math.random() * 100;
+    const weight = 0;
 
     createNode(source, graph, nodeLibrary);
     createNode(target, graph, nodeLibrary);
