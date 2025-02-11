@@ -34,7 +34,6 @@
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import Box from '$lib/components/icons/Box.svelte';
-  import User from '$lib/components/icons/User.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
@@ -96,20 +95,25 @@
       </h1>
       <p class="description">The essential Ethereum ecosystem.</p>
       <div class="avatar">
-        <!-- TODO: replace with person card -->
+        <!-- vitalik.eth -->
         <IdentityBadge
           disableLink
-          address="vitalic.eth"
+          address="0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
           disableTooltip
           size="medium"
-          showFullAddress
         />
         <span>with <span>Drips AI</span></span>
       </div>
       <div class="cubbies">
-        <div><Box style="fill: var(--color-foreground)" />2,618</div>
-        <div><User style="fill: var(--color-foreground)" />17,491</div>
-        <div><Coin style="fill: var(--color-foreground)" />{donationsFormatted}</div>
+        <div>
+          <Box style="fill: var(--color-foreground)" /><strong class="typo-text-bold"
+            >Projects</strong
+          >2,618
+        </div>
+        <div>
+          <Coin style="fill: var(--color-foreground)" /><strong class="typo-text-bold">Funds</strong
+          >{donationsFormatted}
+        </div>
       </div>
     </div>
   </div>
@@ -219,7 +223,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-basis: 33%;
+    flex-basis: 50%;
     gap: 0.25rem;
   }
 
