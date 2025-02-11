@@ -1,6 +1,5 @@
 import type { Edge, Graph } from '$lib/utils/ecosystems/schemas';
 import { csvToGraph } from '../csv-to-graph';
-import { osoToGraphJson } from '../oso-to-graph';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 
 describe('csv-to-graph', () => {
@@ -9,7 +8,6 @@ describe('csv-to-graph', () => {
 
   beforeAll(async () => {
     osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
-    await osoToGraphJson();
     graph = await csvToGraph(osoUnweightedFile);
   });
 
