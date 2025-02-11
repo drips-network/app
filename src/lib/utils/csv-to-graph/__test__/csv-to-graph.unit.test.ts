@@ -68,11 +68,14 @@ describe('csv-to-graph', () => {
 
   describe('when provided an alternative layout', () => {
     beforeAll(async () => {
-      graph = await csvToGraph(osoUnweightedFile, { source: 3, target: 4 });
+      graph = await csvToGraph(osoUnweightedFile, { source: 3, target: 4, startIndex: 1 });
     });
 
     it('should successfully parse a csv', () => {
       // NOTE: relies on the order of the test csv file.
+      const headerNode = graph.nodes.find((n) => n.projectName === 'package_name');
+      expect(headerNode).not.toBeDefined();
+
       const node = graph.nodes.find((n) => n.projectName === '@eslint/eslintrc');
       const edge = graph.edges.find((e) => e.target === 'eslint');
       expect(node).toBeDefined();
