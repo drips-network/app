@@ -71,11 +71,13 @@
       />
     </div>
     <div class="bottom-nav" data-testid="bottom-nav">
+      <!-- TODO: explore needs to go bye bye -->
       <BottomNav
         items={[
           { label: 'Explore', href: '/app', icon: ExploreIcon },
           { label: 'Funds', href: '/app/funds', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Box },
+          { label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon },
           { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
           {
             label: 'Profile',
