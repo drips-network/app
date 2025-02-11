@@ -516,7 +516,7 @@
           >
             <div class="card">
               <div class="p-6">
-                <ProjectBadge {project} />
+                <ProjectBadge tooltip={false} {project} />
                 <div class="pl-3.5 mt-2.5">
                   <SplitsComponent
                     disableLinks={false}
