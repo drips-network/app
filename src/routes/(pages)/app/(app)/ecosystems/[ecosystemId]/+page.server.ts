@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import uriDecodeParams from '$lib/utils/url-decode-params';
+// import uriDecodeParams from '$lib/utils/url-decode-params';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generated__/gql.generated';
@@ -17,6 +17,7 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import { redis } from '../../../../../api/redis';
 import { PROJECT_PROFILE_FRAGMENT } from './components/ecosystem-profile.svelte';
+import * as ecosystemsApi from '$lib/utils/ecosystems';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
@@ -51,15 +52,18 @@ async function fetchDripsProject(repoUrl: string) {
 }
 
 export const load = (async ({ params, fetch, url }) => {
-  let githubUsername, githubRepoName: string;
-  try {
-    const p = uriDecodeParams(params);
-    [, githubUsername, githubRepoName] = p.ecosystemId.split('-');
-    // githubRepoName = p.githubRepoName;
-    // githubUsername = p.githubUsername;
-  } catch {
-    throw error(400);
-  }
+  // let githubUsername, githubRepoName: string;
+  const githubUsername = 'mhgbrown';
+  const githubRepoName = 'cached_resource';
+  // try {
+  //   const p = uriDecodeParams(params);
+  //   [, githubUsername, githubRepoName] = p.ecosystemId.split('-');
+  //   // 'github-mhgbrown-cached_resource'
+  //   // githubRepoName = p.githubRepoName;
+  //   // githubUsername = p.githubUsername;
+  // } catch {
+  //   throw error(400);
+  // }
 
   // `exact` param disables the redirect to the "real" github repo URL.
   // For example, after a repo has been renamed, it would usually automatically redirect
@@ -137,7 +141,11 @@ export const load = (async ({ params, fetch, url }) => {
         }
       : undefined;
 
+  const ecosystem = await ecosystemsApi.get(params.ecosystemId, fetch);
+  // console.log('MORGAN', ecosystem)
+
   return {
+    ecosystem,
     project,
     description:
       typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
