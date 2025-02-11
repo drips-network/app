@@ -36,6 +36,7 @@ export const ecosystemSchema = z.object({
   description: z.optional(z.string().or(z.null())),
   chainId: z.optional(z.string()),
   ownerAccountId: z.optional(z.string()),
+  ownerAddress: z.optional(z.string()),
   metadata: z.array(metadatumSchema),
   nodeCount: z.optional(z.number()),
   graph: z.optional(graphSchema),

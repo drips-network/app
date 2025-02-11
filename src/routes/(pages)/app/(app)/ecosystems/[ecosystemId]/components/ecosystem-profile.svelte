@@ -99,52 +99,52 @@
   // import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import Button from '$lib/components/button/button.svelte';
+  // import Button from '$lib/components/button/button.svelte';
   // import Pen from '$lib/components/icons/Pen.svelte';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
-  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  import Registered from '$lib/components/icons/Registered.svelte';
-  import buildUrl from '$lib/utils/build-url';
+  // import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  // import Registered from '$lib/components/icons/Registered.svelte';
+  // import buildUrl from '$lib/utils/build-url';
   // import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
   import { fade } from 'svelte/transition';
   // import Developer from '$lib/components/developer-section/developer.section.svelte';
-  import { goto } from '$app/navigation';
+  // import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
   import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
   import type { ProjectProfileFragment } from './__generated__/gql.generated';
   // import unreachable from '$lib/utils/unreachable';
-  import ShareButton from '$lib/components/share-button/share-button.svelte';
+  // import ShareButton from '$lib/components/share-button/share-button.svelte';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
+  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import buildProjectUrl from '$lib/utils/build-project-url';
   import { Forge } from '$lib/graphql/__generated__/base-types';
-  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
-  import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
+  // import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
+  // import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   // import DripList from '$lib/components/icons/DripList.svelte';
-  import mergeWithdrawableBalances, {
-    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
-  } from '$lib/utils/merge-withdrawable-balances';
+  import { MERGE_WITHDRAWABLE_BALANCES_FRAGMENT } from '$lib/utils/merge-withdrawable-balances';
   import getSupportersPile, {
     SUPPORTER_PILE_FRAGMENT,
   } from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
+  // import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
   // import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
   // import Settings from '$lib/components/icons/Settings.svelte';
-  import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
+  // import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
   // import EcosystemCard from '../../components/ecosystem-card.svelte';
   import EcosystemCardInteractive from '../../components/ecosystem-card-interactive.svelte';
   import EcosystemMetadata from './ecosystem-metadata.svelte';
   import EcosystemDistribution from './ecosystem-distribution.svelte';
   import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
+  export let ecosystem: Ecosystem;
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
 
@@ -157,9 +157,9 @@
   export let newRepo: RepoInfo | undefined;
   export let correctCasingRepo: RepoInfo | undefined;
 
-  $: ownAccountId = $walletStore.dripsAccountId;
+  // $: ownAccountId = $walletStore.dripsAccountId;
   $: chainData = filterCurrentChainData(project.chainData);
-  $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
+  // $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
 
   type ExtractFragment<T, Condition> = T extends Condition ? T : never;
 
@@ -253,22 +253,22 @@
 
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 
-  $: origin = browser ? window.location.origin : '';
-  $: supportButtonStepConfig = {
-    projectSourceUrl: project.source.url,
-    supportButtonData: {
-      dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
-      projectName: project.source.repoName,
-      projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
-      projectData: chainData as SupportButtonData['projectData'],
-    },
-  };
+  // $: origin = browser ? window.location.origin : '';
+  // $: supportButtonStepConfig = {
+  //   projectSourceUrl: project.source.url,
+  //   supportButtonData: {
+  //     dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
+  //     projectName: project.source.repoName,
+  //     projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
+  //     projectData: chainData as SupportButtonData['projectData'],
+  //   },
+  // };
 
   $: colorHex = isClaimed(chainData) ? chainData.color : undefined;
 </script>
 
 <HeadMeta
-  title="{project.source.ownerName}/{project.source.repoName}"
+  title={ecosystem.name}
   description="Support {project.source
     .repoName} on Drips and help make Open-Source Software sustainable."
   image="{imageBaseUrl}?target=og"
@@ -298,108 +298,6 @@
 </svelte:head>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
-  {#if newRepo}
-    <div class="notice">
-      <AnnotationBox>
-        The GitHub repo for this project has been renamed to {newRepo.ownerName}/{newRepo.repoName}.
-        <svelte:fragment slot="actions">
-          <Button
-            icon={ArrowRight}
-            variant="primary"
-            href={buildProjectUrl(Forge.GitHub, newRepo.ownerName, newRepo.repoName, false)}
-            >Go to the new project</Button
-          >
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
-  {/if}
-  {#if correctCasingRepo}
-    <div class="notice">
-      <AnnotationBox>
-        This project resolves to a GitHub repo with different casing ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName}).
-        Any new splits to this misnamed project will automatically be routed to the correct project.
-        <svelte:fragment slot="actions">
-          <Button
-            size="small"
-            icon={EyeOpen}
-            variant="primary"
-            href={buildProjectUrl(
-              Forge.GitHub,
-              correctCasingRepo.ownerName,
-              correctCasingRepo.repoName,
-              false,
-            )}>View correct project</Button
-          >
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
-  {/if}
-  {#if !isClaimed(chainData)}
-    <div class="notice">
-      <AnnotationBox type="info">
-        {#if chainData.withdrawableBalances.length > 0}This project has <span
-            class="typo-text-small-bold"
-            ><AggregateFiatEstimate
-              amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
-            /></span
-          > in claimable funds! Project owners can collect by claiming their project.{:else}This
-          project has not been claimed yet but can still receive funds that the owner can collect
-          later.{/if}
-        <svelte:fragment slot="actions">
-          <div class="flex gap-3">
-            <ShareButton
-              url={browser ? window.location.href : ''}
-              downloadableImageUrl="{imageBaseUrl}?target=og"
-              supportButtonOptions={supportButtonStepConfig}
-            />
-            <Button
-              size="small"
-              icon={Registered}
-              variant="primary"
-              on:click={() =>
-                $walletStore.connected
-                  ? modal.show(ClaimProjectStepper, undefined, {
-                      skipWalletConnect: true,
-                      projectUrl: project.source.url,
-                    })
-                  : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
-              >Claim project</Button
-            >
-          </div>
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
-  {/if}
-  {#if !project.isVisible}
-    <div class="notice">
-      <AnnotationBox type="info" icon={EyeClosed}>
-        <span class="typo-text-small-bold"
-          >{project.source.ownerName}/{project.source.repoName}</span
-        >
-        has been hidden by its owner.
-        <a
-          style="text-decoration: underline;"
-          target="_blank"
-          href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
-        >.
-        <svelte:fragment slot="actions">
-          {#if isOwnProject}
-            <div class="flex gap-3">
-              <Button
-                size="small"
-                icon={Registered}
-                variant="primary"
-                on:click={() => {
-                  modal.show(Stepper, undefined, editProjectMetadataSteps(project));
-                }}>Unhide it</Button
-              >
-            </div>
-          {/if}
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
-  {/if}
-
   <article
     class="project-profile"
     class:claimed={isClaimed(chainData)}
@@ -408,6 +306,7 @@
     <header class="header card">
       <div>
         <EcosystemProfileHeader
+          {ecosystem}
           {project}
           {description}
           on:editButtonClick={() =>
@@ -595,10 +494,6 @@
     gap: 3rem;
     grid-row-start: 2;
     grid-column: span 2;
-  }
-
-  .notice {
-    margin-bottom: 2rem;
   }
 
   .header {
