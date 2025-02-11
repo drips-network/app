@@ -12,8 +12,7 @@ const metadatumSchema = z.object({
 
 const nodeSchema = z.object({
   // TODO: githubUrl or projectName?
-  githubUrl: z.optional(z.string()),
-  projectName: z.optional(z.string()),
+  projectName: z.string(),
   metadata: z.optional(metadatumSchema),
 });
 
@@ -34,6 +33,7 @@ export const ecosystemSchema = z.object({
   id: z.optional(z.string()),
   name: z.string(),
   description: z.optional(z.string().or(z.null())),
+  state: z.string(),
   chainId: z.optional(z.string()),
   ownerAccountId: z.optional(z.string()),
   ownerAddress: z.optional(z.string()),
