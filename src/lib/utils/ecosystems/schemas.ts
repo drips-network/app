@@ -33,7 +33,7 @@ export const ecosystemSchema = z.object({
   id: z.optional(z.string()),
   name: z.string(),
   description: z.optional(z.string().or(z.null())),
-  state: z.string(),
+  state: z.optional(z.string()),
   chainId: z.optional(z.string()),
   ownerAccountId: z.optional(z.string()),
   ownerAddress: z.optional(z.string()),
