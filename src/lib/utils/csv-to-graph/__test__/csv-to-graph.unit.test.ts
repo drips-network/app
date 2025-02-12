@@ -1,6 +1,7 @@
 import type { Edge, Graph } from '$lib/utils/ecosystems/schemas';
-import { csvToGraph } from '../csv-to-graph';
+import { csvToGraph, correctGraph } from '../csv-to-graph';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
+import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
 
 describe('csv-to-graph', () => {
   let osoUnweightedFile: File;
@@ -82,5 +83,22 @@ describe('csv-to-graph', () => {
       expect(edge).toBeDefined();
       expect(edge?.source).toEqual('@eslint/eslintrc');
     });
+  });
+
+  describe('correctGraph', () => {
+    beforeAll(async () => {
+      graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
+      correctGraph(graph, osoGraphErrors);
+    });
+
+    it('should remove nodes and associated edges that are not found', () => {
+      const projectName = '@fastify/encoding-negotiator';
+      const removal = graph.nodes.find((n) => n.projectName === projectName);
+      expect(removal).not.toBeDefined();
+
+      const edges = graph.edges.filter((e) => e.target === projectName || e.source === projectName);
+      expect(edges.length).toBe(0);
+    });
+    it('should rename nodes and associated edges that have been renamed');
   });
 });
