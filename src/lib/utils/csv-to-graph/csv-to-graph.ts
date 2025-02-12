@@ -60,12 +60,26 @@ export function assignRandomRealisticWeights(graph: Graph) {
     const rands = Array.from({ length: degree }, () => Math.random());
     const randsSum = rands.reduce((sum, rand) => sum + rand, 0);
 
-    const forMaintainers = total - Math.random() * total;
+    let forMaintainers = total - Math.random() * total;
+    // root edges must add up to 100
+    if (node.projectName === 'root') {
+      forMaintainers = 0;
+    }
     const forDependencies = total - forMaintainers;
 
     for (const [index, rand] of rands.entries()) {
       rands[index] = forDependencies * (rand / randsSum);
       edges[index].weight = rands[index];
+    }
+
+    // correct last root edge so that all of them add to 100
+    if (node.projectName === 'root') {
+      const lastEdge = edges.at(-1);
+      if (!lastEdge) {
+        continue;
+      }
+
+      lastEdge.weight = total - edges.slice(0, -1).reduce((sum, e) => sum + Number(e.weight), 0);
     }
   }
 }
