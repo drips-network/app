@@ -52,6 +52,46 @@ function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary)
   return node;
 }
 
+function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrary) {
+  const rootNodes = [];
+  for (const node of graph.nodes) {
+    const edge = graph.edges.find((e) => e.target === node.projectName);
+    if (!edge) {
+      rootNodes.push(node);
+    }
+  }
+
+  for (const node of rootNodes) {
+    createEdge(rootNode.projectName, node.projectName, 0, graph, edgeLibrary);
+  }
+}
+
+export function correctGraph(graph: Graph, errors: string[]): Graph {
+  const repoRegex = /([^/\s]+\/[^/\s]+)/g;
+  for (const error of errors) {
+    if (error.includes('not found')) {
+      const projectNames = error.match(repoRegex);
+      if (!projectNames) {
+        continue;
+      }
+
+      const projectName = projectNames[0];
+      const nodeIndex = graph.nodes.findIndex((n) => n.projectName === projectName);
+      if (nodeIndex === -1) {
+        continue;
+      }
+      graph.nodes.splice(nodeIndex, 1);
+
+      const edgesWithoutProjectname = graph.edges.filter(
+        (e) => e.target !== projectName && e.source !== projectName,
+      );
+      graph.edges = edgesWithoutProjectname;
+    }
+  }
+
+  return graph;
+}
+
 export function assignRandomRealisticWeights(graph: Graph) {
   const total = 100;
   for (const node of graph.nodes) {
@@ -81,20 +121,6 @@ export function assignRandomRealisticWeights(graph: Graph) {
 
       lastEdge.weight = total - edges.slice(0, -1).reduce((sum, e) => sum + Number(e.weight), 0);
     }
-  }
-}
-
-function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrary) {
-  const rootNodes = [];
-  for (const node of graph.nodes) {
-    const edge = graph.edges.find((e) => e.target === node.projectName);
-    if (!edge) {
-      rootNodes.push(node);
-    }
-  }
-
-  for (const node of rootNodes) {
-    createEdge(rootNode.projectName, node.projectName, 0, graph, edgeLibrary);
   }
 }
 
