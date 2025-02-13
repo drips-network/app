@@ -116,5 +116,10 @@ describe('csv-to-graph', () => {
       const neuEdges = graph.edges.filter((e) => e.target === neu || e.source === neu);
       expect(neuEdges.length).toBeGreaterThan(0);
     });
+
+    it('should produce a graph with no duplicate nodes', () => {
+      const set = new Set(graph.nodes.map((n) => n.projectName));
+      expect(graph.nodes.length).toEqual(set.size);
+    });
   });
 });
