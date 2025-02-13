@@ -3,6 +3,7 @@ import tokens from '.';
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 import network from '../wallet/network';
 import { toBigInt } from 'ethers';
+import { createCustomToken, readCustomTokensList } from './stored-custom-tokens';
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -145,6 +146,35 @@ describe('tokens store', () => {
     tokens.init();
 
     expect(tokens.getByAddress(TEST_CUSTOM_TOKEN_INFO.address)).toBeUndefined();
+  });
+
+  it('deletes custom tokens that are part of the default chain list', () => {
+    vi.mocked(network).chainId = 11155111;
+
+    const wrappedEtherTokenInfo = {
+      name: 'Wrapped Ether',
+      address: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
+      symbol: 'WETH',
+      decimals: 18,
+      chainId: 11155111,
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+    };
+
+    createCustomToken(wrappedEtherTokenInfo);
+
+    const storedValueForWrappedEther = {
+      source: 'custom',
+      banned: false,
+      info: wrappedEtherTokenInfo,
+    };
+
+    expect(readCustomTokensList()).toContainEqual(storedValueForWrappedEther);
+
+    tokens.init();
+
+    expect(readCustomTokensList()).not.toContainEqual(storedValueForWrappedEther);
+    expect(tokens.getByAddress(wrappedEtherTokenInfo.address)?.source).toBe('default');
   });
 });
 
