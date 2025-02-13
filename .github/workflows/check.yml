@@ -28,6 +28,8 @@ jobs:
           envkey_PUBLIC_NETWORK: 5
           envkey_GQL_URL: https://drips-multichain-api.up.railway.app/
           envkey_GQL_ACCESS_TOKEN: 123
+          envkey_ECOSYSTEM_API_URL: https://base-pr-ecosystems.up.railway.app
+          envkey_ECOSYSTEM_API_ACCESS_TOKEN: 123
 
       - name: Install dependencies
         run: npm ci
