@@ -2,7 +2,6 @@ import type { Edge, Graph } from '$lib/utils/ecosystems/schemas';
 import { csvToGraph, correctGraph } from '../csv-to-graph';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
-import { osoToGraphJson } from '../oso-to-graph';
 
 describe('csv-to-graph', () => {
   let osoUnweightedFile: File;
@@ -11,7 +10,6 @@ describe('csv-to-graph', () => {
   beforeAll(async () => {
     osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
     graph = await csvToGraph(osoUnweightedFile);
-    await osoToGraphJson();
   });
 
   it('should successfully parse a csv', async () => {
