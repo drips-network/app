@@ -1,11 +1,14 @@
 #!/bin/bash
 set -eu
+
+UI=false
+
 cleanup() {
     docker compose -f docker-compose.yml -f docker-compose.e2e.yml rm -fsv
 }
 trap cleanup EXIT
 
-UI=false
+touch .env
 
 if [[ $* == *--start-playwright-ui* ]]; then
     UI=true

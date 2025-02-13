@@ -8,3 +8,4 @@ Dockerfile.dev
 .env
 build
 .svelte-kit
+docker-compose.*
