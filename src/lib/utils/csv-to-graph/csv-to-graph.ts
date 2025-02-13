@@ -115,14 +115,34 @@ function correctRenamed(graph: Graph, error: string) {
     currentNode.projectName = neu;
   }
 
-  const currentEdges = graph.edges.filter((e) => e.target === current || e.source === current);
-  for (const edge of currentEdges) {
-    if (edge.source === current) {
-      edge.source = neu;
-      continue;
-    }
+  // create a list of edges that use the current project name, with directional information
+  const currentEdges = graph.edges.reduce(
+    (memo: [GraphEdge, keyof GraphEdge, keyof GraphEdge, number][], edge, index) => {
+      if (edge.target === current) {
+        memo.push([edge, 'target', 'source', index]);
+      } else if (edge.source === current) {
+        memo.push([edge, 'source', 'target', index]);
+      }
 
-    edge.target = neu;
+      return memo;
+    },
+    [],
+  );
+
+  // go backwards so we can splice within the loop without
+  // affecting further iterations
+  let i = currentEdges.length;
+  while (i--) {
+    const [edge, direction, opposite, index] = currentEdges[i];
+    // if there's already an edge with the neu project name in a matching
+    // direction (source, target), just remove the edge we would have renamed.
+    // otherwise, rename the edge's direction
+    const neuEdge = graph.edges.find((e) => e[direction] === neu && e[opposite] === edge[opposite]);
+    if (neuEdge) {
+      graph.edges.splice(index, 1);
+    } else {
+      edge[direction] = neu;
+    }
   }
 }
 
