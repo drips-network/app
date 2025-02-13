@@ -66,26 +66,64 @@ function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrar
   }
 }
 
+const PROJECT_NAME_REGEX = /([^/\s]+\/[^/\s]+)/g;
+
+function correctNotFound(graph: Graph, error: string) {
+  const projectNames = error.match(PROJECT_NAME_REGEX);
+  if (!projectNames) {
+    return;
+  }
+
+  const projectName = projectNames[0];
+  const nodeIndex = graph.nodes.findIndex((n) => n.projectName === projectName);
+  if (nodeIndex === -1) {
+    return;
+  }
+  graph.nodes.splice(nodeIndex, 1);
+
+  const edgesWithoutProjectname = graph.edges.filter(
+    (e) => e.target !== projectName && e.source !== projectName,
+  );
+  graph.edges = edgesWithoutProjectname;
+}
+
+function correctRenamed(graph: Graph, error: string) {
+  const projectNames = error.match(PROJECT_NAME_REGEX);
+  if (!projectNames) {
+    return;
+  }
+
+  const current = projectNames[0];
+  const neu = projectNames[1];
+  if (!current || !neu) {
+    return;
+  }
+
+  const node = graph.nodes.find((n) => n.projectName === current);
+  if (!node) {
+    return;
+  }
+  node.projectName = neu;
+
+  const currentEdges = graph.edges.filter((e) => e.target === current || e.source === current);
+  for (const edge of currentEdges) {
+    if (edge.source === current) {
+      edge.source = neu;
+      continue;
+    }
+
+    edge.target = neu;
+  }
+}
+
 export function correctGraph(graph: Graph, errors: string[]): Graph {
-  const repoRegex = /([^/\s]+\/[^/\s]+)/g;
   for (const error of errors) {
     if (error.includes('not found')) {
-      const projectNames = error.match(repoRegex);
-      if (!projectNames) {
-        continue;
-      }
+      correctNotFound(graph, error);
+    }
 
-      const projectName = projectNames[0];
-      const nodeIndex = graph.nodes.findIndex((n) => n.projectName === projectName);
-      if (nodeIndex === -1) {
-        continue;
-      }
-      graph.nodes.splice(nodeIndex, 1);
-
-      const edgesWithoutProjectname = graph.edges.filter(
-        (e) => e.target !== projectName && e.source !== projectName,
-      );
-      graph.edges = edgesWithoutProjectname;
+    if (error.includes('was renamed')) {
+      correctRenamed(graph, error);
     }
   }
 
