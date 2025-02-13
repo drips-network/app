@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Build GQL types
         run: GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 GQL_URL=https://drips-multichain-api.up.railway.app/ npm run gql:build  # public access token
 
