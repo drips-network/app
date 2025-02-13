@@ -93,8 +93,6 @@ services:
   testnet:
     image: 'j537/contracts:${CONTRACTS_TAG-sha-f1ee52c}'
     pull_policy: always
-    volumes:
-      - anvil-data:/anvil-data
     ports:
       - '8545:8545'
 
@@ -139,8 +137,6 @@ services:
       POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
     ports:
       - 54320:5432
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
       interval: 30s
@@ -158,8 +154,6 @@ services:
       POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
     ports:
       - 54321:5432
-    volumes:
-      - postgres-multiplayer-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
       interval: 30s
@@ -178,8 +172,8 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
       interval: 1s
-      timeout: 30s
-      retries: 5
+      timeout: 60s
+      retries: 10
 
   search-sync:
     image: 'j537/search-sync:${SEARCH_SYNC_TAG-main}'
@@ -196,21 +190,3 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@domain.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
-    ports:
-      - 5050:80
-    volumes:
-      - ./docker/pgadmin-servers.json:/pgadmin4/servers.json
-      - ./docker/pgadmin-passwords:/pgpass
-
-volumes:
-  postgres-data:
-  postgres-multiplayer-data:
-  anvil-data:
