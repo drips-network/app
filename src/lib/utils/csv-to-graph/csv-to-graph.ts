@@ -99,11 +99,21 @@ function correctRenamed(graph: Graph, error: string) {
     return;
   }
 
-  const node = graph.nodes.find((n) => n.projectName === current);
-  if (!node) {
+  // don't rename a node that can't be found
+  const currentNodeIndex = graph.nodes.findIndex((n) => n.projectName === current);
+  if (currentNodeIndex === -1) {
     return;
   }
-  node.projectName = neu;
+
+  // remove the current node if there is already one with the neu
+  // project name
+  const neuNode = graph.nodes.find((n) => n.projectName === neu);
+  if (neuNode) {
+    graph.nodes.splice(currentNodeIndex, 1);
+  } else {
+    const currentNode = graph.nodes[currentNodeIndex];
+    currentNode.projectName = neu;
+  }
 
   const currentEdges = graph.edges.filter((e) => e.target === current || e.source === current);
   for (const edge of currentEdges) {
