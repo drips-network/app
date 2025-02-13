@@ -2,6 +2,7 @@ import type { Edge, Graph } from '$lib/utils/ecosystems/schemas';
 import { csvToGraph, correctGraph } from '../csv-to-graph';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
+import { osoToGraphJson } from '../oso-to-graph';
 
 describe('csv-to-graph', () => {
   let osoUnweightedFile: File;
@@ -10,6 +11,7 @@ describe('csv-to-graph', () => {
   beforeAll(async () => {
     osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
     graph = await csvToGraph(osoUnweightedFile);
+    await osoToGraphJson();
   });
 
   it('should successfully parse a csv', async () => {
@@ -92,6 +94,7 @@ describe('csv-to-graph', () => {
     });
 
     it('should remove nodes and associated edges that are not found', () => {
+      // @fastify/encoding-negotiator not found.
       const projectName = '@fastify/encoding-negotiator';
       const removal = graph.nodes.find((n) => n.projectName === projectName);
       expect(removal).not.toBeDefined();
@@ -99,6 +102,21 @@ describe('csv-to-graph', () => {
       const edges = graph.edges.filter((e) => e.target === projectName || e.source === projectName);
       expect(edges.length).toBe(0);
     });
-    it('should rename nodes and associated edges that have been renamed');
+
+    it('should rename nodes and associated edges that have been renamed', () => {
+      // 131/browserify-reload was renamed to repository-vault/browserify-reload
+      const current = '131/browserify-reload';
+      const neu = 'repository-vault/browserify-reload';
+
+      const currentNode = graph.nodes.find((n) => n.projectName === current);
+      expect(currentNode).not.toBeDefined();
+      const neuNode = graph.nodes.find((n) => n.projectName === neu);
+      expect(neuNode).toBeDefined();
+
+      const currentEdges = graph.edges.filter((e) => e.target === current || e.source === current);
+      expect(currentEdges.length).toBe(0);
+      const neuEdges = graph.edges.filter((e) => e.target === neu || e.source === neu);
+      expect(neuEdges.length).toBeGreaterThan(0);
+    });
   });
 });
