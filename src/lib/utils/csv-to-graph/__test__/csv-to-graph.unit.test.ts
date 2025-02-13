@@ -126,5 +126,25 @@ describe('csv-to-graph', () => {
       const set = new Set(graph.edges.map((e) => `${e.source}${e.target}`));
       expect(graph.edges.length).toEqual(set.size);
     });
+
+    // prevent edges whose source and target are the same
+    // ensure edges are unidreictional
+    it('should produce a graph with no duplicate edges', () => {
+      const sourceEdges = new Set(graph.edges.map((e) => `${e.source}${e.target}`));
+      const targetEdges = new Set(graph.edges.map((e) => `${e.target}${e.source}`));
+      const intersection = sourceEdges.intersection(targetEdges);
+      expect(intersection.size).toEqual(0);
+    });
+
+    it('should produce a graph with a root node', () => {
+      const root = graph.nodes.find((n) => n.projectName === 'root');
+      expect(root).toBeDefined();
+    });
+
+    it('should produce a graph with a edges whose source is the root node', () => {
+      // TODO: check all root nodes
+      const edge = graph.edges.find((n) => n.source === 'root');
+      expect(edge).toBeDefined();
+    });
   });
 });
