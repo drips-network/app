@@ -121,5 +121,10 @@ describe('csv-to-graph', () => {
       const set = new Set(graph.nodes.map((n) => n.projectName));
       expect(graph.nodes.length).toEqual(set.size);
     });
+
+    it('should produce a graph with no duplicate edges', () => {
+      const set = new Set(graph.edges.map((e) => `${e.source}${e.target}`));
+      expect(graph.edges.length).toEqual(set.size);
+    });
   });
 });
