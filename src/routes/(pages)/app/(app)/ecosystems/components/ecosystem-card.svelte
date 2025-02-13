@@ -1,38 +1,38 @@
 <script lang="ts" context="module">
-  export const PROJECT_CARD_FRAGMENT = gql`
-    ${PROJECT_AVATAR_FRAGMENT}
-    ${PROJECT_NAME_FRAGMENT}
-    fragment ProjectCard on Project {
-      ...ProjectName
-      isVisible
-      source {
-        forge
-        ownerName
-        repoName
-      }
-      chainData {
-        ... on ClaimedProjectData {
-          chain
-          owner {
-            accountId
-          }
-        }
-        ... on UnClaimedProjectData {
-          chain
-          owner {
-            accountId
-          }
-        }
-        ...ProjectAvatar
-      }
-    }
-  `;
+  // export const PROJECT_CARD_FRAGMENT = gql`
+  //   ${PROJECT_AVATAR_FRAGMENT}
+  //   ${PROJECT_NAME_FRAGMENT}
+  //   fragment ProjectCard on Project {
+  //     ...ProjectName
+  //     isVisible
+  //     source {
+  //       forge
+  //       ownerName
+  //       repoName
+  //     }
+  //     chainData {
+  //       ... on ClaimedProjectData {
+  //         chain
+  //         owner {
+  //           accountId
+  //         }
+  //       }
+  //       ... on UnClaimedProjectData {
+  //         chain
+  //         owner {
+  //           accountId
+  //         }
+  //       }
+  //       ...ProjectAvatar
+  //     }
+  //   }
+  // `;
 </script>
 
 <script lang="ts">
-  import { gql } from 'graphql-request';
-  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
-  import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
+  // import { gql } from 'graphql-request';
+  // import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
+  // import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
