@@ -1,32 +1,32 @@
 <script lang="ts" context="module">
-  export const PROJECT_CARD_FRAGMENT = gql`
-    ${PROJECT_AVATAR_FRAGMENT}
-    ${PROJECT_NAME_FRAGMENT}
-    fragment ProjectCard on Project {
-      ...ProjectName
-      isVisible
-      source {
-        forge
-        ownerName
-        repoName
-      }
-      chainData {
-        ... on ClaimedProjectData {
-          chain
-          owner {
-            accountId
-          }
-        }
-        ... on UnClaimedProjectData {
-          chain
-          owner {
-            accountId
-          }
-        }
-        ...ProjectAvatar
-      }
-    }
-  `;
+  // export const PROJECT_CARD_FRAGMENT = gql`
+  //   ${PROJECT_AVATAR_FRAGMENT}
+  //   ${PROJECT_NAME_FRAGMENT}
+  //   fragment ProjectCard on Project {
+  //     ...ProjectName
+  //     isVisible
+  //     source {
+  //       forge
+  //       ownerName
+  //       repoName
+  //     }
+  //     chainData {
+  //       ... on ClaimedProjectData {
+  //         chain
+  //         owner {
+  //           accountId
+  //         }
+  //       }
+  //       ... on UnClaimedProjectData {
+  //         chain
+  //         owner {
+  //           accountId
+  //         }
+  //       }
+  //       ...ProjectAvatar
+  //     }
+  //   }
+  // `;
 </script>
 
 <script lang="ts">
@@ -37,13 +37,13 @@
   // import ProjectName, {
   // PROJECT_NAME_FRAGMENT,
   // } from '../project-badge/components/project-name.svelte';
-  import { gql } from 'graphql-request';
+  // import { gql } from 'graphql-request';
   // import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   // import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
-  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
-  import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
+  // import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
+  // import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import EcosystemGraph from './ecosystem-graph.svelte';
   // import Box from '$lib/components/icons/Box.svelte';
   // import User from '$lib/components/icons/User.svelte';
