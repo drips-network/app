@@ -143,6 +143,11 @@ function correctRenamed(graph: Graph, error: string) {
     } else {
       edge[direction] = neu;
     }
+
+    // if we made a loop, remove it
+    if (edge[direction] === edge[opposite]) {
+      graph.edges.splice(index, 1);
+    }
   }
 }
 
