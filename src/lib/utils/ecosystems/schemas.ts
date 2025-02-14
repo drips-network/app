@@ -11,7 +11,7 @@ const metadatumSchema = z.object({
 });
 
 const nodeSchema = z.object({
-  projectAccountId: z.string(),
+  projectAccountId: z.string().nullable(),
   repoOwner: z.string(),
   repoName: z.string(),
   absoluteWeight: z.number(),
@@ -36,9 +36,10 @@ const graphSchema = z.object({
   edges: z.array(edgeSchema),
 });
 
-const newGraphSchema = z.object({
+// TODO: fr?
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const newGraphSchema = graphSchema.extend({
   nodes: z.array(newNodeScehma),
-  edges: z.array(edgeSchema),
 });
 
 export const ecosystemSchema = z.object({
@@ -51,7 +52,7 @@ export const ecosystemSchema = z.object({
   ownerAddress: z.optional(z.string()),
   metadata: z.array(metadatumSchema),
   nodeCount: z.optional(z.number()),
-  graph: z.optional(graphSchema.or(newGraphSchema)),
+  graph: z.optional(graphSchema),
 });
 
 export const getAllSchema = z.array(ecosystemSchema);
