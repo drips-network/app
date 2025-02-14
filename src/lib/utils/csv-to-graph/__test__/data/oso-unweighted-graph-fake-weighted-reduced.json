@@ -1,106 +1,211 @@
 {
     "nodes": [
         {
-            "projectName": "antlr4-go/antlr"
+            "projectName": "3-manifolds/cypari"
         },
         {
-            "projectName": "benbjohnson/clock"
+            "projectName": "acornjs/acorn"
         },
         {
-            "projectName": "cespare/xxhash"
+            "projectName": "agemanning/delay_map"
         },
         {
-            "projectName": "docker/go-units"
+            "projectName": "alexliesenfeld/httpmock"
         },
         {
-            "projectName": "dop251/goja"
+            "projectName": "alexmojaki/executing"
         },
         {
-            "projectName": "dustin/go-humanize"
+            "projectName": "alexmojaki/pure_eval"
         },
         {
-            "projectName": "elastic/go-freelru"
+            "projectName": "anacrolix/missinggo"
+        },
+        {
+            "projectName": "andrewhickman/fs-err"
+        },
+        {
+            "projectName": "async-email/async-native-tls"
+        },
+        {
+            "projectName": "async-rs/async-global-executor"
+        },
+        {
+            "projectName": "async-rs/async-std"
+        },
+        {
+            "projectName": "bkchr/impl-trait-for-tuples"
+        },
+        {
+            "projectName": "bluss/arrayvec"
+        },
+        {
+            "projectName": "bytecodealliance/wasi-rs"
+        },
+        {
+            "projectName": "c2h5oh/datasize"
+        },
+        {
+            "projectName": "chalk/slice-ansi"
+        },
+        {
+            "projectName": "clarketm/mergedeep"
+        },
+        {
+            "projectName": "comex/rust-shlex"
+        },
+        {
+            "projectName": "consensys/teku"
+        },
+        {
+            "projectName": "contain-rs/lru-cache"
+        },
+        {
+            "projectName": "dariusc93/rust-igd"
+        },
+        {
+            "projectName": "dirs-dev/dirs-sys-rs"
+        },
+        {
+            "projectName": "doowb/ansi-colors"
+        },
+        {
+            "projectName": "dtolnay/proc-macro2"
+        },
+        {
+            "projectName": "enarx/ciborium"
         },
         {
             "projectName": "erigontech/erigon"
         },
         {
-            "projectName": "erigontech/interfaces"
+            "projectName": "erigontech/erigonwatch"
         },
         {
-            "projectName": "ethereum/eth-hash"
+            "projectName": "erigontech/silkworm-go"
         },
         {
-            "projectName": "ethereum/eth-typing"
+            "projectName": "eslint/doctrine"
         },
         {
-            "projectName": "ethereum/web3.py"
+            "projectName": "floatdrop/pinkie-promise"
         },
         {
-            "projectName": "fsnotify/fsnotify"
+            "projectName": "gimli-rs/object"
         },
         {
-            "projectName": "holiman/bloomfilter"
+            "projectName": "giulio2002/bls"
         },
         {
-            "projectName": "inconshreveable/mousetrap"
+            "projectName": "go-chi/cors"
         },
         {
-            "projectName": "klauspost/compress"
+            "projectName": "gorakhargosh/watchdog"
         },
         {
-            "projectName": "libp2p/go-buffer-pool"
+            "projectName": "grandinetech/grandine"
         },
         {
-            "projectName": "libp2p/go-libp2p-pubsub"
+            "projectName": "hashicorp/go-retryablehttp"
         },
         {
-            "projectName": "libp2p/go-reuseport"
+            "projectName": "hyperium/headers"
         },
         {
-            "projectName": "masterminds/sprig"
+            "projectName": "isaacs/inflight-DEPRECATED-DO-NOT-USE"
         },
         {
-            "projectName": "modern-go/reflect2"
+            "projectName": "isaacs/once"
         },
         {
-            "projectName": "multiformats/go-multiaddr"
+            "projectName": "isaacs/yallist"
         },
         {
-            "projectName": "multiformats/go-multistream"
+            "projectName": "jbenet/go-temp-err-catcher"
         },
         {
-            "projectName": "multiformats/go-varint"
+            "projectName": "jedisct1/rust-superboring"
         },
         {
-            "projectName": "ncruces/go-strftime"
+            "projectName": "johntitor/mach2"
+        },
+        {
+            "projectName": "julienschmidt/httprouter"
+        },
+        {
+            "projectName": "jupyter-widgets/ipywidgets"
+        },
+        {
+            "projectName": "jupyterlab/jupyterlab_pygments"
+        },
+        {
+            "projectName": "lalrpop/lalrpop"
+        },
+        {
+            "projectName": "lufia/plan9stats"
+        },
+        {
+            "projectName": "mathiasbynens/emoji-regex"
+        },
+        {
+            "projectName": "mikolalysenko/functional-red-black-tree"
+        },
+        {
+            "projectName": "mozilla/bleach"
+        },
+        {
+            "projectName": "multiformats/go-multibase"
+        },
+        {
+            "projectName": "multiformats/rust-multihash"
+        },
+        {
+            "projectName": "npm/node-which"
         },
         {
             "projectName": "opencontainers/runtime-spec"
         },
         {
-            "projectName": "pbnjay/memory"
+            "projectName": "paritytech/soketto"
         },
         {
-            "projectName": "pion/interceptor"
+            "projectName": "peternator7/strum"
         },
         {
-            "projectName": "pion/randutil"
+            "projectName": "petgraph/petgraph"
+        },
+        {
+            "projectName": "picohz/mediatype"
+        },
+        {
+            "projectName": "pion/ice"
         },
         {
             "projectName": "pion/udp"
         },
         {
-            "projectName": "pkg/errors"
+            "projectName": "polyfill-rs/is_terminal_polyfill"
         },
         {
             "projectName": "prometheus/client_model"
         },
         {
-            "projectName": "prometheus/common"
+            "projectName": "proxima-one/kzg"
         },
         {
             "projectName": "prysmaticlabs/go-bitfield"
+        },
+        {
+            "projectName": "pyfisch/httpdate"
+        },
+        {
+            "projectName": "pygments/pygments"
+        },
+        {
+            "projectName": "pypa/packaging"
+        },
+        {
+            "projectName": "qix-/color-convert"
         },
         {
             "projectName": "rivo/uniseg"
@@ -109,221 +214,588 @@
             "projectName": "root"
         },
         {
-            "projectName": "shirou/gopsutil"
+            "projectName": "rs/cors"
         },
         {
-            "projectName": "sirupsen/logrus"
+            "projectName": "rust-db/refinery"
         },
         {
-            "projectName": "spf13/cast"
+            "projectName": "rust-lang/cmake-rs"
         },
         {
-            "projectName": "thomasdesr/intmath"
+            "projectName": "rust-netlink/netlink-packet-core"
         },
         {
-            "projectName": "xsleonard/go-merkle"
+            "projectName": "rusticata/asn1-rs"
+        },
+        {
+            "projectName": "rustls/rcgen"
+        },
+        {
+            "projectName": "seanmonstar/reqwest"
+        },
+        {
+            "projectName": "sfackler/foreign-types"
+        },
+        {
+            "projectName": "sfackler/rust-openssl"
+        },
+        {
+            "projectName": "sindresorhus/locate-path"
+        },
+        {
+            "projectName": "sindresorhus/pkg-dir"
+        },
+        {
+            "projectName": "sindresorhus/resolve-from"
+        },
+        {
+            "projectName": "sindresorhus/shebang-regex"
+        },
+        {
+            "projectName": "slog-rs/stdlog"
+        },
+        {
+            "projectName": "smol-rs/async-lock"
+        },
+        {
+            "projectName": "spf13/cobra"
+        },
+        {
+            "projectName": "starkat99/widestring-rs"
+        },
+        {
+            "projectName": "status-im/nimbus-eth2"
+        },
+        {
+            "projectName": "stebalien/tempfile"
+        },
+        {
+            "projectName": "stebalien/term"
+        },
+        {
+            "projectName": "tailhook/quick-error"
+        },
+        {
+            "projectName": "takelushi/jupyter-autotime"
+        },
+        {
+            "projectName": "time-rs/time"
+        },
+        {
+            "projectName": "tokio-rs/slab"
+        },
+        {
+            "projectName": "tootallnate/proxy-agents"
+        },
+        {
+            "projectName": "valyala/fastjson"
+        },
+        {
+            "projectName": "webdesus/fs_extra"
+        },
+        {
+            "projectName": "xx/variant_count"
+        },
+        {
+            "projectName": "zeromq/pyzmq"
         }
     ],
     "edges": [
         {
-            "source": "erigontech/erigon",
-            "target": "dustin/go-humanize",
-            "weight": 0.37849595582482976
+            "source": "consensys/teku",
+            "target": "acornjs/acorn",
+            "weight": 0.004992904148885552
+        },
+        {
+            "source": "consensys/teku",
+            "target": "tootallnate/proxy-agents",
+            "weight": 0.01281440080832354
+        },
+        {
+            "source": "consensys/teku",
+            "target": "isaacs/once",
+            "weight": 0.009922929007772426
+        },
+        {
+            "source": "consensys/teku",
+            "target": "qix-/color-convert",
+            "weight": 0.026180540944511575
+        },
+        {
+            "source": "consensys/teku",
+            "target": "sindresorhus/shebang-regex",
+            "weight": 0.02379250103175587
+        },
+        {
+            "source": "consensys/teku",
+            "target": "isaacs/inflight-DEPRECATED-DO-NOT-USE",
+            "weight": 0.01083607699864604
+        },
+        {
+            "source": "consensys/teku",
+            "target": "floatdrop/pinkie-promise",
+            "weight": 0.019281943757502615
+        },
+        {
+            "source": "consensys/teku",
+            "target": "sindresorhus/resolve-from",
+            "weight": 0.026196023829108683
+        },
+        {
+            "source": "consensys/teku",
+            "target": "eslint/doctrine",
+            "weight": 0.00805638233968575
+        },
+        {
+            "source": "consensys/teku",
+            "target": "mikolalysenko/functional-red-black-tree",
+            "weight": 0.016186510353890602
+        },
+        {
+            "source": "consensys/teku",
+            "target": "mathiasbynens/emoji-regex",
+            "weight": 0.0028426897262225507
+        },
+        {
+            "source": "consensys/teku",
+            "target": "sindresorhus/locate-path",
+            "weight": 0.000589420059358223
+        },
+        {
+            "source": "consensys/teku",
+            "target": "doowb/ansi-colors",
+            "weight": 0.007208901584950989
+        },
+        {
+            "source": "consensys/teku",
+            "target": "npm/node-which",
+            "weight": 0.00541527593375301
+        },
+        {
+            "source": "consensys/teku",
+            "target": "sindresorhus/pkg-dir",
+            "weight": 0.0018887016397621155
+        },
+        {
+            "source": "consensys/teku",
+            "target": "isaacs/yallist",
+            "weight": 0.016889452560213892
+        },
+        {
+            "source": "consensys/teku",
+            "target": "chalk/slice-ansi",
+            "weight": 0.003197454580570255
         },
         {
             "source": "erigontech/erigon",
-            "target": "multiformats/go-multistream",
-            "weight": 0.3293897254043048
+            "target": "multiformats/go-multibase",
+            "weight": 0.05264226589111423
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "anacrolix/missinggo",
+            "weight": 0.009609218908968615
         },
         {
             "source": "erigontech/erigon",
             "target": "opencontainers/runtime-spec",
-            "weight": 0.3438010775709731
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "multiformats/go-varint",
-            "weight": 0.3385526612153555
+            "weight": 0.02381769573575522
         },
         {
             "source": "erigontech/erigon",
             "target": "pion/udp",
-            "weight": 0.12228483946197229
+            "weight": 0.01646188590701097
         },
         {
             "source": "erigontech/erigon",
-            "target": "ncruces/go-strftime",
-            "weight": 0.365821240336195
+            "target": "giulio2002/bls",
+            "weight": 0.049699737327053906
         },
         {
             "source": "erigontech/erigon",
-            "target": "spf13/cast",
-            "weight": 0.44046048667107107
+            "target": "lufia/plan9stats",
+            "weight": 0.05182735552744679
         },
         {
             "source": "erigontech/erigon",
-            "target": "klauspost/compress",
-            "weight": 0.5504697070644823
+            "target": "pion/ice",
+            "weight": 0.05961650747213689
         },
         {
             "source": "erigontech/erigon",
-            "target": "benbjohnson/clock",
-            "weight": 0.2972981412325446
+            "target": "erigontech/erigonwatch",
+            "weight": 0.01917650124292906
         },
         {
             "source": "erigontech/erigon",
-            "target": "multiformats/go-multiaddr",
-            "weight": 0.42466918891896416
+            "target": "spf13/cobra",
+            "weight": 0.0015615517373381573
         },
         {
             "source": "erigontech/erigon",
-            "target": "docker/go-units",
-            "weight": 0.27964141807501414
+            "target": "hashicorp/go-retryablehttp",
+            "weight": 0.010681888829250419
         },
         {
             "source": "erigontech/erigon",
-            "target": "libp2p/go-buffer-pool",
-            "weight": 0.43562979382881817
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "erigontech/interfaces",
-            "weight": 0.18956353265992767
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "inconshreveable/mousetrap",
-            "weight": 0.04142547151815851
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "pion/randutil",
-            "weight": 0.11083900451650625
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "pion/interceptor",
-            "weight": 0.5616205023118593
+            "target": "rs/cors",
+            "weight": 0.008081375424620564
         },
         {
             "source": "erigontech/erigon",
             "target": "rivo/uniseg",
-            "weight": 0.3903784928583151
+            "weight": 0.0556776467460301
         },
         {
             "source": "erigontech/erigon",
-            "target": "sirupsen/logrus",
-            "weight": 0.3511117928918649
+            "target": "c2h5oh/datasize",
+            "weight": 0.05318035865231679
         },
         {
             "source": "erigontech/erigon",
-            "target": "pbnjay/memory",
-            "weight": 0.17240459613222295
+            "target": "jbenet/go-temp-err-catcher",
+            "weight": 0.00612809270867809
         },
         {
             "source": "erigontech/erigon",
-            "target": "masterminds/sprig",
-            "weight": 0.06167064926860539
+            "target": "julienschmidt/httprouter",
+            "weight": 0.033177122427914686
         },
         {
             "source": "erigontech/erigon",
-            "target": "modern-go/reflect2",
-            "weight": 0.4984143928056269
+            "target": "erigontech/silkworm-go",
+            "weight": 0.023054140996911835
         },
         {
             "source": "erigontech/erigon",
-            "target": "pkg/errors",
-            "weight": 0.052994137623349806
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "thomasdesr/intmath",
-            "weight": 0.35307001195528603
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "xsleonard/go-merkle",
-            "weight": 0.04392618467285038
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "dop251/goja",
-            "weight": 0.5502022539370565
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "prometheus/common",
-            "weight": 0.49857036402872146
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "cespare/xxhash",
-            "weight": 0.2779572292505944
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "libp2p/go-reuseport",
-            "weight": 0.25549205736045527
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "holiman/bloomfilter",
-            "weight": 0.19379192948860804
+            "target": "go-chi/cors",
+            "weight": 0.018579901159783054
         },
         {
             "source": "erigontech/erigon",
             "target": "prysmaticlabs/go-bitfield",
-            "weight": 0.13794397093003022
+            "weight": 0.03508720623132488
         },
         {
             "source": "erigontech/erigon",
-            "target": "fsnotify/fsnotify",
-            "weight": 0.2755015451898165
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "elastic/go-freelru",
-            "weight": 0.5977586730894121
-        },
-        {
-            "source": "erigontech/erigon",
-            "target": "shirou/gopsutil",
-            "weight": 0.4696716339450301
+            "target": "valyala/fastjson",
+            "weight": 0.03170355823736357
         },
         {
             "source": "erigontech/erigon",
             "target": "prometheus/client_model",
-            "weight": 0.03339569825817272
+            "weight": 0.007153639293306959
         },
         {
-            "source": "erigontech/erigon",
-            "target": "libp2p/go-libp2p-pubsub",
-            "weight": 0.21057233306183007
+            "source": "grandinetech/grandine",
+            "target": "dirs-dev/dirs-sys-rs",
+            "weight": 0.0020331127590574333
         },
         {
-            "source": "erigontech/erigon",
-            "target": "antlr4-go/antlr",
-            "weight": 0.386332665223517
+            "source": "grandinetech/grandine",
+            "target": "petgraph/petgraph",
+            "weight": 0.002877536877952137
         },
         {
-            "source": "ethereum/web3.py",
-            "target": "ethereum/eth-typing",
-            "weight": 12.615596188599202
+            "source": "grandinetech/grandine",
+            "target": "bytecodealliance/wasi-rs",
+            "weight": 0.0030798872941680804
         },
         {
-            "source": "ethereum/web3.py",
-            "target": "ethereum/eth-hash",
-            "weight": 84.64411294936005
+            "source": "grandinetech/grandine",
+            "target": "agemanning/delay_map",
+            "weight": 0.0028397374797289724
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "enarx/ciborium",
+            "weight": 0.0025446097335420073
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "stebalien/tempfile",
+            "weight": 0.0007065080817910959
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "seanmonstar/reqwest",
+            "weight": 0.0018144369295362698
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "peternator7/strum",
+            "weight": 0.00044334297455527036
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "async-rs/async-global-executor",
+            "weight": 0.00097549942451699
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "picohz/mediatype",
+            "weight": 0.0028878680544343082
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "rust-db/refinery",
+            "weight": 0.0008571612041624428
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "bluss/arrayvec",
+            "weight": 0.0015448071534375973
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "async-rs/async-std",
+            "weight": 0.001273926994446194
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "johntitor/mach2",
+            "weight": 0.00289866309889221
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "xx/variant_count",
+            "weight": 0.0020460713391390745
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "bkchr/impl-trait-for-tuples",
+            "weight": 0.0016826319468705821
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "rusticata/asn1-rs",
+            "weight": 0.0016525263219111643
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "lalrpop/lalrpop",
+            "weight": 0.0022960881566606345
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "contain-rs/lru-cache",
+            "weight": 0.0029861910412837833
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "paritytech/soketto",
+            "weight": 0.002170153938898466
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "proxima-one/kzg",
+            "weight": 0.0011646513166401911
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "jedisct1/rust-superboring",
+            "weight": 0.001126270314698961
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "polyfill-rs/is_terminal_polyfill",
+            "weight": 0.0009019132859253866
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "time-rs/time",
+            "weight": 0.0030339489772440538
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "tokio-rs/slab",
+            "weight": 0.0007475063140495731
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "pyfisch/httpdate",
+            "weight": 0.0012984009775319674
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "webdesus/fs_extra",
+            "weight": 0.001341309956017689
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "starkat99/widestring-rs",
+            "weight": 0.001919510135198283
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "stebalien/term",
+            "weight": 0.0007025867446370771
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "sfackler/foreign-types",
+            "weight": 0.001359163865838114
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "alexliesenfeld/httpmock",
+            "weight": 0.0010926649161329895
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "smol-rs/async-lock",
+            "weight": 0.001260047496648309
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "dariusc93/rust-igd",
+            "weight": 0.0008895894550702405
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "rust-lang/cmake-rs",
+            "weight": 0.0010775616575141405
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "sfackler/rust-openssl",
+            "weight": 0.0010435014995710513
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "andrewhickman/fs-err",
+            "weight": 0.0005265035932560787
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "gimli-rs/object",
+            "weight": 0.002906698707539142
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "comex/rust-shlex",
+            "weight": 0.0012442280402747228
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "rust-netlink/netlink-packet-core",
+            "weight": 0.002163558223545629
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "hyperium/headers",
+            "weight": 0.0008099696485609206
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "dtolnay/proc-macro2",
+            "weight": 0.0023694718178661977
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "async-email/async-native-tls",
+            "weight": 0.0009738761368103475
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "tailhook/quick-error",
+            "weight": 0.0026049991690050987
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "multiformats/rust-multihash",
+            "weight": 0.0006313401036805868
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "slog-rs/stdlog",
+            "weight": 0.0022321089554457126
+        },
+        {
+            "source": "grandinetech/grandine",
+            "target": "rustls/rcgen",
+            "weight": 0.000047019798165296204
+        },
+        {
+            "source": "root",
+            "target": "consensys/teku",
+            "weight": 0.0027378116446020923
         },
         {
             "source": "root",
             "target": "erigontech/erigon",
-            "weight": 21.40292708581327
+            "weight": 0.4122018901805342
         },
         {
             "source": "root",
-            "target": "ethereum/web3.py",
-            "weight": 78.59707291418673
+            "target": "grandinetech/grandine",
+            "weight": 0.21258608952755556
+        },
+        {
+            "source": "root",
+            "target": "status-im/nimbus-eth2",
+            "weight": 0.3724742086473082
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "jupyter-widgets/ipywidgets",
+            "weight": 0.014492649746346504
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "alexmojaki/executing",
+            "weight": 0.07050153312342079
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "mozilla/bleach",
+            "weight": 0.052042002498263566
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "pypa/packaging",
+            "weight": 0.07497515198028235
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "alexmojaki/pure_eval",
+            "weight": 0.06055154840406649
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "jupyterlab/jupyterlab_pygments",
+            "weight": 0.015319030617315491
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "pygments/pygments",
+            "weight": 0.07406717136747026
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "zeromq/pyzmq",
+            "weight": 0.020753322117383483
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "3-manifolds/cypari",
+            "weight": 0.09796121174829378
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "gorakhargosh/watchdog",
+            "weight": 0.04289587306631908
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "clarketm/mergedeep",
+            "weight": 0.0850013488453199
+        },
+        {
+            "source": "status-im/nimbus-eth2",
+            "target": "takelushi/jupyter-autotime",
+            "weight": 0.08739439977178437
         }
     ]
 }
