@@ -77,6 +77,11 @@ export function reduceGraph(graph: Graph, targetOrder: number) {
 }
 
 export function removeNode(graph: Graph, projectName: string) {
+  // can't remove the root node
+  if (projectName === 'root') {
+    return;
+  }
+
   // remove the node with the given projectName
   const nodeIndex = graph.nodes.findIndex((n) => n.projectName === projectName);
   if (nodeIndex === -1) {
