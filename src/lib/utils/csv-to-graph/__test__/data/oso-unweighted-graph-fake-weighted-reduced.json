@@ -1,385 +1,329 @@
 {
     "nodes": [
         {
-            "projectName": "75lb/find-replace"
+            "projectName": "antlr4-go/antlr"
         },
         {
-            "projectName": "apocas/dockerode"
+            "projectName": "benbjohnson/clock"
         },
         {
-            "projectName": "babel/babel"
+            "projectName": "cespare/xxhash"
         },
         {
-            "projectName": "browserify/EVP_BytesToKey"
+            "projectName": "docker/go-units"
         },
         {
-            "projectName": "browserify/resolve"
+            "projectName": "dop251/goja"
         },
         {
-            "projectName": "cgewecke/eth-gas-reporter"
+            "projectName": "dustin/go-humanize"
         },
         {
-            "projectName": "chaijs/chai-as-promised"
+            "projectName": "elastic/go-freelru"
         },
         {
-            "projectName": "chaijs/get-func-name"
+            "projectName": "erigontech/erigon"
         },
         {
-            "projectName": "chalk/slice-ansi"
+            "projectName": "erigontech/interfaces"
         },
         {
-            "projectName": "dsherret/code-block-writer"
+            "projectName": "ethereum/eth-hash"
         },
         {
-            "projectName": "dsherret/ts-morph"
+            "projectName": "ethereum/eth-typing"
         },
         {
-            "projectName": "evanw/node-source-map-support"
+            "projectName": "ethereum/web3.py"
         },
         {
-            "projectName": "felixge/node-retry"
+            "projectName": "fsnotify/fsnotify"
         },
         {
-            "projectName": "gkz/prelude-ls"
+            "projectName": "holiman/bloomfilter"
         },
         {
-            "projectName": "gotwarlost/istanbul"
+            "projectName": "inconshreveable/mousetrap"
         },
         {
-            "projectName": "gulpjs/rechoir"
+            "projectName": "klauspost/compress"
         },
         {
-            "projectName": "hughsk/flat"
+            "projectName": "libp2p/go-buffer-pool"
         },
         {
-            "projectName": "indutny/brorand"
+            "projectName": "libp2p/go-libp2p-pubsub"
         },
         {
-            "projectName": "inspect-js/has-property-descriptors"
+            "projectName": "libp2p/go-reuseport"
         },
         {
-            "projectName": "isaacs/node-graceful-fs"
+            "projectName": "masterminds/sprig"
         },
         {
-            "projectName": "jshttp/mime-db"
+            "projectName": "modern-go/reflect2"
         },
         {
-            "projectName": "kevva/astral-regex"
+            "projectName": "multiformats/go-multiaddr"
         },
         {
-            "projectName": "linusu/buffer-alloc"
+            "projectName": "multiformats/go-multistream"
         },
         {
-            "projectName": "linusu/murmur-128"
+            "projectName": "multiformats/go-varint"
         },
         {
-            "projectName": "ljharb/es-define-property"
+            "projectName": "ncruces/go-strftime"
         },
         {
-            "projectName": "mafintosh/mkdirp-classic"
+            "projectName": "opencontainers/runtime-spec"
         },
         {
-            "projectName": "nodeca/argparse"
+            "projectName": "pbnjay/memory"
         },
         {
-            "projectName": "nomicfoundation/edr"
+            "projectName": "pion/interceptor"
         },
         {
-            "projectName": "NomicFoundation/hardhat"
+            "projectName": "pion/randutil"
         },
         {
-            "projectName": "npm/ini"
+            "projectName": "pion/udp"
         },
         {
-            "projectName": "npm/security-holder"
+            "projectName": "pkg/errors"
         },
         {
-            "projectName": "octet-stream/form-data-encoder"
+            "projectName": "prometheus/client_model"
         },
         {
-            "projectName": "omnidan/node-emoji"
+            "projectName": "prometheus/common"
         },
         {
-            "projectName": "plurals/pluralize"
+            "projectName": "prysmaticlabs/go-bitfield"
         },
         {
-            "projectName": "prettier/eslint-config-prettier"
+            "projectName": "rivo/uniseg"
         },
         {
             "projectName": "root"
         },
         {
-            "projectName": "roryf/parse-cache-control"
+            "projectName": "shirou/gopsutil"
         },
         {
-            "projectName": "rvagg/archived-string_decoder"
+            "projectName": "sirupsen/logrus"
         },
         {
-            "projectName": "ryanzim/at-least-node"
+            "projectName": "spf13/cast"
         },
         {
-            "projectName": "safe-global/safe-smart-account"
+            "projectName": "thomasdesr/intmath"
         },
         {
-            "projectName": "sindresorhus/binary-extensions"
-        },
-        {
-            "projectName": "sindresorhus/decamelize"
-        },
-        {
-            "projectName": "sindresorhus/quick-lru"
-        },
-        {
-            "projectName": "sindresorhus/widest-line"
-        },
-        {
-            "projectName": "sinonjs/commons"
-        },
-        {
-            "projectName": "ts-essentials/ts-essentials"
-        },
-        {
-            "projectName": "webreflection/flatted"
-        },
-        {
-            "projectName": "YuzuJS/setImmediate"
+            "projectName": "xsleonard/go-merkle"
         }
     ],
     "edges": [
         {
+            "source": "erigontech/erigon",
+            "target": "dustin/go-humanize",
+            "weight": 0.37849595582482976
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "multiformats/go-multistream",
+            "weight": 0.3293897254043048
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "opencontainers/runtime-spec",
+            "weight": 0.3438010775709731
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "multiformats/go-varint",
+            "weight": 0.3385526612153555
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "pion/udp",
+            "weight": 0.12228483946197229
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "ncruces/go-strftime",
+            "weight": 0.365821240336195
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "spf13/cast",
+            "weight": 0.44046048667107107
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "klauspost/compress",
+            "weight": 0.5504697070644823
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "benbjohnson/clock",
+            "weight": 0.2972981412325446
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "multiformats/go-multiaddr",
+            "weight": 0.42466918891896416
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "docker/go-units",
+            "weight": 0.27964141807501414
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "libp2p/go-buffer-pool",
+            "weight": 0.43562979382881817
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "erigontech/interfaces",
+            "weight": 0.18956353265992767
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "inconshreveable/mousetrap",
+            "weight": 0.04142547151815851
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "pion/randutil",
+            "weight": 0.11083900451650625
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "pion/interceptor",
+            "weight": 0.5616205023118593
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "rivo/uniseg",
+            "weight": 0.3903784928583151
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "sirupsen/logrus",
+            "weight": 0.3511117928918649
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "pbnjay/memory",
+            "weight": 0.17240459613222295
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "masterminds/sprig",
+            "weight": 0.06167064926860539
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "modern-go/reflect2",
+            "weight": 0.4984143928056269
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "pkg/errors",
+            "weight": 0.052994137623349806
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "thomasdesr/intmath",
+            "weight": 0.35307001195528603
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "xsleonard/go-merkle",
+            "weight": 0.04392618467285038
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "dop251/goja",
+            "weight": 0.5502022539370565
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "prometheus/common",
+            "weight": 0.49857036402872146
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "cespare/xxhash",
+            "weight": 0.2779572292505944
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "libp2p/go-reuseport",
+            "weight": 0.25549205736045527
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "holiman/bloomfilter",
+            "weight": 0.19379192948860804
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "prysmaticlabs/go-bitfield",
+            "weight": 0.13794397093003022
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "fsnotify/fsnotify",
+            "weight": 0.2755015451898165
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "elastic/go-freelru",
+            "weight": 0.5977586730894121
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "shirou/gopsutil",
+            "weight": 0.4696716339450301
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "prometheus/client_model",
+            "weight": 0.03339569825817272
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "libp2p/go-libp2p-pubsub",
+            "weight": 0.21057233306183007
+        },
+        {
+            "source": "erigontech/erigon",
+            "target": "antlr4-go/antlr",
+            "weight": 0.386332665223517
+        },
+        {
+            "source": "ethereum/web3.py",
+            "target": "ethereum/eth-typing",
+            "weight": 12.615596188599202
+        },
+        {
+            "source": "ethereum/web3.py",
+            "target": "ethereum/eth-hash",
+            "weight": 84.64411294936005
+        },
+        {
             "source": "root",
-            "target": "safe-global/safe-smart-account",
-            "weight": 12.723584296551142
+            "target": "erigontech/erigon",
+            "weight": 21.40292708581327
         },
         {
-            "source": "safe-global/safe-smart-account",
-            "target": "kevva/astral-regex",
-            "weight": 0.0021469701050503094
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "gulpjs/rechoir",
-            "weight": 0.05442397524750184
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "babel/babel",
-            "weight": 0.030006794551509165
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "cgewecke/eth-gas-reporter",
-            "weight": 0.030107206254623067
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "chaijs/chai-as-promised",
-            "weight": 0.05550748420434195
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "nodeca/argparse",
-            "weight": 0.010852904385749762
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "omnidan/node-emoji",
-            "weight": 0.053378719693573363
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "gotwarlost/istanbul",
-            "weight": 0.030983377672925173
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "NomicFoundation/hardhat",
-            "weight": 0.01717273593118544
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "hughsk/flat",
-            "weight": 0.0011914727475207674
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "apocas/dockerode",
-            "weight": 0.02176505312731086
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "isaacs/node-graceful-fs",
-            "weight": 0.03070912498744213
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "plurals/pluralize",
-            "weight": 0.03932794625317813
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "browserify/EVP_BytesToKey",
-            "weight": 0.045797367687420466
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "sindresorhus/binary-extensions",
-            "weight": 0.015108030487517075
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "ljharb/es-define-property",
-            "weight": 0.01167681097242342
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "nomicfoundation/edr",
-            "weight": 0.015864570451813453
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "webreflection/flatted",
-            "weight": 0.05125484021032585
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "npm/security-holder",
-            "weight": 0.04325097289033887
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "rvagg/archived-string_decoder",
-            "weight": 0.0556180474886588
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "ts-essentials/ts-essentials",
-            "weight": 0.011775141641320812
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "linusu/buffer-alloc",
-            "weight": 0.048750585519221686
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "evanw/node-source-map-support",
-            "weight": 0.01675642414418692
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "inspect-js/has-property-descriptors",
-            "weight": 0.029753528065756235
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "dsherret/code-block-writer",
-            "weight": 0.02925128593391718
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "browserify/resolve",
-            "weight": 0.040610157537272734
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "linusu/murmur-128",
-            "weight": 0.025242486532936044
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "sindresorhus/decamelize",
-            "weight": 0.020385466127224902
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "ryanzim/at-least-node",
-            "weight": 0.05620058725953085
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "75lb/find-replace",
-            "weight": 0.019192693438254405
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "prettier/eslint-config-prettier",
-            "weight": 0.05152329083591447
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "felixge/node-retry",
-            "weight": 0.042223522914147694
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "mafintosh/mkdirp-classic",
-            "weight": 0.0036016487797988716
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "dsherret/ts-morph",
-            "weight": 0.03008649059841086
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "jshttp/mime-db",
-            "weight": 0.05012231316053938
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "YuzuJS/setImmediate",
-            "weight": 0.017869975263814918
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "chaijs/get-func-name",
-            "weight": 0.04289884564120463
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "sindresorhus/widest-line",
-            "weight": 0.019548700144414954
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "octet-stream/form-data-encoder",
-            "weight": 0.014978661532098586
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "npm/ini",
-            "weight": 0.025925827972974855
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "indutny/brorand",
-            "weight": 0.03542188844723565
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "gkz/prelude-ls",
-            "weight": 0.05042604252014151
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "sindresorhus/quick-lru",
-            "weight": 0.04868005068120149
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "sinonjs/commons",
-            "weight": 0.03070204005216962
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "roryf/parse-cache-control",
-            "weight": 0.05027543756095045
-        },
-        {
-            "source": "safe-global/safe-smart-account",
-            "target": "chalk/slice-ansi",
-            "weight": 0.011836537548588166
+            "source": "root",
+            "target": "ethereum/web3.py",
+            "weight": 78.59707291418673
         }
     ]
 }
