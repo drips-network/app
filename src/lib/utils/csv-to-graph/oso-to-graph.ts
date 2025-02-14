@@ -15,11 +15,11 @@ export async function osoToGraphJson(
   const osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
   const graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
 
-  assignRandomRealisticWeights(graph);
   correctGraph(graph, osoGraphErrors);
   if (Number.isFinite(reduce) && reduce > 0) {
     reduceGraph(graph, reduce);
   }
+  assignRandomRealisticWeights(graph);
 
   graph.nodes.sort((a, b) => a.projectName.localeCompare(b.projectName));
   // @ts-expect-error: source might be undefined
