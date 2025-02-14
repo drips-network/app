@@ -1,5 +1,5 @@
 import type { Edge, Graph } from '$lib/utils/ecosystems/schemas';
-import { csvToGraph, correctGraph } from '../csv-to-graph';
+import { csvToGraph, correctGraph, removeNode, reduceGraph } from '../csv-to-graph';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
 
@@ -146,5 +146,36 @@ describe('csv-to-graph', () => {
       const edge = graph.edges.find((n) => n.source === 'root');
       expect(edge).toBeDefined();
     });
+
+    // it('should leave no orphaned nodes')
+  });
+
+  describe('removeNode', () => {
+    beforeAll(async () => {
+      graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
+      removeNode(graph, 'eth-infinitism/account-abstraction');
+    });
+
+    it('does not leave orphaned nodes', () => {
+      for (const node of graph.nodes) {
+        const edge = graph.edges.find(
+          (e) => e.source === node.projectName || e.target === node.projectName,
+        );
+        expect(edge).toBeDefined();
+      }
+    });
+  });
+
+  describe('reduceGraph', () => {
+    beforeAll(async () => {
+      graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
+      reduceGraph(graph, 100);
+    });
+
+    it('reduces the order of the graph to at most the given value', () => {
+      expect(graph.nodes.length).toBeLessThanOrEqual(100);
+    });
   });
 });
+
+// describe.each([])()
