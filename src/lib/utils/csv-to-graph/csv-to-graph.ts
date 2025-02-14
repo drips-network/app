@@ -66,6 +66,46 @@ function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrar
   }
 }
 
+// NOTE: only guarantees AT MOST targetOrder nodes
+export function reduceGraph(graph: Graph, targetOrder: number) {
+  let i = graph.nodes.length - targetOrder;
+  while (i > 0) {
+    const randomIndex = Math.floor(Math.random() * graph.nodes.length);
+    removeNode(graph, graph.nodes[randomIndex].projectName);
+    i = graph.nodes.length - targetOrder;
+  }
+}
+
+export function removeNode(graph: Graph, projectName: string) {
+  // remove the node with the given projectName
+  const nodeIndex = graph.nodes.findIndex((n) => n.projectName === projectName);
+  if (nodeIndex === -1) {
+    return;
+  }
+  graph.nodes.splice(nodeIndex, 1);
+
+  // reduce all edges to those that don't include the removed projectName
+  // save edges that can create orphans
+  const edgesPotentialOrphans = graph.edges.filter((e) => e.source === projectName);
+  const edgesWithoutProjectname = graph.edges.filter(
+    (e) => e.target !== projectName && e.source !== projectName,
+  );
+  graph.edges = edgesWithoutProjectname;
+
+  // look for orphaned nodes and remove them
+  for (const edge of edgesPotentialOrphans) {
+    const otherEdge = graph.edges.find(
+      (e) => (edge !== e && e.source === edge.target) || e.target === edge.target,
+    );
+    // if there isn't at least one edge involved with the potential
+    // orphan target node, then remove the node
+    if (!otherEdge) {
+      const nodeIndex = graph.nodes.findIndex((n) => n.projectName === edge.target);
+      graph.nodes.splice(nodeIndex, 1);
+    }
+  }
+}
+
 const PROJECT_NAME_REGEX = /([^/\s]+\/[^/\s]+)/g;
 
 function correctNotFound(graph: Graph, error: string) {
@@ -75,16 +115,7 @@ function correctNotFound(graph: Graph, error: string) {
   }
 
   const projectName = projectNames[0];
-  const nodeIndex = graph.nodes.findIndex((n) => n.projectName === projectName);
-  if (nodeIndex === -1) {
-    return;
-  }
-  graph.nodes.splice(nodeIndex, 1);
-
-  const edgesWithoutProjectname = graph.edges.filter(
-    (e) => e.target !== projectName && e.source !== projectName,
-  );
-  graph.edges = edgesWithoutProjectname;
+  removeNode(graph, projectName);
 }
 
 function correctRenamed(graph: Graph, error: string) {
