@@ -202,7 +202,7 @@ export function correctGraph(graph: Graph, errors: string[]): Graph {
 }
 
 export function assignRandomRealisticWeights(graph: Graph) {
-  const total = 100;
+  const total = 1;
   for (const node of graph.nodes) {
     const edges = graph.edges.filter((e) => e.source === node.projectName);
     const degree = edges.length;
@@ -210,7 +210,7 @@ export function assignRandomRealisticWeights(graph: Graph) {
     const randsSum = rands.reduce((sum, rand) => sum + rand, 0);
 
     let forMaintainers = total - Math.random() * total;
-    // root edges must add up to 100
+    // root edges must add up to total
     if (node.projectName === 'root') {
       forMaintainers = 0;
     }
@@ -221,7 +221,7 @@ export function assignRandomRealisticWeights(graph: Graph) {
       edges[index].weight = rands[index];
     }
 
-    // correct last root edge so that all of them add to 100
+    // correct last root edge so that all of them add to total
     if (node.projectName === 'root') {
       const lastEdge = edges.at(-1);
       if (!lastEdge) {
