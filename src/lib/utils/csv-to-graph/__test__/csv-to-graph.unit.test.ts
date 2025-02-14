@@ -1,4 +1,4 @@
-import type { Edge, Graph } from '$lib/utils/ecosystems/schemas';
+import type { Edge, NewGraph } from '$lib/utils/ecosystems/schemas';
 import { csvToGraph, correctGraph, removeNode, reduceGraph } from '../csv-to-graph';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
@@ -7,7 +7,7 @@ describe('csv-to-graph', () => {
   const osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
 
   describe('csvToGraph', () => {
-    let graph: Graph;
+    let graph: NewGraph;
 
     beforeAll(async () => {
       graph = await csvToGraph(osoUnweightedFile);
@@ -88,7 +88,7 @@ describe('csv-to-graph', () => {
   });
 
   describe('correctGraph', () => {
-    let graph: Graph;
+    let graph: NewGraph;
 
     beforeAll(async () => {
       graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
@@ -155,7 +155,7 @@ describe('csv-to-graph', () => {
   });
 
   describe('removeNode', () => {
-    let graph: Graph;
+    let graph: NewGraph;
 
     beforeEach(async () => {
       graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
@@ -180,7 +180,7 @@ describe('csv-to-graph', () => {
   });
 
   describe('reduceGraph', () => {
-    let graph: Graph;
+    let graph: NewGraph;
 
     beforeAll(async () => {
       graph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
