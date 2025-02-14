@@ -11,9 +11,16 @@ const metadatumSchema = z.object({
 });
 
 const nodeSchema = z.object({
-  // TODO: githubUrl or projectName?
-  projectName: z.string(),
+  projectAccountId: z.string(),
+  repoOwner: z.string(),
+  repoName: z.string(),
+  absoluteWeight: z.number(),
+  // TODO: does this exist?
   metadata: z.optional(metadatumSchema),
+});
+
+const newNodeScehma = z.object({
+  projectName: z.string(),
 });
 
 const edgeSchema = z.object({
@@ -29,6 +36,11 @@ const graphSchema = z.object({
   edges: z.array(edgeSchema),
 });
 
+const newGraphSchema = z.object({
+  nodes: z.array(newNodeScehma),
+  edges: z.array(edgeSchema),
+});
+
 export const ecosystemSchema = z.object({
   id: z.optional(z.string()),
   name: z.string(),
@@ -39,7 +51,7 @@ export const ecosystemSchema = z.object({
   ownerAddress: z.optional(z.string()),
   metadata: z.array(metadatumSchema),
   nodeCount: z.optional(z.number()),
-  graph: z.optional(graphSchema),
+  graph: z.optional(graphSchema.or(newGraphSchema)),
 });
 
 export const getAllSchema = z.array(ecosystemSchema);
@@ -49,5 +61,7 @@ export const createSchema = z.string();
 
 export type Ecosystem = z.infer<typeof ecosystemSchema>;
 export type Graph = z.infer<typeof graphSchema>;
+export type NewGraph = z.infer<typeof newGraphSchema>;
 export type Node = z.infer<typeof nodeSchema>;
+export type NewNode = z.infer<typeof newNodeScehma>;
 export type Edge = z.infer<typeof edgeSchema>;
