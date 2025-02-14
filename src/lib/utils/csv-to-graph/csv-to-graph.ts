@@ -1,8 +1,8 @@
 import { parseFile as parseCsv } from '$lib/utils/csv';
-import type { Graph, Node as GraphNode, Edge as GraphEdge } from '../ecosystems/schemas';
+import type { Edge, NewGraph, NewNode } from '../ecosystems/schemas';
 
-type NodeLibrary = Record<string, GraphNode>;
-type EdgeLibrary = Record<string, GraphEdge>;
+type NodeLibrary = Record<string, NewNode>;
+type EdgeLibrary = Record<string, Edge>;
 type CsvLayout = {
   source: number;
   target: number;
@@ -14,9 +14,9 @@ function createEdge(
   source: string,
   target: string,
   weight: number,
-  graph: Graph,
+  graph: NewGraph,
   edgeLibrary: EdgeLibrary,
-): GraphEdge | null {
+): Edge | null {
   // don't add edge to same node
   if (target === source) {
     return null;
@@ -41,7 +41,7 @@ function createEdge(
   return edge;
 }
 
-function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary): GraphNode {
+function createNode(projectName: string, graph: NewGraph, nodeLibrary: NodeLibrary): NewNode {
   let node = nodeLibrary[projectName];
   if (!node) {
     node = { projectName };
@@ -52,7 +52,7 @@ function createNode(projectName: string, graph: Graph, nodeLibrary: NodeLibrary)
   return node;
 }
 
-function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrary) {
+function addRootEdges(rootNode: NewNode, graph: NewGraph, edgeLibrary: EdgeLibrary) {
   const rootNodes = [];
   for (const node of graph.nodes) {
     const edge = graph.edges.find((e) => e.target === node.projectName);
@@ -67,7 +67,7 @@ function addRootEdges(rootNode: GraphNode, graph: Graph, edgeLibrary: EdgeLibrar
 }
 
 // NOTE: only guarantees AT MOST targetOrder nodes
-export function reduceGraph(graph: Graph, targetOrder: number) {
+export function reduceGraph(graph: NewGraph, targetOrder: number) {
   let i = graph.nodes.length - targetOrder;
   while (i > 0) {
     const randomIndex = Math.floor(Math.random() * graph.nodes.length);
@@ -76,7 +76,7 @@ export function reduceGraph(graph: Graph, targetOrder: number) {
   }
 }
 
-export function removeNode(graph: Graph, projectName: string) {
+export function removeNode(graph: NewGraph, projectName: string) {
   // can't remove the root node
   if (projectName === 'root') {
     return;
@@ -113,7 +113,7 @@ export function removeNode(graph: Graph, projectName: string) {
 
 const PROJECT_NAME_REGEX = /([^/\s]+\/[^/\s]+)/g;
 
-function correctNotFound(graph: Graph, error: string) {
+function correctNotFound(graph: NewGraph, error: string) {
   const projectNames = error.match(PROJECT_NAME_REGEX);
   if (!projectNames) {
     return;
@@ -123,7 +123,7 @@ function correctNotFound(graph: Graph, error: string) {
   removeNode(graph, projectName);
 }
 
-function correctRenamed(graph: Graph, error: string) {
+function correctRenamed(graph: NewGraph, error: string) {
   const projectNames = error.match(PROJECT_NAME_REGEX);
   if (!projectNames) {
     return;
@@ -153,7 +153,7 @@ function correctRenamed(graph: Graph, error: string) {
 
   // create a list of edges that use the current project name, with directional information
   const currentEdges = graph.edges.reduce(
-    (memo: [GraphEdge, keyof GraphEdge, keyof GraphEdge, number][], edge, index) => {
+    (memo: [Edge, keyof Edge, keyof Edge, number][], edge, index) => {
       if (edge.target === current) {
         memo.push([edge, 'target', 'source', index]);
       } else if (edge.source === current) {
@@ -187,7 +187,7 @@ function correctRenamed(graph: Graph, error: string) {
   }
 }
 
-export function correctGraph(graph: Graph, errors: string[]): Graph {
+export function correctGraph(graph: NewGraph, errors: string[]): NewGraph {
   for (const error of errors) {
     if (error.includes('not found')) {
       correctNotFound(graph, error);
@@ -201,7 +201,7 @@ export function correctGraph(graph: Graph, errors: string[]): Graph {
   return graph;
 }
 
-export function assignRandomRealisticWeights(graph: Graph) {
+export function assignRandomRealisticWeights(graph: NewGraph) {
   const total = 1;
   for (const node of graph.nodes) {
     const edges = graph.edges.filter((e) => e.source === node.projectName);
@@ -236,9 +236,9 @@ export function assignRandomRealisticWeights(graph: Graph) {
 export async function csvToGraph(
   file: File,
   layout: CsvLayout = { source: 1, target: 5, startIndex: 0 },
-): Promise<Graph> {
+): Promise<NewGraph> {
   const rootNode = { projectName: 'root' };
-  const graph: Graph = { nodes: [rootNode], edges: [] };
+  const graph: NewGraph = { nodes: [rootNode], edges: [] };
   const nodeLibrary: NodeLibrary = { [rootNode.projectName]: rootNode };
   const edgeLibrary: EdgeLibrary = {};
 
