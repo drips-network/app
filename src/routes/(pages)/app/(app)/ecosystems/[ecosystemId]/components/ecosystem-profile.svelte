@@ -358,7 +358,12 @@
     <div class="content">
       <section id="graph">
         <PrimaryColorThemer {colorHex}>
-          <EcosystemCardInteractive {project} isHidden={!project.isVisible} isInteractive />
+          <EcosystemCardInteractive
+            {ecosystem}
+            {project}
+            isHidden={!project.isVisible}
+            isInteractive
+          />
         </PrimaryColorThemer>
       </section>
       <section id="metadata">
