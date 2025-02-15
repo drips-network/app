@@ -55,7 +55,9 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
   import EcosystemProjectCard from './ecosystem-project-card.svelte';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
+  export let ecosystem: Ecosystem;
   export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
@@ -95,7 +97,7 @@
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
     <div class="graph">
-      <EcosystemGraph bind:zoom />
+      <EcosystemGraph {ecosystem} bind:zoom />
     </div>
     {#if $$slots.banner}
       <div class="banner">
