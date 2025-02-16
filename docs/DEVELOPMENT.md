@@ -4,7 +4,12 @@ The stack for the Drips App contains a number of services, which can all be run 
 
 ## 🚀 Quick Start
 
+[!IMPORTANT]
+Our local Docker-based stack described below currently runs only on `linux/arm64` systems (which also works on Apple ARM machines or ARM-based Windows devices with WSL). If you're on Windows or an amd64 Linux machine, you'll need to run the standard dev server with `npm run dev` and bring your own environment variables based on `.env.template`. If this is blocking you from contributing, please reach out to us so we can prioritize building Docker images for `linux/amd64`.
+
 First, run `npm i` to install dependencies.
+
+Create an empty `.env` file by running `touch .env`.
 
 To run a local dev environment, simply run `npm run dev:docker`. This will start all necessary services for running the Drips app locally, complete with a local testnet that has the Drips protocol contracts and a test ERC-20 deployed. After this, set up MetaMask for the local testnet by following the instructions below.
 
