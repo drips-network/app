@@ -11,7 +11,9 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088] as const;
+export const SUPPORTED_CHAIN_IDS = [
+  1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10,
+] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
@@ -443,6 +445,55 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         symbol: 'METIS',
       },
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
+  },
+  [10]: {
+    chainId: 10,
+    name: 'optimism',
+    label: 'Optimism',
+    token: 'ETH',
+    id: '0xa',
+    rpcUrl: 'https://mainnet.optimism.io/',
+    icon: Optimism,
+    color: '#FF0420',
+    isTestnet: false,
+    subdomain: 'optimism.drips.network',
+    gqlName: SupportedChain.Metis,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      linkTemplate: (txHash: string) => `https://optimistic.etherscan.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0xfD1aF9f95f093eE852dc276d9A15A299F3f88735',
+      DRIPS: '0x1803DA2FA1F711B7aEb46E416032d6ae24d3E6c2',
+      CALLER: '0x4bE808D2cfc94160024E3513547e63994278B022',
+      REPO_DRIVER: '0x7dDaa1055Dd1e9E01f09D7D70A400CE8BCb3825b',
+      NFT_DRIVER: '0xF04E808522109D646a7Cd9E797267Aa0ABd3589C',
+      NATIVE_TOKEN_UNWRAPPER: '0x8a89353200f782f11216127A1ec35934bF24F113',
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on Optimism settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    ensSupported: false,
+    ensAddress: undefined,
+    gelatoRelayAvailable: true,
+    gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Metis',
+        symbol: 'METIS',
+      },
+      rpcUrls: ['https://mainnet.optimism.io'],
     },
   },
 };
