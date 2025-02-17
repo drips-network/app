@@ -458,7 +458,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     color: '#FF0420',
     isTestnet: false,
     subdomain: 'optimism.drips.network',
-    gqlName: SupportedChain.Metis,
+    gqlName: SupportedChain.Optimism,
     autoUnwrapPairs: [],
     displayNetworkPicker: true,
     applyGasBuffers: true,
