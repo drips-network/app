@@ -77,6 +77,10 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
         },
       }),
   },
+  10: {
+    variant: 'default',
+    loadFn: loadDefaultExplorePageData,
+  },
 } as const;
 
 export const load = async ({ fetch }) => {
