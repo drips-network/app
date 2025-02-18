@@ -34,6 +34,8 @@
 
     // State derived from hovered node:
     hoveredNeighbors?: Set<string>;
+    // State derived from selected node:
+    selectedNeighbors?: Set<string>;
   }
   const state: State = { searchQuery: '' };
 
@@ -55,6 +57,22 @@
 
   // TODO: sync with wheel zoom state
   $: zoom, sigmaInstance && setZoom(sigmaInstance, zoom);
+
+  function setSelectedNode(node?: string) {
+    if (node) {
+      state.selectedNode = node;
+      state.selectedNeighbors = new Set(graph.neighbors(node));
+    } else {
+      state.selectedNode = undefined;
+      state.selectedNeighbors = undefined;
+    }
+
+    // Refresh rendering
+    sigmaInstance.refresh({
+      // We don't touch the graph data so we can skip its reindexation
+      skipIndexation: true,
+    });
+  }
 
   function setHoveredNode(node?: string) {
     if (node) {
@@ -93,11 +111,6 @@
     if (state.selectedNode === node || state.hoveredNode === node) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
-      // res.zIndex = 0
-      // res.highlighted = false
-      // res.highlighted = true;
-      // res.color = 'green'
-      // res.borderSize = 5;
     } else if (state.suggestions) {
       if (state.suggestions.has(node)) {
         res.forceLabel = true;
@@ -266,6 +279,12 @@
     });
     sigmaInstance.on('leaveNode', () => {
       setHoveredNode(undefined);
+    });
+    sigmaInstance.on('clickNode', ({ node }) => {
+      setSelectedNode(node);
+    });
+    sigmaInstance.on('clickStage', () => {
+      setSelectedNode(undefined);
     });
 
     sigmaInstance.setSetting('nodeReducer', nodeReducer);
