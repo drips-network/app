@@ -13,8 +13,8 @@ import * as ecosystemsApi from '$lib/utils/ecosystems';
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 // const chicken = {
-//   "name": "OSO Ecosystem Reduced",
-//   "description": "Small and beautiful",
+//   "name": "Open Source Ecosystem",
+//   "description": "Awesome and beautiful and cool",
 //   "chainId": "11155111",
 //   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
 //   "ownerAddress": "0xe2E9b9B5d0757c26aB477A754788B19b60f2ed83",
@@ -58,7 +58,7 @@ export const load = async ({ fetch }) => {
 
   const ecosystems = await ecosystemsApi.getAll();
   // console.log(chicken)
-  // if (ecosystems.length < 1) {
+  // if (ecosystems.length < 2) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();
