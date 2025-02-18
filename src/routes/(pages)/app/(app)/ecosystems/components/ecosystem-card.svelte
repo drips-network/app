@@ -92,7 +92,9 @@
           {ecosystem.name}
         </span>
       </h1>
-      <p class="description">The essential Ethereum ecosystem.</p>
+      {#if ecosystem.description}
+        <p class="description">{ecosystem.description}</p>
+      {/if}
       <div class="avatar">
         <!-- vitalik.eth -->
         <IdentityBadge
