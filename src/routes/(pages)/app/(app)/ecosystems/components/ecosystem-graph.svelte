@@ -3,7 +3,7 @@
   // import testData from '../__test__/data/test1.json';
   import Graph from 'graphology';
   import forceAtlas2 from 'graphology-layout-forceatlas2';
-  // import noverlap from 'graphology-layout-noverlap';
+  import noverlap from 'graphology-layout-noverlap';
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
@@ -19,7 +19,7 @@
   // const { nodes, edges } = testData;
   let programaticZoom: boolean = false;
 
-  // type LayoutMapping = { [key: string]: { x: number; y: number } };
+  type LayoutMapping = { [key: string]: { x: number; y: number } };
   type Attributes = { [name: string]: unknown };
 
   interface State {
@@ -35,13 +35,13 @@
   }
   const state: State = { searchQuery: '' };
 
-  // function setPositions(graph: Graph, positions: LayoutMapping) {
-  //   graph.forEachNode((node) => {
-  //     const position = positions[node];
-  //     graph.setNodeAttribute(node, 'x', position.x);
-  //     graph.setNodeAttribute(node, 'y', position.y);
-  //   });
-  // }
+  function setPositions(graph: Graph, positions: LayoutMapping) {
+    graph.forEachNode((node) => {
+      const position = positions[node];
+      graph.setNodeAttribute(node, 'x', position.x);
+      graph.setNodeAttribute(node, 'y', position.y);
+    });
+  }
 
   function setZoom(sigmaInstance: Sigma, zoom: number) {
     programaticZoom = true;
@@ -162,11 +162,12 @@
       );
       graph.addNode(node.projectAccountId, {
         color: isPrimary ? nodeColorSPrimary : nodeColorSecondary,
-        label: `${node.repoOwner}/${node.repoName}`,
+        // label: `${node.repoOwner}/${node.repoName}`,
         x: Math.random(),
         y: Math.random(),
         size: isPrimary ? 16 : 8,
         borderColor: 'black',
+        projectName: `${node.repoOwner}/${node.repoName}`,
       });
     }
 
@@ -179,36 +180,33 @@
       graph.addEdge(edge.source, edge.target, { color: edgeColor, size: 3 });
     }
 
-    forceAtlas2.assign(graph, 50);
+    // forceAtlas2.assign(graph, 50);
 
-    // const fa2Positions = forceAtlas2(graph, {
-    //   iterations: 50,
-    //   // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
-    //   settings: {
-    //     // spread nodes apart
-    //     gravity: 1,
-    //     // take into account the size of the node when calculating
-    //     // layout.the
-    //     adjustSizes: true,
-    //     strongGravityMode: true,
-    //     // barnesHutOptimize: true
-    //     // linLogMode: true,
-    //     // outboundAttractionDistribution:
-    //     // scalingRatio: 100
-    //   },
-    // });
+    const fa2Positions = forceAtlas2(graph, {
+      iterations: 50,
+      // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
+      settings: {
+        // spread nodes apart
+        // gravity: 100,
+        // take into account the size of the node when calculating
+        // layout.the
+        // adjustSizes: true,
+        // strongGravityMode: true,
+        // barnesHutOptimize: true
+        // linLogMode: true,
+        // outboundAttractionDistribution:
+        // scalingRatio: 100
+      },
+    });
     // // console.log(positions)
 
-    // setPositions(graph, fa2Positions);
+    setPositions(graph, fa2Positions);
 
-    // const noPositions = noverlap(graph, {
-    //   maxIterations: 50,
-    //   settings: {
-    //     ratio: 2,
-    //   },
-    // });
+    const noPositions = noverlap(graph, {
+      maxIterations: 50,
+    });
 
-    // setPositions(graph, noPositions);
+    setPositions(graph, noPositions);
 
     sigmaInstance = new Sigma(graph, graphContainer, {
       defaultNodeType: 'bordered',
@@ -221,7 +219,7 @@
       },
     });
 
-    setZoom(sigmaInstance, zoom);
+    // setZoom(sigmaInstance, 2);
 
     const camera = sigmaInstance.getCamera();
     camera.on('updated', handleCameraUpdated);
