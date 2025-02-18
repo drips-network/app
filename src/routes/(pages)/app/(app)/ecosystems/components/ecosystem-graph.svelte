@@ -111,6 +111,9 @@
     if (state.selectedNode === node || state.hoveredNode === node) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
+      // TODO: tweak
+      // @ts-expect-error: res.size might be undefined
+      res.size = res.size + 2.5;
     } else if (state.suggestions) {
       if (state.suggestions.has(node)) {
         res.forceLabel = true;
