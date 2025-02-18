@@ -1,13 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  // import testData from '../__test__/data/test1.json';
   import Graph from 'graphology';
   import forceAtlas2 from 'graphology-layout-forceatlas2';
   import noverlap from 'graphology-layout-noverlap';
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  // import type { LayoutMapping } from 'graphology-layout-forceatlas2'
 
   export let ecosystem: Ecosystem;
   export let zoom: number = 3;
@@ -16,8 +14,12 @@
   let sigmaInstance: Sigma;
   let graphContainer: HTMLDivElement;
 
-  // const { nodes, edges } = testData;
   let programaticZoom: boolean = false;
+
+  let networkStyle: CSSStyleDeclaration;
+  let nodeColorPrimary: string;
+  let nodeColorSecondary: string;
+  let edgeColor: string;
 
   type LayoutMapping = { [key: string]: { x: number; y: number } };
   type Attributes = { [name: string]: unknown };
@@ -79,13 +81,23 @@
   function nodeReducer(node: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<NodeDisplayData> = { ...data };
 
-    if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
-      res.label = '';
-      res.color = '#f6f6f6';
+    if (state.hoveredNeighbors) {
+      if (!state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
+        // res.label = '';
+        // res.color = '#00000000';
+      } else {
+        res.color = nodeColorPrimary;
+      }
     }
 
-    if (state.selectedNode === node) {
-      res.highlighted = true;
+    if (state.selectedNode === node || state.hoveredNode === node) {
+      // @ts-expect-error: borderSize doesn't exist
+      res.borderSize = 5;
+      // res.zIndex = 0
+      // res.highlighted = false
+      // res.highlighted = true;
+      // res.color = 'green'
+      // res.borderSize = 5;
     } else if (state.suggestions) {
       if (state.suggestions.has(node)) {
         res.forceLabel = true;
@@ -99,6 +111,7 @@
   }
 
   // Render edges accordingly to the internal state:
+  // 0. Color every neighboring edge the primary color
   // 1. If a node is hovered, the edge is hidden if it is not connected to the
   //    node
   // 2. If there is a query, the edge is only visible if it connects two
@@ -108,12 +121,21 @@
 
     if (
       state.hoveredNode &&
-      !graph
+      graph
         .extremities(edge)
         .every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
     ) {
-      res.hidden = true;
+      res.color = nodeColorPrimary;
     }
+
+    // if (
+    //   state.hoveredNode &&
+    //   !graph
+    //     .extremities(edge)
+    //     .every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
+    // ) {
+    //   res.hidden = true;
+    // }
 
     if (
       state.suggestions &&
@@ -132,15 +154,13 @@
   }
 
   async function initializeGraph() {
-    const networkStyle = window.getComputedStyle(graphContainer);
-    const nodeColorSPrimary = networkStyle.getPropertyValue('--color-primary');
-    const nodeColorSecondary = networkStyle.getPropertyValue('--color-foreground');
-    const edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
+    networkStyle = window.getComputedStyle(graphContainer);
+    nodeColorPrimary = networkStyle.getPropertyValue('--color-primary');
+    nodeColorSecondary = networkStyle.getPropertyValue('--color-foreground');
+    edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
 
     // Can't be imported server side
-    // const { Sigma } = await import('sigma');
-    // const { NodeBorderProgram } = await import('@sigma/node-border');
-    const [{ Sigma }, { NodeBorderProgram }] = await Promise.all([
+    const [{ Sigma }, { createNodeBorderProgram }] = await Promise.all([
       import('sigma'),
       import('@sigma/node-border'),
     ]);
@@ -161,13 +181,15 @@
         (e) => e.source === null && e.target === node.projectAccountId,
       );
       graph.addNode(node.projectAccountId, {
-        color: isPrimary ? nodeColorSPrimary : nodeColorSecondary,
+        color: isPrimary ? nodeColorPrimary : nodeColorSecondary,
         // label: `${node.repoOwner}/${node.repoName}`,
         x: Math.random(),
         y: Math.random(),
         size: isPrimary ? 16 : 8,
         borderColor: 'black',
+        borderSize: isPrimary ? 2 : 0,
         projectName: `${node.repoOwner}/${node.repoName}`,
+        isPrimary,
       });
     }
 
@@ -210,12 +232,26 @@
 
     sigmaInstance = new Sigma(graph, graphContainer, {
       defaultNodeType: 'bordered',
+      autoRescale: false,
+      // Remove box shadow on hover
+      // https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
+      defaultDrawNodeHover: () => {},
+      // autoRescale: true,
       // don't adjust the size of the nodes and edges
       // when zooming.
       // https://www.sigmajs.org/storybook/?path=/story/fit-sizes-to-positions--story
       zoomToSizeRatioFunction: () => 1,
       nodeProgramClasses: {
-        bordered: NodeBorderProgram,
+        // bordered: NodeBorderProgram,
+        bordered: createNodeBorderProgram({
+          borders: [
+            {
+              size: { attribute: 'borderSize', defaultValue: 1, mode: 'pixels' },
+              color: { attribute: 'borderColor' },
+            },
+            { size: { fill: true }, color: { attribute: 'color' } },
+          ],
+        }),
       },
     });
 
