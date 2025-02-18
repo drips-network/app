@@ -1,5 +1,6 @@
 #!/bin/bash
-set -eux
+set -eu
+
 cleanup() {
     docker compose -f docker-compose.yml -f docker-compose.dev.yml rm -fsv
 }

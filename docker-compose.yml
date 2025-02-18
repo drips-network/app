@@ -17,6 +17,7 @@ services:
       - PINATA_SDK_SECRET=123
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_API_KEY=1234
+      - PUBLIC_USE_LOCAL_TESTNET_WALLET_STORE=${APP_USE_LOCAL_TESTNET_WALLET_STORE-false}
     volumes:
     - .:/app
     - /app/node_modules/

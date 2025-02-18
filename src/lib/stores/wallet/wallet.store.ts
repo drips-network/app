@@ -21,6 +21,7 @@ import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/ad
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import assert from '$lib/utils/assert';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -337,4 +338,69 @@ const walletStore = () => {
   };
 };
 
-export default walletStore();
+const localTestnetWalletStore = () => {
+  const provider = new FailoverJsonRpcProvider(
+    ['http://testnet:8545', 'http://localhost:8545'],
+    network,
+    {
+      staticNetwork: true,
+    },
+  );
+  const initialized = writable(false);
+  const waitingForOnboard = writable(false);
+
+  const state = writable<WalletStoreState>({
+    connected: false,
+    network,
+    provider,
+  });
+
+  async function initialize() {
+    initialized.set(true);
+  }
+
+  async function connect() {
+    const signer = await provider.getSigner();
+
+    const ownAccountId = (
+      await executeAddressDriverReadMethod({
+        functionName: 'calcAccountId',
+        args: [signer.address as OxString],
+      })
+    ).toString();
+
+    state.set({
+      connected: true,
+      address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+      provider,
+      signer,
+      network,
+      dripsAccountId: ownAccountId,
+    });
+
+    initialized.set(true);
+  }
+
+  async function disconnect() {
+    state.set({
+      connected: false,
+      network,
+      provider,
+    });
+  }
+
+  return {
+    subscribe: state.subscribe,
+    initialized: { subscribe: initialized.subscribe },
+    waitingForOnboard: { subscribe: waitingForOnboard.subscribe },
+    initialize,
+    connect,
+    disconnect,
+    setOnboardTheme: () => undefined,
+  };
+};
+
+const useLocalTestnetWalletStore =
+  getOptionalEnvVar('PUBLIC_USE_LOCAL_TESTNET_WALLET_STORE', false, null) === 'true';
+
+export default useLocalTestnetWalletStore ? localTestnetWalletStore() : walletStore();

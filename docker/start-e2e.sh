@@ -4,7 +4,7 @@ set -eu
 UI=false
 
 cleanup() {
-    docker compose -f docker-compose.yml -f docker-compose.e2e.yml rm -fsv
+    docker compose -f docker-compose.yml rm -fsv
 }
 trap cleanup EXIT
 
@@ -14,7 +14,7 @@ if [[ $* == *--start-playwright-ui* ]]; then
     UI=true
 fi
 
-docker compose build && docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
+docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 
 printf "⏳ Waiting for the app to start..."
 
