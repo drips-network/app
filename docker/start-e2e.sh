@@ -14,6 +14,9 @@ if [[ $* == *--start-playwright-ui* ]]; then
     UI=true
 fi
 
+ARCH=$(uname -m)
+export ARCH
+
 docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 
 printf "⏳ Waiting for the app to start..."
