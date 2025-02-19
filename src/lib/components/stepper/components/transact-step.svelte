@@ -777,7 +777,13 @@
               </div>
 
               <!-- Content "column" -->
-              <div class="content">
+              <div
+                class="content"
+                data-testid={transactionStatusItem.status === 'pending' ||
+                transactionStatusItem.status === 'finalizing'
+                  ? 'current-tx'
+                  : ''}
+              >
                 <!-- Title and action row -->
                 <div class="title-and-action">
                   <h3>{transactionStatusItem.title}</h3>
