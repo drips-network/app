@@ -340,7 +340,7 @@ const walletStore = () => {
 
 const localTestnetWalletStore = () => {
   const provider = new FailoverJsonRpcProvider(
-    ['http://testnet:8545', 'http://localhost:8545'],
+    browser ? ['http://localhost:8545'] : ['http://testnet:8545'],
     network,
     {
       staticNetwork: true,
