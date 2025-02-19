@@ -15,9 +15,18 @@ if [[ $* == *--start-playwright-ui* ]]; then
 fi
 
 ARCH=$(uname -m)
-if [ "$ARCH" = "x86_64" ]; then
+case "$ARCH" in
+  x86_64)
     ARCH="amd64"
-fi
+    ;;
+  aarch64 | armv8*)
+    ARCH="arm64"
+    ;;
+  *)
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+    ;;
+esac
 export ARCH
 
 docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach

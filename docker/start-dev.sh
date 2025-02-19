@@ -9,9 +9,19 @@ trap cleanup EXIT
 touch .env
 
 ARCH=$(uname -m)
-if [ "$ARCH" = "x86_64" ]; then
+case "$ARCH" in
+  x86_64)
     ARCH="amd64"
-fi
+    ;;
+  aarch64 | armv8*)
+    ARCH="arm64"
+    ;;
+  *)
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+    ;;
+esac
 export ARCH
+
 
 docker compose -f docker-compose.yml -f docker-compose.dev.yml build && docker compose -f docker-compose.yml -f docker-compose.dev.yml up --renew-anon-volumes --attach app
