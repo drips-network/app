@@ -10,6 +10,112 @@ type CsvLayout = {
   startIndex: number;
 };
 
+function dfs(
+  projectName: string,
+  graph: NewGraph,
+  dp: Record<string, number>,
+  visited: Record<string, boolean>,
+) {
+  visited[projectName] = true;
+
+  const neighbors = graph.edges.filter((e) => e.source === projectName);
+  for (const neighbor of neighbors) {
+    if (!visited[neighbor.target]) {
+      dfs(neighbor.target, graph, dp, visited);
+    }
+
+    dp[projectName] = Math.max(dp[projectName], 1 + dp[neighbor.target]);
+  }
+}
+
+export function findLongestPath(graph: NewGraph) {
+  // Object of heights
+  const dp: Record<string, number> = new Proxy(
+    {},
+    {
+      get: function (target: Record<string, number>, name: string) {
+        return Object.prototype.hasOwnProperty.call(target, name) ? target[name] : 0;
+      },
+    },
+  );
+
+  // Visited object to know if the node
+  // has been visited previously or not
+  const vis: Record<string, boolean> = {};
+
+  // Call DFS for every unvisited vertex
+  for (const node of graph.nodes) {
+    if (!vis[node.projectName]) {
+      dfs(node.projectName, graph, dp, vis);
+    }
+  }
+
+  let ans = 0;
+  // Traverse and find the maximum of all dp
+  for (const value of Object.values(dp)) {
+    ans = Math.max(ans, value);
+  }
+
+  return ans;
+}
+
+function getRandomLeaf(graph: NewGraph, initial: string = 'root'): string {
+  let currentEdges;
+  let currentEdge = { target: initial };
+
+  // TODO: scary
+  while (true) {
+    currentEdges = graph.edges.filter((edge) => edge.source === currentEdge.target);
+    if (!currentEdges.length) {
+      return currentEdge.target;
+    }
+
+    const rand = Math.floor(Math.random() * currentEdges.length);
+    currentEdge = currentEdges[rand];
+  }
+}
+
+function getNewNode(graph: NewGraph, libraryGraph: NewGraph) {
+  return libraryGraph.nodes.find((libraryNode) => {
+    return !graph.nodes.find((node) => node.projectName === libraryNode.projectName);
+  });
+}
+
+export function addLevel(graph: NewGraph, libraryGraph: NewGraph) {
+  const leaf = getRandomLeaf(graph);
+  const sourceNode = getNewNode(graph, libraryGraph);
+
+  if (!sourceNode) {
+    // eslint-disable-next-line no-console
+    console.warn('No new node to make root');
+    return;
+  }
+
+  graph.nodes.push(sourceNode);
+  graph.edges.push({
+    source: leaf,
+    target: sourceNode.projectName,
+    weight: 0.0001,
+  });
+
+  let i = 5;
+  while (i--) {
+    const targetNode = getNewNode(graph, libraryGraph);
+    if (!targetNode) {
+      // eslint-disable-next-line no-console
+      console.warn('No new node to make children', i);
+      break;
+    }
+
+    graph.nodes.push(targetNode);
+    graph.edges.push({
+      source: sourceNode.projectName,
+      target: targetNode.projectName,
+      weight: 0,
+    });
+  }
+}
+
 function createEdge(
   source: string,
   target: string,
@@ -99,15 +205,30 @@ export function removeNode(graph: NewGraph, projectName: string) {
 
   // look for orphaned nodes and remove them
   for (const edge of edgesPotentialOrphans) {
-    const otherEdge = graph.edges.find(
-      (e) => (edge !== e && e.source === edge.target) || e.target === edge.target,
-    );
+    // the edge is not the one pointing to the orphan
+    // and it's source is the orphan
+    // or it's target is the orphan
+    // const otherEdge = graph.edges.find(
+    //   (e) => edge !== e && (e.source === edge.target || e.target === edge.target),
+    // );
+    const otherSourceEdges = graph.edges.filter((e) => edge !== e && e.source === edge.target);
+    const otherTargetEdges = graph.edges.filter((e) => edge !== e && e.target === edge.target);
     // if there isn't at least one edge involved with the potential
     // orphan target node, then remove the node
-    if (!otherEdge) {
+    if (!otherSourceEdges.length && !otherTargetEdges.length) {
       const nodeIndex = graph.nodes.findIndex((n) => n.projectName === edge.target);
       graph.nodes.splice(nodeIndex, 1);
+    } else if (!otherTargetEdges.length) {
+      // if the orphaned node has children and no node points to it
+      // then make it a root node
+      graph.edges.push({
+        source: 'root',
+        target: edge.target,
+        weight: 0,
+      });
     }
+
+    // if the orphaned node is not the source of anything, then it's a leaf
   }
 }
 
