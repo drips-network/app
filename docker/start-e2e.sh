@@ -15,6 +15,9 @@ if [[ $* == *--start-playwright-ui* ]]; then
 fi
 
 ARCH=$(uname -m)
+if [ "$ARCH" = "x86_64" ]; then
+    ARCH="amd64"
+fi
 export ARCH
 
 docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
