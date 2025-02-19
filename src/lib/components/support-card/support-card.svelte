@@ -78,6 +78,7 @@
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
+  export let ecosystem: object | undefined = undefined;
 
   export let draftListMode = false;
 
@@ -184,7 +185,11 @@
   }
 </script>
 
-<div class="become-supporter-card" class:disabled>
+<div
+  class="become-supporter-card"
+  class:disabled
+  class:become-supporter-card--ecosystem={ecosystem}
+>
   {#if !draftListMode && (ownDripLists === undefined || updating)}
     <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
@@ -204,7 +209,14 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  {#if ecosystem}
+    <p>
+      Join <strong>donator.eth</strong> and 23 others in supporting
+      <strong>Example Ecosystem</strong> on Drips.
+    </p>
+  {:else}
+    <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  {/if}
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons
@@ -235,11 +247,17 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
+    /* NEW */
+    justify-content: space-between;
   }
 
   .become-supporter-card.disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .become-supporter-card.become-supporter-card--ecosystem {
+    gap: auto;
   }
 
   .loading-overlay {
@@ -306,5 +324,9 @@
   .support-buttons-placeholder {
     opacity: 0;
     pointer-events: none;
+  }
+
+  strong {
+    font-weight: 600;
   }
 </style>
