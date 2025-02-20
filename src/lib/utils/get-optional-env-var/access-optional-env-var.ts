@@ -20,7 +20,9 @@ export default function accessOptionalEnvVar(
   const needProdEnvVars = !(dev || building);
 
   if (needProdEnvVars && requiredInProd && varMissing) {
-    throw new Error(`${varName} env var is required in production! ${{ dev, building }}`);
+    throw new Error(
+      `${varName} env var is required in production! ${JSON.stringify({ dev, building, env })}`,
+    );
   } else if (dev && varMissing) {
     const errorMessage = errorMessageIfMissingInDev
       ? `🚨🚨🚨 ${varName} env var is not set. Consequence: ${errorMessageIfMissingInDev}`
