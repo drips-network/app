@@ -174,9 +174,7 @@
     </Section>
   {/if}
 
-  {#if projects.length > 0}
-    <RecentlyClaimedProjects {projects} />
-  {/if}
+  <RecentlyClaimedProjects {projects} />
 
   <LatestNewsSection {blogPosts} />
 
