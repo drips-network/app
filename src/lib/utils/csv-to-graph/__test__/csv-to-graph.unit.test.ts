@@ -12,7 +12,7 @@ describe('csv-to-graph', () => {
 
     beforeAll(async () => {
       graph = await csvToGraph(osoUnweightedFile);
-      // await osoToGraphJson('foo.json', 1000)
+      // await osoToGraphJson('foo.json', { reduce: 2000, addLevels: 5, assignWeights: true });
     });
 
     it('should successfully parse a csv', async () => {

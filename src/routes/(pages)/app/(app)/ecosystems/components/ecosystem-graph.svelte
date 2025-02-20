@@ -108,7 +108,7 @@
       }
     }
 
-    if (state.selectedNode === node || state.hoveredNode === node) {
+    if (state.hoveredNode === node) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
       // TODO: tweak
@@ -225,7 +225,7 @@
       // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
       settings: {
         // spread nodes apart
-        // gravity: 100,
+        // gravity: 0,
         // take into account the size of the node when calculating
         // layout.the
         // adjustSizes: true,
@@ -233,7 +233,7 @@
         // barnesHutOptimize: true
         // linLogMode: true,
         // outboundAttractionDistribution:
-        // scalingRatio: 100
+        // scalingRatio: 1
       },
     });
     // // console.log(positions)
