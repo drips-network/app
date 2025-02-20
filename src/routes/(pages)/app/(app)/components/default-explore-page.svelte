@@ -1,7 +1,6 @@
 <script lang="ts">
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import TrophyIcon from '$lib/components/icons/Trophy.svelte';
-  import EtherscanIcon from '$lib/components/icons/Etherscan.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -24,6 +23,7 @@
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
   import ProjectsGrid from './projects-grid.svelte';
+  import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredProjectIds: string[] | undefined = undefined;
@@ -64,6 +64,8 @@
   onDestroy(() => {
     tickStore.deregister(tickHandle);
   });
+
+  $: enabledNetworks = Object.values(NETWORK_CONFIG).filter((v) => !v.isTestnet);
 </script>
 
 <div class="explore">
@@ -88,15 +90,21 @@
       </div>
       {#if typeof tlv === 'number'}
         <div class="value-wrapper">
-          <a
-            href="https://etherscan.io/address/0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4"
-            target="_blank"
-            rel="noreferrer"
-            class="header"
-          >
+          <div class="header">
             <h5>Total value on Drips</h5>
-            <EtherscanIcon />
-          </a>
+            <div class="explorer-icons">
+              {#each enabledNetworks as network}
+                <a
+                  href="{network.explorer.base}/address/0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="header"
+                >
+                  <svelte:component this={network.icon} />
+                </a>
+              {/each}
+            </div>
+          </div>
           <span class="large-number pixelated">{formattedTlv}</span>
         </div>
       {/if}
@@ -203,6 +211,21 @@
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
+  }
+
+  .stats .value-wrapper .header .explorer-icons {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .stats .value-wrapper .header .explorer-icons a {
+    opacity: 0.5;
+    transition: 0.3s;
+  }
+
+  .stats .value-wrapper .header .explorer-icons a:focus-visible,
+  .stats .value-wrapper .header .explorer-icons a:hover {
+    opacity: 1;
   }
 
   @media (max-width: 1070px) {

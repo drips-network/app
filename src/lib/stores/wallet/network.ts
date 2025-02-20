@@ -45,6 +45,7 @@ export type Network = {
   };
   explorer: {
     name: string;
+    base: string;
     linkTemplate: (txHash: string, networkName: string) => string;
   };
   contracts: {
@@ -103,6 +104,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -145,6 +147,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://polygon-amoy.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -187,6 +190,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://optimism-sepolia.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -229,6 +233,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://sepolia.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -271,6 +276,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: false,
     explorer: {
       name: 'Etherscan',
+      base: 'https://localhost:8545',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -321,6 +327,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://base-sepolia.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -362,6 +369,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: false,
     explorer: {
       name: 'Blockscout',
+      base: 'https://filecoin.blockscout.com',
       linkTemplate: (txHash: string) => `https://filecoin.blockscout.com/tx/${txHash}`,
     },
     contracts: {
@@ -415,6 +423,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: false,
     explorer: {
       name: 'Metis Explorer',
+      base: 'https://explorer.metis.io',
       linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
     },
     contracts: {
@@ -464,6 +473,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://optimistic.etherscan.io',
       linkTemplate: (txHash: string) => `https://optimistic.etherscan.io/tx/${txHash}`,
     },
     contracts: {

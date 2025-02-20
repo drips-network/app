@@ -24,6 +24,10 @@ const cmcResponseSchema = z.object({
 });
 
 export const GET: RequestHandler = async ({ params }) => {
+  if (!COINMARKETCAP_API_KEY) {
+    return new Response('{}');
+  }
+
   const { token_ids } = params;
 
   // tokenIds is a comma-separated string of IDs, so parse it as such
