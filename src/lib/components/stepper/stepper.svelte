@@ -24,6 +24,10 @@
   const resolvedContext = context?.();
   export let minHeightPx = 0;
 
+  export let noTransitions = browser
+    ? window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true
+    : false;
+
   let stepElement: HTMLDivElement;
 
   let internalSteps = steps;
@@ -86,7 +90,7 @@
   let disableTransitions = false;
 
   function getTransition(inOrOut: 'in' | 'out') {
-    if (disableTransitions) return { x: 0, duration: 0 };
+    if (noTransitions || disableTransitions) return { x: 0, duration: 0 };
 
     let x;
 
@@ -133,7 +137,7 @@
     const stepHeight = Math.max(observedElement.offsetHeight, minHeightPx);
 
     wrapperHeight.set(stepHeight, {
-      duration: firstHeightUpdate || !transitioning ? 0 : 300,
+      duration: firstHeightUpdate || noTransitions || !transitioning ? 0 : 300,
       easing: cubicInOut,
     });
 
