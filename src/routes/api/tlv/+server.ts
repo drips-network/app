@@ -2,24 +2,12 @@ import { z } from 'zod';
 import { redis } from '../redis.js';
 import { formatUnits } from 'ethers';
 import network from '$lib/stores/wallet/network.js';
-import { error } from '@sveltejs/kit';
-import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private.js';
 
-const etherscanTokensResponseSchema = z.array(
-  z.object({
-    TokenAddress: z.string(),
-    TokenQuantity: z.string(),
-    TokenDivisor: z.string(),
-  }),
-);
+import getEthMainnetTlv from './tlv-sources/eth-mainnet.js';
+import type { TLVResult } from './types.js';
+import getBlockscoutChainsTlv from './tlv-sources/blockscout-chains.js';
 
 const CACHE_KEY = `${network.name}-explore.tlv-estimate`;
-
-const ETHERSCAN_API_KEY = getOptionalEnvVar(
-  'ETHERSCAN_API_KEY',
-  true,
-  "Drips Contracts TLV won't appear on default explore page.",
-);
 
 export const GET = async ({ fetch }) => {
   const cached = redis && (await redis.get(CACHE_KEY));
@@ -28,37 +16,47 @@ export const GET = async ({ fetch }) => {
     return new Response(cached);
   }
 
-  if (!ETHERSCAN_API_KEY) {
-    return new Response('null', { headers: { 'Content-Type': 'application/json' } });
-  }
+  let tokenHoldings: TLVResult[] = [];
 
-  const driptsTokenHoldingRes = await fetch(
-    `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${ETHERSCAN_API_KEY}`,
-  );
-  if (!driptsTokenHoldingRes.ok) {
-    const errorContent = await driptsTokenHoldingRes.text();
-    const message = `Etherscan returned error response: ${errorContent}`;
+  try {
+    tokenHoldings = (await Promise.all([getEthMainnetTlv(fetch), getBlockscoutChainsTlv(fetch)]))
+      .flat(1)
+      .reduce<TLVResult[]>((res, { tokenAddress, amount, decimals }) => {
+        const existingEntry = res.findIndex(
+          (v) => v.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+        );
+
+        if (existingEntry === -1) {
+          res.push({
+            tokenAddress,
+            amount,
+            decimals,
+          });
+        } else {
+          res[existingEntry].amount += amount;
+        }
+
+        return res;
+      }, []);
+  } catch (e) {
     // eslint-disable-next-line no-console
-    console.error(message);
-    return error(500, message);
+    console.error('Failure fetching TLV', e);
+
+    return new Response('Failed to fetch TLV data.', {
+      status: 500,
+    });
   }
 
-  const dripsTokenHoldingsJson = await driptsTokenHoldingRes.json();
-  if (dripsTokenHoldingsJson.message === 'NOTOK') {
-    const message = `Etherscan returned error message: ${JSON.stringify(dripsTokenHoldingsJson)}`;
-    // eslint-disable-next-line no-console
-    console.error(message);
-    return error(500, message);
+  if (tokenHoldings.length === 0) {
+    return new Response('0');
   }
-
-  const dripsTokenHoldings = etherscanTokensResponseSchema.parse(dripsTokenHoldingsJson.result);
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
   const cmcIdMap = z.record(z.number()).parse(cmcIdMapRes);
 
   const relevantCmcIds = Object.fromEntries(
     Object.entries(cmcIdMap).filter(([address]) =>
-      dripsTokenHoldings.some((v) => v.TokenAddress.toLowerCase() === address.toLowerCase()),
+      tokenHoldings.some((v) => v.tokenAddress.toLowerCase() === address.toLowerCase()),
     ),
   );
 
@@ -73,17 +71,14 @@ export const GET = async ({ fetch }) => {
     const tokenAddress = Object.entries(cmcIdMap).find((v) => cmcId === v[1].toString())?.[0];
     if (!tokenAddress) break;
 
-    const tokenHoldingRecord = dripsTokenHoldings.find(
-      (v) => v.TokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+    const tokenHoldingRecord = tokenHoldings.find(
+      (v) => v.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
     );
     if (!tokenHoldingRecord) break;
 
     total =
       total +
-      Number(
-        formatUnits(tokenHoldingRecord.TokenQuantity, Number(tokenHoldingRecord.TokenDivisor)),
-      ) *
-        value;
+      Number(formatUnits(tokenHoldingRecord.amount, Number(tokenHoldingRecord.decimals))) * value;
   }
 
   await redis?.set(CACHE_KEY, total.toString(), {

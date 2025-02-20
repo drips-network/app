@@ -11,7 +11,9 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 
-export const SUPPORTED_CHAIN_IDS = [1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088] as const;
+export const SUPPORTED_CHAIN_IDS = [
+  1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10,
+] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
 export type AutoUnwrapPair = {
@@ -43,6 +45,7 @@ export type Network = {
   };
   explorer: {
     name: string;
+    base: string;
     linkTemplate: (txHash: string, networkName: string) => string;
   };
   contracts: {
@@ -101,6 +104,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -143,6 +147,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://polygon-amoy.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -185,6 +190,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://optimism-sepolia.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -227,6 +233,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://sepolia.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -269,6 +276,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: false,
     explorer: {
       name: 'Etherscan',
+      base: 'https://localhost:8545',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -319,6 +327,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: true,
     explorer: {
       name: 'Etherscan',
+      base: 'https://base-sepolia.etherscan.io',
       linkTemplate: etherscanLinkTemplate,
     },
     contracts: {
@@ -360,6 +369,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: false,
     explorer: {
       name: 'Blockscout',
+      base: 'https://filecoin.blockscout.com',
       linkTemplate: (txHash: string) => `https://filecoin.blockscout.com/tx/${txHash}`,
     },
     contracts: {
@@ -413,6 +423,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     applyGasBuffers: false,
     explorer: {
       name: 'Metis Explorer',
+      base: 'https://explorer.metis.io',
       linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
     },
     contracts: {
@@ -443,6 +454,56 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         symbol: 'METIS',
       },
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
+  },
+  [10]: {
+    chainId: 10,
+    name: 'optimism',
+    label: 'Optimism',
+    token: 'ETH',
+    id: '0xa',
+    rpcUrl: 'https://mainnet.optimism.io/',
+    icon: Optimism,
+    color: '#FF0420',
+    isTestnet: false,
+    subdomain: 'optimism.drips.network',
+    gqlName: SupportedChain.Optimism,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: true,
+    explorer: {
+      name: 'Etherscan',
+      base: 'https://optimistic.etherscan.io',
+      linkTemplate: (txHash: string) => `https://optimistic.etherscan.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x04693D13826a37dDdF973Be4275546Ad978cb9EE',
+      DRIPS: '0xd320F59F109c618b19707ea5C5F068020eA333B3',
+      CALLER: '0xd6Ab8e72dE3742d45AdF108fAa112Cd232718828',
+      REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
+      NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
+      NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on Optimism settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    ensSupported: false,
+    ensAddress: undefined,
+    gelatoRelayAvailable: true,
+    gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Metis',
+        symbol: 'METIS',
+      },
+      rpcUrls: ['https://mainnet.optimism.io'],
     },
   },
 };

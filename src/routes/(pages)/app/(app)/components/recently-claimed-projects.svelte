@@ -36,19 +36,21 @@
   $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
 </script>
 
-<Section
-  header={{
-    icon: BoxIcon,
-    label: 'Recently claimed projects',
-    actions: [
-      {
-        label: 'See all',
-        href: '/app/projects/all',
-        icon: Box,
-      },
-    ],
-  }}
-  skeleton={{ loaded: true }}
->
-  <ProjectsGrid projects={recentlyClaimedProjects} />
-</Section>
+{#if recentlyClaimedProjects.length > 0}
+  <Section
+    header={{
+      icon: BoxIcon,
+      label: 'Recently claimed projects',
+      actions: [
+        {
+          label: 'See all',
+          href: '/app/projects/all',
+          icon: Box,
+        },
+      ],
+    }}
+    skeleton={{ loaded: true }}
+  >
+    <ProjectsGrid projects={recentlyClaimedProjects} />
+  </Section>
+{/if}

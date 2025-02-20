@@ -6,5 +6,9 @@ export default function getOptionalEnvVar(
   requiredInProd: boolean,
   errorMessageIfMissingInDev?: string | null,
 ): string | undefined {
+  if (!name.startsWith('PUBLIC_')) {
+    throw new Error(`getOptionalEnvVar: name must start with PUBLIC_`);
+  }
+
   return accessOptionalEnvVar(env, name, requiredInProd, errorMessageIfMissingInDev);
 }

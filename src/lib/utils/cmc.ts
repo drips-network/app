@@ -1,6 +1,5 @@
 import { getAddress } from 'ethers';
 import { z } from 'zod';
-import { MANUAL_IDS } from './fiat-estimates/fiat-estimates';
 
 export const getCmcPrices = async (tokenAddresses: string[], fetch = window.fetch) => {
   if (!tokenAddresses.length) {
@@ -13,12 +12,7 @@ export const getCmcPrices = async (tokenAddresses: string[], fetch = window.fetc
     // get response of known token address => token id
     const idMapJson = await idMapResponse.json();
     // produce map of response, and add in manual substitutions for alt L1/L2 tokens
-    const tokenAddressToId = {
-      ...z.record(z.string(), z.number()).parse(idMapJson),
-      ...Object.fromEntries(
-        Object.entries(MANUAL_IDS).map(([address, id]) => [address.toLowerCase(), Number(id)]),
-      ),
-    };
+    const tokenAddressToId = z.record(z.string(), z.number()).parse(idMapJson);
 
     // create parameter for /api/fiat-estimates/price endpoint, removing unknown token ids
     const tokenIdsString = tokenAddresses
