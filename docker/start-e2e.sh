@@ -16,10 +16,10 @@ fi
 
 ARCH=$(uname -m)
 case "$ARCH" in
-  x86_64)
+  x86_64 | amd64)
     ARCH="amd64"
     ;;
-  aarch64 | armv8*)
+  aarch64 | arm64 | armv8*)
     ARCH="arm64"
     ;;
   *)
