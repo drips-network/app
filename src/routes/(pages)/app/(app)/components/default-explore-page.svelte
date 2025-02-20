@@ -95,7 +95,7 @@
             <div class="explorer-icons">
               {#each enabledNetworks as network}
                 <a
-                  href="{network.explorer.base}/address/${network.contracts.DRIPS}"
+                  href="{network.explorer.base}/address/{network.contracts.DRIPS}"
                   target="_blank"
                   rel="noreferrer"
                   class="header"
