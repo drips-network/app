@@ -55,7 +55,6 @@
     programaticZoom = false;
   }
 
-  // TODO: sync with wheel zoom state
   $: zoom, sigmaInstance && setZoom(sigmaInstance, zoom);
 
   function setSelectedNode(node?: string) {
@@ -128,30 +127,21 @@
 
   // Render edges accordingly to the internal state:
   // 0. Color every neighboring edge the primary color
-  // 1. If a node is hovered, the edge is hidden if it is not connected to the
+  // X1. If a node is hovered, the edge is hidden if it is not connected to the
   //    node
   // 2. If there is a query, the edge is only visible if it connects two
   //    suggestions
   function edgeReducer(edge: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<EdgeDisplayData> = { ...data };
 
-    if (
-      state.hoveredNode &&
-      graph
-        .extremities(edge)
-        .every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
-    ) {
-      res.color = nodeColorPrimary;
+    if (state.hoveredNode) {
+      if (graph.extremities(edge).includes(state.hoveredNode)) {
+        res.color = nodeColorPrimary;
+        // res.zIndex = 99999
+      } else {
+        res.hidden = true;
+      }
     }
-
-    // if (
-    //   state.hoveredNode &&
-    //   !graph
-    //     .extremities(edge)
-    //     .every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
-    // ) {
-    //   res.hidden = true;
-    // }
 
     if (
       state.suggestions &&
@@ -181,7 +171,7 @@
       import('@sigma/node-border'),
     ]);
 
-    graph = new Graph();
+    graph = new Graph({ type: 'directed' });
     // TODO: bad, big error energy?
     if (!ecosystem.graph) {
       return;
