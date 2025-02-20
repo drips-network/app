@@ -105,6 +105,7 @@
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import StreamDeveloper from '$lib/components/developer-section/stream-developer.section.svelte';
+  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
 
   export let data: PageData;
   let stream: StreamPageStreamFragment;
@@ -122,6 +123,13 @@
   $: endTimelineItem = stream.timeline.find((item) => item.type === TimelineItemType.End);
   $: endDate = endTimelineItem?.timestamp ? new Date(endTimelineItem.timestamp) : undefined;
   $: startDate = new Date(stream.config.startDate ?? stream.createdAt);
+
+  $: runsOutOfFundsTimelineItem = stream.timeline.find(
+    (item) => item.type === TimelineItemType.OutOfFunds,
+  );
+  $: runsOutOfFundsDate = runsOutOfFundsTimelineItem?.timestamp
+    ? new Date(runsOutOfFundsTimelineItem.timestamp)
+    : undefined;
 
   let elapsedDurationPercentage = tweened(0, { duration: 1000, easing: quintOut });
 
@@ -153,6 +161,17 @@
     : undefined;
 
   $: isUnknownToken = tokensStore.customTokensLoaded && !token;
+
+  $: configuredToStartAt = stream.config.startDate ? new Date(stream.config.startDate) : null;
+
+  $: configuredToEndAt = stream.config.durationSeconds
+    ? new Date(startDate.getTime() + stream.config.durationSeconds * 1000)
+    : null;
+  $: runsOutOfFundsBeforeConfiguredEndDate = Boolean(
+    configuredToEndAt &&
+      runsOutOfFundsDate &&
+      runsOutOfFundsDate.getTime() < configuredToEndAt.getTime(),
+  );
 </script>
 
 <HeadMeta title={stream.name ?? 'Stream'} />
@@ -298,6 +317,63 @@
           <h5 class="key greyed-out">Created at</h5>
           <span class="value small-text">{formatDate(new Date(stream.createdAt), 'verbose')}</span>
         </div>
+
+        {#if configuredToStartAt}
+          <div class="key-value">
+            <div class="with-info-icon">
+              <h5 class="key greyed-out">Configured start date</h5>
+              <Tooltip>
+                <InfoCircle style="height: 1.25rem" />
+                <svelte:fragment slot="tooltip-content">
+                  The stream was configured to start streaming at this specific time.
+                </svelte:fragment>
+              </Tooltip>
+            </div>
+            <span class="value small-text">{formatDate(configuredToStartAt, 'verbose')}</span>
+          </div>
+        {/if}
+
+        {#if configuredToEndAt}
+          <div class="key-value">
+            <div class="with-info-icon">
+              <h5 class="key greyed-out">Configured end date</h5>
+              {#if runsOutOfFundsBeforeConfiguredEndDate}
+                <Tooltip>
+                  <ExclamationCircle style="height: 1.25rem; fill: var(--color-negative);" />
+                  <svelte:fragment slot="tooltip-content">
+                    This stream has an end date configured, but will run out of funds before the
+                    configured end date.
+                  </svelte:fragment>
+                </Tooltip>
+              {/if}
+            </div>
+            <span class="value small-text"
+              >{formatDate(new Date(configuredToEndAt), 'verbose')}</span
+            >
+          </div>
+        {/if}
+
+        {#if runsOutOfFundsDate}
+          {@const alreadyRanOut = runsOutOfFundsDate.getTime() < Date.now()}
+          <div class="key-value">
+            <div class="with-info-icon">
+              <h5 class="key greyed-out">{alreadyRanOut ? 'Ran' : 'Runs'} out of funds at</h5>
+              <Tooltip>
+                <InfoCircle style="height: 1.25rem" />
+                <svelte:fragment slot="tooltip-content">
+                  The date at which the sender's {token?.info.symbol} balance {alreadyRanOut
+                    ? 'ran out'
+                    : 'will run out'}, causing this stream to stop. The sender may top up their
+                  balance at any point.
+                </svelte:fragment>
+              </Tooltip>
+            </div>
+            <span class="value small-text"
+              >{formatDate(new Date(runsOutOfFundsDate), 'verbose')}</span
+            >
+          </div>
+        {/if}
+
         {#if $senderOutgoingBalance}
           <div class="key-value">
             <div class="with-info-icon">
@@ -305,9 +381,9 @@
               <Tooltip>
                 <InfoCircle style="height: 1.25rem" />
                 <svelte:fragment slot="tooltip-content">
-                  The stream sender's currently remaining {'TOKEN'} balance. When this cannot cover all
-                  the sender's streams for this token anymore, all their streams for this token will
-                  cease.
+                  The stream sender's currently remaining {token?.info.symbol} balance. When this cannot
+                  cover all the sender's streams for this token anymore, all their streams for this token
+                  will cease.
                 </svelte:fragment>
               </Tooltip>
             </div>
@@ -326,6 +402,7 @@
           </div>
         {/if}
       </div>
+
       <StreamDeveloper
         amtPerSec={BigInt(stream.config.amountPerSecond.amount)}
         {tokenAddress}

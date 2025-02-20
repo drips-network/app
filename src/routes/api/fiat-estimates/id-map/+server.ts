@@ -35,6 +35,10 @@ const COINMARKETCAP_ETHEREUM_PLATFORM_ID = 1;
 // but only the ones currently needed for estimates.
 
 export const GET: RequestHandler = async ({ fetch }) => {
+  if (!COINMARKETCAP_API_KEY) {
+    return new Response('{}');
+  }
+
   const cmcIdMapRes = await cached(redis, 'cmc-id-map', 24 * 60 * 60, async () => {
     const idMapRes = await ensureResponseOk(
       fetch(

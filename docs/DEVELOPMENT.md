@@ -4,16 +4,15 @@ The stack for the Drips App contains a number of services, which can all be run 
 
 ## 🚀 Quick Start
 
-[!IMPORTANT]
-Our local Docker-based stack described below currently runs only on `linux/arm64` systems (which also works on Apple ARM machines or ARM-based Windows devices with WSL). If you're on Windows or an amd64 Linux machine, you'll need to run the standard dev server with `npm run dev` and bring your own environment variables based on `.env.template`. If this is blocking you from contributing, please reach out to us so we can prioritize building Docker images for `linux/amd64`.
-
 First, run `npm i` to install dependencies.
-
-Create an empty `.env` file by running `touch .env`.
 
 To run a local dev environment, simply run `npm run dev:docker`. This will start all necessary services for running the Drips app locally, complete with a local testnet that has the Drips protocol contracts and a test ERC-20 deployed. After this, set up MetaMask for the local testnet by following the instructions below.
 
 No values in `.env` should be required for running the local dev stack, however setting `GITHUB_PERSONAL_ACCESS_TOKEN` is strongly recommended. Without it, the app will be heavily rate-limited by the GitHub API, and loading project data may fail.
+
+### 🪟 Running on Windows
+
+To run the stack on Windows, [use WSL2 in order to get a UNIX shell](https://learn.microsoft.com/en-us/windows/wsl/install). Make sure Docker is installed on your WSL distribution. The easiest way is to download Docker Desktop for Windows, configure it to use the WSL backend, and make sure to enable the WSL integration for your distro of choice in Docker Desktop -> Resources -> WSL integration -> Enable integration with additional distros. After that, you can use the Docker local environment as described above.
 
 ### 🦊 Using MetaMask with the local testnet
 
@@ -53,8 +52,48 @@ To claim a project during local dev mode:
 - Right after, run `npm run dev:docker:update-repo-owner`. You will be prompted to submit the account ID of the project you want to claim, and the address that should be set as its owner. Enter the address you previously configured in `FUNDING.json` for `localtestnet`.
 - Submit, and the fake oracle will update the owner of the project to the address you specified. The claim flow will continue.
 
+## 🥸 Inspecting databases with PGAdmin
+
+The docker-compose file also spins up pgadmin for you, running at port 5050. Simply open http://localhost:5050 and open the database you're interested in (either the event-processor DB or multiplayer DB). When prompted for the password, enter `admin`.
+
 ## 😩 Running without Docker
 
 Of course, you can also run the app locally without relying on the local Drips stack via Docker. However, you'll need to supply your own environment variables based on `.env.template`.
 
 To start the app directly on your machine, run `npm run dev` to start the dev server.
+
+## 📃 E2E tests
+
+We use Playwright together with our local dev stack for running E2E tests on the app.
+
+To run tests, make sure you have all dependencies and Playwright browsers installed:
+
+```
+npm i && npx playwright install
+```
+
+After that, run...
+
+```
+npm run test:e2e
+```
+
+... to bring up the local stack and start the Playwright test UI. By default, it starts the app up in dev server mode, so that you can fix things and debug tests without having to re-start the entire stack every time.
+
+Any state changes made in the local dev stack are not persisted for E2E runs, meaning that every time you start e2e test mode, the state is a blank slate.
+
+To run all tests in headless mode, run...
+
+```
+npm run test:e2e:headless
+```
+
+### Writing tests
+
+E2E tests go into the `/tests/` directory.
+
+Tip: Run `npx playwright codegen http://localhost:5173` after starting the local dev stack to bring up a test recorder that automatically writes tests for you as you interact with the app.
+
+### Limitations
+
+Tests all run against the same local dev stack, which is created before tests are triggered, and destroyed afterwards. This means that separate tests need to be designed such that state changes they trigger on the local dev stack (e.g. projects being claimed, tokens being topped up, drip lists being created etc.) do not interfere with any other test.
