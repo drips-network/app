@@ -244,7 +244,7 @@
   }
 
   .large-number {
-    font-size: min(12vw, 80px);
+    font-size: min(11vw, 70px);
     line-height: min(12vw, 80px);
     color: var(--color-primary);
   }
