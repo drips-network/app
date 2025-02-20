@@ -13,7 +13,7 @@ import * as ecosystemsApi from '$lib/utils/ecosystems';
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 // const chicken = {
-//   "name": "Orphan Ecosystem",
+//   "name": "Reduced 2000 5 Levels",
 //   "description": "This graph has no orphans and a new level!",
 //   "chainId": "11155111",
 //   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
@@ -58,7 +58,7 @@ export const load = async ({ fetch }) => {
 
   const ecosystems = await ecosystemsApi.getAll();
   // console.log(chicken)
-  // if (ecosystems.length < 7) {
+  // if (ecosystems.length < 8) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();
