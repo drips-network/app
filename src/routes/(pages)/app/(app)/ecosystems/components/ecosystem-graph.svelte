@@ -6,6 +6,7 @@
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  // import { drawDiscNodeHover } from './ecosystem-graph';
 
   export let ecosystem: Ecosystem;
   export let zoom: number = 1;
@@ -19,6 +20,7 @@
   let networkStyle: CSSStyleDeclaration;
   let nodeColorPrimary: string;
   let nodeColorSecondary: string;
+  let nodeColorTertiary: string;
   let edgeColor: string;
 
   type LayoutMapping = { [key: string]: { x: number; y: number } };
@@ -106,12 +108,17 @@
       }
     }
 
+    if (state.hoveredNode === node) {
+      // @ts-expect-error: might be undefined
+      res.label = res.projectName;
+    }
+
     if (state.hoveredNode === node || state.selectedNode === node) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
       res.color = nodeColorPrimary;
       // TODO: tweak
-      // @ts-expect-error: res.size might be undefined
+      // @ts-expect-error: might be undefined
       res.size = res.size + 2.5;
     } else if (state.suggestions) {
       if (state.suggestions.has(node)) {
@@ -163,12 +170,14 @@
     networkStyle = window.getComputedStyle(graphContainer);
     nodeColorPrimary = networkStyle.getPropertyValue('--color-primary');
     nodeColorSecondary = networkStyle.getPropertyValue('--color-foreground');
+    nodeColorTertiary = networkStyle.getPropertyValue('--color-background');
     edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
 
     // Can't be imported server side
-    const [{ Sigma }, { createNodeBorderProgram }] = await Promise.all([
+    const [{ Sigma }, { createNodeBorderProgram }, { drawDiscNodeHover }] = await Promise.all([
       import('sigma'),
       import('@sigma/node-border'),
+      import('./ecosystem-graph'),
     ]);
 
     graph = new Graph({ type: 'directed' });
@@ -188,11 +197,12 @@
       );
       graph.addNode(node.projectAccountId, {
         color: isPrimary ? nodeColorPrimary : nodeColorSecondary,
+        labelBackgroundColor: nodeColorPrimary,
         // label: `${node.repoOwner}/${node.repoName}`,
         x: Math.random(),
         y: Math.random(),
         size: isPrimary ? 16 : 8,
-        borderColor: 'black',
+        borderColor: nodeColorSecondary,
         borderSize: isPrimary ? 2 : 0,
         projectName: `${node.repoOwner}/${node.repoName}`,
         isPrimary,
@@ -239,9 +249,17 @@
     sigmaInstance = new Sigma(graph, graphContainer, {
       defaultNodeType: 'bordered',
       autoRescale: false,
+      labelFont: 'Inter',
+      labelWeight: '600',
+      labelSize: 16,
+      labelColor: {
+        color: nodeColorTertiary,
+      },
       // Remove box shadow on hover
       // https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
-      defaultDrawNodeHover: () => {},
+      defaultDrawNodeHover: drawDiscNodeHover,
+      // don't draw a label underneath the hover label
+      defaultDrawNodeLabel: () => {},
       // autoRescale: true,
       // don't adjust the size of the nodes and edges
       // when zooming.
