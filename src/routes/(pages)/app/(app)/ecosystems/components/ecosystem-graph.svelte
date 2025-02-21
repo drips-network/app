@@ -8,7 +8,7 @@
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
   export let ecosystem: Ecosystem;
-  export let zoom: number = 3;
+  export let zoom: number = 1;
 
   let graph: Graph;
   let sigmaInstance: Sigma;
@@ -25,6 +25,8 @@
   type Attributes = { [name: string]: unknown };
 
   interface State {
+    isDragging?: boolean;
+
     hoveredNode?: string;
     searchQuery: string;
 
@@ -58,7 +60,7 @@
   $: zoom, sigmaInstance && setZoom(sigmaInstance, zoom);
 
   function setSelectedNode(node?: string) {
-    if (node) {
+    if (node && state.selectedNode !== node) {
       state.selectedNode = node;
       state.selectedNeighbors = new Set(graph.neighbors(node));
     } else {
@@ -98,18 +100,16 @@
   function nodeReducer(node: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<NodeDisplayData> = { ...data };
 
-    if (state.hoveredNeighbors) {
-      if (!state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
-        // res.label = '';
-        // res.color = '#00000000';
-      } else {
+    if (state.selectedNeighbors) {
+      if (state.selectedNeighbors.has(node) || state.selectedNode === node) {
         res.color = nodeColorPrimary;
       }
     }
 
-    if (state.hoveredNode === node) {
+    if (state.hoveredNode === node || state.selectedNode === node) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
+      res.color = nodeColorPrimary;
       // TODO: tweak
       // @ts-expect-error: res.size might be undefined
       res.size = res.size + 2.5;
@@ -134,8 +134,8 @@
   function edgeReducer(edge: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<EdgeDisplayData> = { ...data };
 
-    if (state.hoveredNode) {
-      if (graph.extremities(edge).includes(state.hoveredNode)) {
+    if (state.selectedNode) {
+      if (graph.extremities(edge).includes(state.selectedNode)) {
         res.color = nodeColorPrimary;
         // res.zIndex = 99999
       } else {
@@ -280,6 +280,13 @@
       setSelectedNode(undefined);
     });
 
+    sigmaInstance.getMouseCaptor().on('mousedown', () => {
+      state.isDragging = true;
+    });
+    sigmaInstance.getMouseCaptor().on('mouseup', () => {
+      state.isDragging = false;
+    });
+
     sigmaInstance.setSetting('nodeReducer', nodeReducer);
     sigmaInstance.setSetting('edgeReducer', edgeReducer);
   }
@@ -287,10 +294,24 @@
   onMount(initializeGraph);
 </script>
 
-<div class="ecosystem-graph" bind:this={graphContainer}></div>
+<div
+  class="ecosystem-graph"
+  class:hovered-node={state.hoveredNode}
+  class:dragging={state.isDragging}
+  bind:this={graphContainer}
+></div>
 
 <style>
   .ecosystem-graph {
     height: 100%;
+    cursor: grab;
+  }
+
+  .ecosystem-graph.hovered-node {
+    cursor: pointer;
+  }
+
+  .ecosystem-graph.dragging {
+    cursor: grabbing;
   }
 </style>
