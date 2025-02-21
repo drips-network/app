@@ -6,7 +6,10 @@
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  // import { drawDiscNodeHover } from './ecosystem-graph';
+
+  // TODO:
+  // add the right data to the edge label
+  // click a node to laod the project data
 
   export let ecosystem: Ecosystem;
   export let zoom: number = 1;
@@ -197,7 +200,7 @@
       );
       graph.addNode(node.projectAccountId, {
         color: isPrimary ? nodeColorPrimary : nodeColorSecondary,
-        labelBackgroundColor: nodeColorPrimary,
+        labelBackgroundColor: nodeColorTertiary,
         // label: `${node.repoOwner}/${node.repoName}`,
         x: Math.random(),
         y: Math.random(),
@@ -215,7 +218,13 @@
         continue;
       }
 
-      graph.addEdge(edge.source, edge.target, { color: edgeColor, size: 3 });
+      // console.log(edge)
+
+      graph.addEdge(edge.source, edge.target, {
+        color: edgeColor,
+        size: 3,
+        // label: '4%'
+      });
     }
 
     // forceAtlas2.assign(graph, 50);
@@ -253,7 +262,14 @@
       labelWeight: '600',
       labelSize: 16,
       labelColor: {
-        color: nodeColorTertiary,
+        color: nodeColorSecondary,
+      },
+      renderEdgeLabels: true,
+      edgeLabelFont: 'Inter',
+      edgeLabelWeight: '600',
+      edgeLabelSize: 16,
+      edgeLabelColor: {
+        color: nodeColorSecondary,
       },
       // Remove box shadow on hover
       // https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
