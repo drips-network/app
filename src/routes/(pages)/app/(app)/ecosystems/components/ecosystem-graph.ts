@@ -1,7 +1,37 @@
-import { drawDiscNodeLabel } from 'sigma/rendering';
+// import { drawDiscNodeLabel } from 'sigma/rendering';
 import type { Attributes } from 'graphology-types';
 import type { NodeDisplayData, PartialButFor } from 'sigma/types';
 import type { Settings } from 'sigma/settings';
+
+export function drawDiscNodeLabel<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size' | 'label' | 'color'>,
+  settings: Settings<N, E, G>,
+): void {
+  if (!data.label) return;
+
+  const size = settings.labelSize,
+    font = settings.labelFont,
+    weight = settings.labelWeight,
+    color = settings.labelColor.attribute
+      ? data[settings.labelColor.attribute] || settings.labelColor.color || '#000'
+      : settings.labelColor.color;
+
+  const labelParts = data.label.split('/');
+  const firstPart = `${labelParts[0]}/`;
+
+  context.fillStyle = color;
+  context.font = `normal ${size}px ${font}`;
+  context.fillText(firstPart, data.x + data.size + 3, data.y + size / 3);
+
+  const firstPartWidth = context.measureText(firstPart).width;
+  context.font = `${weight} ${size}px ${font}`;
+  context.fillText(labelParts[1], data.x + data.size + 3 + firstPartWidth, data.y + size / 3);
+}
 
 /**
  * Draw an hovered node.
@@ -20,56 +50,57 @@ export function drawDiscNodeHover<
 ): void {
   const size = settings.labelSize,
     font = settings.labelFont,
-    weight = settings.labelWeight;
+    weight = settings.labelWeight,
+    color = settings.labelColor.attribute
+      ? data[settings.labelColor.attribute] || settings.labelColor.color || '#000'
+      : settings.labelColor.color;
 
   context.font = `${weight} ${size}px ${font}`;
 
-  // Then we draw the label background
-  context.fillStyle = data.labelBackgroundColor;
-  // context.shadowOffsetX = 0;
-  // context.shadowOffsetY = 0;
-  // context.shadowBlur = 8;
-  // context.shadowColor = "#000";
-
-  const PADDING_Y = 5;
-  const PADDING_X = 5;
+  const PADDING_Y = 8;
+  const PADDING_X = 8;
   const MARGIN_X = 0;
+  const LABEL_BORDER_WIDTH = 1;
   const BORDER_WIDTH = data.borderSize;
 
   if (typeof data.label === 'string') {
+    // TODO: do we care that this isn't exactly right because the
+    // last part of the label is bold?
     const textWidth = context.measureText(data.label).width,
       boxWidth = Math.round(textWidth + 2 * PADDING_X),
       boxHeight = Math.round(size + 2 * PADDING_Y);
-    // radius = Math.max(data.size, size / 2) + PADDING_Y;
 
-    // const angleRadian = Math.asin(boxHeight / 2 / radius);
-    // const xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radius, 2) - Math.pow(boxHeight / 2, 2)));
-
+    // draw border
     context.beginPath();
-    // context.moveTo(data.x + xDeltaCoord + MARGIN_X, data.y + boxHeight / 2);
-    // context.lineTo(data.x + radius + boxWidth, data.y + boxHeight / 2);
-    // context.lineTo(data.x + radius + boxWidth, data.y - boxHeight / 2);
-    // context.lineTo(data.x + xDeltaCoord + MARGIN_X, data.y - boxHeight / 2);
+    context.fillStyle = color;
+    context.roundRect(
+      data.x + data.size + BORDER_WIDTH + MARGIN_X - LABEL_BORDER_WIDTH,
+      data.y - boxHeight / 2 - LABEL_BORDER_WIDTH,
+      boxWidth + LABEL_BORDER_WIDTH * 2,
+      boxHeight + LABEL_BORDER_WIDTH * 2,
+      [16, 0, 16, 16],
+    );
+    context.closePath();
+    context.fill();
+
+    // draw label content background
+    context.beginPath();
+    context.fillStyle = data.labelBackgroundColor;
     context.roundRect(
       data.x + data.size + BORDER_WIDTH + MARGIN_X,
       data.y - boxHeight / 2,
       boxWidth,
       boxHeight,
-      [8, 0, 8, 8],
+      [16, 0, 16, 16],
     );
-    // context.arc(data.x, data.y, radius, angleRadian, -angleRadian);
     context.closePath();
     context.fill();
   } else {
+    // TODO: remove?
     context.beginPath();
-    // context.arc(data.x, data.y, data.size + PADDING, 0, Math.PI * 2);
     context.closePath();
     context.fill();
   }
-
-  context.shadowOffsetX = 0;
-  context.shadowOffsetY = 0;
-  context.shadowBlur = 0;
 
   // And finally we draw the label
   drawDiscNodeLabel(
