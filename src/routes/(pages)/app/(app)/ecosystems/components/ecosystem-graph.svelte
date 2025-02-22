@@ -146,11 +146,15 @@
 
     if (state.selectedNode) {
       if (graph.extremities(edge).includes(state.selectedNode)) {
+        // show edge labels when we have selected a node
         res.color = nodeColorPrimary;
-        // res.zIndex = 99999
+        res.forceLabel = true;
       } else {
         res.hidden = true;
       }
+    } else if (state.hoveredNode) {
+      // don't show edge labels while hovering
+      res.label = '';
     }
 
     if (
@@ -177,11 +181,12 @@
     edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
 
     // Can't be imported server side
-    const [{ Sigma }, { createNodeBorderProgram }, { drawDiscNodeHover }] = await Promise.all([
-      import('sigma'),
-      import('@sigma/node-border'),
-      import('./ecosystem-graph'),
-    ]);
+    const [{ Sigma }, { createNodeBorderProgram }, { drawDiscNodeHover, drawStraightEdgeLabel }] =
+      await Promise.all([
+        import('sigma'),
+        import('@sigma/node-border'),
+        import('./ecosystem-graph'),
+      ]);
 
     graph = new Graph({ type: 'directed' });
     // TODO: bad, big error energy?
@@ -223,7 +228,8 @@
       graph.addEdge(edge.source, edge.target, {
         color: edgeColor,
         size: 3,
-        // label: '4%'
+        labelBackgroundColor: nodeColorPrimary,
+        label: `${(Number(edge.weight) * 100).toFixed(2)}%`,
       });
     }
 
@@ -269,13 +275,14 @@
       edgeLabelWeight: '600',
       edgeLabelSize: 16,
       edgeLabelColor: {
-        color: nodeColorSecondary,
+        color: nodeColorTertiary,
       },
       // Remove box shadow on hover
       // https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
       defaultDrawNodeHover: drawDiscNodeHover,
       // don't draw a label underneath the hover label
       defaultDrawNodeLabel: () => {},
+      defaultDrawEdgeLabel: drawStraightEdgeLabel,
       // autoRescale: true,
       // don't adjust the size of the nodes and edges
       // when zooming.
@@ -347,5 +354,15 @@
 
   .ecosystem-graph.dragging {
     cursor: grabbing;
+  }
+
+  /* edge labels should always be on top */
+  .ecosystem-graph :global(.sigma-edgeLabels) {
+    z-index: 1;
+  }
+
+  /* mouse events should not be obscurred */
+  .ecosystem-graph :global(.sigma-mouse) {
+    z-index: 2;
   }
 </style>
