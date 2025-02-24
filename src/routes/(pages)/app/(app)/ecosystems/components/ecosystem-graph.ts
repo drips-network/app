@@ -2,6 +2,18 @@ import type { Attributes } from 'graphology-types';
 import type { NodeDisplayData, PartialButFor, EdgeDisplayData } from 'sigma/types';
 import type { Settings } from 'sigma/settings';
 
+export type LayoutMapping = { [key: string]: { x: number; y: number } };
+
+/**
+ * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
+ *
+ * @param context
+ * @param edgeData
+ * @param sourceData
+ * @param targetData
+ * @param settings
+ * @returns
+ */
 export function drawStraightEdgeLabel<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -96,6 +108,13 @@ export function drawStraightEdgeLabel<
   context.restore();
 }
 
+/**
+ * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-labels.ts#L16
+ * @param context
+ * @param data
+ * @param settings
+ * @returns
+ */
 export function drawDiscNodeLabel<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -127,6 +146,8 @@ export function drawDiscNodeLabel<
 }
 
 /**
+ * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
+ *
  * Draw an hovered node.
  * - if there is no label => display a shadow on the node
  * - if the label box is bigger than node size => display a label box that contains the node with a shadow
