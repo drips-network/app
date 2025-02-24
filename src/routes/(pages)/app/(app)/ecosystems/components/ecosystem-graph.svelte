@@ -6,6 +6,8 @@
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import type { Attributes } from 'graphology-types';
+  import type { LayoutMapping } from './ecosystem-graph';
 
   // TODO:
   // add the right data to the edge label
@@ -21,13 +23,17 @@
   let programaticZoom: boolean = false;
 
   let networkStyle: CSSStyleDeclaration;
-  let nodeColorPrimary: string;
-  let nodeColorSecondary: string;
-  let nodeColorTertiary: string;
-  let edgeColor: string;
+  let colorPrimary: string;
+  let colorForeground: string;
+  let colorBackground: string;
+  let colorForegroundLevel3: string;
 
-  type LayoutMapping = { [key: string]: { x: number; y: number } };
-  type Attributes = { [name: string]: unknown };
+  // TODO: this seems to format things weirdly
+  const edgeLabelFormatter = new Intl.NumberFormat('en-US', {
+    style: 'percent',
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 0,
+  });
 
   interface State {
     isDragging?: boolean;
@@ -107,7 +113,7 @@
 
     if (state.selectedNeighbors) {
       if (state.selectedNeighbors.has(node) || state.selectedNode === node) {
-        res.color = nodeColorPrimary;
+        res.color = colorPrimary;
       }
     }
 
@@ -119,7 +125,7 @@
     if (state.hoveredNode === node || state.selectedNode === node) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
-      res.color = nodeColorPrimary;
+      res.color = colorPrimary;
       // TODO: tweak
       // @ts-expect-error: might be undefined
       res.size = res.size + 2.5;
@@ -147,7 +153,7 @@
     if (state.selectedNode) {
       if (graph.extremities(edge).includes(state.selectedNode)) {
         // show edge labels when we have selected a node
-        res.color = nodeColorPrimary;
+        res.color = colorPrimary;
         res.forceLabel = true;
       } else {
         res.hidden = true;
@@ -175,10 +181,10 @@
 
   async function initializeGraph() {
     networkStyle = window.getComputedStyle(graphContainer);
-    nodeColorPrimary = networkStyle.getPropertyValue('--color-primary');
-    nodeColorSecondary = networkStyle.getPropertyValue('--color-foreground');
-    nodeColorTertiary = networkStyle.getPropertyValue('--color-background');
-    edgeColor = networkStyle.getPropertyValue('--color-foreground-level-3');
+    colorPrimary = networkStyle.getPropertyValue('--color-primary');
+    colorForeground = networkStyle.getPropertyValue('--color-foreground');
+    colorBackground = networkStyle.getPropertyValue('--color-background');
+    colorForegroundLevel3 = networkStyle.getPropertyValue('--color-foreground-level-3');
 
     // Can't be imported server side
     const [{ Sigma }, { createNodeBorderProgram }, { drawDiscNodeHover, drawStraightEdgeLabel }] =
@@ -204,13 +210,13 @@
         (e) => e.source === null && e.target === node.projectAccountId,
       );
       graph.addNode(node.projectAccountId, {
-        color: isPrimary ? nodeColorPrimary : nodeColorSecondary,
-        labelBackgroundColor: nodeColorTertiary,
+        color: isPrimary ? colorPrimary : colorForeground,
+        labelBackgroundColor: colorBackground,
         // label: `${node.repoOwner}/${node.repoName}`,
         x: Math.random(),
         y: Math.random(),
         size: isPrimary ? 16 : 8,
-        borderColor: nodeColorSecondary,
+        borderColor: colorForeground,
         borderSize: isPrimary ? 2 : 0,
         projectName: `${node.repoOwner}/${node.repoName}`,
         isPrimary,
@@ -223,13 +229,11 @@
         continue;
       }
 
-      // console.log(edge)
-
       graph.addEdge(edge.source, edge.target, {
-        color: edgeColor,
+        color: colorForegroundLevel3,
         size: 3,
-        labelBackgroundColor: nodeColorPrimary,
-        label: `${(Number(edge.weight) * 100).toFixed(2)}%`,
+        labelBackgroundColor: colorPrimary,
+        label: edgeLabelFormatter.format(Number(edge.weight) * 100),
       });
     }
 
@@ -268,20 +272,20 @@
       labelWeight: '600',
       labelSize: 16,
       labelColor: {
-        color: nodeColorSecondary,
+        color: colorForeground,
       },
       renderEdgeLabels: true,
       edgeLabelFont: 'Inter',
       edgeLabelWeight: '600',
       edgeLabelSize: 16,
       edgeLabelColor: {
-        color: nodeColorTertiary,
+        color: colorBackground,
       },
-      // Remove box shadow on hover
-      // https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
+      // Remove box shadow, get drippy with it
       defaultDrawNodeHover: drawDiscNodeHover,
       // don't draw a label underneath the hover label
       defaultDrawNodeLabel: () => {},
+      // Don't rotate along edge path, get drippy with it
       defaultDrawEdgeLabel: drawStraightEdgeLabel,
       // autoRescale: true,
       // don't adjust the size of the nodes and edges
