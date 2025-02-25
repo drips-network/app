@@ -39,8 +39,8 @@
   // } from '../project-badge/components/project-name.svelte';
   // import { gql } from 'graphql-request';
   // import type { ProjectCardFragment } from './__generated__/gql.generated';
-  import isClaimed from '$lib/utils/project/is-claimed';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  // import isClaimed from '$lib/utils/project/is-claimed';
+  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   // import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
   // import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   // import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
@@ -56,15 +56,19 @@
   import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
   import EcosystemProjectCard from './ecosystem-project-card.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import { fetchProject, type NodeSelectionChangedPayload } from './ecosystem-graph';
+  import { fade } from 'svelte/transition';
 
   export let ecosystem: Ecosystem;
-  export let project: ProjectProfileFragment;
+  // export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
   let zoom: number = 3;
+  let selectedProjectData: { project: ProjectProfileFragment; description: string } | undefined =
+    undefined;
 
-  let projectChainData = filterCurrentChainData(project.chainData);
+  // let projectChainData = filterCurrentChainData(project.chainData);
 
   // function buildEcosystemUrl(
   //   forge: Forge,
@@ -91,13 +95,45 @@
 
     zoom = zoom - 1;
   }
+
+  function getEcosystemNodeById(ecosystem: Ecosystem, nodeId: string) {
+    const { graph } = ecosystem;
+    if (!graph) {
+      return null;
+    }
+
+    return graph.nodes.find((node) => node.projectAccountId == nodeId);
+  }
+
+  async function showProjectData(nodeId: string) {
+    const fullNode = getEcosystemNodeById(ecosystem, nodeId);
+    // TODO: bad, fail
+    if (!fullNode) {
+      return;
+    }
+
+    selectedProjectData = await fetchProject(fullNode.repoOwner, fullNode.repoName);
+    // eslint-disable-next-line no-console
+    console.log('project', selectedProjectData);
+  }
+
+  function handleNodeSelectionChanged(event: CustomEvent<NodeSelectionChangedPayload>) {
+    const { nodeId } = event.detail;
+    if (!nodeId) {
+      selectedProjectData = undefined;
+      return;
+    }
+
+    showProjectData(nodeId);
+    return;
+  }
 </script>
 
 <div class="ecosystem-card-wrapper" class:ecosystem-card-wrapper--interactive={isInteractive}>
   <div class="ecosystem-card" class:hidden-project={isHidden}>
-    <div class="background" class:background--unclaimed={!isClaimed(projectChainData)} />
+    <div class="background" />
     <div class="graph">
-      <EcosystemGraph {ecosystem} bind:zoom />
+      <EcosystemGraph {ecosystem} bind:zoom on:nodeSelectionChanged={handleNodeSelectionChanged} />
     </div>
     {#if $$slots.banner}
       <div class="banner">
@@ -134,7 +170,14 @@
       <div class="surface top-right">
         <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
       </div>
-      <div class="surface bottom-left"><EcosystemProjectCard {project} /></div>
+      {#if selectedProjectData}
+        <div class="surface bottom-left" transition:fade={{ duration: 100 }}>
+          <EcosystemProjectCard
+            project={selectedProjectData.project}
+            description={selectedProjectData.description}
+          />
+        </div>
+      {/if}
       <div class="surface bottom-right">
         <Button circular on:click={(event) => zoomIn(event)}
           ><Plus style="fill: var(--color-forground)" /></Button
@@ -193,13 +236,13 @@
     );
   }
 
-  .background.background--unclaimed {
+  /* .background.background--unclaimed {
     background: linear-gradient(
       180deg,
       var(--color-foreground-level-1) 0%,
       rgba(255, 255, 255, 0) 100%
     );
-  }
+  } */
 
   .details {
     display: flex;
