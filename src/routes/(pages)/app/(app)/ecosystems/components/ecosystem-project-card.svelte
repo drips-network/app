@@ -71,7 +71,6 @@
       transform 0.2s;
     background-color: var(--color-background);
     text-align: initial;
-    display: none;
   }
 
   .avatar {
