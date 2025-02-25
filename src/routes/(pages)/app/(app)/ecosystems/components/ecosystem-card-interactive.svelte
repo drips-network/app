@@ -30,59 +30,28 @@
 </script>
 
 <script lang="ts">
-  // import buildProjectUrl from '$lib/utils/build-project-url';
-  // import Github from '$lib/components/icons/Github.svelte';
-
-  // import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
-  // import ProjectName, {
-  // PROJECT_NAME_FRAGMENT,
-  // } from '../project-badge/components/project-name.svelte';
-  // import { gql } from 'graphql-request';
-  // import type { ProjectCardFragment } from './__generated__/gql.generated';
-  // import isClaimed from '$lib/utils/project/is-claimed';
-  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  // import type { ProjectCardFragment } from '$lib/components/project-card/__generated__/gql.generated';
-  // import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
-  // import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import EcosystemGraph from './ecosystem-graph.svelte';
-  // import Box from '$lib/components/icons/Box.svelte';
-  // import User from '$lib/components/icons/User.svelte';
-  // import Coin from '$lib/components/icons/Coin.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
   import EcosystemProjectCard from './ecosystem-project-card.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  import { fetchProject, type NodeSelectionChangedPayload } from './ecosystem-graph';
+  import { type NodeSelectionChangedPayload } from './ecosystem-graph';
   import { fade } from 'svelte/transition';
 
   export let ecosystem: Ecosystem;
-  // export let project: ProjectProfileFragment;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
   let zoom: number = 3;
-  let selectedProjectData: { project: ProjectProfileFragment; description: string } | undefined =
-    undefined;
-
-  // let projectChainData = filterCurrentChainData(project.chainData);
-
-  // function buildEcosystemUrl(
-  //   forge: Forge,
-  //   ownerName: string,
-  //   repoName: string,
-  //   exact = true,
-  // ): string {
-  //   switch (forge) {
-  //     case Forge.GitHub:
-  //       return `/app/ecosystems/github-${encodeURIComponent(ownerName)}-${encodeURIComponent(repoName)}${exact ? '?exact' : ''}`;
-  //     default:
-  //       throw new Error(`Unsupported forge: ${forge}`);
-  //   }
-  // }
+  let selectedProjectData:
+    | {
+        repoOwner: string;
+        repoName: string;
+      }
+    | undefined = undefined;
 
   function zoomIn(event: MouseEvent) {
     event.stopPropagation();
@@ -112,7 +81,7 @@
       return;
     }
 
-    selectedProjectData = await fetchProject(fullNode.repoOwner, fullNode.repoName);
+    selectedProjectData = { repoOwner: fullNode.repoOwner, repoName: fullNode.repoName };
     // eslint-disable-next-line no-console
     console.log('project', selectedProjectData);
   }
@@ -173,8 +142,8 @@
       {#if selectedProjectData}
         <div class="surface bottom-left" transition:fade={{ duration: 100 }}>
           <EcosystemProjectCard
-            project={selectedProjectData.project}
-            description={selectedProjectData.description}
+            repoName={selectedProjectData.repoName}
+            repoOwner={selectedProjectData.repoOwner}
           />
         </div>
       {/if}
@@ -320,6 +289,7 @@
     position: absolute;
     top: 1rem;
     left: 1rem;
+    z-index: 1;
   }
 
   .surface.top-right {
