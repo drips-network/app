@@ -3,6 +3,20 @@ import type { NodeDisplayData, PartialButFor, EdgeDisplayData } from 'sigma/type
 import type { Settings } from 'sigma/settings';
 
 export type LayoutMapping = { [key: string]: { x: number; y: number } };
+export type NodeSelectionChangedPayload = { nodeId?: string };
+
+export async function fetchProject(ownerName: string, repoName: string, forge: string = 'github') {
+  const response = await fetch(
+    `/api/projects/${encodeURIComponent(forge)}/${encodeURIComponent(ownerName)}/${encodeURIComponent(repoName)}`,
+  );
+  // probably throw an error?
+  if (!response.ok) {
+    return null;
+  }
+
+  const projectData = await response.json();
+  return projectData;
+}
 
 /**
  * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
