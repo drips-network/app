@@ -7,7 +7,12 @@
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import type { Attributes } from 'graphology-types';
-  import type { LayoutMapping } from './ecosystem-graph';
+  import { type LayoutMapping, type NodeSelectionChangedPayload } from './ecosystem-graph';
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher<{
+    nodeSelectionChanged: NodeSelectionChangedPayload;
+  }>();
 
   // TODO:
   // add the right data to the edge label
@@ -79,6 +84,8 @@
       state.selectedNeighbors = undefined;
     }
 
+    dispatch('nodeSelectionChanged', { nodeId: state.selectedNode });
+
     // Refresh rendering
     sigmaInstance.refresh({
       // We don't touch the graph data so we can skip its reindexation
@@ -90,9 +97,7 @@
     if (node) {
       state.hoveredNode = node;
       state.hoveredNeighbors = new Set(graph.neighbors(node));
-    }
-
-    if (!node) {
+    } else {
       state.hoveredNode = undefined;
       state.hoveredNeighbors = undefined;
     }
@@ -128,7 +133,7 @@
       res.color = colorPrimary;
       // TODO: tweak
       // @ts-expect-error: might be undefined
-      res.size = res.size + 2.5;
+      res.size = res.size + 5;
     } else if (state.suggestions) {
       if (state.suggestions.has(node)) {
         res.forceLabel = true;
@@ -283,7 +288,7 @@
       },
       // Remove box shadow, get drippy with it
       defaultDrawNodeHover: drawDiscNodeHover,
-      // don't draw a label underneath the hover label
+      // Don't draw a label underneath the hover label
       defaultDrawNodeLabel: () => {},
       // Don't rotate along edge path, get drippy with it
       defaultDrawEdgeLabel: drawStraightEdgeLabel,
