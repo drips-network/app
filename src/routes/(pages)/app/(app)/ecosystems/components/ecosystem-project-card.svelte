@@ -14,24 +14,41 @@
   import { fetchProject } from './ecosystem-graph';
   import Spinner from '$lib/components/spinner/spinner.svelte';
 
-  export let forge: string = 'github';
-  export let repoOwner: string;
-  export let repoName: string;
+  export let loadProjectData: {
+    forge: string;
+    repoOwner: string;
+    repoName: string;
+  };
+  export let projectMetadata:
+    | {
+        absoluteWeight: number;
+      }
+    | undefined = undefined;
 
   export let project: ProjectProfileFragment | undefined = undefined;
   export let description: string | undefined = undefined;
 
   let loading: boolean = false;
 
+  const percentFormatter = new Intl.NumberFormat('en-US', {
+    style: 'percent',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  });
+
   $: projectChainData = project ? filterCurrentChainData(project.chainData) : undefined;
-  $: forge, repoName, repoOwner, loadProject();
+  $: loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject();
 
   async function loadProject() {
     // TODO: if project return
 
     try {
       loading = true;
-      const projectData = await fetchProject(repoOwner, repoName, forge);
+      const projectData = await fetchProject(
+        loadProjectData.repoOwner,
+        loadProjectData.repoName,
+        loadProjectData.forge,
+      );
       project = projectData.project;
       description = projectData.description;
     } finally {
@@ -63,11 +80,13 @@
       </div>
     </div>
     <div class="stats">
-      <div>
-        <Pie style="fill: var(--color-background)" /><strong class="ml-1 typo-text-bold"
-          >2.47%</strong
-        > of ecosystem funds
-      </div>
+      {#if Number.isFinite(projectMetadata?.absoluteWeight)}
+        <div>
+          <Pie style="fill: var(--color-background)" /><strong class="ml-1 typo-text-bold"
+            >{percentFormatter.format(Number(projectMetadata?.absoluteWeight))}</strong
+          > of ecosystem funds
+        </div>
+      {/if}
       <div>
         <DripList style="fill: var(--color-foreground)" /><strong class="ml-1 typo-text-bold"
           >50%</strong

@@ -50,6 +50,12 @@
     | {
         repoOwner: string;
         repoName: string;
+        forge: string;
+      }
+    | undefined = undefined;
+  let projectMetadata:
+    | {
+        absoluteWeight: number;
       }
     | undefined = undefined;
 
@@ -81,7 +87,12 @@
       return;
     }
 
-    selectedProjectData = { repoOwner: fullNode.repoOwner, repoName: fullNode.repoName };
+    projectMetadata = { absoluteWeight: fullNode.absoluteWeight };
+    selectedProjectData = {
+      repoOwner: fullNode.repoOwner,
+      repoName: fullNode.repoName,
+      forge: 'github',
+    };
     // eslint-disable-next-line no-console
     console.log('project', selectedProjectData);
   }
@@ -90,6 +101,7 @@
     const { nodeId } = event.detail;
     if (!nodeId) {
       selectedProjectData = undefined;
+      projectMetadata = undefined;
       return;
     }
 
@@ -141,10 +153,7 @@
       </div>
       {#if selectedProjectData}
         <div class="surface bottom-left" transition:fade={{ duration: 100 }}>
-          <EcosystemProjectCard
-            repoName={selectedProjectData.repoName}
-            repoOwner={selectedProjectData.repoOwner}
-          />
+          <EcosystemProjectCard loadProjectData={selectedProjectData} {projectMetadata} />
         </div>
       {/if}
       <div class="surface bottom-right">
