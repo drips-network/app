@@ -142,9 +142,6 @@ export function removeNode(graph: NewGraph, projectName: string) {
     // the edge is not the one pointing to the orphan
     // and it's source is the orphan
     // or it's target is the orphan
-    // const otherEdge = graph.edges.find(
-    //   (e) => edge !== e && (e.source === edge.target || e.target === edge.target),
-    // );
     const otherSourceEdges = graph.edges.filter((e) => edge !== e && e.source === edge.target);
     const otherTargetEdges = graph.edges.filter((e) => edge !== e && e.target === edge.target);
     // if there isn't at least one edge involved with the potential
@@ -286,4 +283,49 @@ export function assignRandomRealisticWeights(graph: NewGraph) {
       lastEdge.weight = total - edges.slice(0, -1).reduce((sum, e) => sum + Number(e.weight), 0);
     }
   }
+}
+
+export function addLevel0(
+  graph: NewGraph,
+  libraryGraph: NewGraph,
+  neighborsCount: number = 5,
+  startNodeId?: string,
+) {
+  const sourceNodeId = startNodeId ? startNodeId : getRandomLeaf(graph);
+  const node = graph.nodes.find((n) => n.projectName === sourceNodeId);
+  if (!node) {
+    // eslint-disable-next-line no-console
+    console.error('Could not find source node');
+    return;
+  }
+
+  let i = neighborsCount;
+  while (i--) {
+    const targetNode = getNewNode(graph, libraryGraph);
+    if (!targetNode) {
+      // eslint-disable-next-line no-console
+      console.warn('No new node to make children', i);
+      break;
+    }
+
+    graph.nodes.push(targetNode);
+    graph.edges.push({
+      source: sourceNodeId,
+      target: targetNode.projectName,
+      weight: 0,
+    });
+  }
+}
+
+export function fabricateGraph(libraryGraph: NewGraph, minNeighbors: number, maxNeighbors: number) {
+  const rootNode = { projectName: 'root' };
+  const graph: NewGraph = { nodes: [rootNode], edges: [] };
+
+  let i = Math.ceil((maxNeighbors - minNeighbors) / 2);
+  while (i--) {
+    const numNeighbors = Math.floor(Math.random() * maxNeighbors) + minNeighbors;
+    addLevel0(graph, libraryGraph, numNeighbors);
+  }
+
+  return graph;
 }
