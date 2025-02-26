@@ -152,7 +152,7 @@
         <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
       </div>
       {#if selectedProjectData}
-        <div class="surface bottom-left" transition:fade={{ duration: 100 }}>
+        <div class="surface bottom-left" transition:fade={{ duration: 300 }}>
           <EcosystemProjectCard loadProjectData={selectedProjectData} {projectMetadata} />
         </div>
       {/if}
@@ -298,7 +298,7 @@
     position: absolute;
     top: 1rem;
     left: 1rem;
-    z-index: 1;
+    z-index: 2;
   }
 
   .surface.top-right {
