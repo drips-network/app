@@ -3,6 +3,7 @@ import { csvToGraph } from '../csv-to-graph';
 import { correctGraph, removeNode, reduceGraph } from '../graph-utils';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
+// import { osoToFabricatedGraph } from '../oso-to-graph';
 // import { osoToGraphJson } from '../oso-to-graph';
 
 describe('csv-to-graph', () => {
@@ -13,6 +14,7 @@ describe('csv-to-graph', () => {
 
     beforeAll(async () => {
       graph = await csvToGraph(osoUnweightedFile);
+      // await osoToFabricatedGraph()
       // await osoToGraphJson('foo.json', { reduce: 5000, assignWeights: true });
     });
 
