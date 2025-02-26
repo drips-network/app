@@ -149,7 +149,7 @@
       </div> -->
       <div class="surface top-left"><SearchInput small placeholder="Search" /></div>
       <div class="surface top-right">
-        <Button><ArrowExpand style="fill: var(--color-forground)" />Explore in full screen</Button>
+        <Button><ArrowExpand style="fill: var(--color-foreground)" />Explore in full screen</Button>
       </div>
       {#if selectedProjectData}
         <div class="surface bottom-left" transition:fade={{ duration: 300 }}>
@@ -158,10 +158,10 @@
       {/if}
       <div class="surface bottom-right">
         <Button circular on:click={(event) => zoomIn(event)}
-          ><Plus style="fill: var(--color-forground)" /></Button
+          ><Plus style="fill: var(--color-foreground)" /></Button
         >
         <Button circular on:click={(event) => zoomOut(event)}
-          ><Minus style="fill: var(--color-forground)" /></Button
+          ><Minus style="fill: var(--color-foreground)" /></Button
         >
       </div>
     </div>
