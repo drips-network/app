@@ -32,6 +32,7 @@
   let colorForeground: string;
   let colorBackground: string;
   let colorForegroundLevel3: string;
+  let colorForegroundLevel2: string;
 
   // TODO: this seems to format things weirdly
   const edgeLabelFormatter = new Intl.NumberFormat('en-US', {
@@ -119,6 +120,8 @@
     if (state.selectedNeighbors) {
       if (state.selectedNeighbors.has(node) || state.selectedNode === node) {
         res.color = colorPrimary;
+      } else {
+        res.color = colorForegroundLevel2;
       }
     }
 
@@ -190,6 +193,7 @@
     colorForeground = networkStyle.getPropertyValue('--color-foreground');
     colorBackground = networkStyle.getPropertyValue('--color-background');
     colorForegroundLevel3 = networkStyle.getPropertyValue('--color-foreground-level-3');
+    colorForegroundLevel2 = networkStyle.getPropertyValue('--color-foreground-level-2');
 
     // Can't be imported server side
     const [{ Sigma }, { createNodeBorderProgram }, { drawDiscNodeHover, drawStraightEdgeLabel }] =
@@ -296,7 +300,7 @@
       // don't adjust the size of the nodes and edges
       // when zooming.
       // https://www.sigmajs.org/storybook/?path=/story/fit-sizes-to-positions--story
-      zoomToSizeRatioFunction: () => 1,
+      // zoomToSizeRatioFunction: () => 1,
       nodeProgramClasses: {
         // bordered: NodeBorderProgram,
         bordered: createNodeBorderProgram({
