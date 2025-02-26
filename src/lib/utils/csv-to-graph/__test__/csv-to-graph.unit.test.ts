@@ -1,5 +1,6 @@
 import type { Edge, NewGraph } from '$lib/utils/ecosystems/schemas';
-import { csvToGraph, correctGraph, removeNode, reduceGraph } from '../csv-to-graph';
+import { csvToGraph } from '../csv-to-graph';
+import { correctGraph, removeNode, reduceGraph } from '../graph-utils';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
 // import { osoToGraphJson } from '../oso-to-graph';

@@ -1,11 +1,5 @@
-import {
-  addLevel,
-  assignRandomRealisticWeights,
-  correctGraph,
-  csvToGraph,
-  // findLongestPath,
-  reduceGraph,
-} from './csv-to-graph';
+import { csvToGraph } from './csv-to-graph';
+import { correctGraph, addLevel, reduceGraph, assignRandomRealisticWeights } from './graph-utils';
 import osoUnweighted from './__test__/data/oso-unweighted-graph.csv?raw';
 import fs from 'fs';
 import osoGraphErrors from './__test__/data/oso-unweighted-graph-errors.json';
