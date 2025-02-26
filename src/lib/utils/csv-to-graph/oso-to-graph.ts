@@ -1,8 +1,28 @@
 import { csvToGraph } from './csv-to-graph';
-import { correctGraph, addLevel, reduceGraph, assignRandomRealisticWeights } from './graph-utils';
+import {
+  correctGraph,
+  addLevel,
+  reduceGraph,
+  assignRandomRealisticWeights,
+  fabricateGraph,
+} from './graph-utils';
 import osoUnweighted from './__test__/data/oso-unweighted-graph.csv?raw';
 import fs from 'fs';
 import osoGraphErrors from './__test__/data/oso-unweighted-graph-errors.json';
+
+export async function osoToFabricatedGraph(outputPath: string = 'fabricated-graph.json') {
+  const osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
+  const osoGraph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
+  correctGraph(osoGraph, osoGraphErrors);
+
+  const fabricatedGraph = fabricateGraph(osoGraph, 10, 50);
+  assignRandomRealisticWeights(fabricatedGraph);
+  fabricatedGraph.nodes.sort((a, b) => a.projectName.localeCompare(b.projectName));
+  // @ts-expect-error: source might be undefined
+  fabricatedGraph.edges.sort((a, b) => a.source.localeCompare(b.source));
+
+  fs.writeFileSync(outputPath, JSON.stringify(fabricatedGraph, null, 4));
+}
 
 export async function osoToGraphJson(
   outputPath: string = 'oso-unweighted-graph-fake-weighted.json',

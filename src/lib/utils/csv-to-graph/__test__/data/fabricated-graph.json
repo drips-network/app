@@ -1,0 +1,5785 @@
+{
+    "nodes": [
+        {
+            "projectName": "3rd-eden/diagnostics"
+        },
+        {
+            "projectName": "75lb/typical"
+        },
+        {
+            "projectName": "aceakash/string-similarity"
+        },
+        {
+            "projectName": "achingbrain/it"
+        },
+        {
+            "projectName": "achingbrain/uint8arraylist"
+        },
+        {
+            "projectName": "acornjs/acorn-jsx"
+        },
+        {
+            "projectName": "actions/toolkit"
+        },
+        {
+            "projectName": "ahmadnassri/mkdirp-promise"
+        },
+        {
+            "projectName": "ahmadnassri/node-har-validator"
+        },
+        {
+            "projectName": "airbnb/babel-plugin-dynamic-import-node"
+        },
+        {
+            "projectName": "alanshaw/get-iterator"
+        },
+        {
+            "projectName": "alexcrist/json-to-pretty-yaml"
+        },
+        {
+            "projectName": "alexeyraspopov/picocolors"
+        },
+        {
+            "projectName": "alexreardon/tiny-warning"
+        },
+        {
+            "projectName": "algolia/algoliasearch-client-javascript"
+        },
+        {
+            "projectName": "algolia/autocomplete"
+        },
+        {
+            "projectName": "angus-c/just"
+        },
+        {
+            "projectName": "anonrig/fast-querystring"
+        },
+        {
+            "projectName": "Arachnid/eth-ens-namehash"
+        },
+        {
+            "projectName": "archiverjs/archiver-utils"
+        },
+        {
+            "projectName": "archiverjs/node-zip-stream"
+        },
+        {
+            "projectName": "ardatan/graphql-tools"
+        },
+        {
+            "projectName": "ardatan/whatwg-node"
+        },
+        {
+            "projectName": "ariaminaei/utila"
+        },
+        {
+            "projectName": "ariya/esprima"
+        },
+        {
+            "projectName": "ashtuchkin/iconv-lite"
+        },
+        {
+            "projectName": "atomiks/floating-ui"
+        },
+        {
+            "projectName": "babel/babel"
+        },
+        {
+            "projectName": "babel/babel-plugin-proposal-private-property-in-object"
+        },
+        {
+            "projectName": "babel/babel-polyfills"
+        },
+        {
+            "projectName": "babel/babelify"
+        },
+        {
+            "projectName": "base-repos/base"
+        },
+        {
+            "projectName": "beatgammit/deflate-js"
+        },
+        {
+            "projectName": "bendrucker/builtin-status-codes"
+        },
+        {
+            "projectName": "billiegoose/isomorphic-textencoder"
+        },
+        {
+            "projectName": "blakeembrey/change-case"
+        },
+        {
+            "projectName": "blockchainsllc/in3-legacy"
+        },
+        {
+            "projectName": "bnjmnt4n/regjsgen"
+        },
+        {
+            "projectName": "broofa/mime"
+        },
+        {
+            "projectName": "brooooooklyn/snappy"
+        },
+        {
+            "projectName": "browserify/browserify-aes"
+        },
+        {
+            "projectName": "browserify/browserify-des"
+        },
+        {
+            "projectName": "browserify/browserify-sign"
+        },
+        {
+            "projectName": "browserify/commonjs-assert"
+        },
+        {
+            "projectName": "browserify/diffie-hellman"
+        },
+        {
+            "projectName": "browserify/events"
+        },
+        {
+            "projectName": "browserify/insert-module-globals"
+        },
+        {
+            "projectName": "browserify/labeled-stream-splicer"
+        },
+        {
+            "projectName": "browserify/module-deps"
+        },
+        {
+            "projectName": "browserify/parse-asn1"
+        },
+        {
+            "projectName": "browserify/publicEncrypt"
+        },
+        {
+            "projectName": "browserify/resolve"
+        },
+        {
+            "projectName": "browserify/ripemd160"
+        },
+        {
+            "projectName": "browserify/stream-splicer"
+        },
+        {
+            "projectName": "btd/rollup-plugin-visualizer"
+        },
+        {
+            "projectName": "btxtiger/change-case-all"
+        },
+        {
+            "projectName": "bushong1/split-ca"
+        },
+        {
+            "projectName": "calvinmetcalf/immediate"
+        },
+        {
+            "projectName": "calvinmetcalf/minimalistic-assert"
+        },
+        {
+            "projectName": "calvinmetcalf/process-nextick-args"
+        },
+        {
+            "projectName": "canjs/can-globals"
+        },
+        {
+            "projectName": "centralnicgroup-opensource/rtldev-middleware-idna-uts46"
+        },
+        {
+            "projectName": "cgewecke/eth-gas-reporter"
+        },
+        {
+            "projectName": "chaijs/assertion-error"
+        },
+        {
+            "projectName": "chaijs/chai-as-promised"
+        },
+        {
+            "projectName": "chaijs/deep-eql"
+        },
+        {
+            "projectName": "chaijs/get-func-name"
+        },
+        {
+            "projectName": "chaijs/pathval"
+        },
+        {
+            "projectName": "chaijs/type-detect"
+        },
+        {
+            "projectName": "chainsafe/bls-keygen"
+        },
+        {
+            "projectName": "chainsafe/discv5"
+        },
+        {
+            "projectName": "chainsafe/hashtree-js"
+        },
+        {
+            "projectName": "chainsafe/lodestar"
+        },
+        {
+            "projectName": "chainsafe/persistent-merkle-tree"
+        },
+        {
+            "projectName": "chainsafe/ssz"
+        },
+        {
+            "projectName": "chainsafe/swap-or-not-shuffle"
+        },
+        {
+            "projectName": "chalk/chalk"
+        },
+        {
+            "projectName": "chalk/strip-ansi"
+        },
+        {
+            "projectName": "chalk/supports-color"
+        },
+        {
+            "projectName": "chalk/wrap-ansi"
+        },
+        {
+            "projectName": "cheeriojs/cheerio-select"
+        },
+        {
+            "projectName": "cheeriojs/dom-serializer"
+        },
+        {
+            "projectName": "chimurai/http-proxy-middleware"
+        },
+        {
+            "projectName": "chriseth/browser-solidity"
+        },
+        {
+            "projectName": "cimi/murmurhash3js-revisited"
+        },
+        {
+            "projectName": "cli-table/cli-table3"
+        },
+        {
+            "projectName": "clibs/bytes"
+        },
+        {
+            "projectName": "colingo/global"
+        },
+        {
+            "projectName": "colorjs/color-name"
+        },
+        {
+            "projectName": "component/escape-html"
+        },
+        {
+            "projectName": "component/is-module"
+        },
+        {
+            "projectName": "component/toidentifier"
+        },
+        {
+            "projectName": "consensys/teku"
+        },
+        {
+            "projectName": "conventional-changelog/conventional-changelog"
+        },
+        {
+            "projectName": "cosmiconfig/cosmiconfig"
+        },
+        {
+            "projectName": "creationix/http-parser-js"
+        },
+        {
+            "projectName": "cryptocoinjs/secp256k1-node"
+        },
+        {
+            "projectName": "css-modules/postcss-modules-local-by-default"
+        },
+        {
+            "projectName": "cssnano/cssnano"
+        },
+        {
+            "projectName": "csstree/csstree"
+        },
+        {
+            "projectName": "cthackers/adm-zip"
+        },
+        {
+            "projectName": "cure53/dompurify"
+        },
+        {
+            "projectName": "d3/d3-array"
+        },
+        {
+            "projectName": "d3/d3-force"
+        },
+        {
+            "projectName": "dankogai/js-base64"
+        },
+        {
+            "projectName": "darsain/remove-trailing-separator"
+        },
+        {
+            "projectName": "davidmarkclements/fast-redact"
+        },
+        {
+            "projectName": "davidmarkclements/fast-safe-stringify"
+        },
+        {
+            "projectName": "davidmarkclements/rfdc"
+        },
+        {
+            "projectName": "dcastil/tailwind-merge"
+        },
+        {
+            "projectName": "dchest/tweetnacl-js"
+        },
+        {
+            "projectName": "dcposch/blakejs"
+        },
+        {
+            "projectName": "debug-js/debug"
+        },
+        {
+            "projectName": "definitelytyped/definitelytyped"
+        },
+        {
+            "projectName": "delvedor/find-my-way"
+        },
+        {
+            "projectName": "dethcrypto/TypeChain"
+        },
+        {
+            "projectName": "develar/app-builder"
+        },
+        {
+            "projectName": "develar/fs-extra-p"
+        },
+        {
+            "projectName": "developit/unfetch"
+        },
+        {
+            "projectName": "dignifiedquire/borc"
+        },
+        {
+            "projectName": "dirtyhairy/async-mutex"
+        },
+        {
+            "projectName": "discoveryjs/json-ext"
+        },
+        {
+            "projectName": "dividab/tsconfig-paths"
+        },
+        {
+            "projectName": "dividab/tsconfig-paths-webpack-plugin"
+        },
+        {
+            "projectName": "dominictarr/json-buffer"
+        },
+        {
+            "projectName": "dominictarr/split"
+        },
+        {
+            "projectName": "doowb/ansi-colors"
+        },
+        {
+            "projectName": "dotansimha/graphql-code-generator"
+        },
+        {
+            "projectName": "dougwilson/nodejs-depd"
+        },
+        {
+            "projectName": "dperini/nwsapi"
+        },
+        {
+            "projectName": "ds300/patch-package"
+        },
+        {
+            "projectName": "editorconfig/editorconfig-core-js"
+        },
+        {
+            "projectName": "eemeli/safe-identifier"
+        },
+        {
+            "projectName": "egeste/http-errors"
+        },
+        {
+            "projectName": "electron-userland/electron-builder"
+        },
+        {
+            "projectName": "elierotenberg/typed-assert"
+        },
+        {
+            "projectName": "emn178/js-sha3"
+        },
+        {
+            "projectName": "emotion-js/emotion"
+        },
+        {
+            "projectName": "empeeric/jest"
+        },
+        {
+            "projectName": "eomm/json-schema-resolver"
+        },
+        {
+            "projectName": "epoberezkin/fast-json-stable-stringify"
+        },
+        {
+            "projectName": "epoberezkin/json-schema-traverse"
+        },
+        {
+            "projectName": "eps1lon/dom-accessibility-api"
+        },
+        {
+            "projectName": "es-shims/es-object-atoms"
+        },
+        {
+            "projectName": "es-shims/es-set-tostringtag"
+        },
+        {
+            "projectName": "es-shims/object-is"
+        },
+        {
+            "projectName": "eslint-community/eslint-utils"
+        },
+        {
+            "projectName": "eslint/eslint"
+        },
+        {
+            "projectName": "eslint/eslint-scope"
+        },
+        {
+            "projectName": "eslint/eslintrc"
+        },
+        {
+            "projectName": "eslint/js"
+        },
+        {
+            "projectName": "eslint/rewrite"
+        },
+        {
+            "projectName": "estools/esrecurse"
+        },
+        {
+            "projectName": "estools/estraverse"
+        },
+        {
+            "projectName": "estools/esutils"
+        },
+        {
+            "projectName": "eta-dev/eta"
+        },
+        {
+            "projectName": "eth-infinitism/account-abstraction"
+        },
+        {
+            "projectName": "ethereum/js-ethereum-cryptography"
+        },
+        {
+            "projectName": "ethereum/remix-plugin"
+        },
+        {
+            "projectName": "ethereum/remix-project"
+        },
+        {
+            "projectName": "ethereumjs/eth-query"
+        },
+        {
+            "projectName": "ethereumjs/ethereumjs-abi"
+        },
+        {
+            "projectName": "ethereumjs/ethereumjs-block"
+        },
+        {
+            "projectName": "ethereumjs/ethereumjs-blockchain"
+        },
+        {
+            "projectName": "ethereumjs/ethereumjs-monorepo"
+        },
+        {
+            "projectName": "ethers-io/ethers.js"
+        },
+        {
+            "projectName": "ethjs/ethjs-util"
+        },
+        {
+            "projectName": "euank/node-parse-numeric-range"
+        },
+        {
+            "projectName": "evanw/esbuild"
+        },
+        {
+            "projectName": "evocateur/pacote"
+        },
+        {
+            "projectName": "exogen/postinstall-build"
+        },
+        {
+            "projectName": "expressjs/compression"
+        },
+        {
+            "projectName": "expressjs/express"
+        },
+        {
+            "projectName": "facebook/create-react-app"
+        },
+        {
+            "projectName": "facebook/docusaurus"
+        },
+        {
+            "projectName": "facebook/fbjs"
+        },
+        {
+            "projectName": "facebook/prop-types"
+        },
+        {
+            "projectName": "facebook/react"
+        },
+        {
+            "projectName": "faye/websocket-driver-node"
+        },
+        {
+            "projectName": "fb55/boolbase"
+        },
+        {
+            "projectName": "fb55/domhandler"
+        },
+        {
+            "projectName": "fb55/domutils"
+        },
+        {
+            "projectName": "felixge/node-combined-stream"
+        },
+        {
+            "projectName": "felixge/node-require-like"
+        },
+        {
+            "projectName": "feross/buffer"
+        },
+        {
+            "projectName": "feross/fromentries"
+        },
+        {
+            "projectName": "feross/is-buffer"
+        },
+        {
+            "projectName": "feross/run-parallel"
+        },
+        {
+            "projectName": "feross/run-parallel-limit"
+        },
+        {
+            "projectName": "feross/safe-buffer"
+        },
+        {
+            "projectName": "feross/simple-concat"
+        },
+        {
+            "projectName": "feross/simple-get"
+        },
+        {
+            "projectName": "feross/typedarray-to-buffer"
+        },
+        {
+            "projectName": "fitzgen/glob-to-regexp"
+        },
+        {
+            "projectName": "fkhadra/react-toastify"
+        },
+        {
+            "projectName": "flmnt/graphemer"
+        },
+        {
+            "projectName": "floatdrop/pinkie-promise"
+        },
+        {
+            "projectName": "floating-ui/floating-ui"
+        },
+        {
+            "projectName": "forbeslindesay/sync-rpc"
+        },
+        {
+            "projectName": "forbeslindesay/throat"
+        },
+        {
+            "projectName": "formatjs/formatjs"
+        },
+        {
+            "projectName": "fregante/eslint-formatters"
+        },
+        {
+            "projectName": "fsevents/fsevents"
+        },
+        {
+            "projectName": "gajus/global-agent"
+        },
+        {
+            "projectName": "gajus/roarr"
+        },
+        {
+            "projectName": "gcanti/fp-ts"
+        },
+        {
+            "projectName": "gcanti/io-ts"
+        },
+        {
+            "projectName": "getsentry/sentry-javascript"
+        },
+        {
+            "projectName": "google/flatbuffers"
+        },
+        {
+            "projectName": "goto-bus-stop/dash-ast"
+        },
+        {
+            "projectName": "goto-bus-stop/estree-is-member-expression"
+        },
+        {
+            "projectName": "goto-bus-stop/get-assigned-identifiers"
+        },
+        {
+            "projectName": "goto-bus-stop/shasum-object"
+        },
+        {
+            "projectName": "gotwarlost/istanbul"
+        },
+        {
+            "projectName": "graphql/graphql-spec"
+        },
+        {
+            "projectName": "gregberge/svgr"
+        },
+        {
+            "projectName": "grncdr/merge-stream"
+        },
+        {
+            "projectName": "gulpjs/rechoir"
+        },
+        {
+            "projectName": "gulpjs/semver-greatest-satisfied-range"
+        },
+        {
+            "projectName": "gulpjs/vinyl-fs"
+        },
+        {
+            "projectName": "h2non/node-os-shim"
+        },
+        {
+            "projectName": "hapijs/formula"
+        },
+        {
+            "projectName": "hejny/locate-app"
+        },
+        {
+            "projectName": "henningm/express-ws"
+        },
+        {
+            "projectName": "here-be/snapdragon"
+        },
+        {
+            "projectName": "hildjj/node-cbor"
+        },
+        {
+            "projectName": "hildjj/nofilter"
+        },
+        {
+            "projectName": "holepunchto/b4a"
+        },
+        {
+            "projectName": "holepunchto/bare-os"
+        },
+        {
+            "projectName": "holepunchto/bare-path"
+        },
+        {
+            "projectName": "holepunchto/bare-stream"
+        },
+        {
+            "projectName": "http-party/node-http-proxy"
+        },
+        {
+            "projectName": "hughsk/is-typedarray"
+        },
+        {
+            "projectName": "iamkun/dayjs"
+        },
+        {
+            "projectName": "iarna/console-control-strings"
+        },
+        {
+            "projectName": "iarna/promise-inflight"
+        },
+        {
+            "projectName": "iden3/circom_runtime"
+        },
+        {
+            "projectName": "iden3/wasmcurves"
+        },
+        {
+            "projectName": "image-size/image-size"
+        },
+        {
+            "projectName": "IndigoUnited/js-deep-compact"
+        },
+        {
+            "projectName": "indutny/hmac-drbg"
+        },
+        {
+            "projectName": "indutny/minimalistic-crypto-utils"
+        },
+        {
+            "projectName": "inspect-js/available-typed-arrays"
+        },
+        {
+            "projectName": "inspect-js/data-view-buffer"
+        },
+        {
+            "projectName": "inspect-js/get-symbol-description"
+        },
+        {
+            "projectName": "inspect-js/has-bigints"
+        },
+        {
+            "projectName": "inspect-js/has-symbols"
+        },
+        {
+            "projectName": "inspect-js/has-tostringtag"
+        },
+        {
+            "projectName": "inspect-js/is-accessor-descriptor"
+        },
+        {
+            "projectName": "inspect-js/is-boolean-object"
+        },
+        {
+            "projectName": "inspect-js/is-callable"
+        },
+        {
+            "projectName": "inspect-js/is-core-module"
+        },
+        {
+            "projectName": "inspect-js/is-data-view"
+        },
+        {
+            "projectName": "inspect-js/is-generator-function"
+        },
+        {
+            "projectName": "inspect-js/is-negative-zero"
+        },
+        {
+            "projectName": "inspect-js/is-symbol"
+        },
+        {
+            "projectName": "inspect-js/is-weakset"
+        },
+        {
+            "projectName": "inspect-js/typed-array-byte-length"
+        },
+        {
+            "projectName": "inspect-js/typed-array-byte-offset"
+        },
+        {
+            "projectName": "IonicaBizau/parse-path"
+        },
+        {
+            "projectName": "ionicabizau/protocols"
+        },
+        {
+            "projectName": "ioredis/commands"
+        },
+        {
+            "projectName": "isaacs/chownr"
+        },
+        {
+            "projectName": "isaacs/dezalgo"
+        },
+        {
+            "projectName": "isaacs/http-https"
+        },
+        {
+            "projectName": "isaacs/inherits"
+        },
+        {
+            "projectName": "isaacs/jackspeak"
+        },
+        {
+            "projectName": "isaacs/json-stringify-nice"
+        },
+        {
+            "projectName": "isaacs/minimatch"
+        },
+        {
+            "projectName": "isaacs/minipass"
+        },
+        {
+            "projectName": "isaacs/minipass-collect"
+        },
+        {
+            "projectName": "isaacs/minipass-flush"
+        },
+        {
+            "projectName": "isaacs/node-glob"
+        },
+        {
+            "projectName": "isaacs/node-lru-cache"
+        },
+        {
+            "projectName": "isaacs/node-tar"
+        },
+        {
+            "projectName": "isaacs/once"
+        },
+        {
+            "projectName": "isaacs/path-scurry"
+        },
+        {
+            "projectName": "isaacs/sax-js"
+        },
+        {
+            "projectName": "isaacs/treeverse"
+        },
+        {
+            "projectName": "isaacs/wrappy"
+        },
+        {
+            "projectName": "istanbuljs-archived-repos/istanbul-lib-source-maps"
+        },
+        {
+            "projectName": "istanbuljs/istanbuljs"
+        },
+        {
+            "projectName": "istanbuljs/nyc"
+        },
+        {
+            "projectName": "istanbuljs/test-exclude"
+        },
+        {
+            "projectName": "jacksontian/streamx"
+        },
+        {
+            "projectName": "jakearchibald/idb-keyval"
+        },
+        {
+            "projectName": "jakejs/jake"
+        },
+        {
+            "projectName": "jamiebuilds/react-loadable"
+        },
+        {
+            "projectName": "janl/node-jsonpointer"
+        },
+        {
+            "projectName": "jaredwray/cacheable"
+        },
+        {
+            "projectName": "jaredwray/keyv"
+        },
+        {
+            "projectName": "jbgutierrez/path-parse"
+        },
+        {
+            "projectName": "jensyt/imurmurhash-js"
+        },
+        {
+            "projectName": "jestjs/jest"
+        },
+        {
+            "projectName": "jfromaniello/selfsigned"
+        },
+        {
+            "projectName": "jfsiii/d3-color"
+        },
+        {
+            "projectName": "jfsiii/d3-format"
+        },
+        {
+            "projectName": "jimmywarting/formdata"
+        },
+        {
+            "projectName": "joeferner/node-bplist-parser"
+        },
+        {
+            "projectName": "johnagan/clean-webpack-plugin"
+        },
+        {
+            "projectName": "jonathanong/ee-first"
+        },
+        {
+            "projectName": "jonschlinkert/arr-diff"
+        },
+        {
+            "projectName": "jonschlinkert/arr-filter"
+        },
+        {
+            "projectName": "jonschlinkert/assign-symbols"
+        },
+        {
+            "projectName": "jonschlinkert/copy-descriptor"
+        },
+        {
+            "projectName": "jonschlinkert/expand-tilde"
+        },
+        {
+            "projectName": "jonschlinkert/extend-shallow"
+        },
+        {
+            "projectName": "jonschlinkert/fill-range"
+        },
+        {
+            "projectName": "jonschlinkert/is-relative"
+        },
+        {
+            "projectName": "jonschlinkert/isobject"
+        },
+        {
+            "projectName": "jonschlinkert/kind-of"
+        },
+        {
+            "projectName": "jonschlinkert/parse-filepath"
+        },
+        {
+            "projectName": "jonschlinkert/repeat-element"
+        },
+        {
+            "projectName": "jonschlinkert/right-align"
+        },
+        {
+            "projectName": "jonschlinkert/section-matter"
+        },
+        {
+            "projectName": "jonschlinkert/strip-bom-string"
+        },
+        {
+            "projectName": "jonschlinkert/window-size"
+        },
+        {
+            "projectName": "joshglazebrook/smart-buffer"
+        },
+        {
+            "projectName": "joshuakgoldberg/ts-api-utils"
+        },
+        {
+            "projectName": "jpmonette/feed"
+        },
+        {
+            "projectName": "jpommerening/node-lazystream"
+        },
+        {
+            "projectName": "jprichardson/node-death"
+        },
+        {
+            "projectName": "jprichardson/node-jsonfile"
+        },
+        {
+            "projectName": "jridgewell/resolve-uri"
+        },
+        {
+            "projectName": "jridgewell/sourcemap-codec"
+        },
+        {
+            "projectName": "jridgewell/trace-mapping"
+        },
+        {
+            "projectName": "jsbizon/node-memorystream"
+        },
+        {
+            "projectName": "jscommunity/make-error"
+        },
+        {
+            "projectName": "jsdom/cssstyle"
+        },
+        {
+            "projectName": "jsdom/domexception"
+        },
+        {
+            "projectName": "jsdom/whatwg-mimetype"
+        },
+        {
+            "projectName": "jshttp/accepts"
+        },
+        {
+            "projectName": "jshttp/forwarded"
+        },
+        {
+            "projectName": "jshttp/fresh"
+        },
+        {
+            "projectName": "jshttp/methods"
+        },
+        {
+            "projectName": "jshttp/mime-db"
+        },
+        {
+            "projectName": "jshttp/on-headers"
+        },
+        {
+            "projectName": "jshttp/proxy-addr"
+        },
+        {
+            "projectName": "jshttp/range-parser"
+        },
+        {
+            "projectName": "jshttp/vary"
+        },
+        {
+            "projectName": "json5/json5"
+        },
+        {
+            "projectName": "juanelas/bigint-crypto-utils"
+        },
+        {
+            "projectName": "juliangruber/brace-expansion"
+        },
+        {
+            "projectName": "juliangruber/constants-browserify"
+        },
+        {
+            "projectName": "kaelzhang/node-ignore"
+        },
+        {
+            "projectName": "keik/merge-source-map"
+        },
+        {
+            "projectName": "keithamus/sort-package-json"
+        },
+        {
+            "projectName": "kevva/astral-regex"
+        },
+        {
+            "projectName": "kevva/dir-glob"
+        },
+        {
+            "projectName": "koichik/node-tunnel"
+        },
+        {
+            "projectName": "komagata/eastasianwidth"
+        },
+        {
+            "projectName": "kornelski/http-cache-semantics"
+        },
+        {
+            "projectName": "kriszyp/json-schema"
+        },
+        {
+            "projectName": "kriszyp/lmdb-js"
+        },
+        {
+            "projectName": "kriszyp/msgpackr"
+        },
+        {
+            "projectName": "kriszyp/msgpackr-extract"
+        },
+        {
+            "projectName": "kriszyp/weak-lru-cache"
+        },
+        {
+            "projectName": "leonardfactory/babel-plugin-transform-typescript-metadata"
+        },
+        {
+            "projectName": "leonidas-from-xiv/node-xml2js"
+        },
+        {
+            "projectName": "lerna/lerna"
+        },
+        {
+            "projectName": "libp2p/js-libp2p"
+        },
+        {
+            "projectName": "libp2p/js-libp2p-mdns"
+        },
+        {
+            "projectName": "linusu/buffer-from"
+        },
+        {
+            "projectName": "litejs/natural-compare-lite"
+        },
+        {
+            "projectName": "litomore/is-yarn-global"
+        },
+        {
+            "projectName": "ljharb/call-bind"
+        },
+        {
+            "projectName": "ljharb/define-data-property"
+        },
+        {
+            "projectName": "ljharb/es-errors"
+        },
+        {
+            "projectName": "ljharb/es-shim-unscopables"
+        },
+        {
+            "projectName": "ljharb/es-to-primitive"
+        },
+        {
+            "projectName": "ljharb/internal-slot"
+        },
+        {
+            "projectName": "ljharb/jsonify"
+        },
+        {
+            "projectName": "ljharb/qs"
+        },
+        {
+            "projectName": "ljharb/side-channel"
+        },
+        {
+            "projectName": "ljharb/unbox-primitive"
+        },
+        {
+            "projectName": "lodash/lodash"
+        },
+        {
+            "projectName": "lquixada/cross-fetch"
+        },
+        {
+            "projectName": "lukeed/mri"
+        },
+        {
+            "projectName": "lukeed/polka"
+        },
+        {
+            "projectName": "lydell/source-map-url"
+        },
+        {
+            "projectName": "mafintosh/fs-constants"
+        },
+        {
+            "projectName": "mafintosh/pump"
+        },
+        {
+            "projectName": "mafintosh/sorted-union-stream"
+        },
+        {
+            "projectName": "mafintosh/to-buffer"
+        },
+        {
+            "projectName": "majek/sockjs-client"
+        },
+        {
+            "projectName": "markdown-it/mdurl"
+        },
+        {
+            "projectName": "markedjs/marked"
+        },
+        {
+            "projectName": "mathiasbynens/cssesc"
+        },
+        {
+            "projectName": "mathiasbynens/jsesc"
+        },
+        {
+            "projectName": "mathiasbynens/regenerate"
+        },
+        {
+            "projectName": "mathieuturcotte/node-backoff"
+        },
+        {
+            "projectName": "mathieuturcotte/node-precond"
+        },
+        {
+            "projectName": "matter-labs/hardhat-zksync"
+        },
+        {
+            "projectName": "mcollina/fastq"
+        },
+        {
+            "projectName": "medikoo/es5-ext"
+        },
+        {
+            "projectName": "medikoo/es6-iterator"
+        },
+        {
+            "projectName": "medikoo/next-tick"
+        },
+        {
+            "projectName": "medikoo/timers-ext"
+        },
+        {
+            "projectName": "metamask/eth-block-tracker"
+        },
+        {
+            "projectName": "metamask/rpc-errors"
+        },
+        {
+            "projectName": "mhart/aws4"
+        },
+        {
+            "projectName": "micromark/micromark"
+        },
+        {
+            "projectName": "micromark/micromark-extension-directive"
+        },
+        {
+            "projectName": "micromark/micromark-extension-gfm"
+        },
+        {
+            "projectName": "micromark/micromark-extension-gfm-table"
+        },
+        {
+            "projectName": "micromark/micromark-extension-gfm-tagfilter"
+        },
+        {
+            "projectName": "micromatch/anymatch"
+        },
+        {
+            "projectName": "micromatch/braces"
+        },
+        {
+            "projectName": "micromatch/micromatch"
+        },
+        {
+            "projectName": "micromatch/picomatch"
+        },
+        {
+            "projectName": "micromatch/posix-character-classes"
+        },
+        {
+            "projectName": "microsoft/tsdoc"
+        },
+        {
+            "projectName": "mighdoll/config-file-ts"
+        },
+        {
+            "projectName": "mishoo/uglifyjs"
+        },
+        {
+            "projectName": "mochajs/mocha"
+        },
+        {
+            "projectName": "mongodb-js/electron-installer-fixture-windows"
+        },
+        {
+            "projectName": "mozilla/source-map"
+        },
+        {
+            "projectName": "mrmlnc/fast-glob"
+        },
+        {
+            "projectName": "mscdex/buildcheck"
+        },
+        {
+            "projectName": "multiformats/js-multiaddr"
+        },
+        {
+            "projectName": "my-archives/pbkdf2"
+        },
+        {
+            "projectName": "mysticatea/eslint-plugin-es"
+        },
+        {
+            "projectName": "mysticatea/eslint-utils"
+        },
+        {
+            "projectName": "mysticatea/npm-run-all"
+        },
+        {
+            "projectName": "napi-rs/node-rs"
+        },
+        {
+            "projectName": "naturalintelligence/strnum"
+        },
+        {
+            "projectName": "nexdrew/ansi-align"
+        },
+        {
+            "projectName": "nexdrew/which-module"
+        },
+        {
+            "projectName": "niklasvh/base64-arraybuffer"
+        },
+        {
+            "projectName": "node-fetch/fetch-blob"
+        },
+        {
+            "projectName": "node-fetch/node-fetch"
+        },
+        {
+            "projectName": "node-modules/address"
+        },
+        {
+            "projectName": "nodeca/argparse"
+        },
+        {
+            "projectName": "nodeca/js-yaml"
+        },
+        {
+            "projectName": "nodejs/nan"
+        },
+        {
+            "projectName": "nodejs/node-gyp"
+        },
+        {
+            "projectName": "nodelib/nodelib"
+        },
+        {
+            "projectName": "nomicfoundation/hardhat"
+        },
+        {
+            "projectName": "nomicfoundation/solidity-analyzer"
+        },
+        {
+            "projectName": "normalize/mz"
+        },
+        {
+            "projectName": "npm/abbrev-js"
+        },
+        {
+            "projectName": "npm/bin-links"
+        },
+        {
+            "projectName": "npm/hosted-git-info"
+        },
+        {
+            "projectName": "npm/ini"
+        },
+        {
+            "projectName": "npm/metavuln-calculator"
+        },
+        {
+            "projectName": "npm/minipass-fetch"
+        },
+        {
+            "projectName": "npm/move-file"
+        },
+        {
+            "projectName": "npm/node-gyp"
+        },
+        {
+            "projectName": "npm/node-semver"
+        },
+        {
+            "projectName": "npm/node-which"
+        },
+        {
+            "projectName": "npm/nopt"
+        },
+        {
+            "projectName": "npm/npm-normalize-package-bin"
+        },
+        {
+            "projectName": "npm/npm-package-arg"
+        },
+        {
+            "projectName": "npm/npm-registry-client"
+        },
+        {
+            "projectName": "npm/read-cmd-shim"
+        },
+        {
+            "projectName": "npm/read-package-tree"
+        },
+        {
+            "projectName": "npm/write-file-atomic"
+        },
+        {
+            "projectName": "nrwl/nx"
+        },
+        {
+            "projectName": "nstepien/iltorb"
+        },
+        {
+            "projectName": "nv/cssom"
+        },
+        {
+            "projectName": "octokit/webhooks"
+        },
+        {
+            "projectName": "omnidan/node-emoji"
+        },
+        {
+            "projectName": "onlxltd/bonjour-service"
+        },
+        {
+            "projectName": "open-draft/strict-event-emitter"
+        },
+        {
+            "projectName": "parcel-bundler/watcher"
+        },
+        {
+            "projectName": "paulmillr/micro-bmark"
+        },
+        {
+            "projectName": "paulmillr/micro-ftch"
+        },
+        {
+            "projectName": "paulmillr/noble-ciphers"
+        },
+        {
+            "projectName": "paulmillr/noble-curves"
+        },
+        {
+            "projectName": "paulmillr/noble-secp256k1"
+        },
+        {
+            "projectName": "paulmillr/readdirp"
+        },
+        {
+            "projectName": "paulmillr/scure-base"
+        },
+        {
+            "projectName": "paulmillr/scure-bip39"
+        },
+        {
+            "projectName": "pdmlab/docker-compose"
+        },
+        {
+            "projectName": "pieroxy/lz-string"
+        },
+        {
+            "projectName": "pillarjs/finalhandler"
+        },
+        {
+            "projectName": "pillarjs/parseurl"
+        },
+        {
+            "projectName": "pimterry/loglevel"
+        },
+        {
+            "projectName": "pinojs/pino-std-serializers"
+        },
+        {
+            "projectName": "piotrwitek/ts-mocha"
+        },
+        {
+            "projectName": "pkgjs/parseargs"
+        },
+        {
+            "projectName": "pmowrer/rollup-plugin-peer-deps-external"
+        },
+        {
+            "projectName": "polkadot-js/common"
+        },
+        {
+            "projectName": "polkadot-js/wasm"
+        },
+        {
+            "projectName": "postcss/postcss"
+        },
+        {
+            "projectName": "postcss/postcss-selector-parser"
+        },
+        {
+            "projectName": "prettier/eslint-config-prettier"
+        },
+        {
+            "projectName": "prettier/prettier-linter-helpers"
+        },
+        {
+            "projectName": "primus/eventemitter3"
+        },
+        {
+            "projectName": "pubkey/broadcast-channel"
+        },
+        {
+            "projectName": "pugjs/void-elements"
+        },
+        {
+            "projectName": "pull-stream/pull-defer"
+        },
+        {
+            "projectName": "qix-/node-error-ex"
+        },
+        {
+            "projectName": "qix-/node-is-arrayish"
+        },
+        {
+            "projectName": "qubyte/fetch-ponyfill"
+        },
+        {
+            "projectName": "radix-ui/primitives"
+        },
+        {
+            "projectName": "ralphtheninja/expand-template"
+        },
+        {
+            "projectName": "raynos/to-array"
+        },
+        {
+            "projectName": "raynos/xtend"
+        },
+        {
+            "projectName": "react-grid-layout/react-draggable"
+        },
+        {
+            "projectName": "reactjs/react-transition-group"
+        },
+        {
+            "projectName": "redux-saga/redux-saga"
+        },
+        {
+            "projectName": "rehypejs/rehype-raw"
+        },
+        {
+            "projectName": "remarkablemark/react-dom-core"
+        },
+        {
+            "projectName": "remix-run/react-router"
+        },
+        {
+            "projectName": "reown-com/appkit"
+        },
+        {
+            "projectName": "request/aws-sign"
+        },
+        {
+            "projectName": "request/caseless"
+        },
+        {
+            "projectName": "rich-harris/is-reference"
+        },
+        {
+            "projectName": "rich-harris/magic-string"
+        },
+        {
+            "projectName": "rich-harris/periscopic"
+        },
+        {
+            "projectName": "rich-harris/svg-parser"
+        },
+        {
+            "projectName": "ricmoo/scrypt-js"
+        },
+        {
+            "projectName": "rollup/plugins"
+        },
+        {
+            "projectName": "rollup/rollup"
+        },
+        {
+            "projectName": "root"
+        },
+        {
+            "projectName": "rs/node-netmask"
+        },
+        {
+            "projectName": "rvagg/archived-prr"
+        },
+        {
+            "projectName": "rvagg/node-errno"
+        },
+        {
+            "projectName": "ryanmcgrath/node-utf8"
+        },
+        {
+            "projectName": "safe-global/safe-smart-account"
+        },
+        {
+            "projectName": "samn/json-stable-stringify"
+        },
+        {
+            "projectName": "scottcorgan/tap-out"
+        },
+        {
+            "projectName": "serapath/fnjson"
+        },
+        {
+            "projectName": "sheetjs/js-crc32"
+        },
+        {
+            "projectName": "shirshak55/edge-paths"
+        },
+        {
+            "projectName": "shrpne/from-exponential"
+        },
+        {
+            "projectName": "sigstore/protobuf-specs"
+        },
+        {
+            "projectName": "siilwyn/css-declaration-sorter"
+        },
+        {
+            "projectName": "silentcicero/is-hex-prefixed"
+        },
+        {
+            "projectName": "silentcicero/number-to-bn"
+        },
+        {
+            "projectName": "silentcicero/strip-hex-prefix"
+        },
+        {
+            "projectName": "sindresorhus/aggregate-error"
+        },
+        {
+            "projectName": "sindresorhus/array-differ"
+        },
+        {
+            "projectName": "sindresorhus/array-find-index"
+        },
+        {
+            "projectName": "sindresorhus/array-union"
+        },
+        {
+            "projectName": "sindresorhus/builtin-modules"
+        },
+        {
+            "projectName": "sindresorhus/caller-callsite"
+        },
+        {
+            "projectName": "sindresorhus/cli-truncate"
+        },
+        {
+            "projectName": "sindresorhus/code-point-at"
+        },
+        {
+            "projectName": "sindresorhus/component-emitter"
+        },
+        {
+            "projectName": "sindresorhus/decamelize-keys"
+        },
+        {
+            "projectName": "sindresorhus/decompress-response"
+        },
+        {
+            "projectName": "sindresorhus/define-lazy-prop"
+        },
+        {
+            "projectName": "sindresorhus/detect-newline"
+        },
+        {
+            "projectName": "sindresorhus/env-paths"
+        },
+        {
+            "projectName": "sindresorhus/escape-goat"
+        },
+        {
+            "projectName": "sindresorhus/escape-string-regexp"
+        },
+        {
+            "projectName": "sindresorhus/figures"
+        },
+        {
+            "projectName": "sindresorhus/filenamify"
+        },
+        {
+            "projectName": "sindresorhus/get-port"
+        },
+        {
+            "projectName": "sindresorhus/git-remote-origin-url"
+        },
+        {
+            "projectName": "sindresorhus/globby"
+        },
+        {
+            "projectName": "sindresorhus/got"
+        },
+        {
+            "projectName": "sindresorhus/gzip-size"
+        },
+        {
+            "projectName": "sindresorhus/import-fresh"
+        },
+        {
+            "projectName": "sindresorhus/imul"
+        },
+        {
+            "projectName": "sindresorhus/is"
+        },
+        {
+            "projectName": "sindresorhus/is-binary-path"
+        },
+        {
+            "projectName": "sindresorhus/is-docker"
+        },
+        {
+            "projectName": "sindresorhus/is-fn"
+        },
+        {
+            "projectName": "sindresorhus/is-generator-fn"
+        },
+        {
+            "projectName": "sindresorhus/is-npm"
+        },
+        {
+            "projectName": "sindresorhus/is-path-inside"
+        },
+        {
+            "projectName": "sindresorhus/is-stream"
+        },
+        {
+            "projectName": "sindresorhus/ky"
+        },
+        {
+            "projectName": "sindresorhus/make-dir"
+        },
+        {
+            "projectName": "sindresorhus/map-obj"
+        },
+        {
+            "projectName": "sindresorhus/markdown-extensions"
+        },
+        {
+            "projectName": "sindresorhus/matcher"
+        },
+        {
+            "projectName": "sindresorhus/multimatch"
+        },
+        {
+            "projectName": "sindresorhus/number-is-nan"
+        },
+        {
+            "projectName": "sindresorhus/object-assign"
+        },
+        {
+            "projectName": "sindresorhus/os-tmpdir"
+        },
+        {
+            "projectName": "sindresorhus/p-cancelable"
+        },
+        {
+            "projectName": "sindresorhus/p-is-promise"
+        },
+        {
+            "projectName": "sindresorhus/p-limit"
+        },
+        {
+            "projectName": "sindresorhus/p-locate"
+        },
+        {
+            "projectName": "sindresorhus/p-pipe"
+        },
+        {
+            "projectName": "sindresorhus/p-reduce"
+        },
+        {
+            "projectName": "sindresorhus/p-timeout"
+        },
+        {
+            "projectName": "sindresorhus/parse-json"
+        },
+        {
+            "projectName": "sindresorhus/path-type"
+        },
+        {
+            "projectName": "sindresorhus/quick-lru"
+        },
+        {
+            "projectName": "sindresorhus/read-package-up"
+        },
+        {
+            "projectName": "sindresorhus/read-pkg"
+        },
+        {
+            "projectName": "sindresorhus/redent"
+        },
+        {
+            "projectName": "sindresorhus/responselike"
+        },
+        {
+            "projectName": "sindresorhus/serialize-error"
+        },
+        {
+            "projectName": "sindresorhus/shebang-regex"
+        },
+        {
+            "projectName": "sindresorhus/srcset"
+        },
+        {
+            "projectName": "sindresorhus/string-width"
+        },
+        {
+            "projectName": "sindresorhus/strip-bom"
+        },
+        {
+            "projectName": "sindresorhus/strip-json-comments"
+        },
+        {
+            "projectName": "sindresorhus/timed-out"
+        },
+        {
+            "projectName": "sindresorhus/to-fast-properties"
+        },
+        {
+            "projectName": "sindresorhus/trim-newlines"
+        },
+        {
+            "projectName": "sindresorhus/trim-repeated"
+        },
+        {
+            "projectName": "sindresorhus/type-fest"
+        },
+        {
+            "projectName": "sindresorhus/untildify"
+        },
+        {
+            "projectName": "sindresorhus/url-parse-lax"
+        },
+        {
+            "projectName": "sokra/modules-webpack"
+        },
+        {
+            "projectName": "sonarsource/sonarjs"
+        },
+        {
+            "projectName": "spdy-http2/http-deceiver"
+        },
+        {
+            "projectName": "spdy-http2/node-spdy"
+        },
+        {
+            "projectName": "square/find-yarn-workspace-root"
+        },
+        {
+            "projectName": "stablelib/stablelib"
+        },
+        {
+            "projectName": "standard-things/esm"
+        },
+        {
+            "projectName": "standard/eslint-config-standard"
+        },
+        {
+            "projectName": "staylor/react-helmet-async"
+        },
+        {
+            "projectName": "stevemao/promise-to-callback"
+        },
+        {
+            "projectName": "steveukx/git-js"
+        },
+        {
+            "projectName": "stream-utils/unpipe"
+        },
+        {
+            "projectName": "streamich/memfs"
+        },
+        {
+            "projectName": "streetsidesoftware/cspell-dicts"
+        },
+        {
+            "projectName": "suguru03/neo-async"
+        },
+        {
+            "projectName": "superchupudev/tinyglobby"
+        },
+        {
+            "projectName": "swc-project/swc"
+        },
+        {
+            "projectName": "syntax-tree/hast-util-parse-selector"
+        },
+        {
+            "projectName": "syntax-tree/hast-util-to-text"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-definitions"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-find-and-replace"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-gfm-autolink-literal"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-gfm-table"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-gfm-task-list-item"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-mdx"
+        },
+        {
+            "projectName": "syntax-tree/mdast-util-to-markdown"
+        },
+        {
+            "projectName": "szmarczak/cacheable-lookup"
+        },
+        {
+            "projectName": "szmarczak/defer-to-connect"
+        },
+        {
+            "projectName": "szmarczak/http-timer"
+        },
+        {
+            "projectName": "szmarczak/resolve-alpn"
+        },
+        {
+            "projectName": "tad-lispy/node-damerau-levenshtein"
+        },
+        {
+            "projectName": "tanstack/query"
+        },
+        {
+            "projectName": "tapjs/signal-exit"
+        },
+        {
+            "projectName": "tarruda/has"
+        },
+        {
+            "projectName": "taylorhakes/fecha"
+        },
+        {
+            "projectName": "teambition/merge2"
+        },
+        {
+            "projectName": "terser/html-minifier-terser"
+        },
+        {
+            "projectName": "testing-library/react-testing-library"
+        },
+        {
+            "projectName": "thekashey/aria-hidden"
+        },
+        {
+            "projectName": "thekashey/react-remove-scroll-bar"
+        },
+        {
+            "projectName": "theupdateframework/tuf-js"
+        },
+        {
+            "projectName": "thlorenz/brace"
+        },
+        {
+            "projectName": "thlorenz/convert-source-map"
+        },
+        {
+            "projectName": "thlorenz/exorcist"
+        },
+        {
+            "projectName": "thlorenz/parse-link-header"
+        },
+        {
+            "projectName": "thysultan/stylis"
+        },
+        {
+            "projectName": "timoxley/columnify"
+        },
+        {
+            "projectName": "tinylibs/tinybench"
+        },
+        {
+            "projectName": "tinylibs/tinypool"
+        },
+        {
+            "projectName": "tinylibs/tinyrainbow"
+        },
+        {
+            "projectName": "tj/ejs"
+        },
+        {
+            "projectName": "tj/node-cookie-signature"
+        },
+        {
+            "projectName": "tjfontaine/node-path-platform"
+        },
+        {
+            "projectName": "tjmehta/is-circular"
+        },
+        {
+            "projectName": "tootallnate/node-agent-base"
+        },
+        {
+            "projectName": "tootallnate/node-pac-proxy-agent"
+        },
+        {
+            "projectName": "tootallnate/node-proxy-agent"
+        },
+        {
+            "projectName": "tootallnate/proxy-agents"
+        },
+        {
+            "projectName": "TooTallNate/proxy-agents"
+        },
+        {
+            "projectName": "toyobayashi/emnapi"
+        },
+        {
+            "projectName": "toyobayashi/wasm-util"
+        },
+        {
+            "projectName": "trentm/node-dashdash"
+        },
+        {
+            "projectName": "TritonDataCenter/node-asn1"
+        },
+        {
+            "projectName": "troygoode/node-require-directory"
+        },
+        {
+            "projectName": "tsconfig/bases"
+        },
+        {
+            "projectName": "typedoc2md/typedoc-plugin-markdown"
+        },
+        {
+            "projectName": "typescript-eslint/typescript-eslint"
+        },
+        {
+            "projectName": "typestrong/ts-node"
+        },
+        {
+            "projectName": "typestrong/tsconfig"
+        },
+        {
+            "projectName": "typicode/husky"
+        },
+        {
+            "projectName": "unindented/custom-jquery-matchers"
+        },
+        {
+            "projectName": "Uniswap/solidity-lib"
+        },
+        {
+            "projectName": "unjs/jiti"
+        },
+        {
+            "projectName": "unjs/node-fetch-native"
+        },
+        {
+            "projectName": "unjs/std-env"
+        },
+        {
+            "projectName": "unjs/unstorage"
+        },
+        {
+            "projectName": "unshiftio/url-parse"
+        },
+        {
+            "projectName": "vercel/webpack-asset-relocator-loader"
+        },
+        {
+            "projectName": "VictorTaelin/eth-lib"
+        },
+        {
+            "projectName": "VictorTaelin/swarm-js"
+        },
+        {
+            "projectName": "vigour-io/colors-browserify"
+        },
+        {
+            "projectName": "vweevers/module-error"
+        },
+        {
+            "projectName": "walletconnect/walletconnect-utils"
+        },
+        {
+            "projectName": "wayfind/is-utf8"
+        },
+        {
+            "projectName": "web3/web3.js"
+        },
+        {
+            "projectName": "webdriverio-community/node-edgedriver"
+        },
+        {
+            "projectName": "webdriverio/query-selector-shadow-dom"
+        },
+        {
+            "projectName": "webdriverio/webdriverio"
+        },
+        {
+            "projectName": "webmodules/custom-event"
+        },
+        {
+            "projectName": "webpack-contrib/copy-webpack-plugin"
+        },
+        {
+            "projectName": "webpack-contrib/css-minimizer-webpack-plugin"
+        },
+        {
+            "projectName": "webpack-contrib/mini-css-extract-plugin"
+        },
+        {
+            "projectName": "webpack-contrib/sass-loader"
+        },
+        {
+            "projectName": "webpack-contrib/terser-webpack-plugin"
+        },
+        {
+            "projectName": "webpack-contrib/webpack-bundle-analyzer"
+        },
+        {
+            "projectName": "webpack/webpack-cli"
+        },
+        {
+            "projectName": "webpack/webpack-dev-middleware"
+        },
+        {
+            "projectName": "webreflection/html-escaper"
+        },
+        {
+            "projectName": "websockets/ws"
+        },
+        {
+            "projectName": "welch/tdigest"
+        },
+        {
+            "projectName": "wighawag/hardhat-deploy"
+        },
+        {
+            "projectName": "winstonjs/winston-transport"
+        },
+        {
+            "projectName": "wooorm/ccount"
+        },
+        {
+            "projectName": "wooorm/character-entities-html4"
+        },
+        {
+            "projectName": "wooorm/emoticon"
+        },
+        {
+            "projectName": "xtuc/acorn-import-attributes"
+        },
+        {
+            "projectName": "xtuc/webassemblyjs"
+        },
+        {
+            "projectName": "yahoo/serialize-javascript"
+        },
+        {
+            "projectName": "yargs/set-blocking"
+        },
+        {
+            "projectName": "yargs/yargs"
+        },
+        {
+            "projectName": "yargs/yargs-parser"
+        },
+        {
+            "projectName": "yargs/yargs-unparser"
+        },
+        {
+            "projectName": "yomguithereal/mnemonist"
+        },
+        {
+            "projectName": "yomguithereal/obliterator"
+        },
+        {
+            "projectName": "YuzuJS/setImmediate"
+        },
+        {
+            "projectName": "zaraldev/native-request"
+        },
+        {
+            "projectName": "zertosh/invariant"
+        },
+        {
+            "projectName": "zhipeng-jia/snappyjs"
+        },
+        {
+            "projectName": "zkat/genfun"
+        },
+        {
+            "projectName": "zkat/npm-pick-manifest"
+        },
+        {
+            "projectName": "zloirock/core-js"
+        },
+        {
+            "projectName": "zly201/js-sdsl"
+        }
+    ],
+    "edges": [
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "jridgewell/sourcemap-codec",
+            "weight": 0.026121086189393065
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "lukeed/polka",
+            "weight": 0.020168186654026168
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "kriszyp/msgpackr",
+            "weight": 0.014237104475840638
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "paulmillr/noble-ciphers",
+            "weight": 0.006851543715996861
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "inspect-js/available-typed-arrays",
+            "weight": 0.035946823439927306
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "mafintosh/pump",
+            "weight": 0.009132032384835825
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "pieroxy/lz-string",
+            "weight": 0.016642434637034298
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "superchupudev/tinyglobby",
+            "weight": 0.013534375120197523
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "rs/node-netmask",
+            "weight": 0.0025167221883795523
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "hejny/locate-app",
+            "weight": 0.026709232101689427
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "paulmillr/micro-bmark",
+            "weight": 0.035563197786374796
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "feross/fromentries",
+            "weight": 0.013730559610501665
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "sonarsource/sonarjs",
+            "weight": 0.012700840995286601
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "rollup/plugins",
+            "weight": 0.02128391541355337
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "YuzuJS/setImmediate",
+            "weight": 0.04413693709104792
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "calvinmetcalf/immediate",
+            "weight": 0.02581844799598386
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "webdriverio/query-selector-shadow-dom",
+            "weight": 0.005741500339868307
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "jacksontian/streamx",
+            "weight": 0.02090173956448128
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "sindresorhus/serialize-error",
+            "weight": 0.006596959073781386
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "jridgewell/resolve-uri",
+            "weight": 0.0234435864024285
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "d3/d3-force",
+            "weight": 0.04213810149366489
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "archiverjs/node-zip-stream",
+            "weight": 0.023597933749411826
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "airbnb/babel-plugin-dynamic-import-node",
+            "weight": 0.011177934694445734
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "broofa/mime",
+            "weight": 0.026262475945620745
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "websockets/ws",
+            "weight": 0.04146083847669569
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "feross/safe-buffer",
+            "weight": 0.04408815292249978
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "actions/toolkit",
+            "weight": 0.0056968596698221755
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "http-party/node-http-proxy",
+            "weight": 0.02428616368016524
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "cimi/murmurhash3js-revisited",
+            "weight": 0.022014862372693733
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "css-modules/postcss-modules-local-by-default",
+            "weight": 0.01990557940427805
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "webpack-contrib/copy-webpack-plugin",
+            "weight": 0.03647645148583529
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "csstree/csstree",
+            "weight": 0.018570459758962425
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "syntax-tree/mdast-util-gfm-table",
+            "weight": 0.00024123135734031406
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "sindresorhus/define-lazy-prop",
+            "weight": 0.041157554917611486
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "npm/npm-normalize-package-bin",
+            "weight": 0.039571960159235794
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "paulmillr/noble-secp256k1",
+            "weight": 0.00876209355259573
+        },
+        {
+            "source": "Arachnid/eth-ens-namehash",
+            "target": "rich-harris/periscopic",
+            "weight": 0.022561994422255854
+        },
+        {
+            "source": "babel/babel",
+            "target": "eslint-community/eslint-utils",
+            "weight": 0.0007032600918515573
+        },
+        {
+            "source": "babel/babel",
+            "target": "micromatch/picomatch",
+            "weight": 0.022233389113775384
+        },
+        {
+            "source": "babel/babel",
+            "target": "typescript-eslint/typescript-eslint",
+            "weight": 0.023301069961781426
+        },
+        {
+            "source": "babel/babel",
+            "target": "sindresorhus/path-type",
+            "weight": 0.026635344817414627
+        },
+        {
+            "source": "babel/babel",
+            "target": "centralnicgroup-opensource/rtldev-middleware-idna-uts46",
+            "weight": 0.007179893495160742
+        },
+        {
+            "source": "babel/babel",
+            "target": "jaredwray/cacheable",
+            "weight": 0.005568016653331015
+        },
+        {
+            "source": "babel/babel",
+            "target": "sindresorhus/decompress-response",
+            "weight": 0.0071124213923031854
+        },
+        {
+            "source": "babel/babel",
+            "target": "kevva/dir-glob",
+            "weight": 0.002103979058918654
+        },
+        {
+            "source": "babel/babel",
+            "target": "stream-utils/unpipe",
+            "weight": 0.02271167497844033
+        },
+        {
+            "source": "babel/babel",
+            "target": "mathiasbynens/regenerate",
+            "weight": 0.015220038543087802
+        },
+        {
+            "source": "babel/babel",
+            "target": "nodelib/nodelib",
+            "weight": 0.016831604888038677
+        },
+        {
+            "source": "babel/babel",
+            "target": "sindresorhus/timed-out",
+            "weight": 0.006797965361135046
+        },
+        {
+            "source": "babel/babel",
+            "target": "expressjs/express",
+            "weight": 0.002017391240963076
+        },
+        {
+            "source": "babel/babel",
+            "target": "streetsidesoftware/cspell-dicts",
+            "weight": 0.024388762943784916
+        },
+        {
+            "source": "babel/babel",
+            "target": "rollup/rollup",
+            "weight": 0.0036419107102226467
+        },
+        {
+            "source": "babel/babel",
+            "target": "istanbuljs/test-exclude",
+            "weight": 0.01979505355926377
+        },
+        {
+            "source": "babel/babel",
+            "target": "sindresorhus/p-cancelable",
+            "weight": 0.004854200175262717
+        },
+        {
+            "source": "babel/babel",
+            "target": "polkadot-js/common",
+            "weight": 0.025570495926295157
+        },
+        {
+            "source": "babel/babel",
+            "target": "tootallnate/node-proxy-agent",
+            "weight": 0.028286830294296773
+        },
+        {
+            "source": "babel/babel",
+            "target": "welch/tdigest",
+            "weight": 0.007641069927207871
+        },
+        {
+            "source": "babel/babel",
+            "target": "zhipeng-jia/snappyjs",
+            "weight": 0.02545858530028736
+        },
+        {
+            "source": "babel/babel",
+            "target": "grncdr/merge-stream",
+            "weight": 0.008484830635650845
+        },
+        {
+            "source": "babel/babel",
+            "target": "fregante/eslint-formatters",
+            "weight": 0.012124006134185232
+        },
+        {
+            "source": "babel/babel",
+            "target": "open-draft/strict-event-emitter",
+            "weight": 0.013441871336177249
+        },
+        {
+            "source": "babel/babel",
+            "target": "webdriverio-community/node-edgedriver",
+            "weight": 0.0045826606243300925
+        },
+        {
+            "source": "babel/babel",
+            "target": "tootallnate/node-agent-base",
+            "weight": 0.027614701865615918
+        },
+        {
+            "source": "babel/babel",
+            "target": "emn178/js-sha3",
+            "weight": 0.020144052142379177
+        },
+        {
+            "source": "babel/babel",
+            "target": "archiverjs/archiver-utils",
+            "weight": 0.006466150582263429
+        },
+        {
+            "source": "babel/babel",
+            "target": "es-shims/object-is",
+            "weight": 0.0001301907909530886
+        },
+        {
+            "source": "babel/babel",
+            "target": "es-shims/es-object-atoms",
+            "weight": 0.009173763718398216
+        },
+        {
+            "source": "babel/babel",
+            "target": "jpommerening/node-lazystream",
+            "weight": 0.007099542401256548
+        },
+        {
+            "source": "babel/babel",
+            "target": "tinylibs/tinyrainbow",
+            "weight": 0.009501676122118366
+        },
+        {
+            "source": "babel/babel",
+            "target": "kriszyp/weak-lru-cache",
+            "weight": 0.021683109316190167
+        },
+        {
+            "source": "babel/babel",
+            "target": "browserify/events",
+            "weight": 0.009669974974493
+        },
+        {
+            "source": "babel/babel",
+            "target": "webdriverio/webdriverio",
+            "weight": 0.02788357612391814
+        },
+        {
+            "source": "babel/babel",
+            "target": "facebook/react",
+            "weight": 0.012363319042872491
+        },
+        {
+            "source": "babel/babel",
+            "target": "inspect-js/is-data-view",
+            "weight": 0.007966197294896551
+        },
+        {
+            "source": "babel/babel",
+            "target": "multiformats/js-multiaddr",
+            "weight": 0.00019478139145359276
+        },
+        {
+            "source": "babel/babel",
+            "target": "sindresorhus/ky",
+            "weight": 0.029034804340355946
+        },
+        {
+            "source": "babel/babel",
+            "target": "ariya/esprima",
+            "weight": 0.025324773413511872
+        },
+        {
+            "source": "babel/babel",
+            "target": "sindresorhus/make-dir",
+            "weight": 0.011503268354038632
+        },
+        {
+            "source": "babel/babel",
+            "target": "szmarczak/http-timer",
+            "weight": 0.006937958721664188
+        },
+        {
+            "source": "babel/babel",
+            "target": "feross/buffer",
+            "weight": 0.004888607498261285
+        },
+        {
+            "source": "babel/babel",
+            "target": "kriszyp/lmdb-js",
+            "weight": 0.02711620631274174
+        },
+        {
+            "source": "babel/babel",
+            "target": "acornjs/acorn-jsx",
+            "weight": 0.019910412954150008
+        },
+        {
+            "source": "babel/babel",
+            "target": "markdown-it/mdurl",
+            "weight": 0.021289187406284563
+        },
+        {
+            "source": "babel/babel",
+            "target": "inspect-js/data-view-buffer",
+            "weight": 0.015983963778315388
+        },
+        {
+            "source": "babel/babel",
+            "target": "isaacs/jackspeak",
+            "weight": 0.02520161226908704
+        },
+        {
+            "source": "babel/babel",
+            "target": "ljharb/internal-slot",
+            "weight": 0.008495102919199235
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "silentcicero/number-to-bn",
+            "weight": 0.03442856429108654
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "qix-/node-error-ex",
+            "weight": 0.028678298855895776
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "sindresorhus/multimatch",
+            "weight": 0.024911884072808442
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "goto-bus-stop/shasum-object",
+            "weight": 0.00997640706832056
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "troygoode/node-require-directory",
+            "weight": 0.02801040223918731
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "streamich/memfs",
+            "weight": 0.0032002895929696185
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "micromark/micromark-extension-gfm",
+            "weight": 0.0049700231629792955
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "gregberge/svgr",
+            "weight": 0.02906375808290533
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "VictorTaelin/swarm-js",
+            "weight": 0.03893013810704644
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "unshiftio/url-parse",
+            "weight": 0.036111127532662594
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "jonschlinkert/is-relative",
+            "weight": 0.03069008291889986
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "isaacs/dezalgo",
+            "weight": 0.03360128928705499
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "floating-ui/floating-ui",
+            "weight": 0.013118227318659128
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "here-be/snapdragon",
+            "weight": 0.021440289934678215
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "nexdrew/which-module",
+            "weight": 0.052456765163060484
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "pull-stream/pull-defer",
+            "weight": 0.01835404614961085
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "jonschlinkert/window-size",
+            "weight": 0.0530321046146036
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "yargs/yargs",
+            "weight": 0.007510386203286018
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "jonschlinkert/repeat-element",
+            "weight": 0.05971150106962137
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "ethers-io/ethers.js",
+            "weight": 0.01416129574396417
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "babel/babelify",
+            "weight": 0.00023113448619814349
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "silentcicero/strip-hex-prefix",
+            "weight": 0.004328711786125474
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "isaacs/minimatch",
+            "weight": 0.05352439943899947
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "sindresorhus/url-parse-lax",
+            "weight": 0.003302441617641849
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "dougwilson/nodejs-depd",
+            "weight": 0.05898257393861722
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "szmarczak/resolve-alpn",
+            "weight": 0.04836398500810583
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "npm/nopt",
+            "weight": 0.04502716671334451
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "dethcrypto/TypeChain",
+            "weight": 0.02222514828495452
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "chaijs/deep-eql",
+            "weight": 0.05197131195523812
+        },
+        {
+            "source": "blockchainsllc/in3-legacy",
+            "target": "browserify/browserify-aes",
+            "weight": 0.05833890070055749
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "fsevents/fsevents",
+            "weight": 0.0318831206104467
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "sindresorhus/p-timeout",
+            "weight": 0.01817544424750657
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "dperini/nwsapi",
+            "weight": 0.04616570253245213
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "estools/estraverse",
+            "weight": 0.01175889870276014
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "image-size/image-size",
+            "weight": 0.05269562171938243
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "reactjs/react-transition-group",
+            "weight": 0.05676485187164217
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "hughsk/is-typedarray",
+            "weight": 0.04660787698874012
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "feross/simple-get",
+            "weight": 0.050415539134072276
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "litejs/natural-compare-lite",
+            "weight": 0.014544078799678112
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "jfsiii/d3-color",
+            "weight": 0.006772146290545307
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "ethereumjs/eth-query",
+            "weight": 0.027485063748985027
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "ljharb/jsonify",
+            "weight": 0.054081471603949396
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "inspect-js/is-negative-zero",
+            "weight": 0.0009956028369743728
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "syntax-tree/mdast-util-gfm-autolink-literal",
+            "weight": 0.05050666898270017
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "jestjs/jest",
+            "weight": 0.02451752090703804
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "microsoft/tsdoc",
+            "weight": 0.04968815655595222
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "micromark/micromark-extension-gfm-table",
+            "weight": 0.018010635305465924
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "raynos/to-array",
+            "weight": 0.05316066334640507
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "syntax-tree/mdast-util-find-and-replace",
+            "weight": 0.05309896689609622
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "ljharb/es-to-primitive",
+            "weight": 0.017416071567956996
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "sindresorhus/escape-goat",
+            "weight": 0.005650121509898449
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "sindresorhus/is-binary-path",
+            "weight": 0.05950134277701814
+        },
+        {
+            "source": "calvinmetcalf/process-nextick-args",
+            "target": "facebook/docusaurus",
+            "weight": 0.06345223406071393
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "alexcrist/json-to-pretty-yaml",
+            "weight": 0.00014357341661326722
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "unjs/jiti",
+            "weight": 8.422187467912597e-7
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "isaacs/treeverse",
+            "weight": 0.00019210580635925127
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "prettier/eslint-config-prettier",
+            "weight": 0.00012221711306994152
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "yargs/yargs-unparser",
+            "weight": 0.0002416578838516386
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "micromark/micromark-extension-gfm-tagfilter",
+            "weight": 0.0002788145535554321
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "stablelib/stablelib",
+            "weight": 0.000007576016714297884
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "es-shims/es-set-tostringtag",
+            "weight": 0.00005741842087242942
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "syntax-tree/mdast-util-definitions",
+            "weight": 0.00011769811511090962
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "tjmehta/is-circular",
+            "weight": 0.0003134242717061027
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "jsbizon/node-memorystream",
+            "weight": 0.0003366587270823125
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "mighdoll/config-file-ts",
+            "weight": 0.0003113187107437495
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "scottcorgan/tap-out",
+            "weight": 0.0002938984892535227
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "sindresorhus/code-point-at",
+            "weight": 0.0002814664084596729
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "eps1lon/dom-accessibility-api",
+            "weight": 0.000254082423771882
+        },
+        {
+            "source": "chaijs/chai-as-promised",
+            "target": "inspect-js/has-symbols",
+            "weight": 0.000067239805972684
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "tsconfig/bases",
+            "weight": 0.009189456848530491
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "janl/node-jsonpointer",
+            "weight": 0.004638553236173398
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "consensys/teku",
+            "weight": 0.008859128627386251
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "colorjs/color-name",
+            "weight": 0.0017330638769051557
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "epoberezkin/json-schema-traverse",
+            "weight": 0.005700280040594992
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "epoberezkin/fast-json-stable-stringify",
+            "weight": 0.0021599725118202477
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "isaacs/inherits",
+            "weight": 0.0030512444055403373
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "safe-global/safe-smart-account",
+            "weight": 0.010050043380526242
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "nomicfoundation/solidity-analyzer",
+            "weight": 0.004501533258733567
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "indutny/minimalistic-crypto-utils",
+            "weight": 0.0018769846664917708
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "micromatch/anymatch",
+            "weight": 0.009642743931967986
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "kevva/astral-regex",
+            "weight": 0.009849713710143706
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jonschlinkert/kind-of",
+            "weight": 0.004090774146508918
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "szmarczak/cacheable-lookup",
+            "weight": 0.0027519898480651366
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "isaacs/minipass",
+            "weight": 0.0013646487007892315
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "ethjs/ethjs-util",
+            "weight": 0.006696333599898044
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "isaacs/path-scurry",
+            "weight": 0.007960586849686032
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "ricmoo/scrypt-js",
+            "weight": 0.002404472269966712
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jprichardson/node-death",
+            "weight": 0.005384788277247426
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "eslint/eslint",
+            "weight": 0.0053706836954891795
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jridgewell/trace-mapping",
+            "weight": 0.008988543600955265
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "75lb/typical",
+            "weight": 0.0009613042442606926
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "yomguithereal/obliterator",
+            "weight": 0.0024861962625790756
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "gulpjs/rechoir",
+            "weight": 0.0014729672123668216
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "pkgjs/parseargs",
+            "weight": 0.006746635304406643
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "feross/run-parallel",
+            "weight": 0.0013377569292198374
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "prettier/prettier-linter-helpers",
+            "weight": 0.0034662794007339595
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "component/toidentifier",
+            "weight": 0.008733840879683884
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jensyt/imurmurhash-js",
+            "weight": 0.0005208522465214552
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "sindresorhus/is",
+            "weight": 0.0053516005087977415
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "nomicfoundation/hardhat",
+            "weight": 0.00240093107147383
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "npm/abbrev-js",
+            "weight": 0.002861168448879814
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "silentcicero/is-hex-prefixed",
+            "weight": 0.006925530308096592
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "ethereum/remix-project",
+            "weight": 0.008213286175586488
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "ardatan/whatwg-node",
+            "weight": 0.004833492286602014
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "goto-bus-stop/estree-is-member-expression",
+            "weight": 0.006662066570976263
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jonschlinkert/expand-tilde",
+            "weight": 0.0005093799851760479
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "fitzgen/glob-to-regexp",
+            "weight": 0.007822269154089855
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "unjs/node-fetch-native",
+            "weight": 0.009272211737883998
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jonschlinkert/parse-filepath",
+            "weight": 0.004790801103514348
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "browserify/stream-splicer",
+            "weight": 0.0005721125052605083
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "chalk/strip-ansi",
+            "weight": 0.0023711424961287433
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "sindresorhus/import-fresh",
+            "weight": 0.009761516170558635
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "IonicaBizau/parse-path",
+            "weight": 0.008735252679865529
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "holepunchto/bare-os",
+            "weight": 0.00909792571089968
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "cure53/dompurify",
+            "weight": 0.007191447363072051
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "lodash/lodash",
+            "weight": 0.0013494151213469144
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "chimurai/http-proxy-middleware",
+            "weight": 0.006612131694170027
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "inspect-js/is-core-module",
+            "weight": 0.008025689263142606
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "ardatan/graphql-tools",
+            "weight": 0.008282465283566461
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "xtuc/webassemblyjs",
+            "weight": 0.0042637796976924235
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "develar/fs-extra-p",
+            "weight": 0.0016400354320999478
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "jonschlinkert/copy-descriptor",
+            "weight": 0.0002254391972494321
+        },
+        {
+            "source": "eslint/eslintrc",
+            "target": "sindresorhus/git-remote-origin-url",
+            "weight": 0.0023306527509074273
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "sindresorhus/map-obj",
+            "weight": 0.05698115700640443
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "sindresorhus/matcher",
+            "weight": 0.040690444576058825
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "evanw/esbuild",
+            "weight": 0.016521789478424836
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "jshttp/fresh",
+            "weight": 0.06379065115803524
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "euank/node-parse-numeric-range",
+            "weight": 0.07239615796074617
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "davidmarkclements/fast-safe-stringify",
+            "weight": 0.0474270538281035
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "tinylibs/tinypool",
+            "weight": 0.033876833424958036
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "delvedor/find-my-way",
+            "weight": 0.04347929635478091
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "jshttp/forwarded",
+            "weight": 0.033676938539537876
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "beatgammit/deflate-js",
+            "weight": 0.01701734187956757
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "webpack/webpack-dev-middleware",
+            "weight": 0.04348054044448142
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "tinylibs/tinybench",
+            "weight": 0.05849543026647006
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "clibs/bytes",
+            "weight": 0.04033841285023785
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "feross/run-parallel-limit",
+            "weight": 0.009451872828219311
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "eomm/json-schema-resolver",
+            "weight": 0.06452740470278304
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "isaacs/minipass-collect",
+            "weight": 0.07083510816008316
+        },
+        {
+            "source": "estools/esrecurse",
+            "target": "pinojs/pino-std-serializers",
+            "weight": 0.02184932309468026
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "keik/merge-source-map",
+            "weight": 0.051616506724656105
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "onlxltd/bonjour-service",
+            "weight": 0.049541299350725675
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "npm/bin-links",
+            "weight": 0.0005430640309576656
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "mishoo/uglifyjs",
+            "weight": 0.10287866760707766
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "jonschlinkert/fill-range",
+            "weight": 0.047296226700741684
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "nodejs/node-gyp",
+            "weight": 0.05044937623204838
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "npm/npm-registry-client",
+            "weight": 0.06257709151418489
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "rvagg/archived-prr",
+            "weight": 0.04972975922612395
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "npm/read-package-tree",
+            "weight": 0.06065337570601074
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "pubkey/broadcast-channel",
+            "weight": 0.013362881044839847
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "tarruda/has",
+            "weight": 0.009142930559397822
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "alanshaw/get-iterator",
+            "weight": 0.04895494373159577
+        },
+        {
+            "source": "feross/is-buffer",
+            "target": "angus-c/just",
+            "weight": 0.020510310710179912
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "discoveryjs/json-ext",
+            "weight": 0.02887152402844849
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "electron-userland/electron-builder",
+            "weight": 0.010122621637692394
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "testing-library/react-testing-library",
+            "weight": 0.01356951262994431
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "browserify/publicEncrypt",
+            "weight": 0.011180837066848094
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "thysultan/stylis",
+            "weight": 0.018768343650003457
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "goto-bus-stop/dash-ast",
+            "weight": 0.026528938971288323
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "jshttp/on-headers",
+            "weight": 0.005380709657034923
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "samn/json-stable-stringify",
+            "weight": 0.025892466935293117
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "web3/web3.js",
+            "weight": 0.021100940559975613
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "nodeca/js-yaml",
+            "weight": 0.005803337308487385
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "npm/node-gyp",
+            "weight": 0.027394719959138676
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "mathieuturcotte/node-backoff",
+            "weight": 0.02329690398824057
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "fb55/domhandler",
+            "weight": 0.0002954084400901734
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "sindresorhus/builtin-modules",
+            "weight": 0.016109523115850958
+        },
+        {
+            "source": "jscommunity/make-error",
+            "target": "sindresorhus/got",
+            "weight": 0.012852734866183262
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "walletconnect/walletconnect-utils",
+            "weight": 0.008989873469521797
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "mathiasbynens/jsesc",
+            "weight": 0.010306619425963764
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "sindresorhus/p-reduce",
+            "weight": 0.007027047060031701
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "npm/read-cmd-shim",
+            "weight": 0.00032755055647974924
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "sindresorhus/trim-repeated",
+            "weight": 0.0038923781956349724
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "darsain/remove-trailing-separator",
+            "weight": 0.0017120266800589221
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "evocateur/pacote",
+            "weight": 0.005914108863299822
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "colingo/global",
+            "weight": 0.001171331697055639
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "dividab/tsconfig-paths",
+            "weight": 0.0025409895909890546
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "reown-com/appkit",
+            "weight": 0.00842711232608365
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "eemeli/safe-identifier",
+            "weight": 0.0010323279322476567
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "nexdrew/ansi-align",
+            "weight": 0.007617128789449841
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "mcollina/fastq",
+            "weight": 0.004637063905400237
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "holepunchto/b4a",
+            "weight": 0.009648446023598765
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "linusu/buffer-from",
+            "weight": 0.0015387686346003899
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "tanstack/query",
+            "weight": 0.012903235288422084
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "sindresorhus/figures",
+            "weight": 0.0029427920501116592
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "3rd-eden/diagnostics",
+            "weight": 0.013564774076532305
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "sindresorhus/is-generator-fn",
+            "weight": 0.014102960238652937
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "facebook/prop-types",
+            "weight": 0.013403253039885678
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "sindresorhus/escape-string-regexp",
+            "weight": 0.009016729021232628
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "Arachnid/eth-ens-namehash",
+            "weight": 0.007424325980856956
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "jakearchibald/idb-keyval",
+            "weight": 0.004409283008142936
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "gajus/roarr",
+            "weight": 0.0026367973430020206
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "sindresorhus/gzip-size",
+            "weight": 0.004791752373062831
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "iden3/circom_runtime",
+            "weight": 0.010003639434118486
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "typicode/husky",
+            "weight": 0.0047327886555571935
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "aceakash/string-similarity",
+            "weight": 0.008469644182898686
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "tad-lispy/node-damerau-levenshtein",
+            "weight": 0.012318934812450518
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "formatjs/formatjs",
+            "weight": 0.010894571954309687
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "ethereum/remix-plugin",
+            "weight": 0.005638809457655174
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "emotion-js/emotion",
+            "weight": 0.009465767755021543
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "facebook/fbjs",
+            "weight": 0.013906205834668532
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "jonschlinkert/isobject",
+            "weight": 0.01291562926313851
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "browserify/module-deps",
+            "weight": 0.0033291649264774645
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "gulpjs/semver-greatest-satisfied-range",
+            "weight": 0.006502612527380045
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "alexeyraspopov/picocolors",
+            "weight": 0.001262785553165733
+        },
+        {
+            "source": "kriszyp/json-schema",
+            "target": "rich-harris/is-reference",
+            "weight": 0.012054954670536836
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "unjs/unstorage",
+            "weight": 0.04755592854564504
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "juliangruber/constants-browserify",
+            "weight": 0.004991974868980642
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "billiegoose/isomorphic-textencoder",
+            "weight": 0.0613867635986566
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "vercel/webpack-asset-relocator-loader",
+            "weight": 0.004579339383380514
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "sindresorhus/decamelize-keys",
+            "weight": 0.030202758940335753
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "rehypejs/rehype-raw",
+            "weight": 0.008144280764108332
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "leonardfactory/babel-plugin-transform-typescript-metadata",
+            "weight": 0.03820091609452651
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "exogen/postinstall-build",
+            "weight": 0.021554586185966014
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "dignifiedquire/borc",
+            "weight": 0.017636986792857273
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "siilwyn/css-declaration-sorter",
+            "weight": 0.06576944888153638
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "lukeed/mri",
+            "weight": 0.008658476093110792
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "react-grid-layout/react-draggable",
+            "weight": 0.00691417519493751
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "pmowrer/rollup-plugin-peer-deps-external",
+            "weight": 0.019851302666256402
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "blakeembrey/change-case",
+            "weight": 0.016585725819302857
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "google/flatbuffers",
+            "weight": 0.027268319996974457
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "jonathanong/ee-first",
+            "weight": 0.06616605289961588
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "redux-saga/redux-saga",
+            "weight": 0.029863910570590933
+        },
+        {
+            "source": "medikoo/es6-iterator",
+            "target": "browserify/browserify-sign",
+            "weight": 0.02835519519270383
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sindresorhus/strip-json-comments",
+            "weight": 0.007835723489711042
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "request/aws-sign",
+            "weight": 0.002060918978795652
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "eslint/eslint-scope",
+            "weight": 0.00733532138700626
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "my-archives/pbkdf2",
+            "weight": 0.006730079429518947
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "Uniswap/solidity-lib",
+            "weight": 0.008904505069638557
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "mhart/aws4",
+            "weight": 0.0019634136440842683
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "ahmadnassri/node-har-validator",
+            "weight": 0.004039824151113264
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "ljharb/es-shim-unscopables",
+            "weight": 0.0018495296400456787
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "suguru03/neo-async",
+            "weight": 0.0010263996886402344
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "base-repos/base",
+            "weight": 0.008256007164267994
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "chaijs/get-func-name",
+            "weight": 0.003473033076056437
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "mathieuturcotte/node-precond",
+            "weight": 0.0049838113533608955
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "npm/ini",
+            "weight": 0.0016277680894755397
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "piotrwitek/ts-mocha",
+            "weight": 0.004915129382965818
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "rvagg/node-errno",
+            "weight": 0.005711023180392122
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "chaijs/assertion-error",
+            "weight": 0.00868881644606097
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "feross/simple-concat",
+            "weight": 0.004384719963630114
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "lydell/source-map-url",
+            "weight": 0.004429761825669661
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sindresorhus/strip-bom",
+            "weight": 0.007378733610845973
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "chalk/chalk",
+            "weight": 0.0005123490616938998
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "btd/rollup-plugin-visualizer",
+            "weight": 0.006357254906692801
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "postcss/postcss",
+            "weight": 0.005868434681215249
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "wooorm/ccount",
+            "weight": 0.007230040492547902
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "holepunchto/bare-stream",
+            "weight": 0.004004747004261389
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "inspect-js/has-bigints",
+            "weight": 0.002437609068647007
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "joshglazebrook/smart-buffer",
+            "weight": 0.00100421577210996
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sindresorhus/string-width",
+            "weight": 0.002590948549833207
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "mrmlnc/fast-glob",
+            "weight": 0.0017701185603352463
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sindresorhus/cli-truncate",
+            "weight": 0.0005260944066106383
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "isaacs/node-lru-cache",
+            "weight": 0.0076552394155531035
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "keithamus/sort-package-json",
+            "weight": 0.001727874874595569
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "achingbrain/uint8arraylist",
+            "weight": 0.006308207184237233
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "pimterry/loglevel",
+            "weight": 0.0050136777023134195
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "graphql/graphql-spec",
+            "weight": 0.005488735137643015
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "typedoc2md/typedoc-plugin-markdown",
+            "weight": 0.008267257454369625
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "eslint/js",
+            "weight": 0.00442197311958522
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sindresorhus/shebang-regex",
+            "weight": 0.006517012818312694
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "paulmillr/noble-curves",
+            "weight": 0.004667352432911623
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "istanbuljs/istanbuljs",
+            "weight": 0.006266648721158699
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "inspect-js/is-weakset",
+            "weight": 0.00032259905473796017
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "jaredwray/keyv",
+            "weight": 0.007213197726675739
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "inspect-js/typed-array-byte-offset",
+            "weight": 0.0036638150984625723
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "taylorhakes/fecha",
+            "weight": 0.007711083192587516
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "d3/d3-array",
+            "weight": 0.0022923483653733497
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "isaacs/sax-js",
+            "weight": 0.006067180781278455
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sheetjs/js-crc32",
+            "weight": 0.005447064942326974
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "jprichardson/node-jsonfile",
+            "weight": 0.00013381777567513477
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "felixge/node-require-like",
+            "weight": 0.006026526404843209
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "browserify/commonjs-assert",
+            "weight": 0.003265622768663749
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "sindresorhus/is-path-inside",
+            "weight": 0.008735631455500116
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "libp2p/js-libp2p-mdns",
+            "weight": 0.004552365249875864
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "npm/npm-package-arg",
+            "weight": 0.008102706891790773
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "unjs/std-env",
+            "weight": 0.007074116424564506
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "jpmonette/feed",
+            "weight": 0.003223005636872936
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "theupdateframework/tuf-js",
+            "weight": 0.0021839942166610336
+        },
+        {
+            "source": "mozilla/source-map",
+            "target": "ljharb/qs",
+            "weight": 0.004664118434231599
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "mongodb-js/electron-installer-fixture-windows",
+            "weight": 0.01587859712965322
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "dankogai/js-base64",
+            "weight": 0.011809890667455993
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/array-find-index",
+            "weight": 0.01863614162316668
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "jonschlinkert/right-align",
+            "weight": 0.016887096437646156
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "thlorenz/brace",
+            "weight": 0.0007882147951905158
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "cheeriojs/cheerio-select",
+            "weight": 0.015333461538532376
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/detect-newline",
+            "weight": 0.010712596893934155
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "gulpjs/vinyl-fs",
+            "weight": 0.02432456901952441
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "markedjs/marked",
+            "weight": 0.019994858686849838
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "juanelas/bigint-crypto-utils",
+            "weight": 0.02059844334632475
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "alexreardon/tiny-warning",
+            "weight": 0.009706534915463584
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/is-npm",
+            "weight": 0.002421050434382068
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "cli-table/cli-table3",
+            "weight": 0.02223101418979492
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "webpack-contrib/css-minimizer-webpack-plugin",
+            "weight": 0.017519921960073136
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "wooorm/character-entities-html4",
+            "weight": 0.014396869700537314
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "pugjs/void-elements",
+            "weight": 0.0002663176002221084
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "nv/cssom",
+            "weight": 0.023538154475699548
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "medikoo/next-tick",
+            "weight": 0.0015519788184538941
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/globby",
+            "weight": 0.02101400790637437
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "unindented/custom-jquery-matchers",
+            "weight": 0.005215338484848648
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "inspect-js/is-callable",
+            "weight": 0.006261031949823655
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/redent",
+            "weight": 0.005348397337333323
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "nstepien/iltorb",
+            "weight": 0.0166201516030941
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "mathiasbynens/cssesc",
+            "weight": 0.017050378467948303
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "empeeric/jest",
+            "weight": 0.024558583352900513
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "jakejs/jake",
+            "weight": 0.000536713524616197
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "kornelski/http-cache-semantics",
+            "weight": 0.008196295668100519
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "webmodules/custom-event",
+            "weight": 0.022113979138533777
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "ethereumjs/ethereumjs-abi",
+            "weight": 0.014466095426473074
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "yahoo/serialize-javascript",
+            "weight": 0.0150352814296991
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "joeferner/node-bplist-parser",
+            "weight": 0.0026180023324031704
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "h2non/node-os-shim",
+            "weight": 0.017667832513446162
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "jsdom/domexception",
+            "weight": 0.00025467149015574134
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "thekashey/aria-hidden",
+            "weight": 0.011722116999899867
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "yargs/yargs-parser",
+            "weight": 0.023944139768417444
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/is-fn",
+            "weight": 0.018285162970407314
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "creationix/http-parser-js",
+            "weight": 0.008333604682211254
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "stevemao/promise-to-callback",
+            "weight": 0.02104791921677875
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/caller-callsite",
+            "weight": 0.02146169101125991
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "dcastil/tailwind-merge",
+            "weight": 0.012251807929170503
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "canjs/can-globals",
+            "weight": 0.014366526106438907
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "tj/node-cookie-signature",
+            "weight": 0.01701527250673204
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "inspect-js/is-symbol",
+            "weight": 0.007178346048704432
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "isaacs/once",
+            "weight": 0.003048091849866126
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "tjfontaine/node-path-platform",
+            "weight": 0.02097034720274348
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "jbgutierrez/path-parse",
+            "weight": 0.011133379306439805
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "thekashey/react-remove-scroll-bar",
+            "weight": 0.011348275355459736
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/is-docker",
+            "weight": 0.007443887985633024
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "teambition/merge2",
+            "weight": 0.011329270017612938
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "jsdom/whatwg-mimetype",
+            "weight": 0.0027432029957406945
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "medikoo/es5-ext",
+            "weight": 0.0037342557250283678
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "istanbuljs/nyc",
+            "weight": 0.00911375749565995
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "node-modules/address",
+            "weight": 0.02464003805683306
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "paulmillr/scure-base",
+            "weight": 0.015876289155734424
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "sindresorhus/component-emitter",
+            "weight": 0.019890108577561776
+        },
+        {
+            "source": "nomicfoundation/solidity-analyzer",
+            "target": "IndigoUnited/js-deep-compact",
+            "weight": 0.0025005185850096377
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "forbeslindesay/throat",
+            "weight": 0.000018114636904431413
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "jshttp/methods",
+            "weight": 0.002516535269857806
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "metamask/eth-block-tracker",
+            "weight": 0.005379853644461825
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "isaacs/json-stringify-nice",
+            "weight": 0.0007918874111454823
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "gcanti/io-ts",
+            "weight": 0.000914366021106197
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "browserify/insert-module-globals",
+            "weight": 0.003026361403366687
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "trentm/node-dashdash",
+            "weight": 0.004600644227801333
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "rich-harris/magic-string",
+            "weight": 0.004516079210990453
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "sindresorhus/aggregate-error",
+            "weight": 0.0021971913997289702
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "micromatch/braces",
+            "weight": 0.005073522055175373
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "cthackers/adm-zip",
+            "weight": 0.0019182736225143789
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "isaacs/node-glob",
+            "weight": 0.002434998154294292
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "ds300/patch-package",
+            "weight": 0.0034239180404129475
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "sindresorhus/type-fest",
+            "weight": 0.0020922124223395886
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "dchest/tweetnacl-js",
+            "weight": 0.0028585610512377375
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "ethereum/js-ethereum-cryptography",
+            "weight": 0.004792273982979977
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "yargs/set-blocking",
+            "weight": 0.005097071692131444
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "isaacs/http-https",
+            "weight": 0.003878306003433155
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "sindresorhus/array-union",
+            "weight": 0.0024639958743107745
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "jonschlinkert/extend-shallow",
+            "weight": 0.0017542270955658783
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "TooTallNate/proxy-agents",
+            "weight": 0.0006225411188779505
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "ethereumjs/ethereumjs-block",
+            "weight": 0.002907421318018262
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "wighawag/hardhat-deploy",
+            "weight": 0.0031377667872164177
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "sindresorhus/is-stream",
+            "weight": 0.005938736181105739
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "square/find-yarn-workspace-root",
+            "weight": 0.004743555858610355
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "sindresorhus/to-fast-properties",
+            "weight": 0.0026061868822209807
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "isaacs/chownr",
+            "weight": 0.0020423600911025517
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "ethereumjs/ethereumjs-blockchain",
+            "weight": 0.0046659176896841825
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "sindresorhus/read-package-up",
+            "weight": 0.0056071465926359155
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "jshttp/mime-db",
+            "weight": 0.0017105633463154303
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "jshttp/range-parser",
+            "weight": 0.00562517876051134
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "hildjj/nofilter",
+            "weight": 0.004917479522129298
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "polkadot-js/wasm",
+            "weight": 0.0025724208309685468
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "joshuakgoldberg/ts-api-utils",
+            "weight": 0.00421752180293133
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "tootallnate/node-pac-proxy-agent",
+            "weight": 0.0027581439431793864
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "naturalintelligence/strnum",
+            "weight": 0.004849912924021643
+        },
+        {
+            "source": "npm/node-gyp",
+            "target": "kriszyp/msgpackr-extract",
+            "weight": 0.004451974151935533
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "node-fetch/node-fetch",
+            "weight": 0.009784693764782346
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "floatdrop/pinkie-promise",
+            "weight": 0.014098627599704039
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "ljharb/call-bind",
+            "weight": 0.003043565227983179
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "blockchainsllc/in3-legacy",
+            "weight": 0.0016850698306251379
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "johnagan/clean-webpack-plugin",
+            "weight": 0.0050816683888495594
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "sindresorhus/p-limit",
+            "weight": 0.011504727285499158
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "browserify/labeled-stream-splicer",
+            "weight": 0.0011090156797699882
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "nodejs/nan",
+            "weight": 0.012335277156882245
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "cryptocoinjs/secp256k1-node",
+            "weight": 0.01287800916188209
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "mochajs/mocha",
+            "weight": 0.0016116571211929032
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "sindresorhus/untildify",
+            "weight": 0.005660500936697899
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "cheeriojs/dom-serializer",
+            "weight": 0.0019000760094499284
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "radix-ui/primitives",
+            "weight": 0.008128294191042613
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "syntax-tree/hast-util-to-text",
+            "weight": 0.007396579746358199
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "jfsiii/d3-format",
+            "weight": 0.014888928313401727
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "webpack/webpack-cli",
+            "weight": 0.015891845310883574
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "dirtyhairy/async-mutex",
+            "weight": 0.009710710864569906
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "iarna/console-control-strings",
+            "weight": 0.012584306408158082
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "VictorTaelin/eth-lib",
+            "weight": 0.01044899228719373
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "npm/metavuln-calculator",
+            "weight": 0.013796359637818183
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "jonschlinkert/section-matter",
+            "weight": 0.010524223840350112
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "ariaminaei/utila",
+            "weight": 0.013898977638316422
+        },
+        {
+            "source": "pillarjs/finalhandler",
+            "target": "npm/move-file",
+            "weight": 0.013057784845535558
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "npm/minipass-fetch",
+            "weight": 0.0007940723623942583
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "octokit/webhooks",
+            "weight": 0.00702733156036351
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "dividab/tsconfig-paths-webpack-plugin",
+            "weight": 0.011498612963529784
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "syntax-tree/mdast-util-to-markdown",
+            "weight": 0.016401055132903266
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "browserify/resolve",
+            "weight": 0.0016203086869195362
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "develar/app-builder",
+            "weight": 0.01073110714743556
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "zkat/npm-pick-manifest",
+            "weight": 0.004047416111573093
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "sokra/modules-webpack",
+            "weight": 0.011341887582439527
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "szmarczak/defer-to-connect",
+            "weight": 0.012507492281719032
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "atomiks/floating-ui",
+            "weight": 0.016766552198151975
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "henningm/express-ws",
+            "weight": 0.009343072091740848
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "babel/babel-plugin-proposal-private-property-in-object",
+            "weight": 0.00559965074424821
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "primus/eventemitter3",
+            "weight": 0.015038580344584208
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "ralphtheninja/expand-template",
+            "weight": 0.012588739613406357
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "remix-run/react-router",
+            "weight": 0.003687732671383039
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "fkhadra/react-toastify",
+            "weight": 0.015529098915449275
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "editorconfig/editorconfig-core-js",
+            "weight": 0.006116080968166463
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "mysticatea/eslint-utils",
+            "weight": 0.010352106236871682
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "faye/websocket-driver-node",
+            "weight": 0.011128035787131002
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "dotansimha/graphql-code-generator",
+            "weight": 0.01549793129064452
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "tj/ejs",
+            "weight": 0.014130435877830718
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "iden3/wasmcurves",
+            "weight": 0.009208067924463449
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "jshttp/vary",
+            "weight": 0.017886539689649553
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "developit/unfetch",
+            "weight": 0.012010972782654958
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "niklasvh/base64-arraybuffer",
+            "weight": 0.00041054128068992383
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "jonschlinkert/arr-filter",
+            "weight": 0.013820558121262639
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "jonschlinkert/assign-symbols",
+            "weight": 0.007621047931792876
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "npm/hosted-git-info",
+            "weight": 0.017473130115798596
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "zly201/js-sdsl",
+            "weight": 0.0034912308467925277
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "btxtiger/change-case-all",
+            "weight": 0.01700362001105101
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "pillarjs/parseurl",
+            "weight": 0.0011954343654014678
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "chaijs/pathval",
+            "weight": 0.014271964231554938
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "flmnt/graphemer",
+            "weight": 0.014905522745189768
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "raynos/xtend",
+            "weight": 0.002888846346496555
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "ahmadnassri/mkdirp-promise",
+            "weight": 0.016461380783459198
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "thlorenz/exorcist",
+            "weight": 0.002187762727802182
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "browserify/parse-asn1",
+            "weight": 0.008690013471975901
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "vigour-io/colors-browserify",
+            "weight": 0.015828301593504443
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "lerna/lerna",
+            "weight": 0.009236546591257137
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "sindresorhus/p-is-promise",
+            "weight": 0.011407994809510021
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "webpack-contrib/webpack-bundle-analyzer",
+            "weight": 0.007998162450205822
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "ioredis/commands",
+            "weight": 0.0009276815521620985
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "parcel-bundler/watcher",
+            "weight": 0.015084474161972857
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "node-fetch/fetch-blob",
+            "weight": 0.0033576497180186934
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "sindresorhus/os-tmpdir",
+            "weight": 0.003762112520223903
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "chaijs/type-detect",
+            "weight": 0.007629435990754724
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "paulmillr/micro-ftch",
+            "weight": 0.0028525159656089807
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "sindresorhus/number-is-nan",
+            "weight": 0.010876540896131078
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "typestrong/ts-node",
+            "weight": 0.0016971414360742725
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "remarkablemark/react-dom-core",
+            "weight": 0.01366879429128846
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "elierotenberg/typed-assert",
+            "weight": 0.005300415733811603
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "ryanmcgrath/node-utf8",
+            "weight": 0.0025275638845008146
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "felixge/node-combined-stream",
+            "weight": 0.015815137584052955
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "komagata/eastasianwidth",
+            "weight": 0.006099646599548378
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "normalize/mz",
+            "weight": 0.009454016134264562
+        },
+        {
+            "source": "qix-/node-is-arrayish",
+            "target": "webpack-contrib/sass-loader",
+            "weight": 0.0057228962771712615
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "swc-project/swc",
+            "weight": 0.009808129163877343
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "davidmarkclements/rfdc",
+            "weight": 0.0024283555808016044
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "inspect-js/has-tostringtag",
+            "weight": 0.004602907301139107
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "feross/is-buffer",
+            "weight": 0.008804765407008306
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "chainsafe/lodestar",
+            "weight": 0.00310492121819231
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "spdy-http2/http-deceiver",
+            "weight": 0.008221564253396294
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "leonidas-from-xiv/node-xml2js",
+            "weight": 0.008281407083582439
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "libp2p/js-libp2p",
+            "weight": 0.009726676090373811
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "postcss/postcss-selector-parser",
+            "weight": 0.005672677735652371
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "thlorenz/convert-source-map",
+            "weight": 0.004082319496809445
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "sindresorhus/markdown-extensions",
+            "weight": 0.009155360015286964
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "webpack-contrib/mini-css-extract-plugin",
+            "weight": 0.007125763505363082
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "tootallnate/proxy-agents",
+            "weight": 0.003750038452821536
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "babel/babel-polyfills",
+            "weight": 0.0014588696466017442
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "syntax-tree/mdast-util-mdx",
+            "weight": 0.00009268866271003163
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "browserify/browserify-des",
+            "weight": 0.003074117607159512
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "lquixada/cross-fetch",
+            "weight": 0.00932358790731249
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "algolia/algoliasearch-client-javascript",
+            "weight": 0.0023485711186906704
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "napi-rs/node-rs",
+            "weight": 0.0047040159432728094
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "mysticatea/npm-run-all",
+            "weight": 0.00020491544367361246
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "holepunchto/bare-path",
+            "weight": 0.00705516207733626
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "zloirock/core-js",
+            "weight": 0.0017094996941317457
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "jsdom/cssstyle",
+            "weight": 0.006952202188841508
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "chainsafe/ssz",
+            "weight": 0.006667210014287889
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "eta-dev/eta",
+            "weight": 0.010099019617999923
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "anonrig/fast-querystring",
+            "weight": 0.009176726442884873
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "majek/sockjs-client",
+            "weight": 0.0037421152462734095
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "fb55/boolbase",
+            "weight": 0.007951881002025702
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "micromark/micromark",
+            "weight": 0.0055676712984968485
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "bnjmnt4n/regjsgen",
+            "weight": 0.003465031439643259
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "iarna/promise-inflight",
+            "weight": 0.007444813512728752
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "sindresorhus/trim-newlines",
+            "weight": 0.007843986019924776
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "chalk/wrap-ansi",
+            "weight": 0.003362570825014392
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "jshttp/proxy-addr",
+            "weight": 0.006447536954046437
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "webpack-contrib/terser-webpack-plugin",
+            "weight": 0.007966198545816757
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "npm/node-which",
+            "weight": 0.004339440868253559
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "pdmlab/docker-compose",
+            "weight": 0.0058672644298061035
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "bushong1/split-ca",
+            "weight": 0.0020425576438029454
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "sindresorhus/get-port",
+            "weight": 0.0012780150825662288
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "browserify/diffie-hellman",
+            "weight": 0.007161430140721271
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "isaacs/wrappy",
+            "weight": 0.002620247387855562
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "egeste/http-errors",
+            "weight": 0.007005527183361178
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "calvinmetcalf/minimalistic-assert",
+            "weight": 0.009704940547142578
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "sindresorhus/read-pkg",
+            "weight": 0.00763251668826819
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "cssnano/cssnano",
+            "weight": 0.009999045600128719
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "sindresorhus/parse-json",
+            "weight": 0.007325071215317492
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "chainsafe/bls-keygen",
+            "weight": 0.006152578837263764
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "achingbrain/it",
+            "weight": 0.0045576012755707265
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "xtuc/acorn-import-attributes",
+            "weight": 0.0004130348256632073
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "litomore/is-yarn-global",
+            "weight": 0.005404496606658133
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "iamkun/dayjs",
+            "weight": 0.0018088703602567133
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "staylor/react-helmet-async",
+            "weight": 0.0039641213894319295
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "chainsafe/persistent-merkle-tree",
+            "weight": 0.00008632874197123089
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "nrwl/nx",
+            "weight": 0.005266415854751027
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "inspect-js/get-symbol-description",
+            "weight": 0.010196363444387745
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "brooooooklyn/snappy",
+            "weight": 0.010012005393683876
+        },
+        {
+            "source": "qubyte/fetch-ponyfill",
+            "target": "istanbuljs-archived-repos/istanbul-lib-source-maps",
+            "weight": 0.0020511145979397057
+        },
+        {
+            "source": "root",
+            "target": "eth-infinitism/account-abstraction",
+            "weight": 0.015322253153027442
+        },
+        {
+            "source": "root",
+            "target": "eslint/eslintrc",
+            "weight": 0.05434450642457848
+        },
+        {
+            "source": "root",
+            "target": "definitelytyped/definitelytyped",
+            "weight": 0.018981186387941582
+        },
+        {
+            "source": "root",
+            "target": "estools/esrecurse",
+            "weight": 0.02887693741599938
+        },
+        {
+            "source": "root",
+            "target": "inspect-js/typed-array-byte-length",
+            "weight": 0.049959157144098515
+        },
+        {
+            "source": "root",
+            "target": "qubyte/fetch-ponyfill",
+            "weight": 0.06179074614202715
+        },
+        {
+            "source": "root",
+            "target": "pillarjs/finalhandler",
+            "weight": 0.039112890214709296
+        },
+        {
+            "source": "root",
+            "target": "ashtuchkin/iconv-lite",
+            "weight": 0.008312715478089039
+        },
+        {
+            "source": "root",
+            "target": "chriseth/browser-solidity",
+            "weight": 0.03728097504017048
+        },
+        {
+            "source": "root",
+            "target": "kriszyp/json-schema",
+            "weight": 0.0773639666802099
+        },
+        {
+            "source": "root",
+            "target": "jscommunity/make-error",
+            "weight": 0.06995852863549425
+        },
+        {
+            "source": "root",
+            "target": "mozilla/source-map",
+            "weight": 0.007008254034030249
+        },
+        {
+            "source": "root",
+            "target": "ethereumjs/ethereumjs-monorepo",
+            "weight": 0.03312897711370562
+        },
+        {
+            "source": "root",
+            "target": "jonschlinkert/arr-diff",
+            "weight": 0.0013351180549403883
+        },
+        {
+            "source": "root",
+            "target": "paulmillr/scure-bip39",
+            "weight": 0.04828804616275805
+        },
+        {
+            "source": "root",
+            "target": "qix-/node-is-arrayish",
+            "weight": 0.018359158716253716
+        },
+        {
+            "source": "root",
+            "target": "sindresorhus/quick-lru",
+            "weight": 0.05510078954066487
+        },
+        {
+            "source": "root",
+            "target": "vweevers/module-error",
+            "weight": 0.046923388044351005
+        },
+        {
+            "source": "root",
+            "target": "indutny/hmac-drbg",
+            "weight": 0.01789214579203607
+        },
+        {
+            "source": "root",
+            "target": "standard/eslint-config-standard",
+            "weight": 0.03214011603731374
+        },
+        {
+            "source": "root",
+            "target": "chaijs/chai-as-promised",
+            "weight": 0.023354380600637582
+        },
+        {
+            "source": "root",
+            "target": "calvinmetcalf/process-nextick-args",
+            "weight": 0.001151985060627445
+        },
+        {
+            "source": "root",
+            "target": "ljharb/side-channel",
+            "weight": 0.018175394623444925
+        },
+        {
+            "source": "root",
+            "target": "medikoo/es6-iterator",
+            "weight": 0.0019230891060021348
+        },
+        {
+            "source": "root",
+            "target": "babel/babel",
+            "weight": 0.07319199436032237
+        },
+        {
+            "source": "root",
+            "target": "component/escape-html",
+            "weight": 0.06853533347862538
+        },
+        {
+            "source": "root",
+            "target": "kaelzhang/node-ignore",
+            "weight": 0.07814886807841902
+        },
+        {
+            "source": "root",
+            "target": "wayfind/is-utf8",
+            "weight": 0.014039098479522005
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "npm/write-file-atomic",
+            "weight": 0.004275636194691697
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "inspect-js/is-boolean-object",
+            "weight": 0.01965913128312438
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "chainsafe/discv5",
+            "weight": 0.016270174241534367
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "bendrucker/builtin-status-codes",
+            "weight": 0.005531054649455259
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "tapjs/signal-exit",
+            "weight": 0.015968478860391846
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "cosmiconfig/cosmiconfig",
+            "weight": 0.012518103876707267
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "davidmarkclements/fast-redact",
+            "weight": 0.003760409524739652
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "micromark/micromark-extension-directive",
+            "weight": 0.00611028770542429
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "rich-harris/svg-parser",
+            "weight": 0.014855865388057185
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "algolia/autocomplete",
+            "weight": 0.01116776983630042
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "TritonDataCenter/node-asn1",
+            "weight": 0.018793543424261427
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "wooorm/emoticon",
+            "weight": 0.00441426555002692
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sigstore/protobuf-specs",
+            "weight": 0.00025087830600300284
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "zertosh/invariant",
+            "weight": 0.010971277038604824
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "dominictarr/split",
+            "weight": 0.00864927457101804
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "jonschlinkert/strip-bom-string",
+            "weight": 0.015630548745588415
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "terser/html-minifier-terser",
+            "weight": 0.01576329021538801
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "ljharb/es-errors",
+            "weight": 0.003096731542045326
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "hapijs/formula",
+            "weight": 0.013707022818412263
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "jshttp/accepts",
+            "weight": 0.01013101806669945
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "syntax-tree/mdast-util-gfm-task-list-item",
+            "weight": 0.010259348688237562
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "isaacs/minipass-flush",
+            "weight": 0.019254881998597314
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "koichik/node-tunnel",
+            "weight": 0.020131448245824128
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "isaacs/node-tar",
+            "weight": 0.00982350232479759
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sindresorhus/srcset",
+            "weight": 0.000536581030436516
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "chainsafe/swap-or-not-shuffle",
+            "weight": 0.015063419416545768
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "chainsafe/hashtree-js",
+            "weight": 0.0015218753523303444
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "standard-things/esm",
+            "weight": 0.011635167638912893
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "feross/typedarray-to-buffer",
+            "weight": 0.019420620558699378
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "paulmillr/readdirp",
+            "weight": 0.0006715672557636104
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "winstonjs/winston-transport",
+            "weight": 0.01947026478845974
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "mafintosh/fs-constants",
+            "weight": 0.01122286325310102
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "spdy-http2/node-spdy",
+            "weight": 0.008946630403393175
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "toyobayashi/emnapi",
+            "weight": 0.003779070212243668
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "json5/json5",
+            "weight": 0.01284799129906357
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "browserify/ripemd160",
+            "weight": 0.006345568765475047
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "gajus/global-agent",
+            "weight": 0.01427603410275148
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sindresorhus/array-differ",
+            "weight": 0.010526011981315581
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "conventional-changelog/conventional-changelog",
+            "weight": 0.009052152133279437
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sindresorhus/p-pipe",
+            "weight": 0.009263177555370141
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "shirshak55/edge-paths",
+            "weight": 0.0014814746354904714
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "mscdex/buildcheck",
+            "weight": 0.016312524300156606
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "toyobayashi/wasm-util",
+            "weight": 0.018380696403948363
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "jamiebuilds/react-loadable",
+            "weight": 0.010970958674094592
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "typestrong/tsconfig",
+            "weight": 0.015525473045469482
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "jfromaniello/selfsigned",
+            "weight": 0.015812222542127403
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sindresorhus/filenamify",
+            "weight": 0.008875387361161573
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sindresorhus/object-assign",
+            "weight": 0.008687625269307475
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "juliangruber/brace-expansion",
+            "weight": 0.008990026045502532
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "sindresorhus/p-locate",
+            "weight": 0.013889634394046155
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "jimmywarting/formdata",
+            "weight": 0.013171119446260853
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "debug-js/debug",
+            "weight": 0.013803787246586183
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "ionicabizau/protocols",
+            "weight": 0.010602544047528072
+        },
+        {
+            "source": "sindresorhus/quick-lru",
+            "target": "chalk/supports-color",
+            "weight": 0.01815988165988597
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "cgewecke/eth-gas-reporter",
+            "weight": 0.016869774345293534
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "sindresorhus/imul",
+            "weight": 0.01866984170597637
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "getsentry/sentry-javascript",
+            "weight": 0.01149473714810169
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "npm/node-semver",
+            "weight": 0.009997116042607735
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "sindresorhus/responselike",
+            "weight": 0.005505178502421044
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "matter-labs/hardhat-zksync",
+            "weight": 0.00801760005743542
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "estools/esutils",
+            "weight": 0.018055525522985057
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "doowb/ansi-colors",
+            "weight": 0.019348085104303355
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "gcanti/fp-ts",
+            "weight": 0.005259991720264901
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "forbeslindesay/sync-rpc",
+            "weight": 0.009491038745681614
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "mafintosh/to-buffer",
+            "weight": 0.0047129724329805335
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "nodeca/argparse",
+            "weight": 0.004746918266657059
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "omnidan/node-emoji",
+            "weight": 0.004359418613669437
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "ljharb/define-data-property",
+            "weight": 0.0004985022109526367
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "yomguithereal/mnemonist",
+            "weight": 0.006555310779133699
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "eslint/rewrite",
+            "weight": 0.009790202862041228
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "dominictarr/json-buffer",
+            "weight": 0.00430953356857098
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "request/caseless",
+            "weight": 0.019749222369101812
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "gotwarlost/istanbul",
+            "weight": 0.014572946564362376
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "thlorenz/parse-link-header",
+            "weight": 0.015321516349117437
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "shrpne/from-exponential",
+            "weight": 0.004176663506369006
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "inspect-js/is-generator-function",
+            "weight": 0.004629149367580381
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "metamask/rpc-errors",
+            "weight": 0.001742614088296408
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "syntax-tree/hast-util-parse-selector",
+            "weight": 0.014617440767525563
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "goto-bus-stop/get-assigned-identifiers",
+            "weight": 0.013201225812115526
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "micromatch/micromatch",
+            "weight": 0.015904610719774663
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "steveukx/git-js",
+            "weight": 0.015356735230954512
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "ljharb/unbox-primitive",
+            "weight": 0.015650629695856812
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "timoxley/columnify",
+            "weight": 0.006551207983566805
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "sindresorhus/env-paths",
+            "weight": 0.015418556161086975
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "webreflection/html-escaper",
+            "weight": 0.01984741929430076
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "fb55/domutils",
+            "weight": 0.01543968012213026
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "medikoo/timers-ext",
+            "weight": 0.002205463368508188
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "hildjj/node-cbor",
+            "weight": 0.017272101883401374
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "zkat/genfun",
+            "weight": 0.0033887620957432046
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "mysticatea/eslint-plugin-es",
+            "weight": 0.018988403944870728
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "micromatch/posix-character-classes",
+            "weight": 0.00789976796731985
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "expressjs/compression",
+            "weight": 0.011225112939702341
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "mafintosh/sorted-union-stream",
+            "weight": 0.003294244672253834
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "inspect-js/is-accessor-descriptor",
+            "weight": 0.0017990050475978662
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "component/is-module",
+            "weight": 0.015161982051845576
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "facebook/create-react-app",
+            "weight": 0.00874222897974669
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "serapath/fnjson",
+            "weight": 0.017552365857240897
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "zaraldev/native-request",
+            "weight": 0.0013975358355037657
+        },
+        {
+            "source": "standard/eslint-config-standard",
+            "target": "dcposch/blakejs",
+            "weight": 0.009443941434252303
+        }
+    ]
+}
