@@ -45,6 +45,12 @@
     projectChainData && isClaimed(projectChainData)
       ? projectChainData.splits.dependencies.length
       : 0;
+  $: dependenciesPercentage =
+    projectChainData && isClaimed(projectChainData)
+      ? percentFormatter.format(
+          projectChainData.splits.dependencies.reduce((sum, dep) => sum + dep.weight, 0),
+        )
+      : '0%';
   $: dependenciesStatement =
     dependenciesCount > 1
       ? `to ${dependenciesCount} dependencies`
@@ -53,6 +59,12 @@
     projectChainData && isClaimed(projectChainData)
       ? projectChainData.splits.maintainers.length
       : 0;
+  $: maintainersPercentage =
+    projectChainData && isClaimed(projectChainData)
+      ? percentFormatter.format(
+          projectChainData.splits.maintainers.reduce((sum, dep) => sum + dep.weight, 0),
+        )
+      : '0%';
   $: maintainersStatement =
     maintainersCount > 1
       ? `to ${maintainersCount} maintainers`
@@ -152,13 +164,13 @@
         {#if isClaimed(projectChainData)}
           <div>
             <DripList style="fill: var(--color-foreground)" /><strong class="ml-1 typo-text-bold"
-              >50%&nbsp;</strong
+              >{dependenciesPercentage}&nbsp;</strong
             >
             {dependenciesStatement}
           </div>
           <div>
             <User style="fill: var(--color-foreground)" /><strong class="ml-1 typo-text-bold"
-              >50%&nbsp;</strong
+              >{maintainersPercentage}&nbsp;</strong
             >
             {maintainersStatement}
           </div>
