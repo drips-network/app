@@ -201,12 +201,17 @@
     colorForegroundLevel2 = networkStyle.getPropertyValue('--color-foreground-level-2');
 
     // Can't be imported server side
-    const [{ Sigma }, { createNodeBorderProgram }, { drawDiscNodeHover, drawStraightEdgeLabel }] =
-      await Promise.all([
-        import('sigma'),
-        import('@sigma/node-border'),
-        import('./ecosystem-graph'),
-      ]);
+    const [
+      { Sigma },
+      { createNodeBorderProgram },
+      { drawDiscNodeHover, drawStraightEdgeLabel },
+      { createEdgeArrowProgram },
+    ] = await Promise.all([
+      import('sigma'),
+      import('@sigma/node-border'),
+      import('./ecosystem-graph'),
+      import('sigma/rendering'),
+    ]);
 
     graph = new Graph({ type: 'directed' });
     // TODO: bad, big error energy?
@@ -256,6 +261,8 @@
         size: 3,
         labelBackgroundColor: colorPrimary,
         label: edgeLabelFormatter.format(Number(edge.weight) * 100),
+        // minArrowSize: 5,
+        type: 'arrowed',
       });
     }
 
@@ -339,6 +346,11 @@
             },
             { size: { fill: true }, color: { attribute: 'color' } },
           ],
+        }),
+      },
+      edgeProgramClasses: {
+        arrowed: createEdgeArrowProgram({
+          widenessToThicknessRatio: 2.5,
         }),
       },
     });
