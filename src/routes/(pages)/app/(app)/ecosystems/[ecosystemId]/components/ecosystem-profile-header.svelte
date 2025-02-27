@@ -37,7 +37,6 @@
 
   export let ecosystem: Ecosystem;
   export let project: ProjectProfileHeaderFragment;
-  export let description: string | undefined = undefined;
 
   export let pendingAvatar = false;
 
@@ -59,12 +58,12 @@
         {/if}
         <ProjectBadge size="tiny" {project} forceUnclaimed tooltip={false} linkTo="external-url" />
       </div>
-      {#if description}
+      {#if ecosystem.description}
         <span
           class="typo-text-small line-clamp-2 twemoji-text"
           style:margin-top="0.25rem"
           style:color="var(--color-foreground-level-4)"
-          >{@html twemoji(description)}
+          >{@html twemoji(ecosystem.description)}
         </span>
       {/if}
     </div>

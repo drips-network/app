@@ -355,25 +355,24 @@
         </div>
       {/if}
     </header>
-    <div class="content">
-      <section id="graph">
-        <PrimaryColorThemer {colorHex}>
-          <EcosystemCardInteractive {ecosystem} isHidden={!project.isVisible} isInteractive />
-        </PrimaryColorThemer>
-      </section>
-      <section id="metadata">
-        <PrimaryColorThemer {colorHex}>
-          <EcosystemMetadata />
-        </PrimaryColorThemer>
-      </section>
-      <section id="distribution">
-        <PrimaryColorThemer {colorHex}>
-          <EcosystemDistribution />
-        </PrimaryColorThemer>
-      </section>
+    <section id="graph">
+      <PrimaryColorThemer {colorHex}>
+        <EcosystemCardInteractive {ecosystem} isHidden={!project.isVisible} isInteractive />
+      </PrimaryColorThemer>
+    </section>
+    <section id="metadata">
+      <PrimaryColorThemer {colorHex}>
+        <EcosystemMetadata />
+      </PrimaryColorThemer>
+    </section>
+    <section id="distribution">
+      <PrimaryColorThemer {colorHex}>
+        <EcosystemDistribution />
+      </PrimaryColorThemer>
+    </section>
 
-      <!-- <Developer accountId={project.account.accountId} /> -->
-      <!-- {#if isClaimed(chainData)}
+    <!-- <Developer accountId={project.account.accountId} /> -->
+    <!-- {#if isClaimed(chainData)}
         <section id="splits" class="app-section">
           <SectionHeader
             icon={DripList}
@@ -450,16 +449,15 @@
           </SectionSkeleton>
         </section>
       {/if} -->
-      <section id="support">
-        <PrimaryColorThemer {colorHex}>
-          <SupportersSection
-            bind:sectionSkeleton={supportersSectionSkeleton}
-            type="project"
-            supportItems={chainData.support}
-          />
-        </PrimaryColorThemer>
-      </section>
-    </div>
+    <section id="support">
+      <PrimaryColorThemer {colorHex}>
+        <SupportersSection
+          bind:sectionSkeleton={supportersSectionSkeleton}
+          type="project"
+          supportItems={chainData.support}
+        />
+      </PrimaryColorThemer>
+    </section>
     <aside>
       <div class="become-supporter-card">
         <SupportCard
@@ -487,13 +485,13 @@
     max-width: 100%;
   }
 
-  .content {
-    align-self: top;
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    grid-row-start: 2;
+  section {
     grid-column: span 2;
+  }
+
+  aside {
+    grid-row-start: 1;
+    grid-column-start: 2;
   }
 
   .header {
@@ -521,10 +519,6 @@
     margin-left: 0.5rem;
   }
 
-  /* .become-supporter-card {
-    top: 6rem;
-  } */
-
   .card {
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
@@ -536,22 +530,28 @@
   }
 
   @media (max-width: 1080px) {
-    .project-profile {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto auto auto;
-      gap: 3rem;
-      grid-template-areas:
-        'header'
-        'sidebar'
-        'content';
-    }
-
     .header {
       margin-bottom: 0;
     }
 
     aside {
       height: auto;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    .project-profile {
+      gap: 1.5rem;
+    }
+
+    .header {
+      grid-row-start: 1;
+      grid-column: span 2;
+    }
+
+    aside {
+      grid-row-start: 3;
+      grid-column: span 2;
     }
   }
 </style>

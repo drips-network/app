@@ -35,7 +35,7 @@
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
-  import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
+  // import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
   import EcosystemProjectCard from './ecosystem-project-card.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import { type NodeSelectionChangedPayload } from './ecosystem-graph';
@@ -149,9 +149,11 @@
         <div><User style="fill: var(--color-foreground)" />17,491</div>
         <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
       </div> -->
-      <div class="surface top-left"><SearchInput small placeholder="Search" /></div>
+      <div class="surface top-left">
+        <!-- <SearchInput small placeholder="Search" /> -->
+      </div>
       <div class="surface top-right">
-        <Button><ArrowExpand style="fill: var(--color-foreground)" />Explore in full screen</Button>
+        <Button><ArrowExpand style="fill: var(--color-foreground)" />Expand</Button>
       </div>
       {#if selectedProjectData}
         <div class="surface bottom-left" transition:fade={{ duration: 300 }}>
@@ -327,6 +329,12 @@
   @keyframes fadeIn {
     to {
       opacity: 0.3;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ecosystem-card {
+      aspect-ratio: 0.786;
     }
   }
 </style>
