@@ -45,6 +45,8 @@
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
+  let expanded: boolean = false;
+
   // let the graph decide
   let zoom: number = 1;
   let selectedProjectData:
@@ -110,9 +112,17 @@
     showProjectData(nodeId);
     return;
   }
+
+  async function handleClickExpand() {
+    expanded = !expanded;
+  }
 </script>
 
-<div class="ecosystem-card-wrapper" class:ecosystem-card-wrapper--interactive={isInteractive}>
+<div
+  class="ecosystem-card-wrapper"
+  class:ecosystem-card-wrapper--interactive={isInteractive}
+  class:expanded
+>
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" />
     <div class="graph">
@@ -153,7 +163,10 @@
         <!-- <SearchInput small placeholder="Search" /> -->
       </div>
       <div class="surface top-right">
-        <Button><ArrowExpand style="fill: var(--color-foreground)" />Expand</Button>
+        <Button on:click={handleClickExpand}>
+          <ArrowExpand style="fill: var(--color-foreground)" />
+          {expanded ? 'Collapse' : 'Expand'}
+        </Button>
       </div>
       {#if selectedProjectData}
         <div class="surface bottom-left" transition:fade={{ duration: 300 }}>
@@ -176,6 +189,12 @@
   .ecosystem-card-wrapper {
     padding: 2px 0;
     margin: -2px 0;
+    transform: translateZ(0);
+    padding-bottom: 55.3%;
+  }
+
+  .ecosystem-card-wrapper.expanded {
+    transform: none;
   }
 
   .ecosystem-card {
@@ -190,8 +209,28 @@
       box-shadow 0.2s,
       backgorund-color 0.2s,
       transform 0.2s;
-    aspect-ratio: 1.807;
+    /* aspect-ratio: 1.807; */
+
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: var(--color-background);
   }
+
+  /* .ecosystem-card.expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    aspect-ratio: auto;
+    background: white;
+    z-index: 10;
+    border-radius: 0;
+  } */
 
   /* .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
   .ecosystem-card-wrapper:focus-visible .ecosystem-card {
@@ -216,6 +255,10 @@
       var(--color-primary-level-2) 0%,
       rgba(255, 255, 255, 0) 100%
     );
+  }
+
+  .ecosystem-card-wrapper.expanded .background {
+    border-radius: 0;
   }
 
   /* .background.background--unclaimed {
@@ -247,6 +290,10 @@
     height: 100%;
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
+  }
+
+  .ecosystem-card-wrapper.expanded .graph {
+    border-radius: 0;
   }
 
   .hidden-project {
@@ -333,8 +380,25 @@
   }
 
   @media (max-width: 768px) {
-    .ecosystem-card {
+    .ecosystem-card-wrapper {
+      padding-bottom: 131.57%;
+    }
+    /* .ecosystem-card {
       aspect-ratio: 0.786;
+    } */
+
+    .surface,
+    .surface.bottom-right,
+    .surface.bottom-left {
+      display: none;
+    }
+
+    .surface.top-right {
+      display: block;
+      left: 1rem;
+      right: auto;
+      bottom: 1rem;
+      top: auto;
     }
   }
 </style>
