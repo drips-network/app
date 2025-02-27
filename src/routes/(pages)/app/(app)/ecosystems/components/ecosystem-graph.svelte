@@ -1,14 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Graph from 'graphology';
-  import forceAtlas2 from 'graphology-layout-forceatlas2';
-  import noverlap from 'graphology-layout-noverlap';
+  // import forceAtlas2 from 'graphology-layout-forceatlas2';
+  // import noverlap from 'graphology-layout-noverlap';
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import type { Attributes } from 'graphology-types';
   import { type LayoutMapping, type NodeSelectionChangedPayload } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
+  import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
     nodeSelectionChanged: NodeSelectionChangedPayload;
@@ -222,6 +223,11 @@
       const isPrimary = ecosystem.graph.edges.find(
         (e) => e.source === null && e.target === node.projectAccountId,
       );
+      const firstParentEdge = ecosystem.graph.edges.find((e) => {
+        return e.source !== null && e.target === node.projectAccountId;
+      });
+      const firstParent = firstParentEdge ? firstParentEdge.source : node.projectAccountId;
+      // console.log(firstParent, '')
       graph.addNode(node.projectAccountId, {
         color: isPrimary ? colorPrimary : colorForeground,
         labelBackgroundColor: colorBackground,
@@ -231,6 +237,9 @@
         size: isPrimary ? 16 : 8,
         borderColor: colorForeground,
         borderSize: isPrimary ? 2 : 0,
+        firstParent,
+        // repoOwner: node.repoOwner,
+        // repoName: node.repoName,
         projectName: `${node.repoOwner}/${node.repoName}`,
         isPrimary,
       });
@@ -250,40 +259,48 @@
       });
     }
 
+    const cpPositions = circlepack(graph, {
+      hierarchyAttributes: ['firstParent'],
+      scale: 2,
+      // center: 0
+    });
+
+    setPositions(graph, cpPositions);
+
     // forceAtlas2.assign(graph, 50);
 
-    const fa2Positions = forceAtlas2(graph, {
-      iterations: 50,
-      // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
-      settings: {
-        // spread nodes apart
-        // gravity: 0,
-        // take into account the size of the node when calculating
-        // layout.the
-        // adjustSizes: true,
-        // strongGravityMode: true,
-        // barnesHutOptimize: true
-        // linLogMode: true,
-        // outboundAttractionDistribution:
-        scalingRatio: 1.5,
-      },
-    });
-    // // console.log(positions)
+    // const fa2Positions = forceAtlas2(graph, {
+    //   iterations: 50,
+    //   // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
+    //   settings: {
+    //     // adjustSizes: false,
+    //     // barnesHutOptimize: false,
+    //     // barnesHutTheta: 0.5,
+    //     // edgeWeightInfluence: 1
+    //     // gravity: 1,
+    //     // linLogMode: false,
+    //     // outboundAttractionDistribution: false
+    //     // scalingRatio: 1,
+    //     // slowDown: 1,
+    //     // strongGravityMode: true,
+    //   },
+    // });
+    // // // console.log(positions)
 
-    setPositions(graph, fa2Positions);
+    // setPositions(graph, fa2Positions);
 
-    const noPositions = noverlap(graph, {
-      maxIterations: 500,
-      settings: {
-        // gridSize: 20,
-        // margin: 5,
-        // expansion: 1.1,
-        // ratio: 1.0,
-        // speed: 3
-      },
-    });
+    // const noPositions = noverlap(graph, {
+    //   maxIterations: 50,
+    //   settings: {
+    //     // gridSize: 20,
+    //     // margin: 5,
+    //     // expansion: 1.1,
+    //     // ratio: 1.0,
+    //     // speed: 3
+    //   },
+    // });
 
-    setPositions(graph, noPositions);
+    // setPositions(graph, noPositions);
 
     sigmaInstance = new Sigma(graph, graphContainer, {
       defaultNodeType: 'bordered',

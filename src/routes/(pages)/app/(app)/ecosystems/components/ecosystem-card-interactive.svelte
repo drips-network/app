@@ -220,6 +220,10 @@
     background: var(--color-background);
   }
 
+  .ecosystem-card-wrapper.expanded .ecosystem-card {
+    border-radius: 0;
+  }
+
   /* .ecosystem-card.expanded {
     position: fixed;
     top: 0;
@@ -349,7 +353,7 @@
     position: absolute;
     top: 1rem;
     left: 1rem;
-    z-index: 2;
+    z-index: 20;
   }
 
   .surface.top-right {
@@ -383,22 +387,33 @@
     .ecosystem-card-wrapper {
       padding-bottom: 131.57%;
     }
-    /* .ecosystem-card {
-      aspect-ratio: 0.786;
-    } */
 
     .surface,
-    .surface.bottom-right,
-    .surface.bottom-left {
+    .surface.bottom-right {
       display: none;
+    }
+
+    .surface.bottom-left {
+      display: block;
+      top: 1.5rem;
+      bottom: auto;
+      left: 1.5rem;
     }
 
     .surface.top-right {
       display: block;
-      left: 1rem;
+      left: 1.5rem;
       right: auto;
-      bottom: 1rem;
+      bottom: 1.5rem;
       top: auto;
+    }
+
+    .graph {
+      pointer-events: none;
+    }
+
+    .ecosystem-card-wrapper.expanded .graph {
+      pointer-events: all;
     }
   }
 </style>
