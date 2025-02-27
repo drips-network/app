@@ -108,6 +108,7 @@
     "fuzzysort": "^2.0.3",
     "globals": "^15.6.0",
     "graphology": "^0.25.4",
+    "graphology-layout": "^0.6.1",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-layout-noverlap": "^0.4.2",
     "graphql": "^16.8.2",

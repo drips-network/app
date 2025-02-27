@@ -149,9 +149,12 @@
         <div>
           <ProjectBadge size="tiny" {project} projectNameSize="small" />
         </div>
-        <div>
+        <!-- <div>
           <span class="line-clamp-2 twemoji-text">{@html twemoji(description)} </span>
-        </div>
+        </div> -->
+      </div>
+      <div class="description">
+        <span class="line-clamp-2 twemoji-text">{@html twemoji(description)} </span>
       </div>
       <div class="stats">
         {#if Number.isFinite(projectMetadata?.absoluteWeight)}
@@ -200,11 +203,16 @@
       transform 0.2s;
     background-color: var(--color-background);
     text-align: initial;
+
+    display: grid;
+    grid-template-areas: 'left center right';
+    grid-template-columns: min-content 1fr 1fr;
   }
 
   .ecosystem-project-card.loading {
+    display: flex;
     width: 44rem;
-    height: 152px;
+    height: 167px;
     align-items: center;
     justify-content: center;
     /* aspect-ratio: 704 / 152; */
@@ -212,6 +220,10 @@
 
   .avatar {
     align-self: center;
+  }
+
+  .details {
+    grid-area: center;
   }
 
   .details,
@@ -239,5 +251,44 @@
     gap: 0.5rem;
     height: 100%;
     top: 0;
+  }
+
+  .description {
+    grid-area: center;
+    display: flex;
+    align-items: end;
+  }
+
+  @media (max-width: 768px) {
+    .ecosystem-project-card,
+    .ecosystem-project-card.loading {
+      width: calc(100vw - 3rem);
+    }
+
+    .ecosystem-project-card {
+      display: grid;
+      grid-template-areas: unset;
+      grid-template-columns: min-content 1fr;
+      height: auto;
+      gap: 1rem;
+    }
+
+    .description {
+      max-width: calc(100% - 3rem);
+    }
+
+    .details,
+    .description {
+      grid-area: auto;
+    }
+
+    .description,
+    .stats {
+      grid-column: span 2;
+    }
+
+    .details {
+      justify-content: center;
+    }
   }
 </style>
