@@ -146,7 +146,6 @@
 
   export let ecosystem: Ecosystem;
   export let project: ProjectProfileFragment;
-  export let description: string | undefined;
 
   interface RepoInfo {
     url: string;
@@ -308,7 +307,6 @@
         <EcosystemProfileHeader
           {ecosystem}
           {project}
-          {description}
           on:editButtonClick={() =>
             isClaimed(chainData) &&
             modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
