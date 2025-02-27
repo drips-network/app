@@ -45,7 +45,8 @@
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
-  let zoom: number = 3;
+  // let the graph decide
+  let zoom: number = 1;
   let selectedProjectData:
     | {
         repoOwner: string;
@@ -59,16 +60,17 @@
       }
     | undefined = undefined;
 
+  const ZOOM_INCREMENT = 0.2;
   function zoomIn(event: MouseEvent) {
     event.stopPropagation();
 
-    zoom = zoom + 1;
+    zoom = zoom + ZOOM_INCREMENT;
   }
 
   function zoomOut(event: MouseEvent) {
     event.stopPropagation();
 
-    zoom = zoom - 1;
+    zoom = zoom - ZOOM_INCREMENT;
   }
 
   function getEcosystemNodeById(ecosystem: Ecosystem, nodeId: string) {
