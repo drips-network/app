@@ -67,6 +67,10 @@
   }
 
   function setZoom(sigmaInstance: Sigma, zoom: number) {
+    if (zoom < 0) {
+      return;
+    }
+
     programaticZoom = true;
     const camera = sigmaInstance.getCamera();
     const state = camera.getState();
@@ -261,7 +265,7 @@
         // barnesHutOptimize: true
         // linLogMode: true,
         // outboundAttractionDistribution:
-        // scalingRatio: 1
+        scalingRatio: 1.5,
       },
     });
     // // console.log(positions)
@@ -269,7 +273,14 @@
     setPositions(graph, fa2Positions);
 
     const noPositions = noverlap(graph, {
-      maxIterations: 50,
+      maxIterations: 500,
+      settings: {
+        // gridSize: 20,
+        // margin: 5,
+        // expansion: 1.1,
+        // ratio: 1.0,
+        // speed: 3
+      },
     });
 
     setPositions(graph, noPositions);
