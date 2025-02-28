@@ -46,6 +46,7 @@
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
+  let ecosystemCardElement: HTMLDivElement;
   let expanded: boolean = false;
 
   // let the graph decide
@@ -115,6 +116,19 @@
   }
 
   async function handleClickExpand() {
+    if (!expanded) {
+      const clientRect = ecosystemCardElement.getBoundingClientRect();
+      ecosystemCardElement.style.width = '100vw';
+      ecosystemCardElement.style.height = '100vh';
+      ecosystemCardElement.style.top = `${-clientRect.y}px`;
+      ecosystemCardElement.style.left = `${-clientRect.x}px`;
+    } else {
+      ecosystemCardElement.style.width = '';
+      ecosystemCardElement.style.height = '';
+      ecosystemCardElement.style.top = '';
+      ecosystemCardElement.style.left = '';
+    }
+
     expanded = !expanded;
   }
 </script>
@@ -124,7 +138,7 @@
   class:ecosystem-card-wrapper--interactive={isInteractive}
   class:expanded
 >
-  <div class="ecosystem-card" class:hidden-project={isHidden}>
+  <div class="ecosystem-card" class:hidden-project={isHidden} bind:this={ecosystemCardElement}>
     <div class="background" />
     <div class="graph">
       <EcosystemGraph {ecosystem} bind:zoom on:nodeSelectionChanged={handleNodeSelectionChanged} />
@@ -194,11 +208,9 @@
     padding: 2px 0;
     margin: -2px 0;
     transform: translateZ(0);
-    padding-bottom: 55.3%;
-  }
-
-  .ecosystem-card-wrapper.expanded {
-    transform: none;
+    padding-bottom: 56.25%;
+    position: relative;
+    z-index: 2;
   }
 
   .ecosystem-card {
@@ -209,12 +221,7 @@
     gap: 1rem;
     display: flex;
     flex-direction: column;
-    transition:
-      box-shadow 0.2s,
-      backgorund-color 0.2s,
-      transform 0.2s;
-    /* aspect-ratio: 1.807; */
-
+    transition: all 0.3s;
     position: fixed;
     width: 100%;
     height: 100%;
@@ -227,24 +234,6 @@
   .ecosystem-card-wrapper.expanded .ecosystem-card {
     border-radius: 0;
   }
-
-  /* .ecosystem-card.expanded {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    aspect-ratio: auto;
-    background: white;
-    z-index: 10;
-    border-radius: 0;
-  } */
-
-  /* .ecosystem-card-wrapper:hover:not(:active) .ecosystem-card,
-  .ecosystem-card-wrapper:focus-visible .ecosystem-card {
-    box-shadow: var(--elevation-medium);
-    transform: translateY(-2px);
-  } */
 
   .ecosystem-card-wrapper:focus-visible {
     outline: none;
