@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Graph from 'graphology';
   import forceAtlas2 from 'graphology-layout-forceatlas2';
   import noverlap from 'graphology-layout-noverlap';
@@ -27,6 +27,7 @@
   let graphContainer: HTMLDivElement;
 
   let programaticZoom: boolean = false;
+  let cameraUpdated: boolean = false;
 
   let networkStyle: CSSStyleDeclaration;
   let colorPrimary: string;
@@ -67,7 +68,7 @@
     });
   }
 
-  function setZoom(sigmaInstance: Sigma, zoom: number) {
+  async function setZoom(sigmaInstance: Sigma, zoom: number) {
     if (zoom < 0) {
       return;
     }
@@ -75,7 +76,13 @@
     programaticZoom = true;
     const camera = sigmaInstance.getCamera();
     const state = camera.getState();
-    camera.setState({ ...state, ratio: 1 / zoom });
+    const newState = { ...state, ratio: 1 / zoom };
+    // animate only when using the zoom buttons
+    if (cameraUpdated) {
+      camera.setState(newState);
+    } else {
+      await camera.animate(newState);
+    }
     programaticZoom = false;
   }
 
@@ -186,10 +193,15 @@
     return res;
   }
 
-  function handleCameraUpdated({ ratio }: { ratio: number }) {
+  async function handleCameraUpdated({ ratio }: { ratio: number }) {
+    cameraUpdated = true;
+
     if (!programaticZoom) {
       zoom = 1 / ratio;
     }
+
+    await tick();
+    cameraUpdated = false;
   }
 
   async function initializeGraph() {
