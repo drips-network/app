@@ -87,7 +87,20 @@
     if (!project && !dripList) disabled = true;
   }
 
-  $: type = project ? ('project' as const) : ('dripList' as const);
+  let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
+
+  $: {
+    switch (true) {
+      case !!project:
+        type = 'project';
+        break;
+      case !!ecosystem:
+        type = 'ecosystem';
+        break;
+      default:
+        type = 'dripList';
+    }
+  }
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
@@ -209,14 +222,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  {#if ecosystem}
-    <p>
-      Join <strong>donator.eth</strong> and 23 others in supporting
-      <strong>Example Ecosystem</strong> on Drips.
-    </p>
-  {:else}
-    <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
-  {/if}
+  <p>Donate once, {dripList || ecosystem ? 'continuously, ' : ''}or add this to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons
@@ -324,9 +330,5 @@
   .support-buttons-placeholder {
     opacity: 0;
     pointer-events: none;
-  }
-
-  strong {
-    font-weight: 600;
   }
 </style>
