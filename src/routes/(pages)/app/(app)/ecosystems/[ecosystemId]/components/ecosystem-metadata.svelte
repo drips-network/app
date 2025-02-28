@@ -38,15 +38,24 @@
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     display: flex;
     gap: 0.5rem;
-    flex-direction: column;
     overflow-x: scroll;
     text-align: left;
   }
 
   .ecosystem-metadata {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 2rem;
+  }
+
+  .ecosystem-metadata > * {
+    flex-basis: calc(33% - 2rem);
+  }
+
+  @media (max-width: 768px) {
+    .ecosystem-metadata > * {
+      flex-basis: calc(50% - 2rem);
+    }
   }
 
   h4 {

@@ -65,4 +65,10 @@
   .actions {
     text-align: center;
   }
+
+  @media (max-width: 768px) {
+    .splits {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 </style>
