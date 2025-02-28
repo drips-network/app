@@ -62,7 +62,7 @@
       }
     | undefined = undefined;
 
-  const ZOOM_INCREMENT = 0.2;
+  const ZOOM_INCREMENT = 0.33;
   function zoomIn(event: MouseEvent) {
     event.stopPropagation();
 
