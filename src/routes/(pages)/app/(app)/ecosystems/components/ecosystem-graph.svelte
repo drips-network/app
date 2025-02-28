@@ -307,14 +307,14 @@
       iterations: 50,
       // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
       settings: {
-        // adjustSizes: false,
+        adjustSizes: false,
         // barnesHutOptimize: false,
         // barnesHutTheta: 0.5,
-        // edgeWeightInfluence: 1
+        // edgeWeightInfluence: 1,
         // gravity: 1,
         // linLogMode: false,
-        // outboundAttractionDistribution: false
-        // scalingRatio: 1,
+        outboundAttractionDistribution: true,
+        scalingRatio: 1.5,
         // slowDown: 1,
         // strongGravityMode: true,
       },
@@ -326,7 +326,7 @@
       maxIterations: 50,
       settings: {
         // gridSize: 20,
-        margin: 5,
+        // margin: 5,
         // expansion: 1.1,
         // ratio: 1.0,
         // speed: 3
