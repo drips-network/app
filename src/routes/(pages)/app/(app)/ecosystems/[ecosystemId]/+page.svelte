@@ -8,7 +8,6 @@
 <EcosytemProfile
   ecosystem={data.ecosystem}
   project={data.project}
-  description={data.description}
   newRepo={data.newRepo}
   correctCasingRepo={data.correctCasingRepo}
 />

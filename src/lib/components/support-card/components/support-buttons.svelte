@@ -8,7 +8,7 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { fade } from 'svelte/transition';
 
-  export let type: 'dripList' | 'project';
+  export let type: 'dripList' | 'project' | 'ecosystem';
 
   export let transitions = true;
 
@@ -42,7 +42,7 @@
     in:fade={transitions ? { duration: 300, delay: 300 } : { duration: 0 }}
     class="button-container"
   >
-    {#if type === 'dripList'}
+    {#if type === 'dripList' || type === 'ecosystem'}
       <Button on:click={onClickNewStream} size="large" icon={TokenStreams}
         >Continuous donation</Button
       >
