@@ -285,7 +285,7 @@
 
       graph.addEdge(edge.source, edge.target, {
         color: colorForegroundLevel3,
-        size: 3,
+        size: 2,
         labelBackgroundColor: colorPrimary,
         label: edgeLabelFormatter.format(Number(edge.weight) * 100),
         // minArrowSize: 5,
