@@ -40,6 +40,7 @@
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import { type NodeSelectionChangedPayload } from './ecosystem-graph';
   import { fade } from 'svelte/transition';
+  import ArrowCollapse from '$lib/components/icons/ArrowCollapse.svelte';
 
   export let ecosystem: Ecosystem;
   export let isHidden: boolean = false;
@@ -164,8 +165,11 @@
       </div>
       <div class="surface top-right">
         <Button on:click={handleClickExpand}>
-          <ArrowExpand style="fill: var(--color-foreground)" />
-          {expanded ? 'Collapse' : 'Expand'}
+          {#if expanded}
+            <ArrowCollapse style="fill: var(--color-foreground)" />Collapse
+          {:else}
+            <ArrowExpand style="fill: var(--color-foreground)" />Expand
+          {/if}
         </Button>
       </div>
       {#if selectedProjectData}
