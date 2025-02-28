@@ -79,7 +79,7 @@
   function refreshGraph() {
     if (sigmaInstance) {
       // We don't touch the graph data so we can skip its reindexation
-      sigmaInstance.refresh({ skipIndexation: true });
+      sigmaInstance.refresh({ schedule: true, skipIndexation: true });
     }
   }
 
