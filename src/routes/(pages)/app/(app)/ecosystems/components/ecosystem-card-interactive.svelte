@@ -119,7 +119,7 @@
     if (!expanded) {
       const clientRect = ecosystemCardElement.getBoundingClientRect();
       ecosystemCardElement.style.width = '100vw';
-      ecosystemCardElement.style.height = '100vh';
+      ecosystemCardElement.style.height = '100dvh';
       ecosystemCardElement.style.top = `${-clientRect.y}px`;
       ecosystemCardElement.style.left = `${-clientRect.x}px`;
     } else {
@@ -209,6 +209,9 @@
     margin: -2px 0;
     transform: translateZ(0);
     padding-bottom: 56.25%;
+  }
+
+  .ecosystem-card-wrapper.expanded {
     position: relative;
     z-index: 2;
   }
