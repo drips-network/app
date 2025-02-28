@@ -224,6 +224,7 @@
 
   .details {
     grid-area: center;
+    overflow: hidden;
   }
 
   .details,
@@ -257,6 +258,7 @@
     grid-area: center;
     display: flex;
     align-items: end;
+    overflow: hidden;
   }
 
   @media (max-width: 768px) {
@@ -271,10 +273,6 @@
       grid-template-columns: min-content 1fr;
       height: auto;
       gap: 1rem;
-    }
-
-    .description {
-      max-width: calc(100% - 3rem);
     }
 
     .details,
