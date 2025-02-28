@@ -15,10 +15,6 @@
     nodeSelectionChanged: NodeSelectionChangedPayload;
   }>();
 
-  // TODO:
-  // add the right data to the edge label
-  // click a node to laod the project data
-
   export let ecosystem: Ecosystem;
   export let zoom: number = 1;
 
@@ -38,9 +34,11 @@
 
   let w: number = 0;
   let h: number = 0;
+  let lastW: number = w;
+  let lastH: number = h;
 
   // for expanding and collapsing, refresh instance to get most up to date view
-  $: w, h, refreshGraph();
+  $: w, h, refreshGraph(), cuttilyDetectCollapseAndDeselectNode();
 
   // TODO: this seems to format things weirdly
   const edgeLabelFormatter = new Intl.NumberFormat('en-US', {
@@ -65,6 +63,18 @@
     selectedNeighbors?: Set<string>;
   }
   const state: State = { searchQuery: '' };
+
+  // TODO: be less cutty
+  function cuttilyDetectCollapseAndDeselectNode() {
+    if (w !== lastW || h !== lastH) {
+      if (w < lastW || h < lastH) {
+        setSelectedNode(undefined);
+      }
+
+      lastW = w;
+      lastH = h;
+    }
+  }
 
   function refreshGraph() {
     if (sigmaInstance) {
