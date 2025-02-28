@@ -36,6 +36,12 @@
   let colorForegroundLevel3: string;
   let colorForegroundLevel2: string;
 
+  let w: number = 0;
+  let h: number = 0;
+
+  // for expanding and collapsing, refresh instance to get most up to date view
+  $: w, h, refreshGraph();
+
   // TODO: this seems to format things weirdly
   const edgeLabelFormatter = new Intl.NumberFormat('en-US', {
     style: 'percent',
@@ -59,6 +65,13 @@
     selectedNeighbors?: Set<string>;
   }
   const state: State = { searchQuery: '' };
+
+  function refreshGraph() {
+    if (sigmaInstance) {
+      // We don't touch the graph data so we can skip its reindexation
+      sigmaInstance.refresh({ skipIndexation: true });
+    }
+  }
 
   function setPositions(graph: Graph, positions: LayoutMapping) {
     graph.forEachNode((node) => {
@@ -99,11 +112,7 @@
 
     dispatch('nodeSelectionChanged', { nodeId: state.selectedNode });
 
-    // Refresh rendering
-    sigmaInstance.refresh({
-      // We don't touch the graph data so we can skip its reindexation
-      skipIndexation: true,
-    });
+    refreshGraph();
   }
 
   function setHoveredNode(node?: string) {
@@ -115,11 +124,7 @@
       state.hoveredNeighbors = undefined;
     }
 
-    // Refresh rendering
-    sigmaInstance.refresh({
-      // We don't touch the graph data so we can skip its reindexation
-      skipIndexation: true,
-    });
+    refreshGraph();
   }
 
   // Render nodes accordingly to the internal state:
@@ -404,6 +409,8 @@
   class:hovered-node={state.hoveredNode}
   class:dragging={state.isDragging}
   bind:this={graphContainer}
+  bind:clientWidth={w}
+  bind:clientHeight={h}
 ></div>
 
 <style>
