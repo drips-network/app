@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Graph from 'graphology';
-  // import forceAtlas2 from 'graphology-layout-forceatlas2';
-  // import noverlap from 'graphology-layout-noverlap';
+  import forceAtlas2 from 'graphology-layout-forceatlas2';
+  import noverlap from 'graphology-layout-noverlap';
   import type Sigma from 'sigma';
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import type { Attributes } from 'graphology-types';
   import { type LayoutMapping, type NodeSelectionChangedPayload } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
-  import circlepack from 'graphology-layout/circlepack';
+  // import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
     nodeSelectionChanged: NodeSelectionChangedPayload;
@@ -266,48 +266,47 @@
       });
     }
 
-    const cpPositions = circlepack(graph, {
-      hierarchyAttributes: ['firstParent'],
-      scale: 2,
-      // center: 0
-    });
+    // const cpPositions = circlepack(graph, {
+    //   hierarchyAttributes: ['firstParent'],
+    //   scale: 2,
+    //   // center: 0
+    // });
 
-    setPositions(graph, cpPositions);
+    // setPositions(graph, cpPositions);
 
     // forceAtlas2.assign(graph, 50);
 
-    // const fa2Positions = forceAtlas2(graph, {
-    //   iterations: 50,
-    //   // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
-    //   settings: {
-    //     // adjustSizes: false,
-    //     // barnesHutOptimize: false,
-    //     // barnesHutTheta: 0.5,
-    //     // edgeWeightInfluence: 1
-    //     // gravity: 1,
-    //     // linLogMode: false,
-    //     // outboundAttractionDistribution: false
-    //     // scalingRatio: 1,
-    //     // slowDown: 1,
-    //     // strongGravityMode: true,
-    //   },
-    // });
-    // // // console.log(positions)
+    const fa2Positions = forceAtlas2(graph, {
+      iterations: 50,
+      // https://github.com/graphology/graphology/tree/master/src/layout-forceatlas2
+      settings: {
+        // adjustSizes: false,
+        // barnesHutOptimize: false,
+        // barnesHutTheta: 0.5,
+        // edgeWeightInfluence: 1
+        // gravity: 1,
+        // linLogMode: false,
+        // outboundAttractionDistribution: false
+        // scalingRatio: 1,
+        // slowDown: 1,
+        // strongGravityMode: true,
+      },
+    });
 
-    // setPositions(graph, fa2Positions);
+    setPositions(graph, fa2Positions);
 
-    // const noPositions = noverlap(graph, {
-    //   maxIterations: 50,
-    //   settings: {
-    //     // gridSize: 20,
-    //     // margin: 5,
-    //     // expansion: 1.1,
-    //     // ratio: 1.0,
-    //     // speed: 3
-    //   },
-    // });
+    const noPositions = noverlap(graph, {
+      maxIterations: 50,
+      settings: {
+        // gridSize: 20,
+        margin: 5,
+        // expansion: 1.1,
+        // ratio: 1.0,
+        // speed: 3
+      },
+    });
 
-    // setPositions(graph, noPositions);
+    setPositions(graph, noPositions);
 
     sigmaInstance = new Sigma(graph, graphContainer, {
       defaultNodeType: 'bordered',
@@ -350,7 +349,7 @@
       },
       edgeProgramClasses: {
         arrowed: createEdgeArrowProgram({
-          widenessToThicknessRatio: 2.5,
+          widenessToThicknessRatio: 3,
         }),
       },
     });
