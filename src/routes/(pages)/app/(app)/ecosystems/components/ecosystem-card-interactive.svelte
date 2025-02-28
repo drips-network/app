@@ -415,5 +415,9 @@
     .ecosystem-card-wrapper.expanded .graph {
       pointer-events: all;
     }
+
+    .ecosystem-card-wrapper.expanded .surface.bottom-right {
+      display: flex;
+    }
   }
 </style>
