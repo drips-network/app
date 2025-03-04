@@ -296,7 +296,7 @@
         bind:selected={$context.selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
-        emptyStateText={`No tokens available to stream. Add one first by clicking "Add funds" from your Account page.`}
+        emptyStateText={`No tokens available to stream. Add one by clicking "Add funds" on the Funds page.`}
         type="tokens"
       />
     </div>
