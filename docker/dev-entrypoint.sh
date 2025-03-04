@@ -12,10 +12,8 @@ printf "  \_____|_|  |_|\n\n"
                 
 echo "ℹ️ Starting with UID: $USER_ID, GID: $GROUP_ID"
 useradd -u $USER_ID -o -m drippy
-groupmod -g $GROUP_ID drippy
+groupmod -g $GROUP_ID drippy 2>/dev/null
 export HOME=/home/drippy
-
-ls -al | grep .svelte-kit
 
 /usr/sbin/gosu drippy npm run gql:build
 
