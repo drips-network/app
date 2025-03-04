@@ -7,7 +7,11 @@
   import type { DisplayData, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import type { Attributes } from 'graphology-types';
-  import { type LayoutMapping, type NodeSelectionChangedPayload } from './ecosystem-graph';
+  import {
+    createDrawStraightEdgeLabel,
+    type LayoutMapping,
+    type NodeSelectionChangedPayload,
+  } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
   // import { fitViewportToNodes } from "@sigma/utils";
   // import circlepack from 'graphology-layout/circlepack';
@@ -249,7 +253,7 @@
     const [
       { Sigma },
       { createNodeBorderProgram },
-      { drawDiscNodeHover, drawStraightEdgeLabel },
+      { drawDiscNodeHover },
       { createEdgeArrowProgram },
     ] = await Promise.all([
       import('sigma'),
@@ -371,11 +375,11 @@
         color: colorBackground,
       },
       // Remove box shadow, get drippy with it
-      defaultDrawNodeHover: drawDiscNodeHover,
+      // defaultDrawNodeHover: drawDiscNodeHover,
       // Don't draw a label underneath the hover label
       defaultDrawNodeLabel: () => {},
       // Don't rotate along edge path, get drippy with it
-      defaultDrawEdgeLabel: drawStraightEdgeLabel,
+      // defaultDrawEdgeLabel: drawStraightEdgeLabel,
       // autoRescale: true,
       // don't adjust the size of the nodes and edges
       // when zooming.
@@ -426,6 +430,8 @@
       state.isDragging = false;
     });
 
+    sigmaInstance.setSetting('defaultDrawNodeHover', drawDiscNodeHover);
+    sigmaInstance.setSetting('defaultDrawEdgeLabel', createDrawStraightEdgeLabel(sigmaInstance));
     sigmaInstance.setSetting('nodeReducer', nodeReducer);
     sigmaInstance.setSetting('edgeReducer', edgeReducer);
 

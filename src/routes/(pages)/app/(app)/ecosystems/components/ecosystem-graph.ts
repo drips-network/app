@@ -2,6 +2,8 @@ import type { Attributes } from 'graphology-types';
 import type { NodeDisplayData, PartialButFor, EdgeDisplayData } from 'sigma/types';
 import type { Settings } from 'sigma/settings';
 import type { Project } from '$lib/graphql/__generated__/base-types';
+import type Sigma from 'sigma';
+import type { EdgeLabelDrawingFunction } from 'sigma/rendering';
 
 export type LayoutMapping = { [key: string]: { x: number; y: number } };
 export type NodeSelectionChangedPayload = { nodeId?: string };
@@ -26,6 +28,12 @@ export async function fetchProject(
   return projectData;
 }
 
+export function createDrawStraightEdgeLabel(renderer: Sigma): EdgeLabelDrawingFunction {
+  return function (...args) {
+    return drawStraightEdgeLabel(renderer, ...args);
+  };
+}
+
 /**
  * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
  *
@@ -41,14 +49,15 @@ export function drawStraightEdgeLabel<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 >(
+  renderer: Sigma,
   context: CanvasRenderingContext2D,
   edgeData: PartialButFor<EdgeDisplayData, 'label' | 'color' | 'size'>,
   sourceData: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size'>,
   targetData: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size'>,
   settings: Settings<N, E, G>,
 ): void {
-  const size = settings.edgeLabelSize,
-    font = settings.edgeLabelFont,
+  let size = settings.edgeLabelSize;
+  const font = settings.edgeLabelFont,
     weight = settings.edgeLabelWeight,
     color = settings.edgeLabelColor.attribute
       ? edgeData[settings.edgeLabelColor.attribute] || settings.edgeLabelColor.color || '#000'
@@ -57,6 +66,10 @@ export function drawStraightEdgeLabel<
   let label = edgeData.label;
 
   if (!label) return;
+
+  const camera = renderer.getCamera();
+  const cameraState = camera.getState();
+  size = Math.min(size * Math.pow(1 / cameraState.ratio, 1), 16);
 
   context.fillStyle = color;
   context.font = `${weight} ${size}px ${font}`;
