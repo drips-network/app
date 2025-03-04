@@ -93,6 +93,7 @@
     "@safe-global/safe-apps-provider": "^0.18.3",
     "@safe-global/safe-apps-sdk": "^9.1.0",
     "@sigma/node-border": "^3.0.0",
+    "@sigma/utils": "^3.0.0",
     "@sveltejs/adapter-node": "^5.2.9",
     "@tanstack/svelte-table": "^8.17.3",
     "@uniswap/default-token-list": "^11.19.0",
