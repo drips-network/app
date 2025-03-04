@@ -120,3 +120,17 @@
   --color-primary-level-2: #783a00;
   --color-primary-level-6: #ffd2a8;
 }
+
+[data-primary-color='red'] {
+  --color-primary: #ff0420;
+  --color-primary-level-1: #ffb0b9;
+  --color-primary-level-2: #ff7484;
+  --color-primary-level-6: #ff223b;
+}
+
+[data-primary-color='red'][data-theme='dark'] {
+  --color-primary: #ff0420;
+  --color-primary-level-1: #5b000a;
+  --color-primary-level-2: #aa0013;
+  --color-primary-level-6: #ffa1aa;
+}
