@@ -500,8 +500,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       blockExplorerUrls: ['https://optimistic.etherscan.io/'],
       nativeCurrency: {
         decimals: 18,
-        name: 'Metis',
-        symbol: 'METIS',
+        name: 'Ethereum',
+        symbol: 'ETH',
       },
       rpcUrls: ['https://mainnet.optimism.io'],
     },
