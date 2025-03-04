@@ -8,7 +8,6 @@ if [ ! -f ./schema.graphql ]; then
   exit 1
 fi
 
-
 start_time=$(date +%s)
 end_time=$((start_time + 300))  # 5 minutes = 300 seconds
 

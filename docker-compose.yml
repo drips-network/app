@@ -18,10 +18,11 @@ services:
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_API_KEY=1234
       - PUBLIC_USE_LOCAL_TESTNET_WALLET_STORE=${APP_USE_LOCAL_TESTNET_WALLET_STORE-false}
+      - LOCAL_UID=1000
+      - LOCAL_GID=1000
     volumes:
     - .:/app
     - /app/node_modules/
-    - /app/.svelte-kit/
     ports:
     - 5173:5173
     depends_on:
