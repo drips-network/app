@@ -79,7 +79,12 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
   },
   10: {
     variant: 'default',
-    loadFn: loadDefaultExplorePageData,
+    loadFn: (f) =>
+      loadDefaultExplorePageData(f, {
+        featuredDripListIds: [
+          '46441013481627019632859175771245733399752255312769848791334977723541',
+        ],
+      }),
   },
 } as const;
 
