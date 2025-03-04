@@ -147,6 +147,7 @@
     if (state.selectedNeighbors) {
       if (state.selectedNeighbors.has(node) || state.selectedNode === node) {
         res.color = colorPrimary;
+        res.zIndex = 2;
       } else {
         res.color = colorForegroundLevel2;
       }
@@ -190,6 +191,9 @@
         // show edge labels when we have selected a node
         res.color = colorPrimary;
         res.forceLabel = true;
+        // TODO: doesn't work for edges yet
+        // bringEdgeToFront(graph, edge)
+        // res.zIndex = 2;
       } else {
         res.hidden = true;
       }
@@ -218,6 +222,14 @@
     await tick();
     cameraUpdated = false;
   }
+
+  // function bringEdgeToFront(graph: Graph, edge: unknown) {
+  //   let attribs = graph.getEdgeAttributes(edge)
+  //   let source = graph.source(edge);
+  //   let target = graph.target(edge);
+  //   graph.dropEdge(edge)
+  //   graph.addEdgeWithKey(edge, source, target, attribs)
+  // }
 
   async function initializeGraph() {
     networkStyle = window.getComputedStyle(graphContainer);
@@ -336,11 +348,12 @@
     setPositions(graph, noPositions);
 
     sigmaInstance = new Sigma(graph, graphContainer, {
+      zIndex: true,
       defaultNodeType: 'bordered',
       autoRescale: false,
       labelFont: 'Inter',
       labelWeight: '600',
-      labelSize: 16,
+      labelSize: 14,
       labelColor: {
         color: colorForeground,
       },
