@@ -7,6 +7,7 @@ const META_THEME_COLOR = {
   blue: '#5555ff',
   pink: '#ff55ff',
   orange: '#ff7b00',
+  red: '#FF0420',
 } as const;
 
 interface State {
@@ -26,6 +27,7 @@ const storedPrimaryColorSchema = z.union([
   z.literal('blue'),
   z.literal('pink'),
   z.literal('orange'),
+  z.literal('red'),
 ]);
 
 export type Theme = 'light' | 'dark' | 'h4x0r';
