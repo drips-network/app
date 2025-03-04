@@ -13,7 +13,7 @@
     type NodeSelectionChangedPayload,
   } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
-  // import { fitViewportToNodes } from "@sigma/utils";
+  import { fitViewportToNodes } from '@sigma/utils';
   // import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
@@ -435,9 +435,9 @@
     sigmaInstance.setSetting('nodeReducer', nodeReducer);
     sigmaInstance.setSetting('edgeReducer', edgeReducer);
 
-    // setTimeout(() => {
-    //   fitViewportToNodes(sigmaInstance, graph.nodes(), { animate: true })
-    // }, 0)
+    setTimeout(() => {
+      fitViewportToNodes(sigmaInstance, graph.nodes(), { animate: true });
+    }, 0);
   }
 
   onMount(initializeGraph);
