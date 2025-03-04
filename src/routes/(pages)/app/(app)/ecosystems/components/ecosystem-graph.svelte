@@ -9,6 +9,7 @@
   import type { Attributes } from 'graphology-types';
   import { type LayoutMapping, type NodeSelectionChangedPayload } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
+  // import { fitViewportToNodes } from "@sigma/utils";
   // import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
@@ -113,6 +114,13 @@
 
   function setSelectedNode(node?: string) {
     if (node && state.selectedNode !== node) {
+      // bring all the node's edges to the front
+      // to draw over other edges
+      const edges = graph.edges(node);
+      for (const edge of edges) {
+        bringEdgeToFront(graph, edge);
+      }
+
       state.selectedNode = node;
       state.selectedNeighbors = new Set(graph.neighbors(node));
     } else {
@@ -191,11 +199,9 @@
         // show edge labels when we have selected a node
         res.color = colorPrimary;
         res.forceLabel = true;
-        // TODO: doesn't work for edges yet
-        // bringEdgeToFront(graph, edge)
-        // res.zIndex = 2;
       } else {
-        res.hidden = true;
+        // TODO: do we want this?
+        // res.hidden = true;
       }
     } else if (state.hoveredNode) {
       // don't show edge labels while hovering
@@ -223,13 +229,13 @@
     cameraUpdated = false;
   }
 
-  // function bringEdgeToFront(graph: Graph, edge: unknown) {
-  //   let attribs = graph.getEdgeAttributes(edge)
-  //   let source = graph.source(edge);
-  //   let target = graph.target(edge);
-  //   graph.dropEdge(edge)
-  //   graph.addEdgeWithKey(edge, source, target, attribs)
-  // }
+  function bringEdgeToFront(graph: Graph, edge: unknown) {
+    let attribs = graph.getEdgeAttributes(edge);
+    let source = graph.source(edge);
+    let target = graph.target(edge);
+    graph.dropEdge(edge);
+    graph.addEdgeWithKey(edge, source, target, attribs);
+  }
 
   async function initializeGraph() {
     networkStyle = window.getComputedStyle(graphContainer);
@@ -422,6 +428,10 @@
 
     sigmaInstance.setSetting('nodeReducer', nodeReducer);
     sigmaInstance.setSetting('edgeReducer', edgeReducer);
+
+    // setTimeout(() => {
+    //   fitViewportToNodes(sigmaInstance, graph.nodes(), { animate: true })
+    // }, 0)
   }
 
   onMount(initializeGraph);
