@@ -48,7 +48,7 @@
   // TODO: this seems to format things weirdly
   const edgeLabelFormatter = new Intl.NumberFormat('en-US', {
     style: 'percent',
-    maximumFractionDigits: 1,
+    maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   });
 
@@ -309,7 +309,7 @@
         color: colorForegroundLevel3,
         size: 2,
         labelBackgroundColor: colorPrimary,
-        label: edgeLabelFormatter.format(Number(edge.weight) * 100),
+        label: edgeLabelFormatter.format(Number(edge.weight)),
         // minArrowSize: 5,
         type: 'arrowed',
       });
@@ -345,7 +345,7 @@
     setPositions(graph, fa2Positions);
 
     const noPositions = noverlap(graph, {
-      maxIterations: 50,
+      maxIterations: 100,
       settings: {
         // gridSize: 20,
         // margin: 5,
