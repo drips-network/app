@@ -8,13 +8,15 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
-  import type { DripListCardFragment } from '$lib/components/drip-list-card/__generated__/gql.generated';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import network from '$lib/stores/wallet/network';
+  import Section from '$lib/components/section/section.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import DripListsGrid from './drip-lists-grid.svelte';
+  import type { ComponentProps } from 'svelte';
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
-  export let dripList: DripListCardFragment | null | undefined;
+  export let featuredDripLists: ComponentProps<DripListsGrid>['dripLists'];
   export let welcomeCard: {
     title: string;
     description: string;
@@ -26,36 +28,52 @@
 </script>
 
 <div class="explore">
-  {#if welcomeCard || dripList}
+  {#if welcomeCard}
     <div class="hero">
-      {#if welcomeCard}
-        <div class="welcome-card">
-          <div class="illustration">
-            <div class="background" />
-            <div class="filecoin-logo-wrapper">
-              <svelte:component this={network.icon} style="height: 3rem; width: 3rem;" />
-            </div>
-          </div>
-          <div class="content">
-            <div style:display="flex" style:flex-direction="column" style:gap="1rem">
-              <h1>{welcomeCard.title}</h1>
-              <p>{welcomeCard.description}</p>
-            </div>
-            {#if welcomeCard.docsButton}
-              {@const docsButton = welcomeCard.docsButton}
-              <div>
-                <Button href={docsButton.href} target="_blank" icon={ArrowBoxUpRight}
-                  >{docsButton.label}</Button
-                >
-              </div>
-            {/if}
+      <div class="welcome-card">
+        <div class="illustration">
+          <div class="background" />
+          <div class="filecoin-logo-wrapper">
+            <svelte:component this={network.icon} style="height: 3rem; width: 3rem;" />
           </div>
         </div>
-      {/if}
-      {#if dripList}
-        <DripListCard listingMode={true} data={{ dripList }} maxSplitRows={5} />
-      {/if}
+        <div class="content">
+          <div style:display="flex" style:flex-direction="column" style:gap="1rem">
+            <h1>{welcomeCard.title}</h1>
+            <p>{welcomeCard.description}</p>
+          </div>
+          {#if welcomeCard.docsButton}
+            {@const docsButton = welcomeCard.docsButton}
+            <div>
+              <Button href={docsButton.href} target="_blank" icon={ArrowBoxUpRight}
+                >{docsButton.label}</Button
+              >
+            </div>
+          {/if}
+        </div>
+      </div>
     </div>
+  {/if}
+
+  {#if featuredDripLists.length > 0}
+    <Section
+      header={{
+        icon: DripListIcon,
+        label: 'Featured Drip Lists',
+        actions: [
+          {
+            label: 'See all',
+            href: '/app/drip-lists/all',
+            icon: DripListIcon,
+          },
+        ],
+      }}
+      skeleton={{
+        loaded: true,
+      }}
+    >
+      <DripListsGrid dripLists={featuredDripLists} />
+    </Section>
   {/if}
 
   {#if projects}
