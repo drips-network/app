@@ -6,7 +6,7 @@ import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from
 import { featuredDripListQuery, fetchList } from './load-drip-list';
 import type { ComponentProps } from 'svelte';
 import type DistributionExplorePage from './distribution-explore-page.svelte';
-import filterFalseish from '$lib/utils/filter-falseish';
+import filterFalsy from '$lib/utils/filter-falsy';
 
 type PageProps = ComponentProps<DistributionExplorePage>;
 
@@ -42,7 +42,7 @@ export default async function loadDistributionExplorePageData(
   return {
     blogPosts,
     projects,
-    featuredDripLists: filterFalseish(featuredDripLists),
+    featuredDripLists: filterFalsy(featuredDripLists),
     welcomeCard: welcomeCardConfig,
   };
 }
