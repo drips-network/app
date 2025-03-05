@@ -19,6 +19,13 @@ const STREAMS: {
     endsAt: 1740939492000,
     amtPerSec: '70062152777777777777777777',
   },
+  // 2nd Filecoin RPGF-2 donation https://filecoin.drips.network/app/976822925357514561093139105352740088169738576235/tokens/0x60E1773636CF5E4A227d9AC24F20fEca034ee25A/streams/2080508173
+  {
+    token: { address: '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A' },
+    started: 1741132800000,
+    endsAt: 1743724802000,
+    amtPerSec: '24459452160493827160493827',
+  },
 ];
 
 const GIVES = [
