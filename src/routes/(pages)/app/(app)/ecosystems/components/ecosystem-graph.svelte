@@ -204,12 +204,12 @@
         res.color = colorPrimary;
         res.forceLabel = true;
       } else {
-        // TODO: do we want this?
-        // res.hidden = true;
+        res.label = '';
       }
     } else if (state.hoveredNode) {
       // don't show edge labels while hovering
       res.label = '';
+      // res.hidden = true;
     }
 
     if (
@@ -370,7 +370,7 @@
       renderEdgeLabels: true,
       edgeLabelFont: 'Inter',
       edgeLabelWeight: '600',
-      edgeLabelSize: 16,
+      edgeLabelSize: 14,
       edgeLabelColor: {
         color: colorBackground,
       },
