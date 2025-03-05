@@ -54,8 +54,8 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     loadFn: (f) =>
       loadDistributionExplorePageData(f, {
         featuredListIds: [
-          '45193817480599985262554974973835763972521255481355516335980315118301',
-          '45193817480599985262554974973835763972521255481357121508020698376704',
+          '45193817480599985262554974973835763972521255481355516335980315118301', // 2nd RPGF-2 FIL distribution
+          '45193817480599985262554974973835763972521255481357121508020698376704', // 1st RPGF-2 FIL distribution
         ],
         welcomeCardConfig: {
           title: 'Welcome to Drips on Filecoin',
@@ -85,7 +85,7 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     loadFn: (f) =>
       loadDefaultExplorePageData(f, {
         featuredDripListIds: [
-          '46441013481627019632859175771245733399752255312769848791334977723541',
+          '46441013481627019632859175771245733399752255312769848791334977723541', // Web3PrivacyNow list
         ],
       }),
   },
