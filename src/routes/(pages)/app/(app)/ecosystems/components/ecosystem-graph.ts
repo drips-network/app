@@ -28,6 +28,20 @@ export async function fetchProject(
   return projectData;
 }
 
+export function formatPercent(amount: number) {
+  const percentFormatter = new Intl.NumberFormat('en-US', {
+    style: 'percent',
+    maximumFractionDigits: 3,
+    minimumFractionDigits: 0,
+  });
+
+  if (amount < 0.001) {
+    return '<0.001%';
+  }
+
+  return percentFormatter.format(amount);
+}
+
 export function createDrawStraightEdgeLabel(renderer: Sigma): EdgeLabelDrawingFunction {
   return function (...args) {
     return drawStraightEdgeLabel(renderer, ...args);

@@ -9,6 +9,7 @@
   import type { Attributes } from 'graphology-types';
   import {
     createDrawStraightEdgeLabel,
+    formatPercent,
     type LayoutMapping,
     type NodeSelectionChangedPayload,
   } from './ecosystem-graph';
@@ -44,13 +45,6 @@
 
   // for expanding and collapsing, refresh instance to get most up to date view
   $: w, h, refreshGraph(), cuttilyDetectCollapseAndDeselectNode();
-
-  // TODO: this seems to format things weirdly
-  const edgeLabelFormatter = new Intl.NumberFormat('en-US', {
-    style: 'percent',
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
-  });
 
   interface State {
     isDragging?: boolean;
@@ -171,6 +165,9 @@
     }
 
     if (state.hoveredNode === node || state.selectedNode === node) {
+      // TODO: adjust border according to zoom?
+      // const camera = sigmaInstance.getCamera()
+      // const cameraState = camera.getState()
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
       res.color = colorPrimary;
@@ -309,7 +306,7 @@
         color: colorForegroundLevel3,
         size: 2,
         labelBackgroundColor: colorPrimary,
-        label: edgeLabelFormatter.format(Number(edge.weight)),
+        label: formatPercent(Number(edge.weight)),
         // minArrowSize: 5,
         type: 'arrowed',
       });
