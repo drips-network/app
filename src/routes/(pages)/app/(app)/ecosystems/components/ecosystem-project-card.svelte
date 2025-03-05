@@ -11,7 +11,7 @@
   import twemoji from '$lib/utils/twemoji';
   import { onMount } from 'svelte';
   import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
-  import { fetchProject } from './ecosystem-graph';
+  import { fetchProject, formatPercent } from './ecosystem-graph';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
@@ -33,12 +33,6 @@
 
   let loading: boolean = false;
 
-  const percentFormatter = new Intl.NumberFormat('en-US', {
-    style: 'percent',
-    maximumFractionDigits: 3,
-    minimumFractionDigits: 0,
-  });
-
   $: projectChainData = project ? filterCurrentChainData(project.chainData) : undefined;
   $: loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject();
   $: dependenciesCount =
@@ -47,7 +41,7 @@
       : 0;
   $: dependenciesPercentage =
     projectChainData && isClaimed(projectChainData)
-      ? percentFormatter.format(
+      ? formatPercent(
           projectChainData.splits.dependencies.reduce((sum, dep) => sum + dep.weight, 0),
         )
       : '0%';
@@ -61,9 +55,7 @@
       : 0;
   $: maintainersPercentage =
     projectChainData && isClaimed(projectChainData)
-      ? percentFormatter.format(
-          projectChainData.splits.maintainers.reduce((sum, dep) => sum + dep.weight, 0),
-        )
+      ? formatPercent(projectChainData.splits.maintainers.reduce((sum, dep) => sum + dep.weight, 0))
       : '0%';
   $: maintainersStatement =
     maintainersCount > 1
@@ -160,7 +152,7 @@
         {#if Number.isFinite(projectMetadata?.absoluteWeight)}
           <div>
             <Pie style="fill: var(--color-background)" /><strong class="ml-1 typo-text-bold"
-              >{percentFormatter.format(Number(projectMetadata?.absoluteWeight))}&nbsp;</strong
+              >{formatPercent(Number(projectMetadata?.absoluteWeight))}&nbsp;</strong
             >of ecosystem funds
           </div>
         {/if}
