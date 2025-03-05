@@ -16,7 +16,7 @@
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
-  export let featuredDripLists: ComponentProps<DripListsGrid['dripLists']>;
+  export let featuredDripLists: ComponentProps<DripListsGrid>['dripLists'];
   export let welcomeCard: {
     title: string;
     description: string;
