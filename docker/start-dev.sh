@@ -23,5 +23,6 @@ case "$ARCH" in
 esac
 export ARCH
 
-
+export LOCAL_UID=$(id -u)
+export LOCAL_GID=$(id -g)
 docker compose -f docker-compose.yml -f docker-compose.dev.yml build && docker compose -f docker-compose.yml -f docker-compose.dev.yml up --renew-anon-volumes --attach app
