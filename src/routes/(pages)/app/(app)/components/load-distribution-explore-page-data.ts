@@ -19,13 +19,14 @@ export default async function loadDistributionExplorePageData(
   },
 ): Promise<PageProps> {
   const projectsParameters = createFetchProjectsParameters();
-  const cacheKey = queryCacheKey(
-    fetchProjectsQuery + featuredDripListQuery,
-    [Object.entries(projectsParameters)],
-    'explore-page',
-  );
 
   const { featuredListIds, welcomeCardConfig, showRecentProjects } = config;
+
+  const cacheKey = queryCacheKey(
+    fetchProjectsQuery + featuredDripListQuery,
+    [Object.entries(projectsParameters), featuredListIds],
+    'explore-page',
+  );
 
   const [blogPosts, projects, featuredDripLists] = await cached(
     redis,
