@@ -6,13 +6,14 @@ import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from
 import { featuredDripListQuery, fetchList } from './load-drip-list';
 import type { ComponentProps } from 'svelte';
 import type DistributionExplorePage from './distribution-explore-page.svelte';
+import filterFalseish from '$lib/utils/filter-falseish';
 
 type PageProps = ComponentProps<DistributionExplorePage>;
 
 export default async function loadDistributionExplorePageData(
   f: typeof fetch,
   config: {
-    featuredListId: string | null;
+    featuredListIds: string[];
     welcomeCardConfig: PageProps['welcomeCard'];
     showRecentProjects?: true;
   },
@@ -24,20 +25,24 @@ export default async function loadDistributionExplorePageData(
     'explore-page',
   );
 
-  const { featuredListId, welcomeCardConfig, showRecentProjects } = config;
+  const { featuredListIds, welcomeCardConfig, showRecentProjects } = config;
 
-  const [blogPosts, projects, dripList] = await cached(redis, cacheKey, 6 * 60 * 60, async () =>
-    Promise.all([
-      fetchBlogPosts(),
-      showRecentProjects ? fetchProjects(f, projectsParameters) : undefined,
-      featuredListId ? fetchList(featuredListId, f) : undefined,
-    ]),
+  const [blogPosts, projects, featuredDripLists] = await cached(
+    redis,
+    cacheKey,
+    6 * 60 * 60,
+    async () =>
+      Promise.all([
+        fetchBlogPosts(),
+        showRecentProjects ? fetchProjects(f, projectsParameters) : undefined,
+        await Promise.all((featuredListIds ?? []).map(async (id) => await fetchList(id, f))),
+      ]),
   );
 
   return {
     blogPosts,
     projects,
-    dripList,
+    featuredDripLists: filterFalseish(featuredDripLists),
     welcomeCard: welcomeCardConfig,
   };
 }
