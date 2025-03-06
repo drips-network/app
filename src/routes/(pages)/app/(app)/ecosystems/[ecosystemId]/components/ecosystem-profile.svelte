@@ -264,6 +264,12 @@
   // };
 
   $: colorHex = isClaimed(chainData) ? chainData.color : undefined;
+
+  const recipientsFormatter = new Intl.NumberFormat('en-US');
+  // all nodes except the root node
+  $: recipientsFormatted = recipientsFormatter.format(
+    ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0,
+  );
 </script>
 
 <HeadMeta
@@ -318,7 +324,7 @@
           <KeyValuePair key="Donations">$186,833.91</KeyValuePair>
         </div>
         <div class="stat drip-bordered">
-          <KeyValuePair key="Recipients">2,618</KeyValuePair>
+          <KeyValuePair key="Recipients">{recipientsFormatted}</KeyValuePair>
         </div>
         <div class="stat drip-bordered">
           <KeyValuePair key="Supporters">A Pile</KeyValuePair>
