@@ -37,7 +37,11 @@
 
   export let pendingAvatar = false;
 
+  const TODO_REMOVE_FALLBACK_ADDRESS = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045';
+
   $: projectChainData = filterCurrentChainData(project.chainData);
+  // TODO: get owner of NFT once the ecosystem is deployed.
+  $: ownerAddress = ecosystem.ownerAddress ?? TODO_REMOVE_FALLBACK_ADDRESS;
 </script>
 
 <div
@@ -53,7 +57,7 @@
       <h1>{ecosystem.name}</h1>
       <div class="flex justify-center sm:justify-start">
         <div class="identity-wrapper">
-          <IdentityBadge address="0xd8da6bf26964af9d7eed9e03e53415d37aa96045" />
+          <IdentityBadge address={ownerAddress} />
         </div>
       </div>
       {#if ecosystem.description}

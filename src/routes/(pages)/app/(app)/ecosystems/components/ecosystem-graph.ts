@@ -48,6 +48,9 @@ export function createDrawStraightEdgeLabel(renderer: Sigma): EdgeLabelDrawingFu
   };
 }
 
+// don't show labels when zoom is less than this
+const LABEL_ZOOM_THRESHOLD = 2;
+
 /**
  * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
  *
@@ -83,7 +86,11 @@ export function drawStraightEdgeLabel<
 
   const camera = renderer.getCamera();
   const cameraState = camera.getState();
-  size = Math.min(size * Math.pow(1 / cameraState.ratio, 1), 16);
+  if (1 / cameraState.ratio < LABEL_ZOOM_THRESHOLD) {
+    return;
+  }
+
+  size = Math.min(size * Math.pow(1 / cameraState.ratio, 1), 14);
 
   context.fillStyle = color;
   context.font = `${weight} ${size}px ${font}`;
