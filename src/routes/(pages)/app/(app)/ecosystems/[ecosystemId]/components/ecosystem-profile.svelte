@@ -313,6 +313,18 @@
         />
       </div>
 
+      <div class="stats">
+        <div class="stat drip-bordered">
+          <KeyValuePair key="Donations">$186,833.91</KeyValuePair>
+        </div>
+        <div class="stat drip-bordered">
+          <KeyValuePair key="Recipients">2,618</KeyValuePair>
+        </div>
+        <div class="stat drip-bordered">
+          <KeyValuePair key="Supporters">A Pile</KeyValuePair>
+        </div>
+      </div>
+
       {#if isClaimed(chainData)}
         <div class="stats" in:fade={{ duration: 300 }}>
           <div class="stat shadow-low rounded-drip-lg">
@@ -501,20 +513,17 @@
   }
 
   .stats {
-    width: calc(100% + 32px);
-    margin: -16px 0 -16px -16px;
-    padding: 16px;
     overflow: scroll;
-    white-space: nowrap;
+    gap: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
   .stats .stat {
-    display: inline-flex;
     padding: 1rem;
     min-height: 6.125rem;
-  }
-  .stats .stat + .stat {
-    margin-left: 0.5rem;
+    flex-grow: 1;
+    flex-basis: 33%;
   }
 
   .card {
@@ -527,6 +536,11 @@
     opacity: 0.5;
   }
 
+  .drip-bordered {
+    border: 1px solid var(--color-foreground-level-3);
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
   @media (max-width: 1080px) {
     .header {
       margin-bottom: 0;
@@ -535,9 +549,7 @@
     aside {
       height: auto;
     }
-  }
 
-  @media (max-width: 1080px) {
     .project-profile {
       gap: 1.5rem;
     }
@@ -550,6 +562,22 @@
     aside {
       grid-row-start: 3;
       grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .stats {
+      gap: 1rem;
+      grid-template-columns: auto auto;
+    }
+
+    .stats .stat:first-child {
+      grid-column: span 2;
+      grid-row-start: 2;
+    }
+
+    .header {
+      gap: 1.5rem;
     }
   }
 </style>
