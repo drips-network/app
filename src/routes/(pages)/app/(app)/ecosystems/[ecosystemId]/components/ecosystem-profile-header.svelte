@@ -24,12 +24,9 @@
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
   } from '$lib/components/project-avatar/project-avatar.svelte';
-  import ProjectBadge, {
-    PROJECT_BADGE_FRAGMENT,
-  } from '$lib/components/project-badge/project-badge.svelte';
+  import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import { gql } from 'graphql-request';
   import twemoji from '$lib/utils/twemoji';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
@@ -44,19 +41,20 @@
 </script>
 
 <div
-  class="ecosystem-profile-header flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative"
+  class="ecosystem-profile-header flex flex-col gap-4 items-center sm:flex-row sm:justify-between relative"
 >
-  <div class="max-w-full flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:gap-8 sm:items-center">
+  <div
+    class="max-w-full flex-1 min-w-0 flex flex-col gap-2 items-center sm:flex-row sm:gap-8 sm:items-center"
+  >
     <div class="avatar">
       <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{ecosystem.name}</h1>
-      <div style:display="flex" style:gap="0.75rem" style:flex-wrap="wrap">
-        {#if isClaimed(projectChainData)}
-          <IdentityBadge address={projectChainData.owner.address} />
-        {/if}
-        <ProjectBadge size="tiny" {project} forceUnclaimed tooltip={false} linkTo="external-url" />
+      <div class="flex justify-center sm:justify-start">
+        <div class="identity-wrapper">
+          <IdentityBadge address="0xd8da6bf26964af9d7eed9e03e53415d37aa96045" />
+        </div>
       </div>
       {#if ecosystem.description}
         <span
@@ -71,4 +69,10 @@
 </div>
 
 <style>
+  .identity-wrapper {
+    border: 1px solid var(--color-foreground-level-3);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+    display: inline-flex;
+  }
 </style>
