@@ -39,16 +39,18 @@ export default (() => {
     // Clean any custom tokens that are already part of the default list
     // This could happen if someone added a token, and the custom token list
     // was later amended.
-    for (const [index, customToken] of customTokens.entries()) {
+    const tokensToRemove: CustomTokenInfoWrapper[] = [];
+    for (const customToken of customTokens) {
       const matchingDefaultToken = defaultTokens.find(
         (t) => t.info.address.toLowerCase() === customToken.info.address.toLowerCase(),
       );
 
       if (matchingDefaultToken) {
         storedTokens.deleteCustomToken(customToken);
-        customTokens = customTokens.splice(index, 1);
+        tokensToRemove.push(customToken);
       }
     }
+    customTokens = customTokens.filter((token) => !tokensToRemove.includes(token));
 
     tokenList.set([...defaultTokens, ...customTokens]);
   }
