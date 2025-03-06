@@ -15,8 +15,7 @@
   } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
   import { fitViewportToNodes } from '@sigma/utils';
-  // @ts-expect-error: debounce sucks
-  import debounce from 'debounce';
+  import { debounce } from 'lodash';
   // import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
@@ -84,7 +83,7 @@
     }
   }
 
-  const refreshGraphDebounced = debounce(refreshGraph, 0);
+  const refreshGraphDebounced = debounce(refreshGraph);
 
   function setPositions(graph: Graph, positions: LayoutMapping) {
     graph.forEachNode((node) => {
@@ -346,7 +345,7 @@
     setPositions(graph, fa2Positions);
 
     const noPositions = noverlap(graph, {
-      maxIterations: 100,
+      maxIterations: 50,
       settings: {
         // gridSize: 20,
         // margin: 5,
@@ -359,6 +358,7 @@
     setPositions(graph, noPositions);
 
     sigmaInstance = new Sigma(graph, graphContainer, {
+      enableCameraRotation: false,
       zIndex: true,
       defaultNodeType: 'bordered',
       autoRescale: false,

@@ -253,7 +253,7 @@
     border-radius: 1rem 0 0 0;
     background: linear-gradient(
       180deg,
-      var(--color-primary-level-2) 0%,
+      var(--color-primary-level-1) 0%,
       rgba(255, 255, 255, 0) 100%
     );
   }
