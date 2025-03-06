@@ -42,6 +42,11 @@ const newGraphSchema = graphSchema.extend({
   nodes: z.array(newNodeScehma),
 });
 
+const avatarSchema = z.object({
+  type: z.string(),
+  emoji: z.string(),
+});
+
 export const ecosystemSchema = z.object({
   id: z.optional(z.string()),
   name: z.string(),
@@ -50,6 +55,8 @@ export const ecosystemSchema = z.object({
   chainId: z.optional(z.string()),
   ownerAccountId: z.optional(z.string()),
   ownerAddress: z.optional(z.string()),
+  avatar: z.optional(avatarSchema),
+  color: z.optional(z.string()),
   metadata: z.array(metadatumSchema),
   nodeCount: z.optional(z.number()),
   graph: z.optional(graphSchema),
