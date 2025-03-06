@@ -18,12 +18,14 @@
     DripListExistsQueryVariables,
   } from './__generated__/gql.generated';
   import * as multiplayer from '$lib/utils/multiplayer';
-  import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import network from '$lib/stores/wallet/network';
+  import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
+  import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
+  import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -132,26 +134,26 @@
     {/if}
   </FormField>
 
-  <div class="whats-next text-left">
-    <div class="card">
-      <h4>After transaction confirmation…</h4>
-      <ul>
-        <UlIconLi icon={DripList}
+  <WhatsNextSection>
+    <WhatsNextCard>
+      <svelte:fragment slot="title">After transaction confirmation…</svelte:fragment>
+      <svelte:fragment slot="items">
+        <WhatsNextItem icon={DripList}
           >The published Drip List will appear on your <span class="typo-text-bold"
             >public profile</span
-          >.</UlIconLi
+          >.</WhatsNextItem
         >
-        <UlIconLi icon={TokenStreams}
+        <WhatsNextItem icon={TokenStreams}
           >You or anyone else can <span class="typo-text-bold">support the Drip List</span> with continuous
-          or one-time donations.</UlIconLi
+          or one-time donations.</WhatsNextItem
         >
-        <UlIconLi icon={Pen}
+        <WhatsNextItem icon={Pen}
           >You can <span class="typo-text-bold">edit the Drip List</span> anytime, or start another voting
-          round.</UlIconLi
+          round.</WhatsNextItem
         >
-      </ul>
-    </div>
-  </div>
+      </svelte:fragment>
+    </WhatsNextCard>
+  </WhatsNextSection>
 
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
@@ -163,27 +165,3 @@
     >
   </svelte:fragment>
 </StepLayout>
-
-<style>
-  .card {
-    background-color: var(--color-background);
-    padding: 1rem;
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-  }
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .whats-next {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-  }
-</style>

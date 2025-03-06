@@ -10,7 +10,6 @@
   import type { State } from '../../create-drip-list-flow';
   import Pen from '$lib/components/icons/Pen.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
-  import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
   import Proposals from '$lib/components/icons/Proposals.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import ArrowUp from '$lib/components/icons/ArrowUp.svelte';
@@ -21,6 +20,9 @@
   import * as multiplayer from '$lib/utils/multiplayer';
   import assert from '$lib/utils/assert';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
+  import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
+  import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -162,33 +164,32 @@
     </svelte:fragment>
   </FormField>
 
-  <div class="whats-next text-left">
-    <div class="card">
-      <h4>Once confirmed…</h4>
-      <ul>
-        <UlIconLi icon={Proposals}
-          >Collaborators can begin <span class="typo-text-bold"
+  <WhatsNextSection>
+    <WhatsNextCard>
+      <svelte:fragment slot="title">Once confirmed…</svelte:fragment>
+      <svelte:fragment slot="items">
+        <WhatsNextItem icon={Proposals}>
+          Collaborators can begin <span class="typo-text-bold"
             >voting on which projects and people should receive what percentage of funds</span
-          >.</UlIconLi
-        >
-        <UlIconLi icon={DripList}
-          >The Drip List will appear on your <span class="typo-text-bold">public profile</span
-          >.</UlIconLi
-        >
-      </ul>
-    </div>
-    <div class="card">
-      <h4>After the voting period…</h4>
-      <ul>
-        <UlIconLi icon={ArrowUp}
-          >You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.</UlIconLi
-        >
-        <UlIconLi icon={Pen}
-          ><span class="typo-text-bold">Edit your Drip List</span> anytime.</UlIconLi
-        >
-      </ul>
-    </div>
-  </div>
+          >.
+        </WhatsNextItem>
+        <WhatsNextItem icon={DripList}>
+          The Drip List will appear on your <span class="typo-text-bold">public profile</span>.
+        </WhatsNextItem>
+      </svelte:fragment>
+    </WhatsNextCard>
+    <WhatsNextCard>
+      <svelte:fragment slot="title">After the voting period…</svelte:fragment>
+      <svelte:fragment slot="items">
+        <WhatsNextItem icon={ArrowUp}>
+          You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.
+        </WhatsNextItem>
+        <WhatsNextItem icon={Pen}>
+          <span class="typo-text-bold">Edit your Drip List</span> anytime.
+        </WhatsNextItem>
+      </svelte:fragment>
+    </WhatsNextCard>
+  </WhatsNextSection>
 
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
@@ -200,27 +201,3 @@
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-  .card {
-    background-color: var(--color-background);
-    padding: 1rem;
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-  }
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .whats-next {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-  }
-</style>

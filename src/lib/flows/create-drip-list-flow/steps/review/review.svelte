@@ -13,7 +13,6 @@
   import unreachable from '$lib/utils/unreachable';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import tokensStore from '$lib/stores/tokens/tokens.store';
-  import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
   import CoinIcon from '$lib/components/icons/Coin.svelte';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import DripListService from '$lib/utils/driplist/DripListService';
@@ -34,6 +33,9 @@
   import network from '$lib/stores/wallet/network';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
+  import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
+  import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -189,16 +191,16 @@
     </FormField>
   {/if}
 
-  <div class="whats-next text-left">
-    <div class="card">
-      <h4>On transaction confirmation…</h4>
-      <ul>
+  <WhatsNextSection>
+    <WhatsNextCard>
+      <svelte:fragment slot="title">On transaction confirmation…</svelte:fragment>
+      <svelte:fragment slot="items">
         {#if $context.selectedSupportOption === 1}
           {#if $context.continuousSupportConfig.topUpAmountValueParsed && $context.continuousSupportConfig.streamRateValueParsed && $context.continuousSupportConfig.listSelected[0]}
             {@const token =
               tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0]) ??
               unreachable()}
-            <UlIconLi icon={TransactionsIcon}>
+            <WhatsNextItem icon={TransactionsIcon}>
               <span class="typo-text-bold">
                 {formatTokenAmount(
                   $context.continuousSupportConfig.topUpAmountValueParsed,
@@ -218,7 +220,7 @@
                 )}
                 {token.info.symbol} per month</span
               >.
-            </UlIconLi>
+            </WhatsNextItem>
           {/if}
         {/if}
         {#if $context.selectedSupportOption === 2}
@@ -226,7 +228,7 @@
             tokensStore.getByAddress(
               $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
             ) ?? unreachable()}
-          <UlIconLi icon={TransactionsIcon}>
+          <WhatsNextItem icon={TransactionsIcon}>
             <span class="typo-text-bold">
               {formatTokenAmount(
                 $context.oneTimeDonationConfig.amount ?? unreachable(),
@@ -237,47 +239,47 @@
               {token.info.symbol} will be transferred from your wallet</span
             >
             and distributed to your list.
-          </UlIconLi>
+          </WhatsNextItem>
         {/if}
-        <UlIconLi icon={ListIcon}
+        <WhatsNextItem icon={ListIcon}
           >Your new Drip List will appear on your <span class="typo-text-bold">public profile</span
-          >.</UlIconLi
+          >.</WhatsNextItem
         >
-      </ul>
-    </div>
-    <div class="card">
-      <h4>After transaction confirmation…</h4>
-      <ul>
+      </svelte:fragment>
+    </WhatsNextCard>
+    <WhatsNextCard>
+      <svelte:fragment slot="title">After transaction confirmation…</svelte:fragment>
+      <svelte:fragment slot="items">
         {#if $context.selectedSupportOption === 1}
-          <UlIconLi icon={CoinIcon}>
+          <WhatsNextItem icon={CoinIcon}>
             <span class="typo-text-bold">Add funds</span> (or withdraw any unstreamed funds) from your
             Drips dashboard.
-          </UlIconLi>
-          <UlIconLi icon={Pause}>
+          </WhatsNextItem>
+          <WhatsNextItem icon={Pause}>
             <span class="typo-text-bold">Pause or cancel</span> your support anytime.
-          </UlIconLi>
-          <UlIconLi icon={Heart}>
+          </WhatsNextItem>
+          <WhatsNextItem icon={Heart}>
             <span class="typo-text-bold">Create additional support streams</span> or make one-time donations
             anytime.
-          </UlIconLi>
+          </WhatsNextItem>
         {/if}
         {#if $context.selectedSupportOption === 2}
-          <UlIconLi icon={Heart}>
+          <WhatsNextItem icon={Heart}>
             <span class="typo-text-bold">Make more one-time donations</span> or start a continuous support
             stream anytime.
-          </UlIconLi>
+          </WhatsNextItem>
         {/if}
         {#if $context.selectedSupportOption === undefined}
-          <UlIconLi icon={TokenStreams}>
+          <WhatsNextItem icon={TokenStreams}>
             You can <span class="typo-text-bold">start supporting</span> your Drip List anytime.
-          </UlIconLi>
+          </WhatsNextItem>
         {/if}
-        <UlIconLi icon={PenIcon}
-          ><span class="typo-text-bold">Edit</span> your Drip List anytime.</UlIconLi
+        <WhatsNextItem icon={PenIcon}
+          ><span class="typo-text-bold">Edit</span> your Drip List anytime.</WhatsNextItem
         >
-      </ul>
-    </div>
-  </div>
+      </svelte:fragment>
+    </WhatsNextCard>
+  </WhatsNextSection>
 
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={goBack}>Back</Button>
@@ -289,29 +291,7 @@
 </StandaloneFlowStepLayout>
 
 <style>
-  .card {
-    background-color: var(--color-background);
-    padding: 1rem;
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-  }
-
   .drip-list-title {
     margin-bottom: 1rem;
-  }
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .whats-next {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
   }
 </style>
