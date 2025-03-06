@@ -179,6 +179,7 @@
       </div>
       <div class="surface top-right">
         <Button on:click={handleClickExpand}>
+          <button class="mobile-graph-expander"></button>
           {#if expanded}
             <ArrowCollapse style="fill: var(--color-foreground)" />Collapse
           {:else}
@@ -379,6 +380,10 @@
     }
   }
 
+  .mobile-graph-expander {
+    display: none;
+  }
+
   @media (max-width: 768px) {
     .ecosystem-card-wrapper {
       padding-bottom: 131.57%;
@@ -414,6 +419,21 @@
 
     .ecosystem-card-wrapper.expanded .surface.bottom-right {
       display: flex;
+    }
+
+    .mobile-graph-expander {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 2;
+    }
+
+    .ecosystem-card-wrapper.expanded .mobile-graph-expander {
+      display: none;
     }
   }
 </style>
