@@ -29,6 +29,8 @@ case "$ARCH" in
 esac
 export ARCH
 
+export LOCAL_UID=$(id -u)
+export LOCAL_GID=$(id -g)
 docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 
 printf "⏳ Waiting for the app to start..."

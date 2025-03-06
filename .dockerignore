@@ -1,11 +1,11 @@
 node_modules
 docs
 docker
+!docker/dev-entrypoint.sh
 Dockerfile
 Dockerfile.dev
 .git
 .gitignore
 .env
 build
-.svelte-kit
 docker-compose.*
