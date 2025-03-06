@@ -15,7 +15,7 @@
   } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
   import { fitViewportToNodes } from '@sigma/utils';
-  import { debounce } from 'lodash';
+  import _ from 'lodash';
   // import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
@@ -83,7 +83,7 @@
     }
   }
 
-  const refreshGraphDebounced = debounce(refreshGraph);
+  const refreshGraphDebounced = _.debounce(refreshGraph);
 
   function setPositions(graph: Graph, positions: LayoutMapping) {
     graph.forEachNode((node) => {
