@@ -15,7 +15,6 @@
   import { makeStep, type StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import UlIconLi from '$lib/components/ul-icon-li/ul-icon-li.svelte';
   import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import EyeOpenIcon from '$lib/components/icons/EyeOpen.svelte';
   import TokenStreamsIcon from '$lib/components/icons/TokenStreams.svelte';
@@ -41,6 +40,9 @@
   import network from '$lib/stores/wallet/network';
   import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';
   import sanitize from 'sanitize-html';
+  import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
+  import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
+  import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -200,69 +202,59 @@
       </div>
     </div>
   </FormField>
-  <div class="whats-next">
+  <WhatsNextSection>
     {#if hasCollectableAmount || hasSplittableAmount}
-      <div class="card">
-        <h4>On transaction confirmation…</h4>
-        <ul>
+      <WhatsNextCard>
+        <svelte:fragment slot="title">On transaction confirmation...</svelte:fragment>
+        <svelte:fragment slot="items">
           {#if hasCollectableAmount && hasSplittableAmount}
-            <!--
-              Something called "Split" before the project was claimed,
-              and there's also a splittable amount too.
-            -->
-            <UlIconLi icon={Download}
+            <WhatsNextItem icon={Download}
               >Some of your claimable funds will be <span class="typo-text-bold"
                 >collected directly to your connected wallet</span
-              > as shown above.</UlIconLi
+              > as shown above.</WhatsNextItem
             >
-            <UlIconLi icon={SplitsIcon}
+            <WhatsNextItem icon={SplitsIcon}
               >Remaining claimable funds will be <span class="typo-text-bold"
                 >immediately split</span
-              > as shown above.</UlIconLi
+              > as shown above.</WhatsNextItem
             >
           {:else if hasCollectableAmount}
-            <!--
-              Something called "Split" before the project was claimed.
-            -->
-            <UlIconLi icon={SplitsIcon}
+            <WhatsNextItem icon={SplitsIcon}
               >Claimable funds will be<span class="typo-text-bold"
                 >collected directly to your connected wallet</span
-              > as shown above.</UlIconLi
+              > as shown above.</WhatsNextItem
             >
           {:else if hasSplittableAmount}
-            <!--
-              The usual case; no-one has called `split` on the account before it
-              being claimed.
-            -->
-            <UlIconLi icon={SplitsIcon}
+            <WhatsNextItem icon={SplitsIcon}
               >All claimable funds will be <span class="typo-text-bold"
                 >immediately split as shown above</span
-              >.</UlIconLi
+              >.</WhatsNextItem
             >
           {/if}
-        </ul>
-      </div>
+        </svelte:fragment>
+      </WhatsNextCard>
     {/if}
-    <div class="card">
-      <h4>After transaction confirmation…</h4>
-      <ul>
-        <UlIconLi icon={EyeOpenIcon}>Anyone can support or split to your project on Drips.</UlIconLi
+    <WhatsNextCard>
+      <svelte:fragment slot="title">After transaction confirmation...</svelte:fragment>
+      <svelte:fragment slot="items">
+        <WhatsNextItem icon={EyeOpenIcon}
+          >Anyone can support or split to your project on Drips.</WhatsNextItem
         >
-        <UlIconLi icon={WalletIcon}
+        <WhatsNextItem icon={WalletIcon}
           >You can <span class="typo-text-bold">collect your tokens</span> from your
-          <span class="typo-text-bold">Drips dashboard</span>.</UlIconLi
+          <span class="typo-text-bold">Drips dashboard</span>.</WhatsNextItem
         >
-        <UlIconLi icon={TokenStreamsIcon}>
+        <WhatsNextItem icon={TokenStreamsIcon}>
           {@html sanitize(network.settlement.recipientsExplainerHtml, {
             allowedTags: ['span'],
             allowedAttributes: {
               span: ['class'],
             },
-          })}</UlIconLi
+          })}</WhatsNextItem
         >
-      </ul>
-    </div>
-  </div>
+      </svelte:fragment>
+    </WhatsNextCard>
+  </WhatsNextSection>
   <svelte:fragment slot="left-actions">
     <Button
       icon={ArrowLeft}
@@ -278,30 +270,6 @@
 </StandaloneFlowStepLayout>
 
 <style>
-  .card {
-    background-color: var(--color-background);
-    padding: 1rem;
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-    overflow-x: scroll;
-    text-align: left;
-  }
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .whats-next {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-  }
-
   .drip-icon {
     width: 1.5rem;
   }

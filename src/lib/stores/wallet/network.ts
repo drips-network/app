@@ -40,6 +40,7 @@ export type Network = {
   applyGasBuffers: boolean;
   settlement: {
     nextSettlementDate: (() => Date) | 'daily';
+    frequencyLabel: string;
     recipientsExplainerHtml: string;
     explainerText: string;
   };
@@ -117,6 +118,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      frequencyLabel: 'on the last Thursday of every month',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
@@ -160,6 +162,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      frequencyLabel: 'on the last Thursday of every month',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
@@ -203,6 +206,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      frequencyLabel: 'on the last Thursday of every month',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
@@ -246,6 +250,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      frequencyLabel: 'on the last Thursday of every month',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
@@ -289,6 +294,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      frequencyLabel: 'on the last Thursday of every month',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
@@ -340,6 +346,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
+      frequencyLabel: 'on the last Thursday of every month',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">monthly</span>, on the last Thursday of every month.',
       explainerText:
@@ -382,6 +389,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: 'daily',
+      frequencyLabel: 'daily',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
@@ -436,6 +444,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: 'daily',
+      frequencyLabel: 'daily',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
@@ -486,6 +495,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     settlement: {
       nextSettlementDate: 'daily',
+      frequencyLabel: 'daily',
       recipientsExplainerHtml:
         'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
       explainerText:
