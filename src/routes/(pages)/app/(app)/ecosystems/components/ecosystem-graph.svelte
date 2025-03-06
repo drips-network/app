@@ -15,6 +15,8 @@
   } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
   import { fitViewportToNodes } from '@sigma/utils';
+  // @ts-expect-error: debounce sucks
+  import debounce from 'debounce';
   // import circlepack from 'graphology-layout/circlepack';
 
   const dispatch = createEventDispatcher<{
@@ -44,7 +46,7 @@
   let lastH: number = h;
 
   // for expanding and collapsing, refresh instance to get most up to date view
-  $: w, h, refreshGraph(), cuttilyDetectCollapseAndDeselectNode();
+  $: w, h, refreshGraphDebounced(), cuttilyDetectCollapseAndDeselectNode();
 
   interface State {
     isDragging?: boolean;
@@ -81,6 +83,8 @@
       sigmaInstance.refresh({ schedule: true, skipIndexation: true });
     }
   }
+
+  const refreshGraphDebounced = debounce(refreshGraph, 0);
 
   function setPositions(graph: Graph, positions: LayoutMapping) {
     graph.forEachNode((node) => {
