@@ -178,8 +178,8 @@
         <!-- <SearchInput small placeholder="Search" /> -->
       </div>
       <div class="surface top-right">
+        <button class="mobile-graph-expander" on:click={handleClickExpand}></button>
         <Button on:click={handleClickExpand}>
-          <button class="mobile-graph-expander"></button>
           {#if expanded}
             <ArrowCollapse style="fill: var(--color-foreground)" />Collapse
           {:else}
@@ -382,6 +382,14 @@
 
   .mobile-graph-expander {
     display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1;
+    border-radius: 1rem 0 1rem 1rem;
   }
 
   @media (max-width: 768px) {
@@ -423,13 +431,6 @@
 
     .mobile-graph-expander {
       display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      z-index: 2;
     }
 
     .ecosystem-card-wrapper.expanded .mobile-graph-expander {
