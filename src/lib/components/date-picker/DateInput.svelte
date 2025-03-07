@@ -173,6 +173,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="date-time-field {classes}" on:focusout={onFocusOut} on:keydown={keydown}>
   <TextInput
+    testId="date-time-field"
     bind:inputElement={InputElement}
     validationState={valid ? { type: 'valid' } : { type: 'invalid', message: 'Invalid date' }}
     value={text}

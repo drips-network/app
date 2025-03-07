@@ -2,6 +2,7 @@ node_modules
 docs
 docker
 !docker/dev-entrypoint.sh
+!docker/e2e-entrypoint.sh
 Dockerfile
 Dockerfile.dev
 .git

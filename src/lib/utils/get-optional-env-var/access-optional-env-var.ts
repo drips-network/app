@@ -1,4 +1,5 @@
 import { building, dev } from '$app/environment';
+import * as publicEnv from '$env/static/public';
 
 /**
  * **DO NOT use this directly, instead import `getOptionalEnvVar` from either `private.ts` or `public.ts` in this dir.**
@@ -19,7 +20,11 @@ export default function accessOptionalEnvVar(
 
   const needProdEnvVars = !(dev || building);
 
-  if (needProdEnvVars && requiredInProd && varMissing) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const surpressMissingVarErrors =
+    (publicEnv as any).PUBLIC_SUPPRESS_MISSING_VAR_IN_PROD_ERRORS === 'true';
+
+  if (needProdEnvVars && requiredInProd && !surpressMissingVarErrors && varMissing) {
     throw new Error(`${varName} env var is required in production! ${{ dev, building }}`);
   } else if (dev && varMissing) {
     const errorMessage = errorMessageIfMissingInDev

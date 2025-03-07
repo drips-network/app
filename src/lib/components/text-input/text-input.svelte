@@ -24,6 +24,8 @@
   export let showSuccessCheck = false;
   export let showClearButton = false;
 
+  export let testId: string | undefined = undefined;
+
   export let icon: ComponentType | undefined = undefined;
 
   export let inputStyle: string | undefined = undefined;
@@ -102,6 +104,7 @@
     autocapitalize={autocapitalize ? 'on' : 'off'}
     autocorrect={autocorrect ? 'on' : 'off'}
     lang="en-001"
+    data-testid={testId}
   />
 
   <div class="right-container" bind:clientWidth={rightContainerWidth}>

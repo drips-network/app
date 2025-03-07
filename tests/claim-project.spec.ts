@@ -10,20 +10,20 @@ test('claim project flow', async ({ page }) => {
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('link', { name: 'Projects' }).click();
   await page.getByRole('button', { name: 'Claim project' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('textbox', { name: 'Paste your GitHub project URL' }).click();
   await page
     .getByRole('textbox', { name: 'Paste your GitHub project URL' })
     .fill('github.com/efstajas/drips-test-repo-10');
   await page.getByRole('textbox', { name: 'Paste your GitHub project URL' }).press('Enter');
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByText('I edited the FUNDING.json file').click();
   await page.getByRole('button', { name: 'Verify now' }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('100');
   await page.getByRole('textbox').first().press('Enter');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
 
   await expect(page.getByTestId('current-tx')).toContainText('Finalizing verification', {
@@ -34,7 +34,7 @@ test('claim project flow', async ({ page }) => {
 
   await expect(page.getByText('Set project splits and metadata')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Continue' }).click({ timeout: 120_000 });
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
   await page.getByRole('button', { name: 'View project profile' }).click();
 
   await page.waitForURL(
