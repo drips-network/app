@@ -131,14 +131,42 @@
 
     expanded = !expanded;
   }
+
+  function stopScroll(event: WheelEvent | TouchEvent | KeyboardEvent) {
+    if (!expanded) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const keys: Record<number, number> = { 37: 1, 38: 1, 39: 1, 40: 1 };
+  function stopKeyScroll(event: KeyboardEvent) {
+    if (!expanded) {
+      return;
+    }
+
+    if (keys[event.keyCode]) {
+      stopScroll(event);
+      return false;
+    }
+  }
 </script>
 
+<svelte:window on:keydown={(event) => stopKeyScroll(event)} />
 <div
   class="ecosystem-card-wrapper"
   class:ecosystem-card-wrapper--interactive={isInteractive}
   class:expanded
 >
-  <div class="ecosystem-card" class:hidden-project={isHidden} bind:this={ecosystemCardElement}>
+  <div
+    class="ecosystem-card"
+    class:hidden-project={isHidden}
+    bind:this={ecosystemCardElement}
+    on:wheel={(event) => stopScroll(event)}
+    on:touchmove={(event) => stopScroll(event)}
+  >
     <div class="background" />
     <div class="graph">
       <EcosystemGraph {ecosystem} bind:zoom on:nodeSelectionChanged={handleNodeSelectionChanged} />
