@@ -9,7 +9,7 @@ services:
 
   testnet:
     volumes:
-      - anvil-data:/anvil-data
+      - anvil-data:/contracts/anvil-data
 
   pgadmin:
     image: dpage/pgadmin4
