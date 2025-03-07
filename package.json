@@ -7,6 +7,7 @@
     "dev:docker": "./docker/start-dev.sh",
     "dev:docker:clear": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v",
     "dev:docker:update-repo-owner": "./docker/update-repo-owner.sh",
+    "dev:docker:sprinkle": "./docker/sprinkle.sh",
     "preview": "vite preview",
     "test:unit": "vitest run unit",
     "test:e2e": "./docker/start-e2e.sh --start-playwright-ui",
