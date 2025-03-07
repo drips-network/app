@@ -141,6 +141,15 @@
     event.stopPropagation();
   }
 
+  function stopTouchScroll(event: TouchEvent) {
+    // allow graph to be manipulated
+    if (event.target && (event.target as HTMLElement).classList.contains('sigma-mouse')) {
+      return;
+    }
+
+    stopScroll(event);
+  }
+
   const keys: Record<number, number> = { 37: 1, 38: 1, 39: 1, 40: 1 };
   function stopKeyScroll(event: KeyboardEvent) {
     if (!expanded) {
@@ -165,7 +174,7 @@
     class:hidden-project={isHidden}
     bind:this={ecosystemCardElement}
     on:wheel={(event) => stopScroll(event)}
-    on:touchmove={(event) => stopScroll(event)}
+    on:touchmove={(event) => stopTouchScroll(event)}
   >
     <div class="background" />
     <div class="graph">
