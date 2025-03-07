@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test:unit": "vitest run unit",
     "test:e2e": "./docker/start-e2e.sh --start-playwright-ui",
-    "test:e2e:headless": "./docker/start-e2e.sh",
+    "test:e2e:headless": "./docker/start-e2e.sh --prod-build",
     "coverage": "vitest run --coverage",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

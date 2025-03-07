@@ -20,6 +20,9 @@ services:
       - PUBLIC_USE_LOCAL_TESTNET_WALLET_STORE=${APP_USE_LOCAL_TESTNET_WALLET_STORE-false}
       - LOCAL_UID=${LOCAL_UID-root}
       - LOCAL_GID=${LOCAL_GID-root}
+      - PUBLIC_BASE_URL=http://localhost:5173
+      - PUBLIC_PORT=5173
+      - PUBLIC_SUPPRESS_MISSING_VAR_IN_PROD_ERRORS=true
     volumes:
     - .:/app
     - /app/node_modules/

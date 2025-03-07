@@ -2,6 +2,7 @@
 set -eu
 
 UI=false
+PROD_BUILD=false
 
 cleanup() {
     docker compose -f docker-compose.yml rm -fsv
@@ -12,6 +13,10 @@ touch .env
 
 if [[ $* == *--start-playwright-ui* ]]; then
     UI=true
+fi
+
+if [[ $* == *--prod-build* ]]; then
+    PROD_BUILD=true
 fi
 
 ARCH=$(uname -m)
@@ -31,7 +36,13 @@ export ARCH
 
 export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
-docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+
+if [ $PROD_BUILD = true ]; then
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
+else
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+fi
+
 
 printf "⏳ Waiting for the app to start..."
 
