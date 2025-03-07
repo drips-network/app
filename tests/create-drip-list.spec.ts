@@ -21,7 +21,7 @@ test('create a drip list', async ({ page }) => {
       exact: true,
     })
     .click();
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('textbox').click();
   await page.getByRole('textbox').fill('github.com/efstajas/drips-test-repo-10');
   await page.getByRole('textbox').press('Enter');
@@ -50,10 +50,10 @@ test('create a drip list', async ({ page }) => {
     .getByTestId('item-80921553623925136102837120782793736893291544351678576578072673071408')
     .getByRole('spinbutton')
     .press('Enter');
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('button', { name: 'Support later' }).click();
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click({ timeout: 120_000 });
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
   await page.getByRole('button', { name: 'View your Drip List' }).click();
 
   await page.waitForURL('http://localhost:5173/app/drip-lists/*');
@@ -86,7 +86,7 @@ test('create collaborative drip list', async ({ page }) => {
       exact: true,
     })
     .click();
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('textbox', { name: 'Add Collaborators* Import' }).click();
   await page.getByRole('textbox', { name: 'Add Collaborators* Import' }).click();
   await page
@@ -105,7 +105,7 @@ test('create collaborative drip list', async ({ page }) => {
     .getByTestId('date-time-field')
     .fill(inCurrentTimezone.toISOString().slice(0, 19).replace('T', ' '));
 
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
   await page.getByRole('button', { name: 'View your Drip List' }).click();
   await page.getByRole('button', { name: 'Cast your vote' }).click();
@@ -145,7 +145,7 @@ test('create collaborative drip list', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Publish Drip List' }).nth(1).click({ timeout: 120_000 });
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click({ timeout: 120_000 });
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
   await page.getByRole('button', { name: 'Got it' }).click();
 
   await expect(page.getByText('this list is in voting').nth(0)).not.toBeVisible();
