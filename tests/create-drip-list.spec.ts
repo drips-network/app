@@ -5,8 +5,7 @@ test('create a drip list', async ({ page }) => {
 
   page.emulateMedia({ reducedMotion: 'reduce' });
 
-  await page.goto('http://localhost:5173/');
-  await page.getByRole('link', { name: 'Open app' }).click();
+  await page.goto('http://localhost:5173/app');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('link', { name: 'Drip Lists' }).click();
   await page.getByRole('button', { name: 'Create Drip List' }).click();
@@ -71,7 +70,7 @@ test('create collaborative drip list', async ({ page }) => {
 
   page.emulateMedia({ reducedMotion: 'reduce' });
 
-  await page.goto('http://localhost:5173/');
+  await page.goto('http://localhost:5173/app');
   await page.getByRole('link', { name: 'Open app' }).click();
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('link', { name: 'Drip Lists' }).click();
