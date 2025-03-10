@@ -241,6 +241,17 @@
     graph.addEdgeWithKey(edge, source, target, attribs);
   }
 
+  const MIN_CAMERA_RATIO = 0.25;
+  async function initializeGraphViewport() {
+    requestAnimationFrame(async () => {
+      await fitViewportToNodes(sigmaInstance, graph.nodes(), { animate: true });
+      const camera = sigmaInstance.getCamera();
+      const state = camera.getState();
+      sigmaInstance.setSetting('minCameraRatio', MIN_CAMERA_RATIO);
+      sigmaInstance.setSetting('maxCameraRatio', state.ratio);
+    });
+  }
+
   async function initializeGraph() {
     networkStyle = window.getComputedStyle(graphContainer);
     colorPrimary = networkStyle.getPropertyValue('--color-primary');
@@ -281,19 +292,15 @@
         return e.source !== null && e.target === node.projectAccountId;
       });
       const firstParent = firstParentEdge ? firstParentEdge.source : node.projectAccountId;
-      // console.log(firstParent, '')
       graph.addNode(node.projectAccountId, {
         color: isPrimary ? colorPrimary : colorForeground,
         labelBackgroundColor: colorBackground,
-        // label: `${node.repoOwner}/${node.repoName}`,
         x: Math.random(),
         y: Math.random(),
         size: isPrimary ? 16 : 8,
         borderColor: colorForeground,
         borderSize: isPrimary ? 2 : 0,
         firstParent,
-        // repoOwner: node.repoOwner,
-        // repoName: node.repoName,
         projectName: `${node.repoOwner}/${node.repoName}`,
         isPrimary,
       });
@@ -436,9 +443,7 @@
     sigmaInstance.setSetting('nodeReducer', nodeReducer);
     sigmaInstance.setSetting('edgeReducer', edgeReducer);
 
-    setTimeout(() => {
-      fitViewportToNodes(sigmaInstance, graph.nodes(), { animate: true });
-    }, 0);
+    initializeGraphViewport();
   }
 
   onMount(initializeGraph);
