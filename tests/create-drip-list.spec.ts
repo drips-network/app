@@ -22,12 +22,12 @@ test('create a drip list', async ({ page }) => {
     })
     .click();
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();
-  await page.getByRole('textbox').click();
-  await page.getByRole('textbox').fill('github.com/efstajas/drips-test-repo-10');
-  await page.getByRole('textbox').press('Enter');
-  await page.getByRole('textbox').click();
-  await page.getByRole('textbox').fill('0x70997970C51812dc3A010C7d01b50e0d17dc79C8');
-  await page.getByRole('textbox').press('Enter');
+  await page.getByTestId('list-editor-input').click();
+  await page.getByTestId('list-editor-input').fill('github.com/efstajas/drips-test-repo-10');
+  await page.getByTestId('list-editor-input').press('Enter');
+  await page.getByTestId('list-editor-input').click();
+  await page.getByTestId('list-editor-input').fill('0x70997970C51812dc3A010C7d01b50e0d17dc79C8');
+  await page.getByTestId('list-editor-input').press('Enter');
   await page.getByRole('button', { name: 'Clear' }).click();
   await page
     .getByTestId('item-642829559307850963015472508762062935916233390536')
