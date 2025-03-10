@@ -10,7 +10,9 @@ import osoUnweighted from './__test__/data/oso-unweighted-graph.csv?raw';
 import fs from 'fs';
 import osoGraphErrors from './__test__/data/oso-unweighted-graph-errors.json';
 
-export async function osoToFabricatedGraph(outputPath: string = 'fabricated-graph.json') {
+export async function osoToFabricatedGraph(
+  outputPath: string = `fabricated-graph-${+new Date()}.json`,
+) {
   const osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');
   const osoGraph = await csvToGraph(osoUnweightedFile, { source: 1, target: 5, startIndex: 1 });
   correctGraph(osoGraph, osoGraphErrors);
