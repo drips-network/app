@@ -20,5 +20,8 @@ RUN rm -rf .svelte-kit
 EXPOSE 5173
 
 COPY ./docker/dev-entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./docker/e2e-entrypoint.sh /usr/local/bin/e2e-entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/e2e-entrypoint.sh
+
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
