@@ -3,8 +3,8 @@ import { csvToGraph } from '../csv-to-graph';
 import { correctGraph, removeNode, reduceGraph } from '../graph-utils';
 import osoUnweighted from './data/oso-unweighted-graph.csv?raw';
 import osoGraphErrors from './data/oso-unweighted-graph-errors.json';
-// import { osoToFabricatedGraph } from '../oso-to-graph';
 // import { osoToGraphJson } from '../oso-to-graph';
+// import { osoToFabricatedGraph } from '../oso-to-graph';
 
 describe('csv-to-graph', () => {
   const osoUnweightedFile = new File([new Blob([osoUnweighted], { type: 'text/csv' })], 'name');

@@ -99,8 +99,6 @@
       repoName: fullNode.repoName,
       forge: 'github',
     };
-    // eslint-disable-next-line no-console
-    console.log('project', selectedProjectData);
   }
 
   function handleNodeSelectionChanged(event: CustomEvent<NodeSelectionChangedPayload>) {
