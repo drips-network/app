@@ -61,6 +61,9 @@
     hoveredNeighbors?: Set<string>;
     // State derived from selected node:
     selectedNeighbors?: Set<string>;
+
+    hoveredEdge?: string;
+    hoveredEdgeExtremities?: Set<string>;
   }
   const state: State = { searchQuery: '' };
 
@@ -146,6 +149,18 @@
     refreshGraph();
   }
 
+  function setHoveredEdge(edge?: string) {
+    if (edge) {
+      state.hoveredEdge = edge;
+      state.hoveredEdgeExtremities = new Set(graph.extremities(edge));
+    } else {
+      state.hoveredEdge = undefined;
+      state.hoveredEdgeExtremities = undefined;
+    }
+
+    refreshGraph();
+  }
+
   // Render nodes accordingly to the internal state:
   // 1. If a node is selected, it is highlighted
   // 2. If there is query, all non-matching nodes are greyed
@@ -162,12 +177,18 @@
       }
     }
 
-    if (state.hoveredNode === node) {
+    if (state.hoveredNode === node || state.hoveredEdgeExtremities?.has(node)) {
       // @ts-expect-error: might be undefined
       res.label = res.projectName;
+      // res.forceLabel = true
+      res.highlighted = true;
     }
 
-    if (state.hoveredNode === node || state.selectedNode === node) {
+    if (
+      state.hoveredNode === node ||
+      state.selectedNode === node ||
+      state.hoveredEdgeExtremities?.has(node)
+    ) {
       // TODO: adjust border according to zoom?
       // const camera = sigmaInstance.getCamera()
       // const cameraState = camera.getState()
@@ -198,7 +219,10 @@
   function edgeReducer(edge: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<EdgeDisplayData> = { ...data };
 
-    if (state.selectedNode) {
+    if (state.hoveredEdge && state.hoveredEdge === edge) {
+      res.color = colorPrimary;
+      // res.forceLabel = true;
+    } else if (state.selectedNode) {
       if (graph.extremities(edge).includes(state.selectedNode)) {
         // show edge labels when we have selected a node
         res.color = colorPrimary;
@@ -376,6 +400,8 @@
         color: colorForeground,
       },
       renderEdgeLabels: true,
+      enableEdgeEvents: true,
+      // enableEdgeHoverEvents: false,
       edgeLabelFont: 'Inter',
       edgeLabelWeight: '600',
       edgeLabelSize: 14,
@@ -430,8 +456,14 @@
     sigmaInstance.on('enterNode', ({ node }) => {
       setHoveredNode(node);
     });
+    sigmaInstance.on('enterEdge', ({ edge }) => {
+      setHoveredEdge(edge);
+    });
     sigmaInstance.on('leaveNode', () => {
       setHoveredNode(undefined);
+    });
+    sigmaInstance.on('leaveEdge', () => {
+      setHoveredEdge(undefined);
     });
     sigmaInstance.on('clickNode', ({ node }) => {
       setSelectedNode(node);
