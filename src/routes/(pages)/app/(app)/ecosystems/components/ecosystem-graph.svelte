@@ -392,7 +392,16 @@
       // don't adjust the size of the nodes and edges
       // when zooming.
       // https://www.sigmajs.org/storybook/?path=/story/fit-sizes-to-positions--story
-      // zoomToSizeRatioFunction: () => 1,
+      zoomToSizeRatioFunction: (zoom) => {
+        // TODO: refine
+        const threshold = (1 / zoom) * 16;
+        if (threshold > 16) {
+          return 1;
+        }
+
+        return zoom;
+      },
+      // itemSizesReference: 'positions',
       nodeProgramClasses: {
         // bordered: NodeBorderProgram,
         bordered: createNodeBorderProgram({
