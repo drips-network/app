@@ -3,6 +3,7 @@ import tokens from '.';
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 import network from '../wallet/network';
 import { toBigInt } from 'ethers';
+import { createCustomToken, readCustomTokensList } from './stored-custom-tokens';
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -145,6 +146,75 @@ describe('tokens store', () => {
     tokens.init();
 
     expect(tokens.getByAddress(TEST_CUSTOM_TOKEN_INFO.address)).toBeUndefined();
+  });
+
+  it('deletes custom tokens that are part of the default chain list', () => {
+    vi.mocked(network).chainId = 11155111;
+
+    const wrappedEtherTokenInfo = {
+      name: 'Wrapped Ether',
+      address: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
+      symbol: 'WETH',
+      decimals: 18,
+      chainId: 11155111,
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+    };
+
+    const uniswapTokenInfo = {
+      name: 'Uniswap',
+      address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+      symbol: 'UNI',
+      decimals: 18,
+      chainId: 11155111,
+      logoURI: '',
+    };
+
+    const anotherTokenInfo = {
+      name: 'Another Token',
+      address: '0x7705ea2afD095d898f73023C30fC49490799A730',
+      symbol: 'AT',
+      decimals: 18,
+      chainId: 11155111,
+      logoURI: '',
+    };
+
+    createCustomToken(wrappedEtherTokenInfo);
+    createCustomToken(uniswapTokenInfo);
+    createCustomToken(anotherTokenInfo);
+
+    const storedValueForWrappedEther = {
+      source: 'custom',
+      banned: false,
+      info: wrappedEtherTokenInfo,
+    };
+
+    const storedValueForUniswap = {
+      source: 'custom',
+      banned: false,
+      info: uniswapTokenInfo,
+    };
+
+    const storedValueForAnotherToken = {
+      source: 'custom',
+      banned: false,
+      info: anotherTokenInfo,
+    };
+
+    expect(readCustomTokensList()).toContainEqual(storedValueForWrappedEther);
+    expect(readCustomTokensList()).toContainEqual(storedValueForUniswap);
+    expect(readCustomTokensList()).toContainEqual(storedValueForAnotherToken);
+
+    tokens.init();
+
+    expect(readCustomTokensList()).not.toContainEqual(storedValueForWrappedEther);
+    expect(tokens.getByAddress(wrappedEtherTokenInfo.address)?.source).toBe('default');
+
+    expect(readCustomTokensList()).not.toContainEqual(storedValueForUniswap);
+    expect(tokens.getByAddress(uniswapTokenInfo.address)?.source).toBe('default');
+
+    expect(readCustomTokensList()).toContainEqual(storedValueForAnotherToken);
+    expect(tokens.getByAddress(anotherTokenInfo.address)?.source).toBe('custom');
   });
 });
 

@@ -230,6 +230,7 @@
     <List style="fill: var(--color-foreground)" />
   {/if}
   <input
+    data-testid="list-editor-input"
     bind:this={inputElem}
     on:keydown={handleKeydown}
     on:paste={handlePaste}

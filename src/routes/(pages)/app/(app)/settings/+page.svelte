@@ -79,6 +79,10 @@
             value: 'blue',
           },
           {
+            title: 'Red',
+            value: 'red',
+          },
+          {
             title: 'Orange',
             value: 'orange',
           },

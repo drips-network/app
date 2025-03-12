@@ -2,6 +2,7 @@
 set -eu
 
 UI=false
+PROD_BUILD=false
 
 cleanup() {
     docker compose -f docker-compose.yml rm -fsv
@@ -12,6 +13,10 @@ touch .env
 
 if [[ $* == *--start-playwright-ui* ]]; then
     UI=true
+fi
+
+if [[ $* == *--prod-build* ]]; then
+    PROD_BUILD=true
 fi
 
 ARCH=$(uname -m)
@@ -29,7 +34,15 @@ case "$ARCH" in
 esac
 export ARCH
 
-docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+export LOCAL_UID=$(id -u)
+export LOCAL_GID=$(id -g)
+
+if [ $PROD_BUILD = true ]; then
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
+else
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+fi
+
 
 printf "⏳ Waiting for the app to start..."
 
@@ -42,7 +55,7 @@ printf "\n✅ The app is ready!\n"
 printf "\n🚀 Running tests..."
 
 if [ $UI = true ]; then
-  npx playwright test --ui &
+  npx playwright test --ui-port 0 &
   docker compose logs app --follow
 else
   npx playwright test

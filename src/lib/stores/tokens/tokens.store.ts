@@ -34,7 +34,25 @@ export default (() => {
       source: 'default',
     }));
 
-    tokenList.set([...defaultTokens, ...(browser ? storedTokens.readCustomTokensList() : [])]);
+    let customTokens = browser ? storedTokens.readCustomTokensList() : [];
+
+    // Clean any custom tokens that are already part of the default list
+    // This could happen if someone added a token, and the custom token list
+    // was later amended.
+    const tokensToRemove: CustomTokenInfoWrapper[] = [];
+    for (const customToken of customTokens) {
+      const matchingDefaultToken = defaultTokens.find(
+        (t) => t.info.address.toLowerCase() === customToken.info.address.toLowerCase(),
+      );
+
+      if (matchingDefaultToken) {
+        storedTokens.deleteCustomToken(customToken);
+        tokensToRemove.push(customToken);
+      }
+    }
+    customTokens = customTokens.filter((token) => !tokensToRemove.includes(token));
+
+    tokenList.set([...defaultTokens, ...customTokens]);
   }
   init();
 

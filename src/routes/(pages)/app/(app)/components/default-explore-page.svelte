@@ -12,7 +12,6 @@
   import tickStore from '$lib/stores/tick/tick.store';
   import Box from '$lib/components/icons/Box.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
-  import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import type {
     DefaultExplorePageFeaturedProjectFragment,
     ExplorePageFeaturedDripListsFragment,
@@ -24,6 +23,7 @@
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
   import ProjectsGrid from './projects-grid.svelte';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
+  import DripListsGrid from './drip-lists-grid.svelte';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredProjectIds: string[] | undefined = undefined;
@@ -151,11 +151,7 @@
         loaded: true,
       }}
     >
-      <div class="drip-list-cards-grid">
-        {#each featuredDripLists as dripList}
-          <DripListCard listingMode data={{ dripList: dripList }} />
-        {/each}
-      </div>
+      <DripListsGrid dripLists={featuredDripLists} />
     </Section>
   {/if}
 
@@ -251,18 +247,5 @@
 
   .horizontal-scroll {
     overflow-x: auto;
-  }
-
-  .drip-list-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
-    gap: 1rem;
-    padding: 4px 2px;
-  }
-
-  @media (max-width: 767px) {
-    .drip-list-cards-grid {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

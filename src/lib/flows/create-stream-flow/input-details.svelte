@@ -61,6 +61,13 @@
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
+  import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
+  import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
+  import TransactionsIcon from '$lib/components/icons/Transactions.svelte';
+  import network from '$lib/stores/wallet/network';
+  import formatDate from '$lib/utils/format-date';
+  import CalendarIcon from '$lib/components/icons/Calendar.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -296,7 +303,7 @@
         bind:selected={$context.selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
-        emptyStateText={`No tokens available to stream. Add one first by clicking "Add funds" from your Account page.`}
+        emptyStateText={`No tokens available to stream. Add one by clicking "Add funds" on the Funds page.`}
         type="tokens"
       />
     </div>
@@ -388,6 +395,27 @@
     </div>
   </Toggleable>
   <SafeAppDisclaimer disclaimerType="drips" />
+
+  {#if $context.receiver?.__typename === 'NftDriverAccount'}
+    <WhatsNextSection>
+      {@const nextSettlementDate = network.settlement.nextSettlementDate}
+      <WhatsNextCard>
+        <svelte:fragment slot="title">When your continuous donation begins...</svelte:fragment>
+        <svelte:fragment slot="items">
+          <WhatsNextItem icon={TransactionsIcon}>
+            Funds sent to Drip Lists on {network.label} are distributed among its recipients
+            <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+          </WhatsNextItem>
+          <WhatsNextItem icon={CalendarIcon}>
+            The next date that accumulated funds will be distributed is <span class="typo-text-bold"
+              >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
+            >.
+          </WhatsNextItem>
+        </svelte:fragment>
+      </WhatsNextCard>
+    </WhatsNextSection>
+  {/if}
+
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>

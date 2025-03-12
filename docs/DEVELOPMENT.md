@@ -52,6 +52,10 @@ To claim a project during local dev mode:
 - Right after, run `npm run dev:docker:update-repo-owner`. You will be prompted to submit the account ID of the project you want to claim, and the address that should be set as its owner. Enter the address you previously configured in `FUNDING.json` for `localtestnet`.
 - Submit, and the fake oracle will update the owner of the project to the address you specified. The claim flow will continue.
 
+### 💦 Triggering a settlement event
+
+On production networks, funds on Drips donated to projects and Drip Lists are automatically `split` with recipients using (Sprinkler)[https://github.com/drips-network/sprinkler]. You can manually trigger settlement on your local environment by running `npm run dev:docker:sprinkle`. It will automatically detect TEST sitting Drip Lists or projects, and split them to recipients.
+
 ## 🥸 Inspecting databases with PGAdmin
 
 The docker-compose file also spins up pgadmin for you, running at port 5050. Simply open http://localhost:5050 and open the database you're interested in (either the event-processor DB or multiplayer DB). When prompted for the password, enter `admin`.

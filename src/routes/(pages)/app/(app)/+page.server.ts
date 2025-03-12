@@ -53,7 +53,10 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     variant: 'distribution',
     loadFn: (f) =>
       loadDistributionExplorePageData(f, {
-        featuredListId: '45193817480599985262554974973835763972521255481357121508020698376704',
+        featuredListIds: [
+          '45193817480599985262554974973835763972521255481355516335980315118301', // 2nd RPGF-2 FIL distribution
+          '45193817480599985262554974973835763972521255481357121508020698376704', // 1st RPGF-2 FIL distribution
+        ],
         welcomeCardConfig: {
           title: 'Welcome to Drips on Filecoin',
           description:
@@ -70,7 +73,7 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     variant: 'distribution',
     loadFn: (f) =>
       loadDistributionExplorePageData(f, {
-        featuredListId: null,
+        featuredListIds: [],
         welcomeCardConfig: {
           title: 'Welcome to Drips on Metis',
           description: "Drips on Metis is where rewards from Metis' RetroPGF will be distributed.",
@@ -79,7 +82,12 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
   },
   10: {
     variant: 'default',
-    loadFn: loadDefaultExplorePageData,
+    loadFn: (f) =>
+      loadDefaultExplorePageData(f, {
+        featuredDripListIds: [
+          '46441013481627019632859175771245733399752255312769848791334977723541', // Web3PrivacyNow list
+        ],
+      }),
   },
 } as const;
 
