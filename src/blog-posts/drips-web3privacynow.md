@@ -22,7 +22,7 @@ Read about Web3 Privacy Now, The Privacy Proof Awards & Drips for Privacy [here]
 
 #### Support the projects:
 
-View the list & start streaming your support now at [drips.network/privacyproof24](drips.network/privacyproof24)!
+View the list & start streaming your support now at [drips.network/privacyproof24](https://drips.network/privacyproof24)!
 
 #### For award winners:
 
