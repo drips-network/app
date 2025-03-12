@@ -31,7 +31,7 @@
     "@graphql-codegen/near-operation-file-preset": "^3.0.0",
     "@graphql-codegen/schema-ast": "^4.1.0",
     "@graphql-codegen/typescript": "^4.0.7",
-    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@graphql-codegen/typescript-operations": "^4.5.1",
     "@playwright/test": "^1.50.1",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/kit": "^2.5.17",
