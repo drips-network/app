@@ -20,11 +20,11 @@ Privacy is the foundation of trust and decentralization. As the digital landscap
 
 Read about Web3 Privacy Now, The Privacy Proof Awards & Drips for Privacy [here](https://mirror.xyz/0x0f1F3DAf416B74DB3DE55Eb4D7513a80F4841073).
 
-## Support the projects:
+## Support the projects
 
 View the list & start streaming your support now at [drips.network/privacyproof24](https://drips.network/privacyproof24)!
 
-## For award winners:
+## For award winners
 
 If your project is on the list and you'd like to claim your profile on Drips, check out our guide [here](https://docs.drips.network/get-support/claim-your-repository).
 
