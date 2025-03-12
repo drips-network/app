@@ -80,6 +80,7 @@ export function drawStraightEdgeLabel<
       ? edgeData[settings.edgeLabelColor.attribute] || settings.edgeLabelColor.color || '#000'
       : settings.edgeLabelColor.color;
 
+  // console.log('drawStraightEdgeLabel', sourceData.highlighted, targetData.highlighted)
   let label = edgeData.label;
 
   if (!label) return;
@@ -232,6 +233,7 @@ export function drawDiscNodeHover<
   const MARGIN_X = 0;
   const LABEL_BORDER_WIDTH = 1;
   const BORDER_WIDTH = data.borderSize;
+  const BORDER_RADIUS = 16;
 
   if (typeof data.label === 'string') {
     // TODO: do we care that this isn't exactly right because the
@@ -248,7 +250,7 @@ export function drawDiscNodeHover<
       data.y - boxHeight / 2 - LABEL_BORDER_WIDTH,
       boxWidth + LABEL_BORDER_WIDTH * 2,
       boxHeight + LABEL_BORDER_WIDTH * 2,
-      [16, 0, 16, 16],
+      [BORDER_RADIUS, 0, BORDER_RADIUS, BORDER_RADIUS],
     );
     context.closePath();
     context.fill();
@@ -261,7 +263,7 @@ export function drawDiscNodeHover<
       data.y - boxHeight / 2,
       boxWidth,
       boxHeight,
-      [16, 0, 16, 16],
+      [BORDER_RADIUS, 0, BORDER_RADIUS, BORDER_RADIUS],
     );
     context.closePath();
     context.fill();

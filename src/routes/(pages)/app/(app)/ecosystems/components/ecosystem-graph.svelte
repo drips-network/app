@@ -180,7 +180,6 @@
     if (state.hoveredNode === node || state.hoveredEdgeExtremities?.has(node)) {
       // @ts-expect-error: might be undefined
       res.label = res.projectName;
-      // res.forceLabel = true
       res.highlighted = true;
     }
 
@@ -219,23 +218,23 @@
   function edgeReducer(edge: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<EdgeDisplayData> = { ...data };
 
-    if (state.hoveredEdge && state.hoveredEdge === edge) {
-      res.color = colorPrimary;
-      // res.forceLabel = true;
-    } else if (state.selectedNode) {
-      if (graph.extremities(edge).includes(state.selectedNode)) {
-        // show edge labels when we have selected a node
+    switch (true) {
+      // highlight and label edge if it's the hovered one
+      case state.hoveredEdge && state.hoveredEdge === edge:
         res.color = colorPrimary;
         res.forceLabel = true;
-      } else {
+        break;
+      // show edge labels around selected node
+      case state.selectedNode && graph.extremities(edge).includes(state.selectedNode):
+        res.color = colorPrimary;
+        res.forceLabel = true;
+        break;
+      default:
+        // otherwise, don't show a label
         res.label = '';
-      }
-    } else if (state.hoveredNode) {
-      // don't show edge labels while hovering
-      res.label = '';
-      // res.hidden = true;
     }
 
+    // TODO: not yet specified
     if (
       state.suggestions &&
       (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
@@ -456,11 +455,11 @@
     sigmaInstance.on('enterNode', ({ node }) => {
       setHoveredNode(node);
     });
-    sigmaInstance.on('enterEdge', ({ edge }) => {
-      setHoveredEdge(edge);
-    });
     sigmaInstance.on('leaveNode', () => {
       setHoveredNode(undefined);
+    });
+    sigmaInstance.on('enterEdge', ({ edge }) => {
+      setHoveredEdge(edge);
     });
     sigmaInstance.on('leaveEdge', () => {
       setHoveredEdge(undefined);
@@ -471,7 +470,6 @@
     sigmaInstance.on('clickStage', () => {
       setSelectedNode(undefined);
     });
-
     sigmaInstance.getMouseCaptor().on('mousedown', () => {
       state.isDragging = true;
     });
