@@ -13,10 +13,10 @@
   // import { gql } from 'graphql-request';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
 
-  export let ecosystems: Ecosystem[];
+  export let ecosystems: LeanEcosystem[];
   export let big: boolean = false;
 </script>
 

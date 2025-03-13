@@ -1,14 +1,62 @@
 <script lang="ts">
-  import Button from '$lib/components/button/button.svelte';
+  // import Button from '$lib/components/button/button.svelte';
   import Section from '$lib/components/section/section.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  import EcosystemSplit from './ecosystem-split.svelte';
+  // import EcosystemSplit from './ecosystem-split.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
+  import Table from '$lib/components/table/table.svelte';
+  import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
 
   export let ecosystem: Ecosystem;
+
+  interface DistributionTableRow {
+    name: string;
+    ecosystemFunds: number;
+    dependencies: number;
+  }
+
+  const tableData: DistributionTableRow[] = ecosystem.graph.nodes
+    .sort((a, b) => b.absoluteWeight - a.absoluteWeight)
+    .slice(0, 10)
+    .map((node) => {
+      const dependencies = ecosystem.graph.edges.filter(
+        (edge) => edge.source === node.projectAccountId,
+      );
+      return {
+        name: `${node.repoOwner}/${node.repoName}`,
+        ecosystemFunds: node.absoluteWeight,
+        dependencies: dependencies.length,
+      };
+    });
+
+  // tableData =
+
+  const tableColumns: ColumnDef<DistributionTableRow>[] = [
+    {
+      accessorKey: 'name',
+      header: 'Project',
+      cell: (...stuff) => stuff,
+      enableSorting: false,
+      size: (100 / 24) * 8,
+    },
+    {
+      accessorKey: 'ecosystemFunds',
+      header: 'Percentage of Ecosystem Funds',
+      cell: (...stuff) => stuff,
+      enableSorting: true,
+      size: (100 / 24) * 8,
+    },
+    {
+      accessorKey: 'dependencies',
+      header: 'Dependencies',
+      cell: (...stuff) => stuff,
+      enableSorting: false,
+      size: (100 / 24) * 8,
+    },
+  ];
 </script>
 
-<div class="card ecosystem-distribution">
+<div class="ecosystem-distribution">
   <Section
     header={{
       icon: DripList,
@@ -24,16 +72,24 @@
       loaded: true,
     }}
   >
+    <Table
+      rowHeight={76}
+      options={{
+        data: tableData,
+        columns: tableColumns,
+        getCoreRowModel: getCoreRowModel(),
+      }}
+    />
     <!-- <div class="horizontal-scroll">
       <ProjectsGrid projects={featuredWeb3Projects} />
     </div> -->
   </Section>
-  <div class="header">
+  <!-- <div class="header">
     <h4 class="typo-header-4">
       <DripList style="fill: var(--color-primary)" />Distribution details
     </h4>
-  </div>
-  <div class="splits">
+  </div> -->
+  <!-- <div class="splits">
     <EcosystemSplit />
     <EcosystemSplit />
     <EcosystemSplit />
@@ -55,43 +111,8 @@
   </div>
   <div class="actions">
     <Button>Load more</Button>
-  </div>
+  </div> -->
 </div>
 
 <style>
-  .card {
-    background-color: var(--color-background);
-    padding: 1.5rem;
-    box-shadow: var(--elevation-low);
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-    overflow-x: scroll;
-    text-align: left;
-  }
-
-  h4 {
-    color: var(--color-primary);
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .splits {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .actions {
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
-    .splits {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
 </style>
