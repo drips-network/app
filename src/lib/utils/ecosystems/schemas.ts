@@ -59,15 +59,17 @@ export const ecosystemSchema = z.object({
   color: z.optional(z.string()),
   metadata: z.array(metadatumSchema),
   nodeCount: z.optional(z.number()),
-  graph: z.optional(graphSchema),
+  graph: graphSchema,
 });
 
-export const getAllSchema = z.array(ecosystemSchema);
+const ecosystemWithoutGraphSchema = ecosystemSchema.omit({ graph: true });
+
+export const getAllSchema = z.array(ecosystemWithoutGraphSchema);
 export const getSchema = ecosystemSchema;
-// UUID of newly created graph
 export const createSchema = z.object({ id: z.string() });
 
 export type Ecosystem = z.infer<typeof ecosystemSchema>;
+export type LeanEcosystem = z.infer<typeof ecosystemWithoutGraphSchema>;
 export type Graph = z.infer<typeof graphSchema>;
 export type NewGraph = z.infer<typeof newGraphSchema>;
 export type Node = z.infer<typeof nodeSchema>;

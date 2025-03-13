@@ -28,10 +28,10 @@
   // import VisibilityToggle from '$lib/components/visibility-toggle/visibility-toggle.svelte';
   // import EcosystemCard, { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
   import EcosystemsGrid from './ecosystems-grid.svelte';
-  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   // import { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
 
-  export let ecosystems: Ecosystem[];
+  export let ecosystems: LeanEcosystem[];
 
   let error = false;
 
