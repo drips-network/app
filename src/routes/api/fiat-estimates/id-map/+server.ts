@@ -43,6 +43,8 @@ const MANUAL_IDS: Record<string, string> = {
   '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000': '9640',
   /* Add RAD ID manually because for whatever reason it's missing from CMC response */
   '0x31c8eacbffdd875c74b94b077895bd78cf1e64a3': '6843',
+  /* Map Optimism USDC to USDC */
+  '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85': '3408',
 };
 
 export const GET: RequestHandler = async ({ fetch }) => {
