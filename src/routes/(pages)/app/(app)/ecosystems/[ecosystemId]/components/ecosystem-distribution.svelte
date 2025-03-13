@@ -1,10 +1,33 @@
-<script>
+<script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import DripList from '$lib/components/icons/DripList.svelte';
+  import Section from '$lib/components/section/section.svelte';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import EcosystemSplit from './ecosystem-split.svelte';
+  import DripList from '$lib/components/icons/DripList.svelte';
+
+  export let ecosystem: Ecosystem;
 </script>
 
 <div class="card ecosystem-distribution">
+  <Section
+    header={{
+      icon: DripList,
+      label: 'Distribution details',
+      actions: [
+        {
+          label: 'View all',
+          href: `/app/ecosystems/${ecosystem.id}/distribution`,
+        },
+      ],
+    }}
+    skeleton={{
+      loaded: true,
+    }}
+  >
+    <!-- <div class="horizontal-scroll">
+      <ProjectsGrid projects={featuredWeb3Projects} />
+    </div> -->
+  </Section>
   <div class="header">
     <h4 class="typo-header-4">
       <DripList style="fill: var(--color-primary)" />Distribution details

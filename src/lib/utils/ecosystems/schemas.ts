@@ -65,7 +65,7 @@ export const ecosystemSchema = z.object({
 export const getAllSchema = z.array(ecosystemSchema);
 export const getSchema = ecosystemSchema;
 // UUID of newly created graph
-export const createSchema = z.string();
+export const createSchema = z.object({ id: z.string() });
 
 export type Ecosystem = z.infer<typeof ecosystemSchema>;
 export type Graph = z.infer<typeof graphSchema>;

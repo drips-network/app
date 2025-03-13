@@ -383,7 +383,7 @@
     </section>
     <section id="distribution">
       <PrimaryColorThemer {colorHex}>
-        <EcosystemDistribution />
+        <EcosystemDistribution {ecosystem} />
       </PrimaryColorThemer>
     </section>
 
