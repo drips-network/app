@@ -15,7 +15,6 @@ const nodeSchema = z.object({
   repoOwner: z.string(),
   repoName: z.string(),
   absoluteWeight: z.number(),
-  // TODO: does this exist?
   metadata: z.optional(metadatumSchema),
 });
 
