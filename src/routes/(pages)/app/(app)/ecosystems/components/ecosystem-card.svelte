@@ -37,10 +37,10 @@
   import Coin from '$lib/components/icons/Coin.svelte';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
-  export let ecosystem: Ecosystem;
+  export let ecosystem: LeanEcosystem;
   export let isHidden: boolean = false;
   export let isInteractive: boolean = false;
 
@@ -61,7 +61,7 @@
       ? currencyFormatterShort.format(donations)
       : currencyFormatterLong.format(donations);
 
-  function buildEcosystemUrl(ecosystem: Ecosystem): string {
+  function buildEcosystemUrl(ecosystem: LeanEcosystem): string {
     return `/app/ecosystems/${ecosystem.id}`;
   }
 </script>
