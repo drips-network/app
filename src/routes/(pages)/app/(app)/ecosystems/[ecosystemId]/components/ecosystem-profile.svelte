@@ -138,7 +138,7 @@
   // import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
   // import EcosystemCard from '../../components/ecosystem-card.svelte';
-  import EcosystemCardInteractive from '../../components/ecosystem-card-interactive.svelte';
+  import EcosystemCardInteractive from './ecosystem-card-interactive.svelte';
   import EcosystemMetadata from './ecosystem-metadata.svelte';
   import EcosystemDistribution from './ecosystem-distribution/ecosystem-distribution.svelte';
   import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';

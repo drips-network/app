@@ -10,7 +10,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import twemoji from '$lib/utils/twemoji';
   import { onMount } from 'svelte';
-  import type { ProjectProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
+  import type { ProjectProfileFragment } from './__generated__/gql.generated';
   import { fetchProject, formatPercent } from './ecosystem-graph';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
