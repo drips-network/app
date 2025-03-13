@@ -6,13 +6,17 @@
   import DripList from '$lib/components/icons/DripList.svelte';
   import Table from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
+  import type { ComponentProps } from 'svelte';
+  import EcosystemDistributionProject from './ecosystem-distribution-project.svelte';
+  import EcosystemDistributionWeight from './ecosystem-distribution-weight.svelte';
+  import EcosystemDistributionDependencies from './ecosystem-distribution-dependencies.svelte';
 
   export let ecosystem: Ecosystem;
 
   interface DistributionTableRow {
-    name: string;
-    ecosystemFunds: number;
-    dependencies: number;
+    projectProps: ComponentProps<EcosystemDistributionProject>;
+    weightProps: ComponentProps<EcosystemDistributionWeight>;
+    dependenciesProps: ComponentProps<EcosystemDistributionDependencies>;
   }
 
   const tableData: DistributionTableRow[] = ecosystem.graph.nodes
@@ -23,33 +27,38 @@
         (edge) => edge.source === node.projectAccountId,
       );
       return {
-        name: `${node.repoOwner}/${node.repoName}`,
-        ecosystemFunds: node.absoluteWeight,
-        dependencies: dependencies.length,
+        projectProps: {
+          repoOwner: node.repoOwner,
+          repoName: node.repoName,
+        },
+        weightProps: {
+          weight: node.absoluteWeight,
+        },
+        dependenciesProps: {
+          numDependencies: dependencies.length,
+        },
       };
     });
 
-  // tableData =
-
   const tableColumns: ColumnDef<DistributionTableRow>[] = [
     {
-      accessorKey: 'name',
+      accessorKey: 'projectProps',
       header: 'Project',
-      cell: (...stuff) => stuff,
+      cell: () => EcosystemDistributionProject,
       enableSorting: false,
       size: (100 / 24) * 8,
     },
     {
-      accessorKey: 'ecosystemFunds',
+      accessorKey: 'weightProps',
       header: 'Percentage of Ecosystem Funds',
-      cell: (...stuff) => stuff,
-      enableSorting: true,
+      cell: () => EcosystemDistributionWeight,
+      enableSorting: false,
       size: (100 / 24) * 8,
     },
     {
-      accessorKey: 'dependencies',
+      accessorKey: 'dependenciesProps',
       header: 'Dependencies',
-      cell: (...stuff) => stuff,
+      cell: () => EcosystemDistributionDependencies,
       enableSorting: false,
       size: (100 / 24) * 8,
     },

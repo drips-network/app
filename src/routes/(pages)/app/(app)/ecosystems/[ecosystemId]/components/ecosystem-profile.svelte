@@ -140,7 +140,7 @@
   // import EcosystemCard from '../../components/ecosystem-card.svelte';
   import EcosystemCardInteractive from '../../components/ecosystem-card-interactive.svelte';
   import EcosystemMetadata from './ecosystem-metadata.svelte';
-  import EcosystemDistribution from './ecosystem-distribution.svelte';
+  import EcosystemDistribution from './ecosystem-distribution/ecosystem-distribution.svelte';
   import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
