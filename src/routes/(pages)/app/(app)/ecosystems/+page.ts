@@ -7,18 +7,22 @@ import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import network from '$lib/stores/wallet/network';
-// import * as ecosystemsApi from '$lib/utils/ecosystems';
+import * as ecosystemsApi from '$lib/utils/ecosystems';
 // import osoJson from '$lib/utils/csv-to-graph/__test__/data/fabricated-graph.json';
-import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 // const chicken = {
-//   "name": "Fabricated Graph 0",
-//   "description": "It's not that big™️",
+//   "name": "Fabricated Graph 1",
+//   "description": "tootallnate has been removed",
 //   "chainId": "11155111",
 //   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
-//   "ownerAddress": "0xe2E9b9B5d0757c26aB477A754788B19b60f2ed83",
+//   "ownerAddress": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+//   "avatar": {
+//     "type": "emoji",
+//     "emoji": "👽"
+//   },
+//   "color": "#27C537",
 //   "metadata": [{
 //       "icon": "icon",
 //       "title": "title",
@@ -57,14 +61,10 @@ export const load = async ({ fetch }) => {
 
   fetchedDataCache.write(res);
 
-  const ecosystems: Ecosystem[] = [];
-  // console.log('Creating a chicken')
-  // const eco = await ecosystemsApi.create(chicken);
-  // console.log(eco)
-  // ecosystems.push(eco)
-  // const ecosystems = await ecosystemsApi.getAll();
+  // const ecosystems: Ecosystem[] = [];
+  const ecosystems = await ecosystemsApi.getAll();
   // console.log(chicken)
-  // if (ecosystems.length < 9) {
+  // if (ecosystems.length < 4) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();

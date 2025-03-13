@@ -68,11 +68,7 @@
 
   <div class="section">
     {#if data.ecosystems}
-      <AllEcosystemsSection
-        withClaimProjectButton
-        ecosystems={data.ecosystems}
-        showVisibilityToggle={true}
-      />
+      <AllEcosystemsSection ecosystems={data.ecosystems} />
     {/if}
   </div>
 </div>
