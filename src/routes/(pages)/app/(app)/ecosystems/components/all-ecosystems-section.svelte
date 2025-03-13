@@ -32,8 +32,6 @@
   // import { PROJECT_CARD_FRAGMENT } from './ecosystem-card.svelte';
 
   export let ecosystems: Ecosystem[];
-  export let withClaimProjectButton = false;
-  export let showVisibilityToggle = false;
 
   let error = false;
 
@@ -56,13 +54,11 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: showVisibilityToggle ? ecosystems.length === 0 : ecosystems.length === 0,
+    empty: ecosystems.length === 0,
     error,
     emptyStateEmoji: '🫙',
-    emptyStateHeadline: 'No claimed projects',
-    emptyStateText: withClaimProjectButton
-      ? 'If you develop an open-source project, click "Claim project" to get started.'
-      : 'This user hasnʼt claimed any software projects yet.',
+    emptyStateHeadline: 'No ecosystems',
+    emptyStateText: 'Create an ecosystem to get started.',
   }}
 >
   {#if ecosystems}
