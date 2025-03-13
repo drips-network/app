@@ -42,7 +42,7 @@ export default async function loadDefaultExplorePageData(
   const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
     redis,
     cacheKey,
-    6 * 60 * 60, // Change the cache expiration time to 6 hours
+    1 * 60 * 60, // 1 hr
     async () =>
       Promise.all([
         fetchBlogPosts(),
