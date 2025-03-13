@@ -96,6 +96,7 @@
     createDonation(
       dispatch,
       recipientAccountId,
+      receiver.__typename,
       selectedTokenAddress ?? unreachable(),
       amount ?? unreachable(),
       selectedTokenAllowance ?? unreachable(),

@@ -8,10 +8,78 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import { populateAddressDriverWriteTx } from '$lib/utils/sdk/address-driver/address-driver';
 import network from '$lib/stores/wallet/network';
+import expect from '$lib/utils/expect';
+import query from '$lib/graphql/dripsQL';
+import { gql } from 'graphql-request';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+import type {
+  ProjectOtDsQuery,
+  ProjectOtDsQueryVariables,
+  DripListOtDsQuery,
+  DripListOtDsQueryVariables,
+} from './__generated__/gql.generated';
+
+const projectSupportQuery = gql`
+  query ProjectOTDs($id: ID!, $chains: [SupportedChain!]!) {
+    projectById(id: $id, chains: $chains) {
+      chainData {
+        ... on ClaimedProjectData {
+          chain
+          support {
+            ... on OneTimeDonationSupport {
+              account {
+                accountId
+              }
+              date
+            }
+          }
+        }
+        ... on UnClaimedProjectData {
+          chain
+          support {
+            ... on OneTimeDonationSupport {
+              account {
+                accountId
+              }
+              date
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const dripListSupportQuery = gql`
+  query DripListOTDs($id: ID!, $chain: SupportedChain!) {
+    dripList(id: $id, chain: $chain) {
+      chain
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+          date
+        }
+      }
+    }
+  }
+`;
+
+function checkDonation(
+  ownAccountId: string,
+  supportAccountId: string,
+  supportDate: number,
+  blockTimestamp: number,
+) {
+  return ownAccountId === supportAccountId && supportDate / 1000 === blockTimestamp;
+}
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   recipientAccountId: string,
+  recipientType: 'AddressDriverAccount' | 'Project' | 'NftDriverAccount',
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
@@ -21,7 +89,7 @@ export default function (
     makeTransactPayload({
       headline: 'Donate Instantly',
       before: async () => {
-        const { address } = get(walletStore);
+        const { address, dripsAccountId: ownAccountId } = get(walletStore);
 
         assert(address, 'User is not connected to wallet');
         assert(
@@ -47,6 +115,7 @@ export default function (
           approvePopulatedTx,
           needApproval,
           tokenAddress,
+          ownAccountId,
         };
       },
 
@@ -68,28 +137,69 @@ export default function (
         },
       ],
 
-      after: async () => {
-        /*
-        We wait up to five seconds for `refreshUserAccount` to include a history item
-        matching our transaction's block timestamp, checking once a second. If it doesnʼt
-        after five tries, we move forward anyway, but the user will be made aware that they
-        may need to wait for a while for their dashboard to refresh.
-        */
-        // TODO(streams): poll api here
-        // await expect(
-        //   streams.refreshUserAccount,
-        //   (account) =>
-        //     Boolean(
-        //       account.assetConfigs
-        //         .find(
-        //           (ac) =>
-        //             ac.tokenAddress.toLowerCase() === transactContext.tokenAddress.toLowerCase(),
-        //         )
-        //         ?.history?.find((hi) => hi.timestamp.getTime() / 1000 === blockTimestamp),
-        //     ),
-        //   5000,
-        //   1000,
-        // );
+      after: async (receipts, { ownAccountId }) => {
+        try {
+          const blockTimestamp = (await receipts[0].getBlock()).timestamp;
+
+          switch (recipientType) {
+            case 'Project': {
+              await expect(
+                () =>
+                  query<ProjectOtDsQuery, ProjectOtDsQueryVariables>(projectSupportQuery, {
+                    id: recipientAccountId,
+                    chains: [network.gqlName],
+                  }),
+                (res) => {
+                  const projectData = res.projectById;
+                  if (!projectData) return true;
+
+                  return filterCurrentChainData(projectData.chainData).support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
+            }
+            case 'NftDriverAccount': {
+              await expect(
+                () =>
+                  query<DripListOtDsQuery, DripListOtDsQueryVariables>(dripListSupportQuery, {
+                    id: recipientAccountId,
+                    chain: network.gqlName,
+                  }),
+                (res) => {
+                  const dripListData = res.dripList;
+                  if (!dripListData) return true;
+
+                  return dripListData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
+            }
+          }
+
+          await invalidateAll();
+        } catch {
+          return;
+        }
       },
     }),
   );
