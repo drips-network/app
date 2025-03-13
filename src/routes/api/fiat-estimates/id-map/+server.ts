@@ -45,6 +45,12 @@ const MANUAL_IDS: Record<string, string> = {
   '0x31c8eacbffdd875c74b94b077895bd78cf1e64a3': '6843',
   /* Map Optimism USDC to USDC */
   '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85': '3408',
+  /* Optimism DAI to DAI */
+  '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '4943',
+  /* Optimism Tether USD to Tether USD */
+  '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58': '825',
+  /* Optimism WETH to WETH */
+  '0x4200000000000000000000000000000000000006': '2396',
 };
 
 export const GET: RequestHandler = async ({ fetch }) => {
