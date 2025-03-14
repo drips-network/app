@@ -1,8 +1,6 @@
 <script lang="ts">
-  // import Button from '$lib/components/button/button.svelte';
   import Section from '$lib/components/section/section.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  // import EcosystemSplit from './ecosystem-split.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import Table from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
@@ -13,6 +11,7 @@
   import formatNumber from '$lib/utils/format-number';
 
   export let ecosystem: Ecosystem;
+  export let full: boolean = false;
 
   interface DistributionTableRow {
     projectProps: ComponentProps<EcosystemDistributionProject>;
@@ -20,7 +19,7 @@
     dependenciesProps: ComponentProps<EcosystemDistributionDependencies>;
   }
 
-  const ROW_COUNT = 6;
+  const ROW_COUNT = full ? Infinity : 6;
   const tableData: DistributionTableRow[] = ecosystem.graph.nodes
     .sort((a, b) => b.absoluteWeight - a.absoluteWeight)
     .slice(0, ROW_COUNT)
@@ -75,10 +74,14 @@
       icon: DripList,
       label: 'Distribution details',
       actions: [
-        {
-          label: 'View all',
-          href: `/app/ecosystems/${ecosystem.id}/distribution`,
-        },
+        ...(!full
+          ? [
+              {
+                label: 'View all',
+                href: `/app/ecosystems/${ecosystem.id}/distribution`,
+              },
+            ]
+          : []),
       ],
     }}
     skeleton={{
@@ -93,10 +96,9 @@
         getCoreRowModel: getCoreRowModel(),
       }}
     />
-    <div class="shadow-rest">{restCount} more…</div>
-    <!-- <div class="horizontal-scroll">
-      <ProjectsGrid projects={featuredWeb3Projects} />
-    </div> -->
+    {#if !full}
+      <div class="shadow-rest">{restCount} more…</div>
+    {/if}
   </Section>
 </div>
 
