@@ -97,11 +97,7 @@ const INITIAL_STATE: DisconnectedWalletStoreState = {
   network: DEFAULT_NETWORK,
   provider: new FailoverJsonRpcProvider(
     mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
-    {
-      chainId: network.chainId,
-      name: network.name,
-      ensAddress: network.ensAddress,
-    },
+    undefined,
     undefined,
     {
       logger: console,

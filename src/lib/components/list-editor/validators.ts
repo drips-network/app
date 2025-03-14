@@ -1,6 +1,5 @@
 import { isAddress } from 'ethers';
 import ensStore from '../../stores/ens/ens.store';
-import network from '$lib/stores/wallet/network';
 
 export const reformatUrl = (url: string): string => {
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -38,10 +37,6 @@ export const validateAddress = async (
 ): Promise<boolean | string | undefined> => {
   if (isAddress(addressValue)) {
     return true;
-  }
-
-  if (!network.ensSupported) {
-    return false;
   }
 
   try {
