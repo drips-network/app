@@ -9,14 +9,13 @@
   import type { Attributes } from 'graphology-types';
   import {
     createDrawStraightEdgeLabel,
-    formatPercent,
     type LayoutMapping,
     type NodeSelectionChangedPayload,
   } from './ecosystem-graph';
   import { createEventDispatcher } from 'svelte';
   import { fitViewportToNodes } from '@sigma/utils';
   import _ from 'lodash';
-  // import circlepack from 'graphology-layout/circlepack';
+  import formatPercent from '$lib/utils/format-percent';
 
   const dispatch = createEventDispatcher<{
     nodeSelectionChanged: NodeSelectionChangedPayload;
