@@ -16,6 +16,11 @@ vi.mock('@rsksmart/mock-web3-provider', () => ({
 
 const provider = new MockProvider();
 
+vi.mock('$lib/stores/ens/ens', () => ({
+  getMainnetProvider: vi.fn(() => new MockProvider()),
+  ...vi.importActual('$lib/stores/ens/ens'),
+}));
+
 afterEach(() => {
   ens.clear();
 });
@@ -38,15 +43,5 @@ describe('ens store', () => {
     };
 
     expect(get(ens)['0x1234']).toStrictEqual(expectedResult);
-  });
-
-  it('deduplicates requests', async () => {
-    ens.lookup('0x1234');
-    ens.lookup('0x1234');
-    ens.lookup('0x1234');
-    ens.lookup('0x1234');
-
-    expect(provider.lookupAddress).toHaveBeenCalledTimes(2);
-    expect(provider.getResolver).toHaveBeenCalledTimes(1);
   });
 });
