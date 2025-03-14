@@ -11,10 +11,11 @@
   import twemoji from '$lib/utils/twemoji';
   import { onMount } from 'svelte';
   import type { ProjectProfileFragment } from './__generated__/gql.generated';
-  import { fetchProject, formatPercent } from './ecosystem-graph';
+  import { fetchProject } from './ecosystem-graph';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
+  import formatPercent from '$lib/utils/format-percent';
   // import { fade } from 'svelte/transition';
 
   export let loadProjectData: {

@@ -10,6 +10,7 @@
   import EcosystemDistributionProject from './ecosystem-distribution-project.svelte';
   import EcosystemDistributionWeight from './ecosystem-distribution-weight.svelte';
   import EcosystemDistributionDependencies from './ecosystem-distribution-dependencies.svelte';
+  import formatNumber from '$lib/utils/format-number';
 
   export let ecosystem: Ecosystem;
 
@@ -19,9 +20,10 @@
     dependenciesProps: ComponentProps<EcosystemDistributionDependencies>;
   }
 
+  const ROW_COUNT = 6;
   const tableData: DistributionTableRow[] = ecosystem.graph.nodes
     .sort((a, b) => b.absoluteWeight - a.absoluteWeight)
-    .slice(0, 10)
+    .slice(0, ROW_COUNT)
     .map((node) => {
       const dependencies = ecosystem.graph.edges.filter(
         (edge) => edge.source === node.projectAccountId,
@@ -63,6 +65,8 @@
       size: (100 / 24) * 8,
     },
   ];
+
+  $: restCount = formatNumber(ecosystem.graph.nodes.length - ROW_COUNT);
 </script>
 
 <div class="ecosystem-distribution">
@@ -89,39 +93,27 @@
         getCoreRowModel: getCoreRowModel(),
       }}
     />
+    <div class="shadow-rest">{restCount} more…</div>
     <!-- <div class="horizontal-scroll">
       <ProjectsGrid projects={featuredWeb3Projects} />
     </div> -->
   </Section>
-  <!-- <div class="header">
-    <h4 class="typo-header-4">
-      <DripList style="fill: var(--color-primary)" />Distribution details
-    </h4>
-  </div> -->
-  <!-- <div class="splits">
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-    <EcosystemSplit />
-  </div>
-  <div class="actions">
-    <Button>Load more</Button>
-  </div> -->
 </div>
 
 <style>
+  .ecosystem-distribution {
+    position: relative;
+  }
+
+  .shadow-rest {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+    height: 218px;
+    padding: 1.5rem;
+  }
 </style>
