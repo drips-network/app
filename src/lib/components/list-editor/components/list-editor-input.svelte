@@ -17,7 +17,6 @@
   import { AddItemError } from '../errors';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import { isAddress } from 'ethers';
-  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
@@ -51,8 +50,7 @@
 
   $: validInput =
     (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
-    (allowAddresses &&
-      ((network.ensSupported && inputValue.endsWith('.eth')) || isAddress(inputValue))) ||
+    (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
     (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
 
   function createInvalidMessage(type: string, value: string): string {
@@ -62,7 +60,7 @@
           return "This isn't a valid wallet address";
         }
 
-        return 'Invalid ENS name';
+        return 'Invalid or unknown ENS name';
       }
       case 'project':
         return "Couldn't find that Git project. Is it private?";

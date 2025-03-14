@@ -15,8 +15,9 @@ import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-fr
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { getMainnetProvider, safeReverseLookp } from '$lib/stores/ens/ens';
 
-const provider = new FailoverJsonRpcProvider(
+const currentNetworkProvider = new FailoverJsonRpcProvider(
   mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
   undefined,
   undefined,
@@ -24,6 +25,8 @@ const provider = new FailoverJsonRpcProvider(
     logger: console,
   },
 );
+
+const mainnetProvider = getMainnetProvider();
 
 const PROFILE_PAGE_QUERY = gql`
   ${PROJECTS_SECTION_PROJECT_FRAGMENT}
@@ -61,10 +64,15 @@ const PROFILE_PAGE_QUERY = gql`
 
 async function resolveEnsFields(address: string) {
   try {
-    const ensName = await provider.lookupAddress(address);
+    const ensName = await safeReverseLookp(
+      currentNetworkProvider,
+      mainnetProvider,
+      network.chainId,
+      address,
+    );
 
     if (ensName) {
-      const resolver = await provider.getResolver(ensName);
+      const resolver = await mainnetProvider.getResolver(ensName);
 
       const promises = ['description', 'url', 'com.twitter', 'com.github'].map(
         async (recordName) => [recordName, await resolver?.getText(recordName)],
@@ -88,8 +96,13 @@ export const load = async ({ params, fetch }) => {
 
   if (isAddress(universalAccountId)) {
     address = universalAccountId;
-  } else if ((universalAccountId as string).endsWith('.eth') && network.ensSupported) {
-    const lookupRes = await provider.resolveName(universalAccountId);
+  } else if ((universalAccountId as string).endsWith('.eth')) {
+    const lookupRes = await safeReverseLookp(
+      currentNetworkProvider,
+      mainnetProvider,
+      network.chainId,
+      universalAccountId,
+    );
 
     if (!lookupRes) {
       return { error: true, type: 'ens-not-resolved' as const };

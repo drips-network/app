@@ -2,6 +2,7 @@ import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import network from '../wallet/network';
 import walletStore from '../wallet/wallet.store';
+import { getMainnetProvider, safeReverseLookp } from './ens';
 
 export interface ResolvedRecord {
   name?: string;
@@ -12,8 +13,14 @@ type State = {
   [address: string]: ResolvedRecord;
 };
 
+const mainnetProvider = getMainnetProvider();
+
 export default (() => {
   const state = writable<State>({});
+
+  function _pickProvider() {
+    return mainnetProvider ?? get(walletStore).provider;
+  }
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -21,9 +28,7 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
-    if (!network.ensSupported) return;
-
-    const { provider } = get(walletStore);
+    const provider = _pickProvider();
 
     const saved = get(state)[address];
     if (saved) return;
@@ -72,9 +77,7 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
-    if (!network.ensSupported) return;
-
-    const { provider } = get(walletStore);
+    const provider = _pickProvider();
 
     assert(
       provider,
@@ -82,14 +85,17 @@ export default (() => {
     );
 
     const saved = Object.entries(get(state)).find((entry) => entry[1].name === name);
-
     if (saved) return saved[0];
 
-    const address = await provider.resolveName(name);
-
+    const address = await safeReverseLookp(
+      get(walletStore).provider,
+      provider,
+      network.chainId,
+      name,
+    );
     if (address) lookup(address);
 
-    return address ?? undefined;
+    return address;
   }
 
   function clear() {

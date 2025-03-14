@@ -62,8 +62,6 @@ export type Network = {
    * This will be obsolete once the app goes fully multi-chain, without separate deployments per network.
    */
   alternativeChainMode: boolean;
-  ensSupported: boolean;
-  ensAddress: string | undefined;
   gelatoRelayAvailable: boolean;
   gaslessClaimAndCollect: boolean;
   addToWalletConfig:
@@ -125,8 +123,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists on Ethereum settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
-    ensSupported: true,
-    ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
@@ -169,8 +165,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: true,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
@@ -213,8 +207,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: true,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
@@ -257,8 +249,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
-    ensSupported: true,
-    ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: undefined,
@@ -301,8 +291,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: false,
     gaslessClaimAndCollect: false,
     addToWalletConfig: {
@@ -353,8 +341,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: true,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
@@ -396,8 +382,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists on Filecoin settle and become collectable once per day.',
     },
     alternativeChainMode: true,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: {
@@ -451,8 +435,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists on Metis settle and become collectable once per day.',
     },
     alternativeChainMode: true,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: {
@@ -502,8 +484,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists on Optimism settle and become collectable once per day.',
     },
     alternativeChainMode: true,
-    ensSupported: false,
-    ensAddress: undefined,
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: true,
     addToWalletConfig: {
