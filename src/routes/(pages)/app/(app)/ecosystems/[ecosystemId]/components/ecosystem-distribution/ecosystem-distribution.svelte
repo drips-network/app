@@ -110,11 +110,12 @@
   .shadow-rest {
     position: absolute;
     bottom: 0;
+    left: 0;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: end;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--color-background) 100%);
     height: 218px;
     padding: 1.5rem;
   }
