@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import network from '../wallet/network';
 import walletStore from '../wallet/wallet.store';
-import { getMainnetProvider, safeReverseLookp } from './ens';
+import { getMainnetProvider, safeReverseLookup } from './ens';
 
 export interface ResolvedRecord {
   name?: string;
@@ -74,7 +74,7 @@ export default (() => {
     const saved = Object.entries(get(state)).find((entry) => entry[1].name === name);
     if (saved) return saved[0];
 
-    const address = await safeReverseLookp(
+    const address = await safeReverseLookup(
       get(walletStore).provider,
       mainnetProvider,
       network.chainId,

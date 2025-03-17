@@ -1,4 +1,4 @@
-import type { AbstractProvider } from 'ethers';
+import { isAddress, type AbstractProvider } from 'ethers';
 import { NETWORK_CONFIG } from '../wallet/network';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import filterFalsy from '$lib/utils/filter-falsy';
@@ -26,39 +26,32 @@ export function getMainnetProvider() {
  * @param name The name to reverse-lookup
  * @returns resolved address if exists and safe, otherwise undefined
  */
-export async function safeReverseLookp(
+export async function safeReverseLookup(
   currentChainProvider: AbstractProvider,
   mainnetProvider: AbstractProvider,
   chainId: number,
   name: string,
 ) {
-  if (chainId === 1) {
-    return await mainnetProvider.resolveName(name);
-  }
+  try {
+    const resolver = await mainnetProvider.getResolver(name);
+    if (!resolver) return undefined;
 
-  const address = await mainnetProvider.resolveName(name);
-  if (!address) return undefined;
+    const addressForCurrentChain = await resolver.getAddress(chainId);
+    if (isAddress(addressForCurrentChain)) return addressForCurrentChain;
 
-  const resolver = await mainnetProvider.getResolver(name);
-  if (!resolver) return undefined;
+    const address = await resolver.getAddress();
+    if (!address) return undefined;
+    if (chainId === 1) return address;
 
-  const addressForCurrentChain = await resolver.getAddress(chainId);
-  if (addressForCurrentChain) return addressForCurrentChain;
+    const [isContractOnMainnet, isContractOnCurrentChain] = await Promise.all([
+      isAddressContract(mainnetProvider, address),
+      isAddressContract(currentChainProvider, address),
+    ]);
 
-  const [tempAddressIsContractOnMainnet, tempAddressIsContractOnCurrentChain] = await Promise.all([
-    isAddressContract(mainnetProvider, address),
-    isAddressContract(currentChainProvider, address),
-  ]);
-
-  // If the address is a contract on both chains, we can assume resolving mainnet address is safe.
-  // If it's not one on either, we're also good.
-  // If it's a contract on one chain but not the other, we can't be sure whether it's safe to send
-  // to the mainnet-resolved address on the current chain.
-  if (tempAddressIsContractOnMainnet && tempAddressIsContractOnCurrentChain) {
-    return address;
-  } else if (!tempAddressIsContractOnMainnet && !tempAddressIsContractOnCurrentChain) {
-    return address;
-  } else {
+    return !isContractOnCurrentChain && isContractOnMainnet ? undefined : address;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failure to resolve ENS name:', error);
     return undefined;
   }
 }

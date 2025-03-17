@@ -15,7 +15,7 @@ import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-fr
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import { getMainnetProvider, safeReverseLookp } from '$lib/stores/ens/ens';
+import { getMainnetProvider, safeReverseLookup } from '$lib/stores/ens/ens';
 
 const currentNetworkProvider = new FailoverJsonRpcProvider(
   mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
@@ -64,7 +64,7 @@ const PROFILE_PAGE_QUERY = gql`
 
 async function resolveEnsFields(address: string) {
   try {
-    const ensName = await safeReverseLookp(
+    const ensName = await safeReverseLookup(
       currentNetworkProvider,
       mainnetProvider,
       network.chainId,
@@ -97,7 +97,7 @@ export const load = async ({ params, fetch }) => {
   if (isAddress(universalAccountId)) {
     address = universalAccountId;
   } else if ((universalAccountId as string).endsWith('.eth')) {
-    const lookupRes = await safeReverseLookp(
+    const lookupRes = await safeReverseLookup(
       currentNetworkProvider,
       mainnetProvider,
       network.chainId,
