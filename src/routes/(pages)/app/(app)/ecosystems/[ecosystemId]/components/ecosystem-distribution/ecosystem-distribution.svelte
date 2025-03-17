@@ -97,7 +97,11 @@
       }}
     />
     {#if !full}
-      <div class="shadow-rest">{restCount} more…</div>
+      <div class="shadow-rest">
+        <div class="shadow-rest-inner">
+          {restCount} more…
+        </div>
+      </div>
     {/if}
   </Section>
 </div>
@@ -109,14 +113,21 @@
 
   .shadow-rest {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: 2px;
+    left: calc(2.5rem + 1px);
+    width: calc(100% - 5rem - 2px);
+    height: 218px;
+    overflow: hidden;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .shadow-rest-inner {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: end;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--color-background) 100%);
-    height: 218px;
+    height: 100%;
     padding: 1.5rem;
   }
 </style>
