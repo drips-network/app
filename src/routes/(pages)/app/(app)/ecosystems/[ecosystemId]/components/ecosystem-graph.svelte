@@ -162,6 +162,12 @@
     refreshGraph();
   }
 
+  function setSelectedEdge(edge: string) {
+    const extremities = graph.extremities(edge);
+    // select the node in the direction of the arrow
+    setSelectedNode(extremities[1]);
+  }
+
   // Render nodes accordingly to the internal state:
   // 1. If a node is selected, it is highlighted
   // 2. If there is query, all non-matching nodes are greyed
@@ -465,6 +471,9 @@
     sigmaInstance.on('leaveEdge', () => {
       setHoveredEdge(undefined);
     });
+    sigmaInstance.on('clickEdge', ({ edge }) => {
+      setSelectedEdge(edge);
+    });
     sigmaInstance.on('clickNode', ({ node }) => {
       setSelectedNode(node);
     });
@@ -492,6 +501,7 @@
 <div
   class="ecosystem-graph"
   class:hovered-node={state.hoveredNode}
+  class:hovered-edge={state.hoveredEdge}
   class:dragging={state.isDragging}
   bind:this={graphContainer}
   bind:clientWidth={w}
@@ -504,6 +514,7 @@
     cursor: grab;
   }
 
+  .ecosystem-graph.hovered-edge,
   .ecosystem-graph.hovered-node {
     cursor: pointer;
   }
