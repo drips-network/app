@@ -1,4 +1,4 @@
-import { isAddress, type AbstractProvider } from 'ethers';
+import { type AbstractProvider } from 'ethers';
 import { NETWORK_CONFIG } from '../wallet/network';
 import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
 import filterFalsy from '$lib/utils/filter-falsy';
@@ -16,6 +16,10 @@ export function getMainnetProvider() {
     { logger: console },
   );
 }
+
+export const convertEVMChainIdToCoinType = (chainId: number) => {
+  return (0x80000000 | chainId) >>> 0;
+};
 
 /**
  * Safely reverse lookup an ENS name, ensuring that the resolved address is safe to use.
@@ -36,12 +40,14 @@ export async function safeReverseLookup(
     const resolver = await mainnetProvider.getResolver(name);
     if (!resolver) return undefined;
 
-    const addressForCurrentChain = await resolver.getAddress(chainId);
-    if (isAddress(addressForCurrentChain)) return addressForCurrentChain;
+    const currentChainCoinType = convertEVMChainIdToCoinType(chainId);
 
-    const address = await resolver.getAddress();
+    const addressForCurrentChain = await resolver.getAddress(currentChainCoinType);
+    if (addressForCurrentChain || chainId === 1) return addressForCurrentChain;
+
+    // coinType 60 is Ethereum Mainnet
+    const address = await resolver.getAddress(60);
     if (!address) return undefined;
-    if (chainId === 1) return address;
 
     const [isContractOnMainnet, isContractOnCurrentChain] = await Promise.all([
       isAddressContract(mainnetProvider, address),
