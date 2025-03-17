@@ -66,7 +66,6 @@ export function drawStraightEdgeLabel<
       ? edgeData[settings.edgeLabelColor.attribute] || settings.edgeLabelColor.color || '#000'
       : settings.edgeLabelColor.color;
 
-  // console.log('drawStraightEdgeLabel', sourceData.highlighted, targetData.highlighted)
   let label = edgeData.label;
 
   if (!label) return;
@@ -83,8 +82,10 @@ export function drawStraightEdgeLabel<
   context.font = `${weight} ${size}px ${font}`;
 
   // Computing positions without considering nodes sizes:
-  const sSize = sourceData.size;
-  const tSize = targetData.size;
+  // Subtract borderSize to prevent label twitching when hovering on
+  // edges of selected nodes.
+  const sSize = sourceData.size - sourceData.borderSize;
+  const tSize = targetData.size - targetData.borderSize;
   let sx = sourceData.x;
   let sy = sourceData.y;
   let tx = targetData.x;
