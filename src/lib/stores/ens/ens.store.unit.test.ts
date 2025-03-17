@@ -1,34 +1,17 @@
-import { MockProvider } from '@rsksmart/mock-web3-provider';
 import { get } from 'svelte/store';
 import ens from '.';
-import walletStore from '../wallet/wallet.store';
+import { provider } from './__mocks__/ens';
 
-vi.mock('$lib/stores/wallet/wallet.store');
+vi.spyOn(provider, 'lookupAddress');
+vi.spyOn(provider, 'getResolver');
 
-vi.mock('@rsksmart/mock-web3-provider', () => ({
-  MockProvider: vi.fn().mockImplementation(() => ({
-    lookupAddress: vi.fn(() => 'test.ens'),
-    getResolver: vi.fn(() => ({
-      getAvatar: vi.fn(() => 'avatar.png'),
-    })),
-  })),
-}));
-
-const provider = new MockProvider();
+vi.mock('$lib/stores/ens/ens');
 
 afterEach(() => {
   ens.clear();
 });
 
 describe('ens store', () => {
-  beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (walletStore as any).mockSetSubscribeValue({
-      ...get(walletStore),
-      provider,
-    });
-  });
-
   it('resolves records', async () => {
     await ens.lookup('0x1234');
 

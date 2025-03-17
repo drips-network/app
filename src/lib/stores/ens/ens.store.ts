@@ -71,9 +71,6 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
-    const saved = Object.entries(get(state)).find((entry) => entry[1].name === name);
-    if (saved) return saved[0];
-
     const address = await safeReverseLookup(
       get(walletStore).provider,
       mainnetProvider,
