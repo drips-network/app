@@ -46,7 +46,7 @@
   let lastH: number = h;
 
   // for expanding and collapsing, refresh instance to get most up to date view
-  $: w, h, refreshGraphDebounced(), cuttilyDetectCollapseAndDeselectNode();
+  $: w, h, cuttilyDetectCollapseAndDeselectNode(), refreshGraphDebounced();
 
   interface State {
     isDragging?: boolean;
@@ -97,15 +97,24 @@
     });
   }
 
-  async function setZoom(sigmaInstance: Sigma, zoom: number) {
-    if (zoom < 0) {
+  async function setZoom(sigmaInstance: Sigma, newZoom: number) {
+    const min = sigmaInstance.getSetting('minCameraRatio');
+    const max = sigmaInstance.getSetting('maxCameraRatio');
+
+    if (max && newZoom > max) {
+      zoom = max;
+      return;
+    }
+
+    if (min && newZoom < min) {
+      zoom = min;
       return;
     }
 
     programaticZoom = true;
     const camera = sigmaInstance.getCamera();
     const state = camera.getState();
-    const newState = { ...state, ratio: 1 / zoom };
+    const newState = { ...state, ratio: 1 / newZoom };
     // animate only when using the zoom buttons
     if (cameraUpdated) {
       camera.setState(newState);
