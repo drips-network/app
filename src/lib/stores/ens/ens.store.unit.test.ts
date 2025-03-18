@@ -5,6 +5,11 @@ import { provider } from './__mocks__/ens';
 vi.spyOn(provider, 'lookupAddress');
 vi.spyOn(provider, 'getResolver');
 
+vi.mock('$app/environment', () => ({
+  browser: true,
+  dev: true,
+}));
+
 vi.mock('$lib/stores/ens/ens');
 
 afterEach(() => {
