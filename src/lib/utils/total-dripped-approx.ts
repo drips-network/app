@@ -29,6 +29,11 @@ const STREAMS: {
 ];
 
 const GIVES = [
+  // 1st Metis RPGF OTD https://metis.drips.network/app/drip-lists/49912297604373019159051760081241164707594370315238407529962585664988
+  {
+    tokenAddress: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+    amount: '2292000000000000000000',
+  },
   // Radworks Grant https://www.drips.network/app/drip-lists/40866246603895578971810925870326321539836543960399385681839516039553
   {
     tokenAddress: '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3',
@@ -106,8 +111,6 @@ export default function totalDrippedApproximation() {
 
   return mergeAmounts(GIVES, streamedAmounts);
 }
-
-`${network.name}:total-dripped-prices`;
 
 export const totalDrippedPrices = (fetch = window.fetch) => {
   const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
