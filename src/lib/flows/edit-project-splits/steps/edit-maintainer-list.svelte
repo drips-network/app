@@ -18,7 +18,6 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -52,7 +51,7 @@
           [
             ['0xa404a9258A2240d6f2FDa871a7Fbd71bb6523570', 20],
             ['0x38493bA0F8a15D81985bF5438bc6f90C6C5418C1', 75],
-            network.ensSupported ? ['vitalik.eth', 5] : undefined,
+            ['vitalik.eth', 5],
           ],
           (v) => v,
         ),

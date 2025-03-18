@@ -1,18 +1,9 @@
-import { readable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 const TEST_ADDRESS = '0x12345678';
 
 export default (() => {
   const state = writable({});
-  const connected = readable(true);
-
-  function connect() {
-    return undefined;
-  }
-
-  function disconnect() {
-    return undefined;
-  }
 
   async function lookup(address: string) {
     if (address === TEST_ADDRESS) {
@@ -33,9 +24,6 @@ export default (() => {
 
   return {
     subscribe: state.subscribe,
-    connected: { subscribe: connected.subscribe },
-    connect,
-    disconnect,
     lookup,
   };
 })();

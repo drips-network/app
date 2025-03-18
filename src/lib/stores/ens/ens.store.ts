@@ -2,6 +2,7 @@ import { get, writable } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import network from '../wallet/network';
 import walletStore from '../wallet/wallet.store';
+import { getMainnetProvider, safeReverseLookup } from './ens';
 
 export interface ResolvedRecord {
   name?: string;
@@ -12,6 +13,8 @@ type State = {
   [address: string]: ResolvedRecord;
 };
 
+const mainnetProvider = getMainnetProvider();
+
 export default (() => {
   const state = writable<State>({});
 
@@ -21,10 +24,6 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
-    if (!network.ensSupported) return;
-
-    const { provider } = get(walletStore);
-
     const saved = get(state)[address];
     if (saved) return;
 
@@ -32,11 +31,11 @@ export default (() => {
     // for the same name
     state.update((s) => ({ ...s, [address]: {} }));
     try {
-      const name = await provider.lookupAddress(address);
+      const name = await mainnetProvider.lookupAddress(address);
 
       let avatarUrl: string | null = null;
       if (name) {
-        const resolver = await provider.getResolver(name);
+        const resolver = await mainnetProvider.getResolver(name);
         assert(resolver, 'Failed to get resolver');
 
         avatarUrl = resolver ? await resolver.getAvatar() : null;
@@ -72,21 +71,12 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
-    if (!network.ensSupported) return;
-
-    const { provider } = get(walletStore);
-
-    assert(
-      provider,
-      'You need to `connect` the store to a provider before being able to reverse lookup',
+    const address = await safeReverseLookup(
+      get(walletStore).provider,
+      mainnetProvider,
+      network.chainId,
+      name,
     );
-
-    const saved = Object.entries(get(state)).find((entry) => entry[1].name === name);
-
-    if (saved) return saved[0];
-
-    const address = await provider.resolveName(name);
-
     if (address) lookup(address);
 
     return address ?? undefined;
