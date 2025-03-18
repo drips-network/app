@@ -112,8 +112,6 @@ export default function totalDrippedApproximation() {
   return mergeAmounts(GIVES, streamedAmounts);
 }
 
-`${network.name}:total-dripped-prices`;
-
 export const totalDrippedPrices = (fetch = window.fetch) => {
   const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
   return getCmcPrices(tokenAddresses, fetch);
