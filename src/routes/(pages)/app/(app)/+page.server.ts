@@ -73,10 +73,13 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     variant: 'distribution',
     loadFn: (f) =>
       loadDistributionExplorePageData(f, {
-        featuredListIds: [],
+        featuredListIds: [
+          '49912297604373019159051760081241164707594370315238407529962585664988', // 1st Metis RPGF distribution
+        ],
         welcomeCardConfig: {
           title: 'Welcome to Drips on Metis',
-          description: "Drips on Metis is where rewards from Metis' RetroPGF will be distributed.",
+          description:
+            "Drips on Metis is where rewards from Metis' RetroPGF are being distributed.",
         },
       }),
   },
