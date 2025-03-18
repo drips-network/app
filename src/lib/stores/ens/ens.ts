@@ -17,10 +17,6 @@ export function getMainnetProvider() {
   );
 }
 
-export const convertEVMChainIdToCoinType = (chainId: number) => {
-  return (0x80000000 | chainId) >>> 0;
-};
-
 /**
  * Safely reverse lookup an ENS name, ensuring that the resolved address is safe to use.
  * Resolved addresses are considered unsafe if they are contracts on one chain but not the other.
@@ -40,12 +36,11 @@ export async function safeReverseLookup(
     const resolver = await mainnetProvider.getResolver(name);
     if (!resolver) return undefined;
 
-    const currentChainCoinType = convertEVMChainIdToCoinType(chainId);
+    // coinType 60 is Ethereum Mainnet, but we can use chainIds for all other supported chains
+    // See https://github.com/ethers-io/ethers.js/discussions/4964
+    const addressForCurrentChain = await resolver.getAddress(chainId === 1 ? 60 : chainId);
+    if (addressForCurrentChain || chainId === 1) return addressForCurrentChain ?? undefined;
 
-    const addressForCurrentChain = await resolver.getAddress(currentChainCoinType);
-    if (addressForCurrentChain || chainId === 1) return addressForCurrentChain;
-
-    // coinType 60 is Ethereum Mainnet
     const address = await resolver.getAddress(60);
     if (!address) return undefined;
 
