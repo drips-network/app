@@ -12,7 +12,7 @@ vi.mock('$app/environment', () => ({
   dev: true,
 }));
 
-vi.mock('$lib/stores/ens/ens.store.ts');
+vi.mock('$lib/stores/ens/ens.store');
 
 vi.mock('$lib/utils/blockies', () => ({
   createIcon: vi.fn(() => ({
