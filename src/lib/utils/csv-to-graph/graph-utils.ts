@@ -205,7 +205,7 @@ function correctRenamed(graph: NewGraph, error: string) {
 
   // create a list of edges that use the current project name, with directional information
   const currentEdges = graph.edges.reduce(
-    (memo: [Edge, keyof Edge, keyof Edge, number][], edge, index) => {
+    (memo: [Edge, 'source' | 'target', 'source' | 'target', number][], edge, index) => {
       if (edge.target === current) {
         memo.push([edge, 'target', 'source', index]);
       } else if (edge.source === current) {

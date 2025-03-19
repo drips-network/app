@@ -4,12 +4,15 @@
   import Recipients from '$lib/components/icons/Recipients.svelte';
   import Server from '$lib/components/icons/Server.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+
+  export let ecosystem: Ecosystem;
 </script>
 
 <div class="card ecosystem-metadata">
   <div>
     <h4 class="typo-header-4"><Recipients style="fill: var(--color-primary)" />Recipients</h4>
-    2,618
+    {ecosystem.graph.nodes.length - 1}
   </div>
   <div>
     <h4 class="typo-header-4"><Server style="fill: var(--color-primary)" />Model</h4>

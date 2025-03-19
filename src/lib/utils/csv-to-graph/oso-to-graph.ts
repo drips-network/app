@@ -20,7 +20,6 @@ export async function osoToFabricatedGraph(
   const fabricatedGraph = fabricateGraph(osoGraph, 10, 50);
   assignRandomRealisticWeights(fabricatedGraph);
   fabricatedGraph.nodes.sort((a, b) => a.projectName.localeCompare(b.projectName));
-  // @ts-expect-error: source might be undefined
   fabricatedGraph.edges.sort((a, b) => a.source.localeCompare(b.source));
 
   fs.writeFileSync(outputPath, JSON.stringify(fabricatedGraph, null, 4));
@@ -67,7 +66,6 @@ export async function osoToGraphJson(
 
   if (sortOutput) {
     graph.nodes.sort((a, b) => a.projectName.localeCompare(b.projectName));
-    // @ts-expect-error: source might be undefined
     graph.edges.sort((a, b) => a.source.localeCompare(b.source));
   }
 
