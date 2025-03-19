@@ -13,7 +13,7 @@ import isRunningInSafe from '$lib/utils/is-running-in-safe';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
-import network, { getNetwork, isConfiguredChainId, type Network } from './network';
+import network, { getNetwork, isConfiguredChainId, NETWORK_CONFIG, type Network } from './network';
 import { invalidateAll } from '../fetched-data-cache/invalidate';
 import { BrowserProvider } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
@@ -335,13 +335,9 @@ const walletStore = () => {
 };
 
 const localTestnetWalletStore = () => {
-  const provider = new FailoverJsonRpcProvider(
-    browser ? ['http://localhost:8545'] : ['http://testnet:8545'],
-    network,
-    {
-      staticNetwork: true,
-    },
-  );
+  const provider = new FailoverJsonRpcProvider([NETWORK_CONFIG[31337].rpcUrl], network, {
+    staticNetwork: true,
+  });
   const initialized = writable(false);
   const waitingForOnboard = writable(false);
 
