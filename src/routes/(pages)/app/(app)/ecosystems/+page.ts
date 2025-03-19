@@ -13,8 +13,8 @@ import * as ecosystemsApi from '$lib/utils/ecosystems';
 const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
 
 // const chicken = {
-//   "name": "Fabricated Graph 1",
-//   "description": "tootallnate has been removed",
+//   "name": "Fabricated Graph 2",
+//   "description": "It's got metadata and theme data",
 //   "chainId": "11155111",
 //   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
 //   "ownerAddress": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -24,13 +24,36 @@ const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:proj
 //   },
 //   "color": "#27C537",
 //   "metadata": [{
-//       "icon": "icon",
-//       "title": "title",
-//       "text": "text",
+//       "icon": "Recipients",
+//       "title": "MIT Licensed",
+//       "text": "327",
 //       "link": {
-//           "href": "http://href.com",
-//           "label": "label"
+//         "href": "https://maps.app.goo.gl/cQFc5uDp1g1NQh488",
+//         "label": "Castro Monte Mozinho"
 //       }
+//   }, {
+//     "icon": "Wallet",
+//     "title": "Source",
+//     "text": "Based on data from",
+//     "link": {
+//         "href": "https://www.opensource.observer/",
+//         "label": "Open Source Observer"
+//     }
+//   }, {
+//     "icon": "Download",
+//     "title": "Culinary Relations",
+//     "link": {
+//         "href": "https://maps.app.goo.gl/5PmHWtBCAjguoatB7",
+//         "label": "Casa Da Viuva"
+//     }
+//   }, {
+//     "icon": "Coin",
+//     "title": "Fun Fact",
+//     "text": "Dijkstra was apparently a huge a-hole.",
+//     "link": {
+//       "href": "https://drips.network",
+//       "label": "Drips"
+//     }
 //   }],
 //   "graph": osoJson
 // }
@@ -64,7 +87,7 @@ export const load = async ({ fetch }) => {
   // const ecosystems: Ecosystem[] = [];
   const ecosystems = await ecosystemsApi.getAll();
   // console.log(chicken)
-  // if (ecosystems.length < 4) {
+  // if (ecosystems.length < 5) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();

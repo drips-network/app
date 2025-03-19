@@ -3,11 +3,13 @@ import { z } from 'zod';
 const metadatumSchema = z.object({
   icon: z.string(),
   title: z.string(),
-  text: z.string(),
-  link: z.object({
-    href: z.string(),
-    label: z.string(),
-  }),
+  text: z.string().optional(),
+  link: z
+    .object({
+      href: z.string(),
+      label: z.string(),
+    })
+    .optional(),
 });
 
 const nodeSchema = z.object({
@@ -23,11 +25,9 @@ const newNodeScehma = z.object({
 });
 
 const edgeSchema = z.object({
-  // TODO: null is not a valid source
-  source: z.string().or(z.null()),
+  source: z.string(),
   target: z.string(),
-  // TODO: should we standardize on a number or a string?
-  weight: z.string().or(z.number()),
+  weight: z.number().positive(),
 });
 
 const graphSchema = z.object({

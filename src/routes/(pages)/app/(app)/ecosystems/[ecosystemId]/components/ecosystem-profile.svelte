@@ -378,7 +378,7 @@
     </section>
     <section id="metadata">
       <PrimaryColorThemer {colorHex}>
-        <EcosystemMetadata />
+        <EcosystemMetadata {ecosystem} />
       </PrimaryColorThemer>
     </section>
     <section id="distribution">
