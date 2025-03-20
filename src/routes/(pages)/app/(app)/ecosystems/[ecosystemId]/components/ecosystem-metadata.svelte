@@ -1,36 +1,46 @@
 <script lang="ts">
-  import Coin from '$lib/components/icons/Coin.svelte';
-  import Download from '$lib/components/icons/Download.svelte';
-  import Recipients from '$lib/components/icons/Recipients.svelte';
-  import Server from '$lib/components/icons/Server.svelte';
-  import Wallet from '$lib/components/icons/Wallet.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import type { ComponentType } from 'svelte';
 
   export let ecosystem: Ecosystem;
+
+  const iconImports = import.meta.glob('$lib/components/icons/*.svelte') as Record<
+    string,
+    () => Promise<{ default: ComponentType }>
+  >;
+
+  $: metadata = ecosystem.metadata || [];
 </script>
 
 <div class="card ecosystem-metadata">
-  <div>
-    <h4 class="typo-header-4"><Recipients style="fill: var(--color-primary)" />Recipients</h4>
-    {ecosystem.graph.nodes.length - 1}
-  </div>
-  <div>
-    <h4 class="typo-header-4"><Server style="fill: var(--color-primary)" />Model</h4>
-    Drips Bot 9000
-  </div>
-  <div>
-    <h4 class="typo-header-4"><Download style="fill: var(--color-primary)" />Download</h4>
-    Download ecosystem as CSV
-  </div>
-  <div>
-    <h4 class="typo-header-4"><Wallet style="fill: var(--color-primary)" />Owner</h4>
-    brandonhaslegs.eth
-  </div>
-  <div>
-    <!-- TODO: wrong icon -->
-    <h4 class="typo-header-4"><Coin style="fill: var(--color-primary)" />Donations</h4>
-    none
-  </div>
+  {#if !metadata.length}
+    No metadata
+  {/if}
+  {#each metadata as metadatum}
+    {@const importIcon = iconImports[`/src/lib/components/icons/${metadatum.icon}.svelte`]}
+    <div>
+      <h4 class="typo-header-4">
+        {#if importIcon}
+          {#await importIcon() then { default: Icon }}
+            <Icon style="fill: var(--color-primary)" />
+          {/await}
+        {/if}
+        {metadatum.title}
+      </h4>
+      {#if metadatum.text}
+        {metadatum.text}
+      {/if}
+      {#if metadatum.link}
+        <a
+          href={metadatum.link.href}
+          target="_blank"
+          class="typo-link"
+          style="color: var(--color-foreground)"
+          >{metadatum.link.label ? metadatum.link.label : metadatum.link.href}</a
+        >
+      {/if}
+    </div>
+  {/each}
 </div>
 
 <style>
