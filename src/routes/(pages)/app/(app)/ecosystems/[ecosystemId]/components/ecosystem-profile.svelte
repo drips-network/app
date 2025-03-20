@@ -263,7 +263,7 @@
   //   },
   // };
 
-  $: colorHex = isClaimed(chainData) ? chainData.color : undefined;
+  $: colorHex = ecosystem.color ? ecosystem.color : undefined;
 
   const recipientsFormatter = new Intl.NumberFormat('en-US');
   // all nodes except the root node
@@ -312,7 +312,6 @@
       <div>
         <EcosystemProfileHeader
           {ecosystem}
-          {project}
           on:editButtonClick={() =>
             isClaimed(chainData) &&
             modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
