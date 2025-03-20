@@ -49,7 +49,9 @@
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{ecosystem.name}</h1>
       {#if ecosystem.description}
-        <p class="line-clamp-2 twemoji-text">{@html twemoji(ecosystem.description)}</p>
+        <p class="line-clamp-2 text-center sm:text-left twemoji-text">
+          {@html twemoji(ecosystem.description)}
+        </p>
       {/if}
       <div class="flex justify-center sm:justify-start" style:margin-top="0.5rem">
         <div class="identity-wrapper">
