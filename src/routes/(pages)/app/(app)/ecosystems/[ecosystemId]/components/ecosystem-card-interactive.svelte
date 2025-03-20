@@ -1,41 +1,9 @@
-<script lang="ts" context="module">
-  // export const PROJECT_CARD_FRAGMENT = gql`
-  //   ${PROJECT_AVATAR_FRAGMENT}
-  //   ${PROJECT_NAME_FRAGMENT}
-  //   fragment ProjectCard on Project {
-  //     ...ProjectName
-  //     isVisible
-  //     source {
-  //       forge
-  //       ownerName
-  //       repoName
-  //     }
-  //     chainData {
-  //       ... on ClaimedProjectData {
-  //         chain
-  //         owner {
-  //           accountId
-  //         }
-  //       }
-  //       ... on UnClaimedProjectData {
-  //         chain
-  //         owner {
-  //           accountId
-  //         }
-  //       }
-  //       ...ProjectAvatar
-  //     }
-  //   }
-  // `;
-</script>
-
 <script lang="ts">
   import EcosystemGraph from './ecosystem-graph.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
-  // import SearchInput from '$lib/components/search-bar/components/search-input.svelte';
   import EcosystemProjectCard from './ecosystem-project-card.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import { type NodeSelectionChangedPayload } from './ecosystem-graph';
@@ -88,7 +56,7 @@
 
   async function showProjectData(nodeId: string) {
     const fullNode = getEcosystemNodeById(ecosystem, nodeId);
-    // TODO: bad, fail
+    // TODO: bad, fail, but don't fully fail
     if (!fullNode) {
       return;
     }
@@ -183,32 +151,7 @@
         <slot name="banner" />
       </div>
     {/if}
-    <!-- <div class="header">
-
-    </div> -->
     <div class="details">
-      <!-- <div class="source">
-        <div class="icon">
-          <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
-        </div>
-        <span class="owner-name">{project.source.ownerName}</span>
-      </div> -->
-      <!-- <h1 class="name">
-        <span class="pixelated">
-          {project.source.repoName}
-          <ProjectName showSource={false} {project} />
-        </span>
-      </h1> -->
-      <!-- <p class="description">The essential Ethereum ecosystem.</p> -->
-      <!-- <div class="avatar">
-        <ProjectAvatar project={projectChainData} size="small" outline />
-        <span>with <span>Drips AI</span></span>
-      </div> -->
-      <!-- <div class="cubbies">
-        <div><Box style="fill: var(--color-foreground)" />2,618</div>
-        <div><User style="fill: var(--color-foreground)" />17,491</div>
-        <div><Coin style="fill: var(--color-foreground)" />$186,833.91</div>
-      </div> -->
       <div class="surface top-left">
         <!-- <SearchInput small placeholder="Search" /> -->
       </div>
@@ -297,14 +240,6 @@
     border-radius: 0;
   }
 
-  /* .background.background--unclaimed {
-    background: linear-gradient(
-      180deg,
-      var(--color-foreground-level-1) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  } */
-
   .details {
     display: flex;
     flex-direction: column;
@@ -312,11 +247,6 @@
     justify-content: center;
     text-align: center;
   }
-
-  /* .header {
-    flex-grow: 1;
-    position: relative;
-  } */
 
   .graph {
     position: absolute;
@@ -337,41 +267,6 @@
     opacity: 0;
     animation: fadeIn 1s ease forwards;
   }
-
-  /* .avatar {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    justify-content: center;
-  } */
-
-  /* .cubbies {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    border-top: 1px solid var(--color-foreground-level-2);
-    position: relative;
-    top: 0.75rem;
-    left: -0.75rem;
-    width: calc(100% + 1.5rem);
-  }
-
-  .cubbies > * {
-    flex-grow: 1;
-    border-right: 1px solid var(--color-foreground-level-2);
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .cubbies > *:last-child {
-    border-right: none;
-  }
-
-  .ecosystem-card-wrapper.ecosystem-card-wrapper--interactive .cubbies {
-    display: none;
-  } */
 
   .banner {
     position: absolute;
