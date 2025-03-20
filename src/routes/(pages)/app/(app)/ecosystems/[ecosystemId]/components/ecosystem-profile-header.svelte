@@ -1,29 +1,4 @@
-<script lang="ts" context="module">
-  export const PROJECT_PROFILE_HEADER_FRAGMENT = gql`
-    ${PROJECT_BADGE_FRAGMENT}
-    ${PROJECT_AVATAR_FRAGMENT}
-    fragment ProjectProfileHeader on Project {
-      ...ProjectBadge
-      source {
-        url
-      }
-      chainData {
-        ...ProjectAvatar
-        ... on ClaimedProjectData {
-          chain
-          owner {
-            address
-          }
-        }
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
-  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
-  import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
-  import { gql } from 'graphql-request';
   import twemoji from '$lib/utils/twemoji';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
