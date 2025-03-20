@@ -48,16 +48,14 @@
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{ecosystem.name}</h1>
-      <div class="flex justify-center sm:justify-start">
+      {#if ecosystem.description}
+        <p class="line-clamp-2 twemoji-text">{@html twemoji(ecosystem.description)}</p>
+      {/if}
+      <div class="flex justify-center sm:justify-start" style:margin-top="0.5rem">
         <div class="identity-wrapper">
           <IdentityBadge address={ownerAddress} />
         </div>
       </div>
-      {#if ecosystem.description}
-        <span class="line-clamp-2 twemoji-text" style:margin-top="0.25rem"
-          >{@html twemoji(ecosystem.description)}
-        </span>
-      {/if}
     </div>
   </div>
 </div>
