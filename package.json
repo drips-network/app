@@ -132,7 +132,8 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-arm64-gnu": "^4.31.0",
-    "@rollup/rollup-linux-x64-gnu": "^4.31.0"
+    "@rollup/rollup-linux-x64-gnu": "^4.31.0",
+    "@esbuild/linux-x64":"0.24.0"
   },
   "type": "module"
 }
