@@ -21,25 +21,18 @@
 </script>
 
 <script lang="ts">
-  import ProjectAvatar, {
-    PROJECT_AVATAR_FRAGMENT,
-  } from '$lib/components/project-avatar/project-avatar.svelte';
+  import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
   import { gql } from 'graphql-request';
   import twemoji from '$lib/utils/twemoji';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import EcosystemAvatar from './ecosystem-avatar.svelte';
 
   export let ecosystem: Ecosystem;
-  export let project: ProjectProfileHeaderFragment;
-
-  export let pendingAvatar = false;
 
   const TODO_REMOVE_FALLBACK_ADDRESS = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045';
 
-  $: projectChainData = filterCurrentChainData(project.chainData);
   // TODO: get owner of NFT once the ecosystem is deployed.
   $: ownerAddress = ecosystem.ownerAddress ?? TODO_REMOVE_FALLBACK_ADDRESS;
 </script>
@@ -51,7 +44,7 @@
     class="max-w-full flex-1 min-w-0 flex flex-col gap-2 items-center sm:flex-row sm:gap-8 sm:items-center"
   >
     <div class="avatar">
-      <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
+      <EcosystemAvatar {ecosystem} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{ecosystem.name}</h1>
@@ -61,10 +54,7 @@
         </div>
       </div>
       {#if ecosystem.description}
-        <span
-          class="typo-text-small line-clamp-2 twemoji-text"
-          style:margin-top="0.25rem"
-          style:color="var(--color-foreground-level-4)"
+        <span class="line-clamp-2 twemoji-text" style:margin-top="0.25rem"
           >{@html twemoji(ecosystem.description)}
         </span>
       {/if}
