@@ -1,9 +1,6 @@
 <script lang="ts">
-  // import Button from '$lib/components/button/button.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
-  // import Pen from '$lib/components/icons/Pen.svelte';
   import Pie from '$lib/components/icons/Pie.svelte';
-  // import Trash from '$lib/components/icons/Trash.svelte';
   import User from '$lib/components/icons/User.svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -16,7 +13,6 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import formatPercent from '$lib/utils/format-percent';
-  // import { fade } from 'svelte/transition';
 
   export let loadProjectData: {
     forge: string;
@@ -75,46 +71,6 @@
       );
       project = projectData.project;
       description = projectData.description;
-
-      // await tick()
-      // if (projectChainData) {
-
-      //         {
-      //     __typename: "AddressReceiver";
-      //     driver: Driver;
-      //     weight: number;
-      //     account: {
-      //         __typename: "AddressDriverAccount";
-      //         address: string;
-      //         driver: Driver;
-      //         accountId: string;
-      //     };
-      // }
-      // projectData.project.chainData
-      // projectChainData.splits = {}
-      // projectChainData.splits.maintainers = [{
-      //   __typename: "AddressReceiver",
-      //   driver: '',
-      //   weight: 0.1,
-      //   account: {
-      //       __typename: "AddressDriverAccount",
-      //       address: 'address',
-      //       driver: 'driver',
-      //       accountId: 'accountId',
-      //   }
-      // }]
-      // projectChainData.splits.dependencies = [{
-      //   __typename: "AddressReceiver",
-      //   driver: '',
-      //   weight: 0.1,
-      //   account: {
-      //       __typename: "AddressDriverAccount",
-      //       address: 'address',
-      //       driver: 'driver',
-      //       accountId: 'accountId',
-      //   }
-      // }]
-      // }
     } finally {
       loading = false;
     }
