@@ -23,6 +23,8 @@ services:
       - PUBLIC_BASE_URL=http://localhost:5173
       - PUBLIC_PORT=5173
       - PUBLIC_SUPPRESS_MISSING_VAR_IN_PROD_ERRORS=true
+      - ECOSYSTEM_API_URL=https://base-pr-ecosystems.up.railway.app
+      - ECOSYSTEM_API_ACCESS_TOKEN=${ECOSYSTEM_API_ACCESS_TOKEN}
     volumes:
     - .:/app
     - /app/node_modules/
