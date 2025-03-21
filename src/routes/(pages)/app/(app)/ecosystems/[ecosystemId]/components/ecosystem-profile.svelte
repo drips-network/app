@@ -87,51 +87,49 @@
   // import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   // import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   // import Wallet from '$lib/components/icons/Wallet.svelte';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  // import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   // import SplitsComponent from '$lib/components/splits/splits.svelte';
   // import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
-  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import Pile from '$lib/components/pile/pile.svelte';
-  import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  // import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  // import Pile from '$lib/components/pile/pile.svelte';
+  // import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
+  // import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   // import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
+  // import walletStore from '$lib/stores/wallet/wallet.store';
   // import Button from '$lib/components/button/button.svelte';
   // import Pen from '$lib/components/icons/Pen.svelte';
-  import modal from '$lib/stores/modal';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
-  import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
+  // import modal from '$lib/stores/modal';
+  // import Stepper from '$lib/components/stepper/stepper.svelte';
+  // import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
   // import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   // import Registered from '$lib/components/icons/Registered.svelte';
   // import buildUrl from '$lib/utils/build-url';
   // import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
-  import { fade } from 'svelte/transition';
+  // import { fade } from 'svelte/transition';
   // import Developer from '$lib/components/developer-section/developer.section.svelte';
   // import { goto } from '$app/navigation';
-  import { browser } from '$app/environment';
-  import isClaimed from '$lib/utils/project/is-claimed';
+  // import { browser } from '$app/environment';
+  // import isClaimed from '$lib/utils/project/is-claimed';
   import { gql } from 'graphql-request';
-  import type { ProjectProfileFragment } from './__generated__/gql.generated';
+  // import type { ProjectProfileFragment } from './__generated__/gql.generated';
   // import unreachable from '$lib/utils/unreachable';
   // import ShareButton from '$lib/components/share-button/share-button.svelte';
-  import highlightStore from '$lib/stores/highlight/highlight.store';
-  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
+  // import highlightStore from '$lib/stores/highlight/highlight.store';
+  // import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  // import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  // import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
   // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
-  import buildProjectUrl from '$lib/utils/build-project-url';
-  import { Forge } from '$lib/graphql/__generated__/base-types';
+  // import buildProjectUrl from '$lib/utils/build-project-url';
+  // import { Forge } from '$lib/graphql/__generated__/base-types';
   // import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   // import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
   // import DripList from '$lib/components/icons/DripList.svelte';
   import { MERGE_WITHDRAWABLE_BALANCES_FRAGMENT } from '$lib/utils/merge-withdrawable-balances';
-  import getSupportersPile, {
-    SUPPORTER_PILE_FRAGMENT,
-  } from '$lib/components/drip-list-card/methods/get-supporters-pile';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import { SUPPORTER_PILE_FRAGMENT } from '$lib/components/drip-list-card/methods/get-supporters-pile';
+  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   // import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
   // import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
   // import Settings from '$lib/components/icons/Settings.svelte';
@@ -145,112 +143,113 @@
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
   export let ecosystem: Ecosystem;
-  export let project: ProjectProfileFragment;
+  // export let project: ProjectProfileFragment;
 
-  interface RepoInfo {
-    url: string;
-    repoName: string;
-    ownerName: string;
-  }
+  // interface RepoInfo {
+  //   url: string;
+  //   repoName: string;
+  //   ownerName: string;
+  // }
 
-  export let newRepo: RepoInfo | undefined;
-  export let correctCasingRepo: RepoInfo | undefined;
+  // export let newRepo: RepoInfo | undefined;
+  // export let correctCasingRepo: RepoInfo | undefined;
 
   // $: ownAccountId = $walletStore.dripsAccountId;
-  $: chainData = filterCurrentChainData(project.chainData);
+  // $: chainData = filterCurrentChainData(project.chainData);
   // $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
 
-  type ExtractFragment<T, Condition> = T extends Condition ? T : never;
+  // type ExtractFragment<T, Condition> = T extends Condition ? T : never;
 
-  function getSplitsPile(
-    splitCollections: (
-      | ExtractFragment<
-          ProjectProfileFragment['chainData'][number],
-          { __typename: 'ClaimedProjectData' }
-        >['splits']['maintainers']
-      | ExtractFragment<
-          ProjectProfileFragment['chainData'][number],
-          { __typename: 'ClaimedProjectData' }
-        >['splits']['dependencies']
-    )[],
-  ) {
-    const splits = splitCollections.flat();
+  // function getSplitsPile(
+  //   splitCollections: (
+  //     | ExtractFragment<
+  //         ProjectProfileFragment['chainData'][number],
+  //         { __typename: 'ClaimedProjectData' }
+  //       >['splits']['maintainers']
+  //     | ExtractFragment<
+  //         ProjectProfileFragment['chainData'][number],
+  //         { __typename: 'ClaimedProjectData' }
+  //       >['splits']['dependencies']
+  //   )[],
+  // ) {
+  //   const splits = splitCollections.flat();
 
-    return mapFilterUndefined(splits, (v) => {
-      switch (v.__typename) {
-        case 'AddressReceiver':
-          return {
-            component: IdentityBadge,
-            props: {
-              address: v.account.address,
-              showIdentity: false,
-              size: 'medium',
-              disableLink: true,
-            },
-          };
-        case 'ProjectReceiver':
-          return {
-            component: ProjectAvatar,
-            props: {
-              project: filterCurrentChainData(v.project.chainData),
-              outline: true,
-              isLinked: false,
-            },
-          };
-        case 'DripListReceiver':
-          return {
-            component: DripListAvatar,
-            props: { outline: true, isLinked: false },
-          };
-        default:
-          return undefined;
-      }
-    });
-  }
+  //   return mapFilterUndefined(splits, (v) => {
+  //     switch (v.__typename) {
+  //       case 'AddressReceiver':
+  //         return {
+  //           component: IdentityBadge,
+  //           props: {
+  //             address: v.account.address,
+  //             showIdentity: false,
+  //             size: 'medium',
+  //             disableLink: true,
+  //           },
+  //         };
+  //       case 'ProjectReceiver':
+  //         return {
+  //           component: ProjectAvatar,
+  //           props: {
+  //             project: filterCurrentChainData(v.project.chainData),
+  //             outline: true,
+  //             isLinked: false,
+  //           },
+  //         };
+  //       case 'DripListReceiver':
+  //         return {
+  //           component: DripListAvatar,
+  //           props: { outline: true, isLinked: false },
+  //         };
+  //       default:
+  //         return undefined;
+  //     }
+  //   });
+  // }
 
-  $: mobileView =
-    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
+  // $: mobileView =
+  //   $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
 
-  let collectHintTriggered = false;
+  // let collectHintTriggered = false;
 
-  function triggerCollectHint() {
-    collectHintTriggered = true;
+  // function triggerCollectHint() {
+  //   collectHintTriggered = true;
 
-    setTimeout(() => {
-      highlightStore.highlight({
-        title: 'Collect received funds',
-        description: 'You can collect funds to your wallet here.',
-        element: document.querySelectorAll("[data-highlightid='global-collect']")[0],
-        borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
-        paddingPx: mobileView ? 8 : 0,
-      });
-    }, 2000);
-  }
+  //   setTimeout(() => {
+  //     highlightStore.highlight({
+  //       title: 'Collect received funds',
+  //       description: 'You can collect funds to your wallet here.',
+  //       element: document.querySelectorAll("[data-highlightid='global-collect']")[0],
+  //       borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
+  //       paddingPx: mobileView ? 8 : 0,
+  //     });
+  //   }, 2000);
+  // }
 
-  const walletInitialized = walletStore.initialized;
+  // const walletInitialized = walletStore.initialized;
 
-  $: {
-    if (browser && !collectHintTriggered && $walletInitialized) {
-      let url = new URL(window.location.href);
+  // $: {
+  //   if (browser && !collectHintTriggered && $walletInitialized) {
+  //     let url = new URL(window.location.href);
 
-      if (url.searchParams.get('collectHint') === 'true') {
-        url.searchParams.delete('collectHint');
-        window.history.replaceState({}, '', url.toString());
+  //     if (url.searchParams.get('collectHint') === 'true') {
+  //       url.searchParams.delete('collectHint');
+  //       window.history.replaceState({}, '', url.toString());
 
-        if (!dismissablesStore.isDismissed('project-claim-collect-hint')) {
-          triggerCollectHint();
-          dismissablesStore.dismiss('project-claim-collect-hint');
-        }
-      }
-    }
-  }
+  //       if (!dismissablesStore.isDismissed('project-claim-collect-hint')) {
+  //         triggerCollectHint();
+  //         dismissablesStore.dismiss('project-claim-collect-hint');
+  //       }
+  //     }
+  //   }
+  // }
 
-  $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
+  // $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
 
-  let splitsSectionSkeleton: SectionSkeleton | undefined;
+  // let splitsSectionSkeleton: SectionSkeleton | undefined;
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
-  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
+  // TODO: fix
+  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent('TODO')}.png`;
 
   // $: origin = browser ? window.location.origin : '';
   // $: supportButtonStepConfig = {
@@ -270,12 +269,15 @@
   $: recipientsFormatted = recipientsFormatter.format(
     ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0,
   );
+
+  // function buildEcosystemUrl() {
+  //   return window.
+  // }
 </script>
 
 <HeadMeta
   title={ecosystem.name}
-  description="Support {project.source
-    .repoName} on Drips and help make Open-Source Software sustainable."
+  description="Support {ecosystem.name} on Drips and help make Open-Source Software sustainable."
   image="{imageBaseUrl}?target=og"
   twitterImage="{imageBaseUrl}?target=twitter"
 />
@@ -287,35 +289,18 @@
     - The correct-casing repo URL if the project has different casing to the Drips project
     - The project URL, without ?exact parameter
   -->
-  <link
-    rel="canonical"
-    href="https://drips.network{buildProjectUrl(
-      Forge.GitHub,
-      canonicalRepoInfo.ownerName,
-      canonicalRepoInfo.repoName,
-      false,
-    )}"
-  />
+  <link rel="canonical" href={`https://drips.network/app/ecosystems/${ecosystem.id}`} />
 
-  {#if !project.isVisible}
+  <!-- {#if !project.isVisible}
     <meta name="robots" content="noindex" />
-  {/if}
+  {/if} -->
 </svelte:head>
 
-<PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
-  <article
-    class="project-profile"
-    class:claimed={isClaimed(chainData)}
-    class:hidden-by-user={!project.isVisible}
-  >
+<PrimaryColorThemer colorHex={ecosystem.color}>
+  <article class="project-profile">
     <header class="header card">
       <div>
-        <EcosystemProfileHeader
-          {ecosystem}
-          on:editButtonClick={() =>
-            isClaimed(chainData) &&
-            modal.show(Stepper, undefined, editProjectMetadataSteps(project))}
-        />
+        <EcosystemProfileHeader {ecosystem} />
       </div>
 
       <div class="stats">
@@ -330,14 +315,14 @@
         </div>
       </div>
 
-      {#if isClaimed(chainData)}
+      <!-- {#if isClaimed(chainData)}
         <div class="stats" in:fade={{ duration: 300 }}>
           <div class="stat shadow-low rounded-drip-lg">
             <KeyValuePair key="Donations">
               <AggregateFiatEstimate amounts={chainData.totalEarned} />
             </KeyValuePair>
           </div>
-          <!-- ("Supporters" stat) -->
+          ("Supporters" stat)
           {#if [chainData.support].flat().length > 0}
             <a
               class="stat btn-theme-outlined"
@@ -349,7 +334,7 @@
               </KeyValuePair>
             </a>
           {/if}
-          <!-- ("Splits with" stat) -->
+          ("Splits with" stat)
           {#if [chainData.splits.maintainers, chainData.splits.dependencies].flat().length > 0}
             <a
               class="stat btn-theme-outlined"
@@ -368,11 +353,11 @@
             </a>
           {/if}
         </div>
-      {/if}
+      {/if} -->
     </header>
     <section id="graph">
       <PrimaryColorThemer {colorHex}>
-        <EcosystemCardInteractive {ecosystem} isHidden={!project.isVisible} isInteractive />
+        <EcosystemCardInteractive {ecosystem} />
       </PrimaryColorThemer>
     </section>
     <section id="metadata">
@@ -468,18 +453,14 @@
       <PrimaryColorThemer {colorHex}>
         <SupportersSection
           bind:sectionSkeleton={supportersSectionSkeleton}
-          type="project"
-          supportItems={chainData.support}
+          type="ecosystem"
+          supportItems={[]}
         />
       </PrimaryColorThemer>
     </section>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard
-          ecosystem={{}}
-          {project}
-          disabled={!!newRepo || !!correctCasingRepo || !project.isVisible}
-        />
+        <SupportCard {ecosystem} disabled={false} />
       </div>
     </aside>
   </article>
@@ -535,10 +516,6 @@
     border: 1px solid var(--color-foreground);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
-  }
-
-  .hidden-by-user {
-    opacity: 0.5;
   }
 
   .drip-bordered {
