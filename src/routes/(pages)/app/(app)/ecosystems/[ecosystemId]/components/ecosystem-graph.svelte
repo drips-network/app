@@ -22,6 +22,7 @@
   }>();
 
   const ROOT_NODE_ID = 'N/A';
+  const ROOT_EDGE_SOURCE = 'root';
 
   export let ecosystem: Ecosystem;
   export let zoom: number = 1;
@@ -325,10 +326,10 @@
       }
 
       const isPrimary = ecosystem.graph.edges.find(
-        (e) => e.source === ROOT_NODE_ID && e.target === node.projectAccountId,
+        (e) => e.source === ROOT_EDGE_SOURCE && e.target === node.projectAccountId,
       );
       const firstParentEdge = ecosystem.graph.edges.find((e) => {
-        return e.source !== ROOT_NODE_ID && e.target === node.projectAccountId;
+        return e.source !== ROOT_EDGE_SOURCE && e.target === node.projectAccountId;
       });
       const firstParent = firstParentEdge ? firstParentEdge.source : node.projectAccountId;
       graph.addNode(node.projectAccountId, {
@@ -347,7 +348,7 @@
 
     for (const edge of ecosystem.graph.edges) {
       // edge from root
-      if (edge.source === ROOT_NODE_ID) {
+      if (edge.source === ROOT_EDGE_SOURCE) {
         continue;
       }
 
