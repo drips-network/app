@@ -11,8 +11,6 @@
   import ArrowCollapse from '$lib/components/icons/ArrowCollapse.svelte';
 
   export let ecosystem: Ecosystem;
-  export let isHidden: boolean = false;
-  export let isInteractive: boolean = false;
 
   let ecosystemCardElement: HTMLDivElement;
   let expanded: boolean = false;
@@ -130,14 +128,9 @@
 </script>
 
 <svelte:window on:keydown={(event) => stopKeyScroll(event)} />
-<div
-  class="ecosystem-card-wrapper"
-  class:ecosystem-card-wrapper--interactive={isInteractive}
-  class:expanded
->
+<div class="ecosystem-card-wrapper" class:expanded>
   <div
     class="ecosystem-card"
-    class:hidden-project={isHidden}
     bind:this={ecosystemCardElement}
     on:wheel={(event) => stopScroll(event)}
     on:touchmove={(event) => stopTouchScroll(event)}
@@ -260,12 +253,6 @@
 
   .ecosystem-card-wrapper.expanded .graph {
     border-radius: 0;
-  }
-
-  .hidden-project {
-    color: var(--color-foreground);
-    opacity: 0;
-    animation: fadeIn 1s ease forwards;
   }
 
   .banner {
