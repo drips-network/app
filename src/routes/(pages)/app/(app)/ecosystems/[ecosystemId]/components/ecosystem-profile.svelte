@@ -283,17 +283,7 @@
 />
 
 <svelte:head>
-  <!--
-    Canonical URL is either, in order of priority:
-    - The new repo URL if the project has been renamed
-    - The correct-casing repo URL if the project has different casing to the Drips project
-    - The project URL, without ?exact parameter
-  -->
   <link rel="canonical" href={`https://drips.network/app/ecosystems/${ecosystem.id}`} />
-
-  <!-- {#if !project.isVisible}
-    <meta name="robots" content="noindex" />
-  {/if} -->
 </svelte:head>
 
 <PrimaryColorThemer colorHex={ecosystem.color}>
