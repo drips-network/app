@@ -21,11 +21,11 @@
     nodeSelectionChanged: NodeSelectionChangedPayload;
   }>();
 
-  const ROOT_NODE_ID = 'N/A';
-  const ROOT_EDGE_SOURCE = 'root';
-
   export let ecosystem: Ecosystem;
   export let zoom: number = 1;
+
+  const ROOT_NODE_ID = 'N/A';
+  const ROOT_EDGE_SOURCE = 'root';
 
   let graph: Graph;
   let sigmaInstance: Sigma;
