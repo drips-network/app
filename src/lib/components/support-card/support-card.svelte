@@ -78,6 +78,7 @@
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
+  export let ecosystem: object | undefined = undefined;
 
   export let draftListMode = false;
 
@@ -86,7 +87,20 @@
     if (!project && !dripList) disabled = true;
   }
 
-  $: type = project ? ('project' as const) : ('dripList' as const);
+  let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
+
+  $: {
+    switch (true) {
+      case !!project:
+        type = 'project';
+        break;
+      case !!ecosystem:
+        type = 'ecosystem';
+        break;
+      default:
+        type = 'dripList';
+    }
+  }
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
@@ -184,7 +198,11 @@
   }
 </script>
 
-<div class="become-supporter-card" class:disabled>
+<div
+  class="become-supporter-card"
+  class:disabled
+  class:become-supporter-card--ecosystem={ecosystem}
+>
   {#if !draftListMode && (ownDripLists === undefined || updating)}
     <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
@@ -204,7 +222,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  <p>Donate once, {dripList || ecosystem ? 'continuously, ' : ''}or add this to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons
@@ -235,11 +253,17 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
+    /* NEW */
+    justify-content: space-between;
   }
 
   .become-supporter-card.disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .become-supporter-card.become-supporter-card--ecosystem {
+    gap: auto;
   }
 
   .loading-overlay {

@@ -106,7 +106,7 @@
 
   export let ownerAccountId: string | undefined = undefined;
 
-  export let type: 'project' | 'dripList' | 'address';
+  export let type: 'project' | 'dripList' | 'address' | 'ecosystem';
   export let headline = 'Support';
   export let emptyStateHeadline = 'No supporters';
 
@@ -124,6 +124,9 @@
         break;
       case 'address':
         emptyStateText = `This user doesnʼt have any supporters yet.`;
+        break;
+      case 'ecosystem':
+        emptyStateText = `This ecosystem doesnʼt have any supporters yet.`;
         break;
     }
   }
