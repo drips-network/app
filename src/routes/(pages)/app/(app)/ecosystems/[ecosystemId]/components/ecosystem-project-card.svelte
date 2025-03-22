@@ -108,7 +108,10 @@
       <div class="stats">
         {#if Number.isFinite(projectMetadata?.absoluteWeight)}
           <div>
-            <Pie style="fill: var(--color-background)" /><strong class="ml-1 typo-text-bold"
+            <Pie
+              style="fill: var(--color-background)"
+              slice={Number(projectMetadata?.absoluteWeight)}
+            /><strong class="ml-1 typo-text-bold"
               >{formatPercent(Number(projectMetadata?.absoluteWeight))}&nbsp;</strong
             >of ecosystem funds
           </div>
