@@ -75,16 +75,17 @@
   import awaitStoreValue from '$lib/utils/await-store-value';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
-  export let ecosystem: object | undefined = undefined;
+  export let ecosystem: Ecosystem | undefined = undefined;
 
   export let draftListMode = false;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList) disabled = true;
+    if (!project && !dripList && !ecosystem) disabled = true;
   }
 
   let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
