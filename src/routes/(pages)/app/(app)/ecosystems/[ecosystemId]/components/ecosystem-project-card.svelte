@@ -13,6 +13,9 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import formatPercent from '$lib/utils/format-percent';
+  import Button from '$lib/components/button/button.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
 
   export let loadProjectData: {
     forge: string;
@@ -98,12 +101,9 @@
         <div>
           <ProjectBadge size="tiny" {project} projectNameSize="small" />
         </div>
-        <!-- <div>
+        <div>
           <span class="line-clamp-2 twemoji-text">{@html twemoji(description)} </span>
-        </div> -->
-      </div>
-      <div class="description">
-        <span class="line-clamp-2 twemoji-text">{@html twemoji(description)} </span>
+        </div>
       </div>
       <div class="stats">
         {#if Number.isFinite(projectMetadata?.absoluteWeight)}
@@ -132,8 +132,8 @@
         {/if}
       </div>
       <div class="actions">
-        <!-- <Button circular icon={Trash}></Button> -->
-        <!-- <Button circular icon={Pen}></Button> -->
+        <Button circular icon={Trash}></Button>
+        <Button circular icon={Pen}></Button>
       </div>
     {/if}
   </div>
@@ -167,7 +167,6 @@
     height: 167px;
     align-items: center;
     justify-content: center;
-    /* aspect-ratio: 704 / 152; */
   }
 
   .avatar {
@@ -204,13 +203,7 @@
     gap: 0.5rem;
     height: 100%;
     top: 0;
-  }
-
-  .description {
-    grid-area: center;
-    display: flex;
-    align-items: end;
-    overflow: hidden;
+    display: none;
   }
 
   @media (max-width: 768px) {
@@ -227,12 +220,10 @@
       gap: 1rem;
     }
 
-    .details,
-    .description {
+    .details {
       grid-area: auto;
     }
 
-    .description,
     .stats {
       grid-column: span 2;
     }
