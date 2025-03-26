@@ -15,6 +15,12 @@ async function fetchEcosystem(ecosystemId: string, fetch: typeof global.fetch) {
 
 export const load = (async ({ params, fetch }) => {
   const ecosystem = await fetchEcosystem(params.ecosystemId, fetch);
+  // if (ecosystem.state !== 'deployed') {
+  //   await ecosystemsApi.deploy(String(ecosystem.id), {
+  //     chainId: '11155111',
+  //     ownerAddress: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
+  //   }, fetch)
+  // }
 
   return {
     ecosystem,
