@@ -42,7 +42,7 @@
     },
     {
       "chainId": 31337,
-      "address": "0x700b6A60ce7EaaEA56F065753d8dcB9653dbAD35",
+      "address": "0x33aE7b63Ef1Fc2852800F30b2102b9fd88fcb931",
       "name": "Test Token",
       "symbol": "TEST",
       "decimals": 18

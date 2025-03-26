@@ -54,7 +54,7 @@ services:
       - NETWORK=localtestnet
       - POLLING_INTERVAL=${EVENT_PROCESSOR_POLLING_INTERVAL}
       - CHUNK_SIZE=${EVENT_PROCESSOR_CHUNK_SIZE}
-      - CONFIRMATIONS=${EVENT_PROCESSOR_CONFIRMATIONS}
+      - CONFIRMATIONS=0
       - SHOULD_START_MONITORING_UI=true
       - REDIS_CONNECTION_STRING=redis://redis:6379
       - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
@@ -96,7 +96,7 @@ services:
       retries: 5
 
   testnet:
-    image: 'j537/contracts:${CONTRACTS_TAG-sha-7530976}-${ARCH}'
+    image: 'j537/contracts:${CONTRACTS_TAG-sha-0b554e8}-${ARCH}'
     pull_policy: always
     ports:
       - '8545:8545'
