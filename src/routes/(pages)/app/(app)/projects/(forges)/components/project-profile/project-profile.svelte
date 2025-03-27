@@ -138,6 +138,7 @@
   import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
   import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
+  import network from '$lib/stores/wallet/network';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -342,8 +343,8 @@
               amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
             /></span
           > in claimable funds! Project owners can collect by claiming their project.{:else}This
-          project has not been claimed yet but can still receive funds that the owner can collect
-          later.{/if}
+          project is unclaimed on {network.label}, but can still receive funds that the owner can
+          collect later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
             <ShareButton
