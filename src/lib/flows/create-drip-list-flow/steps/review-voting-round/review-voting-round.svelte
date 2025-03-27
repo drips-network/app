@@ -127,7 +127,7 @@
       isEditable={false}
     />
     <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
+      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -6 })}
         >Edit</Button
       >
     </svelte:fragment>
@@ -141,7 +141,7 @@
       That's {formatDate($context.votingRoundConfig.votingEnds ?? unreachable(), 'verbose')} your time.
     </p>
     <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
+      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -6 })}
         >Edit</Button
       >
     </svelte:fragment>
@@ -158,7 +158,7 @@
       <span class="typo-text" style:color="var(--color-foreground-level-4)">Any recipient</span>
     {/if}
     <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -1 })}
+      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -6 })}
         >Edit</Button
       >
     </svelte:fragment>
