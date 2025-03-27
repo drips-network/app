@@ -94,9 +94,7 @@
   let error: Error | undefined;
   let transactionsTimeline: TransactionTimelineItem[] = [];
 
-  onMount(async () => {
-    await executeTransactions();
-  });
+  onMount(executeTransactions);
 
   async function executeTransactions(retryIndex: number = 0) {
     if (failedTxIndex !== -1) {
@@ -129,7 +127,17 @@
 
     const contractReceipts: TransactionReceipt[] = [];
 
-    const beforeResult = await before?.();
+    let beforeResult: Awaited<ReturnType<BeforeFunc>> | undefined;
+    try {
+      beforeResult = (await before?.()) ?? undefined;
+    } catch (e) {
+      dispatchResult('result', { success: false, error: e as Error });
+
+      // eslint-disable-next-line no-console
+      console.error(e);
+
+      return;
+    }
 
     // If the promise resolves really fast, we ensure it stays for at least 600ms in order to prevent a glitchy step transition.
     const [transactionWrappers] = await Promise.all([
