@@ -150,6 +150,7 @@
 
   export let newRepo: RepoInfo | undefined;
   export let correctCasingRepo: RepoInfo | undefined;
+  export let repoExists: boolean;
 
   $: ownAccountId = $walletStore.dripsAccountId;
   $: chainData = filterCurrentChainData(project.chainData);
@@ -333,7 +334,7 @@
       </AnnotationBox>
     </div>
   {/if}
-  {#if !isClaimed(chainData)}
+  {#if !isClaimed(chainData) && repoExists}
     <div class="notice">
       <AnnotationBox type="info">
         {#if chainData.withdrawableBalances.length > 0}This project has <span
@@ -366,6 +367,18 @@
             >
           </div>
         </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
+  {#if !repoExists}
+    <div class="notice">
+      <AnnotationBox type="error">
+        This project has previously {isClaimed(chainData) ? 'been claimed' : 'received funds'}, but
+        the underlying GitHub repo has been either deleted or made private. It cannot be donated to {isClaimed(
+          chainData,
+        )
+          ? ''
+          : 'or claimed '}until a repo with the same name is publicly available on GitHub again.
       </AnnotationBox>
     </div>
   {/if}
@@ -402,7 +415,7 @@
   <article
     class="project-profile"
     class:claimed={isClaimed(chainData)}
-    class:hidden-by-user={!project.isVisible}
+    class:hidden-by-user={!project.isVisible || !repoExists}
   >
     <header class="header">
       <div>
@@ -547,7 +560,7 @@
                 {project}
                 unclaimedTokensExpandable={false}
                 unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
-                showClaimButton
+                showClaimButton={repoExists}
                 on:claimButtonClick={() =>
                   goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
               />
@@ -565,7 +578,10 @@
     </div>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {project} disabled={!!newRepo || !!correctCasingRepo || !project.isVisible} />
+        <SupportCard
+          {project}
+          disabled={!!newRepo || !!correctCasingRepo || !project.isVisible || !repoExists}
+        />
       </div>
     </aside>
   </article>

@@ -6,6 +6,7 @@
 </script>
 
 <ProjectProfile
+  repoExists={data.repoExists}
   project={data.project}
   description={data.description}
   newRepo={data.newRepo}
