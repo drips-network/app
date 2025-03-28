@@ -75,27 +75,50 @@
   import awaitStoreValue from '$lib/utils/await-store-value';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
+  export let ecosystem: Ecosystem | undefined = undefined;
 
   export let draftListMode = false;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList) disabled = true;
+    if (!project && !dripList && (!ecosystem || !ecosystem?.accountId)) disabled = true;
   }
 
-  $: type = project ? ('project' as const) : ('dripList' as const);
+  let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
+
+  $: {
+    switch (true) {
+      case !!project:
+        type = 'project';
+        break;
+      case !!ecosystem:
+        type = 'ecosystem';
+        break;
+      default:
+        type = 'dripList';
+    }
+  }
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
   let supportUrl: string;
   $: {
-    if (project) {
-      supportUrl = project.source.url;
-    } else if (dripList) {
-      supportUrl = `${BASE_URL}/app/drip-lists/${dripList.account.accountId}`;
+    switch (true) {
+      case !!project:
+        supportUrl = project.source.url;
+        break;
+      case !!dripList:
+        supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;
+        break;
+      case !!ecosystem:
+        supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem.id}`;
+        break;
+      default:
+        supportUrl = '/';
     }
   }
 
@@ -170,6 +193,7 @@
   }
 
   function onClickNewDonation() {
+    // TODO: add ecosystems
     return modal.show(
       Stepper,
       undefined,
@@ -204,7 +228,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  <p>Donate once, {dripList || ecosystem ? 'continuously, ' : ''}or add this to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons
@@ -235,6 +259,8 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
+    /* NEW */
+    justify-content: space-between;
   }
 
   .become-supporter-card.disabled {
