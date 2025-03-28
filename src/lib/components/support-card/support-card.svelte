@@ -85,7 +85,7 @@
 
   export let disabled = false;
   $: {
-    if (!project && !dripList && !ecosystem) disabled = true;
+    if (!project && !dripList && (!ecosystem || !ecosystem?.accountId)) disabled = true;
   }
 
   let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
@@ -107,10 +107,18 @@
 
   let supportUrl: string;
   $: {
-    if (project) {
-      supportUrl = project.source.url;
-    } else if (dripList) {
-      supportUrl = `${BASE_URL}/app/drip-lists/${dripList.account.accountId}`;
+    switch (true) {
+      case !!project:
+        supportUrl = project.source.url;
+        break;
+      case !!dripList:
+        supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;
+        break;
+      case !!ecosystem:
+        supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem.id}`;
+        break;
+      default:
+        supportUrl = '/';
     }
   }
 
@@ -185,6 +193,7 @@
   }
 
   function onClickNewDonation() {
+    // TODO: add ecosystems
     return modal.show(
       Stepper,
       undefined,
@@ -199,11 +208,7 @@
   }
 </script>
 
-<div
-  class="become-supporter-card"
-  class:disabled
-  class:become-supporter-card--ecosystem={ecosystem}
->
+<div class="become-supporter-card" class:disabled>
   {#if !draftListMode && (ownDripLists === undefined || updating)}
     <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
@@ -261,10 +266,6 @@
   .become-supporter-card.disabled {
     opacity: 0.5;
     pointer-events: none;
-  }
-
-  .become-supporter-card.become-supporter-card--ecosystem {
-    gap: auto;
   }
 
   .loading-overlay {
