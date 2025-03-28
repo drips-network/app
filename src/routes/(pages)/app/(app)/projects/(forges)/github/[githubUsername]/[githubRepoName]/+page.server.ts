@@ -73,8 +73,6 @@ export const load = (async ({ params, fetch, url }) => {
     defaultBranch: z.string(),
   });
 
-  let repo: z.infer<typeof repoSchema>;
-
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
   const [repoRes, projectRes] = await Promise.all([
@@ -91,42 +89,47 @@ export const load = (async ({ params, fetch, url }) => {
 
   const repoResJson = await repoRes.json();
 
+  const repoClaimed = isClaimed(projectChainData);
+  const repoHasSupport = projectChainData.support.length > 0;
+
+  let repoExists = true;
+  let repo: z.infer<typeof repoSchema> | undefined;
+
   if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
-    throw error(404);
+    if (!repoClaimed && !repoHasSupport) {
+      throw error(404);
+    } else {
+      repoExists = false;
+    }
+  } else {
+    try {
+      repo = repoSchema.parse(repoResJson);
+    } catch {
+      throw error(500, 'Unable to fetch repo info from GitHub / cache');
+    }
   }
 
-  try {
-    repo = repoSchema.parse(repoResJson);
-  } catch {
-    throw error(500, 'Unable to fetch repo info from GitHub / cache');
-  }
+  const { url: realRepoUrl } = repo ?? {};
 
-  const { url: realRepoUrl } = repo;
+  type SmallRepoInfo = { repoName: string; ownerName: string; url: string };
+  let correctCasingRepo: SmallRepoInfo | undefined;
+  let newRepo: SmallRepoInfo | undefined;
 
-  const repoUrlIsCanonical = repoUrl === realRepoUrl;
+  if (realRepoUrl && repo) {
+    const repoUrlIsCanonical = repoUrl === realRepoUrl;
 
-  if (!exact && !repoUrlIsCanonical) {
-    return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
-  }
+    if (!exact && !repoUrlIsCanonical) {
+      return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
+    }
 
-  if (isClaimed(projectChainData) && !projectChainData.splits) {
-    throw new Error('Claimed project somehow does not have splits');
-  }
+    if (isClaimed(projectChainData) && !projectChainData.splits) {
+      throw new Error('Claimed project somehow does not have splits');
+    }
 
-  // True if the repo URL is non-canonical, but only the casing is wrong
-  const wrongCasing = !repoUrlIsCanonical && repoUrl.toLowerCase() === realRepoUrl.toLowerCase();
+    // True if the repo URL is non-canonical, but only the casing is wrong
+    const wrongCasing = !repoUrlIsCanonical && repoUrl.toLowerCase() === realRepoUrl.toLowerCase();
 
-  const correctCasingRepo = wrongCasing
-    ? {
-        url: realRepoUrl,
-        repoName: repo.repoName,
-        ownerName: repo.ownerName,
-      }
-    : undefined;
-
-  // If the repo has been renamed / moved, this is the new URL
-  const newRepo =
-    !repoUrlIsCanonical && !wrongCasing
+    correctCasingRepo = wrongCasing
       ? {
           url: realRepoUrl,
           repoName: repo.repoName,
@@ -134,11 +137,23 @@ export const load = (async ({ params, fetch, url }) => {
         }
       : undefined;
 
+    // If the repo has been renamed / moved, this is the new URL
+    newRepo =
+      !repoUrlIsCanonical && !wrongCasing
+        ? {
+            url: realRepoUrl,
+            repoName: repo.repoName,
+            ownerName: repo.ownerName,
+          }
+        : undefined;
+  }
+
   return {
     project,
     description:
       typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
     newRepo,
+    repoExists,
     correctCasingRepo,
     blockWhileInitializing: false,
     preservePathOnNetworkChange: true,
