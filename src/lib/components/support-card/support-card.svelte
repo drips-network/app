@@ -76,6 +76,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import { Driver } from '$lib/graphql/__generated__/base-types';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -193,12 +194,27 @@
   }
 
   function onClickNewDonation() {
+    let donationFlowStepsInput: Parameters<typeof createDonationFlowSteps>[0];
+    switch (true) {
+      case !!project:
+        donationFlowStepsInput = project;
+        break;
+      case !!dripList:
+        donationFlowStepsInput = dripList?.account;
+        break;
+      case !!ecosystem:
+        donationFlowStepsInput = {
+          __typename: 'NftDriverAccount',
+          driver: Driver['Nft'],
+          accountId: ecosystem.accountId as string,
+        };
+        break;
+      default:
+        unreachable();
+    }
+
     // TODO: add ecosystems
-    return modal.show(
-      Stepper,
-      undefined,
-      createDonationFlowSteps(dripList?.account ?? project ?? unreachable()),
-    );
+    return modal.show(Stepper, undefined, createDonationFlowSteps(donationFlowStepsInput));
   }
 
   let supportMenuOpen = false;
