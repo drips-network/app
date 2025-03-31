@@ -175,10 +175,27 @@
   }
 
   function onClickNewStream() {
-    const accountId = dripList?.account.accountId;
+    let donationFlowStepsInput: Parameters<typeof createStreamFlowSteps>[1];
+    let hasAccountId: boolean = false;
+
+    switch (true) {
+      case !!dripList:
+        hasAccountId = !!dripList.account.accountId;
+        donationFlowStepsInput = dripList.account;
+        break;
+      case !!ecosystem:
+        hasAccountId = !!ecosystem.accountId;
+        donationFlowStepsInput = {
+          __typename: 'NftDriverAccount',
+          driver: Driver['Nft'],
+          accountId: ecosystem.accountId as string,
+        };
+        break;
+    }
+
     return (
-      accountId &&
-      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, dripList?.account))
+      hasAccountId &&
+      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, donationFlowStepsInput))
     );
   }
 
@@ -213,7 +230,6 @@
         unreachable();
     }
 
-    // TODO: add ecosystems
     return modal.show(Stepper, undefined, createDonationFlowSteps(donationFlowStepsInput));
   }
 
