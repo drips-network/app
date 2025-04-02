@@ -125,18 +125,24 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       component: WalletSlot,
       props: {},
     },
-    editStepIndex: 1,
+    editStepIndex: 3,
     rightComponent: undefined,
   };
+
+  if (state.selectedCreationMode === 2 && stepIndex > 0 && stepIndex < 7) return [dripListSlot];
 
   switch (stepIndex) {
     case 1:
       return [dripListSlot];
     case 2:
-      return [dripListSlot, walletSlot];
+      return [dripListSlot];
     case 3:
-      return [dripListSlot, walletSlot];
+      return [dripListSlot];
     case 4:
+      return [dripListSlot, walletSlot];
+    case 5:
+      return [dripListSlot, walletSlot];
+    case 6:
       return [dripListSlot, walletSlot];
     default:
       return [];
@@ -164,14 +170,11 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
       return get(state).selectedCreationMode === 2;
     },
   }),
-  ...(skipWalletConnect
-    ? []
-    : [
-        makeStep({
-          component: ConnectWalletStep,
-          props: undefined,
-        }),
-      ]),
+  makeStep({
+    component: ConnectWalletStep,
+    props: undefined,
+    condition: () => !skipWalletConnect,
+  }),
   makeStep({
     component: ChooseSupportTypeStep,
     props: undefined,
