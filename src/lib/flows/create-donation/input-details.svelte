@@ -62,6 +62,7 @@
   import network from '$lib/stores/wallet/network';
   import CalendarIcon from '$lib/components/icons/Calendar.svelte';
   import formatDate from '$lib/utils/format-date';
+  import type { CreateDonationDetailsStepEcosystemFragment } from './create-donation-flow-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -70,7 +71,8 @@
   export let receiver:
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
-    | CreateDonationDetailsStepProjectFragment;
+    | CreateDonationDetailsStepProjectFragment
+    | CreateDonationDetailsStepEcosystemFragment;
 
   let selectedTokenAllowance: bigint | undefined;
 
@@ -86,6 +88,7 @@
     switch (receiver.__typename) {
       case 'AddressDriverAccount':
       case 'NftDriverAccount':
+      case 'Ecosystem':
         recipientAccountId = receiver.accountId;
         break;
       case 'Project':

@@ -67,6 +67,10 @@
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
 
+  type DripVisualEcosystemFragment = Omit<DripVisualNftDriverAccountFragment, '__typename'> & {
+    __typename: 'Ecosystem';
+  };
+
   export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
   export let to:
     | DripVisualNftDriverAccountFragment
@@ -74,6 +78,7 @@
     | DripVisualProjectFragment
     | DripVisualDripListFragment
     | DripVisualUserFragment
+    | DripVisualEcosystemFragment
     | undefined = undefined;
   export let visual: 'stream' | 'donation' = 'stream';
   export let disableLinks = false;

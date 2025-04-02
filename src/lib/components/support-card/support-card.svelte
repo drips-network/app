@@ -221,7 +221,7 @@
         break;
       case !!ecosystem:
         donationFlowStepsInput = {
-          __typename: 'NftDriverAccount',
+          __typename: 'Ecosystem',
           driver: Driver['Nft'],
           accountId: ecosystem.accountId as string,
         };

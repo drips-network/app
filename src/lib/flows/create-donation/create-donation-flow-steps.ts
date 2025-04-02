@@ -29,10 +29,18 @@ export const CREATE_DONATION_FLOW_PROJECT_FRAGMENT = gql`
   }
 `;
 
+export type CreateDonationDetailsStepEcosystemFragment = Omit<
+  CreateDonationDetailsStepNftDriverAccountFragment,
+  '__typename'
+> & {
+  __typename: 'Ecosystem';
+};
+
 export default (
   receiver:
     | CreateDonationDetailsStepNftDriverAccountFragment
-    | CreateDonationDetailsStepProjectFragment,
+    | CreateDonationDetailsStepProjectFragment
+    | CreateDonationDetailsStepEcosystemFragment,
 ) => ({
   context: createDonationFlowState,
   steps: [
