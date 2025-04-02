@@ -63,13 +63,11 @@ export const ecosystemSchema = z.object({
 
 const ecosystemWithoutGraphSchema = ecosystemSchema.omit({ graph: true });
 
-export const getAllSchema = z.array(ecosystemWithoutGraphSchema);
-export const getSchema = ecosystemSchema;
-export const createSchema = z.object({ id: z.string() });
-export const deploySchema = z.object({
-  chainId: z.string(),
-  ownerAddress: z.string(),
-});
+export const getAllResponseSchema = z.array(ecosystemWithoutGraphSchema);
+export const getResponseSchema = ecosystemSchema;
+export const createResponseSchema = z.object({ id: z.string() });
+export const deployRequestSchema = z.object({ chainId: z.string(), ownerAddress: z.string() });
+export const deployResponseSchema = z.object({ message: z.string() });
 
 export type Ecosystem = z.infer<typeof ecosystemSchema>;
 export type LeanEcosystem = z.infer<typeof ecosystemWithoutGraphSchema>;
@@ -78,4 +76,4 @@ export type NewGraph = z.infer<typeof newGraphSchema>;
 export type Node = z.infer<typeof nodeSchema>;
 export type NewNode = z.infer<typeof newNodeScehma>;
 export type Edge = z.infer<typeof edgeSchema>;
-export type Deploy = z.infer<typeof deploySchema>;
+export type Deploy = z.infer<typeof deployRequestSchema>;
