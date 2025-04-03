@@ -65,7 +65,8 @@
     },
   ];
 
-  $: restCount = formatNumber(ecosystem.graph.nodes.length - ROW_COUNT);
+  $: restCount = formatNumber(Math.max(ecosystem.graph.nodes.length - ROW_COUNT, 0));
+  $: hasEnough = restCount !== '0';
 </script>
 
 <div class="ecosystem-distribution">
@@ -96,7 +97,7 @@
         getCoreRowModel: getCoreRowModel(),
       }}
     />
-    {#if !full}
+    {#if !full && hasEnough}
       <div class="shadow-rest">
         <div class="shadow-rest-inner">
           {restCount} more…
