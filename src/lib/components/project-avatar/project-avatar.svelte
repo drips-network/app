@@ -34,7 +34,7 @@
 
   export let pendingAvatar = false;
 
-  type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'huge';
+  type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'huge';
   export let size: Size = 'small';
   export let outline = project.__typename === 'ClaimedProjectData';
 
@@ -44,6 +44,7 @@
     small: '2rem',
     medium: '3rem',
     large: '4rem',
+    xlarge: '6.5rem',
     huge: '8rem',
   };
   $: containerSize = CONTAINER_SIZES[size];
