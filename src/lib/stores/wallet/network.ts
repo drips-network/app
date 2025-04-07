@@ -449,7 +449,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [10]: {
     chainId: 10,
     name: 'optimism',
-    label: 'Optimism',
+    label: 'OP Mainnet',
     token: 'ETH',
     id: '0xa',
     rpcUrl: 'https://mainnet.optimism.io/',
