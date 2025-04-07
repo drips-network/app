@@ -50,6 +50,15 @@
   margin: 2.5rem -2rem;
 }
 
+#blog-article-content code {
+  font-family: var(--typeface-mono-regular);
+  font-size: 14px;
+  background-color: var(--color-foreground-level-2);
+  color: var(--color-foreground-level-6);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
 @media (max-width: 797px) {
   #blog-article-content img:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
     width: 100%;
