@@ -7,7 +7,6 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import twemoji from '$lib/utils/twemoji';
   import { onMount } from 'svelte';
-  import type { ProjectProfileFragment } from './__generated__/gql.generated';
   import { fetchProject } from './ecosystem-graph';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
@@ -16,6 +15,7 @@
   import Button from '$lib/components/button/button.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
+  import type { ProjectProfileFragment } from '../../../projects/(forges)/components/project-profile/__generated__/gql.generated';
 
   export let loadProjectData: {
     forge: string;

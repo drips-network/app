@@ -16,7 +16,7 @@ import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import { redis } from '../../../../../redis';
-import { PROJECT_PROFILE_FRAGMENT } from '../../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/components/ecosystem-profile.svelte';
+import { PROJECT_PROFILE_FRAGMENT } from '../../../../../../(pages)/app/(app)/projects/(forges)/components/project-profile/project-profile.svelte';
 
 async function fetchDripsProject(repoUrl: string) {
   const getProjectsQuery = gql`
