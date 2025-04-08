@@ -1,7 +1,7 @@
 ---
 title: 'Q1 2025 Roundup: Optimism & Metis Launches, Universal Search, and Ecosystems Sneak Peek'
 date: '2025-04-07'
-coverImage: '/assets/blog-images/placeholder.png'
+coverImage: '/assets/blog-images/q1-2025-roundup.png'
 coverImageAlt: '[placeholder]'
 excerpt: 'Drips landed on Optimism & Metis, launched powerful universal search, and gives a glimpse into the future with Ecosystems.'
 author: 'jason'
