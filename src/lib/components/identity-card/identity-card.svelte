@@ -51,11 +51,21 @@
   export let address: string | undefined = undefined;
   export let dripList: IdentityCardDripListFragment | undefined = undefined;
   export let project: IdentityCardProjectFragment | undefined = undefined;
+  export let ecosystem: Record<string, unknown> | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
   export let disableLink = false;
 
+  // TODO: add ecosystem support
+  // eslint-disable-next-line no-console
+  console.log(ecosystem);
+
   let avatarImgElem: HTMLImageElement | undefined;
+
+  let link = undefined;
+  $: {
+    // TODO: determine link also given ecosystem
+  }
 
   $: link = disableLink
     ? undefined
