@@ -19,6 +19,16 @@
           "Username": "user",
           "PassFile": "/pgpass",
           "SSLMode": "prefer"
+      },
+      "3": {
+          "Name": "Ecosystems DB",
+          "Group": "Servers",
+          "Host": "postgres-ecosystems",
+          "Port": 5432,
+          "MaintenanceDB": "postgres",
+          "Username": "user",
+          "PassFile": "/pgpass",
+          "SSLMode": "prefer"
       }
   }
 }
