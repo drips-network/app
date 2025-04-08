@@ -1,79 +1,49 @@
 <script lang="ts" context="module">
-  import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
-  import { PROJECT_PROFILE_HEADER_FRAGMENT } from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/types';
-  import { SUPPORT_CARD_PROJECT_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
-  import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
-  import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import { EDIT_PROJECT_METADATA_FLOW_FRAGMENT } from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
-  import {
-    EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
-    EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
-    EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
-  } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
+  import { gql } from 'graphql-request';
 
-  export const PROJECT_PROFILE_FRAGMENT = gql`
-    ${PROJECT_PROFILE_HEADER_FRAGMENT}
-    ${EDIT_PROJECT_METADATA_FLOW_FRAGMENT}
-    ${DRIP_LIST_BADGE_FRAGMENT}
-    ${SUPPORT_CARD_PROJECT_FRAGMENT}
-    ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
-    ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
-    ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
-    ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
-    ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
-    ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
-    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-    ${SUPPORTER_PILE_FRAGMENT}
-    fragment ProjectProfile on Project {
-      ...UnclaimedProjectCard
-      ...ProjectProfileHeader
-      ...SupportCardProject
-      ...EditProjectMetadataFlow
+  export const ECOSYSTEM_PROFILE_FRAGMENT = gql`
+    fragment EcosystemProfile on Ecosystem {
       account {
         accountId
+        driver
       }
-      chainData {
-        ...SplitsComponentProjectSplits
-        ... on UnClaimedProjectData {
-          support {
-            ...SupportersSectionSupportItem
-            ...SupporterPile
-          }
-          withdrawableBalances {
-            ...MergeWithdrawableBalances
-          }
-        }
-        ... on ClaimedProjectData {
-          owner {
+      name
+      description
+      creator
+      support {
+        ... on OneTimeDonationSupport {
+          account {
             accountId
+            address
           }
-          support {
-            ...SupportersSectionSupportItem
-            ...SupporterPile
-          }
-          totalEarned {
-            tokenAddress
+          amount {
             amount
+            tokenAddress
           }
-          splits {
-            dependencies {
-              ... on AddressReceiver {
-                ...EditProjectSplitsFlowAddressReceiver
+          date
+        }
+        ... on StreamSupport {
+          stream {
+            ...StreamStateStream
+            config {
+              amountPerSecond {
+                amount
+                tokenAddress
               }
-              ... on ProjectReceiver {
-                ...EditProjectSplitsFlowProjectReceiver
-              }
-              ... on DripListReceiver {
-                ...EditProjectSplitsFlowDripListReceiver
+              dripId
+            }
+            createdAt
+            sender {
+              account {
+                accountId
+                address
               }
             }
-            maintainers {
-              ... on AddressReceiver {
-                ...EditProjectSplitsFlowAddressReceiver
-              }
+            timeline {
+              ...CurrentAmountsTimelineItem
             }
           }
+          date
         }
       }
     }
@@ -82,67 +52,25 @@
 
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  // import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
-  // import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
-  // import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  // import Wallet from '$lib/components/icons/Wallet.svelte';
-  // import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
-  // import SplitsComponent from '$lib/components/splits/splits.svelte';
-  // import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
-  // import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  // import Pile from '$lib/components/pile/pile.svelte';
-  // import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
-  // import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  // import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  // import walletStore from '$lib/stores/wallet/wallet.store';
-  // import Button from '$lib/components/button/button.svelte';
-  // import Pen from '$lib/components/icons/Pen.svelte';
-  // import modal from '$lib/stores/modal';
-  // import Stepper from '$lib/components/stepper/stepper.svelte';
-  // import editProjectMetadataSteps from '$lib/flows/edit-project-metadata/edit-project-metadata-steps';
-  // import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  // import Registered from '$lib/components/icons/Registered.svelte';
-  // import buildUrl from '$lib/utils/build-url';
-  // import editProjectSplitsSteps from '$lib/flows/edit-project-splits/edit-project-splits-steps';
-  // import { fade } from 'svelte/transition';
-  // import Developer from '$lib/components/developer-section/developer.section.svelte';
-  // import { goto } from '$app/navigation';
-  // import { browser } from '$app/environment';
-  // import isClaimed from '$lib/utils/project/is-claimed';
-  import { gql } from 'graphql-request';
-  // import type { ProjectProfileFragment } from './__generated__/gql.generated';
-  // import unreachable from '$lib/utils/unreachable';
-  // import ShareButton from '$lib/components/share-button/share-button.svelte';
-  // import highlightStore from '$lib/stores/highlight/highlight.store';
-  // import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  // import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  // import DripListAvatar from '$lib/components/drip-list-avatar/drip-list-avatar.svelte';
-  // import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
-  // import buildProjectUrl from '$lib/utils/build-project-url';
-  // import { Forge } from '$lib/graphql/__generated__/base-types';
-  // import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
-  // import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
-  // import DripList from '$lib/components/icons/DripList.svelte';
-  import { MERGE_WITHDRAWABLE_BALANCES_FRAGMENT } from '$lib/utils/merge-withdrawable-balances';
-  import { SUPPORTER_PILE_FRAGMENT } from '$lib/components/drip-list-card/methods/get-supporters-pile';
-  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  // import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
-  // import configureProjectSupportButtonSteps from '$lib/flows/configure-project-support-button/configure-project-support-button-steps';
-  // import Settings from '$lib/components/icons/Settings.svelte';
-  // import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
-  // import EcosystemCard from '../../components/ecosystem-card.svelte';
   import EcosystemCardInteractive from './ecosystem-card-interactive.svelte';
   import EcosystemMetadata from './ecosystem-metadata.svelte';
   import EcosystemDistribution from './ecosystem-distribution/ecosystem-distribution.svelte';
   import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import type { EcosystemProfileFragment } from './__generated__/gql.generated';
+  import getSupportersPile from '$lib/components/drip-list-card/methods/get-supporters-pile';
+  import Pile from '$lib/components/pile/pile.svelte';
+  // src/routes/(pages)/app/(app)/ecosystems/[ecosystemId]/components/__generated__/gql.generated.ts
 
   export let ecosystem: Ecosystem;
+  export let ecosystemFragment: EcosystemProfileFragment | undefined;
+
+  $: ecosystemSupport = ecosystemFragment?.support || [];
   // export let project: ProjectProfileFragment;
 
   // interface RepoInfo {
@@ -301,7 +229,18 @@
           <KeyValuePair key="Recipients">{recipientsFormatted}</KeyValuePair>
         </div>
         <div class="stat drip-bordered">
-          <KeyValuePair key="Supporters">A Pile</KeyValuePair>
+          <!-- ("Supporters" stat) -->
+          {#if [ecosystemSupport].flat().length > 0}
+            <a
+              class="stat btn-theme-outlined"
+              href="#support"
+              on:click={() => supportersSectionSkeleton?.highlightSection()}
+            >
+              <KeyValuePair key="Supporters">
+                <Pile maxItems={4} components={getSupportersPile(ecosystemSupport)} />
+              </KeyValuePair>
+            </a>
+          {/if}
         </div>
       </div>
 
@@ -444,7 +383,7 @@
         <SupportersSection
           bind:sectionSkeleton={supportersSectionSkeleton}
           type="ecosystem"
-          supportItems={[]}
+          supportItems={ecosystemSupport}
         />
       </PrimaryColorThemer>
     </section>

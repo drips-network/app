@@ -169,6 +169,8 @@
       <IdentityCard disableLink={disableLinks} dripList={to} title="To" />
     {:else if to && to.__typename === 'User'}
       <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
+    {:else if to && to.__typename === 'Ecosystem'}
+      <IdentityCard disableLink={disableLinks} ecosystem={to} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}
