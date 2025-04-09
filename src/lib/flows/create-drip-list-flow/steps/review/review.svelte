@@ -183,7 +183,7 @@
   {#if !connectedWalletHidden}
     <FormField type="div" title="Your connected wallet">
       <svelte:fragment slot="action">
-        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
           >Edit</Button
         >
       </svelte:fragment>

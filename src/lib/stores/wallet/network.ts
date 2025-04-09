@@ -249,8 +249,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
-    gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: true,
+    gelatoRelayAvailable: false,
+    gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
   },
   [31337]: {
@@ -449,7 +449,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [10]: {
     chainId: 10,
     name: 'optimism',
-    label: 'Optimism',
+    label: 'OP Mainnet',
     token: 'ETH',
     id: '0xa',
     rpcUrl: 'https://mainnet.optimism.io/',
