@@ -249,8 +249,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists settle and become collectable on the last Thursday of each month.',
     },
     alternativeChainMode: false,
-    gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: true,
+    gelatoRelayAvailable: false,
+    gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
   },
   [31337]: {
