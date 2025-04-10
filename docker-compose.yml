@@ -208,7 +208,7 @@ services:
       - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - CONFIRMATIONS=0
     ports:
-      - 5000:5000
+      - 8081:5000
     depends_on:
       postgres-ecosystems:
         condition: service_healthy
