@@ -50,6 +50,7 @@ services:
   event-processor:
     image: 'j537/event-processor:${EVENT_PROCESSOR_TAG-main}-localtestnet'
     pull_policy: always
+    entrypoint: bash -c "npm run db:run-migrations && npm run start"
     environment:
       - IPFS_GATEWAY_URL=http://fake-pinata:3000
       - SHOULD_PROCESS_PAST_EVENTS=${EVENT_PROCESSOR_SHOULD_PROCESS_PAST_EVENTS}
@@ -112,6 +113,8 @@ services:
       interval: 1s
       timeout: 30s
       retries: 5
+    ports:
+      - '3000:3000'
 
   multiplayer:
     image: 'j537/multiplayer:${MULTIPLAYER_TAG-main}'
@@ -203,6 +206,7 @@ services:
       - PINATA_API_KEY=123
       - PINATA_SECRET_API_KEY=123
       - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - CONFIRMATIONS=0
     ports:
       - 5000:5000
     depends_on:
