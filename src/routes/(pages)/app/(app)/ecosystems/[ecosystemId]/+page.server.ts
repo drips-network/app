@@ -42,6 +42,14 @@ export const load = (async ({ params, fetch }) => {
     }
   }
 
+  // if (ecosystem.state !== 'deployed' && ecosystem.state !== 'deploying') {
+  //   console.log('deploying the dang thing')
+  //   await ecosystemsApi.deploy(ecosystem.id as string, {
+  //     chainId: '31337',
+  //     ownerAddress: '0xe2E9b9B5d0757c26aB477A754788B19b60f2ed83'
+  //   }, fetch)
+  // }
+
   return {
     ecosystem,
     ecosystemFragment,

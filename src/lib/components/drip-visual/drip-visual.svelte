@@ -39,6 +39,13 @@
       }
     }
   `;
+
+  export const DRIP_VISUAL_ECOSYSTEM_FRAGMENT = gql`
+    ${IDENTITY_CARD_ECOSYSTEM_FRAGMENT}
+    fragment DripVisualEcosystem on EcosystemMainAccount {
+      ...IdentityCardEcosystem
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -51,6 +58,7 @@
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
   import IdentityCard, {
     IDENTITY_CARD_DRIP_LIST_FRAGMENT,
+    IDENTITY_CARD_ECOSYSTEM_FRAGMENT,
     IDENTITY_CARD_PROJECT_FRAGMENT,
   } from '../identity-card/identity-card.svelte';
   import { gql } from 'graphql-request';
@@ -63,13 +71,10 @@
     DripVisualNftDriverAccountFragment,
     DripVisualProjectFragment,
     DripVisualUserFragment,
+    DripVisualEcosystemFragment,
   } from './__generated__/gql.generated';
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
-
-  type DripVisualEcosystemFragment = Omit<DripVisualNftDriverAccountFragment, '__typename'> & {
-    __typename: 'Ecosystem';
-  };
 
   export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
   export let to:
@@ -169,7 +174,7 @@
       <IdentityCard disableLink={disableLinks} dripList={to} title="To" />
     {:else if to && to.__typename === 'User'}
       <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
-    {:else if to && to.__typename === 'Ecosystem'}
+    {:else if to && to.__typename === 'EcosystemMainAccount'}
       <IdentityCard disableLink={disableLinks} ecosystem={to} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />

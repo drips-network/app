@@ -298,6 +298,7 @@
             </svelte:fragment>
           </SupportItem>
         {/if}
+        <!-- TODO: also ecosystem support -->
       {/each}
     </div>
   </Section>

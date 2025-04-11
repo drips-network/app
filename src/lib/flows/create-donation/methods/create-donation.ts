@@ -79,7 +79,7 @@ function checkDonation(
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   recipientAccountId: string,
-  recipientType: 'AddressDriverAccount' | 'Project' | 'NftDriverAccount' | 'Ecosystem',
+  recipientType: 'AddressDriverAccount' | 'Project' | 'NftDriverAccount' | 'EcosystemMainAccount',
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
@@ -168,7 +168,7 @@ export default function (
               );
               break;
             }
-            case 'Ecosystem':
+            case 'EcosystemMainAccount':
             case 'NftDriverAccount': {
               await expect(
                 () =>

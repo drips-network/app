@@ -4,12 +4,14 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import createDonationFlowState from './create-donation-flow-state';
 import InputDetails, {
+  CREATE_DONATION_DETAILS_STEP_ECOSYSTEM_FRAGMENT,
   CREATE_DONATION_DETAILS_STEP_NFT_DRIVER_ACCOUNT_FRAGMENT,
   CREATE_DONATION_DETAILS_STEP_PROJECT_FRAGMENT,
 } from './input-details.svelte';
 import type {
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
+  CreateDonationDetailsStepEcosystemFragment,
 } from './__generated__/gql.generated';
 import { gql } from 'graphql-request';
 
@@ -29,12 +31,12 @@ export const CREATE_DONATION_FLOW_PROJECT_FRAGMENT = gql`
   }
 `;
 
-export type CreateDonationDetailsStepEcosystemFragment = Omit<
-  CreateDonationDetailsStepNftDriverAccountFragment,
-  '__typename'
-> & {
-  __typename: 'Ecosystem';
-};
+export const CREATE_DONATION_FLOW_ECOSYSTEM_FRAGMENT = gql`
+  ${CREATE_DONATION_DETAILS_STEP_ECOSYSTEM_FRAGMENT}
+  fragment CreateDonationFlowEcosystem on EcosystemMainAccount {
+    ...CreateDonationDetailsStepEcosystem
+  }
+`;
 
 export default (
   receiver:

@@ -51,6 +51,7 @@ export type Network = {
     linkTemplate: (txHash: string, networkName: string) => string;
   };
   contracts: {
+    GIVERS_REGISTRY?: string;
     ADDRESS_DRIVER: string;
     DRIPS: string;
     CALLER: string;
