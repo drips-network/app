@@ -35,6 +35,18 @@
       }
     }
   `;
+
+  export const SUPPORT_CARD_ECOSYSTEM_FRAGEMENT = gql`
+    fragment SupportCardEcosystem on EcosystemMainAccount {
+      account {
+        accountId
+        driver
+      }
+      owner {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -62,6 +74,7 @@
     OwnDripListsQueryVariables,
     SupportCardDripListFragment,
     SupportCardProjectFragment,
+    SupportCardEcosystemFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import createDonationFlowSteps, {
@@ -75,18 +88,16 @@
   import awaitStoreValue from '$lib/utils/await-store-value';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
-  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  import { Driver } from '$lib/graphql/__generated__/base-types';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
-  export let ecosystem: Ecosystem | undefined = undefined;
+  export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
 
   export let draftListMode = false;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList && (!ecosystem || !ecosystem?.accountId)) disabled = true;
+    if (!project && !dripList && !ecosystem) disabled = true;
   }
 
   let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
@@ -116,7 +127,8 @@
         supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;
         break;
       case !!ecosystem:
-        supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem.id}`;
+        // TODO: also get ecosystem by account id
+        supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
         break;
       default:
         supportUrl = '/';
@@ -184,12 +196,8 @@
         donationFlowStepsInput = dripList.account;
         break;
       case !!ecosystem:
-        hasAccountId = !!ecosystem.accountId;
-        donationFlowStepsInput = {
-          __typename: 'NftDriverAccount',
-          driver: Driver['Nft'],
-          accountId: ecosystem.accountId as string,
-        };
+        hasAccountId = !!ecosystem.account.accountId;
+        donationFlowStepsInput = ecosystem.account;
         break;
     }
 
@@ -220,11 +228,7 @@
         donationFlowStepsInput = dripList?.account;
         break;
       case !!ecosystem:
-        donationFlowStepsInput = {
-          __typename: 'Ecosystem',
-          driver: Driver['Nft'],
-          accountId: ecosystem.accountId as string,
-        };
+        donationFlowStepsInput = ecosystem.account;
         break;
       default:
         unreachable();

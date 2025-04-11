@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
@@ -29,6 +30,16 @@
       }
     }
   `;
+
+  export const CREATE_DONATION_DETAILS_STEP_ECOSYSTEM_FRAGMENT = gql`
+    ${DRIP_VISUAL_ECOSYSTEM_FRAGMENT}
+    fragment CreateDonationDetailsStepEcosystem on EcosystemMainAccount {
+      ...DripVisualEcosystem
+      account {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -48,6 +59,7 @@
     CreateDonationDetailsStepAddressDriverAccountFragment,
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
+    CreateDonationDetailsStepEcosystemFragment,
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
   import { Driver } from '$lib/graphql/__generated__/base-types';
@@ -62,7 +74,6 @@
   import network from '$lib/stores/wallet/network';
   import CalendarIcon from '$lib/components/icons/Calendar.svelte';
   import formatDate from '$lib/utils/format-date';
-  import type { CreateDonationDetailsStepEcosystemFragment } from './create-donation-flow-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -88,10 +99,10 @@
     switch (receiver.__typename) {
       case 'AddressDriverAccount':
       case 'NftDriverAccount':
-      case 'Ecosystem':
         recipientAccountId = receiver.accountId;
         break;
       case 'Project':
+      case 'EcosystemMainAccount':
         recipientAccountId = receiver.account.accountId;
         break;
     }
