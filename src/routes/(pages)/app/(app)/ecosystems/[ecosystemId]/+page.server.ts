@@ -14,7 +14,7 @@ async function fetchEcosystem(accountId: string, fetch: typeof global.fetch) {
   const getEcosystemQuery = gql`
     ${ECOSYSTEM_PROFILE_FRAGMENT}
     query EcosystemByAccountId($accountId: ID!, $chain: SupportedChain!) {
-      ecosystem(id: $accountId, chain: $chain) {
+      ecosystemMainAccount(id: $accountId, chain: $chain) {
         ...EcosystemProfile
       }
     }
@@ -36,7 +36,7 @@ export const load = (async ({ params, fetch }) => {
   let ecosystemFragment = undefined;
   if (ecosystem.accountId) {
     const ecosystemRes = await fetchEcosystem(ecosystem.accountId, fetch);
-    ecosystemFragment = ecosystemRes.ecosystem;
+    ecosystemFragment = ecosystemRes.ecosystemMainAccount;
     if (!ecosystemFragment) {
       throw error(404);
     }
