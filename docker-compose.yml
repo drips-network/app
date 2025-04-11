@@ -207,6 +207,8 @@ services:
       - PINATA_SECRET_API_KEY=123
       - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - CONFIRMATIONS=0
+      - DISABLE_RPC_CACHE=true
+      - DISABLE_GITHUB_VALIDATION=true
     ports:
       - 8081:5000
     depends_on:
