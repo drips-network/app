@@ -5,10 +5,9 @@ import * as ecosystemsApi from '$lib/utils/ecosystems';
 // import osoJson from '$lib/utils/csv-to-graph/__test__/data/fabricated-graph-corrected-19032025.json';
 
 // const chicken = {
-//   "name": "Ethereum Ecosystem (PR 53)",
+//   "name": "Ethereum Ecosystem (202504111550)",
 //   "description": "Vital projects for Ethereum, based on OSS node implementations.",
 //   "chainId": "31337",
-//   "ownerAccountId": "1295444165478540595942340304482567097034602638723",
 //   "ownerAddress": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
 //   "avatar": {
 //     "type": "emoji",
@@ -59,7 +58,7 @@ export const load = async () => {
 
   const ecosystems = await ecosystemsApi.getAll();
   // console.log(chicken)
-  // if (ecosystems.length < 6) {
+  // if (ecosystems.length < 1) {
   //   console.log('Creating a chicken')
   //   const eco = await ecosystemsApi.create(chicken);
   //   ecosystems = await ecosystemsApi.getAll();

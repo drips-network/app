@@ -12,6 +12,14 @@
       name
       description
       creator
+      owner {
+        accountId
+        address
+      }
+      totalEarned {
+        tokenAddress
+        amount
+      }
       support {
         ... on OneTimeDonationSupport {
           account {
@@ -69,6 +77,7 @@
   import Pile from '$lib/components/pile/pile.svelte';
   import { STREAM_STATE_STREAM_FRAGMENT } from '$lib/utils/stream-state';
   import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   // src/routes/(pages)/app/(app)/ecosystems/[ecosystemId]/components/__generated__/gql.generated.ts
 
   export let ecosystem: Ecosystem;
@@ -227,14 +236,16 @@
 
       <div class="stats">
         <div class="stat drip-bordered">
-          <KeyValuePair key="Donations">$186,833.91</KeyValuePair>
+          <KeyValuePair key="Donations">
+            <AggregateFiatEstimate amounts={ecosystemFragment?.totalEarned} />
+          </KeyValuePair>
         </div>
         <div class="stat drip-bordered">
           <KeyValuePair key="Recipients">{recipientsFormatted}</KeyValuePair>
         </div>
-        <div class="stat drip-bordered">
-          <!-- ("Supporters" stat) -->
-          {#if [ecosystemSupport].flat().length > 0}
+        {#if [ecosystemSupport].flat().length > 0}
+          <div class="stat drip-bordered">
+            <!-- ("Supporters" stat) -->
             <a
               class="stat btn-theme-outlined"
               href="#support"
@@ -244,8 +255,8 @@
                 <Pile maxItems={4} components={getSupportersPile(ecosystemSupport)} />
               </KeyValuePair>
             </a>
-          {/if}
-        </div>
+          </div>
+        {/if}
       </div>
 
       <!-- {#if isClaimed(chainData)}
@@ -393,7 +404,7 @@
     </section>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard {ecosystem} disabled={false} />
+        <SupportCard ecosystem={ecosystemFragment} />
       </div>
     </aside>
   </article>
