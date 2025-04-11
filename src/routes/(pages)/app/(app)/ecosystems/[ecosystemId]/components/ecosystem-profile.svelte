@@ -2,7 +2,9 @@
   import { gql } from 'graphql-request';
 
   export const ECOSYSTEM_PROFILE_FRAGMENT = gql`
-    fragment EcosystemProfile on Ecosystem {
+    ${STREAM_STATE_STREAM_FRAGMENT}
+    ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
+    fragment EcosystemProfile on EcosystemMainAccount {
       account {
         accountId
         driver
@@ -65,6 +67,8 @@
   import type { EcosystemProfileFragment } from './__generated__/gql.generated';
   import getSupportersPile from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import Pile from '$lib/components/pile/pile.svelte';
+  import { STREAM_STATE_STREAM_FRAGMENT } from '$lib/utils/stream-state';
+  import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   // src/routes/(pages)/app/(app)/ecosystems/[ecosystemId]/components/__generated__/gql.generated.ts
 
   export let ecosystem: Ecosystem;
