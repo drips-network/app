@@ -51,6 +51,7 @@
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
+  export let projectNameSize: 'small' | 'medium' = 'medium';
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
@@ -94,7 +95,7 @@
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">
-        <ProjectName project={processedProject} />
+        <ProjectName project={processedProject} size={projectNameSize} />
       </div>
       {#if !project?.isVisible}
         <WarningIcon
