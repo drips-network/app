@@ -533,8 +533,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists on ZkSync Era settle and become collectable once per day.',
     },
     alternativeChainMode: true,
-    gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: true,
+    gelatoRelayAvailable: false,
+    gaslessClaimAndCollect: false,
     addToWalletConfig: {
       blockExplorerUrls: ['https://sepolia.explorer.zksync.io/'],
       nativeCurrency: {
