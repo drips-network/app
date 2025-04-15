@@ -10,9 +10,10 @@ import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
+import ZkSync from '$lib/components/icons/networks/ZkSync.svelte';
 
 export const SUPPORTED_CHAIN_IDS = [
-  1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10,
+  1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10, 300,
 ] as const;
 export type ChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
 
@@ -493,6 +494,55 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         symbol: 'ETH',
       },
       rpcUrls: ['https://mainnet.optimism.io'],
+    },
+  },
+  [300]: {
+    chainId: 300,
+    name: 'zksync-era-sepolia',
+    label: 'ZkSync Era Sepolia',
+    token: 'ETH',
+    id: '0x12c',
+    rpcUrl: 'https://sepolia.era.zksync.dev',
+    icon: ZkSync,
+    color: '#4E529A',
+    isTestnet: true,
+    subdomain: 'zksync.drips.network',
+    gqlName: SupportedChain.ZksyncEraSepolia,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: true,
+    applyGasBuffers: false,
+    explorer: {
+      name: 'ZkSync Block Explorer',
+      base: 'https://sepolia.explorer.zksync.io',
+      linkTemplate: (txHash: string) => `https://sepolia.explorer.zksync.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x0557b6BA791A24df0Fa6167E1Dc304F403ee777A',
+      DRIPS: '0xe190AB5e92F937751c5ECec9416349666e8C54b9',
+      CALLER: '0xfCcEeC41090dd2Fe61f6Cd32D2452bCbCFe81317',
+      REPO_DRIVER: '0x8bDC23877A23Ce59fEF1712A1486810d9A6E2B94',
+      NFT_DRIVER: '0xB6B3b6a24cB9A9E2De4c6f2Ea54870E411bFc30d',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      frequencyLabel: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on ZkSync Era settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    gelatoRelayAvailable: true,
+    gaslessClaimAndCollect: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://sepolia.explorer.zksync.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Ethereum',
+        symbol: 'ETH',
+      },
+      rpcUrls: ['https://sepolia.era.zksync.dev'],
     },
   },
 };
