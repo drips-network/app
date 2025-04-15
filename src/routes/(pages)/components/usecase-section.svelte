@@ -4,36 +4,39 @@
   import UsecaseCard from "./usecase-card.svelte";
   import breakpointsStore from "$lib/stores/breakpoints/breakpoints.store";
   import { onMount } from "svelte";
+  import DripList from "$lib/components/icons/DripList.svelte";
+  import TokenStreams from "$lib/components/icons/TokenStreams.svelte";
+  import Proposals from "$lib/components/icons/Proposals.svelte";
 
   const usecaseCards = [
     {
-      id: "fund-dependencies",
       headline: "Fund your dependencies",
       description: "Claim your project and pay it forward to the projects that you depend on.",
+      icon: Splits,
       illustration: FundDependenciesUsecase,
     },
     {
-      id: "fund-dependencies",
-      headline: "Fund your dependencies",
-      description: "Claim your project and pay it forward to the projects that you depend on.",
+      headline: "Run a RetroPGF round",
+      description: "Distribute retroactive public goods funding easily.",
+      icon: DripList,
       illustration: FundDependenciesUsecase,
     },
     {
-      id: "fund-dependencies",
-      headline: "Fund your dependencies",
-      description: "Claim your project and pay it forward to the projects that you depend on.",
+      headline: "Programmable cashflow",
+      description: "Set up flexible, on-chain payment streams that you can adjust anytime.",
+      icon: TokenStreams,
       illustration: FundDependenciesUsecase,
     },
     {
-      id: "fund-dependencies",
-      headline: "Fund your dependencies",
-      description: "Claim your project and pay it forward to the projects that you depend on.",
+      headline: "Fund entire ecosystems",
+      description: "Support thousands of projects and people with a single stream or donation",
+      icon: DripList,
       illustration: FundDependenciesUsecase,
     },
     {
-      id: "fund-dependencies",
-      headline: "Fund your dependencies",
-      description: "Claim your project and pay it forward to the projects that you depend on.",
+      headline: "Start a hackathon",
+      description: "Set up a hackathon that allows submissions and voting on recipients.",
+      icon: Proposals,
       illustration: FundDependenciesUsecase,
     },
   ];
@@ -52,7 +55,7 @@
   let opacities: number[] = [];
   let activeIndex = 0;
 
-  const HEADER_HEIGHT = 128;
+  const HEADER_HEIGHT = 100;
 
   function handleScroll() {
     if (!mobile) return;
@@ -84,10 +87,6 @@
         } else if (i === 0) {
           activeIndex = 0;
         }
-
-        if (i === 0) {
-          console.log({ distanceToNext,visiblePercentage, currentElementHeight, scale });
-        }
       }
     }
   }
@@ -97,12 +96,12 @@
 <svelte:window on:scroll={handleScroll} />
 
 <div class="usecases mobile-only" bind:this={wrapperElement}>
-  {#each usecaseCards as { id, illustration }, index}
+  {#each usecaseCards as { headline, description, icon, illustration }, index}
   <div class="card" bind:this={elements[index]} style:opacity="{opacities[index]}" style:transform="translateY({elementOffsets[index]}px) scale({elementScales[index]})">
-    <UsecaseCard padHeight autoActive={!mobile} active={activeIndex === index} icon={Splits}>
-      <svelte:fragment slot="headline">Fund your dependencies</svelte:fragment>
+    <UsecaseCard padHeight autoActive={!mobile} active={activeIndex === index} {icon}>
+      <svelte:fragment slot="headline">{headline}</svelte:fragment>
       <svelte:fragment slot="description">
-        Claim your project and pay it forward to the projects that you depend on.
+        {description}
       </svelte:fragment>
       <svelte:fragment slot="illustration" let:active>
         <svelte:component this={illustration} {active} />
@@ -113,12 +112,12 @@
 </div>
 
 <div class="usecases-desktop">
-  {#each usecaseCards.reverse() as { id, illustration }, index}
+  {#each usecaseCards.reverse() as { headline, description, icon, illustration }, index}
   <div class="card">
-    <UsecaseCard padHeight icon={Splits}>
-      <svelte:fragment slot="headline">Fund your dependencies</svelte:fragment>
+    <UsecaseCard padHeight {icon}>
+      <svelte:fragment slot="headline">{headline}</svelte:fragment>
       <svelte:fragment slot="description">
-        Claim your project and pay it forward to the projects that you depend on.
+        {description}
       </svelte:fragment>
       <svelte:fragment slot="illustration" let:active>
         <svelte:component this={illustration} {active} />
