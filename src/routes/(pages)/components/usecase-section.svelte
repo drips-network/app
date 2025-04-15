@@ -50,10 +50,9 @@
   let elementOffsets: number[] = [];
   let elementScales: number [] = [];
   let opacities: number[] = [];
-  let blurs: number[] = [];
   let activeIndex = 0;
 
-  const HEADER_HEIGHT = 64;
+  const HEADER_HEIGHT = 128;
 
   function handleScroll() {
     if (!mobile) return;
@@ -80,9 +79,6 @@
         const opacity = visiblePercentage;
         opacities[i] = opacity;
 
-        const blur = Math.abs(1 - visiblePercentage);
-        blurs[i] = blur;
-
         if (visiblePercentage < 1) {
           activeIndex = i + 1;
         } else if (i === 0) {
@@ -102,7 +98,7 @@
 
 <div class="usecases mobile-only" bind:this={wrapperElement}>
   {#each usecaseCards as { id, illustration }, index}
-  <div class="card" bind:this={elements[index]} style:opacity="{opacities[index]}" style:transform="translateY({elementOffsets[index]}px) scale({elementScales[index]})" style:filter="blur({blurs[index]}px)">
+  <div class="card" bind:this={elements[index]} style:opacity="{opacities[index]}" style:transform="translateY({elementOffsets[index]}px) scale({elementScales[index]})">
     <UsecaseCard padHeight autoActive={!mobile} active={activeIndex === index} icon={Splits}>
       <svelte:fragment slot="headline">Fund your dependencies</svelte:fragment>
       <svelte:fragment slot="description">
