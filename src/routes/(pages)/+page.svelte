@@ -1,5 +1,6 @@
 <script lang="ts">
-  import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svelte";
+  import Button from "$lib/components/button/button.svelte";
+import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svelte";
   import type { PageData } from "./$types";
   import CaseStudyCard from "./components/case-study-card.svelte";
   import type { AnnouncementBannerConfig } from "./components/lp-header.svelte";
@@ -26,11 +27,21 @@
 
 <div class="wrapper">
   <LpHeader announcementBanner={announcementBannerConfig} />
-  <LpHeroBigGraph />
+
+  <section class="hero">
+    <div class="bg">
+      <LpHeroBigGraph />
+    </div>
+    <div class="text">
+      <h1>The easiest way to fund open-source in your ecosystem.</h1>
+      <p style:color="var(--color-foreground-level-5)">Have a funding experiment to talk about?</p>
+      <Button variant="primary">Get in touch</Button>
+    </div>
+  </section>
+
   <section>
     <UsecaseSection />
-  </section>
-  
+  </section> 
   
   <section class="case-studies">
     <div class="case-study">
@@ -84,7 +95,36 @@
     overflow: hidden;
   }
 
+  .hero .bg {
+    width: 100%;
+    filter: blur(1px);
+    opacity: 0.7;
+    transform: scale(1.2) translateY(3rem);
+  }
+
+  .hero .text {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: center;
+    transform: translateY(3rem)
+  }
+
+  .hero .text h1 {
+    max-width: 900px;
+    font-size: 3.5rem;
+    line-height: 4rem;
+  }
+
   section {
+    position: relative;
     max-width: calc(1373px + 1rem);
     margin: 0 auto;
     padding: 1rem;

@@ -6,6 +6,7 @@
 
   export let icon: ComponentType;
   export let active = false;
+  export let tonedDown = false;
   export let autoActive = true;
   export let padHeight = false;
 
@@ -19,7 +20,7 @@
 </script>
 
 <div class="wrapper" class:pad-height={padHeight}>
-  <a href="wikipedia.com" class="usecase-card" class:pad-height={padHeight} class:active on:mouseenter={() => handleHover(true)} on:mouseleave={() => handleHover(false)}>
+  <a href="wikipedia.com" class:toned-down={tonedDown} class="usecase-card" class:pad-height={padHeight} class:active on:mouseenter on:mouseenter={() => handleHover(true)} on:mouseleave on:mouseleave={() => handleHover(false)}>
     <div class="icon">
       <svelte:component this={icon} style="height: 2rem; width: 2rem; fill: var(--color-primary)" />
     </div>
@@ -52,7 +53,7 @@
   }
 
   .wrapper.pad-height {
-    height: 220px;
+    height: 200px;
   }
 
   .usecase-card {
@@ -66,7 +67,7 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-2);
     border-radius: 1rem 0 1rem 1rem;
     box-sizing: border-box;
-    transition: height 0.3s, box-shadow 0.3s;
+    transition: height 0.3s, box-shadow 0.3s, transform 0.3s, filter 0.3s;
   }
 
   .usecase-card.pad-height {
@@ -77,6 +78,11 @@
     background-color: var(--color-primary-level-1);
     box-shadow: 0px 0px 0px 1px var(--color-primary), 0 4px 0px 1px var(--color-primary);
     height: 220px;
+  }
+
+  .usecase-card.toned-down {
+    transform: scale(0.95);
+    filter: blur(0.8px) brightness(50%) contrast(90%);
   }
 
   .text {

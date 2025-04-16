@@ -91,6 +91,8 @@
     }
   }
   onMount(handleScroll);
+
+  let hoveringOverIndex = -1;
 </script>
 
 <svelte:window on:scroll={handleScroll} />
@@ -114,7 +116,7 @@
 <div class="usecases-desktop">
   {#each usecaseCards.reverse() as { headline, description, icon, illustration }, index}
   <div class="card">
-    <UsecaseCard padHeight {icon}>
+    <UsecaseCard tonedDown={hoveringOverIndex !== -1 && hoveringOverIndex !== index} on:mouseenter={() => hoveringOverIndex = index} on:mouseleave={() => hoveringOverIndex = -1} padHeight {icon}>
       <svelte:fragment slot="headline">{headline}</svelte:fragment>
       <svelte:fragment slot="description">
         {description}
