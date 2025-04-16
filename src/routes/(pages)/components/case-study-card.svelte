@@ -61,7 +61,7 @@
   .case-study-card {
     text-align: left;
     padding: 1.5rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-2);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     display: flex;
     justify-content: space-between;
@@ -78,7 +78,7 @@
 
   .list {
     flex: 1 1 0;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-2);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
     max-width: 32rem;
@@ -105,7 +105,7 @@
   }
 
   a {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-2);
     padding: 0.25rem;
     display: flex;
     align-items: center;
