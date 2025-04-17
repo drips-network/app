@@ -73,6 +73,7 @@
   <Section
     header={{
       icon: DripList,
+      iconPrimary: true,
       label: 'Distribution details',
       actions: [
         ...(!full

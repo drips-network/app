@@ -4,6 +4,7 @@ import type { Settings } from 'sigma/settings';
 import type { Project } from '$lib/graphql/__generated__/base-types';
 import type Sigma from 'sigma';
 import type { EdgeLabelDrawingFunction } from 'sigma/rendering';
+import { ensureResponseOk } from '$lib/utils/fetch';
 
 export type LayoutMapping = { [key: string]: { x: number; y: number } };
 export type NodeSelectionChangedPayload = { nodeId?: string };
@@ -16,15 +17,14 @@ export async function fetchProject(
   project: Project;
   description: string;
 }> {
-  const response = await fetch(
-    `/api/projects/${encodeURIComponent(forge)}/${encodeURIComponent(ownerName)}/${encodeURIComponent(repoName)}`,
+  const response = await ensureResponseOk(
+    fetch(
+      `/api/projects/${encodeURIComponent(forge)}/${encodeURIComponent(ownerName)}/${encodeURIComponent(repoName)}`,
+    ),
   );
-  // probably throw an error?
-  // if (!response.ok) {
-  //   return null;
-  // }
 
   const projectData = await response.json();
+
   return projectData;
 }
 

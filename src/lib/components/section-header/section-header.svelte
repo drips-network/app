@@ -6,6 +6,7 @@
   import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 
   export let icon: ComponentType | undefined = undefined;
+  export let iconPrimary: boolean = false;
   export let label: string;
   export let actions: {
     handler?: (event: MouseEvent) => void;
@@ -33,7 +34,7 @@
 >
   <div class="title">
     {#if icon}
-      <div data-testid="section-icon" class="icon-wrapper">
+      <div data-testid="section-icon" class="icon-wrapper" class:icon-primary={iconPrimary}>
         <svelte:component this={icon} style="fill: var(--color-background)" />
       </div>
     {/if}
@@ -98,6 +99,10 @@
     align-items: center;
     border-radius: 1rem;
     flex-shrink: 0;
+  }
+
+  .icon-wrapper.icon-primary {
+    background-color: var(--color-primary);
   }
 
   .expand-button {

@@ -32,6 +32,7 @@
   export let description: string | undefined = undefined;
 
   let loading: boolean = false;
+  let error: boolean = false;
 
   $: projectChainData = project ? filterCurrentChainData(project.chainData) : undefined;
   $: loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject();
@@ -63,10 +64,9 @@
       : `to ${maintainersCount} maintainer`;
 
   async function loadProject() {
-    // TODO: if project return
-
     try {
       loading = true;
+      error = false;
       const projectData = await fetchProject(
         loadProjectData.repoOwner,
         loadProjectData.repoName,
@@ -74,6 +74,8 @@
       );
       project = projectData.project;
       description = projectData.description;
+    } catch {
+      error = true;
     } finally {
       loading = false;
     }
@@ -85,8 +87,10 @@
 <PrimaryColorThemer
   colorHex={projectChainData && isClaimed(projectChainData) ? projectChainData.color : undefined}
 >
-  <div class="ecosystem-project-card" class:loading>
-    {#if loading}
+  <div class="ecosystem-project-card" class:loading class:error>
+    {#if error}
+      <span>Unable to load project data</span>
+    {:else if loading}
       <Spinner visibilityDelay={0} />
     {:else if projectChainData && description && project}
       <div class="avatar">
@@ -161,9 +165,10 @@
     grid-template-columns: min-content 1fr 1fr;
   }
 
+  .ecosystem-project-card.error,
   .ecosystem-project-card.loading {
     display: flex;
-    width: 44rem;
+    width: 100vh;
     height: 167px;
     align-items: center;
     justify-content: center;
