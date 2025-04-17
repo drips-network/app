@@ -227,7 +227,7 @@
   <link rel="canonical" href={`https://drips.network/app/ecosystems/${ecosystem.id}`} />
 </svelte:head>
 
-<PrimaryColorThemer colorHex={ecosystem.color}>
+<PrimaryColorThemer {colorHex}>
   <article class="project-profile">
     <header class="header card">
       <div>
@@ -300,19 +300,13 @@
       {/if} -->
     </header>
     <section id="graph">
-      <PrimaryColorThemer {colorHex}>
-        <EcosystemCardInteractive {ecosystem} />
-      </PrimaryColorThemer>
+      <EcosystemCardInteractive {ecosystem} />
     </section>
     <section id="metadata">
-      <PrimaryColorThemer {colorHex}>
-        <EcosystemMetadata {ecosystem} />
-      </PrimaryColorThemer>
+      <EcosystemMetadata {ecosystem} />
     </section>
     <section id="distribution">
-      <PrimaryColorThemer {colorHex}>
-        <EcosystemDistribution {ecosystem} />
-      </PrimaryColorThemer>
+      <EcosystemDistribution {ecosystem} />
     </section>
 
     <!-- <Developer accountId={project.account.accountId} /> -->
@@ -394,13 +388,11 @@
         </section>
       {/if} -->
     <section id="support">
-      <PrimaryColorThemer {colorHex}>
-        <SupportersSection
-          bind:sectionSkeleton={supportersSectionSkeleton}
-          type="ecosystem"
-          supportItems={ecosystemSupport}
-        />
-      </PrimaryColorThemer>
+      <SupportersSection
+        bind:sectionSkeleton={supportersSectionSkeleton}
+        type="ecosystem"
+        supportItems={ecosystemSupport}
+      />
     </section>
     <aside>
       <div class="become-supporter-card">
