@@ -143,6 +143,7 @@
     bind:collapsable
     header={{
       icon: Heart,
+      iconPrimary: true,
       label: headline,
       infoTooltip,
     }}
