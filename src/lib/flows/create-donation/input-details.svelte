@@ -94,6 +94,18 @@
   $: selectedTokenAddress = $context.selectedTokenAddress?.[0];
   $: selectedToken = selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null;
 
+  let receiverTypeLabel = 'Drip List';
+  $: {
+    switch (receiver.__typename) {
+      case 'Project':
+        receiverTypeLabel = 'Drips project';
+        break;
+      case 'EcosystemMainAccount':
+        receiverTypeLabel = 'Ecosystem';
+        break;
+    }
+  }
+
   function submit() {
     let recipientAccountId: string;
     switch (receiver.__typename) {
@@ -146,7 +158,6 @@
   />
 
   {#if amount && selectedToken}
-    {@const receiverTypeLabel = receiver.__typename === 'Project' ? 'Drips project' : 'Drip List'}
     {@const nextSettlementDate = network.settlement.nextSettlementDate}
     <TransitionedHeight collapsed={!formValid} negativeMarginWhileCollapsed="-1rem">
       <WhatsNextSection>

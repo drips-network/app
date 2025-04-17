@@ -48,7 +48,11 @@
       >
     {/if}
     <Button size="large" icon={Droplet} on:click={onClickNewDonation}>One-time donation</Button>
-    <Button on:click={onClickAddToDripList} size="large" icon={DripList}>Add to a Drip List</Button>
+    {#if type !== 'ecosystem'}
+      <Button on:click={onClickAddToDripList} size="large" icon={DripList}
+        >Add to a Drip List</Button
+      >
+    {/if}
   </div>
 {/if}
 

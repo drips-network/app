@@ -38,6 +38,7 @@
 
   export const SUPPORT_CARD_ECOSYSTEM_FRAGEMENT = gql`
     fragment SupportCardEcosystem on EcosystemMainAccount {
+      name
       account {
         accountId
         driver
@@ -197,7 +198,7 @@
         break;
       case !!ecosystem:
         hasAccountId = !!ecosystem.account.accountId;
-        donationFlowStepsInput = ecosystem.account;
+        donationFlowStepsInput = ecosystem;
         break;
     }
 
@@ -228,7 +229,7 @@
         donationFlowStepsInput = dripList?.account;
         break;
       case !!ecosystem:
-        donationFlowStepsInput = ecosystem.account;
+        donationFlowStepsInput = ecosystem;
         break;
       default:
         unreachable();
