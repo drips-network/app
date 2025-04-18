@@ -437,8 +437,7 @@
   .stats {
     overflow: scroll;
     gap: 1.5rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
   }
 
   .stats .stat {
