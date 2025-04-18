@@ -265,7 +265,11 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, {dripList || ecosystem ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  {#if ecosystem}
+    <p>Donate once or continuously.</p>
+  {:else}
+    <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  {/if}
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons

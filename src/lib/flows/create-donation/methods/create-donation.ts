@@ -18,6 +18,8 @@ import type {
   ProjectOtDsQueryVariables,
   DripListOtDsQuery,
   DripListOtDsQueryVariables,
+  EcosystemOtDsQuery,
+  EcosystemOtDsQueryVariables,
 } from './__generated__/gql.generated';
 
 const projectSupportQuery = gql`
@@ -54,6 +56,22 @@ const projectSupportQuery = gql`
 const dripListSupportQuery = gql`
   query DripListOTDs($id: ID!, $chain: SupportedChain!) {
     dripList(id: $id, chain: $chain) {
+      chain
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+          date
+        }
+      }
+    }
+  }
+`;
+
+const ecosystemSupportQuery = gql`
+  query EcosystemOTDs($accountId: ID!, $chain: SupportedChain!) {
+    ecosystemMainAccount(id: $accountId, chain: $chain) {
       chain
       support {
         ... on OneTimeDonationSupport {
@@ -169,6 +187,30 @@ export default function (
               break;
             }
             case 'EcosystemMainAccount':
+              await expect(
+                () =>
+                  query<EcosystemOtDsQuery, EcosystemOtDsQueryVariables>(ecosystemSupportQuery, {
+                    accountId: recipientAccountId,
+                    chain: network.gqlName,
+                  }),
+                (res) => {
+                  const ecoystemData = res.ecosystemMainAccount;
+                  if (!ecoystemData) return true;
+
+                  return ecoystemData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
             case 'NftDriverAccount': {
               await expect(
                 () =>
