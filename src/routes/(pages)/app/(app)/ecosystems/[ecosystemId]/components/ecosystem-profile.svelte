@@ -458,6 +458,10 @@
     border-radius: 1rem 0 1rem 1rem;
   }
 
+  .become-supporter-card {
+    height: 100%;
+  }
+
   @media (max-width: 1080px) {
     .header {
       margin-bottom: 0;
