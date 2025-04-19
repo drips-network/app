@@ -128,7 +128,6 @@
         supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;
         break;
       case !!ecosystem:
-        // TODO: also get ecosystem by account id
         supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
         break;
       default:
