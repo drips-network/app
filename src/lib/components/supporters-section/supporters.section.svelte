@@ -106,7 +106,7 @@
 
   export let ownerAccountId: string | undefined = undefined;
 
-  export let type: 'project' | 'dripList' | 'address';
+  export let type: 'project' | 'dripList' | 'address' | 'ecosystem';
   export let headline = 'Support';
   export let emptyStateHeadline = 'No supporters';
 
@@ -125,6 +125,9 @@
       case 'address':
         emptyStateText = `This user doesnʼt have any supporters yet.`;
         break;
+      case 'ecosystem':
+        emptyStateText = `This ecosystem doesnʼt have any supporters yet.`;
+        break;
     }
   }
 
@@ -140,6 +143,7 @@
     bind:collapsable
     header={{
       icon: Heart,
+      iconPrimary: true,
       label: headline,
       infoTooltip,
     }}
@@ -295,6 +299,7 @@
             </svelte:fragment>
           </SupportItem>
         {/if}
+        <!-- TODO: also ecosystem support -->
       {/each}
     </div>
   </Section>

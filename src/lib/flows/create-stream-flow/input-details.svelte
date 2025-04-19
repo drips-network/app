@@ -7,6 +7,17 @@
     }
   `;
 
+  export const CREATE_STREAM_FLOW_ECOSYSTEM_ACCOUNT_FRAGMENT = gql`
+    ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
+    fragment CreateStreamFlowEcosystemAccount on EcosystemMainAccount {
+      name
+      account {
+        ...DripVisualNftDriverAccount
+        accountId
+      }
+    }
+  `;
+
   export const CREATE_STREAM_FLOW_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
     fragment CreateStreamFlowAddressDriverAccount on AddressDriverAccount {
@@ -73,7 +84,9 @@
 
   export let context: Writable<CreateStreamFlowState>;
 
-  $: nameInputHidden = $context.receiver?.__typename === 'NftDriverAccount';
+  $: nameInputHidden =
+    $context.receiver?.__typename === 'NftDriverAccount' ||
+    $context.receiver?.__typename === 'EcosystemMainAccount';
 
   // Recipient Address
 
@@ -199,7 +212,10 @@
 
           let recipientAccountId: string;
           if ($context.receiver) {
-            recipientAccountId = $context.receiver.accountId;
+            recipientAccountId =
+              'accountId' in $context.receiver
+                ? $context.receiver.accountId
+                : $context.receiver.account?.accountId;
           } else {
             const recipientInputValue = $context.recipientInputValue ?? unreachable();
 
@@ -396,14 +412,16 @@
   </Toggleable>
   <SafeAppDisclaimer disclaimerType="drips" />
 
-  {#if $context.receiver?.__typename === 'NftDriverAccount'}
+  {#if $context.receiver?.__typename === 'NftDriverAccount' || $context.receiver?.__typename === 'EcosystemMainAccount'}
     <WhatsNextSection>
       {@const nextSettlementDate = network.settlement.nextSettlementDate}
       <WhatsNextCard>
         <svelte:fragment slot="title">When your continuous donation begins...</svelte:fragment>
         <svelte:fragment slot="items">
           <WhatsNextItem icon={TransactionsIcon}>
-            Funds sent to Drip Lists on {network.label} are distributed among its recipients
+            Funds sent to {$context.receiver?.__typename === 'EcosystemMainAccount'
+              ? 'Ecosystems'
+              : 'Drip Lists'} on {network.label} are distributed among its recipients
             <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
           </WhatsNextItem>
           <WhatsNextItem icon={CalendarIcon}>
