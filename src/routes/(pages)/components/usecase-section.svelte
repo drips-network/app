@@ -7,37 +7,84 @@
   import DripList from "$lib/components/icons/DripList.svelte";
   import TokenStreams from "$lib/components/icons/TokenStreams.svelte";
   import Proposals from "$lib/components/icons/Proposals.svelte";
+  import RetropgfUsecase from "./usecase-illustrations/retropgf-usecase.svelte";
+  import UsecaseIllustration, { type UsecaseIllustrationConfig } from "./usecase-illustrations/usecase-illustration.svelte";
+  import StreamUsecase from "./usecase-illustrations/stream-usecase.svelte";
+  import EcosystemUsecase from "./usecase-illustrations/ecosystem-usecase.svelte";
+  import HackathonUsecase from "./usecase-illustrations/hackathon-usecase.svelte";
 
-  const usecaseCards = [
+  const usecaseCards: UsecaseIllustrationConfig[] = [
     {
       headline: "Fund your dependencies",
       description: "Claim your project and pay it forward to the projects that you depend on.",
       icon: Splits,
+      sparkles: [{
+        x: "-20px",
+        y: "60px",
+        delay: 50,
+      },{
+        x: "160px",
+        y: "30px",
+        delay: 100,
+      }],
       illustration: FundDependenciesUsecase,
     },
     {
       headline: "Run a RetroPGF round",
       description: "Distribute retroactive public goods funding easily.",
       icon: DripList,
-      illustration: FundDependenciesUsecase,
+      sparkles: [{
+        x: "-20px",
+        y: "60px",
+        delay: 50,
+      },{
+        x: "220px",
+        y: "30px",
+        delay: 100,
+      },
+      {
+        x: "180px",
+        y: "170px",
+        delay: 150,
+      }],
+      illustration: RetropgfUsecase,
     },
     {
       headline: "Programmable cashflow",
       description: "Set up flexible, on-chain payment streams that you can adjust anytime.",
       icon: TokenStreams,
-      illustration: FundDependenciesUsecase,
+      sparkles: [],
+      illustration: StreamUsecase,
     },
     {
       headline: "Fund entire ecosystems",
       description: "Support thousands of projects and people with a single stream or donation",
       icon: DripList,
-      illustration: FundDependenciesUsecase,
+      sparkles: [],
+      illustration: EcosystemUsecase,
+      illustrationOffset: {
+        x: "-25px",
+        y: "-10px",
+      }
     },
     {
       headline: "Start a hackathon",
       description: "Set up a hackathon that allows submissions and voting on recipients.",
       icon: Proposals,
-      illustration: FundDependenciesUsecase,
+      sparkles: [{
+        x: "-20px",
+        y: "20px",
+        delay: 50,
+      },{
+        x: "160px",
+        y: "100px",
+        delay: 100,
+      }],
+      illustration: HackathonUsecase,
+      illustrationOffset: {
+        x: "-30px",
+        y: "0",
+      }
     },
   ];
 
@@ -46,8 +93,6 @@
   $: {
     if (mobile) handleScroll();
   }
-
-  let wrapperElement: HTMLDivElement;
 
   const elements: HTMLDivElement[] = [];
   let elementOffsets: number[] = [];
@@ -97,16 +142,16 @@
 
 <svelte:window on:scroll={handleScroll} />
 
-<div class="usecases mobile-only" bind:this={wrapperElement}>
-  {#each usecaseCards as { headline, description, icon, illustration }, index}
+<div class="usecases mobile-only">
+  {#each usecaseCards as config, index}
   <div class="card" bind:this={elements[index]} style:opacity="{opacities[index]}" style:transform="translateY({elementOffsets[index]}px) scale({elementScales[index]})">
-    <UsecaseCard padHeight autoActive={!mobile} active={activeIndex === index} {icon}>
-      <svelte:fragment slot="headline">{headline}</svelte:fragment>
+    <UsecaseCard padHeight autoActive={!mobile} active={activeIndex === index} icon={config.icon}>
+      <svelte:fragment slot="headline">{config.headline}</svelte:fragment>
       <svelte:fragment slot="description">
-        {description}
+        {config.description}
       </svelte:fragment>
       <svelte:fragment slot="illustration" let:active>
-        <svelte:component this={illustration} {active} />
+        <UsecaseIllustration {active} {config} />
       </svelte:fragment>
     </UsecaseCard>
   </div>
@@ -114,15 +159,15 @@
 </div>
 
 <div class="usecases-desktop">
-  {#each usecaseCards.reverse() as { headline, description, icon, illustration }, index}
+  {#each usecaseCards.reverse() as config, index}
   <div class="card">
-    <UsecaseCard tonedDown={hoveringOverIndex !== -1 && hoveringOverIndex !== index} on:mouseenter={() => hoveringOverIndex = index} on:mouseleave={() => hoveringOverIndex = -1} padHeight {icon}>
-      <svelte:fragment slot="headline">{headline}</svelte:fragment>
+    <UsecaseCard tonedDown={hoveringOverIndex !== -1 && hoveringOverIndex !== index} on:mouseenter={() => hoveringOverIndex = index} on:mouseleave={() => hoveringOverIndex = -1} padHeight icon={config.icon}>
+      <svelte:fragment slot="headline">{config.headline}</svelte:fragment>
       <svelte:fragment slot="description">
-        {description}
+        {config.description}
       </svelte:fragment>
       <svelte:fragment slot="illustration" let:active>
-        <svelte:component this={illustration} {active} />
+        <UsecaseIllustration {active} {config} />
       </svelte:fragment>
     </UsecaseCard>
   </div>

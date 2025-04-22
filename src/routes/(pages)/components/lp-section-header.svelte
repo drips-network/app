@@ -1,26 +1,27 @@
 <script>
   import Star from '$lib/components/illustrations/star.svelte';
-  import Dot from '$lib/components/illustrations/dot.svelte';
 </script>
 
 <div class="section-header">
   <div class="illus hide-mobile">
-    <Dot />
+
     <Star />
   </div>
-  <div class="content">
+  <h1 class="content">
     <slot />
-  </div>
+  </h1>
   <div class="illus">
     <Star />
-    <Dot />
   </div>
 </div>
 
 <style>
   .section-header {
+    margin-top: 4rem;
+    margin-bottom: 2rem;
     display: flex;
     justify-content: center;
+    gap: 3rem;
   }
 
   .illus {

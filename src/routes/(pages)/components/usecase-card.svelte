@@ -22,7 +22,7 @@
 <div class="wrapper" class:pad-height={padHeight}>
   <a href="wikipedia.com" class:toned-down={tonedDown} class="usecase-card" class:pad-height={padHeight} class:active on:mouseenter on:mouseenter={() => handleHover(true)} on:mouseleave on:mouseleave={() => handleHover(false)}>
     <div class="icon">
-      <svelte:component this={icon} style="height: 2rem; width: 2rem; fill: var(--color-primary)" />
+      <svelte:component this={icon} style="height: 2rem; width: 2rem; fill: {!tonedDown ? 'var(--color-primary)' : 'var(--color-primary-level-2)'}" />
     </div>
     <div class="text">
       <h2 class="extra-bold">
@@ -67,7 +67,7 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-2);
     border-radius: 1rem 0 1rem 1rem;
     box-sizing: border-box;
-    transition: height 0.3s, box-shadow 0.3s, transform 0.3s, filter 0.3s;
+    transition: height 0.3s, box-shadow 0.3s, transform 0.3s, filter 0.3s, background-color 0.3s;
   }
 
   .usecase-card.pad-height {
@@ -82,7 +82,16 @@
 
   .usecase-card.toned-down {
     transform: scale(0.95);
-    filter: blur(0.8px) brightness(50%) contrast(90%);
+    background-color: var(--color-foreground-level-1);
+    filter: blur(0.8px);
+  }
+
+  .usecase-card.toned-down h2, .usecase-card.toned-down p {
+    color: var(--color-foreground-level-4);
+  }
+
+  h2, p {
+    transition: color 0.3s;
   }
 
   .text {

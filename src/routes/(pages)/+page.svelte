@@ -1,11 +1,16 @@
 <script lang="ts">
   import Button from "$lib/components/button/button.svelte";
-import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svelte";
+  import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svelte";
   import type { PageData } from "./$types";
   import CaseStudyCard from "./components/case-study-card.svelte";
+  import LpContactCard from "./components/lp-contact-card.svelte";
+  import LpFooter from "./components/lp-footer.svelte";
   import type { AnnouncementBannerConfig } from "./components/lp-header.svelte";
-  import LpHeader from "./components/lp-header.svelte";
+  import LpHeader from "$lib/components/lp-header/lp-header.svelte";
+  import LpHiwEntrypoint from "./components/lp-hiw-entrypoint.svelte";
+  import LpSectionHeader from "./components/lp-section-header.svelte";
   import UsecaseSection from "./components/usecase-section.svelte";
+  import TrustedBy from "./components/trusted-by.svelte";
 
   export let data: PageData;
 
@@ -36,6 +41,9 @@ import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svel
       <h1>The easiest way to fund open-source in your ecosystem.</h1>
       <p style:color="var(--color-foreground-level-5)">Have a funding experiment to talk about?</p>
       <Button variant="primary">Get in touch</Button>
+      <div class="trusted-by">
+        <TrustedBy />
+      </div>
     </div>
   </section>
 
@@ -44,6 +52,9 @@ import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svel
   </section> 
   
   <section class="case-studies">
+    <LpSectionHeader>
+      How orgs use Drips
+    </LpSectionHeader>
     <div class="case-study">
       <CaseStudyCard
         maxSplitRows={5}
@@ -86,20 +97,33 @@ import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svel
       />
     </div>
   </section>
+
+  <section class="two-column" style:margin-top="4rem">
+    <div>
+      <LpHiwEntrypoint />
+    </div>
+    <div>
+      <LpContactCard />
+    </div>
+  </section>
+
+  <LpFooter />
 </div>
 
 <style>
   .wrapper {
     background-color: var(--color-foreground-level-1);
     padding-bottom: 2rem;
+    width: 100vw;
     overflow: hidden;
   }
 
   .hero .bg {
+    max-height: 85svh;
     width: 100%;
-    filter: blur(1px);
-    opacity: 0.7;
-    transform: scale(1.2) translateY(3rem);
+    filter: blur(1.5px);
+    opacity: 0.4;
+    transform: scale(1.3) translateY(8svh);
   }
 
   .hero .text {
@@ -114,7 +138,11 @@ import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svel
     gap: 1.5rem;
     align-items: center;
     text-align: center;
-    transform: translateY(3rem)
+    transform: translateY(7svh);
+  }
+
+  .hero .trusted-by {
+    margin-top: 3rem;
   }
 
   .hero .text h1 {
@@ -143,6 +171,19 @@ import LpHeroBigGraph from "$lib/components/illustrations/lp-hero-big-graph.svel
 
   .case-studies .case-study:nth-child(2n) {
     align-self: flex-end;
+  }
+
+  section.two-column {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 2rem;
+  }
+
+  section.two-column > div {
+    flex: 1 1 0;
+    min-width: 500px;
   }
 
   @media (max-width: 882px) {
