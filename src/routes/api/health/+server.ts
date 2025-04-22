@@ -17,6 +17,9 @@ async function checkGqlApi() {
 }
 
 async function checkRpc() {
+  // skip this check on localtestnet
+  if (network.chainId === 31337) return;
+
   const provider = new FailoverJsonRpcProvider(
     mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
     undefined,
