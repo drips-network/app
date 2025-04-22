@@ -246,11 +246,7 @@
         {#if [ecosystemSupport].flat().length > 0}
           <div class="stat drip-bordered">
             <!-- ("Supporters" stat) -->
-            <a
-              class="stat btn-theme-outlined"
-              href="#support"
-              on:click={() => supportersSectionSkeleton?.highlightSection()}
-            >
+            <a href="#support" on:click={() => supportersSectionSkeleton?.highlightSection()}>
               <KeyValuePair key="Supporters">
                 <Pile maxItems={4} components={getSupportersPile(ecosystemSupport)} />
               </KeyValuePair>
