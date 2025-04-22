@@ -93,6 +93,7 @@ export default class FailoverJsonRpcProvider extends JsonRpcProvider {
         }
 
         request.body = JSON.stringify(payload);
+        request.timeout = 10000; // 10 seconds
         request.setHeader('content-type', 'application/json');
 
         const response = await request.send();
