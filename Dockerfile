@@ -61,6 +61,9 @@ ARG PUBLIC_SUPPRESS_MISSING_VAR_IN_PROD_ERRORS
 ARG LOCAL_TESTNET_RPC_URL
 ARG FAKE_PINATA_URL
 
+ARG PUBLIC_JUNCTION_URL
+ARG PUBLIC_INTERNAL_JUNCTION_URL
+
 RUN apt-get update \
  && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \

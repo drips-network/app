@@ -2,9 +2,8 @@
 
 import query from '$lib/graphql/dripsQL';
 import network from '$lib/stores/wallet/network';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { error } from '@sveltejs/kit';
+import { JsonRpcProvider } from 'ethers';
 
 async function checkGqlApi() {
   const testQuery = `
@@ -17,17 +16,7 @@ async function checkGqlApi() {
 }
 
 async function checkRpc() {
-  // skip this check on localtestnet
-  if (network.chainId === 31337) return;
-
-  const provider = new FailoverJsonRpcProvider(
-    mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
-    undefined,
-    undefined,
-    {
-      logger: console,
-    },
-  );
+  const provider = new JsonRpcProvider(network.rpcUrl, network);
 
   await provider.getBlockNumber();
 }

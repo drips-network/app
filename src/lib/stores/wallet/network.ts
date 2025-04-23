@@ -10,6 +10,8 @@ import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import { browser } from '$app/environment';
 
 export const SUPPORTED_CHAIN_IDS = [
   1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10,
@@ -84,6 +86,19 @@ const etherscanLinkTemplate = (txHash: string, networkName: string) =>
     ? `https://etherscan.io/tx/${txHash}`
     : `https://${networkName}.etherscan.io/tx/${txHash}`;
 
+const PUBLIC_JUNCTION_URL = getOptionalEnvVar('PUBLIC_JUNCTION_URL', true, null);
+const INTERNAL_JUNCTION_URL = getOptionalEnvVar('PUBLIC_INTERNAL_JUNCTION_URL', true, null);
+
+function junctionUrl(networkName: string) {
+  if (!PUBLIC_JUNCTION_URL || !INTERNAL_JUNCTION_URL) {
+    throw new Error(
+      'Missing PUBLIC_JUNCTION_URL and/or PUBLIC_INTERNAL_JUNCTION_URL. Check your environment variables.',
+    );
+  }
+
+  return (browser ? PUBLIC_JUNCTION_URL : INTERNAL_JUNCTION_URL) + `/${networkName}`;
+}
+
 export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [1]: {
     chainId: 1,
@@ -91,8 +106,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Ethereum',
     token: 'ETH',
     id: '0x1',
-    rpcUrl: `${BASE_URL}/api/rpc/alchemy/mainnet`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/infura/mainnet`,
+    rpcUrl: junctionUrl('mainnet'),
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: false,
@@ -217,8 +231,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Sepolia',
     token: 'ETH',
     id: '0xaa36a7',
-    rpcUrl: `${BASE_URL}/api/rpc/alchemy/sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/infura/sepolia`,
+    rpcUrl: junctionUrl('sepolia'),
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -350,7 +363,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Filecoin',
     token: 'FIL',
     id: '0x13a',
-    rpcUrl: `${BASE_URL}/api/rpc/glif/filecoin-mainnet`,
+    rpcUrl: junctionUrl('filecoin'),
     icon: Filecoin,
     color: '#0090FF',
     isTestnet: false,
@@ -403,7 +416,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Metis',
     token: 'METIS',
     id: '0x440',
-    rpcUrl: 'https://andromeda.metis.io/?owner=1088',
+    rpcUrl: junctionUrl('metis'),
     icon: Metis,
     color: '#00D2FF',
     isTestnet: false,
@@ -452,7 +465,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'OP Mainnet',
     token: 'ETH',
     id: '0xa',
-    rpcUrl: 'https://mainnet.optimism.io/',
+    rpcUrl: junctionUrl('optimism'),
     icon: Optimism,
     color: '#FF0420',
     isTestnet: false,
