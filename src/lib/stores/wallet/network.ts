@@ -91,12 +91,6 @@ const PUBLIC_JUNCTION_URL = getOptionalEnvVar('PUBLIC_JUNCTION_URL', true, null)
 const INTERNAL_JUNCTION_URL = getOptionalEnvVar('PUBLIC_INTERNAL_JUNCTION_URL', true, null);
 
 function junctionUrl(networkName: string) {
-  if (!PUBLIC_JUNCTION_URL || !INTERNAL_JUNCTION_URL) {
-    throw new Error(
-      'Missing PUBLIC_JUNCTION_URL and/or PUBLIC_INTERNAL_JUNCTION_URL. Check your environment variables.',
-    );
-  }
-
   return (browser ? PUBLIC_JUNCTION_URL : INTERNAL_JUNCTION_URL) + `/${networkName}`;
 }
 
