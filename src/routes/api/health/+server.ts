@@ -16,6 +16,9 @@ async function checkGqlApi() {
 }
 
 async function checkRpc() {
+  // skip this check on localtestnet
+  if (network.chainId === 31337) return;
+
   const provider = new JsonRpcProvider(network.rpcUrl, network);
 
   await provider.getBlockNumber();
