@@ -78,130 +78,15 @@
   import { STREAM_STATE_STREAM_FRAGMENT } from '$lib/utils/stream-state';
   import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  // src/routes/(pages)/app/(app)/ecosystems/[ecosystemId]/components/__generated__/gql.generated.ts
 
   export let ecosystem: Ecosystem;
   export let ecosystemFragment: EcosystemProfileFragment | undefined;
 
   $: ecosystemSupport = ecosystemFragment?.support || [];
-  // export let project: ProjectProfileFragment;
-
-  // interface RepoInfo {
-  //   url: string;
-  //   repoName: string;
-  //   ownerName: string;
-  // }
-
-  // export let newRepo: RepoInfo | undefined;
-  // export let correctCasingRepo: RepoInfo | undefined;
-
-  // $: ownAccountId = $walletStore.dripsAccountId;
-  // $: chainData = filterCurrentChainData(project.chainData);
-  // $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
-
-  // type ExtractFragment<T, Condition> = T extends Condition ? T : never;
-
-  // function getSplitsPile(
-  //   splitCollections: (
-  //     | ExtractFragment<
-  //         ProjectProfileFragment['chainData'][number],
-  //         { __typename: 'ClaimedProjectData' }
-  //       >['splits']['maintainers']
-  //     | ExtractFragment<
-  //         ProjectProfileFragment['chainData'][number],
-  //         { __typename: 'ClaimedProjectData' }
-  //       >['splits']['dependencies']
-  //   )[],
-  // ) {
-  //   const splits = splitCollections.flat();
-
-  //   return mapFilterUndefined(splits, (v) => {
-  //     switch (v.__typename) {
-  //       case 'AddressReceiver':
-  //         return {
-  //           component: IdentityBadge,
-  //           props: {
-  //             address: v.account.address,
-  //             showIdentity: false,
-  //             size: 'medium',
-  //             disableLink: true,
-  //           },
-  //         };
-  //       case 'ProjectReceiver':
-  //         return {
-  //           component: ProjectAvatar,
-  //           props: {
-  //             project: filterCurrentChainData(v.project.chainData),
-  //             outline: true,
-  //             isLinked: false,
-  //           },
-  //         };
-  //       case 'DripListReceiver':
-  //         return {
-  //           component: DripListAvatar,
-  //           props: { outline: true, isLinked: false },
-  //         };
-  //       default:
-  //         return undefined;
-  //     }
-  //   });
-  // }
-
-  // $: mobileView =
-  //   $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
-
-  // let collectHintTriggered = false;
-
-  // function triggerCollectHint() {
-  //   collectHintTriggered = true;
-
-  //   setTimeout(() => {
-  //     highlightStore.highlight({
-  //       title: 'Collect received funds',
-  //       description: 'You can collect funds to your wallet here.',
-  //       element: document.querySelectorAll("[data-highlightid='global-collect']")[0],
-  //       borderRadius: mobileView ? '1rem 0 1rem 1rem' : '2rem 0 2rem 2rem',
-  //       paddingPx: mobileView ? 8 : 0,
-  //     });
-  //   }, 2000);
-  // }
-
-  // const walletInitialized = walletStore.initialized;
-
-  // $: {
-  //   if (browser && !collectHintTriggered && $walletInitialized) {
-  //     let url = new URL(window.location.href);
-
-  //     if (url.searchParams.get('collectHint') === 'true') {
-  //       url.searchParams.delete('collectHint');
-  //       window.history.replaceState({}, '', url.toString());
-
-  //       if (!dismissablesStore.isDismissed('project-claim-collect-hint')) {
-  //         triggerCollectHint();
-  //         dismissablesStore.dismiss('project-claim-collect-hint');
-  //       }
-  //     }
-  //   }
-  // }
-
-  // $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
-
-  // let splitsSectionSkeleton: SectionSkeleton | undefined;
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
   // TODO: fix
   const imageBaseUrl = `/api/share-images/project/${encodeURIComponent('TODO')}.png`;
-
-  // $: origin = browser ? window.location.origin : '';
-  // $: supportButtonStepConfig = {
-  //   projectSourceUrl: project.source.url,
-  //   supportButtonData: {
-  //     dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
-  //     projectName: project.source.repoName,
-  //     projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
-  //     projectData: chainData as SupportButtonData['projectData'],
-  //   },
-  // };
 
   $: colorHex = ecosystem.color ? ecosystem.color : undefined;
 
@@ -210,10 +95,6 @@
   $: recipientsFormatted = recipientsFormatter.format(
     ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0,
   );
-
-  // function buildEcosystemUrl() {
-  //   return window.
-  // }
 </script>
 
 <HeadMeta
@@ -254,46 +135,6 @@
           </div>
         {/if}
       </div>
-
-      <!-- {#if isClaimed(chainData)}
-        <div class="stats" in:fade={{ duration: 300 }}>
-          <div class="stat shadow-low rounded-drip-lg">
-            <KeyValuePair key="Donations">
-              <AggregateFiatEstimate amounts={chainData.totalEarned} />
-            </KeyValuePair>
-          </div>
-          ("Supporters" stat)
-          {#if [chainData.support].flat().length > 0}
-            <a
-              class="stat btn-theme-outlined"
-              href="#support"
-              on:click={() => supportersSectionSkeleton?.highlightSection()}
-            >
-              <KeyValuePair key="Supporters">
-                <Pile maxItems={4} components={getSupportersPile(chainData.support)} />
-              </KeyValuePair>
-            </a>
-          {/if}
-          ("Splits with" stat)
-          {#if [chainData.splits.maintainers, chainData.splits.dependencies].flat().length > 0}
-            <a
-              class="stat btn-theme-outlined"
-              href="#splits"
-              on:click={() => splitsSectionSkeleton?.highlightSection()}
-            >
-              <KeyValuePair key="Splits with">
-                <Pile
-                  maxItems={4}
-                  components={getSplitsPile([
-                    chainData.splits.maintainers ?? [],
-                    chainData.splits.dependencies ?? [],
-                  ])}
-                />
-              </KeyValuePair>
-            </a>
-          {/if}
-        </div>
-      {/if} -->
     </header>
     <section id="graph">
       <EcosystemCardInteractive {ecosystem} />
@@ -305,84 +146,6 @@
       <EcosystemDistribution {ecosystem} />
     </section>
 
-    <!-- <Developer accountId={project.account.accountId} /> -->
-    <!-- {#if isClaimed(chainData)}
-        <section id="splits" class="app-section">
-          <SectionHeader
-            icon={DripList}
-            label="Splits"
-            actions={isOwnProject
-              ? [
-                  {
-                    handler: () =>
-                      isClaimed(chainData) &&
-                      modal.show(
-                        Stepper,
-                        undefined,
-                        isClaimed(chainData)
-                          ? editProjectSplitsSteps(
-                              project.account.accountId,
-                              project.source.url,
-                              chainData.splits,
-                            )
-                          : unreachable(),
-                      ),
-                    label: 'Edit',
-                    icon: Pen,
-                  },
-                ]
-              : []}
-          />
-          <SectionSkeleton
-            bind:this={splitsSectionSkeleton}
-            loaded={true}
-            empty={chainData.splits.maintainers.length === 0 &&
-              chainData.splits.dependencies.length === 0}
-            emptyStateHeadline="No splits"
-            emptyStateEmoji="🫧"
-            emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
-          >
-            <div class="card">
-              <div class="p-6">
-                <ProjectBadge {project} />
-                <div class="pl-3.5 mt-2.5">
-                  <SplitsComponent
-                    disableLinks={false}
-                    list={[
-                      {
-                        __typename: 'SplitGroup',
-                        name: 'Maintainers',
-                        list: chainData.splits.maintainers,
-                      },
-                      {
-                        __typename: 'SplitGroup',
-                        name: 'Dependencies',
-                        list: chainData.splits.dependencies,
-                      },
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-          </SectionSkeleton>
-        </section>
-      {:else if chainData.withdrawableBalances.length > 0}
-        <section class="app-section">
-          <SectionHeader icon={Wallet} label="Claimable funds" />
-          <SectionSkeleton loaded={true}>
-            <div class="unclaimed-funds-section">
-              <UnclaimedProjectCard
-                {project}
-                unclaimedTokensExpandable={false}
-                unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
-                showClaimButton
-                on:claimButtonClick={() =>
-                  goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
-              />
-            </div>
-          </SectionSkeleton>
-        </section>
-      {/if} -->
     <section id="support">
       <SupportersSection
         bind:sectionSkeleton={supportersSectionSkeleton}
