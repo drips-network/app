@@ -77,6 +77,7 @@ export type Network = {
         rpcUrls: string[];
       }
     | undefined;
+  enableEns: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -140,6 +141,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [80002]: {
     chainId: 80002,
@@ -182,6 +184,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [11155420]: {
     chainId: 11155420,
@@ -224,6 +227,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [11155111]: {
     chainId: 11155111,
@@ -265,6 +269,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: false,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [31337]: {
     chainId: 31337,
@@ -314,6 +319,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['http://localhost:8545'],
     },
+    enableEns: false,
   },
   [84532]: {
     chainId: 84532,
@@ -356,6 +362,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [314]: {
     chainId: 314,
@@ -409,6 +416,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'https://rpc.ankr.com/filecoin',
       ],
     },
+    enableEns: true,
   },
   [1088]: {
     chainId: 1088,
@@ -458,6 +466,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
     },
+    enableEns: true,
   },
   [10]: {
     chainId: 10,
@@ -507,6 +516,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['https://mainnet.optimism.io'],
     },
+    enableEns: true,
   },
 };
 
