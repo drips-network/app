@@ -9,7 +9,7 @@
     "dev:docker:update-repo-owner": "./docker/update-repo-owner.sh",
     "dev:docker:sprinkle": "./docker/sprinkle.sh",
     "preview": "vite preview",
-    "test:unit": "vitest run unit",
+    "test:unit": "PUBLIC_NETWORK=1 PUBLIC_JUNCTION_URL=http://dummy.org PUBLIC_INTERNAL_JUNCTION_URL=http://dummy.org vitest run unit",
     "test:e2e": "./docker/start-e2e.sh --start-playwright-ui",
     "test:e2e:headless": "./docker/start-e2e.sh --prod-build",
     "coverage": "vitest run --coverage",

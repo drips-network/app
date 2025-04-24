@@ -23,7 +23,7 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
-    if (network.enableEns || !mainnetProvider) {
+    if (!network.enableEns || !mainnetProvider) {
       return undefined;
     }
 
@@ -74,7 +74,7 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
-    if (network.enableEns || !mainnetProvider) {
+    if (!network.enableEns || !mainnetProvider) {
       return undefined;
     }
 
