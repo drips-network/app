@@ -205,13 +205,9 @@
       state.selectedNode === node ||
       state.hoveredEdgeExtremities?.has(node)
     ) {
-      // TODO: adjust border according to zoom?
-      // const camera = sigmaInstance.getCamera()
-      // const cameraState = camera.getState()
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
       res.color = colorPrimary;
-      // TODO: tweak
       // @ts-expect-error: might be undefined
       res.size = res.size + 5;
     } else if (state.suggestions) {
@@ -226,12 +222,6 @@
     return res;
   }
 
-  // Render edges accordingly to the internal state:
-  // 0. Color every neighboring edge the primary color
-  // X1. If a node is hovered, the edge is hidden if it is not connected to the
-  //    node
-  // 2. If there is a query, the edge is only visible if it connects two
-  //    suggestions
   function edgeReducer(edge: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<EdgeDisplayData> = { ...data };
 
@@ -314,9 +304,8 @@
     ]);
 
     graph = new Graph({ type: 'directed' });
-    // TODO: bad, big error energy?
     if (!ecosystem.graph) {
-      return;
+      throw new Error('Ecosystem has no graph!');
     }
 
     for (const node of ecosystem.graph.nodes) {
@@ -357,20 +346,9 @@
         size: 2,
         labelBackgroundColor: colorPrimary,
         label: formatPercent(Number(edge.weight)),
-        // minArrowSize: 5,
         type: 'arrowed',
       });
     }
-
-    // const cpPositions = circlepack(graph, {
-    //   hierarchyAttributes: ['firstParent'],
-    //   scale: 2,
-    //   // center: 0
-    // });
-
-    // setPositions(graph, cpPositions);
-
-    // forceAtlas2.assign(graph, 50);
 
     const fa2Positions = forceAtlas2(graph, {
       iterations: 50,
@@ -424,15 +402,10 @@
       edgeLabelColor: {
         color: colorBackground,
       },
-      // Remove box shadow, get drippy with it
-      // defaultDrawNodeHover: drawDiscNodeHover,
       // Don't draw a label underneath the hover label
       defaultDrawNodeLabel: () => {},
-      // Don't rotate along edge path, get drippy with it
-      // defaultDrawEdgeLabel: drawStraightEdgeLabel,
       // autoRescale: true,
-      // don't adjust the size of the nodes and edges
-      // when zooming.
+      // change how nodes and edges are scaled according to zoom
       // https://www.sigmajs.org/storybook/?path=/story/fit-sizes-to-positions--story
       zoomToSizeRatioFunction: (zoom) => {
         // TODO: refine
@@ -462,8 +435,6 @@
         }),
       },
     });
-
-    // setZoom(sigmaInstance, 2);
 
     const camera = sigmaInstance.getCamera();
     camera.on('updated', handleCameraUpdated);

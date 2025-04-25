@@ -193,9 +193,6 @@ export function drawDiscNodeLabel<
  * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
  *
  * Draw an hovered node.
- * - if there is no label => display a shadow on the node
- * - if the label box is bigger than node size => display a label box that contains the node with a shadow
- * - else node with shadow and the label box
  */
 export function drawDiscNodeHover<
   N extends Attributes = Attributes,

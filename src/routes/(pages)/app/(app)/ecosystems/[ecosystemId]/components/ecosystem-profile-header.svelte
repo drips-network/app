@@ -5,11 +5,6 @@
   import EcosystemAvatar from './ecosystem-avatar.svelte';
 
   export let ecosystem: Ecosystem;
-
-  const TODO_REMOVE_FALLBACK_ADDRESS = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045';
-
-  // TODO: get owner of NFT once the ecosystem is deployed.
-  $: ownerAddress = ecosystem.ownerAddress ?? TODO_REMOVE_FALLBACK_ADDRESS;
 </script>
 
 <div
@@ -23,16 +18,20 @@
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{ecosystem.name}</h1>
+
       {#if ecosystem.description}
         <p class="line-clamp-2 text-center sm:text-left twemoji-text">
           {@html twemoji(ecosystem.description)}
         </p>
       {/if}
-      <div class="flex justify-center sm:justify-start" style:margin-top="0.5rem">
-        <div class="identity-wrapper">
-          <IdentityBadge address={ownerAddress} />
+
+      {#if ecosystem.ownerAddress}
+        <div class="flex justify-center sm:justify-start" style:margin-top="0.5rem">
+          <div class="identity-wrapper">
+            <IdentityBadge address={ecosystem.ownerAddress} />
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
   </div>
 </div>
