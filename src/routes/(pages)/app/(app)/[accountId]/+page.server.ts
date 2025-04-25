@@ -26,7 +26,7 @@ const currentNetworkProvider = new FailoverJsonRpcProvider(
   },
 );
 
-const mainnetProvider = getMainnetProvider();
+const mainnetProvider = network.enableEns ? getMainnetProvider() : null;
 
 const PROFILE_PAGE_QUERY = gql`
   ${PROJECTS_SECTION_PROJECT_FRAGMENT}
@@ -63,6 +63,10 @@ const PROFILE_PAGE_QUERY = gql`
 `;
 
 async function resolveEnsFields(address: string) {
+  if (!mainnetProvider) {
+    return null;
+  }
+
   try {
     const ensName = await safeReverseLookup(
       currentNetworkProvider,
@@ -97,6 +101,10 @@ export const load = async ({ params, fetch }) => {
   if (isAddress(universalAccountId)) {
     address = universalAccountId;
   } else if ((universalAccountId as string).endsWith('.eth')) {
+    if (!mainnetProvider) {
+      return { error: true, type: 'ens-not-resolved' as const };
+    }
+
     const lookupRes = await safeReverseLookup(
       currentNetworkProvider,
       mainnetProvider,
