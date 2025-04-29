@@ -8,7 +8,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
-  import DripsLogo from '$lib/components/illustrations/logo.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import scrollStore from '$lib/stores/scroll/scroll.store';
   import { onMount } from 'svelte';
@@ -16,6 +15,8 @@
   import NewAnimation from './new-animation.svelte';
   import twemoji from '$lib/utils/twemoji';
   import HeaderNavItem from './header-nav-item.svelte';
+  import Hamburger from '../icons/Hamburger.svelte';
+  import DripsLogo from '../header/drips-logo.svelte';
 
   $: scrolledDown = $scrollStore.pos > 10;
 
@@ -39,26 +40,57 @@
     !firstRender &&
     !scrolledDown;
 
-  let openMenu: keyof typeof menus | null = null;
+  let openMenu: string | 'all' | null = null;
   let menuXOffset: number | null = null;
 
-  const menus = {
-    solutions: [
-      { title: "Dependency Funding", href: "/solutions/dependency-funding" },
-      { title: "RetroPGF Voting & Distribution", href: "/solutions/retro-pgf" },
+  // Define the types for the menu structure explicitly
+  type MenuLink = { title: string, type: 'link'; href: string };
+  type MenuDropdown = { title: string, type: 'dropdown'; entries: { title: string; href: string }[] };
+  type MenuItem = MenuLink | MenuDropdown;
 
-    ],
-    developers: [
-      { title: "Protocol documentation", href: "/developers/sdk" },
-      { title: "Code on GitHub", href: "/developers/api" },
-      { title: "Development & Contributions Guide", href: "/developers/api" },
-    ]
-  }
+  const menus: MenuItem[] = [ // Add index signature for stricter typing
+    {
+      title: 'Solutions',
+      type: 'dropdown',
+      entries: [
+        { title: 'Dependency Funding', href: '/solutions/dependency-funding' },
+        { title: 'RetroPGF Voting & Distribution', href: '/solutions/retro-pgf' },
+      ],
+    },
+    {
+      title: 'How it works',
+      type: 'link',
+      href: '/how-it-works',
+    },
+    {
+      title: 'Blog',
+      type: 'link',
+      href: '/blog',
+    },
+    {
+      title: 'For developers',
+      type: 'dropdown',
+      entries: [
+        { title: 'Protocol documentation', href: '/developers/sdk' },
+        { title: 'Code on GitHub', href: '/developers/api' },
+        { title: 'Development & Contributions Guide', href: '/developers/api' },
+      ],
+    },
+  ];
 
-  function handleMenuHover(slug: keyof typeof menus, e: Element) {
+  function handleMenuHover(slug: string | 'all', e?: Element) {
     openMenu = slug;
-    menuXOffset = e.getBoundingClientRect().x - wrapper.getBoundingClientRect().x;
+    if (slug === 'all') {
+      menuXOffset = null;
+    } else if (e && e instanceof HTMLElement) {
+      menuXOffset = e.getBoundingClientRect().x - wrapper.getBoundingClientRect().x;
+    }
   }
+
+  $: allMenusSorted = [
+    ...menus.filter((menu) => menu.type === 'link'),
+    ...menus.filter((menu) => menu.type === 'dropdown'),
+  ]
 </script>
 
 {#if openMenu}
@@ -66,34 +98,91 @@
 {/if}
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<header on:mouseleave={() => openMenu = null} bind:this={wrapper} class:raised={scrolledDown || openMenu} class:has-announcement-banner={announcementBannerVisible}>
+<header
+  on:mouseleave={() => (openMenu = null)}
+  bind:this={wrapper}
+  class:raised={scrolledDown || openMenu}
+  class:has-announcement-banner={announcementBannerVisible}
+>
   <div class="top">
     <div class="left">
-      <a aria-label="Go to homepage" class="logo" href="/" on:mouseenter={() => openMenu = null} on:focus={() => openMenu = null} >
+      <button
+        class="hamburger"
+        on:click={() => handleMenuHover('all')}
+        on:mouseenter={() => (openMenu = null)}
+        on:focus={() => (openMenu = null)}
+      >
+        <Hamburger />
+      </button>
+      <a
+        aria-label="Go to homepage"
+        class="logo"
+        href="/"
+        on:mouseenter={() => (openMenu = null)}
+        on:focus={() => (openMenu = null)}
+      >
         <DripsLogo />
       </a>
-      <nav>
-        <HeaderNavItem tonedDown={Boolean(openMenu) && openMenu !== 'solutions'} dropdownActive={openMenu === 'solutions'} on:activate={(e) => handleMenuHover('solutions', e.detail)} dropdown href="wikipedia.com">
-          Solutions
-        </HeaderNavItem>
-        <HeaderNavItem tonedDown={Boolean(openMenu)} on:activate={() => openMenu = null} href="wikipedia.com">How it works</HeaderNavItem>
-        <HeaderNavItem tonedDown={Boolean(openMenu)} on:activate={() => openMenu = null} href="wikipedia.com">Blog</HeaderNavItem>
-        <HeaderNavItem tonedDown={Boolean(openMenu) && openMenu !== 'developers'} dropdownActive={openMenu === 'developers'} on:activate={(e) => handleMenuHover('developers', e.detail)} dropdown href="wikipedia.com">For developers</HeaderNavItem>
+      <nav class="desktop-nav">
+        {#each menus as menu}
+          {#if menu.type === 'link'}
+            <HeaderNavItem
+              tonedDown={Boolean(openMenu)}
+              on:activate={() => (openMenu = null)}
+              href={menu.href}
+            >
+              {menu.title}
+            </HeaderNavItem>
+          {:else if menu.type === 'dropdown'}
+            <HeaderNavItem
+              tonedDown={Boolean(openMenu) && openMenu !== menu.title}
+              dropdownActive={openMenu === menu.title}
+              on:activate={(e) => handleMenuHover(menu.title, e.detail)}
+              dropdown
+            >
+              {menu.title}
+            </HeaderNavItem>
+          {/if}
+        {/each}
       </nav>
     </div>
     <div data-sveltekit-preload-code="eager">
-      <Button variant="primary" href="/app" on:mouseenter={() => openMenu = null}>Open app</Button>
+      <Button variant="primary" href="/app" on:mouseenter={() => (openMenu = null)}>Open app</Button
+      >
     </div>
   </div>
   {#if openMenu}
-    <div style:transform="translateX({menuXOffset}px)" transition:slide|global={{ duration: 300 }} class="menu">
-      <div class="menu-content" style:padding-bottom="1.75rem">
-        {#each menus[openMenu] as item}
-          <HeaderNavItem href={item.href}>
-            {item.title}
-          </HeaderNavItem>
-        {/each}
-      </div>
+    <div
+      style:transform="translateX({menuXOffset}px)"
+      transition:slide|global={{ duration: 300 }}
+      class="menu"
+    >
+      {#if openMenu === 'all'}
+        <div class="menu-content mobile-menu-content">
+          {#each allMenusSorted as menu}
+            {#if menu.type === 'link'}
+              <HeaderNavItem href={menu.href}>{menu.title}</HeaderNavItem>
+            {/if}
+            {#if menu.type === 'dropdown'}
+              <h5>{menu.title}</h5>
+              {#each menu.entries ?? [] as entry}
+                <HeaderNavItem href={entry.href}>{entry.title}</HeaderNavItem>
+              {/each}
+            {/if}
+          {/each}
+        </div>
+      {:else if openMenu && openMenu !== 'all'}
+        {@const currentMenu = menus.find((menu) => menu.title === openMenu)}
+        {#if currentMenu?.type === 'dropdown'}
+          <div class="menu-content" style:padding-bottom="1.75rem">
+            {#each currentMenu.entries as entry}
+              <HeaderNavItem href={entry.href}>
+                {entry.title}
+              </HeaderNavItem>
+            {/each}
+          </div>
+        {/if}
+      {/if}
     </div>
   {/if}
   {#if announcementBannerVisible && announcementBanner && !openMenu}
@@ -177,6 +266,21 @@
     gap: 1rem;
   }
 
+  .mobile-menu-content {
+    padding: 1rem 1.5rem 1.75rem; /* Add padding for mobile */
+  }
+
+  .mobile-menu-content h5 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-foreground-secondary); /* Optional: Style title */
+    font-weight: bold;
+  }
+
+  .mobile-menu-content h5:first-child {
+    margin-top: 0;
+  }
+
   nav {
     display: flex;
     gap: 1.25rem;
@@ -209,6 +313,9 @@
     height: 28px;
   }
 
+  .hamburger {
+    display: none;
+  }
 
   @media (max-width: 1024px) {
     .announcement-banner {
@@ -216,35 +323,35 @@
     }
   }
 
-  @media (max-width: 577px) {
-    header {
-      border: none;
-      border-bottom: 1px solid var(--color-foreground);
-      gap: 0.75rem;
-      top: 0;
-      left: 0;
-      right: 0;
-      max-width: 100vw;
-      padding: 0.5rem;
-      transform: none;
-      border-radius: 0;
-    }
+  @media (max-width: 804px) {
+    header, header.has-announcement-banner {
 
-    header.has-announcement-banner {
-      border-radius: 0;
+      border-radius: 1.5rem 0 1.5rem 1.5rem;
     }
 
     header .top {
-      padding: 0;
-      gap: 0.75rem;
+      padding: 0.5rem 0.5rem;
+    }
+
+    header .left {
+      padding-left: 0.5rem;
+      gap: 0.5rem;
     }
 
     .logo {
-      max-width: 128px;
+      margin-left: 0.5rem;
+      height: 24px;
     }
 
-    nav {
-      gap: 0;
+    .hamburger {
+      display: flex;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .desktop-nav {
+      display: none;
     }
   }
 </style>

@@ -1,7 +1,7 @@
 <script>
+  import LpHeader from '$lib/components/lp-header/lp-header.svelte';
   import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import LpFooter from '../components/lp-footer.svelte';
-  import LpHeader from '../components/lp-header.svelte';
 
   export let data;
 </script>

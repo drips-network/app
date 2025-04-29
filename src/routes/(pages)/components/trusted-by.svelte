@@ -1,28 +1,23 @@
-<script lang="ts">
-  const imageUrls = [
-    '/partner-logos/ef.png',
-    '/partner-logos/ens.png',
-    '/partner-logos/ftc.png',
-    '/partner-logos/octant.png',
-    '/partner-logos/scroll.png',
-    '/partner-logos/protocol-labs.png',
-    '/partner-logos/radworks.png',
-  ]
+<script>
+  import Ens from "./svgs/partner-logos/ens.svelte";
+  import EthereumFoundation from "./svgs/partner-logos/ethereum-foundation.svelte";
+  import FilecoinFoundation from "./svgs/partner-logos/filecoin-foundation.svelte";
+  import FundingTheCommons from "./svgs/partner-logos/funding-the-commons.svelte";
+  import Octant from "./svgs/partner-logos/octant.svelte";
+  import Radworks from "./svgs/partner-logos/radworks.svelte";
+  import Scroll from "./svgs/partner-logos/scroll.svelte";
 
-  const imageElems: HTMLImageElement[] = [];4
-  let loadedIndexes = [];
-
-  function handleImageLoad(index: number) {
-    loadedIndexes.push(index);
-  }
 </script>
-
 <div class="trusted-by">
   <h5>Trusted by</h5>
   <div class="logos">
-    {#each imageUrls as imageUrl, i}
-      <img on:load={() => handleImageLoad(i)} bind:this={imageElems[i]} src={imageUrl} alt="Partner logo" />
-    {/each}
+    <div class="image"><Ens /></div>
+    <div class="image"><FilecoinFoundation /></div>
+    <div class="image"><Scroll /></div>
+    <div class="image"><Octant /></div>
+    <div class="image"><FundingTheCommons /></div>
+    <div class="image"><Radworks /></div>
+    <div class="image"><EthereumFoundation /></div>
   </div>
 </div>
 
@@ -32,10 +27,12 @@
     gap: 2rem;
     justify-content: center;
     margin-top: 1rem;
+    flex-wrap: wrap;
+    padding: 0 1rem;
   }
 
-  .logos img {
-    height: 2rem;
+  .logos .image {
+    height: 1.5rem;
     width: auto;
   }
 </style>
