@@ -60,4 +60,5 @@ So, the next time funding comes your way, ask:
 - Who enabled this success, and how can I pay it forward?
 - What kind of resilient, collaborative ecosystem do I want to help build?
 
+Want to learn more about amplifying the impact of funding? [Tweet at us](https://x.com/dripsnetwork), hit us up on [Bluesky](https://bsky.app/profile/drips.network), or join our [Discord](https://discord.gg/BakDKKDpHF).
 **Start amplifying with Drips today.** Help create an open-source and public goods landscape that’s not just sustained, but truly thriving.
