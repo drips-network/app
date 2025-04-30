@@ -8,13 +8,13 @@ author: 'becca'
 announcementBannerCopy: 'Amplify your funding impact: Easily split funds with your dependencies using Drips'
 ---
 
-# Funding is Not an Endpoint, It's a Catalyst
+# Funding is not an endpoint, It's a catalyst
 
 Receiving funding – whether from a Retroactive Public Goods Funding (RPGF) round, a grant, or community donations – feels like a significant achievement. But what if that funding wasn't just a milestone, but the start of something bigger? What if it could ignite an ongoing cycle of sustainability that benefits not just your project, but the entire ecosystem you operate within?
 
 Enter **Drips**. Drips isn't merely a funding tool; it's an **amplification engine**. It empowers you to take _any_ funding received and multiply its positive effects throughout the network of projects, tools, and creators you rely on. Instead of treating funding as a destination, Drips helps you turn it into a catalyst for continuous, ecosystem-wide support.
 
-# Amplification Made Simple: Impact Through Action
+# Amplification made simple: Impact through action
 
 The digital public goods and grants space often buzzes with discussions about **impact**: how to measure it, prove it, and optimize for it. These conversations are vital, but at Drips, we believe impact can also be straightforward.
 
@@ -24,23 +24,23 @@ Crucially, regardless of your funding source, one of the most direct ways to inc
 
 **The act of sharing funding with projects you depend on is, in itself, a powerful form of measurable impact.** Every split strengthens the ecosystem, acknowledges vital contributions, and supports the often-unsung maintainers behind critical infrastructure.
 
-# Amplify Any Funding, Strengthen Every Link
+# Amplify any funding, strengthen every link
 
 Whether you've just received a grant or are distributing funds yourself, Drips makes amplifying reach effortless:
 
-## If You're a Grant Recipient:
+## If you're a grant recipient:
 
 - **Create a Drip List:** Set up your project on Drips, identify your key dependencies (libraries, tools, infrastructure, creators you rely on), and allocate a portion of your funding to flow directly to them.
 - **Amplify Voluntarily:** While optional, sharing funding strengthens the very foundation your project is built upon. It's an investment in shared success.
 - **Lead by Example:** By "dripping" funds to others, you support them directly _and_ inspire a culture of shared responsibility and ecosystem thinking.
 
-## If You're Running a Funding Round:
+## If you're running a funding round:
 
 - **Distribute via Drips:** Streamline the process by distributing funds directly through Drips, making it seamless for recipients to then amplify their impact.
 - **Encourage Amplification:** Integrate the concept of dependency funding into your communications. Prompt recipients to consider: **"Who made this work possible?"** and show them how Drips facilitates sharing.
 - **Build Ecosystem Resilience:** Funding rounds that actively encourage dependency splits foster healthier, more sustainable ecosystems where foundational projects aren't left behind.
 
-# Growing the Dependency Graph: Small Splits, Exponential Reach
+# Growing the Dependency Graph: small splits, exponential reach
 
 Every project exists within a network of dependencies. By allocating even a small percentage of your funding to these essential components using Drips, you contribute to a dynamic, self-reinforcing support system:
 
@@ -50,7 +50,7 @@ Every project exists within a network of dependencies. By allocating even a smal
 
 Imagine: a single grant, through these interconnected splits, rippling outward to support dozens, even hundreds, of projects over time. This is **amplification in action** – funding that doesn't just sustain, but actively _multiplies_ its positive effect.
 
-# Why Amplification Matters Now
+# Why amplification matters now
 
 In an environment where funding can be scarce and ecosystems fragile, maximizing the impact of every dollar is crucial. Drips makes amplification not just possible, but practical and automated. With transparent, programmable fund flows, you ensure **your funding's journey doesn't end in your wallet.**
 
