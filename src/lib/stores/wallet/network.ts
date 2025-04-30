@@ -31,7 +31,6 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
-  fallbackRpcUrl?: string;
   icon: ComponentType;
   color: string;
   isTestnet: boolean;
@@ -144,7 +143,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     token: 'MATIC',
     id: '0x13882',
     rpcUrl: `${BASE_URL}/api/rpc/infura/polygon-amoy`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/polygon-amoy`,
     icon: Polygon,
     color: '#627EEA',
     isTestnet: true,
@@ -187,7 +185,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     token: 'ETH',
     id: '0xaa37dc',
     rpcUrl: `${BASE_URL}/api/rpc/infura/optimism-sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/optimism-sepolia`,
     icon: Optimism,
     color: '#627EEA',
     isTestnet: true,
@@ -322,7 +319,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     token: 'ETH',
     id: '0x14a34',
     rpcUrl: `${BASE_URL}/api/rpc/infura/base-sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/base-sepolia`,
     icon: Base,
     color: '#627EEA',
     isTestnet: true,

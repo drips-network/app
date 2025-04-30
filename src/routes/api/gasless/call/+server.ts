@@ -4,10 +4,9 @@ import { z } from 'zod';
 import { callerAbi } from '$lib/utils/sdk/caller/caller-abi.js';
 import { Signature } from 'ethers';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 import { error } from '@sveltejs/kit';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+import { JsonRpcProvider } from 'ethers';
 
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
@@ -16,15 +15,7 @@ const GELATO_API_KEY = getOptionalEnvVar(
     "This means that claiming a project won't and collecting funds (on networks supporting gasless TXs and with gasless TXs enabled in settings) won't work.",
 );
 
-const { rpcUrl, fallbackRpcUrl } = network;
-const provider = new FailoverJsonRpcProvider(
-  mapFilterUndefined([rpcUrl, fallbackRpcUrl], (url) => url),
-  undefined,
-  undefined,
-  {
-    logger: console,
-  },
-);
+const provider = new JsonRpcProvider(network.rpcUrl);
 const caller = new ethers.Contract(network.contracts.CALLER, callerAbi, provider);
 
 const relay = new GelatoRelay();

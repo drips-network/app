@@ -18,8 +18,6 @@ import { invalidateAll } from '../fetched-data-cache/invalidate';
 import { BrowserProvider } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import assert from '$lib/utils/assert';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 
@@ -74,7 +72,7 @@ export interface ConnectedWalletStoreState {
   connected: true;
   address: string;
   dripsAccountId: string;
-  provider: BrowserProvider | JsonRpcProvider | FailoverJsonRpcProvider;
+  provider: BrowserProvider | JsonRpcProvider;
   signer: JsonRpcSigner;
   network: Network;
   safe?: SafeInfo;
@@ -83,7 +81,7 @@ export interface ConnectedWalletStoreState {
 export interface DisconnectedWalletStoreState {
   connected: false;
   network: Network;
-  provider: BrowserProvider | JsonRpcProvider | FailoverJsonRpcProvider;
+  provider: BrowserProvider | JsonRpcProvider;
   dripsAccountId?: undefined;
   address?: undefined;
   signer?: undefined;
@@ -95,14 +93,7 @@ type WalletStoreState = ConnectedWalletStoreState | DisconnectedWalletStoreState
 const INITIAL_STATE: DisconnectedWalletStoreState = {
   connected: false,
   network: DEFAULT_NETWORK,
-  provider: new FailoverJsonRpcProvider(
-    mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
-    undefined,
-    undefined,
-    {
-      logger: console,
-    },
-  ),
+  provider: new JsonRpcProvider(network.rpcUrl),
 };
 
 const walletStore = () => {
@@ -335,7 +326,7 @@ const walletStore = () => {
 };
 
 const localTestnetWalletStore = () => {
-  const provider = new FailoverJsonRpcProvider([NETWORK_CONFIG[31337].rpcUrl], network, {
+  const provider = new JsonRpcProvider(NETWORK_CONFIG[31337].rpcUrl, network, {
     staticNetwork: true,
   });
   const initialized = writable(false);
