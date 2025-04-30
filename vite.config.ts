@@ -1,9 +1,8 @@
-import { sentrySvelteKit } from '@sentry/sveltekit';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 
 const config = defineConfig({
-  plugins: [sentrySvelteKit(), sveltekit()],
+  plugins: [sveltekit()],
   test: {
     // Jest like globals
     globals: true,
