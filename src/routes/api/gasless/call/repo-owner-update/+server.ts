@@ -5,9 +5,7 @@ import { ethers, toUtf8Bytes } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
 import assert from '$lib/utils/assert';
-import network, { getNetwork } from '$lib/stores/wallet/network';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import network from '$lib/stores/wallet/network';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type {
@@ -19,6 +17,7 @@ import { Octokit } from '@octokit/rest';
 import GitHub from '$lib/utils/github/GitHub';
 import { redis } from '../../../redis';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+import { JsonRpcProvider } from 'ethers';
 
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
@@ -153,15 +152,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  const { rpcUrl, fallbackRpcUrl } = getNetwork(chainId);
-  const provider = new FailoverJsonRpcProvider(
-    mapFilterUndefined([rpcUrl, fallbackRpcUrl], (url) => url),
-    undefined,
-    undefined,
-    {
-      logger: console,
-    },
-  );
+  const provider = new JsonRpcProvider(network.rpcUrl);
   const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
 
   const tx = await contract.requestUpdateOwner.populateTransaction(
