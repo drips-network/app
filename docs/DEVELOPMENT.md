@@ -8,6 +8,8 @@ First, run `npm i` to install dependencies.
 
 To run a local dev environment, simply run `npm run dev:docker`. This will start all necessary services for running the Drips app locally, complete with a local testnet that has the Drips protocol contracts and a test ERC-20 deployed. After this, set up MetaMask for the local testnet by following the instructions below.
 
+If you're having trouble with `sudo` being required for interacting with Docker, but you don't have `npm` installed for `sudo`, you can run `sudo sh ./docker/start-dev.sh` instead.
+
 No values in `.env` should be required for running the local dev stack, however setting `GITHUB_PERSONAL_ACCESS_TOKEN` is strongly recommended. Without it, the app will be heavily rate-limited by the GitHub API, and loading project data may fail.
 
 ### 🪟 Running on Windows
