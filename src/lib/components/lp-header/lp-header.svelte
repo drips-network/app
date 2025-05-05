@@ -76,9 +76,15 @@
       title: 'For developers',
       type: 'dropdown',
       entries: [
-        { title: 'Protocol documentation', href: '/developers/sdk' },
-        { title: 'Code on GitHub', href: '/developers/api' },
-        { title: 'Development & Contributions Guide', href: '/developers/api' },
+        {
+          title: 'Protocol documentation',
+          href: 'https://docs.drips.network/the-protocol/overview',
+        },
+        { title: 'Code on GitHub', href: 'https://github.com/drips-network' },
+        {
+          title: 'Development & Contributions Guide',
+          href: 'https://github.com/drips-network/app/blob/main/docs/DEVELOPMENT.md',
+        },
       ],
     },
   ];

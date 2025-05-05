@@ -15,6 +15,8 @@
   function handleHover() {
     dispatch('activate', element);
   }
+
+  $: externalLink = href && href.startsWith('http');
 </script>
 
 <svelte:element
@@ -27,6 +29,8 @@
   class="wrapper typo-text"
   on:mouseenter={handleHover}
   on:focus={handleHover}
+  target={externalLink ? '_blank' : undefined}
+  rel={externalLink ? 'noopener noreferrer' : undefined}
 >
   <div class="content" bind:this={element}>
     <slot />
