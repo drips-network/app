@@ -158,7 +158,7 @@
         {/each}
       </nav>
     </div>
-    <div data-sveltekit-preload-code="eager">
+    <div data-sveltekit-preload-code="eager" data-sveltekit-reload>
       <Button variant="primary" href="/app" on:mouseenter={() => (openMenu = null)}>Open app</Button
       >
     </div>
