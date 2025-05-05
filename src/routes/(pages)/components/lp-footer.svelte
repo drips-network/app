@@ -20,7 +20,7 @@
     <a href="/solutions/retro-pgf">RetroPGF</a>
     <a href="/solutions/programmable-cashflow">Programmable Cashflow</a>
     <a href="/solutions/hackathons">Hackathons</a>
-    <a href="/solutions/ecosystems">Ecosystem funding</a>
+    <a href="/solutions/ecosystem-funding">Ecosystem funding</a>
   </div>
 
   <div class="column">
