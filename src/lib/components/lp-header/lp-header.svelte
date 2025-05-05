@@ -44,11 +44,16 @@
   let menuXOffset: number | null = null;
 
   // Define the types for the menu structure explicitly
-  type MenuLink = { title: string, type: 'link'; href: string };
-  type MenuDropdown = { title: string, type: 'dropdown'; entries: { title: string; href: string }[] };
+  type MenuLink = { title: string; type: 'link'; href: string };
+  type MenuDropdown = {
+    title: string;
+    type: 'dropdown';
+    entries: { title: string; href: string }[];
+  };
   type MenuItem = MenuLink | MenuDropdown;
 
-  const menus: MenuItem[] = [ // Add index signature for stricter typing
+  const menus: MenuItem[] = [
+    // Add index signature for stricter typing
     {
       title: 'Solutions',
       type: 'dropdown',
@@ -90,7 +95,7 @@
   $: allMenusSorted = [
     ...menus.filter((menu) => menu.type === 'link'),
     ...menus.filter((menu) => menu.type === 'dropdown'),
-  ]
+  ];
 </script>
 
 {#if openMenu}
@@ -103,6 +108,8 @@
   bind:this={wrapper}
   class:raised={scrolledDown || openMenu}
   class:has-announcement-banner={announcementBannerVisible}
+  on:keydown={() => (openMenu = null)}
+  on:focus={() => (openMenu = null)}
 >
   <div class="top">
     <div class="left">
@@ -129,6 +136,7 @@
             <HeaderNavItem
               tonedDown={Boolean(openMenu)}
               on:activate={() => (openMenu = null)}
+              on:navigate={() => (openMenu = null)}
               href={menu.href}
             >
               {menu.title}
@@ -161,12 +169,16 @@
         <div class="menu-content mobile-menu-content">
           {#each allMenusSorted as menu}
             {#if menu.type === 'link'}
-              <HeaderNavItem href={menu.href}>{menu.title}</HeaderNavItem>
+              <HeaderNavItem href={menu.href} on:navigate={() => (openMenu = null)}
+                >{menu.title}</HeaderNavItem
+              >
             {/if}
             {#if menu.type === 'dropdown'}
               <h5>{menu.title}</h5>
               {#each menu.entries ?? [] as entry}
-                <HeaderNavItem href={entry.href}>{entry.title}</HeaderNavItem>
+                <HeaderNavItem href={entry.href} on:navigate={() => (openMenu = null)}
+                  >{entry.title}</HeaderNavItem
+                >
               {/each}
             {/if}
           {/each}
@@ -176,7 +188,7 @@
         {#if currentMenu?.type === 'dropdown'}
           <div class="menu-content" style:padding-bottom="1.75rem">
             {#each currentMenu.entries as entry}
-              <HeaderNavItem href={entry.href}>
+              <HeaderNavItem href={entry.href} on:navigate={() => (openMenu = null)}>
                 {entry.title}
               </HeaderNavItem>
             {/each}
@@ -254,6 +266,7 @@
       border-radius 0.3s;
     overflow: hidden;
     top: 1rem;
+    view-transition-name: header;
   }
 
   .menu {
@@ -324,8 +337,8 @@
   }
 
   @media (max-width: 804px) {
-    header, header.has-announcement-banner {
-
+    header,
+    header.has-announcement-banner {
       border-radius: 1.5rem 0 1.5rem 1.5rem;
     }
 

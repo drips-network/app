@@ -171,6 +171,7 @@
     justify-content: space-between;
     padding: 1rem 1.5rem;
     gap: 0.5rem;
+    view-transition-name: header;
   }
 
   .logo {

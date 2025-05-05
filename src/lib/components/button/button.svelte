@@ -50,10 +50,10 @@
   class:loading
   disabled={isDisabled}
   aria-disabled={isDisabled}
-  on:click|stopPropagation
+  on:click
   data-testid={dataTestId}
-  on:mouseenter
-  on:mouseleave
+  on:mouseenter|stopPropagation
+  on:mouseleave|stopPropagation
   on:focus
   role={href ? 'link' : 'button'}
   style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}

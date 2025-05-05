@@ -6,10 +6,12 @@
   import SolutionsRecurringFunding from '$lib/components/illustrations/solutions-recurring-funding.svelte';
   import SolutionCard from '$lib/components/solutions/solution-card.svelte';
   import SolutionHeader from '$lib/components/solutions/solution-header.svelte';
+  import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
 </script>
 
 <SolutionHeader>
+  <svelte:fragment slot="usecase-badge">Dependency Funding</svelte:fragment>
   <svelte:fragment slot="headline">Sustain your dependencies, sustain your project</svelte:fragment>
   <svelte:fragment slot="description">
     Open-source software is the backbone of most projects but many of the libraries and tools we
@@ -41,6 +43,13 @@
     </SolutionLineItem>
   </svelte:fragment>
 </SolutionCard>
+
+<SolutionInterstitial>
+  <svelte:fragment slot="headline">Start funding your dependencies today</svelte:fragment>
+  <svelte:fragment slot="description">
+    Talk to us so we can design your bespoke Dependency Funding program together.
+  </svelte:fragment>
+</SolutionInterstitial>
 
 <SolutionCard reverse>
   <svelte:fragment slot="illustration">

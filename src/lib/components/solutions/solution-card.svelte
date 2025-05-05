@@ -36,6 +36,8 @@
   }
 
   .illustration {
+    position: relative;
+    max-height: 30rem;
     margin-top: -2rem;
     margin-bottom: -2rem;
     display: flex;
@@ -51,7 +53,7 @@
   }
 
   .content .inner {
-    max-width: 500px;
+    max-width: 600px;
     height: 100%;
     padding: 2rem;
     display: flex;
@@ -63,5 +65,26 @@
   h2 {
     font-size: 1rem;
     line-height: 1.5rem;
+  }
+
+  @media (max-width: 882px) {
+    .solution-card {
+      flex-direction: column;
+      margin-top: 3rem;
+      margin-bottom: 0;
+    }
+
+    .solution-card.reverse {
+      flex-direction: column;
+    }
+
+    .illustration {
+      flex-basis: 20rem;
+      display: block;
+      max-height: 20rem;
+      margin: 0 auto;
+      margin-top: -3rem;
+      margin-bottom: 1rem;
+    }
   }
 </style>

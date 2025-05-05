@@ -8,7 +8,9 @@
     <h5>Drips</h5>
     <a rel="noreferrer" target="_blank" href="https://docs.drips.network">Docs</a>
     <a rel="noreferrer" target="_blank" href="https://github.com/dripsnetwork">Code on GitHub</a>
-    <a rel="noreferrer" target="_blank" href="https://github.com/drips-network/app/issues/new">Report a bug</a>
+    <a rel="noreferrer" target="_blank" href="https://github.com/drips-network/app/issues/new"
+      >Report a bug</a
+    >
     <a href="/solutions/dependency-funding">System status <SystemStatusBadge /></a>
   </div>
 
@@ -42,6 +44,7 @@
 
 <style>
   footer {
+    width: 100%;
     margin-top: 4rem;
     display: grid;
     gap: 2rem;

@@ -1,6 +1,5 @@
 <script lang="ts">
   import wallet from '$lib/stores/wallet/wallet.store';
-  import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import { navigating } from '$app/stores';
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
@@ -35,9 +34,7 @@
 
 <div class="main" class:disconnected={!$wallet.connected} in:fly|global={{ duration: 300, y: 16 }}>
   <div class="page">
-    <PageTransition pathname={data.pathname}>
-      <div class:loading={$navigating}><slot /></div>
-    </PageTransition>
+    <div class:loading={$navigating}><slot /></div>
   </div>
 
   {#if $wallet.connected}

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import ChevronDown from "../icons/ChevronDown.svelte";
+  import { createEventDispatcher } from 'svelte';
+  import ChevronDown from '../icons/ChevronDown.svelte';
 
   export let dropdown = false;
   export let tonedDown: boolean = false;
@@ -10,14 +10,24 @@
 
   let element: HTMLDivElement;
 
-  const dispatch = createEventDispatcher<{ activate: Element }>();
+  const dispatch = createEventDispatcher<{ activate: Element; navigate: void }>();
 
   function handleHover() {
-    dispatch("activate", element);
+    dispatch('activate', element);
   }
 </script>
 
-<svelte:element role="button" tabindex="0" this={href ? 'a' : 'button'} {href} class:toned-down={tonedDown} class:dropdown-active={dropdownActive} class="wrapper typo-text" on:mouseenter={handleHover} on:focus={handleHover}>
+<svelte:element
+  this={href ? 'a' : 'button'}
+  role="button"
+  tabindex="0"
+  {href}
+  class:toned-down={tonedDown}
+  class:dropdown-active={dropdownActive}
+  class="wrapper typo-text"
+  on:mouseenter={handleHover}
+  on:focus={handleHover}
+>
   <div class="content" bind:this={element}>
     <slot />
   </div>
