@@ -1,10 +1,8 @@
 <script>
-  import LpHeader from '$lib/components/lp-header/lp-header.svelte';
   import LpFooter from '../components/lp-footer.svelte';
 </script>
 
 <div class="wrapper">
-  <LpHeader />
   <div class="content">
     <slot />
   </div>
