@@ -125,7 +125,11 @@
         on:mouseenter={() => (openMenu = null)}
         on:focus={() => (openMenu = null)}
       >
-        <Hamburger />
+        {#if openMenu === 'all'}
+          <Cross />
+        {:else}
+          <Hamburger />
+        {/if}
       </button>
       <a
         aria-label="Go to homepage"
