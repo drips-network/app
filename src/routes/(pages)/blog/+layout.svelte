@@ -1,19 +1,14 @@
 <script>
   import LpHeader from '$lib/components/lp-header/lp-header.svelte';
-  import PageTransition from '$lib/components/page-transition/page-transition.svelte';
   import LpFooter from '../components/lp-footer.svelte';
-
-  export let data;
 </script>
 
 <div class="wrapper">
   <LpHeader />
-  <PageTransition pathname={data.pathname}>
-    <div class="content">
-      <slot />
-    </div>
-    <LpFooter />
-  </PageTransition>
+  <div class="content">
+    <slot />
+  </div>
+  <LpFooter />
 </div>
 
 <style>
