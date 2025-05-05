@@ -85,8 +85,7 @@
   $: ecosystemSupport = ecosystemFragment?.support || [];
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
-  // TODO: fix
-  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent('TODO')}.png`;
+  const imageBaseUrl = `/api/share-images/ecosystem/${encodeURIComponent(ecosystem.id as string)}.png`;
 
   $: colorHex = ecosystem.color ? ecosystem.color : undefined;
 
@@ -109,7 +108,7 @@
 </svelte:head>
 
 <PrimaryColorThemer {colorHex}>
-  <article class="project-profile">
+  <article class="ecosystem-profile">
     <header class="header card">
       <div>
         <EcosystemProfileHeader {ecosystem} />
@@ -162,17 +161,17 @@
 </PrimaryColorThemer>
 
 <style>
-  .project-profile > * {
+  .ecosystem-profile > * {
     min-width: 0;
   }
 
-  .project-profile {
+  .ecosystem-profile {
     display: grid;
     grid-template-columns: 3fr minmax(auto, 18rem);
     gap: 3rem;
   }
 
-  .project-profile > * {
+  .ecosystem-profile > * {
     max-width: 100%;
   }
 
@@ -230,7 +229,7 @@
       height: auto;
     }
 
-    .project-profile {
+    .ecosystem-profile {
       gap: 1.5rem;
     }
 
