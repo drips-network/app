@@ -63,11 +63,6 @@
       ],
     },
     {
-      title: 'How it works',
-      type: 'link',
-      href: '/how-it-works',
-    },
-    {
       title: 'Blog',
       type: 'link',
       href: '/blog',
