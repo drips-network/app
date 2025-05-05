@@ -1,4 +1,3 @@
-import type { HttpMethod } from '@sveltejs/kit';
 import { z, type ZodSchema } from 'zod';
 import {
   startVotingRoundResponseSchema,
@@ -47,7 +46,7 @@ import type { OxString } from '../sdk/sdk-types';
 import network, { type ChainId } from '$lib/stores/wallet/network';
 
 async function _authenticatedCall<ST extends ZodSchema>(
-  method: HttpMethod,
+  method: 'GET' | 'POST' | 'DELETE',
   path: string,
   responseSchema: ST | undefined,
   body?: Record<string, unknown>,
