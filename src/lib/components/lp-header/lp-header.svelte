@@ -53,7 +53,6 @@
   type MenuItem = MenuLink | MenuDropdown;
 
   const menus: MenuItem[] = [
-    // Add index signature for stricter typing
     {
       title: 'Solutions',
       type: 'dropdown',
