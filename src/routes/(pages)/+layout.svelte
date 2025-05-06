@@ -1,5 +1,6 @@
 <script lang="ts">
   import '../../styles/app.css';
+  import { ProgressBar } from '@prgm/sveltekit-progress-bar';
 
   import '$lib/stores/theme/theme.store';
 
@@ -36,6 +37,8 @@
     });
   });
 </script>
+
+<ProgressBar color="var(--color-primary)" />
 
 <div class="main" data-uifont="inter">
   <main class="page">
