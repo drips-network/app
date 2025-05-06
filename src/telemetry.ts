@@ -62,9 +62,9 @@ if (requiredEnvVarsSet) {
               request.url?.endsWith('.mp3') ||
               request.url?.endsWith('.wav')
             ) {
-              return false;
+              return true;
             }
-            return true;
+            return false;
           },
         },
       }),
