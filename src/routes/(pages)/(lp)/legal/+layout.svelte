@@ -1,10 +1,8 @@
 <script>
-  import LpHeader from '$lib/components/lp-header/lp-header.svelte';
   import './longform-text.css';
 </script>
 
 <div class="wrapper legal-page">
-  <LpHeader />
   <div class="content">
     <slot />
   </div>
