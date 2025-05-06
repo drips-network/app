@@ -22,6 +22,11 @@ if (requiredEnvVarsSet) {
   const METRICS_URL = process.env.OTEL_EXPORTER_OTLP_ENDPOINT + '/v1/metrics';
   const SERVICE_NAME = process.env.OTEL_SERVICE_NAME;
 
+  console.log('👀 Telemetry initialized with the following settings:');
+  console.log('  OTEL_EXPORTER_OTLP_ENDPOINT:', TRACE_URL);
+  console.log('  OTEL_SERVICE_NAME:', SERVICE_NAME);
+  console.log('  OTEL_RESOURCE_ATTRIBUTES:', process.env.OTEL_RESOURCE_ATTRIBUTES);
+
   const traceExporter = new OTLPTraceExporter({
     url: TRACE_URL,
     headers: {},
