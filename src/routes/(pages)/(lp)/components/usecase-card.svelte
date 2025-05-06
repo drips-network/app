@@ -1,8 +1,9 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import type { ComponentType } from 'svelte';
-  import { fly } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import BezierEasing from 'bezier-easing';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
 
   export let icon: ComponentType;
   export let active = false;
@@ -39,6 +40,9 @@
           ? 'var(--color-primary)'
           : 'var(--color-primary-level-2)'}"
       />
+      {#if !active}
+        <div transition:fade={{ duration: 200 }}><ArrowRight /></div>
+      {/if}
     </div>
     <div class="text">
       <h2 class="extra-bold">
@@ -66,6 +70,11 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .icon {
+    display: flex;
+    justify-content: space-between;
   }
 
   .wrapper.pad-height {
@@ -132,5 +141,8 @@
     right: 0;
     width: 0px;
     transform: translate(-150px, -60%);
+  }
+
+  @media (pointer: coarse) {
   }
 </style>

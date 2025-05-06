@@ -80,7 +80,8 @@
 
     .illustration {
       flex-basis: 20rem;
-      display: block;
+      display: flex;
+      width: calc(100% - 1rem);
       max-height: 20rem;
       margin: 0 auto;
       margin-top: -3rem;

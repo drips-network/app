@@ -59,6 +59,9 @@
       entries: [
         { title: 'Dependency Funding', href: '/solutions/dependency-funding' },
         { title: 'RetroPGF Voting & Distribution', href: '/solutions/retro-pgf' },
+        { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
+        { title: 'Ecosystem funding', href: '/solutions/ecosystem-funding' },
+        { title: 'Hackathons', href: '/solutions/hackathons' },
       ],
     },
     {

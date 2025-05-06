@@ -12,9 +12,12 @@
   import BgGraph1 from './components/svgs/background-graph-1.svelte';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data;
 </script>
+
+<HeadMeta title="Drips | Funding that flows" />
 
 <div class="wrapper">
   <section class="hero">

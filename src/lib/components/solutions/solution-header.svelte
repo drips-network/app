@@ -37,4 +37,11 @@
   p {
     color: var(--color-foreground-level-6);
   }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2.5rem;
+      line-height: 3rem;
+    }
+  }
 </style>
