@@ -100,6 +100,8 @@ RUN npm run gql:build-types
 # While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
 RUN npm run build:app
 
+RUN npm run build:telemetry
+
 EXPOSE 8080
 
 # Run the app (this is not a build command, it runs /build/index.js)
