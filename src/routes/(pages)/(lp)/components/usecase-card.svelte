@@ -4,6 +4,7 @@
   import { fade, fly } from 'svelte/transition';
   import BezierEasing from 'bezier-easing';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
+  import isSafari from '$lib/utils/is-safari';
 
   export let icon: ComponentType;
   export let active = false;
@@ -19,6 +20,10 @@
   }
 
   const easing = BezierEasing(0.47, 0, 0.23, 2);
+
+  // Super ugly but Safari just simply cannot handle blur effect transitions at all.
+  // This is a dirty hack to mitigate that.
+  const disableBlurs = isSafari();
 </script>
 
 <div class="wrapper" class:pad-height={padHeight}>
@@ -32,6 +37,7 @@
     on:mouseenter={() => handleHover(true)}
     on:mouseleave
     on:mouseleave={() => handleHover(false)}
+    class:blurs={!disableBlurs}
   >
     <div class="icon">
       <svelte:component
@@ -97,7 +103,6 @@
       height 0.3s,
       box-shadow 0.3s,
       transform 0.3s,
-      filter 0.3s,
       background-color 0.3s;
   }
 
@@ -116,6 +121,9 @@
   .usecase-card.toned-down {
     transform: scale(0.95);
     background-color: var(--color-foreground-level-1);
+  }
+
+  .usecase-card.toned-down.blurs {
     filter: blur(0.8px);
   }
 
