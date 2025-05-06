@@ -106,6 +106,15 @@
       background-color 0.3s;
   }
 
+  .usecase-card.blurs {
+    transition:
+      filter 0.3s,
+      height 0.3s,
+      box-shadow 0.3s,
+      transform 0.3s,
+      background-color 0.3s;
+  }
+
   .usecase-card.pad-height {
     height: 175px;
   }
