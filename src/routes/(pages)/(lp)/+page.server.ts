@@ -81,5 +81,3 @@ export const load = async ({ fetch, request }) => {
     featuredLists,
   };
 };
-
-export const prerender = true;
