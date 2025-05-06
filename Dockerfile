@@ -64,6 +64,9 @@ ARG FAKE_PINATA_URL
 ARG PUBLIC_JUNCTION_URL
 ARG PUBLIC_INTERNAL_JUNCTION_URL
 
+ARG OTEL_EXPORTER_OTLP_ENDPOINT
+ARG OTEL_SERVICE_NAME
+
 RUN apt-get update \
  && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
@@ -100,4 +103,4 @@ RUN npm run build:app
 EXPOSE 8080
 
 # Run the app (this is not a build command, it runs /build/index.js)
-CMD ["node", "build"]
+CMD ["node", "build", "--require /app/build/telemetry.cjs"]
