@@ -7,6 +7,7 @@
   import { onMount } from 'svelte';
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
+  import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
   export let blogPost:
     | (Pick<z.infer<typeof metadataSchema>, 'title' | 'coverImage' | 'coverImageAlt'> & {
@@ -19,6 +20,7 @@
   export let description: string;
   export let dripList: DripListCardFragment | undefined;
   export let maxSplitRows: number | undefined = undefined;
+  export let chainOverride: SupportedChain | undefined = undefined;
 
   onMount(fiatEstimates.start);
 </script>
@@ -52,6 +54,7 @@
         hideDescription
         listingMode={true}
         data={{ dripList }}
+        {chainOverride}
       />
     </div>
   {/if}

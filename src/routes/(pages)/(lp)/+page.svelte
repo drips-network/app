@@ -11,6 +11,7 @@
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import BgGraph1 from './components/svgs/background-graph-1.svelte';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
+  import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
   export let data;
 </script>
@@ -44,7 +45,7 @@
         <CaseStudyCard
           maxSplitRows={5}
           dripList={data.featuredLists[
-            '52616587671615462427509444020197501845441172922070932614265487278307'
+            '31017209032870028068280040871339261037749177808773684797297972107972'
           ]}
           orgName="ENS"
           logoSrc="/assets/lp/ens-avatar.png"
@@ -58,8 +59,9 @@
 
       <div class="case-study">
         <CaseStudyCard
+          chainOverride={SupportedChain.Filecoin}
           dripList={data.featuredLists[
-            '52616587671615462427509444020197501845441172922070932614265487278307'
+            '45193817480599985262554974973835763972521255481357121508020698376704'
           ]}
           orgName="Filecoin"
           logoSrc="/assets/lp/filecoin.png"
@@ -72,7 +74,7 @@
       <div class="case-study">
         <CaseStudyCard
           dripList={data.featuredLists[
-            '52616587671615462427509444020197501845441172922070932614265487278307'
+            '41971962915943119138973997144514496143454239023249281594792952267407'
           ]}
           orgName="Scroll"
           logoSrc="/assets/lp/scroll-avatar.png"

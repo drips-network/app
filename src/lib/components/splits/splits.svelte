@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import SplitComponent from './components/split/split.svelte';
   import { type Splits, type SplitGroup } from './types';
 
@@ -13,6 +14,8 @@
   export let draft = false;
 
   export let disableTooltips = false;
+
+  export let chainOverride: SupportedChain | undefined = undefined;
 
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
@@ -56,6 +59,7 @@
         isNested={isGroup}
         split={listItem}
         {draft}
+        {chainOverride}
       />
     </li>
   {/each}
