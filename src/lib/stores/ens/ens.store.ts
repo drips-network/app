@@ -13,10 +13,9 @@ type State = {
   [address: string]: ResolvedRecord;
 };
 
-const mainnetProvider = getMainnetProvider();
-
 export default (() => {
   const state = writable<State>({});
+  const mainnetProvider = network.enableEns ? getMainnetProvider() : null;
 
   /**
    * Perform an ENS lookup for the provided address, and append the result to the
@@ -24,6 +23,10 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
+    if (!network.enableEns || !mainnetProvider) {
+      return undefined;
+    }
+
     const saved = get(state)[address];
     if (saved) return;
 
@@ -71,6 +74,10 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
+    if (!network.enableEns || !mainnetProvider) {
+      return undefined;
+    }
+
     const address = await safeReverseLookup(
       get(walletStore).provider,
       mainnetProvider,

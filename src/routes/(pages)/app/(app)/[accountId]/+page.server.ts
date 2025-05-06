@@ -13,20 +13,12 @@ import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/suppor
 import { isAddress } from 'ethers';
 import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { getMainnetProvider, safeReverseLookup } from '$lib/stores/ens/ens';
+import { JsonRpcProvider } from 'ethers';
 
-const currentNetworkProvider = new FailoverJsonRpcProvider(
-  mapFilterUndefined([network.rpcUrl, network.fallbackRpcUrl], (url) => url),
-  undefined,
-  undefined,
-  {
-    logger: console,
-  },
-);
+const currentNetworkProvider = new JsonRpcProvider(network.rpcUrl);
 
-const mainnetProvider = getMainnetProvider();
+const mainnetProvider = network.enableEns ? getMainnetProvider() : null;
 
 const PROFILE_PAGE_QUERY = gql`
   ${PROJECTS_SECTION_PROJECT_FRAGMENT}
@@ -63,6 +55,10 @@ const PROFILE_PAGE_QUERY = gql`
 `;
 
 async function resolveEnsFields(address: string) {
+  if (!mainnetProvider) {
+    return null;
+  }
+
   try {
     const ensName = await safeReverseLookup(
       currentNetworkProvider,
@@ -97,6 +93,10 @@ export const load = async ({ params, fetch }) => {
   if (isAddress(universalAccountId)) {
     address = universalAccountId;
   } else if ((universalAccountId as string).endsWith('.eth')) {
+    if (!mainnetProvider) {
+      return { error: true, type: 'ens-not-resolved' as const };
+    }
+
     const lookupRes = await safeReverseLookup(
       currentNetworkProvider,
       mainnetProvider,

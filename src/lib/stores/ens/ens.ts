@@ -1,7 +1,6 @@
 import { type AbstractProvider } from 'ethers';
 import { NETWORK_CONFIG } from '../wallet/network';
-import FailoverJsonRpcProvider from '$lib/utils/FailoverJsonRpcProvider';
-import filterFalsy from '$lib/utils/filter-falsy';
+import { JsonRpcProvider } from 'ethers';
 
 async function isAddressContract(provider: AbstractProvider, address: string) {
   return (await provider.getCode(address)) !== '0x';
@@ -9,12 +8,7 @@ async function isAddressContract(provider: AbstractProvider, address: string) {
 
 export function getMainnetProvider() {
   const mainnet = NETWORK_CONFIG[1];
-  return new FailoverJsonRpcProvider(
-    filterFalsy([mainnet.rpcUrl, mainnet.fallbackRpcUrl]),
-    undefined,
-    undefined,
-    { logger: console },
-  );
+  return new JsonRpcProvider(mainnet.rpcUrl);
 }
 
 /**
