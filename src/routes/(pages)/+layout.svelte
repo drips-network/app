@@ -1,12 +1,12 @@
 <script lang="ts">
   import '../../styles/app.css';
-  import { ProgressBar } from '@prgm/sveltekit-progress-bar';
 
   import '$lib/stores/theme/theme.store';
 
   import { onMount } from 'svelte';
   import scroll from '$lib/stores/scroll';
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
+  import NavProgressBar from '$lib/components/nav-progress-bar/nav-progress-bar.svelte';
 
   onMount(() => {
     scroll.attach();
@@ -38,7 +38,7 @@
   });
 </script>
 
-<ProgressBar color="var(--color-primary)" />
+<NavProgressBar color="var(--color-primary)" />
 
 <div class="main" data-uifont="inter">
   <main class="page">
