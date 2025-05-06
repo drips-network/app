@@ -49,6 +49,7 @@
       <DripListCard
         {maxSplitRows}
         hideSupporterPile
+        hideTotal
         openInNewTab
         clampTitle={false}
         hideDescription
