@@ -75,7 +75,7 @@
   .usecase-card {
     position: relative;
     user-select: none;
-    max-width: 340px;
+    max-width: 350px;
     padding: 1rem;
     background-color: var(--color-background);
     display: flex;

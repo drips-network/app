@@ -1,6 +1,7 @@
 <script>
   import RadworksLogo from '$lib/components/illustrations/radworks-logo.svelte';
   import SystemStatusBadge from '$lib/components/system-status-badge/system-status-badge.svelte';
+  import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
 </script>
 
 <footer>
@@ -25,7 +26,7 @@
 
   <div class="column">
     <h5>Get in touch</h5>
-    <a rel="noreferrer" target="_blank" href="/contact-form">Contact</a>
+    <a rel="noreferrer" target="_blank" href={INBOUND_LEAD_FORM_URL}>Contact</a>
     <a rel="noreferrer" target="_blank" href="https://discord.gg/BakDKKDpHF">Discord</a>
     <a rel="noreferrer" target="_blank" href="https://bsky.app/profile/drips.network">Bluesky</a>
     <a rel="noreferrer" target="_blank" href="https://x.com/dripsnetwork">X</a>

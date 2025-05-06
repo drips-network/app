@@ -1,5 +1,6 @@
 <script>
   import Button from '$lib/components/button/button.svelte';
+  import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
 </script>
 
 <div class="lp-contact-card">
@@ -8,7 +9,7 @@
     If you have a funding idea or a chain we’re not yet live on, let’s work together to build
     something for your use case.
   </p>
-  <Button>Talk to us</Button>
+  <Button href={INBOUND_LEAD_FORM_URL} target="_blank" rel="noreferrer">Talk to us</Button>
 </div>
 
 <style>

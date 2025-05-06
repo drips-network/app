@@ -10,6 +10,7 @@
   import TrustedBy from './components/trusted-by.svelte';
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
   import BgGraph1 from './components/svgs/background-graph-1.svelte';
+  import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
 
   export let data;
 </script>
@@ -23,7 +24,9 @@
       <h1>The easiest way to fund open-source in your ecosystem.</h1>
 
       <p style:color="var(--color-foreground-level-5)">Have a funding experiment to talk about?</p>
-      <Button variant="primary">Get in touch</Button>
+      <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank" rel="noreferrer"
+        >Get in touch</Button
+      >
       <div class="trusted-by">
         <TrustedBy />
       </div>
