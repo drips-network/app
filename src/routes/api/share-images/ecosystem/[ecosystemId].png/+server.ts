@@ -22,7 +22,8 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
       })
     : 'none';
 
-  const recipientsCount = ecosystem.graph.nodes.length;
+  // minus root node
+  const recipientsCount = ecosystem.graph.nodes.length - 1;
 
   const color = ecosystem.color ? ecosystem.color : 'none';
   const target = url.searchParams.get('target');

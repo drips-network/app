@@ -78,6 +78,7 @@
   import { STREAM_STATE_STREAM_FRAGMENT } from '$lib/utils/stream-state';
   import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import formatNumber from '$lib/utils/format-number';
 
   export let ecosystem: Ecosystem;
   export let ecosystemFragment: EcosystemProfileFragment | undefined;
@@ -87,13 +88,8 @@
 
   const imageBaseUrl = `/api/share-images/ecosystem/${encodeURIComponent(ecosystem.id as string)}.png`;
 
-  $: colorHex = ecosystem.color ? ecosystem.color : undefined;
-
-  const recipientsFormatter = new Intl.NumberFormat('en-US');
   // all nodes except the root node
-  $: recipientsFormatted = recipientsFormatter.format(
-    ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0,
-  );
+  $: recipientsFormatted = formatNumber(ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0);
 </script>
 
 <HeadMeta
@@ -107,7 +103,7 @@
   <link rel="canonical" href={`https://drips.network/app/ecosystems/${ecosystem.id}`} />
 </svelte:head>
 
-<PrimaryColorThemer {colorHex}>
+<PrimaryColorThemer colorHex={ecosystem.color}>
   <article class="ecosystem-profile">
     <header class="header card">
       <div>
