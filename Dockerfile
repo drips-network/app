@@ -105,4 +105,4 @@ RUN npm run build:telemetry
 EXPOSE 8080
 
 # Run the app (this is not a build command, it runs /build/index.js)
-CMD ["node", "build", "--require /app/build/telemetry.cjs"]
+CMD ["node", "build", "--require", "/app/build/telemetry.cjs"]
