@@ -17,7 +17,7 @@
   export let data;
 </script>
 
-<HeadMeta title="Drips | Funding that flows" />
+<HeadMeta title="Drips | Fund Open-Source In Your Ecosystem" />
 
 <div class="wrapper">
   <section class="hero">
