@@ -12,7 +12,9 @@
     <a rel="noreferrer" target="_blank" href="https://github.com/drips-network/app/issues/new"
       >Report a bug</a
     >
-    <a href="/solutions/dependency-funding">System status <SystemStatusBadge /></a>
+    <a rel="noreferrer" target="_blank" href="https://status.drips.network"
+      >System status <SystemStatusBadge /></a
+    >
   </div>
 
   <div class="column">
