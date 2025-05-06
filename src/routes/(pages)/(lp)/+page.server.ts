@@ -6,6 +6,9 @@ import { gql } from 'graphql-request';
 import network from '$lib/stores/wallet/network';
 import { fetchBlogPosts } from '$lib/utils/blog-posts';
 import { SupportedChain } from '$lib/graphql/__generated__/base-types';
+import cached from '$lib/utils/cache/remote/cached';
+import { redis } from '../../api/redis';
+import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 
 const FEATURED_DRIP_LISTS: { accountId: string; chain: SupportedChain }[] =
   {
@@ -74,7 +77,12 @@ export const load = async ({ fetch, request }) => {
     );
   };
 
-  const [featuredLists, blogPosts] = await Promise.all([fetchFeaturedLists(), fetchBlogPosts()]);
+  const [featuredLists, blogPosts] = await cached(
+    redis,
+    queryCacheKey(dripListQuery, JSON.stringify(FEATURED_DRIP_LISTS), 'homepage'),
+    60 * 60 * 6,
+    () => Promise.all([fetchFeaturedLists(), fetchBlogPosts()]),
+  );
 
   return {
     blogPosts,
