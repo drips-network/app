@@ -333,7 +333,7 @@
                     </div>
                   {/if}
                 </div>
-                <PaddedHorizontalScroll>
+                <PaddedHorizontalScroll disableScroll={listingMode}>
                   <div
                     class="splits-component"
                     style:pointer-events={listingMode ? 'none' : undefined}
