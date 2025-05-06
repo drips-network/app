@@ -8,6 +8,8 @@
 
   export let href: string | null = null;
 
+  export let elem: HTMLAnchorElement | HTMLButtonElement | null = null;
+
   let element: HTMLDivElement;
 
   const dispatch = createEventDispatcher<{ activate: Element; navigate: void }>();
@@ -16,11 +18,18 @@
     dispatch('activate', element);
   }
 
+  function handleClick() {
+    if (href) {
+      dispatch('navigate');
+    }
+  }
+
   $: externalLink = href && href.startsWith('http');
 </script>
 
 <svelte:element
   this={href ? 'a' : 'button'}
+  bind:this={elem}
   role="button"
   tabindex="0"
   {href}
@@ -29,6 +38,7 @@
   class="wrapper typo-text"
   on:mouseenter={handleHover}
   on:focus={handleHover}
+  on:click={handleClick}
   target={externalLink ? '_blank' : undefined}
   rel={externalLink ? 'noopener noreferrer' : undefined}
 >

@@ -55,6 +55,20 @@
           )}
         />
       </div>
+
+      <div class="case-study">
+        <CaseStudyCard
+          dripList={data.featuredLists[
+            '52616587671615462427509444020197501845441172922070932614265487278307'
+          ]}
+          orgName="Filecoin"
+          logoSrc="/assets/lp/filecoin.png"
+          logoAlt="Filecoin logo"
+          description="Filecoin is using Drips distribute & amplify the impact of funds from its RetroPGF program."
+          blogPost={data.blogPosts.find((p) => p.slug === 'amplifying-the-impact-of-funding')}
+        />
+      </div>
+
       <div class="case-study">
         <CaseStudyCard
           dripList={data.featuredLists[
@@ -65,20 +79,6 @@
           logoAlt="Scroll logo"
           description="Scroll used a Collaborative Drip List to vote on and fund their Level Up hackathon in Argentina."
           blogPost={data.blogPosts.find((p) => p.slug === 'scroll-argentinia-hackathon')}
-        />
-      </div>
-      <div class="case-study">
-        <CaseStudyCard
-          dripList={data.featuredLists[
-            '52616587671615462427509444020197501845441172922070932614265487278307'
-          ]}
-          orgName="Octant"
-          logoSrc="/assets/lp/octant-avatar.png"
-          logoAlt="Octant logo"
-          description="Octant committed a total of 23.2 ETH from its first two public goods funding rounds to fund its dependencies."
-          blogPost={data.blogPosts.find(
-            (p) => p.slug === 'octant-teams-up-with-drips-to-fund-its-dependencies',
-          )}
         />
       </div>
     </div>

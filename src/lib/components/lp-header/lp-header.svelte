@@ -11,7 +11,7 @@
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import scrollStore from '$lib/stores/scroll/scroll.store';
   import { onMount } from 'svelte';
-  import { fade, slide } from 'svelte/transition';
+  import { fade, fly, slide } from 'svelte/transition';
   import NewAnimation from './new-animation.svelte';
   import twemoji from '$lib/utils/twemoji';
   import HeaderNavItem from './header-nav-item.svelte';
@@ -92,6 +92,15 @@
     }
   }
 
+  function handleHamburgerClick() {
+    menuXOffset = null;
+    if (openMenu === 'all') {
+      openMenu = null;
+    } else {
+      openMenu = 'all';
+    }
+  }
+
   $: allMenusSorted = [
     ...menus.filter((menu) => menu.type === 'link'),
     ...menus.filter((menu) => menu.type === 'dropdown'),
@@ -99,7 +108,9 @@
 </script>
 
 {#if openMenu}
-  <div transition:fade={{ duration: 100 }} class="bg" />
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div transition:fade={{ duration: 100 }} class="bg" on:click={() => (openMenu = null)} />
 {/if}
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -113,16 +124,13 @@
 >
   <div class="top">
     <div class="left">
-      <button
-        class="hamburger"
-        on:click={() => handleMenuHover('all')}
-        on:mouseenter={() => (openMenu = null)}
-        on:focus={() => (openMenu = null)}
-      >
+      <button class="hamburger" on:click={handleHamburgerClick}>
         {#if openMenu === 'all'}
-          <Cross />
+          <div out:fly={{ duration: 300, y: -4 }} in:fly={{ duration: 300, y: 4 }}><Cross /></div>
         {:else}
-          <Hamburger />
+          <div out:fly={{ duration: 300, y: -4 }} in:fly={{ duration: 300, y: 4 }}>
+            <Hamburger />
+          </div>
         {/if}
       </button>
       <a
@@ -189,6 +197,7 @@
         </div>
       {:else if openMenu && openMenu !== 'all'}
         {@const currentMenu = menus.find((menu) => menu.title === openMenu)}
+
         {#if currentMenu?.type === 'dropdown'}
           <div class="menu-content" style:padding-bottom="1.75rem">
             {#each currentMenu.entries as entry}
@@ -332,6 +341,12 @@
 
   .hamburger {
     display: none;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .hamburger > div {
+    position: absolute;
   }
 
   @media (max-width: 1024px) {

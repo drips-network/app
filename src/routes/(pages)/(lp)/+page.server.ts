@@ -3,19 +3,27 @@ import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.
 import query from '$lib/graphql/dripsQL';
 import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-list-card.svelte';
 import { gql } from 'graphql-request';
-import { PUBLIC_NETWORK } from '$env/static/public';
 import network from '$lib/stores/wallet/network';
 import { fetchBlogPosts } from '$lib/utils/blog-posts';
+import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
-const FEATURED_DRIP_LISTS =
+const FEATURED_DRIP_LISTS: { accountId: string; chain: SupportedChain }[] =
   {
     1: [
-      '31017209032870028068280040871339261037749177808773684797297972107972',
-      '41971962915943119138973997144514496143454239023249281594792952267407',
-      '30178668158349445547603108732480118476541651095408979232800331391215',
+      {
+        accountId: '31017209032870028068280040871339261037749177808773684797297972107972',
+        chain: SupportedChain.Mainnet,
+      }, // ENS
+      {
+        accountId: '41971962915943119138973997144514496143454239023249281594792952267407',
+        chain: SupportedChain.Mainnet,
+      }, // Scroll
+      {
+        accountId: '45193817480599985262554974973835763972521255481357121508020698376704',
+        chain: SupportedChain.Filecoin,
+      }, // Filecoin
     ],
-    31337: ['52616587671615462427509444020197501845441172922070932614265487278307'],
-  }[PUBLIC_NETWORK] ?? [];
+  }[network.chainId as number] ?? [];
 
 export const load = async ({ fetch, request }) => {
   const isIframe = request.headers.get('Sec-Fetch-Dest') === 'iframe';
@@ -49,10 +57,10 @@ export const load = async ({ fetch, request }) => {
     Record<string, NonNullable<DripListQuery['dripList']>>
   > => {
     const results = await Promise.all(
-      FEATURED_DRIP_LISTS.map((listId) =>
+      FEATURED_DRIP_LISTS.map(({ accountId, chain }) =>
         query<DripListQuery, DripListQueryVariables>(
           dripListQuery,
-          { listId, chain: network.gqlName },
+          { listId: accountId, chain },
           fetch,
         ),
       ),
@@ -73,3 +81,5 @@ export const load = async ({ fetch, request }) => {
     featuredLists,
   };
 };
+
+export const prerender = true;
